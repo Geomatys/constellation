@@ -1,0 +1,8 @@
+#
+# Palette de couleurs allant du bleu
+# au rouge en passant par le blanc.
+#
+
+   000 000 255
+   255 255 255
+   255 000 000

@@ -1,0 +1,12 @@
+#
+# Palette de couleurs allant du blanc
+# au rouge en passant par cyan, jaune
+# et orange.
+#
+
+   255 255 255
+   000 255 255
+   000 255 000
+   255 255 000
+   255 180 000
+   255 000 000

@@ -1,0 +1,90 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+package net.sicade.observation.coverage;
+
+// J2SE dependencies
+import java.lang.reflect.UndeclaredThrowableException;
+
+// Geotools dependencies
+import org.geotools.coverage.SpatioTemporalCoverage3D;
+
+// Sicade dependencies.
+import net.sicade.observation.Station;
+import net.sicade.observation.CatalogException;
+
+
+/**
+ * Une paire {@linkplain Station station} - {@linkplain Descriptor descripteur}.
+ * Utilisée par {@link MeasurementTableFiller} pour déterminer un ordre optimal
+ * dans lequel ces éléments devraient être évalués.
+ *
+ * @version $Id$
+ * @author Martin Desruisseaux
+ */
+final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
+    /**
+     * La station.
+     */
+    public final Station station;
+
+    /**
+     * Le descripteur du paysage océanique.
+     */
+    public final Descriptor descriptor;
+
+    /**
+     * Construit une nouvelle paire pour la station et le descripteur spécifié.
+     */
+    public StationDescriptorPair(final Station station, final Descriptor descriptor) {
+        this.station    = station;
+        this.descriptor = descriptor;
+    }
+
+    /**
+     * Retourne la date à laquelle le descripteur sera évalué.
+     */
+    private long getTime() throws CatalogException {
+        return station.getTime().getTime() + Math.round((24*60*60*1000) * descriptor.getLocationOffset().getDayOffset());
+    }
+
+    /**
+     * Compare cette paire avec la paire spécifiée.
+     */
+    public int compareTo(final StationDescriptorPair that) {
+        final long t1, t2;
+        try {
+            t1 = this.getTime();
+            t2 = that.getTime();
+        } catch (CatalogException exception) {
+            // Sera traité de manière particulière par MeasurementTableFiller
+            throw new UndeclaredThrowableException(exception);
+        }
+        if (t1 < t2) return -1;
+        if (t1 > t2) return +1;
+        return 0;
+    }
+
+    /**
+     * Retourne une représentation textuelle de cette paire, à des fins de déboguage.
+     */
+    @Override
+    public String toString() {
+        return '(' + station.getName() + ", " + descriptor.getName() + ')';
+    }
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>package net.sicade.observation.coverage.sql</TITLE>
+  </HEAD>
+  <BODY>
+    Implémentation des interfaces du paquet {@link net.sicade.observation.coverage coverage}.
+
+    <p align="justify">Quelques unes des tables de ce paquet ne produisent
+    pas d'{@linkplain net.sicade.observation.Element éléments} du paquet
+    {@link net.sicade.observation observation}, mais produisent plutôt divers composantes qui
+    serviront à la création d'un objet {@link org.geotools.coverage.grid.GridCoverage2D}. Ces
+    composantes sont (en partant du plus haut niveau vers le plus détaillé):</p>
+
+    <ul>
+      <li><p align="justify">Une vue à trois dimensions (<var>x</var>,<var>y</var>,<var>t</var>) de
+          l'ensemble des données d'une {@linkplain net.sicade.observation.coverage.Descriptor descripteur},
+          que l'on peut accéder par la méthode {@linkplain net.sicade.observation.coverage.Descriptor#getCoverage
+          getCoverage()} sans se soucier des détails apparaissant ci-dessous.</p></li>
+
+      <li><p align="justify">Chaque séries d'images du point précédent possède un ensemble
+          d'objets {@link org.geotools.coverage.grid.GridCoverage2D}, qui sont créés par
+          {@link net.sicade.observation.coverage.sql.GridCoverageTable}.</p></li>
+
+      <li><p align="justify">Chaque object {@code GridCoverage2D} du point précédent possède
+          un ensemble d'objets {@link org.geotools.coverage.SampleDimension}, qui sont créés
+          par {@link net.sicade.observation.coverage.sql.SampleDimensionTable}.</p></li>
+
+      <li><p align="justify">Chaque objet {@code SampleDimension} du point précédent possède
+          un ensemble d'objets {@link org.geotools.coverage.Category}, qui sont créés par
+          {@link net.sicade.observation.coverage.sql.CategoryTable}.</p></li>
+    </ul>
+  </BODY>
+</HTML>

@@ -1,0 +1,13 @@
+#
+# Palette de couleurs bleu, cyan, blanc, jaune, rouge.
+# Utile pour les données en forme de cloche  dont la distribution va
+# de valeur négatives sans minimum bien définie (bleu)   jusqu'à des
+# valeurs positives sans maximum bien définie (rouge) en passant par
+# un 0 que l'on représente par le blanc.
+#
+
+   000 000 255
+   000 255 255
+   255 255 255
+   255 255 000
+   255 000 000

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+  Configuration du projet Sicade sur SourceForge.
+  Version: $Id$
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+
+
+  <!--
+    Description du projet (incluant la licence)
+  -->
+  <groupId>net.sicade</groupId>
+  <artifactId>seagis</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Projet SICADE</name>
+  <url>http://seagis.sourceforge.net</url>
+  <description>
+    Systèmes intégrés de connaissances pour l'aide à la décision en environnement.
+  </description>
+  <organization>
+    <name>Unité S140 (Espace)</name>
+    <url>http://www.espace.ird.fr/</url>
+  </organization>
+  <inceptionYear>2002</inceptionYear>
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:svn:https://svn.sourceforge.net/svnroot/seagis/trunk</connection>
+    <url>http://svn.sourceforge.net/viewcvs.cgi/seagis/trunk</url>
+  </scm>
+
+
+
+  <!--
+    Dépendences externes.
+    Tous les modules hériteront ces dépendences.
+  -->
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+
+
+  <!--
+    Liste des développeurs et des contributeurs.
+  -->
+  <developers>
+    <developer>
+      <id>desruisseaux</id>
+      <name>Martin Desruisseaux</name>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Unité S140 (Espace)</organization>
+      <roles>
+        <role>Administrateur du projet</role>
+        <role>Développeur Java</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+
+  <!--
+    Serveurs à partir desquels télécharger les dépendences.
+  -->
+  <repositories>
+    <repository>
+      <id>ibiblio</id>
+      <name>Ibiblio - the public's library and digital archive</name>
+      <url>http://www.ibiblio.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>geotools</id>
+      <name>Geotools - Geographic toolkit</name>
+      <url>http://maven.geotools.fr/repository</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+
+
+  <!--
+    Gestion des dépendences. Si un sous-module déclare une des dépendences suivante,
+    la version utilisée sera celle qui est spécifiée dans le bloc ci-dessous.
+  -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>8.1-407.jdbc3</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.units</groupId>
+        <artifactId>jsr108</artifactId>
+        <version>0.01</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opengis</groupId>
+        <artifactId>geoapi</artifactId>
+        <version>pending-20060215.095613-1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt2-referencing</artifactId>
+        <version>2.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt2-coverage</artifactId>
+        <version>2.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt2-widgets-swing</artifactId>
+        <version>2.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt2-migrate</artifactId>
+        <version>2.3-SNAPSHOT</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+
+
+  <!--
+    Compilation et création du fichier JAR.
+  -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>             <!-- The -source argument for the Java compiler.                           -->
+          <target>1.5</target>             <!-- The -target argument for the Java compiler.                           -->
+          <debug>true</debug>              <!-- Whether to include debugging information in the compiled class files. -->
+          <encoding>ISO-8859-1</encoding>  <!-- The -encoding argument for the Java compiler.                         -->
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+
+
+  <!--
+    Génération de la javadoc et du site web.
+  -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>            <!-- Necessary to enable javadoc to handle J2SE 1.5 features.           -->
+          <author>true</author>           <!-- Specifies whether or not the author text is included.              -->
+          <version>false</version>        <!-- Includes the version text in the generated docs.                   -->
+          <linksource>true</linksource>   <!-- Creates an HTML version of each source file (with line numbers).   -->
+          <noqualifier>all</noqualifier>  <!-- Omits qualifying package name from ahead of class names in output. -->
+          <quiet>true</quiet>             <!-- Shuts off non-error and non-warning messages.                      -->
+          <maxmemory>384M</maxmemory>     <!-- The maximum Java heap size to be used when launching the javadoc.  -->
+          <encoding>ISO-8859-1</encoding> <!-- Specifies the encoding name of the source files.                   -->
+          <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
+          <links>
+            <link>http://java.sun.com/j2se/1.5/docs/api</link>
+            <link>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs</link>
+            <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
+            <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
+            <link>http://javadoc.geotools.fr/snapshot</link>
+          </links>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <locales>fr</locales>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>surefire-report-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jxr-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>taglist-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+
+
+
+  <!--
+    Serveurs vers lesquels déployer la documentation.
+  -->
+  <distributionManagement>
+    <site>
+      <id>SourceForge</id>
+      <name>Site SourceForge</name>
+      <url>scp://seagis.sourceforge.net/home/groups/s/se/seagis/htdocs</url>
+    </site>
+  </distributionManagement>
+
+
+
+  <!--
+    Liste de tous les modules de SICADE.
+  -->
+  <modules>
+    <module>observations</module>
+  </modules>
+</project>
