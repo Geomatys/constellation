@@ -165,6 +165,13 @@ public class Table {
     }
 
     /**
+     * Retourne la base de données d'où provient cette table.
+     */
+    public final Database getDatabase() {
+        return database;
+    }
+
+    /**
      * Retourne une propriété pour la clé spécifiée. Cette méthode extrait la propriété de la
      * {@linkplain #database base de données} si elle est non-nulle, ou retourne une propriété
      * par défaut sinon.

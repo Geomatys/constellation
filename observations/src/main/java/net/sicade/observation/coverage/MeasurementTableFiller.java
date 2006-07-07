@@ -41,7 +41,7 @@ import net.sicade.observation.Measurement;
 import net.sicade.observation.ServerException;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.sql.MeasurementTable;
-import net.sicade.observation.gui.DescriptorChooser;
+import net.sicade.observation.coverage.sql.DescriptorTable;
 import net.sicade.resources.seagis.Resources;
 import net.sicade.resources.XArray;
 
@@ -99,6 +99,24 @@ public class MeasurementTableFiller implements Runnable {
     }
 
     /**
+     * Retourne l'ensemble des stations pour lesquelles on voudra calculer les descripteurs du
+     * paysage océanique. L'ensemble retourné est modifiable; il est possible d'ajouter ou de
+     * retirer des stations à prendre en compte en appelant {@link Set#add} ou {@link Set#remove}.
+     */
+    public Set<Station> stations() {
+        return stations;
+    }
+
+    /**
+     * Retourne l'ensemble des descripteurs à évaluer pour chaque station. L'ensemble retourné est
+     * modifiable; il est possible d'ajouter ou de retirer des descripteurs à prendre en compte en
+     * appelant {@link Set#add} ou {@link Set#remove}.
+     */
+    public Set<Descriptor> descriptors() {
+        return descriptors;
+    }
+
+    /**
      * Utilise un ensemble de stations par défaut pour lesquelles on voudra calculer les
      * descripteurs du paysage océanique. Cet ensemble est constitué de stations pour lesquelles
      * {@link MeasurementTable} pourrait avoir des données.
@@ -108,40 +126,24 @@ public class MeasurementTableFiller implements Runnable {
     public synchronized void addDefaultStations() throws CatalogException {
         Descriptor.LOGGER.info("Obtient l'ensemble des stations.");
         try {
-            addStations(measures.getStations());
+            stations.addAll(measures.getStations());
         } catch (SQLException exception) {
             throw new ServerException(exception);
         }
     }
 
     /**
-     * Ajoute des stations à l'ensemble de celles pour lesquelles on voudra calculer les
-     * descripteurs du paysage océanique.
+     * Utilise un ensemble de descripteurs par défaut à évaluer pour chaque station.
+     *
+     * @throws CatalogException si l'interrogation de la base de données a échouée.
      */
-    public synchronized void addStations(final Collection<Station> stations) {
-        this.stations.addAll(stations);
-    }
-
-    /**
-     * Retire des stations de l'ensemble de celles pour lesquelles on voudra calculer les
-     * descripteurs du paysage océanique.
-     */
-    public synchronized void removeStations(final Collection<Station> stations) {
-        this.stations.removeAll(stations);
-    }
-
-    /**
-     * Ajoute des descripteurs à l'ensemble de ceux qui seront à évaluer pour chaque station.
-     */
-    public synchronized void addDescriptors(final Collection<Descriptor> descriptors) {
-        this.descriptors.addAll(descriptors);
-    }
-
-    /**
-     * Retire des descripteurs à l'ensemble de ceux qui seront à évaluer pour chaque station.
-     */
-    public synchronized void removeDescriptors(final Collection<Descriptor> descriptors) {
-        this.descriptors.removeAll(descriptors);
+    public synchronized void addDefaultDescriptors() throws CatalogException {
+        Descriptor.LOGGER.info("Obtient l'ensemble des descripteurs.");
+        try {
+            descriptors.addAll(measures.getDatabase().getTable(DescriptorTable.class).getEntries());
+        } catch (SQLException exception) {
+            throw new ServerException(exception);
+        }
     }
 
     /**
@@ -165,6 +167,8 @@ public class MeasurementTableFiller implements Runnable {
      * @throws CatalogException si un problème est survenu lors des accès au catalogue.
      */
     public synchronized void execute() throws CatalogException {
+        final Set<Station>    stations    = stations();
+        final Set<Descriptor> descriptors = descriptors();
         if (descriptors.isEmpty()) {
             Descriptor.LOGGER.warning("L'ensemble des descripteurs est vide.");
             return;
@@ -180,29 +184,30 @@ public class MeasurementTableFiller implements Runnable {
          * en même temps des séries d'images différentes pour éviter de consommer trop de mémoire
          * lors de la création du tableau de paires stations-descripteurs plus bas.
          *
-         * Note: Nous cachons la variable de classe 'descriptors', qui contenait l'ensemble
-         *       des descripteurs,  par une variable locale de même nom qui ne contient que
-         *       les descripteurs de la même série. Ca ne change rien pour l'algorithme qui
-         *       suit,  excepté que cela peut jouer sur les performances et la consommation
-         *       de mémoire.
+         * Note: Nous remplaçont la variable de classe 'descriptors',  qui contenait l'ensemble
+         *       des descripteurs, par une liste locale qui ne contient que les descripteurs de
+         *       la même série. Ca ne change rien pour l'algorithme qui suit,  excepté que cela
+         *       peut jouer sur les performances et la consommation de mémoire.
          */
         while (!remaining.isEmpty()) {
             final Series series = remaining.getFirst().getPhenomenon();
-            final List<Descriptor> descriptors = new ArrayList<Descriptor>(remaining.size());
+            final List<Descriptor> descriptorList = new ArrayList<Descriptor>(remaining.size());
             for (final Iterator<Descriptor> it=remaining.iterator(); it.hasNext();) {
                 final Descriptor descriptor = it.next();
                 if (Utilities.equals(descriptor.getPhenomenon(), series)) {
-                    descriptors.add(descriptor);
+                    descriptorList.add(descriptor);
                     it.remove();
                 }
             }
-            if (descriptors.isEmpty())   throw new AssertionError(series);
-            assert Collections.disjoint(descriptors, remaining) : series;
-            assert this.descriptors.containsAll(descriptors)    : series;
+            if (descriptorList.isEmpty()) {
+                throw new AssertionError(series);
+            }
+            assert Collections.disjoint(descriptorList, remaining) : series;
+            assert descriptors.containsAll(descriptorList) : series;
             Descriptor.LOGGER.info("Traitement de la série \"" + series.getName() +
-                                   "\" (" + descriptors.size() + " descripteurs)");
+                                   "\" (" + descriptorList.size() + " descripteurs)");
             /*
-             * La variable locale 'descriptors' ne contient maintenant qu'un sous-ensemble des
+             * La variable locale 'descriptorList' ne contient maintenant qu'un sous-ensemble des
              * descripteurs pour une même série. On voudra évaluer ces descripteurs aux positions
              * des stations, mais pas nécessairement dans l'ordre chronologique des stations.
              * L'ordre dépendra aussi des décalages temporelles des descripteurs, car l'objectif
@@ -210,10 +215,10 @@ public class MeasurementTableFiller implements Runnable {
              * stations 10 jours plus tard mais qui souhaite les valeurs environnementales 10 jours
              * auparavant) avant de passer à l'image suivante.
              */
-            StationDescriptorPair[] pairs = new StationDescriptorPair[descriptors.size() * stations.size()];
+            StationDescriptorPair[] pairs = new StationDescriptorPair[descriptorList.size() * stations.size()];
             final Map<Descriptor,SpatioTemporalCoverage3D> coverages = new IdentityHashMap<Descriptor,SpatioTemporalCoverage3D>();
             int index = 0;
-            for (final Descriptor descriptor : descriptors) {
+            for (final Descriptor descriptor : descriptorList) {
                 if (coverages.put(descriptor, new SpatioTemporalCoverage3D(null, descriptor.getCoverage())) != null) {
                     throw new AssertionError(descriptor);
                 }
@@ -335,54 +340,5 @@ public class MeasurementTableFiller implements Runnable {
      */
     public void cancel() {
         cancel = true;
-    }
-
-    /**
-     * Composante graphique pour démarrer le remplissage de la table des mesures. Cette composante
-     * graphique demandera à l'utilisateur de sélectionner un sous-ensemble de descripteurs parmis
-     * les descripteurs qui ont été spécifiés à {@link MeasurementTableFiller}. Si l'utilisateur
-     * appuie sur le bouton "Exécuter" après cette sélection, alors cette objet appelera
-     * {@link MeasurementTableFiller#execute} pour les descripteurs sélectionnés.
-     * <p>
-     * Pour faire apparaître cette composante graphique et permettre ainsi le lancement du
-     * remplissage de la table des mesures, appelez {@link #show}.
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    public class Starter extends DescriptorChooser {
-        /**
-         * Construit une composante graphique pour les descripteurs actuellement déclarés dans
-         * l'objet {@link MeasurementTableFiller}.
-         */
-        public Starter() {
-            super(descriptors);
-        }
-
-        /**
-         * Appelée automatiquement lorsque l'utilisateur a appuyé sur le bouton "Exécuter".
-         * L'implémentation par défaut réduit les descripteur de {@link MeasurementTableFiller}
-         * à l'ensemble sélectionné par l'utilisateur, et appelle
-         * {@link MeasurementTableFiller#start start()}.
-         */
-        @Override
-        protected void execute() {
-            synchronized (MeasurementTableFiller.this) {
-                descriptors.clear();
-                addDescriptors(getDescriptors(true));
-                start();
-            }
-        }
-
-        /**
-         * Appelée automatiquement lorsque l'utilisateur a appuyé sur le bouton "Annuler".
-         * L'implémentation par défaut interrompt l'exécution lancée par
-         * {@link MeasurementTableFiller#start start()}.
-         */
-        @Override
-        protected void cancel() {
-            cancel = true;
-            super.cancel();
-        }
     }
 }

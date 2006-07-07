@@ -86,7 +86,6 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
-
     <repository>
       <id>geotools</id>
       <name>Geotools - Geographic toolkit</name>
@@ -137,7 +136,12 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-migrate</artifactId>
+        <artifactId>gt2-go</artifactId>
+        <version>2.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt2-openoffice</artifactId>
         <version>2.3-SNAPSHOT</version>
       </dependency>
     </dependencies>
@@ -160,7 +164,6 @@
           <encoding>ISO-8859-1</encoding>  <!-- The -encoding argument for the Java compiler.                         -->
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -193,7 +196,32 @@
           <noqualifier>all</noqualifier>  <!-- Omits qualifying package name from ahead of class names in output. -->
           <quiet>true</quiet>             <!-- Shuts off non-error and non-warning messages.                      -->
           <maxmemory>384M</maxmemory>     <!-- The maximum Java heap size to be used when launching the javadoc.  -->
-          <encoding>ISO-8859-1</encoding> <!-- Specifies the encoding name of the source files.                   -->
+          <encoding>ISO-8859-1</encoding> <!-- The encoding name of the source files.                             -->
+          <locale>fr</locale>             <!-- The locale that javadoc uses when generating documentation.        -->
+          <overview>                      <!-- The text for the overview documentation.                           -->
+            ${project.build.sourceDirectory}/overview.html
+          </overview>
+          <additionalparam>-keywords</additionalparam>
+          <excludePackageNames>net.sicade.resources</excludePackageNames>
+          <!-- Separates packages on the overview page into whatever groups is specified. -->
+          <groups>
+            <group>
+              <title>Interfaces graphiques</title>
+              <packages>net.sicade.gui*</packages>
+            </group>
+            <group>
+              <title>Calculs numériques</title>
+              <packages>net.sicade.numeric*</packages>
+            </group>
+            <group>
+              <title>Observations</title>
+              <packages>net.sicade.observation*</packages>
+            </group>
+            <group>
+              <title>Observations &lt;font size='-1'&gt;(implémentations)&lt;/font&gt;</title>
+              <packages>net.sicade.observation.sql*:net.sicade.observation.coverage.sql*:net.sicade.observation.coverage.rmi*:net.sicade.observation.fishery.sql*</packages>
+            </group>
+          </groups>
           <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
           <links>
             <link>http://java.sun.com/j2se/1.5/docs/api</link>
@@ -201,7 +229,13 @@
             <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
             <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
             <link>http://javadoc.geotools.fr/snapshot</link>
+            <link>http://jsr-108.sourceforge.net/javadoc</link>
           </links>
+          <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in
+               doc comments. Note: <placement/> should be a combinaison of the letters Xaoptcmf. -->
+          <tags>
+            <tag><name>todo</name><placement>tfmc</placement><head>TODO:</head></tag>
+          </tags>
         </configuration>
       </plugin>
       <plugin>
@@ -249,6 +283,9 @@
     Liste de tous les modules de SICADE.
   -->
   <modules>
+    <module>numeric</module>
     <module>observations</module>
+    <module>widgets</module>
+    <module>openoffice</module>
   </modules>
 </project>

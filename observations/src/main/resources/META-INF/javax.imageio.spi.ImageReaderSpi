@@ -1,0 +1,4 @@
+org.geotools.image.io.RawBinaryImageReader$Spi
+net.sicade.image.io.raw.RawReaderSpi
+net.sicade.image.io.text.TextReaderSpi
+net.sicade.image.io.hdf.CHL_ReaderSpi

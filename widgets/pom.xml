@@ -19,12 +19,12 @@
     Description du module.
   -->
   <groupId>net.sicade</groupId>
-  <artifactId>seagis-observations</artifactId>
+  <artifactId>seagis-widgets</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Observations et mesures</name>
+  <name>Interfaces utilisateur</name>
   <description>
-    Utilitaires dédiés à l'exploitation d'une base de données PostgreSQL contenant un ensemble de mesures.
+    Interfaces graphiques pilotant les connections à la base de données et l'affichage des résultats.
   </description>
 
 
@@ -52,10 +52,6 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
     </dependency>
@@ -67,35 +63,14 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-widgets-swing</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-go</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.sicade</groupId>
+      <artifactId>seagis-observations</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
-
-
-
-  <!--
-    Compilation et création du fichier JAR. Par rapport à la configuration
-    définie dans le pom.xml parent, on ajoute la compilation des stubs RMI.
-  -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.geotools</groupId>
-        <artifactId>gt2-rmic</artifactId>
-        <version>2.3-SNAPSHOT</version>
-        <configuration>
-          <includes>
-            net.sicade.observation.coverage.rmi.Server,
-            net.sicade.observation.coverage.rmi.RemoteLoader,
-            net.sicade.observation.coverage.rmi.GridCoverageServer
-          </includes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>rmic</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
