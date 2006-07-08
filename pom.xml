@@ -131,6 +131,11 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
+        <artifactId>gt2-api</artifactId>
+        <version>2.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
         <artifactId>gt2-widgets-swing</artifactId>
         <version>2.3-SNAPSHOT</version>
       </dependency>
@@ -142,6 +147,11 @@
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-openoffice</artifactId>
+        <version>2.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt2-epsg-hsql</artifactId>
         <version>2.3-SNAPSHOT</version>
       </dependency>
     </dependencies>
@@ -216,10 +226,6 @@
             <group>
               <title>Observations</title>
               <packages>net.sicade.observation*</packages>
-            </group>
-            <group>
-              <title>Observations &lt;font size='-1'&gt;(implémentations)&lt;/font&gt;</title>
-              <packages>net.sicade.observation.sql*:net.sicade.observation.coverage.sql*:net.sicade.observation.coverage.rmi*:net.sicade.observation.fishery.sql*</packages>
             </group>
           </groups>
           <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->

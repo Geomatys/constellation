@@ -37,14 +37,26 @@
       <id>desruisseaux</id>
       <name>Martin Desruisseaux</name>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Unité S140 (Espace)</organization>
+      <organization>IRD Unité S140</organization>
       <roles>
         <role>Administrateur du projet</role>
         <role>Développeur Java</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
   </developers>
-
+  <contributors>
+    <contributor>
+      <name>Antoine Hnawia</name>
+      <email>antoine.hnawia@noumea.ird.nc</email>
+      <organization>IRD Unité S140</organization>
+      <organizationUrl>http://www.espace.ird.nc</organizationUrl>
+      <roles>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+11</timezone>
+    </contributor>
+  </contributors>
 
 
   <!--
