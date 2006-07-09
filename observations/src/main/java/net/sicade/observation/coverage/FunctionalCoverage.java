@@ -50,7 +50,7 @@ import static java.lang.Double.isInfinite;
 
 
 /**
- * Un couverture à une seule bande dont les valeurs sont calculées par une fonction plutôt que
+ * Une couverture à une seule bande dont les valeurs sont calculées par une fonction plutôt que
  * déterminée à partir de données. Le système de référence des coordonnées est fixé à celui de
  * {@link CRS#XYT}.
  * <p>

@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+OpenIDE-Module: net.sicade.sie
+OpenIDE-Module-Layer: net/sicade/sie/layer.xml
+OpenIDE-Module-Localizing-Bundle: net/sicade/sie/Bundle.properties
+OpenIDE-Module-Specification-Version: 0.1
+
+Name: net/sicade/sie/type/bbox/Loader.class
+OpenIDE-Module-Class: Loader
+

@@ -56,6 +56,16 @@
       </roles>
       <timezone>+11</timezone>
     </contributor>
+    <contributor>
+      <name>Touraivane</name>
+      <email>touraivane@univ-nc.nc</email>
+      <organization>Université de la Nouvelle-Calédonie</organization>
+      <organizationUrl>http://www.univ-nc.nc</organizationUrl>
+      <roles>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+11</timezone>
+    </contributor>
   </contributors>
 
 
