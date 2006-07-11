@@ -18,37 +18,33 @@
  */
 package net.sicade.observation.coverage;
 
-// JUnit dependencies
+// J2SE dependencies
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import junit.framework.TestCase;
-
-// OpenGIS dependencies
-import org.opengis.coverage.Coverage;
+import java.io.IOException;
+import java.sql.SQLException;
 
 // Geotools dependencies
 import org.geotools.resources.CRSUtilities;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 // Sicade dependencies
 import net.sicade.observation.sql.CRS;
-import net.sicade.observation.Observations;
-import net.sicade.observation.CatalogException;
-
 
 /**
  * Evalue les prédictions d'un modèle linéaire.
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.
  */
-public class ModelTest extends TestCase {
+public class ModelTest extends AbstractTest {
     /**
      * Définir à {@code true} pour afficher des informations de déboguage.
      */
@@ -70,7 +66,7 @@ public class ModelTest extends TestCase {
      * Initialise cette suite de test.
      */
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws SQLException, IOException {
         super.setUp();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CANADA);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -91,33 +87,5 @@ public class ModelTest extends TestCase {
         position.setOrdinate(1, latitude);
         position.setOrdinate(2, crs.toValue(d));
         return position;
-    }
-
-    /**
-     * Testes des valeurs prédites par le modèle.
-     */
-    public void testModel() throws ParseException, CatalogException {
-        final Observations observations = Observations.getDefault();
-        final Series series = observations.getSeries(
-                new GeographicBoundingBoxImpl(155, 165, -20, -15), null,
-                "Potentiel de pêche ALB-optimal (Calédonie)");
-        final LinearModel model = (LinearModel) series.getModel();
-        if (verbose) {
-            System.out.println(model);
-            for (final LinearModel.Term t : model.getTerms()) {
-                for (final Descriptor d : t.getDescriptors()) {
-                    System.out.print(d.getNumericIdentifier());
-                    System.out.print(' ');
-                }
-                System.out.println(t);
-            }
-        }
-        double[] buffer = null;
-        final Coverage coverage = model.asCoverage();
-        final GeneralDirectPosition position = createPosition(160.1666666666666666666666,
-                                                              -19.8833333333333333333333,
-                                                              "2000-11-06 12:00");
-        buffer = coverage.evaluate(position, buffer);
-        final double value = buffer[0];
     }
 }

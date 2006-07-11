@@ -42,7 +42,7 @@ import net.sicade.observation.sql.Database;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class EvaluateTest extends TestCase {
+public class AbstractTest extends TestCase {
     /**
      * Connexion vers la base de données.
      */
@@ -62,7 +62,7 @@ public class EvaluateTest extends TestCase {
     /**
      * Construit la suite de tests.
      */
-    public EvaluateTest(final String name) {
+    public AbstractTest(final String name) {
         super(name);
     }
 

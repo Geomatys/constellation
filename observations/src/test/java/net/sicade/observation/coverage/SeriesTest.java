@@ -1,6 +1,5 @@
 /*
- * Sicade - Systèmes intégrés de connaissances
- *          pour l'aide à la décision en environnement
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
@@ -57,8 +56,10 @@ import net.sicade.observation.coverage.sql.GridCoverageTable;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.
  */
-public class SeriesTest extends EvaluateTest {
+public class SeriesTest extends AbstractTest {
     /**
      * {@code true} pour désactiver tous les tests (sauf typiquement un test en particulier que l'on
      * souhaite suivre pas à pas). La valeur de ce champ devrait être toujours {@code false} sauf en
@@ -79,7 +80,28 @@ public class SeriesTest extends EvaluateTest {
     }
 
     /**
-     * Etablit la connexion avec la base de données.
+     * Retourne la suite de tests.
+     */
+    public static Test suite() {
+        TestSuite suite = new TestSuite(SeriesTest.class);
+        return suite;
+    }
+
+    /**
+     * Exécute la suite de tests à partir de la ligne de commande.
+     */
+    public static void main(final String[] args) {
+        MonolineFormatter.init("org.geotools");
+        MonolineFormatter.init("net.sicade");
+        final Arguments arguments = new Arguments(args);
+        Locale.setDefault(arguments.locale);
+        junit.textui.TestRunner.run(suite());
+    }
+
+    /**
+     * Etablit la connexion avec la base de données. Cette connexion ne sera établie que la
+     * première fois où un test sera exécuté. Pour la fermeture des connections, on se fiera
+     * au rammase-miettes et aux "shutdown hooks" mis en place par {@code Database}.
      */
     @Override
     protected void setUp() throws SQLException, IOException {
@@ -90,7 +112,11 @@ public class SeriesTest extends EvaluateTest {
     }
 
     /**
-     * Construit la couverture 3D pour la série spécifiée.
+     * Construit la couverture 3D pour la série spécifiée. La résultat sera placé
+     * dans le champ {@link #coverage}.
+     *
+     * @param seriesName  Nom de la série pour laquelle on veut une couverture 3D.
+     * @param interpolate {@code true} si les interpolations sont autorisées.
      */
     private void createCoverage3D(final String seriesName, final boolean interpolate)
             throws CatalogException, SQLException, IOException
@@ -118,7 +144,7 @@ public class SeriesTest extends EvaluateTest {
     public void testSeries() throws Exception {
         if (DISABLED) return;
         final SeriesTable table = database.getTable(SeriesTable.class);
-        final Set<Series> all   = table.getEntries();
+        final Set<Series> all = table.getEntries();
         assertFalse(all.isEmpty());
         final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(-60, 40, 15, 80);
         table.setGeographicBoundingBox(bbox);
@@ -130,169 +156,5 @@ public class SeriesTest extends EvaluateTest {
         assertTrue (selected.size() < all.size());
         assertTrue (all.containsAll(selected));
         assertFalse(selected.containsAll(all));
-
-        final double EPS = 1E-7;
-        Series series = table.getEntry("SST (Nouvelle-Calédonie - synthèse 5 jours - Centrée)");
-        GeographicBoundingBox b = series.getGeographicBoundingBox();
-        assertEquals(5,   b.getNorthBoundLatitude(), EPS);
-        assertEquals(136, b.getWestBoundLongitude(), EPS);
-        assertEquals(-65, b.getSouthBoundLatitude(), EPS);
-        assertEquals(196, b.getEastBoundLongitude(), EPS);
-        series = table.getEntry("SST (Réunion - synthèse 5 jours)");
-        b = series.getGeographicBoundingBox();
-        // TODO: Tester le "bounding box".
-    }
-
-    /**
-     * Teste quelques valeurs de chlorophylle.
-     */
-    public void testCHL_historique() throws Exception {
-        if (DISABLED) return;
-        createCoverage3D("CHL (Monde - hebdomadaires) - historique", false);
-//        assertEquals(0.0851138f, evaluate(66.6100,  -3.2100, "24/12/1997"), 0.00001f);
-//        assertEquals(0.0851138f, evaluate(60.9576, -11.6657, "15/03/1998"), 0.00001f);
-        assertTrue  (Float.isNaN(evaluate(52.6300,  +3.6600, "15/06/1999")));
-    }
-
-    /**
-     * Teste quelques valeurs de chlorophylle.
-     */
-    public void testCHL() throws Exception {
-        if (DISABLED) return;
-        createCoverage3D("CHL (Monde - hebdomadaires)", false);
-        assertEquals(0.116291724f, evaluate(66.6100,  -3.2100, "24/07/2002"), 0.00001f);
-        assertEquals(0.6477361f,   evaluate(52.6300,  +3.6600, "15/06/2004"), 0.00001f);
-        assertTrue  (Float.isNaN(  evaluate(60.9576, -11.6657, "15/03/2003")));
-    }
-
-    /**
-     * Teste quelques valeurs de hauteur de l'eau sur une seule image.
-     */
-    public void testSLA1() throws Exception {
-        if (DISABLED) return;
-        final GridCoverageTable table;
-        CoverageReference       entry;
-        GridCoverage2D          grid;
-        final GridRange         fullRange;
-        final GridRange         clippedRange;
-        double[]                output = null;
-        final double            EPS = 0.0001;
-
-        table = database.getTable(GridCoverageTable.class);
-        table.setSeries(series.getEntry("SLA (Monde - TP/ERS)"));
-        table.setTimeRange(dateFormat.parse("01/03/1996"), dateFormat.parse("02/03/1996"));
-        entry     = table.getEntry();
-        grid      = entry.getCoverage(null);
-        fullRange = grid.getGridGeometry().getGridRange();
-        assertEquals(  4.1, (output=grid.evaluate(new Point2D.Double(12.00+.25/2, -61.50+.25/2), output))[0], EPS);
-        assertEquals( 11.7, (output=grid.evaluate(new Point2D.Double(17.00+.25/2, -52.25+.25/2), output))[0], EPS);
-        assertEquals( 15.0, (output=grid.evaluate(new Point2D.Double(20.00+.25/2, -41.25+.25/2), output))[0], EPS);
-        assertEquals( -0.1, (output=grid.evaluate(new Point2D.Double(22.50+.25/2,  75.25+.25/2), output))[0], EPS);
-        /*
-         * Essaie de réduire la région d'intérêt, et vérifie que l'on obtient les mêmes valeurs.
-         */
-        final GeographicBoundingBox subarea = new GeographicBoundingBoxImpl(15, 25, -65, 80);
-        table.setGeographicBoundingBox(subarea);
-        assertEquals(subarea, table.getGeographicBoundingBox());
-        entry        = table.getEntry();
-        grid         = entry.getCoverage(null);
-        clippedRange = grid.getGridGeometry().getGridRange();
-        assertTrue(clippedRange.getLength(0) < fullRange.getLength(0));
-        assertTrue(clippedRange.getLength(1) < fullRange.getLength(1));
-        assertEquals(  4.1, (output=grid.evaluate(new Point2D.Double(12.00+.25/2, -61.50+.25/2), output))[0], EPS);
-        assertEquals( 11.7, (output=grid.evaluate(new Point2D.Double(17.00+.25/2, -52.25+.25/2), output))[0], EPS);
-        assertEquals( 15.0, (output=grid.evaluate(new Point2D.Double(20.00+.25/2, -41.25+.25/2), output))[0], EPS);
-        assertEquals( -0.1, (output=grid.evaluate(new Point2D.Double(22.50+.25/2,  75.25+.25/2), output))[0], EPS);
-    }
-
-    /**
-     * Teste quelques valeurs de hauteur de l'eau.
-     */
-    public void testSLA() throws Exception {
-        if (DISABLED) return;
-        createCoverage3D("SLA (Monde - TP/ERS)", false);
-        assertEquals( 20.4f, evaluate(60.9576, -11.6657, "15/03/1998"), 0.0001f);
-        assertEquals(-10.9f, evaluate(61.7800,  -3.5100, "06/01/1997"), 0.0001f);
-        assertEquals( 20.5f, evaluate(49.6000,  -5.8600, "03/03/1993"), 0.0001f);
-
-        // Valeurs puisées dans les fichiers textes.
-        assertEquals(  4.1f, evaluate(12.00+.25/2, -61.50+.25/2, "01/03/1996"), 0.0001f);
-        assertEquals( 11.7f, evaluate(17.00+.25/2, -52.25+.25/2, "01/03/1996"), 0.0001f);
-        assertEquals( 15.0f, evaluate(20.00+.25/2, -41.25+.25/2, "01/03/1996"), 0.0001f);
-        assertEquals( -0.1f, evaluate(22.50+.25/2,  75.25+.25/2, "01/03/1996"), 0.0001f);
-
-        // Valeurs puisées dans les fichiers textes aux même positions deux jours consécutifs.
-        assertEquals(  4.5f, evaluate( 6.75+.25/2,  77.00+.25/2, "04/07/1999"), 0.0001f);
-        assertEquals(-18.1f, evaluate(15.25+.25/2,  35.00+.25/2, "04/07/1999"), 0.0001f);
-        assertEquals(-40.0f, evaluate(17.25+.25/2, -40.75+.25/2, "04/07/1999"), 0.0001f);
-        assertEquals( 13.9f, evaluate(21.25+.25/2, -45.50+.25/2, "04/07/1999"), 0.0001f);
-
-        assertEquals(  3.5f, evaluate( 6.75+.25/2,  77.00+.25/2, "14/07/1999"), 0.0001f);
-        assertEquals(-13.5f, evaluate(15.25+.25/2,  35.00+.25/2, "14/07/1999"), 0.0001f);
-        assertEquals(-38.1f, evaluate(17.25+.25/2, -40.75+.25/2, "14/07/1999"), 0.0001f);
-        assertEquals(  8.3f, evaluate(21.25+.25/2, -45.50+.25/2, "14/07/1999"), 0.0001f);
-
-        createCoverage3D("SLA (Monde - TP/ERS)", true);
-        // Utilise une tolérance égale à la pente de la droite reliant les deux points
-        // dans le temps: (SLA2 - SLA1) / 10 jours.  Autrement dit, accepte une erreur
-        // de 24 heures dans la date.
-        assertEquals(  4.5f, evaluate( 6.75+.25/2,  77.00+.25/2, "04/07/1999"), 0.10f);
-        assertEquals(-18.1f, evaluate(15.25+.25/2,  35.00+.25/2, "04/07/1999"), 0.46f);
-        assertEquals(-40.0f, evaluate(17.25+.25/2, -40.75+.25/2, "04/07/1999"), 0.19f);
-        assertEquals( 13.9f, evaluate(21.25+.25/2, -45.50+.25/2, "04/07/1999"), 0.56f);
-
-        assertEquals(  3.5f, evaluate( 6.75+.25/2,  77.00+.25/2, "14/07/1999"), 0.10f);
-        assertEquals(-13.5f, evaluate(15.25+.25/2,  35.00+.25/2, "14/07/1999"), 0.46f);
-        assertEquals(-38.1f, evaluate(17.25+.25/2, -40.75+.25/2, "14/07/1999"), 0.19f);
-        assertEquals(  8.3f, evaluate(21.25+.25/2, -45.50+.25/2, "14/07/1999"), 0.56f);
-
-        assertEquals(  4.0f, evaluate( 6.75+.25/2,  77.00+.25/2, "09/07/1999"), 0.10f);
-        assertEquals(-15.8f, evaluate(15.25+.25/2,  35.00+.25/2, "09/07/1999"), 0.46f);
-        assertEquals(-39.1f, evaluate(17.25+.25/2, -40.75+.25/2, "09/07/1999"), 0.19f);
-        assertEquals( 11.1f, evaluate(21.25+.25/2, -45.50+.25/2, "09/07/1999"), 0.56f);
-    }
-
-    /**
-     * Teste une valeur de pente.
-     */
-//    public void testPente() throws Exception {
-//        if (DISABLED) return;
-//        final GridCoverage2D coverage = series.getEntry("Pente").getCoverageReferences()
-//                                              .iterator().next().getCoverage(null);
-//        coverage.show();
-//        Thread.currentThread().sleep(50000);
-//        assertEquals(11.1f, evaluate(166.0, -22.0, "01/01/2006"), 0.01f);
-//        createCoverage3D("Pente", true);
-//        assertEquals(11.1f, evaluate(166.0, -22.0, "01/01/2006"), 0.01f);
-//    }
-
-    /**
-     * Teste l'obtention d'une image d'un nom spécifique.
-     */
-    public void testNamed() throws Exception {
-        if (DISABLED) return;
-        final GridCoverageTable table = database.getTable(GridCoverageTable.class);
-        table.setSeries(series.getEntry("Potentiel de pêche (Calédonie) ALB-opérationnel"));
-        CoverageReference reference = table.getEntry("PP20060611");
-        assertTrue(reference.getName().endsWith("PP20060611"));
-    }
-
-    /**
-     * Retourne la suite de tests.
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite(SeriesTest.class);
-        return suite;
-    }
-
-    /**
-     * Exécute la suite de tests à partir de la ligne de commande.
-     */
-    public static void main(final String[] args) {
-        MonolineFormatter.init("org.geotools");
-        MonolineFormatter.init("net.sicade");
-        final Arguments arguments = new Arguments(args);
-        Locale.setDefault(arguments.locale);
-        junit.textui.TestRunner.run(suite());
     }
 }

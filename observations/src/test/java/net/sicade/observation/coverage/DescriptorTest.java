@@ -39,8 +39,10 @@ import net.sicade.observation.coverage.sql.DescriptorTable;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.
  */
-public class DescriptorTest extends EvaluateTest {
+public class DescriptorTest extends AbstractTest {
     /**
      * Connexion vers la table des descripteurs.
      */
@@ -51,6 +53,25 @@ public class DescriptorTest extends EvaluateTest {
      */
     public DescriptorTest(final String name) {
         super(name);
+    }
+
+    /**
+     * Retourne la suite de tests.
+     */
+    public static Test suite() {
+        TestSuite suite = new TestSuite(DescriptorTest.class);
+        return suite;
+    }
+
+    /**
+     * Exécute la suite de tests à partir de la ligne de commande.
+     */
+    public static void main(final String[] args) {
+        MonolineFormatter.init("org.geotools");
+        MonolineFormatter.init("net.sicade");
+        final Arguments arguments = new Arguments(args);
+        Locale.setDefault(arguments.locale);
+        junit.textui.TestRunner.run(suite());
     }
 
     /**
@@ -72,45 +93,5 @@ public class DescriptorTest extends EvaluateTest {
     {
         coverage = new SpatioTemporalCoverage3D(descriptorName,
                        descriptors.getEntry(descriptorName).getCoverage());
-    }
-
-    /**
-     * Teste quelques valeurs de hauteur de l'eau.
-     */
-    public void testSLA() throws Exception {
-        createCoverage3D("SLA");
-        assertEquals(  4.5f, evaluate( 6.75+.25/2,  77.00+.25/2, "04/07/1999"), 0.10f);
-        assertEquals(-18.1f, evaluate(15.25+.25/2,  35.00+.25/2, "04/07/1999"), 0.46f);
-        assertEquals(-40.0f, evaluate(17.25+.25/2, -40.75+.25/2, "04/07/1999"), 0.19f);
-        assertEquals( 13.9f, evaluate(21.25+.25/2, -45.50+.25/2, "04/07/1999"), 0.56f);
-
-        assertEquals(  3.5f, evaluate( 6.75+.25/2,  77.00+.25/2, "14/07/1999"), 0.10f);
-        assertEquals(-13.5f, evaluate(15.25+.25/2,  35.00+.25/2, "14/07/1999"), 0.46f);
-        assertEquals(-38.1f, evaluate(17.25+.25/2, -40.75+.25/2, "14/07/1999"), 0.19f);
-        assertEquals(  8.3f, evaluate(21.25+.25/2, -45.50+.25/2, "14/07/1999"), 0.56f);
-
-        assertEquals(  4.0f, evaluate( 6.75+.25/2,  77.00+.25/2, "09/07/1999"), 0.10f);
-        assertEquals(-15.8f, evaluate(15.25+.25/2,  35.00+.25/2, "09/07/1999"), 0.46f);
-        assertEquals(-39.1f, evaluate(17.25+.25/2, -40.75+.25/2, "09/07/1999"), 0.19f);
-        assertEquals( 11.1f, evaluate(21.25+.25/2, -45.50+.25/2, "09/07/1999"), 0.56f);
-    }
-
-    /**
-     * Retourne la suite de tests.
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite(DescriptorTest.class);
-        return suite;
-    }
-
-    /**
-     * Exécute la suite de tests à partir de la ligne de commande.
-     */
-    public static void main(final String[] args) {
-        MonolineFormatter.init("org.geotools");
-        MonolineFormatter.init("net.sicade");
-        final Arguments arguments = new Arguments(args);
-        Locale.setDefault(arguments.locale);
-        junit.textui.TestRunner.run(suite());
     }
 }

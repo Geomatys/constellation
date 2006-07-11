@@ -1,6 +1,5 @@
 /*
- * Sicade - Systèmes intégrés de connaissances
- *          pour l'aide à la décision en environnement
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
@@ -32,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
 // Sicade dependencies
-import net.sicade.observation.coverage.EvaluateTest;
+import net.sicade.observation.coverage.AbstractTest;
 
 
 /**
@@ -41,7 +40,7 @@ import net.sicade.observation.coverage.EvaluateTest;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TimeStampTest extends EvaluateTest {
+public class TimeStampTest extends AbstractTest {
     /**
      * Construit la suite de tests.
      */

@@ -24,7 +24,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.awt.image.RenderedImage;
 import javax.swing.JFrame;
-import javax.media.jai.widget.ScrollingImagePanel;
 
 // Geotools dependencies
 import org.geotools.image.io.PaletteFactory;
@@ -71,7 +70,7 @@ public final class Utilities {
     public static void show(final RenderedImage image, final String title) {
         final JFrame frame = new JFrame(title);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.add(new ScrollingImagePanel(image, 400, 400));
+        frame.add(new javax.media.jai.widget.ScrollingImagePanel(image, 400, 400));
         frame.pack();
         frame.show();
     }

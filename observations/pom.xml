@@ -118,6 +118,23 @@
           </execution>
         </executions>
       </plugin>
+
+      <!--
+        Exécution des tests. La propriété "rmi.enabled" indique si
+        la suite de tests est autorisée à se connecter au serveur RMI.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>rmi.enabled</name>
+              <value>false</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

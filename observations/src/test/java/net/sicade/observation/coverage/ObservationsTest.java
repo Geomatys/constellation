@@ -31,6 +31,8 @@ import net.sicade.observation.CatalogException;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.
  */
 public class ObservationsTest extends TestCase {
     /**
