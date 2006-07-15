@@ -34,15 +34,11 @@ import net.sicade.observation.sql.MeasurementTable;
 public class EnvironmentTable extends MeasurementTable {
     /**
      * Requête SQL pour obtenir les mesures pour une station et un observable donnés.
-     *
-     * @todo L'utilisation d'instruction {@code LIKE} ralentit considérablement l'exécution
-     *       de la requête. Il faudrait se débarasser de ce bricolage de façon à n'utiliser
-     *       que l'opérateur =.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Environments:SELECT",
             "SELECT station, observable, value, error\n"  +
             "  FROM \"AllEnvironments\"\n"                +
-            " WHERE (station LIKE ?) AND (observable LIKE ?)");
+            " WHERE (station = ?) AND (observable = ?)");
 
     /**
      * Requête SQL pour insérer les mesures pour une station et un observable donnés.

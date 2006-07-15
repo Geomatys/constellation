@@ -253,7 +253,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * @return La requête SQL avec l'argument modifié.
      * @throws SQLException si cette méthode n'a pas pu comprendre la requête SQL spécifiée.
      */
-    protected static String changeArgumentTarget(final String query, int target) throws SQLException {
+    @SuppressWarnings("fallthrough")
+    static String changeArgumentTarget(final String query, int target) throws SQLException {
         String  oldColumn = null;
         String  newColumn = null;
         int     step      = 0;

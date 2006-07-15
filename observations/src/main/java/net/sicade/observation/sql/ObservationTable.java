@@ -48,8 +48,6 @@ import net.sicade.resources.seagis.Resources;
  * <ul>
  *   <li>Les deux premiers arguments doivent être la {@linkplain Station station} et
  *       l'{@linkplain Observable observable} recherchés, dans cet ordre.</li>
- *   <li>L'opérateur de comparaison pour les deux arguments du point précédent
- *       doit être {@code LIKE}.</li>
  *   <li>Les deux premières colonnes retournées doivent aussi être les identifiants de la
  *       {@linkplain Station station} et de l'{@linkplain Observable observable}.</li>
  * </ul>
@@ -57,7 +55,7 @@ import net.sicade.resources.seagis.Resources;
  * Exemple:
  *
  * <blockquote><pre>
- * SELECT station, observable FROM Observations WHERE (station LIKE ?) AND (observable LIKE ?)
+ * SELECT station, observable FROM Observations WHERE (station = ?) AND (observable = ?)
  * </pre></blockquote>
  *
  * @version $Id$
@@ -216,12 +214,12 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
         if (station != null) {
             statement.setInt(STATION, station.getNumericIdentifier());
         } else {
-            statement.setString(STATION, "%");
+            throw new UnsupportedOperationException("La recherche sur toutes les stations n'est pas encore impléméntée.");
         }
         if (observable != null) {
             statement.setInt(OBSERVABLE, observable.getNumericIdentifier());
         } else {
-            statement.setString(OBSERVABLE, "%");
+            throw new UnsupportedOperationException("La recherche sur tous les observables n'est pas encore impléméntée.");
         }
     }
 

@@ -213,7 +213,6 @@ public class Table {
      *   <li>La requête courante (s'il y en a une) sera fermée.</li>
      *   <li>Une nouvelle requête est pré-compilée et {@linkplain #configure configurée}.</li>
      * </ul>
-     * <p>
      *
      * @param  query La requête SQL à soumettre à la base de données, ou {@code null}
      *         pour fermer la requête courante sans en construire de nouvelle.
@@ -320,21 +319,6 @@ public class Table {
         }
         buffer.append(text.substring(lower));
         return buffer.toString();
-    }
-
-    /**
-     * Pour le premier argument après la clause {@code WHERE}, remplace l'opérateur {@code =}
-     * par l'instruction {@code LIKE}.
-     */
-    protected static String selectWhereArgumentLike(String query) {
-        int offset = indexOfWord(query, "WHERE", 0);
-        if (offset >= 0) {
-            offset = query.indexOf('=', offset);
-            if (offset >= 0) {
-                query = query.substring(0, offset) + " LIKE " + query.substring(offset+1);
-            }
-        }
-        return query;
     }
 
     /**

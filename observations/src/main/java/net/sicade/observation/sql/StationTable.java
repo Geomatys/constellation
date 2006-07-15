@@ -58,7 +58,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
      * Requête SQL pour obtenir une station à partir de son identifiant.
      *
      * @todo L'utilisation d'une clause {@code LIKE %} ne retourne pas les lignes dont la valeur est
-     *       nulle. C'est embêtant lorsque la recherche est faite sur la colonne {@code provider},
+     *       nulle. C'est embêtant lorsque la recherche est faite sur la colonne {@code platform},
      *       ce qui ce produit dans le cas {@code LIST} de la méthode {@link #getQuery}.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Stations:SELECT",

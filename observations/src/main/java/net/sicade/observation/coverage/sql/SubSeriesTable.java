@@ -55,7 +55,15 @@ public class SubSeriesTable extends SingletonTable<SubSeries> {
     private static final ConfigurationKey SELECT = new ConfigurationKey("SubSeries:SELECT",
         "SELECT identifier, series, format, NULL as remarks\n"  +
         "  FROM \"SubSeries\"\n"                                +
-        " WHERE identifier=?\n"                                 +
+        " WHERE identifier=?");
+
+    /**
+     * Requête SQL utilisée pour obtenir une liste de sous-séries.
+     */
+    private static final ConfigurationKey LIST = new ConfigurationKey("SubSeries:LIST",
+        "SELECT identifier, series, format, NULL as remarks\n"  +
+        "  FROM \"SubSeries\"\n"                                +
+        " WHERE series LIKE ?\n"                                +
         " ORDER BY identifier");
 
     /** Numéro de colonne. */ private static final int NAME    = 1;
@@ -110,7 +118,7 @@ public class SubSeriesTable extends SingletonTable<SubSeries> {
     protected String getQuery(final QueryType type) throws SQLException {
         switch (type) {
             case SELECT: return getProperty(SELECT);
-            case LIST:   return selectWhereArgumentLike(changeArgumentTarget(getQuery(QueryType.SELECT), 2));
+            case LIST:   return getProperty(LIST);
             default:     return super.getQuery(type);
         }
     }
@@ -125,7 +133,7 @@ public class SubSeriesTable extends SingletonTable<SubSeries> {
         super.configure(type, statement);
         switch (type) {
             case LIST: {
-                statement.setString(1, escapeSearch(series.getName()));
+                statement.setString(1, escapeSearch(series!=null ? series.getName() : null));
             }
         }
     }

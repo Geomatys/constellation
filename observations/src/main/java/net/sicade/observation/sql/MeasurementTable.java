@@ -52,7 +52,7 @@ public class MeasurementTable extends ObservationTable<Measurement> {
     private static final ConfigurationKey SELECT = new ConfigurationKey("Measurements:SELECT",
             "SELECT station, observable, value, error\n"  +
             "  FROM \"Measurements\"\n"                   +
-            " WHERE (station LIKE ?) AND (observable LIKE ?)");
+            " WHERE (station = ?) AND (observable = ?)");
 
     /**
      * Requête SQL pour insérer les mesures pour une station et un observable donnés.
