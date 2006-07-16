@@ -19,6 +19,7 @@
 package net.sicade.observation.coverage;
 
 // J2SE dependencies
+import java.util.Date;
 import java.lang.reflect.UndeclaredThrowableException;
 
 // Geotools dependencies
@@ -41,12 +42,17 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
     /**
      * La station.
      */
-    public final Station station;
+    final Station station;
 
     /**
      * Le descripteur du paysage océanique.
      */
-    public final Descriptor descriptor;
+    final Descriptor descriptor;
+
+    /**
+     * La valeur. Sera calculée par {@link MeasurementTableFiller}.
+     */
+    float value = Float.NaN;
 
     /**
      * Construit une nouvelle paire pour la station et le descripteur spécifié.
@@ -60,7 +66,15 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
      * Retourne la date à laquelle le descripteur sera évalué.
      */
     private long getTime() throws CatalogException {
-        return station.getTime().getTime() + Math.round((24*60*60*1000) * descriptor.getLocationOffset().getDayOffset());
+        final Date time = station.getTime();
+        if (time == null) {
+            /*
+             * Place les stations dont la date est indéterminée à la fin. C'est cohérent
+             * avec le classement des valeurs NaN de type 'float' par exemple.
+             */
+            return Long.MAX_VALUE;
+        }
+        return time.getTime() + Math.round((24*60*60*1000) * descriptor.getLocationOffset().getDayOffset());
     }
 
     /**

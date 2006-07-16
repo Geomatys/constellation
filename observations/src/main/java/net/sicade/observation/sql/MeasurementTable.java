@@ -122,10 +122,7 @@ public class MeasurementTable extends ObservationTable<Measurement> {
     }
 
     /**
-     * Définie une valeur réelle pour la station et l'observable courant. Cette méthode peut être
-     * utilisée pour ajouter ou mettre à jour une observation. L'implémentation par défaut lance
-     * toujours une exception. Les classes dérivées devrait redéfinir cette méthode si elles peuvent
-     * affecter des valeurs à la table des mesures.
+     * Définie une valeur réelle pour la station et l'observable courant.
      *
      * @param  value Valeur à inscrire dans la base de données.
      * @param  error Une estimation de l'erreur, ou {@link Float#NaN} s'il n'y en a pas.

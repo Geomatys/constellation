@@ -59,13 +59,6 @@ import net.sicade.resources.XArray;
  */
 public class MeasurementTableFiller implements Runnable {
     /**
-     * {@code true} si on veut seulement tester cette classe sans écrire
-     * dans la base de données. Note: une connexion en lecture aux bases
-     * de données est tout de même nécessaire.
-     */
-    private static final boolean TEST_ONLY = false;
-
-    /**
      * Mis à {@code true} quand l'utilisateur a demandé à annuler l'exécution de {@link #execute}.
      */
     private volatile boolean cancel;
@@ -177,7 +170,10 @@ public class MeasurementTableFiller implements Runnable {
             Descriptor.LOGGER.warning("L'ensemble des stations est vide.");
             return;
         }
+        int withoutPosition = 0; // Compte le nombre de stations sans coordonnées.
         final LinkedList<Descriptor> remaining = new LinkedList<Descriptor>(descriptors);
+        final MeasurementInserts updater = new MeasurementInserts(measures);
+        updater.start();
         /*
          * On traitera ensemble tous les descripteurs qui correspondent à la même série d'images,
          * pour éviter de charger en mémoire les même images plusieurs fois.  On évite de traiter
@@ -245,46 +241,37 @@ public class MeasurementTableFiller implements Runnable {
             cancel = false;
             float[] values = null;
             for (index=0; index<pairs.length; index++) {
-                final StationDescriptorPair    pair       = pairs[index]; pairs[index] = null;
+                final StationDescriptorPair    pair       = pairs[index];
                 final Station                  station    = pair.station;
                 final Descriptor               descriptor = pair.descriptor;
                 final SpatioTemporalCoverage3D coverage   = coverages.get(descriptor);
                 final Point2D                  coord      = station.getCoordinate();
                 final Date                     time       = station.getTime();
+                pairs[index] = null;
+                if (coord==null || time==null) {
+                    withoutPosition++;
+                    continue;
+                }
                 try {
                     values = coverage.evaluate(coord, time, values);
                 } catch (PointOutsideCoverageException exception) {
                     warning(coverage, exception);
                     continue;
                 }
-                final float value = values[0];
-                measures.setObservable(descriptor);
-                measures.setStation   (station);
-                try {
-                    if (TEST_ONLY) {
-                        final Measurement current = measures.getEntry();
-                        System.out.print("INSERT station=");
-                        System.out.print(station.getName());
-                        System.out.print(" value=");
-                        System.out.print(value);
-                        if (current != null) {
-                            System.out.print("  (old=");
-                            System.out.print(current.getValue());
-                            System.out.print(')');
-                        }
-                        System.out.println();
-                    } else {
-                        measures.setValue(value, Float.NaN);
-                    }
-                } catch (SQLException exception) {
-                    throw new ServerException(exception);
-                }
+                pair.value = values[0];
+                updater.add(pair);
                 if (cancel) {
+                    updater.finished();
                     Descriptor.LOGGER.info("Remplissage interrompu.");
                     return;
                 }
             }
         }
+        if (withoutPosition != 0) {
+            Descriptor.LOGGER.warning("Les coordonnées de " + withoutPosition +
+                                      " couple(s) (station, descripteur) sont incomplètes.");
+        }
+        updater.finished();
         Descriptor.LOGGER.info("Remplissage de la table des mesures terminé.");
     }
 

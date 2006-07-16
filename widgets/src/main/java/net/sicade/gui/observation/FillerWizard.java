@@ -46,6 +46,9 @@ import net.sicade.observation.sql.StationTable;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo Eviter une référence directe à {@link EnvironmentTable}. Il faut trouver un moyen de
+ *       laisser ce choix à l'utilisateur.
  */
 @SuppressWarnings("serial")
 public class FillerWizard extends DescriptorChooser {

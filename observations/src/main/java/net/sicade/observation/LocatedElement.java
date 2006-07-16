@@ -45,7 +45,7 @@ public interface LocatedElement extends Element {
 
     /**
      * Retourne une coordonnée représentative de cet élément, en degrés de longitude et de latitude.
-     * Cette méthode ne devrait jamais retourner {@code null}.
+     * Cette méthode peut retourner {@code null} si aucune coordonnées représentative n'est trouvée.
      *
      * @throws CatalogException si l'interrogation du catalogue a échoué.
      */
@@ -54,15 +54,17 @@ public interface LocatedElement extends Element {
     /**
      * Retourne une date représentative de cet élément. Dans le cas des observations qui
      * s'étendent sur une certaine période de temps, ça pourrait être par exemple la date
-     * du milieu.
+     * du milieu. Cette méthode peut retourner {@code null} si aucune date n'est associée
+     * à cet élément.
      *
      * @throws CatalogException si l'interrogation du catalogue a échoué.
      */
     Date getTime() throws CatalogException;
 
     /**
-     * Retourne la plage de temps de cet élément.
-     * Les composantes de la plage retournée seront du type {@link Date}.
+     * Retourne la plage de temps de cet élément. Les composantes de la plage retournée seront du
+     * type {@link Date}. Cette méthode peut retourner {@code null} si aucune plage de temps n'est
+     * associé à cet élément.
      *
      * @throws CatalogException si l'interrogation du catalogue a échoué.
      */

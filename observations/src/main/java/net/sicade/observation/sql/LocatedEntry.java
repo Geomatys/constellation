@@ -180,10 +180,32 @@ public class LocatedEntry extends Entry implements LocatedElement {
      * {@inheritDoc}
      */
     public Date getTime() throws CatalogException {
+        // Note: les dates correspondant à MIN_VALUE ou MAX_VALUE
+        //       seront traitées comme représentant l'infinie.
         final DateRange timeRange = getTimeRange();
-        final long  startTime = timeRange.getMinValue().getTime();
-        final long  endTime   = timeRange.getMaxValue().getTime();
-        return new Date(startTime + ((endTime - startTime) / 2));
+        if (timeRange != null) {
+            final Date min = timeRange.getMinValue();
+            final Date max = timeRange.getMaxValue();
+            if (min != null) {
+                final long startTime = min.getTime();
+                if (startTime > Long.MIN_VALUE) {
+                    if (max != null) {
+                        final long endTime = max.getTime();
+                        if (endTime < Long.MAX_VALUE) {
+                            return new Date(startTime + (endTime - startTime)/2);
+                        }
+                    }
+                    return new Date(startTime);
+                }
+            }
+            if (max != null) {
+                final long endTime = max.getTime();
+                if (endTime < Long.MAX_VALUE) {
+                    return new Date(endTime);
+                }
+            }
+        }
+        return null;
     }
 
     /**
