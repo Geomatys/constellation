@@ -110,9 +110,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.geotools</groupId>
+        <groupId>org.geotools.maven</groupId>
         <artifactId>gt2-javamaker</artifactId>
-        <version>2.3-SNAPSHOT</version>
+        <version>2.4-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>
@@ -122,11 +122,24 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.geotools</groupId>
-        <artifactId>gt2-unopkg</artifactId>
-        <version>2.3-SNAPSHOT</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-          <finalName>sicade</finalName>
+          <archive>
+            <manifestEntries>
+              <RegistrationClassName>
+                net.sicade.openoffice.Observations
+              </RegistrationClassName>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>gt2-unopkg</artifactId>
+        <version>2.4-SNAPSHOT</version>
+        <configuration>
+          <oxtName>seagis-${project.version}</oxtName>
         </configuration>
         <executions>
           <execution>

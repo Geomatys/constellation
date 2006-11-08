@@ -8,5 +8,5 @@
   <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-typelibrary;type=RDB"
                        manifest:full-path="sicade.rdb"/>
   <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Java"
-                       manifest:full-path="seagis-openoffice-1.0-SNAPSHOT.jar"/>
+                       manifest:full-path="${project.build.finalName}.jar"/>
 </manifest:manifest>
