@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Geomatys
+ * (C) 2005, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -11,8 +11,13 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package fr.geomatys.coverage.io;
+
+package net.sicade.coverage.io;
 
 // J2SE dependencies
 import java.util.HashMap;
@@ -31,15 +36,14 @@ import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
- * Description of NetCDF format.
+ * Description of Observation format.
  *
  * @author Cédric Briançon
  */
 public class ObservationFormat extends AbstractGridFormat implements Format {
     
     /**
-     * Creates a new instance of ObservationFormat.
-     * Contains the main information about the NetCDF format.
+     * Contains the main information about the Observation format.
      */
     public ObservationFormat() {        
         writeParameters = null;
@@ -55,8 +59,7 @@ public class ObservationFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * Gets a reader for the netCDF file specified.
-     *
+     * 
      * @param object May be a netCDF file, or an URL for a netCDF file.
      *
      * @deprecated
@@ -66,8 +69,7 @@ public class ObservationFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * Gets a reader for the netCDF file specified.
-     *
+     * 
      * @param object May be a netCDF file, or an URL for a netCDF file.
      */
     public GridCoverageReader getReader(final Object object, final Hints hints) {
@@ -75,7 +77,6 @@ public class ObservationFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * Gets a writer for the netCDF file.
      * Not used in our implementation.
      *
      * @param object The source in which we will write.
@@ -85,7 +86,7 @@ public class ObservationFormat extends AbstractGridFormat implements Format {
     }
 
     /**
-     * Specifies if the source is a netCDF file, and by the way is available.
+     * Specifies if the source is valid.
      *
      * @param object The source to test.
      *
