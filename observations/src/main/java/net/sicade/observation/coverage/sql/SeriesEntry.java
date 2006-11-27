@@ -21,6 +21,7 @@ package net.sicade.observation.coverage.sql;
 // J2SE dependencies
 import java.util.Set;
 import java.util.Map;
+import java.util.Date;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Collections;
@@ -69,6 +70,11 @@ public class SeriesEntry extends ObservableEntry implements Series {
     private static final long serialVersionUID = 5283559646740856038L;
 
     /**
+     * Nombre de millisecondes dans une journée.
+     */
+    private static final long MILLIS_IN_DAY = 24*60*60*1000L;
+
+    /**
      * L'intervalle de temps typique des images de cette série (en nombre
      * de jours), ou {@link Double#NaN} si elle est inconnue.
      */
@@ -115,6 +121,12 @@ public class SeriesEntry extends ObservableEntry implements Series {
      * de même pour les valeurs de ce {@code Map}.
      */
     private transient Map<Operation,DataConnection> servers;
+
+    /**
+     * La fabrique à utiliser pour obtenir une seule image à une date spécifique.
+     * Ne sera construit que la première fois où elle sera nécessaire.
+     */
+    private transient DataConnection singleCoverageServer;
 
     /**
      * Construit une nouvelle séries.
@@ -196,6 +208,30 @@ public class SeriesEntry extends ObservableEntry implements Series {
             throw new ServerException(e);
         }
         return GeographicBoundingBoxImpl.WORLD;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public synchronized CoverageReference getCoverageReference(final Date time) throws CatalogException {
+        long delay = Math.round(timeInterval * (MILLIS_IN_DAY/2));
+        if (delay <= 0) {
+            delay = MILLIS_IN_DAY / 2;
+        }
+        final long t = time.getTime();
+        final Date startTime = new Date(t - delay);
+        final Date   endTime = new Date(t + delay);
+        try {
+            if (singleCoverageServer == null) {
+                singleCoverageServer = server.newInstance(null);
+            }
+            singleCoverageServer.setTimeRange(startTime, endTime);
+            return singleCoverageServer.getEntry();
+        } catch (RemoteException exception) {
+            throw new ServerException(exception);
+        } catch (SQLException exception) {
+            throw new ServerException(exception);
+        }
     }
 
     /**

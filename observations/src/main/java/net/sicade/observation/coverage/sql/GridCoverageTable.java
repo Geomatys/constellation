@@ -476,7 +476,7 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * Retourne une des images disponibles dans la plage de coordonnées spatio-temporelles
      * préalablement sélectionnées. Si plusieurs images interceptent la région et la plage
-     * de temps (c'est-à-dire si {@link #getEntries} retourne un tableau d'au moins deux
+     * de temps (c'est-à-dire si {@link #getEntries} retourne un ensemble d'au moins deux
      * entrées), alors le choix de l'image se fera en utilisant un objet
      * {@link CoverageComparator} par défaut.
      *
@@ -605,6 +605,7 @@ loop:   for (final CoverageReference newReference : entries) {
      * a {@linkplain #fireStateChanged changé d'état}.
      */
     @Override
+    @SuppressWarnings("fallthrough")
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
         switch (type) {
@@ -727,6 +728,7 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * Prépare l'évaluation d'un point.
      */
+    @SuppressWarnings("fallthrough")
     private void prepare(final double x, final double y, final double t)
             throws CatalogException, SQLException, IOException
     {

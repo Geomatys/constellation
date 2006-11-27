@@ -20,6 +20,7 @@ package net.sicade.observation.coverage.rmi;
 
 import java.util.Set;
 import java.util.List;
+import java.util.Date;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.rmi.RemoteException;
@@ -61,6 +62,11 @@ import net.sicade.observation.coverage.sql.GridCoverageEntry;
  * @author Martin Desruisseaux
  */
 public class GridCoverageServer extends UnicastRemoteObject implements DataConnection {
+    /**
+     * Pour compatibilité entre différentes versions.
+     */
+    private static final long serialVersionUID = -1288646310349616893L;
+
     /**
      * La table d'images locale.
      */
@@ -112,6 +118,13 @@ public class GridCoverageServer extends UnicastRemoteObject implements DataConne
     /**
      * {@inheritDoc}
      */
+    public boolean setTimeRange(final Date startTime, final Date endTime) throws CatalogException, RemoteException {
+        return table.setTimeRange(startTime, endTime);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public double evaluate(final double x, final double y, final double t, final short band)
             throws CatalogException, SQLException, IOException
     {
@@ -147,6 +160,17 @@ public class GridCoverageServer extends UnicastRemoteObject implements DataConne
             }
         }
         return entries;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public CoverageReference getEntry() throws CatalogException, SQLException, RemoteException {
+        CoverageReference entry = table.getEntry();
+        if (entry instanceof GridCoverageEntry) {
+            ((GridCoverageEntry) entry).export();
+        }
+        return entry;
     }
 
     /**

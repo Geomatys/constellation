@@ -11,16 +11,13 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.rmi;
 
 // J2SE dependencies
 import java.util.Set;
 import java.util.List;
+import java.util.Date;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.io.IOException;
@@ -86,6 +83,19 @@ public interface DataConnection extends Remote {
     DateRange getTimeRange() throws CatalogException, RemoteException;
 
     /**
+     * Modifie la partie temporelle de l'{@linkplain #getEnvelope enveloppe} des données.
+     * Toutes les images qui interceptent cette plage de temps seront pris en compte lors
+     * du prochain appel de {@link #getEntries}.
+     *
+     * @return {@code true} si la plage de temps à changée, ou {@code false} si les valeurs
+     *         spécifiées étaient les mêmes que la dernière fois.
+     *
+     * @throws CatalogException si la base de données n'a pas pu être interrogée.
+     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
+     */
+    boolean setTimeRange(final Date startTime, final Date endTime) throws CatalogException, RemoteException;
+
+    /**
      * Retourne la valeur d'une bande à une position interpolée dans l'ensemble des images de cette
      * table. L'ensemble des données est traité comme une matrice tri-dimensionnelle. La coordonnée
      * doit être exprimée selon le {@linkplain #getCoordinateReferenceSystem système de référence
@@ -149,10 +159,24 @@ public interface DataConnection extends Remote {
     Set<CoverageReference> getEntries() throws CatalogException, SQLException, RemoteException;
 
     /**
+     * Retourne une des images disponibles dans la plage de coordonnées spatio-temporelles
+     * préalablement sélectionnées. Si plusieurs images interceptent la région et la plage
+     * de temps (c'est-à-dire si {@link #getEntries} retourne un ensemble d'au moins deux
+     * entrées), alors le choix de l'image se fera en utilisant un objet
+     * {@link net.sicade.observation.coverage.CoverageComparator} par défaut.
+     *
+     * @return Une image choisie arbitrairement dans la région et la plage de date
+     *         sélectionnées, ou {@code null} s'il n'y a pas d'image dans ces plages.
+     * @throws CatalogException si un enregistrement est invalide.
+     * @throws SQLException si la base de données n'a pas pu être interrogée pour une autre raison.
+     */
+    CoverageReference getEntry() throws CatalogException, SQLException, RemoteException;
+
+    /**
      * Retourne une nouvelle connexion vers les données pour l'opération spécifiées.
      * L'envelope spatio-temporelle restera la même.
      *
-     * @param  operation  L'opération à appliquer pour conserver la même.
+     * @param  operation  L'opération à appliquer, ou {@code null} si aucune.
      * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
      */
     DataConnection newInstance(Operation operation) throws RemoteException;

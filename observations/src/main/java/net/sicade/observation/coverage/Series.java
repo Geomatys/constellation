@@ -20,6 +20,7 @@ package net.sicade.observation.coverage;
 
 // J2SE dependencies
 import java.util.Set;
+import java.util.Date;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -99,6 +100,13 @@ public interface Series extends Observable, Phenomenon {
      * @throws CatalogException si le catalogue n'a pas pu être interrogé.
      */
     GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
+
+    /**
+     * Retourne une image appropriée pour la date spécifiée.
+     *
+     * @throws CatalogException si le catalogue n'a pas pu être interrogé.
+     */
+    CoverageReference getCoverageReference(Date time) throws CatalogException;
 
     /**
      * Retourne la liste des images disponibles dans la plage de coordonnées spatio-temporelles
