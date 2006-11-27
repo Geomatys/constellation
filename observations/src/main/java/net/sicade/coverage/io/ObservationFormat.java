@@ -56,7 +56,7 @@ public class ObservationFormat extends AbstractGridFormat {
     /**
      * Returns a grid coverage reader for this format.
      * 
-     * @param object May be a netCDF file, or an URL for a netCDF file.
+     * @param object 
      */
     public GridCoverageReader getReader(final Object object) {
         return getReader(object, null);
@@ -65,7 +65,7 @@ public class ObservationFormat extends AbstractGridFormat {
     /**
      * Returns a grid coverage reader for this format.
      * 
-     * @param object May be a netCDF file, or an URL for a netCDF file.
+     * @param object 
      */
     public GridCoverageReader getReader(final Object object, final Hints hints) {
         return new ObservationCoverageReader(this, object, null);        

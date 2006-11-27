@@ -81,7 +81,7 @@ public class ObservationCoverageReaderTest {
 //        final ObservationCoverageReader obs = new ObservationCoverageReader(
 //                "CHL (Monde - hebdomadaires) - historique", date);
         GridCoverage2D gridCoverage2D = (GridCoverage2D) obs.read(null);        
-        RenderedImage image = gridCoverage2D.geophysics(false).getRenderedImage();
+        RenderedImage image = gridCoverage2D.getRenderedImage();
         final ScrollingImagePanel scroll = new ScrollingImagePanel(image, 1024, 768);
         frame.add(scroll);
         frame.pack();

@@ -122,11 +122,13 @@ public class ObservationCoverageReader extends AbstractGridCoverage2DReader impl
      * Keep only the two-dimensonal part of the specified grid coverage.
      */
     private GridCoverage2D trimExtraDimensions(final GridCoverage2D gc) throws TransformException {
-        CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc.getCoordinateReferenceSystem());
+        // Set the CRS for the new GridCoverage2D generated.
+        crs = CRSUtilities.getCRS2D(gc.getCoordinateReferenceSystem());
         GridSampleDimension[] bands = gc.getSampleDimensions();
         MathTransform gridToCRS = ((GridGeometry2D) gc.getGridGeometry()).getGridToCRS2D();
         GridCoverageFactory gcFact = FactoryFinder.getGridCoverageFactory(hints);
-        return gcFact.create(null, gc.getRenderedImage(), crs, gridToCRS, bands, null, null);
+        return gcFact.create(gc.getName(), gc.geophysics(false).getRenderedImage(), crs, gridToCRS, bands, 
+			null, gc.getProperties());
     }
     
     /**
