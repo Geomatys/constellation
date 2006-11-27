@@ -28,7 +28,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.NoninvertibleTransformException;
-import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 
 // Graphics
 import java.awt.Paint;

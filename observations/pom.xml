@@ -85,6 +85,10 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-coverage</artifactId>
     </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt2-main</artifactId>
+      </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-widgets-swing</artifactId>
@@ -100,9 +104,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.geotools</groupId>
+        <groupId>org.geotools.maven</groupId>
         <artifactId>gt2-rmic</artifactId>
-        <version>2.3-SNAPSHOT</version>
+        <version>2.4-SNAPSHOT</version>
         <configuration>
           <includes>
             net.sicade.observation.coverage.rmi.Server,

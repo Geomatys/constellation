@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2006, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -11,12 +11,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package net.sicade.coverage.io;
 
 // J2SE dependencies
@@ -30,18 +25,18 @@ import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 
 // OpenGIS dependencies
-import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
+
 /**
- * Description of Observation format.
+ * A format for reading grid coverage from the observation database.
  *
+ * @version $Id$
  * @author Cédric Briançon
  */
-public class ObservationFormat extends AbstractGridFormat implements Format {
-    
+public class ObservationFormat extends AbstractGridFormat {
     /**
      * Contains the main information about the Observation format.
      */
@@ -59,16 +54,16 @@ public class ObservationFormat extends AbstractGridFormat implements Format {
     }
 
     /**
+     * Returns a grid coverage reader for this format.
      * 
      * @param object May be a netCDF file, or an URL for a netCDF file.
-     *
-     * @deprecated
      */
     public GridCoverageReader getReader(final Object object) {
         return getReader(object, null);
     }
 
     /**
+     * Returns a grid coverage reader for this format.
      * 
      * @param object May be a netCDF file, or an URL for a netCDF file.
      */

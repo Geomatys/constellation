@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2006, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -11,12 +11,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package net.sicade.coverage.io;
 
 // J2SE dependencies
@@ -31,18 +26,23 @@ import org.opengis.coverage.grid.Format;
 // Geotools dependencies
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 
+// Sicade dependencies
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.Observations;
+
 
 /**
- * A factory to create the format for Observations images. It verifies if JAI and JAI-IO are reachable.
+ * Provider of {@link ObservationFormat} instances.
  *
+ * @version $Id$
  * @author Cédric Briançon
  */
 public class ObservationFormatFactorySpi implements GridFormatFactorySpi {  
-    
     /**
-     *
+     * Creates a default provider.
      */
-    public ObservationFormatFactorySpi() {}
+    public ObservationFormatFactorySpi() {
+    }
       
     /**
      * The format is created if the needed classes in JAI and JAI Image IO are found.
@@ -50,33 +50,26 @@ public class ObservationFormatFactorySpi implements GridFormatFactorySpi {
     public Format createFormat() {
         if (!isAvailable()) {
             throw new UnsupportedOperationException(
-                    "The Observations plugin requires the JAI and JAI ImageI/O libraries.");
+                    "The Observations plugin requires a database connection.");
         }
         return new ObservationFormat();
     }
     
     /**
-     * Verifies if the JAI and JAI-IO package are installed on your machine and reachables.
-     *
-     * @return True if the needed classes are found, false otherwise.
+     * Checks if the {@linkplain ObservationFormat observation format is available}.
+     * The default implementation checks if a SQL connection is available.
      */
     public boolean isAvailable() {
-        boolean available = true;
-        // verifies if these classes are found.
         try {
-            Class.forName("javax.media.jai.JAI");
-            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
-        } catch (ClassNotFoundException cnf) {
-            available = false;
+            return Observations.getDefault().getDatabase() != null;
+        } catch (CatalogException e) {
+            return false;
         }
-        return available;
     }
     
     /**
      * Returns the implementation hints. The default implementation returns en
      * empty map.
-     *
-     * @return Empty Map.
      */
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;

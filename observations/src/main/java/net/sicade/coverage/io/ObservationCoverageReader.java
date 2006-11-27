@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2006, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -11,12 +11,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package net.sicade.coverage.io;
 
 // J2SE dependencies
@@ -25,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 // Seagis dependencies
@@ -34,13 +30,13 @@ import net.sicade.observation.coverage.Series;
 import net.sicade.observation.Observations;
 
 // Geotools dependencies
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.factory.Hints;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.CRSUtilities;
 
@@ -51,60 +47,59 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransformFactory;
 import org.opengis.referencing.operation.TransformException;
 
+
 /**
+ * A reader for grid coverages from the observation database.
  *
  * @version $Id$
  * @author Cédric Briançon
  */
-public class ObservationCoverageReader extends AbstractGridCoverage2DReader implements GridCoverageReader{
+public class ObservationCoverageReader extends AbstractGridCoverage2DReader implements GridCoverageReader {
     /**
      * The entry to log messages during the process.
      */
-    private static final Logger LOGGER = Logger.getLogger(ObservationCoverageReader.class.toString());    
+    private static final Logger LOGGER = Logger.getLogger("net.sicade.coverage.io");    
     
     /**
      * The format that created this reader.
      */
     private final Format format;
     
-    private final Series series ;
+    /**
+     * The series where to fetch image from.
+     */
+    private final Series series;
     
-    private final Date date ;
+    /**
+     * The date of the image to fetch.
+     */
+    private final Date date;
     
     /**
      * Constructor to test the reading method with a direct Main class.
-     * @param sSeries The string name of the series.
+     *
+     * @param series The string name of the series.
      * @param date The date to choose the appropriate image.
-     * @throws CatalogException
+     * @throws CatalogException if the series can't be found.
      */
-    public ObservationCoverageReader(String sSeries, Date date) throws CatalogException {
-        Observations obs = Observations.getDefault();
-        Series series = obs.getSeries(sSeries);
-        this.series = series;
-        this.date = date;
+    public ObservationCoverageReader(final String series, final Date date) throws CatalogException {
+        final Observations obs = Observations.getDefault();
+        this.series = obs.getSeries(series);
+        this.date   = date;
         this.format = null;
     }
     
     /**
-     *
+     * Constructs a reader for the specified format.
      */
-    public ObservationCoverageReader(final Format format, Object input, Hints hints) {
-        this.hints = hints;
+    public ObservationCoverageReader(final Format format, final Object input, final Hints hints) {
+        this.hints  = hints;
         this.format = format;
-        try {
-            this.crs = CRS.decode("EPSG:4326"); 
-        } catch (NoSuchAuthorityCodeException ex) {
-            this.crs = DefaultGeographicCRS.WGS84;
-        } catch (FactoryException ex) {
-            this.crs = DefaultGeographicCRS.WGS84;
-        }
+        this.crs    = DefaultGeographicCRS.WGS84;
         Date date = null;
         try {
             date = stringToDate("19/08/1998 00:00:00", "dd/MM/yyyy hh:mm:ss");
@@ -122,28 +117,27 @@ public class ObservationCoverageReader extends AbstractGridCoverage2DReader impl
         }
         this.series = series;
     }
-    
-    GridCoverage2D trimExtraDimensions(GridCoverage2D gc) throws TransformException, FactoryException {
-        crs = CRSUtilities.getCRS2D(gc.getCoordinateReferenceSystem());
+
+    /**
+     * Keep only the two-dimensonal part of the specified grid coverage.
+     */
+    private GridCoverage2D trimExtraDimensions(final GridCoverage2D gc) throws TransformException {
+        CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc.getCoordinateReferenceSystem());
         GridSampleDimension[] bands = gc.getSampleDimensions();
-        MathTransform gridToCRS = gc.getGridGeometry().getGridToCoordinateSystem();
-        MathTransformFactory mtFactory = FactoryFinder.getMathTransformFactory(null);
-        CoordinateOperationFactory opFactory = FactoryFinder.getCoordinateOperationFactory(null);
-        MathTransform CRS_to_CRS2D = opFactory.createOperation(
-                gc.getCoordinateReferenceSystem(), crs).getMathTransform();
-        gridToCRS = mtFactory.createConcatenatedTransform(gridToCRS, CRS_to_CRS2D);
-        GridCoverageFactory gcFact = new GridCoverageFactory();
+        MathTransform gridToCRS = ((GridGeometry2D) gc.getGridGeometry()).getGridToCRS2D();
+        GridCoverageFactory gcFact = FactoryFinder.getGridCoverageFactory(hints);
         return gcFact.create(null, gc.getRenderedImage(), crs, gridToCRS, bands, null, null);
     }
     
     /**
-     * Converts a string notation of a date into a Date, using the format specified.
+     * Converts a string notation of a date into a {@link Date}, using the format specified.
+     *
      * @param sDate A string representation of a date.
      * @param sFormat The format of the date.
      * @return A date using the appropriate format.
      */
-    public static Date stringToDate(String sDate, String sFormat) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat(sFormat);
+    private static Date stringToDate(String sDate, String sFormat) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(sFormat, Locale.FRANCE);
         return sdf.parse(sDate);
     }
     
@@ -257,8 +251,6 @@ public class ObservationCoverageReader extends AbstractGridCoverage2DReader impl
                 return trimExtraDimensions(coverage2D);
             } catch (TransformException ex) {
                 return coverage2D;
-            } catch (FactoryException ex) {
-                return coverage2D;
             }
             //return coverage2D;
         }
@@ -275,12 +267,9 @@ public class ObservationCoverageReader extends AbstractGridCoverage2DReader impl
      * Desallocate the input stream. If in IOException is caught, this implementation will retry.
      */
     public void dispose() throws IOException {
-        while (inStream != null) {
-            if (inStream != null) {
-                try {
-                    inStream.close();
-                } catch (IOException e) {}
-            }
+        if (inStream != null) {
+            inStream.close();
+            inStream = null;
         }
     }
     
