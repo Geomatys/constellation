@@ -352,12 +352,21 @@ public class Database {
     }
 
     /**
-     * Retourne la valeur de la propriété spécifiée, ou de {@code fallback} si aucune propriété
-     * n'est définie pour {@code key}.
+     * Obtient la valeur de la propriété spécifiée, ou de {@code fallback} si aucune propriété
+     * n'est définie pour {@code key}. Si une valeur non-null est trouvée, elle sera copiée
+     * dans l'ensemble {@code properties} spécifié sous la clé {@code targetKey} spécifiée.
      */
-    final String getProperty(final ConfigurationKey key, final ConfigurationKey fallback) {
-        final String candidate = getProperty(key);
-        return (candidate != null) ? candidate : getProperty(fallback);
+    final void getProperty(final ConfigurationKey key, final ConfigurationKey fallback,
+                           final Properties properties, final String targetKey)
+    {
+        String candidate = getProperty(key);
+        if (candidate == null) {
+            candidate = getProperty(fallback);
+            if (candidate == null) {
+                return;
+            }
+        }
+        properties.put(targetKey, candidate);
     }
 
     /**

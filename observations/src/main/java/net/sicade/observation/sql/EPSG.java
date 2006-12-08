@@ -95,11 +95,11 @@ public class EPSG extends SimpleDataSource {
      */
     private static Properties getProperties(final Database database) {
         final Properties properties = new Properties();
-        properties.setProperty("driver",   database.getProperty(DRIVER,   Database.DRIVER));
-        properties.setProperty("url",      database.getProperty(DATABASE, Database.DATABASE));
-        properties.setProperty("schema",   database.getProperty(SCHEMA));
-        properties.setProperty("user",     database.getProperty(USER,     Database.USER));
-        properties.setProperty("password", database.getProperty(PASSWORD, Database.PASSWORD));
+        database.getProperty(DRIVER,   Database.DRIVER,   properties, "driver"  );
+        database.getProperty(DATABASE, Database.DATABASE, properties, "url"     );
+        database.getProperty(SCHEMA,   null,              properties, "schema"  );
+        database.getProperty(USER,     Database.USER,     properties, "user"    );
+        database.getProperty(PASSWORD, Database.PASSWORD, properties, "password");
         return properties;
     }
 }
