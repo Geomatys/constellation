@@ -31,7 +31,7 @@ public class Resources_en extends Resources {
     /**
      * The resource file, using UTF-8 encoding.
      */
-    static final String FILEPATH = "net/sicade/resources/seasview/resources_en.utf";
+    static final String FILEPATH = "resources_en.utf";
 
     /**
      * Construct resources for English.
