@@ -35,7 +35,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.CRSUtilities;
@@ -189,35 +189,35 @@ public class ObservationCoverageReader extends AbstractGridCoverage2DReader impl
     /**
      * Get the names of metadata. Not implemented in this project.
      */
-    public String[] getMetadataNames() throws IOException {
+    public String[] getMetadataNames() {
         throw new UnsupportedOperationException("Not implemented.");
     }
     
     /**
      * Not implemented.
      */
-    public String getMetadataValue(String string) throws IOException, MetadataNameNotFoundException {
+    public String getMetadataValue(String string) throws MetadataNameNotFoundException {
         throw new UnsupportedOperationException("Not implemented.");
     }
     
     /**
      * Not implemented.
      */
-    public String[] listSubNames() throws IOException {
+    public String[] listSubNames() {
         throw new UnsupportedOperationException("Not implemented.");
     }
     
     /**
      * Not implemented.
      */
-    public String getCurrentSubname() throws IOException {
+    public String getCurrentSubname() {
         throw new UnsupportedOperationException("Not implemented.");
     }
     
     /**
      * Not implemented.
      */
-    public boolean hasMoreGridCoverages() throws IOException {
+    public boolean hasMoreGridCoverages() {
         throw new UnsupportedOperationException("Not implemented.");
     }
 
@@ -261,17 +261,20 @@ public class ObservationCoverageReader extends AbstractGridCoverage2DReader impl
     /**
      * Not implemented.
      */
-    public void skip() throws IOException {
+    public void skip() {
         throw new UnsupportedOperationException("Only one image supported.");
     }
     
     /**
      * Desallocate the input stream. If in IOException is caught, this implementation will retry.
      */
-    public void dispose() throws IOException {
-        if (inStream != null) {
-            inStream.close();
-            inStream = null;
+    public void dispose() {
+        while (inStream != null) {
+            if (inStream != null) {
+                try {
+                    inStream.close();
+                } catch (IOException e) {}
+            }
         }
     }
     

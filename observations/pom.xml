@@ -85,10 +85,14 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-coverage</artifactId>
     </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gt2-main</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-coverageio</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-widgets-swing</artifactId>

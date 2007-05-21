@@ -19,8 +19,8 @@ import java.util.HashMap;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 
@@ -52,7 +52,7 @@ public class ObservationFormat extends AbstractGridFormat {
                 new DefaultParameterDescriptorGroup(mInfo,
                 new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
     }
-
+    
     /**
      * Returns a grid coverage reader for this format.
      * 
@@ -81,6 +81,15 @@ public class ObservationFormat extends AbstractGridFormat {
     }
 
     /**
+     * Not used in our implementation.
+     *
+     * @return
+     */
+    public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
+        return null;
+    }
+    
+    /**
      * Specifies if the source is valid.
      *
      * @param object The source to test.
@@ -89,5 +98,5 @@ public class ObservationFormat extends AbstractGridFormat {
      */
     public boolean accepts(Object object) {
         return true;
-    }
+    }    
 }
