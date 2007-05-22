@@ -25,8 +25,8 @@ import java.sql.SQLException;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
-import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

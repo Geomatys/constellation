@@ -27,7 +27,7 @@ import java.rmi.RemoteException;   // For javadoc
 
 // OpenGIS dependencies
 import org.opengis.coverage.SampleDimension;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

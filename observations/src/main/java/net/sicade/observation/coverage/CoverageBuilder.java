@@ -60,10 +60,10 @@ import javax.imageio.stream.ImageOutputStream;
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 // Geotools dependencies

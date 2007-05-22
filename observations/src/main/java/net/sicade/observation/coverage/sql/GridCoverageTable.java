@@ -31,7 +31,7 @@ import java.util.logging.LogRecord;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import org.geotools.resources.geometry.XRectangle2D;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 

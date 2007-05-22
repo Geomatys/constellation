@@ -24,7 +24,7 @@ import java.util.List;
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.util.InternationalString;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 // Sicade dependencies
 import net.sicade.observation.CatalogException;

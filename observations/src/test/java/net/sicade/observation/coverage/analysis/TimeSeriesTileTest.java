@@ -23,7 +23,7 @@ import junit.framework.*;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.gui.headless.ProgressPrinter;
 import org.geotools.util.ProgressListener;
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 
 
 

@@ -29,7 +29,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.max;
 
 // OpenGIS dependencies
-import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;

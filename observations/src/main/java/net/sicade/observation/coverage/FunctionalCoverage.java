@@ -32,7 +32,7 @@ import java.util.GregorianCalendar;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.resources.CRSUtilities;

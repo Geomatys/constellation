@@ -27,7 +27,7 @@ import java.nio.DoubleBuffer;
 import java.nio.channels.FileChannel;
 
 // OpenGIS dependencies
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 
 /**

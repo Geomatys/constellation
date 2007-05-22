@@ -4,7 +4,7 @@ import net.sicade.observation.sql.CRS;
 import org.geotools.coverage.AbstractCoverage;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.SampleDimension;
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 /**
  *

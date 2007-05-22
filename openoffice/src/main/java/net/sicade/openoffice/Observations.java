@@ -35,7 +35,7 @@ import com.sun.star.comp.loader.FactoryHelper;
 import com.sun.star.registry.XRegistryKey;
 
 // OpenGIS dependencies
-import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.openoffice.Formulas;

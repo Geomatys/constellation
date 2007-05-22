@@ -94,6 +94,12 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
+    <repository>
+	  <!-- Used for NetCDF jars from UCAR -->
+      <id>refractions</id>
+      <name>Refractions Research Maven 2 Repository</name>
+      <url>http://lists.refractions.net/m2</url>
+    </repository>
   </repositories>
 
 
@@ -115,9 +121,20 @@
         <version>0.01</version>
       </dependency>
       <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.7.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.opengis</groupId>
         <artifactId>geoapi-nogenerics</artifactId>
-        <version>2.1-M0</version>
+        <version>2.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
@@ -163,6 +180,11 @@
         <groupId>org.geotools</groupId>
         <artifactId>gt2-epsg-hsql</artifactId>
         <version>2.4-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>edu.ucar</groupId>
+        <artifactId>netcdf</artifactId>
+        <version>2.2.20</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
