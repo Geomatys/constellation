@@ -56,7 +56,7 @@ public class TimeStampTest extends AbstractTest {
         final Calendar cal = new GregorianCalendar(UTC, Locale.CANADA);
         final Statement  s = database.getConnection().createStatement();
         final ResultSet  r = s.executeQuery("SELECT \"startTime\", \"startTime\" FROM \"GridCoverages\" " +
-                                            "WHERE subseries='WTH' AND filename='199901'");
+                                            "WHERE subseries='WTH' AND filename='198601'");
         Date t1, t2;
         try {
             assertTrue(r.next());
@@ -76,15 +76,15 @@ public class TimeStampTest extends AbstractTest {
          * veut que t2 apparaisse correctement lorsque affichée selon le fuseau horaire UTC. On peut
          * vérifier que c'est bien le cas avec les pilote plus récents (les plus anciens on un bug).
          */
-        assertEquals("1999-01-01 00:00:00.0", String.valueOf(t1));
-        assertEquals("1999-01-01 00:00:00",        df.format(t1));
+        assertEquals("1986-01-01 00:00:00.0", String.valueOf(t1));
+        assertEquals("1986-01-01 00:00:00",        df.format(t1));
         if (offset == 0) {
             assertEquals(t1, t2);
         } else {
             assertFalse("Calendrier ignoré.", String.valueOf(t2).equals("1999-01-01 00:00:00.0"));
         }
         df.setTimeZone(UTC);
-        assertEquals("1999-01-01 00:00:00", df.format(t2));
+        assertEquals("1986-01-01 00:00:00", df.format(t2));
         /*
          * Tentative d'explication de ce qui se passe: offset est le laps de temps (en millisecondes)
          * qu'il faut ajouter au temps UTC afin d'obtenir le temps local. A l'est de Greenwich, cette
