@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Geomatys
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,25 +24,20 @@ import java.util.Map;
 import org.opengis.coverage.grid.Format;
 
 // Geotools dependencies
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-
-// Sicade dependencies
-import net.sicade.observation.CatalogException;
-import net.sicade.observation.Observations;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 
 
 /**
- * Provider of {@link ObservationFormat} instances.
+ * A factory to create the format for a PostGrid database. It verifies if JAI and JAI-IO are reachable.
  *
  * @version $Id$
  * @author Cédric Briançon
  */
-public class ObservationFormatFactorySpi implements GridFormatFactorySpi {  
+public class PostGridFormatFactorySpi implements GridFormatFactorySpi {    
     /**
-     * Creates a default provider.
+     * Not used in this implementation.
      */
-    public ObservationFormatFactorySpi() {
-    }
+    public PostGridFormatFactorySpi() {}
       
     /**
      * The format is created if the needed classes in JAI and JAI Image IO are found.
@@ -50,28 +45,37 @@ public class ObservationFormatFactorySpi implements GridFormatFactorySpi {
     public Format createFormat() {
         if (!isAvailable()) {
             throw new UnsupportedOperationException(
-                    "The Observations plugin requires a database connection.");
+                    "The PostGrid plugin requires the JAI and JAI ImageI/O libraries.");
         }
-        return new ObservationFormat();
+        
+        return new PostGridFormat();
     }
     
     /**
-     * Checks if the {@linkplain ObservationFormat observation format is available}.
-     * The default implementation checks if a SQL connection is available.
+     * Verifies if the JAI and JAI-IO package are installed on your machine and reachables.
+     *
+     * @return True if the needed classes are found, false otherwise.
      */
     public boolean isAvailable() {
+        boolean available = true;
+        // verifies if these classes are found.
         try {
-            return Observations.getDefault().getDatabase() != null;
-        } catch (CatalogException e) {
-            return false;
+            Class.forName("javax.media.jai.JAI");
+            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
+        } catch (ClassNotFoundException cnf) {
+            available = false;
         }
+        return available;
     }
     
     /**
      * Returns the implementation hints. The default implementation returns en
      * empty map.
+     *
+     * @return Empty Map.
      */
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;
     }
+
 }

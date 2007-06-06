@@ -66,6 +66,16 @@
       </roles>
       <timezone>+11</timezone>
     </contributor>
+    <contributor>
+      <name>Briançon Cédric</name>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+1</timezone>
+    </contributor>
   </contributors>
 
 
