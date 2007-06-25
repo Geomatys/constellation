@@ -66,8 +66,8 @@ public class SeriesTree extends Table implements Shareable {
                   " s.name,"                                     +
                   " g.identifier,"                               +
                     " format\n"                                  +
-            "  FROM \"SubSeries\"  AS g\n"                       +
-            "  JOIN \"Series\"     AS s ON s.name=series\n"      +
+            "  FROM \"Series\"     AS g\n"                       +
+            "  JOIN \"Layers\"     AS s ON s.name=layers\n"      +
             "  JOIN \"Procedures\" AS p ON p.name=procedure\n"   +
             "  JOIN \"Thematics\"  AS t ON t.name=phenomenon\n"  +
             " WHERE visible=TRUE\n"                              +

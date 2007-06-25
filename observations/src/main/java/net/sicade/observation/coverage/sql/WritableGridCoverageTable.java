@@ -19,17 +19,17 @@
 package net.sicade.observation.coverage.sql;
 
 // J2SE dependencies
+import java.io.File;
 import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.awt.Dimension;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.IllegalFormatException;
 import java.util.Set;
 import java.util.logging.LogRecord;
-
-// OpenGIS dependencies
-import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.geotools.referencing.crs.DefaultTemporalCRS;
 
 // Seagis dependencies
 import net.sicade.observation.Element;
@@ -40,6 +40,17 @@ import net.sicade.observation.sql.Database;
 import net.sicade.observation.coverage.Series;
 import net.sicade.observation.coverage.SubSeries;
 import net.sicade.observation.sql.QueryType;
+
+// Geotools dependencies
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotools.referencing.CRS;
+
+// OpenGIS dependencies
+import org.opengis.geometry.Envelope;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.TemporalCRS;
+
 
 /**
  * Insère de nouvelles entrées dans la base de données d'images. Par exemple, cette classe peut
@@ -132,7 +143,42 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         buffer.append(query.substring(last));
         log(new LogRecord(LoggingLevel.UPDATE, buffer.toString()));
     }
-
+    
+    /**
+     * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setSeries}
+     * doit d'abord avoir été appelée au moins une fois.
+     * 
+     * @param   file        Le fichier image avec son chemin complet.
+     * @param   envelope    L'enveloppe géographique pour cette image.
+     * @param   size        La dimension de l'image, en nombre de pixels.
+     * @throws  SQLException     Si l'exécution d'une requête SQL a échouée.
+     * @throws  FactoryException Si le Coordinate Reference System n'est pas de type "Temporel".
+     * @throws  CatalogException Si l'exécution a échouée pour une autre raison.
+     */
+    public synchronized void addEntry(final File      file,
+                                      final Envelope  envelope,
+                                      final Dimension size) 
+            throws CatalogException, FactoryException, SQLException
+    {
+        final double westLong = envelope.getUpperCorner().getCoordinates()[0];
+        final double eastLong = envelope.getLowerCorner().getCoordinates()[0];
+        final double southLat = envelope.getLowerCorner().getCoordinates()[1];
+        final double northLat = envelope.getUpperCorner().getCoordinates()[1];
+        final GeographicBoundingBox geoBBox = 
+                new GeographicBoundingBoxImpl(westLong, eastLong, southLat, northLat);
+        
+        TemporalCRS temporalCRS = CRS.getTemporalCRS(envelope.getCoordinateReferenceSystem());
+        if (temporalCRS == null) {
+            throw new FactoryException("Le CRS spécifié n'est pas de type \"Temporel\".");
+        }
+        DefaultTemporalCRS defaultTempCRS = DefaultTemporalCRS.wrap(temporalCRS);
+        final Date startTime = defaultTempCRS.toDate(envelope.getMinimum(0));
+        final Date endTime   = defaultTempCRS.toDate(envelope.getMaximum(0));
+        String fileNameWithExt = file.getName();
+        final String fileName = fileNameWithExt.substring(0, fileNameWithExt.indexOf("."));
+        addEntry(fileName, startTime, endTime, geoBBox, size);
+    }
+    
     /**
      * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setSeries}
      * doit d'abord avoir été appelée au moins une fois.

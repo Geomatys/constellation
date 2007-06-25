@@ -60,24 +60,30 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Series:SELECT",
             "SELECT name, phenomenon, procedure, period, fallback, description\n" +
-            "  FROM \"Series\"\n"                                                 +
+            "  FROM \"Layers\"\n"                                                 +
             " WHERE name=?");
 
     /**
      * Requête SQL utilisée pour obtenir une série à partir de son nom.
+     * @todo Adapter les colonnes de la requête à un objet postgresql.BOX3D concernant la recherche 
+     *       des limites de l'enveloppe (table "GridGeometries"). Dans le cas d'une base JavaDB,
+     *       utiliser la requête telle qu'actuellement, car l'objet BOX3D n'est pas reconnu.
      */
     private static final ConfigurationKey LIST = new ConfigurationKey("Series:LIST",
-            "SELECT name, phenomenon, procedure, period, fallback, description\n"                 +
-            "  FROM \"Series\" JOIN (SELECT DISTINCT series, visible FROM \"SubSeries\"\n"        +
-            "  JOIN \"GridCoverages\""            + " ON subseries=\"SubSeries\".identifier\n"    +
-            "  JOIN \"GeographicBoundingBoxes\""  + " ON extent=\"GeographicBoundingBoxes\".id\n" +
-            " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                              +
-            "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                              +
-            "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"                  +
-            "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?))\n"                 +
-            "    AS \"Selected\" ON series=\"Series\".name\n"                                     +
-            " WHERE visible=TRUE\n"                                                               +
-            " ORDER BY name");
+            "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
+            "  FROM \"Layers\" "                                                       +
+            "  JOIN (\n"                                                               +
+            "   SELECT DISTINCT layer, visible FROM \"Series\"\n"                      +
+            "   JOIN \"GridCoverages\""         + " ON series=\"Series\".identifier\n" +
+            "   JOIN \"GridGeometries\""        + " ON extent=\"GridGeometries\".id\n" +
+            "   WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                 +
+            "     AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                 +
+            "     AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"     +
+            "     AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"     +
+            "  ) "                                                                     +
+            "  AS \"Selected\" ON layer=\"Layers\".name\n"                             +
+            "  WHERE visible=TRUE\n"                                                   +
+            "  ORDER BY name");
 
     /** Numéro de colonne. */ private static final int NAME      =  1;
     /** Numéro de colonne. */ private static final int THEMATIC  =  2;

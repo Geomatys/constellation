@@ -53,17 +53,17 @@ public class SubSeriesTable extends SingletonTable<SubSeries> {
      * Requête SQL utilisée pour obtenir une sous-séries par son nom.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("SubSeries:SELECT",
-        "SELECT identifier, series, format, NULL as remarks\n"  +
-        "  FROM \"SubSeries\"\n"                                +
+        "SELECT identifier, layer, format, NULL as remarks\n"  +
+        "  FROM \"Series\"\n"                                  +
         " WHERE identifier=?");
 
     /**
      * Requête SQL utilisée pour obtenir une liste de sous-séries.
      */
     private static final ConfigurationKey LIST = new ConfigurationKey("SubSeries:LIST",
-        "SELECT identifier, series, format, NULL as remarks\n"  +
-        "  FROM \"SubSeries\"\n"                                +
-        " WHERE series LIKE ?\n"                                +
+        "SELECT identifier, layer, format, NULL as remarks\n"  +
+        "  FROM \"Series\"\n"                                  +
+        " WHERE layer LIKE ?\n"                                +
         " ORDER BY identifier");
 
     /** Numéro de colonne. */ private static final int NAME    = 1;

@@ -84,6 +84,10 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * Requête SQL utilisée pour obtenir l'enveloppe spatio-temporelle couverte
      * par toutes les images d'une série (ou de l'ensemble des séries).
+     *
+     * @todo Adapter les colonnes de la requête à un objet postgresql.BOX3D concernant la recherche 
+     *       des limites de l'enveloppe (table "GridGeometries"). Dans le cas d'une base JavaDB,
+     *       utiliser la requête telle qu'actuellement, car l'objet BOX3D n'est pas reconnu.
      */
      static final ConfigurationKey BOUNDING_BOX = new ConfigurationKey("GridCoverages:BOX",
             "SELECT MIN(\"startTime\") "           + "AS \"tmin\", "  +
@@ -93,18 +97,22 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
                    "MIN(\"southBoundLatitude\") "  + "AS \"ymin\", "  +
                    "MAX(\"northBoundLatitude\") "  + "AS \"ymax\"\n"  +
              "  FROM \"GridCoverages\"\n"          +
-             "  JOIN \"GeographicBoundingBoxes\""  + " ON extent=\"GeographicBoundingBoxes\".id\n" +
-             "  JOIN \"SubSeries\""                + " ON subseries=\"SubSeries\".identifier\n"    +
-             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                              +
-             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                              +
-             "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"                  +
-             "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"                  +
+             "  JOIN \"GridGeometries\""           + " ON extent=\"GridGeometries\".id\n" +
+             "  JOIN \"Series\""                   + " ON layer=\"Series\".identifier\n"  +
+             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                     +
+             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                     +
+             "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"         +
+             "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"         +
              "   AND (series LIKE ?) AND visible=TRUE\n");
 
     /**
      * Requête SQL utilisée par cette classe pour obtenir la liste des images.
      * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par
      * les constantes {@link #SERIES}, {@link #FILENAME} et compagnie.
+     *
+     * @todo Adapter les colonnes de la requête à un objet postgresql.BOX3D concernant la recherche 
+     *       des limites de l'enveloppe (table "GridGeometries"). Dans le cas d'une base JavaDB,
+     *       utiliser la requête telle qu'actuellement, car l'objet BOX3D n'est pas reconnu.
      */
     private static final ConfigurationKey LIST = new ConfigurationKey("GridCoverages:LIST",
             "SELECT " + "series, "                +  // [01] SERIES
@@ -122,15 +130,15 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
                         "\"CRS\", "               +  // [13] CRS
                         "format, "                +  // [14] FORMAT
                         "NULL AS remarks\n"       +  // [15] REMARKS
-             "  FROM \"GridCoverages\"\n"                                                         +
-             "  JOIN \"GeographicBoundingBoxes\"" + " ON extent=\"GeographicBoundingBoxes\".id\n" +
-             "  JOIN \"SubSeries\""               + " ON subseries=\"SubSeries\".identifier\n"    +
-             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                             +
-             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                             +
-             "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"                 +
-             "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"                 +
-             "   AND (series LIKE ?) AND (filename LIKE ?) AND visible=TRUE\n"                    +
-             " ORDER BY \"endTime\", subseries"); // DOIT être en ordre chronologique.
+             "  FROM \"GridCoverages\"\n"                                                +
+             "  JOIN \"GridGeometries\""          + " ON extent=\"GridGeometries\".id\n" +
+             "  JOIN \"Series\""                  + " ON layer=\"Series\".identifier\n"  +
+             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                    +
+             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                    +
+             "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"        +
+             "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"        +
+             "   AND (series LIKE ?) AND (filename LIKE ?) AND visible=TRUE\n"           +
+             " ORDER BY \"endTime\", series"); // DOIT être en ordre chronologique.
                                                   // Voir {@link GridCoverageEntry#compare}.
 
 
