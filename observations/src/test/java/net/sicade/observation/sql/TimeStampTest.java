@@ -56,7 +56,7 @@ public class TimeStampTest extends AbstractTest {
         final Calendar cal = new GregorianCalendar(UTC, Locale.CANADA);
         final Statement  s = database.getConnection().createStatement();
         final ResultSet  r = s.executeQuery("SELECT \"startTime\", \"startTime\" FROM \"GridCoverages\" " +
-                                            "WHERE subseries='WTH' AND filename='198601'");
+                                            "WHERE series='WTH' AND filename='198601'");
         Date t1, t2;
         try {
             assertTrue(r.next());

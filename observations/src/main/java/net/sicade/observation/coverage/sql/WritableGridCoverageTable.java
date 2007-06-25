@@ -50,6 +50,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.TemporalCRS;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -160,13 +161,12 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                                       final Dimension size) 
             throws CatalogException, FactoryException, SQLException
     {
-        final double westLong = envelope.getUpperCorner().getCoordinates()[0];
-        final double eastLong = envelope.getLowerCorner().getCoordinates()[0];
-        final double southLat = envelope.getLowerCorner().getCoordinates()[1];
-        final double northLat = envelope.getUpperCorner().getCoordinates()[1];
-        final GeographicBoundingBox geoBBox = 
-                new GeographicBoundingBoxImpl(westLong, eastLong, southLat, northLat);
-        
+        GeographicBoundingBox geoBBox = null;
+        try {
+            geoBBox = new GeographicBoundingBoxImpl(envelope);
+        } catch (TransformException ex) {
+            log(new LogRecord(LoggingLevel.SEVERE, ex.getMessage()));
+        }        
         TemporalCRS temporalCRS = CRS.getTemporalCRS(envelope.getCoordinateReferenceSystem());
         if (temporalCRS == null) {
             throw new FactoryException("Le CRS spécifié n'est pas de type \"Temporel\".");

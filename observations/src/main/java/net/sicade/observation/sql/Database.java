@@ -314,6 +314,14 @@ public class Database {
                 }
             }
         }
+        /*
+         * Dans le cas d'une connection sur une base de type PostgreSQL, le type de données 
+         * postgis.BOX3D doit être spécifié, afin de permettre son utilisation dans les tables.
+         */
+        if (connection instanceof org.postgresql.PGConnection) {
+            org.postgresql.PGConnection connec = (org.postgresql.PGConnection) connection;
+            connec.addDataType("box3d", org.postgis.PGbox3d.class);
+        }
         return connection;
     }
 
