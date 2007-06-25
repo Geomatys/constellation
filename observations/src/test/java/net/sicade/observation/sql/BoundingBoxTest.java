@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,10 +28,10 @@ import net.sicade.observation.coverage.AbstractTest;
 
 
 /**
- * Tests le fonctionnement de {@link ResultSet#getTimestamp(int,Calendar)}.
- *
- * @version $Id: TimeStampTest.java 20 2007-05-22 11:04:09Z cedricbr $
- * @author Martin Desruisseaux
+ * Test le bon fonctionnement de la colonne "spatialSchema" dans la table GridGeometries.
+ * 
+ * @version $Id$
+ * @author Cédric Briançon
  */
 public class BoundingBoxTest extends AbstractTest {
     /**
@@ -42,7 +42,9 @@ public class BoundingBoxTest extends AbstractTest {
     }
 
     /**
-     * Tests la méthode {@link {@link ResultSet#getTimestamp(int,Calendar)}.
+     * Tests l'extraction d'informations depuis une colonne ayant pour type de données une {@code box3d}.
+     *
+     * @throws SQLException
      */
     public void testGet() throws SQLException {
         if (database.getConnection() instanceof org.postgresql.PGConnection) {
