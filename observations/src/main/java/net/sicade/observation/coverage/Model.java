@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,44 +30,44 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Interface de base des modèles linéaires ou non-linéaires.
+ * Interface de base des modÃ¨les linÃ©aires ou non-linÃ©aires.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface Model extends Element {
     /**
-     * Retourne la série dans laquelle seront stockées les valeurs de la variable dépendante <var>y</var>.
-     * C'est la série des images qui seront produites à partir de ce modèle.
+     * Retourne la sÃ©rie dans laquelle seront stockÃ©es les valeurs de la variable dÃ©pendante <var>y</var>.
+     * C'est la sÃ©rie des images qui seront produites Ã  partir de ce modÃ¨le.
      */
     Series getTarget();
 
     /**
-     * Retourne l'ensemble des descripteurs utilisés comme entrées au modèle. Cet ensemble est
-     * ordonné; à chaque index correspond une valeur réelle qui sera donnée à la méthode
+     * Retourne l'ensemble des descripteurs utilisÃ©s comme entrÃ©es au modÃ¨le. Cet ensemble est
+     * ordonnÃ©; Ã  chaque index correspond une valeur rÃ©elle qui sera donnÃ©e Ã  la mÃ©thode
      * {@link #evaluate}.
      */
     List<Descriptor> getDescriptors();
 
     /**
-     * {@linkplain Distribution#normalize Normalise} toutes les données spécifiées. Il est de la
-     * responsabilité de l'utilisateur d'appeller cette méthode exactement une fois avant d'appeller
-     * la méthode {@link #evaluate evaluate}. La normalisation est faite sur place.
+     * {@linkplain Distribution#normalize Normalise} toutes les donnÃ©es spÃ©cifiÃ©es. Il est de la
+     * responsabilitÃ© de l'utilisateur d'appeller cette mÃ©thode exactement une fois avant d'appeller
+     * la mÃ©thode {@link #evaluate evaluate}. La normalisation est faite sur place.
      */
     void normalize(double[] values);
 
     /**
-     * Calcule la valeur prédite à partir des valeurs données en entrés. Chaque valeur à un index
-     * <var>i</var> doit correspondre au descripteur à ce même index <var>i</var> dans l'ensemble
-     * retournée par {@link #getDescriptors}.
+     * Calcule la valeur prÃ©dite Ã  partir des valeurs donnÃ©es en entrÃ©s. Chaque valeur Ã  un index
+     * <var>i</var> doit correspondre au descripteur Ã  ce mÃªme index <var>i</var> dans l'ensemble
+     * retournÃ©e par {@link #getDescriptors}.
      */
     double evaluate(double[] values);
 
     /**
-     * Retourne une couverture qui évaluera le modèle aux positions spatio-temporelles qui lui
-     * seront données.
+     * Retourne une couverture qui Ã©valuera le modÃ¨le aux positions spatio-temporelles qui lui
+     * seront donnÃ©es.
      *
-     * @throws CatalogException si la couverture n'a pas pu être construite.
+     * @throws CatalogException si la couverture n'a pas pu Ãªtre construite.
      */
     Coverage asCoverage() throws CatalogException;
 }

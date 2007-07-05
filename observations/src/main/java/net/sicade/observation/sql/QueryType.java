@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,38 +20,38 @@ package net.sicade.observation.sql;
 
 
 /**
- * Type de requête exécutée par {@link SingletonTable}.
+ * Type de requÃªte exÃ©cutÃ©e par {@link SingletonTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public enum QueryType {
     /**
-     * Tous les enregistrements seront listés. C'est le type de requête sélectionné
-     * lorsque la méthode {@link SingletonTable#getEntries} est appelée.
+     * Tous les enregistrements seront listÃ©s. C'est le type de requÃªte sÃ©lectionnÃ©
+     * lorsque la mÃ©thode {@link SingletonTable#getEntries} est appelÃ©e.
      */
     LIST,
 
     /**
-     * Un enregistrement sera sélectionné en fonction de son nom. C'est le type de requête
-     * sélectionné lorsque la méthode {@link SingletonTable#getEntry(String)} est appelée.
+     * Un enregistrement sera sÃ©lectionnÃ© en fonction de son nom. C'est le type de requÃªte
+     * sÃ©lectionnÃ© lorsque la mÃ©thode {@link SingletonTable#getEntry(String)} est appelÃ©e.
      */
     SELECT,
 
     /**
-     * Un enregistrement sera sélectionné en fonction de son numéro d'identifiant. C'est le type
-     * de requête sélectionné lorsque la méthode {@link SingletonTable#getEntry(int)} est appelée.
+     * Un enregistrement sera sÃ©lectionnÃ© en fonction de son numÃ©ro d'identifiant. C'est le type
+     * de requÃªte sÃ©lectionnÃ© lorsque la mÃ©thode {@link SingletonTable#getEntry(int)} est appelÃ©e.
      */
     SELECT_BY_IDENTIFIER,
 
     /**
-     * Sélectionne les coordonnées spatio-temporelles d'un ensemble d'enregistrements. C'est le
-     * type de requête que peut exécuter {@link BoundedSingletonTable#getGeographicBoundingBox}.
+     * SÃ©lectionne les coordonnÃ©es spatio-temporelles d'un ensemble d'enregistrements. C'est le
+     * type de requÃªte que peut exÃ©cuter {@link BoundedSingletonTable#getGeographicBoundingBox}.
      */
     BOUNDING_BOX,
 
     /**
-     * Un enregistrement sera ajouté.
+     * Un enregistrement sera ajoutÃ©.
      */
     INSERT
 }

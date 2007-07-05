@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,11 +23,11 @@ import net.sicade.observation.Phenomenon;
 
 
 /**
- * Un thème de série(s) d'images. Un thème peut être par exemple la température, où les concentrations
- * en chlorophylle-<var>a</var>. Notez qu'un thème est différent d'une {@linkplain Series série} du
- * fait qu'une même série représente souvent un même thème (par exemple la température) mesuré par le
- * même capteur (par exemple les satellites NOAA) sur la même région géographique. La notion de thème
- * représentée ici est plus générale.
+ * Un thÃ¨me de sÃ©rie(s) d'images. Un thÃ¨me peut Ãªtre par exemple la tempÃ©rature, oÃ¹ les concentrations
+ * en chlorophylle-<var>a</var>. Notez qu'un thÃ¨me est diffÃ©rent d'une {@linkplain Series sÃ©rie} du
+ * fait qu'une mÃªme sÃ©rie reprÃ©sente souvent un mÃªme thÃ¨me (par exemple la tempÃ©rature) mesurÃ© par le
+ * mÃªme capteur (par exemple les satellites NOAA) sur la mÃªme rÃ©gion gÃ©ographique. La notion de thÃ¨me
+ * reprÃ©sentÃ©e ici est plus gÃ©nÃ©rale.
  *
  * @version $Id$
  * @author Antoine Hnawia

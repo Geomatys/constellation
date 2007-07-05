@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,14 +40,14 @@ import net.sicade.observation.coverage.Series;
 
 
 /**
- * Ajoute des entrées dans une table {@link WritableGridCoverageTable}.
- * Elle peut être appelée par un script shell pour automatiser l'ajout d'image dans la table 
+ * Ajoute des entrÃ©es dans une table {@link WritableGridCoverageTable}.
+ * Elle peut Ãªtre appelÃ©e par un script shell pour automatiser l'ajout d'image dans la table 
  * {@link GridCoverageTable GridCoverage}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
  *
- * @todo Envisager de déplacer ce code vers {@link WritableGridCoverageTable}.
+ * @todo Envisager de dÃ©placer ce code vers {@link WritableGridCoverageTable}.
  */
 public class UpdateGridCoverageTable {
     /**
@@ -57,10 +57,10 @@ public class UpdateGridCoverageTable {
     }
     
     /**
-     * Retourne un objet {@link Date} correspondant a la chaîne de caractère {@code date} fournie 
-     * en paramètre.
+     * Retourne un objet {@link Date} correspondant a la chaÃ®ne de caractÃ¨re {@code date} fournie 
+     * en paramÃ¨tre.
      * 
-     * @param   date    La chaîne de caractère à "traduire" en objet {@link Date}.
+     * @param   date    La chaÃ®ne de caractÃ¨re Ã  "traduire" en objet {@link Date}.
      */
     private static Date getDate(String date) {
         final DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE);
@@ -92,14 +92,14 @@ public class UpdateGridCoverageTable {
     }
     
     /**
-     * La méthode principale attend comme argument sur la ligne de commande : 
-     *  - la série pour laquelle rajouter une image, 
-     *  - le nom de l'image à rajouter (sans son chemin ni son extension), 
-     *  - la date de début, 
+     * La mÃ©thode principale attend comme argument sur la ligne de commande : 
+     *  - la sÃ©rie pour laquelle rajouter une image, 
+     *  - le nom de l'image Ã  rajouter (sans son chemin ni son extension), 
+     *  - la date de dÃ©but, 
      *  - la date de fin, 
-     *  - xmin, ymin, xmax, ymax coordonnées géographiques, 
+     *  - xmin, ymin, xmax, ymax coordonnÃ©es gÃ©ographiques, 
      *  - largeur et hauteur de l'image.
-     * Les dates peuvent être au format : aaaammjj ou aaaajjj.
+     * Les dates peuvent Ãªtre au format : aaaammjj ou aaaajjj.
      * 
      * @param args the command line arguments
      */
@@ -133,35 +133,35 @@ public class UpdateGridCoverageTable {
         System.out.println("Usage: -series=subseries -f=filename -startTime=aaaammjj -endTime=aaaammjj " +
                 "-xmin=xmin -xmax=xmax -ymin=ymin -ymax=ymax -width=width -height=height");
         System.out.println();
-        System.out.println("  -series       La série pour laquelle il faut rajouter une entrée dans la table.");
+        System.out.println("  -series       La sÃ©rie pour laquelle il faut rajouter une entrÃ©e dans la table.");
         System.out.println("  -f            Le nom de l'image, sans son chemin ni son extension.");
-        System.out.println("  -startTime    Le début de la plage de temps qui concerne l'image.");
+        System.out.println("  -startTime    Le dÃ©but de la plage de temps qui concerne l'image.");
         System.out.println("  -endTime      La fin de la plage de temps qui concerne l'image.");
         System.out.println("  -xmin         Le xmin de la bounding box de l'image.");
         System.out.println("  -xmax         Le xmax de la bounding box de l'image.");
         System.out.println("  -ymin         Le ymin de la bounding box de l'image.");
         System.out.println("  -ymax         Le ymax de la bounding box de l'image.");
         System.out.println();
-        System.out.println("Les cinq paramètres sont obligatoires.");
+        System.out.println("Les cinq paramÃ¨tres sont obligatoires.");
         System.out.println();
-        System.out.println("Le format de la date peut être : aaaammjj ou bien aaaajjj.");
+        System.out.println("Le format de la date peut Ãªtre : aaaammjj ou bien aaaajjj.");
         System.out.println();
         System.out.println("L'exemple suivant rajoute dans la table \"GridCoverages\" : ");
         System.out.println("    - l'image                   \"PP20070102\" ");
-        System.out.println("    - de la série               \"Potentiel de pêche (Calédonie) BET-optimal\" ");
-        System.out.println("    - dont la date de début est \"20070101\" ");
+        System.out.println("    - de la sÃ©rie               \"Potentiel de pÃªche (CalÃ©donie) BET-optimal\" ");
+        System.out.println("    - dont la date de dÃ©but est \"20070101\" ");
         System.out.println("    - la date de fin est        \"20070102\" ");
-        System.out.println("    - la bounding box est définie par : ");
+        System.out.println("    - la bounding box est dÃ©finie par : ");
         System.out.println("        - xmin                  \"155\"");
         System.out.println("        - ymin                  \"-29.6666666666667\"");
         System.out.println("        - xmax                  \"175\"");
         System.out.println("        - ymax                  \"-14\"");
-        System.out.println("    - les dimensions sont définie par : ");
+        System.out.println("    - les dimensions sont dÃ©finie par : ");
         System.out.println("        - width                 \"400\"");
         System.out.println("        - height                \"313\"");
         System.out.println();
         System.out.println("java net.sicade.observation.coverage.sql.UpdateGridCoverageTable "  +
-                                "-series=\"Potentiel de pêche (Calédonie) BET-optimal\" "       +
+                                "-series=\"Potentiel de pÃªche (CalÃ©donie) BET-optimal\" "       +
                                 "-f=PP20070102 -startTime=20070101 -endTime=20070102 "          +
                                 "-xmin=155 -xmax=175 -ymin=-29.6666666666667 -ymax=-14 "        +
                                 "-width=400 -height=height");

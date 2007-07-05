@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ import javax.units.Unit;
  */
 public interface Measurement extends Observation {
     /**
-     * Retourne la valeur numérique de la mesure.
+     * Retourne la valeur numÃ©rique de la mesure.
      */
     float getValue();
 
@@ -40,9 +40,9 @@ public interface Measurement extends Observation {
     float getError();
 
     /**
-     * Retourne les unités de la mesure. Ca peut être par exemple des kilogrammes
-     * ou des tonnes de poissons pêchés, ou plus simplement un comptage du nombre
-     * d'individus. Dans ce dernier cas, l'unité retournée sera sans dimension.
+     * Retourne les unitÃ©s de la mesure. Ca peut Ãªtre par exemple des kilogrammes
+     * ou des tonnes de poissons pÃªchÃ©s, ou plus simplement un comptage du nombre
+     * d'individus. Dans ce dernier cas, l'unitÃ© retournÃ©e sera sans dimension.
      */
     Unit getUnit();
 }

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ import junit.framework.TestSuite;
  */
 public class OrderedVectorTest extends TestCase {
     /**
-     * Exécute la suite de tests à partir de la ligne de commande.
+     * ExÃ©cute la suite de tests Ã  partir de la ligne de commande.
      */
     public static void main(final String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -56,14 +56,14 @@ public class OrderedVectorTest extends TestCase {
     }
 
     /**
-     * Teste la version bufferisée.
+     * Teste la version bufferisÃ©e.
      */
     public void testBuffered() {
         /*
-         * Construit un vecteur de valeurs aléatoires. Note: la valeur 'seed' utilisé ci-dessous
-         * a été choisie empiriquement de manière à éviter de produire des valeurs trop proches
-         * des limites du tableau. On évite ainsi de compliquer les vérifications des méthodes
-         * testées ici. La vérification des méthodes aux limites devrait être effectuée par un
+         * Construit un vecteur de valeurs alÃ©atoires. Note: la valeur 'seed' utilisÃ© ci-dessous
+         * a Ã©tÃ© choisie empiriquement de maniÃ¨re Ã  Ã©viter de produire des valeurs trop proches
+         * des limites du tableau. On Ã©vite ainsi de compliquer les vÃ©rifications des mÃ©thodes
+         * testÃ©es ici. La vÃ©rification des mÃ©thodes aux limites devrait Ãªtre effectuÃ©e par un
          * code explicite.
          */
         final Random random = new Random(563874);
@@ -74,13 +74,13 @@ public class OrderedVectorTest extends TestCase {
         final OrderedVector vector = new BufferedOrderedVector(DoubleBuffer.wrap(data));
         final double EPS = 1E-8; // Petite valeur pour les comparaisons qui se veulent exactes.
         /*
-         * Vérification des propriétées les plus simples.
+         * VÃ©rification des propriÃ©tÃ©es les plus simples.
          */
         assertEquals(data.length,                   vector.length());
         assertEquals(data[500],                     vector.get(500), EPS);
         assertEquals(DataOrder.STRICTLY_ASCENDING,  vector.getDataOrder());
         /*
-         * Vérifie le fonctionnement des méthode 'locate', 'locateAroundIndex', 'copyIndexInto'
+         * VÃ©rifie le fonctionnement des mÃ©thode 'locate', 'locateAroundIndex', 'copyIndexInto'
          * en l'absence de valeurs manquantes.
          */
         final int[] index0 = new int[0];
@@ -128,8 +128,8 @@ public class OrderedVectorTest extends TestCase {
             assertOneIncrement(index4);
         }
         /*
-         * Vérifie le fonctionnement des méthode 'locate', 'locateAroundIndex', 'copyIndexInto'
-         * en présence de valeurs manquantes.
+         * VÃ©rifie le fonctionnement des mÃ©thode 'locate', 'locateAroundIndex', 'copyIndexInto'
+         * en prÃ©sence de valeurs manquantes.
          */
         for (int i=0; i<10; i++) {
             int index, b;
@@ -171,7 +171,7 @@ public class OrderedVectorTest extends TestCase {
     }
 
     /**
-     * Vérifie que l'intervalle entre chaque valeurs du tableau spécifié est 1.
+     * VÃ©rifie que l'intervalle entre chaque valeurs du tableau spÃ©cifiÃ© est 1.
      */
     private static void assertOneIncrement(final int[] index) {
         for (int i=1; i<index.length; i++) {

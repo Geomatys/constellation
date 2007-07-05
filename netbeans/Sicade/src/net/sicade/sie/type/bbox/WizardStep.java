@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@ import javax.swing.JPanel;
 
 
 /**
- * Classe de base de la partie visuelle des différentes pages de l'assistant.
- * Chaque sous-classe de {@code WizardStep} correspond à une étape de l'assistant.
+ * Classe de base de la partie visuelle des diffÃ©rentes pages de l'assistant.
+ * Chaque sous-classe de {@code WizardStep} correspond Ã  une Ã©tape de l'assistant.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -37,12 +37,12 @@ abstract class WizardStep extends JPanel {
     }
 
     /**
-     * Modifie l'état de ce paneau à partir des informations contenues dans l'objet spécifié.
+     * Modifie l'Ã©tat de ce paneau Ã  partir des informations contenues dans l'objet spÃ©cifiÃ©.
      */
     public abstract void readSettings(final BoundingBox settings);
 
     /**
-     * Enregistre l'état de ce paneau dans l'objet spécifié.
+     * Enregistre l'Ã©tat de ce paneau dans l'objet spÃ©cifiÃ©.
      */
     public abstract void storeSettings(final BoundingBox settings);
 }

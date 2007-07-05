@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,33 +30,33 @@ import net.sicade.resources.XArray;
 
 
 /**
- * Un noeud qui représentera le {@linkplain DataFile contenu d'un fichier} de manière visuelle dans
+ * Un noeud qui reprÃ©sentera le {@linkplain DataFile contenu d'un fichier} de maniÃ¨re visuelle dans
  * l'arboresence. Ces fichiers sont de type {code bbox} et contiennent des informations sur la
- * {@linkplain BoundingBox région spatio-temporelle d'intérêt}, à partir de laquelle seront déduites
- * les séries de données proposées à l'utilisateur dans l'arborescence.
+ * {@linkplain BoundingBox rÃ©gion spatio-temporelle d'intÃ©rÃªt}, Ã  partir de laquelle seront dÃ©duites
+ * les sÃ©ries de donnÃ©es proposÃ©es Ã  l'utilisateur dans l'arborescence.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class RootNode extends DataNode {
     /**
-     * Chemin vers l'icone représentant ce noeud, or {@code null} si aucun icone n'a été définie.
+     * Chemin vers l'icone reprÃ©sentant ce noeud, or {@code null} si aucun icone n'a Ã©tÃ© dÃ©finie.
      */
     static final String ICON_PATH = "toolbarButtonGraphics/development/WebComponent16.gif";
 
     /**
-     * Chemin vers l'icone représentant ce noeud, or {@code null} si aucun icone n'a été définie.
+     * Chemin vers l'icone reprÃ©sentant ce noeud, or {@code null} si aucun icone n'a Ã©tÃ© dÃ©finie.
      */
     static final String ICON_32_PATH = "toolbarButtonGraphics/development/WebComponent24.gif";
 
     /**
-     * Les actions à retourner par {@link #addAction}. Ne sera construit que la première
-     * fois où elles seront nécessaires.
+     * Les actions Ã  retourner par {@link #addAction}. Ne sera construit que la premiÃ¨re
+     * fois oÃ¹ elles seront nÃ©cessaires.
      */
     private transient Action[] actions;
 
     /**
-     * Construit un noeud qui représentera dans l'arborescence la région d'intérêt spécifiée.
+     * Construit un noeud qui reprÃ©sentera dans l'arborescence la rÃ©gion d'intÃ©rÃªt spÃ©cifiÃ©e.
      */
     public RootNode(final DataFile data) {
         super(data, new ChildrenList(data.bbox));
@@ -66,18 +66,18 @@ final class RootNode extends DataNode {
     }
 
     /**
-     * Reconstruit la totalité de l'arborescence, typiquement après un changement de la structure.
-     * Cette méthode est appelée après {@link BoundingBox#setTreeLayout}.
+     * Reconstruit la totalitÃ© de l'arborescence, typiquement aprÃ¨s un changement de la structure.
+     * Cette mÃ©thode est appelÃ©e aprÃ¨s {@link BoundingBox#setTreeLayout}.
      */
     final void refresh() {
         setChildren(((ChildrenList) getChildren()).recreate());
     }
 
     /**
-     * Retourne la liste des actions qui peuvent être exécutées sur ce noeud. Cette méthode obtient
-     * les actions par défaut de la classe parente, et y ajoute des actions particulières juste avant
-     * le dernier séparateur. Ca a pour effet de placer les actions supplémentaires avant l'item
-     * "Propriétés" dans le menu contextuel.
+     * Retourne la liste des actions qui peuvent Ãªtre exÃ©cutÃ©es sur ce noeud. Cette mÃ©thode obtient
+     * les actions par dÃ©faut de la classe parente, et y ajoute des actions particuliÃ¨res juste avant
+     * le dernier sÃ©parateur. Ca a pour effet de placer les actions supplÃ©mentaires avant l'item
+     * "PropriÃ©tÃ©s" dans le menu contextuel.
      */
     @Override
     public Action[] getActions(final boolean context) {
@@ -100,7 +100,7 @@ final class RootNode extends DataNode {
     }
 
     /**
-     * Construit une feuille de propriétés pour ce noeud.
+     * Construit une feuille de propriÃ©tÃ©s pour ce noeud.
      */
     @Override
     protected Sheet createSheet() {

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,7 +39,7 @@ import org.geotools.image.io.PaletteFactory;
  */
 public class UtilitiesTest extends TestCase {
     /**
-     * Exécute la suite de tests à partir de la ligne de commande.
+     * ExÃ©cute la suite de tests Ã  partir de la ligne de commande.
      */
     public static void main(final String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -60,7 +60,7 @@ public class UtilitiesTest extends TestCase {
     }
 
     /**
-     * Teste la palette retournée par {@link Utilities#getPaletteFactory}.
+     * Teste la palette retournÃ©e par {@link Utilities#getPaletteFactory}.
      */
     public void testPalette() throws IOException {
         final PaletteFactory palette = Utilities.getPaletteFactory(null);

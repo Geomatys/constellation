@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,11 +27,11 @@ import static java.lang.Double.doubleToLongBits;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain LocationOffset décalage spatio-temporel}.
- * Ces entrées sont comparables entre elles. Leur ordre naturel place les entrées en ordre croissant
- * de {@linkplain #getDayOffset décalage spatio-temporel}. Si deux entrées ont le même décalage temporel,
- * alors ils seront ordonnés selon leur {@linkplain #getAltitudeOffset décalage d'altitude}, et ainsi
- * de suite avec le {@linkplain #getNorthing décalage de latitude} et le {@linkplain #getEasting décalage
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain LocationOffset dÃ©calage spatio-temporel}.
+ * Ces entrÃ©es sont comparables entre elles. Leur ordre naturel place les entrÃ©es en ordre croissant
+ * de {@linkplain #getDayOffset dÃ©calage spatio-temporel}. Si deux entrÃ©es ont le mÃªme dÃ©calage temporel,
+ * alors ils seront ordonnÃ©s selon leur {@linkplain #getAltitudeOffset dÃ©calage d'altitude}, et ainsi
+ * de suite avec le {@linkplain #getNorthing dÃ©calage de latitude} et le {@linkplain #getEasting dÃ©calage
  * de longitude}.
  *
  * @version $Id$
@@ -40,17 +40,17 @@ import static java.lang.Double.doubleToLongBits;
  */
 public class LocationOffsetEntry extends Entry implements LocationOffset, Comparable<LocationOffsetEntry> {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -8724628577303211607L;
 
     /**
-     * Une entrée à utiliser à la place de {@code null}.
+     * Une entrÃ©e Ã  utiliser Ã  la place de {@code null}.
      */
     public static final LocationOffsetEntry NULL = new LocationOffsetEntry("", 0, 0, 0, 0); 
 
     /**
-     * Nombre de millisecondes dans une journée.
+     * Nombre de millisecondes dans une journÃ©e.
      */
     static final double DAY = 24*60*60*1000.0;
 
@@ -71,19 +71,19 @@ public class LocationOffsetEntry extends Entry implements LocationOffset, Compar
     
     /**
      * Ecart de temps (en nombre de millisecondes) entre la date de l'observation
-     * et la date à prendre en compte dans les paramètres environnementaux.
+     * et la date Ã  prendre en compte dans les paramÃ¨tres environnementaux.
      */
     private long timeOffset;
 
     /**
-     * Construit une nouvelle entré.
+     * Construit une nouvelle entrÃ©.
      *
-     * @param name Le nom de cette entrée.
+     * @param name Le nom de cette entrÃ©e.
      * @param dx   Ecart de position en x.
      * @param dy   Ecart de position en y.
      * @param dz   Ecart de position en z.
      * @param dt   Ecart de temps (en nombre de millisecondes) entre la date de l'observation
-     *             et la date à prendre en compte dans les paramètres environnementaux.
+     *             et la date Ã  prendre en compte dans les paramÃ¨tres environnementaux.
      */
     protected LocationOffsetEntry(final String  name,
                                   final double  dx,
@@ -127,7 +127,7 @@ public class LocationOffsetEntry extends Entry implements LocationOffset, Compar
     }
 
     /**
-     * Compare l'objet spécifié avec cette entré.
+     * Compare l'objet spÃ©cifiÃ© avec cette entrÃ©.
      */
     @Override
     public boolean equals(final Object object) {
@@ -145,7 +145,7 @@ public class LocationOffsetEntry extends Entry implements LocationOffset, Compar
     }
 
     /**
-     * Compare l'objet spécifié avec cette entré.
+     * Compare l'objet spÃ©cifiÃ© avec cette entrÃ©.
      */
     public int compareTo(final LocationOffsetEntry that) {
         if (this.timeOffset < that.timeOffset) return -1;

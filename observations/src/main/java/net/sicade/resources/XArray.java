@@ -1,7 +1,7 @@
 /*
- * Sicade - Systèmes intégrés de connaissances
- *          pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances
+ *          pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,601 +37,601 @@ public final class XArray {
     }
 
     /**
-     * Renvoie un nouveau tableau qui contiendra les mêmes éléments que {@code array} mais avec la longueur {@code length}
-     * spécifiée. Si la longueur désirée {@code length} est plus grande que la longueur initiale du tableau {@code array},
-     * alors le tableau retourné contiendra tous les éléments de {@code array} avec en plus des éléments initialisés à {@code null}
-     * à la fin du tableau. Si au contraire la longueur désirée {@code length} est plus courte que la longueur initiale du tableau
-     * {@code array}, alors le tableau sera tronqué (c'est à dire que les éléments en trop de {@code array} seront oubliés).
-     * Si la longueur de {@code array} est égale à {@code length}, alors {@code array} sera retourné tel quel.
+     * Renvoie un nouveau tableau qui contiendra les mÃªmes Ã©lÃ©ments que {@code array} mais avec la longueur {@code length}
+     * spÃ©cifiÃ©e. Si la longueur dÃ©sirÃ©e {@code length} est plus grande que la longueur initiale du tableau {@code array},
+     * alors le tableau retournÃ© contiendra tous les Ã©lÃ©ments de {@code array} avec en plus des Ã©lÃ©ments initialisÃ©s Ã  {@code null}
+     * Ã  la fin du tableau. Si au contraire la longueur dÃ©sirÃ©e {@code length} est plus courte que la longueur initiale du tableau
+     * {@code array}, alors le tableau sera tronquÃ© (c'est Ã  dire que les Ã©lÃ©ments en trop de {@code array} seront oubliÃ©s).
+     * Si la longueur de {@code array} est Ã©gale Ã  {@code length}, alors {@code array} sera retournÃ© tel quel.
      *
-     * @param  array Tableau à copier.
-     * @param  length Longueur du tableau désiré.
-     * @return Tableau du même type que {@code array}, de longueur {@code length} et contenant les données de {@code array}.
+     * @param  array Tableau Ã  copier.
+     * @param  length Longueur du tableau dÃ©sirÃ©.
+     * @return Tableau du mÃªme type que {@code array}, de longueur {@code length} et contenant les donnÃ©es de {@code array}.
      */
     public static <Element> Element[] resize(final Element[] array, final int length) {
         return (Element[]) org.geotools.resources.XArray.resize(array, length);
     }
 
     /**
-     * Renvoie un nouveau tableau qui contiendra les mêmes éléments que {@code array} mais avec la longueur {@code length}
-     * spécifiée. Si la longueur désirée {@code length} est plus grande que la longueur initiale du tableau {@code array},
-     * alors le tableau retourné contiendra tous les éléments de {@code array} avec en plus des éléments initialisés à 0
-     * à la fin du tableau. Si au contraire la longueur désirée {@code length} est plus courte que la longueur initiale du tableau
-     * {@code array}, alors le tableau sera tronqué (c'est à dire que les éléments en trop de {@code array} seront oubliés).
-     * Si la longueur de {@code array} est égale à {@code length}, alors {@code array} sera retourné tel quel.
+     * Renvoie un nouveau tableau qui contiendra les mÃªmes Ã©lÃ©ments que {@code array} mais avec la longueur {@code length}
+     * spÃ©cifiÃ©e. Si la longueur dÃ©sirÃ©e {@code length} est plus grande que la longueur initiale du tableau {@code array},
+     * alors le tableau retournÃ© contiendra tous les Ã©lÃ©ments de {@code array} avec en plus des Ã©lÃ©ments initialisÃ©s Ã  0
+     * Ã  la fin du tableau. Si au contraire la longueur dÃ©sirÃ©e {@code length} est plus courte que la longueur initiale du tableau
+     * {@code array}, alors le tableau sera tronquÃ© (c'est Ã  dire que les Ã©lÃ©ments en trop de {@code array} seront oubliÃ©s).
+     * Si la longueur de {@code array} est Ã©gale Ã  {@code length}, alors {@code array} sera retournÃ© tel quel.
      *
-     * @param  array Tableau à copier.
-     * @param  length Longueur du tableau désiré.
-     * @return Tableau du même type que {@code array}, de longueur {@code length} et contenant les données de {@code array}.
+     * @param  array Tableau Ã  copier.
+     * @param  length Longueur du tableau dÃ©sirÃ©.
+     * @return Tableau du mÃªme type que {@code array}, de longueur {@code length} et contenant les donnÃ©es de {@code array}.
      */
     public static double[] resize(final double[] array, final int length) {
         return org.geotools.resources.XArray.resize(array, length);
     }
 
     /**
-     * Renvoie un nouveau tableau qui contiendra les mêmes éléments que {@code array} mais avec la longueur {@code length}
-     * spécifiée. Si la longueur désirée {@code length} est plus grande que la longueur initiale du tableau {@code array},
-     * alors le tableau retourné contiendra tous les éléments de {@code array} avec en plus des éléments initialisés à 0
-     * à la fin du tableau. Si au contraire la longueur désirée {@code length} est plus courte que la longueur initiale du tableau
-     * {@code array}, alors le tableau sera tronqué (c'est à dire que les éléments en trop de {@code array} seront oubliés).
-     * Si la longueur de {@code array} est égale à {@code length}, alors {@code array} sera retourné tel quel.
+     * Renvoie un nouveau tableau qui contiendra les mÃªmes Ã©lÃ©ments que {@code array} mais avec la longueur {@code length}
+     * spÃ©cifiÃ©e. Si la longueur dÃ©sirÃ©e {@code length} est plus grande que la longueur initiale du tableau {@code array},
+     * alors le tableau retournÃ© contiendra tous les Ã©lÃ©ments de {@code array} avec en plus des Ã©lÃ©ments initialisÃ©s Ã  0
+     * Ã  la fin du tableau. Si au contraire la longueur dÃ©sirÃ©e {@code length} est plus courte que la longueur initiale du tableau
+     * {@code array}, alors le tableau sera tronquÃ© (c'est Ã  dire que les Ã©lÃ©ments en trop de {@code array} seront oubliÃ©s).
+     * Si la longueur de {@code array} est Ã©gale Ã  {@code length}, alors {@code array} sera retournÃ© tel quel.
      *
-     * @param  array Tableau à copier.
-     * @param  length Longueur du tableau désiré.
-     * @return Tableau du même type que {@code array}, de longueur {@code length} et contenant les données de {@code array}.
+     * @param  array Tableau Ã  copier.
+     * @param  length Longueur du tableau dÃ©sirÃ©.
+     * @return Tableau du mÃªme type que {@code array}, de longueur {@code length} et contenant les donnÃ©es de {@code array}.
      */
     public static float[] resize(final float[] array, final int length) {
         return org.geotools.resources.XArray.resize(array, length);
     }
 
     /**
-     * Renvoie un nouveau tableau qui contiendra les mêmes éléments que {@code array} mais avec la longueur {@code length}
-     * spécifiée. Si la longueur désirée {@code length} est plus grande que la longueur initiale du tableau {@code array},
-     * alors le tableau retourné contiendra tous les éléments de {@code array} avec en plus des éléments initialisés à 0
-     * à la fin du tableau. Si au contraire la longueur désirée {@code length} est plus courte que la longueur initiale du tableau
-     * {@code array}, alors le tableau sera tronqué (c'est à dire que les éléments en trop de {@code array} seront oubliés).
-     * Si la longueur de {@code array} est égale à {@code length}, alors {@code array} sera retourné tel quel.
+     * Renvoie un nouveau tableau qui contiendra les mÃªmes Ã©lÃ©ments que {@code array} mais avec la longueur {@code length}
+     * spÃ©cifiÃ©e. Si la longueur dÃ©sirÃ©e {@code length} est plus grande que la longueur initiale du tableau {@code array},
+     * alors le tableau retournÃ© contiendra tous les Ã©lÃ©ments de {@code array} avec en plus des Ã©lÃ©ments initialisÃ©s Ã  0
+     * Ã  la fin du tableau. Si au contraire la longueur dÃ©sirÃ©e {@code length} est plus courte que la longueur initiale du tableau
+     * {@code array}, alors le tableau sera tronquÃ© (c'est Ã  dire que les Ã©lÃ©ments en trop de {@code array} seront oubliÃ©s).
+     * Si la longueur de {@code array} est Ã©gale Ã  {@code length}, alors {@code array} sera retournÃ© tel quel.
      *
-     * @param  array Tableau à copier.
-     * @param  length Longueur du tableau désiré.
-     * @return Tableau du même type que {@code array}, de longueur {@code length} et contenant les données de {@code array}.
+     * @param  array Tableau Ã  copier.
+     * @param  length Longueur du tableau dÃ©sirÃ©.
+     * @return Tableau du mÃªme type que {@code array}, de longueur {@code length} et contenant les donnÃ©es de {@code array}.
      */
     public static long[] resize(final long[] array, final int length) {
         return org.geotools.resources.XArray.resize(array, length);
     }
 
     /**
-     * Renvoie un nouveau tableau qui contiendra les mêmes éléments que {@code array} mais avec la longueur {@code length}
-     * spécifiée. Si la longueur désirée {@code length} est plus grande que la longueur initiale du tableau {@code array},
-     * alors le tableau retourné contiendra tous les éléments de {@code array} avec en plus des éléments initialisés à 0
-     * à la fin du tableau. Si au contraire la longueur désirée {@code length} est plus courte que la longueur initiale du tableau
-     * {@code array}, alors le tableau sera tronqué (c'est à dire que les éléments en trop de {@code array} seront oubliés).
-     * Si la longueur de {@code array} est égale à {@code length}, alors {@code array} sera retourné tel quel.
+     * Renvoie un nouveau tableau qui contiendra les mÃªmes Ã©lÃ©ments que {@code array} mais avec la longueur {@code length}
+     * spÃ©cifiÃ©e. Si la longueur dÃ©sirÃ©e {@code length} est plus grande que la longueur initiale du tableau {@code array},
+     * alors le tableau retournÃ© contiendra tous les Ã©lÃ©ments de {@code array} avec en plus des Ã©lÃ©ments initialisÃ©s Ã  0
+     * Ã  la fin du tableau. Si au contraire la longueur dÃ©sirÃ©e {@code length} est plus courte que la longueur initiale du tableau
+     * {@code array}, alors le tableau sera tronquÃ© (c'est Ã  dire que les Ã©lÃ©ments en trop de {@code array} seront oubliÃ©s).
+     * Si la longueur de {@code array} est Ã©gale Ã  {@code length}, alors {@code array} sera retournÃ© tel quel.
      *
-     * @param  array Tableau à copier.
-     * @param  length Longueur du tableau désiré.
-     * @return Tableau du même type que {@code array}, de longueur {@code length} et contenant les données de {@code array}.
+     * @param  array Tableau Ã  copier.
+     * @param  length Longueur du tableau dÃ©sirÃ©.
+     * @return Tableau du mÃªme type que {@code array}, de longueur {@code length} et contenant les donnÃ©es de {@code array}.
      */
     public static int[] resize(final int[] array, final int length) {
         return org.geotools.resources.XArray.resize(array, length);
     }
 
     /**
-     * Renvoie un nouveau tableau qui contiendra les mêmes éléments que {@code array} mais avec la longueur {@code length}
-     * spécifiée. Si la longueur désirée {@code length} est plus grande que la longueur initiale du tableau {@code array},
-     * alors le tableau retourné contiendra tous les éléments de {@code array} avec en plus des éléments initialisés à 0
-     * à la fin du tableau. Si au contraire la longueur désirée {@code length} est plus courte que la longueur initiale du tableau
-     * {@code array}, alors le tableau sera tronqué (c'est à dire que les éléments en trop de {@code array} seront oubliés).
-     * Si la longueur de {@code array} est égale à {@code length}, alors {@code array} sera retourné tel quel.
+     * Renvoie un nouveau tableau qui contiendra les mÃªmes Ã©lÃ©ments que {@code array} mais avec la longueur {@code length}
+     * spÃ©cifiÃ©e. Si la longueur dÃ©sirÃ©e {@code length} est plus grande que la longueur initiale du tableau {@code array},
+     * alors le tableau retournÃ© contiendra tous les Ã©lÃ©ments de {@code array} avec en plus des Ã©lÃ©ments initialisÃ©s Ã  0
+     * Ã  la fin du tableau. Si au contraire la longueur dÃ©sirÃ©e {@code length} est plus courte que la longueur initiale du tableau
+     * {@code array}, alors le tableau sera tronquÃ© (c'est Ã  dire que les Ã©lÃ©ments en trop de {@code array} seront oubliÃ©s).
+     * Si la longueur de {@code array} est Ã©gale Ã  {@code length}, alors {@code array} sera retournÃ© tel quel.
      *
-     * @param  array Tableau à copier.
-     * @param  length Longueur du tableau désiré.
-     * @return Tableau du même type que {@code array}, de longueur {@code length} et contenant les données de {@code array}.
+     * @param  array Tableau Ã  copier.
+     * @param  length Longueur du tableau dÃ©sirÃ©.
+     * @return Tableau du mÃªme type que {@code array}, de longueur {@code length} et contenant les donnÃ©es de {@code array}.
      */
     public static short[] resize(final short[] array, final int length) {
         return org.geotools.resources.XArray.resize(array, length);
     }
 
     /**
-     * Renvoie un nouveau tableau qui contiendra les mêmes éléments que {@code array} mais avec la longueur {@code length}
-     * spécifiée. Si la longueur désirée {@code length} est plus grande que la longueur initiale du tableau {@code array},
-     * alors le tableau retourné contiendra tous les éléments de {@code array} avec en plus des éléments initialisés à 0
-     * à la fin du tableau. Si au contraire la longueur désirée {@code length} est plus courte que la longueur initiale du tableau
-     * {@code array}, alors le tableau sera tronqué (c'est à dire que les éléments en trop de {@code array} seront oubliés).
-     * Si la longueur de {@code array} est égale à {@code length}, alors {@code array} sera retourné tel quel.
+     * Renvoie un nouveau tableau qui contiendra les mÃªmes Ã©lÃ©ments que {@code array} mais avec la longueur {@code length}
+     * spÃ©cifiÃ©e. Si la longueur dÃ©sirÃ©e {@code length} est plus grande que la longueur initiale du tableau {@code array},
+     * alors le tableau retournÃ© contiendra tous les Ã©lÃ©ments de {@code array} avec en plus des Ã©lÃ©ments initialisÃ©s Ã  0
+     * Ã  la fin du tableau. Si au contraire la longueur dÃ©sirÃ©e {@code length} est plus courte que la longueur initiale du tableau
+     * {@code array}, alors le tableau sera tronquÃ© (c'est Ã  dire que les Ã©lÃ©ments en trop de {@code array} seront oubliÃ©s).
+     * Si la longueur de {@code array} est Ã©gale Ã  {@code length}, alors {@code array} sera retournÃ© tel quel.
      *
-     * @param  array Tableau à copier.
-     * @param  length Longueur du tableau désiré.
-     * @return Tableau du même type que {@code array}, de longueur {@code length} et contenant les données de {@code array}.
+     * @param  array Tableau Ã  copier.
+     * @param  length Longueur du tableau dÃ©sirÃ©.
+     * @return Tableau du mÃªme type que {@code array}, de longueur {@code length} et contenant les donnÃ©es de {@code array}.
      */
     public static byte[] resize(final byte[] array, final int length) {
         return org.geotools.resources.XArray.resize(array, length);
     }
 
     /**
-     * Renvoie un nouveau tableau qui contiendra les mêmes éléments que {@code array} mais avec la longueur {@code length}
-     * spécifiée. Si la longueur désirée {@code length} est plus grande que la longueur initiale du tableau {@code array},
-     * alors le tableau retourné contiendra tous les éléments de {@code array} avec en plus des éléments initialisés à 0
-     * à la fin du tableau. Si au contraire la longueur désirée {@code length} est plus courte que la longueur initiale du tableau
-     * {@code array}, alors le tableau sera tronqué (c'est à dire que les éléments en trop de {@code array} seront oubliés).
-     * Si la longueur de {@code array} est égale à {@code length}, alors {@code array} sera retourné tel quel.
+     * Renvoie un nouveau tableau qui contiendra les mÃªmes Ã©lÃ©ments que {@code array} mais avec la longueur {@code length}
+     * spÃ©cifiÃ©e. Si la longueur dÃ©sirÃ©e {@code length} est plus grande que la longueur initiale du tableau {@code array},
+     * alors le tableau retournÃ© contiendra tous les Ã©lÃ©ments de {@code array} avec en plus des Ã©lÃ©ments initialisÃ©s Ã  0
+     * Ã  la fin du tableau. Si au contraire la longueur dÃ©sirÃ©e {@code length} est plus courte que la longueur initiale du tableau
+     * {@code array}, alors le tableau sera tronquÃ© (c'est Ã  dire que les Ã©lÃ©ments en trop de {@code array} seront oubliÃ©s).
+     * Si la longueur de {@code array} est Ã©gale Ã  {@code length}, alors {@code array} sera retournÃ© tel quel.
      *
-     * @param  array Tableau à copier.
-     * @param  length Longueur du tableau désiré.
-     * @return Tableau du même type que {@code array}, de longueur {@code length} et contenant les données de {@code array}.
+     * @param  array Tableau Ã  copier.
+     * @param  length Longueur du tableau dÃ©sirÃ©.
+     * @return Tableau du mÃªme type que {@code array}, de longueur {@code length} et contenant les donnÃ©es de {@code array}.
      */
     public static char[] resize(final char[] array, final int length) {
         return org.geotools.resources.XArray.resize(array, length);
     }
 
     /**
-     * Renvoie un nouveau tableau qui contiendra les mêmes éléments que {@code array} mais avec la longueur {@code length}
-     * spécifiée. Si la longueur désirée {@code length} est plus grande que la longueur initiale du tableau {@code array},
-     * alors le tableau retourné contiendra tous les éléments de {@code array} avec en plus des éléments initialisés à {@code false}
-     * à la fin du tableau. Si au contraire la longueur désirée {@code length} est plus courte que la longueur initiale du tableau
-     * {@code array}, alors le tableau sera tronqué (c'est à dire que les éléments en trop de {@code array} seront oubliés).
-     * Si la longueur de {@code array} est égale à {@code length}, alors {@code array} sera retourné tel quel.
+     * Renvoie un nouveau tableau qui contiendra les mÃªmes Ã©lÃ©ments que {@code array} mais avec la longueur {@code length}
+     * spÃ©cifiÃ©e. Si la longueur dÃ©sirÃ©e {@code length} est plus grande que la longueur initiale du tableau {@code array},
+     * alors le tableau retournÃ© contiendra tous les Ã©lÃ©ments de {@code array} avec en plus des Ã©lÃ©ments initialisÃ©s Ã  {@code false}
+     * Ã  la fin du tableau. Si au contraire la longueur dÃ©sirÃ©e {@code length} est plus courte que la longueur initiale du tableau
+     * {@code array}, alors le tableau sera tronquÃ© (c'est Ã  dire que les Ã©lÃ©ments en trop de {@code array} seront oubliÃ©s).
+     * Si la longueur de {@code array} est Ã©gale Ã  {@code length}, alors {@code array} sera retournÃ© tel quel.
      *
-     * @param  array Tableau à copier.
-     * @param  length Longueur du tableau désiré.
-     * @return Tableau du même type que {@code array}, de longueur {@code length} et contenant les données de {@code array}.
+     * @param  array Tableau Ã  copier.
+     * @param  length Longueur du tableau dÃ©sirÃ©.
+     * @return Tableau du mÃªme type que {@code array}, de longueur {@code length} et contenant les donnÃ©es de {@code array}.
      */
     public static boolean[] resize(final boolean[] array, final int length) {
         return org.geotools.resources.XArray.resize(array, length);
     }
 
     /**
-     * Retire des éléments au milieu d'un tableau.
+     * Retire des Ã©lÃ©ments au milieu d'un tableau.
      *
-     * @param array   Tableau dans lequel retirer des éléments.
-     * @param index   Index dans {@code array} du premier élément à retirer.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'éléments à retirer.
-     * @return        Tableau qui contient la données de {@code array} avec des éléments retirés.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel retirer des Ã©lÃ©ments.
+     * @param index   Index dans {@code array} du premier Ã©lÃ©ment Ã  retirer.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'Ã©lÃ©ments Ã  retirer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec des Ã©lÃ©ments retirÃ©s.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static <Element> Element[] remove(final Element[] array, final int index, final int length) {
         return (Element[]) org.geotools.resources.XArray.remove(array, index, length);
     }
 
     /**
-     * Retire des éléments au milieu d'un tableau.
+     * Retire des Ã©lÃ©ments au milieu d'un tableau.
      *
-     * @param array   Tableau dans lequel retirer des éléments.
-     * @param index   Index dans {@code array} du premier élément à retirer.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'éléments à retirer.
-     * @return        Tableau qui contient la données de {@code array} avec des éléments retirés.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel retirer des Ã©lÃ©ments.
+     * @param index   Index dans {@code array} du premier Ã©lÃ©ment Ã  retirer.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'Ã©lÃ©ments Ã  retirer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec des Ã©lÃ©ments retirÃ©s.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static double[] remove(final double[] array, final int index, final int length) {
         return org.geotools.resources.XArray.remove(array, index, length);
     }
 
     /**
-     * Retire des éléments au milieu d'un tableau.
+     * Retire des Ã©lÃ©ments au milieu d'un tableau.
      *
-     * @param array   Tableau dans lequel retirer des éléments.
-     * @param index   Index dans {@code array} du premier élément à retirer.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'éléments à retirer.
-     * @return        Tableau qui contient la données de {@code array} avec des éléments retirés.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel retirer des Ã©lÃ©ments.
+     * @param index   Index dans {@code array} du premier Ã©lÃ©ment Ã  retirer.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'Ã©lÃ©ments Ã  retirer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec des Ã©lÃ©ments retirÃ©s.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static float[] remove(final float[] array, final int index, final int length) {
         return org.geotools.resources.XArray.remove(array, index, length);
     }
 
     /**
-     * Retire des éléments au milieu d'un tableau.
+     * Retire des Ã©lÃ©ments au milieu d'un tableau.
      *
-     * @param array   Tableau dans lequel retirer des éléments.
-     * @param index   Index dans {@code array} du premier élément à retirer.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'éléments à retirer.
-     * @return        Tableau qui contient la données de {@code array} avec des éléments retirés.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel retirer des Ã©lÃ©ments.
+     * @param index   Index dans {@code array} du premier Ã©lÃ©ment Ã  retirer.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'Ã©lÃ©ments Ã  retirer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec des Ã©lÃ©ments retirÃ©s.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static long[] remove(final long[] array, final int index, final int length) {
         return org.geotools.resources.XArray.remove(array, index, length);
     }
 
     /**
-     * Retire des éléments au milieu d'un tableau.
+     * Retire des Ã©lÃ©ments au milieu d'un tableau.
      *
-     * @param array   Tableau dans lequel retirer des éléments.
-     * @param index   Index dans {@code array} du premier élément à retirer.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'éléments à retirer.
-     * @return        Tableau qui contient la données de {@code array} avec des éléments retirés.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel retirer des Ã©lÃ©ments.
+     * @param index   Index dans {@code array} du premier Ã©lÃ©ment Ã  retirer.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'Ã©lÃ©ments Ã  retirer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec des Ã©lÃ©ments retirÃ©s.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static int[] remove(final int[] array, final int index, final int length) {
         return org.geotools.resources.XArray.remove(array, index, length);
     }
 
     /**
-     * Retire des éléments au milieu d'un tableau.
+     * Retire des Ã©lÃ©ments au milieu d'un tableau.
      *
-     * @param array   Tableau dans lequel retirer des éléments.
-     * @param index   Index dans {@code array} du premier élément à retirer.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'éléments à retirer.
-     * @return        Tableau qui contient la données de {@code array} avec des éléments retirés.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel retirer des Ã©lÃ©ments.
+     * @param index   Index dans {@code array} du premier Ã©lÃ©ment Ã  retirer.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'Ã©lÃ©ments Ã  retirer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec des Ã©lÃ©ments retirÃ©s.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static short[] remove(final short[] array, final int index, final int length) {
         return org.geotools.resources.XArray.remove(array, index, length);
     }
 
     /**
-     * Retire des éléments au milieu d'un tableau.
+     * Retire des Ã©lÃ©ments au milieu d'un tableau.
      *
-     * @param array   Tableau dans lequel retirer des éléments.
-     * @param index   Index dans {@code array} du premier élément à retirer.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'éléments à retirer.
-     * @return        Tableau qui contient la données de {@code array} avec des éléments retirés.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel retirer des Ã©lÃ©ments.
+     * @param index   Index dans {@code array} du premier Ã©lÃ©ment Ã  retirer.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'Ã©lÃ©ments Ã  retirer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec des Ã©lÃ©ments retirÃ©s.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static byte[] remove(final byte[] array, final int index, final int length) {
         return org.geotools.resources.XArray.remove(array, index, length);
     }
 
     /**
-     * Retire des éléments au milieu d'un tableau.
+     * Retire des Ã©lÃ©ments au milieu d'un tableau.
      *
-     * @param array   Tableau dans lequel retirer des éléments.
-     * @param index   Index dans {@code array} du premier élément à retirer.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'éléments à retirer.
-     * @return        Tableau qui contient la données de {@code array} avec des éléments retirés.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel retirer des Ã©lÃ©ments.
+     * @param index   Index dans {@code array} du premier Ã©lÃ©ment Ã  retirer.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'Ã©lÃ©ments Ã  retirer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec des Ã©lÃ©ments retirÃ©s.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static char[] remove(final char[] array, final int index, final int length) {
         return org.geotools.resources.XArray.remove(array, index, length);
     }
 
     /**
-     * Retire des éléments au milieu d'un tableau.
+     * Retire des Ã©lÃ©ments au milieu d'un tableau.
      *
-     * @param array   Tableau dans lequel retirer des éléments.
-     * @param index   Index dans {@code array} du premier élément à retirer.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'éléments à retirer.
-     * @return        Tableau qui contient la données de {@code array} avec des éléments retirés.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel retirer des Ã©lÃ©ments.
+     * @param index   Index dans {@code array} du premier Ã©lÃ©ment Ã  retirer.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'Ã©lÃ©ments Ã  retirer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec des Ã©lÃ©ments retirÃ©s.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static boolean[] remove(final boolean[] array, final int index, final int length) {
         return org.geotools.resources.XArray.remove(array, index, length);
     }
 
     /**
-     * Insère des espaces au milieu d'un tableau.
-     * Ces "espaces" seront constitués d'élements nuls.
+     * InsÃ¨re des espaces au milieu d'un tableau.
+     * Ces "espaces" seront constituÃ©s d'Ã©lements nuls.
      *
-     * @param array   Tableau dans lequel insérer des espaces.
-     * @param index   Index de {@code array} où insérer les espaces.
-     *                Tous les éléments de {@code array} dont l'index est
-     *                égal ou supérieur à {@code index} seront décalés.
-     * @param length  Nombre d'espaces à insérer.
-     * @return        Tableau qui contient la données de {@code array} avec l'espace suplémentaire.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel insÃ©rer des espaces.
+     * @param index   Index de {@code array} oÃ¹ insÃ©rer les espaces.
+     *                Tous les Ã©lÃ©ments de {@code array} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code index} seront dÃ©calÃ©s.
+     * @param length  Nombre d'espaces Ã  insÃ©rer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec l'espace suplÃ©mentaire.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static <Element> Element[] insert(final Element[] array, final int index, final int length) {
         return (Element[]) org.geotools.resources.XArray.insert(array, index, length);
     }
 
     /**
-     * Insère des espaces au milieu d'un tableau.
-     * Ces "espaces" seront constitués de zéros.
+     * InsÃ¨re des espaces au milieu d'un tableau.
+     * Ces "espaces" seront constituÃ©s de zÃ©ros.
      *
-     * @param array   Tableau dans lequel insérer des espaces.
-     * @param index   Index de {@code array} où insérer les espaces.
-     *                Tous les éléments de {@code array} dont l'index est
-     *                égal ou supérieur à {@code index} seront décalés.
-     * @param length  Nombre d'espaces à insérer.
-     * @return        Tableau qui contient la données de {@code array} avec l'espace suplémentaire.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel insÃ©rer des espaces.
+     * @param index   Index de {@code array} oÃ¹ insÃ©rer les espaces.
+     *                Tous les Ã©lÃ©ments de {@code array} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code index} seront dÃ©calÃ©s.
+     * @param length  Nombre d'espaces Ã  insÃ©rer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec l'espace suplÃ©mentaire.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static double[] insert(final double[] array, final int index, final int length) {
         return org.geotools.resources.XArray.insert(array, index, length);
     }
 
     /**
-     * Insère des espaces au milieu d'un tableau.
-     * Ces "espaces" seront constitués de zéros.
+     * InsÃ¨re des espaces au milieu d'un tableau.
+     * Ces "espaces" seront constituÃ©s de zÃ©ros.
      *
-     * @param array   Tableau dans lequel insérer des espaces.
-     * @param index   Index de {@code array} où insérer les espaces.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'espaces à insérer.
-     * @return        Tableau qui contient la données de {@code array} avec l'espace suplémentaire.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel insÃ©rer des espaces.
+     * @param index   Index de {@code array} oÃ¹ insÃ©rer les espaces.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'espaces Ã  insÃ©rer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec l'espace suplÃ©mentaire.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static float[] insert(final float[] array, final int index, final int length) {
         return org.geotools.resources.XArray.insert(array, index, length);
     }
 
     /**
-     * Insère des espaces au milieu d'un tableau.
-     * Ces "espaces" seront constitués de zéros.
+     * InsÃ¨re des espaces au milieu d'un tableau.
+     * Ces "espaces" seront constituÃ©s de zÃ©ros.
      *
-     * @param array   Tableau dans lequel insérer des espaces.
-     * @param index   Index de {@code array} où insérer les espaces.
-     *                Tous les éléments de {@code array} qui suivent cet index peuvent être décalés.
-     * @param length  Nombre d'espaces à insérer.
-     * @return        Tableau qui contient la données de {@code array} avec l'espace suplémentaire.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel insÃ©rer des espaces.
+     * @param index   Index de {@code array} oÃ¹ insÃ©rer les espaces.
+     *                Tous les Ã©lÃ©ments de {@code array} qui suivent cet index peuvent Ãªtre dÃ©calÃ©s.
+     * @param length  Nombre d'espaces Ã  insÃ©rer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec l'espace suplÃ©mentaire.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static long[] insert(final long[] array, final int index, final int length) {
         return org.geotools.resources.XArray.insert(array, index, length);
     }
 
     /**
-     * Insère des espaces au milieu d'un tableau.
-     * Ces "espaces" seront constitués de zéros.
+     * InsÃ¨re des espaces au milieu d'un tableau.
+     * Ces "espaces" seront constituÃ©s de zÃ©ros.
      *
-     * @param array   Tableau dans lequel insérer des espaces.
-     * @param index   Index de {@code array} où insérer les espaces.
-     *                Tous les éléments de {@code array} dont l'index est
-     *                égal ou supérieur à {@code index} seront décalés.
-     * @param length  Nombre d'espaces à insérer.
-     * @return        Tableau qui contient la données de {@code array} avec l'espace suplémentaire.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel insÃ©rer des espaces.
+     * @param index   Index de {@code array} oÃ¹ insÃ©rer les espaces.
+     *                Tous les Ã©lÃ©ments de {@code array} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code index} seront dÃ©calÃ©s.
+     * @param length  Nombre d'espaces Ã  insÃ©rer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec l'espace suplÃ©mentaire.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static int[] insert(final int[] array, final int index, final int length) {
         return org.geotools.resources.XArray.insert(array, index, length);
     }
 
     /**
-     * Insère des espaces au milieu d'un tableau.
-     * Ces "espaces" seront constitués de zéros.
+     * InsÃ¨re des espaces au milieu d'un tableau.
+     * Ces "espaces" seront constituÃ©s de zÃ©ros.
      *
-     * @param array   Tableau dans lequel insérer des espaces.
-     * @param index   Index de {@code array} où insérer les espaces.
-     *                Tous les éléments de {@code array} dont l'index est
-     *                égal ou supérieur à {@code index} seront décalés.
-     * @param length  Nombre d'espaces à insérer.
-     * @return        Tableau qui contient la données de {@code array} avec l'espace suplémentaire.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel insÃ©rer des espaces.
+     * @param index   Index de {@code array} oÃ¹ insÃ©rer les espaces.
+     *                Tous les Ã©lÃ©ments de {@code array} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code index} seront dÃ©calÃ©s.
+     * @param length  Nombre d'espaces Ã  insÃ©rer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec l'espace suplÃ©mentaire.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static short[] insert(final short[] array, final int index, final int length) {
         return org.geotools.resources.XArray.insert(array, index, length);
     }
 
     /**
-     * Insère des espaces au milieu d'un tableau.
-     * Ces "espaces" seront constitués de zéros.
+     * InsÃ¨re des espaces au milieu d'un tableau.
+     * Ces "espaces" seront constituÃ©s de zÃ©ros.
      *
-     * @param array   Tableau dans lequel insérer des espaces.
-     * @param index   Index de {@code array} où insérer les espaces.
-     *                Tous les éléments de {@code array} dont l'index est
-     *                égal ou supérieur à {@code index} seront décalés.
-     * @param length  Nombre d'espaces à insérer.
-     * @return        Tableau qui contient la données de {@code array} avec l'espace suplémentaire.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel insÃ©rer des espaces.
+     * @param index   Index de {@code array} oÃ¹ insÃ©rer les espaces.
+     *                Tous les Ã©lÃ©ments de {@code array} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code index} seront dÃ©calÃ©s.
+     * @param length  Nombre d'espaces Ã  insÃ©rer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec l'espace suplÃ©mentaire.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static byte[] insert(final byte[] array, final int index, final int length) {
         return org.geotools.resources.XArray.insert(array, index, length);
     }
 
     /**
-     * Insère des espaces au milieu d'un tableau.
-     * Ces "espaces" seront constitués de zéros.
+     * InsÃ¨re des espaces au milieu d'un tableau.
+     * Ces "espaces" seront constituÃ©s de zÃ©ros.
      *
-     * @param array   Tableau dans lequel insérer des espaces.
-     * @param index   Index de {@code array} où insérer les espaces.
-     *                Tous les éléments de {@code array} dont l'index est
-     *                égal ou supérieur à {@code index} seront décalés.
-     * @param length  Nombre d'espaces à insérer.
-     * @return        Tableau qui contient la données de {@code array} avec l'espace suplémentaire.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel insÃ©rer des espaces.
+     * @param index   Index de {@code array} oÃ¹ insÃ©rer les espaces.
+     *                Tous les Ã©lÃ©ments de {@code array} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code index} seront dÃ©calÃ©s.
+     * @param length  Nombre d'espaces Ã  insÃ©rer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec l'espace suplÃ©mentaire.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static char[] insert(final char[] array, final int index, final int length) {
         return org.geotools.resources.XArray.insert(array, index, length);
     }
 
     /**
-     * Insère des espaces au milieu d'un tableau.
-     * Ces "espaces" seront constitués de {@code false}.
+     * InsÃ¨re des espaces au milieu d'un tableau.
+     * Ces "espaces" seront constituÃ©s de {@code false}.
      *
-     * @param array   Tableau dans lequel insérer des espaces.
-     * @param index   Index de {@code array} où insérer les espaces.
-     *                Tous les éléments de {@code array} dont l'index est
-     *                égal ou supérieur à {@code index} seront décalés.
-     * @param length  Nombre d'espaces à insérer.
-     * @return        Tableau qui contient la données de {@code array} avec l'espace suplémentaire.
-     *                Cette méthode peut retourner directement {@code dst}, mais la plupart du temps
-     *                elle retournera un tableau nouvellement créé.
+     * @param array   Tableau dans lequel insÃ©rer des espaces.
+     * @param index   Index de {@code array} oÃ¹ insÃ©rer les espaces.
+     *                Tous les Ã©lÃ©ments de {@code array} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code index} seront dÃ©calÃ©s.
+     * @param length  Nombre d'espaces Ã  insÃ©rer.
+     * @return        Tableau qui contient la donnÃ©es de {@code array} avec l'espace suplÃ©mentaire.
+     *                Cette mÃ©thode peut retourner directement {@code dst}, mais la plupart du temps
+     *                elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static boolean[] insert(final boolean[] array, final int index, final int length) {
         return org.geotools.resources.XArray.insert(array, index, length);
     }
 
     /**
-     * Insère une portion de tableau dans un autre tableau. Le tableau {@code src}
-     * sera inséré en totalité ou en partie dans le tableau {@code dst}.
+     * InsÃ¨re une portion de tableau dans un autre tableau. Le tableau {@code src}
+     * sera insÃ©rÃ© en totalitÃ© ou en partie dans le tableau {@code dst}.
      *
-     * @param src     Tableau à insérer dans {@code dst}.
-     * @param src_pos Index de la première donnée de {@code src} à insérer dans {@code dst}.
-     * @param dst     Tableau dans lequel insérer des données de {@code src}.
-     * @param dst_pos Index de {@code dst} où insérer les données de {@code src}.
-     *                Tous les éléments de {@code dst} dont l'index est
-     *                égal ou supérieur à {@code dst_pos} seront décalés.
-     * @param length  Nombre de données de {@code src} à insérer.
+     * @param src     Tableau Ã  insÃ©rer dans {@code dst}.
+     * @param src_pos Index de la premiÃ¨re donnÃ©e de {@code src} Ã  insÃ©rer dans {@code dst}.
+     * @param dst     Tableau dans lequel insÃ©rer des donnÃ©es de {@code src}.
+     * @param dst_pos Index de {@code dst} oÃ¹ insÃ©rer les donnÃ©es de {@code src}.
+     *                Tous les Ã©lÃ©ments de {@code dst} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code dst_pos} seront dÃ©calÃ©s.
+     * @param length  Nombre de donnÃ©es de {@code src} Ã  insÃ©rer.
      * @return        Tableau qui contient la combinaison de {@code src} et {@code dst}. Cette
-     *                méthode peut retourner directement {@code dst}, mais jamais {@code src}.
-     *                La plupart du temps, elle retournera un tableau nouvellement créé.
+     *                mÃ©thode peut retourner directement {@code dst}, mais jamais {@code src}.
+     *                La plupart du temps, elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static <Element> Element[] insert(final Element[] src, final int src_pos, final Element[] dst, final int dst_pos, final int length) {
         return (Element[]) org.geotools.resources.XArray.insert(src, src_pos, dst, dst_pos, length);
     }
 
     /**
-     * Insère une portion de tableau dans un autre tableau. Le tableau {@code src}
-     * sera inséré en totalité ou en partie dans le tableau {@code dst}.
+     * InsÃ¨re une portion de tableau dans un autre tableau. Le tableau {@code src}
+     * sera insÃ©rÃ© en totalitÃ© ou en partie dans le tableau {@code dst}.
      *
-     * @param src     Tableau à insérer dans {@code dst}.
-     * @param src_pos Index de la première donnée de {@code src} à insérer dans {@code dst}.
-     * @param dst     Tableau dans lequel insérer des données de {@code src}.
-     * @param dst_pos Index de {@code dst} où insérer les données de {@code src}.
-     *                Tous les éléments de {@code dst} dont l'index est
-     *                égal ou supérieur à {@code dst_pos} seront décalés.
-     * @param length  Nombre de données de {@code src} à insérer.
+     * @param src     Tableau Ã  insÃ©rer dans {@code dst}.
+     * @param src_pos Index de la premiÃ¨re donnÃ©e de {@code src} Ã  insÃ©rer dans {@code dst}.
+     * @param dst     Tableau dans lequel insÃ©rer des donnÃ©es de {@code src}.
+     * @param dst_pos Index de {@code dst} oÃ¹ insÃ©rer les donnÃ©es de {@code src}.
+     *                Tous les Ã©lÃ©ments de {@code dst} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code dst_pos} seront dÃ©calÃ©s.
+     * @param length  Nombre de donnÃ©es de {@code src} Ã  insÃ©rer.
      * @return        Tableau qui contient la combinaison de {@code src} et {@code dst}. Cette
-     *                méthode peut retourner directement {@code dst}, mais jamais {@code src}.
-     *                La plupart du temps, elle retournera un tableau nouvellement créé.
+     *                mÃ©thode peut retourner directement {@code dst}, mais jamais {@code src}.
+     *                La plupart du temps, elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static double[] insert(final double[] src, final int src_pos, final double[] dst, final int dst_pos, final int length) {
         return org.geotools.resources.XArray.insert(src, src_pos, dst, dst_pos, length);
     }
 
     /**
-     * Insère une portion de tableau dans un autre tableau. Le tableau {@code src}
-     * sera inséré en totalité ou en partie dans le tableau {@code dst}.
+     * InsÃ¨re une portion de tableau dans un autre tableau. Le tableau {@code src}
+     * sera insÃ©rÃ© en totalitÃ© ou en partie dans le tableau {@code dst}.
      *
-     * @param src     Tableau à insérer dans {@code dst}.
-     * @param src_pos Index de la première donnée de {@code src} à insérer dans {@code dst}.
-     * @param dst     Tableau dans lequel insérer des données de {@code src}.
-     * @param dst_pos Index de {@code dst} où insérer les données de {@code src}.
-     *                Tous les éléments de {@code dst} dont l'index est
-     *                égal ou supérieur à {@code dst_pos} seront décalés.
-     * @param length  Nombre de données de {@code src} à insérer.
+     * @param src     Tableau Ã  insÃ©rer dans {@code dst}.
+     * @param src_pos Index de la premiÃ¨re donnÃ©e de {@code src} Ã  insÃ©rer dans {@code dst}.
+     * @param dst     Tableau dans lequel insÃ©rer des donnÃ©es de {@code src}.
+     * @param dst_pos Index de {@code dst} oÃ¹ insÃ©rer les donnÃ©es de {@code src}.
+     *                Tous les Ã©lÃ©ments de {@code dst} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code dst_pos} seront dÃ©calÃ©s.
+     * @param length  Nombre de donnÃ©es de {@code src} Ã  insÃ©rer.
      * @return        Tableau qui contient la combinaison de {@code src} et {@code dst}. Cette
-     *                méthode peut retourner directement {@code dst}, mais jamais {@code src}.
-     *                La plupart du temps, elle retournera un tableau nouvellement créé.
+     *                mÃ©thode peut retourner directement {@code dst}, mais jamais {@code src}.
+     *                La plupart du temps, elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static float[] insert(final float[] src, final int src_pos, final float[] dst, final int dst_pos, final int length) {
         return org.geotools.resources.XArray.insert(src, src_pos, dst, dst_pos, length);
     }
 
     /**
-     * Insère une portion de tableau dans un autre tableau. Le tableau {@code src}
-     * sera inséré en totalité ou en partie dans le tableau {@code dst}.
+     * InsÃ¨re une portion de tableau dans un autre tableau. Le tableau {@code src}
+     * sera insÃ©rÃ© en totalitÃ© ou en partie dans le tableau {@code dst}.
      *
-     * @param src     Tableau à insérer dans {@code dst}.
-     * @param src_pos Index de la première donnée de {@code src} à insérer dans {@code dst}.
-     * @param dst     Tableau dans lequel insérer des données de {@code src}.
-     * @param dst_pos Index de {@code dst} où insérer les données de {@code src}.
-     *                Tous les éléments de {@code dst} dont l'index est
-     *                égal ou supérieur à {@code dst_pos} seront décalés.
-     * @param length  Nombre de données de {@code src} à insérer.
+     * @param src     Tableau Ã  insÃ©rer dans {@code dst}.
+     * @param src_pos Index de la premiÃ¨re donnÃ©e de {@code src} Ã  insÃ©rer dans {@code dst}.
+     * @param dst     Tableau dans lequel insÃ©rer des donnÃ©es de {@code src}.
+     * @param dst_pos Index de {@code dst} oÃ¹ insÃ©rer les donnÃ©es de {@code src}.
+     *                Tous les Ã©lÃ©ments de {@code dst} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code dst_pos} seront dÃ©calÃ©s.
+     * @param length  Nombre de donnÃ©es de {@code src} Ã  insÃ©rer.
      * @return        Tableau qui contient la combinaison de {@code src} et {@code dst}. Cette
-     *                méthode peut retourner directement {@code dst}, mais jamais {@code src}.
-     *                La plupart du temps, elle retournera un tableau nouvellement créé.
+     *                mÃ©thode peut retourner directement {@code dst}, mais jamais {@code src}.
+     *                La plupart du temps, elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static long[] insert(final long[] src, final int src_pos, final long[] dst, final int dst_pos, final int length) {
         return org.geotools.resources.XArray.insert(src, src_pos, dst, dst_pos, length);
     }
 
     /**
-     * Insère une portion de tableau dans un autre tableau. Le tableau {@code src}
-     * sera inséré en totalité ou en partie dans le tableau {@code dst}.
+     * InsÃ¨re une portion de tableau dans un autre tableau. Le tableau {@code src}
+     * sera insÃ©rÃ© en totalitÃ© ou en partie dans le tableau {@code dst}.
      *
-     * @param src     Tableau à insérer dans {@code dst}.
-     * @param src_pos Index de la première donnée de {@code src} à insérer dans {@code dst}.
-     * @param dst     Tableau dans lequel insérer des données de {@code src}.
-     * @param dst_pos Index de {@code dst} où insérer les données de {@code src}.
-     *                Tous les éléments de {@code dst} dont l'index est
-     *                égal ou supérieur à {@code dst_pos} seront décalés.
-     * @param length  Nombre de données de {@code src} à insérer.
+     * @param src     Tableau Ã  insÃ©rer dans {@code dst}.
+     * @param src_pos Index de la premiÃ¨re donnÃ©e de {@code src} Ã  insÃ©rer dans {@code dst}.
+     * @param dst     Tableau dans lequel insÃ©rer des donnÃ©es de {@code src}.
+     * @param dst_pos Index de {@code dst} oÃ¹ insÃ©rer les donnÃ©es de {@code src}.
+     *                Tous les Ã©lÃ©ments de {@code dst} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code dst_pos} seront dÃ©calÃ©s.
+     * @param length  Nombre de donnÃ©es de {@code src} Ã  insÃ©rer.
      * @return        Tableau qui contient la combinaison de {@code src} et {@code dst}. Cette
-     *                méthode peut retourner directement {@code dst}, mais jamais {@code src}.
-     *                La plupart du temps, elle retournera un tableau nouvellement créé.
+     *                mÃ©thode peut retourner directement {@code dst}, mais jamais {@code src}.
+     *                La plupart du temps, elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static int[] insert(final int[] src, final int src_pos, final int[] dst, final int dst_pos, final int length) {
         return org.geotools.resources.XArray.insert(src, src_pos, dst, dst_pos, length);
     }
 
     /**
-     * Insère une portion de tableau dans un autre tableau. Le tableau {@code src}
-     * sera inséré en totalité ou en partie dans le tableau {@code dst}.
+     * InsÃ¨re une portion de tableau dans un autre tableau. Le tableau {@code src}
+     * sera insÃ©rÃ© en totalitÃ© ou en partie dans le tableau {@code dst}.
      *
-     * @param src     Tableau à insérer dans {@code dst}.
-     * @param src_pos Index de la première donnée de {@code src} à insérer dans {@code dst}.
-     * @param dst     Tableau dans lequel insérer des données de {@code src}.
-     * @param dst_pos Index de {@code dst} où insérer les données de {@code src}.
-     *                Tous les éléments de {@code dst} dont l'index est
-     *                égal ou supérieur à {@code dst_pos} seront décalés.
-     * @param length  Nombre de données de {@code src} à insérer.
+     * @param src     Tableau Ã  insÃ©rer dans {@code dst}.
+     * @param src_pos Index de la premiÃ¨re donnÃ©e de {@code src} Ã  insÃ©rer dans {@code dst}.
+     * @param dst     Tableau dans lequel insÃ©rer des donnÃ©es de {@code src}.
+     * @param dst_pos Index de {@code dst} oÃ¹ insÃ©rer les donnÃ©es de {@code src}.
+     *                Tous les Ã©lÃ©ments de {@code dst} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code dst_pos} seront dÃ©calÃ©s.
+     * @param length  Nombre de donnÃ©es de {@code src} Ã  insÃ©rer.
      * @return        Tableau qui contient la combinaison de {@code src} et {@code dst}. Cette
-     *                méthode peut retourner directement {@code dst}, mais jamais {@code src}.
-     *                La plupart du temps, elle retournera un tableau nouvellement créé.
+     *                mÃ©thode peut retourner directement {@code dst}, mais jamais {@code src}.
+     *                La plupart du temps, elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static short[] insert(final short[] src, final int src_pos, final short[] dst, final int dst_pos, final int length) {
         return org.geotools.resources.XArray.insert(src, src_pos, dst, dst_pos, length);
     }
 
     /**
-     * Insère une portion de tableau dans un autre tableau. Le tableau {@code src}
-     * sera inséré en totalité ou en partie dans le tableau {@code dst}.
+     * InsÃ¨re une portion de tableau dans un autre tableau. Le tableau {@code src}
+     * sera insÃ©rÃ© en totalitÃ© ou en partie dans le tableau {@code dst}.
      *
-     * @param src     Tableau à insérer dans {@code dst}.
-     * @param src_pos Index de la première donnée de {@code src} à insérer dans {@code dst}.
-     * @param dst     Tableau dans lequel insérer des données de {@code src}.
-     * @param dst_pos Index de {@code dst} où insérer les données de {@code src}.
-     *                Tous les éléments de {@code dst} dont l'index est
-     *                égal ou supérieur à {@code dst_pos} seront décalés.
-     * @param length  Nombre de données de {@code src} à insérer.
+     * @param src     Tableau Ã  insÃ©rer dans {@code dst}.
+     * @param src_pos Index de la premiÃ¨re donnÃ©e de {@code src} Ã  insÃ©rer dans {@code dst}.
+     * @param dst     Tableau dans lequel insÃ©rer des donnÃ©es de {@code src}.
+     * @param dst_pos Index de {@code dst} oÃ¹ insÃ©rer les donnÃ©es de {@code src}.
+     *                Tous les Ã©lÃ©ments de {@code dst} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code dst_pos} seront dÃ©calÃ©s.
+     * @param length  Nombre de donnÃ©es de {@code src} Ã  insÃ©rer.
      * @return        Tableau qui contient la combinaison de {@code src} et {@code dst}. Cette
-     *                méthode peut retourner directement {@code dst}, mais jamais {@code src}.
-     *                La plupart du temps, elle retournera un tableau nouvellement créé.
+     *                mÃ©thode peut retourner directement {@code dst}, mais jamais {@code src}.
+     *                La plupart du temps, elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static byte[] insert(final byte[] src, final int src_pos, final byte[] dst, final int dst_pos, final int length) {
         return org.geotools.resources.XArray.insert(src, src_pos, dst, dst_pos, length);
     }
 
     /**
-     * Insère une portion de tableau dans un autre tableau. Le tableau {@code src}
-     * sera inséré en totalité ou en partie dans le tableau {@code dst}.
+     * InsÃ¨re une portion de tableau dans un autre tableau. Le tableau {@code src}
+     * sera insÃ©rÃ© en totalitÃ© ou en partie dans le tableau {@code dst}.
      *
-     * @param src     Tableau à insérer dans {@code dst}.
-     * @param src_pos Index de la première donnée de {@code src} à insérer dans {@code dst}.
-     * @param dst     Tableau dans lequel insérer des données de {@code src}.
-     * @param dst_pos Index de {@code dst} où insérer les données de {@code src}.
-     *                Tous les éléments de {@code dst} dont l'index est
-     *                égal ou supérieur à {@code dst_pos} seront décalés.
-     * @param length  Nombre de données de {@code src} à insérer.
+     * @param src     Tableau Ã  insÃ©rer dans {@code dst}.
+     * @param src_pos Index de la premiÃ¨re donnÃ©e de {@code src} Ã  insÃ©rer dans {@code dst}.
+     * @param dst     Tableau dans lequel insÃ©rer des donnÃ©es de {@code src}.
+     * @param dst_pos Index de {@code dst} oÃ¹ insÃ©rer les donnÃ©es de {@code src}.
+     *                Tous les Ã©lÃ©ments de {@code dst} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code dst_pos} seront dÃ©calÃ©s.
+     * @param length  Nombre de donnÃ©es de {@code src} Ã  insÃ©rer.
      * @return        Tableau qui contient la combinaison de {@code src} et {@code dst}. Cette
-     *                méthode peut retourner directement {@code dst}, mais jamais {@code src}.
-     *                La plupart du temps, elle retournera un tableau nouvellement créé.
+     *                mÃ©thode peut retourner directement {@code dst}, mais jamais {@code src}.
+     *                La plupart du temps, elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static char[] insert(final char[] src, final int src_pos, final char[] dst, final int dst_pos, final int length) {
         return org.geotools.resources.XArray.insert(src, src_pos, dst, dst_pos, length);
     }
 
     /**
-     * Insère une portion de tableau dans un autre tableau. Le tableau {@code src}
-     * sera inséré en totalité ou en partie dans le tableau {@code dst}.
+     * InsÃ¨re une portion de tableau dans un autre tableau. Le tableau {@code src}
+     * sera insÃ©rÃ© en totalitÃ© ou en partie dans le tableau {@code dst}.
      *
-     * @param src     Tableau à insérer dans {@code dst}.
-     * @param src_pos Index de la première donnée de {@code src} à insérer dans {@code dst}.
-     * @param dst     Tableau dans lequel insérer des données de {@code src}.
-     * @param dst_pos Index de {@code dst} où insérer les données de {@code src}.
-     *                Tous les éléments de {@code dst} dont l'index est
-     *                égal ou supérieur à {@code dst_pos} seront décalés.
-     * @param length  Nombre de données de {@code src} à insérer.
+     * @param src     Tableau Ã  insÃ©rer dans {@code dst}.
+     * @param src_pos Index de la premiÃ¨re donnÃ©e de {@code src} Ã  insÃ©rer dans {@code dst}.
+     * @param dst     Tableau dans lequel insÃ©rer des donnÃ©es de {@code src}.
+     * @param dst_pos Index de {@code dst} oÃ¹ insÃ©rer les donnÃ©es de {@code src}.
+     *                Tous les Ã©lÃ©ments de {@code dst} dont l'index est
+     *                Ã©gal ou supÃ©rieur Ã  {@code dst_pos} seront dÃ©calÃ©s.
+     * @param length  Nombre de donnÃ©es de {@code src} Ã  insÃ©rer.
      * @return        Tableau qui contient la combinaison de {@code src} et {@code dst}. Cette
-     *                méthode peut retourner directement {@code dst}, mais jamais {@code src}.
-     *                La plupart du temps, elle retournera un tableau nouvellement créé.
+     *                mÃ©thode peut retourner directement {@code dst}, mais jamais {@code src}.
+     *                La plupart du temps, elle retournera un tableau nouvellement crÃ©Ã©.
      */
     public static boolean[] insert(final boolean[] src, final int src_pos, final boolean[] dst, final int dst_pos, final int length) {
         return org.geotools.resources.XArray.insert(src, src_pos, dst, dst_pos, length);

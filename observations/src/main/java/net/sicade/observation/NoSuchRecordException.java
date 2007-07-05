@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,23 +20,23 @@ package net.sicade.observation;
 
 
 /**
- * Indique qu'un enregistrement requis n'a pas été trouvé dans la base de données.
- * Cette exception contient le nom de la table dans laquelle l'enregistrement était attendu.
+ * Indique qu'un enregistrement requis n'a pas Ã©tÃ© trouvÃ© dans la base de donnÃ©es.
+ * Cette exception contient le nom de la table dans laquelle l'enregistrement Ã©tait attendu.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class NoSuchRecordException extends CatalogException {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -3105861955682823122L;
 
     /**
-     * Construit une exception signalant qu'un enregistrement n'a pas été trouvé.
+     * Construit une exception signalant qu'un enregistrement n'a pas Ã©tÃ© trouvÃ©.
      *
-     * @param message Message décrivant l'erreur.
-     * @param table Nom de la table dans laquelle l'enregistrement était attendu, ou {@code null} si inconnu.
+     * @param message Message dÃ©crivant l'erreur.
+     * @param table Nom de la table dans laquelle l'enregistrement Ã©tait attendu, ou {@code null} si inconnu.
      */
     public NoSuchRecordException(final String message, final String table) {
         super(message, table);

@@ -1,7 +1,7 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 1997, Pêches et Océans Canada
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 1997, PÃªches et OcÃ©ans Canada
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,41 +21,41 @@ package net.sicade.numeric.table;
 
 
 /**
- * Exception lancée lorsqu'une extrapolation a été effectuée alors que ce n'était pas permis.
+ * Exception lancÃ©e lorsqu'une extrapolation a Ã©tÃ© effectuÃ©e alors que ce n'Ã©tait pas permis.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ExtrapolationException extends Exception {
     /**
-     * Pour compatibilité avec des enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ© avec des enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -7105249847450063936L;
 
     /**
-     * Valeur <var>x</var> pour laquelle une interpolation avait été demandée.
+     * Valeur <var>x</var> pour laquelle une interpolation avait Ã©tÃ© demandÃ©e.
      */
     public final double xi;
 
     /**
-     * Construit une exception déclarant que le vecteur
-     * des <var>x</var> ne contient pas suffisament de données.
+     * Construit une exception dÃ©clarant que le vecteur
+     * des <var>x</var> ne contient pas suffisament de donnÃ©es.
      */
     public ExtrapolationException() {
-        super("Le vecteur ne contient pas suffisament de données.");
+        super("Le vecteur ne contient pas suffisament de donnÃ©es.");
         xi = Double.NaN;
     }
 
     /**
-     * Construit une exception déclarant que le vecteur des <var>x</var> ne contient pas
-     * suffisament de données ou que la donnée <var>xi</var> demandée n'est pas valide,
+     * Construit une exception dÃ©clarant que le vecteur des <var>x</var> ne contient pas
+     * suffisament de donnÃ©es ou que la donnÃ©e <var>xi</var> demandÃ©e n'est pas valide,
      * si celle-ci est un NaN.
      *
      * @param xi valeur de <var>x</var> pour laquelle on voulait interpoler un <var>y</var>.
      */
     public ExtrapolationException(final double xi) {
-        super(Double.isNaN(xi) ? "Ne peux pas interpoler à x=NaN."
-                               : "La donnée demandée est en dehors de la plage de valeurs du vecteur des X.");
+        super(Double.isNaN(xi) ? "Ne peux pas interpoler Ã  x=NaN."
+                               : "La donnÃ©e demandÃ©e est en dehors de la plage de valeurs du vecteur des X.");
         this.xi = xi;
     }
 }

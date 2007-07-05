@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,64 +39,64 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Implémentation d'une entrée représentant une {@link Station station}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@link Station station}.
  *
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  *
- * @todo L'implémentation actuelle n'est pas <cite>serializable</cite> du fait qu'elle nécessite
- *       une connexion à la base de données. Une version future devrait rétablir la connexion au
+ * @todo L'implÃ©mentation actuelle n'est pas <cite>serializable</cite> du fait qu'elle nÃ©cessite
+ *       une connexion Ã  la base de donnÃ©es. Une version future devrait rÃ©tablir la connexion au
  *       moment de la <cite>deserialization</cite>.
  */
 public class StationEntry extends LocatedEntry implements Station {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 8822736167506306189L;
 
     /**
-     * L'identifiant numérique de la station.
+     * L'identifiant numÃ©rique de la station.
      */
     private final int identifier;
 
     /**
-     * La plateforme (par exemple un bateau) sur laquelle a été prise cette station.
-     * Peut être nul si cette information n'est pas disponible.
+     * La plateforme (par exemple un bateau) sur laquelle a Ã©tÃ© prise cette station.
+     * Peut Ãªtre nul si cette information n'est pas disponible.
      */
     private final Platform platform;
 
     /**
-     * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
+     * La qualitÃ© de la donnÃ©e. Peut Ãªtre nul si cette information n'est pas disponible.
      */
     private final DataQuality quality;
 
     /**
-     * La provenance de la donnée. Peut être nul si cette information n'est pas disponible.
+     * La provenance de la donnÃ©e. Peut Ãªtre nul si cette information n'est pas disponible.
      */
     private final Citation provider;
 
     /**
-     * Connexion vers la table des observations. Contrairement à la plupart des autres
-     * entrées du paquet {@code net.sicade.observation}, les observations ne seront pas
-     * conservées dans une cache car elle sont potentiellement très nombreuses. Il nous
+     * Connexion vers la table des observations. Contrairement Ã  la plupart des autres
+     * entrÃ©es du paquet {@code net.sicade.observation}, les observations ne seront pas
+     * conservÃ©es dans une cache car elle sont potentiellement trÃ¨s nombreuses. Il nous
      * faudra donc conserver la connexion en permanence.
      */
     private final ObservationTable<? extends Observation> table;
 
     /** 
-     * Construit une entrée pour l'identifiant de station spécifié.
+     * Construit une entrÃ©e pour l'identifiant de station spÃ©cifiÃ©.
      *
-     * @param table      La table qui a produit cette entrée.
-     * @param identifier L'identifiant numérique de la station.
+     * @param table      La table qui a produit cette entrÃ©e.
+     * @param identifier L'identifiant numÃ©rique de la station.
      * @param name       Le nom de la station.
-     * @param coordinate Une coordonnée représentative en degrés de longitude et de latitude,
+     * @param coordinate Une coordonnÃ©e reprÃ©sentative en degrÃ©s de longitude et de latitude,
      *                   ou {@code null} si inconue.
-     * @param timeRange  Plage de temps de cet élément, ou {@code null} si inconue.
-     * @param platform   La plateforme (par exemple un bateau) sur laquelle a été prise cette
+     * @param timeRange  Plage de temps de cet Ã©lÃ©ment, ou {@code null} si inconue.
+     * @param platform   La plateforme (par exemple un bateau) sur laquelle a Ã©tÃ© prise cette
      *                   station, ou {@code null} si inconnue.
-     * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
-     * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
+     * @param quality    La qualitÃ© de la donnÃ©e, ou {@code null} si inconnue.
+     * @param provider   La provenance de la donnÃ©e, ou {@code null} si inconnue.
      */
     protected StationEntry(final StationTable table,
                            final int          identifier,
@@ -175,7 +175,7 @@ public class StationEntry extends LocatedEntry implements Station {
     }
 
     /**
-     * Retourne le code numérique identifiant cette entrée.
+     * Retourne le code numÃ©rique identifiant cette entrÃ©e.
      */
     @Override
     public int hashCode() {
@@ -183,7 +183,7 @@ public class StationEntry extends LocatedEntry implements Station {
     }
 
     /**
-     * Vérifie que cette station est identique à l'objet spécifié
+     * VÃ©rifie que cette station est identique Ã  l'objet spÃ©cifiÃ©
      */
     @Override
     public boolean equals(final Object object) {

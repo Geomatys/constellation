@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -47,17 +47,17 @@ import net.sicade.resources.seagis.ResourceKeys;
 
 
 /**
- * Construction d'une arborescence des {@linkplain Series séries}. Cette classe possède une méthode
- * {@link #getTree} capable de retrouver les {@linkplain Thematic thématiques} et les {@linkplain
- * Procedure procédures} qui constituent les séries, et de placer ces informations dans une arborescence.
+ * Construction d'une arborescence des {@linkplain Series sÃ©ries}. Cette classe possÃ¨de une mÃ©thode
+ * {@link #getTree} capable de retrouver les {@linkplain Thematic thÃ©matiques} et les {@linkplain
+ * Procedure procÃ©dures} qui constituent les sÃ©ries, et de placer ces informations dans une arborescence.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class SeriesTree extends Table implements Shareable {
     /**
-     * Requête SQL utilisée pour obtenir l'arborescence des séries. L'ordre des colonnes est
-     * essentiel. Ces colonnes sont référencées par les constantes {@link #SERIES_NAME},
+     * RequÃªte SQL utilisÃ©e pour obtenir l'arborescence des sÃ©ries. L'ordre des colonnes est
+     * essentiel. Ces colonnes sont rÃ©fÃ©rencÃ©es par les constantes {@link #SERIES_NAME},
      * {@link #SUBSERIES_NAME} et compagnie.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Series:TREE",
@@ -77,14 +77,14 @@ public class SeriesTree extends Table implements Shareable {
                      " g.identifier");
 
 
-    /** Numéro de colonne.  */ static final int THEMATIC   =  1;
-    /** Numéro de colonne.  */ static final int PROCEDURE  =  2;
-    /** Numéro de colonne.  */ static final int SERIES     =  3;
-    /** Numéro de colonne.  */ static final int SUBSERIES  =  4;
-    /** Numéro de colonne.  */ static final int FORMAT     =  5;
+    /** NumÃ©ro de colonne.  */ static final int THEMATIC   =  1;
+    /** NumÃ©ro de colonne.  */ static final int PROCEDURE  =  2;
+    /** NumÃ©ro de colonne.  */ static final int SERIES     =  3;
+    /** NumÃ©ro de colonne.  */ static final int SUBSERIES  =  4;
+    /** NumÃ©ro de colonne.  */ static final int FORMAT     =  5;
 
     /**
-     * Les types de table pour chacune des colonnes identifiées par les constantes
+     * Les types de table pour chacune des colonnes identifiÃ©es par les constantes
      * {@link #THEMATIC}, {@link #PROCEDURE}, etc.
      */
     @SuppressWarnings("unchecked")
@@ -98,33 +98,33 @@ public class SeriesTree extends Table implements Shareable {
     }
 
     /**
-     * Les tables qui ont déjà été créées.
+     * Les tables qui ont dÃ©jÃ  Ã©tÃ© crÃ©Ã©es.
      */
     private final SingletonTable[] tables = new SingletonTable[TYPES.length];
 
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
+     * Construit une table qui interrogera la base de donnÃ©es spÃ©cifiÃ©e.
      *
-     * @param database  Connexion vers la base de données d'observations.
+     * @param database  Connexion vers la base de donnÃ©es d'observations.
      */
     public SeriesTree(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne une arborescence qui pourra être affichée dans une composante {@link javax.swing.JTree}.
-     * Cette méthode peut construire les {@linkplain Element éléments} correspondant à chaque noeud,
-     * (ce qui a un certain coût), ou simplement stocker les noms de chaque noeuds. Ce comportement
-     * est contrôlé par le paramètre {@code createEntries}. S'il a la valeur {@code true}, alors
+     * Retourne une arborescence qui pourra Ãªtre affichÃ©e dans une composante {@link javax.swing.JTree}.
+     * Cette mÃ©thode peut construire les {@linkplain Element Ã©lÃ©ments} correspondant Ã  chaque noeud,
+     * (ce qui a un certain coÃ»t), ou simplement stocker les noms de chaque noeuds. Ce comportement
+     * est contrÃ´lÃ© par le paramÃ¨tre {@code createEntries}. S'il a la valeur {@code true}, alors
      * l'{@linkplain org.geotools.gui.swing.tree.TreeNode#getUserObject objet utilisateur} de chaque
-     * noeud sera un {@linkplain Element élément} complètement formé.
+     * noeud sera un {@linkplain Element Ã©lÃ©ment} complÃ¨tement formÃ©.
      *
      * @param  depth La profondeur de l'arborescence.
-     * @param  createEntries Indique s'il faut contruire les {@linkplain Element éléments}
+     * @param  createEntries Indique s'il faut contruire les {@linkplain Element Ã©lÃ©ments}
      *         pour chaque noeud.
-     * @return Arborescence des séries de la base de données.
+     * @return Arborescence des sÃ©ries de la base de donnÃ©es.
      * @throws CatalogException si un enregitrement est invalide.
-     * @throws SQLException si l'interrogation du catalogue a échoué pour une autre raison.
+     * @throws SQLException si l'interrogation du catalogue a Ã©chouÃ© pour une autre raison.
      */
     public synchronized TreeModel getTree(final TreeDepth depth, final boolean createEntries)
             throws CatalogException, SQLException
@@ -136,15 +136,15 @@ public class SeriesTree extends Table implements Shareable {
                 Resources.getResources(locale).getString(ResourceKeys.SERIES));
         /*
          * Balaye la liste de tous les groupes, et place ces groupes
-         * dans une arborescence au fur et à mesure qu'ils sont trouvés.
+         * dans une arborescence au fur et Ã  mesure qu'ils sont trouvÃ©s.
          */
         while (result.next()) {
             DefaultMutableTreeNode branch = root;
       scan: for (int i=1; i<=branchCount; i++) {
                 /*
-                 * Vérifie s'il existe déjà une branche pour la thématique, procédure où la
-                 * série de l'enregistrement courant. Si une de ces branches n'existe pas,
-                 * elle sera créée au passage.
+                 * VÃ©rifie s'il existe dÃ©jÃ  une branche pour la thÃ©matique, procÃ©dure oÃ¹ la
+                 * sÃ©rie de l'enregistrement courant. Si une de ces branches n'existe pas,
+                 * elle sera crÃ©Ã©e au passage.
                  */
                 final String name = result.getString(i).trim();
                 for (int j=branch.getChildCount(); --j>=0;) {
@@ -155,7 +155,7 @@ public class SeriesTree extends Table implements Shareable {
                     }
                 }
                 /*
-                 * Construit l'entrée, si elle a été demandée. Sinon, on ne retiendra que le nom.
+                 * Construit l'entrÃ©e, si elle a Ã©tÃ© demandÃ©e. Sinon, on ne retiendra que le nom.
                  */
                 final boolean continueAfter = (i == branchCount) && (depth.rank > branchCount);
                 final Object entry;
@@ -170,8 +170,8 @@ public class SeriesTree extends Table implements Shareable {
                     entry = name;
                 }
                 /*
-                 * Construit le noeud. Si les catégories ont été demandées, elles seront
-                 * ajoutées après le dernier noeud qui est du ressort de cette table.
+                 * Construit le noeud. Si les catÃ©gories ont Ã©tÃ© demandÃ©es, elles seront
+                 * ajoutÃ©es aprÃ¨s le dernier noeud qui est du ressort de cette table.
                  */
                 final DefaultMutableTreeNode node = new NamedTreeNode(name, entry, i!=depth.rank);
                 if (continueAfter) {

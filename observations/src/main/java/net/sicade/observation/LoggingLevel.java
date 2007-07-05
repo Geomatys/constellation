@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,11 +22,11 @@ import java.util.logging.Level;
 
 
 /**
- * Niveaux utilisés dans le paquet {@code net.sicade.observation} pour la journalisation d'événéments.
- * Les événements archivés peuvent être des {@linkplain #SELECT consultations} et surtout des
- * {@linkplain #UPDATE mises à jour}. Du côté du serveur, ils correspondent à des instructions
- * SQL {@code SELECT} et {@code UPDATE} (ou {@code INSERT}) respectivement. Du côté du client,
- * ils correspondent à des appels à des méthodes distances via les RMI.
+ * Niveaux utilisÃ©s dans le paquet {@code net.sicade.observation} pour la journalisation d'Ã©vÃ©nÃ©ments.
+ * Les Ã©vÃ©nements archivÃ©s peuvent Ãªtre des {@linkplain #SELECT consultations} et surtout des
+ * {@linkplain #UPDATE mises Ã  jour}. Du cÃ´tÃ© du serveur, ils correspondent Ã  des instructions
+ * SQL {@code SELECT} et {@code UPDATE} (ou {@code INSERT}) respectivement. Du cÃ´tÃ© du client,
+ * ils correspondent Ã  des appels Ã  des mÃ©thodes distances via les RMI.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -35,7 +35,7 @@ import java.util.logging.Level;
  */
 public final class LoggingLevel extends Level {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 7505485471495575298L;
 

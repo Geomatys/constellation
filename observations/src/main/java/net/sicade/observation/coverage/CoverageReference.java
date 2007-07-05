@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -46,13 +46,13 @@ import net.sicade.observation.ConfigurationKey;
 
 
 /**
- * Méta-données concernant une image, et éventuellement une référence vers l'image elle-même.
- * Un objet {@code CoverageReference} permet d'obtenir quelques propriétés sur une image telles
- * que sa date et sa couverture géographique, sans nécessiter une connexion à l'image elle-même.
- * L'image ne sera téléchargée que la première fois où elle sera demandée, lors d'un appel à la
- * méthode {@link #getCoverage}.
+ * MÃ©ta-donnÃ©es concernant une image, et Ã©ventuellement une rÃ©fÃ©rence vers l'image elle-mÃªme.
+ * Un objet {@code CoverageReference} permet d'obtenir quelques propriÃ©tÃ©s sur une image telles
+ * que sa date et sa couverture gÃ©ographique, sans nÃ©cessiter une connexion Ã  l'image elle-mÃªme.
+ * L'image ne sera tÃ©lÃ©chargÃ©e que la premiÃ¨re fois oÃ¹ elle sera demandÃ©e, lors d'un appel Ã  la
+ * mÃ©thode {@link #getCoverage}.
  * <p>
- * Les objets {@code CoverageReference} sont imutables et sécuritaires dans un environnement
+ * Les objets {@code CoverageReference} sont imutables et sÃ©curitaires dans un environnement
  * multi-threads.
  *
  * @version $Id$
@@ -60,29 +60,29 @@ import net.sicade.observation.ConfigurationKey;
  */
 public interface CoverageReference extends Element, CoverageStack.Element {
     /**
-     * Clé pour récupérer le répertoire racine des images. La valeur de cette propriété
-     * peut être {@code null} si les fichiers ne sont pas accessibles localement, auquel
-     * cas les fichiers devront être accédés en utilisant un URL construit à partir de
-     * {@link #ROOT_URL}. La valeur par défaut est {@code null}.
+     * ClÃ© pour rÃ©cupÃ©rer le rÃ©pertoire racine des images. La valeur de cette propriÃ©tÃ©
+     * peut Ãªtre {@code null} si les fichiers ne sont pas accessibles localement, auquel
+     * cas les fichiers devront Ãªtre accÃ©dÃ©s en utilisant un URL construit Ã  partir de
+     * {@link #ROOT_URL}. La valeur par dÃ©faut est {@code null}.
      */
     ConfigurationKey ROOT_DIRECTORY = new ConfigurationKey("RootDirectory", null);
 
     /**
-     * Clé pour récupérer la racine des images sous forme d'adresse {@code ftp://}.
-     * La valeur par défaut est {@code "ftp://localhost/"}.
+     * ClÃ© pour rÃ©cupÃ©rer la racine des images sous forme d'adresse {@code ftp://}.
+     * La valeur par dÃ©faut est {@code "ftp://localhost/"}.
      */
     ConfigurationKey ROOT_URL = new ConfigurationKey("RootURL", "ftp://localhost/");
 
     /**
-     * Clé pour récupérer l'encodage des adresses URL. Des valeurs typiques sont {@code "UTF-8"}
-     * et {@code "ISO-8859-1"}. La valeur par défaut est {@code null}, ce qui signifie qu'aucun
-     * encodage ne sera appliqué sur les adresses URL.
+     * ClÃ© pour rÃ©cupÃ©rer l'encodage des adresses URL. Des valeurs typiques sont {@code "UTF-8"}
+     * et {@code "ISO-8859-1"}. La valeur par dÃ©faut est {@code null}, ce qui signifie qu'aucun
+     * encodage ne sera appliquÃ© sur les adresses URL.
      */
     ConfigurationKey URL_ENCODING = new ConfigurationKey("URL_encoding", null);
 
     /**
-     * Clé sous laquelle mémoriser l'objet {@code CoverageReference} source dans les propriétés de
-     * {@link GridCoverage2D}. Cette propriété permet de retrouver l'objet {@code CoverageReference}
+     * ClÃ© sous laquelle mÃ©moriser l'objet {@code CoverageReference} source dans les propriÃ©tÃ©s de
+     * {@link GridCoverage2D}. Cette propriÃ©tÃ© permet de retrouver l'objet {@code CoverageReference}
      * qui a produit un objet {@code GridCoverage2D}. Exemple:
      *
      * <blockquote><pre>
@@ -95,7 +95,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     String SOURCE_KEY = "net.sicade.observation.CoverageReference";
 
     /**
-     * Retourne la série à laquelle appartient cette image.
+     * Retourne la sÃ©rie Ã  laquelle appartient cette image.
      */
     Series getSeries();
 
@@ -106,140 +106,140 @@ public interface CoverageReference extends Element, CoverageStack.Element {
 
     /**
      * Retourne le chemin de l'image, ou {@code null} si le fichier n'est pas accessible localement.
-     * Dans ce dernier cas, {@link #getURL} devra être utilisé à la place.
+     * Dans ce dernier cas, {@link #getURL} devra Ãªtre utilisÃ© Ã  la place.
      */
     File getFile();
 
     /**
      * Retourne l'URL de l'image, ou {@code null} si le fichier n'est pas accessible ni localement,
-     * ni à travers un réseau.
+     * ni Ã  travers un rÃ©seau.
      */
     URL getURL();
 
     /**
-     * Retourne le système de référence des coordonnées de l'image. En général, ce système de
-     * référence aura trois dimensions (la dernière dimension étant le temps), soit dans l'ordre:
+     * Retourne le systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es de l'image. En gÃ©nÃ©ral, ce systÃ¨me de
+     * rÃ©fÃ©rence aura trois dimensions (la derniÃ¨re dimension Ã©tant le temps), soit dans l'ordre:
      * <p>
      * <ul>
-     *   <li>Les longitudes, en degrés selon l'ellipsoïde WGS 1984.</li>
-     *   <li>Les latitudes,  en degrés selon l'ellipsoïde WGS 1984.</li>
+     *   <li>Les longitudes, en degrÃ©s selon l'ellipsoÃ¯de WGS 1984.</li>
+     *   <li>Les latitudes,  en degrÃ©s selon l'ellipsoÃ¯de WGS 1984.</li>
      *   <li>Le temps, en jours juliens depuis le 01/01/1950 00:00 UTC.</li>
      * </ul>
      * <p>
-     * Bien que toutes les images provenant d'une même {@linkplain Series série} ont en
-     * général le même système de référence des coordonnées, ce n'est pas toujours le cas.
+     * Bien que toutes les images provenant d'une mÃªme {@linkplain Series sÃ©rie} ont en
+     * gÃ©nÃ©ral le mÃªme systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es, ce n'est pas toujours le cas.
      */
     CoordinateReferenceSystem getCoordinateReferenceSystem();
 
     /**
-     * Retourne les coordonnées spatio-temporelles de l'image. Le système de référence des
-     * coordonnées utilisé est {@linkplain #getCoordinateReferenceSystem celui de l'image}.
+     * Retourne les coordonnÃ©es spatio-temporelles de l'image. Le systÃ¨me de rÃ©fÃ©rence des
+     * coordonnÃ©es utilisÃ© est {@linkplain #getCoordinateReferenceSystem celui de l'image}.
      */
     Envelope getEnvelope();
 
     /**
-     * Retourne la plage de temps couverte par l'image, selon les unités de l'axe temporel.
-     * Cette méthode est fournit principalement afin de supporter l'interface
+     * Retourne la plage de temps couverte par l'image, selon les unitÃ©s de l'axe temporel.
+     * Cette mÃ©thode est fournit principalement afin de supporter l'interface
      * {@link org.geotools.coverage.CoverageStack.Element}. Pour les autres usage,
-     * la méthode {@link #getTimeRange} peut être une alternative plus pratique.
+     * la mÃ©thode {@link #getTimeRange} peut Ãªtre une alternative plus pratique.
      */
     NumberRange getZRange();
 
     /**
-     * Retourne la plage de temps couverte par l'image. Cette plage sera délimitée
-     * par des objets {@link Date}. Appeler cette méthode équivaut à n'extraire que
-     * la partie temporelle de l'{@linkplain #getEnvelope enveloppe} et à transformer
-     * les coordonnées si nécessaire.
+     * Retourne la plage de temps couverte par l'image. Cette plage sera dÃ©limitÃ©e
+     * par des objets {@link Date}. Appeler cette mÃ©thode Ã©quivaut Ã  n'extraire que
+     * la partie temporelle de l'{@linkplain #getEnvelope enveloppe} et Ã  transformer
+     * les coordonnÃ©es si nÃ©cessaire.
      */
     DateRange getTimeRange();
 
     /**
-     * Retourne les coordonnées géographiques de la région couverte par l'image. Les coordonnées
-     * seront exprimées en degrés de longitudes et de latitudes selon l'ellipsoïde WGS 1984.
-     * Appeler cette méthode équivaut parfois à n'extraire que la partie horizontale de
-     * l'{@linkplain #getEnvelope enveloppe} et à transformer les coordonnées si nécessaire.
-     * Toutefois dans certains cas cette méthode peut retourner une région géographique plus
+     * Retourne les coordonnÃ©es gÃ©ographiques de la rÃ©gion couverte par l'image. Les coordonnÃ©es
+     * seront exprimÃ©es en degrÃ©s de longitudes et de latitudes selon l'ellipsoÃ¯de WGS 1984.
+     * Appeler cette mÃ©thode Ã©quivaut parfois Ã  n'extraire que la partie horizontale de
+     * l'{@linkplain #getEnvelope enveloppe} et Ã  transformer les coordonnÃ©es si nÃ©cessaire.
+     * Toutefois dans certains cas cette mÃ©thode peut retourner une rÃ©gion gÃ©ographique plus
      * grande que l'{@linkplain #getEnvelope enveloppe}, par exemple comme un effet des
-     * transformations de coordonnées ou encore parce que l'image (et par conséquence son
-     * {@linkplain #getEnvelope enveloppe}) sera découpée au moment de la lecture.
+     * transformations de coordonnÃ©es ou encore parce que l'image (et par consÃ©quence son
+     * {@linkplain #getEnvelope enveloppe}) sera dÃ©coupÃ©e au moment de la lecture.
      */
     GeographicBoundingBox getGeographicBoundingBox();
 
     /**
-     * Retourne des informations sur la géométrie de l'image. Ces informations comprennent notamment
-     * la taille de l'image (en pixels) ainsi que la transformation à utiliser pour passer des
-     * coordonnées pixels vers les coordonnées selon le {@linkplain #getCoordinateReferenceSystem
-     * système de référence de l'image}. Cette transformation sera le plus souvent affine.
+     * Retourne des informations sur la gÃ©omÃ©trie de l'image. Ces informations comprennent notamment
+     * la taille de l'image (en pixels) ainsi que la transformation Ã  utiliser pour passer des
+     * coordonnÃ©es pixels vers les coordonnÃ©es selon le {@linkplain #getCoordinateReferenceSystem
+     * systÃ¨me de rÃ©fÃ©rence de l'image}. Cette transformation sera le plus souvent affine.
      */
     GridGeometry2D getGridGeometry();
 
     /**
-     * Retourne les bandes de l'image. Cette méthode retourne toujours la version geophysique des
+     * Retourne les bandes de l'image. Cette mÃ©thode retourne toujours la version geophysique des
      * bandes (<code>{@linkplain GridSampleDimension#geophysics geophysics}(true)</code>), ce qui
-     * est cohérent avec le type d'image retourné par {@link #getCoverage getCoverage(...)}.
+     * est cohÃ©rent avec le type d'image retournÃ© par {@link #getCoverage getCoverage(...)}.
      *
-     * @return La liste des catégories géophysiques pour chaque bande de l'image.
-     *         La longueur de ce tableau sera égale au nombre de bandes.
+     * @return La liste des catÃ©gories gÃ©ophysiques pour chaque bande de l'image.
+     *         La longueur de ce tableau sera Ã©gale au nombre de bandes.
      */
     SampleDimension[] getSampleDimensions();
 
     /**
-     * Retourne l'image correspondant à cette entrée. Cette méthode retourne toujours la version
+     * Retourne l'image correspondant Ã  cette entrÃ©e. Cette mÃ©thode retourne toujours la version
      * geophysique de l'image (<code>{@linkplain GridCoverage2D#geophysics geophysics}(true)</code>).
      * <p>
-     * Si l'image avait déjà été lue précédemment et qu'elle n'a pas encore été réclamée par le
-     * ramasse-miette, alors l'image existante sera retournée sans qu'une nouvelle lecture du
-     * fichier ne soit nécessaire. Si au contraire l'image n'était pas déjà en mémoire, alors
-     * un décodage du fichier sera nécessaire.
+     * Si l'image avait dÃ©jÃ  Ã©tÃ© lue prÃ©cÃ©demment et qu'elle n'a pas encore Ã©tÃ© rÃ©clamÃ©e par le
+     * ramasse-miette, alors l'image existante sera retournÃ©e sans qu'une nouvelle lecture du
+     * fichier ne soit nÃ©cessaire. Si au contraire l'image n'Ã©tait pas dÃ©jÃ  en mÃ©moire, alors
+     * un dÃ©codage du fichier sera nÃ©cessaire.
      * <p>
-     * Certaines implémentations peuvent utiliser en interne les RMI (<cite>Remote Method Invocation</cite>).
-     * Dans ce dernier cas, cette méthode effectuera le découpage géographique et appliquera d'eventuelles
-     * opérations (par exemple un calcul de gradient) sur le serveur; seul le résultat sera envoyé à travers
-     * le réseau vers le client. Il est toutefois possible que la qualité du résultat soit dégradée pour une
-     * transmission plus compacte sur le réseau.
+     * Certaines implÃ©mentations peuvent utiliser en interne les RMI (<cite>Remote Method Invocation</cite>).
+     * Dans ce dernier cas, cette mÃ©thode effectuera le dÃ©coupage gÃ©ographique et appliquera d'eventuelles
+     * opÃ©rations (par exemple un calcul de gradient) sur le serveur; seul le rÃ©sultat sera envoyÃ© Ã  travers
+     * le rÃ©seau vers le client. Il est toutefois possible que la qualitÃ© du rÃ©sultat soit dÃ©gradÃ©e pour une
+     * transmission plus compacte sur le rÃ©seau.
      *
-     * @param  listeners Liste des objets à informer des progrès de la lecture ainsi que des
-     *         éventuels avertissements, ou {@code null} s'il n'y en a pas.
+     * @param  listeners Liste des objets Ã  informer des progrÃ¨s de la lecture ainsi que des
+     *         Ã©ventuels avertissements, ou {@code null} s'il n'y en a pas.
      * @return Image lue, ou {@code null} si l'utilisateur a {@linkplain #abort interrompu la lecture}.
-     * @throws IOException si le fichier n'a pas été trouvé ou si une autre erreur d'entrés/sorties
+     * @throws IOException si le fichier n'a pas Ã©tÃ© trouvÃ© ou si une autre erreur d'entrÃ©s/sorties
      *         est survenue.
-     * @throws IIOException s'il n'y a pas de décodeur approprié pour l'image, ou si l'image n'est
+     * @throws IIOException s'il n'y a pas de dÃ©codeur appropriÃ© pour l'image, ou si l'image n'est
      *         pas valide.
-     * @throws RemoteException si un problème est survenu lors de la communication avec le serveur.
+     * @throws RemoteException si un problÃ¨me est survenu lors de la communication avec le serveur.
      */
     GridCoverage2D getCoverage(IIOListeners listeners) throws IOException;
 
     /**
-     * Annule la lecture de l'image. Cette méthode peut être appelée à partir de n'importe quel
-     * thread.  Si la méthode {@link #getCoverage getCoverage(...)} était en train de lire une
-     * image dans un autre thread, elle s'arrêtera et retournera {@code null}.
+     * Annule la lecture de l'image. Cette mÃ©thode peut Ãªtre appelÃ©e Ã  partir de n'importe quel
+     * thread.  Si la mÃ©thode {@link #getCoverage getCoverage(...)} Ã©tait en train de lire une
+     * image dans un autre thread, elle s'arrÃªtera et retournera {@code null}.
      */
     void abort();
 
 
     /**
-     * Une référence qui délègue son travail à une autre instance de {@link CoverageReference}.
-     * L'implémentation par défaut redirige tous les appels des méthodes vers l'objet {@link
-     * CoverageReference} qui a été spécifié lors de la construction. Les classes dérivées
-     * vont typiquement redéfinir quelques méthodes afin d'ajouter ou de modifier certaines
-     * fonctionalitées.
+     * Une rÃ©fÃ©rence qui dÃ©lÃ¨gue son travail Ã  une autre instance de {@link CoverageReference}.
+     * L'implÃ©mentation par dÃ©faut redirige tous les appels des mÃ©thodes vers l'objet {@link
+     * CoverageReference} qui a Ã©tÃ© spÃ©cifiÃ© lors de la construction. Les classes dÃ©rivÃ©es
+     * vont typiquement redÃ©finir quelques mÃ©thodes afin d'ajouter ou de modifier certaines
+     * fonctionalitÃ©es.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     public static class Proxy extends net.sicade.observation.Proxy implements CoverageReference {
         /**
-         * Pour compatibilités entre les enregistrements binaires de différentes versions.
+         * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
          */
         private static final long serialVersionUID = 1679051552440633120L;
 
         /**
-         * Référence enveloppée par ce proxy.
+         * RÃ©fÃ©rence enveloppÃ©e par ce proxy.
          */
         private final CoverageReference ref;
 
         /**
-         * Construit un proxy qui redirigera tous les appels vers la référence spécifiée.
+         * Construit un proxy qui redirigera tous les appels vers la rÃ©fÃ©rence spÃ©cifiÃ©e.
          */
         protected Proxy(final CoverageReference ref) {
             this.ref = ref;

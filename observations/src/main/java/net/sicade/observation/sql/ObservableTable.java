@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -38,49 +38,49 @@ import net.sicade.observation.CatalogException;
  */
 public class ObservableTable extends SingletonTable<Observable> implements Shareable {
     /**
-     * Requête permettant de récupérer une entrée de la table des observables.
+     * RequÃªte permettant de rÃ©cupÃ©rer une entrÃ©e de la table des observables.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Observables:SELECT",
             "SELECT identifier AS name, identifier, phenomenon, procedure, NULL AS distribution, NULL AS description\n" +
             "  FROM \"Observables\"\n" + 
             " WHERE identifier=?");
 
-    /** Numéro de colonne. */ static final int NAME         = 1;
-    /** Numéro de colonne. */ static final int IDENTIFIER   = 2;
-    /** Numéro de colonne. */ static final int PHENOMENON   = 3;
-    /** Numéro de colonne. */ static final int PROCEDURE    = 4;
-    /** Numéro de colonne. */ static final int DISTRIBUTION = 5;
-    /** Numéro de colonne. */ static final int REMARKS      = 6;
+    /** NumÃ©ro de colonne. */ static final int NAME         = 1;
+    /** NumÃ©ro de colonne. */ static final int IDENTIFIER   = 2;
+    /** NumÃ©ro de colonne. */ static final int PHENOMENON   = 3;
+    /** NumÃ©ro de colonne. */ static final int PROCEDURE    = 4;
+    /** NumÃ©ro de colonne. */ static final int DISTRIBUTION = 5;
+    /** NumÃ©ro de colonne. */ static final int REMARKS      = 6;
 
     /**
-     * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Connexion vers la table des {@linkplain Phenomenon phÃ©nomÃ¨nes}.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private PhenomenonTable phenomenons;
 
     /**
      * Connexion vers la table des {@linkplain Procedure procedures}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private ProcedureTable procedures;
 
     /**
      * Connexion vers la table des {@linkplain Distribution distributions}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private DistributionTable distributions;
     
     /** 
      * Construit une nouvelle connexion vers la table des observables.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnÃ©es.
      */
     public ObservableTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les observables.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les observables.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -91,7 +91,7 @@ public class ObservableTable extends SingletonTable<Observable> implements Share
     }
 
     /**
-     * Construit un observable pour l'entrée courante.
+     * Construit un observable pour l'entrÃ©e courante.
      */
     protected Observable createEntry(final ResultSet result) throws CatalogException, SQLException {
         final String name           = result.getString(NAME);

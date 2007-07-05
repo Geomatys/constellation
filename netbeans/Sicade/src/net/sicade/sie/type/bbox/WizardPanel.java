@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -35,48 +35,48 @@ import org.openide.WizardDescriptor;
 
 
 /**
- * Un paneau de l'assistant. Ces paneaux sont construits par l'{@linkplain WizardIterator itérateur}
+ * Un paneau de l'assistant. Ces paneaux sont construits par l'{@linkplain WizardIterator itÃ©rateur}
  * et contiennent des informations tels que le nom ou l'aide contextuelle, mais pas les composantes
- * visuelles elle-mêmes. Pour des raisons de performances, ces dernières ne seront construites que
- * lorsque la méthode {@link #getComponent} sera appelée.
+ * visuelles elle-mÃªmes. Pour des raisons de performances, ces derniÃ¨res ne seront construites que
+ * lorsque la mÃ©thode {@link #getComponent} sera appelÃ©e.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
     /**
-     * L'étape de cet assistant, à partir de 0.
+     * L'Ã©tape de cet assistant, Ã  partir de 0.
      */
     private final int step;
 
     /**
-     * La composante visuelle propre à ce paneau.
+     * La composante visuelle propre Ã  ce paneau.
      */
     private JComponent component;
 
     /**
-     * L'ensemble des objets à informer des changement survenant dans ce paneau.
+     * L'ensemble des objets Ã  informer des changement survenant dans ce paneau.
      */
     private final Set<ChangeListener> listeners = new HashSet<ChangeListener>();
 
     /**
-     * Les informations obligatoires qui n'ont pas été remplie par l'utilisateur.
-     * Ce paneau ne sera considéré valide que si cet ensemble est vide.
+     * Les informations obligatoires qui n'ont pas Ã©tÃ© remplie par l'utilisateur.
+     * Ce paneau ne sera considÃ©rÃ© valide que si cet ensemble est vide.
      */
     private final Set<Document> missing = new HashSet<Document>();
 
     /**
      * Construit le paneau.
      *
-     * @param step L'étape de cet assistant, à partir de 0.
+     * @param step L'Ã©tape de cet assistant, Ã  partir de 0.
      */
     public WizardPanel(final int step) {
         this.step = step;
     }
 
     /**
-     * Retourne la composante visuelle propre à ce paneau. Cette méthode peut être appelée
-     * à partir de n'importe quel thread (pas nécessairement celui de <cite>Swing</cite>).
+     * Retourne la composante visuelle propre Ã  ce paneau. Cette mÃ©thode peut Ãªtre appelÃ©e
+     * Ã  partir de n'importe quel thread (pas nÃ©cessairement celui de <cite>Swing</cite>).
      */
     public JComponent getComponent() {
         if (component == null) {
@@ -85,8 +85,8 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
                 case  1: component = new WizardStep2();     break;
                 default: throw new IllegalStateException(String.valueOf(step));
             }
-            // Le numéro suivant indique la position (à partir de 0)
-            // à laquelle est sensée apparaître cette étape.
+            // Le numÃ©ro suivant indique la position (Ã  partir de 0)
+            // Ã  laquelle est sensÃ©e apparaÃ®tre cette Ã©tape.
             component.putClientProperty("WizardPanel_contentSelectedIndex", step);
             component.setName(NbBundle.getMessage(WizardPanel.class, "Wizard_"+(step+1)));
         }
@@ -108,16 +108,16 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
 
     /**
      * Retourne {@code true} si l'utilisateur peut appuyer sur "Suivant" ou "Terminer".
-     * Si cette méthode retourne {@code false}, alors tous les objets enregistrés avec
-     * {@link #addChangeListener addChangeListener} seront informés lorsque les conditions
-     * changeront et que cette méthode retournera {@code true}.
+     * Si cette mÃ©thode retourne {@code false}, alors tous les objets enregistrÃ©s avec
+     * {@link #addChangeListener addChangeListener} seront informÃ©s lorsque les conditions
+     * changeront et que cette mÃ©thode retournera {@code true}.
      */
     public boolean isValid() {
         return missing.isEmpty();
     }
 
     /**
-     * Ajoute un objet à informer losque la valeur retournée par {@link #isValid} changera.
+     * Ajoute un objet Ã  informer losque la valeur retournÃ©e par {@link #isValid} changera.
      */
     public final void addChangeListener(final ChangeListener listener) {
         synchronized (listeners) {
@@ -126,7 +126,7 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
     }
 
     /**
-     * Retire un objet à informer losque la valeur retournée par {@link #isValid} change.
+     * Retire un objet Ã  informer losque la valeur retournÃ©e par {@link #isValid} change.
      */
     public final void removeChangeListener(final ChangeListener listener) {
         synchronized (listeners) {
@@ -135,7 +135,7 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
     }
 
     /**
-     * Informe tous les objets intéressés que la valeur retournée par {@link #isValid} a changé.
+     * Informe tous les objets intÃ©ressÃ©s que la valeur retournÃ©e par {@link #isValid} a changÃ©.
      */
     private void fireChangeEvent() {
         final ChangeEvent event = new ChangeEvent(this);
@@ -147,9 +147,9 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
     }
 
     /**
-     * Méthode appelée automatiquement chaque fois que l'utilisateur a modifié le contenu d'un
-     * champ obligatoire. Si ce champ est devenu vide, alors cette méthode lancera un événement
-     * informant les objets intéressés que ce paneau est devenu invalide.
+     * MÃ©thode appelÃ©e automatiquement chaque fois que l'utilisateur a modifiÃ© le contenu d'un
+     * champ obligatoire. Si ce champ est devenu vide, alors cette mÃ©thode lancera un Ã©vÃ©nement
+     * informant les objets intÃ©ressÃ©s que ce paneau est devenu invalide.
      */
     private void mandatoryFieldUpdated(final Document document) {
         final boolean changed;
@@ -164,7 +164,7 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
     }
 
     /**
-     * Méthode appelée automatiquement chaque fois que l'utilisateur a modifié le contenu d'un
+     * MÃ©thode appelÃ©e automatiquement chaque fois que l'utilisateur a modifiÃ© le contenu d'un
      * champ obligatoire.
      */
     public void insertUpdate(final DocumentEvent event) {
@@ -172,7 +172,7 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
     }
 
     /**
-     * Méthode appelée automatiquement chaque fois que l'utilisateur a modifié le contenu d'un
+     * MÃ©thode appelÃ©e automatiquement chaque fois que l'utilisateur a modifiÃ© le contenu d'un
      * champ obligatoire.
      */
     public void removeUpdate(final DocumentEvent event) {
@@ -180,7 +180,7 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
     }
 
     /**
-     * Méthode appelée automatiquement chaque fois que l'utilisateur a modifié le contenu d'un
+     * MÃ©thode appelÃ©e automatiquement chaque fois que l'utilisateur a modifiÃ© le contenu d'un
      * champ obligatoire.
      */
     public void changedUpdate(final DocumentEvent event) {
@@ -188,7 +188,7 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
     }
 
     /**
-     * Modifie l'état de ce paneau à partir des informations contenues dans l'objet spécifié.
+     * Modifie l'Ã©tat de ce paneau Ã  partir des informations contenues dans l'objet spÃ©cifiÃ©.
      * L'objet {@code settings} sera habituellement une instance de {@link BoundingBox}.
      */
     public void readSettings(final Object settings) {
@@ -200,7 +200,7 @@ final class WizardPanel implements WizardDescriptor.Panel, DocumentListener {
     }
 
     /**
-     * Enregistre l'état de ce paneau dans l'objet spécifié.
+     * Enregistre l'Ã©tat de ce paneau dans l'objet spÃ©cifiÃ©.
      * L'objet {@code settings} sera habituellement une instance de {@link BoundingBox}.
      */
     public void storeSettings(final Object settings) {

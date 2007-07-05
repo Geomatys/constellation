@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -35,113 +35,113 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Représentation une série d'images. Chaque série d'images portent sur un
- * {@linkplain Phenomenon phénomène} (par exemple la température) observé à l'aide d'une certaine
- * {@linkplain Procedure procédure} (par exemple une synthèse des données de plusieurs satellites
- * NOAA). Chaque série d'images étant la combinaison d'un phénomène avec une procédure, elles
+ * ReprÃ©sentation une sÃ©rie d'images. Chaque sÃ©rie d'images portent sur un
+ * {@linkplain Phenomenon phÃ©nomÃ¨ne} (par exemple la tempÃ©rature) observÃ© Ã  l'aide d'une certaine
+ * {@linkplain Procedure procÃ©dure} (par exemple une synthÃ¨se des donnÃ©es de plusieurs satellites
+ * NOAA). Chaque sÃ©rie d'images Ã©tant la combinaison d'un phÃ©nomÃ¨ne avec une procÃ©dure, elles
  * forment donc des {@linkplain Observable observables}.
  * <p>
- * Dans le contexte particulier des séries d'images, le <cite>phénomène</cite> est appelé
- * {@linkplain Thematic thématique}.
+ * Dans le contexte particulier des sÃ©ries d'images, le <cite>phÃ©nomÃ¨ne</cite> est appelÃ©
+ * {@linkplain Thematic thÃ©matique}.
  * <p>
- * Des opérations supplémentaires peuvent être appliquées sur une série d'image. Par exemple une
- * série peut représenter des images de températures, et un calcul statistique peut travailler
- * sur les gradients de ces images de température. Aux yeux d'entités de plus haut niveau (tels
- * les {@linkplain Descriptor descripteurs du paysage océanique}), une série d'images peut donc
- * être considérée comme un phénomène à combiner avec une autre procédure, en l'occurence une
- * {@linkplain Operation opération}.
+ * Des opÃ©rations supplÃ©mentaires peuvent Ãªtre appliquÃ©es sur une sÃ©rie d'image. Par exemple une
+ * sÃ©rie peut reprÃ©senter des images de tempÃ©ratures, et un calcul statistique peut travailler
+ * sur les gradients de ces images de tempÃ©rature. Aux yeux d'entitÃ©s de plus haut niveau (tels
+ * les {@linkplain Descriptor descripteurs du paysage ocÃ©anique}), une sÃ©rie d'images peut donc
+ * Ãªtre considÃ©rÃ©e comme un phÃ©nomÃ¨ne Ã  combiner avec une autre procÃ©dure, en l'occurence une
+ * {@linkplain Operation opÃ©ration}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface Series extends Observable, Phenomenon {
     /**
-     * Retourne la thématique de cette série d'images. Des exemples de thématiques sont
-     * la <cite>température</cite>, l'<cite>anomalie de la hauteur de l'eau</cite>,
+     * Retourne la thÃ©matique de cette sÃ©rie d'images. Des exemples de thÃ©matiques sont
+     * la <cite>tempÃ©rature</cite>, l'<cite>anomalie de la hauteur de l'eau</cite>,
      * la <cite>concentration en chlorophylle-a</cite>, etc.
      */
     Thematic getPhenomenon();
 
     /**
-     * Retourne la procédure utilisée pour collecter les images. Par exemple il peut d'agir d'une
-     * synthèse des données captées par plusieurs satellites NOAA.
+     * Retourne la procÃ©dure utilisÃ©e pour collecter les images. Par exemple il peut d'agir d'une
+     * synthÃ¨se des donnÃ©es captÃ©es par plusieurs satellites NOAA.
      */
     Procedure getProcedure();
 
     /**
-     * Une série de second recours qui peut être utilisée si aucune données n'est disponible
-     * dans cette série à une certaine position spatio-temporelle. Retourne {@code null} s'il
-     * n'y a pas de série de second recours.
+     * Une sÃ©rie de second recours qui peut Ãªtre utilisÃ©e si aucune donnÃ©es n'est disponible
+     * dans cette sÃ©rie Ã  une certaine position spatio-temporelle. Retourne {@code null} s'il
+     * n'y a pas de sÃ©rie de second recours.
      */
     Series getFallback();
 
     /**
-     * Retourne les sous-ensembles de cette séries.
+     * Retourne les sous-ensembles de cette sÃ©ries.
      */
     Set<SubSeries> getSubSeries();
 
     /**
-     * Retourne l'intervalle de temps typique entre deux images consécutives de cette série.
-     * Cette information n'est qu'à titre indicative. L'intervalle est exprimée en nombre de
-     * jours. Cette méthode retourne {@link Double#NaN} si l'intervalle de temps est inconnu.
+     * Retourne l'intervalle de temps typique entre deux images consÃ©cutives de cette sÃ©rie.
+     * Cette information n'est qu'Ã  titre indicative. L'intervalle est exprimÃ©e en nombre de
+     * jours. Cette mÃ©thode retourne {@link Double#NaN} si l'intervalle de temps est inconnu.
      */
     double getTimeInterval();
 
     /**
-     * Retourne la plage de temps englobeant toutes les images de cette série.
+     * Retourne la plage de temps englobeant toutes les images de cette sÃ©rie.
      *
-     * @throws CatalogException si le catalogue n'a pas pu être interrogé.
+     * @throws CatalogException si le catalogue n'a pas pu Ãªtre interrogÃ©.
      */
     DateRange getTimeRange() throws CatalogException;
 
     /**
-     * Retourne les coordonnées géographiques englobeant toutes les images de cette série.
+     * Retourne les coordonnÃ©es gÃ©ographiques englobeant toutes les images de cette sÃ©rie.
      *
-     * @throws CatalogException si le catalogue n'a pas pu être interrogé.
+     * @throws CatalogException si le catalogue n'a pas pu Ãªtre interrogÃ©.
      */
     GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
 
     /**
-     * Retourne une image appropriée pour la date spécifiée.
+     * Retourne une image appropriÃ©e pour la date spÃ©cifiÃ©e.
      *
-     * @throws CatalogException si le catalogue n'a pas pu être interrogé.
+     * @throws CatalogException si le catalogue n'a pas pu Ãªtre interrogÃ©.
      */
     CoverageReference getCoverageReference(Date time) throws CatalogException;
 
     /**
-     * Retourne la liste des images disponibles dans la plage de coordonnées spatio-temporelles
-     * de cette série. Les images ne seront pas immédiatement chargées; seules des références
-     * vers ces images seront retournées.
+     * Retourne la liste des images disponibles dans la plage de coordonnÃ©es spatio-temporelles
+     * de cette sÃ©rie. Les images ne seront pas immÃ©diatement chargÃ©es; seules des rÃ©fÃ©rences
+     * vers ces images seront retournÃ©es.
      *
-     * @return Liste d'images qui interceptent la plage de temps et la région géographique d'intérêt.
-     * @throws CatalogException si le catalogue n'a pas pu être interrogé.
+     * @return Liste d'images qui interceptent la plage de temps et la rÃ©gion gÃ©ographique d'intÃ©rÃªt.
+     * @throws CatalogException si le catalogue n'a pas pu Ãªtre interrogÃ©.
      */
     Set<CoverageReference> getCoverageReferences() throws CatalogException;
 
     /**
-     * Retourne une vue des données de cette séries sous forme de fonction. Chaque valeur peut
-     * être évaluée à une position (<var>x</var>,<var>y</var>,<var>t</var>), en faisant intervenir
-     * des interpolations si nécessaire. Cette méthode retourne une fonction moins élaborée que
+     * Retourne une vue des donnÃ©es de cette sÃ©ries sous forme de fonction. Chaque valeur peut
+     * Ãªtre Ã©valuÃ©e Ã  une position (<var>x</var>,<var>y</var>,<var>t</var>), en faisant intervenir
+     * des interpolations si nÃ©cessaire. Cette mÃ©thode retourne une fonction moins Ã©laborÃ©e que
      * celle de {@link Descriptor#getCoverage} pour les raisons suivantes:
      * <p>
      * <ul>
-     *   <li>Il n'y a ni {@linkplain Operation opération}, ni {@link LocationOffset décalage
-     *       spatio-temporel} d'appliqués sur les données à évaluer.</li>
-     *   <li>Les valeurs sont évaluées directement sur les images de cette série, jamais sur
-     *       celles de la {@linkplain #getFallback série de second recours}.</li>
-     *   <li>Des images entières peuvent être transiter sur le réseau, plutôt que seulement
-     *       les valeurs à évaluer.</li>
+     *   <li>Il n'y a ni {@linkplain Operation opÃ©ration}, ni {@link LocationOffset dÃ©calage
+     *       spatio-temporel} d'appliquÃ©s sur les donnÃ©es Ã  Ã©valuer.</li>
+     *   <li>Les valeurs sont Ã©valuÃ©es directement sur les images de cette sÃ©rie, jamais sur
+     *       celles de la {@linkplain #getFallback sÃ©rie de second recours}.</li>
+     *   <li>Des images entiÃ¨res peuvent Ãªtre transiter sur le rÃ©seau, plutÃ´t que seulement
+     *       les valeurs Ã  Ã©valuer.</li>
      * </ul>
      *
-     * @throws CatalogException si la fonction n'a pas pu être construite.
+     * @throws CatalogException si la fonction n'a pas pu Ãªtre construite.
      */
     Coverage getCoverage() throws CatalogException;
 
     /**
-     * Si cette série est le résultat d'un modèle numérique, retourne ce modèle.
+     * Si cette sÃ©rie est le rÃ©sultat d'un modÃ¨le numÃ©rique, retourne ce modÃ¨le.
      * Sinon, retourne {@code null}.
      *
-     * @throws CatalogException si la base de données n'a pas pu être construite.
+     * @throws CatalogException si la base de donnÃ©es n'a pas pu Ãªtre construite.
      */
     Model getModel() throws CatalogException;
 }

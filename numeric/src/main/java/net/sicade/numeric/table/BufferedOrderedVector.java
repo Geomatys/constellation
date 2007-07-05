@@ -1,7 +1,7 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 1997, Pêches et Océans Canada
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 1997, PÃªches et OcÃ©ans Canada
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,39 +34,39 @@ import static org.geotools.resources.XArray.isSorted;
 
 
 /**
- * Un vecteur ordonné dont les données sont spécifiées dans un buffer.
+ * Un vecteur ordonnÃ© dont les donnÃ©es sont spÃ©cifiÃ©es dans un buffer.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class BufferedOrderedVector extends OrderedVector {
     /**
-     * Les valeurs de ce vecteur. Il est de la responsabilité de l'utilisateur de s'assurer que
-     * ces données restent en ordre croissant ou décroissant. Pour des raisons de performance,
-     * ça ne sera pas vérifié.
+     * Les valeurs de ce vecteur. Il est de la responsabilitÃ© de l'utilisateur de s'assurer que
+     * ces donnÃ©es restent en ordre croissant ou dÃ©croissant. Pour des raisons de performance,
+     * Ã§a ne sera pas vÃ©rifiÃ©.
      */
     private final DoubleBuffer data;
 
     /**
-     * Construit un vecteur ordonné pour les données spécifiées. Les données doivent obligatoirement
-     * être en ordre croissant ou décroissant. Pour des raisons de performances (et aussi parce qu'il
-     * n'est pas possible de s'assurer que l'utilisateur ne modifiera pas les données après la
-     * construction de ce vecteur), ça ne sera pas vérifié.
+     * Construit un vecteur ordonnÃ© pour les donnÃ©es spÃ©cifiÃ©es. Les donnÃ©es doivent obligatoirement
+     * Ãªtre en ordre croissant ou dÃ©croissant. Pour des raisons de performances (et aussi parce qu'il
+     * n'est pas possible de s'assurer que l'utilisateur ne modifiera pas les donnÃ©es aprÃ¨s la
+     * construction de ce vecteur), Ã§a ne sera pas vÃ©rifiÃ©.
      * <p>
-     * Les premières données prises en compte seront les données à la {@linkplain DoubleBuffer#position()
-     * position courante}. Le nombre de données prises en compte sera le {@linkplain DoubleBuffer#remaining()
-     * nombre de données restantes}. Après la construction du vecteur, les changements de
+     * Les premiÃ¨res donnÃ©es prises en compte seront les donnÃ©es Ã  la {@linkplain DoubleBuffer#position()
+     * position courante}. Le nombre de donnÃ©es prises en compte sera le {@linkplain DoubleBuffer#remaining()
+     * nombre de donnÃ©es restantes}. AprÃ¨s la construction du vecteur, les changements de
      * {@linkplain DoubleBuffer#position() position} ou de {@linkplain DoubleBuffer#limit() limite}
-     * de l'objet {@code data} donné en argument n'affecteront pas ce vecteur. Toutefois tout changement
-     * des données contenues dans le buffer affecteront ce vecteur.
+     * de l'objet {@code data} donnÃ© en argument n'affecteront pas ce vecteur. Toutefois tout changement
+     * des donnÃ©es contenues dans le buffer affecteront ce vecteur.
      */
     public BufferedOrderedVector(final DoubleBuffer data) {
         this.data = data.slice();
     }
 
     /**
-     * Retourne l'ordre des données dans ce vecteur. Cette méthode évalue l'ordre chaque fois qu'elle
-     * est invoquée. Elle peut donc servir à déterminer si un changement de données a eu un impact sur
+     * Retourne l'ordre des donnÃ©es dans ce vecteur. Cette mÃ©thode Ã©value l'ordre chaque fois qu'elle
+     * est invoquÃ©e. Elle peut donc servir Ã  dÃ©terminer si un changement de donnÃ©es a eu un impact sur
      * leur ordre.
      */
     public DataOrder getDataOrder() {
@@ -117,11 +117,11 @@ final class BufferedOrderedVector extends OrderedVector {
     }
 
     /**
-     * Retourne la valeur à l'index spécifié. La valeur de cet index peut varier de 0 inclusivement
-     * jusqu'à {@link #length} exclusivement.
+     * Retourne la valeur Ã  l'index spÃ©cifiÃ©. La valeur de cet index peut varier de 0 inclusivement
+     * jusqu'Ã  {@link #length} exclusivement.
      *
      * @param  index La valeur de l'index.
-     * @return La valeur du vecteur à l'index spécifié.
+     * @return La valeur du vecteur Ã  l'index spÃ©cifiÃ©.
      * @throws IndexOutOfBoundsException si l'index est en dehors des limites permises.
      */
     public final double get(final int index) throws IndexOutOfBoundsException {
@@ -133,7 +133,7 @@ final class BufferedOrderedVector extends OrderedVector {
      */
     public boolean locate(final double x) {
         /*
-         * Positionne la plage [upper..lower] aux extrémités du vecteur. S'il y a des NaN, ils seront
+         * Positionne la plage [upper..lower] aux extrÃ©mitÃ©s du vecteur. S'il y a des NaN, ils seront
          * pris en compte en peu plus bas. 'xlo' et 'xhi' seront les valeurs de x correspondantes.
          */
         value = x;
@@ -146,9 +146,9 @@ final class BufferedOrderedVector extends OrderedVector {
         double xlo = data.get(lower);
         boolean ascending = (xlo < xhi);
         /*
-         * Si la valeur de x spécifiée n'est pas comprise dans la plage de valeurs de ce vecteur,
-         * ignore les NaN et vérifie si la valeur est égale à celle de l'une des extrémités. Note:
-         * le '!' dans l'expression ci-dessous est nécessaire pour attraper les valeurs NaN.
+         * Si la valeur de x spÃ©cifiÃ©e n'est pas comprise dans la plage de valeurs de ce vecteur,
+         * ignore les NaN et vÃ©rifie si la valeur est Ã©gale Ã  celle de l'une des extrÃ©mitÃ©s. Note:
+         * le '!' dans l'expression ci-dessous est nÃ©cessaire pour attraper les valeurs NaN.
          */
         while (ascending ? !(xlo<x && x<xhi) : !(xlo>x && x>xhi)) {
             if (x == xlo) {upper=lower; return true;}
@@ -170,13 +170,13 @@ final class BufferedOrderedVector extends OrderedVector {
             ascending = (xlo < xhi);
         }
         /*
-         * A partir de ce point, on a l'assurance qu'il existe au moins une donnée autre que NaN
+         * A partir de ce point, on a l'assurance qu'il existe au moins une donnÃ©e autre que NaN
          * et que la valeur de 'x' est comprise entre 'xlo' et 'xhi'. On peut lancer la recherche
-         * bilinéaire.
+         * bilinÃ©aire.
          */
 search: while (upper - lower > 1) {
             int k = (upper+lower) >> 1;     // Indice au centre de la plage [lower..upper]
-            int scan = 0;                   // Utilisé en cas de valeurs NaN seulement.
+            int scan = 0;                   // UtilisÃ© en cas de valeurs NaN seulement.
             do {
                 assert k>lower && k<upper : k;
                 final double xk = data.get(k);
@@ -195,28 +195,28 @@ search: while (upper - lower > 1) {
                     return true;
                 }
                 /*
-                 * Le code suivant ne sera exécuté que si l'on vient de tomber sur un NaN.
-                 * On recherche linéairement une valeur qui ne soit pas NaN autour de k en
+                 * Le code suivant ne sera exÃ©cutÃ© que si l'on vient de tomber sur un NaN.
+                 * On recherche linÃ©airement une valeur qui ne soit pas NaN autour de k en
                  * testant dans l'ordre k-1, k+1, k-2, k+2, k-3, k+3, etc.
                  */
                 assert isNaN(xk) || isNaN(x) : xk;
                 // Dans la ligne ci-dessous, le premier (k-scan) restore la valeur originale de k
-                // tandis que le second (k-scan) anticipe sur le changement de 'scan' à venir.
+                // tandis que le second (k-scan) anticipe sur le changement de 'scan' Ã  venir.
                 k -= (scan << 1);
                 if (scan >= 0) {
-                    scan = ~scan;  // Equivaut à (-scan - 1)
+                    scan = ~scan;  // Equivaut Ã  (-scan - 1)
                     if (--k > lower) {
-                        assert k-scan == (upper+lower) >> 1 : scan; // (k-scan) devrait être la valeur originale.
+                        assert k-scan == (upper+lower) >> 1 : scan; // (k-scan) devrait Ãªtre la valeur originale.
                         continue;
                     }
                     k -= (scan << 1);  // Annule le test de 'k-scan' et passe au test de 'k+scan'.
                 }
                 scan = -scan;
                 assert scan > 0 : scan;
-                assert k-scan == (upper+lower) >> 1 : scan; // (k-scan) devrait être la valeur originale.
+                assert k-scan == (upper+lower) >> 1 : scan; // (k-scan) devrait Ãªtre la valeur originale.
             } while (k < upper);
             /*
-             * On atteint ce point si aucune valeur autre que NaN n'a été trouvée entre
+             * On atteint ce point si aucune valeur autre que NaN n'a Ã©tÃ© trouvÃ©e entre
              * 'lower' et 'upper'. Les index 'lower' et 'upper' toutefois sont valides.
              */
             break;
@@ -254,9 +254,9 @@ search: while (upper - lower > 1) {
             center >>= 1;
             int i = center;
             /*
-             * Si 'upper' et 'lower' sont identiques, on n'écrira pas 'lower' afin de ne pas
-             * répéter deux fois le même index. On écrira seulement 'upper.' La boucle 'loop'
-             * copie au début du tableau 'index' les index qui précèdent 'lower'.
+             * Si 'upper' et 'lower' sont identiques, on n'Ã©crira pas 'lower' afin de ne pas
+             * rÃ©pÃ©ter deux fois le mÃªme index. On Ã©crira seulement 'upper.' La boucle 'loop'
+             * copie au dÃ©but du tableau 'index' les index qui prÃ©cÃ¨dent 'lower'.
              */
             if (upper != lower) {
                 index[--i] = lower;
@@ -271,9 +271,9 @@ loop:       while (i > 0) {
             }
             /*
              * La boucle suivante copie 'upper' et les index qui le suivent dans le tableau 'index'.
-             * Si on a atteint la fin des données sans avoir réussi à copier tous les index, on
-             * décalera vers la droite les index qui ont été copiés et on tentera de combler le trou
-             * créé à gauche en copiant d'autres index qui précédaient 'lower'.
+             * Si on a atteint la fin des donnÃ©es sans avoir rÃ©ussi Ã  copier tous les index, on
+             * dÃ©calera vers la droite les index qui ont Ã©tÃ© copiÃ©s et on tentera de combler le trou
+             * crÃ©Ã© Ã  gauche en copiant d'autres index qui prÃ©cÃ©daient 'lower'.
              */
             i = center;
             index[i++] = upper;
@@ -306,14 +306,14 @@ loop:       while (i < index.length) {
     public double getInterval() {
         int k0, k1;
         /*
-         *	Repère les index pointant vers les données à utiliser pour le calcul
+         *	RepÃ¨re les index pointant vers les donnÃ©es Ã  utiliser pour le calcul
          *	de l'intervalle. En l'absence de NaN on obtient:
          *
          *		klo0 = lower			khi0 = upper
          *		klo1 = klo0-1			khi1 = upper+1
          *
-         *	Le schema ci-dessous donne un exemple de la façon dont se comporte
-         *	le code en la présence de NaN pour des 'lower' et 'upper' donnés.
+         *	Le schema ci-dessous donne un exemple de la faÃ§on dont se comporte
+         *	le code en la prÃ©sence de NaN pour des 'lower' et 'upper' donnÃ©s.
          *
          *		                   lower          upper
          *		                     |              |
@@ -357,9 +357,9 @@ loop:       while (i < index.length) {
     }
 
     /**
-     * Retourne une copie de ce vecteur. Le buffer {@link #data} est copié (afin de pouvoir être
-     * utilisé dans un autre thread), mais pas les données qu'il contient. Cette copie reste donc
-     * relativement économique.
+     * Retourne une copie de ce vecteur. Le buffer {@link #data} est copiÃ© (afin de pouvoir Ãªtre
+     * utilisÃ© dans un autre thread), mais pas les donnÃ©es qu'il contient. Cette copie reste donc
+     * relativement Ã©conomique.
      */
     @Override
     public BufferedOrderedVector clone() {

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,21 +23,21 @@ import net.sicade.resources.seagis.ResourceKeys;
 
 
 /**
- * Indique qu'une incohérence a été détectée dans un enregistrement d'une table de la base
- * de données. Cette exception peut être levée par exemple si une valeur négative a été trouvée
- * dans un champ qui ne devrait contenir que des valeurs positives, ou si une clé étrangère n'a
- * pas été trouvée. Dans plusieurs cas, cette exception ne devrait pas être soulévée si la base
- * de données à bien vérifié toutes les contraintes (par exemple les clés étrangères).
+ * Indique qu'une incohÃ©rence a Ã©tÃ© dÃ©tectÃ©e dans un enregistrement d'une table de la base
+ * de donnÃ©es. Cette exception peut Ãªtre levÃ©e par exemple si une valeur nÃ©gative a Ã©tÃ© trouvÃ©e
+ * dans un champ qui ne devrait contenir que des valeurs positives, ou si une clÃ© Ã©trangÃ¨re n'a
+ * pas Ã©tÃ© trouvÃ©e. Dans plusieurs cas, cette exception ne devrait pas Ãªtre soulÃ©vÃ©e si la base
+ * de donnÃ©es Ã  bien vÃ©rifiÃ© toutes les contraintes (par exemple les clÃ©s Ã©trangÃ¨res).
  * <p>
  * Cette exception contient le nom de la table contenant un enregistrement invalide.
- * Ce nom apparaît dans le message formaté par {@link #getLocalizedMessage}.
+ * Ce nom apparaÃ®t dans le message formatÃ© par {@link #getLocalizedMessage}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class IllegalRecordException extends CatalogException {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -8491590864510381052L;
     
@@ -50,7 +50,7 @@ public class IllegalRecordException extends CatalogException {
      * Construit une exception signalant qu'un enregistrement n'est pas valide.
      *
      * @param table Nom de la table qui contient l'enregistrement invalide, ou {@code null} si inconnu.
-     * @param message Message décrivant l'erreur, ou {@code null} si aucun.
+     * @param message Message dÃ©crivant l'erreur, ou {@code null} si aucun.
      */
     public IllegalRecordException(final String table, final String message) {
         super(message);
@@ -61,7 +61,7 @@ public class IllegalRecordException extends CatalogException {
      * Construit une exception signalant qu'un enregistrement n'est pas valide.
      *
      * @param table Nom de la table qui contient l'enregistrement invalide ou {@code null} si inconnu.
-     * @param exception Exception rencontrée lors de l'analyse de l'enregistrement.
+     * @param exception Exception rencontrÃ©e lors de l'analyse de l'enregistrement.
      */
     public IllegalRecordException(final String table, final Exception exception) {
         this(table, exception.getLocalizedMessage());
@@ -77,8 +77,8 @@ public class IllegalRecordException extends CatalogException {
     }
 
     /**
-     * Retourne une chaîne de caractère qui contiendra le
-     * nom de la table et un message décrivant l'erreur.
+     * Retourne une chaÃ®ne de caractÃ¨re qui contiendra le
+     * nom de la table et un message dÃ©crivant l'erreur.
      */
     @Override
     public String getLocalizedMessage() {

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@ import net.sicade.observation.Element;
 
 
 /**
- * Un stade de développement des individus d'une {@linkplain Species espèce}.
- * Par exemple il peut s'agir du stage "juvénile" ou "adulte".
+ * Un stade de dÃ©veloppement des individus d'une {@linkplain Species espÃ¨ce}.
+ * Par exemple il peut s'agir du stage "juvÃ©nile" ou "adulte".
  * 
  * @version $Id$
  * @author Antoine Hnawia

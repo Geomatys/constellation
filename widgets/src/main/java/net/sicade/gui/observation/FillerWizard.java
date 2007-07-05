@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -35,30 +35,30 @@ import net.sicade.observation.sql.StationTable;
 
 
 /**
- * Composante graphique pour démarrer le remplissage de la table des mesures. Cette composante
- * graphique demandera à l'utilisateur de sélectionner un sous-ensemble de descripteurs parmis
- * les descripteurs qui ont été spécifiés à {@link MeasurementTableFiller}. Si l'utilisateur
- * appuie sur le bouton "Exécuter" après cette sélection, alors cette objet appelera
- * {@link MeasurementTableFiller#execute} pour les descripteurs sélectionnés.
+ * Composante graphique pour dÃ©marrer le remplissage de la table des mesures. Cette composante
+ * graphique demandera Ã  l'utilisateur de sÃ©lectionner un sous-ensemble de descripteurs parmis
+ * les descripteurs qui ont Ã©tÃ© spÃ©cifiÃ©s Ã  {@link MeasurementTableFiller}. Si l'utilisateur
+ * appuie sur le bouton "ExÃ©cuter" aprÃ¨s cette sÃ©lection, alors cette objet appelera
+ * {@link MeasurementTableFiller#execute} pour les descripteurs sÃ©lectionnÃ©s.
  * <p>
- * Pour faire apparaître cette composante graphique et permettre ainsi le lancement du
+ * Pour faire apparaÃ®tre cette composante graphique et permettre ainsi le lancement du
  * remplissage de la table des mesures, appelez {@link #show}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @todo Eviter une référence directe à {@link EnvironmentTable}. Il faut trouver un moyen de
- *       laisser ce choix à l'utilisateur.
+ * @todo Eviter une rÃ©fÃ©rence directe Ã  {@link EnvironmentTable}. Il faut trouver un moyen de
+ *       laisser ce choix Ã  l'utilisateur.
  */
 @SuppressWarnings("serial")
 public class FillerWizard extends DescriptorChooser {
     /**
-     * Le contrôleur pour remplir la table des mesures.
+     * Le contrÃ´leur pour remplir la table des mesures.
      */
     private final MeasurementTableFiller filler;
 
     /**
-     * Construit une composante graphique pour les descripteurs actuellement déclarés dans
+     * Construit une composante graphique pour les descripteurs actuellement dÃ©clarÃ©s dans
      * l'objet {@link MeasurementTableFiller}.
      */
     public FillerWizard(final MeasurementTableFiller filler) {
@@ -67,9 +67,9 @@ public class FillerWizard extends DescriptorChooser {
     }
 
     /**
-     * Appelée automatiquement lorsque l'utilisateur a appuyé sur le bouton "Exécuter".
-     * L'implémentation par défaut réduit les descripteur de {@link MeasurementTableFiller}
-     * à l'ensemble sélectionné par l'utilisateur, et appelle
+     * AppelÃ©e automatiquement lorsque l'utilisateur a appuyÃ© sur le bouton "ExÃ©cuter".
+     * L'implÃ©mentation par dÃ©faut rÃ©duit les descripteur de {@link MeasurementTableFiller}
+     * Ã  l'ensemble sÃ©lectionnÃ© par l'utilisateur, et appelle
      * {@link MeasurementTableFiller#start start()}.
      */
     @Override
@@ -83,8 +83,8 @@ public class FillerWizard extends DescriptorChooser {
     }
 
     /**
-     * Appelée automatiquement lorsque l'utilisateur a appuyé sur le bouton "Annuler".
-     * L'implémentation par défaut interrompt l'exécution lancée par
+     * AppelÃ©e automatiquement lorsque l'utilisateur a appuyÃ© sur le bouton "Annuler".
+     * L'implÃ©mentation par dÃ©faut interrompt l'exÃ©cution lancÃ©e par
      * {@link MeasurementTableFiller#start start()}.
      */
     @Override
@@ -94,10 +94,10 @@ public class FillerWizard extends DescriptorChooser {
     }
 
     /**
-     * Fait apparaître la boîte de dialogue qui suggère à l'utilisateur de sélectionner des
-     * descripteurs du paysage océanique. La liste des descripteurs sera puisée dans la base
-     * de données. Si l'utilisateur appuie sur le bouton "Exécuter", l'exécution démarrera
-     * immédiatement.
+     * Fait apparaÃ®tre la boÃ®te de dialogue qui suggÃ¨re Ã  l'utilisateur de sÃ©lectionner des
+     * descripteurs du paysage ocÃ©anique. La liste des descripteurs sera puisÃ©e dans la base
+     * de donnÃ©es. Si l'utilisateur appuie sur le bouton "ExÃ©cuter", l'exÃ©cution dÃ©marrera
+     * immÃ©diatement.
      */
     public static void main(String[] args) {
         final FillerWizard wizard;

@@ -1,7 +1,7 @@
 /*
- * Sicade - Systèmes intégrés de connaissances
- *          pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances
+ *          pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,10 +25,10 @@ import java.lang.annotation.RetentionPolicy;
 
 
 /**
- * Référence bibliographique vers une fonction de <A HREF="http://www.nr.com">Numerical Recipes</A>.
- * L'annotation {@code NR} doit accompagner chaque méthode dont le code, même modifié, est dérivé
- * de <cite>Numerical Recipes</cite>. Ces fonctions sont propriétés intellectuelles de leurs
- * auteurs et ne pourront pas êtres distribuées librement.
+ * RÃ©fÃ©rence bibliographique vers une fonction de <A HREF="http://www.nr.com">Numerical Recipes</A>.
+ * L'annotation {@code NR} doit accompagner chaque mÃ©thode dont le code, mÃªme modifiÃ©, est dÃ©rivÃ©
+ * de <cite>Numerical Recipes</cite>. Ces fonctions sont propriÃ©tÃ©s intellectuelles de leurs
+ * auteurs et ne pourront pas Ãªtres distribuÃ©es librement.
  *
  * @author Patricia Derex
  * @version $Id$
@@ -44,7 +44,7 @@ public @interface NR {
     String function();
 
     /**
-     * Chapitre ou section dans laquelle est publiée la fonction.
+     * Chapitre ou section dans laquelle est publiÃ©e la fonction.
      */
     String chapter();
 }

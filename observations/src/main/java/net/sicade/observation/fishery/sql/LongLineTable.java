@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ import net.sicade.observation.sql.StationTable;
  */
 public class LongLineTable extends StationTable {
     /**
-     * Requête SQL pour obtenir une station à partir de son identifiant.
+     * RequÃªte SQL pour obtenir une station Ã  partir de son identifiant.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("LongLines:SELECT",
             "SELECT identifier AS name, identifier, platform, quality, provider, \"startTime\", \"endTime\", x, y\n" +
@@ -61,7 +61,7 @@ public class LongLineTable extends StationTable {
     }
 
     /**
-     * Retourne la requête à utiliser pour obtenir les lignes de palangres.
+     * Retourne la requÃªte Ã  utiliser pour obtenir les lignes de palangres.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -76,9 +76,9 @@ public class LongLineTable extends StationTable {
     }
 
     /**
-     * Construit une station à partir des informations spécifiées.
+     * Construit une station Ã  partir des informations spÃ©cifiÃ©es.
      *
-     * @todo A mettre à jour lorsque l'on aura implémenté une classe {@code LongLineEntry}.
+     * @todo A mettre Ã  jour lorsque l'on aura implÃ©mentÃ© une classe {@code LongLineEntry}.
      */
     @Override
     protected Station createEntry(final int          identifier,

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,13 @@ import java.sql.SQLException;
 
 
 /**
- * Marque les {@linkplain Table tables} qui peuvent être partagées par plusieurs utilisateurs.
+ * Marque les {@linkplain Table tables} qui peuvent Ãªtre partagÃ©es par plusieurs utilisateurs.
  * Par "plusieurs utilisateurs", on entend notamment d'autres {@linkplain Table tables}. Par
- * exemple une même instance de {@link MetadataTable} peut être utilisée en interne par plusieurs
+ * exemple une mÃªme instance de {@link MetadataTable} peut Ãªtre utilisÃ©e en interne par plusieurs
  * instances de {@link StationTable}.
  * <p>
- * Les tables partageables ne doivent pas être paramètrables. Autrement dit, elle ne doivent contenir
- * aucun <cite>beans</cite> (c'est-à-dire aucune paire de méthodes {@code getXXX} et {@code setXXX}).
+ * Les tables partageables ne doivent pas Ãªtre paramÃ¨trables. Autrement dit, elle ne doivent contenir
+ * aucun <cite>beans</cite> (c'est-Ã -dire aucune paire de mÃ©thodes {@code getXXX} et {@code setXXX}).
  *
  * @version $Id$
  * @author Martin Desruisseaux

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,44 +40,44 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Copie le contenu de tables vers des tables équivalentes d'une autre base de données. Cette classe
- * est utilisée lorsque l'on a deux copies d'une base de données (typiquement une copie expérimentale
- * et une copie opérationnelle), et que l'on souhaite copier de temps à autre le contenu de la table
- * expérimentale vers sa contrepartie opérationnelle.
+ * Copie le contenu de tables vers des tables Ã©quivalentes d'une autre base de donnÃ©es. Cette classe
+ * est utilisÃ©e lorsque l'on a deux copies d'une base de donnÃ©es (typiquement une copie expÃ©rimentale
+ * et une copie opÃ©rationnelle), et que l'on souhaite copier de temps Ã  autre le contenu de la table
+ * expÃ©rimentale vers sa contrepartie opÃ©rationnelle.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Synchronizer {
     /**
-     * Connections vers les bases de données source. Cette connexion ne doit pas être fermée,
-     * car elle restera utilisée par les méthodes de {@link Observations}.
+     * Connections vers les bases de donnÃ©es source. Cette connexion ne doit pas Ãªtre fermÃ©e,
+     * car elle restera utilisÃ©e par les mÃ©thodes de {@link Observations}.
      */
     private final Connection source;
     
     /**
-     * Connections vers les bases de données destination.
+     * Connections vers les bases de donnÃ©es destination.
      */
     private final Connection target;
 
     /**
-     * Construit un objet qui synchronisera le contenu de la base de données spécifiée.
-     * La base de données source sera la base de données par défaut, telle que configurée
+     * Construit un objet qui synchronisera le contenu de la base de donnÃ©es spÃ©cifiÃ©e.
+     * La base de donnÃ©es source sera la base de donnÃ©es par dÃ©faut, telle que configurÃ©e
      * sur le poste du client.
      *
-     * @param  target L'URL vers la base de données destination.
-     * @throws CatalogException si une connexion n'a pas pu être établie.
+     * @param  target L'URL vers la base de donnÃ©es destination.
+     * @throws CatalogException si une connexion n'a pas pu Ãªtre Ã©tablie.
      */
     public Synchronizer(final String target, final String user, final String password) throws CatalogException {
         this(Observations.getDefault().getDatabase(), target, user, password);
     }
 
     /**
-     * Construit un objet qui synchronisera le contenu de la base de données spécifiée.
+     * Construit un objet qui synchronisera le contenu de la base de donnÃ©es spÃ©cifiÃ©e.
      *
-     * @param  source La base de données source.
-     * @param  target L'URL vers la base de données destination.
-     * @throws CatalogException si une connexion n'a pas pu être établie.
+     * @param  source La base de donnÃ©es source.
+     * @param  target L'URL vers la base de donnÃ©es destination.
+     * @throws CatalogException si une connexion n'a pas pu Ãªtre Ã©tablie.
      */
     public Synchronizer(final Database source, final String target, final String user, final String password)
             throws CatalogException
@@ -92,13 +92,13 @@ public class Synchronizer {
     }
 
     /**
-     * Remplace le contenu de la table spécifiée dans la base de données destination.
-     * Si des enregistrements existaient déjà dans la table destination, ils seront
-     * supprimées avant la copie. Si {@code condition} est non-nul, alors seuls les
-     * enregistrements répondant à cette condition seront affectées.
+     * Remplace le contenu de la table spÃ©cifiÃ©e dans la base de donnÃ©es destination.
+     * Si des enregistrements existaient dÃ©jÃ  dans la table destination, ils seront
+     * supprimÃ©es avant la copie. Si {@code condition} est non-nul, alors seuls les
+     * enregistrements rÃ©pondant Ã  cette condition seront affectÃ©es.
      *
      * @param table Le nom de la table dont on veut remplacer les enregistrements.
-     * @param condition Une condition SQL désignant les enregistrements à remplacer,
+     * @param condition Une condition SQL dÃ©signant les enregistrements Ã  remplacer,
      *        ou {@code null} pour remplacer tous les enregistrements.
      */
     public void replace(String table, String condition) throws SQLException {
@@ -119,10 +119,10 @@ public class Synchronizer {
             }
             String sql = b.toString();
             int count = targetStmt.executeUpdate(sql);
-            log(LoggingLevel.DELETE, "replace", sql + '\n' + count + " lignes supprimées.");
+            log(LoggingLevel.DELETE, "replace", sql + '\n' + count + " lignes supprimÃ©es.");
             /*
              * Obtient les nouveaux enregistrements de la table source,
-             * ainsi que les noms de toutes les colonnes impliquées.
+             * ainsi que les noms de toutes les colonnes impliquÃ©es.
              */
             b.setLength(0);
             b.append("SELECT * FROM \"");
@@ -187,20 +187,20 @@ public class Synchronizer {
         sourceStmt.close();
         targetStmt.close();
         if (!success) {
-            throw new SQLException("Certains enregistrements n'ont pas pu être ajoutés.");
+            throw new SQLException("Certains enregistrements n'ont pas pu Ãªtre ajoutÃ©s.");
         }
     }
 
     /**
-     * Libère les resources utilisées par cet objet.
+     * LibÃ¨re les resources utilisÃ©es par cet objet.
      */
     public void close() throws SQLException {
-        // Ne PAS fermer 'source', car il reste utilisé par Observations.
+        // Ne PAS fermer 'source', car il reste utilisÃ© par Observations.
         target.close();
     }
 
     /**
-     * Enregistre un événement du niveau spécifié dans le journal.
+     * Enregistre un Ã©vÃ©nement du niveau spÃ©cifiÃ© dans le journal.
      */
     private static void log(final Level level, final String method, final String message) {
         final LogRecord record = new LogRecord(level, message);
@@ -210,17 +210,17 @@ public class Synchronizer {
     }
 
     /**
-     * Lance {@link #replace} à partir de la ligne de commande.
+     * Lance {@link #replace} Ã  partir de la ligne de commande.
      */
     public static void main(String[] args) throws CatalogException, SQLException {
         if (false) {
-            // A des fins de déboguages seulement.
+            // A des fins de dÃ©boguages seulement.
             args = new String[] {
                 "-target",      "jdbc:postgresql://server/database",
                 "-user",        "",
                 "-password",    "",
                 "-table",       "LinearModelTerms",
-                "-condition",   "target = 'Potentiel de pêche ALB-optimal (Calédonie)'"
+                "-condition",   "target = 'Potentiel de pÃªche ALB-optimal (CalÃ©donie)'"
             };
         }
         final Arguments arguments = new Arguments(args);

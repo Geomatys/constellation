@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ import org.postgis.Point;
 
 
 /**
- * Connexion à la table des étendues géographiques des images.
+ * Connexion Ã  la table des Ã©tendues gÃ©ographiques des images.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -53,7 +53,7 @@ import org.postgis.Point;
  */
 public class GeographicBoundingBoxTable extends Table implements Shareable {
     /**
-     * Facteur de tolérance pour la comparaison des limites géographiques.
+     * Facteur de tolÃ©rance pour la comparaison des limites gÃ©ographiques.
      */
     private static final double EPSILON = 1E-7;
     
@@ -116,8 +116,8 @@ public class GeographicBoundingBoxTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne l'identifieur de l'étendue géographique et la dimension d'image spécifiées.
-     * Si aucun enregistrement n'a été trouvée, alors cette méthode retourne {@code null}.
+     * Retourne l'identifieur de l'Ã©tendue gÃ©ographique et la dimension d'image spÃ©cifiÃ©es.
+     * Si aucun enregistrement n'a Ã©tÃ© trouvÃ©e, alors cette mÃ©thode retourne {@code null}.
      *
      * @param  bbox The geographic bounding box.
      * @param  size The image size, in pixels.
@@ -142,8 +142,8 @@ public class GeographicBoundingBoxTable extends Table implements Shareable {
             statement.setInt   (7, 1);
         } else {
             /*
-             * Dans le cas d'une base JavaDB, on spécifie temporairement les valeurs d'altitudes min
-             * et max à 0. On devra par la suite obtenir des valeurs dynamiques.
+             * Dans le cas d'une base JavaDB, on spÃ©cifie temporairement les valeurs d'altitudes min
+             * et max Ã  0. On devra par la suite obtenir des valeurs dynamiques.
              */
             statement.setDouble(5, 0.0);
             statement.setDouble(6, 0.0);
@@ -170,7 +170,7 @@ public class GeographicBoundingBoxTable extends Table implements Shareable {
     }
 
     /**
-     * Ajoute une entrée pour l'étendue géographique et la dimension d'image spécifiée.
+     * Ajoute une entrÃ©e pour l'Ã©tendue gÃ©ographique et la dimension d'image spÃ©cifiÃ©e.
      */
     public synchronized void addEntry(final String          identifier,
                                       final GeographicBoundingBox bbox,
@@ -202,7 +202,7 @@ public class GeographicBoundingBoxTable extends Table implements Shareable {
             statement.setInt   (10, 1);
         }
         if (statement.executeUpdate() != 1) {
-            throw new CatalogException("L'étendue géographique n'a pas été ajoutée.");
+            throw new CatalogException("L'Ã©tendue gÃ©ographique n'a pas Ã©tÃ© ajoutÃ©e.");
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ import net.sicade.observation.fishery.Stage;
 
 
 /**
- * Implémentation d'une entrée représentant un {@linkplain Stage stade de développement}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant un {@linkplain Stage stade de dÃ©veloppement}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -32,12 +32,12 @@ import net.sicade.observation.fishery.Stage;
  */
 public class StageEntry extends Entry implements Stage {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -1748702104564293463L;
 
     /**
-     * Crée une nouvelle entrée du nom spécifié.
+     * CrÃ©e une nouvelle entrÃ©e du nom spÃ©cifiÃ©.
      */
     public StageEntry(final String name, final String remarks) {
         super(name, remarks);

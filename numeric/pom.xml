@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
   Configuration du module "observations" du projet Sicade.
@@ -22,25 +22,25 @@
   <artifactId>seagis-numeric</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Algorithmes numériques</name>
+  <name>Algorithmes numÃ©riques</name>
   <description>
-    Algorithmes de calculs numériques.
+    Algorithmes de calculs numÃ©riques.
   </description>
 
 
 
   <!--
-    Liste des développeurs et des contributeurs.
+    Liste des dÃ©veloppeurs et des contributeurs.
   -->
   <developers>
     <developer>
       <id>desruisseaux</id>
       <name>Martin Desruisseaux</name>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Unité S140 (Espace)</organization>
+      <organization>UnitÃ© S140 (Espace)</organization>
       <roles>
         <role>Administrateur du projet</role>
-        <role>Développeur Java</role>
+        <role>DÃ©veloppeur Java</role>
       </roles>
       <timezone>+1</timezone>
     </developer>
@@ -49,7 +49,7 @@
 
 
   <!--
-    Dépendences.
+    DÃ©pendences.
   -->
   <dependencies>
     <dependency>

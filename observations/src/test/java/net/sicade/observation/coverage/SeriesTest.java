@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -52,23 +52,23 @@ import net.sicade.observation.coverage.sql.GridCoverageTable;
 /**
  * Teste le fonctionnement de {@link CoverageStack#evaluate} avec des {@link Series}.
  * Ce test est un peu plus direct que {@link DescriptorTest} du fait qu'il construit
- * lui même le {@link CoverageStack} dans plusieurs cas.
+ * lui mÃªme le {@link CoverageStack} dans plusieurs cas.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.
+ * @todo Ajouter des tests sur le mÃªme modÃ¨le que ceux que l'on peut trouver dans le projet SICADE.
  */
 public class SeriesTest extends AbstractTest {
     /**
-     * {@code true} pour désactiver tous les tests (sauf typiquement un test en particulier que l'on
-     * souhaite suivre pas à pas). La valeur de ce champ devrait être toujours {@code false} sauf en
-     * cas de déboguage d'une méthode bien spécifique.
+     * {@code true} pour dÃ©sactiver tous les tests (sauf typiquement un test en particulier que l'on
+     * souhaite suivre pas Ã  pas). La valeur de ce champ devrait Ãªtre toujours {@code false} sauf en
+     * cas de dÃ©boguage d'une mÃ©thode bien spÃ©cifique.
      */
     private static final boolean DISABLED = false;
 
     /**
-     * Connexion vers la table des séries.
+     * Connexion vers la table des sÃ©ries.
      */
     private static SeriesTable series;
 
@@ -88,7 +88,7 @@ public class SeriesTest extends AbstractTest {
     }
 
     /**
-     * Exécute la suite de tests à partir de la ligne de commande.
+     * ExÃ©cute la suite de tests Ã  partir de la ligne de commande.
      */
     public static void main(final String[] args) {
         MonolineFormatter.init("org.geotools");
@@ -99,8 +99,8 @@ public class SeriesTest extends AbstractTest {
     }
 
     /**
-     * Etablit la connexion avec la base de données. Cette connexion ne sera établie que la
-     * première fois où un test sera exécuté. Pour la fermeture des connections, on se fiera
+     * Etablit la connexion avec la base de donnÃ©es. Cette connexion ne sera Ã©tablie que la
+     * premiÃ¨re fois oÃ¹ un test sera exÃ©cutÃ©. Pour la fermeture des connections, on se fiera
      * au rammase-miettes et aux "shutdown hooks" mis en place par {@code Database}.
      */
     @Override
@@ -112,11 +112,11 @@ public class SeriesTest extends AbstractTest {
     }
 
     /**
-     * Construit la couverture 3D pour la série spécifiée. La résultat sera placé
+     * Construit la couverture 3D pour la sÃ©rie spÃ©cifiÃ©e. La rÃ©sultat sera placÃ©
      * dans le champ {@link #coverage}.
      *
-     * @param seriesName  Nom de la série pour laquelle on veut une couverture 3D.
-     * @param interpolate {@code true} si les interpolations sont autorisées.
+     * @param seriesName  Nom de la sÃ©rie pour laquelle on veut une couverture 3D.
+     * @param interpolate {@code true} si les interpolations sont autorisÃ©es.
      */
     private void createCoverage3D(final String seriesName, final boolean interpolate)
             throws CatalogException, SQLException, IOException
@@ -139,7 +139,7 @@ public class SeriesTest extends AbstractTest {
     }
 
     /**
-     * Teste l'obtention de la liste des séries, incluant un filtrage par région géographique.
+     * Teste l'obtention de la liste des sÃ©ries, incluant un filtrage par rÃ©gion gÃ©ographique.
      */
     public void testSeries() throws Exception {
         if (DISABLED) return;
@@ -149,17 +149,17 @@ public class SeriesTest extends AbstractTest {
         final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(-60, 40, 15, 80);
         table.setGeographicBoundingBox(bbox);
         assertEquals(bbox, table.getGeographicBoundingBox());
-        table.trimEnvelope(); // Devrait n'avoir aucun effet lorsque la sélection contient des image mondiales.
+        table.trimEnvelope(); // Devrait n'avoir aucun effet lorsque la sÃ©lection contient des image mondiales.
         assertEquals(bbox, table.getGeographicBoundingBox());
         final Set<Series> selected = table.getEntries();
         assertFalse(selected.isEmpty());
-        /* TODO: notre base a été épurée de certaines données, pour les tests on modifie la condition qui était
-         * un inférieur strict par un inférieur ou égal (dans notre cas selected.size() et all.size() sont égaux.
+        /* TODO: notre base a Ã©tÃ© Ã©purÃ©e de certaines donnÃ©es, pour les tests on modifie la condition qui Ã©tait
+         * un infÃ©rieur strict par un infÃ©rieur ou Ã©gal (dans notre cas selected.size() et all.size() sont Ã©gaux.
          */ 
         assertTrue (selected.size() <= all.size());
         assertTrue (all.containsAll(selected));
-        /* TODO: Après épuration des données, selected et all sont identiques pour la zone choisie. Le test
-         * suivi n'a donc plus de raisons d'être.
+        /* TODO: AprÃ¨s Ã©puration des donnÃ©es, selected et all sont identiques pour la zone choisie. Le test
+         * suivi n'a donc plus de raisons d'Ãªtre.
          */
         //assertFalse(selected.containsAll(all) && !selected.equals(all));
     }

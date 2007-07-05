@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ import net.sicade.observation.Distribution;
 
 
 /**
- * Implémentation d'une entrée représentant un {@linkplain Observable observable}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant un {@linkplain Observable observable}.
  *
  * @version $Id$
  * @author Antoine Hnawia
@@ -34,7 +34,7 @@ import net.sicade.observation.Distribution;
  */
 public class ObservableEntry extends Entry implements Observable {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 7998601835565062137L;
 
@@ -44,17 +44,17 @@ public class ObservableEntry extends Entry implements Observable {
     protected final int identifier;
 
     /**
-     * Référence vers le {@linkplain Phenomenon phénomène} observé.
+     * RÃ©fÃ©rence vers le {@linkplain Phenomenon phÃ©nomÃ¨ne} observÃ©.
      */
     private final Phenomenon phenomenon;
 
     /**
-     * Référence vers la {@linkplain Procedure procédure} associée à cet observable.
+     * RÃ©fÃ©rence vers la {@linkplain Procedure procÃ©dure} associÃ©e Ã  cet observable.
      */
     private final Procedure procedure;
 
     /**
-     * Référence vers la {@linkplain Distribution distribution} associée à cet observable.
+     * RÃ©fÃ©rence vers la {@linkplain Distribution distribution} associÃ©e Ã  cet observable.
      */
     private final Distribution distribution;
 
@@ -63,9 +63,9 @@ public class ObservableEntry extends Entry implements Observable {
      *
      * @param identifier  L'identifiant de l'observable.
      * @param symbol      Le symbole de l'observable.
-     * @param phenomenon  Le phénomène observé.
-     * @param procedure   La procédure associée.
-     * @param remarks     Remarques s'appliquant à cette entrée, ou {@code null}.
+     * @param phenomenon  Le phÃ©nomÃ¨ne observÃ©.
+     * @param procedure   La procÃ©dure associÃ©e.
+     * @param remarks     Remarques s'appliquant Ã  cette entrÃ©e, ou {@code null}.
      */
     protected ObservableEntry(final int          identifier,
                               final String       symbol,
@@ -110,7 +110,7 @@ public class ObservableEntry extends Entry implements Observable {
     }
 
     /**
-     * Retourne le code numérique identifiant cette entrée.
+     * Retourne le code numÃ©rique identifiant cette entrÃ©e.
      */
     @Override
     public int hashCode() {
@@ -118,7 +118,7 @@ public class ObservableEntry extends Entry implements Observable {
     }
 
     /**
-     * Compare cette entré avec l'object spécifié.
+     * Compare cette entrÃ© avec l'object spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object object) {

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,10 +28,10 @@ import org.opengis.util.InternationalString;
 
 
 /**
- * Clé désignant un aspect d'une configuration d'une base de données. Une clé peut désigner
- * par exemple le pilote JDBC à utiliser pour la connexion, ou une des requête SQL utilisée.
- * Un ensemble de clés sont prédéfinies comme variables statiques dans les implémentations
- * côté serveur des différentes interfaces. Les valeurs correspondantes peuvent être modifiées
+ * ClÃ© dÃ©signant un aspect d'une configuration d'une base de donnÃ©es. Une clÃ© peut dÃ©signer
+ * par exemple le pilote JDBC Ã  utiliser pour la connexion, ou une des requÃªte SQL utilisÃ©e.
+ * Un ensemble de clÃ©s sont prÃ©dÃ©finies comme variables statiques dans les implÃ©mentations
+ * cÃ´tÃ© serveur des diffÃ©rentes interfaces. Les valeurs correspondantes peuvent Ãªtre modifiÃ©es
  * par {@link net.sicade.gui.swing.ConfigurationEditor}.
  *
  * @version $Id$
@@ -40,59 +40,59 @@ import org.opengis.util.InternationalString;
  */
 public class ConfigurationKey implements Serializable {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 3068136990916953221L;
 
     /**
-     * Ensemble des clés déjà créées dans cette machine virtuelle. Chaque clé est créée une fois
-     * pour toute et ajoutée à cet ensemble. La création des clés se fait habituellement lors de
+     * Ensemble des clÃ©s dÃ©jÃ  crÃ©Ã©es dans cette machine virtuelle. Chaque clÃ© est crÃ©Ã©e une fois
+     * pour toute et ajoutÃ©e Ã  cet ensemble. La crÃ©ation des clÃ©s se fait habituellement lors de
      * l'initialisation des classes qui les contient comme variables statiques.
      */
     private static final Map<String,ConfigurationKey> POOL = new HashMap<String,ConfigurationKey>();
 
     /**
-     * Le nom de la clé courante. Chaque clé a un nom unique.
+     * Le nom de la clÃ© courante. Chaque clÃ© a un nom unique.
      */
     private final String name;
 
     /**
-     * Valeur par défaut associée à la clé. Cette valeur est codée en dur dans les implémentations
-     * qui définissent des clés comme variables statiques. Cette valeur par défaut ne sera utilisée
-     * que si l'utilisateur n'a pas spécifié explicitement de valeur dans le fichier de configuration.
+     * Valeur par dÃ©faut associÃ©e Ã  la clÃ©. Cette valeur est codÃ©e en dur dans les implÃ©mentations
+     * qui dÃ©finissent des clÃ©s comme variables statiques. Cette valeur par dÃ©faut ne sera utilisÃ©e
+     * que si l'utilisateur n'a pas spÃ©cifiÃ© explicitement de valeur dans le fichier de configuration.
      */
     private final transient String defaultValue;
 
     /**
-     * Construit une nouvelle clé.
+     * Construit une nouvelle clÃ©.
      *
-     * @param name          Le nom de la clé à créer. Ce nom doit être unique.
-     * @param defaultValue  Valeur par défaut associée à la clé, utilisée que si l'utilisateur n'a
-     *                      pas spécifié explicitement de valeur.
+     * @param name          Le nom de la clÃ© Ã  crÃ©er. Ce nom doit Ãªtre unique.
+     * @param defaultValue  Valeur par dÃ©faut associÃ©e Ã  la clÃ©, utilisÃ©e que si l'utilisateur n'a
+     *                      pas spÃ©cifiÃ© explicitement de valeur.
      *
-     * @throws IllegalStateException si une clé a déjà été créée précédemment pour le nom spécifié.
+     * @throws IllegalStateException si une clÃ© a dÃ©jÃ  Ã©tÃ© crÃ©Ã©e prÃ©cÃ©demment pour le nom spÃ©cifiÃ©.
      */
     public ConfigurationKey(final String name, final String defaultValue) throws IllegalStateException {
         this.name         = name.trim();
         this.defaultValue = defaultValue;
         synchronized (POOL) {
             if (POOL.put(name, this) != null) {
-                throw new IllegalStateException("Doublon dans les noms de clés."); // TODO: localize
+                throw new IllegalStateException("Doublon dans les noms de clÃ©s."); // TODO: localize
             }
         }
     }
 
     /**
-     * Retourne le nom de la clé courante. Chaque clé a un nom unique.
+     * Retourne le nom de la clÃ© courante. Chaque clÃ© a un nom unique.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Retourne la valeur par défaut associée à la clé. Cette valeur est codée en dur dans
-     * les implémentations qui définissent des clés comme variables statiques. Cette valeur
-     * par défaut ne sera utilisée que si l'utilisateur n'a pas spécifié explicitement de
+     * Retourne la valeur par dÃ©faut associÃ©e Ã  la clÃ©. Cette valeur est codÃ©e en dur dans
+     * les implÃ©mentations qui dÃ©finissent des clÃ©s comme variables statiques. Cette valeur
+     * par dÃ©faut ne sera utilisÃ©e que si l'utilisateur n'a pas spÃ©cifiÃ© explicitement de
      * valeur dans le fichier de configuration.
      */
     public String getDefaultValue() {
@@ -100,10 +100,10 @@ public class ConfigurationKey implements Serializable {
     }
 
     /**
-     * Retourne une instance unique de cette clé après lecture binaire.
+     * Retourne une instance unique de cette clÃ© aprÃ¨s lecture binaire.
      *
-     * @todo L'implémentation actuelle échouera si la classe qui déclare cette clé comme variable
-     *       statique n'a pas été initialisée avant la déserialisation de cette clée.
+     * @todo L'implÃ©mentation actuelle Ã©chouera si la classe qui dÃ©clare cette clÃ© comme variable
+     *       statique n'a pas Ã©tÃ© initialisÃ©e avant la dÃ©serialisation de cette clÃ©e.
      */
     protected Object readResolve() throws ObjectStreamException {
         synchronized (POOL) {
@@ -112,11 +112,11 @@ public class ConfigurationKey implements Serializable {
                 return r;
             }
         }
-        throw new InvalidObjectException("Clé inconnue: "+name); // TODO: localize
+        throw new InvalidObjectException("ClÃ© inconnue: "+name); // TODO: localize
     }
 
     /**
-     * Retourne le nom de cette clé, pour inclusion dans une interface graphique.
+     * Retourne le nom de cette clÃ©, pour inclusion dans une interface graphique.
      */
     @Override
     public String toString() {

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -33,8 +33,8 @@ import net.sicade.observation.coverage.sql.TreeDepth;
 
 
 /**
- * Arborescence des séries de données à développer en dessous d'un noeud {@link RootNode}.
- * Les noeuds enfants ne seront créés que la première fois où {@link #addNotify} sera appelée.
+ * Arborescence des sÃ©ries de donnÃ©es Ã  dÃ©velopper en dessous d'un noeud {@link RootNode}.
+ * Les noeuds enfants ne seront crÃ©Ã©s que la premiÃ¨re fois oÃ¹ {@link #addNotify} sera appelÃ©e.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -52,27 +52,27 @@ final class ChildrenList extends Children.Array {
     private final TreeDepth childType;
 
     /**
-     * La région géographique qui contiendra la liste des séries.
+     * La rÃ©gion gÃ©ographique qui contiendra la liste des sÃ©ries.
      */
     private final BoundingBox bbox;
 
     /**
-     * Les éléments de cette liste (thématiques, opérations ou séries), avec les éventuels
+     * Les Ã©lÃ©ments de cette liste (thÃ©matiques, opÃ©rations ou sÃ©ries), avec les Ã©ventuels
      * enfants de chacun d'eux.
      */
     private java.util.Map<Element,ChildrenList> childs;
 
     /**
-     * Prépare une liste pour la région spécifiée.
+     * PrÃ©pare une liste pour la rÃ©gion spÃ©cifiÃ©e.
      */
     public ChildrenList(final BoundingBox bbox) {
         this(bbox, bbox.next(null));
     }
 
     /**
-     * Prépare une liste pour la région spécifiée.
+     * PrÃ©pare une liste pour la rÃ©gion spÃ©cifiÃ©e.
      *
-     * @param bbox La région géographique qui contiendra la liste des séries.
+     * @param bbox La rÃ©gion gÃ©ographique qui contiendra la liste des sÃ©ries.
      * @param type Le type de cette liste.
      */
     private ChildrenList(final BoundingBox bbox, final TreeDepth type) {
@@ -82,16 +82,16 @@ final class ChildrenList extends Children.Array {
     }
 
     /**
-     * Ajoute une série à cette liste. Cette méthode préparera automatiquement une catégorie
-     * (thématique ou opération) si nécessaire, ainsi que tous les noeuds enfants. Toutefois,
-     * les objets {@link org.openide.nodes.Node} correspondants ne seront réellement créés
-     * que lorsque {@link #addNotify} sera appelée.
+     * Ajoute une sÃ©rie Ã  cette liste. Cette mÃ©thode prÃ©parera automatiquement une catÃ©gorie
+     * (thÃ©matique ou opÃ©ration) si nÃ©cessaire, ainsi que tous les noeuds enfants. Toutefois,
+     * les objets {@link org.openide.nodes.Node} correspondants ne seront rÃ©ellement crÃ©Ã©s
+     * que lorsque {@link #addNotify} sera appelÃ©e.
      */
     private void add(final Series series) {
         /*
-         * Obtient la catégorie dans laquelle placer la série spécifiée. La catégorie peut être
-         * une thématique ou une opération appliquée sur les images. Les catégories seront les
-         * enfants créés par cette liste.
+         * Obtient la catÃ©gorie dans laquelle placer la sÃ©rie spÃ©cifiÃ©e. La catÃ©gorie peut Ãªtre
+         * une thÃ©matique ou une opÃ©ration appliquÃ©e sur les images. Les catÃ©gories seront les
+         * enfants crÃ©Ã©s par cette liste.
          */
         final Element category;
         switch (type) {
@@ -101,9 +101,9 @@ final class ChildrenList extends Children.Array {
             default: throw new IllegalStateException(String.valueOf(type));
         }
         /*
-         * Ajoute la catégorie à la liste des enfants (si ce n'était pas déjà fait),
-         * puis demande à la liste enfant de créer elle-même ses propres catégories
-         * pour la série spécifiée.
+         * Ajoute la catÃ©gorie Ã  la liste des enfants (si ce n'Ã©tait pas dÃ©jÃ  fait),
+         * puis demande Ã  la liste enfant de crÃ©er elle-mÃªme ses propres catÃ©gories
+         * pour la sÃ©rie spÃ©cifiÃ©e.
          */
         if (childs == null) {
             childs = new LinkedHashMap<Element,ChildrenList>();
@@ -121,8 +121,8 @@ final class ChildrenList extends Children.Array {
     }
 
     /**
-     * Appelée automatiquement la première fois où les noeuds enfants doivent être construit.
-     * Cette méthode obtient l'ensemble des séries, puis construit un {@linkplain SeriesNode
+     * AppelÃ©e automatiquement la premiÃ¨re fois oÃ¹ les noeuds enfants doivent Ãªtre construit.
+     * Cette mÃ©thode obtient l'ensemble des sÃ©ries, puis construit un {@linkplain SeriesNode
      * noeud} pour chacune d'elles.
      */
     @Override
@@ -130,10 +130,10 @@ final class ChildrenList extends Children.Array {
         super.addNotify();
         if (childs == null) {
             /*
-             * Si la liste d'enfants n'a pas encore été déterminée (ça ne devrait se produire que
+             * Si la liste d'enfants n'a pas encore Ã©tÃ© dÃ©terminÃ©e (Ã§a ne devrait se produire que
              * si cette liste est directement sous RootNode), alors construit la liste d'enfants.
-             * L'appel à la méthode 'add' devrait cascader dans toute la profondeur de l'arborescence.
-             * Note: La ligne suivante peut bloquer jusqu'à ce que le serveur fournisse une réponse.
+             * L'appel Ã  la mÃ©thode 'add' devrait cascader dans toute la profondeur de l'arborescence.
+             * Note: La ligne suivante peut bloquer jusqu'Ã  ce que le serveur fournisse une rÃ©ponse.
              */
             final Series[] series = bbox.getSeries();
             if (series == null) {
@@ -158,8 +158,8 @@ final class ChildrenList extends Children.Array {
     }
 
     /**
-     * Reconstruit une nouvelle liste d'enfants. Cette méthode est appelée après que la structure
-     * de l'arborescence aie été modifiée par à un appel à {@link BoundingBox#setTreeLayout}.
+     * Reconstruit une nouvelle liste d'enfants. Cette mÃ©thode est appelÃ©e aprÃ¨s que la structure
+     * de l'arborescence aie Ã©tÃ© modifiÃ©e par Ã  un appel Ã  {@link BoundingBox#setTreeLayout}.
      */
     final ChildrenList recreate() {
         return new ChildrenList(bbox);

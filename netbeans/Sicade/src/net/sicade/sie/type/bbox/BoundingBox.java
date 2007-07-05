@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -41,88 +41,88 @@ import static net.sicade.observation.coverage.sql.TreeDepth.*;
 
 
 /**
- * Représente une région géographique d'intérêt tel que spécifiée dans un fichier {@code .bbox}.
- * Cette région d'intérêt détermine les séries de données qui seront disponibles (exemple: SST
- * LAC autour de l'île de la Réunion, SST LAC autour de la Nouvelle-Calédonie, <cite>etc.</cite>).
- * Les objets {@code DataFile} sont construits par {@link Loader} et représentés visuellement par
+ * ReprÃ©sente une rÃ©gion gÃ©ographique d'intÃ©rÃªt tel que spÃ©cifiÃ©e dans un fichier {@code .bbox}.
+ * Cette rÃ©gion d'intÃ©rÃªt dÃ©termine les sÃ©ries de donnÃ©es qui seront disponibles (exemple: SST
+ * LAC autour de l'Ã®le de la RÃ©union, SST LAC autour de la Nouvelle-CalÃ©donie, <cite>etc.</cite>).
+ * Les objets {@code DataFile} sont construits par {@link Loader} et reprÃ©sentÃ©s visuellement par
  * {@link RootNode}.
  * <p>
- * <strong>Note:</strong> Cette classe est séparée de {@link DataFile} car l'enregistrement binaire
- * de cette dernière n'enregistre que le nom du fichier. On pourrait fusionner les deux classes si
- * on lisait un fichier XML (par exemple) plutôt qu'un objet de type {@link Serializable}.
+ * <strong>Note:</strong> Cette classe est sÃ©parÃ©e de {@link DataFile} car l'enregistrement binaire
+ * de cette derniÃ¨re n'enregistre que le nom du fichier. On pourrait fusionner les deux classes si
+ * on lisait un fichier XML (par exemple) plutÃ´t qu'un objet de type {@link Serializable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class BoundingBox implements Serializable {
     /**
-     * Pour compatibilité avec différentes versions de cette classe.
+     * Pour compatibilitÃ© avec diffÃ©rentes versions de cette classe.
      */
     private static final long serialVersionUID = -5271456523356557418L;
 
     /**
-     * Nom de cette région d'intérêt, tel que spécifié par l'utilisateur. Ce nom devrait
-     * être identique au nom du fichier, mais ça ne sera pas vérifié.
+     * Nom de cette rÃ©gion d'intÃ©rÃªt, tel que spÃ©cifiÃ© par l'utilisateur. Ce nom devrait
+     * Ãªtre identique au nom du fichier, mais Ã§a ne sera pas vÃ©rifiÃ©.
      */
     private transient String name;
 
     /**
-     * La région géographique demandée par l'utilisateur, ou {@code null} s'il n'y a pas de
+     * La rÃ©gion gÃ©ographique demandÃ©e par l'utilisateur, ou {@code null} s'il n'y a pas de
      * restriction.
      */
     private GeographicBoundingBox area;
 
     /**
-     * La plage de date demandée par l'utilisateur, ou {@code null} s'il n'y a pas de
+     * La plage de date demandÃ©e par l'utilisateur, ou {@code null} s'il n'y a pas de
      * restriction.
      */
     private DateRange timeRange;
 
     /**
-     * La résolution préférée, ou {@code null} si aucune.
+     * La rÃ©solution prÃ©fÃ©rÃ©e, ou {@code null} si aucune.
      */
     private Dimension2D resolution;
 
     /**
-     * Les séries d'images pour cette région géographique, ou {@code null} si elle n'ont pas encore
-     * été obtenue.
+     * Les sÃ©ries d'images pour cette rÃ©gion gÃ©ographique, ou {@code null} si elle n'ont pas encore
+     * Ã©tÃ© obtenue.
      */
     private transient Series[] series;
 
     /**
-     * La structure de l'arborescence selon laquelle organiser les séries. Par défaut, les
-     * séries seront placées dans une arborescence de type thematic/procédure/series. Les
-     * premiers et derniers elements doivent obligatoirement être {@code null} pour un
-     * fonctionnement correct de la méthode {@link #next}.
+     * La structure de l'arborescence selon laquelle organiser les sÃ©ries. Par dÃ©faut, les
+     * sÃ©ries seront placÃ©es dans une arborescence de type thematic/procÃ©dure/series. Les
+     * premiers et derniers elements doivent obligatoirement Ãªtre {@code null} pour un
+     * fonctionnement correct de la mÃ©thode {@link #next}.
      *
      * @see #setTreeLayout
      */
     private TreeDepth[] treeLayout = new TreeDepth[] {null, THEMATIC, PROCEDURE, SERIES, null};
 
     /**
-     * Construit une nouvelle instance d'une région géographique.
+     * Construit une nouvelle instance d'une rÃ©gion gÃ©ographique.
      */
     public BoundingBox(final String name) {
         this.name = name;
     }
 
     /**
-     * Retourne le nom de cette région d'intérêt, tel que spécifié par l'utilisateur.
-     * Ce nom devrait être identique au nom du fichier, mais ça ne sera pas vérifié.
+     * Retourne le nom de cette rÃ©gion d'intÃ©rÃªt, tel que spÃ©cifiÃ© par l'utilisateur.
+     * Ce nom devrait Ãªtre identique au nom du fichier, mais Ã§a ne sera pas vÃ©rifiÃ©.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Définie le nom de cette région d'intérêt. Ce nom servira à nommer le fichier à créer.
+     * DÃ©finie le nom de cette rÃ©gion d'intÃ©rÃªt. Ce nom servira Ã  nommer le fichier Ã  crÃ©er.
      */
     public void setName(final String name) {
         this.name = name;
     }
 
     /**
-     * Retourne la région géographique demandée par l'utilisateur,
+     * Retourne la rÃ©gion gÃ©ographique demandÃ©e par l'utilisateur,
      * ou {@code null} s'il n'y a pas de restriction.
      */
     public GeographicBoundingBox getGeographicBoundingBox() {
@@ -130,7 +130,7 @@ final class BoundingBox implements Serializable {
     }
 
     /**
-     * Spécifie la région géographique demandée par l'utilisateur.
+     * SpÃ©cifie la rÃ©gion gÃ©ographique demandÃ©e par l'utilisateur.
      */
     public synchronized void setGeographicBoundingBox(final GeographicBoundingBox area) {
         this.area = area;
@@ -138,7 +138,7 @@ final class BoundingBox implements Serializable {
     }
 
     /**
-     * Retourne la plage de date demandée par l'utilisateur,
+     * Retourne la plage de date demandÃ©e par l'utilisateur,
      * ou {@code null} s'il n'y a pas de restriction.
      */
     public DateRange getTimeRange() {
@@ -146,7 +146,7 @@ final class BoundingBox implements Serializable {
     }
 
     /**
-     * Spécifie la plage de date demandée par l'utilisateur.
+     * SpÃ©cifie la plage de date demandÃ©e par l'utilisateur.
      */
     public synchronized void setTimeRange(final DateRange timeRange) {
         this.timeRange = timeRange;
@@ -154,14 +154,14 @@ final class BoundingBox implements Serializable {
     }
 
     /**
-     * Retourne la résolution préférée, ou {@code null} si aucune.
+     * Retourne la rÃ©solution prÃ©fÃ©rÃ©e, ou {@code null} si aucune.
      */
     public Dimension2D getResolution() {
         return resolution;
     }
 
     /**
-     * Spécifie la résolution préférée.
+     * SpÃ©cifie la rÃ©solution prÃ©fÃ©rÃ©e.
      */
     public synchronized void setResolution(final Dimension2D resolution) {
         this.resolution = resolution;
@@ -169,9 +169,9 @@ final class BoundingBox implements Serializable {
     }
 
     /**
-     * Retourne les séries correspondant à cette envelope spatio-temporelle. Si ces séries n'ont
-     * pas encore été déterminées, alors cette méthode bloquera jusqu'à ce qu'elles le soient.
-     * Cette méthode peut retourner {@code null} si l'obtention des séries a échouée pour une
+     * Retourne les sÃ©ries correspondant Ã  cette envelope spatio-temporelle. Si ces sÃ©ries n'ont
+     * pas encore Ã©tÃ© dÃ©terminÃ©es, alors cette mÃ©thode bloquera jusqu'Ã  ce qu'elles le soient.
+     * Cette mÃ©thode peut retourner {@code null} si l'obtention des sÃ©ries a Ã©chouÃ©e pour une
      * quelconque raison.
      */
     public synchronized Series[] getSeries() {
@@ -180,18 +180,18 @@ final class BoundingBox implements Serializable {
             wait();
         } catch (InterruptedException e) {
             /*
-             * L'attente a été interrompue. Ca ne devrait pas se produire, mais si c'est quand
-             * même le cas, alors on retournera 'null' tel qu'indiqué dans la documentation.
+             * L'attente a Ã©tÃ© interrompue. Ca ne devrait pas se produire, mais si c'est quand
+             * mÃªme le cas, alors on retournera 'null' tel qu'indiquÃ© dans la documentation.
              */
         }
         return series;
     }
 
     /**
-     * Définie les séries correspondantes à cette enveloppe spatio-temporelle. Cette méthode est
-     * appelée automatiquement par {@link BoundingBoxBuilder#run}. Le tableau {@code series} peut
-     * être {@code null} si l'obtention des séries a échouée, auquel cas une nouvelle tentative
-     * sera faite la prochaine fois où {@link #prefetch} sera appelée.
+     * DÃ©finie les sÃ©ries correspondantes Ã  cette enveloppe spatio-temporelle. Cette mÃ©thode est
+     * appelÃ©e automatiquement par {@link BoundingBoxBuilder#run}. Le tableau {@code series} peut
+     * Ãªtre {@code null} si l'obtention des sÃ©ries a Ã©chouÃ©e, auquel cas une nouvelle tentative
+     * sera faite la prochaine fois oÃ¹ {@link #prefetch} sera appelÃ©e.
      */
     final synchronized void setSeries(final Series[] series) {
         this.series = series;
@@ -199,19 +199,19 @@ final class BoundingBox implements Serializable {
     }
 
     /**
-     * Prévient cet objet qu'on lui demandera bientôt la {@linkplain #getSeries liste des séries}.
-     * Cette méthode obtiendra d'avance la liste des séries dans un thread en arrière-plan. Cette
-     * méthode peut être appelée après que l'enveloppe spatio-temporelle aie été spécifiée.
+     * PrÃ©vient cet objet qu'on lui demandera bientÃ´t la {@linkplain #getSeries liste des sÃ©ries}.
+     * Cette mÃ©thode obtiendra d'avance la liste des sÃ©ries dans un thread en arriÃ¨re-plan. Cette
+     * mÃ©thode peut Ãªtre appelÃ©e aprÃ¨s que l'enveloppe spatio-temporelle aie Ã©tÃ© spÃ©cifiÃ©e.
      */
     final void prefetch() {
         BoundingBoxBuilder.DEFAULT.add(this);
     }
 
     /**
-     * Retourne la catégorie qui suit la catégorie spécifiée dans la structure de l'arborescence.
+     * Retourne la catÃ©gorie qui suit la catÃ©gorie spÃ©cifiÃ©e dans la structure de l'arborescence.
      * <ul>
-     *   <li>Si {@code current} est {@code null}, alors cette méthode retourne la première catégorie.</li>
-     *   <li>Si {@code current} est la dernière catégorie, alors cette méthode retourne {@code null}.</li>
+     *   <li>Si {@code current} est {@code null}, alors cette mÃ©thode retourne la premiÃ¨re catÃ©gorie.</li>
+     *   <li>Si {@code current} est la derniÃ¨re catÃ©gorie, alors cette mÃ©thode retourne {@code null}.</li>
      * </ul>
      */
     final TreeDepth next(final TreeDepth current) {
@@ -224,27 +224,27 @@ final class BoundingBox implements Serializable {
     }
 
     /**
-     * Définie la structure de l'arborescence. La structure par défaut est {{@code THEMATIC},
-     * {@code PROCEDURE}). Il est de la responsabilité de l'appellant de mettre à jour le
-     * noeud {@link RootNode} correspondant à cet objet {@code BoundingBox}.
+     * DÃ©finie la structure de l'arborescence. La structure par dÃ©faut est {{@code THEMATIC},
+     * {@code PROCEDURE}). Il est de la responsabilitÃ© de l'appellant de mettre Ã  jour le
+     * noeud {@link RootNode} correspondant Ã  cet objet {@code BoundingBox}.
      */
     final void setTreeLayout(final TreeDepth[] layout) {
         final Set<TreeDepth> set = new LinkedHashSet<TreeDepth>();
-        set.add(null); // Garantie que la première valeur sera nulle.
+        set.add(null); // Garantie que la premiÃ¨re valeur sera nulle.
         for (final TreeDepth d : layout) {
             set.add(d);
         }
-        set.remove(SERIES); // Pour garantir que les séries seront en dernier.
+        set.remove(SERIES); // Pour garantir que les sÃ©ries seront en dernier.
         set.add(SERIES);
-        // Construit un tableau d'un élément plus long pour que ce dernier élément soit nul.
+        // Construit un tableau d'un Ã©lÃ©ment plus long pour que ce dernier Ã©lÃ©ment soit nul.
         treeLayout = set.toArray(new TreeDepth[set.size() + 1]);
     }
 
     /**
-     * Enregistre cet objet en binaire dans le fichier spécifié.
+     * Enregistre cet objet en binaire dans le fichier spÃ©cifiÃ©.
      *
      * @param  writeTo Le fichier dans lequel enregistrer.
-     * @throws IOException si l'enregistrement a échoué.
+     * @throws IOException si l'enregistrement a Ã©chouÃ©.
      */
     public void save(final FileObject writeTo) throws IOException {
         final FileLock lock = writeTo.lock();
@@ -258,7 +258,7 @@ final class BoundingBox implements Serializable {
     }
 
     /**
-     * Retourne le nom de cette région géographique.
+     * Retourne le nom de cette rÃ©gion gÃ©ographique.
      */
     @Override
     public String toString() {

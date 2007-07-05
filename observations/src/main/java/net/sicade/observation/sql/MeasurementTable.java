@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -47,7 +47,7 @@ import net.sicade.observation.CatalogException;
  */
 public class MeasurementTable extends ObservationTable<Measurement> {
     /**
-     * Requête SQL pour obtenir les mesures pour une station et un observable donnés.
+     * RequÃªte SQL pour obtenir les mesures pour une station et un observable donnÃ©s.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Measurements:SELECT",
             "SELECT station, observable, value, error\n"  +
@@ -55,17 +55,17 @@ public class MeasurementTable extends ObservationTable<Measurement> {
             " WHERE (station = ?) AND (observable = ?)");
 
     /**
-     * Requête SQL pour insérer les mesures pour une station et un observable donnés.
+     * RequÃªte SQL pour insÃ©rer les mesures pour une station et un observable donnÃ©s.
      */
     private static final ConfigurationKey INSERT = new ConfigurationKey("Measurements:INSERT",
             "INSERT INTO \"Measurements\" (station, observable, value, error)\n"  +
             "VALUES (?, ?, ?, ?)");
 
-    /** Numéro de colonne. */ private static final int VALUE = 3;
-    /** Numéro de colonne. */ private static final int ERROR = 4;
+    /** NumÃ©ro de colonne. */ private static final int VALUE = 3;
+    /** NumÃ©ro de colonne. */ private static final int ERROR = 4;
 
     /**
-     * La clé désignant la requête à utiliser pour ajouter des valeurs.
+     * La clÃ© dÃ©signant la requÃªte Ã  utiliser pour ajouter des valeurs.
      */
     private final ConfigurationKey insert;
 
@@ -79,10 +79,10 @@ public class MeasurementTable extends ObservationTable<Measurement> {
     /** 
      * Construit une nouvelle connexion vers la table des mesures.
      * 
-     * @param  database Connexion vers la base de données des observations.
-     * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
-     * @param  insert   Clé de la requête SQL à utiliser pour ajouter des valeurs,
-     *                  ou {@code null} si les insertions ne sont pas supportées.
+     * @param  database Connexion vers la base de donnÃ©es des observations.
+     * @param  select   ClÃ© de la requÃªte SQL Ã  utiliser pour obtenir des valeurs.
+     * @param  insert   ClÃ© de la requÃªte SQL Ã  utiliser pour ajouter des valeurs,
+     *                  ou {@code null} si les insertions ne sont pas supportÃ©es.
      */
     protected MeasurementTable(final Database       database,
                                final ConfigurationKey select,
@@ -93,12 +93,12 @@ public class MeasurementTable extends ObservationTable<Measurement> {
     }
 
     /** 
-     * Construit une nouvelle connexion vers la table des mesures pour les stations spécifiées.
+     * Construit une nouvelle connexion vers la table des mesures pour les stations spÃ©cifiÃ©es.
      * 
-     * @param  stations La table des stations à utiliser.
-     * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
-     * @param  insert   Clé de la requête SQL à utiliser pour ajouter des valeurs,
-     *                  ou {@code null} si les insertions ne sont pas supportées.
+     * @param  stations La table des stations Ã  utiliser.
+     * @param  select   ClÃ© de la requÃªte SQL Ã  utiliser pour obtenir des valeurs.
+     * @param  insert   ClÃ© de la requÃªte SQL Ã  utiliser pour ajouter des valeurs,
+     *                  ou {@code null} si les insertions ne sont pas supportÃ©es.
      */
     protected MeasurementTable(final StationTable   stations,
                                final ConfigurationKey select,
@@ -122,12 +122,12 @@ public class MeasurementTable extends ObservationTable<Measurement> {
     }
 
     /**
-     * Définie une valeur réelle pour la station et l'observable courant.
+     * DÃ©finie une valeur rÃ©elle pour la station et l'observable courant.
      *
-     * @param  value Valeur à inscrire dans la base de données.
+     * @param  value Valeur Ã  inscrire dans la base de donnÃ©es.
      * @param  error Une estimation de l'erreur, ou {@link Float#NaN} s'il n'y en a pas.
-     * @throws CatalogException si la station ou le descripteur spécifié n'existe pas.
-     * @throws SQLException si la mise à jour de la base de données a échoué pour une autre raison.
+     * @throws CatalogException si la station ou le descripteur spÃ©cifiÃ© n'existe pas.
+     * @throws SQLException si la mise Ã  jour de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     public synchronized void setValue(final float value, final float error) throws CatalogException, SQLException {
         if (insert == null) {
@@ -136,11 +136,11 @@ public class MeasurementTable extends ObservationTable<Measurement> {
         }
         final Station station = getStation();
         if (station == null) {
-            throw new CatalogException("La station doit être définie.");
+            throw new CatalogException("La station doit Ãªtre dÃ©finie.");
         }
         final Observable observable = getObservable();
         if (observable == null) {
-            throw new CatalogException("L'observable doit être défini.");
+            throw new CatalogException("L'observable doit Ãªtre dÃ©fini.");
         }
         if (Float.isNaN(value)) {
             return;
@@ -156,7 +156,7 @@ public class MeasurementTable extends ObservationTable<Measurement> {
         }
         final int count = statement.executeUpdate();
         if (count != 1) {
-            Measurement.LOGGER.warning(count + " valeurs ajoutées pour \"" + observable + "\" à la station " + station);
+            Measurement.LOGGER.warning(count + " valeurs ajoutÃ©es pour \"" + observable + "\" Ã  la station " + station);
         }
     }
 }

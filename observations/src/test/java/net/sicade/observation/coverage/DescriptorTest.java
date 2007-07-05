@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import net.sicade.observation.coverage.sql.DescriptorTable;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.
+ * @todo Ajouter des tests sur le mÃªme modÃ¨le que ceux que l'on peut trouver dans le projet SICADE.
  */
 public class DescriptorTest extends AbstractTest {
     /**
@@ -64,7 +64,7 @@ public class DescriptorTest extends AbstractTest {
     }
 
     /**
-     * Exécute la suite de tests à partir de la ligne de commande.
+     * ExÃ©cute la suite de tests Ã  partir de la ligne de commande.
      */
     public static void main(final String[] args) {
         MonolineFormatter.init("org.geotools");
@@ -75,7 +75,7 @@ public class DescriptorTest extends AbstractTest {
     }
 
     /**
-     * Etablit la connexion avec la base de données.
+     * Etablit la connexion avec la base de donnÃ©es.
      */
     @Override
     protected void setUp() throws SQLException, IOException {
@@ -86,7 +86,7 @@ public class DescriptorTest extends AbstractTest {
     }
 
     /**
-     * Construit une couverture pour le descripteur spécifié.
+     * Construit une couverture pour le descripteur spÃ©cifiÃ©.
      */
     private void createCoverage3D(final String descriptorName)
             throws CatalogException, SQLException, IOException

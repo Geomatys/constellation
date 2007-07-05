@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,8 +26,8 @@ import net.sicade.observation.coverage.SubSeries;
 
 
 /**
- * Représentation d'une sous-série. Il n'y a pas d'interface correspondant directement à cette
- * entrée, car la division des séries en sous-séries est habituellement cachée aux yeux de
+ * ReprÃ©sentation d'une sous-sÃ©rie. Il n'y a pas d'interface correspondant directement Ã  cette
+ * entrÃ©e, car la division des sÃ©ries en sous-sÃ©ries est habituellement cachÃ©e aux yeux de
  * l'utilisateur.
  *
  * @version $Id$
@@ -35,21 +35,21 @@ import net.sicade.observation.coverage.SubSeries;
  */
 public class SubSeriesEntry extends Entry implements SubSeries {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -7991804359597967276L;
 
     /**
-     * Le format pour les images de cette sous-série.
+     * Le format pour les images de cette sous-sÃ©rie.
      */
     private final Format format;
 
     /**
-     * Construit une nouvelle sous-série du nom spécifié.
+     * Construit une nouvelle sous-sÃ©rie du nom spÃ©cifiÃ©.
      *
-     * @param name    Le nom de la procédure.
-     * @param format  Le format pour les images de cette sous-série.
-     * @param remarks Remarques s'appliquant à cette entrée, ou {@code null}.
+     * @param name    Le nom de la procÃ©dure.
+     * @param format  Le format pour les images de cette sous-sÃ©rie.
+     * @param remarks Remarques s'appliquant Ã  cette entrÃ©e, ou {@code null}.
      */
     protected SubSeriesEntry(final String name, final Format format, final String remarks) {
         super(name, remarks);
@@ -64,7 +64,7 @@ public class SubSeriesEntry extends Entry implements SubSeries {
     }
 
     /**
-     * Compare cette sous-série avec l'objet spécifié.
+     * Compare cette sous-sÃ©rie avec l'objet spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object object) {

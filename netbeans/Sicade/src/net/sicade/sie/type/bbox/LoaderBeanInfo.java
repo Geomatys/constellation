@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,20 +31,20 @@ import org.openide.util.Utilities;
 
 
 /**
- * Propriétés de {@link Loader}.
+ * PropriÃ©tÃ©s de {@link Loader}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class LoaderBeanInfo extends SimpleBeanInfo {
     /**
-     * Construit un ensemble de propriétés par défaut.
+     * Construit un ensemble de propriÃ©tÃ©s par dÃ©faut.
      */
     public LoaderBeanInfo() {
     }
 
     /**
-     * Retourne des informations supplémentaires concernant la classe parente.
+     * Retourne des informations supplÃ©mentaires concernant la classe parente.
      */
     @Override
     public BeanInfo[] getAdditionalBeanInfo() {
@@ -58,7 +58,7 @@ public final class LoaderBeanInfo extends SimpleBeanInfo {
     }
 
     /**
-     * Retourne l'icône représentant les propriétés de {@link Loader}.
+     * Retourne l'icÃ´ne reprÃ©sentant les propriÃ©tÃ©s de {@link Loader}.
      */
     @Override
     public Image getIcon(final int type) {

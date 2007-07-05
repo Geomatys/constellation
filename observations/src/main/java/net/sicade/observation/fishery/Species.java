@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import net.sicade.observation.Phenomenon;
 
 
 /**
- * Représentation d'une espèce animale.
+ * ReprÃ©sentation d'une espÃ¨ce animale.
  * 
  * @version $Id$
  * @author Martin Desruisseaux
@@ -35,8 +35,8 @@ import net.sicade.observation.Phenomenon;
  */
 public interface Species extends Phenomenon {
     /**
-     * Constante désignant la langue "Latin".
-     * Souvent utilisée pour nommer les espèces.
+     * Constante dÃ©signant la langue "Latin".
+     * Souvent utilisÃ©e pour nommer les espÃ¨ces.
      *
      * @see Locale#ENGLISH
      * @see Locale#FRENCH
@@ -45,47 +45,47 @@ public interface Species extends Phenomenon {
     Locale LATIN = new Locale("la", "");
 
     /**
-     * Constante désignant les codes de la FAO. Il ne s'agit pas d'une langue à proprement
-     * parler. Toutefois, cette constante est utile pour désignant la façon de représenter
-     * le {@linkplain #getName nom d'une espèce}.
+     * Constante dÃ©signant les codes de la FAO. Il ne s'agit pas d'une langue Ã  proprement
+     * parler. Toutefois, cette constante est utile pour dÃ©signant la faÃ§on de reprÃ©senter
+     * le {@linkplain #getName nom d'une espÃ¨ce}.
      */
     Locale FAO = new Locale("fao", "");
 
     /**
-     * Retourne les langues dans lesquelles peuvent être exprimées le nom de cette espèce.
+     * Retourne les langues dans lesquelles peuvent Ãªtre exprimÃ©es le nom de cette espÃ¨ce.
      */
     Locale[] getLocales();
 
     /**
-     * Retourne le nom de cette espèce dans la langue spécifiée. Cette langue peut être typiquement
-     * {@linkplain Locale#ENGLISH l'anglais}, {@linkplain Locale#FRENCH le français} ou {@linkplain
-     * Locale#SPANISH l'espagnol}. La "langue" {@link #FAO} fait partie des valeurs légales. Elle
-     * signifie que la chaîne désirée est un code représentant l'espèce. Par exemple, le code de
+     * Retourne le nom de cette espÃ¨ce dans la langue spÃ©cifiÃ©e. Cette langue peut Ãªtre typiquement
+     * {@linkplain Locale#ENGLISH l'anglais}, {@linkplain Locale#FRENCH le franÃ§ais} ou {@linkplain
+     * Locale#SPANISH l'espagnol}. La "langue" {@link #FAO} fait partie des valeurs lÃ©gales. Elle
+     * signifie que la chaÃ®ne dÃ©sirÃ©e est un code reprÃ©sentant l'espÃ¨ce. Par exemple, le code de
      * la FAO pour l'albacore (<cite>Thunnus albacares</cite>, ou <cite>Yellowfin tuna</cite> en
      * anglais) est "YFT".
      * <p>
-     * Si la langue spécifiée est {@code null}, alors cette méthode tentera de retourner
-     * un nom dans la {@linkplain Locale#getDefault() langue par défaut du système}. Si
-     * aucun nom n'est disponible dans la langue du système, alors cette méthode tentera
-     * de retourner un nom dans une autre langue. Le code de l'espèce (tel que retourné
-     * par {@code getName(FAO)}) ne sera retourné qu'en dernier recours.
+     * Si la langue spÃ©cifiÃ©e est {@code null}, alors cette mÃ©thode tentera de retourner
+     * un nom dans la {@linkplain Locale#getDefault() langue par dÃ©faut du systÃ¨me}. Si
+     * aucun nom n'est disponible dans la langue du systÃ¨me, alors cette mÃ©thode tentera
+     * de retourner un nom dans une autre langue. Le code de l'espÃ¨ce (tel que retournÃ©
+     * par {@code getName(FAO)}) ne sera retournÃ© qu'en dernier recours.
      *
-     * @param  locale Langue désirée pour le nom de l'espèce, or {@code null} pour
-     *         un nom dans une langue par défaut.
-     * @return Le nom de l'espèce dans la langue spécifiée, ou {@code null} si
-     *         aucun nom n'est disponible dans la langue spécifiée.
+     * @param  locale Langue dÃ©sirÃ©e pour le nom de l'espÃ¨ce, or {@code null} pour
+     *         un nom dans une langue par dÃ©faut.
+     * @return Le nom de l'espÃ¨ce dans la langue spÃ©cifiÃ©e, ou {@code null} si
+     *         aucun nom n'est disponible dans la langue spÃ©cifiÃ©e.
      */
     String getName(Locale locale);
     
     /**
-     * Construit un nouvel icone représentant cette espèce.
+     * Construit un nouvel icone reprÃ©sentant cette espÃ¨ce.
      */
     Icon getIcon();
 
     /**
-     * Icône représentant une espèce. Un icône peut servir à positionner
-     * sur une carte plusieurs individus d'une même espèce, et peut aussi
-     * apparaître devant une étiquette dans les listes déroulantes.
+     * IcÃ´ne reprÃ©sentant une espÃ¨ce. Un icÃ´ne peut servir Ã  positionner
+     * sur une carte plusieurs individus d'une mÃªme espÃ¨ce, et peut aussi
+     * apparaÃ®tre devant une Ã©tiquette dans les listes dÃ©roulantes.
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -93,17 +93,17 @@ public interface Species extends Phenomenon {
      */
     public interface Icon extends javax.swing.Icon {
         /**
-         * Retourne l'espèce associée à cet icône.
+         * Retourne l'espÃ¨ce associÃ©e Ã  cet icÃ´ne.
          */
         Species getSpecies();
 
         /**
-         * Retourne la couleur de cet icône.
+         * Retourne la couleur de cet icÃ´ne.
          */
         Color getColor();
 
         /**
-         * Change la couleur de cet icône.
+         * Change la couleur de cet icÃ´ne.
          */
         void setColor(Color color);
     }

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,9 +24,9 @@ import com.sun.star.beans.XPropertySet;
 
 
 /**
- * Pont en Java de l'interface IDL pour le service {@code XCoverage3D} déclaré dans le paquet
+ * Pont en Java de l'interface IDL pour le service {@code XCoverage3D} dÃ©clarÃ© dans le paquet
  * {@code XNumeric.idl}. Cette interface existe principalement pour satisfaire les environnements
- * IDE. Le fichier JAR final devrait plutôt inclure le fichier {@code .class} généré par l'outil
+ * IDE. Le fichier JAR final devrait plutÃ´t inclure le fichier {@code .class} gÃ©nÃ©rÃ© par l'outil
  * {@code javamaker} du SDK d'OpenOffice.
  *
  * @author Martin Desruisseaux
@@ -34,33 +34,33 @@ import com.sun.star.beans.XPropertySet;
  */
 public interface XNumeric extends XInterface {
     /**
-     * Retourne les index autour de la valeur <var>x<sub>i</sub></var> spécifiée. Le tableau
+     * Retourne les index autour de la valeur <var>x<sub>i</sub></var> spÃ©cifiÃ©e. Le tableau
      * {@code data} doit contenir au minimum une colonne, celle des <var>x</var>. Toutes les
      * colonnes suivantes (optionnelles) sont des <var>y</var>. Si une valeur {@link Double#NaN
-     * NaN} est trouvée dans l'une de ces colonnes, les index retournés éviteront de pointer vers
+     * NaN} est trouvÃ©e dans l'une de ces colonnes, les index retournÃ©s Ã©viteront de pointer vers
      * la ligne correspondante.
      *
-     * @param xOptions Propriétés fournies par OpenOffice.
-     * @param data     Les données (<var>x</var>, <var>y1</var>, <var>y2</var>, <cite>etc.</cite>).
+     * @param xOptions PropriÃ©tÃ©s fournies par OpenOffice.
+     * @param data     Les donnÃ©es (<var>x</var>, <var>y1</var>, <var>y2</var>, <cite>etc.</cite>).
      * @param xi       La valeur <var>x<sub>i</sub></var> pour laquelle on veut les index.
      * @return Index des lignes.
      */
     double[][] getLocatedIndex(XPropertySet xOptions, double[][] data, double xi);
 
     /**
-     * Interpole les valeurs de <var>y</var> pour les valeurs <var>x<sub>i</sub></var> spécifiées.
-     * Le tableau {@code data} devrait contenir au minimum deux colonnes. La première colonne est
+     * Interpole les valeurs de <var>y</var> pour les valeurs <var>x<sub>i</sub></var> spÃ©cifiÃ©es.
+     * Le tableau {@code data} devrait contenir au minimum deux colonnes. La premiÃ¨re colonne est
      * celle des <var>x</var>, et toutes les colonnes suivantes sont celles des <var>y</var>. La
-     * sortie sera une matrice de même dimension que le tableau {@code xi}.
+     * sortie sera une matrice de mÃªme dimension que le tableau {@code xi}.
      *
-     * @param xOptions Propriétés fournies par OpenOffice.
-     * @param data     Les données (<var>x</var>, <var>y1</var>, <var>y2</var>, <cite>etc.</cite>).
+     * @param xOptions PropriÃ©tÃ©s fournies par OpenOffice.
+     * @param data     Les donnÃ©es (<var>x</var>, <var>y1</var>, <var>y2</var>, <cite>etc.</cite>).
      * @param xi       Les valeurs <var>x<sub>i</sub></var> auxquelles interpoller.
      * @param interpolation Le type d'interpolation: {@code "nearest"}, {@code "linear"}.
      * @param skipMissingY  {@code true} pour ignorer les valeurs manquantes dans les vecteurs des
      *                      <var>y</var>, ou {@code false} pour retourner {@link Double#NaN NaN} si
-     *                      de telles valeurs sont rencontrées.
-     * @return Les valeurs interpolées.
+     *                      de telles valeurs sont rencontrÃ©es.
+     * @return Les valeurs interpolÃ©es.
      */
     double[][] getInterpolated(XPropertySet xOptions, double[][] data, double[][] xi,
                                Object interpolation, Object skipMissingY);

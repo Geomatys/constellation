@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,30 +40,30 @@ import net.sicade.observation.coverage.sql.GridCoverageEntry;
 
 
 /**
- * Une table d'images qui procèdera aux lectures sur un serveur distant plutôt que de télécharger
- * les images par FTP. Les avantages de ce procédé sont:
+ * Une table d'images qui procÃ¨dera aux lectures sur un serveur distant plutÃ´t que de tÃ©lÃ©charger
+ * les images par FTP. Les avantages de ce procÃ©dÃ© sont:
  * <p>
  * <ul>
  *   <li>Utilisation moindre de la bande passante si seule une petite zone est extraite,
- *       ou si une décimation a été demandée.</li>
- *   <li>Meilleures performances à la lecture, puisque le serveur peut accéder aux images à partir d'un
- *       {@link java.io.File} (qui permet des accès aléatoires) alors que les clients ont besoin de
- *       passer par un {@link java.net.URL} (qui ne permet pas des accès aléatoires dans un fichier).</li>
- *   <li>Evite d'exiger que le client dispose de décodeurs d'images spécialisés tels que HDF, puisque
- *       le décodage est pris en charge par le serveur.</li>
- *   <li>Plus faible consommation de la mémoire du côté des clients.</li>
- *   <li>Opérations exécutées sur le serveur, et résultats conservés dans une cache au cas où la
- *       même image serait demandée plusieurs fois (potentiellement par des clients différents).</li>
+ *       ou si une dÃ©cimation a Ã©tÃ© demandÃ©e.</li>
+ *   <li>Meilleures performances Ã  la lecture, puisque le serveur peut accÃ©der aux images Ã  partir d'un
+ *       {@link java.io.File} (qui permet des accÃ¨s alÃ©atoires) alors que les clients ont besoin de
+ *       passer par un {@link java.net.URL} (qui ne permet pas des accÃ¨s alÃ©atoires dans un fichier).</li>
+ *   <li>Evite d'exiger que le client dispose de dÃ©codeurs d'images spÃ©cialisÃ©s tels que HDF, puisque
+ *       le dÃ©codage est pris en charge par le serveur.</li>
+ *   <li>Plus faible consommation de la mÃ©moire du cÃ´tÃ© des clients.</li>
+ *   <li>OpÃ©rations exÃ©cutÃ©es sur le serveur, et rÃ©sultats conservÃ©s dans une cache au cas oÃ¹ la
+ *       mÃªme image serait demandÃ©e plusieurs fois (potentiellement par des clients diffÃ©rents).</li>
  * </ul>
  * <p>
- * L'inconvénient est une charge de travail accrue sur le serveur.
+ * L'inconvÃ©nient est une charge de travail accrue sur le serveur.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class GridCoverageServer extends UnicastRemoteObject implements DataConnection {
     /**
-     * Pour compatibilité entre différentes versions.
+     * Pour compatibilitÃ© entre diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -1288646310349616893L;
 
@@ -73,11 +73,11 @@ public class GridCoverageServer extends UnicastRemoteObject implements DataConne
     protected final DataConnection table;
     
     /**
-     * Construit une table d'image à exécuter sur un serveur distant.
+     * Construit une table d'image Ã  exÃ©cuter sur un serveur distant.
      * <p>
-     * <strong>Important:</strong> Pour éviter des comportement inatendues, la connexion {@code table}
-     * donnée en argument ne doit pas être partagée avec un autre objet. En d'autres termes, aucune
-     * référence vers {@code table} ne devrait être conservée en déhors de cette instance de
+     * <strong>Important:</strong> Pour Ã©viter des comportement inatendues, la connexion {@code table}
+     * donnÃ©e en argument ne doit pas Ãªtre partagÃ©e avec un autre objet. En d'autres termes, aucune
+     * rÃ©fÃ©rence vers {@code table} ne devrait Ãªtre conservÃ©e en dÃ©hors de cette instance de
      * {@code GridCoverageServer}.
      *
      * @param  table La table d'images locale (habituellement une instance de {@link GridCoverageTable}).

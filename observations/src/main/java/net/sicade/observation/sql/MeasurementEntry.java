@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import net.sicade.observation.Measurement;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Measurement mesure}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain Measurement mesure}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -33,28 +33,28 @@ import net.sicade.observation.Measurement;
  */
 public class MeasurementEntry extends ObservationEntry implements Measurement {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 6700527485309897974L;
 
     /**
-     * La valeur mesurée.
+     * La valeur mesurÃ©e.
      */
     private final float value;
 
     /**
-     * Estimation de l'erreur sur la valeur mesurée, ou {@link Double#NaN NaN} si l'erreur
+     * Estimation de l'erreur sur la valeur mesurÃ©e, ou {@link Double#NaN NaN} si l'erreur
      * est inconnue ou ne s'applique pas.
      */
     private final float error;
     
     /** 
-     * Crée une nouvelle mesure.
+     * CrÃ©e une nouvelle mesure.
      *
-     * @param station     La station d'observation (par exemple une position de pêche).
-     * @param observable  Ce que l'on observe (température, quantité pêchée, <cite>etc.</cite>).
-     * @param value       La valeur mesurée.
-     * @param error       Estimation de l'erreur sur la valeur mesurée, ou {@link Float#NaN NaN}
+     * @param station     La station d'observation (par exemple une position de pÃªche).
+     * @param observable  Ce que l'on observe (tempÃ©rature, quantitÃ© pÃªchÃ©e, <cite>etc.</cite>).
+     * @param value       La valeur mesurÃ©e.
+     * @param error       Estimation de l'erreur sur la valeur mesurÃ©e, ou {@link Float#NaN NaN}
      *                    si l'erreur est inconnue ou ne s'applique pas.
      */
     protected MeasurementEntry(final Station    station, 
@@ -85,7 +85,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     /**
      * {@inheritDoc}
      *
-     * @todo Implémenter le retour des unités.
+     * @todo ImplÃ©menter le retour des unitÃ©s.
      */
     public Unit getUnit() {
         return null;
@@ -106,7 +106,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     }
 
     /**
-     * Vérifie si cette entré est identique à l'objet spécifié.
+     * VÃ©rifie si cette entrÃ© est identique Ã  l'objet spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object object) {

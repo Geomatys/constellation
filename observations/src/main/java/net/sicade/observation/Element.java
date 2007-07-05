@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,33 +22,33 @@ import java.util.logging.Logger;
 
 
 /**
- * Interface de base des éléments ayant un rapport avec les observations. Il s'agit en quelque sorte
- * de l'équivalent de la classe {@link Object}; une interface de base pouvant représenter à peu près
- * n'importe quoi. Les interfaces dérivées utiles comprennent les {@linkplain Observation observations}
- * et les {@linkplain net.sicade.observation.coverage.Series séries d'images} par exemple.
+ * Interface de base des Ã©lÃ©ments ayant un rapport avec les observations. Il s'agit en quelque sorte
+ * de l'Ã©quivalent de la classe {@link Object}; une interface de base pouvant reprÃ©senter Ã  peu prÃ¨s
+ * n'importe quoi. Les interfaces dÃ©rivÃ©es utiles comprennent les {@linkplain Observation observations}
+ * et les {@linkplain net.sicade.observation.coverage.Series sÃ©ries d'images} par exemple.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface Element {
     /**
-     * Le journal dans lequel enregistrer les événements qui ont rapport avec les données d'observations.
-     * Ce journal peut archiver des événements relatifs à certaines {@linkplain LoggingLevel#SELECT
-     * consultations} de la base de données, et surtout aux {@linkplain LoggingLevel#UPDATE mises à jour}.
+     * Le journal dans lequel enregistrer les Ã©vÃ©nements qui ont rapport avec les donnÃ©es d'observations.
+     * Ce journal peut archiver des Ã©vÃ©nements relatifs Ã  certaines {@linkplain LoggingLevel#SELECT
+     * consultations} de la base de donnÃ©es, et surtout aux {@linkplain LoggingLevel#UPDATE mises Ã  jour}.
      */
     Logger LOGGER = Logger.getLogger("net.sicade.observation");
 
     /**
-     * Retourne le nom de cet élément. Ce nom peut être dérivé à partir d'une propriété arbitraire
-     * de cet élément. Par exemple dans le cas d'une image, il s'agira le plus souvent du nom du
-     * fichier (sans son chemin). Le nom retourné par cette méthode devrait être suffisament parlant
-     * pour être inséré dans une interface utilisateur (par exemple une liste déroulante).
+     * Retourne le nom de cet Ã©lÃ©ment. Ce nom peut Ãªtre dÃ©rivÃ© Ã  partir d'une propriÃ©tÃ© arbitraire
+     * de cet Ã©lÃ©ment. Par exemple dans le cas d'une image, il s'agira le plus souvent du nom du
+     * fichier (sans son chemin). Le nom retournÃ© par cette mÃ©thode devrait Ãªtre suffisament parlant
+     * pour Ãªtre insÃ©rÃ© dans une interface utilisateur (par exemple une liste dÃ©roulante).
      */
     String getName();
 
     /**
-     * Retourne des remarques s'appliquant à cette entrée, ou {@code null} s'il n'y en a pas.
-     * Ces remarques peuvent être par exemple une courte explication à faire apparaître dans une
+     * Retourne des remarques s'appliquant Ã  cette entrÃ©e, ou {@code null} s'il n'y en a pas.
+     * Ces remarques peuvent Ãªtre par exemple une courte explication Ã  faire apparaÃ®tre dans une
      * interface utilisateur comme "<cite>tooltip text</cite>".
      */
     String getRemarks();

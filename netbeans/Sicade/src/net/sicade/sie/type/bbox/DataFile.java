@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,10 +31,10 @@ import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.DataObjectExistsException;
 
 /**
- * Représente une région géographique d'intérêt tel que spécifiée dans un fichier {@code .bbox}.
- * Cette région d'intérêt détermine les séries de données qui seront disponibles (exemple: SST
- * LAC autour de l'île de la Réunion, SST LAC autour de la Nouvelle-Calédonie, <cite>etc.</cite>).
- * Les objets {@code DataFile} sont construits par {@link Loader} et représentés visuellement par
+ * ReprÃ©sente une rÃ©gion gÃ©ographique d'intÃ©rÃªt tel que spÃ©cifiÃ©e dans un fichier {@code .bbox}.
+ * Cette rÃ©gion d'intÃ©rÃªt dÃ©termine les sÃ©ries de donnÃ©es qui seront disponibles (exemple: SST
+ * LAC autour de l'Ã®le de la RÃ©union, SST LAC autour de la Nouvelle-CalÃ©donie, <cite>etc.</cite>).
+ * Les objets {@code DataFile} sont construits par {@link Loader} et reprÃ©sentÃ©s visuellement par
  * {@link RootNode}.
  *
  * @version $Id$
@@ -42,17 +42,17 @@ import org.openide.loaders.DataObjectExistsException;
  */
 final class DataFile extends MultiDataObject implements SaveCookie {
     /**
-     * La région spatio-temporelle d'intérêt.
+     * La rÃ©gion spatio-temporelle d'intÃ©rÃªt.
      */
     final BoundingBox bbox;
 
     /**
-     * Construit une région géographique d'intérêt à partir du fichier {@code .bbox} spécifié.
+     * Construit une rÃ©gion gÃ©ographique d'intÃ©rÃªt Ã  partir du fichier {@code .bbox} spÃ©cifiÃ©.
      *
-     * @param  primaryFile le fichier {@code .bbox} à lire.
-     * @param  loader Le lecteur qui a demandé la construction de cet objet.
-     * @throws DataObjectExistsException Si un object {@code DataFile} existe déjà
-     *         pour le fichier spécifié.
+     * @param  primaryFile le fichier {@code .bbox} Ã  lire.
+     * @param  loader Le lecteur qui a demandÃ© la construction de cet objet.
+     * @throws DataObjectExistsException Si un object {@code DataFile} existe dÃ©jÃ 
+     *         pour le fichier spÃ©cifiÃ©.
      * @throws IOException si une erreur est survenue lors de la lecture du fichier {@code .bbox}.
      */
     public DataFile(final FileObject primaryFile, final Loader loader)
@@ -73,8 +73,8 @@ final class DataFile extends MultiDataObject implements SaveCookie {
     }
 
     /**
-     * Retourne un noeud qui représentera graphiquement cette région d'intérêt dans l'arborescence
-     * de l'explorateur. Le noeud retourné sera une instance de {@link RootNode}.
+     * Retourne un noeud qui reprÃ©sentera graphiquement cette rÃ©gion d'intÃ©rÃªt dans l'arborescence
+     * de l'explorateur. Le noeud retournÃ© sera une instance de {@link RootNode}.
      */
     @Override
     protected Node createNodeDelegate() {

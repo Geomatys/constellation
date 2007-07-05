@@ -1,7 +1,7 @@
 /*
- * Sicade - Systèmes intégrés de connaissances
- *          pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances
+ *          pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -29,28 +29,28 @@ import java.awt.geom.Ellipse2D;
 
 /**
  * Une ellipse {@linkplain Serializable enregistrable}. Cette classe n'est que temporaire.
- * Elle sera suprimée quand (et si) Sun donne suite au RFE #4093004.
+ * Elle sera suprimÃ©e quand (et si) Sun donne suite au RFE #4093004.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class XEllipse2D extends Ellipse2D.Double implements Serializable {
     /**
-     * Construit une ellipse par défaut.
+     * Construit une ellipse par dÃ©faut.
      */
     public XEllipse2D() {
         super();
     }
 
     /**
-     * Construit une ellipse avec la dimension spécifiée.
+     * Construit une ellipse avec la dimension spÃ©cifiÃ©e.
      */
     public XEllipse2D(double x, double y, double width, double height) {
         super(x, y, width, height);
     }
 
     /**
-     * Procède à la lecture d'une ellispe.
+     * ProcÃ¨de Ã  la lecture d'une ellispe.
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -61,7 +61,7 @@ public final class XEllipse2D extends Ellipse2D.Double implements Serializable {
     }
 
     /**
-     * Procède à l'enregistrement d'une ellispe.
+     * ProcÃ¨de Ã  l'enregistrement d'une ellispe.
      */
     private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();

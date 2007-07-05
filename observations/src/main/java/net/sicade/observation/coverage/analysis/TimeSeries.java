@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,69 +31,69 @@ import org.opengis.geometry.DirectPosition;
 
 
 /**
- * Représente une série temporelle à une position spatiale fixe. La série sera construite à partir
- * de la base de données d'images.
+ * ReprÃ©sente une sÃ©rie temporelle Ã  une position spatiale fixe. La sÃ©rie sera construite Ã  partir
+ * de la base de donnÃ©es d'images.
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author TouraÃ¯vane
  */
 public final class TimeSeries {
     /**
-     * La taille de la {@linkplain #cache}, en nombre d'octèts.
+     * La taille de la {@linkplain #cache}, en nombre d'octÃ¨ts.
      */
     private static final int CACHE_SIZE = 1024;
 
     /**
-     * La taille (en nombre d'octets) d'une valeur de la série temporelle.
+     * La taille (en nombre d'octets) d'une valeur de la sÃ©rie temporelle.
      */
     private static final int DATA_SIZE = Double.SIZE / Byte.SIZE;
 
     /**
-     * Ensemble de séries temporelles à laquelle cette série appartient.
+     * Ensemble de sÃ©ries temporelles Ã  laquelle cette sÃ©rie appartient.
      */
     private final TimeSeriesTile tile;
 
     /**
-     * Coordonnées à laquelle sera évaluée la série temporelle. Cette coordonnées doit
-     * contenir une dimension temporelle dont on fera varier l'ordonnée. Cette dimension
-     * est spécifiée par {@link TimeSeriesTile#varyingDimension}.
+     * CoordonnÃ©es Ã  laquelle sera Ã©valuÃ©e la sÃ©rie temporelle. Cette coordonnÃ©es doit
+     * contenir une dimension temporelle dont on fera varier l'ordonnÃ©e. Cette dimension
+     * est spÃ©cifiÃ©e par {@link TimeSeriesTile#varyingDimension}.
      * <p>
-     * Ce champ est accédé en lecture seule par {@link TimeSeriesTile#writeCoordinates}.
+     * Ce champ est accÃ©dÃ© en lecture seule par {@link TimeSeriesTile#writeCoordinates}.
      */
     final DirectPosition position;
 
     /**
-     * Position à partir de laquelle cette série temporelle écrira dans {@link TimeSeries#channel}.
+     * Position Ã  partir de laquelle cette sÃ©rie temporelle Ã©crira dans {@link TimeSeries#channel}.
      */
     private final long base;
 
     /**
-     * Position à partir de laquelle écrire la {@linkplain #cache} dans le canal.
-     * Cette cache n'est qu'une fenêtre sur l'ensemble de la série temporelle.
+     * Position Ã  partir de laquelle Ã©crire la {@linkplain #cache} dans le canal.
+     * Cette cache n'est qu'une fenÃªtre sur l'ensemble de la sÃ©rie temporelle.
      */
     private long cacheBase;
 
     /**
-     * La cache dans laquelle écrire les données avant de les envoyer vers le {@linkplain
-     * TimeSeriesTile#channel canal}. Ce buffer ne représente qu'une fenêtre sur l'ensemble
-     * de la série temporelle que cet objet enregistrera dans le canal.
+     * La cache dans laquelle Ã©crire les donnÃ©es avant de les envoyer vers le {@linkplain
+     * TimeSeriesTile#channel canal}. Ce buffer ne reprÃ©sente qu'une fenÃªtre sur l'ensemble
+     * de la sÃ©rie temporelle que cet objet enregistrera dans le canal.
      */
     private final ByteBuffer cache;
 
     /**
      * Une vue de la {@linkplain #cache} sous forme de buffer de {@code double}. C'est dans ce
-     * buffer que les valeurs de la série temporelle seront enregistrées avant d'être envoyées
+     * buffer que les valeurs de la sÃ©rie temporelle seront enregistrÃ©es avant d'Ãªtre envoyÃ©es
      * vers le {@linkplain TimeSeriesTile#channel canal}.
      */
     private final DoubleBuffer buffer;
 
     /**
-     * Construit une série temporelle qui sera évaluée à la position spécifiée.
+     * Construit une sÃ©rie temporelle qui sera Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
      *
-     * @param tile     La tuile à laquelle appartiendra cette série temporelle.
-     * @param position La coordonnées à laquelle évaluée la série temporelle.
-     * @param counter  Le numéro de cette série dans {@code tile} (0 pour la première,
+     * @param tile     La tuile Ã  laquelle appartiendra cette sÃ©rie temporelle.
+     * @param position La coordonnÃ©es Ã  laquelle Ã©valuÃ©e la sÃ©rie temporelle.
+     * @param counter  Le numÃ©ro de cette sÃ©rie dans {@code tile} (0 pour la premiÃ¨re,
      *                 1 pour la seconde, <cite>etc.</cite>).
      */
     TimeSeries(final TimeSeriesTile tile, final DirectPosition position, final int counter) {
@@ -106,17 +106,17 @@ public final class TimeSeries {
     }
 
     /**
-     * Retourne la taille qu'occupera chaque série temporelle, en nombre d'octets. Cette
-     * méthode est utilisée par {@code TimeSeries} afin de se positionner dans le fichier.
+     * Retourne la taille qu'occupera chaque sÃ©rie temporelle, en nombre d'octets. Cette
+     * mÃ©thode est utilisÃ©e par {@code TimeSeries} afin de se positionner dans le fichier.
      */
     private int getSeriesSize() {
         return tile.getSeriesLength() * DATA_SIZE;
     }
 
     /**
-     * Ajoute une valeur à cette série temporelle pour l'instant spécifié.
-     * Cette méthode est appelée par {@link TimeSeriesTile} pour toute les
-     * séries temporelles comprises dans une tuile.
+     * Ajoute une valeur Ã  cette sÃ©rie temporelle pour l'instant spÃ©cifiÃ©.
+     * Cette mÃ©thode est appelÃ©e par {@link TimeSeriesTile} pour toute les
+     * sÃ©ries temporelles comprises dans une tuile.
      */
     final void evaluate(final double t) throws IOException {
         assert Thread.holdsLock(tile);
@@ -129,7 +129,7 @@ public final class TimeSeries {
     }
 
     /**
-     * Envoie vers le canal toutes les données qui étaient en attente d'écriture.
+     * Envoie vers le canal toutes les donnÃ©es qui Ã©taient en attente d'Ã©criture.
      */
     final void flush() throws IOException {
         assert Thread.holdsLock(tile);
@@ -144,29 +144,29 @@ public final class TimeSeries {
     }
 
     /**
-     * Vérifie que le tableau spécifié à une taille compatible avec la taille du buffer.
+     * VÃ©rifie que le tableau spÃ©cifiÃ© Ã  une taille compatible avec la taille du buffer.
      *
-     * @param  data Le tableau qui contient ou contiendra les données de la séries temporelle.
-     * @param  size La taille totale <strong>en octets</strong> de la série temporelle.
+     * @param  data Le tableau qui contient ou contiendra les donnÃ©es de la sÃ©ries temporelle.
+     * @param  size La taille totale <strong>en octets</strong> de la sÃ©rie temporelle.
      * @throws IllegalArgumentException si le tableau n'a pas la longueur attendue.
      */
     private static void checkDataSize(final double[] data, final int size) throws IllegalArgumentException {
         if (data != null && data.length*DATA_SIZE != size) {
-            throw new IllegalArgumentException("La taille du tableau est incompatible avec celle de la série.");
+            throw new IllegalArgumentException("La taille du tableau est incompatible avec celle de la sÃ©rie.");
         }
     }
 
     /**
-     * Retourne toutes les données de cette séries temporelle. Si l'argument {@code data} est
-     * non-nul, alors les données seront écrites dans ce tableau.
+     * Retourne toutes les donnÃ©es de cette sÃ©ries temporelle. Si l'argument {@code data} est
+     * non-nul, alors les donnÃ©es seront Ã©crites dans ce tableau.
      * <p>
-     * Chaque valeur {@code data[i]} correspond au temps <var>t</var> retourné par
+     * Chaque valeur {@code data[i]} correspond au temps <var>t</var> retournÃ© par
      * <code>tile.{@link TimeSeriesTile#getTime getTime}(i)</code>.
      *
-     * @param  data Un tableau pré-alloué dans lequel placer les données, ou {@code null} si aucun.
-     * @return Les données de la séries temporelle dans {@code data}, ou dans un nouveau tableau si
-     *         {@code data} était nul.
-     * @throws IOException si les données n'ont pas pu être récupérées à partir du disque.
+     * @param  data Un tableau prÃ©-allouÃ© dans lequel placer les donnÃ©es, ou {@code null} si aucun.
+     * @return Les donnÃ©es de la sÃ©ries temporelle dans {@code data}, ou dans un nouveau tableau si
+     *         {@code data} Ã©tait nul.
+     * @throws IOException si les donnÃ©es n'ont pas pu Ãªtre rÃ©cupÃ©rÃ©es Ã  partir du disque.
      */
     public double[] getData(double[] data) throws IOException {
         final int size = getSeriesSize();
@@ -196,12 +196,12 @@ public final class TimeSeries {
     }
 
     /**
-     * Modifie toutes les données de cette séries temporelle. Cette méthode est typiquement
-     * appellée après qu'un calcul aie été effectué sur la série temporelle, par exemple un
+     * Modifie toutes les donnÃ©es de cette sÃ©ries temporelle. Cette mÃ©thode est typiquement
+     * appellÃ©e aprÃ¨s qu'un calcul aie Ã©tÃ© effectuÃ© sur la sÃ©rie temporelle, par exemple un
      * filtre passe-bas.
      *
-     * @param  data Les nouvelles données de la séries temporelle.
-     * @throws IOException si les données n'ont pas pu être écrites sur le disque.
+     * @param  data Les nouvelles donnÃ©es de la sÃ©ries temporelle.
+     * @throws IOException si les donnÃ©es n'ont pas pu Ãªtre Ã©crites sur le disque.
      */
     public void setData(final double[] data) throws IOException {
         final int size = getSeriesSize();
@@ -221,30 +221,30 @@ public final class TimeSeries {
     }
 
     /**
-     * Positionne le buffer sur la première valeur de la série temporelle. Cette méthode doit
-     * être appelée une fois avant de procéder aux appels successifs de {@link #next}.
+     * Positionne le buffer sur la premiÃ¨re valeur de la sÃ©rie temporelle. Cette mÃ©thode doit
+     * Ãªtre appelÃ©e une fois avant de procÃ©der aux appels successifs de {@link #next}.
      * <p>
-     * <strong>NOTE:</strong> Cette méthode (ainsi que {@link #next}) ne devrait jamais être
-     * appelée avant que la construction de la série temporelle n'aie été complétée par tous
-     * les appels nécessaires à {@link #evaluate}.
+     * <strong>NOTE:</strong> Cette mÃ©thode (ainsi que {@link #next}) ne devrait jamais Ãªtre
+     * appelÃ©e avant que la construction de la sÃ©rie temporelle n'aie Ã©tÃ© complÃ©tÃ©e par tous
+     * les appels nÃ©cessaires Ã  {@link #evaluate}.
      */
     final void rewind() throws IOException {
         assert Thread.holdsLock(tile);
         cacheBase = base;
-        buffer.clear().position(buffer.limit()); // Forcera next() à remplir le buffer à partir du fichier.
+        buffer.clear().position(buffer.limit()); // Forcera next() Ã  remplir le buffer Ã  partir du fichier.
     }
 
     /**
-     * Retourne la valeur suivante. Cette méthode est appelée afin de construire les images
-     * à partir des valeurs de toutes les séries temporelles à un temps <var>t</var>.
+     * Retourne la valeur suivante. Cette mÃ©thode est appelÃ©e afin de construire les images
+     * Ã  partir des valeurs de toutes les sÃ©ries temporelles Ã  un temps <var>t</var>.
      */
     final double next() throws IOException {
         assert Thread.holdsLock(tile);
         while (!buffer.hasRemaining()) {
             final int remaning = getSeriesSize() - (int)(cacheBase - base);
             if (remaning == 0) {
-                // Cette situation ne devrait pas se produire. Si elle se produit néanmois,
-                // on laissera buffer.get() à la fin de cette méthode lancer son exception.
+                // Cette situation ne devrait pas se produire. Si elle se produit nÃ©anmois,
+                // on laissera buffer.get() Ã  la fin de cette mÃ©thode lancer son exception.
                 break;
             }
             buffer.clear();

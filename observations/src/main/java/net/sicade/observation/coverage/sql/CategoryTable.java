@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -54,12 +54,12 @@ import net.sicade.image.Utilities;
 
 
 /**
- * Connexion vers une table des {@linkplain Category catégories}. Cette table construit des objets
+ * Connexion vers une table des {@linkplain Category catÃ©gories}. Cette table construit des objets
  * {@link Category} pour une bande individuelle. Les categories sont une des composantes d'un objet
- * {@link org.geotools.coverage.grid.GridCoverage2D}, mais ne correspondent pas directement à un
- * {@linkplain net.sicade.observation.Element élément} du paquet des observations.
+ * {@link org.geotools.coverage.grid.GridCoverage2D}, mais ne correspondent pas directement Ã  un
+ * {@linkplain net.sicade.observation.Element Ã©lÃ©ment} du paquet des observations.
  * <p>
- * Cette table est utilisée par {@link SampleDimensionTable}, qui construit des objets de
+ * Cette table est utilisÃ©e par {@link SampleDimensionTable}, qui construit des objets de
  * plus haut niveau.
  *
  * @author Martin Desruisseaux
@@ -68,8 +68,8 @@ import net.sicade.image.Utilities;
 @UsedBy(SampleDimensionTable.class)
 public class CategoryTable extends Table implements Shareable {
     /**
-     * Requête SQL utilisée par cette classe pour obtenir la table des catégories.
-     * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par les
+     * RequÃªte SQL utilisÃ©e par cette classe pour obtenir la table des catÃ©gories.
+     * L'ordre des colonnes est essentiel. Ces colonnes sont rÃ©fÃ©rencÃ©es par les
      * constantes {@link #NAME}, {@link #UPPER} et compagnie.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Categories:SELECT",
@@ -83,38 +83,38 @@ public class CategoryTable extends Table implements Shareable {
             "  FROM \"Categories\"\n" +
             " WHERE band=? ORDER BY lower");
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_BAND = 1;
-    /** Numéro de colonne. */ private static final int NAME          = 1;
-    /** Numéro de colonne. */ private static final int LOWER         = 2;
-    /** Numéro de colonne. */ private static final int UPPER         = 3;
-    /** Numéro de colonne. */ private static final int C0            = 4;
-    /** Numéro de colonne. */ private static final int C1            = 5;
-    /** Numéro de colonne. */ private static final int LOG           = 6;
-    /** Numéro de colonne. */ private static final int COLORS        = 7;
+    /** NumÃ©ro d'argument. */ private static final int ARGUMENT_BAND = 1;
+    /** NumÃ©ro de colonne. */ private static final int NAME          = 1;
+    /** NumÃ©ro de colonne. */ private static final int LOWER         = 2;
+    /** NumÃ©ro de colonne. */ private static final int UPPER         = 3;
+    /** NumÃ©ro de colonne. */ private static final int C0            = 4;
+    /** NumÃ©ro de colonne. */ private static final int C1            = 5;
+    /** NumÃ©ro de colonne. */ private static final int LOG           = 6;
+    /** NumÃ©ro de colonne. */ private static final int COLORS        = 7;
 
     /**
-     * Transformation <code>f(x) = 10<sup>x</sup></code>. Utilisée pour le décodage des images de
-     * concentrations en chlorophylle-a. Ne sera construite que la première fois où elle sera
-     * nécessaire.
+     * Transformation <code>f(x) = 10<sup>x</sup></code>. UtilisÃ©e pour le dÃ©codage des images de
+     * concentrations en chlorophylle-a. Ne sera construite que la premiÃ¨re fois oÃ¹ elle sera
+     * nÃ©cessaire.
      */
     private transient MathTransform1D exponential;
 
     /**
-     * Construit une table en utilisant la connexion spécifiée.
+     * Construit une table en utilisant la connexion spÃ©cifiÃ©e.
      *
-     * @param database  Connexion vers la base de données d'observations.
+     * @param database  Connexion vers la base de donnÃ©es d'observations.
      */
     public CategoryTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la liste des catégories qui appartiennent à la bande spécifiée.
+     * Retourne la liste des catÃ©gories qui appartiennent Ã  la bande spÃ©cifiÃ©e.
      *
-     * @param  band Identificateur de la bande pour lequel on veut les catégories.
-     * @return Les catégories de la bande demandée.
-     * @throws IllegalRecordException si une incohérence a été trouvée dans les enregistrements.
-     * @throws SQLException si l'interrogation de la table a échoué pour une autre raison.
+     * @param  band Identificateur de la bande pour lequel on veut les catÃ©gories.
+     * @return Les catÃ©gories de la bande demandÃ©e.
+     * @throws IllegalRecordException si une incohÃ©rence a Ã©tÃ© trouvÃ©e dans les enregistrements.
+     * @throws SQLException si l'interrogation de la table a Ã©chouÃ© pour une autre raison.
      */
     public synchronized Category[] getCategories(final String band) throws CatalogException, SQLException {
         final PreparedStatement statement = getStatement(SELECT);
@@ -131,8 +131,8 @@ public class CategoryTable extends Table implements Shareable {
             final boolean    log = result.getBoolean(LOG);
             final String colorID = result.getString (COLORS);
             /*
-             * Procède maintenant au décodage du champ "colors". Ce champ contient
-             * une chaîne de caractère qui indique soit le code RGB d'une couleur
+             * ProcÃ¨de maintenant au dÃ©codage du champ "colors". Ce champ contient
+             * une chaÃ®ne de caractÃ¨re qui indique soit le code RGB d'une couleur
              * uniforme, ou soit l'adresse URL d'une palette de couleurs.
              */
             Color[] colors = null;
@@ -144,20 +144,20 @@ public class CategoryTable extends Table implements Shareable {
                 throw new IllegalRecordException(result.getMetaData().getTableName(COLORS), exception);
             }
             /*
-             * Construit une catégorie correspondant à l'enregistrement qui vient d'être lu.
-             * Une catégorie peut être qualitative (premier cas), quantitative mais linéaire
-             * (deuxième cas), ou quantitative et logarithmique (troisième cas).
+             * Construit une catÃ©gorie correspondant Ã  l'enregistrement qui vient d'Ãªtre lu.
+             * Une catÃ©gorie peut Ãªtre qualitative (premier cas), quantitative mais linÃ©aire
+             * (deuxiÃ¨me cas), ou quantitative et logarithmique (troisiÃ¨me cas).
              */
             Category category;
             final NumberRange range = new NumberRange(lower, upper);
             if (!isQuantifiable) {
-                // Catégorie qualitative.
+                // CatÃ©gorie qualitative.
                 category = new Category(name, colors, range, (MathTransform1D)null);
             } else {
-                // Catégorie quantitative
+                // CatÃ©gorie quantitative
                 category = new Category(name, colors, range, c1, c0);
                 if (log) try {
-                    // Catégorie quantitative et logarithmique.
+                    // CatÃ©gorie quantitative et logarithmique.
                     final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(FACTORY_HINTS);
                     if (exponential == null) {
                         final ParameterValueGroup param = factory.getDefaultParameters("Exponential");
@@ -179,20 +179,20 @@ public class CategoryTable extends Table implements Shareable {
 
     /**
      * Optient une couleur uniforme ou une palette de couleur. L'argument {@code colors}
-     * peut être un code RGB d'une seule couleur (par exemple {@code "#D2C8A0"}), ou un
+     * peut Ãªtre un code RGB d'une seule couleur (par exemple {@code "#D2C8A0"}), ou un
      * lien URL vers une palette de couleurs (par exemple {@code "SST-Nasa.pal"}).
      *
-     * @param  colors Identificateur de la ou les couleurs désirées.
-     * @return Palette de couleurs demandée.
-     * @throws IOException si les couleurs n'ont pas pu être lues.
-     * @throws ParseException si le fichier de la palette de couleurs a été ouvert,
-     *         mais qu'elle contient des caractères qui n'ont pas pus être interprétés.
+     * @param  colors Identificateur de la ou les couleurs dÃ©sirÃ©es.
+     * @return Palette de couleurs demandÃ©e.
+     * @throws IOException si les couleurs n'ont pas pu Ãªtre lues.
+     * @throws ParseException si le fichier de la palette de couleurs a Ã©tÃ© ouvert,
+     *         mais qu'elle contient des caractÃ¨res qui n'ont pas pus Ãªtre interprÃ©tÃ©s.
      */
     private static Color[] decode(String colors) throws IOException, ParseException {
         /*
-         * Retire les guillements au début et à la fin de la chaîne, s'il y en a.
-         * Cette opération vise à éviter des problèmes de compatibilités lorsque
-         * l'importation des thèmes dans la base des données s'est senti obligée
+         * Retire les guillements au dÃ©but et Ã  la fin de la chaÃ®ne, s'il y en a.
+         * Cette opÃ©ration vise Ã  Ã©viter des problÃ¨mes de compatibilitÃ©s lorsque
+         * l'importation des thÃ¨mes dans la base des donnÃ©es s'est senti obligÃ©e
          * de placer des guillemets partout.
          */
         if (true) {
@@ -203,17 +203,17 @@ public class CategoryTable extends Table implements Shareable {
             }
         }
         /*
-         * Vérifie si la chaîne de caractère représente un code de couleurs
-         * unique, comme par exemple "#D2C8A0". Si oui, ce code sera retourné
+         * VÃ©rifie si la chaÃ®ne de caractÃ¨re reprÃ©sente un code de couleurs
+         * unique, comme par exemple "#D2C8A0". Si oui, ce code sera retournÃ©
          * dans un tableau de longueur 1.
          */
         try {
             return new Color[] {Color.decode(colors)};
         } catch (NumberFormatException exception) {
             /*
-             * Le décodage de la chaîne a échoué. C'est peut-être
+             * Le dÃ©codage de la chaÃ®ne a Ã©chouÃ©. C'est peut-Ãªtre
              * parce qu'il s'agit d'un nom de fichier.  On ignore
-             * l'erreur et on continue en essayant de décoder l'URL.
+             * l'erreur et on continue en essayant de dÃ©coder l'URL.
              */
         }
         final URL url = new URL(colors);

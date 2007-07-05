@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,13 +18,13 @@
  */
 package net.sicade.observation.sql;
 
-// Bases de données
+// Bases de donnÃ©es
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
-// Entrés/sorties (incluant RMI)
+// EntrÃ©s/sorties (incluant RMI)
 import java.net.URL;
 import java.io.File;
 import java.io.IOException;
@@ -61,9 +61,9 @@ import net.sicade.observation.ConfigurationKey;
 
 
 /**
- * Connexion vers une base de données d'observations via JDBC (<cite>Java Database Connectivity</cite>).
- * Les requêtes SQL sont sauvegardées dans un fichier de configuration {@code "DatabaseQueries.xml"}
- * placé dans le répertoire {@code "Application Data\Sicade"} (sous Windows) ou {@code ".Sicade"} (sous Unix)
+ * Connexion vers une base de donnÃ©es d'observations via JDBC (<cite>Java Database Connectivity</cite>).
+ * Les requÃªtes SQL sont sauvegardÃ©es dans un fichier de configuration {@code "DatabaseQueries.xml"}
+ * placÃ© dans le rÃ©pertoire {@code "Application Data\Sicade"} (sous Windows) ou {@code ".Sicade"} (sous Unix)
  * de l'utilisateur.
  *
  * @version $Id$
@@ -71,9 +71,9 @@ import net.sicade.observation.ConfigurationKey;
  */
 public class Database {
     /**
-     * Paramètres de connexions à une {@linkplain Database base de données d'observations}. En plus
+     * ParamÃ¨tres de connexions Ã  une {@linkplain Database base de donnÃ©es d'observations}. En plus
      * des informations de connexion, cette interface peut fournir un URL optionel vers un fichier
-     * de configuration qui contiendra les requêtes URL à utiliser pour interroger la base de données.
+     * de configuration qui contiendra les requÃªtes URL Ã  utiliser pour interroger la base de donnÃ©es.
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -86,7 +86,7 @@ public class Database {
     }
 
     /**
-     * Le sous-répertoire pour enregistrer la configuration.
+     * Le sous-rÃ©pertoire pour enregistrer la configuration.
      */
     private static final String CONFIG_DIRECTORY = "Sicade";
 
@@ -96,50 +96,50 @@ public class Database {
     private static final String CONFIG_FILENAME = "DatabaseQueries.xml";
 
     /**
-     * Le pilote de la base de données. Utilisé seulement si aucun {@link DataSource} n'a été
-     * spécifié au constructeur. Exemple: {@code org.postgresql.Driver}.
+     * Le pilote de la base de donnÃ©es. UtilisÃ© seulement si aucun {@link DataSource} n'a Ã©tÃ©
+     * spÃ©cifiÃ© au constructeur. Exemple: {@code org.postgresql.Driver}.
      */
     public static final ConfigurationKey DRIVER = new ConfigurationKey("Driver", null);
 
     /**
-     * L'URL vers la base de données. Utilisé seulement si aucun {@link DataSource} n'a été
-     * spécifié au constructeur. Exemple: {@code jdbc:postgresql://monserveur.com/mabase}.
+     * L'URL vers la base de donnÃ©es. UtilisÃ© seulement si aucun {@link DataSource} n'a Ã©tÃ©
+     * spÃ©cifiÃ© au constructeur. Exemple: {@code jdbc:postgresql://monserveur.com/mabase}.
      */
     public static final ConfigurationKey DATABASE = new ConfigurationKey("Database", null);
 
     /**
-     * L'utilisateur se connectant à la {@linkplain #DATABASE base de données}.
-     * Utilisé seulement si aucun {@link DataSource} n'a été spécifié au constructeur.
+     * L'utilisateur se connectant Ã  la {@linkplain #DATABASE base de donnÃ©es}.
+     * UtilisÃ© seulement si aucun {@link DataSource} n'a Ã©tÃ© spÃ©cifiÃ© au constructeur.
      */
     public static final ConfigurationKey USER = new ConfigurationKey("User", null);
 
     /**
-     * Le mot de passe de l'{@linkplain #USER utilisateur}. Utilisé seulement si aucun
-     * {@link DataSource} n'a été spécifié au constructeur.
+     * Le mot de passe de l'{@linkplain #USER utilisateur}. UtilisÃ© seulement si aucun
+     * {@link DataSource} n'a Ã©tÃ© spÃ©cifiÃ© au constructeur.
      */
     public static final ConfigurationKey PASSWORD = new ConfigurationKey("Password", null);
 
     /**
-     * Clé désignant le serveur RMI distant (<cite>Remote Method Invocation</cite>). La valeur par
-     * défaut est {@code null}, ce qui signifie que les images devront être rapatriées par FTP et
-     * traitées localement plutôt que de laisser un serveur distant n'envoyer que les résultats.
+     * ClÃ© dÃ©signant le serveur RMI distant (<cite>Remote Method Invocation</cite>). La valeur par
+     * dÃ©faut est {@code null}, ce qui signifie que les images devront Ãªtre rapatriÃ©es par FTP et
+     * traitÃ©es localement plutÃ´t que de laisser un serveur distant n'envoyer que les rÃ©sultats.
      */
     public static final ConfigurationKey REMOTE_SERVER = new ConfigurationKey("RemoteServer", null);
 
     /**
-     * Clé désignant le fuseau horaire de dates comprises dans la base de données.
-     * Ce fuseau horaire peut être configurée par l'utilisateur. Si aucun fuseau
-     * n'est spécifié, alors le fuseau horaire local est utilisé.
+     * ClÃ© dÃ©signant le fuseau horaire de dates comprises dans la base de donnÃ©es.
+     * Ce fuseau horaire peut Ãªtre configurÃ©e par l'utilisateur. Si aucun fuseau
+     * n'est spÃ©cifiÃ©, alors le fuseau horaire local est utilisÃ©.
      *
      * @see #getProperty
      */
     public static final ConfigurationKey TIMEZONE = new ConfigurationKey("TimeZone", "UTC");
 
     /**
-     * {@code false} si les RMI devraient être désactivés. Ce drapeau est définie à partir de
-     * la ligne de commande avec l'option {@code -Drmi.enabled=false}. Il est utile de désactiver
-     * les RMI pendant les déboguages si l'on souhaite faire du pas-à-pas dans le code qui aurait
-     * normalement été exécuté sur le serveur.
+     * {@code false} si les RMI devraient Ãªtre dÃ©sactivÃ©s. Ce drapeau est dÃ©finie Ã  partir de
+     * la ligne de commande avec l'option {@code -Drmi.enabled=false}. Il est utile de dÃ©sactiver
+     * les RMI pendant les dÃ©boguages si l'on souhaite faire du pas-Ã -pas dans le code qui aurait
+     * normalement Ã©tÃ© exÃ©cutÃ© sur le serveur.
      */
     private static final boolean RMI_ENABLED;
     static {
@@ -151,79 +151,79 @@ public class Database {
         }
         RMI_ENABLED = enabled;
         if (!RMI_ENABLED) {
-            Entry.LOGGER.config("RMI désactivés.");
+            Entry.LOGGER.config("RMI dÃ©sactivÃ©s.");
         }
     }
     
     /**
-     * Spécifie le type de base de données utilisée.
+     * SpÃ©cifie le type de base de donnÃ©es utilisÃ©e.
      */
     public static final boolean BOX3D_POSTGIS = true;
 
     /**
-     * Source de données.
+     * Source de donnÃ©es.
      */
     private final DataSource source;
 
     /**
-     * Connexion vers la base de données.
+     * Connexion vers la base de donnÃ©es.
      */
     private Connection connection;
 
     /**
-     * Ensemble des tables qui ont été créées.
+     * Ensemble des tables qui ont Ã©tÃ© crÃ©Ã©es.
      */
     private final Map<Class<? extends Table>, Table> tables = new HashMap<Class<? extends Table>, Table>();
 
     /**
-     * Ensemble des connections RMI déjà obtenues avec {@link #getRemote}.
+     * Ensemble des connections RMI dÃ©jÃ  obtenues avec {@link #getRemote}.
      */
     private final Map<String, Remote> remotes = new HashMap<String, Remote>();
 
     /**
-     * Fuseau horaire à utiliser pour lire ou écrire des dates dans la base de données.
-     * Ce fuseau horaire peut être spécifié par la propriété {@link #TIMEZONE}, et sera
-     * utilisé pour construire le calendrier retourné par {@link Table#getCalendar}.
+     * Fuseau horaire Ã  utiliser pour lire ou Ã©crire des dates dans la base de donnÃ©es.
+     * Ce fuseau horaire peut Ãªtre spÃ©cifiÃ© par la propriÃ©tÃ© {@link #TIMEZONE}, et sera
+     * utilisÃ© pour construire le calendrier retournÃ© par {@link Table#getCalendar}.
      */
     final TimeZone timezone;
 
     /**
-     * Propriétés à utiliser pour extraire les valeurs du fichier de configuration.
+     * PropriÃ©tÃ©s Ã  utiliser pour extraire les valeurs du fichier de configuration.
      */
     private final Properties properties;
 
     /**
-     * Indique si les propriétés ont été modifiées.
+     * Indique si les propriÃ©tÃ©s ont Ã©tÃ© modifiÃ©es.
      */
     private boolean modified;
 
     /**
-     * Appellé automatiquement lors de l'arrêt de la machine virtuelle. Ferme les
-     * connections à la base de données si l'utilisateur ne l'avait pas fait lui-même.
+     * AppellÃ© automatiquement lors de l'arrÃªt de la machine virtuelle. Ferme les
+     * connections Ã  la base de donnÃ©es si l'utilisateur ne l'avait pas fait lui-mÃªme.
      */
     private Thread finalizer;
 
     /**
-     * Prépare une connection vers une base de données en n'utilisant que les informations trouvées
+     * PrÃ©pare une connection vers une base de donnÃ©es en n'utilisant que les informations trouvÃ©es
      * dans le fichier de configuration.
      *
-     * @throws IOException si le fichier de configuration existe mais n'a pas pu être ouvert.
+     * @throws IOException si le fichier de configuration existe mais n'a pas pu Ãªtre ouvert.
      */
     public Database() throws IOException {
         this(null);
     }
 
     /**
-     * Prépare une connection vers une base de données en utilisant la source spécifiée.
+     * PrÃ©pare une connection vers une base de donnÃ©es en utilisant la source spÃ©cifiÃ©e.
      *
-     * @param  source Source de données.
-     * @throws IOException si le fichier de configuration existe mais n'a pas pu être ouvert.
+     * @param  source Source de donnÃ©es.
+     * @throws IOException si le fichier de configuration existe mais n'a pas pu Ãªtre ouvert.
      */
     public Database(final DataSource source) throws IOException {
         /*
-         * Procède d'abord à la lecture du fichier de configuration,  afin de permettre
-         * à la méthode 'getProperty' de fonctionner. Cette dernière sera utilisée dans
-         * les lignes suivantes, et risque aussi d'être surchargée.
+         * ProcÃ¨de d'abord Ã  la lecture du fichier de configuration,  afin de permettre
+         * Ã  la mÃ©thode 'getProperty' de fonctionner. Cette derniÃ¨re sera utilisÃ©e dans
+         * les lignes suivantes, et risque aussi d'Ãªtre surchargÃ©e.
          */
         properties = new Properties();
         this.source = source;
@@ -236,8 +236,8 @@ public class Database {
             }
         }
         /*
-         * Ecrase la configuration récupérée sur le réseau par la configuration spécifiée
-         * explicitement par l'utilisateur, s'il l'a définie.
+         * Ecrase la configuration rÃ©cupÃ©rÃ©e sur le rÃ©seau par la configuration spÃ©cifiÃ©e
+         * explicitement par l'utilisateur, s'il l'a dÃ©finie.
          */
         final File file = getConfigurationFile(false);
         if (file!=null && file.exists()) {
@@ -248,8 +248,8 @@ public class Database {
         final String ID = getProperty(TIMEZONE);
         timezone = (ID!=null) ? TimeZone.getTimeZone(ID) : TimeZone.getDefault();
         /*
-         * Prépare un processus qui fermera automatiquement les connections lors de l'arrêt
-         * de la machine virtuelle si l'utilisateur n'appelle par close() lui-même.
+         * PrÃ©pare un processus qui fermera automatiquement les connections lors de l'arrÃªt
+         * de la machine virtuelle si l'utilisateur n'appelle par close() lui-mÃªme.
          */
         finalizer = new Finalizer();
         Runtime.getRuntime().addShutdownHook(finalizer);
@@ -257,19 +257,19 @@ public class Database {
 
     /**
      * Retourne le fichier de configuration de l'utilisateur, ou {@code null} s'il n'a pas
-     * été trouvé. Le répertoire {@value #CONFIG_DIRECTORY} ne sera créé que si l'argument
+     * Ã©tÃ© trouvÃ©. Le rÃ©pertoire {@value #CONFIG_DIRECTORY} ne sera crÃ©Ã© que si l'argument
      * {@code create} est {@code true}.
      */
     private static File getConfigurationFile(final boolean create) {
         /*
-         * Donne priorité au fichier de configuration dans le répertoire courant, s'il existe.
+         * Donne prioritÃ© au fichier de configuration dans le rÃ©pertoire courant, s'il existe.
          */
         File path = new File(CONFIG_FILENAME);
         if (path.isFile()) {
             return path;
         }
         /*
-         * Recherche dans le répertoire de configuration de l'utilisateur.
+         * Recherche dans le rÃ©pertoire de configuration de l'utilisateur.
          */
         final String home = System.getProperty("user.home");
         path = new File(home, "Application Data");
@@ -287,14 +287,14 @@ public class Database {
     }
 
     /**
-     * Retourne la connexion à la base de données. Si une {@linkplain DataSource source de données}
-     * a été spécifié au constructeur, elle sera utilisée mais en écrasant éventuellement le nom de
-     * l'utilisateur et le mot de passe par ceux qui ont été spécifiés dans le fichier de configuration.
-     * Si aucune source de donnée n'a été spécifié, alors on utilisera les propriétés définies pas
+     * Retourne la connexion Ã  la base de donnÃ©es. Si une {@linkplain DataSource source de donnÃ©es}
+     * a Ã©tÃ© spÃ©cifiÃ© au constructeur, elle sera utilisÃ©e mais en Ã©crasant Ã©ventuellement le nom de
+     * l'utilisateur et le mot de passe par ceux qui ont Ã©tÃ© spÃ©cifiÃ©s dans le fichier de configuration.
+     * Si aucune source de donnÃ©e n'a Ã©tÃ© spÃ©cifiÃ©, alors on utilisera les propriÃ©tÃ©s dÃ©finies pas
      * {@link #DATABASE} et {@link #DRIVER}.
      *
-     * @return La connexion à la base de données.
-     * @throws SQLException si la connexion n'a pas pu être établie.
+     * @return La connexion Ã  la base de donnÃ©es.
+     * @throws SQLException si la connexion n'a pas pu Ãªtre Ã©tablie.
      */
     protected synchronized Connection getConnection() throws SQLException {
         if (connection == null) {
@@ -315,13 +315,13 @@ public class Database {
                     connection = null;
                 }
                 if (connection != null) {
-                    Element.LOGGER.info("Connecté à la base de données "+connection.getMetaData().getURL());
+                    Element.LOGGER.info("ConnectÃ© Ã  la base de donnÃ©es "+connection.getMetaData().getURL());
                 }
             }
         }
         /*
-         * Dans le cas d'une connection sur une base de type PostgreSQL, le type de données 
-         * postgis.BOX3D doit être spécifié, afin de permettre son utilisation dans les tables.
+         * Dans le cas d'une connection sur une base de type PostgreSQL, le type de donnÃ©es 
+         * postgis.BOX3D doit Ãªtre spÃ©cifiÃ©, afin de permettre son utilisation dans les tables.
          */
         if (connection instanceof org.postgresql.PGConnection) {
             org.postgresql.PGConnection connec = (org.postgresql.PGConnection) connection;
@@ -331,9 +331,9 @@ public class Database {
     }
 
     /**
-     * Retourne le fuseau horaire des dates exprimées dans cette base de données. Cette
-     * information peut être spécifiée par la propriétée {@link #TIMEZONE} et est utilisée
-     * pour convertir des dates du fuseau horaire de la base de données vers le fuseau UTC.
+     * Retourne le fuseau horaire des dates exprimÃ©es dans cette base de donnÃ©es. Cette
+     * information peut Ãªtre spÃ©cifiÃ©e par la propriÃ©tÃ©e {@link #TIMEZONE} et est utilisÃ©e
+     * pour convertir des dates du fuseau horaire de la base de donnÃ©es vers le fuseau UTC.
      *
      * @see Table#getCalendar
      */
@@ -349,12 +349,12 @@ public class Database {
     }
 
     /**
-     * Retourne une des propriétée de la base de données. La clé {@code name}
-     * est habituellement une constante comme {@link #TIMEZONE}. Cette méthode
-     * retourne {@code null} si la propriété demandée n'est pas définie.
+     * Retourne une des propriÃ©tÃ©e de la base de donnÃ©es. La clÃ© {@code name}
+     * est habituellement une constante comme {@link #TIMEZONE}. Cette mÃ©thode
+     * retourne {@code null} si la propriÃ©tÃ© demandÃ©e n'est pas dÃ©finie.
      */
     public String getProperty(final ConfigurationKey key) {
-        // Pas besoin de synchronizer; 'Properties' l'est déjà.
+        // Pas besoin de synchronizer; 'Properties' l'est dÃ©jÃ .
         String value = properties.getProperty(key.getName(), key.getDefaultValue());
         if (value == null) {
             if (key.equals(TIMEZONE)) {
@@ -365,9 +365,9 @@ public class Database {
     }
 
     /**
-     * Obtient la valeur de la propriété spécifiée, ou de {@code fallback} si aucune propriété
-     * n'est définie pour {@code key}. Si une valeur non-null est trouvée, elle sera copiée
-     * dans l'ensemble {@code properties} spécifié sous la clé {@code targetKey} spécifiée.
+     * Obtient la valeur de la propriÃ©tÃ© spÃ©cifiÃ©e, ou de {@code fallback} si aucune propriÃ©tÃ©
+     * n'est dÃ©finie pour {@code key}. Si une valeur non-null est trouvÃ©e, elle sera copiÃ©e
+     * dans l'ensemble {@code properties} spÃ©cifiÃ© sous la clÃ© {@code targetKey} spÃ©cifiÃ©e.
      */
     final void getProperty(final ConfigurationKey key, final ConfigurationKey fallback,
                            final Properties properties, final String targetKey)
@@ -383,11 +383,11 @@ public class Database {
     }
 
     /**
-     * Affecte une nouvelle valeur sous la clé spécifiée. Cette valeur sera sauvegardée dans
-     * le fichier de configuration qui se trouve dans le répertoire locale de l'utilisateur.
+     * Affecte une nouvelle valeur sous la clÃ© spÃ©cifiÃ©e. Cette valeur sera sauvegardÃ©e dans
+     * le fichier de configuration qui se trouve dans le rÃ©pertoire locale de l'utilisateur.
      *
-     * @param key   La clé.
-     * @param value Nouvelle valeur, ou {@code null} pour rétablir la propriété à sa valeur par défaut.
+     * @param key   La clÃ©.
+     * @param value Nouvelle valeur, ou {@code null} pour rÃ©tablir la propriÃ©tÃ© Ã  sa valeur par dÃ©faut.
      */
     public void setProperty(final ConfigurationKey key, final String value) {
         synchronized (properties) {
@@ -404,22 +404,22 @@ public class Database {
     }
 
     /**
-     * Retourne une table du type spécifié. Cette méthode peut retourner une instance d'une table
-     * déjà existante si elle répond aux conditions suivantes:
+     * Retourne une table du type spÃ©cifiÃ©. Cette mÃ©thode peut retourner une instance d'une table
+     * dÃ©jÃ  existante si elle rÃ©pond aux conditions suivantes:
      * <p>
      * <ul>
-     *   <li>Une instance de la table demandée avait déjà été créée précédement.</li>
-     *   <li>La table implémente l'interface {@link Shareable}.</li>
-     *   <li>La table n'a pas été fermée.</li>
+     *   <li>Une instance de la table demandÃ©e avait dÃ©jÃ  Ã©tÃ© crÃ©Ã©e prÃ©cÃ©dement.</li>
+     *   <li>La table implÃ©mente l'interface {@link Shareable}.</li>
+     *   <li>La table n'a pas Ã©tÃ© fermÃ©e.</li>
      * </ul>
      * <p>
-     * Si les conditions ci-dessous ne sont pas remplies, alors cette méthode créera une nouvelle
-     * instance en appellant la méthode <code>{@linkplain #createTable createTable}(type)</code>,
-     * et le résultat sera éventuellement conservée dans une cache interne pour les appels ultérieurs.
+     * Si les conditions ci-dessous ne sont pas remplies, alors cette mÃ©thode crÃ©era une nouvelle
+     * instance en appellant la mÃ©thode <code>{@linkplain #createTable createTable}(type)</code>,
+     * et le rÃ©sultat sera Ã©ventuellement conservÃ©e dans une cache interne pour les appels ultÃ©rieurs.
      *
      * @param  type Le type de la table (par exemple <code>{@linkplain StationTable}.class</code>).
-     * @return Une instance d'une table du type spécifié.
-     * @throws NoSuchElementException si le type spécifié n'est pas connu.
+     * @return Une instance d'une table du type spÃ©cifiÃ©.
+     * @throws NoSuchElementException si le type spÃ©cifiÃ© n'est pas connu.
      */
     public final <T extends Table> T getTable(final Class<T> type) throws NoSuchElementException {
         synchronized (tables) {
@@ -437,16 +437,16 @@ public class Database {
     }
 
     /**
-     * Retourne une nouvelle instance du type de table spécifié. Cette méthode est appelée
+     * Retourne une nouvelle instance du type de table spÃ©cifiÃ©. Cette mÃ©thode est appelÃ©e
      * automatiquement par <code>{@linkplain #getTable getTable}(type)</code> lorsque cette
-     * dernière a déterminée que la création d'une nouvelle instance de la table est nécessaire.
-     * L'implémentation par défaut tente d'appeller un constructeur qui attend pour seul argument
-     * un objet {@code Database}. Les classes dérivées devraient redéfinir cette méthode si elles
+     * derniÃ¨re a dÃ©terminÃ©e que la crÃ©ation d'une nouvelle instance de la table est nÃ©cessaire.
+     * L'implÃ©mentation par dÃ©faut tente d'appeller un constructeur qui attend pour seul argument
+     * un objet {@code Database}. Les classes dÃ©rivÃ©es devraient redÃ©finir cette mÃ©thode si elles
      * veulent prendre en compte un plus grand nombre de tables.
      *
      * @param  type Le type de la table (par exemple <code>{@linkplain StationTable}.class</code>).
-     * @return Une nouvelle instance d'une table du type spécifié.
-     * @throws NoSuchElementException si le type spécifié n'est pas connu.
+     * @return Une nouvelle instance d'une table du type spÃ©cifiÃ©.
+     * @throws NoSuchElementException si le type spÃ©cifiÃ© n'est pas connu.
      */
     public <T extends Table> T createTable(final Class<T> type) throws NoSuchElementException {
         try {
@@ -454,7 +454,7 @@ public class Database {
             return c.newInstance(this);
         } catch (Exception exception) {
             /*
-             * Attraper toutes les exceptions n'est pas recommandé,
+             * Attraper toutes les exceptions n'est pas recommandÃ©,
              * mais il y en a un bon paquet dans le code ci-dessus.
              */
             final NoSuchElementException e = new NoSuchElementException(Utilities.getShortName(type));
@@ -464,21 +464,21 @@ public class Database {
     }
 
     /**
-     * Obtient un objet distant du nom spécifié. Si l'objet {@code name} avait déjà été demandée
-     * lors d'un précédent appel, le même objet sera retourné. Sinon, un nouvel objet sera obtenu
-     * et retourné.
+     * Obtient un objet distant du nom spÃ©cifiÃ©. Si l'objet {@code name} avait dÃ©jÃ  Ã©tÃ© demandÃ©e
+     * lors d'un prÃ©cÃ©dent appel, le mÃªme objet sera retournÃ©. Sinon, un nouvel objet sera obtenu
+     * et retournÃ©.
      * <p>
-     * Si l'objet distant du nom spécifié n'a pas pu être obtenu par ce qu'aucun objet de ce nom
-     * n'est défini ou parce que le serveur a refusé la connexion, alors cette methode retourne
-     * {@code null}. Si l'objet n'a pas pu être obtenu pour une autre raison, alors une exception
-     * est lancée.
+     * Si l'objet distant du nom spÃ©cifiÃ© n'a pas pu Ãªtre obtenu par ce qu'aucun objet de ce nom
+     * n'est dÃ©fini ou parce que le serveur a refusÃ© la connexion, alors cette methode retourne
+     * {@code null}. Si l'objet n'a pas pu Ãªtre obtenu pour une autre raison, alors une exception
+     * est lancÃ©e.
      *
-     * @param  name Le nom de l'objet désiré (sans le nom du serveur). Typiquement une constante
+     * @param  name Le nom de l'objet dÃ©sirÃ© (sans le nom du serveur). Typiquement une constante
      *         telle que {@link net.sicade.observation.coverage.rmi.DataConnectionFactory#REGISTRY_NAME
      *         REGISTRY_NAME}.
-     * @return Une instance partagée (entre les différents appels de cette méthode) de l'objet distant,
-     *         ou {@code null} si aucun objet du nom de spécifié n'est disponible.
-     * @throws RemoteException si la connexion au serveur a échouée.
+     * @return Une instance partagÃ©e (entre les diffÃ©rents appels de cette mÃ©thode) de l'objet distant,
+     *         ou {@code null} si aucun objet du nom de spÃ©cifiÃ© n'est disponible.
+     * @throws RemoteException si la connexion au serveur a Ã©chouÃ©e.
      */
     public Remote getRemote(final String name) throws RemoteException {
         if (!RMI_ENABLED) {
@@ -502,30 +502,30 @@ public class Database {
                         candidate = Naming.lookup(url.toString());
                     } catch (MalformedURLException exception) {
                         /*
-                         * Ne devrait pas se produire, puisque l'on a construit notre URL nous-même
+                         * Ne devrait pas se produire, puisque l'on a construit notre URL nous-mÃªme
                          * et que l'argument 'name' est habituellement une constante d'une des
                          * interfaces du paquet net.sicade.observation.coverage.rmi.
                          */
                         throw new IllegalArgumentException(name, exception);
                     } catch (ConnectException exception) {
                         /*
-                         * La connexion au serveur a été refusée; peut-être le serveur n'est pas
+                         * La connexion au serveur a Ã©tÃ© refusÃ©e; peut-Ãªtre le serveur n'est pas
                          * en service. Retourne null, ce qui signifie que l'appellant devra se
-                         * passer de RMI (par exemple en téléchargeant les images par FTP).
+                         * passer de RMI (par exemple en tÃ©lÃ©chargeant les images par FTP).
                          */
                         unexpectedException("getRemote", exception);
                     } catch (NotBoundException exception) {
                         /*
-                         * L'objet demandé n'a pas été mis en service. Retourne null, ce qui
+                         * L'objet demandÃ© n'a pas Ã©tÃ© mis en service. Retourne null, ce qui
                          * signifie que l'appellant devra se passer de RMI (par exemple en
-                         * téléchargeant les images par FTP).
+                         * tÃ©lÃ©chargeant les images par FTP).
                          */
                         unexpectedException("getRemote", exception);
                     }
                 }
                 /*
-                 * Sauvegarde la référence même si elle est restée nulle afin d'éviter
-                 * de recommencer les tentatives de connections à chaque appel.
+                 * Sauvegarde la rÃ©fÃ©rence mÃªme si elle est restÃ©e nulle afin d'Ã©viter
+                 * de recommencer les tentatives de connections Ã  chaque appel.
                  */
                 remotes.put(name, candidate);
             }
@@ -534,8 +534,8 @@ public class Database {
     }
 
     /**
-     * Enregistre un événement dans le journal signalant qu'une erreur est survenue dans la
-     * méthode spécifiée, mais que cette erreur n'empêche pas un fonctionnement à peu près
+     * Enregistre un Ã©vÃ©nement dans le journal signalant qu'une erreur est survenue dans la
+     * mÃ©thode spÃ©cifiÃ©e, mais que cette erreur n'empÃªche pas un fonctionnement Ã  peu prÃ¨s
      * normal.
      */
     private void unexpectedException(final String method, final Exception exception) {
@@ -544,10 +544,10 @@ public class Database {
     }
 
     /**
-     * Ferme la connexion avec la base de données.
+     * Ferme la connexion avec la base de donnÃ©es.
      *
-     * @throws SQLException si un problème est survenu lors de la fermeture de la connexion.
-     * @throws IOException si la configuration de l'utilisateur n'a pas pu être sauvegardée.
+     * @throws SQLException si un problÃ¨me est survenu lors de la fermeture de la connexion.
+     * @throws IOException si la configuration de l'utilisateur n'a pas pu Ãªtre sauvegardÃ©e.
      */
     public void close() throws SQLException, IOException {
         /*
@@ -569,7 +569,7 @@ public class Database {
             }
         }
         /*
-         * Enregistre les propriétés.
+         * Enregistre les propriÃ©tÃ©s.
          */
         synchronized (properties) {
             if (modified) {
@@ -581,16 +581,16 @@ public class Database {
                     out.close();
                 } else {
                     // TODO: provide a localized message.
-                    throw new FileNotFoundException("Aucun fichier où enregistrer la configuration.");
+                    throw new FileNotFoundException("Aucun fichier oÃ¹ enregistrer la configuration.");
                 }
             }
         }
     }
 
     /**
-     * Libère les ressources utilisées par cette base de données si ce n'était pas déjà fait.
-     * Cette méthode est appellée automatiquement par le ramasse-miettes lorsqu'il a détecté
-     * que cette base de données n'est plus utilisée. L'implémentation par défaut ne fait
+     * LibÃ¨re les ressources utilisÃ©es par cette base de donnÃ©es si ce n'Ã©tait pas dÃ©jÃ  fait.
+     * Cette mÃ©thode est appellÃ©e automatiquement par le ramasse-miettes lorsqu'il a dÃ©tectÃ©
+     * que cette base de donnÃ©es n'est plus utilisÃ©e. L'implÃ©mentation par dÃ©faut ne fait
      * qu'appeller {@link #close}.
      */
     @Override
@@ -600,8 +600,8 @@ public class Database {
     }
 
     /**
-     * Appellé automatiquement lors de l'arrêt de la machine virtuelle. Cette classe ferme
-     * les connections à la base de données si l'utilisateur ne l'a pas fait lui-même.
+     * AppellÃ© automatiquement lors de l'arrÃªt de la machine virtuelle. Cette classe ferme
+     * les connections Ã  la base de donnÃ©es si l'utilisateur ne l'a pas fait lui-mÃªme.
      */
     private final class Finalizer extends Thread {
         public Finalizer() {
@@ -617,7 +617,7 @@ public class Database {
                 } catch (Exception ignore) {
                     /*
                      * Rien que nous ne puissions faire, puisque la machine virtuelle est en train
-                     * de s'arrêter. Les journaux (java.util.logging) ne sont déjà plus disponibles.
+                     * de s'arrÃªter. Les journaux (java.util.logging) ne sont dÃ©jÃ  plus disponibles.
                      */
                 }
             }

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,25 +23,25 @@ import java.util.TimerTask;
 
 
 /**
- * Stop l'exécution de {@link System#runFinalization} lorsqu'un délai a été dépassé. Cette méthode
- * est utilisée pour éviter les bloquages que l'on observe parfois.
+ * Stop l'exÃ©cution de {@link System#runFinalization} lorsqu'un dÃ©lai a Ã©tÃ© dÃ©passÃ©. Cette mÃ©thode
+ * est utilisÃ©e pour Ã©viter les bloquages que l'on observe parfois.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class FinalizationStopper extends TimerTask {
     /**
-     * Le timer pour arrêter les exécution de {@link System#runFinalization}.
+     * Le timer pour arrÃªter les exÃ©cution de {@link System#runFinalization}.
      */
     private static final Timer TIMER = new Timer("Finalization stopper", true);
 
     /**
-     * Le processus à arrêter.
+     * Le processus Ã  arrÃªter.
      */
     private final Thread toStop;
 
     /**
-     * Construit une nouvelle tâche qui arrêtera le processus courant.
+     * Construit une nouvelle tÃ¢che qui arrÃªtera le processus courant.
      */
     FinalizationStopper() {
         this.toStop = Thread.currentThread();

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -32,8 +32,8 @@ import net.sicade.observation.CatalogException;
 
 /**
  * Une paire {@linkplain Station station} - {@linkplain Descriptor descripteur}.
- * Utilisée par {@link MeasurementTableFiller} pour déterminer un ordre optimal
- * dans lequel ces éléments devraient être évalués.
+ * UtilisÃ©e par {@link MeasurementTableFiller} pour dÃ©terminer un ordre optimal
+ * dans lequel ces Ã©lÃ©ments devraient Ãªtre Ã©valuÃ©s.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -45,17 +45,17 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
     final Station station;
 
     /**
-     * Le descripteur du paysage océanique.
+     * Le descripteur du paysage ocÃ©anique.
      */
     final Descriptor descriptor;
 
     /**
-     * La valeur. Sera calculée par {@link MeasurementTableFiller}.
+     * La valeur. Sera calculÃ©e par {@link MeasurementTableFiller}.
      */
     float value = Float.NaN;
 
     /**
-     * Construit une nouvelle paire pour la station et le descripteur spécifié.
+     * Construit une nouvelle paire pour la station et le descripteur spÃ©cifiÃ©.
      */
     public StationDescriptorPair(final Station station, final Descriptor descriptor) {
         this.station    = station;
@@ -63,13 +63,13 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
     }
 
     /**
-     * Retourne la date à laquelle le descripteur sera évalué.
+     * Retourne la date Ã  laquelle le descripteur sera Ã©valuÃ©.
      */
     private long getTime() throws CatalogException {
         final Date time = station.getTime();
         if (time == null) {
             /*
-             * Place les stations dont la date est indéterminée à la fin. C'est cohérent
+             * Place les stations dont la date est indÃ©terminÃ©e Ã  la fin. C'est cohÃ©rent
              * avec le classement des valeurs NaN de type 'float' par exemple.
              */
             return Long.MAX_VALUE;
@@ -78,7 +78,7 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
     }
 
     /**
-     * Compare cette paire avec la paire spécifiée.
+     * Compare cette paire avec la paire spÃ©cifiÃ©e.
      */
     public int compareTo(final StationDescriptorPair that) {
         final long t1, t2;
@@ -86,7 +86,7 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
             t1 = this.getTime();
             t2 = that.getTime();
         } catch (CatalogException exception) {
-            // Sera traité de manière particulière par MeasurementTableFiller
+            // Sera traitÃ© de maniÃ¨re particuliÃ¨re par MeasurementTableFiller
             throw new UndeclaredThrowableException(exception);
         }
         if (t1 < t2) return -1;
@@ -95,7 +95,7 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
     }
 
     /**
-     * Retourne une représentation textuelle de cette paire, à des fins de déboguage.
+     * Retourne une reprÃ©sentation textuelle de cette paire, Ã  des fins de dÃ©boguage.
      */
     @Override
     public String toString() {

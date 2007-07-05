@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// Base de données
+// Base de donnÃ©es
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -44,7 +44,7 @@ import net.sicade.observation.coverage.LinearModel;
 
 
 /**
- * Connexion vers la table des {@linkplain LinearModel modèles linéaires}.
+ * Connexion vers la table des {@linkplain LinearModel modÃ¨les linÃ©aires}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -54,7 +54,7 @@ import net.sicade.observation.coverage.LinearModel;
 @UsedBy(SeriesTable.class)
 public class LinearModelTable extends Table implements Shareable {
     /**
-     * La requête SQL servant à interroger la table.
+     * La requÃªte SQL servant Ã  interroger la table.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("LinearModels:SELECT",
             "SELECT source1, source2, coefficient\n" +
@@ -62,40 +62,40 @@ public class LinearModelTable extends Table implements Shareable {
             " WHERE target=?\n" +
             " ORDER BY source1, source2");
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_TARGET = 1;
-    /** Numéro de colonne. */ private static final int SOURCE1         = 1;
-    /** Numéro de colonne. */ private static final int SOURCE2         = 2;
-    /** Numéro de colonne. */ private static final int COEFFICIENT     = 3;
+    /** NumÃ©ro d'argument. */ private static final int ARGUMENT_TARGET = 1;
+    /** NumÃ©ro de colonne. */ private static final int SOURCE1         = 1;
+    /** NumÃ©ro de colonne. */ private static final int SOURCE2         = 2;
+    /** NumÃ©ro de colonne. */ private static final int COEFFICIENT     = 3;
 
     /**
-     * La table des descripteurs du paysage océanique. Ne sera construit que la première fois
-     * où elle sera nécessaire.
+     * La table des descripteurs du paysage ocÃ©anique. Ne sera construit que la premiÃ¨re fois
+     * oÃ¹ elle sera nÃ©cessaire.
      */
     private DescriptorTable descriptors;
 
     /**
-     * La table de substitution des descripteurs. Ne sera construit que la première fois
-     * où elle sera nécessaire.
+     * La table de substitution des descripteurs. Ne sera construit que la premiÃ¨re fois
+     * oÃ¹ elle sera nÃ©cessaire.
      */
     private DescriptorSubstitutionTable substitution;
 
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
+     * Construit une table qui interrogera la base de donnÃ©es spÃ©cifiÃ©e.
      *
-     * @param database  Connexion vers la base de données d'observations.
+     * @param database  Connexion vers la base de donnÃ©es d'observations.
      */
     public LinearModelTable(final Database database) {
         super(database);
     }
 
     /**
-     * Définie la table des descripteurs à utiliser. Cette méthode peut être appelée par
-     * {@link SeriesTable} immédiatement après la construction de {@code LinearModelTable}
-     * et avant toute première utilisation. Notez que les instances de {@code LinearModelTable}
-     * ainsi créées ne devraient pas être partagées par {@link Database#getTable}.
+     * DÃ©finie la table des descripteurs Ã  utiliser. Cette mÃ©thode peut Ãªtre appelÃ©e par
+     * {@link SeriesTable} immÃ©diatement aprÃ¨s la construction de {@code LinearModelTable}
+     * et avant toute premiÃ¨re utilisation. Notez que les instances de {@code LinearModelTable}
+     * ainsi crÃ©Ã©es ne devraient pas Ãªtre partagÃ©es par {@link Database#getTable}.
      *
-     * @param  descriptors Table des descripteurs à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des descripteurs.
+     * @param  descriptors Table des descripteurs Ã  utiliser.
+     * @throws IllegalStateException si cette instance utilise dÃ©jÃ  une autre table des descripteurs.
      */
     protected synchronized void setDescriptorTable(final DescriptorTable descriptors)
             throws IllegalStateException
@@ -112,12 +112,12 @@ public class LinearModelTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne le modèle linéaire pour la série spécifiée. Si cette série n'est pas
-     * le résultat d'un modèle linéaire, alors cette méthode retourne {@code null}.
+     * Retourne le modÃ¨le linÃ©aire pour la sÃ©rie spÃ©cifiÃ©e. Si cette sÃ©rie n'est pas
+     * le rÃ©sultat d'un modÃ¨le linÃ©aire, alors cette mÃ©thode retourne {@code null}.
      *
-     * @param  target La série d'images pour laquelle on veut le modèle linéaire.
-     * @return Le modèle linéaire, ou {@code null} s'il n'y en a pas.
-     * @throws SQLException si l'interrogation de la base de données a échoué.
+     * @param  target La sÃ©rie d'images pour laquelle on veut le modÃ¨le linÃ©aire.
+     * @return Le modÃ¨le linÃ©aire, ou {@code null} s'il n'y en a pas.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ©.
      */
     public synchronized LinearModel getEntry(final Series target) throws CatalogException, SQLException {
         final List<LinearModel.Term> terms = getTerms(target);
@@ -139,13 +139,13 @@ public class LinearModelTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne les termes de modèle linéaire pour la série d'images spécifiée. 
-     * Si cette série n'est pas le résultat d'un modèle linéaire, alors cette
-     * méthode retourne {@code null}.
+     * Retourne les termes de modÃ¨le linÃ©aire pour la sÃ©rie d'images spÃ©cifiÃ©e. 
+     * Si cette sÃ©rie n'est pas le rÃ©sultat d'un modÃ¨le linÃ©aire, alors cette
+     * mÃ©thode retourne {@code null}.
      *
-     * @param  target La série d'images pour laquelle on veut le modèle linéaire.
-     * @return Les termes du modèle linéaire, ou {@code null} s'il n'y en a pas.
-     * @throws SQLException si l'interrogation de la base de données a échoué.
+     * @param  target La sÃ©rie d'images pour laquelle on veut le modÃ¨le linÃ©aire.
+     * @return Les termes du modÃ¨le linÃ©aire, ou {@code null} s'il n'y en a pas.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ©.
      */
     private List<LinearModel.Term> getTerms(final Series target) throws CatalogException, SQLException {
         ArrayList<LinearModelTerm> terms = null;
@@ -156,14 +156,14 @@ public class LinearModelTable extends Table implements Shareable {
             results = statement.executeQuery();
         } catch (SQLException e) {
             /*
-             * Il est possible que nous l'utilisateur courant n'aie pas les droits d'accès à la
-             * table des modèles linéaires. Les données de cette table sont parfois considérées
-             * sensibles et l'accès restreint. Puisque les modèles linéaires ne sont pas une
-             * information essentielle au fonctionnement des séries et que 'null' est une valeur
-             * légale, on considèrera que la série demandée n'a pas de modèle linéaire associée.
+             * Il est possible que nous l'utilisateur courant n'aie pas les droits d'accÃ¨s Ã  la
+             * table des modÃ¨les linÃ©aires. Les donnÃ©es de cette table sont parfois considÃ©rÃ©es
+             * sensibles et l'accÃ¨s restreint. Puisque les modÃ¨les linÃ©aires ne sont pas une
+             * information essentielle au fonctionnement des sÃ©ries et que 'null' est une valeur
+             * lÃ©gale, on considÃ¨rera que la sÃ©rie demandÃ©e n'a pas de modÃ¨le linÃ©aire associÃ©e.
              */
             final LogRecord record = new LogRecord(Level.WARNING,
-                    "Le modèle linéaire n'est pas accessible pour la série \"" + target.getName() + "\".");
+                    "Le modÃ¨le linÃ©aire n'est pas accessible pour la sÃ©rie \"" + target.getName() + "\".");
             record.setSourceClassName("LinearModelTable");
             record.setSourceMethodName("getEntry");
             record.setThrown(e);
@@ -172,8 +172,8 @@ public class LinearModelTable extends Table implements Shareable {
         }
         /*
          * Obtient l'ensemble des termes, mais en ne lisant que les noms des descripteurs. La
-         * construction complète des descripteurs ne sera effectuée qu'après la fermeture du
-         * 'ResultSet', afin d'éviter des problèmes lors d'appels recursifs à cette méthode.
+         * construction complÃ¨te des descripteurs ne sera effectuÃ©e qu'aprÃ¨s la fermeture du
+         * 'ResultSet', afin d'Ã©viter des problÃ¨mes lors d'appels recursifs Ã  cette mÃ©thode.
          */
         while (results.next()) {
             final String source1     = results.getString(SOURCE1);
@@ -186,7 +186,7 @@ public class LinearModelTable extends Table implements Shareable {
         }
         results.close();
         /*
-         * Après la construction de la liste des termes, complète la construction
+         * AprÃ¨s la construction de la liste des termes, complÃ¨te la construction
          * de tous les descripteurs.
          */
         if (terms == null) {

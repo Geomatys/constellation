@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -38,46 +38,46 @@ import org.openide.loaders.DataObjectNotFoundException;
 
 
 /**
- * Fenêtre qui affichera l'arborescence des séries d'images. Cette fenêtre peut être affichée
- * par {@link ViewAction}, une action qui sera proposée dans le menu "Window".
+ * FenÃªtre qui affichera l'arborescence des sÃ©ries d'images. Cette fenÃªtre peut Ãªtre affichÃ©e
+ * par {@link ViewAction}, une action qui sera proposÃ©e dans le menu "Window".
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ExplorerWindow extends TopComponent implements ExplorerManager.Provider {
     /**
-     * Pour compatibilité avec différentes versions de cette classe.
+     * Pour compatibilitÃ© avec diffÃ©rentes versions de cette classe.
      */
     private static final long serialVersionUID = -144435609721401628L;
 
     /**
-     * Une instance unique créée par {@link #getDefault} la première fois où cette dernière
-     * sera appelée. Cette instance n'est utilisée que lors de la construction de la fenêtre
-     * à partir d'un flot binaire.
+     * Une instance unique crÃ©Ã©e par {@link #getDefault} la premiÃ¨re fois oÃ¹ cette derniÃ¨re
+     * sera appelÃ©e. Cette instance n'est utilisÃ©e que lors de la construction de la fenÃªtre
+     * Ã  partir d'un flot binaire.
      */
     private static ExplorerWindow instance;
 
     /**
-     * Chemin vers l'icône utilisée pour cette fenêtre ainsi que pour l'action
+     * Chemin vers l'icÃ´ne utilisÃ©e pour cette fenÃªtre ainsi que pour l'action
      * {@link ViewAction} qui l'ouvrira.
      */
     static final String ICON_PATH = "net/sicade/sie/window/series/Icon.gif";
 
     /**
-     * Une chaîne de caractères qui représentera cette fenêtre au sein du {@linkplain WindowManager
-     * gestionnaire des fenêtres}. Cet ID sert à obtenir une instance unique de cette fenêtre par
-     * un appel à la méthode {@link #findInstance}.
+     * Une chaÃ®ne de caractÃ¨res qui reprÃ©sentera cette fenÃªtre au sein du {@linkplain WindowManager
+     * gestionnaire des fenÃªtres}. Cet ID sert Ã  obtenir une instance unique de cette fenÃªtre par
+     * un appel Ã  la mÃ©thode {@link #findInstance}.
      */
     private static final String PREFERRED_ID = "ExplorerWindow";
 
     /**
-     * Le gestionnaire de l'arborescence qui contiendra la liste des séries
-     * pour différentes régions géographiques.
+     * Le gestionnaire de l'arborescence qui contiendra la liste des sÃ©ries
+     * pour diffÃ©rentes rÃ©gions gÃ©ographiques.
      */
     private final ExplorerManager manager = new ExplorerManager();
 
     /**
-     * Construit une fenêtre contenant une arborescence initialement vide.
+     * Construit une fenÃªtre contenant une arborescence initialement vide.
      */
     private ExplorerWindow() {
         initComponents();
@@ -88,9 +88,9 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
         setIcon       (Utilities.loadImage(ICON_PATH, true));
         view.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         /*
-         * Définit le noeud qui servira de racine. Cette racine ne sera pas
-         * nécessairement visible (ça dépend de la configuration de 'view').
-         * En cas d'erreur, aucune racine ne sera définie et l'explorateur
+         * DÃ©finit le noeud qui servira de racine. Cette racine ne sera pas
+         * nÃ©cessairement visible (Ã§a dÃ©pend de la configuration de 'view').
+         * En cas d'erreur, aucune racine ne sera dÃ©finie et l'explorateur
          * restera vide.
          */
         try {
@@ -116,8 +116,8 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
         }
         keys.put(KeyStroke.getKeyStroke("DELETE"), "delete");
         /*
-         * Spécifie l'objet à utiliser pour trouver les services (implémentations d'une interface
-         * donnée). L'objet spécifié ici ce mettra à jour lui-même en fonction de l'état de
+         * SpÃ©cifie l'objet Ã  utiliser pour trouver les services (implÃ©mentations d'une interface
+         * donnÃ©e). L'objet spÃ©cifiÃ© ici ce mettra Ã  jour lui-mÃªme en fonction de l'Ã©tat de
          * l'explorateur.
          */
         associateLookup(ExplorerUtils.createLookup(manager, map));
@@ -144,9 +144,9 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Retourne une instance par défaut. <strong>N'appellez pas cette méthode directement!</strong>
-     * Cette méthode est public pour les besoins de la plateforme Netbeans, mais réservée à un usage
-     * interne par les fichiers {@code *.settings}, c'est-à-dire durant les lectures à partir d'un flot
+     * Retourne une instance par dÃ©faut. <strong>N'appellez pas cette mÃ©thode directement!</strong>
+     * Cette mÃ©thode est public pour les besoins de la plateforme Netbeans, mais rÃ©servÃ©e Ã  un usage
+     * interne par les fichiers {@code *.settings}, c'est-Ã -dire durant les lectures Ã  partir d'un flot
      * binaire. Pour obtenir un singleton dans les tous les autres cas, utilisez {@link #findInstance}.
      */
     public static synchronized ExplorerWindow getDefault() {
@@ -157,15 +157,15 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
     }
 
     /**
-     * Obtient une instance unique d'une fenêtre de cette classe. Utilisez cette méthode
-     * plutôt que {@link #getDefault}.
+     * Obtient une instance unique d'une fenÃªtre de cette classe. Utilisez cette mÃ©thode
+     * plutÃ´t que {@link #getDefault}.
      */
     public static synchronized ExplorerWindow findInstance() {
         final TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         final String message;
         if (win == null) {
             message = "Aucune composante de type \"" + PREFERRED_ID + "\". " +
-                      "La fenêtre ne sera pas positionnée correctement.";
+                      "La fenÃªtre ne sera pas positionnÃ©e correctement.";
         } else if (win instanceof ExplorerWindow) {
             return (ExplorerWindow) win;
         } else {
@@ -177,8 +177,8 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
     }
 
     /**
-     * Retourne l'identifiant des fenêtres de type {@code ExplorerWindow} dans le
-     * gestionnaire des fenêtres.
+     * Retourne l'identifiant des fenÃªtres de type {@code ExplorerWindow} dans le
+     * gestionnaire des fenÃªtres.
      */
     @Override
     protected String preferredID() {
@@ -186,9 +186,9 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
     }
 
     /**
-     * Spécifie de manière explicite que le type de persistence doit être
+     * SpÃ©cifie de maniÃ¨re explicite que le type de persistence doit Ãªtre
      * {@link #PERSISTENCE_ALWAYS PERSISTENCE_ALWAYS}. La surcharge de cette
-     * méthode est nécessaire pour éviter un avertissement au moment de l'exécution.
+     * mÃ©thode est nÃ©cessaire pour Ã©viter un avertissement au moment de l'exÃ©cution.
      */
     @Override
     public int getPersistenceType() {
@@ -196,15 +196,15 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
     }
 
     /**
-     * Retourne le gestionnaire de l'explorateur affiché par cette composante.
+     * Retourne le gestionnaire de l'explorateur affichÃ© par cette composante.
      */
     public ExplorerManager getExplorerManager() {
         return manager;
     }
 
     /**
-     * Active tous les "listeners" qui avaient été désactivés lorsque cette composante a été
-     * cachée.
+     * Active tous les "listeners" qui avaient Ã©tÃ© dÃ©sactivÃ©s lorsque cette composante a Ã©tÃ©
+     * cachÃ©e.
      */
     @Override
     protected void componentActivated() {
@@ -213,7 +213,7 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
     }
 
     /**
-     * Désactive tous les "listeners" lorsque cette composante est cachée.
+     * DÃ©sactive tous les "listeners" lorsque cette composante est cachÃ©e.
      */
     @Override
     protected void componentDeactivated() {
@@ -222,8 +222,8 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
     }
 
     /**
-     * Lors de l'écriture en binaire de cette fenêtre, écrit une classe sentinelle
-     * à la place de la totalité de {@code ExplorerWindow}.
+     * Lors de l'Ã©criture en binaire de cette fenÃªtre, Ã©crit une classe sentinelle
+     * Ã  la place de la totalitÃ© de {@code ExplorerWindow}.
      */
     @Override
     public Object writeReplace() {
@@ -231,21 +231,21 @@ public class ExplorerWindow extends TopComponent implements ExplorerManager.Prov
     }
 
     /**
-     * Les classes qui seront enregistrées en binaire à la place de {@link ExplorerWindow}.
+     * Les classes qui seront enregistrÃ©es en binaire Ã  la place de {@link ExplorerWindow}.
      * Lors de la lecture, cette classe appelera {@link ExplorerWindow#getDefault} afin de
-     * reconstruire une fenêtre qui apparaîtra dans l'application de l'utilisateur.
+     * reconstruire une fenÃªtre qui apparaÃ®tra dans l'application de l'utilisateur.
      *
      * @author Martin Desruisseaux
      * @version $Id$
      */
     final static class ResolvableHelper implements Serializable {
         /**
-         * Pour compatibilité avec différentes versions de cette classe.
+         * Pour compatibilitÃ© avec diffÃ©rentes versions de cette classe.
          */
         private static final long serialVersionUID = 3743903472227127764L;
 
         /**
-         * Lors de la lecture binaire, remplace cet objet par une instance de la fenêtre
+         * Lors de la lecture binaire, remplace cet objet par une instance de la fenÃªtre
          * {@link ExplorerWindow}.
          */
         public Object readResolve() {

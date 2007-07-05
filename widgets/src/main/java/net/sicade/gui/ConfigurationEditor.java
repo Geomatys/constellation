@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import javax.swing.BorderFactory;
 
-// Modèles et événements
+// ModÃ¨les et Ã©vÃ©nements
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.AbstractListModel;
@@ -57,52 +57,52 @@ import net.sicade.resources.seagis.Resources;
 
 /**
  * Editeur de la configuration de l'application. La configuration comprend entre autres les
- * instructions SQL à utiliser pour accéder à la base de données. Cet objet peut être construit
- * en lui spécifiant en paramètres l'objet {@link Database} qui contient les instructions SQL à
+ * instructions SQL Ã  utiliser pour accÃ©der Ã  la base de donnÃ©es. Cet objet peut Ãªtre construit
+ * en lui spÃ©cifiant en paramÃ¨tres l'objet {@link Database} qui contient les instructions SQL Ã 
  * utiliser. On peut ensuite appeler {@link #addKey} pour ajouter un aspect de la configuration
- * qui poura être édité. Enfin, on peut appeler la méthode {@link #showDialog} pour faire apparaître
- * l'éditeur.
+ * qui poura Ãªtre Ã©ditÃ©. Enfin, on peut appeler la mÃ©thode {@link #showDialog} pour faire apparaÃ®tre
+ * l'Ã©diteur.
  *
  * @author Martin Desruisseaux
  * @version $Id$
  */
 public class ConfigurationEditor extends JPanel {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -7936405915390502830L;
 
     /**
-     * Liste des clés représentant les instructions SQL éditables.
+     * Liste des clÃ©s reprÃ©sentant les instructions SQL Ã©ditables.
      */
     private final List<ConfigurationKey> keySQL = new ArrayList<ConfigurationKey>();
 
     /**
-     * Liste des instructions SQL éditées par l'utilisateur.
+     * Liste des instructions SQL Ã©ditÃ©es par l'utilisateur.
      */
     private final List<String> userSQL = new ArrayList<String>();
     
     /**
-     * Base de données à éditer.
+     * Base de donnÃ©es Ã  Ã©diter.
      */
     protected final Database configuration;
 
     /**
-     * Journal dans lequel écrire une notification
-     * des requêtes qui ont été changées.
+     * Journal dans lequel Ã©crire une notification
+     * des requÃªtes qui ont Ã©tÃ© changÃ©es.
      */
     private final Logger logger;
 
     /**
-     * Composante dans laquelle l'utilisateur pourra éditer les instructions SQL.
-     * Avant de changer la requête à éditer, le contenu de ce champ devra être
-     * copié dans {@code userSQL.get(index)}.
+     * Composante dans laquelle l'utilisateur pourra Ã©diter les instructions SQL.
+     * Avant de changer la requÃªte Ã  Ã©diter, le contenu de ce champ devra Ãªtre
+     * copiÃ© dans {@code userSQL.get(index)}.
      */
     private final JTextArea valueArea = new JTextArea(5, 40);
 
     /**
-     * Modèle pour l'affichage de la liste des noms descriptifs des instructions SQL.
-     * Ce modèle s'occupe des transferts entre {@code valueArea} et {@code userSQL}.
+     * ModÃ¨le pour l'affichage de la liste des noms descriptifs des instructions SQL.
+     * Ce modÃ¨le s'occupe des transferts entre {@code valueArea} et {@code userSQL}.
      */
     private final Model model = new Model();
 
@@ -112,19 +112,19 @@ public class ConfigurationEditor extends JPanel {
     private final JList sqlList = new JList(model);
 
     /**
-     * Modèle pour l'affichage de la liste des noms descriptifs des instructions SQL.
+     * ModÃ¨le pour l'affichage de la liste des noms descriptifs des instructions SQL.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class Model extends AbstractListModel implements ListSelectionListener, ActionListener {
         /**
-         * Pour compatibilités entre les enregistrements binaires de différentes versions.
+         * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
          */
         private static final long serialVersionUID = 5243424642395410933L;
 
         /**
-         * Index de l'instruction sélectionné.
+         * Index de l'instruction sÃ©lectionnÃ©.
          */
         int index = -1;
 
@@ -141,15 +141,15 @@ public class ConfigurationEditor extends JPanel {
         }
 
         /**
-         * Retourne l'instruction à l'index spécifié.
+         * Retourne l'instruction Ã  l'index spÃ©cifiÃ©.
          */
         public Object getElementAt(final int index) {
             return keySQL.get(index).getName();
         }
 
         /**
-         * Sélectionne une nouvelle instruction. Le
-         * contenu du champ de texte sera mis à jour.
+         * SÃ©lectionne une nouvelle instruction. Le
+         * contenu du champ de texte sera mis Ã  jour.
          */
         public void valueChanged(final ListSelectionEvent event) {
             if (index>=0 && index<userSQL.size()) {
@@ -159,9 +159,9 @@ public class ConfigurationEditor extends JPanel {
         }
 
         /**
-         * Sauvegarde la requête SQL que l'utilisateur vient de modifier.
-         * Cette modification n'est pas encore enregistrées dans les
-         * configuration. Cette étape sera faite à la fin par la méthode
+         * Sauvegarde la requÃªte SQL que l'utilisateur vient de modifier.
+         * Cette modification n'est pas encore enregistrÃ©es dans les
+         * configuration. Cette Ã©tape sera faite Ã  la fin par la mÃ©thode
          * {@link #save()} si l'utilisateur clique sur "Ok"
          */
         final void commit() {
@@ -174,7 +174,7 @@ public class ConfigurationEditor extends JPanel {
 
         /**
          * Affiche dans {@code valueArea} l'instruction SQL qui
-         * correspond à la sélection courrante de l'utilisateur.
+         * correspond Ã  la sÃ©lection courrante de l'utilisateur.
          */
         void valueTextChanged() {
             index = sqlList.getSelectedIndex();
@@ -188,8 +188,8 @@ public class ConfigurationEditor extends JPanel {
         }
 
         /**
-         * Vérifie si de nouvelles instructions SQL ont été
-         * ajoutées à la suite des instruction déjà déclarées.
+         * VÃ©rifie si de nouvelles instructions SQL ont Ã©tÃ©
+         * ajoutÃ©es Ã  la suite des instruction dÃ©jÃ  dÃ©clarÃ©es.
          */
         protected void update() {
             final int size = userSQL.size();
@@ -200,8 +200,8 @@ public class ConfigurationEditor extends JPanel {
         }
         
         /**
-         * Méthode appelée automatiquement lorsque l'utilisateur
-         * clique sur le bouton "Rétablir".
+         * MÃ©thode appelÃ©e automatiquement lorsque l'utilisateur
+         * clique sur le bouton "RÃ©tablir".
          */
         public void actionPerformed(final ActionEvent event) {
             reset();
@@ -209,12 +209,12 @@ public class ConfigurationEditor extends JPanel {
     }
 
     /**
-     * Construit un éditeur d'instructions SQL.
+     * Construit un Ã©diteur d'instructions SQL.
      *
-     * @param configuration Base de données dont on veut éditer la configuration.
-     * @param description Note explicative destinée à l'utilisateur.
-     * @param logger Journal dans lequel écrire une notification des
-     *               requêtes qui ont été changées.
+     * @param configuration Base de donnÃ©es dont on veut Ã©diter la configuration.
+     * @param description Note explicative destinÃ©e Ã  l'utilisateur.
+     * @param logger Journal dans lequel Ã©crire une notification des
+     *               requÃªtes qui ont Ã©tÃ© changÃ©es.
      */
     public ConfigurationEditor(final Database configuration,
                                final String   description,
@@ -241,16 +241,16 @@ public class ConfigurationEditor extends JPanel {
     }
 
     /**
-     * Fait apparaître l'éditeur des instructions SQL. Si l'utilisateur clique sur "Ok",
-     * alors les instructions éditées seront sauvegardées par un appel à la méthode
+     * Fait apparaÃ®tre l'Ã©diteur des instructions SQL. Si l'utilisateur clique sur "Ok",
+     * alors les instructions Ã©ditÃ©es seront sauvegardÃ©es par un appel Ã  la mÃ©thode
      * {@link #save}.
      *
-     * @param  owner Composante par-dessus laquelle faire apparaître la boîte de dialogue.
-     * @return {@code true} si l'utilisateur à cliqué sur "Ok", ou {@code false} sinon.
+     * @param  owner Composante par-dessus laquelle faire apparaÃ®tre la boÃ®te de dialogue.
+     * @return {@code true} si l'utilisateur Ã  cliquÃ© sur "Ok", ou {@code false} sinon.
      */
     public boolean showDialog(final Component owner) {
         if (userSQL.isEmpty()) {
-            // Il n'y a rien à afficher.
+            // Il n'y a rien Ã  afficher.
             return false;
         }
         model.update();
@@ -258,7 +258,7 @@ public class ConfigurationEditor extends JPanel {
 
         // TODO: JOptionPane ne fait pas un bon travail concernant la taille des boutons
         //       que l'on ajoute sur la barre des boutons (en plus de "Ok" et "Annuler").
-        //       Pour afficher le bouton "Rétablir" malgré ces défauts, ne pas mettre
+        //       Pour afficher le bouton "RÃ©tablir" malgrÃ© ces dÃ©fauts, ne pas mettre
         //       'model' en commentaire.
         final boolean ok = SwingUtilities.showOptionDialog(owner, this,
                            Resources.format(ResourceKeys.SQL_QUERIES)/*, model*/);
@@ -268,9 +268,9 @@ public class ConfigurationEditor extends JPanel {
     }
 
     /**
-     * Ajoute un caractère de changement de ligne ('\n')
-     * à la fin de texte spécifié s'il n'y en avait pas
-     * déjà un.
+     * Ajoute un caractÃ¨re de changement de ligne ('\n')
+     * Ã  la fin de texte spÃ©cifiÃ© s'il n'y en avait pas
+     * dÃ©jÃ  un.
      */
     private static String line(String value) {
         if (value == null) {
@@ -287,9 +287,9 @@ public class ConfigurationEditor extends JPanel {
     }
 
     /**
-     * Ajoute une instruction SQL à la liste des instructions qui pourront être éditées.
+     * Ajoute une instruction SQL Ã  la liste des instructions qui pourront Ãªtre Ã©ditÃ©es.
      *
-     * @param key Clé permetant de retrouver l'instruction SQL actuelle dans l'objet {@link Database}.
+     * @param key ClÃ© permetant de retrouver l'instruction SQL actuelle dans l'objet {@link Database}.
      */
      public synchronized void addKey(final ConfigurationKey key) {
          userSQL.add(line(configuration.getProperty(key)));
@@ -297,9 +297,9 @@ public class ConfigurationEditor extends JPanel {
      }
 
     /**
-     * Enregistre les modifications apportées aux instructions SQL. Cette
-     * méthode sera appelée automatiquement lorsque l'utilisateur appuie
-     * sur "Ok" dans la boîte de dialogue.
+     * Enregistre les modifications apportÃ©es aux instructions SQL. Cette
+     * mÃ©thode sera appelÃ©e automatiquement lorsque l'utilisateur appuie
+     * sur "Ok" dans la boÃ®te de dialogue.
      */
     protected void save() {
         for (int i=userSQL.size(); --i>=0;) {
@@ -312,23 +312,23 @@ public class ConfigurationEditor extends JPanel {
                 }
             }
             if (!Utilities.equals(value, configuration.getProperty(key))) {
-                final int clé;
+                final int clÃ©;
                 if (Utilities.equals(value, key.getDefaultValue())) {
-                    clé = ResourceKeys.REMOVE_QUERY_$1;
+                    clÃ© = ResourceKeys.REMOVE_QUERY_$1;
                     value = null;
                 } else {
-                    clé = ResourceKeys.DEFINE_QUERY_$1;
+                    clÃ© = ResourceKeys.DEFINE_QUERY_$1;
                 }
                 configuration.setProperty(key, value);
                 if (logger != null) {
-                    logger.config(Resources.format(clé, key.getName()));
+                    logger.config(Resources.format(clÃ©, key.getName()));
                 }
             }
         }
     }
 
     /**
-     * Rétablit les requêtes par défaut.
+     * RÃ©tablit les requÃªtes par dÃ©faut.
      */
     private void reset() {
         for (int i=userSQL.size(); --i>=0;) {

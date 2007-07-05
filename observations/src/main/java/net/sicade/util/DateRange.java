@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,28 +23,28 @@ import javax.media.jai.util.Range;
 
 
 /**
- * Une plage de dates. Dans la version actuelle, cette implémentation ne clone pas les dates
- * données en argument ou retournées. Cette classe devrait donc être considérée comme mutable.
+ * Une plage de dates. Dans la version actuelle, cette implÃ©mentation ne clone pas les dates
+ * donnÃ©es en argument ou retournÃ©es. Cette classe devrait donc Ãªtre considÃ©rÃ©e comme mutable.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class DateRange extends Range {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -6400011350250757942L;
 
     /**
-     * Construit une nouvelle plage pour les dates spécifiées.
-     * Les dates de départ et de fins sont considérées inclusives.
+     * Construit une nouvelle plage pour les dates spÃ©cifiÃ©es.
+     * Les dates de dÃ©part et de fins sont considÃ©rÃ©es inclusives.
      */
     public DateRange(final Date startTime, final Date endTime) {
         super(Date.class, startTime, endTime);
     }
 
     /**
-     * Construit une nouvelle plage pour les dates spécifiées.
+     * Construit une nouvelle plage pour les dates spÃ©cifiÃ©es.
      */
     public DateRange(final Date startTime, boolean isMinIncluded,
                      final Date   endTime, boolean isMaxIncluded)
@@ -53,7 +53,7 @@ public class DateRange extends Range {
     }
 
     /**
-     * Retourne la date de départ.
+     * Retourne la date de dÃ©part.
      */
     @Override
     public Date getMinValue() {

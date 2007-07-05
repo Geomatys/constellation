@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@ import net.sicade.resources.seagis.ResourceKeys;
 
 
 /**
- * Exception survenue du côté du serveur lors d'une requête sur une base de données.
- * La {@linkplain #getCause cause} dépend de l'implémentation de la classe qui a lancée l'exception,
+ * Exception survenue du cÃ´tÃ© du serveur lors d'une requÃªte sur une base de donnÃ©es.
+ * La {@linkplain #getCause cause} dÃ©pend de l'implÃ©mentation de la classe qui a lancÃ©e l'exception,
  * mais sera typiquement de type {@link java.sql.SQLException} ou {@link java.rmi.RemoteException}.
  *
  * @version $Id$
@@ -32,28 +32,28 @@ import net.sicade.resources.seagis.ResourceKeys;
  */
 public class ServerException extends CatalogException {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -6413382346019648505L;
 
     /** 
-     * Construit une exception avec la cause spécifiée.
-     * Le message sera déterminée à partir de la cause.
+     * Construit une exception avec la cause spÃ©cifiÃ©e.
+     * Le message sera dÃ©terminÃ©e Ã  partir de la cause.
      */
     public ServerException(final Exception exception) {
         super(exception, null);
     }
 
     /** 
-     * Construit une exception avec la cause spécifiée.
+     * Construit une exception avec la cause spÃ©cifiÃ©e.
      */
     public ServerException(final Exception exception, final String table) {
         super(exception, table);
     }
 
     /**
-     * Retourne une chaîne de caractère qui contiendra le
-     * nom de la table et un message décrivant l'erreur.
+     * Retourne une chaÃ®ne de caractÃ¨re qui contiendra le
+     * nom de la table et un message dÃ©crivant l'erreur.
      */
     @Override
     public String getLocalizedMessage() {

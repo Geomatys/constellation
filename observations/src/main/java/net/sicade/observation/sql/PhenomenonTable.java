@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,34 +26,34 @@ import net.sicade.observation.ConfigurationKey;
 
 
 /**
- * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
+ * Connexion vers la table des {@linkplain Phenomenon phÃ©nomÃ¨nes}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class PhenomenonTable extends SingletonTable<Phenomenon> implements Shareable {
     /**
-     * Requête SQL pour obtenir un phénomène.
+     * RequÃªte SQL pour obtenir un phÃ©nomÃ¨ne.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Phenomenons:SELECT",
             "SELECT name, NULL as description\n" +
             "  FROM \"Phenomenons\"\n"           +
             " WHERE name=?");
 
-    /** Numéro de colonne. */ private static final int NAME    = 1;
-    /** Numéro de colonne. */ private static final int REMARKS = 2;
+    /** NumÃ©ro de colonne. */ private static final int NAME    = 1;
+    /** NumÃ©ro de colonne. */ private static final int REMARKS = 2;
 
     /**
-     * Construit une table des phénomènes.
+     * Construit une table des phÃ©nomÃ¨nes.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnÃ©es.
      */
     public PhenomenonTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les procédures.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les procÃ©dures.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -64,7 +64,7 @@ public class PhenomenonTable extends SingletonTable<Phenomenon> implements Share
     }
 
     /**
-     * Construit un phénomène pour l'enregistrement courant.
+     * Construit un phÃ©nomÃ¨ne pour l'enregistrement courant.
      */
     protected Phenomenon createEntry(final ResultSet results) throws SQLException {
         return new PhenomenonEntry(results.getString(NAME), results.getString(REMARKS));

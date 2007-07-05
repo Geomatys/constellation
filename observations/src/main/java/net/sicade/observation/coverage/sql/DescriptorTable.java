@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -45,12 +45,12 @@ import net.sicade.observation.sql.Use;
 
 
 /**
- * Connexion vers la table des {@linkplain Descriptor descripteurs}. Les informations nécessaires à
- * la construction des descripteurs sont puisées principalement dans trois tables: {@link SeriesTable},
- * {@link LocationOffsetTable} et {@link OperationTable}. De ces trois tables, la table des séries
- * est particulière du fait qu'elle n'est pas sensée être {@linkplain Shareable partageable}. Cela
- * n'empêche toutefois pas {@code DescriptorTable} de l'être, puisqu'il utilise par défaut une table
- * des séries globales dont il ne modifiera pas la configuration.
+ * Connexion vers la table des {@linkplain Descriptor descripteurs}. Les informations nÃ©cessaires Ã 
+ * la construction des descripteurs sont puisÃ©es principalement dans trois tables: {@link SeriesTable},
+ * {@link LocationOffsetTable} et {@link OperationTable}. De ces trois tables, la table des sÃ©ries
+ * est particuliÃ¨re du fait qu'elle n'est pas sensÃ©e Ãªtre {@linkplain Shareable partageable}. Cela
+ * n'empÃªche toutefois pas {@code DescriptorTable} de l'Ãªtre, puisqu'il utilise par dÃ©faut une table
+ * des sÃ©ries globales dont il ne modifiera pas la configuration.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -60,7 +60,7 @@ import net.sicade.observation.sql.Use;
 @UsedBy({LinearModelTable.class, DescriptorSubstitutionTable.class})
 public class DescriptorTable extends SingletonTable<Descriptor> implements NumericAccess, Shareable {
     /**
-     * Requête SQL pour obtenir un descripteur du paysage océanique.
+     * RequÃªte SQL pour obtenir un descripteur du paysage ocÃ©anique.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Descriptors:SELECT",
             "SELECT symbol, identifier, phenomenon, procedure, \"offset\", band, distribution\n" +
@@ -68,53 +68,53 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
             " WHERE symbol=?\n"                                                                  +
             " ORDER BY identifier");
     
-    /** Numéro de colonne. */ private static final int SYMBOL       = 1;
-    /** Numéro de colonne. */ private static final int IDENTIFIER   = 2;
-    /** Numéro de colonne. */ private static final int PHENOMENON   = 3;
-    /** Numéro de colonne. */ private static final int PROCEDURE    = 4;
-    /** Numéro de colonne. */ private static final int OFFSET       = 5;
-    /** Numéro de colonne. */ private static final int BAND         = 6;
-    /** Numéro de colonne. */ private static final int DISTRIBUTION = 7;
+    /** NumÃ©ro de colonne. */ private static final int SYMBOL       = 1;
+    /** NumÃ©ro de colonne. */ private static final int IDENTIFIER   = 2;
+    /** NumÃ©ro de colonne. */ private static final int PHENOMENON   = 3;
+    /** NumÃ©ro de colonne. */ private static final int PROCEDURE    = 4;
+    /** NumÃ©ro de colonne. */ private static final int OFFSET       = 5;
+    /** NumÃ©ro de colonne. */ private static final int BAND         = 6;
+    /** NumÃ©ro de colonne. */ private static final int DISTRIBUTION = 7;
 
     /**
-     * La table des séries. Elle sera construite la première fois où elle sera nécessaire.
+     * La table des sÃ©ries. Elle sera construite la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private SeriesTable series;
     
     /**
-     * La table des opérations. Ne sera construite que la première fois où elle sera nécessaire.
+     * La table des opÃ©rations. Ne sera construite que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private OperationTable operations;
     
     /**
      * La table des positions relatives.
-     * Ne sera construite que la première fois où elle sera nécessaire.
+     * Ne sera construite que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private LocationOffsetTable offsets;
     
     /**
      * La table des distributions.
-     * Ne sera construite que la première fois où elle sera nécessaire.
+     * Ne sera construite que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private DistributionTable distributions;
     
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
+     * Construit une table qui interrogera la base de donnÃ©es spÃ©cifiÃ©e.
      *
-     * @param database  Connexion vers la base de données d'observations.
+     * @param database  Connexion vers la base de donnÃ©es d'observations.
      */
     public DescriptorTable(final Database database) {
         super(database);
     }
 
     /**
-     * Définie la table des séries à utiliser. Cette méthode peut être appelée par {@link SeriesTable}
-     * immédiatement après la construction de {@code DescriptorTable} et avant toute première utilisation.
-     * Notez que les instances de {@code DescriptorTable} ainsi créées ne seront pas partagées par
+     * DÃ©finie la table des sÃ©ries Ã  utiliser. Cette mÃ©thode peut Ãªtre appelÃ©e par {@link SeriesTable}
+     * immÃ©diatement aprÃ¨s la construction de {@code DescriptorTable} et avant toute premiÃ¨re utilisation.
+     * Notez que les instances de {@code DescriptorTable} ainsi crÃ©Ã©es ne seront pas partagÃ©es par
      * {@link Database#getTable}.
      *
-     * @param  series Table des séries à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des séries.
+     * @param  series Table des sÃ©ries Ã  utiliser.
+     * @throws IllegalStateException si cette instance utilise dÃ©jÃ  une autre table des sÃ©ries.
      */
     protected synchronized void setSeriesTable(final SeriesTable series)
             throws IllegalStateException
@@ -128,18 +128,18 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
     }
 
     /**
-     * Retourne une entrée pour le nom spécifié. Cette méthode est tolérante au nom: si ce dernier
-     * est purement numérique, alors {@link #getEntry(int)} est appelée. Sinon, les chiffres qui
-     * apparaissent à la fin du nom peuvent être remplacés par les caractères unicodes représentant
-     * ces mêmes chiffres sous forme d'indices.
+     * Retourne une entrÃ©e pour le nom spÃ©cifiÃ©. Cette mÃ©thode est tolÃ©rante au nom: si ce dernier
+     * est purement numÃ©rique, alors {@link #getEntry(int)} est appelÃ©e. Sinon, les chiffres qui
+     * apparaissent Ã  la fin du nom peuvent Ãªtre remplacÃ©s par les caractÃ¨res unicodes reprÃ©sentant
+     * ces mÃªmes chiffres sous forme d'indices.
      */
     public Descriptor getEntryLenient(final String name) throws CatalogException, SQLException {
         try {
             return getEntry(name);
         } catch (final NoSuchRecordException exception) {
             /*
-             * Aucune entrée n'a été trouvée pour le nom. Essaie comme identifiant numérique.
-             * Si l'identifiant est purement numérique mais la recherche échoue pour ce dernier
+             * Aucune entrÃ©e n'a Ã©tÃ© trouvÃ©e pour le nom. Essaie comme identifiant numÃ©rique.
+             * Si l'identifiant est purement numÃ©rique mais la recherche Ã©choue pour ce dernier
              * aussi, on ne fera pas d'autres tentatives.
              */
             int identifier = 0;
@@ -147,8 +147,8 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
                 identifier = Integer.parseInt(name);
             } catch (NumberFormatException dummy) {
                 /*
-                 * L'identifiant n'est pas numérique. Essaie de remplacer les derniers chiffres
-                 * par les caractères unicodes correspondant à ces même chiffres en indices.
+                 * L'identifiant n'est pas numÃ©rique. Essaie de remplacer les derniers chiffres
+                 * par les caractÃ¨res unicodes correspondant Ã  ces mÃªme chiffres en indices.
                  */
                 final StringBuilder builder = new StringBuilder(name);
                 for (int i=builder.length(); --i>=0;) {
@@ -171,7 +171,7 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les descripteurs.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les descripteurs.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {

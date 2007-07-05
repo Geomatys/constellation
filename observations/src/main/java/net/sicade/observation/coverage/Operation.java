@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ import net.sicade.observation.Procedure;
 
 
 /**
- * Une opération à appliquer sur les images d'une même {@linkplain Series series}.
+ * Une opÃ©ration Ã  appliquer sur les images d'une mÃªme {@linkplain Series series}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -31,18 +31,18 @@ import net.sicade.observation.Procedure;
  */
 public interface Operation extends Procedure {
     /**
-     * Retourne le préfix à utiliser dans les noms composites. Les noms composites
-     * seront de la forme "<cite>operation - paramètre - temps</cite>", par exemple
-     * <code>"&nabla;SST<sub>-15</sub>"</code>. Dans l'exemple précédent, le préfix
+     * Retourne le prÃ©fix Ã  utiliser dans les noms composites. Les noms composites
+     * seront de la forme "<cite>operation - paramÃ¨tre - temps</cite>", par exemple
+     * <code>"&nabla;SST<sub>-15</sub>"</code>. Dans l'exemple prÃ©cÃ©dent, le prÃ©fix
      * est <code>"&nabla;"</code>.
      */
     String getPrefix();
 
     /**
-     * Applique l'opération sur une image.
+     * Applique l'opÃ©ration sur une image.
      *
-     * @param  coverage L'image sur laquelle appliquer l'opération.
-     * @return Le résultat de l'opération appliquée sur l'image.
+     * @param  coverage L'image sur laquelle appliquer l'opÃ©ration.
+     * @return Le rÃ©sultat de l'opÃ©ration appliquÃ©e sur l'image.
      */
     Coverage doOperation(Coverage coverage);
 
@@ -50,8 +50,8 @@ public interface Operation extends Procedure {
 
 
     /**
-     * Une opération qui délègue son travail à une autre instance de {@link Operation}. Cette
-     * classe est utile lorsque l'on ne souhaite redéfinir qu'une ou deux méthodes, notamment
+     * Une opÃ©ration qui dÃ©lÃ¨gue son travail Ã  une autre instance de {@link Operation}. Cette
+     * classe est utile lorsque l'on ne souhaite redÃ©finir qu'une ou deux mÃ©thodes, notamment
      * {@link #doOperation}.
      *
      * @version $Id$
@@ -59,40 +59,40 @@ public interface Operation extends Procedure {
      */
     public static class Proxy extends net.sicade.observation.Proxy implements Operation {
         /**
-         * Pour compatibilités entre les enregistrements binaires de différentes versions.
+         * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
          */
         private static final long serialVersionUID = -2285791043646792332L;
 
         /**
-         * L'opération envelopée.
+         * L'opÃ©ration envelopÃ©e.
          */
         protected final Operation parent;
 
         /**
-         * Construit une nouvelle opération enveloppant l'opération spécifiée.
+         * Construit une nouvelle opÃ©ration enveloppant l'opÃ©ration spÃ©cifiÃ©e.
          */
         protected Proxy(final Operation parent) {
             this.parent = parent;
         }
 
         /**
-         * Retourne l'opération envelopée.
+         * Retourne l'opÃ©ration envelopÃ©e.
          */
         public Operation getParent() {
             return parent;
         }
 
         /**
-         * Retourne le préfix à utiliser dans les noms composites.
-         * L'implémentation par défaut délègue le travail au {@linkplain #getParent parent}.
+         * Retourne le prÃ©fix Ã  utiliser dans les noms composites.
+         * L'implÃ©mentation par dÃ©faut dÃ©lÃ¨gue le travail au {@linkplain #getParent parent}.
          */
         public String getPrefix() {
             return parent.getPrefix();
         }
 
         /**
-         * Applique l'opération sur une image.
-         * L'implémentation par défaut délègue le travail au {@linkplain #getParent parent}.
+         * Applique l'opÃ©ration sur une image.
+         * L'implÃ©mentation par dÃ©faut dÃ©lÃ¨gue le travail au {@linkplain #getParent parent}.
          */
         public Coverage doOperation(final Coverage coverage) {
             return parent.doOperation(coverage);

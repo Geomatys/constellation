@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,31 +23,31 @@ import net.sicade.observation.sql.PhenomenonEntry;
 
 
 /**
- * Implémentation d'une entrée représentant un {@linkplain Thematic thème}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant un {@linkplain Thematic thÃ¨me}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ThematicEntry extends PhenomenonEntry implements Thematic {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 5494927909479524177L;
 
     /**
-     * Construit un nouveau thème du nom spécifié.
+     * Construit un nouveau thÃ¨me du nom spÃ©cifiÃ©.
      *
-     * @param name Le nom du phénomène.
+     * @param name Le nom du phÃ©nomÃ¨ne.
      */
     protected ThematicEntry(final String name) {
         super(name);
     }
 
     /** 
-     * Construit un nouveau thème du nom spécifié.
+     * Construit un nouveau thÃ¨me du nom spÃ©cifiÃ©.
      *
-     * @param name    Le nom du phénomène.
-     * @param remarks Remarques s'appliquant à ce phénomène, ou {@code null}.
+     * @param name    Le nom du phÃ©nomÃ¨ne.
+     * @param remarks Remarques s'appliquant Ã  ce phÃ©nomÃ¨ne, ou {@code null}.
      */
     protected ThematicEntry(final String name, final String remarks) {
         super(name, remarks);

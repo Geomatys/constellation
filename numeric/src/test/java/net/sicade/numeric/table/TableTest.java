@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,7 @@ import junit.framework.TestSuite;
  */
 public class TableTest extends TestCase {
     /**
-     * Exécute la suite de tests à partir de la ligne de commande.
+     * ExÃ©cute la suite de tests Ã  partir de la ligne de commande.
      */
     public static void main(final String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -61,10 +61,10 @@ public class TableTest extends TestCase {
      */
     public void testNearest() throws ExtrapolationException, IOException {
         /*
-         * Construit un vecteur de valeurs aléatoires. Note: la valeur 'seed' utilisé ci-dessous
-         * a été choisie empiriquement de manière à éviter de produire des valeurs trop proches
-         * des limites du tableau. On évite ainsi de compliquer les vérifications des méthodes
-         * testées ici. La vérification des méthodes aux limites devrait être effectuée par un
+         * Construit un vecteur de valeurs alÃ©atoires. Note: la valeur 'seed' utilisÃ© ci-dessous
+         * a Ã©tÃ© choisie empiriquement de maniÃ¨re Ã  Ã©viter de produire des valeurs trop proches
+         * des limites du tableau. On Ã©vite ainsi de compliquer les vÃ©rifications des mÃ©thodes
+         * testÃ©es ici. La vÃ©rification des mÃ©thodes aux limites devrait Ãªtre effectuÃ©e par un
          * code explicite.
          */
         final Random random = new Random(4895268);

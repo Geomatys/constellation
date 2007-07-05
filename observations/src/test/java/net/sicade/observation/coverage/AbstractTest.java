@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,24 +37,24 @@ import net.sicade.observation.sql.Database;
 
 
 /**
- * Classe de base des tests qui évalueront les valeurs des pixels.
+ * Classe de base des tests qui Ã©valueront les valeurs des pixels.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class AbstractTest extends TestCase {
     /**
-     * Connexion vers la base de données.
+     * Connexion vers la base de donnÃ©es.
      */
     protected static Database database;
 
     /**
-     * La couverture à tester. Sera construites par les différentes méthodes {@code testXXX}.
+     * La couverture Ã  tester. Sera construites par les diffÃ©rentes mÃ©thodes {@code testXXX}.
      */
     protected SpatioTemporalCoverage3D coverage;
 
     /**
-     * Objet à utiliser pour lire et écrire des dates.
+     * Objet Ã  utiliser pour lire et Ã©crire des dates.
      * Le format attendu est de la forme "24/12/1997".
      */
     protected DateFormat dateFormat;
@@ -67,7 +67,7 @@ public class AbstractTest extends TestCase {
     }
 
     /**
-     * Etablit la connexion avec la base de données.
+     * Etablit la connexion avec la base de donnÃ©es.
      */
     @Override
     protected void setUp() throws SQLException, IOException {
@@ -86,8 +86,8 @@ public class AbstractTest extends TestCase {
     }
 
     /**
-     * Retourne la valeur de la première bande évaluée à la position spécifiée.
-     * Cette méthode est un bon endroit où placer un point d'arrêt à des fins de déboguage.
+     * Retourne la valeur de la premiÃ¨re bande Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * Cette mÃ©thode est un bon endroit oÃ¹ placer un point d'arrÃªt Ã  des fins de dÃ©boguage.
      */
     protected final float evaluate(final double x, final double y, final String date) throws ParseException {
         final Point2D coord = new Point2D.Double(x,y);

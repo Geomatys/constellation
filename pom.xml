@@ -1,17 +1,29 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  Configuration du projet Sicade sur SourceForge.
+  Configuration globale du projet Seagis. Les projets enfants hériteront par
+  défaut des informations déclarées dans ce fichier,  mais pourront les redéfinir
+  si nécessaire. La configuration par défaut suppose que:
+
+  - L'arborescence des répertoires respecte la convention de Maven
+  - Le code source de tous les fichiers Java utilise l'encodage UTF-8
+
   Version: $Id$
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
 
 
   <!--
-    Description du projet (incluant la licence)
+    Description du projet, incluant la licence. Ces informations apparaîtront
+    dans la page web générée automatiquement par Maven (voir la configuration
+    dans la section <reporting>). Les URL doivent être exacts pour éviter des
+    liens brisés dans les pages qui seront générées et pour permettre à
+    Continuum de fonctionner.
   -->
   <groupId>net.sicade</groupId>
   <artifactId>seagis</artifactId>
@@ -20,10 +32,10 @@
   <name>Projet SICADE</name>
   <url>http://seagis.sourceforge.net</url>
   <description>
-    Syst�mes int�gr�s de connaissances pour l'aide � la d�cision en environnement.
+    Systèmes intégrés de connaissances pour l'aide à la décision en environnement.
   </description>
   <organization>
-    <name>Unit� S140 (Espace)</name>
+    <name>Unité S140 (Espace)</name>
     <url>http://www.espace.ird.fr/</url>
   </organization>
   <inceptionYear>2002</inceptionYear>
@@ -42,10 +54,48 @@
 
 
   <!--
-    D�pendences externes.
-    Tous les modules h�riteront ces d�pendences.
+    Liste des développeurs et des contributeurs. Les développeurs ont effectué
+    des livraisons sur le SVN,  tandis que les contributeurs n'ont pas d'accès
+    en écriture.
+  -->
+  <developers>
+    <developer>
+      <id>desruisseaux</id>
+      <name>Martin Desruisseaux</name>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Administrateur du projet</role>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+
+
+  <!--
+    Dépendances externes héritées par tous les modules. Nous déclarons la dépendance
+    "Java Advanced Imaging" (JAI) inconditionnellement, car cette bibliothèque fournit
+    des services de grandes valeurs pour les traitements d'images. Toutefois cette
+    dépendances est déclarée comme "provided" car on suppose que l'utilisateur final
+    aura utilisé l'installeur de JAI afin de disposer des accélérations natives
+    propres à sa plateforme.
   -->
   <dependencies>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_core</artifactId>
+      <version>1.1.3</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <version>1.1</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -57,57 +107,14 @@
 
 
   <!--
-    Liste des d�veloppeurs et des contributeurs.
+    Dépendances optionnelles.  Ces dépendances ne sont pas automatiquement
+    héritées par les modules enfants. Mais si un module enfant déclare une
+    de ces dependances sans spécifier de numéro de version, alors la version
+    par défaut sera celle qui est déclarée ci-dessous.
   -->
-  <developers>
-    <developer>
-      <id>desruisseaux</id>
-      <name>Martin Desruisseaux</name>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Unit� S140 (Espace)</organization>
-      <roles>
-        <role>Administrateur du projet</role>
-        <role>D�veloppeur Java</role>
-      </roles>
-    </developer>
-  </developers>
-
-
-
-  <!--
-    Serveurs � partir desquels t�l�charger les d�pendences.
-  -->
-  <repositories>
-    <repository>
-      <id>ibiblio</id>
-      <name>Ibiblio - the public's library and digital archive</name>
-      <url>http://www.ibiblio.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>geotools</id>
-      <name>Geotools - Geographic toolkit</name>
-      <url>http://maven.geotools.fr/repository</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-	  <!-- Used for NetCDF jars from UCAR -->
-      <id>refractions</id>
-      <name>Refractions Research Maven 2 Repository</name>
-      <url>http://lists.refractions.net/m2</url>
-    </repository>
-  </repositories>
-
-
-
-  <!--
-    Gestion des d�pendences. Si un sous-module d�clare une des d�pendences suivante,
-    la version utilis�e sera celle qui est sp�cifi�e dans le bloc ci-dessous.
-  -->
+  <properties>
+    <geotools.version>2.4-SNAPSHOT</geotools.version>
+  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -139,52 +146,47 @@
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-referencing</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-coverage</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-coverageio</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-api</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-main</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-widgets-swing</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-go</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-openoffice</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt2-epsg-hsql</artifactId>
-        <version>2.4-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>edu.ucar</groupId>
-        <artifactId>netcdf</artifactId>
-        <version>2.2.20</version>
+        <version>${geotools.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -192,23 +194,63 @@
 
 
   <!--
-    Compilation et cr�ation du fichier JAR.
+    Répertoires où trouver les dépendances. Un répertoire http://*.maven.org/
+    est implicite. On y trouve à la fois les dépendances nécessaires à Maven
+    lui-même ansi que des dépendances courantes telles que le pilote JDBC de
+    PostgreSQL. Le répertoire "Geotools" contient les fichiers JAR de Geotools
+    ainsi que quelques dépendances nécessaires à Geotools mais non publiées
+    sur le répertoire de Maven, par exemple la bibliothèque de l'UCAR pour
+    les lectures de fichiers NetCDF.
+  -->
+  <repositories>
+    <repository>
+      <id>geotools</id>
+      <name>Geotools et ses dépendances spécifiques</name>
+      <url>http://maven.geotools.fr/repository/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>geotools</id>
+      <name>Geotools et ses dépendances spécifiques</name>
+      <url>http://maven.geotools.fr/repository/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+
+
+  <!--
+    Configuration du compilateur et de l'archiveur.    Pour chaque fichier JAR, une
+    entrée "class-path" sera ajoutée dans  "META-INF/MANIFEST.MF"  avec la liste de
+    toutes les dépendances utilisées. En outre, les dépendances seront copiées dans
+    le répertoire "target/binaries" par commodité (cette tâche est effectuée par un
+    plugin propre à Geotools). La combinaison de ces deux fonctionnalités permet de
+    lancer une application facilement en spécifiant simplement le JAR final, sans
+    avoir à spécifier toutes les dépendances dans le "classpath".
+
+    En principe, il n'est pas nécessaire de déclarer de numéro de version pour les
+    plugins de Maven. Dans la pratique, ces déclarations aident à garder un "build"
+    stable et cohérent sur différentes machines. On peut facilement vérifier si de
+    nouvelles mise à jour sont disponibles en naviguant dans la page suivante:
+
+    http://maven.apache.org/plugins/index.html
   -->
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
         <configuration>
-          <source>1.5</source>             <!-- The -source argument for the Java compiler.                           -->
-          <target>1.5</target>             <!-- The -target argument for the Java compiler.                           -->
-          <debug>true</debug>              <!-- Whether to include debugging information in the compiled class files. -->
-          <encoding>ISO-8859-1</encoding>  <!-- The -encoding argument for the Java compiler.                         -->
+          <source>1.5</source>        <!-- The -source argument for the Java compiler.   -->
+          <target>1.5</target>        <!-- The -target argument for the Java compiler.   -->
+          <encoding>UTF-8</encoding>  <!-- The -encoding argument for the Java compiler. -->
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>2.1</version>
         <configuration>
           <archive>
             <manifest>
@@ -217,20 +259,43 @@
           </archive>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.3</version> <!-- Version minimale supportant JUnit 4 -->
+      </plugin>
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>gt2-jar-collector</artifactId>
+        <version>${geotools.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>collect</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
 
 
   <!--
-    G�n�ration de la javadoc et du site web.
+    Génération de la javadoc et du site web.
+
+    En principe, il n'est pas nécessaire de déclarer de numéro de version pour les
+    plugins de Maven. Dans la pratique, ces déclarations aident à garder un "build"
+    stable et cohérent sur différentes machines. On peut facilement vérifier si de
+    nouvelles mise à jour sont disponibles en naviguant dans la page suivante:
+
+    http://maven.apache.org/plugins/index.html
   -->
   <reporting>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.0</version>
+        <version>2.2</version>
         <configuration>
           <source>1.5</source>            <!-- Necessary to enable javadoc to handle J2SE 1.5 features.           -->
           <author>true</author>           <!-- Specifies whether or not the author text is included.              -->
@@ -239,12 +304,22 @@
           <noqualifier>all</noqualifier>  <!-- Omits qualifying package name from ahead of class names in output. -->
           <quiet>true</quiet>             <!-- Shuts off non-error and non-warning messages.                      -->
           <maxmemory>384M</maxmemory>     <!-- The maximum Java heap size to be used when launching the javadoc.  -->
-          <encoding>ISO-8859-1</encoding> <!-- The encoding name of the source files.                             -->
-          <locale>fr</locale>             <!-- The locale that javadoc uses when generating documentation.        -->
-          <overview>                      <!-- The text for the overview documentation.                           -->
+          <encoding>UTF-8</encoding>      <!-- Specifies the encoding name of the source files.                   -->
+          <charset>UTF-8</charset>        <!-- Specifies the HTML character set for this document.                -->
+          <locale>fr</locale>            <!-- The locale that javadoc uses when generating documentation.        -->
+          <overview>                     <!-- The text for the overview documentation.                           -->
             ${project.build.sourceDirectory}/overview.html
           </overview>
           <additionalparam>-keywords</additionalparam>
+          <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
+          <links>
+            <link>http://java.sun.com/javase/6/docs/api/</link>
+            <link>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs</link>
+            <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
+            <link>http://geoapi.sourceforge.net/pending/javadoc</link>
+            <link>http://javadoc.geotools.fr/snapshot</link>
+            <link>http://jsr-108.sourceforge.net/javadoc</link>
+          </links>
           <excludePackageNames>net.sicade.resources</excludePackageNames>
           <!-- Separates packages on the overview page into whatever groups is specified. -->
           <groups>
@@ -253,7 +328,7 @@
               <packages>net.sicade.gui*</packages>
             </group>
             <group>
-              <title>Calculs num�riques</title>
+              <title>Calculs numériques</title>
               <packages>net.sicade.numeric*</packages>
             </group>
             <group>
@@ -261,15 +336,6 @@
               <packages>net.sicade.observation*</packages>
             </group>
           </groups>
-          <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
-          <links>
-            <link>http://java.sun.com/j2se/1.5/docs/api</link>
-            <link>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs</link>
-            <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
-            <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
-            <link>http://javadoc.geotools.fr/snapshot</link>
-            <link>http://jsr-108.sourceforge.net/javadoc</link>
-          </links>
           <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in
                doc comments. Note: <placement/> should be a combinaison of the letters Xaoptcmf. -->
           <tags>
@@ -277,28 +343,56 @@
           </tags>
         </configuration>
       </plugin>
+
+      <!-- Génération des rapports pour le site web. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
+        <version>2.0-beta-5</version>
         <configuration>
           <locales>fr</locales>
+          <inputEncoding>UTF-8</inputEncoding>
+          <outputEncoding>UTF-8</outputEncoding>
         </configuration>
       </plugin>
+
+      <!-- Publication de la section "info". -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.0.1</version>
       </plugin>
+
+      <!-- Publication de la liste des changements récents. -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>surefire-report-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-changelog-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <type>range</type>
+          <range>30</range>
+        </configuration>
       </plugin>
+
+      <!-- Publication des résultats des tests unitaires. -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jxr-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.3</version>
       </plugin>
+
+      <!-- Publication du code source. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.1</version>
+      </plugin>
+
+      <!-- Publication d'une liste de "todo" trouvés dans le code source. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
+        <version>2.0</version>
       </plugin>
     </plugins>
   </reporting>
@@ -306,7 +400,7 @@
 
 
   <!--
-    Serveurs vers lesquels d�ployer la documentation.
+    Serveurs vers lesquels déployer la documentation.
   -->
   <distributionManagement>
     <site>

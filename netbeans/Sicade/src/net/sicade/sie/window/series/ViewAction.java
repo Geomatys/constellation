@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,8 +30,8 @@ import org.openide.windows.TopComponent;
 
 
 /**
- * Action affichant la {@linkplain ExplorerWindow fenêtre de l'explorateur} des séries d'images.
- * Cette action est déclarée dans le fichier {@code layer.xml}, qui le placera aussi dans le menu
+ * Action affichant la {@linkplain ExplorerWindow fenÃªtre de l'explorateur} des sÃ©ries d'images.
+ * Cette action est dÃ©clarÃ©e dans le fichier {@code layer.xml}, qui le placera aussi dans le menu
  * "Window".
  *
  * @version $Id$
@@ -47,7 +47,7 @@ public final class ViewAction extends AbstractAction {
     }
 
     /**
-     * Ouvre une {@linkplain ExplorerWindow fenêtre de l'explorateur} des séries d'images.
+     * Ouvre une {@linkplain ExplorerWindow fenÃªtre de l'explorateur} des sÃ©ries d'images.
      */
     public void actionPerformed(final ActionEvent event) {
         final TopComponent win = ExplorerWindow.findInstance();

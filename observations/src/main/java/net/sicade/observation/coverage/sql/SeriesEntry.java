@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -58,87 +58,87 @@ import net.sicade.observation.coverage.rmi.DataConnection;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Series séries d'images}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain Series sÃ©ries d'images}.
  *
  * @author Martin Desruisseaux
  * @version $Id$
  */
 public class SeriesEntry extends ObservableEntry implements Series {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 5283559646740856038L;
 
     /**
-     * Nombre de millisecondes dans une journée.
+     * Nombre de millisecondes dans une journÃ©e.
      */
     private static final long MILLIS_IN_DAY = 24*60*60*1000L;
 
     /**
-     * L'intervalle de temps typique des images de cette série (en nombre
+     * L'intervalle de temps typique des images de cette sÃ©rie (en nombre
      * de jours), ou {@link Double#NaN} si elle est inconnue.
      */
     private final double timeInterval;
 
     /**
-     * Si cette série est le résultat d'un modèle numérique, ce modèle.
-     * Sinon, {@code null}. Ce champ sera initialisé par {@link SeriesTable}.
+     * Si cette sÃ©rie est le rÃ©sultat d'un modÃ¨le numÃ©rique, ce modÃ¨le.
+     * Sinon, {@code null}. Ce champ sera initialisÃ© par {@link SeriesTable}.
      */
     Model model;
 
     /**
-     * Les sous-séries. Sera construit par {@link SeriesTable#postCreateEntry}.
+     * Les sous-sÃ©ries. Sera construit par {@link SeriesTable#postCreateEntry}.
      */
     Set<SubSeries> subseries;
 
     /**
-     * Une série de second recours qui peut être utilisée si aucune données n'est disponible
-     * dans cette série à une certaine position spatio-temporelle. Peut être {@code null} s'il
-     * n'y a pas de série de second recours.
+     * Une sÃ©rie de second recours qui peut Ãªtre utilisÃ©e si aucune donnÃ©es n'est disponible
+     * dans cette sÃ©rie Ã  une certaine position spatio-temporelle. Peut Ãªtre {@code null} s'il
+     * n'y a pas de sÃ©rie de second recours.
      * <p>
-     * Lors de la construction d'une série, ce champ est initialement le nom de la série sous forme
+     * Lors de la construction d'une sÃ©rie, ce champ est initialement le nom de la sÃ©rie sous forme
      * d'objet {@link String}. Ce n'est que lors de l'appel de {@link SeriesTable#postCreateEntry}
      * que ce nom est convertit en objet {@link SeriesEntry}.
      */
     Object fallback;
 
     /**
-     * Une vue tri-dimensionnelle des données retournée par {@link #getCoverage}.
-     * Sera construit la première fois où elle sera demandée.
+     * Une vue tri-dimensionnelle des donnÃ©es retournÃ©e par {@link #getCoverage}.
+     * Sera construit la premiÃ¨re fois oÃ¹ elle sera demandÃ©e.
      */
     private transient Reference<Coverage> coverage;
 
     /**
-     * La fabrique à utiliser pour construire des objets {@link CoverageReference}. Cette fabrique
-     * peut être un objet {@link java.rmi.server.RemoteServer}, et donc construire les images sur
+     * La fabrique Ã  utiliser pour construire des objets {@link CoverageReference}. Cette fabrique
+     * peut Ãªtre un objet {@link java.rmi.server.RemoteServer}, et donc construire les images sur
      * un serveur distant.
      */
     private DataConnection server;
 
     /**
-     * Ensemble des fabriques pour différentes opérations. Ne seront construites que lorsque
-     * nécessaire. Si {@link #server} était une connexion vers un objet RMI, alors il en sera
-     * de même pour les valeurs de ce {@code Map}.
+     * Ensemble des fabriques pour diffÃ©rentes opÃ©rations. Ne seront construites que lorsque
+     * nÃ©cessaire. Si {@link #server} Ã©tait une connexion vers un objet RMI, alors il en sera
+     * de mÃªme pour les valeurs de ce {@code Map}.
      */
     private transient Map<Operation,DataConnection> servers;
 
     /**
-     * La fabrique à utiliser pour obtenir une seule image à une date spécifique.
-     * Ne sera construit que la première fois où elle sera nécessaire.
+     * La fabrique Ã  utiliser pour obtenir une seule image Ã  une date spÃ©cifique.
+     * Ne sera construit que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private transient DataConnection singleCoverageServer;
 
     /**
-     * Construit une nouvelle séries.
+     * Construit une nouvelle sÃ©ries.
      *
-     * @param name         Le nom de la série.
-     * @param thematic     La thématique de cette série de données.
-     * @param procedure    La procédure ayant servit à obtenir les données de cette série.
-     * @param timeInterval L'intervalle de temps typique des images de cette série (en nombre
+     * @param name         Le nom de la sÃ©rie.
+     * @param thematic     La thÃ©matique de cette sÃ©rie de donnÃ©es.
+     * @param procedure    La procÃ©dure ayant servit Ã  obtenir les donnÃ©es de cette sÃ©rie.
+     * @param timeInterval L'intervalle de temps typique des images de cette sÃ©rie (en nombre
      *                     de jours), ou {@link Double#NaN} si elle est inconnue.
-     * @param remarks      Remarques s'appliquant à cette entrée, ou {@code null}.
+     * @param remarks      Remarques s'appliquant Ã  cette entrÃ©e, ou {@code null}.
      *
-     * @throws CatalogException Si cette entrée n'a pas pu être construite.
+     * @throws CatalogException Si cette entrÃ©e n'a pas pu Ãªtre construite.
      */
     protected SeriesEntry(final String    name,
                           final Thematic  thematic,
@@ -146,7 +146,7 @@ public class SeriesEntry extends ObservableEntry implements Series {
                           final double    timeInterval,
                           final String    remarks) throws CatalogException
     {
-        super(name.hashCode() ^ (int)serialVersionUID, // Simulation d'un identifiant numérique.
+        super(name.hashCode() ^ (int)serialVersionUID, // Simulation d'un identifiant numÃ©rique.
               name, thematic, procedure, null, remarks);
         this.timeInterval = timeInterval;
         this.subseries    = subseries;
@@ -260,7 +260,7 @@ public class SeriesEntry extends ObservableEntry implements Series {
             if (c != null) {
                 return c;
             }
-            LOGGER.fine("Reconstruit à nouveau la converture de \"" + getName() + "\".");
+            LOGGER.fine("Reconstruit Ã  nouveau la converture de \"" + getName() + "\".");
         }
         if (server != null) try {
             c = new CoverageStack(getName(),
@@ -281,12 +281,12 @@ public class SeriesEntry extends ObservableEntry implements Series {
     }
 
     /**
-     * Retourne une connexion vers les données de la même série, mais avec l'opération spécifiée.
-     * Cette méthode est appelée par le constructeur de {@link DataCoverage}.
+     * Retourne une connexion vers les donnÃ©es de la mÃªme sÃ©rie, mais avec l'opÃ©ration spÃ©cifiÃ©e.
+     * Cette mÃ©thode est appelÃ©e par le constructeur de {@link DataCoverage}.
      *
-     * @param  operation L'opération désirée, ou {@code null} si aucune.
-     * @return Une connexion vers les données produites par l'opération spécifiée.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
+     * @param  operation L'opÃ©ration dÃ©sirÃ©e, ou {@code null} si aucune.
+     * @return Une connexion vers les donnÃ©es produites par l'opÃ©ration spÃ©cifiÃ©e.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
      */
     protected synchronized DataConnection getDataConnection(final Operation operation) throws RemoteException {
         if (operation==null || server==null) {
@@ -304,12 +304,12 @@ public class SeriesEntry extends ObservableEntry implements Series {
     }
 
     /**
-     * Définit la connexion vers les données à utiliser pour cette entrée. Cette méthode est
-     * appellée une et une seule fois par {@link SeriesTable#postCreateEntry} pour chaque
-     * entrée créée.
+     * DÃ©finit la connexion vers les donnÃ©es Ã  utiliser pour cette entrÃ©e. Cette mÃ©thode est
+     * appellÃ©e une et une seule fois par {@link SeriesTable#postCreateEntry} pour chaque
+     * entrÃ©e crÃ©Ã©e.
      *
-     * @param data Connexion vers une vue des données comme une matrice tri-dimensionnelle.
-     * @throws IllegalStateException si une connexion existait déjà pour cette entrée.
+     * @param data Connexion vers une vue des donnÃ©es comme une matrice tri-dimensionnelle.
+     * @throws IllegalStateException si une connexion existait dÃ©jÃ  pour cette entrÃ©e.
      */
     protected synchronized void setDataConnection(final DataConnection data) throws IllegalStateException {
         if (server != null) {
@@ -319,7 +319,7 @@ public class SeriesEntry extends ObservableEntry implements Series {
     }
 
     /**
-     * Vérifie si l'objet spécifié est identique à cette série.
+     * VÃ©rifie si l'objet spÃ©cifiÃ© est identique Ã  cette sÃ©rie.
      */
     @Override
     public boolean equals(final Object object) {
@@ -331,8 +331,8 @@ public class SeriesEntry extends ObservableEntry implements Series {
             return Double.doubleToLongBits(this.timeInterval) ==
                    Double.doubleToLongBits(that.timeInterval);
             /*
-             * On ne teste pas 'fallback' car la méthode 'equals' doit fonctionner dès que la
-             * construction de l'entrée est complétée, alors que 'fallback' est définit un peu
+             * On ne teste pas 'fallback' car la mÃ©thode 'equals' doit fonctionner dÃ¨s que la
+             * construction de l'entrÃ©e est complÃ©tÃ©e, alors que 'fallback' est dÃ©finit un peu
              * plus tard ('postCreateEntry').
              */
         }

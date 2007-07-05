@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,31 +28,31 @@ import org.geotools.coverage.Category;            // Pour javadoc
 
 /**
  * Indique la profondeur de l'arborescence attendue de {@link SeriesTree#getTree}. Les arborescences
- * peuvent contenir des chemins de la forme "{@linkplain Thematic thématique}/{@linkplain Procedure
- * procédure}/{@linkplain Series série}/{@linkplain Format format}/{@linkplain SampleDimension
- * bande}/{@linkplain Category catégorie}".
+ * peuvent contenir des chemins de la forme "{@linkplain Thematic thÃ©matique}/{@linkplain Procedure
+ * procÃ©dure}/{@linkplain Series sÃ©rie}/{@linkplain Format format}/{@linkplain SampleDimension
+ * bande}/{@linkplain Category catÃ©gorie}".
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public enum TreeDepth {
     /**
-     * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Thematic thèmes}.
+     * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Thematic thÃ¨mes}.
      */
     THEMATIC(SeriesTree.THEMATIC),
 
     /**
-     * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Procedure procédures}.
+     * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Procedure procÃ©dures}.
      */
     PROCEDURE(SeriesTree.PROCEDURE),
 
     /**
-     * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Series séries}.
+     * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Series sÃ©ries}.
      */
     SERIES(SeriesTree.SERIES),
 
     /**
-     * Indique que l'arborescence ne doit pas aller plus loin que les sous-séries (après les séries).
+     * Indique que l'arborescence ne doit pas aller plus loin que les sous-sÃ©ries (aprÃ¨s les sÃ©ries).
      */
     SUBSERIES(SeriesTree.SUBSERIES),
 
@@ -62,19 +62,19 @@ public enum TreeDepth {
     FORMAT(SeriesTree.FORMAT),
 
     /**
-     * Indique que l'arborescence doit aller jusqu'aux catégories (après les formats).
+     * Indique que l'arborescence doit aller jusqu'aux catÃ©gories (aprÃ¨s les formats).
      */
     CATEGORY(SeriesTree.FORMAT + 2);
 
     /**
-     * La profondeur de l'arborescence, comptée comme le nombre de noeuds à traverser jusqu'à la
+     * La profondeur de l'arborescence, comptÃ©e comme le nombre de noeuds Ã  traverser jusqu'Ã  la
      * feuille (feuille inclue).
      */
     final int rank;
 
     /**
-     * Construit une nouvelle énumération avec la profondeur d'arborescence spécifiée. Cette
-     * profondeur est comptée comme le nombre de noeuds à traverser jusqu'à la feuille
+     * Construit une nouvelle Ã©numÃ©ration avec la profondeur d'arborescence spÃ©cifiÃ©e. Cette
+     * profondeur est comptÃ©e comme le nombre de noeuds Ã  traverser jusqu'Ã  la feuille
      * (feuille inclue).
      */
     private TreeDepth(final int rank) {

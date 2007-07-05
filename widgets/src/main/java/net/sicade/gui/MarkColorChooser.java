@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -49,9 +49,9 @@ import org.geotools.display.geom.Arrow2D;
 
 
 /**
- * Boîte de dialogue demandant à l'utilisateur de choisir une couleur. La
- * section "aperçu" contiendra une image satellitaire (facultative)  avec
- * une forme géométrique par dessus.
+ * BoÃ®te de dialogue demandant Ã  l'utilisateur de choisir une couleur. La
+ * section "aperÃ§u" contiendra une image satellitaire (facultative)  avec
+ * une forme gÃ©omÃ©trique par dessus.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -59,40 +59,40 @@ import org.geotools.display.geom.Arrow2D;
 @SuppressWarnings("serial")
 final class MarkColorChooser extends JColorChooser {
     /**
-     * Image à placer en arrière-plan dans l'aperçu,
+     * Image Ã  placer en arriÃ¨re-plan dans l'aperÃ§u,
      * ou {@code null} s'il n'y en a pas.
      */
     private RenderedImage image;
 
     /**
-     * Transformation affine à appliquer sur l'image pour son affichage.
+     * Transformation affine Ã  appliquer sur l'image pour son affichage.
      * Cette transformation affine comprendra principalement une translation.
      */
     private AffineTransform transform;
 
     /**
-     * Forme géométrique utilisée pour représenter une composante
-     * sur une image. Cette forme sera utilisée pour permettre à
+     * Forme gÃ©omÃ©trique utilisÃ©e pour reprÃ©senter une composante
+     * sur une image. Cette forme sera utilisÃ©e pour permettre Ã 
      * l'utilisateur de constater de visu l'effet d'un changement
-     * de couleur. Cette forme doit être centrée sur (0,0) et ses
-     * dimensions doivent être en pixels.
+     * de couleur. Cette forme doit Ãªtre centrÃ©e sur (0,0) et ses
+     * dimensions doivent Ãªtre en pixels.
      */
     private Shape shape = new Arrow2D(-32f, -24f, 64f, 48f);
 
     /**
-     * Coordonnées (en pixels) de l'espace occupée par la ou les formes
-     * géométriques dont la couleur variera. Ces coordonnées ne sont pas
-     * centrées à (0,0), contrairement à {@code shape}.
+     * CoordonnÃ©es (en pixels) de l'espace occupÃ©e par la ou les formes
+     * gÃ©omÃ©triques dont la couleur variera. Ces coordonnÃ©es ne sont pas
+     * centrÃ©es Ã  (0,0), contrairement Ã  {@code shape}.
      */
     private Rectangle shapeBounds, paintBounds;
 
     /**
      * Construit un paneau qui permettra de choisir une couleur
-     * pour des composantes à placer par dessus des images.
+     * pour des composantes Ã  placer par dessus des images.
      *
-     * @param simplified {@code true} s'il faut utiliser la forme simplifiée
-     *        de la boîte de dialogue. La forme simplifiée ne comprend que la palette
-     *        de couleurs, sans les autres paneaux qui servent à contrôler les
+     * @param simplified {@code true} s'il faut utiliser la forme simplifiÃ©e
+     *        de la boÃ®te de dialogue. La forme simplifiÃ©e ne comprend que la palette
+     *        de couleurs, sans les autres paneaux qui servent Ã  contrÃ´ler les
      *        composantes RGBs.
      */
     public MarkColorChooser(final boolean simplified) {
@@ -111,9 +111,9 @@ final class MarkColorChooser extends JColorChooser {
     }
 
     /**
-     * Spécifie l'image à faire apparaître en arrière plan, ou {@code null}
-     * s'il n'y en a pas. Cette image sera centrée dans la zone "aperçu" de la
-     * boîte de dialogue.
+     * SpÃ©cifie l'image Ã  faire apparaÃ®tre en arriÃ¨re plan, ou {@code null}
+     * s'il n'y en a pas. Cette image sera centrÃ©e dans la zone "aperÃ§u" de la
+     * boÃ®te de dialogue.
      */
     public void setBackground(final RenderedImage image) {
         this.image=image;
@@ -122,10 +122,10 @@ final class MarkColorChooser extends JColorChooser {
     }
 
     /**
-     * Spécifie la forme géométrique à tracer. Cette forme devrait être centrée
-     * à (0,0) et ses coordonnées devraient être exprimées en pixels. Cette forme
-     * sera centrée dans la zone "aperçu" de la boîte de dialogue. Les dimensions
-     * de cette forme détermineront les dimensions en pixels de la zone d'aperçu.
+     * SpÃ©cifie la forme gÃ©omÃ©trique Ã  tracer. Cette forme devrait Ãªtre centrÃ©e
+     * Ã  (0,0) et ses coordonnÃ©es devraient Ãªtre exprimÃ©es en pixels. Cette forme
+     * sera centrÃ©e dans la zone "aperÃ§u" de la boÃ®te de dialogue. Les dimensions
+     * de cette forme dÃ©termineront les dimensions en pixels de la zone d'aperÃ§u.
      */
     public void setShape(final Shape shape) {
         shapeBounds = shape.getBounds();
@@ -133,9 +133,9 @@ final class MarkColorChooser extends JColorChooser {
     }
 
     /**
-     * Duplique la forme géométrique. Cette méthode peut être appelée après
+     * Duplique la forme gÃ©omÃ©trique. Cette mÃ©thode peut Ãªtre appelÃ©e aprÃ¨s
      * {@link #setShape} pour disperser un peu les exemplaires de la forme
-     * dans la zone d'aperçu.
+     * dans la zone d'aperÃ§u.
      */
     public void duplicateShape(final int count) {
         final AffineTransform transform = AffineTransform.getTranslateInstance(
@@ -149,10 +149,10 @@ final class MarkColorChooser extends JColorChooser {
     }
 
     /**
-     * Dessine l'apperçu. Cette méthode n'a pas à se soucier de rétablir
-     * le graphique dans son état original lorsqu'elle aura terminé.
+     * Dessine l'apperÃ§u. Cette mÃ©thode n'a pas Ã  se soucier de rÃ©tablir
+     * le graphique dans son Ã©tat original lorsqu'elle aura terminÃ©.
      *
-     * @return Un rectangle englobant les coordonnées
+     * @return Un rectangle englobant les coordonnÃ©es
      *         de la forme dont la couleur variera.
      */
     private Rectangle paintPreview(final Graphics2D graphics) {
@@ -165,25 +165,25 @@ final class MarkColorChooser extends JColorChooser {
     }
 
     /**
-     * Classe de la composante qui affichera un apperçu des
+     * Classe de la composante qui affichera un apperÃ§u des
      * composantes cartographiques avec leur nouvelle couleur.
      */
     @SuppressWarnings("serial")
     private final class Preview extends JComponent implements ChangeListener {
         /**
-         * Utilisé temporairement pour éviter des création trop fréquentes.
+         * UtilisÃ© temporairement pour Ã©viter des crÃ©ation trop frÃ©quentes.
          */
         private final Insets insets=new Insets(0,0,0,0);
 
         /**
-         * Construit un visualisateur d'aperçus.
+         * Construit un visualisateur d'aperÃ§us.
          */
         public Preview() {
             setUI(new ComponentUI() {
                 public Dimension getPreferredSize(final JComponent c) {
                     final Dimension size=shapeBounds.getSize();
                     size.width  += 24; // Note: se souvenir que de la place
-                    size.height += 24; //    est utilisée pour les bordures
+                    size.height += 24; //    est utilisÃ©e pour les bordures
                     return size;
                 }
 
@@ -201,8 +201,8 @@ final class MarkColorChooser extends JColorChooser {
         }
 
         /**
-         * Méthode appelée automatiquement chaque fois que
-         * l'utilisateur sélectionne une nouvelle couleur.
+         * MÃ©thode appelÃ©e automatiquement chaque fois que
+         * l'utilisateur sÃ©lectionne une nouvelle couleur.
          */
         public void stateChanged(final ChangeEvent event) {
             if (paintBounds != null) {

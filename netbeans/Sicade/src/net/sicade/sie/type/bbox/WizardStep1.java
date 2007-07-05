@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ import javax.swing.event.DocumentListener;
 
 
 /**
- * La partie visuelle propre à la première page de l'assistant.
+ * La partie visuelle propre Ã  la premiÃ¨re page de l'assistant.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -32,7 +32,7 @@ final class WizardStep1 extends WizardStep {
     /**
      * Construit la composante visuelle.
      *
-     * @param listener Objet à informer chaque fois que l'utilisateur a modifié le contenu d'un
+     * @param listener Objet Ã  informer chaque fois que l'utilisateur a modifiÃ© le contenu d'un
      *                 champ obligatoire.
      */
     public WizardStep1(final DocumentListener listener) {

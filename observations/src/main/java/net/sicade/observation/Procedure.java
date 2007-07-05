@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,13 +20,13 @@ package net.sicade.observation;
 
 
 /**
- * Représentation d'une procédure utilisée pour observer un {@linkplain Phenomenon phénomène}.
- * Cette interface est étendue dans des paquets spécialisés. Par exemple pour les images, les
- * procédures utilisées sont des {@linkplain net.sicade.observation.coverage.Operation opérations}.
- * Pour les données de pêches, les procédures utilisées sont des
- * {@linkplain net.sicade.observation.fishery.FisheryType types de pêche}.
+ * ReprÃ©sentation d'une procÃ©dure utilisÃ©e pour observer un {@linkplain Phenomenon phÃ©nomÃ¨ne}.
+ * Cette interface est Ã©tendue dans des paquets spÃ©cialisÃ©s. Par exemple pour les images, les
+ * procÃ©dures utilisÃ©es sont des {@linkplain net.sicade.observation.coverage.Operation opÃ©rations}.
+ * Pour les donnÃ©es de pÃªches, les procÃ©dures utilisÃ©es sont des
+ * {@linkplain net.sicade.observation.fishery.FisheryType types de pÃªche}.
  * <p>
- * La combinaison d'un {@linkplain Phenomenon phénomène} avec une procedure donne un
+ * La combinaison d'un {@linkplain Phenomenon phÃ©nomÃ¨ne} avec une procedure donne un
  * {@linkplain Observable observable}.
  *
  * @version $Id$

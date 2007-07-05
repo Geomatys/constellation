@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2007, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2007, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import net.sicade.observation.coverage.AbstractTest;
  * Test le bon fonctionnement de la colonne "spatialSchema" dans la table GridGeometries.
  * 
  * @version $Id$
- * @author Cédric Briançon
+ * @author CÃ©dric BrianÃ§on
  */
 public class BoundingBoxTest extends AbstractTest {
     /**
@@ -42,7 +42,7 @@ public class BoundingBoxTest extends AbstractTest {
     }
 
     /**
-     * Tests l'extraction d'informations depuis une colonne ayant pour type de données une {@code box3d}.
+     * Tests l'extraction d'informations depuis une colonne ayant pour type de donnÃ©es une {@code box3d}.
      *
      * @throws SQLException
      */

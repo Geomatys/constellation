@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,28 +34,28 @@ import org.geotools.metadata.iso.quality.DataQualityImpl;
 
 
 /**
- * Connexion vers la table des méta-données. Cette connexion cache les requêtes précédentes
- * par des références fortes. Nous supposons que les méta-données sont assez peu nombreuses
- * et n'ont pas besoin d'un mécanisme utilisant des références faibles.
+ * Connexion vers la table des mÃ©ta-donnÃ©es. Cette connexion cache les requÃªtes prÃ©cÃ©dentes
+ * par des rÃ©fÃ©rences fortes. Nous supposons que les mÃ©ta-donnÃ©es sont assez peu nombreuses
+ * et n'ont pas besoin d'un mÃ©canisme utilisant des rÃ©fÃ©rences faibles.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @todo Le mécanisme de cache serait plus efficace à l'intérieur de {@link MetadataSource}.
+ * @todo Le mÃ©canisme de cache serait plus efficace Ã  l'intÃ©rieur de {@link MetadataSource}.
  */
 public class MetadataTable extends Table implements Shareable {
     /**
-     * Connexion vers la base des méta-données.
+     * Connexion vers la base des mÃ©ta-donnÃ©es.
      */
     private MetadataSource source;
 
     /**
-     * Ensemble des méta-données qui ont déjà été créées.
+     * Ensemble des mÃ©ta-donnÃ©es qui ont dÃ©jÃ  Ã©tÃ© crÃ©Ã©es.
      */
     private final Map<Class, Map<String,Object>> pool = new HashMap<Class, Map<String,Object>>();
 
     /**
-     * Construit une connexion vers la table des méta-données.
+     * Construit une connexion vers la table des mÃ©ta-donnÃ©es.
      * 
      * @param  database Connexion vers la table des plateformes qui utilisera cette table des stations.
      */
@@ -64,12 +64,12 @@ public class MetadataTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne la méta-données correspondant à l'identifiant spécifié.
+     * Retourne la mÃ©ta-donnÃ©es correspondant Ã  l'identifiant spÃ©cifiÃ©.
      *
-     * @param type Le type de méta-donnée (par exemple <code>{@linkplain Citation}.class</code>).
-     * @param identifier L'identifiant de la méta-donnée désirée.
+     * @param type Le type de mÃ©ta-donnÃ©e (par exemple <code>{@linkplain Citation}.class</code>).
+     * @param identifier L'identifiant de la mÃ©ta-donnÃ©e dÃ©sirÃ©e.
      *
-     * @throws SQLException si l'accès à la base de données a échoué.
+     * @throws SQLException si l'accÃ¨s Ã  la base de donnÃ©es a Ã©chouÃ©.
      */
     public synchronized <T> T getEntry(final Class<T> type, final String identifier) throws SQLException {
         Map<String,Object> p = pool.get(type);
@@ -84,10 +84,10 @@ public class MetadataTable extends Table implements Shareable {
             }
             candidate = type.cast(source.getEntry(type, identifier));
             /*
-             * Extrait immédiatement les informations les plus utilisées telles que les titres
-             * des citations, afin d'éviter des connexions trop fréquentes à la base de données
-             * (par exemple chaque fois que l'on veut vérifier le fournisseur pour savoir si une
-             * station doit être inclue dans une liste).
+             * Extrait immÃ©diatement les informations les plus utilisÃ©es telles que les titres
+             * des citations, afin d'Ã©viter des connexions trop frÃ©quentes Ã  la base de donnÃ©es
+             * (par exemple chaque fois que l'on veut vÃ©rifier le fournisseur pour savoir si une
+             * station doit Ãªtre inclue dans une liste).
              */
             if (candidate instanceof DataQuality) {
                 // TODO

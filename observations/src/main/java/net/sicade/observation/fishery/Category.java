@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ import net.sicade.observation.Observable;
 
 
 /**
- * Une {@linkplain Species espèces} observée à un certain {@linkplain Stage stade de développement}.
+ * Une {@linkplain Species espÃ¨ces} observÃ©e Ã  un certain {@linkplain Stage stade de dÃ©veloppement}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -31,17 +31,17 @@ import net.sicade.observation.Observable;
  */
 public interface Category extends Observable {
     /**
-     * Retourne l'espèce observée.
+     * Retourne l'espÃ¨ce observÃ©e.
      */
     Species getPhenomenon();
     
     /**
-     * Retourne le stade de développement de l'espèce observé.
+     * Retourne le stade de dÃ©veloppement de l'espÃ¨ce observÃ©.
      */
     Stage getStage();
 
     /**
-     * Retourne la méthode par laquelle les individus sont capturés.
+     * Retourne la mÃ©thode par laquelle les individus sont capturÃ©s.
      */
     FisheryType getProcedure();
 }

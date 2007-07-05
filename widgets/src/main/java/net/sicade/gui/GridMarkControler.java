@@ -1,7 +1,7 @@
 /*
- * Sicade - Systèmes intégrés de connaissances
- *          pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances
+ *          pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -57,7 +57,7 @@ import net.sicade.resources.seasview.ResourceKeys;
 
 
 /**
- * Boite de dialogue proposant à l'utilisateur d'ajuster la densité des marques sur une grille.
+ * Boite de dialogue proposant Ã  l'utilisateur d'ajuster la densitÃ© des marques sur une grille.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -65,7 +65,7 @@ import net.sicade.resources.seasview.ResourceKeys;
 @SuppressWarnings("serial")
 public final class GridMarkControler extends JPanel {
     /**
-     * Titre de la boîte de dialogue.
+     * Titre de la boÃ®te de dialogue.
      */
     private final String title;
 
@@ -75,27 +75,27 @@ public final class GridMarkControler extends JPanel {
     private final MarkColorChooser colorChooser = new MarkColorChooser(true);
 
     /**
-     * Case à cocher pour indiquer s'il faut ajuster
-     * la densité automatiquement en fonction du zoom.
+     * Case Ã  cocher pour indiquer s'il faut ajuster
+     * la densitÃ© automatiquement en fonction du zoom.
      */
     private final JToggleButton automatic;
 
     /**
-     * Case à cocher pour indiquer s'il faut utiliser
-     * une valeur fixe pour la densité des marques.
+     * Case Ã  cocher pour indiquer s'il faut utiliser
+     * une valeur fixe pour la densitÃ© des marques.
      */
     private final JToggleButton manual;
 
     /**
-     * Composante permettant de sélectionner la densité des marques. La valeur
-     * "1" correspond à la densité maximale (minimum de décimation).
+     * Composante permettant de sÃ©lectionner la densitÃ© des marques. La valeur
+     * "1" correspond Ã  la densitÃ© maximale (minimum de dÃ©cimation).
      */
     private final JSlider decimation=new JSlider(1, 10, 1);
 
     /**
-     * Construit une boîte de dialogue par défaut.
+     * Construit une boÃ®te de dialogue par dÃ©faut.
      *
-     * @param title Titre de la boîte de dialogue.
+     * @param title Titre de la boÃ®te de dialogue.
      */
     public GridMarkControler(final String title) {
         super(new BorderLayout());
@@ -114,7 +114,7 @@ public final class GridMarkControler extends JPanel {
             tabs.addTab(resources.getString(ResourceKeys.COLOR), colorChooser);
         }
         ///////////////////
-        ////  Densité  ////
+        ////  DensitÃ©  ////
         ///////////////////
         if (true) {
             final JPanel panel=new JPanel(new GridBagLayout());
@@ -149,50 +149,50 @@ public final class GridMarkControler extends JPanel {
     }
 
     /**
-     * Spécifie l'image à faire apparaître en arrière plan, ou {@code null}
-     * s'il n'y en a pas. Cette image sera centrée dans la zone "aperçu" du
-     * paneau servant à sélectionner la couleur.
+     * SpÃ©cifie l'image Ã  faire apparaÃ®tre en arriÃ¨re plan, ou {@code null}
+     * s'il n'y en a pas. Cette image sera centrÃ©e dans la zone "aperÃ§u" du
+     * paneau servant Ã  sÃ©lectionner la couleur.
      */
     public void setBackground(final RenderedImage image) {
         colorChooser.setBackground(image);
     }
 
     /**
-     * Spécifie la forme géométrique à tracer. Cette forme devrait être centrée
-     * à (0,0) et ses coordonnées devraient être exprimées en pixels. Cette forme
-     * sera centrée dans la zone "aperçu" de la boîte de dialogue. Les dimensions
-     * de cette forme détermineront les dimensions en pixels de la zone d'aperçu.
+     * SpÃ©cifie la forme gÃ©omÃ©trique Ã  tracer. Cette forme devrait Ãªtre centrÃ©e
+     * Ã  (0,0) et ses coordonnÃ©es devraient Ãªtre exprimÃ©es en pixels. Cette forme
+     * sera centrÃ©e dans la zone "aperÃ§u" de la boÃ®te de dialogue. Les dimensions
+     * de cette forme dÃ©termineront les dimensions en pixels de la zone d'aperÃ§u.
      */
     public void setShape(final Shape shape) {
         colorChooser.setShape(shape);
     }
 
     /**
-     * Retourne la couleur sélectionnée.
+     * Retourne la couleur sÃ©lectionnÃ©e.
      */
     public Color getColor() {
         return colorChooser.getColor();
     }
 
     /**
-     * Spécifie la couleur sélectionnée.
+     * SpÃ©cifie la couleur sÃ©lectionnÃ©e.
      */
     public void setColor(final Color color) {
         colorChooser.setColor(color);
     }
 
     /**
-     * Retourne la décimation sélectionnée par l'utilisateur, ou 0 si la décimation
-     * doit être déterminée automatiquement. Si la décimation a été spécifiée par
-     * l'utilisateur, elle sera obligatoirement supérieure à 0.
+     * Retourne la dÃ©cimation sÃ©lectionnÃ©e par l'utilisateur, ou 0 si la dÃ©cimation
+     * doit Ãªtre dÃ©terminÃ©e automatiquement. Si la dÃ©cimation a Ã©tÃ© spÃ©cifiÃ©e par
+     * l'utilisateur, elle sera obligatoirement supÃ©rieure Ã  0.
      */
     public int getDecimation() {
         return manual.isSelected() ? decimation.getValue() : 0;
     }
 
     /**
-     * Spécifie la décimation sélectionnée. La valeur de 0 signifie
-     * que la décimation devra être déterminée automatiquement.
+     * SpÃ©cifie la dÃ©cimation sÃ©lectionnÃ©e. La valeur de 0 signifie
+     * que la dÃ©cimation devra Ãªtre dÃ©terminÃ©e automatiquement.
      */
     public void setDecimation(final int dc) {
         if (dc != 0) {
@@ -206,10 +206,10 @@ public final class GridMarkControler extends JPanel {
     }
 
     /**
-     * Fait apparaître la boite de dialogue. Cette méthode retourne {@code true}
-     * si l'utilisateur a cliqué sur "Ok" après avoir changé au moins un paramètre.
-     * S'il a cliqué sur "Annuler", fermer la boîte de dialogue ou cliqué sur "Ok"
-     * sans n'avoir rien changé, alors cette méthode retourne {@code false}.
+     * Fait apparaÃ®tre la boite de dialogue. Cette mÃ©thode retourne {@code true}
+     * si l'utilisateur a cliquÃ© sur "Ok" aprÃ¨s avoir changÃ© au moins un paramÃ¨tre.
+     * S'il a cliquÃ© sur "Annuler", fermer la boÃ®te de dialogue ou cliquÃ© sur "Ok"
+     * sans n'avoir rien changÃ©, alors cette mÃ©thode retourne {@code false}.
      */
     public boolean showDialog(final Component owner) {
         final Color color=getColor();

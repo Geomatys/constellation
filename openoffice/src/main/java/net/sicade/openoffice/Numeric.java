@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,7 +39,7 @@ import net.sicade.numeric.table.Interpolation;
 
 
 /**
- * Implémentation de l'interface {@link XNumeric} qui sera exportée vers
+ * ImplÃ©mentation de l'interface {@link XNumeric} qui sera exportÃ©e vers
  * <A HREF="http://www.openoffice.org">OpenOffice</A>.
  *
  * @version $Id$
@@ -52,7 +52,7 @@ public class Numeric extends Formulas implements XNumeric {
     private static final Logger LOGGER = Logger.getLogger("net.sicade.openoffice");
 
     /**
-     * Le nom sous lequel sera enregistré cette composante.
+     * Le nom sous lequel sera enregistrÃ© cette composante.
      *
      * <strong>Note:</strong> Bien que ce nom de correspondent pas aux conventions
      * du Java, on ne peut le changer car il correspond au nom attendu par OpenOffice.
@@ -60,7 +60,7 @@ public class Numeric extends Formulas implements XNumeric {
     private static final String __serviceName = "net.sicade.openoffice.Numeric";
 
     /**
-     * Le service que l'on étend.
+     * Le service que l'on Ã©tend.
      */
     private static final String ADDIN_SERVICE = "com.sun.star.sheet.AddIn";
 
@@ -70,26 +70,26 @@ public class Numeric extends Formulas implements XNumeric {
     @SuppressWarnings("unchecked")
     public Numeric() {
         methods.put("getLocatedIndex", new MethodInfo("Numeric", "LOCATE.INDEX",
-            "Retourne les index autour de la valeur xi spécifiée.",
+            "Retourne les index autour de la valeur xi spÃ©cifiÃ©e.",
             new String[] {
                 "xOptions",      "Fournit par OpenOffice.",
-                "data",          "Les données. Doit contenir au minimum une colonne, celle des x. " +
+                "data",          "Les donnÃ©es. Doit contenir au minimum une colonne, celle des x. " +
                                  "Toutes les colonnes suivantes (optionnelles) sont des y. Si une " +
-                                 "valeur #N/A est trouvée dans l'une de ces colonnes, les index "   +
-                                 "retournés éviteront de pointer vers la ligne correspondante.",
+                                 "valeur #N/A est trouvÃ©e dans l'une de ces colonnes, les index "   +
+                                 "retournÃ©s Ã©viteront de pointer vers la ligne correspondante.",
                 "xi",            "La valeur xi pour laquelle on veut les index."
         }));
         methods.put("getInterpolated", new MethodInfo("Numeric", "INTERPOLATE",
-            "Interpole les valeurs de y pour les valeurs xi spécifiées.",
+            "Interpole les valeurs de y pour les valeurs xi spÃ©cifiÃ©es.",
             new String[] {
                 "xOptions",      "Fournit par OpenOffice.",
-                "data",          "Les données. Doit contenir au minimum deux colonnes. La première "   +
+                "data",          "Les donnÃ©es. Doit contenir au minimum deux colonnes. La premiÃ¨re "   +
                                  "colonne est celle des x. Toutes les colonnes suivantes sont celles " +
                                  "des y.",
                 "xi",            "Les valeurs xi pour lesquelles on veut interpoler.",
                 "interpolation", "Le type d'interpolation: \"nearest\" ou \"linear\".",
                 "skipMissingY",  "VRAI pour ignorer les valeurs manquantes dans les vecteurs des y," +
-                                 "ou FAUX pour retourner #N/A si de telles valeurs sont rencontrées."
+                                 "ou FAUX pour retourner #N/A si de telles valeurs sont rencontrÃ©es."
         }));
     }
 
@@ -154,7 +154,7 @@ public class Numeric extends Formulas implements XNumeric {
     }
 
     /**
-     * Construit une table pour les données spécifiées.
+     * Construit une table pour les donnÃ©es spÃ©cifiÃ©es.
      */
     private static Table createTable(final double[][] data, final Object interpolation) {
         final Interpolation type;
@@ -232,7 +232,7 @@ public class Numeric extends Formulas implements XNumeric {
     }
 
     /**
-     * Retourne le journal dans lequel écrire d'éventuels avertissements.
+     * Retourne le journal dans lequel Ã©crire d'Ã©ventuels avertissements.
      */
     @Override
     protected Logger getLogger() {

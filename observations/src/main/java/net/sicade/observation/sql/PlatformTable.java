@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,14 +34,14 @@ import net.sicade.observation.ConfigurationKey;
 
 /**
  * Connexion vers la table des {@linkplain Platform plateformes}
- * (bateaux, campagnes d'échantillonages...).
+ * (bateaux, campagnes d'Ã©chantillonages...).
  * 
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class PlatformTable extends BoundedSingletonTable<Platform> {
     /**
-     * Requête SQL pour obtenir les limites géographiques des plateformes dans une région.
+     * RequÃªte SQL pour obtenir les limites gÃ©ographiques des plateformes dans une rÃ©gion.
      */
     private static final ConfigurationKey BOUNDING_BOX = new ConfigurationKey("Platforms:BBOX",
             "SELECT MIN(date), MAX(date), MIN(x), MAX(x), MIN(y), MAX(y)\n"          +
@@ -51,7 +51,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
             "   AND (provider LIKE ?)");
 
     /**
-     * Requête SQL pour obtenir la liste des plateformes dans une région.
+     * RequÃªte SQL pour obtenir la liste des plateformes dans une rÃ©gion.
      */
     private static final ConfigurationKey LIST = new ConfigurationKey("Platforms:LIST",
             "SELECT DISTINCT platform\n"                                             +
@@ -62,52 +62,52 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
             " ORDER BY date");
 
     /**
-     * Requête SQL pour obtenir des informations sur une plateforme.
+     * RequÃªte SQL pour obtenir des informations sur une plateforme.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Platforms:SELECT",
             "SELECT DISTINCT platform\n" +
             "  FROM \"Stations\"\n"      +
             " WHERE platform=?");
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_PROVIDER = 7;
-    /** Numéro de colonne. */ private static final int NAME              = 1;
+    /** NumÃ©ro d'argument. */ private static final int ARGUMENT_PROVIDER = 7;
+    /** NumÃ©ro de colonne. */ private static final int NAME              = 1;
 
     /**
      * Connexion vers la table permettant d'obtenir les trajectoires des plateformes. Une table
-     * par défaut sera construite la première fois où elle sera nécessaire.
+     * par dÃ©faut sera construite la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private LocationTable locations;
 
     /**
-     * Connexion vers la table des {@linkplain Station stations}. Une table par défaut sera
-     * construite la première fois où elle sera nécessaire.
+     * Connexion vers la table des {@linkplain Station stations}. Une table par dÃ©faut sera
+     * construite la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      * <p>
-     * <strong>IMPORTANT:</strong> La table des stations peut faire elle-même appel à cette
-     * table {@code PlatformTable}.  En conséquence, toutes méthodes qui peut faire appel à
+     * <strong>IMPORTANT:</strong> La table des stations peut faire elle-mÃªme appel Ã  cette
+     * table {@code PlatformTable}.  En consÃ©quence, toutes mÃ©thodes qui peut faire appel Ã 
      * la table des stations doit se synchroniser sur {@code stations} <em>avant</em> de se
-     * synchroniser sur {@code this}, afin d'éviter des situations de <cite>thread lock</cite>.
+     * synchroniser sur {@code this}, afin d'Ã©viter des situations de <cite>thread lock</cite>.
      */
     private StationTable stations;
 
     /**
-     * Le fournisseur des stations recherchées, ou {@code null} si on accepte tous les fournisseurs.
+     * Le fournisseur des stations recherchÃ©es, ou {@code null} si on accepte tous les fournisseurs.
      */
     private String provider;
 
     /**
-     * Construit une connexion vers la table des plateformes qui utilisera la base de données
-     * spécifiée.
+     * Construit une connexion vers la table des plateformes qui utilisera la base de donnÃ©es
+     * spÃ©cifiÃ©e.
      */
     public PlatformTable(final Database database) {
         super(database, CRS.XYZT);
     }
 
     /**
-     * Définie la table des stations à utiliser. Cette méthode peut être appelée par
-     * {@link StationTable} avant toute première utilisation de {@code PlatformTable}.
+     * DÃ©finie la table des stations Ã  utiliser. Cette mÃ©thode peut Ãªtre appelÃ©e par
+     * {@link StationTable} avant toute premiÃ¨re utilisation de {@code PlatformTable}.
      *
-     * @param  stations Table des stations à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des stations.
+     * @param  stations Table des stations Ã  utiliser.
+     * @throws IllegalStateException si cette instance utilise dÃ©jÃ  une autre table des stations.
      */
     protected synchronized void setStationTable(final StationTable stations)
             throws IllegalStateException
@@ -116,13 +116,13 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
             if (this.stations != null) {
                 throw new IllegalStateException();
             }
-            this.stations = stations; // Doit être avant tout appel de setTable(this).
+            this.stations = stations; // Doit Ãªtre avant tout appel de setTable(this).
             stations.setPlatformTable(this);
         }
     }
 
     /**
-     * Retourne la table des stations à utiliser pour la création des objets {@link StationEntry}.
+     * Retourne la table des stations Ã  utiliser pour la crÃ©ation des objets {@link StationEntry}.
      */
     final StationTable getStationTable() {
         assert Thread.holdsLock(this);
@@ -133,7 +133,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
     }
 
     /**
-     * Retourne la table des positions à utiliser pour la création des objets {@link StationEntry}.
+     * Retourne la table des positions Ã  utiliser pour la crÃ©ation des objets {@link StationEntry}.
      */
     final LocationTable getLocationTable() {
         assert Thread.holdsLock(this);
@@ -144,7 +144,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
     }
 
     /**
-     * Retourne le fournisseur des plateformes désirées, ou {@code null} pour obtenir toutes
+     * Retourne le fournisseur des plateformes dÃ©sirÃ©es, ou {@code null} pour obtenir toutes
      * les plateformes.
      */
     public final String getProvider() {
@@ -152,9 +152,9 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
     }
 
     /**
-     * Définit le fournisseur des plateformes désirées. Les prochains appels à la méthode
+     * DÃ©finit le fournisseur des plateformes dÃ©sirÃ©es. Les prochains appels Ã  la mÃ©thode
      * {@link #getEntries() getEntries()} ne retourneront que les plateformes de ce fournisseur.
-     * La valeur {@code null} sélectionne toutes les plateformes.
+     * La valeur {@code null} sÃ©lectionne toutes les plateformes.
      */
     public synchronized void setProvider(final String provider) {
         if (!Utilities.equals(provider, this.provider)) {
@@ -164,9 +164,9 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
     }
 
     /**
-     * Configure la requête SQL spécifiée en fonction du {@linkplain #getProvider provider}
-     * des données de cette table. Cette méthode est appelée automatiquement lorsque cette
-     * table a {@linkplain #fireStateChanged changé d'état}.
+     * Configure la requÃªte SQL spÃ©cifiÃ©e en fonction du {@linkplain #getProvider provider}
+     * des donnÃ©es de cette table. Cette mÃ©thode est appelÃ©e automatiquement lorsque cette
+     * table a {@linkplain #fireStateChanged changÃ© d'Ã©tat}.
      */
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
@@ -181,7 +181,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les plateformes.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les plateformes.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {

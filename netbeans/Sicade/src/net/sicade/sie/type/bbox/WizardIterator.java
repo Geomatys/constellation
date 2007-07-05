@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,12 +37,12 @@ import net.sicade.resources.XArray;
 
 
 /**
- * Itérateur sur les différentes étapes de l'assistant "choix d'une région d'intérêt". Chaque
- * étape est représenté par un objet {@code WizardPanel}. Cet assistant proposera les étapes
+ * ItÃ©rateur sur les diffÃ©rentes Ã©tapes de l'assistant "choix d'une rÃ©gion d'intÃ©rÃªt". Chaque
+ * Ã©tape est reprÃ©sentÃ© par un objet {@code WizardPanel}. Cet assistant proposera les Ã©tapes
  * suivantes:
  * <p>
  * <ul>
- *   <li>Choix d'un serveur de données</li>
+ *   <li>Choix d'un serveur de donnÃ©es</li>
  *   <li>Choix de l'envelope spatio-temporelle</li>
  * </ul>
  *
@@ -51,34 +51,34 @@ import net.sicade.resources.XArray;
  */
 public final class WizardIterator implements WizardDescriptor.InstantiatingIterator {
     /**
-     * Descripteur de l'assistant. La valeur de ce champ n'est pas déterminée par cet itérateur.
-     * C'est l'objet {@link WizardDescriptor} lui-même qui fournira cette information par un appel
-     * à la methode {@link #initialize}.
+     * Descripteur de l'assistant. La valeur de ce champ n'est pas dÃ©terminÃ©e par cet itÃ©rateur.
+     * C'est l'objet {@link WizardDescriptor} lui-mÃªme qui fournira cette information par un appel
+     * Ã  la methode {@link #initialize}.
      */
     private WizardDescriptor wizard;
 
     /**
-     * Liste des paneaux constituant les différentes étapes de cet assistant. Cette liste est
-     * initialement nulle. Elle ne sera construite que la première fois où l'itérateur sera
-     * {@linkplain #initialize initialisé}.
+     * Liste des paneaux constituant les diffÃ©rentes Ã©tapes de cet assistant. Cette liste est
+     * initialement nulle. Elle ne sera construite que la premiÃ¨re fois oÃ¹ l'itÃ©rateur sera
+     * {@linkplain #initialize initialisÃ©}.
      */
     private WizardDescriptor.Panel[] panels;
 
     /**
-     * Index de l'étape en cours, de 0 inclusivement jusqu'à {@code panels.length} exclusivement.
+     * Index de l'Ã©tape en cours, de 0 inclusivement jusqu'Ã  {@code panels.length} exclusivement.
      */
     private int index;
 
     /**
-     * Construit un itérateur. La méthode {@link #initialize initialize} devra être appelée avant
-     * que cet itérateur ne soit utilisable.
+     * Construit un itÃ©rateur. La mÃ©thode {@link #initialize initialize} devra Ãªtre appelÃ©e avant
+     * que cet itÃ©rateur ne soit utilisable.
      */
     public WizardIterator() {
     }
 
     /**
-     * Initialise cet itérateur. Cette méthode est appelée automatiquement par l'objet
-     * {@code wizard} donné en argument.
+     * Initialise cet itÃ©rateur. Cette mÃ©thode est appelÃ©e automatiquement par l'objet
+     * {@code wizard} donnÃ© en argument.
      */
     public void initialize(final WizardDescriptor wizard) {
         this.wizard = wizard;
@@ -102,15 +102,15 @@ public final class WizardIterator implements WizardDescriptor.InstantiatingItera
     }
 
     /**
-     * Dispose de cet itérateur. Cette méthode est appelée automatiquement lorsque l'assistant
-     * est fermé.
+     * Dispose de cet itÃ©rateur. Cette mÃ©thode est appelÃ©e automatiquement lorsque l'assistant
+     * est fermÃ©.
      */
     public void uninitialize(final WizardDescriptor wizard) {
         panels = null;
     }
 
     /**
-     * Retourne les objets créés par cet assistant.
+     * Retourne les objets crÃ©Ã©s par cet assistant.
      */
     public Set instantiate() throws IOException {
         return Collections.EMPTY_SET;
@@ -124,33 +124,33 @@ public final class WizardIterator implements WizardDescriptor.InstantiatingItera
     }
 
     /**
-     * Retourne le nom du paneau courant. Ce nom apparaîtra entre parenthèses après le nom
-     * de l'étape. L'implémentation par défaut retourne "(<var>x</var> de <var>y</var>)" où
-     * <var>x</var> et le numéro de l'étape en cours et <var>y</var> le nombre d'étapes. Le
-     * résultat ressemblera à "Serveur de données (1 de 2)".
+     * Retourne le nom du paneau courant. Ce nom apparaÃ®tra entre parenthÃ¨ses aprÃ¨s le nom
+     * de l'Ã©tape. L'implÃ©mentation par dÃ©faut retourne "(<var>x</var> de <var>y</var>)" oÃ¹
+     * <var>x</var> et le numÃ©ro de l'Ã©tape en cours et <var>y</var> le nombre d'Ã©tapes. Le
+     * rÃ©sultat ressemblera Ã  "Serveur de donnÃ©es (1 de 2)".
      */
     public String name() {
         return (index + 1) + " de " + panels.length;
     }
 
     /**
-     * Retourne {@code true} s'il y a d'autres paneaux à retourner.
+     * Retourne {@code true} s'il y a d'autres paneaux Ã  retourner.
      */
     public boolean hasNext() {
         return index < panels.length - 1;
     }
 
     /**
-     * Retourne {@code true} s'il est possible de revenir en arrière.
+     * Retourne {@code true} s'il est possible de revenir en arriÃ¨re.
      */
     public boolean hasPrevious() {
         return index > 0;
     }
 
     /**
-     * Avance au paneau suivant. Cette méthode ne fait qu'incrémenter le compteur;
-     * elle ne modifie par l'interface utilisateur elle-même. Cette interface sera
-     * obtenue par un appel à {@link #current}.
+     * Avance au paneau suivant. Cette mÃ©thode ne fait qu'incrÃ©menter le compteur;
+     * elle ne modifie par l'interface utilisateur elle-mÃªme. Cette interface sera
+     * obtenue par un appel Ã  {@link #current}.
      *
      * @throws NoSuchElementException s'il n'y a pas de paneau suivant.
      */
@@ -162,11 +162,11 @@ public final class WizardIterator implements WizardDescriptor.InstantiatingItera
     }
     
     /**
-     * Recule au paneau précédent. Cette méthode ne fait que décrémenter le compteur;
-     * elle ne modifie par l'interface utilisateur elle-même. Cette interface sera
-     * obtenue par un appel à {@link #current}.
+     * Recule au paneau prÃ©cÃ©dent. Cette mÃ©thode ne fait que dÃ©crÃ©menter le compteur;
+     * elle ne modifie par l'interface utilisateur elle-mÃªme. Cette interface sera
+     * obtenue par un appel Ã  {@link #current}.
      *
-     * @throws NoSuchElementException s'il n'y a pas de paneau précédent.
+     * @throws NoSuchElementException s'il n'y a pas de paneau prÃ©cÃ©dent.
      */
     public void previousPanel() throws NoSuchElementException {
         if (!hasPrevious()) {
@@ -176,17 +176,17 @@ public final class WizardIterator implements WizardDescriptor.InstantiatingItera
     }
 
     /**
-     * Ajoute un objet à informer si la possibilité d'avancer ou de reculer change.
+     * Ajoute un objet Ã  informer si la possibilitÃ© d'avancer ou de reculer change.
      */
     public void addChangeListener(final ChangeListener listener) {
-        // Rien à faire, puisque le nombre de paneaux reste fixe.
+        // Rien Ã  faire, puisque le nombre de paneaux reste fixe.
     }
 
     /**
-     * Retire un objet à informer si la possibilité d'avancer ou de reculer change.
+     * Retire un objet Ã  informer si la possibilitÃ© d'avancer ou de reculer change.
      */
     public void removeChangeListener(final ChangeListener listener) {
-        // Rien à faire, puisque le nombre de paneaux reste fixe.
+        // Rien Ã  faire, puisque le nombre de paneaux reste fixe.
     }
     
     // If something changes dynamically (besides moving between panels), e.g.

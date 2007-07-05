@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,42 +20,42 @@ package net.sicade.numeric.table;
 
 
 /**
- * Ordre des données dans un {@linkplain OrderedVector vecteur}. Les données peuvent être croissantes
- * ou décroissantes, strictement ou pas.
+ * Ordre des donnÃ©es dans un {@linkplain OrderedVector vecteur}. Les donnÃ©es peuvent Ãªtre croissantes
+ * ou dÃ©croissantes, strictement ou pas.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public enum DataOrder {
     /**
-     * Indique que les données d'un {@linkplain OrderedVector vecteur} sont strictement croissantes.
+     * Indique que les donnÃ©es d'un {@linkplain OrderedVector vecteur} sont strictement croissantes.
      */
     STRICTLY_ASCENDING,
 
     /**
-     * Indique que les données d'un {@linkplain OrderedVector vecteur} sont croissantes.
-     * Le vecteur contient quelques données consécutives de même valeur.
+     * Indique que les donnÃ©es d'un {@linkplain OrderedVector vecteur} sont croissantes.
+     * Le vecteur contient quelques donnÃ©es consÃ©cutives de mÃªme valeur.
      */
     ASCENDING,
 
     /**
-     * Indique que les données d'un {@linkplain OrderedVector vecteur} ont la même valeur.
+     * Indique que les donnÃ©es d'un {@linkplain OrderedVector vecteur} ont la mÃªme valeur.
      */
     FLAT,
 
     /**
-     * Indique que les données d'un {@linkplain OrderedVector vecteur} sont décroissantes.
-     * Le vecteur contient quelques données consécutives de même valeur.
+     * Indique que les donnÃ©es d'un {@linkplain OrderedVector vecteur} sont dÃ©croissantes.
+     * Le vecteur contient quelques donnÃ©es consÃ©cutives de mÃªme valeur.
      */
     DESCENDING,
 
     /**
-     * Indique que les données d'un {@linkplain OrderedVector vecteur} sont strictement croissantes.
+     * Indique que les donnÃ©es d'un {@linkplain OrderedVector vecteur} sont strictement croissantes.
      */
     STRICTLY_DESCENDING,
 
     /**
-     * Indique que les données d'un {@linkplain OrderedVector vecteur} ne sont pas ordonnées.
+     * Indique que les donnÃ©es d'un {@linkplain OrderedVector vecteur} ne sont pas ordonnÃ©es.
      */
     UNORDERED
 }

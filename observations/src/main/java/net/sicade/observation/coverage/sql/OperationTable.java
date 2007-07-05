@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -38,7 +38,7 @@ import net.sicade.observation.sql.SingletonTable;
 
 
 /**
- * Connexion vers la table des {@linkplain Operation opérations} susceptibles d'être appliquées
+ * Connexion vers la table des {@linkplain Operation opÃ©rations} susceptibles d'Ãªtre appliquÃ©es
  * sur des images.
  * 
  * @version $Id$
@@ -49,7 +49,7 @@ import net.sicade.observation.sql.SingletonTable;
 @UsedBy(DescriptorTable.class)
 public class OperationTable extends SingletonTable<Operation> implements Shareable {
     /**
-     * Requête SQL utilisée par cette classe pour obtenir les opérations.
+     * RequÃªte SQL utilisÃ©e par cette classe pour obtenir les opÃ©rations.
      * L'ordre des colonnes est essentiel. 
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Operations:SELECT", 
@@ -60,28 +60,28 @@ public class OperationTable extends SingletonTable<Operation> implements Shareab
             "  FROM \"Operations\"\n"  +
             " WHERE name=?");
 
-    /** Numéro de colonne. */ private static final int NAME         =  1;
-    /** Numéro de colonne. */ private static final int PREFIX       =  2;
-    /** Numéro de colonne. */ private static final int OPERATION    =  3;
-    /** Numéro de colonne. */ private static final int DESCRIPTION  =  4;
+    /** NumÃ©ro de colonne. */ private static final int NAME         =  1;
+    /** NumÃ©ro de colonne. */ private static final int PREFIX       =  2;
+    /** NumÃ©ro de colonne. */ private static final int OPERATION    =  3;
+    /** NumÃ©ro de colonne. */ private static final int DESCRIPTION  =  4;
 
     /** 
-     * La table des paramètres des opérations. Ne sera construite que la première fois
-     * où elle sera nécessaire.
+     * La table des paramÃ¨tres des opÃ©rations. Ne sera construite que la premiÃ¨re fois
+     * oÃ¹ elle sera nÃ©cessaire.
      */
     private OperationParameterTable parameters;
 
     /** 
-     * Construit une table des opérations.
+     * Construit une table des opÃ©rations.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnÃ©es.
      */
     public OperationTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les opérations.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les opÃ©rations.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -92,10 +92,10 @@ public class OperationTable extends SingletonTable<Operation> implements Shareab
     }
 
     /**
-     * Construit une opération pour l'enregistrement courant.
+     * Construit une opÃ©ration pour l'enregistrement courant.
      *
-     * @throws  SQLException            Si l'interrogation de la base de données a échoué.
-     * @throws  IllegalRecordException  Si un des paramètres trouvés dans la base de données
+     * @throws  SQLException            Si l'interrogation de la base de donnÃ©es a Ã©chouÃ©.
+     * @throws  IllegalRecordException  Si un des paramÃ¨tres trouvÃ©s dans la base de donnÃ©es
      *          n'est pas connu par le groupe {@code parameters}, ou a une valeur invalide.
      */
     protected Operation createEntry(final ResultSet results) throws SQLException, IllegalRecordException {

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,12 +39,12 @@ import net.sicade.sie.type.bbox.AddAction;
 
 
 /**
- * Le noeud à la racine de toutes l'arborescence qui apparaîtra dans la fenêtre {@link ExplorerWindow}.
- * Cette racine ne sera pas nécessairement visible; ça dépend de la configuration de l'afficheur de
- * l'arborescence. Cette racine enveloppe un noeud du {@linkplain FileSystem système de fichier} de
- * Netbeans. Ce système de fichiers est en quelque sorte virtuel, et sa racine déclarée par l'élément
- * {@value #ROOT_NAME} du fichier {@code layer.xml} (tous les éléments du fichier {@code layer.xml}
- * peuvent être un vus comme un système de fichiers par Netbeans).
+ * Le noeud Ã  la racine de toutes l'arborescence qui apparaÃ®tra dans la fenÃªtre {@link ExplorerWindow}.
+ * Cette racine ne sera pas nÃ©cessairement visible; Ã§a dÃ©pend de la configuration de l'afficheur de
+ * l'arborescence. Cette racine enveloppe un noeud du {@linkplain FileSystem systÃ¨me de fichier} de
+ * Netbeans. Ce systÃ¨me de fichiers est en quelque sorte virtuel, et sa racine dÃ©clarÃ©e par l'Ã©lÃ©ment
+ * {@value #ROOT_NAME} du fichier {@code layer.xml} (tous les Ã©lÃ©ments du fichier {@code layer.xml}
+ * peuvent Ãªtre un vus comme un systÃ¨me de fichiers par Netbeans).
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -56,22 +56,22 @@ public final class RootNode extends FilterNode {
     public static final String ROOT_NAME = "Series";
 
     /**
-     * Icône représentant cette racine. Ne sera construit que la première fois où il sera
-     * nécessaire.
+     * IcÃ´ne reprÃ©sentant cette racine. Ne sera construit que la premiÃ¨re fois oÃ¹ il sera
+     * nÃ©cessaire.
      */
     private transient Image icon;
 
     /**
-     * Les actions à retourner par {@link #addAction}. Ne sera construit que la première
-     * fois où elles seront nécessaires.
+     * Les actions Ã  retourner par {@link #addAction}. Ne sera construit que la premiÃ¨re
+     * fois oÃ¹ elles seront nÃ©cessaires.
      */
     private transient Action[] actions;
 
     /**
-     * Construit une nouvelle racine pour l'élément {@value #ROOT_NAME} déclaré dans
+     * Construit une nouvelle racine pour l'Ã©lÃ©ment {@value #ROOT_NAME} dÃ©clarÃ© dans
      * le fichier {@code layer.xml}.
      *
-     * @throws DataObjectNotFoundException si l'élément {@value #ROOT_NAME} n'a pas été trouvé.
+     * @throws DataObjectNotFoundException si l'Ã©lÃ©ment {@value #ROOT_NAME} n'a pas Ã©tÃ© trouvÃ©.
      */
     public RootNode() throws DataObjectNotFoundException {
         super(getSystemRoot());
@@ -85,11 +85,11 @@ public final class RootNode extends FilterNode {
     }
 
     /**
-     * Retourne la racine {@value #ROOT_NAME} vue par le {@linkplain FileSystem système de fichier}
-     * par défaut de Netbeans. Ce noeud devra être enveloppé dans une instance de {@link RootNode}
-     * afin d'offrir les services spécifiques à cette classe.
+     * Retourne la racine {@value #ROOT_NAME} vue par le {@linkplain FileSystem systÃ¨me de fichier}
+     * par dÃ©faut de Netbeans. Ce noeud devra Ãªtre enveloppÃ© dans une instance de {@link RootNode}
+     * afin d'offrir les services spÃ©cifiques Ã  cette classe.
      *
-     * @throws DataObjectNotFoundException si l'élément {@value #ROOT_NAME} n'a pas été trouvé.
+     * @throws DataObjectNotFoundException si l'Ã©lÃ©ment {@value #ROOT_NAME} n'a pas Ã©tÃ© trouvÃ©.
      */
     private static Node getSystemRoot() throws DataObjectNotFoundException {
         final FileSystem fs   = Repository.getDefault().getDefaultFileSystem();
@@ -98,7 +98,7 @@ public final class RootNode extends FilterNode {
     }
 
     /**
-     * Retourne l'icône représentant cette racine avant que le dossier ne soit ouvert.
+     * Retourne l'icÃ´ne reprÃ©sentant cette racine avant que le dossier ne soit ouvert.
      */
     @Override
     public Image getIcon(final int type) {
@@ -109,9 +109,9 @@ public final class RootNode extends FilterNode {
     }
 
     /**
-     * Retourne l'icône représentant cette racine après que le dossier aie été ouvert.
-     * L'implémentation par défaut retourne <code>{@linkplain #getIcon getIcon}(type)</code>
-     * (autrement dit nous ne faisons pas de distinction entre les dossiers ouverts et fermés).
+     * Retourne l'icÃ´ne reprÃ©sentant cette racine aprÃ¨s que le dossier aie Ã©tÃ© ouvert.
+     * L'implÃ©mentation par dÃ©faut retourne <code>{@linkplain #getIcon getIcon}(type)</code>
+     * (autrement dit nous ne faisons pas de distinction entre les dossiers ouverts et fermÃ©s).
      */
     @Override
     public Image getOpenedIcon(final int type) {
@@ -120,8 +120,8 @@ public final class RootNode extends FilterNode {
 
     /**
      * Retourne {@code false} pour interdire tout renommage de cette racine. Un renommage peut
-     * provoquer des résultats inatendus puisque le nom d'affichage spécifié par le constructeur
-     * n'est pas le même que le nom spécifié interne spécifié dans le fichier {@code layer.xml}.
+     * provoquer des rÃ©sultats inatendus puisque le nom d'affichage spÃ©cifiÃ© par le constructeur
+     * n'est pas le mÃªme que le nom spÃ©cifiÃ© interne spÃ©cifiÃ© dans le fichier {@code layer.xml}.
      */
     @Override
     public boolean canRename() {
@@ -137,7 +137,7 @@ public final class RootNode extends FilterNode {
     }
 
     /**
-     * Masque les propriétés pour ce noeud, car ces informations sont sans intérêt pour
+     * Masque les propriÃ©tÃ©s pour ce noeud, car ces informations sont sans intÃ©rÃªt pour
      * l'utilisateur et leur modification peut provoquer un dysfonctionnement du programme.
      */
     @Override
@@ -146,10 +146,10 @@ public final class RootNode extends FilterNode {
     }
 
     /**
-     * Retourne l'ensemble des actions disponibles pour cette racine. Cette méthode est
-     * appelée pour construire les menus "popup". Le tableau retourné peut contenir des
-     * valeurs {@code null} pour insérer des séparateurs. Ce menu devra contenir au moins
-     * un item pour créer un nouvel objet {@code .bbox}.
+     * Retourne l'ensemble des actions disponibles pour cette racine. Cette mÃ©thode est
+     * appelÃ©e pour construire les menus "popup". Le tableau retournÃ© peut contenir des
+     * valeurs {@code null} pour insÃ©rer des sÃ©parateurs. Ce menu devra contenir au moins
+     * un item pour crÃ©er un nouvel objet {@code .bbox}.
      */
     @Override
     public Action[] getActions(final boolean context) {

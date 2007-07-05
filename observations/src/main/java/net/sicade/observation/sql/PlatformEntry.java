@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Implémentation d'une entrée représentant une {@link Platform plateforme}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@link Platform plateforme}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -39,26 +39,26 @@ import net.sicade.observation.CatalogException;
  */
 public class PlatformEntry extends LocatedEntry implements Platform {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 791454287176154131L;
 
     /**
-     * L'ensemble des stations. Ne sera construit que la première fois où il sera nécessaire.
+     * L'ensemble des stations. Ne sera construit que la premiÃ¨re fois oÃ¹ il sera nÃ©cessaire.
      */
     private Set<? extends Station> elements;
 
     /**
      * Connexion vers la table des stations.
-     * Sera mis à {@code null} lorsqu'elle ne sera plus nécessaire.
+     * Sera mis Ã  {@code null} lorsqu'elle ne sera plus nÃ©cessaire.
      */
     private transient StationTable stations;
 
     /**
-     * Construit une entrée pour l'identifiant de plateforme spécifié.
+     * Construit une entrÃ©e pour l'identifiant de plateforme spÃ©cifiÃ©.
      *
-     * @param table La table qui a produit cette entrée.
-     * @param name  Le nom de la plateforme (parfois assimilé à une campagne d'échantillonage).
+     * @param table La table qui a produit cette entrÃ©e.
+     * @param name  Le nom de la plateforme (parfois assimilÃ© Ã  une campagne d'Ã©chantillonage).
      */
     protected PlatformEntry(final PlatformTable table,
                             final String        name)
@@ -88,7 +88,7 @@ public class PlatformEntry extends LocatedEntry implements Platform {
     }
 
     /**
-     * Complète les informations manquantes avant l'enregistrement binaire de cette entrée.
+     * ComplÃ¨te les informations manquantes avant l'enregistrement binaire de cette entrÃ©e.
      */
     @Override
     protected void preSerialize() throws Exception {

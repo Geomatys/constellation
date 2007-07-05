@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ import net.sicade.observation.Station;
 
 
 /**
- * Représentation d'une ligne de palangre.
+ * ReprÃ©sentation d'une ligne de palangre.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -31,7 +31,7 @@ import net.sicade.observation.Station;
  */
 public interface LongLine extends Station {
     /**
-     * Retourne le nombre d'hameçons.
+     * Retourne le nombre d'hameÃ§ons.
      */
     int getHookCount();
 
@@ -41,13 +41,13 @@ public interface LongLine extends Station {
     float getLineLength();
 
     /**
-     * Retourne la distance au bateau le plus proche du même jour,
+     * Retourne la distance au bateau le plus proche du mÃªme jour,
      * ou {@link Float#NaN NaN} si elle n'est pas connue.
      */
     float getNearestNeighbor();
 
     /**
-     * Retourne la distance à la côte la plus proche,
+     * Retourne la distance Ã  la cÃ´te la plus proche,
      * ou {@link Float#NaN NaN} si elle n'est pas connue.
      */
     float getNearestCoast();

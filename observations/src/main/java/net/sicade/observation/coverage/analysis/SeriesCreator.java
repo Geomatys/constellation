@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,11 +39,11 @@ import org.geotools.resources.image.ImageUtilities;
 
 
 /**
- * Construit des séries temporelles.
+ * Construit des sÃ©ries temporelles.
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author TouraÃ¯vane
  */
 public class SeriesCreator {
     /**
@@ -61,11 +61,11 @@ public class SeriesCreator {
         final Coverage coverage = Observations.getDefault().getDescriptorCoverage("SST");
         final GeneralEnvelope e = new GeneralEnvelope(coverage.getEnvelope());
         e.setRange(0,   136,   196);  // Plage de longitudes
-        e.setRange(0,   136,   180);  // (coupe à la ligne +/-180)
+        e.setRange(0,   136,   180);  // (coupe Ã  la ligne +/-180)
         e.setRange(1,   -44,     3);  // Plage de latitudes
 //        e.setRange(2, 12784, 19723);  // Plage de temps: 1er janvier 1985 au 1er janvier 2004.
 //        e.setRange(2, 18262, 19358);  // Plage de temps: 1er janvier 2000 au 1er janvier 2003.
-        e.setRange(2, 18262, 18293);  // Plage de temps: 1er janvier 2000 au 1er février 2000.
+        e.setRange(2, 18262, 18293);  // Plage de temps: 1er janvier 2000 au 1er fÃ©vrier 2000.
 //        final TimeSeriesTile ts = new TimeSeriesTile(coverage, e, new double[] {5, 5, 1});
         final TimeSeriesTile ts = new TimeSeriesTile(coverage, e, new double[] {0.1, 0.1, 1}, 2);
         final Writer out = new BufferedWriter(new FileWriter("C:\\Documents and Settings\\Antoine\\Bureau\\TestTimeSeriesTile\\series.txt"));

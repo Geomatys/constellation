@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,29 +34,29 @@ import net.sicade.observation.ConfigurationKey;
  */
 public class DistributionTable extends SingletonTable<Distribution> implements Shareable {
     /**
-     * Requête SQL pour obtenir une distribution.
+     * RequÃªte SQL pour obtenir une distribution.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Distributions:SELECT",
             "SELECT name, scale, \"offset\", log\n" +
             "  FROM \"Distributions\"\n"            +
             " WHERE name=?");
 
-    /** Numéro de colonne. */ private static final int NAME   = 1;
-    /** Numéro de colonne. */ private static final int SCALE  = 2;
-    /** Numéro de colonne. */ private static final int OFFSET = 3;
-    /** Numéro de colonne. */ private static final int LOG    = 4;
+    /** NumÃ©ro de colonne. */ private static final int NAME   = 1;
+    /** NumÃ©ro de colonne. */ private static final int SCALE  = 2;
+    /** NumÃ©ro de colonne. */ private static final int OFFSET = 3;
+    /** NumÃ©ro de colonne. */ private static final int LOG    = 4;
 
     /**
      * Construit une table des distributions.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnÃ©es.
      */
     public DistributionTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les distributions.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les distributions.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {

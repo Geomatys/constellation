@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,40 +26,40 @@ import net.sicade.observation.coverage.DynamicCoverage;
 
 
 /**
- * Fournit des instances de {@link DataConnection} à la demande.
+ * Fournit des instances de {@link DataConnection} Ã  la demande.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface DataConnectionFactory extends Remote {
     /**
-     * Le nom sous lequel sera enregistré ce service dans {@link java.rmi.Naming}.
+     * Le nom sous lequel sera enregistrÃ© ce service dans {@link java.rmi.Naming}.
      */
     String REGISTRY_NAME = "DataConnectionFactory";
 
     /**
-     * Construit une nouvelle connexion vers les données de la série spécifiée.
+     * Construit une nouvelle connexion vers les donnÃ©es de la sÃ©rie spÃ©cifiÃ©e.
      *
-     * @throws CatalogException si la table n'a pas pu être construite pour la série spécifiée.
-     * @throws SQLException si la connexion à la base de données a échoué.
-     * @throws RemoteException si la connexion n'a pas pu être établie.
+     * @throws CatalogException si la table n'a pas pu Ãªtre construite pour la sÃ©rie spÃ©cifiÃ©e.
+     * @throws SQLException si la connexion Ã  la base de donnÃ©es a Ã©chouÃ©.
+     * @throws RemoteException si la connexion n'a pas pu Ãªtre Ã©tablie.
      */
     DataConnection connectSeries(final String series) throws CatalogException, SQLException, RemoteException;
 
     /**
-     * Retourne la couverture de données pour le descripteur spécifié. Appeller cette méthode est
-     * équivalent à exécuter le code suivant:
+     * Retourne la couverture de donnÃ©es pour le descripteur spÃ©cifiÃ©. Appeller cette mÃ©thode est
+     * Ã©quivalent Ã  exÃ©cuter le code suivant:
      *
      * <blockquote><pre>
      * return database.getTable(DescriptorTable.class).getEntryLenient(descriptor).getCoverage();
      * </pre></blockquote>
      *
-     * Toutefois, faire exécuter ce code sur le serveur RMI distant permet d'éviter que le client
-     * n'ouvre une connexion à la base de données.
+     * Toutefois, faire exÃ©cuter ce code sur le serveur RMI distant permet d'Ã©viter que le client
+     * n'ouvre une connexion Ã  la base de donnÃ©es.
      *
-     * @throws CatalogException si la table n'a pas pu être construite pour la série spécifiée.
-     * @throws SQLException si la connexion à la base de données a échoué.
-     * @throws RemoteException si la connexion n'a pas pu être établie.
+     * @throws CatalogException si la table n'a pas pu Ãªtre construite pour la sÃ©rie spÃ©cifiÃ©e.
+     * @throws SQLException si la connexion Ã  la base de donnÃ©es a Ã©chouÃ©.
+     * @throws RemoteException si la connexion n'a pas pu Ãªtre Ã©tablie.
      */
     DynamicCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException, RemoteException;
 }

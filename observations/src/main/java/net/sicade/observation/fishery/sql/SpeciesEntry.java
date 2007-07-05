@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,31 +28,31 @@ import net.sicade.observation.sql.PhenomenonEntry;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Species espèce}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain Species espÃ¨ce}.
  * 
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class SpeciesEntry extends PhenomenonEntry implements Species {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 6568964374209025692L;
 
     /**
-     * Conventions locales pré-définies.
+     * Conventions locales prÃ©-dÃ©finies.
      */
     private static final Locale[] LOCALES = {
         ENGLISH, FRENCH, LATIN, FAO
     };
 
     /**
-     * Les noms de cette espèce selon les différentes langues.
+     * Les noms de cette espÃ¨ce selon les diffÃ©rentes langues.
      */
     private final String english, french, latin;
 
     /**
-     * Crée une nouvelle entrée du nom spécifié.
+     * CrÃ©e une nouvelle entrÃ©e du nom spÃ©cifiÃ©.
      */
     public SpeciesEntry(final String name,
                         final String english,
@@ -87,7 +87,7 @@ public class SpeciesEntry extends PhenomenonEntry implements Species {
     /**
      * {@inheritDoc}
      *
-     * @deprecated Pas encore implémenté...
+     * @deprecated Pas encore implÃ©mentÃ©...
      */
     public Icon getIcon() {
         throw new UnsupportedOperationException();

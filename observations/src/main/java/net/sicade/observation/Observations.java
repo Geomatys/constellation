@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -47,52 +47,52 @@ import net.sicade.observation.coverage.rmi.DataConnectionFactory;
 
 
 /**
- * Méthodes de commodité permettant d'obtenir des observations.
+ * MÃ©thodes de commoditÃ© permettant d'obtenir des observations.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Observations {
     /**
-     * Une instance de {@code Observations} connectée à la base de données par défaut. Cette
-     * base de données est habituellement déclarée dans un fichier {@code DatabaseQueries.xml}
-     * situé dans le répertoire de l'utilisateur.
+     * Une instance de {@code Observations} connectÃ©e Ã  la base de donnÃ©es par dÃ©faut. Cette
+     * base de donnÃ©es est habituellement dÃ©clarÃ©e dans un fichier {@code DatabaseQueries.xml}
+     * situÃ© dans le rÃ©pertoire de l'utilisateur.
      */
     private static Observations DEFAULT;
 
     /**
-     * La connexion vers la base de données. Si sa valeur est {@code null}, alors une connexion
-     * par défaut ne sera établie que la première fois où elle sera nécessaire.
+     * La connexion vers la base de donnÃ©es. Si sa valeur est {@code null}, alors une connexion
+     * par dÃ©faut ne sera Ã©tablie que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private Database database;
 
     /**
-     * Connections vers les table des séries pour différentes enveloppes spatio-temporelles.
-     * Chaque connexion ne sera construite que la première fois où elle sera nécessaire. La
-     * valeur associée à la clé {@code null} sera la table de toutes les séries sans restriction.
+     * Connections vers les table des sÃ©ries pour diffÃ©rentes enveloppes spatio-temporelles.
+     * Chaque connexion ne sera construite que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire. La
+     * valeur associÃ©e Ã  la clÃ© {@code null} sera la table de toutes les sÃ©ries sans restriction.
      */
     private final Map<Envelope,SeriesTable> series = new HashMap<Envelope,SeriesTable>();
 
     /**
-     * L'ensemble des couvertures de données obtenues par {@link #getCoverage}.
+     * L'ensemble des couvertures de donnÃ©es obtenues par {@link #getCoverage}.
      */
     @SuppressWarnings("unchecked")
     private final Map<String,DynamicCoverage> coverages = new WeakValueHashMap();
 
     /**
-     * Construit une instance de {@code Observations} pour la base de données spécifiée.
+     * Construit une instance de {@code Observations} pour la base de donnÃ©es spÃ©cifiÃ©e.
      *
-     * @param database Connexion à la base de données, ou {@code null} pour utiliser la
-     *        base de données par défaut.
+     * @param database Connexion Ã  la base de donnÃ©es, ou {@code null} pour utiliser la
+     *        base de donnÃ©es par dÃ©faut.
      */
     public Observations(final Database database) {
         this.database = database;
     }
 
     /**
-     * Une instance de {@code Observations} connectée à la base de données par défaut. Cette
-     * base de données est habituellement déclarée dans un fichier {@code DatabaseQueries.xml}
-     * situé dans le répertoire de l'utilisateur.
+     * Une instance de {@code Observations} connectÃ©e Ã  la base de donnÃ©es par dÃ©faut. Cette
+     * base de donnÃ©es est habituellement dÃ©clarÃ©e dans un fichier {@code DatabaseQueries.xml}
+     * situÃ© dans le rÃ©pertoire de l'utilisateur.
      */
     public static synchronized Observations getDefault() {
         if (DEFAULT == null) {
@@ -102,10 +102,10 @@ public class Observations {
     }
 
     /**
-     * Retourne une connexion à la base de données.
+     * Retourne une connexion Ã  la base de donnÃ©es.
      *
-     * @return La connexion à la base de données (jamais nulle).
-     * @param  CatalogException si la base de données n'a pas pu être obtenue.
+     * @return La connexion Ã  la base de donnÃ©es (jamais nulle).
+     * @param  CatalogException si la base de donnÃ©es n'a pas pu Ãªtre obtenue.
      */
     public synchronized Database getDatabase() throws CatalogException {
         if (database == null) try {
@@ -119,24 +119,24 @@ public class Observations {
     /**
      * Retourne la table des descripteurs.
      *
-     * @param  CatalogException si la table n'a pas pu être obtenue.
+     * @param  CatalogException si la table n'a pas pu Ãªtre obtenue.
      *
-     * @todo Envisager de cacher le résultat. Et aussi de fournir la possibilité de
-     *       réduire la région géographique.
+     * @todo Envisager de cacher le rÃ©sultat. Et aussi de fournir la possibilitÃ© de
+     *       rÃ©duire la rÃ©gion gÃ©ographique.
      */
     private DescriptorTable getDescriptorTable() throws CatalogException {
         return getDatabase().getTable(DescriptorTable.class);
     }
 
     /**
-     * Retourne la table des séries pour la région spatio-temporelle spécifiée.
+     * Retourne la table des sÃ©ries pour la rÃ©gion spatio-temporelle spÃ©cifiÃ©e.
      *
-     * @param  area La région géographique des séries désirées, ou {@code null} pour ne placer aucune
-     *         restriction géographique.
-     * @param  timeRange La plage de temps des séries désirées, ou {@code null} pour ne placer aucune
+     * @param  area La rÃ©gion gÃ©ographique des sÃ©ries dÃ©sirÃ©es, ou {@code null} pour ne placer aucune
+     *         restriction gÃ©ographique.
+     * @param  timeRange La plage de temps des sÃ©ries dÃ©sirÃ©es, ou {@code null} pour ne placer aucune
      *         restriction temporelle.
-     * @return La table des séries interceptant la région géographique et la plage de temps spécifiées.
-     * @throws SQLException si une erreur est survenue lors de l'interrogation de la base de données.
+     * @return La table des sÃ©ries interceptant la rÃ©gion gÃ©ographique et la plage de temps spÃ©cifiÃ©es.
+     * @throws SQLException si une erreur est survenue lors de l'interrogation de la base de donnÃ©es.
      */
     private SeriesTable getSeriesTable(final GeographicBoundingBox area, final DateRange timeRange)
             throws CatalogException, SQLException
@@ -162,15 +162,15 @@ public class Observations {
     }
 
     /**
-     * Retourne l'ensemble des séries disponibles dans la base de données. Si une région géographique
-     * ou une plage de temps sont spécifiées, alors seules les séries interceptant ces régions seront
-     * retournées.
+     * Retourne l'ensemble des sÃ©ries disponibles dans la base de donnÃ©es. Si une rÃ©gion gÃ©ographique
+     * ou une plage de temps sont spÃ©cifiÃ©es, alors seules les sÃ©ries interceptant ces rÃ©gions seront
+     * retournÃ©es.
      *
-     * @param  area La région géographique des séries désirées, ou {@code null} pour ne placer aucune
-     *         restriction géographique.
-     * @param  timeRange La plage de temps des séries désirées, ou {@code null} pour ne placer aucune
+     * @param  area La rÃ©gion gÃ©ographique des sÃ©ries dÃ©sirÃ©es, ou {@code null} pour ne placer aucune
+     *         restriction gÃ©ographique.
+     * @param  timeRange La plage de temps des sÃ©ries dÃ©sirÃ©es, ou {@code null} pour ne placer aucune
      *         restriction temporelle.
-     * @return L'ensemble des séries interceptant la région géographique et la plage de temps spécifiées.
+     * @return L'ensemble des sÃ©ries interceptant la rÃ©gion gÃ©ographique et la plage de temps spÃ©cifiÃ©es.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      */
     public synchronized Set<Series> getSeries(final GeographicBoundingBox area,
@@ -185,15 +185,15 @@ public class Observations {
     }
 
     /**
-     * Retourne la séries de données du nom spécifié dans la région spatio-temporelle spécifiée.
+     * Retourne la sÃ©ries de donnÃ©es du nom spÃ©cifiÃ© dans la rÃ©gion spatio-temporelle spÃ©cifiÃ©e.
      *
-     * @param  area La région géographique des séries désirées, ou {@code null} pour ne placer aucune
-     *         restriction géographique.
-     * @param  timeRange La plage de temps des séries désirées, ou {@code null} pour ne placer aucune
+     * @param  area La rÃ©gion gÃ©ographique des sÃ©ries dÃ©sirÃ©es, ou {@code null} pour ne placer aucune
+     *         restriction gÃ©ographique.
+     * @param  timeRange La plage de temps des sÃ©ries dÃ©sirÃ©es, ou {@code null} pour ne placer aucune
      *         restriction temporelle.
-     * @param  name Nom de la série désirée.
-     * @return Une série de nom spécifié.
-     * @throws NoSuchRecordException si aucune série n'a été trouvée pour le nom spécifié.
+     * @param  name Nom de la sÃ©rie dÃ©sirÃ©e.
+     * @return Une sÃ©rie de nom spÃ©cifiÃ©.
+     * @throws NoSuchRecordException si aucune sÃ©rie n'a Ã©tÃ© trouvÃ©e pour le nom spÃ©cifiÃ©.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      */
     public synchronized Series getSeries(final GeographicBoundingBox area,
@@ -209,11 +209,11 @@ public class Observations {
     }
 
     /**
-     * Retourne la séries de données du nom spécifié.
+     * Retourne la sÃ©ries de donnÃ©es du nom spÃ©cifiÃ©.
      *
-     * @param  name Nom de la série désirée.
-     * @return Une série de nom spécifié.
-     * @throws NoSuchRecordException si aucune série n'a été trouvée pour le nom spécifié.
+     * @param  name Nom de la sÃ©rie dÃ©sirÃ©e.
+     * @return Une sÃ©rie de nom spÃ©cifiÃ©.
+     * @throws NoSuchRecordException si aucune sÃ©rie n'a Ã©tÃ© trouvÃ©e pour le nom spÃ©cifiÃ©.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      */
     public synchronized Series getSeries(final String name) throws CatalogException {
@@ -225,15 +225,15 @@ public class Observations {
     }
 
     /**
-     * Retourne les données pour un descripteur du nom spécifié.
+     * Retourne les donnÃ©es pour un descripteur du nom spÃ©cifiÃ©.
      *
      * @param  name Le nom du {@linkplain Descriptor descripteur}.
-     * @return La converture des données pour le descripteur spécifié.
-     * @throws NoSuchRecordException si aucun descripteur n'a été trouvée pour le nom spécifié.
+     * @return La converture des donnÃ©es pour le descripteur spÃ©cifiÃ©.
+     * @throws NoSuchRecordException si aucun descripteur n'a Ã©tÃ© trouvÃ©e pour le nom spÃ©cifiÃ©.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      *
-     * @todo Faire en sorte que le boulot soit entièrement fait du côté du serveur RMI (sans
-     *       qu'il ne soit néssaire de faire une connexion à la base de données ici).
+     * @todo Faire en sorte que le boulot soit entiÃ¨rement fait du cÃ´tÃ© du serveur RMI (sans
+     *       qu'il ne soit nÃ©ssaire de faire une connexion Ã  la base de donnÃ©es ici).
      */
     public synchronized DynamicCoverage getDescriptorCoverage(final String name)
             throws CatalogException
@@ -258,15 +258,15 @@ public class Observations {
     }
 
     /**
-     * Retourne les données pour un modèle du nom spécifié.
+     * Retourne les donnÃ©es pour un modÃ¨le du nom spÃ©cifiÃ©.
      *
-     * @param  name Le nom du {@linkplain Descriptor descripteur} ou de la {@linkplain Series série}.
-     * @return Le modèle pour le descripteur ou la série spécifié, ou {@code null} si la série n'a pas de modèle.
-     * @throws NoSuchRecordException si aucun descripteur ou série n'a été trouvée pour le nom spécifié.
+     * @param  name Le nom du {@linkplain Descriptor descripteur} ou de la {@linkplain Series sÃ©rie}.
+     * @return Le modÃ¨le pour le descripteur ou la sÃ©rie spÃ©cifiÃ©, ou {@code null} si la sÃ©rie n'a pas de modÃ¨le.
+     * @throws NoSuchRecordException si aucun descripteur ou sÃ©rie n'a Ã©tÃ© trouvÃ©e pour le nom spÃ©cifiÃ©.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      *
-     * @todo Faire en sorte que le boulot soit entièrement fait du côté du serveur RMI (sans
-     *       qu'il ne soit néssaire de faire une connexion à la base de données ici).
+     * @todo Faire en sorte que le boulot soit entiÃ¨rement fait du cÃ´tÃ© du serveur RMI (sans
+     *       qu'il ne soit nÃ©ssaire de faire une connexion Ã  la base de donnÃ©es ici).
      */
     public synchronized Coverage getModelCoverage(final String name) throws CatalogException {
         Series series;
@@ -285,7 +285,7 @@ public class Observations {
     }
 
     /**
-     * Retourne l'ensemble des descripteurs dans la base de données.
+     * Retourne l'ensemble des descripteurs dans la base de donnÃ©es.
      *
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      */
@@ -298,28 +298,28 @@ public class Observations {
     }
 
     /**
-     * Une enveloppe représentée par une {@linkplain GeographicBoundingBox région géographique} et
-     * une {@linkplain DateRange plage de temps}. Cette classe sert uniquement de clés pour la cache
-     * des {@linkplain SeriesTable tables des séries}.
+     * Une enveloppe reprÃ©sentÃ©e par une {@linkplain GeographicBoundingBox rÃ©gion gÃ©ographique} et
+     * une {@linkplain DateRange plage de temps}. Cette classe sert uniquement de clÃ©s pour la cache
+     * des {@linkplain SeriesTable tables des sÃ©ries}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Envelope {
         /**
-         * La région géographique des séries désirées, ou {@code null} pour ne placer aucune
-         * restriction géographique.
+         * La rÃ©gion gÃ©ographique des sÃ©ries dÃ©sirÃ©es, ou {@code null} pour ne placer aucune
+         * restriction gÃ©ographique.
          */
         private final GeographicBoundingBox bbox;
 
         /**
-         * La plage de temps des séries désirées, ou {@code null} pour ne placer aucune
+         * La plage de temps des sÃ©ries dÃ©sirÃ©es, ou {@code null} pour ne placer aucune
          * restriction temporelle.
          */
         private final DateRange timeRange;
 
         /**
-         * Construit une enveloppe pour les limites spatio-temporelles spécifiées.
+         * Construit une enveloppe pour les limites spatio-temporelles spÃ©cifiÃ©es.
          */
         public Envelope(final GeographicBoundingBox bbox, final DateRange timeRange) {
             this.bbox      = bbox;
@@ -327,7 +327,7 @@ public class Observations {
         }
 
         /**
-         * Retourne un code à peu près unique pour cette enveloppe.
+         * Retourne un code Ã  peu prÃ¨s unique pour cette enveloppe.
          */
         @Override
         public int hashCode() {
@@ -342,7 +342,7 @@ public class Observations {
         }
 
         /**
-         * Compare cette enveloppe avec l'objet spécifié.
+         * Compare cette enveloppe avec l'objet spÃ©cifiÃ©.
          */
         @Override
         public boolean equals(final Object object) {

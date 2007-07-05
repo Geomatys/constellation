@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,9 +27,9 @@ import static java.lang.annotation.RetentionPolicy.*;
 
 
 /**
- * Ensemble des tables qui utilisent la {@linkplain Table table} annotée.
+ * Ensemble des tables qui utilisent la {@linkplain Table table} annotÃ©e.
  * Cette annotation est l'inverse de {@link Use} et n'existe que temporairement.
- * Elle sera supprimée lorsque l'on aura configuré {@code apt} de façon à générer
+ * Elle sera supprimÃ©e lorsque l'on aura configurÃ© {@code apt} de faÃ§on Ã  gÃ©nÃ©rer
  * cette information automatiquement.
  *
  * @version $Id$
@@ -40,7 +40,7 @@ import static java.lang.annotation.RetentionPolicy.*;
 @Retention(SOURCE)
 public @interface UsedBy {
     /**
-     * Ensemble des tables qui utilisent la {@linkplain Table table} annotée.
+     * Ensemble des tables qui utilisent la {@linkplain Table table} annotÃ©e.
      */
     Class<? extends Table>[] value();
 }

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,31 +31,31 @@ import net.sicade.observation.sql.DistributionEntry;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Category catégorie}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain Category catÃ©gorie}.
  * 
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class CategoryEntry extends ObservableEntry implements Category {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 3164568338698958014L;
 
     /**
-     * Le stade de développement.
+     * Le stade de dÃ©veloppement.
      */
     private final Stage stage;
 
     /**
-     * Construit une nouvelle catégorie.
+     * Construit une nouvelle catÃ©gorie.
      *
-     * @param identifier  L'identifiant de la catégorie.
-     * @param symbol      Le symbole de la catégorie.
-     * @param species     L'espèce observée.
-     * @param stage       Le stade de développement.
-     * @param procedure   La procédure associée.
-     * @param remarks     Remarques s'appliquant à cette entrée, ou {@code null}.
+     * @param identifier  L'identifiant de la catÃ©gorie.
+     * @param symbol      Le symbole de la catÃ©gorie.
+     * @param species     L'espÃ¨ce observÃ©e.
+     * @param stage       Le stade de dÃ©veloppement.
+     * @param procedure   La procÃ©dure associÃ©e.
+     * @param remarks     Remarques s'appliquant Ã  cette entrÃ©e, ou {@code null}.
      */
     protected CategoryEntry(final int          identifier,
                             final String       symbol,
@@ -92,7 +92,7 @@ public class CategoryEntry extends ObservableEntry implements Category {
     }
 
     /**
-     * Compare cette entré avec l'object spécifié.
+     * Compare cette entrÃ© avec l'object spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object object) {

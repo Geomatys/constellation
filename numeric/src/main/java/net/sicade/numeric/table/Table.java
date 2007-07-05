@@ -1,7 +1,7 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 1997, Pêches et Océans Canada
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 1997, PÃªches et OcÃ©ans Canada
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,7 @@ import static org.geotools.resources.Utilities.spaces;
 
 
 /**
- * Classe de base pour les interpolations à une dimension. Cette classe mémorisera un vecteur des
+ * Classe de base pour les interpolations Ã  une dimension. Cette classe mÃ©morisera un vecteur des
  * <var>x</var> et un nombre arbitraire de vecteurs des <var>y</var> comme dans l'exemple ci-dessous:
  *
  * <blockquote><pre>
@@ -54,30 +54,30 @@ import static org.geotools.resources.Utilities.spaces;
  * (...etc...)
  *	</pre></blockquote>
  *
- * Les données du vecteur des <var>x</var> doivent obligatoirement être en ordre croissant ou
- * décroissant (cette condition ne sera pas vérifiée, à la fois pour des raisons de performances
- * et parce que de toute façon on ne peut pas empêcher l'utilisateur de changer ses données après
- * la création de la table). Celles des vecteur <var>y</var> peuvent être dans un ordre quelconque.
- * Tous les vecteurs doivent avoir la même longueur.
+ * Les donnÃ©es du vecteur des <var>x</var> doivent obligatoirement Ãªtre en ordre croissant ou
+ * dÃ©croissant (cette condition ne sera pas vÃ©rifiÃ©e, Ã  la fois pour des raisons de performances
+ * et parce que de toute faÃ§on on ne peut pas empÃªcher l'utilisateur de changer ses donnÃ©es aprÃ¨s
+ * la crÃ©ation de la table). Celles des vecteur <var>y</var> peuvent Ãªtre dans un ordre quelconque.
+ * Tous les vecteurs doivent avoir la mÃªme longueur.
  * <p>
- * Les données sont référencées par des objets {@link DoubleBuffer}, ce qui permet entre autres de
- * référencer des sous-tableaux et d'utiliser les buffer hautes performances de {@link java.nio}.
- * Les données elles-mêmes ne sont jamais copiées, en aucun cas. On limite ainsi la consommation de
- * mémoire pour les gros tableaux.
+ * Les donnÃ©es sont rÃ©fÃ©rencÃ©es par des objets {@link DoubleBuffer}, ce qui permet entre autres de
+ * rÃ©fÃ©rencer des sous-tableaux et d'utiliser les buffer hautes performances de {@link java.nio}.
+ * Les donnÃ©es elles-mÃªmes ne sont jamais copiÃ©es, en aucun cas. On limite ainsi la consommation de
+ * mÃ©moire pour les gros tableaux.
  * <p>
- * Les données manquantes (valeurs {@link Double#NaN NaN}) sont acceptées à la fois dans le vecteur
- * des <var>x</var> et dans les vecteurs des <var>y</var>. Par défaut, les interpolations agissent
+ * Les donnÃ©es manquantes (valeurs {@link Double#NaN NaN}) sont acceptÃ©es Ã  la fois dans le vecteur
+ * des <var>x</var> et dans les vecteurs des <var>y</var>. Par dÃ©faut, les interpolations agissent
  * comme si elles utilisaient une copie des vecteurs des <var>x</var> et des <var>y</var> dans
- * lesquels toutes les valeurs {@link Double#NaN NaN} ont été omises (l'implémentation simule ce
- * comportement sans qu'aucune copie ne soit réellement effectuée). Ce comportement peut être
- * désactivé en appellant <code>{@linkplain #setSkipMissingY setSkipMissingY}(false)</code>.
+ * lesquels toutes les valeurs {@link Double#NaN NaN} ont Ã©tÃ© omises (l'implÃ©mentation simule ce
+ * comportement sans qu'aucune copie ne soit rÃ©ellement effectuÃ©e). Ce comportement peut Ãªtre
+ * dÃ©sactivÃ© en appellant <code>{@linkplain #setSkipMissingY setSkipMissingY}(false)</code>.
  * <p>
- * Dans l'implémentation par défaut de {@code Table}, la méthode {@link #interpolate} renvoie la
- * valeur <var>y</var> du plus proche voisin. Les classes dérivées fourniront des interpolations
- * plus élaborées (linéaire, spline, <cite>etc.</cite>).
+ * Dans l'implÃ©mentation par dÃ©faut de {@code Table}, la mÃ©thode {@link #interpolate} renvoie la
+ * valeur <var>y</var> du plus proche voisin. Les classes dÃ©rivÃ©es fourniront des interpolations
+ * plus Ã©laborÃ©es (linÃ©aire, spline, <cite>etc.</cite>).
  * <p>
- * Les objets {@code Table} ne sont pas sécuritaire pour un environnement multi-threads. Si
- * plusieurs interpolations peuvent être fait simultanément par différents threads, il faudra
+ * Les objets {@code Table} ne sont pas sÃ©curitaire pour un environnement multi-threads. Si
+ * plusieurs interpolations peuvent Ãªtre fait simultanÃ©ment par diffÃ©rents threads, il faudra
  * une {@linkplain #clone copie} de {@code Table} pour chaque thread.
  *
  * @version $Id$
@@ -85,52 +85,52 @@ import static org.geotools.resources.Utilities.spaces;
  */
 public class Table implements Matrix {
     /**
-     * Nombre de chiffres significatifs à conserver lors de l'affichage du contenu d'une table.
-     * Il ne s'agit pas forcément du nombre de chiffres après la virgule. Il s'agit plutôt du
+     * Nombre de chiffres significatifs Ã  conserver lors de l'affichage du contenu d'une table.
+     * Il ne s'agit pas forcÃ©ment du nombre de chiffres aprÃ¨s la virgule. Il s'agit plutÃ´t du
      * nombre de chiffres dans la partie des nombres ques l'on verra varier.
      */
     private static final int SIGNIFICANT_DIGIT = 4;
 
     /**
-     * Nombre de chiffres à partir duquel on devrait utiliser la notation scientifique.
+     * Nombre de chiffres Ã  partir duquel on devrait utiliser la notation scientifique.
      */
     private static final int SCIENTIFIC_THRESHOLD = 5;
 
     /**
-     * Vecteur des <var>x</var> de cette table. Ces données doivent obligatoirement
-     * être en ordre croissant ou décroissant.
+     * Vecteur des <var>x</var> de cette table. Ces donnÃ©es doivent obligatoirement
+     * Ãªtre en ordre croissant ou dÃ©croissant.
      */
     final OrderedVector x;
 
     /**
-     * Vecteurs des <var>y</var> de cette table. Chacun de ces vecteurs doit avoir la même
+     * Vecteurs des <var>y</var> de cette table. Chacun de ces vecteurs doit avoir la mÃªme
      * longeur que {@link #x}.
      */
     private final DoubleBuffer[] y;
 
     /**
-     * Indique aux méthodes {@link #interpolate} si elles doivent ignorer les {@link Double#NaN NaN}
+     * Indique aux mÃ©thodes {@link #interpolate} si elles doivent ignorer les {@link Double#NaN NaN}
      * dans le vecteur des <var>y</var>. Cette valeur n'affecte pas le comportement de cette table
-     * vis-à-vis le vecteur des <var>x</var>. En effet, les valeurs {@link Double#NaN NaN} dans ce
-     * dernier sont toujours ignorées.
+     * vis-Ã -vis le vecteur des <var>x</var>. En effet, les valeurs {@link Double#NaN NaN} dans ce
+     * dernier sont toujours ignorÃ©es.
      */
     private boolean skipMissingY;
 
     /**
-     * Construit une table pour les vecteurs <var>x</var> et <var>y</var> spécifiés. Les données du
-     * vecteur <var>x</var> doivent obligatoirement être en ordre croissant ou décroissant.
+     * Construit une table pour les vecteurs <var>x</var> et <var>y</var> spÃ©cifiÃ©s. Les donnÃ©es du
+     * vecteur <var>x</var> doivent obligatoirement Ãªtre en ordre croissant ou dÃ©croissant.
      * <p>
-     * Les premières données prises en compte par la table seront les données à la {@linkplain
-     * DoubleBuffer#position() position courante} des vecteurs. Le nombre de données pris en compte
-     * sera le {@linkplain DoubleBuffer#remaining() nombre de données restantes} dans chacun de ces
-     * vecteurs. Après la construction de la table, les changements de {@linkplain DoubleBuffer#position()
-     * position} ou de {@linkplain DoubleBuffer#limit() limite} des objets {@code x} et {@code y} donnés
-     * en argument n'affecteront pas cette table. Toutefois tout changement des données contenues dans
+     * Les premiÃ¨res donnÃ©es prises en compte par la table seront les donnÃ©es Ã  la {@linkplain
+     * DoubleBuffer#position() position courante} des vecteurs. Le nombre de donnÃ©es pris en compte
+     * sera le {@linkplain DoubleBuffer#remaining() nombre de donnÃ©es restantes} dans chacun de ces
+     * vecteurs. AprÃ¨s la construction de la table, les changements de {@linkplain DoubleBuffer#position()
+     * position} ou de {@linkplain DoubleBuffer#limit() limite} des objets {@code x} et {@code y} donnÃ©s
+     * en argument n'affecteront pas cette table. Toutefois tout changement des donnÃ©es contenues dans
      * les buffers affecteront cette table.
      *
-     * @param x Le vecteur des <var>x</var>, obligatoirement être en ordre croissant ou décroissant.
+     * @param x Le vecteur des <var>x</var>, obligatoirement Ãªtre en ordre croissant ou dÃ©croissant.
      * @param y Les vecteurs des <var>y</var>.
-     * @throws MismatchedSizeException si deux vecteurs n'ont pas la même longueur.
+     * @throws MismatchedSizeException si deux vecteurs n'ont pas la mÃªme longueur.
      */
     Table(final OrderedVector x, DoubleBuffer[] y) throws MismatchedSizeException {
         this.x = x;
@@ -160,16 +160,16 @@ public class Table implements Matrix {
     }
 
     /**
-     * Modifie la valeur pour la ligne et colonne spécifiées. La colonne 0 correspond au vecteur
+     * Modifie la valeur pour la ligne et colonne spÃ©cifiÃ©es. La colonne 0 correspond au vecteur
      * des <var>x</var>. Toutes les autres colonnes correspondent aux vecteurs des <var>y</var>.
      * La plupart du temps, les valeurs de la colonne 0 ne sont pas modifiables.
      *
-     * @param  row    La ligne désirée, de 0 inclusivement jusqu'à {@link #getNumRow} exclusivement.
-     * @param  column La colonne désirée, de 0 inclusivement jusqu'à {@link #getNumCol} exclusivement.
-     * @param  value  La nouvelle valeur à affecter à la position spécifiée.
+     * @param  row    La ligne dÃ©sirÃ©e, de 0 inclusivement jusqu'Ã  {@link #getNumRow} exclusivement.
+     * @param  column La colonne dÃ©sirÃ©e, de 0 inclusivement jusqu'Ã  {@link #getNumCol} exclusivement.
+     * @param  value  La nouvelle valeur Ã  affecter Ã  la position spÃ©cifiÃ©e.
      * @throws IndexOutOfBoundsException si l'index de la ligne ou de la colonne est en dehors des
      *         limites permises.
-     * @throws ReadOnlyBufferException si les valeurs de la colonne spécifiée ne sont pas modifiables.
+     * @throws ReadOnlyBufferException si les valeurs de la colonne spÃ©cifiÃ©e ne sont pas modifiables.
      */
     public final void setElement(final int row, final int column, final double value)
             throws IndexOutOfBoundsException, ReadOnlyBufferException
@@ -181,12 +181,12 @@ public class Table implements Matrix {
     }
 
     /**
-     * Retourne la valeur pour la ligne et colonne spécifiées. La colonne 0 correspond au vecteur
+     * Retourne la valeur pour la ligne et colonne spÃ©cifiÃ©es. La colonne 0 correspond au vecteur
      * des <var>x</var>. Toutes les autres colonnes correspondent aux vecteurs des <var>y</var>.
      *
-     * @param  row    La ligne désirée, de 0 inclusivement jusqu'à {@link #getNumRow} exclusivement.
-     * @param  column La colonne désirée, de 0 inclusivement jusqu'à {@link #getNumCol} exclusivement.
-     * @return La valeur à la position spécifiée.
+     * @param  row    La ligne dÃ©sirÃ©e, de 0 inclusivement jusqu'Ã  {@link #getNumRow} exclusivement.
+     * @param  column La colonne dÃ©sirÃ©e, de 0 inclusivement jusqu'Ã  {@link #getNumCol} exclusivement.
+     * @return La valeur Ã  la position spÃ©cifiÃ©e.
      * @throws IndexOutOfBoundsException si l'index de la ligne ou de la colonne est en dehors des
      *         limites permises.
      */
@@ -199,18 +199,18 @@ public class Table implements Matrix {
     }
 
     /**
-     * Renvoie la valeur <var>y<sub>i</sub></var> interpolée à {@code x[row]} mais sans utiliser
-     * la valeur de {@code y[row]}. Cette méthode est utile pour boucher les trous causés par les
-     * données manquantes ({@link Double#NaN NaN}). On peut aussi utiliser cette méthode pour
-     * interpoler des pics isolés qui semblent suspects. Toutefois s'il y a une possibilité que
-     * deux pics soient collés, il est préférable de remplacer tous les pics par des
-     * {@link Double#NaN NaN} et ensuite d'utiliser cette méthode pour combler les trous.
+     * Renvoie la valeur <var>y<sub>i</sub></var> interpolÃ©e Ã  {@code x[row]} mais sans utiliser
+     * la valeur de {@code y[row]}. Cette mÃ©thode est utile pour boucher les trous causÃ©s par les
+     * donnÃ©es manquantes ({@link Double#NaN NaN}). On peut aussi utiliser cette mÃ©thode pour
+     * interpoler des pics isolÃ©s qui semblent suspects. Toutefois s'il y a une possibilitÃ© que
+     * deux pics soient collÃ©s, il est prÃ©fÃ©rable de remplacer tous les pics par des
+     * {@link Double#NaN NaN} et ensuite d'utiliser cette mÃ©thode pour combler les trous.
      *
      * @param  row index du <var>x</var> pour lequel on veut interpoler un <var>y</var>.
-     * @param  column La colonne des <var>y</var>, habituellement à partir de 1 (car la
+     * @param  column La colonne des <var>y</var>, habituellement Ã  partir de 1 (car la
      *         colonne 0 est celle des <var>x</var>).
      * @throws IndexOutOfBoundsException si {@code column} n'est pas compris
-     *         de 1 inclusivement à {@link #getNumCol} exclusivement.
+     *         de 1 inclusivement Ã  {@link #getNumCol} exclusivement.
      * @throws ExtrapolationException si une extrapolation non-permise a eu lieu.
      *
      * @see #getElement(int,int)
@@ -223,23 +223,23 @@ public class Table implements Matrix {
         }
         final DoubleBuffer y = this.y[column-1];
         if (skipMissingY) {
-            x.validateIndex(y); // TODO: prendre en compte le cas où d > 2
+            x.validateIndex(y); // TODO: prendre en compte le cas oÃ¹ d > 2
         }
         return interpolate(y);
     }
 
     /**
-     * Renvoie la valeur <var>y<sub>i</sub></var> interpolée au <var>x<sub>i</sub></var> spécifié pour
-     * la colonne des <var>y</var> spécifiée. Cette méthode est similaire à {@link #interpolate(double)}
+     * Renvoie la valeur <var>y<sub>i</sub></var> interpolÃ©e au <var>x<sub>i</sub></var> spÃ©cifiÃ© pour
+     * la colonne des <var>y</var> spÃ©cifiÃ©e. Cette mÃ©thode est similaire Ã  {@link #interpolate(double)}
      * pour une colonne arbitraire.
      *
      * @param  xi valeur de <var>x</var> pour laquelle on veut interpoler un <var>y</var>.
-     * @param  column La colonne des <var>y</var>, habituellement à partir de 1 (car la
+     * @param  column La colonne des <var>y</var>, habituellement Ã  partir de 1 (car la
      *         colonne 0 est celle des <var>x</var>). Si cet argument est omis, alors la
-     *         valeur par défaut est 1.
-     * @return valeur interpolée.
+     *         valeur par dÃ©faut est 1.
+     * @return valeur interpolÃ©e.
      * @throws IndexOutOfBoundsException si {@code column} n'est pas compris
-     *         de 1 inclusivement à {@link #getNumCol} exclusivement.
+     *         de 1 inclusivement Ã  {@link #getNumCol} exclusivement.
      * @throws ExtrapolationException si une extrapolation non-permise a eu lieu.
      *
      * @see #interpolate(double)
@@ -251,23 +251,23 @@ public class Table implements Matrix {
         }
         final DoubleBuffer y = this.y[column-1];
         if (skipMissingY) {
-            x.validateIndex(y); // TODO: prendre en compte le cas où d > 2
+            x.validateIndex(y); // TODO: prendre en compte le cas oÃ¹ d > 2
         }
         return interpolate(y);
     }
 
     /**
-     * Renvoie la valeur <var>y<sub>i</sub></var> interpolée au <var>x<sub>i</sub></var> spécifié.
+     * Renvoie la valeur <var>y<sub>i</sub></var> interpolÃ©e au <var>x<sub>i</sub></var> spÃ©cifiÃ©.
      * Les valeurs {@link Double#NaN NaN} apparaissant dans le vecteur des <var>x</var> seront
-     * toujours ignorées. Celles qui apparaissent dans le vecteur des <var>y</var> seront ignorées
-     * aussi sauf si <code>{@linkplain #setSkipMissingY setSkipMissingY}(true)</code> a été appelée.
+     * toujours ignorÃ©es. Celles qui apparaissent dans le vecteur des <var>y</var> seront ignorÃ©es
+     * aussi sauf si <code>{@linkplain #setSkipMissingY setSkipMissingY}(true)</code> a Ã©tÃ© appelÃ©e.
      * <p>
-     * Le type d'interpolation effectuée dépendra de la classe de cet objet. Par exemple la classe
-     * {@link Spline} effectuera une interpolation cubique B-Spline. L'implémentation par défaut
+     * Le type d'interpolation effectuÃ©e dÃ©pendra de la classe de cet objet. Par exemple la classe
+     * {@link Spline} effectuera une interpolation cubique B-Spline. L'implÃ©mentation par dÃ©faut
      * de {@code Table} retourne la valeur du plus proche voisin.
      *
      * @param  xi valeur de <var>x</var> pour laquelle on veut interpoler un <var>y</var>.
-     * @return valeur interpolée.
+     * @return valeur interpolÃ©e.
      * @throws ExtrapolationException si une extrapolation non-permise a eu lieu.
      *
      * @see #interpolate(double,int)
@@ -279,21 +279,21 @@ public class Table implements Matrix {
         }
         final DoubleBuffer y = this.y[0];
         if (skipMissingY) {
-            x.validateIndex(y); // TODO: prendre en compte le cas où d > 2
+            x.validateIndex(y); // TODO: prendre en compte le cas oÃ¹ d > 2
         }
         return interpolate(y);
     }
 
     /**
-     * Renvoie les valeurs <var>y<sub>i</sub></var> interpolée au <var>x<sub>i</sub></var> spécifié
-     * pour toutes les colonnes des <var>y</var>. Les lignes utilisées seront celles où une valeur
+     * Renvoie les valeurs <var>y<sub>i</sub></var> interpolÃ©e au <var>x<sub>i</sub></var> spÃ©cifiÃ©
+     * pour toutes les colonnes des <var>y</var>. Les lignes utilisÃ©es seront celles oÃ¹ une valeur
      * valide (non {@link Double#NaN NaN}) existe pour <u>toutes</u> les colonnes des <var>y</var>
-     * simultanément.
+     * simultanÃ©ment.
      *
      * @param  xi valeur de <var>x</var> pour laquelle on veut interpoler un <var>y</var>.
-     * @param  dest Si non-null, tableau dans lequel enregistrer les résultats.
-     * @return Les valeurs interpolées dans le tableau {@code dest}, ou dans un nouveau tableau
-     *         si {@code dest} était {@code null}.
+     * @param  dest Si non-null, tableau dans lequel enregistrer les rÃ©sultats.
+     * @return Les valeurs interpolÃ©es dans le tableau {@code dest}, ou dans un nouveau tableau
+     *         si {@code dest} Ã©tait {@code null}.
      * @throws ExtrapolationException si une extrapolation non-permise a eu lieu.
      */
     public final double[] interpolateAll(final double xi, double[] dest) throws ExtrapolationException {
@@ -304,7 +304,7 @@ public class Table implements Matrix {
             boolean hasChanged = false;
             do {
                 for (int i=0; i<y.length; i++) {
-                    hasChanged |= x.validateIndex(y[i]); // TODO: prendre en compte le cas où d > 2
+                    hasChanged |= x.validateIndex(y[i]); // TODO: prendre en compte le cas oÃ¹ d > 2
                 }
             } while (hasChanged);
         }
@@ -320,15 +320,15 @@ public class Table implements Matrix {
     }
 
     /**
-     * Renvoie la valeur <var>y<sub>i</sub></var> interpolée à la position courante du vecteur des
-     * <var>x</var>. La valeur n'est calculée que pour la colonne spécifiée.
+     * Renvoie la valeur <var>y<sub>i</sub></var> interpolÃ©e Ã  la position courante du vecteur des
+     * <var>x</var>. La valeur n'est calculÃ©e que pour la colonne spÃ©cifiÃ©e.
      * <p>
-     * Le type d'interpolation effectuée dépendra de la classe de cet objet. Par exemple la classe
-     * {@link Spline} effectuera une interpolation cubique B-Spline. L'implémentation par défaut
+     * Le type d'interpolation effectuÃ©e dÃ©pendra de la classe de cet objet. Par exemple la classe
+     * {@link Spline} effectuera une interpolation cubique B-Spline. L'implÃ©mentation par dÃ©faut
      * de {@code Table} retourne la valeur du plus proche voisin.
      *
-     * @param  y Le vecteur des <var>y</var> à utiliser.
-     * @return La valeur interpolée.
+     * @param  y Le vecteur des <var>y</var> Ã  utiliser.
+     * @return La valeur interpolÃ©e.
      */
     double interpolate(final DoubleBuffer y) {
         final double xi = x.value;
@@ -340,9 +340,9 @@ public class Table implements Matrix {
     /**
      * Trouve l'index de la valeur <var>x<sub>i</sub></var> dans le vecteur des <var>x</var> et
      * renvoie dans le tableau {@code index} les index qui y correspondent. Ce tableau peut avoir
-     * une longueur quelconque. Cette méthode tentera de créer une suite d'index, mais en sautant
+     * une longueur quelconque. Cette mÃ©thode tentera de crÃ©er une suite d'index, mais en sautant
      * les {@link Double#NaN NaN} qui apparaissent dans le vecteur des <var>x</var> ou le vecteur
-     * des <var>y</var>. Par exemple supposons que cet objet représente la table suivante:
+     * des <var>y</var>. Par exemple supposons que cet objet reprÃ©sente la table suivante:
      *
      * <blockquote><pre>
      *        [  0   1   2   3   4   5   6   7]
@@ -350,12 +350,12 @@ public class Table implements Matrix {
      *    Y = [  4   7   2   1   6   1 NaN   5]
      * </pre></blockquote>
      *
-     * Alors, si {@code index} est un tableau de 4 éléments, {@code locate(10.0, index)} écrira
-     * dans ce tableau les valeurs {@code [2 3 4 7]}. Les valeurs 5 et 6 ont été sautées parce
+     * Alors, si {@code index} est un tableau de 4 Ã©lÃ©ments, {@code locate(10.0, index)} Ã©crira
+     * dans ce tableau les valeurs {@code [2 3 4 7]}. Les valeurs 5 et 6 ont Ã©tÃ© sautÃ©es parce
      * que {@code X[5]==NaN} et {@code Y[6]==NaN}.
      *
-     * @param xi valeur <var>x</var> dont on désire les index.
-     * @param index tableau dans lequel écrire les index. Les valeurs de ce tableau seront écrasées.
+     * @param xi valeur <var>x</var> dont on dÃ©sire les index.
+     * @param index tableau dans lequel Ã©crire les index. Les valeurs de ce tableau seront Ã©crasÃ©es.
      */
     public final void locate(final double xi, final int[] index) throws ExtrapolationException {
         if (!x.locate(xi)) {
@@ -387,14 +387,14 @@ public class Table implements Matrix {
     /**
      * Indique si les interpolations devront ignorer les valeurs {@link Double#NaN NaN} dans le
      * vecteur des <var>y</var>. La valeur {@code false} indique que les {@link Double#NaN NaN}
-     * ne seront pas ignorées, de sorte qu'ils peuvent être retournées par la méthode
+     * ne seront pas ignorÃ©es, de sorte qu'ils peuvent Ãªtre retournÃ©es par la mÃ©thode
      * {@link #interpolate} s'ils apparaissent dans le vecteur des <var>y</var>. La valeurs
-     * {@code true} indique au contraire que la méthode {@link #interpolate} doit tenter de
-     * n'utiliser que des valeurs réelles (différentes de {@link Double#NaN NaN}) pour ses
+     * {@code true} indique au contraire que la mÃ©thode {@link #interpolate} doit tenter de
+     * n'utiliser que des valeurs rÃ©elles (diffÃ©rentes de {@link Double#NaN NaN}) pour ses
      * calculs.
      *
-     * @param {@code true} si la méthode {@link #interpolate} doit agir comme si elle utilisait des
-     *        copies des données dans lesquelles on avait retiré tout les {@link Double#NaN NaN}.
+     * @param {@code true} si la mÃ©thode {@link #interpolate} doit agir comme si elle utilisait des
+     *        copies des donnÃ©es dans lesquelles on avait retirÃ© tout les {@link Double#NaN NaN}.
      */
     public void setSkipMissingY(final boolean skipMissingY) {
         this.skipMissingY = skipMissingY;
@@ -411,25 +411,25 @@ public class Table implements Matrix {
     }
 
     /**
-     * Ecrit toutes les valeurs de ce tableau vers le flot spécifié en utilisant les conventions
+     * Ecrit toutes les valeurs de ce tableau vers le flot spÃ©cifiÃ© en utilisant les conventions
      * locales.
      *
-     * @param  out Le flot dans lequel écrire.
-     * @throws IOException si une erreur est survenue lors de l'écriture.
+     * @param  out Le flot dans lequel Ã©crire.
+     * @throws IOException si une erreur est survenue lors de l'Ã©criture.
      */
     public void print(final Writer out) throws IOException {
         print(out, Locale.getDefault(), 0, getNumRow());
     }
 
     /**
-     * Ecrit les valeurs de ce tableau vers le flot spécifié. Les lignes écrites iront de
-     * {@code lower} inclusivement jusqu'à {@code upper} explusivement.
+     * Ecrit les valeurs de ce tableau vers le flot spÃ©cifiÃ©. Les lignes Ã©crites iront de
+     * {@code lower} inclusivement jusqu'Ã  {@code upper} explusivement.
      *
-     * @param  out    Le flot dans lequel écrire.
-     * @param  locale Les conventions locales à utiliser pour l'écriture.
-     * @param  lower  Numéro de la première ligne à écrire, inclusivement.
-     * @param  upper  Numéro de la dernière ligne à écrire, exclusivement.
-     * @throws IOException si une erreur est survenue lors de l'écriture.
+     * @param  out    Le flot dans lequel Ã©crire.
+     * @param  locale Les conventions locales Ã  utiliser pour l'Ã©criture.
+     * @param  lower  NumÃ©ro de la premiÃ¨re ligne Ã  Ã©crire, inclusivement.
+     * @param  upper  NumÃ©ro de la derniÃ¨re ligne Ã  Ã©crire, exclusivement.
+     * @throws IOException si une erreur est survenue lors de l'Ã©criture.
      */
     public void print(final Writer out, final Locale locale,
                       final int lower, final int upper) throws IOException
@@ -475,8 +475,8 @@ public class Table implements Matrix {
             }
         }
         /*
-         * Maintenant que les formats sont déterminés une fois pour toutes pour l'ensemble
-         * des lignes et chaque colonne, procède à l'écriture.
+         * Maintenant que les formats sont dÃ©terminÃ©s une fois pour toutes pour l'ensemble
+         * des lignes et chaque colonne, procÃ¨de Ã  l'Ã©criture.
          */
         final StringBuffer buffer = new StringBuffer();
         final FieldPosition dummy = new FieldPosition(0);
@@ -499,8 +499,8 @@ public class Table implements Matrix {
     }
 
     /**
-     * Retourne une courte représentation textuelle de cette table. Cette chaîne est utilisée
-     * surtout à des fins de déboguage.
+     * Retourne une courte reprÃ©sentation textuelle de cette table. Cette chaÃ®ne est utilisÃ©e
+     * surtout Ã  des fins de dÃ©boguage.
      */
     @Override
     public String toString() {
@@ -515,9 +515,9 @@ public class Table implements Matrix {
     }
 
     /**
-     * Retourne une copie de cette table. La copie partagera les mêmes données que la table
-     * originale. Cette copie est utile si des interpolations doivent être faites simultanément
-     * dans différents threads.
+     * Retourne une copie de cette table. La copie partagera les mÃªmes donnÃ©es que la table
+     * originale. Cette copie est utile si des interpolations doivent Ãªtre faites simultanÃ©ment
+     * dans diffÃ©rents threads.
      */
     @Override
     public Table clone() {

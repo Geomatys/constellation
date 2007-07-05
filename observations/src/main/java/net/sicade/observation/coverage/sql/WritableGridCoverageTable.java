@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -54,9 +54,9 @@ import org.opengis.referencing.operation.TransformException;
 
 
 /**
- * Insère de nouvelles entrées dans la base de données d'images. Par exemple, cette classe peut
- * être utilisée pour ajouter de nouvelles entrées dans la table {@code "GridCoverages"}, ce qui
- * peut impliquer l'ajout d'entrés dans la table {@code "GeographicBoundingBoxes"} en même temps.
+ * InsÃ¨re de nouvelles entrÃ©es dans la base de donnÃ©es d'images. Par exemple, cette classe peut
+ * Ãªtre utilisÃ©e pour ajouter de nouvelles entrÃ©es dans la table {@code "GridCoverages"}, ce qui
+ * peut impliquer l'ajout d'entrÃ©s dans la table {@code "GeographicBoundingBoxes"} en mÃªme temps.
  * Cette classe peut ajouter de nouvelles lignes aux tables existantes, mais ne modifie jamais les
  * lignes existantes.
  *
@@ -76,7 +76,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 "VALUES (?, ?, ?, ?, ?)");
 
     /**
-     * Connexion vers la table des étendues géographiques.
+     * Connexion vers la table des Ã©tendues gÃ©ographiques.
      */
     private GeographicBoundingBoxTable geographicBoundingBoxes;
 
@@ -91,19 +91,19 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Retourne la sous-séries à utiliser.
+     * Retourne la sous-sÃ©ries Ã  utiliser.
      * 
-     * @throws CatalogException si aucune série n'a été spécifiée, ou si la série ne contient pas 
-     *                          exactement une sous-série.
+     * @throws CatalogException si aucune sÃ©rie n'a Ã©tÃ© spÃ©cifiÃ©e, ou si la sÃ©rie ne contient pas 
+     *                          exactement une sous-sÃ©rie.
      */
     private SubSeries getSubSeries() throws CatalogException {
         final Series series = getSeries();
         if (series == null) {
-            throw new CatalogException("Aucune série n'a été spécifiée.");
+            throw new CatalogException("Aucune sÃ©rie n'a Ã©tÃ© spÃ©cifiÃ©e.");
         }
         final Set<SubSeries> subseries = series.getSubSeries();
         if (subseries.size() != 1) {
-            throw new CatalogException("La série devrait contenir exactement une sous-série.");
+            throw new CatalogException("La sÃ©rie devrait contenir exactement une sous-sÃ©rie.");
         }
         return subseries.iterator().next();
     }
@@ -146,15 +146,15 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
     
     /**
-     * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setSeries}
-     * doit d'abord avoir été appelée au moins une fois.
+     * Ajoute une entrÃ©e dans la table "{@code GridCoverages}". La mÃ©thode {@link #setSeries}
+     * doit d'abord avoir Ã©tÃ© appelÃ©e au moins une fois.
      * 
      * @param   file        Le fichier image avec son chemin complet.
-     * @param   envelope    L'enveloppe géographique pour cette image.
+     * @param   envelope    L'enveloppe gÃ©ographique pour cette image.
      * @param   size        La dimension de l'image, en nombre de pixels.
-     * @throws  SQLException     Si l'exécution d'une requête SQL a échouée.
+     * @throws  SQLException     Si l'exÃ©cution d'une requÃªte SQL a Ã©chouÃ©e.
      * @throws  FactoryException Si le Coordinate Reference System n'est pas de type "Temporel".
-     * @throws  CatalogException Si l'exécution a échouée pour une autre raison.
+     * @throws  CatalogException Si l'exÃ©cution a Ã©chouÃ©e pour une autre raison.
      */
     public synchronized void addEntry(final File      file,
                                       final Envelope  envelope,
@@ -169,7 +169,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         }        
         TemporalCRS temporalCRS = CRS.getTemporalCRS(envelope.getCoordinateReferenceSystem());
         if (temporalCRS == null) {
-            throw new FactoryException("Le CRS spécifié n'est pas de type \"Temporel\".");
+            throw new FactoryException("Le CRS spÃ©cifiÃ© n'est pas de type \"Temporel\".");
         }
         DefaultTemporalCRS defaultTempCRS = DefaultTemporalCRS.wrap(temporalCRS);
         final Date startTime = defaultTempCRS.toDate(envelope.getMinimum(0));
@@ -180,16 +180,16 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
     
     /**
-     * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setSeries}
-     * doit d'abord avoir été appelée au moins une fois.
+     * Ajoute une entrÃ©e dans la table "{@code GridCoverages}". La mÃ©thode {@link #setSeries}
+     * doit d'abord avoir Ã©tÃ© appelÃ©e au moins une fois.
      * 
      * @param   filename    Le nom de l'image, sans son chemin ni son extension.
-     * @param   startTime   La date de début de la plage de temps concernée par l'image.
-     * @param   endTime     La date de fin de la plage de temps concernée par l'image.
-     * @param   bbox        La région géographique de l'image.
+     * @param   startTime   La date de dÃ©but de la plage de temps concernÃ©e par l'image.
+     * @param   endTime     La date de fin de la plage de temps concernÃ©e par l'image.
+     * @param   bbox        La rÃ©gion gÃ©ographique de l'image.
      * @param   size        La dimension de l'image, en nombre de pixels.
-     * @throws  SQLException     Si l'exécution d'une requête SQL a échouée.
-     * @throws  CatalogException Si l'exécution a échouée pour une autre raison.
+     * @throws  SQLException     Si l'exÃ©cution d'une requÃªte SQL a Ã©chouÃ©e.
+     * @throws  CatalogException Si l'exÃ©cution a Ã©chouÃ©e pour une autre raison.
      */
     public synchronized void addEntry(final String            filename,
                                       final Date             startTime,
@@ -203,7 +203,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         }
         final String bboxID = geographicBoundingBoxes.getIdentifier(bbox, size);
         if (bboxID == null) {
-            throw new CatalogException("L'étendue géographique n'est pas déclarée dans la base de données.");
+            throw new CatalogException("L'Ã©tendue gÃ©ographique n'est pas dÃ©clarÃ©e dans la base de donnÃ©es.");
         }
         final Calendar          calendar  = getCalendar();
         final SubSeries         subseries = getSubSeries();
@@ -214,13 +214,13 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         statement.setTimestamp(4, new Timestamp(endTime.getTime())  , calendar);
         statement.setString   (5, bboxID);
         if (statement.executeUpdate() != 1) {
-            throw new CatalogException("L'image n'a pas été ajoutée.");
+            throw new CatalogException("L'image n'a pas Ã©tÃ© ajoutÃ©e.");
         }
         logUpdate(getProperty(INSERT), subseries.getName(), filename, startTime, endTime, bbox);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour le type spécifié.
+     * Retourne la requÃªte SQL Ã  utiliser pour le type spÃ©cifiÃ©.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {

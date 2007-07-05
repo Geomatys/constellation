@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -57,52 +57,52 @@ import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Un ensemble de {@linkplain TimeSeries séries temporelles} ayant des propriétés communes.
- * Toutes les séries temporelles sont construite à partir du même descripteur du paysage océanique.
+ * Un ensemble de {@linkplain TimeSeries sÃ©ries temporelles} ayant des propriÃ©tÃ©s communes.
+ * Toutes les sÃ©ries temporelles sont construite Ã  partir du mÃªme descripteur du paysage ocÃ©anique.
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Touraïvane
+ * @author TouraÃ¯vane
  */
 public class TimeSeriesTile {
     /**
-     * Petite valeur pour éviter des erreurs d'arrondissement.
+     * Petite valeur pour Ã©viter des erreurs d'arrondissement.
      */
     private static final double EPS = 1e-6;
 
     /**
-     * La source de données tri-dimensionnelle.
+     * La source de donnÃ©es tri-dimensionnelle.
      */
     private final Coverage coverage;
     
     /**
-     * La transforamtion mathématique qui permet de passer des coordonnées image aux coordonnées
-     * réelles.
+     * La transforamtion mathÃ©matique qui permet de passer des coordonnÃ©es image aux coordonnÃ©es
+     * rÃ©elles.
      */
     private final MathTransform gridToCRS;
     
     /**
-     * La fabrique à utiliser pour la création d'objets {@link GridCoverage2D}.
+     * La fabrique Ã  utiliser pour la crÃ©ation d'objets {@link GridCoverage2D}.
      */
     private final GridCoverageFactory gridCoverageFactory = FactoryFinder.getGridCoverageFactory(null);
     
     /**
-     * L'enveloppe de la grille de destination. Ce n'est pas nécessairement l'enveloppe de
-     * {@link #coverage}, car l'utilisateur peut ne souhaiter extraire que les séries temporelles
-     * d'une sous-région. En outre, cette enveloppe sera corrigée pour correspondre à la géométrie
+     * L'enveloppe de la grille de destination. Ce n'est pas nÃ©cessairement l'enveloppe de
+     * {@link #coverage}, car l'utilisateur peut ne souhaiter extraire que les sÃ©ries temporelles
+     * d'une sous-rÃ©gion. En outre, cette enveloppe sera corrigÃ©e pour correspondre Ã  la gÃ©omÃ©trie
      * de la grille de destination. En d'autres termes, le nombre de cellules de la grille de
      * destination sera un nombre entier selon chaque dimension.
      */
     private final GeneralEnvelope envelope;
 
     /**
-     * La bande à prendre en compte dans {@link #coverage}.
+     * La bande Ã  prendre en compte dans {@link #coverage}.
      */
     private final int band = 0;
 
     /**
-     * Un tableau contenant toutes les valeurs d'une bande à une position données.
-     * N'est conservé ici qu'afin d'éviter de le recréer trop souvent.
+     * Un tableau contenant toutes les valeurs d'une bande Ã  une position donnÃ©es.
+     * N'est conservÃ© ici qu'afin d'Ã©viter de le recrÃ©er trop souvent.
      */
     private transient double[] samples;
 
@@ -115,7 +115,7 @@ public class TimeSeriesTile {
     /**
      * La taille de la grille de destination selon chacune des dimensions.
      * <code>size[{@linkplain #varyingDimension}]</code> sera la longueur
-     * de chaque série temporelle, en nombre de valeurs.
+     * de chaque sÃ©rie temporelle, en nombre de valeurs.
      */
     private final int[] size;
 
@@ -125,39 +125,39 @@ public class TimeSeriesTile {
     private final double[] step;
 
     /**
-     * Le tableau de séries temporelles.
+     * Le tableau de sÃ©ries temporelles.
      */
     private final TimeSeries[] series;
 
     /**
      * Le fichier temporaire qui correspond au canal {@link #channel}.
-     * Ce fichier devrait être détruit à la fin du programme.
+     * Ce fichier devrait Ãªtre dÃ©truit Ã  la fin du programme.
      */
     private final File file;
 
     /**
-     * Le canal dans lequel lire et écrire les valeurs des série temporelle.
-     * Chaque objet {@link TimeSeries} écrira dans une portion différente de
-     * ce canal, qui commencera à {@link TimeSeries#base}.
+     * Le canal dans lequel lire et Ã©crire les valeurs des sÃ©rie temporelle.
+     * Chaque objet {@link TimeSeries} Ã©crira dans une portion diffÃ©rente de
+     * ce canal, qui commencera Ã  {@link TimeSeries#base}.
      */
     final FileChannel channel;
 
     /**
-     * {@code true} si {@link #fillSeries} a déjà été appelée.
+     * {@code true} si {@link #fillSeries} a dÃ©jÃ  Ã©tÃ© appelÃ©e.
      */
     private boolean filled;
 
     /**
-     * Construit un ensemble de séries temporelles à partir des données de la couverture spécifiée.
-     * Ce constructeur suppose que la dimension temporelle est la dernière.
+     * Construit un ensemble de sÃ©ries temporelles Ã  partir des donnÃ©es de la couverture spÃ©cifiÃ©e.
+     * Ce constructeur suppose que la dimension temporelle est la derniÃ¨re.
      *
-     * @param  coverage La couverture à utiliser pour extraire les données.
-     * @param  envelope L'enveloppe spatio-temporelle de la zone d'étude, ou {@code null} pour
-     *         prendre la totalité de l'enveloppe de {@code coverage}.
-     * @param  step Le pas selon chacune des dimensions. La longueur de ce tableau doit être identique
+     * @param  coverage La couverture Ã  utiliser pour extraire les donnÃ©es.
+     * @param  envelope L'enveloppe spatio-temporelle de la zone d'Ã©tude, ou {@code null} pour
+     *         prendre la totalitÃ© de l'enveloppe de {@code coverage}.
+     * @param  step Le pas selon chacune des dimensions. La longueur de ce tableau doit Ãªtre identique
      *         au nombre de dimensions de l'enveloppe.
-     * @throws IOException si une erreur est survenue lors des accès disque.
-     * @throws TransformException si une erreur est survenue lors d'une transformation de coordonnées.
+     * @throws IOException si une erreur est survenue lors des accÃ¨s disque.
+     * @throws TransformException si une erreur est survenue lors d'une transformation de coordonnÃ©es.
      */
     public TimeSeriesTile(final Coverage coverage, final Envelope envelope, final double[] step)
             throws IOException, TransformException
@@ -167,20 +167,20 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Construit un ensemble de séries temporelles à partir des données de la couverture spécifiée.
-     * Un objet {@code TimeSeriesTile} est le résultat de l'extraction à partir de la couverture
-     * {@code coverage} des valeurs en faisant varier les coordonnées à la dimension
-     * {@code varyingDimension} par le pas défini par le tableau {@code step}.
+     * Construit un ensemble de sÃ©ries temporelles Ã  partir des donnÃ©es de la couverture spÃ©cifiÃ©e.
+     * Un objet {@code TimeSeriesTile} est le rÃ©sultat de l'extraction Ã  partir de la couverture
+     * {@code coverage} des valeurs en faisant varier les coordonnÃ©es Ã  la dimension
+     * {@code varyingDimension} par le pas dÃ©fini par le tableau {@code step}.
      *
-     * @param  coverage La couverture à utiliser pour extraire les données.
-     * @param  envelope L'enveloppe spatio-temporelle de la zone d'étude, ou {@code null} pour
-     *         prendre la totalité de l'enveloppe de {@code coverage}.
-     * @param  step Le pas selon chacune des dimensions. La longueur de ce tableau doit être identique
+     * @param  coverage La couverture Ã  utiliser pour extraire les donnÃ©es.
+     * @param  envelope L'enveloppe spatio-temporelle de la zone d'Ã©tude, ou {@code null} pour
+     *         prendre la totalitÃ© de l'enveloppe de {@code coverage}.
+     * @param  step Le pas selon chacune des dimensions. La longueur de ce tableau doit Ãªtre identique
      *         au nombre de dimensions de l'enveloppe.
-     * @param  varyingDimension La dimension de l'ordonnée que l'on souhaite faire varier
+     * @param  varyingDimension La dimension de l'ordonnÃ©e que l'on souhaite faire varier
      *         (habituellement la dimension du temps).
-     * @throws IOException si une erreur est survenue lors des accès disque.
-     * @throws TransformException si une erreur est survenue lors d'une transformation de coordonnées.
+     * @throws IOException si une erreur est survenue lors des accÃ¨s disque.
+     * @throws TransformException si une erreur est survenue lors d'une transformation de coordonnÃ©es.
      */
     public TimeSeriesTile(final Coverage coverage, Envelope envelope,
                           double[] step, final int varyingDimension)
@@ -191,8 +191,8 @@ public class TimeSeriesTile {
         }
         envelope = this.envelope = new GeneralEnvelope(envelope);
         /*
-         * Le nombre de dimensions est définit par le système de coordonnées. On vérifie
-         * que les arguments donnés par l'utilisateur (notamment 'step') sont compatibles.
+         * Le nombre de dimensions est dÃ©finit par le systÃ¨me de coordonnÃ©es. On vÃ©rifie
+         * que les arguments donnÃ©s par l'utilisateur (notamment 'step') sont compatibles.
          */
         this.coverage         = coverage;
         this.step             = step = (double[]) step.clone();
@@ -211,17 +211,17 @@ public class TimeSeriesTile {
                                                "varyingDimension", varyingDimension));
         }
         /*
-         * Pour chaque dimension i, "size[i]" contient le nombre d'éléments pour cette
-         * direction qui se calcule en fonction du pas défini pour cette direction. On
-         * ajustera l'enveloppe de façon à ce qu'elle couvre un nombre entier de ces points.
+         * Pour chaque dimension i, "size[i]" contient le nombre d'Ã©lÃ©ments pour cette
+         * direction qui se calcule en fonction du pas dÃ©fini pour cette direction. On
+         * ajustera l'enveloppe de faÃ§on Ã  ce qu'elle couvre un nombre entier de ces points.
          *
-         * "nSeries" définit la taille du tableau "series". C'est un tableau qui contiendra
-         * la liste des séries temporelles qui nous intéresse, en omettant le nombre de points
-         * selon l'axe du temps (puisque ces valeurs seront gérées par les objets TimeSeries).
+         * "nSeries" dÃ©finit la taille du tableau "series". C'est un tableau qui contiendra
+         * la liste des sÃ©ries temporelles qui nous intÃ©resse, en omettant le nombre de points
+         * selon l'axe du temps (puisque ces valeurs seront gÃ©rÃ©es par les objets TimeSeries).
          *
          * Note sur l'usage de Math.floor au lieu de Math.ceil: il ne faut pas compter le nombres
-         * de points (cas où l'on utiliserait Math.ceil), mais plutôt le nombre de cellules (c'est
-         * à dire le nombre d'espaces entre les points). Cette nuance vient du fait que la
+         * de points (cas oÃ¹ l'on utiliserait Math.ceil), mais plutÃ´t le nombre de cellules (c'est
+         * Ã  dire le nombre d'espaces entre les points). Cette nuance vient du fait que la
          * transformation affine 'gridToCRS' fera correspondre les centres des cellules.
          */
         int nSeries = 1;
@@ -237,29 +237,29 @@ public class TimeSeriesTile {
         }
         series = new TimeSeries[nSeries];
         /*
-         * Les éléments extraits de la couverture seront stockés dans un fichier temporaire.
-         * Ce dernier sera détruit lorsque cette instance de TimeSeriesTile sera disposée.
+         * Les Ã©lÃ©ments extraits de la couverture seront stockÃ©s dans un fichier temporaire.
+         * Ce dernier sera dÃ©truit lorsque cette instance de TimeSeriesTile sera disposÃ©e.
          */
         file = File.createTempFile("TimeSeries", ".raw");
         file.deleteOnExit();
         channel = new RandomAccessFile(file, "rw").getChannel();
         /*
-         * Obtient la transformation passant des coordonnées de la grille de destination
-         * (à ne pas confondre avec une éventuelle grille du 'coverage' source) vers les
-         * coordonnées géographiques.
+         * Obtient la transformation passant des coordonnÃ©es de la grille de destination
+         * (Ã  ne pas confondre avec une Ã©ventuelle grille du 'coverage' source) vers les
+         * coordonnÃ©es gÃ©ographiques.
          */
         final GeneralGridRange gridRange = new GeneralGridRange(new int[size.length], size);
         final GeneralGridGeometry gridGeometry = new GeneralGridGeometry(gridRange, envelope);
         gridToCRS = gridGeometry.getGridToCoordinateSystem();
         /*
-         * Le tableau 'index' sert à simuler un suite de boucles imbriquées. Dans le cas où la
-         * dimension est 2, on aurait fait une double boucle imbriquée. Dans notre cas, la
-         * dimension peut varier et nombre de boucles imbriquées ne peut être défini par avance.
+         * Le tableau 'index' sert Ã  simuler un suite de boucles imbriquÃ©es. Dans le cas oÃ¹ la
+         * dimension est 2, on aurait fait une double boucle imbriquÃ©e. Dans notre cas, la
+         * dimension peut varier et nombre de boucles imbriquÃ©es ne peut Ãªtre dÃ©fini par avance.
          */
-        final int[] index = new int[dimension]; // initialisé à 0
+        final int[] index = new int[dimension]; // initialisÃ© Ã  0
         int count = 0;
         loop:  while (true) {
-            // Conversion de l'index en coordonnées géographiques
+            // Conversion de l'index en coordonnÃ©es gÃ©ographiques
             final GeneralDirectPosition position = new GeneralDirectPosition(dimension);
             for (int i=0; i<dimension; i++) {
                 position.ordinates[i] = index[i];
@@ -281,13 +281,13 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Evalue une valeur à la position spatio-temporelle spécifiée. Cette méthode est appelée
-     * automatiquement par les {@linkplain TimeSeries séries temporelles} lors de leur remplissage.
-     * L'implémentation par défaut délègue l'évaluation à l'objet {@link Coverage} spécifié au
-     * constructeur. Redéfinissez cette méthode si les valeurs devraient être évaluées autrement.
+     * Evalue une valeur Ã  la position spatio-temporelle spÃ©cifiÃ©e. Cette mÃ©thode est appelÃ©e
+     * automatiquement par les {@linkplain TimeSeries sÃ©ries temporelles} lors de leur remplissage.
+     * L'implÃ©mentation par dÃ©faut dÃ©lÃ¨gue l'Ã©valuation Ã  l'objet {@link Coverage} spÃ©cifiÃ© au
+     * constructeur. RedÃ©finissez cette mÃ©thode si les valeurs devraient Ãªtre Ã©valuÃ©es autrement.
      *
-     * @param  position La position à laquelle évaluer la couverture.
-     * @return La valeur de la couverture à la position spécifiée.
+     * @param  position La position Ã  laquelle Ã©valuer la couverture.
+     * @return La valeur de la couverture Ã  la position spÃ©cifiÃ©e.
      */
     final double evaluate(final DirectPosition position) {
         try {
@@ -303,12 +303,12 @@ public class TimeSeriesTile {
     /**
      * Remplit le contenu de tous les objets {@link TimeSeries}.
      *
-     * @param  listener Objet à utiliser pour informer des progrès, ou {@code null} si aucun.
-     * @throws IOException si une erreur est survenue lors de l'écriture du fichier temporaire.
+     * @param  listener Objet Ã  utiliser pour informer des progrÃ¨s, ou {@code null} si aucun.
+     * @throws IOException si une erreur est survenue lors de l'Ã©criture du fichier temporaire.
      */
     private void fillSeries(final ProgressListener listener) throws IOException {
         if (listener != null) {
-            listener.setDescription("Chargement des données");
+            listener.setDescription("Chargement des donnÃ©es");
             listener.started();
         }
         final int seriesLength = size[varyingDimension];
@@ -332,15 +332,15 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Retourne toutes les séries temporelles. Toute modification faites dans ces séries (par exemple
-     * par un appel à {@link TimeSeries#setData}) seront reflètées dans cette collection de séries.
+     * Retourne toutes les sÃ©ries temporelles. Toute modification faites dans ces sÃ©ries (par exemple
+     * par un appel Ã  {@link TimeSeries#setData}) seront reflÃ¨tÃ©es dans cette collection de sÃ©ries.
      * <p>
-     * Cette méthode procèdera au chargement des séries temporelles la première fois où elle sera
-     * appelée. Tout appel subséquent retournera immédiatement les séries temporelles déjà en mémoire.
+     * Cette mÃ©thode procÃ¨dera au chargement des sÃ©ries temporelles la premiÃ¨re fois oÃ¹ elle sera
+     * appelÃ©e. Tout appel subsÃ©quent retournera immÃ©diatement les sÃ©ries temporelles dÃ©jÃ  en mÃ©moire.
      *
-     * @param  listener Objet à utiliser pour informer des progrès, ou {@code null} si aucun.
-     * @return Toutes les séries temporelles dans cette collection.
-     * @throws IOException si une erreur est survenue lors de l'écriture du fichier temporaire.
+     * @param  listener Objet Ã  utiliser pour informer des progrÃ¨s, ou {@code null} si aucun.
+     * @return Toutes les sÃ©ries temporelles dans cette collection.
+     * @throws IOException si une erreur est survenue lors de l'Ã©criture du fichier temporaire.
      */
     public synchronized TimeSeries[] getSeries(final ProgressListener listener) throws IOException {
         if (!filled) {
@@ -351,8 +351,8 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Retourne le nombre de séries temporelles. La valeur retournée par cette
-     * méthode doit toujours être identique à celle que retournerait
+     * Retourne le nombre de sÃ©ries temporelles. La valeur retournÃ©e par cette
+     * mÃ©thode doit toujours Ãªtre identique Ã  celle que retournerait
      * <code>{@link #getSeries getSeries}(null).length</code>.
      */
     public final int getSeriesCount() {
@@ -360,34 +360,34 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Retourne la longueur de chaque séries temporelle, en nombre de données.
+     * Retourne la longueur de chaque sÃ©ries temporelle, en nombre de donnÃ©es.
      */
     public final int getSeriesLength() {
         return size[varyingDimension];
     }
 
     /**
-     * Retourne la valeur du temps <var>t</var> au pas de temps <var>s</var> spécifiée. L'argument
-     * <var>s</var> peut varier de 0 inclusivement jusqu'à {@link #getSeriesLength} exclusivement.
-     * Des valeurs de <var>s</var> en dehors de cette plage sont acceptées, mais ne correspondront
-     * pas à des données stockées par {@code TimeSeriesTile}.
+     * Retourne la valeur du temps <var>t</var> au pas de temps <var>s</var> spÃ©cifiÃ©e. L'argument
+     * <var>s</var> peut varier de 0 inclusivement jusqu'Ã  {@link #getSeriesLength} exclusivement.
+     * Des valeurs de <var>s</var> en dehors de cette plage sont acceptÃ©es, mais ne correspondront
+     * pas Ã  des donnÃ©es stockÃ©es par {@code TimeSeriesTile}.
      */
     public double getTime(final int s) {
         return envelope.getMinimum(varyingDimension) + step[varyingDimension] * s;
     }
 
     /**
-     * Enregistre une image pour chaque pas de temps. A un pas de temps <var>t</var> donné,
-     * cette méthode copie les valeurs de toutes les séries temporelles dans une image et
-     * enregistre cette dernière.
+     * Enregistre une image pour chaque pas de temps. A un pas de temps <var>t</var> donnÃ©,
+     * cette mÃ©thode copie les valeurs de toutes les sÃ©ries temporelles dans une image et
+     * enregistre cette derniÃ¨re.
      *
-     * @param  tSubsampling La décimation à appliquer selon l'axe du temps. La valeur 1 n'applique aucune décimation.
-     * @param  xDimension   La dimension à utiliser pour les colonnes de l'image (habituellement 0).
-     * @param  yDimension   La dimension à utiliser pour les lignes   de l'image (habituellement 1).
-     * @param  listener     Objet à utiliser pour informer des progrès, ou {@code null} si aucun.
-     * @throws IOException si une erreur est survenue lors de la lecture ou de l'écriture sur le disque.
+     * @param  tSubsampling La dÃ©cimation Ã  appliquer selon l'axe du temps. La valeur 1 n'applique aucune dÃ©cimation.
+     * @param  xDimension   La dimension Ã  utiliser pour les colonnes de l'image (habituellement 0).
+     * @param  yDimension   La dimension Ã  utiliser pour les lignes   de l'image (habituellement 1).
+     * @param  listener     Objet Ã  utiliser pour informer des progrÃ¨s, ou {@code null} si aucun.
+     * @throws IOException si une erreur est survenue lors de la lecture ou de l'Ã©criture sur le disque.
      *
-     * @todo Cette méthode n'est pas encore opérationnelle.
+     * @todo Cette mÃ©thode n'est pas encore opÃ©rationnelle.
      */
     public synchronized void writeImages(final int tSubsampling,
                                          final int xDimension,
@@ -397,7 +397,7 @@ public class TimeSeriesTile {
     {
         final TimeSeries[] series = getSeries(listener);
         if (listener != null) {
-            listener.setDescription("Création des images");
+            listener.setDescription("CrÃ©ation des images");
             listener.started();
         }
         // le nombre total de positions temporelles = le nombre total d'images pour les series temporelles
@@ -406,7 +406,7 @@ public class TimeSeriesTile {
         final int imageCount   = seriesLength / tSubsampling;
         final WritableRaster raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT,
                                       size[xDimension], size[yDimension], 1, null);
-        // remise à zéro des buffeurs... pour chaque TimeSeries
+        // remise Ã  zÃ©ro des buffeurs... pour chaque TimeSeries
         for (int i=0; i<series.length; i++) {
             series[i].rewind();
         }
@@ -416,8 +416,8 @@ public class TimeSeriesTile {
             if (listener != null) {
                 listener.progress(100f / imageCount * j);
             }
-            // ... pour chaque TimeSeries, on récupère la donnée correspondant au pas de temps...
-            // ... et on écrit celles-ci "dans" le raster
+            // ... pour chaque TimeSeries, on rÃ©cupÃ¨re la donnÃ©e correspondant au pas de temps...
+            // ... et on Ã©crit celles-ci "dans" le raster
             for (int x=0; x<size[xDimension]; x++) {
                 for (int y=0; y<size[yDimension]; y++) {
                     raster.setSample(x, y, 0, series[(x*size[yDimension])+y].next());
@@ -433,8 +433,8 @@ public class TimeSeriesTile {
                     gridToCRS, 
                     bands);
             
-            // création du png...
-            // TODO : trouver un nom plus générique pour les images... ATTENTION au chemin !!!
+            // crÃ©ation du png...
+            // TODO : trouver un nom plus gÃ©nÃ©rique pour les images... ATTENTION au chemin !!!
             final String fileName = "C:\\Documents and Settings\\Antoine\\Bureau\\TestTimeSeriesTile\\imageT";
             ImageIO.write(
                     gridCoverage.geophysics(false).getRenderedImage(), 
@@ -448,7 +448,7 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Retourne une instance par défaut de {@link NumberFormat}.
+     * Retourne une instance par dÃ©faut de {@link NumberFormat}.
      */
     private static NumberFormat getDefaultFormat() {
         final NumberFormat format;
@@ -460,13 +460,13 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Écrit les coordonnées de toutes les séries temporelles vers le flot spécifié. Cette méthode
-     * est typiquement appelée avant {@link #writeValues writeValues} pour écrire l'en-tête.
-     * Les colonnes seront séparées par des tabulations.
+     * Ã‰crit les coordonnÃ©es de toutes les sÃ©ries temporelles vers le flot spÃ©cifiÃ©. Cette mÃ©thode
+     * est typiquement appelÃ©e avant {@link #writeValues writeValues} pour Ã©crire l'en-tÃªte.
+     * Les colonnes seront sÃ©parÃ©es par des tabulations.
      *
-     * @param  out Le flot vers où écrire les coordonnées.
-     * @param  format Le format à utiliser pour l'écriture des nombres, ou {@code null} pour un
-     *         format par défaut.
+     * @param  out Le flot vers oÃ¹ Ã©crire les coordonnÃ©es.
+     * @param  format Le format Ã  utiliser pour l'Ã©criture des nombres, ou {@code null} pour un
+     *         format par dÃ©faut.
      */
     public synchronized void writeCoordinates(final Writer out, NumberFormat format)
             throws IOException
@@ -474,7 +474,7 @@ public class TimeSeriesTile {
         if (format == null) {
             format = getDefaultFormat();
         }
-        // On n'apppele pas 'getSeries(null)' car il n'est pas nécessaire d'extraire les valeurs.
+        // On n'apppele pas 'getSeries(null)' car il n'est pas nÃ©cessaire d'extraire les valeurs.
         final StringBuffer  buffer = new StringBuffer();
         final FieldPosition  dummy = new FieldPosition(0);
         final String lineSeparator = System.getProperty("line.separator", "\n");
@@ -500,15 +500,15 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Écrit les valeurs de toutes les séries temporelles vers le flot spécifié.
-     * La première colonne contiendra les valeurs retournées par {@link #getTime}.
-     * Les colonnes seront séparées par des tabulations.
+     * Ã‰crit les valeurs de toutes les sÃ©ries temporelles vers le flot spÃ©cifiÃ©.
+     * La premiÃ¨re colonne contiendra les valeurs retournÃ©es par {@link #getTime}.
+     * Les colonnes seront sÃ©parÃ©es par des tabulations.
      *
-     * @param  out Le flot vers où écrire les valeurs.
-     * @param  format Le format à utiliser pour l'écriture des nombres, ou {@code null} pour un
-     *         format par défaut.
-     * @param  listener Objet à utiliser pour informer des progrès, ou {@code null} si aucun.
-     * @throws IOException si une erreur est survenue lors d'un accès disque.
+     * @param  out Le flot vers oÃ¹ Ã©crire les valeurs.
+     * @param  format Le format Ã  utiliser pour l'Ã©criture des nombres, ou {@code null} pour un
+     *         format par dÃ©faut.
+     * @param  listener Objet Ã  utiliser pour informer des progrÃ¨s, ou {@code null} si aucun.
+     * @throws IOException si une erreur est survenue lors d'un accÃ¨s disque.
      */
     public synchronized void writeValues(final Writer out, NumberFormat format,
                                          final ProgressListener listener)
@@ -522,7 +522,7 @@ public class TimeSeriesTile {
         final FieldPosition  dummy = new FieldPosition(0);
         final String lineSeparator = System.getProperty("line.separator", "\n");
         if (listener != null) {
-            listener.setDescription("Écriture des valeurs");
+            listener.setDescription("Ã‰criture des valeurs");
             listener.started();
         }
         for (int i=0; i<series.length; i++) {
@@ -543,8 +543,8 @@ public class TimeSeriesTile {
                 out.write(text);
             }
             if (listener != null) {
-                // Note: on affiche les progrès pour toutes les lignes (plutôt qu'une ligne sur 10
-                //       par exemple) parce que chacune de ces lignes peut être très longue.
+                // Note: on affiche les progrÃ¨s pour toutes les lignes (plutÃ´t qu'une ligne sur 10
+                //       par exemple) parce que chacune de ces lignes peut Ãªtre trÃ¨s longue.
                 listener.progress(100f / seriesLength * j);
             }
             out.write(lineSeparator);
@@ -556,15 +556,15 @@ public class TimeSeriesTile {
     }
     
     /**
-     * Retourne une représentation de cet objet sous forme de chaîne de caractères.
+     * Retourne une reprÃ©sentation de cet objet sous forme de chaÃ®ne de caractÃ¨res.
      */
     @Override
     public synchronized String toString() {
         if (true) {
             return super.toString();
         }
-        // TODO: Il faut n'afficher les données que pour des séries courtes.
-        //       Il faut aussi faire une méthode 'write' qui écrit vers un flot.
+        // TODO: Il faut n'afficher les donnÃ©es que pour des sÃ©ries courtes.
+        //       Il faut aussi faire une mÃ©thode 'write' qui Ã©crit vers un flot.
         final String lineSeparator = System.getProperty("line.separator", "\n");
         final StringBuilder buffer = new StringBuilder();
         for (int i=0; i<series.length; i++) {
@@ -590,9 +590,9 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Libère les ressources utilisées par cette instance. Cette méthode devrait être appelée
+     * LibÃ¨re les ressources utilisÃ©es par cette instance. Cette mÃ©thode devrait Ãªtre appelÃ©e
      * lorque cette instance de {@code TimeSeriesTile} et tous les objets {@link TimeSeries}
-     * associés ne sont plus nécessaire.
+     * associÃ©s ne sont plus nÃ©cessaire.
      */
     public void dispose() throws IOException {
         channel.close();
@@ -600,7 +600,7 @@ public class TimeSeriesTile {
     }
 
     /**
-     * Libère les ressources utilisées par cette instance.
+     * LibÃ¨re les ressources utilisÃ©es par cette instance.
      */
     @Override
     protected void finalize() throws IOException {

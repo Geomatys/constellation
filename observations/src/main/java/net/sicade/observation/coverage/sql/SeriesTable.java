@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -42,13 +42,13 @@ import net.sicade.observation.coverage.rmi.DataConnectionFactory;
 
 
 /**
- * Connexion vers la table des {@linkplain Series séries}.
+ * Connexion vers la table des {@linkplain Series sÃ©ries}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @todo L'implémentation actuelle ne transmet pas l'enveloppe spatio-temporelle de {@code this}
- *       vers les objets {@link GridCoverageTable} créés. Il faudrait le faire, en prennant soin
+ * @todo L'implÃ©mentation actuelle ne transmet pas l'enveloppe spatio-temporelle de {@code this}
+ *       vers les objets {@link GridCoverageTable} crÃ©Ã©s. Il faudrait le faire, en prennant soin
  *       de transmettre cette informations aux objets RMI aussi. Dans la version actuelle, ce n'est
  *       pris en compte que pour les connections locales.
  */
@@ -56,7 +56,7 @@ import net.sicade.observation.coverage.rmi.DataConnectionFactory;
 @UsedBy(DescriptorTable.class)
 public class SeriesTable extends BoundedSingletonTable<Series> {
     /**
-     * Requête SQL utilisée pour obtenir une série à partir de son nom.
+     * RequÃªte SQL utilisÃ©e pour obtenir une sÃ©rie Ã  partir de son nom.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Series:SELECT",
             "SELECT name, phenomenon, procedure, period, fallback, description\n" +
@@ -64,7 +64,7 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
             " WHERE name=?");
     
     /**
-     * Requête SQL utilisée pour obtenir une série à partir de son nom.
+     * RequÃªte SQL utilisÃ©e pour obtenir une sÃ©rie Ã  partir de son nom.
      */
     private static final ConfigurationKey LIST = new ConfigurationKey("Series:LIST",
             "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
@@ -82,7 +82,7 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
             "  ORDER BY name");
     
     /**
-     * Requête SQL utilisée pour obtenir une série à partir de son nom.
+     * RequÃªte SQL utilisÃ©e pour obtenir une sÃ©rie Ã  partir de son nom.
      */
     private static final ConfigurationKey LIST_JAVADB = new ConfigurationKey("Series:LIST",
             "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
@@ -101,39 +101,39 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
             "  WHERE visible=TRUE\n"                                                   +
             "  ORDER BY name");
     
-    /** Numéro de colonne. */ private static final int NAME      =  1;
-    /** Numéro de colonne. */ private static final int THEMATIC  =  2;
-    /** Numéro de colonne. */ private static final int PROCEDURE =  3;
-    /** Numéro de colonne. */ private static final int PERIOD    =  4;
-    /** Numéro de colonne. */ private static final int FALLBACK  =  5;
-    /** Numéro de colonne. */ private static final int REMARKS   =  6;
+    /** NumÃ©ro de colonne. */ private static final int NAME      =  1;
+    /** NumÃ©ro de colonne. */ private static final int THEMATIC  =  2;
+    /** NumÃ©ro de colonne. */ private static final int PROCEDURE =  3;
+    /** NumÃ©ro de colonne. */ private static final int PERIOD    =  4;
+    /** NumÃ©ro de colonne. */ private static final int FALLBACK  =  5;
+    /** NumÃ©ro de colonne. */ private static final int REMARKS   =  6;
 
     /**
-     * Connexion vers la table des thématiques.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Connexion vers la table des thÃ©matiques.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private ThematicTable thematics;
 
     /**
-     * Connexion vers la table des procédures.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Connexion vers la table des procÃ©dures.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private ProcedureTable procedures;
 
     /**
-     * Connexion vers la table des modèles.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Connexion vers la table des modÃ¨les.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private LinearModelTable models;
 
     /**
-     * Connexion vers la table des sous-séries.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Connexion vers la table des sous-sÃ©ries.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private SubSeriesTable subseries;
 
     /**
-     * Connections vers une fabrique de {@link DataConnection}, qui peut être locale ou sur un
+     * Connections vers une fabrique de {@link DataConnection}, qui peut Ãªtre locale ou sur un
      * serveur distant.
      */
     private DataConnectionFactory factory;
@@ -154,10 +154,10 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
         }
 
         /**
-         * Retourne la couverture de données pour le descripteur spécifié. Cette méthode
-         * ne devrait jamais être exécutée, puisque cette classe n'est utilisée que par
-         * {@link SeriesTable#postCreateEntry} et que cette dernière n'utilise pas cette
-         * méthode. Nous l'implémentons toujours par prudence.
+         * Retourne la couverture de donnÃ©es pour le descripteur spÃ©cifiÃ©. Cette mÃ©thode
+         * ne devrait jamais Ãªtre exÃ©cutÃ©e, puisque cette classe n'est utilisÃ©e que par
+         * {@link SeriesTable#postCreateEntry} et que cette derniÃ¨re n'utilise pas cette
+         * mÃ©thode. Nous l'implÃ©mentons toujours par prudence.
          */
         public DynamicCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException {
             return database.getTable(DescriptorTable.class).getEntryLenient(descriptor).getCoverage();
@@ -165,16 +165,16 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
     }
 
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
+     * Construit une table qui interrogera la base de donnÃ©es spÃ©cifiÃ©e.
      *
-     * @param database  Connexion vers la base de données d'observations.
+     * @param database  Connexion vers la base de donnÃ©es d'observations.
      */
     public SeriesTable(final Database database) {
         super(database, net.sicade.observation.sql.CRS.XYT);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les séries.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les sÃ©ries.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -197,8 +197,8 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
     }
 
     /**
-     * Configure la requête spécifiée. Cette méthode est appelée automatiquement lorsque la table
-     * a {@linkplain #fireStateChanged changé d'état}.
+     * Configure la requÃªte spÃ©cifiÃ©e. Cette mÃ©thode est appelÃ©e automatiquement lorsque la table
+     * a {@linkplain #fireStateChanged changÃ© d'Ã©tat}.
      */
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
@@ -212,7 +212,7 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
     }
 
     /**
-     * Construit une série pour l'enregistrement courant.
+     * Construit une sÃ©rie pour l'enregistrement courant.
      */
     protected Series createEntry(final ResultSet results) throws CatalogException, SQLException {
         final String name      = results.getString(NAME);
@@ -228,9 +228,9 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
             procedures = database.getTable(ProcedureTable.class);
         }
         /*
-         * Utilise une table d'images distinctes pour chaque séries. La série ne devrait plus
-         * changer après la construction.  Pour cette raison, l'instance de GridCoverageTable
-         * utilisée ici ne devra jamais être accessible publiquement.
+         * Utilise une table d'images distinctes pour chaque sÃ©ries. La sÃ©rie ne devrait plus
+         * changer aprÃ¨s la construction.  Pour cette raison, l'instance de GridCoverageTable
+         * utilisÃ©e ici ne devra jamais Ãªtre accessible publiquement.
          */
         final SeriesEntry entry;
         entry = new SeriesEntry(name,
@@ -242,13 +242,13 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
     }
 
     /**
-     * Complète la construction de la série. Cette méthode construit les éléments suivants:
+     * ComplÃ¨te la construction de la sÃ©rie. Cette mÃ©thode construit les Ã©lÃ©ments suivants:
      * <p>
      * <ul>
-     *   <li>La  {@linkplain Series#getFallback série de second recours}, s'il y en a une.</li>
-     *   <li>Les {@linkplain Series#getSubSeries sous-séries}.</li>
-     *   <li>La  {@linkplain SeriesEntry#setDataConnection connexion aux données}.</li>
-     *   <li>Le  {@linkplain SeriesEntry#getModel modèle linéaire}.</li>
+     *   <li>La  {@linkplain Series#getFallback sÃ©rie de second recours}, s'il y en a une.</li>
+     *   <li>Les {@linkplain Series#getSubSeries sous-sÃ©ries}.</li>
+     *   <li>La  {@linkplain SeriesEntry#setDataConnection connexion aux donnÃ©es}.</li>
+     *   <li>Le  {@linkplain SeriesEntry#getModel modÃ¨le linÃ©aire}.</li>
      * </ul>
      */
     @Override
@@ -266,26 +266,26 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
             entry.fallback = getEntry((String) entry.fallback);
         }
         /*
-         * Etablit la connexion vers les données. Trois cas peuvent se produire ici:
+         * Etablit la connexion vers les donnÃ©es. Trois cas peuvent se produire ici:
          *
-         * 1) Exécution locale:
+         * 1) ExÃ©cution locale:
          *    -----------------
-         *    Si aucun serveur n'est définit pour la propriété REGISTRY_NAME. Dans ce cas, une
-         *    instance privée (Local) sera utilisée, qui construira un GridCoverageTable local
-         *    initialisé avec la série construite par cet SeriesTable.
+         *    Si aucun serveur n'est dÃ©finit pour la propriÃ©tÃ© REGISTRY_NAME. Dans ce cas, une
+         *    instance privÃ©e (Local) sera utilisÃ©e, qui construira un GridCoverageTable local
+         *    initialisÃ© avec la sÃ©rie construite par cet SeriesTable.
          *
-         * 2) Exécution sur un serveur distant:
+         * 2) ExÃ©cution sur un serveur distant:
          *    ---------------------------------
-         *    Si un serveur est définit pour la propriété REGISTRY_NAME, un objet RMI sera obenu
-         *    de ce serveur. Ce serveur construira un GridCoverageTable chez lui initialisé avec
-         *    une copie de la série construite par un SeriesTable chez lui aussi.
+         *    Si un serveur est dÃ©finit pour la propriÃ©tÃ© REGISTRY_NAME, un objet RMI sera obenu
+         *    de ce serveur. Ce serveur construira un GridCoverageTable chez lui initialisÃ© avec
+         *    une copie de la sÃ©rie construite par un SeriesTable chez lui aussi.
          *
-         * 3) Exécution comme serveur:
+         * 3) ExÃ©cution comme serveur:
          *    ------------------------
-         *    Si ce code est exécuté par net.sicade.observation.coverage.rmi.Server, alors
-         *    DataConnectionFactory a déjà été exporté comme service RMI. On ne veut pas créer
-         *    de nouvelle instance locale, mais réutiliser le service qui existe déjà. La
-         *    méthode Database.getRemote aura été redéfinit par Server en ce sens.
+         *    Si ce code est exÃ©cutÃ© par net.sicade.observation.coverage.rmi.Server, alors
+         *    DataConnectionFactory a dÃ©jÃ  Ã©tÃ© exportÃ© comme service RMI. On ne veut pas crÃ©er
+         *    de nouvelle instance locale, mais rÃ©utiliser le service qui existe dÃ©jÃ . La
+         *    mÃ©thode Database.getRemote aura Ã©tÃ© redÃ©finit par Server en ce sens.
          */
         if (factory == null) {
             try {
@@ -305,9 +305,9 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
         }
         entry.setDataConnection(data);
         /*
-         * Construit le modèle linéaire. Notez que l'on utilise 'createTable' plutôt que
+         * Construit le modÃ¨le linÃ©aire. Notez que l'on utilise 'createTable' plutÃ´t que
          * 'getTable' car on ne veut pas partager cette instance de 'LinearModelTable',
-         * à cause de notre appel à 'setDescriptorTable'.
+         * Ã  cause de notre appel Ã  'setDescriptorTable'.
          */
         if (models == null) {
             final DescriptorTable descriptors;

@@ -5,30 +5,30 @@
     <TITLE>package net.sicade.observation.coverage</TITLE>
   </HEAD>
   <BODY>
-  Observations environnementales provenant d'une base de données d'images.
+  Observations environnementales provenant d'une base de donnÃ©es d'images.
     
-  <P ALIGN="justify">Les données sont stockées comme des images ordinaires au format
-  PNG, RAW, ASCII, JPEG-2000, <CITE>etc.</CITE> (le format JPEG classique est à éviter).
-  Une base de données (par exemple <A HREF="http://www.postgresql.org/">PostgreSQL</A>)
-  est utilisée pour stocker des méta-données (enveloppe géographique, signification des
-  valeurs des pixels, <CITE>etc.</CITE>). Cette base de données est aussi utilisée comme
-  un index pour effectuer des recherches rapides. La base de données, ainsi que les fichiers
-  des images, sont habituellement situés sur un serveur distant. La connexion à la base de
-  données se fait via JDBC, qui peut fonctionner à travers un réseau. La récupération des
-  valeurs de pixels des images peuvent se faire de deux façons:</P>
+  <P ALIGN="justify">Les donnÃ©es sont stockÃ©es comme des images ordinaires au format
+  PNG, RAW, ASCII, JPEG-2000, <CITE>etc.</CITE> (le format JPEG classique est Ã  Ã©viter).
+  Une base de donnÃ©es (par exemple <A HREF="http://www.postgresql.org/">PostgreSQL</A>)
+  est utilisÃ©e pour stocker des mÃ©ta-donnÃ©es (enveloppe gÃ©ographique, signification des
+  valeurs des pixels, <CITE>etc.</CITE>). Cette base de donnÃ©es est aussi utilisÃ©e comme
+  un index pour effectuer des recherches rapides. La base de donnÃ©es, ainsi que les fichiers
+  des images, sont habituellement situÃ©s sur un serveur distant. La connexion Ã  la base de
+  donnÃ©es se fait via JDBC, qui peut fonctionner Ã  travers un rÃ©seau. La rÃ©cupÃ©ration des
+  valeurs de pixels des images peuvent se faire de deux faÃ§ons:</P>
 
   <UL>
-    <LI><P ALIGN="justify">Les images sont récupérées par FTP et les traitements effectués sur le
+    <LI><P ALIGN="justify">Les images sont rÃ©cupÃ©rÃ©es par FTP et les traitements effectuÃ©s sur le
     poste du client. C'est l'approche qui demande le moins de temps de processeur sur le serveur,
-    mais peut exiger une bande passante élevée (chaque images fait plusieurs méga-octets, et un
-    traitement nécessite souvent plusieurs images).</P></LI>
+    mais peut exiger une bande passante Ã©levÃ©e (chaque images fait plusieurs mÃ©ga-octets, et un
+    traitement nÃ©cessite souvent plusieurs images).</P></LI>
 
     <LI><P ALIGN="justify">Le client se connecte au serveur via les RMI (<CITE>Remote Method Invocation</CITE>).
-    Cette approche ajoute une charge de travail du côté du serveur, mais nécessite peu de bande passante si
-    seulement quelques pixels sont demandés (par exemple seulement les valeurs aux positions de pêches). Notez
-    que cette approche devient systématiquement moins efficace que l'approche par FTP si l'utilisateur demande
-    un nombre de valeurs d'une même image qui représente une proportion significative du nombre de pixels que
-    contient cette image (vaut mieux alors transférer la totalité de l'image chez le client).</P></LI>
+    Cette approche ajoute une charge de travail du cÃ´tÃ© du serveur, mais nÃ©cessite peu de bande passante si
+    seulement quelques pixels sont demandÃ©s (par exemple seulement les valeurs aux positions de pÃªches). Notez
+    que cette approche devient systÃ©matiquement moins efficace que l'approche par FTP si l'utilisateur demande
+    un nombre de valeurs d'une mÃªme image qui reprÃ©sente une proportion significative du nombre de pixels que
+    contient cette image (vaut mieux alors transfÃ©rer la totalitÃ© de l'image chez le client).</P></LI>
   </UL>
   </BODY>
 </HTML>

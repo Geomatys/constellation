@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,8 +25,8 @@ import net.sicade.observation.Measurement;
 /**
  * Une capture faites lors d'un {@linkplain SeineSet coups de senne} ou par une
  * {@linkplain LongLine palangre}. Un coup de sennes ou une palangre comprendront
- * généralement plusieurs captures, une pour chaque {@linkplain Category catégorie}
- * de poisson pêché.
+ * gÃ©nÃ©ralement plusieurs captures, une pour chaque {@linkplain Category catÃ©gorie}
+ * de poisson pÃªchÃ©.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -34,7 +34,7 @@ import net.sicade.observation.Measurement;
  */
 public interface Catch extends Measurement {
     /**
-     * Retourne la catégorie de poissons capturés.
+     * Retourne la catÃ©gorie de poissons capturÃ©s.
      */
     Category getObservable();
 

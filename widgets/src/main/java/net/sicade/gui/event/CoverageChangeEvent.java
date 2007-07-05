@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,14 +24,14 @@ import net.sicade.observation.coverage.CoverageReference;
 
 
 /**
- * Evénement représentant un changement d'image.
+ * EvÃ©nement reprÃ©sentant un changement d'image.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class CoverageChangeEvent extends EventObject {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 7165162794865321696L;
 
@@ -46,11 +46,11 @@ public class CoverageChangeEvent extends EventObject {
     private final GridCoverage coverage;
 
     /**
-     * Construit un événement représentant un changement d'images.
+     * Construit un Ã©vÃ©nement reprÃ©sentant un changement d'images.
      *
-     * @param source   Source de cet événement.
-     * @param entry    Description de l'image (peut être nulle).
-     * @param coverage Nouvelle image (peut être nulle).
+     * @param source   Source de cet Ã©vÃ©nement.
+     * @param entry    Description de l'image (peut Ãªtre nulle).
+     * @param coverage Nouvelle image (peut Ãªtre nulle).
      */
     public CoverageChangeEvent(final Object           source,
                                final CoverageReference entry,
@@ -62,8 +62,8 @@ public class CoverageChangeEvent extends EventObject {
     }
 
     /**
-     * Retourne la référence décrivant l'image qui vient d'être lue. Si cette référence
-     * n'est pas connue ou qu'il n'y en a pas, alors cette méthode retourne {@code null}.
+     * Retourne la rÃ©fÃ©rence dÃ©crivant l'image qui vient d'Ãªtre lue. Si cette rÃ©fÃ©rence
+     * n'est pas connue ou qu'il n'y en a pas, alors cette mÃ©thode retourne {@code null}.
      */
     public CoverageReference getCoverageReference() {
         return entry;

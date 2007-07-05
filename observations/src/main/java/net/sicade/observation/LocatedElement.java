@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,63 +26,63 @@ import net.sicade.util.DateRange;
 
 
 /**
- * Un élément à une certaine position spatio-temporelle. Cette position est généralement ponctuelle,
+ * Un Ã©lÃ©ment Ã  une certaine position spatio-temporelle. Cette position est gÃ©nÃ©ralement ponctuelle,
  * mais il peut s'agir aussi d'une trajectoire. Par exemple il peut s'agir de la position d'une
- * pêche à la senne, ou la forme geométrique représentant la disposition d'une ligne de palangre.
+ * pÃªche Ã  la senne, ou la forme geomÃ©trique reprÃ©sentant la disposition d'une ligne de palangre.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface LocatedElement extends Element {
     /**
-     * Retourne une chaîne de caractères décrivant la position de cet élément.
-     * Cette chaîne de caractères peut être utilisée comme un identifiant plus
-     * détaillé que le {@linkplain #getName nom} à des fins d'interfaces utilisateurs.
+     * Retourne une chaÃ®ne de caractÃ¨res dÃ©crivant la position de cet Ã©lÃ©ment.
+     * Cette chaÃ®ne de caractÃ¨res peut Ãªtre utilisÃ©e comme un identifiant plus
+     * dÃ©taillÃ© que le {@linkplain #getName nom} Ã  des fins d'interfaces utilisateurs.
      *
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     String getLocation() throws CatalogException;
 
     /**
-     * Retourne une coordonnée représentative de cet élément, en degrés de longitude et de latitude.
-     * Cette méthode peut retourner {@code null} si aucune coordonnées représentative n'est trouvée.
+     * Retourne une coordonnÃ©e reprÃ©sentative de cet Ã©lÃ©ment, en degrÃ©s de longitude et de latitude.
+     * Cette mÃ©thode peut retourner {@code null} si aucune coordonnÃ©es reprÃ©sentative n'est trouvÃ©e.
      *
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     Point2D getCoordinate() throws CatalogException;
 
     /**
-     * Retourne une date représentative de cet élément. Dans le cas des observations qui
-     * s'étendent sur une certaine période de temps, ça pourrait être par exemple la date
-     * du milieu. Cette méthode peut retourner {@code null} si aucune date n'est associée
-     * à cet élément.
+     * Retourne une date reprÃ©sentative de cet Ã©lÃ©ment. Dans le cas des observations qui
+     * s'Ã©tendent sur une certaine pÃ©riode de temps, Ã§a pourrait Ãªtre par exemple la date
+     * du milieu. Cette mÃ©thode peut retourner {@code null} si aucune date n'est associÃ©e
+     * Ã  cet Ã©lÃ©ment.
      *
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     Date getTime() throws CatalogException;
 
     /**
-     * Retourne la plage de temps de cet élément. Les composantes de la plage retournée seront du
-     * type {@link Date}. Cette méthode peut retourner {@code null} si aucune plage de temps n'est
-     * associé à cet élément.
+     * Retourne la plage de temps de cet Ã©lÃ©ment. Les composantes de la plage retournÃ©e seront du
+     * type {@link Date}. Cette mÃ©thode peut retourner {@code null} si aucune plage de temps n'est
+     * associÃ© Ã  cet Ã©lÃ©ment.
      *
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     DateRange getTimeRange() throws CatalogException;
 
     /**
-     * Retourne la forme géométrique reliant toutes les positions visitées par cet élément,
+     * Retourne la forme gÃ©omÃ©trique reliant toutes les positions visitÃ©es par cet Ã©lÃ©ment,
      * dans leur ordre chronologique.
      *
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     Shape getPath() throws CatalogException;
 
     /**
-     * Vérifie si cet élément intercepte le rectangle spécifié.
-     * La réponse retournée par cette méthode n'est qu'à titre indicatif.
+     * VÃ©rifie si cet Ã©lÃ©ment intercepte le rectangle spÃ©cifiÃ©.
+     * La rÃ©ponse retournÃ©e par cette mÃ©thode n'est qu'Ã  titre indicatif.
      *
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     boolean intersects(final Rectangle2D rect) throws CatalogException;
 }

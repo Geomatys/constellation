@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import net.sicade.sie.window.mosaic.OpenAction;
 
 
 /**
- * Noeud représentant une thématique, une opération ou une série d'images. Ces noeuds ont
+ * Noeud reprÃ©sentant une thÃ©matique, une opÃ©ration ou une sÃ©rie d'images. Ces noeuds ont
  * soit {@link RootNode} ou soit un autre {@code ChildNode} comme parent.
  *
  * @version $Id$
@@ -48,17 +48,17 @@ import net.sicade.sie.window.mosaic.OpenAction;
  */
 final class ChildNode extends AbstractNode {
     /**
-     * Chemin vers l'icone représentant ce noeud, or {@code null} si aucun icone n'a été définie.
+     * Chemin vers l'icone reprÃ©sentant ce noeud, or {@code null} si aucun icone n'a Ã©tÃ© dÃ©finie.
      */
     private static final String THEMATIC_ICON = "toolbarButtonGraphics/general/Zoom16.gif";
 
     /**
-     * Chemin vers l'icone représentant ce noeud, or {@code null} si aucun icone n'a été définie.
+     * Chemin vers l'icone reprÃ©sentant ce noeud, or {@code null} si aucun icone n'a Ã©tÃ© dÃ©finie.
      */
     private static final String OPERATION_ICON = "toolbarButtonGraphics/development/Host16.gif";
 
     /**
-     * Chemin vers l'icone représentant ce noeud, or {@code null} si aucun icone n'a été définie.
+     * Chemin vers l'icone reprÃ©sentant ce noeud, or {@code null} si aucun icone n'a Ã©tÃ© dÃ©finie.
      */
     private static final String SERIES_ICON = "toolbarButtonGraphics/media/Movie16.gif";
 
@@ -68,14 +68,14 @@ final class ChildNode extends AbstractNode {
     private transient Action[] actions;
 
     /**
-     * La thématique, opération ou série de données représentée par ce noeud.
+     * La thÃ©matique, opÃ©ration ou sÃ©rie de donnÃ©es reprÃ©sentÃ©e par ce noeud.
      */
     private final Element element;
 
     /**
-     * Construit un noeud pour la thématique, l'opération ou la série d'images spécifiée.
+     * Construit un noeud pour la thÃ©matique, l'opÃ©ration ou la sÃ©rie d'images spÃ©cifiÃ©e.
      *
-     * @param element La thématique, opération ou série d'images.
+     * @param element La thÃ©matique, opÃ©ration ou sÃ©rie d'images.
      * @param children Les enfants, ou {@code null} si aucun.
      */
     public ChildNode(final Element element, final Children children, final TreeDepth type) {
@@ -95,10 +95,10 @@ final class ChildNode extends AbstractNode {
     }
 
     /**
-     * Construit une feuille de propriétés pour ce noeud.
+     * Construit une feuille de propriÃ©tÃ©s pour ce noeud.
      *
-     * @todo Prendre en compte la résolution.
-     * @todo La description ne semble pas fonctionner (excepté si le texte est vraiment très court)...
+     * @todo Prendre en compte la rÃ©solution.
+     * @todo La description ne semble pas fonctionner (exceptÃ© si le texte est vraiment trÃ¨s court)...
      */
     @Override
     protected Sheet createSheet() {
@@ -120,9 +120,9 @@ final class ChildNode extends AbstractNode {
     }
 
     /**
-     * Retourne la liste des actions disponibles pour ce noeud. Si l'élément enveloppé par ce
-     * noeud est une {@linkplain Series séries d'images}, alors le menu proposé comprendra les
-     * items "Ouvrir" et "Propriétés".
+     * Retourne la liste des actions disponibles pour ce noeud. Si l'Ã©lÃ©ment enveloppÃ© par ce
+     * noeud est une {@linkplain Series sÃ©ries d'images}, alors le menu proposÃ© comprendra les
+     * items "Ouvrir" et "PropriÃ©tÃ©s".
      */
     @Override
     public Action[] getActions(final boolean context) {
@@ -141,10 +141,10 @@ final class ChildNode extends AbstractNode {
     }
 
     /**
-     * Retourne l'action par défaut. Cette action sera exécutée lorsque l'utilisateur
-     * effectuera un double-clique sur ce noeud. L'implémentation par défaut retourne
-     * la première action de celles qui sont retournées par {@link #getActions}, qui
-     * correspondra habituellement à l'action "Ouvrir".
+     * Retourne l'action par dÃ©faut. Cette action sera exÃ©cutÃ©e lorsque l'utilisateur
+     * effectuera un double-clique sur ce noeud. L'implÃ©mentation par dÃ©faut retourne
+     * la premiÃ¨re action de celles qui sont retournÃ©es par {@link #getActions}, qui
+     * correspondra habituellement Ã  l'action "Ouvrir".
      */
     @Override
     public Action getPreferredAction() {
@@ -152,14 +152,14 @@ final class ChildNode extends AbstractNode {
         return (actions!=null && actions.length!=0) ? actions[0] : super.getPreferredAction();
     }
 
-    /** Action affichant les propriétés du noeud. */
+    /** Action affichant les propriÃ©tÃ©s du noeud. */
     private final class PropertiesAction extends AbstractAction {
         /** Construit l'action. */
         public PropertiesAction() {
             super(NbBundle.getMessage(ChildNode.class, "Properties"));
         }
 
-        /** Exécute l'action. */
+        /** ExÃ©cute l'action. */
         public void actionPerformed(final ActionEvent event) {
             NodeOperation.getDefault().showProperties(ChildNode.this);
         }

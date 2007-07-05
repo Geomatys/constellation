@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -32,8 +32,8 @@ import net.sicade.observation.sql.SingletonTable;
 
 
 /**
- * Interroge la base de données pour obtenir la liste des stades de 
- * développement des espèces observées.
+ * Interroge la base de donnÃ©es pour obtenir la liste des stades de 
+ * dÃ©veloppement des espÃ¨ces observÃ©es.
  *
  * @version $Id$
  * @author Antoine Hnawia
@@ -41,27 +41,27 @@ import net.sicade.observation.sql.SingletonTable;
  */
 public class StageTable extends SingletonTable<Stage> implements Shareable {
     /**
-     * Requête SQL pour obtenir un stage de développement à partir de son identifiant.
+     * RequÃªte SQL pour obtenir un stage de dÃ©veloppement Ã  partir de son identifiant.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Stages:SELECT",
             "SELECT name, NULL AS remarks\n" +
             "  FROM \"Stages\"\n" +
             " WHERE name LIKE ?");
 
-    /** Numéro de colonne. */ private static final int  NAME    = 1;
-    /** Numéro de colonne. */ private static final int  REMARKS = 2;
+    /** NumÃ©ro de colonne. */ private static final int  NAME    = 1;
+    /** NumÃ©ro de colonne. */ private static final int  REMARKS = 2;
 
     /**
      * Construit une connexion vers la table des stages.
      *
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnÃ©es.
      */
     public StageTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la requête à utiliser pour obtenir un stage de développement.
+     * Retourne la requÃªte Ã  utiliser pour obtenir un stage de dÃ©veloppement.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -72,7 +72,7 @@ public class StageTable extends SingletonTable<Stage> implements Shareable {
     }
 
     /**
-     * Construit un stage de développement pour l'enregistrement courant.
+     * Construit un stage de dÃ©veloppement pour l'enregistrement courant.
      */
     protected Stage createEntry(final ResultSet result) throws SQLException {
         final String name    = result.getString(NAME);

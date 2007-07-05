@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,49 +31,49 @@ import org.geotools.referencing.datum.DefaultTemporalDatum;
 
 
 /**
- * Ensemble de systèmes de référence des coordonnées prédéfinis. Ces systèmes de référence représentent
- * des coordonnées géographiques (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>) par rapport à
- * l'elllipsoïde WGS&nbsp;84 et l'epoch 01/01/1950 00:00 UTC, soit dans l'ordre:
+ * Ensemble de systÃ¨mes de rÃ©fÃ©rence des coordonnÃ©es prÃ©dÃ©finis. Ces systÃ¨mes de rÃ©fÃ©rence reprÃ©sentent
+ * des coordonnÃ©es gÃ©ographiques (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>) par rapport Ã 
+ * l'elllipsoÃ¯de WGS&nbsp;84 et l'epoch 01/01/1950 00:00 UTC, soit dans l'ordre:
  * <p>
  * <ul>
- *   <li>La longitude en degrés relatif au méridien de Greenwich</li>
- *   <li>La latitude en degrés</li>
- *   <li>L'altitude en mètres au dessus de l'ellipsoïde WGS 84</li>
- *   <li>Le temps en nombre de jours écoulés depuis l'epoch.</li>
+ *   <li>La longitude en degrÃ©s relatif au mÃ©ridien de Greenwich</li>
+ *   <li>La latitude en degrÃ©s</li>
+ *   <li>L'altitude en mÃ¨tres au dessus de l'ellipsoÃ¯de WGS 84</li>
+ *   <li>Le temps en nombre de jours Ã©coulÃ©s depuis l'epoch.</li>
  * </ul>
  * <p>
- * Ces coordonnées ne sont pas nécessairement toutes présentes; cela dépend de l'énumération
- * utilisée. Par exemple le système désigné par {@link #XYT} ne comprend pas l'altitude. Mais
- * les coordonnées présentes seront toujours dans cet ordre.
+ * Ces coordonnÃ©es ne sont pas nÃ©cessairement toutes prÃ©sentes; cela dÃ©pend de l'Ã©numÃ©ration
+ * utilisÃ©e. Par exemple le systÃ¨me dÃ©signÃ© par {@link #XYT} ne comprend pas l'altitude. Mais
+ * les coordonnÃ©es prÃ©sentes seront toujours dans cet ordre.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public enum CRS {
     /**
-     * Un système de référence de coordonnées (<var>x</var>, <var>y</var>)
+     * Un systÃ¨me de rÃ©fÃ©rence de coordonnÃ©es (<var>x</var>, <var>y</var>)
      */
     XY(-1, -1),
 
     /**
-     * Un système de référence de coordonnées (<var>x</var>, <var>y</var>, <var>t</var>)
+     * Un systÃ¨me de rÃ©fÃ©rence de coordonnÃ©es (<var>x</var>, <var>y</var>, <var>t</var>)
      */
     XYT(-1, 2),
     
     /**
-     * Un système de référence de coordonnées (<var>x</var>, <var>y</var>, <var>z</var>)
+     * Un systÃ¨me de rÃ©fÃ©rence de coordonnÃ©es (<var>x</var>, <var>y</var>, <var>z</var>)
      */
     XYZ(2, -1),
     
     /**
-     * Un système de référence de coordonnées (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>)
+     * Un systÃ¨me de rÃ©fÃ©rence de coordonnÃ©es (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>)
      */
     XYZT(2, 3);
 
     /**
-     * Système de références de coordonnées temporelles en usage chez Aviso. Ce système compte le
-     * nombre de jours écoulés depuis le 01/01/1950 00:00 UTC. Ce système est aussi en usage pour
-     * certaines données de la Nasa.
+     * SystÃ¨me de rÃ©fÃ©rences de coordonnÃ©es temporelles en usage chez Aviso. Ce systÃ¨me compte le
+     * nombre de jours Ã©coulÃ©s depuis le 01/01/1950 00:00 UTC. Ce systÃ¨me est aussi en usage pour
+     * certaines donnÃ©es de la Nasa.
      */
     static final DefaultTemporalCRS TEMPORAL = new Temporal("Nasa");
 
@@ -98,12 +98,12 @@ public enum CRS {
     final int T_DIMENSION;
 
     /**
-     * Le système de référence des coordonnées.
+     * Le systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es.
      */
     private CoordinateReferenceSystem crs;
 
     /**
-     * Affecte les valeurs aux champs {@link #crs} des énumérations.
+     * Affecte les valeurs aux champs {@link #crs} des Ã©numÃ©rations.
      */
     static {
         final Map<String,Object> properties = new HashMap<String,Object>(4);
@@ -117,7 +117,7 @@ public enum CRS {
     }
 
     /**
-     * Construit une énumération.
+     * Construit une Ã©numÃ©ration.
      */
     private CRS(final int z, final int t) {
         Z_DIMENSION = z;
@@ -125,33 +125,33 @@ public enum CRS {
     }
 
     /**
-     * Retourne le système de référence des coordonnées correspondant à cette énumération.
+     * Retourne le systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es correspondant Ã  cette Ã©numÃ©ration.
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;
     }
 
     /**
-     * Système de référence des coordonnées temporelles par défaut.
+     * SystÃ¨me de rÃ©fÃ©rence des coordonnÃ©es temporelles par dÃ©faut.
      */
     private static final class Temporal extends DefaultTemporalCRS {
         /**
          * Nombre de millisecondes entre le 01/01/1970 00:00 UTC et le 01/01/1950 00:00 UTC.
          * Le 1er janvier 1970 est l'epoch du Java, tandis que le 1er janvier 1950 est celui
-         * de la Nasa (son jour julier "0"). La constante {@code EPOCH} sert à faire les
-         * conversions d'un système à l'autre.
+         * de la Nasa (son jour julier "0"). La constante {@code EPOCH} sert Ã  faire les
+         * conversions d'un systÃ¨me Ã  l'autre.
          */
         private static final long EPOCH = -631152000000L; // Pour 1958, utiliser -378691200000L;
 
         /**
-         * Construit un système de référence du nom spécifié.
+         * Construit un systÃ¨me de rÃ©fÃ©rence du nom spÃ©cifiÃ©.
          */
         public Temporal(final String name) {
             super(name, new DefaultTemporalDatum(name, new Date(EPOCH)), DefaultTimeCS.DAYS);
         }
 
         /**
-         * Convertit une date en valeur numérique, mais en remplaçant les deux extrèmes par
+         * Convertit une date en valeur numÃ©rique, mais en remplaÃ§ant les deux extrÃ¨mes par
          * des valeurs infinies.
          */
         @Override

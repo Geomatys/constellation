@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -45,61 +45,61 @@ import net.sicade.resources.seagis.ResourceKeys;
 
 
 /**
- * Classe de base des tables dont les méthodes {@code getEntry(...)} retourneront un et un seul
- * enregistrement. Les enregistrements de ces tables sont identifiés de façon unique par un nom
- * et (optionnellement) un numéro ID. Le nom ou numéro ID fait souvent partie d'une clé primaire
+ * Classe de base des tables dont les mÃ©thodes {@code getEntry(...)} retourneront un et un seul
+ * enregistrement. Les enregistrements de ces tables sont identifiÃ©s de faÃ§on unique par un nom
+ * et (optionnellement) un numÃ©ro ID. Le nom ou numÃ©ro ID fait souvent partie d'une clÃ© primaire
  * d'une autre table.
  * <p>
- * La classe {@code SingletonTable} définit des méthodes {@link #getEntries()},
+ * La classe {@code SingletonTable} dÃ©finit des mÃ©thodes {@link #getEntries()},
  * {@link #getEntry(String)} et {@link #getEntry(int)}. En contrepartie, les
- * classes dérivées doivent implémenter les méthodes suivantes:
+ * classes dÃ©rivÃ©es doivent implÃ©menter les mÃ©thodes suivantes:
  * <p>
  * <ul>
  *   <li>{@link #getQuery}<br>
- *       pour retourner l'instruction SQL à utiliser pour obtenir les données à partir de son nom
- *       ou numéro ID.</li>
+ *       pour retourner l'instruction SQL Ã  utiliser pour obtenir les donnÃ©es Ã  partir de son nom
+ *       ou numÃ©ro ID.</li>
  *   <li>{@link #createEntry}<br>
- *       pour construire une entrée à partir de la ligne courante.</li>
+ *       pour construire une entrÃ©e Ã  partir de la ligne courante.</li>
  *   <li>{@link #postCreateEntry} (facultatif)<br>
- *       pour achever la construction d'une entrée après que le résultat de la requête SQL ait été
- *       fermé. Particulièrement utile si la phase finale peut impliquer de nouvelles requêtes sur
- *       le même objet {@link java.sql.Statement}.</li>
+ *       pour achever la construction d'une entrÃ©e aprÃ¨s que le rÃ©sultat de la requÃªte SQL ait Ã©tÃ©
+ *       fermÃ©. ParticuliÃ¨rement utile si la phase finale peut impliquer de nouvelles requÃªtes sur
+ *       le mÃªme objet {@link java.sql.Statement}.</li>
  * </ul>
  * <p>
- * Les entrés obtenues lors des appels précédents peuvent être cachées pour un accès plus rapide
- * la prochaine fois qu'une méthode {@code getEntry(...)} est appelée avec la même clé.
+ * Les entrÃ©s obtenues lors des appels prÃ©cÃ©dents peuvent Ãªtre cachÃ©es pour un accÃ¨s plus rapide
+ * la prochaine fois qu'une mÃ©thode {@code getEntry(...)} est appelÃ©e avec la mÃªme clÃ©.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class SingletonTable<E extends Element> extends Table {
     /**
-     * Le type de la requête courante, ou {@code null} si aucune.
+     * Le type de la requÃªte courante, ou {@code null} si aucune.
      */
     private QueryType type;
 
     /**
-     * La requête SQL correspondant au type {@link #type}, ou {@code null}.
+     * La requÃªte SQL correspondant au type {@link #type}, ou {@code null}.
      */
     private String query;
 
     /**
-     * Ensemble des entrés déjà obtenues pour chaque nom ou ID. Les clés doivent être soit des
+     * Ensemble des entrÃ©s dÃ©jÃ  obtenues pour chaque nom ou ID. Les clÃ©s doivent Ãªtre soit des
      * objets {@link Integer}, ou soit des objets {@link String}. Aucune autre classe ne devrait
-     * être utilisée.
+     * Ãªtre utilisÃ©e.
      * <p>
-     * Note: L'utilisation d'une cache n'est pas forcément souhaitable. Si la base de données a été
-     *       mise à jour après qu'une entrée est été mise dans la cache, la mise-à-jour ne sera pas
-     *       visible. Une solution possible serait de prévoir un Listener à appeller lorsque la base
-     *       de données a été mise à jour.
+     * Note: L'utilisation d'une cache n'est pas forcÃ©ment souhaitable. Si la base de donnÃ©es a Ã©tÃ©
+     *       mise Ã  jour aprÃ¨s qu'une entrÃ©e est Ã©tÃ© mise dans la cache, la mise-Ã -jour ne sera pas
+     *       visible. Une solution possible serait de prÃ©voir un Listener Ã  appeller lorsque la base
+     *       de donnÃ©es a Ã©tÃ© mise Ã  jour.
      */
     @SuppressWarnings("unchecked")
     private final Map<Object,E> pool = new WeakValueHashMap();
 
     /**
-     * Construit une table pour la connexion spécifiée.
+     * Construit une table pour la connexion spÃ©cifiÃ©e.
      *
-     * @param  database Connexion vers la base de données d'observations.
+     * @param  database Connexion vers la base de donnÃ©es d'observations.
      */
     protected SingletonTable(final Database database) {
         super(database);
@@ -114,14 +114,14 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Retourne la requête pré-compilée à utiliser pour le type spécifié. Cette méthode préparera
-     * une nouvelle requête si la requête courante n'est pas déjà du type spécifié. Cette méthode
-     * est appelée automatiquement par {@link #getEntries()}, {@link #getEntry(int)} et
+     * Retourne la requÃªte prÃ©-compilÃ©e Ã  utiliser pour le type spÃ©cifiÃ©. Cette mÃ©thode prÃ©parera
+     * une nouvelle requÃªte si la requÃªte courante n'est pas dÃ©jÃ  du type spÃ©cifiÃ©. Cette mÃ©thode
+     * est appelÃ©e automatiquement par {@link #getEntries()}, {@link #getEntry(int)} et
      * {@link #getEntry(String)}.
      *
-     * @param  type Le type de la requête.
-     * @return La requête pré-compilée à utiliser.
-     * @throws SQLException si la requête SQL n'a pas pu être construite.
+     * @param  type Le type de la requÃªte.
+     * @return La requÃªte prÃ©-compilÃ©e Ã  utiliser.
+     * @throws SQLException si la requÃªte SQL n'a pas pu Ãªtre construite.
      *
      * @see #getStatement(String)
      */
@@ -130,19 +130,19 @@ public abstract class SingletonTable<E extends Element> extends Table {
         if (type != this.type) {
             query = getQuery(type);
         }
-        this.type = type; // Doit être avant 'getStatement'.
+        this.type = type; // Doit Ãªtre avant 'getStatement'.
         return getStatement(query);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les données dans le contexte spécifié. Cette
-     * méthode peut être appelée avant l'exécution de {@link #getEntries()}, {@link #getEntry(String)}
-     * ou {@link #getEntry(int)}. La valeur de l'argument {@code type} dépend de laquelle des méthodes
-     * citées sera exécutée.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les donnÃ©es dans le contexte spÃ©cifiÃ©. Cette
+     * mÃ©thode peut Ãªtre appelÃ©e avant l'exÃ©cution de {@link #getEntries()}, {@link #getEntry(String)}
+     * ou {@link #getEntry(int)}. La valeur de l'argument {@code type} dÃ©pend de laquelle des mÃ©thodes
+     * citÃ©es sera exÃ©cutÃ©e.
      * <p>
-     * L'implémentation par défaut appelle <code>{@link #getQuery getQuery}({@linkplain
-     * QueryType#SELECT SELECT})</code>, qui doit être spécifié en redéfinissant cette
-     * méthode comme ci-dessous:
+     * L'implÃ©mentation par dÃ©faut appelle <code>{@link #getQuery getQuery}({@linkplain
+     * QueryType#SELECT SELECT})</code>, qui doit Ãªtre spÃ©cifiÃ© en redÃ©finissant cette
+     * mÃ©thode comme ci-dessous:
      *
      * <blockquote><pre>
      * {@code @Override}
@@ -154,36 +154,36 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * }
      * </pre><blockquote>
      * 
-     * où <var>SELECT_KEY</var> dépend de la classe dérivée. D'autres instructions {@code case}
-     * peuvent être ajoutées si des requêtes prédéfinies existes pour d'autres cas. Pour les cas
-     * restants, l'implémentation par défaut retourne une requête dérivée du cas {@code SELECT}
-     * en supposant que cette dernière répond aux conditions suivantes:
+     * oÃ¹ <var>SELECT_KEY</var> dÃ©pend de la classe dÃ©rivÃ©e. D'autres instructions {@code case}
+     * peuvent Ãªtre ajoutÃ©es si des requÃªtes prÃ©dÃ©finies existes pour d'autres cas. Pour les cas
+     * restants, l'implÃ©mentation par dÃ©faut retourne une requÃªte dÃ©rivÃ©e du cas {@code SELECT}
+     * en supposant que cette derniÃ¨re rÃ©pond aux conditions suivantes:
      * <p>
      * <ul>
-     *   <li>La première colonne après la clause {@code SELECT} doit être l'identifiant des
-     *       enregistrements (habituellement la clé primaire de la table), généralement sous
-     *       forme d'une chaîne de caractères.</li>
+     *   <li>La premiÃ¨re colonne aprÃ¨s la clause {@code SELECT} doit Ãªtre l'identifiant des
+     *       enregistrements (habituellement la clÃ© primaire de la table), gÃ©nÃ©ralement sous
+     *       forme d'une chaÃ®ne de caractÃ¨res.</li>
      *
-     *   <li>Dans le cas particulier où cette table implémente {@link NumericAccess}, alors la rêgle
-     *       précédente est étendue en stipulant que les deux premières colonnes après la clause
-     *       {@code SELECT} doivent être dans l'ordre le nom de l'enregistrement (l'identifiant
-     *       textuel) suivit de l'identifiant numérique.</li>
+     *   <li>Dans le cas particulier oÃ¹ cette table implÃ©mente {@link NumericAccess}, alors la rÃªgle
+     *       prÃ©cÃ©dente est Ã©tendue en stipulant que les deux premiÃ¨res colonnes aprÃ¨s la clause
+     *       {@code SELECT} doivent Ãªtre dans l'ordre le nom de l'enregistrement (l'identifiant
+     *       textuel) suivit de l'identifiant numÃ©rique.</li>
      *
      *   <li>L'instruction SQL doit contenir une clause du genre {@code WHERE identifier=?}, ou
-     *       {@code identifier} est le nom de la première colonne dans la clause {@code SELECT}
+     *       {@code identifier} est le nom de la premiÃ¨re colonne dans la clause {@code SELECT}
      *       (voir le premier point). L'utilisateur est libre d'utiliser le nom de colonne de son
      *       choix; {@code "identifier"} n'est pas un nom obligatoire.</li>
      *
      *   <li>Le premier argument (le premier point d'interrogation dans la clause {@code WHERE})
-     *       doit être le nom ou l'identifiant de l'enregistrement recherché.</li>
+     *       doit Ãªtre le nom ou l'identifiant de l'enregistrement recherchÃ©.</li>
      *
-     *   <li>Si d'autres arguments sont utilisés, il est de la responsabilité 
-     *       des classes dérivées de leur affecter une valeur.</li>
+     *   <li>Si d'autres arguments sont utilisÃ©s, il est de la responsabilitÃ© 
+     *       des classes dÃ©rivÃ©es de leur affecter une valeur.</li>
      * </ul>
      *
-     * @param  type Le type de la requête.
-     * @return La requête à utiliser pour la construction d'un objet {@link java.sql.PreparedStatement}.
-     * @throws SQLException si la requête n'a pas pu être construite.
+     * @param  type Le type de la requÃªte.
+     * @return La requÃªte Ã  utiliser pour la construction d'un objet {@link java.sql.PreparedStatement}.
+     * @throws SQLException si la requÃªte n'a pas pu Ãªtre construite.
      */
     protected String getQuery(final QueryType type) throws SQLException {
         String query;
@@ -202,7 +202,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
             }
             case SELECT: {
                 // TODO: localize
-                throw new IllegalStateException("getQuery(SELECT) n'a pas été définie.");
+                throw new IllegalStateException("getQuery(SELECT) n'a pas Ã©tÃ© dÃ©finie.");
             }
             default: {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
@@ -213,9 +213,9 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Retourne l'index de l'argument pour le rôle spécifié. L'implémentation par défaut retourne
-     * 1 pour {@link Role#IDENTIFIER IDENTIFIER}. Les classes dérivées peuvent redéfinir cette
-     * méthode pour modifier les index des arguments.
+     * Retourne l'index de l'argument pour le rÃ´le spÃ©cifiÃ©. L'implÃ©mentation par dÃ©faut retourne
+     * 1 pour {@link Role#IDENTIFIER IDENTIFIER}. Les classes dÃ©rivÃ©es peuvent redÃ©finir cette
+     * mÃ©thode pour modifier les index des arguments.
      */
     protected int getArgumentIndex(final Role role) {
         switch (role) {
@@ -225,8 +225,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Change la colonne sur laquelle s'applique un argument après la clause {@code WHERE}.
-     * Par exemple cette méthode peut remplacer:
+     * Change la colonne sur laquelle s'applique un argument aprÃ¨s la clause {@code WHERE}.
+     * Par exemple cette mÃ©thode peut remplacer:
      *
      * <blockquote><pre>
      * SELECT identifier, name FROM stations WHERE <em>identifier</em>=?
@@ -238,20 +238,20 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * SELECT identifier, name FROM stations WHERE <em>name</em>=?
      * </pre></blockquote>
      *
-     * Celle méthode procède comme suit:
+     * Celle mÃ©thode procÃ¨de comme suit:
      *
      * <ol>
-     *   <li>Recherche dans la requête la première colonne après la clause {@code SELECT}.</li>
-     *   <li>Recherche le colonne <var>target</var> après la clause {@code SELECT}, où <var>target</var>
-     *       est un numéro de colonne compté à partir de 1.</li>
-     *   <li>Recherche le premier nom dans la clause {@code WHERE}, et le remplace par le deuxième nom.</li>
+     *   <li>Recherche dans la requÃªte la premiÃ¨re colonne aprÃ¨s la clause {@code SELECT}.</li>
+     *   <li>Recherche le colonne <var>target</var> aprÃ¨s la clause {@code SELECT}, oÃ¹ <var>target</var>
+     *       est un numÃ©ro de colonne comptÃ© Ã  partir de 1.</li>
+     *   <li>Recherche le premier nom dans la clause {@code WHERE}, et le remplace par le deuxiÃ¨me nom.</li>
      * </ol>
      *
-     * @param  query  La requête SQL dont on veut changer la cible d'un argument.
-     * @param  target Le numéro de colonne dont le nom doit remplacer celui de la première colonne
+     * @param  query  La requÃªte SQL dont on veut changer la cible d'un argument.
+     * @param  target Le numÃ©ro de colonne dont le nom doit remplacer celui de la premiÃ¨re colonne
      *         dans les arguments.
-     * @return La requête SQL avec l'argument modifié.
-     * @throws SQLException si cette méthode n'a pas pu comprendre la requête SQL spécifiée.
+     * @return La requÃªte SQL avec l'argument modifiÃ©.
+     * @throws SQLException si cette mÃ©thode n'a pas pu comprendre la requÃªte SQL spÃ©cifiÃ©e.
      */
     @SuppressWarnings("fallthrough")
     static String changeArgumentTarget(final String query, int target) throws SQLException {
@@ -263,8 +263,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
         final int length  = query.length();
         for (int index=0; index<length; index++) {
             /*
-             * Recherche les mots délimités par des espaces, virgules ou symbole '='.
-             * Plusieurs de ces symboles peuvent être consécutifs; ils seront ignorés.
+             * Recherche les mots dÃ©limitÃ©s par des espaces, virgules ou symbole '='.
+             * Plusieurs de ces symboles peuvent Ãªtre consÃ©cutifs; ils seront ignorÃ©s.
              */
             final char c = query.charAt(index);
             if ((c!=',' && c!='=' && !Character.isSpaceChar(c)) == scanword) {
@@ -276,28 +276,28 @@ public abstract class SingletonTable<E extends Element> extends Table {
                 continue;
             }
             /*
-             * Un mot a été trouvé. L'action entreprise dépend de l'étape où l'on se trouve
-             * dans notre processus d'analyse. Tous les cas ci-dessous seront exécutés l'un
-             * après l'autre, dans l'ordre.
+             * Un mot a Ã©tÃ© trouvÃ©. L'action entreprise dÃ©pend de l'Ã©tape oÃ¹ l'on se trouve
+             * dans notre processus d'analyse. Tous les cas ci-dessous seront exÃ©cutÃ©s l'un
+             * aprÃ¨s l'autre, dans l'ordre.
              */
             final String word = query.substring(lower, index);
             switch (step) {
                 // Ignore l'instruction "SELECT". Tous ce qui peut se trouver avant le premier
-                // "SELECT" sera ignoré (mais dans une requête SQL normale, il n'y aura rien).
+                // "SELECT" sera ignorÃ© (mais dans une requÃªte SQL normale, il n'y aura rien).
                 case 0: {
                     if (!word.equalsIgnoreCase("SELECT")) {
                         continue;
                     }
                     break;
                 }
-                // Le premier mot après "SELECT" sera le nom de colonne que l'on cherchera
-                // à remplacer (dans une étape ultérieure) après l'instruction "WHERE".
+                // Le premier mot aprÃ¨s "SELECT" sera le nom de colonne que l'on cherchera
+                // Ã  remplacer (dans une Ã©tape ultÃ©rieure) aprÃ¨s l'instruction "WHERE".
                 case 1: {
                     oldColumn = word;
                     break;
                 }
-                // Si le nom de colonne de l'étape précédente est immédiatement suivit de
-                // l'instruction AS, revient à l'étape précédente (c'est-à-dire que c'est
+                // Si le nom de colonne de l'Ã©tape prÃ©cÃ©dente est immÃ©diatement suivit de
+                // l'instruction AS, revient Ã  l'Ã©tape prÃ©cÃ©dente (c'est-Ã -dire que c'est
                 // le mot suivant qu'il faut utiliser comme nom de colonne).
                 case 2: {
                     if (word.equalsIgnoreCase("AS")) {
@@ -307,11 +307,11 @@ public abstract class SingletonTable<E extends Element> extends Table {
                     step++;
                     // fall through
                 }
-                // Recherche la colonne spécifié par l'argument 'target'. Note: pour cette
-                // partie, nous ne prennons pas encore en compte d'éventuels alias ("AS").
+                // Recherche la colonne spÃ©cifiÃ© par l'argument 'target'. Note: pour cette
+                // partie, nous ne prennons pas encore en compte d'Ã©ventuels alias ("AS").
                 case 3: {
                     if (word.equalsIgnoreCase("FROM")) {
-                        throw new SQLException("Numéro de colonne introuvable.");
+                        throw new SQLException("NumÃ©ro de colonne introuvable.");
                     }
                     if (--target != 1) {
                         continue;
@@ -319,15 +319,15 @@ public abstract class SingletonTable<E extends Element> extends Table {
                     newColumn = word;
                     break;
                 }
-                // Ignore tout ce qui suit dans la requête SQL jusqu'à la première instruction WHERE.
+                // Ignore tout ce qui suit dans la requÃªte SQL jusqu'Ã  la premiÃ¨re instruction WHERE.
                 case 4: {
                     if (!word.equalsIgnoreCase("WHERE")) {
                         continue;
                     }
                     break;
                 }
-                // A la première occurence de la première colonne après WHERE, remplace l'ancien
-                // nom de colonne par le nouveau nom. Tout le reste est laissé inchangé.
+                // A la premiÃ¨re occurence de la premiÃ¨re colonne aprÃ¨s WHERE, remplace l'ancien
+                // nom de colonne par le nouveau nom. Tout le reste est laissÃ© inchangÃ©.
                 case 5: {
                     if (!word.equalsIgnoreCase(oldColumn)) {
                         continue;
@@ -344,48 +344,48 @@ public abstract class SingletonTable<E extends Element> extends Table {
             }
             step++;
         }
-        throw new SQLException("La première colonne après SELECT devrait apparaître dans la clause WHERE.");
+        throw new SQLException("La premiÃ¨re colonne aprÃ¨s SELECT devrait apparaÃ®tre dans la clause WHERE.");
     }
 
     /**
-     * Retourne un objet {@link Element} correspondant à la ligne courante du {@link ResultSet} spécifié.
-     * Cette méthode est appelée automatiquement par {@link #getEntry(String)} et {@link #getEntries()}.
+     * Retourne un objet {@link Element} correspondant Ã  la ligne courante du {@link ResultSet} spÃ©cifiÃ©.
+     * Cette mÃ©thode est appelÃ©e automatiquement par {@link #getEntry(String)} et {@link #getEntries()}.
      *
-     * @param  results  Le résultat de la requête. Seul l'enregistrement courant doit être pris en compte.
-     * @return L'entré pour l'enregistrement courant de {@code results}.
-     * @throws CatalogException si une erreur logique a été décelée dans le contenu de la base de données.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @param  results  Le rÃ©sultat de la requÃªte. Seul l'enregistrement courant doit Ãªtre pris en compte.
+     * @return L'entrÃ© pour l'enregistrement courant de {@code results}.
+     * @throws CatalogException si une erreur logique a Ã©tÃ© dÃ©celÃ©e dans le contenu de la base de donnÃ©es.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     protected abstract E createEntry(final ResultSet results) throws CatalogException, SQLException;
 
     /**
-     * Complète la construction de l'entrée spécifiée. Cette méthode est appelée automatiquement
-     * après que toutes les requêtes SQL aient été complétées. On évite ainsi des appels recursifs
-     * qui pourraient entraîner la création de plusieurs {@link ResultSet}s pour le même
+     * ComplÃ¨te la construction de l'entrÃ©e spÃ©cifiÃ©e. Cette mÃ©thode est appelÃ©e automatiquement
+     * aprÃ¨s que toutes les requÃªtes SQL aient Ã©tÃ© complÃ©tÃ©es. On Ã©vite ainsi des appels recursifs
+     * qui pourraient entraÃ®ner la crÃ©ation de plusieurs {@link ResultSet}s pour le mÃªme
      * {@link java.sql.Statement}, ce que ne supportent pas tous les pilotes JDBC.
-     * L'implémentation par défaut ne fait rien.
+     * L'implÃ©mentation par dÃ©faut ne fait rien.
      *
-     * @param  entry L'entré dont on veut compléter la construction.
-     * @throws CatalogException si une erreur logique a été décelée dans le contenu de la base de données.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @param  entry L'entrÃ© dont on veut complÃ©ter la construction.
+     * @throws CatalogException si une erreur logique a Ã©tÃ© dÃ©celÃ©e dans le contenu de la base de donnÃ©es.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     protected void postCreateEntry(final E entry) throws CatalogException, SQLException {
     }
 
     /**
-     * Indique si la méthode {@link #getEntries} devrait accepter l'entrée spécifiée.
-     * L'implémentation par défaut retourne toujours {@code true}.
+     * Indique si la mÃ©thode {@link #getEntries} devrait accepter l'entrÃ©e spÃ©cifiÃ©e.
+     * L'implÃ©mentation par dÃ©faut retourne toujours {@code true}.
      *
-     * @param  entry Une entré trouvée par {@link #getEntries}.
-     * @return {@code true} si l'entré spécifié doit être ajouté à l'ensemble retourné par {@link #getEntries}.
-     * @throws SQLException si l'interrogation de la base de données a échoué.
+     * @param  entry Une entrÃ© trouvÃ©e par {@link #getEntries}.
+     * @return {@code true} si l'entrÃ© spÃ©cifiÃ© doit Ãªtre ajoutÃ© Ã  l'ensemble retournÃ© par {@link #getEntries}.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ©.
      */
     protected boolean accept(final E entry) throws SQLException {
         return true;
     }
 
     /**
-     * Ajoute l'entrée spécifiée dans la cache, en vérifiant qu'elle n'existe pas déjà.
+     * Ajoute l'entrÃ©e spÃ©cifiÃ©e dans la cache, en vÃ©rifiant qu'elle n'existe pas dÃ©jÃ .
      */
     private void cache(final Object key, final E entry) {
         if (pool.put(key, entry) != null) {
@@ -394,18 +394,18 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Retourne une seule entrée pour l'objet {@link #statement} courant. Tous les arguments de
-     * {@link #statement} doivent avoir été définis avent d'appeler cette méthode. Cette méthode
-     * suppose que l'appellant a déjà vérifié qu'aucune entrée n'existait préalablement dans la
-     * cache pour la clé spécifiée. La requête sera exécutée et {@link #createEntry} appelée.
-     * Le résultat sera alors placé dans la cache, et {@link #postCreateEntry} appelée.
+     * Retourne une seule entrÃ©e pour l'objet {@link #statement} courant. Tous les arguments de
+     * {@link #statement} doivent avoir Ã©tÃ© dÃ©finis avent d'appeler cette mÃ©thode. Cette mÃ©thode
+     * suppose que l'appellant a dÃ©jÃ  vÃ©rifiÃ© qu'aucune entrÃ©e n'existait prÃ©alablement dans la
+     * cache pour la clÃ© spÃ©cifiÃ©e. La requÃªte sera exÃ©cutÃ©e et {@link #createEntry} appelÃ©e.
+     * Le rÃ©sultat sera alors placÃ© dans la cache, et {@link #postCreateEntry} appelÃ©e.
      *
-     * @param  statement Requête SQL à exécuter.
-     * @param  key Clé identifiant l'entré.
-     * @return L'entré pour la clé spécifiée et l'état courant de {@link #statement}.
-     * @throws CatalogException si aucun enregistrement ne correspond à l'identifiant demandé,
+     * @param  statement RequÃªte SQL Ã  exÃ©cuter.
+     * @param  key ClÃ© identifiant l'entrÃ©.
+     * @return L'entrÃ© pour la clÃ© spÃ©cifiÃ©e et l'Ã©tat courant de {@link #statement}.
+     * @throws CatalogException si aucun enregistrement ne correspond Ã  l'identifiant demandÃ©,
      *         ou si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     private E executeQuery(final PreparedStatement statement, Object key)
             throws CatalogException, SQLException
@@ -461,9 +461,9 @@ public abstract class SingletonTable<E extends Element> extends Table {
         }
         cache(key, entry);
         /*
-         * Termine la construction en appellant postCreateEntry(...), mais seulement après avoir
-         * placé le résultat dans la cache car postCreateEntry(...) peut appeller getEntry(...) de
-         * manière récursive pour la même clé. En cas d'échec, on retirera l'entrée de la cache.
+         * Termine la construction en appellant postCreateEntry(...), mais seulement aprÃ¨s avoir
+         * placÃ© le rÃ©sultat dans la cache car postCreateEntry(...) peut appeller getEntry(...) de
+         * maniÃ¨re rÃ©cursive pour la mÃªme clÃ©. En cas d'Ã©chec, on retirera l'entrÃ©e de la cache.
          */
         try {
             postCreateEntry(entry);
@@ -484,15 +484,15 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Retourne une entré pour le numéro ID spécifié. Cette méthode est à peu près synonyme
+     * Retourne une entrÃ© pour le numÃ©ro ID spÃ©cifiÃ©. Cette mÃ©thode est Ã  peu prÃ¨s synonyme
      * de <code>{@link #getEntry(String) getEntry}(String.valueOf(identifier))</code>, sauf
-     * si cette table implémente {@link NumericAccess}.
+     * si cette table implÃ©mente {@link NumericAccess}.
      *
-     * @param  identifier Le numéro de l'entrée désirée.
-     * @return L'entrée demandée.
-     * @throws CatalogException si aucun enregistrement ne correspond à l'identifiant demandé,
+     * @param  identifier Le numÃ©ro de l'entrÃ©e dÃ©sirÃ©e.
+     * @return L'entrÃ©e demandÃ©e.
+     * @throws CatalogException si aucun enregistrement ne correspond Ã  l'identifiant demandÃ©,
      *         ou si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     public synchronized E getEntry(final int identifier) throws CatalogException, SQLException {
         final Integer key = new Integer(identifier);
@@ -506,13 +506,13 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Retourne une entré pour le nom spécifié.
+     * Retourne une entrÃ© pour le nom spÃ©cifiÃ©.
      *
-     * @param  name Le nom de l'entrée désirée.
-     * @return L'entrée demandée, ou {@code null} si {@code name} était nul.
-     * @throws CatalogException si aucun enregistrement ne correspond au nom demandé,
+     * @param  name Le nom de l'entrÃ©e dÃ©sirÃ©e.
+     * @return L'entrÃ©e demandÃ©e, ou {@code null} si {@code name} Ã©tait nul.
+     * @throws CatalogException si aucun enregistrement ne correspond au nom demandÃ©,
      *         ou si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     public synchronized E getEntry(String name) throws CatalogException, SQLException {
         if (name == null) {
@@ -529,10 +529,10 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Retourne toutes les entrées disponibles dans la base de données.
+     * Retourne toutes les entrÃ©es disponibles dans la base de donnÃ©es.
      *
      * @throws CatalogException si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     public synchronized Set<E> getEntries() throws CatalogException, SQLException {
         final Map<E,Boolean> set = new LinkedHashMap<E,Boolean>();
@@ -544,8 +544,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
                 if (accept(entry)) {
                     final String name = entry.getName();
                     /*
-                     * Si une entrée existait déjà dans la cache, réutilise cette entrée en se
-                     * souvenant que postCreateEntry(...) n'a pas besoin d'être appelée pour elle.
+                     * Si une entrÃ©e existait dÃ©jÃ  dans la cache, rÃ©utilise cette entrÃ©e en se
+                     * souvenant que postCreateEntry(...) n'a pas besoin d'Ãªtre appelÃ©e pour elle.
                      */
                     Boolean initialized = Boolean.FALSE;
                     final E previous = pool.get(name);
@@ -585,9 +585,9 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Retire de la cache toutes les entrées qui n'avaient pas encore été initialisées.
-     * Cette méthode est appelée en cas d'erreur à l'intérieur de {@link #getEntries}
-     * afin de conserver {@link SingletonTable} dans un état récupérable.
+     * Retire de la cache toutes les entrÃ©es qui n'avaient pas encore Ã©tÃ© initialisÃ©es.
+     * Cette mÃ©thode est appelÃ©e en cas d'erreur Ã  l'intÃ©rieur de {@link #getEntries}
+     * afin de conserver {@link SingletonTable} dans un Ã©tat rÃ©cupÃ©rable.
      */
     private void roolback(final Map<E,Boolean> set) {
         for (final Map.Entry<E,Boolean> entry : set.entrySet()) {
@@ -598,11 +598,11 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Vide la cache de toutes les références vers les entrées précédemment créées. L'implémentation
-     * par défaut de {@code SingletonTable} n'appelle jamais cette méthode. Toutefois, les classes
-     * dérivées devraient l'appeller si {@linkplain #fireStateChanged un aspect de la table a changé},
-     * et que ce changement affecte l'état des prochaines {@linkplain #createEntry entrées qui seront
-     * créées} (au lieu de n'affecter que l'ensemble des entrées qui seront trouvées).
+     * Vide la cache de toutes les rÃ©fÃ©rences vers les entrÃ©es prÃ©cÃ©demment crÃ©Ã©es. L'implÃ©mentation
+     * par dÃ©faut de {@code SingletonTable} n'appelle jamais cette mÃ©thode. Toutefois, les classes
+     * dÃ©rivÃ©es devraient l'appeller si {@linkplain #fireStateChanged un aspect de la table a changÃ©},
+     * et que ce changement affecte l'Ã©tat des prochaines {@linkplain #createEntry entrÃ©es qui seront
+     * crÃ©Ã©es} (au lieu de n'affecter que l'ensemble des entrÃ©es qui seront trouvÃ©es).
      */
     protected void clearCache() {
         assert Thread.holdsLock(this);

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// Entrés/sorties et bases de données
+// EntrÃ©s/sorties et bases de donnÃ©es
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -31,14 +31,14 @@ import java.rmi.server.RemoteStub;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 
-// Geométries
+// GeomÃ©tries
 import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Dimension2D;
 
-// Références faibles
+// RÃ©fÃ©rences faibles
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.ref.SoftReference;
@@ -94,18 +94,18 @@ import static net.sicade.observation.coverage.CoverageBuilder.FACTORY;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain CoverageReference référence vers une
- * image}. Un objet {@code GridCoverageEntry} correspond à un enregistrement de la base de données
- * d'images. Chaque instance est imutable et sécuritaire dans un environnement multi-threads.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain CoverageReference rÃ©fÃ©rence vers une
+ * image}. Un objet {@code GridCoverageEntry} correspond Ã  un enregistrement de la base de donnÃ©es
+ * d'images. Chaque instance est imutable et sÃ©curitaire dans un environnement multi-threads.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class GridCoverageEntry extends Entry implements CoverageReference, CoverageLoader {
     /**
-     * Compare deux entrées selon le même critère que celui qui apparait dans l'instruction
-     * {@code "ORDER BY"} de la réquête SQL de {@link GridCoverageTable}). Les entrés sans
-     * dates sont une exception: elles sont considérées comme non-ordonnées.
+     * Compare deux entrÃ©es selon le mÃªme critÃ¨re que celui qui apparait dans l'instruction
+     * {@code "ORDER BY"} de la rÃ©quÃªte SQL de {@link GridCoverageTable}). Les entrÃ©s sans
+     * dates sont une exception: elles sont considÃ©rÃ©es comme non-ordonnÃ©es.
      */
     final boolean compare(final GridCoverageEntry other) {
         if (startTime==Long.MIN_VALUE && endTime==Long.MAX_VALUE) {
@@ -115,31 +115,31 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -5725249398707248625L;
 
     /**
-     * Ensemble des entrées qui ont déjà été retournées par {@link #canonicalize()} et qui n'ont pas
-     * encore été réclamées par le ramasse-miettes. La classe {@link GridCoverageTable} tentera autant
-     * que possible de retourner des entrées qui existent déjà en mémoire afin de leur donner une chance
+     * Ensemble des entrÃ©es qui ont dÃ©jÃ  Ã©tÃ© retournÃ©es par {@link #canonicalize()} et qui n'ont pas
+     * encore Ã©tÃ© rÃ©clamÃ©es par le ramasse-miettes. La classe {@link GridCoverageTable} tentera autant
+     * que possible de retourner des entrÃ©es qui existent dÃ©jÃ  en mÃ©moire afin de leur donner une chance
      * de faire un meilleur travail de cache sur les images.
      */
     private static final WeakHashSet POOL = new WeakHashSet();
 
     /**
-     * Liste des derniers {@link GridCoverageEntry} pour lesquels la méthode {@link #getCoverage}
-     * a été appelée. Lorsqu'une nouvelle image est lue, les références molles les plus anciennes
-     * sont changées en références faibles afin d'augmenter les chances que le ramasse-miette se
-     * débarasse des images les plus anciennes avant que la mémoire ne sature.
+     * Liste des derniers {@link GridCoverageEntry} pour lesquels la mÃ©thode {@link #getCoverage}
+     * a Ã©tÃ© appelÃ©e. Lorsqu'une nouvelle image est lue, les rÃ©fÃ©rences molles les plus anciennes
+     * sont changÃ©es en rÃ©fÃ©rences faibles afin d'augmenter les chances que le ramasse-miette se
+     * dÃ©barasse des images les plus anciennes avant que la mÃ©moire ne sature.
      */
     private static final LinkedList<GridCoverageEntry> LAST_INVOKED = new LinkedList<GridCoverageEntry>();
 
     /**
-     * Quantité maximale de mémoire (en octets) que l'on autorise pour l'ensemble des images
-     * énumérées dans {@link #LAST_INVOKED}.  Si cette quantité de mémoire est dépassée, les
-     * images les plus anciennes seront retirées de la liste {@link #LAST_INVOKED} jusqu'à ce
-     * qu'elle soit ramenée en dessous de cette limite.
+     * QuantitÃ© maximale de mÃ©moire (en octets) que l'on autorise pour l'ensemble des images
+     * Ã©numÃ©rÃ©es dans {@link #LAST_INVOKED}.  Si cette quantitÃ© de mÃ©moire est dÃ©passÃ©e, les
+     * images les plus anciennes seront retirÃ©es de la liste {@link #LAST_INVOKED} jusqu'Ã  ce
+     * qu'elle soit ramenÃ©e en dessous de cette limite.
      */
     private static final long MAX_MEMORY_USAGE = 128L * 1024 * 1024;
 
@@ -149,71 +149,71 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     private static long lastInvokedMemoryUsage;
 
     /**
-     * Petite valeur utilisée pour contourner les erreurs d'arrondissement.
+     * Petite valeur utilisÃ©e pour contourner les erreurs d'arrondissement.
      */
     private static final double EPS = 1E-6;
 
     /**
-     * Largeur et hauteur minimale des images, en pixels. Si l'utilisateur demande une région plus
-     * petite, la région demandée sera agrandie pour que l'image fasse cette taille.
+     * Largeur et hauteur minimale des images, en pixels. Si l'utilisateur demande une rÃ©gion plus
+     * petite, la rÃ©gion demandÃ©e sera agrandie pour que l'image fasse cette taille.
      */
     private static final int MIN_SIZE = 64;
 
     /** Nom du fichier.                  */ private final String      filename;
-    /** Date du début de l'acquisition.  */ private final long        startTime;
+    /** Date du dÃ©but de l'acquisition.  */ private final long        startTime;
     /** Date de la fin de l'acquisition. */ private final long        endTime;
-    /** Envelope géographique.           */ private final Rectangle2D boundingBox;
+    /** Envelope gÃ©ographique.           */ private final Rectangle2D boundingBox;
     /** Nombre de pixels en largeur.     */ private final short       width;
     /** Nombre de pixels en hauteur.     */ private final short       height;
 
     /**
-     * Bloc de paramètres de la table d'images. On retient ce bloc de paramètres plutôt qu'une
-     * référence directe vers {@link GridCoverageTable} afin de ne pas empêcher le ramasse-miettes
-     * de détruire la table et ses connections vers la base de données.
+     * Bloc de paramÃ¨tres de la table d'images. On retient ce bloc de paramÃ¨tres plutÃ´t qu'une
+     * rÃ©fÃ©rence directe vers {@link GridCoverageTable} afin de ne pas empÃªcher le ramasse-miettes
+     * de dÃ©truire la table et ses connections vers la base de donnÃ©es.
      */
     private final Parameters parameters;
 
     /**
-     * Un décodeur sur lequel déléguer le chargement des images, ou {@code null} pour le lire
-     * directement avec cette entrée. Dans ce dernier cas, l'image sera typiquement rapatriée
+     * Un dÃ©codeur sur lequel dÃ©lÃ©guer le chargement des images, ou {@code null} pour le lire
+     * directement avec cette entrÃ©e. Dans ce dernier cas, l'image sera typiquement rapatriÃ©e
      * par FTP.
      */
     private CoverageLoader loader;
 
     /**
-     * Référence molle vers l'image {@link GridCoverage2D} qui a été retournée lors du dernier appel
-     * de {@link #getCoverage}. Cette référence est retenue afin d'éviter de charger inutilement une
-     * autre fois l'image si elle est déjà en mémoire.
+     * RÃ©fÃ©rence molle vers l'image {@link GridCoverage2D} qui a Ã©tÃ© retournÃ©e lors du dernier appel
+     * de {@link #getCoverage}. Cette rÃ©fÃ©rence est retenue afin d'Ã©viter de charger inutilement une
+     * autre fois l'image si elle est dÃ©jÃ  en mÃ©moire.
      */
     private transient Reference<GridCoverage2D> gridCoverage;
 
     /**
-     * Référence molle vers l'image {@link RenderedImage} qui a été retournée lors du dernier appel
-     * de {@link #getCoverage}. Cette référence est retenue afin d'éviter de charger inutilement une
-     * autre fois l'image si elle est déjà en mémoire.
+     * RÃ©fÃ©rence molle vers l'image {@link RenderedImage} qui a Ã©tÃ© retournÃ©e lors du dernier appel
+     * de {@link #getCoverage}. Cette rÃ©fÃ©rence est retenue afin d'Ã©viter de charger inutilement une
+     * autre fois l'image si elle est dÃ©jÃ  en mÃ©moire.
      */
     private transient Reference<RenderedImage> renderedImage;
 
     /**
-     * Quantité de mémoire utilisée par les pixels de {@link #renderedImage}. Seuls les pixels
-     * sont pris en compte; l'espace occupé par l'objet lui-même n'est pas mesuré. La valeur 0
-     * indique que {@link #renderedImage} n'a pas encore été lue.
+     * QuantitÃ© de mÃ©moire utilisÃ©e par les pixels de {@link #renderedImage}. Seuls les pixels
+     * sont pris en compte; l'espace occupÃ© par l'objet lui-mÃªme n'est pas mesurÃ©. La valeur 0
+     * indique que {@link #renderedImage} n'a pas encore Ã©tÃ© lue.
      */
     private transient int memoryUsage;
 
     /**
-     * Construit une entré contenant des informations sur une image. Un {@linkplain #getName nom unique}
-     * sera construit à partir de la sous-série et du nom de fichiers (les colonnes {@code subseries} et
-     * {@code filename}, qui constituent habituellement la clé primaire de la table).
+     * Construit une entrÃ© contenant des informations sur une image. Un {@linkplain #getName nom unique}
+     * sera construit Ã  partir de la sous-sÃ©rie et du nom de fichiers (les colonnes {@code subseries} et
+     * {@code filename}, qui constituent habituellement la clÃ© primaire de la table).
      * <p>
-     * <strong>NOTE:</strong> Les coordonnées {@code xmin}, {@code xmax}, {@code ymin} et {@code ymax}
-     * ne sont <u>pas</u> exprimées selon le système de coordonnées de l'image, mais plutôt selon le
-     * système de coordonnées de la table d'images ({@code table}). La transformation sera effectuée
-     * par {@link #getEnvelope()} à la volé.
+     * <strong>NOTE:</strong> Les coordonnÃ©es {@code xmin}, {@code xmax}, {@code ymin} et {@code ymax}
+     * ne sont <u>pas</u> exprimÃ©es selon le systÃ¨me de coordonnÃ©es de l'image, mais plutÃ´t selon le
+     * systÃ¨me de coordonnÃ©es de la table d'images ({@code table}). La transformation sera effectuÃ©e
+     * par {@link #getEnvelope()} Ã  la volÃ©.
      *
-     * @param  table Table d'où proviennent les enregistrements.
+     * @param  table Table d'oÃ¹ proviennent les enregistrements.
      * @throws CatalogException si des arguments sont invalides.
-     * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
+     * @throws SQLException si une erreur est survenue lors de l'accÃ¨s Ã  la base de donnÃ©es.
      */
     protected GridCoverageEntry(final GridCoverageTable table,
                                 final String            series,
@@ -249,14 +249,14 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Retourne un exemplaire unique de cette entrée. Une banque d'entrées, initialement vide, est
-     * maintenue de façon interne par la classe {@code GridCoverageEntry}. Lorsque la méthode
-     * {@code canonicalize} est appelée, elle recherchera une entrée égale à {@code this} au
-     * sens de la méthode {@link #equals}. Si une telle entrée est trouvée, elle sera retournée.
-     * Sinon, l'entrée {@code this} sera ajoutée à la banque de données en utilisant une
-     * {@linkplain WeakReference référence faible} et cette méthode retournera {@code this}.
+     * Retourne un exemplaire unique de cette entrÃ©e. Une banque d'entrÃ©es, initialement vide, est
+     * maintenue de faÃ§on interne par la classe {@code GridCoverageEntry}. Lorsque la mÃ©thode
+     * {@code canonicalize} est appelÃ©e, elle recherchera une entrÃ©e Ã©gale Ã  {@code this} au
+     * sens de la mÃ©thode {@link #equals}. Si une telle entrÃ©e est trouvÃ©e, elle sera retournÃ©e.
+     * Sinon, l'entrÃ©e {@code this} sera ajoutÃ©e Ã  la banque de donnÃ©es en utilisant une
+     * {@linkplain WeakReference rÃ©fÃ©rence faible} et cette mÃ©thode retournera {@code this}.
      * <p>
-     * De cette méthode il s'ensuit que pour deux entrées <var>u</var> et <var>v</var>,
+     * De cette mÃ©thode il s'ensuit que pour deux entrÃ©es <var>u</var> et <var>v</var>,
      * la condition {@code u.canonicalize()==v.canonicalize()} sera vrai si et seulement
      * si {@code u.equals(v)} est vrai.
      */
@@ -344,7 +344,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Transforme un chemin en URL. Si {@code encoding} est non-nul, alors le chemin est encodé.
+     * Transforme un chemin en URL. Si {@code encoding} est non-nul, alors le chemin est encodÃ©.
      */
     private static void encodeURL(final File path, final StringBuilder buffer, final String encoding)
             throws UnsupportedEncodingException
@@ -384,9 +384,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     /**
      * {@inheritDoc}
      *
-     * Note: Cette bibliothèque utilise une instance spéciale de {@link DefaultTemporalCRS}
-     *       (définie dans {@link net.sicade.observation.sql.CRS}) qui sait représenter les
-     *       plages de temps illimitées par {@link Double#POSITIVE_INFINITY} ou
+     * Note: Cette bibliothÃ¨que utilise une instance spÃ©ciale de {@link DefaultTemporalCRS}
+     *       (dÃ©finie dans {@link net.sicade.observation.sql.CRS}) qui sait reprÃ©senter les
+     *       plages de temps illimitÃ©es par {@link Double#POSITIVE_INFINITY} ou
      *       {@link Double#NEGATIVE_INFINITY}.
      */
     public NumberRange getZRange() {
@@ -406,7 +406,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     /**
      * {@inheritDoc}
      *
-     * @todo L'implémentation actuelle suppose que le CRS de la table est toujours WGS84.
+     * @todo L'implÃ©mentation actuelle suppose que le CRS de la table est toujours WGS84.
      */
     public GeographicBoundingBox getGeographicBoundingBox() {
         try {
@@ -421,7 +421,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     /**
      * {@inheritDoc}
      *
-     * @todo L'implémentation actuelle suppose que le CRS de la table a toujours des axes dans
+     * @todo L'implÃ©mentation actuelle suppose que le CRS de la table a toujours des axes dans
      *       l'ordre (x,y).
      */
     public GridGeometry2D getGridGeometry() {
@@ -462,29 +462,29 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Calcule les limites des pixels à lire, en coordonnées logiques et en coordonnées pixels.
-     * Cette méthode est appelée avant la lecture d'une image, mais peut aussi être appelée par
+     * Calcule les limites des pixels Ã  lire, en coordonnÃ©es logiques et en coordonnÃ©es pixels.
+     * Cette mÃ©thode est appelÃ©e avant la lecture d'une image, mais peut aussi Ãªtre appelÃ©e par
      * des methodes telles que {@link #getEnvelope} et {@link #getGridGeometry}. Tous les arguments
-     * de cette méthode sont des arguments de sortie (en écriture seule).
+     * de cette mÃ©thode sont des arguments de sortie (en Ã©criture seule).
      *
-     * @param  clipPixel Rectangle dans lequel écrire les coordonnées pixels de la région à lire.
-     *         Ce rectangle restera inchangé si tous les pixels sont à lire.
-     * @param  subsampling Objet dans lequel écrire les pas de sous-échantillonage, ou {@code null}
-     *         si cette information n'est pas désirée.
-     * @param  envelope Envelope dans lequel écrire les coordonnées logiques de la région à lire.
-     * @return Les coordonnées logiques de l'image à lire, où {@code null} si l'image ne doit pas
-     *         être lue (par exemple parce que l'envelope est vide).
+     * @param  clipPixel Rectangle dans lequel Ã©crire les coordonnÃ©es pixels de la rÃ©gion Ã  lire.
+     *         Ce rectangle restera inchangÃ© si tous les pixels sont Ã  lire.
+     * @param  subsampling Objet dans lequel Ã©crire les pas de sous-Ã©chantillonage, ou {@code null}
+     *         si cette information n'est pas dÃ©sirÃ©e.
+     * @param  envelope Envelope dans lequel Ã©crire les coordonnÃ©es logiques de la rÃ©gion Ã  lire.
+     * @return Les coordonnÃ©es logiques de l'image Ã  lire, oÃ¹ {@code null} si l'image ne doit pas
+     *         Ãªtre lue (par exemple parce que l'envelope est vide).
      */
     private GeneralEnvelope computeBounds(final Rectangle clipPixel, final Point subsampling)
             throws TransformException
     {
         /*
-         * Obtient les coordonnées géographiques et la résolution désirées. Notez que ces
-         * rectangles ne sont pas encore exprimées dans le système de coordonnées de l'image.
-         * Cette projection sera effectuée par 'tableToCoverageCRS(...)' seulement après avoir
-         * pris en compte le clip. Ca nous évite d'avoir à projeter le clip, ce qui aurait été
-         * problématique avec les projections qui n'ont pas un domaine de validité suffisament
-         * grand (par exemple jusqu'aux pôles).
+         * Obtient les coordonnÃ©es gÃ©ographiques et la rÃ©solution dÃ©sirÃ©es. Notez que ces
+         * rectangles ne sont pas encore exprimÃ©es dans le systÃ¨me de coordonnÃ©es de l'image.
+         * Cette projection sera effectuÃ©e par 'tableToCoverageCRS(...)' seulement aprÃ¨s avoir
+         * pris en compte le clip. Ca nous Ã©vite d'avoir Ã  projeter le clip, ce qui aurait Ã©tÃ©
+         * problÃ©matique avec les projections qui n'ont pas un domaine de validitÃ© suffisament
+         * grand (par exemple jusqu'aux pÃ´les).
          */
         final Rectangle2D clipArea   = parameters.geographicArea;
         final Dimension2D resolution = parameters.resolution;
@@ -492,7 +492,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         final int ySubsampling;
         if (resolution != null) {
             /*
-             * Conversion [résolution logique désirée] --> [fréquence d'échantillonage des pixels].
+             * Conversion [rÃ©solution logique dÃ©sirÃ©e] --> [frÃ©quence d'Ã©chantillonage des pixels].
              */
             xSubsampling = max(1, min(width /MIN_SIZE, (int)round(width  * (resolution.getWidth () / boundingBox.getWidth ()))));
             ySubsampling = max(1, min(height/MIN_SIZE, (int)round(height * (resolution.getHeight() / boundingBox.getHeight()))));
@@ -507,13 +507,13 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         Rectangle2D clipLogical;
         if (clipArea == null) {
             clipLogical = parameters.tableToCoverageCRS(boundingBox, null);
-            // Ne PAS modifier ce clipLogical; 'boundingBox' n'a peut-être pas été cloné!
+            // Ne PAS modifier ce clipLogical; 'boundingBox' n'a peut-Ãªtre pas Ã©tÃ© clonÃ©!
         } else {
             /*
-             * Vérifie si le rectangle demandé (clipArea) intercepte la région géographique
-             * couverte par l'image. On utilise un code spécial plutôt que de faire appel à
-             * Rectangle2D.intersects(..) parce qu'on veut accepter les cas où le rectangle
-             * demandé se résume à une ligne ou un point.
+             * VÃ©rifie si le rectangle demandÃ© (clipArea) intercepte la rÃ©gion gÃ©ographique
+             * couverte par l'image. On utilise un code spÃ©cial plutÃ´t que de faire appel Ã 
+             * Rectangle2D.intersects(..) parce qu'on veut accepter les cas oÃ¹ le rectangle
+             * demandÃ© se rÃ©sume Ã  une ligne ou un point.
              */
             if (clipArea.getWidth()<0 || clipArea.getHeight()<0 || boundingBox.isEmpty()) {
                 return null;
@@ -529,7 +529,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
             Rectangle2D.intersect(boundingBox, clipArea, clipLogical=new Rectangle2D.Double());
             clipLogical = parameters.tableToCoverageCRS(clipLogical, clipLogical);
             /*
-             * Conversion [coordonnées logiques] --> [coordonnées pixels].
+             * Conversion [coordonnÃ©es logiques] --> [coordonnÃ©es pixels].
              */
             final double scaleX =  width/fullArea.getWidth();
             final double scaleY = height/fullArea.getHeight();
@@ -546,7 +546,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                 clipPixel.height = MIN_SIZE;
             }
             /*
-             * Vérifie que les coordonnées obtenues sont bien
+             * VÃ©rifie que les coordonnÃ©es obtenues sont bien
              * dans les limites de la dimension de l'image.
              */
             final int clipX2 = min(this.width,  clipPixel.width  + clipPixel.x);
@@ -556,8 +556,8 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
             clipPixel.width  = clipX2-clipPixel.x;
             clipPixel.height = clipY2-clipPixel.y;
             /*
-             * Vérifie que la largeur du rectangle est un
-             * multiple entier de la fréquence d'échantillonage.
+             * VÃ©rifie que la largeur du rectangle est un
+             * multiple entier de la frÃ©quence d'Ã©chantillonage.
              */
             clipPixel.width  = (clipPixel.width /xSubsampling) * xSubsampling;
             clipPixel.height = (clipPixel.height/ySubsampling) * ySubsampling;
@@ -565,7 +565,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                 return null;
             }
             /*
-             * Conversion [coordonnées pixels] --> [coordonnées logiques].
+             * Conversion [coordonnÃ©es pixels] --> [coordonnÃ©es logiques].
              *
              * 'clipLogical' ne devrait pas beaucoup changer (mais parfois un peu).
              */
@@ -594,40 +594,40 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Procède à la lecture d'une image à l'index spécifié.
+     * ProcÃ¨de Ã  la lecture d'une image Ã  l'index spÃ©cifiÃ©.
      *
-     * @param imageIndex Index de l'image à lire.
-     *        NOTE: si on permet d'obtenir des images à différents index, il faudra en
+     * @param imageIndex Index de l'image Ã  lire.
+     *        NOTE: si on permet d'obtenir des images Ã  diffÃ©rents index, il faudra en
      *              tenir compte dans {@link #gridCoverage} et {@link #renderedImage}.
-     * @param listeners Liste des objets à informer des progrès de la lecture.
+     * @param listeners Liste des objets Ã  informer des progrÃ¨s de la lecture.
      */
     private synchronized GridCoverage2D getCoverage(final int          imageIndex,
                                                     final IIOListeners listeners)
             throws IOException, TransformException
     {
         /*
-         * NOTE SUR LES SYNCHRONISATIONS: Cette méthode est synchronisée à plusieurs niveau:
+         * NOTE SUR LES SYNCHRONISATIONS: Cette mÃ©thode est synchronisÃ©e Ã  plusieurs niveau:
          *
-         *  1) Toute la méthode sur 'this',  afin d'éviter qu'une image ne soit lue deux fois
-         *     si un thread tente d'accéder à la cache alors que l'autre thread n'a pas eu le
-         *     temps de placer le résultat de la lecture dans cette cache.   Synchroniser sur
-         *     'this' ne devrait pas avoir d'impact significatif sur la performance,    étant
-         *     donné que l'opération vraiment longue (la lecture de l'image) est synchronisée
-         *     sur 'format' de toute façon (voir prochain item).
+         *  1) Toute la mÃ©thode sur 'this',  afin d'Ã©viter qu'une image ne soit lue deux fois
+         *     si un thread tente d'accÃ©der Ã  la cache alors que l'autre thread n'a pas eu le
+         *     temps de placer le rÃ©sultat de la lecture dans cette cache.   Synchroniser sur
+         *     'this' ne devrait pas avoir d'impact significatif sur la performance,    Ã©tant
+         *     donnÃ© que l'opÃ©ration vraiment longue (la lecture de l'image) est synchronisÃ©e
+         *     sur 'format' de toute faÃ§on (voir prochain item).
          *
-         *  2) La lecture de l'image sur 'format'. On ne synchronise pas toute la méthode sur
-         *     'format' afin de ne pas bloquer l'accès à la cache pour un objet 'CoverageReference'
-         *     donné pendant qu'une lecture est en cours sur un autre objet 'CoverageReference' qui
-         *     utiliserait le même format.
+         *  2) La lecture de l'image sur 'format'. On ne synchronise pas toute la mÃ©thode sur
+         *     'format' afin de ne pas bloquer l'accÃ¨s Ã  la cache pour un objet 'CoverageReference'
+         *     donnÃ© pendant qu'une lecture est en cours sur un autre objet 'CoverageReference' qui
+         *     utiliserait le mÃªme format.
          *
          *  3) Les demandes d'annulation de lecture (abort) sur FormatEntry.enqueued, afin de
-         *     pouvoir être faite pendant qu'une lecture est en cours. Cette synchronisation
-         *     est gérée en interne par FormatEntry.
+         *     pouvoir Ãªtre faite pendant qu'une lecture est en cours. Cette synchronisation
+         *     est gÃ©rÃ©e en interne par FormatEntry.
          */
 
         /*
-         * Vérifie d'abord si l'image demandée se trouve déjà en mémoire. Si
-         * oui, elle sera retournée et la méthode se termine immédiatement.
+         * VÃ©rifie d'abord si l'image demandÃ©e se trouve dÃ©jÃ  en mÃ©moire. Si
+         * oui, elle sera retournÃ©e et la mÃ©thode se termine immÃ©diatement.
          */
         if (gridCoverage != null) {
             final GridCoverage2D coverage = gridCoverage.get();
@@ -637,7 +637,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
             gridCoverage = null;
         }
         /*
-         * Obtient les coordonnées pixels et les coordonnées logiques de la région à extraire.
+         * Obtient les coordonnÃ©es pixels et les coordonnÃ©es logiques de la rÃ©gion Ã  extraire.
          */
         final Rectangle       clipPixel   = new Rectangle();
         final Point           subsampling = new Point();
@@ -646,21 +646,21 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
             return null;
         }
         /*
-         * Avant d'effectuer la lecture, vérifie si l'image est déjà en mémoire. Une image
-         * {@link RenderedGridCoverage} peut être en mémoire même si {@link GridCoverage2D}
-         * ne l'est plus si, par exemple, l'image est entrée dans une chaîne d'opérations de JAI.
+         * Avant d'effectuer la lecture, vÃ©rifie si l'image est dÃ©jÃ  en mÃ©moire. Une image
+         * {@link RenderedGridCoverage} peut Ãªtre en mÃ©moire mÃªme si {@link GridCoverage2D}
+         * ne l'est plus si, par exemple, l'image est entrÃ©e dans une chaÃ®ne d'opÃ©rations de JAI.
          */
         RenderedImage image = null;
         if (renderedImage != null) {
             image = renderedImage.get();
             if (image == null) {
                 renderedImage = null;
-                LOGGER.fine("Charge une nouvelle fois les données de \"" + getName() + "\".");
+                LOGGER.fine("Charge une nouvelle fois les donnÃ©es de \"" + getName() + "\".");
             }
         }
         /*
-         * Si la lecture de l'image doit être effectuée par un serveur distant, délègue cette lecture.
-         * Le serveur effectuera toutes les traitements jusqu'à l'application de l'opération, inclusivement.
+         * Si la lecture de l'image doit Ãªtre effectuÃ©e par un serveur distant, dÃ©lÃ¨gue cette lecture.
+         * Le serveur effectuera toutes les traitements jusqu'Ã  l'application de l'opÃ©ration, inclusivement.
          */
         GridCoverage2D coverage;
         if (image==null && loader instanceof RemoteStub) {
@@ -669,8 +669,8 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
             coverage = coverage.geophysics(true);
         } else {
             /*
-             * A ce stade, nous savons que nous devrons effectuer la lecture nous-mêmes et nous
-             * disposons des coordonnées en pixels de la région à charger. Procède maintenant à
+             * A ce stade, nous savons que nous devrons effectuer la lecture nous-mÃªmes et nous
+             * disposons des coordonnÃ©es en pixels de la rÃ©gion Ã  charger. ProcÃ¨de maintenant Ã 
              * la lecture.
              */
             final FormatEntry format = parameters.format;
@@ -697,20 +697,20 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                 format.setReading(this, false);
             }
             /*
-             * La lecture est terminée et n'a pas été annulée. On construit maintenant l'objet
+             * La lecture est terminÃ©e et n'a pas Ã©tÃ© annulÃ©e. On construit maintenant l'objet
              * GridCoverage2D, on le conserve dans une cache interne puis on le retourne. Note:
-             * la source n'est pas conservée si cet objet est susceptible d'être utilisé comme
-             * serveur, afin d'éviter de transmettre une copie de GridCoverageEntry via le réseau.
+             * la source n'est pas conservÃ©e si cet objet est susceptible d'Ãªtre utilisÃ© comme
+             * serveur, afin d'Ã©viter de transmettre une copie de GridCoverageEntry via le rÃ©seau.
              */
             final Map properties = (loader==null) ? Collections.singletonMap(SOURCE_KEY, this) : null;
             coverage = FACTORY.create(filename, image, envelope, bands, null, properties);
             /*
-             * Retourne toujours la version "géophysique" de l'image.
+             * Retourne toujours la version "gÃ©ophysique" de l'image.
              */
             coverage = coverage.geophysics(true);
             /*
-             * Si l'utilisateur a spécifié une operation à appliquer
-             * sur les images, applique cette opération maintenant.
+             * Si l'utilisateur a spÃ©cifiÃ© une operation Ã  appliquer
+             * sur les images, applique cette opÃ©ration maintenant.
              */
             Operation operation = parameters.operation;
             if (operation == null) {
@@ -721,9 +721,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         renderedImage = new WeakReference<RenderedImage>(image);
         gridCoverage  = new SoftReference<GridCoverage2D>(coverage);
         /*
-         * Calcule la quantité de mémoire utilisée par l'image. Si la quantité totale utilisée par
-         * les dernières images dépasse un seuil maximal, alors les images les plus anciennes veront
-         * leurs références molles transformées en références faibles.
+         * Calcule la quantitÃ© de mÃ©moire utilisÃ©e par l'image. Si la quantitÃ© totale utilisÃ©e par
+         * les derniÃ¨res images dÃ©passe un seuil maximal, alors les images les plus anciennes veront
+         * leurs rÃ©fÃ©rences molles transformÃ©es en rÃ©fÃ©rences faibles.
          */
         memoryUsage = (DataBuffer.getDataTypeSize(image.getSampleModel().getDataType()) / Byte.SIZE)
                     * image.getWidth() * image.getHeight();
@@ -746,16 +746,16 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Retourne l'image correspondant à cette entrée. Si l'image avait déjà été lue précédemment et
-     * qu'elle n'a pas encore été réclamée par le ramasse-miette, alors l'image existante sera
-     * retournée sans qu'une nouvelle lecture du fichier ne soit nécessaire. Si au contraire l'image
-     * n'était pas déjà en mémoire, alors un décodage du fichier sera nécessaire.
+     * Retourne l'image correspondant Ã  cette entrÃ©e. Si l'image avait dÃ©jÃ  Ã©tÃ© lue prÃ©cÃ©demment et
+     * qu'elle n'a pas encore Ã©tÃ© rÃ©clamÃ©e par le ramasse-miette, alors l'image existante sera
+     * retournÃ©e sans qu'une nouvelle lecture du fichier ne soit nÃ©cessaire. Si au contraire l'image
+     * n'Ã©tait pas dÃ©jÃ  en mÃ©moire, alors un dÃ©codage du fichier sera nÃ©cessaire.
      * <p>
-     * Cette méthode ne décodera pas nécessairement l'ensemble de l'image. La partie décodée dépend de la
-     * {@linkplain GridCoverageTable#setGeographicBoundingBox région géographique} et de la {@linkplain
-     * GridCoverageTable#setPreferredResolution résolution} qui étaient actifs au moment où
-     * {@link GridCoverageTable#getEntries} a été appelée (les changement subséquents des paramètres
-     * de {@link GridCoverageTable} n'ont pas d'effets sur les {@code GridCoverageEntry} déjà créés).
+     * Cette mÃ©thode ne dÃ©codera pas nÃ©cessairement l'ensemble de l'image. La partie dÃ©codÃ©e dÃ©pend de la
+     * {@linkplain GridCoverageTable#setGeographicBoundingBox rÃ©gion gÃ©ographique} et de la {@linkplain
+     * GridCoverageTable#setPreferredResolution rÃ©solution} qui Ã©taient actifs au moment oÃ¹
+     * {@link GridCoverageTable#getEntries} a Ã©tÃ© appelÃ©e (les changement subsÃ©quents des paramÃ¨tres
+     * de {@link GridCoverageTable} n'ont pas d'effets sur les {@code GridCoverageEntry} dÃ©jÃ  crÃ©Ã©s).
      */
     public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
         try {
@@ -766,7 +766,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Retourne l'image correspondant à cette entrée. Cette méthode délègue son travail à
+     * Retourne l'image correspondant Ã  cette entrÃ©e. Cette mÃ©thode dÃ©lÃ¨gue son travail Ã 
      * <code>{@linkplain #getCoverage(IIOListeners) getCoverage}(null)</code>.
      */
     public final GridCoverage2D getCoverage() throws IOException {
@@ -774,9 +774,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Remplace la référence molle de {@link #gridCoverage} par une référence faible.
-     * Cette méthode est appelée par quand on a déterminé que la mémoire allouée par
-     * un {@link GridCoverage2D} devrait être libérée.
+     * Remplace la rÃ©fÃ©rence molle de {@link #gridCoverage} par une rÃ©fÃ©rence faible.
+     * Cette mÃ©thode est appelÃ©e par quand on a dÃ©terminÃ© que la mÃ©moire allouÃ©e par
+     * un {@link GridCoverage2D} devrait Ãªtre libÃ©rÃ©e.
      */
     private synchronized void clearSoftReference() {
         if (gridCoverage instanceof SoftReference) {
@@ -793,11 +793,11 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Indique si cette image a au moins la résolution spécifiée.
+     * Indique si cette image a au moins la rÃ©solution spÃ©cifiÃ©e.
      *
-     * @param  resolution Résolution désirée, exprimée selon le CRS de la table d'images.
-     * @return {@code true} si la résolution de cette image est égale ou supérieure à la résolution
-     *         demandée. Cette méthode retourne {@code false} si {@code resolution} était nul.
+     * @param  resolution RÃ©solution dÃ©sirÃ©e, exprimÃ©e selon le CRS de la table d'images.
+     * @return {@code true} si la rÃ©solution de cette image est Ã©gale ou supÃ©rieure Ã  la rÃ©solution
+     *         demandÃ©e. Cette mÃ©thode retourne {@code false} si {@code resolution} Ã©tait nul.
      */
     final boolean hasEnoughResolution(final Dimension2D resolution) {
         return (resolution != null) &&
@@ -806,9 +806,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Si les deux images couvrent les mêmes coordonnées spatio-temporelles, retourne celle qui a
-     * la plus basse résolution. Si les deux images ne couvrent pas les mêmes coordonnées ou si
-     * leurs résolutions sont incompatibles, alors cette méthode retourne {@code null}.
+     * Si les deux images couvrent les mÃªmes coordonnÃ©es spatio-temporelles, retourne celle qui a
+     * la plus basse rÃ©solution. Si les deux images ne couvrent pas les mÃªmes coordonnÃ©es ou si
+     * leurs rÃ©solutions sont incompatibles, alors cette mÃ©thode retourne {@code null}.
      */
     final GridCoverageEntry getLowestResolution(final GridCoverageEntry that) {
         if (Utilities.equals(this.parameters.series, that.parameters.series) && sameEnvelope(that)) {
@@ -819,9 +819,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Indique si l'image de cette entrée couvre la même région géographique et la même plage
-     * de temps que celles de l'entré spécifiée. Les deux entrés peuvent toutefois appartenir
-     * à des séries différentes.
+     * Indique si l'image de cette entrÃ©e couvre la mÃªme rÃ©gion gÃ©ographique et la mÃªme plage
+     * de temps que celles de l'entrÃ© spÃ©cifiÃ©e. Les deux entrÃ©s peuvent toutefois appartenir
+     * Ã  des sÃ©ries diffÃ©rentes.
      */
     private boolean sameEnvelope(final GridCoverageEntry that) {
         return this.startTime == that.startTime &&
@@ -831,13 +831,13 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Indique si cette entrée est identique à l'entrée spécifiée. Cette méthode vérifie
-     * tous les paramètres de {@code GridCoverageEntry}, incluant le chemin de l'image et
-     * les coordonnées géographiques de la région qui a été demandée. Si vous souhaitez
-     * seulement vérifier si deux objets {@code GridCoverageEntry} décrivent bien la même
-     * image (même si les coordonnées de la région demandée sont différentes), comparez plutôt
-     * leur identifiant {@link #getName}. Notez que cette dernière solution n'est valide que si
-     * les deux objets {@code GridCoverageEntry} proviennent de la même base de données.
+     * Indique si cette entrÃ©e est identique Ã  l'entrÃ©e spÃ©cifiÃ©e. Cette mÃ©thode vÃ©rifie
+     * tous les paramÃ¨tres de {@code GridCoverageEntry}, incluant le chemin de l'image et
+     * les coordonnÃ©es gÃ©ographiques de la rÃ©gion qui a Ã©tÃ© demandÃ©e. Si vous souhaitez
+     * seulement vÃ©rifier si deux objets {@code GridCoverageEntry} dÃ©crivent bien la mÃªme
+     * image (mÃªme si les coordonnÃ©es de la rÃ©gion demandÃ©e sont diffÃ©rentes), comparez plutÃ´t
+     * leur identifiant {@link #getName}. Notez que cette derniÃ¨re solution n'est valide que si
+     * les deux objets {@code GridCoverageEntry} proviennent de la mÃªme base de donnÃ©es.
      */
     @Override
     public boolean equals(final Object object) {
@@ -856,7 +856,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Retourne une chaîne de caractères représentant cette entrée.
+     * Retourne une chaÃ®ne de caractÃ¨res reprÃ©sentant cette entrÃ©e.
      */
     @Override
     public String toString() {
@@ -877,9 +877,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Après la lecture binaire, remplace l'entrée lue par une entrée qui se trouvaient
-     * déjà en mémoire, si une telle entrée existe. Ce remplacement augmente les chances
-     * que la méthode {@code #getCoverage} retourne une image qui se trouvait déjà en mémoire.
+     * AprÃ¨s la lecture binaire, remplace l'entrÃ©e lue par une entrÃ©e qui se trouvaient
+     * dÃ©jÃ  en mÃ©moire, si une telle entrÃ©e existe. Ce remplacement augmente les chances
+     * que la mÃ©thode {@code #getCoverage} retourne une image qui se trouvait dÃ©jÃ  en mÃ©moire.
      *
      * @see #canonicalize
      */
@@ -888,18 +888,18 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
-     * Exporte cette entrée comme service RMI ((<code>Remote Method Invocation</cite>). Lorsque
-     * cette entrée est envoyée vers un client via le réseau (typiquement comme objet retourné
-     * par une autre fonction exécutée sur un serveur distant), une connexion vers le serveur
-     * d'origine sera conservée. La plupart des méthodes que le client appellera s'exécuteront
-     * localement, excepté {@link #getCoverage()} et ses variantes qui liront et traiteront
-     * l'image sur un serveur distant avant de l'envoyer sur le réseau.
+     * Exporte cette entrÃ©e comme service RMI ((<code>Remote Method Invocation</cite>). Lorsque
+     * cette entrÃ©e est envoyÃ©e vers un client via le rÃ©seau (typiquement comme objet retournÃ©
+     * par une autre fonction exÃ©cutÃ©e sur un serveur distant), une connexion vers le serveur
+     * d'origine sera conservÃ©e. La plupart des mÃ©thodes que le client appellera s'exÃ©cuteront
+     * localement, exceptÃ© {@link #getCoverage()} et ses variantes qui liront et traiteront
+     * l'image sur un serveur distant avant de l'envoyer sur le rÃ©seau.
      * <p>
-     * Il est innofensif d'appeller cette méthode plusieurs fois, mais seul le premier appel aura un
-     * effet. Cette méthode est utilisée par {@link net.sicade.observation.coverage.rmi.GridCoverageServer}
-     * et n'a habituellement pas besoin d'être appelée directement.
+     * Il est innofensif d'appeller cette mÃ©thode plusieurs fois, mais seul le premier appel aura un
+     * effet. Cette mÃ©thode est utilisÃ©e par {@link net.sicade.observation.coverage.rmi.GridCoverageServer}
+     * et n'a habituellement pas besoin d'Ãªtre appelÃ©e directement.
      *
-     * @throws RemoteException si l'exportation du service RMI a échouée.
+     * @throws RemoteException si l'exportation du service RMI a Ã©chouÃ©e.
      *
      * @see RemoteLoader
      */

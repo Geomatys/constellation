@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,11 +40,11 @@ import net.sicade.resources.seagis.Resources;
 
 /**
  * Connexion vers une table pouvant substituer un {@linkplain Descriptor descripteur} par une
- * somme de {@linkplain LinearModel.Term termes}. Cette table est utilisée notamment pour substituer
- * les gradients temporels. Ces derniers sont des descripteurs virtuels, calculés à la volé par
- * PostgreSQL à partir de la différence entre deux descripteurs "bruts". Cette table permet de
+ * somme de {@linkplain LinearModel.Term termes}. Cette table est utilisÃ©e notamment pour substituer
+ * les gradients temporels. Ces derniers sont des descripteurs virtuels, calculÃ©s Ã  la volÃ© par
+ * PostgreSQL Ã  partir de la diffÃ©rence entre deux descripteurs "bruts". Cette table permet de
  * {@linkplain LinearModelEntry#substitute substituer} un descripteur virtuel par les descripteurs
- * réels qui le compose.
+ * rÃ©els qui le compose.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -53,7 +53,7 @@ import net.sicade.resources.seagis.Resources;
 @UsedBy(LinearModelTable.class)
 public class DescriptorSubstitutionTable extends Table implements Shareable {
     /**
-     * Requête SQL pour obtenir un descripteur.
+     * RequÃªte SQL pour obtenir un descripteur.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("DescriptorSubstitutions:SELECT",
             "SELECT symbol1, symbol2\n"                    +
@@ -61,26 +61,26 @@ public class DescriptorSubstitutionTable extends Table implements Shareable {
             " WHERE symbol=?");
 
     /**
-     * La table des descripteurs du paysage océanique. Ne sera construit que la première fois
-     * où elle sera nécessaire.
+     * La table des descripteurs du paysage ocÃ©anique. Ne sera construit que la premiÃ¨re fois
+     * oÃ¹ elle sera nÃ©cessaire.
      */
     private DescriptorTable descriptors;
 
     /**
-     * Construit une nouvelle instance de cette table pour la base de données spécifiée.
+     * Construit une nouvelle instance de cette table pour la base de donnÃ©es spÃ©cifiÃ©e.
      */
     public DescriptorSubstitutionTable(final Database database) {
         super(database);
     }
 
     /**
-     * Définie la table des descripteurs à utiliser. Cette méthode peut être appelée par
-     * {@link LinearModelTable} immédiatement après la construction de cette table et avant
-     * toute première utilisation. Notez que les instances ainsi créées ne devraient pas être
-     * partagées par {@link Database#getTable}.
+     * DÃ©finie la table des descripteurs Ã  utiliser. Cette mÃ©thode peut Ãªtre appelÃ©e par
+     * {@link LinearModelTable} immÃ©diatement aprÃ¨s la construction de cette table et avant
+     * toute premiÃ¨re utilisation. Notez que les instances ainsi crÃ©Ã©es ne devraient pas Ãªtre
+     * partagÃ©es par {@link Database#getTable}.
      *
-     * @param  descriptors Table des descripteurs à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des descripteurs.
+     * @param  descriptors Table des descripteurs Ã  utiliser.
+     * @throws IllegalStateException si cette instance utilise dÃ©jÃ  une autre table des descripteurs.
      */
     protected synchronized void setDescriptorTable(final DescriptorTable descriptors)
             throws IllegalStateException
@@ -94,10 +94,10 @@ public class DescriptorSubstitutionTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne les termes de modèles linéaire pour le descripteur spécifié, ou {@code null}
-     * s'il n'y en a pas. Si cette méthode retourne un tableau non-nul, alors le descripteur
-     * spécifié sera remplacé par la somme de tous les termes retournés lors de la construction
-     * d'un modèle linéaire.
+     * Retourne les termes de modÃ¨les linÃ©aire pour le descripteur spÃ©cifiÃ©, ou {@code null}
+     * s'il n'y en a pas. Si cette mÃ©thode retourne un tableau non-nul, alors le descripteur
+     * spÃ©cifiÃ© sera remplacÃ© par la somme de tous les termes retournÃ©s lors de la construction
+     * d'un modÃ¨le linÃ©aire.
      */
     public synchronized LinearModel.Term[] expand(final Descriptor descriptor)
             throws CatalogException, SQLException
@@ -120,7 +120,7 @@ public class DescriptorSubstitutionTable extends Table implements Shareable {
         }
         results.close();
         if (key.equals(symbol1) || key.equals(symbol2)) {
-            throw new IllegalRecordException(null, "Définition récursive d'un gradient temporel.");
+            throw new IllegalRecordException(null, "DÃ©finition rÃ©cursive d'un gradient temporel.");
         }
         if (descriptors == null) {
             descriptors = database.getTable(DescriptorTable.class);

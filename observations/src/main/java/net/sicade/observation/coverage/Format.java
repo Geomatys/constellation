@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import net.sicade.observation.Element;
 
 
 /**
- * Information sur un format d'image. Le {@linkplain #getName nom} d'une entrée devrait être
+ * Information sur un format d'image. Le {@linkplain #getName nom} d'une entrÃ©e devrait Ãªtre
  * le nom MIME du format d'image.
  *
  * @version $Id$
@@ -33,22 +33,22 @@ import net.sicade.observation.Element;
  */
 public interface Format extends Element {
     /**
-     * Retourne les listes des bandes qui permettent de décoder les valeurs des paramètres
-     * géophysiques. Cette méthode peut retourner plusieurs objets {@link SampleDimension},
-     * un par bande. Leur type (géophysique ou non) correspond au type des images dans leur
+     * Retourne les listes des bandes qui permettent de dÃ©coder les valeurs des paramÃ¨tres
+     * gÃ©ophysiques. Cette mÃ©thode peut retourner plusieurs objets {@link SampleDimension},
+     * un par bande. Leur type (gÃ©ophysique ou non) correspond au type des images dans leur
      * format natif. Par exemple les valeurs des pixels seront des entiers (<code>{@linkplain
      * org.geotools.coverage.GridSampleDimension#geophysics geophysics}(false)</code>) si l'image
-     * est enregistrée au format PNG, tandis que les plages de valeurs peuvent être des nombres
-     * réels (<code>{@linkplain org.geotools.coverage.GridSampleDimension#geophysics geophysics}(true)</code>)
-     * si l'image est enregistrée dans un format brut ou ASCII.
+     * est enregistrÃ©e au format PNG, tandis que les plages de valeurs peuvent Ãªtre des nombres
+     * rÃ©els (<code>{@linkplain org.geotools.coverage.GridSampleDimension#geophysics geophysics}(true)</code>)
+     * si l'image est enregistrÃ©e dans un format brut ou ASCII.
      */
     SampleDimension[] getSampleDimensions();
 
     /**
-     * Retourne une arborescence qui représentera ce format, ses bandes et les catégories de
+     * Retourne une arborescence qui reprÃ©sentera ce format, ses bandes et les catÃ©gories de
      * chaque bandes.
      *
-     * @param  locale La langue à utiliser pour formatter le contenu textuel de l'arborescence.
+     * @param  locale La langue Ã  utiliser pour formatter le contenu textuel de l'arborescence.
      * @return La racine de l'arborescence.
      */
     MutableTreeNode getTree(Locale locale);

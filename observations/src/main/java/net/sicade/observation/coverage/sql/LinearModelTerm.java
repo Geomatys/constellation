@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import net.sicade.observation.coverage.LinearModel;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain LinearModel modèle linéaire}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain LinearModel modÃ¨le linÃ©aire}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -41,7 +41,7 @@ import net.sicade.observation.coverage.LinearModel;
  */
 final class LinearModelTerm extends AbstractList<Descriptor> implements LinearModel.Term, Serializable, RandomAccess {
     /**
-     * Numéro de série pour compatibilité entre différentes versions.
+     * NumÃ©ro de sÃ©rie pour compatibilitÃ© entre diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 5840967233186035005L;
 
@@ -51,10 +51,10 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     private final double coefficient;
 
     /**
-     * Les descripteurs du paysage océanique composant ce terme. Ce tableau doit être soit de
+     * Les descripteurs du paysage ocÃ©anique composant ce terme. Ce tableau doit Ãªtre soit de
      * type {@code String[]}, ou soit de type {@code Descriptor[]}. Le premier cas n'est que
      * temporaire, le temps pour {@link LinearModelTable} de terminer la construction de la
-     * liste des termes avant de construire les objets {@link Descriptor} qui y sont associés.
+     * liste des termes avant de construire les objets {@link Descriptor} qui y sont associÃ©s.
      *
      * @see #getDescriptorNames
      * @see #setDescriptors
@@ -63,15 +63,15 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     private Object[] descriptors;
 
     /**
-     * Le nom de ce terme. Ne sera construit que lorsque nécessaire.
+     * Le nom de ce terme. Ne sera construit que lorsque nÃ©cessaire.
      */
     private transient String name;
 
     /**
-     * Construit un terme d'un modèle linéaire.
+     * Construit un terme d'un modÃ¨le linÃ©aire.
      *
      * @param coefficient Le coefficient <var>C</var> de ce terme.
-     * @param descriptor  Le descripteurs du paysage océanique à multiplier par le coefficient.
+     * @param descriptor  Le descripteurs du paysage ocÃ©anique Ã  multiplier par le coefficient.
      */
     public LinearModelTerm(final double    coefficient,
                            final Descriptor descriptor)
@@ -80,10 +80,10 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     }
 
     /**
-     * Construit un terme d'un modèle linéaire.
+     * Construit un terme d'un modÃ¨le linÃ©aire.
      *
      * @param coefficient Le coefficient <var>C</var> de ce terme.
-     * @param descriptors Les descripteurs du paysage océanique composant ce terme.
+     * @param descriptors Les descripteurs du paysage ocÃ©anique composant ce terme.
      */
     public LinearModelTerm(final double coefficient,
                            final Collection<Descriptor> descriptors)
@@ -92,11 +92,11 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     }
 
     /**
-     * Construit un terme d'un modèle linéaire.
+     * Construit un terme d'un modÃ¨le linÃ©aire.
      *
      * @param coefficient Le coefficient <var>C</var> de ce terme.
-     * @param descriptors Les descripteurs du paysage océanique composant ce terme.
-     *                    Ce tableau ne sera pas cloné.
+     * @param descriptors Les descripteurs du paysage ocÃ©anique composant ce terme.
+     *                    Ce tableau ne sera pas clonÃ©.
      */
     LinearModelTerm(final double       coefficient,
                     final Descriptor[] descriptors)
@@ -106,13 +106,13 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     }
 
     /**
-     * Construit un terme d'un modèle linéaire à partir de noms de descripteurs, plutôt que des
-     * descripteurs complètement formés. Il est de la responsabilité de {@link LinearModelTable}
-     * de terminer la construction des descripteurs après l'appel de cette méthode.
+     * Construit un terme d'un modÃ¨le linÃ©aire Ã  partir de noms de descripteurs, plutÃ´t que des
+     * descripteurs complÃ¨tement formÃ©s. Il est de la responsabilitÃ© de {@link LinearModelTable}
+     * de terminer la construction des descripteurs aprÃ¨s l'appel de cette mÃ©thode.
      *
      * @param coefficient Le coefficient <var>C</var> de ce terme.
-     * @param descriptors Les descripteurs du paysage océanique composant ce terme.
-     *                    Ce tableau ne sera pas cloné.
+     * @param descriptors Les descripteurs du paysage ocÃ©anique composant ce terme.
+     *                    Ce tableau ne sera pas clonÃ©.
      *
      * @see #getDescriptorNames
      * @see #setDescriptors
@@ -125,9 +125,9 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     }
 
     /**
-     * Construit un nouveau terme qui sera égal au produit des deux termes spécifiés, mais en
-     * omettant le descripteur du terme 1 qui se trouve à l'index {@code omit1}. Ce constructeur
-     * est utilisé par {@link LinearModelEntry#substitute}.
+     * Construit un nouveau terme qui sera Ã©gal au produit des deux termes spÃ©cifiÃ©s, mais en
+     * omettant le descripteur du terme 1 qui se trouve Ã  l'index {@code omit1}. Ce constructeur
+     * est utilisÃ© par {@link LinearModelEntry#substitute}.
      */
     LinearModelTerm(final LinearModel.Term term1, final LinearModel.Term term2, final int omit1) {
         final List<Descriptor> descriptors1 = term1.getDescriptors();
@@ -143,16 +143,16 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     }
 
     /**
-     * Retourne les noms des descripteurs, afin de pouvoir compléter leur construction.
-     * Cette méthode est réservée à un usage interne par {@link LinearModelTable} seulement.
+     * Retourne les noms des descripteurs, afin de pouvoir complÃ©ter leur construction.
+     * Cette mÃ©thode est rÃ©servÃ©e Ã  un usage interne par {@link LinearModelTable} seulement.
      */
     final String[] getDescriptorNames() {
         return (String[]) descriptors;
     }
 
     /**
-     * Définit le tableau des descripteurs. Le tableau ne sera pas cloné.
-     * Cette méthode est réservée à un usage interne par {@link LinearModelTable} seulement.
+     * DÃ©finit le tableau des descripteurs. Le tableau ne sera pas clonÃ©.
+     * Cette mÃ©thode est rÃ©servÃ©e Ã  un usage interne par {@link LinearModelTable} seulement.
      */
     final void setDescriptors(final Descriptor[] descriptors) {
         if (!(this.descriptors instanceof String[])) {
@@ -182,7 +182,7 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
                 }
             }
             if (temporary) {
-                // Ne conserve pas le résultat dans le champ 'name'.
+                // Ne conserve pas le rÃ©sultat dans le champ 'name'.
                 return buffer.toString();
             }
             name = buffer.toString();
@@ -219,7 +219,7 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     }
 
     /**
-     * Retourne le descripteur à l'index spécifié.
+     * Retourne le descripteur Ã  l'index spÃ©cifiÃ©.
      */
     public Descriptor get(final int index) {
         return (Descriptor) descriptors[index];
@@ -234,7 +234,7 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     }
 
     /**
-     * Retourne un numéro à peu près unique représentant ce terme.
+     * Retourne un numÃ©ro Ã  peu prÃ¨s unique reprÃ©sentant ce terme.
      */
     @Override
     public int hashCode() {
@@ -245,7 +245,7 @@ final class LinearModelTerm extends AbstractList<Descriptor> implements LinearMo
     }
 
     /**
-     * Vérifie si cet objet est égal à l'objet spécifié.
+     * VÃ©rifie si cet objet est Ã©gal Ã  l'objet spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object object) {

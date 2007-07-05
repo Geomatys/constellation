@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -83,26 +83,26 @@ import net.sicade.resources.seagis.ResourceKeys;
 
 
 /**
- * Implémentation d'une entrée représentant un {@linkplain FormatEntry format d'image}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant un {@linkplain FormatEntry format d'image}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class FormatEntry extends Entry implements Format {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -8790032968708208057L;
 
     /**
-     * {@code true} pour utiliser l'opération {@code "ImageRead"} de JAI, ou {@code false}
+     * {@code true} pour utiliser l'opÃ©ration {@code "ImageRead"} de JAI, ou {@code false}
      * pour utiliser directement l'objet {@link ImageReader}.
      */
     private static final boolean USE_IMAGE_READ_OPERATION = false;
 
     /**
-     * Images en cours de lecture. Les clés sont les objets {@link CoverageReference} en attente
-     * d'être lues, tandis que les valeurs sont {@link Boolean#TRUE} si la lecture est en cours,
+     * Images en cours de lecture. Les clÃ©s sont les objets {@link CoverageReference} en attente
+     * d'Ãªtre lues, tandis que les valeurs sont {@link Boolean#TRUE} si la lecture est en cours,
      * ou {@link Boolean#FALSE} si elle est en attente.
      */
     private final transient Map<CoverageReference,Boolean> enqueued =
@@ -114,34 +114,34 @@ public class FormatEntry extends Entry implements Format {
     private final String mimeType;
 
     /**
-     * Extension (sans le point) des noms de fichier des images à lire.
+     * Extension (sans le point) des noms de fichier des images Ã  lire.
      */
     final String extension;
 
     /**
-     * Liste des bandes appartenant à ce format. Les éléments de ce tableau doivent
+     * Liste des bandes appartenant Ã  ce format. Les Ã©lÃ©ments de ce tableau doivent
      * correspondre dans l'ordre aux bandes {@code [0,1,2...]} de l'image.
      */
     private final GridSampleDimension[] bands;
 
     /**
-     * {@code true} si les données lues représenteront déjà les valeurs du paramètre géophysique.
+     * {@code true} si les donnÃ©es lues reprÃ©senteront dÃ©jÃ  les valeurs du paramÃ¨tre gÃ©ophysique.
      */
     private final boolean geophysics;
 
     /**
-     * Objet à utiliser pour lire des images de ce format. Cet objet ne sera créé que lors
-     * du premier appel de {@link #read}, puis réutilisé pour tous les appels subséquents.
+     * Objet Ã  utiliser pour lire des images de ce format. Cet objet ne sera crÃ©Ã© que lors
+     * du premier appel de {@link #read}, puis rÃ©utilisÃ© pour tous les appels subsÃ©quents.
      */
     private transient ImageReader reader;
 
     /**
-     * Construit une entrée représentant un format.
+     * Construit une entrÃ©e reprÃ©sentant un format.
      *
      * @param name       Nom du format.
      * @param mimeType   Nom MIME du format (par exemple "image/png").
      * @param extension  Extension (sans le point) des noms de fichier (par exemple "png").
-     * @param geophysics {@code true} si les données lues représenteront déjà les valeurs du paramètre géophysique.
+     * @param geophysics {@code true} si les donnÃ©es lues reprÃ©senteront dÃ©jÃ  les valeurs du paramÃ¨tre gÃ©ophysique.
      * @param bands      Listes des bandes apparaissant dans ce format.
      */
     protected FormatEntry(final String  name,
@@ -161,7 +161,7 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * La langue à utiliser pour le décodeur d'image, ou {@code null} pour la langue par défaut.
+     * La langue Ã  utiliser pour le dÃ©codeur d'image, ou {@code null} pour la langue par dÃ©faut.
      */
     private static Locale getLocale() {
         return null;
@@ -175,14 +175,14 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Retourne les bandes {@link GridSampleDimension} qui permettent de décoder les valeurs des
-     * paramètres géophysiques des images lues par cet objet. Cette méthode peut retourner plusieurs
-     * objets {@link GridSampleDimension}, un par bande. De façon optionnelle, on peut spécifier à
-     * cette méthode les paramètres {@link ImageReadParam} qui ont servit à lire une image
-     * (c'est-à-dire les mêmes paramètres que ceux qui avaient été donnés à {@link #read}). Cette
-     * méthode ne retournera alors que les listes de catégories pertinents pour les bandes lues.
+     * Retourne les bandes {@link GridSampleDimension} qui permettent de dÃ©coder les valeurs des
+     * paramÃ¨tres gÃ©ophysiques des images lues par cet objet. Cette mÃ©thode peut retourner plusieurs
+     * objets {@link GridSampleDimension}, un par bande. De faÃ§on optionnelle, on peut spÃ©cifier Ã 
+     * cette mÃ©thode les paramÃ¨tres {@link ImageReadParam} qui ont servit Ã  lire une image
+     * (c'est-Ã -dire les mÃªmes paramÃ¨tres que ceux qui avaient Ã©tÃ© donnÃ©s Ã  {@link #read}). Cette
+     * mÃ©thode ne retournera alors que les listes de catÃ©gories pertinents pour les bandes lues.
      *
-     * @param param Paramètres qui ont servit à lire l'image, ou {@code null} pour les paramètres par défaut.
+     * @param param ParamÃ¨tres qui ont servit Ã  lire l'image, ou {@code null} pour les paramÃ¨tres par dÃ©faut.
      */
     final GridSampleDimension[] getSampleDimensions(final ImageReadParam param) {
         int  bandCount = bands.length;
@@ -197,7 +197,7 @@ public class FormatEntry extends Entry implements Format {
         final GridSampleDimension[] selectedBands = new GridSampleDimension[bandCount];
         /*
          * Recherche les objets 'GridSampleDimension' qui correspondent aux bandes sources
-         * demandées. Ces objets seront placés aux index des bandes de destination spécifiées.
+         * demandÃ©es. Ces objets seront placÃ©s aux index des bandes de destination spÃ©cifiÃ©es.
          */
         for (int j=0; j<bandCount; j++) {
             final int srcBand = (srcBands!=null) ? srcBands[j] : j;
@@ -208,14 +208,14 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Retourne l'objet à utiliser pour lire des images. Le lecteur retourné ne lira
-     * que des images du format MIME spécifié au constructeur. Les méthodes qui appelent
-     * {@code getImageReader} <u>doivent</u> appeler cette méthode et utiliser l'objet
-     * {@link ImageReader} retourné à l'intérieur d'un bloc synchronisé sur cet objet
-     * {@code FormatEntry} (c'est-à-dire {@code this}).
+     * Retourne l'objet Ã  utiliser pour lire des images. Le lecteur retournÃ© ne lira
+     * que des images du format MIME spÃ©cifiÃ© au constructeur. Les mÃ©thodes qui appelent
+     * {@code getImageReader} <u>doivent</u> appeler cette mÃ©thode et utiliser l'objet
+     * {@link ImageReader} retournÃ© Ã  l'intÃ©rieur d'un bloc synchronisÃ© sur cet objet
+     * {@code FormatEntry} (c'est-Ã -dire {@code this}).
      *
-     * @return Le lecteur à utiliser pour lire les images de ce format.
-     *         Cette méthode ne retourne jamais {@code null}.
+     * @return Le lecteur Ã  utiliser pour lire les images de ce format.
+     *         Cette mÃ©thode ne retourne jamais {@code null}.
      * @throws IIOException s'il n'y a pas d'objet {@link ImageReader} pour ce format.
      */
     private ImageReader getImageReader() throws IIOException {
@@ -238,11 +238,11 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Retourne un bloc de paramètres par défaut pour le format courant. Cette méthode n'est
-     * appelée que par {@link GridCoverageEntry#getCoverage}. Note: cette méthode
-     * <strong>doit</strong> être appelée à partir d'un bloc synchronisé sur {@code this}.
+     * Retourne un bloc de paramÃ¨tres par dÃ©faut pour le format courant. Cette mÃ©thode n'est
+     * appelÃ©e que par {@link GridCoverageEntry#getCoverage}. Note: cette mÃ©thode
+     * <strong>doit</strong> Ãªtre appelÃ©e Ã  partir d'un bloc synchronisÃ© sur {@code this}.
      *
-     * @return Un bloc de paramètres par défaut. Cette méthode ne retourne jamais {@code null}.
+     * @return Un bloc de paramÃ¨tres par dÃ©faut. Cette mÃ©thode ne retourne jamais {@code null}.
      * @throws IIOException s'il n'y a pas d'objet {@link ImageReader} pour ce format.
      */
     final ImageReadParam getDefaultReadParam() throws IIOException {
@@ -264,9 +264,9 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Convertit l'objet {@code input} spécifié en un des types spécifiés dans le
-     * tableau {@code inputTypes}. Si la conversion ne peut pas être effectuée,
-     * alors cette méthode retourne {@code null}.
+     * Convertit l'objet {@code input} spÃ©cifiÃ© en un des types spÃ©cifiÃ©s dans le
+     * tableau {@code inputTypes}. Si la conversion ne peut pas Ãªtre effectuÃ©e,
+     * alors cette mÃ©thode retourne {@code null}.
      */
     private static Object getInput(final Object file, final Class<Object>[] inputTypes) {
         if (contains(inputTypes, file.getClass())) {
@@ -306,30 +306,30 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Procède à la lecture d'une image. Il est possible que l'image soit lue non pas
-     * localement, mais plutôt à travers un réseau. Cette méthode n'est appelée que par
+     * ProcÃ¨de Ã  la lecture d'une image. Il est possible que l'image soit lue non pas
+     * localement, mais plutÃ´t Ã  travers un rÃ©seau. Cette mÃ©thode n'est appelÃ©e que par
      * {@link GridCoverageEntry#getCoverage}.
      * <p>
-     * Note 1: cette méthode <strong>doit</strong> être appelée à partir d'un bloc
-     * synchronisé sur {@code this}.
+     * Note 1: cette mÃ©thode <strong>doit</strong> Ãªtre appelÃ©e Ã  partir d'un bloc
+     * synchronisÃ© sur {@code this}.
      * <p>
-     * Note 2: La méthode {@link #setReading} <strong>doit</strong> être appelée
-     *         avant et après cette méthode dans un bloc {@code try...finally}.
+     * Note 2: La mÃ©thode {@link #setReading} <strong>doit</strong> Ãªtre appelÃ©e
+     *         avant et aprÃ¨s cette mÃ©thode dans un bloc {@code try...finally}.
      *
      *
-     * @param  file Fichier à lire. Habituellement un objet {@link File}, {@link URL} ou {@link URI}.
-     * @param  imageIndex Index (à partir de 0) de l'image à lire.
-     * @param  param Bloc de paramètre à utiliser pour la lecture.
-     * @param  listeners Objets à informer des progrès de la lecture ainsi que des éventuels
+     * @param  file Fichier Ã  lire. Habituellement un objet {@link File}, {@link URL} ou {@link URI}.
+     * @param  imageIndex Index (Ã  partir de 0) de l'image Ã  lire.
+     * @param  param Bloc de paramÃ¨tre Ã  utiliser pour la lecture.
+     * @param  listeners Objets Ã  informer des progrÃ¨s de la lecture ainsi que des Ã©ventuels
      *         avertissements, ou {@code null} s'il n'y en a pas. Les objets qui ne sont
      *         pas de la classe {@link IIOReadWarningListener} ou {@link IIOReadProgressListener}
      *         ne seront pas pris en compte.
-     * @param  expected Dimension prévue de l'image.
-     * @param  source Objet {@link CoverageReference} qui a demandé la lecture de l'image.
-     *         Cette information sera utilisée par {@link #abort} pour vérifier si
+     * @param  expected Dimension prÃ©vue de l'image.
+     * @param  source Objet {@link CoverageReference} qui a demandÃ© la lecture de l'image.
+     *         Cette information sera utilisÃ©e par {@link #abort} pour vÃ©rifier si
      *         un l'objet {@link CoverageReference} qui demande l'annulation est celui qui
      *         est en train de lire l'image.
-     * @return Image lue, ou {@code null} si la lecture de l'image a été annulée.
+     * @return Image lue, ou {@code null} si la lecture de l'image a Ã©tÃ© annulÃ©e.
      * @throws IOException si une erreur est survenue lors de la lecture.
      */
     @SuppressWarnings("unchecked")
@@ -345,9 +345,9 @@ public class FormatEntry extends Entry implements Format {
         ImageInputStream inputStream = null;
         Object           inputObject;
         /*
-         * Obtient l'objet à utiliser comme source. Autant que possible,  on
+         * Obtient l'objet Ã  utiliser comme source. Autant que possible,  on
          * essaira de donner un objet de type 'File' ou 'URL', ce qui permet
-         * au décodeur d'utiliser la connection la plus appropriée pour eux.
+         * au dÃ©codeur d'utiliser la connection la plus appropriÃ©e pour eux.
          */
         final ImageReader reader = getImageReader();
         final ImageReaderSpi spi = reader.getOriginatingProvider();
@@ -361,8 +361,8 @@ public class FormatEntry extends Entry implements Format {
             }
         }
         /*
-         * Si l'image à lire est au format "RAW", définit la taille de l'image.  C'est
-         * nécessaire puisque le format binaire RAW ne contient aucune information sur
+         * Si l'image Ã  lire est au format "RAW", dÃ©finit la taille de l'image.  C'est
+         * nÃ©cessaire puisque le format binaire RAW ne contient aucune information sur
          * la taille des images qu'elle contient.
          */
         if (inputStream!=null && contains(inputTypes, RawImageInputStream.class)) {
@@ -374,8 +374,8 @@ public class FormatEntry extends Entry implements Format {
                                                                 new long[]{0},
                                                                 new Dimension[]{expected});
         }
-        // Patch temporaire, en attendant que les décodeurs spéciaux (e.g. "image/raw-msla")
-        // soient adaptés à l'architecture du décodeur RAW de Sun.
+        // Patch temporaire, en attendant que les dÃ©codeurs spÃ©ciaux (e.g. "image/raw-msla")
+        // soient adaptÃ©s Ã  l'architecture du dÃ©codeur RAW de Sun.
         if (param instanceof RawBinaryImageReadParam) {
             final RawBinaryImageReadParam rawParam = (RawBinaryImageReadParam) param;
             if (rawParam.getStreamImageSize() == null) {
@@ -391,32 +391,32 @@ public class FormatEntry extends Entry implements Format {
             }
         }
         /*
-         * Configure maintenant le décodeur et lance la lecture de l'image.
-         * Cette étape existe en deux versions: avec utilisation de l'opération
-         * "ImageRead", ou lecture directe à partir du ImageReader.
+         * Configure maintenant le dÃ©codeur et lance la lecture de l'image.
+         * Cette Ã©tape existe en deux versions: avec utilisation de l'opÃ©ration
+         * "ImageRead", ou lecture directe Ã  partir du ImageReader.
          */
         if (USE_IMAGE_READ_OPERATION) {
             /*
-             * Utilisation de l'opération "ImageRead": cette approche retarde la lecture des
-             * tuiles à un moment indéterminé après l'appel de cette méthode. Elle a l'avantage
-             * de contrôler la mémoire consommée grâce au TileCache de JAI, Mais elle rend plus
+             * Utilisation de l'opÃ©ration "ImageRead": cette approche retarde la lecture des
+             * tuiles Ã  un moment indÃ©terminÃ© aprÃ¨s l'appel de cette mÃ©thode. Elle a l'avantage
+             * de contrÃ´ler la mÃ©moire consommÃ©e grÃ¢ce au TileCache de JAI, Mais elle rend plus
              * difficile la gestion des exceptions et l'annulation de la lecture avec 'abort()',
              * ce qui rend caduc la queue 'enqueued'.
              */
             image = JAI.create("ImageRead", new ParameterBlock()
-                .add(inputObject)                  // Objet à utiliser en entré
-                .add(imageIndex)                   // Index de l'image à lire
-                .add(Boolean.FALSE)                // Pas de lecture des méta-données
+                .add(inputObject)                  // Objet Ã  utiliser en entrÃ©
+                .add(imageIndex)                   // Index de l'image Ã  lire
+                .add(Boolean.FALSE)                // Pas de lecture des mÃ©ta-donnÃ©es
                 .add(Boolean.FALSE)                // Pas de lecture des "thumbnails"
-                .add(Boolean.TRUE)                 // Vérifier la validité de "input"
+                .add(Boolean.TRUE)                 // VÃ©rifier la validitÃ© de "input"
                 .add(listeners.getReadListeners()) // Liste des "listener"
-                .add(getLocale())                  // Langue du décodeur
-                .add(param)                        // Les paramètres
-                .add(reader));                     // L'objet à utiliser pour la lecture.
-            this.reader = null;                    // N'utilise qu'un ImageReader par opération.
+                .add(getLocale())                  // Langue du dÃ©codeur
+                .add(param)                        // Les paramÃ¨tres
+                .add(reader));                     // L'objet Ã  utiliser pour la lecture.
+            this.reader = null;                    // N'utilise qu'un ImageReader par opÃ©ration.
         } else try {
             /*
-             * Utilisation direct du 'ImageReader': cette approche lit l'image immédiatement,
+             * Utilisation direct du 'ImageReader': cette approche lit l'image immÃ©diatement,
              * ce qui facilite la gestion des exceptions, de l'anulation de la lecture avec
              * 'abort()' et les synchronisations.
              */
@@ -483,9 +483,9 @@ public class FormatEntry extends Entry implements Format {
 
     /**
      * Annule la lecture de l'image en appelant {@link ImageReader#abort}.
-     * Cette méthode peut être appelée à partir de n'importe quel thread.
+     * Cette mÃ©thode peut Ãªtre appelÃ©e Ã  partir de n'importe quel thread.
      *
-     * @param source Objet qui appelle cette méthode.
+     * @param source Objet qui appelle cette mÃ©thode.
      */
     final void abort(final CoverageReference source) {
         assert !Thread.holdsLock(this); // The thread must *not* hold the lock.
@@ -510,15 +510,15 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Vérifie que la taille de l'image a bien la taille qui était déclarée
-     * dans la base de données. Cette vérification sert uniquement à tenter
-     * d'intercepter d'éventuelles erreurs qui se serait glissées dans la
-     * base de données et/ou la copie d'images sur le disque.
+     * VÃ©rifie que la taille de l'image a bien la taille qui Ã©tait dÃ©clarÃ©e
+     * dans la base de donnÃ©es. Cette vÃ©rification sert uniquement Ã  tenter
+     * d'intercepter d'Ã©ventuelles erreurs qui se serait glissÃ©es dans la
+     * base de donnÃ©es et/ou la copie d'images sur le disque.
      *
      * @param  imageWidth   Largeur de l'image.
      * @param  imageHeight  Hauteur de l'image.
      * @param  expected     Largeur et hauteur attendues.
-     * @param  file         Nom du fichier de l'image à lire.
+     * @param  file         Nom du fichier de l'image Ã  lire.
      * @throws IIOException si l'image n'a pas la largeur et hauteur attendue.
      */
     private static void checkSize(final int imageWidth, final int imageHeight,
@@ -566,7 +566,7 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Retourne une chaîne de caractères représentant cette entrée.
+     * Retourne une chaÃ®ne de caractÃ¨res reprÃ©sentant cette entrÃ©e.
      */
     final StringBuilder toString(final StringBuilder buffer) {
         buffer.append(getName());
@@ -577,7 +577,7 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Retourne une chaîne de caractères représentant cette entrée.
+     * Retourne une chaÃ®ne de caractÃ¨res reprÃ©sentant cette entrÃ©e.
      */
     @Override
     public String toString() {
@@ -590,7 +590,7 @@ public class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Indique si cette entrée est identique à l'entrée spécifiée.
+     * Indique si cette entrÃ©e est identique Ã  l'entrÃ©e spÃ©cifiÃ©e.
      */
     @Override
     public boolean equals(final Object object) {
@@ -609,20 +609,20 @@ public class FormatEntry extends Entry implements Format {
 
     /**
      * Noeud apparaissant dans l'arborescence des formats et de leurs bandes.
-     * Ce noeud redéfinit la méthode {@link #toString} pour retourner une chaîne
-     * adaptée plutôt que <code>{@link #getUserObject}.toString()</code>.
+     * Ce noeud redÃ©finit la mÃ©thode {@link #toString} pour retourner une chaÃ®ne
+     * adaptÃ©e plutÃ´t que <code>{@link #getUserObject}.toString()</code>.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class TreeNode extends DefaultMutableTreeNode {
         /**
-         * Le texte à retourner par {@link #toString}.
+         * Le texte Ã  retourner par {@link #toString}.
          */
         private final String text;
 
         /**
-         * Construit un noeud pour l'entrée spécifiée.
+         * Construit un noeud pour l'entrÃ©e spÃ©cifiÃ©e.
          */
         public TreeNode(final FormatEntry entry) {
             super(entry);
@@ -630,8 +630,8 @@ public class FormatEntry extends Entry implements Format {
         }
 
         /**
-         * Construit un noeud pour la liste spécifiée. Ce constructeur ne
-         * balaie pas les catégories contenues dans la liste spécifiée.
+         * Construit un noeud pour la liste spÃ©cifiÃ©e. Ce constructeur ne
+         * balaie pas les catÃ©gories contenues dans la liste spÃ©cifiÃ©e.
          */
         public TreeNode(final GridSampleDimension band, final Locale locale) {
             super(band);
@@ -639,7 +639,7 @@ public class FormatEntry extends Entry implements Format {
         }
 
         /**
-         * Construit un noeud pour la catégorie spécifiée.
+         * Construit un noeud pour la catÃ©gorie spÃ©cifiÃ©e.
          */
         public TreeNode(final Category category, final Locale locale) {
             super(category, false);

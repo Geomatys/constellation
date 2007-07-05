@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,12 +24,12 @@ import org.opengis.metadata.quality.DataQuality;
 
 
 /**
- * Représentation d'une station à laquelle ont été effectuées des {@linkplain Observation observations}.
- * Une station peut ne pas être localisée en un point précis, mais plutôt dans une certaine région. La
- * méthode {@link #getCoordinate} retourne les coordonnées d'un point que l'on suppose représentatif
- * (par exemple au milieu d'une zone de pêche à la senne), tandis que {@link #getPath} retourne
- * une forme qui représente la forme de la station. Cette forme n'est pas obligatoirement le contour
- * de la station. Par exemple il peut s'agir d'une ligne représentant la ligne d'une pêche à la palangre.
+ * ReprÃ©sentation d'une station Ã  laquelle ont Ã©tÃ© effectuÃ©es des {@linkplain Observation observations}.
+ * Une station peut ne pas Ãªtre localisÃ©e en un point prÃ©cis, mais plutÃ´t dans une certaine rÃ©gion. La
+ * mÃ©thode {@link #getCoordinate} retourne les coordonnÃ©es d'un point que l'on suppose reprÃ©sentatif
+ * (par exemple au milieu d'une zone de pÃªche Ã  la senne), tandis que {@link #getPath} retourne
+ * une forme qui reprÃ©sente la forme de la station. Cette forme n'est pas obligatoirement le contour
+ * de la station. Par exemple il peut s'agir d'une ligne reprÃ©sentant la ligne d'une pÃªche Ã  la palangre.
  * 
  * @version $Id$
  * @author Martin Desruisseaux
@@ -37,46 +37,46 @@ import org.opengis.metadata.quality.DataQuality;
  */
 public interface Station extends LocatedElement {
     /**
-     * Retourne un numéro unique identifiant cette station. Ce numéro est complémentaire (et dans
+     * Retourne un numÃ©ro unique identifiant cette station. Ce numÃ©ro est complÃ©mentaire (et dans
      * une certaine mesure redondant) avec {@linkplain #getName le nom} de la station. Il existe
-     * parce que les stations, ainsi que les {@linkplain Observable observables}, sont référencées
+     * parce que les stations, ainsi que les {@linkplain Observable observables}, sont rÃ©fÃ©rencÃ©es
      * dans des millions de lignes dans la table des {@linkplain Observation observations}.
      */
     int getNumericIdentifier();
 
     /**
-     * Retourne une indication sur la provenance de la donnée. Peut être {@code null} si cette
+     * Retourne une indication sur la provenance de la donnÃ©e. Peut Ãªtre {@code null} si cette
      * information n'est pas disponible.
      */
     Citation getProvider();
 
     /**
      * Retourne la plateforme transportant la station. Il s'agit par exemple d'un identifiant
-     * d'un bateau ou un numéro de croisière. Peut être {@code null} si cette information n'est
+     * d'un bateau ou un numÃ©ro de croisiÃ¨re. Peut Ãªtre {@code null} si cette information n'est
      * pas disponible.
      */
     Platform getPlatform();
 
     /**
-     * Retourne une indication de la qualité de la donnée. Peut être {@code null} si cette
+     * Retourne une indication de la qualitÃ© de la donnÃ©e. Peut Ãªtre {@code null} si cette
      * information n'est pas disponible.
      */
     DataQuality getQuality();
 
     /**
-     * Retourne l'observation correspondant à l'observable spécifié. Si aucune observation n'a
-     * été effectuée pour cet observable, retourne {@code null}.
+     * Retourne l'observation correspondant Ã  l'observable spÃ©cifiÃ©. Si aucune observation n'a
+     * Ã©tÃ© effectuÃ©e pour cet observable, retourne {@code null}.
      *
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     Observation getObservation(Observable observable) throws CatalogException;
 
     /**
-     * Retourne l'ensemble des observations qui ont été effectuées à cette station. Une même station
-     * peut contenir plusieurs {@linkplain Observation observations}, à la condition que chaque
-     * observation porte sur un {@linkplain Observable observable} différent.
+     * Retourne l'ensemble des observations qui ont Ã©tÃ© effectuÃ©es Ã  cette station. Une mÃªme station
+     * peut contenir plusieurs {@linkplain Observation observations}, Ã  la condition que chaque
+     * observation porte sur un {@linkplain Observable observable} diffÃ©rent.
      *
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     Collection<? extends Observation> getObservations() throws CatalogException;
 }

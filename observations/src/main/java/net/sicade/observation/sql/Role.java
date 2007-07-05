@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,15 +20,15 @@ package net.sicade.observation.sql;
 
 
 /**
- * Rôles d'une entitée (colonnes ou argument) dans une requête SQL.
+ * RÃ´les d'une entitÃ©e (colonnes ou argument) dans une requÃªte SQL.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public enum Role {
     /**
-     * Désigne la colonne ou l'argument qui concerne les identifiants des enregistrements.
-     * Les identifiants peuvent être textuels ou numériques.
+     * DÃ©signe la colonne ou l'argument qui concerne les identifiants des enregistrements.
+     * Les identifiants peuvent Ãªtre textuels ou numÃ©riques.
      */
     IDENTIFIER
 }

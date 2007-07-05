@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -46,8 +46,8 @@ import net.sicade.image.io.FileBasedReaderSpi;
 
 
 /**
- * Implémentation par défaut des décodeurs d'images au format NetCDF. Dans la plupart des
- * cas, il ne sera pas nécessaire de créer des classes dérivées. Des classes dérivées
+ * ImplÃ©mentation par dÃ©faut des dÃ©codeurs d'images au format NetCDF. Dans la plupart des
+ * cas, il ne sera pas nÃ©cessaire de crÃ©er des classes dÃ©rivÃ©es. Des classes dÃ©rivÃ©es
  * de {@link AbstractReaderSpi} suffisent.
  * 
  * @version $Id$
@@ -56,38 +56,38 @@ import net.sicade.image.io.FileBasedReaderSpi;
  */
 final class DefaultReader extends FileBasedReader {
     /**
-     * Dimension correspondant aux colonnes. Doit être constant, car il y aura des appels
-     * à {@link Array#set0} codés en dur.
+     * Dimension correspondant aux colonnes. Doit Ãªtre constant, car il y aura des appels
+     * Ã  {@link Array#set0} codÃ©s en dur.
      */
     private static final int X_DIMENSION = 0;
 
     /**
-     * Dimension correspondant aux lignes. Doit être constant, car il y aura des appels
-     * à {@link Array#set1} codés en dur.
+     * Dimension correspondant aux lignes. Doit Ãªtre constant, car il y aura des appels
+     * Ã  {@link Array#set1} codÃ©s en dur.
      */
     private static final int Y_DIMENSION = 1;
 
     /**
-     * Le fichier NetCDF, ou {@code null} s'il n'a pas encore été ouvert.
+     * Le fichier NetCDF, ou {@code null} s'il n'a pas encore Ã©tÃ© ouvert.
      */
     private NetcdfFile file;
 
     /**
-     * L'ensemble des données du phénomène étudié.
+     * L'ensemble des donnÃ©es du phÃ©nomÃ¨ne Ã©tudiÃ©.
      */
     private Variable variable;
 
     /** 
-     * Construit un nouveau décodeur HDF.
+     * Construit un nouveau dÃ©codeur HDF.
      *
-     * @param spi Une description du service fournit par ce décodeur.
+     * @param spi Une description du service fournit par ce dÃ©codeur.
      */
     public DefaultReader(final AbstractReaderSpi spi) {
         super(spi);
     }
 
     /**
-     * Spécifie la source des données à utiliser en entrée. Cette source doit être un objet de
+     * SpÃ©cifie la source des donnÃ©es Ã  utiliser en entrÃ©e. Cette source doit Ãªtre un objet de
      * type {@link File} ou {@link URL}.
      */
     @Override
@@ -97,9 +97,9 @@ final class DefaultReader extends FileBasedReader {
             try {
                 file.close();
             } catch (IOException e) {
-                LOGGER.warning("Echec lors de la fermeture du fichier précédent.");
+                LOGGER.warning("Echec lors de la fermeture du fichier prÃ©cÃ©dent.");
                 /*
-                 * On continue. Ce n'est qu'un avertissement car de toute façon on
+                 * On continue. Ce n'est qu'un avertissement car de toute faÃ§on on
                  * n'utilisera plus ce fichier.
                  */
             }
@@ -125,17 +125,17 @@ final class DefaultReader extends FileBasedReader {
     }
 
     /**
-     * Vérifie que les données ont bien été chargée dans {@link #variable} pour l'image spécifiée.
-     * Si les données ont déjà été chargée lors d'un appel précédent, alors cette méthode ne fait
+     * VÃ©rifie que les donnÃ©es ont bien Ã©tÃ© chargÃ©e dans {@link #variable} pour l'image spÃ©cifiÃ©e.
+     * Si les donnÃ©es ont dÃ©jÃ  Ã©tÃ© chargÃ©e lors d'un appel prÃ©cÃ©dent, alors cette mÃ©thode ne fait
      * rien.
      * 
-     * @param   imageIndex L'index de l'image à traiter.
-     * @throws  IndexOutOfBoundsException Si {@code indexImage} est différent de 0,
-     *          car on considère qu'il n'y a qu'une image par fichier HDF.
-     * @throws  IllegalStateException Si le champ {@link #input} n'a pas été initialisé via
+     * @param   imageIndex L'index de l'image Ã  traiter.
+     * @throws  IndexOutOfBoundsException Si {@code indexImage} est diffÃ©rent de 0,
+     *          car on considÃ¨re qu'il n'y a qu'une image par fichier HDF.
+     * @throws  IllegalStateException Si le champ {@link #input} n'a pas Ã©tÃ© initialisÃ© via
      *          {@link #setInput setInput(...)}.
      * @throws  IIOException Si le fichier NetCDF ne semble pas correct.
-     * @throws  IOException Si la lecture a échouée pour une autre raison.
+     * @throws  IOException Si la lecture a Ã©chouÃ©e pour une autre raison.
      */
     private void prepareVariable(final int imageIndex) throws IOException {
         if (imageIndex != 0) {
@@ -155,14 +155,14 @@ final class DefaultReader extends FileBasedReader {
             }
             file.close();
             file = null;
-            throw new IIOException("La variable \"" + variableName + "\" n'a pas été trouvée.");
+            throw new IIOException("La variable \"" + variableName + "\" n'a pas Ã©tÃ© trouvÃ©e.");
         }
     }
 
     /**
-     * Construit une image à partir des paramètre de lecture spécifiés.
+     * Construit une image Ã  partir des paramÃ¨tre de lecture spÃ©cifiÃ©s.
      *
-     * @throws  IOException Si la lecture de l'image a échouée.
+     * @throws  IOException Si la lecture de l'image a Ã©chouÃ©e.
      */
     public BufferedImage read(final int imageIndex, final ImageReadParam param) throws IOException {
         clearAbortRequest();
@@ -185,7 +185,7 @@ final class DefaultReader extends FileBasedReader {
         computeRegions(param, width, height, image, srcRegion, destRegion);
         processImageStarted(imageIndex);
         /*
-         * Procède à la lecture de la sous-région demandée par l'utilisateur.
+         * ProcÃ¨de Ã  la lecture de la sous-rÃ©gion demandÃ©e par l'utilisateur.
          */
         final int[] shape  = variable.getShape();
         final int[] origin = new int[shape.length];

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -38,57 +38,57 @@ import net.sicade.observation.coverage.CoverageTableModel;
 
 
 /**
- * Fenêtre qui affichera la liste des images d'une série. Cette fenêtre peut être affichée
- * par {@link ViewAction}, une action qui sera proposée dans le menu "Window".
+ * FenÃªtre qui affichera la liste des images d'une sÃ©rie. Cette fenÃªtre peut Ãªtre affichÃ©e
+ * par {@link ViewAction}, une action qui sera proposÃ©e dans le menu "Window".
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class CoveragesWindow extends TopComponent {
     /**
-     * Pour compatibilité avec différentes versions de cette classe.
+     * Pour compatibilitÃ© avec diffÃ©rentes versions de cette classe.
      */
     private static final long serialVersionUID = -2749736476976179738L;
 
     /**
-     * Une instance unique créée par {@link #getDefault} la première fois où cette dernière
-     * sera appelée. Cette instance n'est utilisée que lors de la construction de la fenêtre
-     * à partir d'un flot binaire.
+     * Une instance unique crÃ©Ã©e par {@link #getDefault} la premiÃ¨re fois oÃ¹ cette derniÃ¨re
+     * sera appelÃ©e. Cette instance n'est utilisÃ©e que lors de la construction de la fenÃªtre
+     * Ã  partir d'un flot binaire.
      */
     private static CoveragesWindow instance;
 
     /**
-     * Chemin vers l'icône utilisée pour cette fenêtre ainsi que pour l'action
+     * Chemin vers l'icÃ´ne utilisÃ©e pour cette fenÃªtre ainsi que pour l'action
      * {@link ViewAction} qui l'ouvrira.
      */
     static final String ICON_PATH = "net/sicade/sie/window/coverages/Icon.gif";
 
     /**
-     * Une chaîne de caractères qui représentera cette fenêtre au sein du {@linkplain WindowManager
-     * gestionnaire des fenêtres}. Cet ID sert à obtenir une instance unique de cette fenêtre par
-     * un appel à la méthode {@link #findInstance}.
+     * Une chaÃ®ne de caractÃ¨res qui reprÃ©sentera cette fenÃªtre au sein du {@linkplain WindowManager
+     * gestionnaire des fenÃªtres}. Cet ID sert Ã  obtenir une instance unique de cette fenÃªtre par
+     * un appel Ã  la mÃ©thode {@link #findInstance}.
      */
     private static final String PREFERRED_ID = "CoveragesWindow";
 
     /**
-     * Un modèle vide, utilisé lorsque aucune mosaïque d'images n'est active.
+     * Un modÃ¨le vide, utilisÃ© lorsque aucune mosaÃ¯que d'images n'est active.
      */
     private final CoverageTableModel emptyModel = new CoverageTableModel();
 
     /**
-     * Le modèle qui représentera les séries dans un tableau.
+     * Le modÃ¨le qui reprÃ©sentera les sÃ©ries dans un tableau.
      */
     private CoverageTableModel model = emptyModel;
 
     /**
-     * Objet à informer des changements de la sélection des images. Ces listeners correspondent
-     * à des instances de {@link net.sicade.sie.window.mosaic.MosaicWindow}, et il ne devrait y
-     * avoir qu'un seul listener actif à chaque instant.
+     * Objet Ã  informer des changements de la sÃ©lection des images. Ces listeners correspondent
+     * Ã  des instances de {@link net.sicade.sie.window.mosaic.MosaicWindow}, et il ne devrait y
+     * avoir qu'un seul listener actif Ã  chaque instant.
      */
     private ListSelectionListener listener;
 
     /**
-     * Construit une fenêtre contenant une liste initialement vide.
+     * Construit une fenÃªtre contenant une liste initialement vide.
      *
      * @todo Ajouter {@code UndoManager}. Voir la javadoc de {@link CoverageTableModel}.
      */
@@ -130,9 +130,9 @@ public final class CoveragesWindow extends TopComponent {
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Retourne une instance par défaut. <strong>N'appellez pas cette méthode directement!</strong>
-     * Cette méthode est public pour les besoins de la plateforme Netbeans, mais réservée à un usage
-     * interne par les fichiers {@code *.settings}, c'est-à-dire durant les lectures à partir d'un flot
+     * Retourne une instance par dÃ©faut. <strong>N'appellez pas cette mÃ©thode directement!</strong>
+     * Cette mÃ©thode est public pour les besoins de la plateforme Netbeans, mais rÃ©servÃ©e Ã  un usage
+     * interne par les fichiers {@code *.settings}, c'est-Ã -dire durant les lectures Ã  partir d'un flot
      * binaire. Pour obtenir un singleton dans les tous les autres cas, utilisez {@link #findInstance}.
      */
     public static synchronized CoveragesWindow getDefault() {
@@ -143,15 +143,15 @@ public final class CoveragesWindow extends TopComponent {
     }
 
     /**
-     * Obtient une instance unique d'une fenêtre de cette classe. Utilisez cette méthode
-     * plutôt que {@link #getDefault}.
+     * Obtient une instance unique d'une fenÃªtre de cette classe. Utilisez cette mÃ©thode
+     * plutÃ´t que {@link #getDefault}.
      */
     public static synchronized CoveragesWindow findInstance() {
         final TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         final String message;
         if (win == null) {
             message = "Aucune composante de type \"" + PREFERRED_ID + "\". " +
-                      "La fenêtre ne sera pas positionnée correctement.";
+                      "La fenÃªtre ne sera pas positionnÃ©e correctement.";
         } else if (win instanceof CoveragesWindow) {
             return (CoveragesWindow) win;
         } else {
@@ -163,11 +163,11 @@ public final class CoveragesWindow extends TopComponent {
     }
 
     /**
-     * Change les données affichées par cette table. Cette méthode est appelée chaque fois qu'une
-     * nouvelle mosaïque d'images devient la fenêtre active.
+     * Change les donnÃ©es affichÃ©es par cette table. Cette mÃ©thode est appelÃ©e chaque fois qu'une
+     * nouvelle mosaÃ¯que d'images devient la fenÃªtre active.
      *
-     * @param model Le modèle de table à utiliser.
-     * @maram listener L'objet à informer des changements de la sélection d'images.
+     * @param model Le modÃ¨le de table Ã  utiliser.
+     * @maram listener L'objet Ã  informer des changements de la sÃ©lection d'images.
      */
     public void setCoverageTableModel(CoverageTableModel model, final ListSelectionListener listener) {
         if (model == null) {
@@ -183,8 +183,8 @@ public final class CoveragesWindow extends TopComponent {
     }
 
     /**
-     * Retourne les références vers les images sélectionnées par l'utilisateur.
-     * Le tableau retourné peut avoir une longueur de 0, mais ne sera jamais {@code null}.
+     * Retourne les rÃ©fÃ©rences vers les images sÃ©lectionnÃ©es par l'utilisateur.
+     * Le tableau retournÃ© peut avoir une longueur de 0, mais ne sera jamais {@code null}.
      */
     public CoverageReference[] getSelectedEntries() {
         final int[] rows = table.getSelectedRows();
@@ -196,8 +196,8 @@ public final class CoveragesWindow extends TopComponent {
     }
 
     /**
-     * Retourne l'identifiant des fenêtres de type {@code CoveragesWindow} dans le
-     * gestionnaire des fenêtres.
+     * Retourne l'identifiant des fenÃªtres de type {@code CoveragesWindow} dans le
+     * gestionnaire des fenÃªtres.
      */
     @Override
     protected String preferredID() {
@@ -205,9 +205,9 @@ public final class CoveragesWindow extends TopComponent {
     }
 
     /**
-     * Spécifie de manière explicite que le type de persistence doit être
+     * SpÃ©cifie de maniÃ¨re explicite que le type de persistence doit Ãªtre
      * {@link #PERSISTENCE_ALWAYS PERSISTENCE_ALWAYS}. La surcharge de cette
-     * méthode est nécessaire pour éviter un avertissement au moment de l'exécution.
+     * mÃ©thode est nÃ©cessaire pour Ã©viter un avertissement au moment de l'exÃ©cution.
      */
     @Override
     public int getPersistenceType() {
@@ -215,8 +215,8 @@ public final class CoveragesWindow extends TopComponent {
     }
 
     /**
-     * Lors de l'écriture en binaire de cette fenêtre, écrit une classe sentinelle
-     * à la place de la totalité de {@code CoveragesWindow}.
+     * Lors de l'Ã©criture en binaire de cette fenÃªtre, Ã©crit une classe sentinelle
+     * Ã  la place de la totalitÃ© de {@code CoveragesWindow}.
      */
     @Override
     public Object writeReplace() {
@@ -224,21 +224,21 @@ public final class CoveragesWindow extends TopComponent {
     }
 
     /**
-     * Les classes qui seront enregistrées en binaire à la place de {@link CoveragesWindow}.
+     * Les classes qui seront enregistrÃ©es en binaire Ã  la place de {@link CoveragesWindow}.
      * Lors de la lecture, cette classe appelera {@link CoveragesWindow#getDefault} afin de
-     * reconstruire une fenêtre qui apparaîtra dans l'application de l'utilisateur.
+     * reconstruire une fenÃªtre qui apparaÃ®tra dans l'application de l'utilisateur.
      *
      * @author Martin Desruisseaux
      * @version $Id$
      */
     final static class ResolvableHelper implements Serializable {
         /**
-         * Pour compatibilité avec différentes versions de cette classe.
+         * Pour compatibilitÃ© avec diffÃ©rentes versions de cette classe.
          */
         private static final long serialVersionUID = 1698356701408203107L;
 
         /**
-         * Lors de la lecture binaire, remplace cet objet par une instance de la fenêtre
+         * Lors de la lecture binaire, remplace cet objet par une instance de la fenÃªtre
          * {@link CoveragesWindow}.
          */
         public Object readResolve() {

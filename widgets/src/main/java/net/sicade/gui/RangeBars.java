@@ -1,7 +1,7 @@
 /*
- * Sicade - Systèmes intégrés de connaissances
- *          pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances
+ *          pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -95,10 +95,10 @@ import net.sicade.resources.seasview.ResourceKeys;
 
 
 /**
- * Paneau représentant les plages des données disponibles. Ces plages sont
- * représentées par des barres verticales. L'axe des <var>x</var> représente
- * les valeurs, et sur l'axe des <var>y</var> on place les différents types
- * de données, un peu comme le ferait un histogramme.
+ * Paneau reprÃ©sentant les plages des donnÃ©es disponibles. Ces plages sont
+ * reprÃ©sentÃ©es par des barres verticales. L'axe des <var>x</var> reprÃ©sente
+ * les valeurs, et sur l'axe des <var>y</var> on place les diffÃ©rents types
+ * de donnÃ©es, un peu comme le ferait un histogramme.
  *
  * <p>&nbsp;</p>
  * <p align="center"><img src="doc-files/RangeBars.png"></p>
@@ -139,40 +139,40 @@ public class RangeBars extends ZoomPane {
     private static final int RESET_MARGIN = 12;
 
     /**
-     * An affine transform for applying a 90° rotation on text labels.
+     * An affine transform for applying a 90Â° rotation on text labels.
      */
     private static final AffineTransform ROTATE_90 = new AffineTransform(0, 1, -1, 0, 0, 0);
 
     /**
-     * Données des barres. Chaque entré est constitué d'une paire
-     * (<em>étiquette</em>, <em>tableau de données</em>). Le tableau de
-     * donnée sera généralement (mais pas obligatoirement) un tableau de
-     * type {@code long[]}. Les données de ces tableaux seront organisées
-     * par paires de valeurs, de la forme (<i>début</i>,<i>fin</i>).
+     * DonnÃ©es des barres. Chaque entrÃ© est constituÃ© d'une paire
+     * (<em>Ã©tiquette</em>, <em>tableau de donnÃ©es</em>). Le tableau de
+     * donnÃ©e sera gÃ©nÃ©ralement (mais pas obligatoirement) un tableau de
+     * type {@code long[]}. Les donnÃ©es de ces tableaux seront organisÃ©es
+     * par paires de valeurs, de la forme (<i>dÃ©but</i>,<i>fin</i>).
      */
     private final Map<String,RangeSet> ranges = new LinkedHashMap<String,RangeSet>();
 
     /**
-     * Axe des <var>x</var> servant à écrire les valeurs des plages. Les
-     * méthodes de {@link Axis2D} peuvent être appellées pour modifier le format
-     * des nombres, une étiquette, des unités ou pour spécifier "à la main" les
+     * Axe des <var>x</var> servant Ã  Ã©crire les valeurs des plages. Les
+     * mÃ©thodes de {@link Axis2D} peuvent Ãªtre appellÃ©es pour modifier le format
+     * des nombres, une Ã©tiquette, des unitÃ©s ou pour spÃ©cifier "Ã  la main" les
      * minimums et maximums.
      */
     private final Axis2D axis;
 
     /**
-     * Valeur minimale à avoir été spécifiée avec {@link #addRange}.
+     * Valeur minimale Ã  avoir Ã©tÃ© spÃ©cifiÃ©e avec {@link #addRange}.
      * Cette valeur n'est pas valide si <code>(minimum<maximum)</code>
-     * est {@code false}. Cette valeur peut etre calculée par un
-     * appel à {@link #ensureValidGlobalRange}.
+     * est {@code false}. Cette valeur peut etre calculÃ©e par un
+     * appel Ã  {@link #ensureValidGlobalRange}.
      */
     private transient double minimum;
 
     /**
-     * Valeur maximale à avoir été spécifiée avec {@link #addRange}.
+     * Valeur maximale Ã  avoir Ã©tÃ© spÃ©cifiÃ©e avec {@link #addRange}.
      * Cette valeur n'est pas valide si <code>(minimum<maximum)</code>
-     * est {@code false}. Cette valeur peut etre calculée par un
-     * appel à {@link #ensureValidGlobalRange}.
+     * est {@code false}. Cette valeur peut etre calculÃ©e par un
+     * appel Ã  {@link #ensureValidGlobalRange}.
      */
     private transient double maximum;
 
@@ -188,26 +188,26 @@ public class RangeBars extends ZoomPane {
     private transient Rectangle zoomableBounds;
 
     /**
-     * Coordonnées (en pixels) de la région dans laquelle seront dessinées
-     * les étiquettes. Ce champ est nul si ces coordonnées ne sont pas encore
-     * connues. Ces coordonnées sont calculées par
+     * CoordonnÃ©es (en pixels) de la rÃ©gion dans laquelle seront dessinÃ©es
+     * les Ã©tiquettes. Ce champ est nul si ces coordonnÃ©es ne sont pas encore
+     * connues. Ces coordonnÃ©es sont calculÃ©es par
      *
      *                    {@link #paintComponent(Graphics2D)}
      *
-     * (notez que cette dernière accepte un argument {@link Graphics2D} nul).
+     * (notez que cette derniÃ¨re accepte un argument {@link Graphics2D} nul).
      */
     private transient Rectangle labelBounds;
 
     /**
-     * Coordonnées (en pixels) de la région dans laquelle sera dessinée l'axe.
-     * Ce champ est nul si ces coordonnées ne sont pas encore connues. Ces
-     * coordonnées sont calculées par {@link #paintComponent(Graphics2D)}
-     * (notez que cette dernière accepte un argument {@link Graphics2D} nul).
+     * CoordonnÃ©es (en pixels) de la rÃ©gion dans laquelle sera dessinÃ©e l'axe.
+     * Ce champ est nul si ces coordonnÃ©es ne sont pas encore connues. Ces
+     * coordonnÃ©es sont calculÃ©es par {@link #paintComponent(Graphics2D)}
+     * (notez que cette derniÃ¨re accepte un argument {@link Graphics2D} nul).
      */
     private transient Rectangle axisBounds;
 
     /**
-     * Indique si cette composante sera orientée horizontalement ou
+     * Indique si cette composante sera orientÃ©e horizontalement ou
      * verticalement.
      */
     private final boolean horizontal;
@@ -219,14 +219,14 @@ public class RangeBars extends ZoomPane {
     private final boolean verticalLabels;
 
     /**
-     * Indique si la méthode {@link #reset} a été appelée
-     * sur cet objet avec une dimension valide de la fenêtre.
+     * Indique si la mÃ©thode {@link #reset} a Ã©tÃ© appelÃ©e
+     * sur cet objet avec une dimension valide de la fenÃªtre.
      */
     private boolean valid;
 
     /**
-     * Espaces (en pixels) à laisser de chaque côtés
-     * du graphique. Ces dimensions seront retournées
+     * Espaces (en pixels) Ã  laisser de chaque cÃ´tÃ©s
+     * du graphique. Ces dimensions seront retournÃ©es
      * par {@link #getInsets}.
      */
     private short top=12, left=12, bottom=6, right=15;
@@ -237,12 +237,12 @@ public class RangeBars extends ZoomPane {
     private final short barThickness=12;
 
     /**
-     * Espace (en pixels) entre les étiquettes et leurs barres.
+     * Espace (en pixels) entre les Ã©tiquettes et leurs barres.
      */
     private final short barOffset=6;
 
     /**
-     * Espace (en pixels) à ajouter entre deux lignes.
+     * Espace (en pixels) Ã  ajouter entre deux lignes.
      */
     private final short lineSpacing=6;
 
@@ -280,45 +280,45 @@ public class RangeBars extends ZoomPane {
     private final Border border = BorderFactory.createEtchedBorder();
 
     /**
-     * Plage de valeurs présentement sélectionnée par l'utilisateur. Cette
-     * plage apparaîtra comme un rectangle transparent (une <em>visière</em>)
-     * par dessus les barres. Ce champ est initialement nul. Une visière ne
-     * sera créée que lorsqu'elle sera nécessaire.
+     * Plage de valeurs prÃ©sentement sÃ©lectionnÃ©e par l'utilisateur. Cette
+     * plage apparaÃ®tra comme un rectangle transparent (une <em>visiÃ¨re</em>)
+     * par dessus les barres. Ce champ est initialement nul. Une visiÃ¨re ne
+     * sera crÃ©Ã©e que lorsqu'elle sera nÃ©cessaire.
      */
     private transient MouseReshapeTracker slider;
 
     /**
-     * Modèle permettant de décrire la position de la visière par un entier.
+     * ModÃ¨le permettant de dÃ©crire la position de la visiÃ¨re par un entier.
      * Ce model est fournit pour faciliter les interactions avec <i>Swing</i>.
-     * Ce champ peut être nul si aucun model n'a encore été demandé.
+     * Ce champ peut Ãªtre nul si aucun model n'a encore Ã©tÃ© demandÃ©.
      */
     private transient SwingModel swingModel;
 
     /**
-     * Point utilisé temporairement lors
+     * Point utilisÃ© temporairement lors
      * des transformations affine.
      */
     private transient Point2D.Double point;
 
     /**
-     * Objet {@link #insets} à réutiliser autant que possible.
+     * Objet {@link #insets} Ã  rÃ©utiliser autant que possible.
      */
     private transient Insets insets;
 
     /**
-     * Construit un paneau initialement vide qui représentera des
-     * nombres sans unités. Des données pourront être ajoutées avec
-     * la méthode {@link #addRange} pour faire apparaître des barres.
+     * Construit un paneau initialement vide qui reprÃ©sentera des
+     * nombres sans unitÃ©s. Des donnÃ©es pourront Ãªtre ajoutÃ©es avec
+     * la mÃ©thode {@link #addRange} pour faire apparaÃ®tre des barres.
      */
     public RangeBars() {
         this((Unit)null, HORIZONTAL);
     }
 
     /**
-     * Construit un paneau initialement vide qui représentera des
-     * nombres selon les unités spécifiées. Des données pourront
-     * être ajoutées avec la méthode {@link #addRange} pour faire
-     * apparaître des barres.
+     * Construit un paneau initialement vide qui reprÃ©sentera des
+     * nombres selon les unitÃ©s spÃ©cifiÃ©es. Des donnÃ©es pourront
+     * Ãªtre ajoutÃ©es avec la mÃ©thode {@link #addRange} pour faire
+     * apparaÃ®tre des barres.
      *
      * @param unit Unit of measure, or {@code null}.
      * @param orientation Either {@link #HORIZONTAL}, {@link #VERTICAL}
@@ -331,10 +331,10 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Construit un paneau initialement vide qui représentera des
-     * dates dans le fuseau horaire spécifié. Des données pourront
-     * être ajoutées avec la méthode {@link #addRange} pour faire
-     * apparaître des barres.
+     * Construit un paneau initialement vide qui reprÃ©sentera des
+     * dates dans le fuseau horaire spÃ©cifiÃ©. Des donnÃ©es pourront
+     * Ãªtre ajoutÃ©es avec la mÃ©thode {@link #addRange} pour faire
+     * apparaÃ®tre des barres.
      *
      * @param timezone The timezone.
      * @param orientation Either {@link #HORIZONTAL}, {@link #VERTICAL}
@@ -347,9 +347,9 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Construit un paneau initialement vide. Des données pourront
-     * être ajoutées avec la méthode {@link #addRange} pour faire
-     * apparaître des barres.
+     * Construit un paneau initialement vide. Des donnÃ©es pourront
+     * Ãªtre ajoutÃ©es avec la mÃ©thode {@link #addRange} pour faire
+     * apparaÃ®tre des barres.
      */
     private RangeBars(final AbstractGraduation graduation,
                       final boolean horizontal,
@@ -436,7 +436,7 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Efface toutes les barres qui étaient tracées.
+     * Efface toutes les barres qui Ã©taient tracÃ©es.
      */
     public synchronized void clear() {
         ranges.clear();
@@ -445,7 +445,7 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Efface les barres correspondant à l'étiquette spécifiée.
+     * Efface les barres correspondant Ã  l'Ã©tiquette spÃ©cifiÃ©e.
      */
     public synchronized void remove(final String label) {
         ranges.remove(label);
@@ -454,24 +454,24 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Ajoute une plage de valeurs. Chaque plage de valeurs est associée à une
-     * étiquette. Il est possible de spécifier (dans n'importe quel ordre)
-     * plusieurs plages à une même étiquette. Si deux plages se chevauchent
-     * pour une étiquette donnée, elles seront fusionnées ensemble.
+     * Ajoute une plage de valeurs. Chaque plage de valeurs est associÃ©e Ã  une
+     * Ã©tiquette. Il est possible de spÃ©cifier (dans n'importe quel ordre)
+     * plusieurs plages Ã  une mÃªme Ã©tiquette. Si deux plages se chevauchent
+     * pour une Ã©tiquette donnÃ©e, elles seront fusionnÃ©es ensemble.
      *
-     * @param label Etiquette désignant la barre pour laquelle on veut ajouter
-     *              une plage. Si cette étiquette avait déjà été utilisée
-     *              précédemment, les données seront ajoutées à la barre déjà
-     *              existante. Sinon, une nouvelle barre sera créée. Les
-     *              différences entres majuscules et minuscules sont prises
-     *              en compte. La valeur {@code null} est autorisée.
-     * @param first Début de la plage.
+     * @param label Etiquette dÃ©signant la barre pour laquelle on veut ajouter
+     *              une plage. Si cette Ã©tiquette avait dÃ©jÃ  Ã©tÃ© utilisÃ©e
+     *              prÃ©cÃ©demment, les donnÃ©es seront ajoutÃ©es Ã  la barre dÃ©jÃ 
+     *              existante. Sinon, une nouvelle barre sera crÃ©Ã©e. Les
+     *              diffÃ©rences entres majuscules et minuscules sont prises
+     *              en compte. La valeur {@code null} est autorisÃ©e.
+     * @param first DÃ©but de la plage.
      * @param last  Fin de la plage.
      *
      * @throws NullPointerException Si {@code first} ou {@code last} est nul.
      * @throws IllegalArgumentException Si {@code first} et {@code last}
-     *         ne sont pas de la même classe, ou s'ils ne sont pas de la classe
-     *         des éléments précédemment mémorisés sous l'étiquette {@code label}.
+     *         ne sont pas de la mÃªme classe, ou s'ils ne sont pas de la classe
+     *         des Ã©lÃ©ments prÃ©cÃ©demment mÃ©morisÃ©s sous l'Ã©tiquette {@code label}.
      */
     public synchronized void addRange(final String     label,
                                       final Comparable first,
@@ -488,11 +488,11 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Définit les plages de valeurs pour l'étiquette spécifiée.
-     * Les anciennes plages de valeurs pour cette étiquette seront
-     * oubliées.
+     * DÃ©finit les plages de valeurs pour l'Ã©tiquette spÃ©cifiÃ©e.
+     * Les anciennes plages de valeurs pour cette Ã©tiquette seront
+     * oubliÃ©es.
      *
-     * @param label     Etiquette pour laquelle définir une plage de valeur.
+     * @param label     Etiquette pour laquelle dÃ©finir une plage de valeur.
      * @param newRanges Nouvelle plage de valeurs.
      */
     public synchronized void setRanges(final String label, final RangeSet newRanges) {
@@ -539,8 +539,8 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Déclare qu'un changement a été fait et que ce changement
-     * peut nécessiter le recalcul d'informations conservées
+     * DÃ©clare qu'un changement a Ã©tÃ© fait et que ce changement
+     * peut nÃ©cessiter le recalcul d'informations conservÃ©es
      * dans une cache interne.
      */
     private void clearCache() {
@@ -554,67 +554,67 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Spécifie la légende de l'axe. La valeur {@code null}
-     * signifie qu'il ne faut pas afficher de légende.
+     * SpÃ©cifie la lÃ©gende de l'axe. La valeur {@code null}
+     * signifie qu'il ne faut pas afficher de lÃ©gende.
      */
     public void setLegend(final String label) {// No 'synchronized' needed here
         ((AbstractGraduation) axis.getGraduation()).setTitle(label);
     }
 
     /**
-     * Retourne la légende de l'axe.
+     * Retourne la lÃ©gende de l'axe.
      */
     public String getLegend() { // No 'synchronized' needed here
         return axis.getGraduation().getTitle(false);
     }
 
     /**
-     * Retourne la liste des étiquettes en mémoire, dans l'ordre dans lequel
-     * elles seront écrites. Le tableau retourné est une copie des tableaux
-     * internes. En conséquence, les changements faits sur ce tableau n'auront
-     * pas de répercussions sur {@code this}.
+     * Retourne la liste des Ã©tiquettes en mÃ©moire, dans l'ordre dans lequel
+     * elles seront Ã©crites. Le tableau retournÃ© est une copie des tableaux
+     * internes. En consÃ©quence, les changements faits sur ce tableau n'auront
+     * pas de rÃ©percussions sur {@code this}.
      */
     public synchronized String[] getLabels() {
         return ranges.keySet().toArray(new String[ranges.size()]);
     }
 
     /**
-     * Retourne la valeur minimale mémorisée. Si plusieurs étiquettes ont été
-     * spécifiées, elles seront tous prises en compte. Si aucune valeur n'a été
-     * mémorisée dans cet objet, alors cette méthode retourne {@code null}.
+     * Retourne la valeur minimale mÃ©morisÃ©e. Si plusieurs Ã©tiquettes ont Ã©tÃ©
+     * spÃ©cifiÃ©es, elles seront tous prises en compte. Si aucune valeur n'a Ã©tÃ©
+     * mÃ©morisÃ©e dans cet objet, alors cette mÃ©thode retourne {@code null}.
      */
     public synchronized Comparable getMinimum() {
         return getMinimum(getLabels());
     }
 
     /**
-     * Retourne la valeur maximale mémorisée. Si plusieurs étiquettes ont été
-     * spécifiées, elles seront tous prises en compte. Si aucune valeur n'a été
-     * mémorisée dans cet objet, alors cette méthode retourne {@code null}.
+     * Retourne la valeur maximale mÃ©morisÃ©e. Si plusieurs Ã©tiquettes ont Ã©tÃ©
+     * spÃ©cifiÃ©es, elles seront tous prises en compte. Si aucune valeur n'a Ã©tÃ©
+     * mÃ©morisÃ©e dans cet objet, alors cette mÃ©thode retourne {@code null}.
      */
     public synchronized Comparable getMaximum() {
         return getMaximum(getLabels());
     }
 
     /**
-     * Retourne la valeur minimale mémorisée sous l'étiquette spécifiée. Si aucune
-     * donnée n'a été mémorisée sous cette étiquette, retourne {@code null}.
+     * Retourne la valeur minimale mÃ©morisÃ©e sous l'Ã©tiquette spÃ©cifiÃ©e. Si aucune
+     * donnÃ©e n'a Ã©tÃ© mÃ©morisÃ©e sous cette Ã©tiquette, retourne {@code null}.
      */
     public Comparable getMinimum(final String label) {
         return getMinimum(new String[] {label});
     }
 
     /**
-     * Retourne la valeur maximale mémorisée sous l'étiquette spécifiée. Si aucune
-     * donnée n'a été mémorisée sous cette étiquette, retourne {@code null}.
+     * Retourne la valeur maximale mÃ©morisÃ©e sous l'Ã©tiquette spÃ©cifiÃ©e. Si aucune
+     * donnÃ©e n'a Ã©tÃ© mÃ©morisÃ©e sous cette Ã©tiquette, retourne {@code null}.
      */
     public Comparable getMaximum(final String label) {
         return getMaximum(new String[] {label});
     }
 
     /**
-     * Retourne la valeur minimale mémorisée sous les étiquettes spécifiées.
-     * Si aucune donnée n'a été mémorisée sous ces étiquettes, retourne
+     * Retourne la valeur minimale mÃ©morisÃ©e sous les Ã©tiquettes spÃ©cifiÃ©es.
+     * Si aucune donnÃ©e n'a Ã©tÃ© mÃ©morisÃ©e sous ces Ã©tiquettes, retourne
      * {@code null}.
      */
     public synchronized Comparable getMinimum(final String[] labels) {
@@ -632,8 +632,8 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Retourne la valeur maximale mémorisée sous les étiquettes spécifiées.
-     * Si aucune donnée n'a été mémorisée sous ces étiquettes, retourne
+     * Retourne la valeur maximale mÃ©morisÃ©e sous les Ã©tiquettes spÃ©cifiÃ©es.
+     * Si aucune donnÃ©e n'a Ã©tÃ© mÃ©morisÃ©e sous ces Ã©tiquettes, retourne
      * {@code null}.
      */
     public synchronized Comparable getMaximum(final String[] labels) {
@@ -651,10 +651,10 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Déclare qu'on aura besoin d'une visière. Cette méthode Vérifie que
-     * {@code slider} est non-nul. S'il était nul, une nouvelle visière
-     * sera créée et positionnée. Si on n'avait pas assez d'informations pour
-     * positionner la visière, sa création sera annulée.
+     * DÃ©clare qu'on aura besoin d'une visiÃ¨re. Cette mÃ©thode VÃ©rifie que
+     * {@code slider} est non-nul. S'il Ã©tait nul, une nouvelle visiÃ¨re
+     * sera crÃ©Ã©e et positionnÃ©e. Si on n'avait pas assez d'informations pour
+     * positionner la visiÃ¨re, sa crÃ©ation sera annulÃ©e.
      */
     private void ensureSliderCreated() {
         if (slider != null) {
@@ -676,9 +676,9 @@ public class RangeBars extends ZoomPane {
         addMouseListener(slider);
         addMouseMotionListener(slider);
         /*
-         * Si un modèle existait, on l'utilisera pour
-         * définir la position initiale de la visière.
-         * Sinon, on construira un nouveau modèle.
+         * Si un modÃ¨le existait, on l'utilisera pour
+         * dÃ©finir la position initiale de la visiÃ¨re.
+         * Sinon, on construira un nouveau modÃ¨le.
          */
         if (swingModel == null) {
             if (ensureValidGlobalRange()) {
@@ -697,7 +697,7 @@ public class RangeBars extends ZoomPane {
 
     /**
      * Retourne la valeur au centre de la
-     * plage sélectionnée par l'utilisateur.
+     * plage sÃ©lectionnÃ©e par l'utilisateur.
      */
     public double getSelectedValue() {
         if (slider == null) {
@@ -707,8 +707,8 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Retourne la valeur au début de la
-     * plage sélectionnée par l'utilisateur.
+     * Retourne la valeur au dÃ©but de la
+     * plage sÃ©lectionnÃ©e par l'utilisateur.
      */
     public double getMinSelectedValue() {
         if (slider == null) {
@@ -718,8 +718,8 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Retourne la valeur à la fin de la
-     * plage sélectionnée par l'utilisateur.
+     * Retourne la valeur Ã  la fin de la
+     * plage sÃ©lectionnÃ©e par l'utilisateur.
      */
     public double getMaxSelectedValue() {
         if (slider == null) {
@@ -729,9 +729,9 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Spécifie la plage de valeurs à sélectionner.
-     * Cette plage de valeurs apparaîtra comme un
-     * rectangle transparent superposé aux barres.
+     * SpÃ©cifie la plage de valeurs Ã  sÃ©lectionner.
+     * Cette plage de valeurs apparaÃ®tra comme un
+     * rectangle transparent superposÃ© aux barres.
      */
     public void setSelectedRange(final double min, final double max) {
         ensureSliderCreated();
@@ -742,9 +742,9 @@ public class RangeBars extends ZoomPane {
             slider.setY(min, max);
         }
         /*
-         * Déclare que la position de la visière à changée.
-         * Les barres seront redessinées et le model sera
-         * prévenu du changement
+         * DÃ©clare que la position de la visiÃ¨re Ã  changÃ©e.
+         * Les barres seront redessinÃ©es et le model sera
+         * prÃ©venu du changement
          */
         repaint(slider.getBounds());
         if (swingModel != null) {
@@ -753,11 +753,11 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Modifie le zoom du graphique de façon à faire apparaître la
-     * plage de valeurs spécifiée. Si l'intervale spécifié n'est pas
-     * entièrement compris dans la plage des valeurs en mémoire, cette
-     * méthode décalera et/ou zoomera l'intervale spécifié de façon à
-     * l'inclure dans la plage des valeurs en mémoire.
+     * Modifie le zoom du graphique de faÃ§on Ã  faire apparaÃ®tre la
+     * plage de valeurs spÃ©cifiÃ©e. Si l'intervale spÃ©cifiÃ© n'est pas
+     * entiÃ¨rement compris dans la plage des valeurs en mÃ©moire, cette
+     * mÃ©thode dÃ©calera et/ou zoomera l'intervale spÃ©cifiÃ© de faÃ§on Ã 
+     * l'inclure dans la plage des valeurs en mÃ©moire.
      *
      * @param min Valeur minimale.
      * @param max Valeur maximale.
@@ -771,11 +771,11 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Modifie le zoom du graphique de façon à faire apparaître la
-     * plage de valeurs spécifiée. Si l'intervale spécifié n'est pas
-     * entièrement compris dans la plage des valeurs en mémoire, cette
-     * méthode décalera et/ou zoomera l'intervale spécifié de façon à
-     * l'inclure dans la plage des valeurs en mémoire.
+     * Modifie le zoom du graphique de faÃ§on Ã  faire apparaÃ®tre la
+     * plage de valeurs spÃ©cifiÃ©e. Si l'intervale spÃ©cifiÃ© n'est pas
+     * entiÃ¨rement compris dans la plage des valeurs en mÃ©moire, cette
+     * mÃ©thode dÃ©calera et/ou zoomera l'intervale spÃ©cifiÃ© de faÃ§on Ã 
+     * l'inclure dans la plage des valeurs en mÃ©moire.
      */
     private void setVisibleRange(double xmin, double xmax, double ymin, double ymax) {
         if (ensureValidGlobalRange()) {
@@ -871,15 +871,15 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Retourne le nombre de pixels à laisser entre la région dans laquelle les
-     * barres sont dessinées et les bords de cette composante. <strong>Notez que
-     * les marges retournées par {@code getInsets(Insets)} peuvent etre plus
-     * grandes que celles qui ont été spécifiées à {@link #setInsets}.</strong>
-     * Un espace suplémentaire peut avoir ajouté pour tenir compte d'une
-     * éventuelle bordure qui aurait été ajoutée à la composante.
+     * Retourne le nombre de pixels Ã  laisser entre la rÃ©gion dans laquelle les
+     * barres sont dessinÃ©es et les bords de cette composante. <strong>Notez que
+     * les marges retournÃ©es par {@code getInsets(Insets)} peuvent etre plus
+     * grandes que celles qui ont Ã©tÃ© spÃ©cifiÃ©es Ã  {@link #setInsets}.</strong>
+     * Un espace suplÃ©mentaire peut avoir ajoutÃ© pour tenir compte d'une
+     * Ã©ventuelle bordure qui aurait Ã©tÃ© ajoutÃ©e Ã  la composante.
      *
-     * @param  insets Objet à réutiliser si possible, ou {@code null}.
-     * @return Les marges à laisser de chaque côté de la zone de traçage.
+     * @param  insets Objet Ã  rÃ©utiliser si possible, ou {@code null}.
+     * @return Les marges Ã  laisser de chaque cÃ´tÃ© de la zone de traÃ§age.
      */
     public Insets getInsets(Insets insets) {
         insets = super.getInsets(insets);
@@ -891,10 +891,10 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Défini le nombre de pixels à laisser entre la région dans laquelle les
-     * barres sont dessinées et les bords de cette composante. Ce nombre de
-     * pixels doit être suffisament grand pour laisser de la place pour les
-     * étiquettes de l'axe. Notez que {@link #getInsets} ne va pas
+     * DÃ©fini le nombre de pixels Ã  laisser entre la rÃ©gion dans laquelle les
+     * barres sont dessinÃ©es et les bords de cette composante. Ce nombre de
+     * pixels doit Ãªtre suffisament grand pour laisser de la place pour les
+     * Ã©tiquettes de l'axe. Notez que {@link #getInsets} ne va pas
      * obligatoirement retourner exactement ces marges.
      */
     public void setInsets(final Insets insets) {
@@ -1112,7 +1112,7 @@ public class RangeBars extends ZoomPane {
                 labelSlotWidth  = 0;
                 labelSlotHeight = barThickness;
             } else if (verticalLabels) {
-                // Rotate font 90°
+                // Rotate font 90Â°
                 font = font.deriveFont(ROTATE_90);
                 labelSlotWidth  = barThickness;
                 labelSlotHeight = 0;
@@ -1453,8 +1453,8 @@ public class RangeBars extends ZoomPane {
             }
         }
         /*
-         * Applique la transformation, met à jour la transformation
-         * de la visière et redessine l'axe en plus du graphique.
+         * Applique la transformation, met Ã  jour la transformation
+         * de la visiÃ¨re et redessine l'axe en plus du graphique.
          */
         super.transform(change);
         if (slider != null) {
@@ -1547,27 +1547,27 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Retourne un model pouvant décrire la position de la visière dans une
+     * Retourne un model pouvant dÃ©crire la position de la visiÃ¨re dans une
      * plage d'entiers. Ce model est fournit pour faciliter les interactions
-     * avec <i>Swing</i>. Ses principales méthodes sont définies comme suit:
+     * avec <i>Swing</i>. Ses principales mÃ©thodes sont dÃ©finies comme suit:
      *
      * <p>{@link BoundedRangeModel#getValue}<br>
-     *    Retourne la position du bord gauche de la visière, exprimée par
+     *    Retourne la position du bord gauche de la visiÃ¨re, exprimÃ©e par
      *    un entier compris entre le minimum et le maximum du model (0 et
-     *    100 par défaut).</p>
+     *    100 par dÃ©faut).</p>
      *
      * <p>{@link BoundedRangeModel#getExtent}<br>
-     *    Retourne la largeur de la visière, exprimée selon les mêmes unités
+     *    Retourne la largeur de la visiÃ¨re, exprimÃ©e selon les mÃªmes unitÃ©s
      *    que {@code getValue()}.</p>
      *
      * <p>{@link BoundedRangeModel#setMinimum} / {@link BoundedRangeModel#setMaximum}<br>
-     *    Modifie les valeurs entière minimale ou maximale retournées par {@code getValue()}.
-     *    Cette modification n'affecte aucunement l'axe des barres affichées; elle
-     *    ne fait que modifier la façon dont la position de la visière est convertie
-     *    en valeur entière par {@code getValue()}.</p>
+     *    Modifie les valeurs entiÃ¨re minimale ou maximale retournÃ©es par {@code getValue()}.
+     *    Cette modification n'affecte aucunement l'axe des barres affichÃ©es; elle
+     *    ne fait que modifier la faÃ§on dont la position de la visiÃ¨re est convertie
+     *    en valeur entiÃ¨re par {@code getValue()}.</p>
      *
      * <p>{@link BoundedRangeModel#setValue} / {@link BoundedRangeModel#setExtent}<br>
-     *    Modifie la position du bord gauche de la visière ou sa largeur.</p>
+     *    Modifie la position du bord gauche de la visiÃ¨re ou sa largeur.</p>
      */
     public synchronized LogicalBoundedRangeModel getModel() {
         if (swingModel == null) {
@@ -1588,51 +1588,51 @@ public class RangeBars extends ZoomPane {
      */
     private final class SwingModel extends DefaultBoundedRangeModel implements LogicalBoundedRangeModel {
         /**
-         * Pour compatibilités entre les enregistrements binaires de différentes versions.
+         * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
          */
         private static final long serialVersionUID = -5691592959010874291L;
 
         /**
          * Valeur minimale. La valeur {@code NaN} indique qu'il
-         * faut puiser le minimum dans les données de {@link RangeBars}.
+         * faut puiser le minimum dans les donnÃ©es de {@link RangeBars}.
          */
         private double minimum = Double.NaN;
 
         /**
          * Valeur maximale. La valeur {@code NaN} indique qu'il
-         * faut puiser le maximum dans les données de {@link RangeBars}.
+         * faut puiser le maximum dans les donnÃ©es de {@link RangeBars}.
          */
         private double maximum = Double.NaN;
 
         /**
-         * Décalage intervenant dans la conversion de la position
-         * de la visière en valeur entière. Le calcul se fait par
+         * DÃ©calage intervenant dans la conversion de la position
+         * de la visiÃ¨re en valeur entiÃ¨re. Le calcul se fait par
          * <code>int_x=(x-offset)*scale</code>.
          */
         private double offset;
 
         /**
-         * Facteur d'échelle intervenant dans la conversion de la position de la visière
-         * en valeur entière. Le calcul se fait par <code>int_x=x*scale+offset</code>.
+         * Facteur d'Ã©chelle intervenant dans la conversion de la position de la visiÃ¨re
+         * en valeur entiÃ¨re. Le calcul se fait par <code>int_x=x*scale+offset</code>.
          */
         private double scale;
 
         /**
-         * Indique d'où vient le dernier ajustement
-         * de la valeur: du model ou de la visière.
+         * Indique d'oÃ¹ vient le dernier ajustement
+         * de la valeur: du model ou de la visiÃ¨re.
          */
         private boolean lastAdjustFromModel;
 
         /**
          * La valeur {@code true} indique que {@link #fireStateChanged}
-         * ne doit pas prendre en compte le prochain événement. Ce champ est
-         * utilisé lors des changements de la position de la visière.
+         * ne doit pas prendre en compte le prochain Ã©vÃ©nement. Ce champ est
+         * utilisÃ© lors des changements de la position de la visiÃ¨re.
          */
         private transient boolean ignoreEvent;
 
         /**
-         * Construit un model avec par défaut une plage allant de 0 à 100. Les valeurs
-         * de cette plage sont toujours indépendantes de celles de {@link RangeBars}.
+         * Construit un model avec par dÃ©faut une plage allant de 0 Ã  100. Les valeurs
+         * de cette plage sont toujours indÃ©pendantes de celles de {@link RangeBars}.
          */
         public SwingModel() {
             revalidate();
@@ -1645,9 +1645,9 @@ public class RangeBars extends ZoomPane {
         ////////                                                  ////////
         //////////////////////////////////////////////////////////////////
         /**
-         * Spécifie les minimum et maximum des valeurs entières.
+         * SpÃ©cifie les minimum et maximum des valeurs entiÃ¨res.
          * Une valeur {@link Double#NaN} signifie de prendre une
-         * valeur par défaut.
+         * valeur par dÃ©faut.
          */
         public void setLogicalRange(final double minimum, final double maximum) {
             this.minimum = minimum;
@@ -1656,14 +1656,14 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Convertit une valeur entière en nombre réel.
+         * Convertit une valeur entiÃ¨re en nombre rÃ©el.
          */
         public double toLogical(final int integer) {
             return (integer-offset)/scale;
         }
 
         /**
-         * Convertit un nombre réel en valeur entière.
+         * Convertit un nombre rÃ©el en valeur entiÃ¨re.
          */
         public int toInteger(final double logical) {
             return (int) Math.round(logical*scale + offset);
@@ -1689,10 +1689,10 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Met à jour les champs {@link #offset} et {@link #scale}. Les minimum
-         * maximum ainsi que la valeur actuels du model seront réutilisés. C'est
-         * de la responsabilité du programmeur de mettre à jour ces propriétés si
-         * c'est nécessaire.
+         * Met Ã  jour les champs {@link #offset} et {@link #scale}. Les minimum
+         * maximum ainsi que la valeur actuels du model seront rÃ©utilisÃ©s. C'est
+         * de la responsabilitÃ© du programmeur de mettre Ã  jour ces propriÃ©tÃ©s si
+         * c'est nÃ©cessaire.
          */
         private void revalidate() {
             revalidate(super.getMinimum(), super.getMaximum());
@@ -1788,7 +1788,7 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Modifie la position de la visière en fonction des valeurs actuelles du modèle.
+         * Modifie la position de la visiÃ¨re en fonction des valeurs actuelles du modÃ¨le.
          */
         private void setSliderPosition() {
             final double min = (super.getValue()-offset)/scale;
@@ -1807,7 +1807,7 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Modifie l'ensemble des paramètres d'un coups.
+         * Modifie l'ensemble des paramÃ¨tres d'un coups.
          */
         public void setRangeProperties(final int value, final int extent,
                                        final int lower, final int upper,
@@ -1820,9 +1820,9 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Met à jour les champs internes de ce model et lance un
-         * évènement prevenant que la position ou la largeur de la
-         * visière a changée.
+         * Met Ã  jour les champs internes de ce model et lance un
+         * Ã©vÃ¨nement prevenant que la position ou la largeur de la
+         * visiÃ¨re a changÃ©e.
          */
         private void setRangeProperties(final int lower, final int upper, final boolean isAdjusting) {
             revalidate(lower, upper);
@@ -1835,9 +1835,9 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Modifie la valeur minimale retournée par {@link #getValue}.
-         * La valeur retournée par cette dernière sera modifiée pour
-         * qu'elle corresponde à la position de la visière dans les
+         * Modifie la valeur minimale retournÃ©e par {@link #getValue}.
+         * La valeur retournÃ©e par cette derniÃ¨re sera modifiÃ©e pour
+         * qu'elle corresponde Ã  la position de la visiÃ¨re dans les
          * nouvelles limites.
          */
         public void setMinimum(final int minimum) {
@@ -1845,9 +1845,9 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Modifie la valeur maximale retournée par {@link #getValue}.
-         * La valeur retournée par cette dernière sera modifiée pour
-         * qu'elle corresponde à la position de la visière dans les
+         * Modifie la valeur maximale retournÃ©e par {@link #getValue}.
+         * La valeur retournÃ©e par cette derniÃ¨re sera modifiÃ©e pour
+         * qu'elle corresponde Ã  la position de la visiÃ¨re dans les
          * nouvelles limites.
          */
         public void setMaximum(final int maximum) {
@@ -1855,7 +1855,7 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Retourne la position de la visière.
+         * Retourne la position de la visiÃ¨re.
          */
         public int getValue() {
             if (!lastAdjustFromModel) {
@@ -1865,7 +1865,7 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Modifie la position de la visière.
+         * Modifie la position de la visiÃ¨re.
          */
         public void setValue(final int value) {
             lastAdjustFromModel = true;
@@ -1874,7 +1874,7 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Retourne l'étendu de la visière.
+         * Retourne l'Ã©tendu de la visiÃ¨re.
          */
         public int getExtent() {
             if (!lastAdjustFromModel) {
@@ -1884,7 +1884,7 @@ public class RangeBars extends ZoomPane {
         }
 
         /**
-         * Modifie la largeur de la visière.
+         * Modifie la largeur de la visiÃ¨re.
          */
         public void setExtent(final int extent) {
             lastAdjustFromModel = true;
@@ -1996,8 +1996,8 @@ public class RangeBars extends ZoomPane {
     }
 
     /**
-     * Fait apparaître dans une fenêtre quelques histogrammes
-     * calculés au hasard. Cette méthode sert à vérifier le
+     * Fait apparaÃ®tre dans une fenÃªtre quelques histogrammes
+     * calculÃ©s au hasard. Cette mÃ©thode sert Ã  vÃ©rifier le
      * bon fonctionnement de la classe {@code RangeBars}.
      */
     public static void main(final String[] args) {
@@ -2018,12 +2018,12 @@ public class RangeBars extends ZoomPane {
         }
         final JFrame frame = new JFrame("RangeBars");
         final RangeBars ranges = new RangeBars((Unit)null, orientation);
-        for (int série=1; série<=4; série++) {
-            final String clé="Série #"+série;
+        for (int sÃ©rie=1; sÃ©rie<=4; sÃ©rie++) {
+            final String clÃ©="SÃ©rie #"+sÃ©rie;
             for (int i=0; i<100; i++) {
                 final double x = 1000*Math.random();
                 final double w =   30*Math.random();
-                ranges.addRange(clé, new Double(x), new Double(x+w));
+                ranges.addRange(clÃ©, new Double(x), new Double(x+w));
             }
         }
         ranges.setSelectedRange(12, 38);

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import net.sicade.observation.ServerException;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Descriptor descripteur du paysage océanique}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain Descriptor descripteur du paysage ocÃ©anique}.
  *
  * @version $Id$
  * @author Martin Desruisseaux 
@@ -48,12 +48,12 @@ import net.sicade.observation.ServerException;
  */
 public class DescriptorEntry extends ObservableEntry implements Descriptor {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -4266087480414759744L;
 
     /**
-     * L'identifiant du descripteur identité.
+     * L'identifiant du descripteur identitÃ©.
      */
     private static final int IDENTITY_ID = 10000;
 
@@ -63,13 +63,13 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
     private final LocationOffset offset;
 
     /**
-     * Le numéro de bande dans laquelle évaluer les valeurs de pixels des images.
+     * Le numÃ©ro de bande dans laquelle Ã©valuer les valeurs de pixels des images.
      */
     private final short band;
 
     /**
-     * Une vue des données de ce descripteur comme objet {@link DynamicCoverage}.
-     * Ne sera établie à partir de la série la première fois où elle sera nécessaire.
+     * Une vue des donnÃ©es de ce descripteur comme objet {@link DynamicCoverage}.
+     * Ne sera Ã©tablie Ã  partir de la sÃ©rie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private transient Reference<DynamicCoverage> coverage;
 
@@ -78,12 +78,12 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
      *
      * @param identifier   L'identifiant du descripteur.
      * @param symbol       Le symbole du descripteur.
-     * @param series       La séries de données ({@linkplain net.sicade.observation.Phenomenon phénomène}).
-     * @param operation    L'opération associée ({@linkplain net.sicade.observation.Procedure  procédure}).
-     * @param band         Le numéro de bande dans laquelle évaluer les valeurs de pixels, à partir de 0.
+     * @param series       La sÃ©ries de donnÃ©es ({@linkplain net.sicade.observation.Phenomenon phÃ©nomÃ¨ne}).
+     * @param operation    L'opÃ©ration associÃ©e ({@linkplain net.sicade.observation.Procedure  procÃ©dure}).
+     * @param band         Le numÃ©ro de bande dans laquelle Ã©valuer les valeurs de pixels, Ã  partir de 0.
      * @param offset       La position relative.
-     * @param distribution La distribution des données.
-     * @param remarks      Remarques s'appliquant à cette entrée, ou {@code null}.
+     * @param distribution La distribution des donnÃ©es.
+     * @param remarks      Remarques s'appliquant Ã  cette entrÃ©e, ou {@code null}.
      */
     protected DescriptorEntry(final int            identifier,
                               final String         symbol,
@@ -132,7 +132,7 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
     /**
      * {@inheritDoc}
      *
-     * @todo La valeur de l'identifiant est codée en dur.
+     * @todo La valeur de l'identifiant est codÃ©e en dur.
      */
     public boolean isIdentity() {
         return identifier == IDENTITY_ID;
@@ -148,7 +148,7 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
             if (c != null) {
                 return c;
             }
-            LOGGER.fine("Reconstruit à nouveau la converture de \"" + getName() + "\".");
+            LOGGER.fine("Reconstruit Ã  nouveau la converture de \"" + getName() + "\".");
         }
         c = FunctionalCoverage.getCoverage(getName());
         if (c == null) try {

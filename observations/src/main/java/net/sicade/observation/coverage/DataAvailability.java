@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,9 +27,9 @@ import org.geotools.measure.Longitude;
 
 
 /**
- * Contient les plages de temps et de coordonnées couvertes par les images. Ces informations
- * sont fournies sous forme d'objets {@link RangeSet}, ce qui permet de connaître les trous
- * dans les données.
+ * Contient les plages de temps et de coordonnÃ©es couvertes par les images. Ces informations
+ * sont fournies sous forme d'objets {@link RangeSet}, ce qui permet de connaÃ®tre les trous
+ * dans les donnÃ©es.
  *
  * @version $Id$
  * @author Remi Eve
@@ -37,27 +37,27 @@ import org.geotools.measure.Longitude;
  */
 public class DataAvailability implements Serializable {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -4275093602674070015L;
 
     /**
-     * Les plages de longitudes, ou {@code null} si cette information n'a pas été demandée.
+     * Les plages de longitudes, ou {@code null} si cette information n'a pas Ã©tÃ© demandÃ©e.
      */
     public final RangeSet x;
 
     /**
-     * Les plages de latitudes, ou {@code null} si cette information n'a pas été demandée.
+     * Les plages de latitudes, ou {@code null} si cette information n'a pas Ã©tÃ© demandÃ©e.
      */
     public final RangeSet y;
 
     /**
-     * Les plages de temps, ou {@code null} si cette information n'a pas été demandée.
+     * Les plages de temps, ou {@code null} si cette information n'a pas Ã©tÃ© demandÃ©e.
      */    
     public final RangeSet t;
 
     /** 
-     * Construit des plages initialement vides pour les dimensions spécifiées.
+     * Construit des plages initialement vides pour les dimensions spÃ©cifiÃ©es.
      *
      * @param x {@code true} pour obtenir les plages de longitudes.
      * @param y {@code true} pour obtenir les plages de latitudes.
@@ -70,16 +70,16 @@ public class DataAvailability implements Serializable {
     }
 
     /**
-     * Retourne {@code true} s'il est plausible qu'une donnée soit disponible à la position
-     * spatio-temporelle spécifiée. Une valeur {@code true} ne garantie pas qu'une donnée est
-     * disponible. En revanche, une valeur {@code false} garantie qu'il n'y a pas de données
-     * pour la position spécifiée.
+     * Retourne {@code true} s'il est plausible qu'une donnÃ©e soit disponible Ã  la position
+     * spatio-temporelle spÃ©cifiÃ©e. Une valeur {@code true} ne garantie pas qu'une donnÃ©e est
+     * disponible. En revanche, une valeur {@code false} garantie qu'il n'y a pas de donnÃ©es
+     * pour la position spÃ©cifiÃ©e.
      *
      * @param x La longitude, ou {@code null} pour ne pas prendre en compte la longitude.
      * @param y La latitude,  ou {@code null} pour ne pas prendre en compte la latitude.
      * @param t La date,      ou {@code null} pour ne pas prendre en compte la date.
-     * @return {@code true} s'il est possible qu'une donnée soit disponible à la coordonnée spécifiée,
-     *         ou {@code false} s'il est garantie qu'il n'y a pas de donnée à cette position.
+     * @return {@code true} s'il est possible qu'une donnÃ©e soit disponible Ã  la coordonnÃ©e spÃ©cifiÃ©e,
+     *         ou {@code false} s'il est garantie qu'il n'y a pas de donnÃ©e Ã  cette position.
      */
     public boolean contains(final Longitude x, final Latitude y, final Date t) {
         return (x==null || this.x==null || this.x.indexOfRange(x)>=0) &&

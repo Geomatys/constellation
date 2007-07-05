@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ import net.sicade.observation.sql.MeasurementTable;
  */
 public class CatchTable extends MeasurementTable {
     /**
-     * Requête SQL pour obtenir les captures pour une station et un observable donnés.
+     * RequÃªte SQL pour obtenir les captures pour une station et un observable donnÃ©s.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Catchs:SELECT",
             "SELECT station, observable, value, error\n"  +

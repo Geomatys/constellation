@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,11 +23,11 @@ import net.sicade.observation.Observation;
 
 
 /**
- * Position spatio-temporelle relative à une {@linkplain Observation observation}.
- * Il s'agit du décalage entre une observation (pêche, <cite>etc.</cite>) et un paramètre
- * environnemental (température, <cite>etc.</cite>) utilisé pour décrire l'environnement
- * de cette observation. Un décalage spatio-temporelle est une des trois composantes du
- * {@linkplain Descriptor descripteur du paysage océanique}.
+ * Position spatio-temporelle relative Ã  une {@linkplain Observation observation}.
+ * Il s'agit du dÃ©calage entre une observation (pÃªche, <cite>etc.</cite>) et un paramÃ¨tre
+ * environnemental (tempÃ©rature, <cite>etc.</cite>) utilisÃ© pour dÃ©crire l'environnement
+ * de cette observation. Un dÃ©calage spatio-temporelle est une des trois composantes du
+ * {@linkplain Descriptor descripteur du paysage ocÃ©anique}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -35,29 +35,29 @@ import net.sicade.observation.Observation;
  */
 public interface LocationOffset extends Element {
     /**
-     * Retourne le décalage temporelle, en nombre de jours. Par exemple la valeur -2 indique que
-     * l'on s'intéressera à la valeur d'un paramètre environnemental (par exemple la température)
-     * deux jours avant l'observation (par exemple une pêche).
+     * Retourne le dÃ©calage temporelle, en nombre de jours. Par exemple la valeur -2 indique que
+     * l'on s'intÃ©ressera Ã  la valeur d'un paramÃ¨tre environnemental (par exemple la tempÃ©rature)
+     * deux jours avant l'observation (par exemple une pÃªche).
      */
     double getDayOffset();
 
     /**
-     * Retourne le décalage vers l'est, en mètres. Par exemple la valeur 1000 indique que l'on
-     * s'intéresse à la valeur d'un paramètre environnemental 1 kilomètre à l'est de l'observation.
+     * Retourne le dÃ©calage vers l'est, en mÃ¨tres. Par exemple la valeur 1000 indique que l'on
+     * s'intÃ©resse Ã  la valeur d'un paramÃ¨tre environnemental 1 kilomÃ¨tre Ã  l'est de l'observation.
      */
     double getEasting();
 
     /**
-     * Retourne le décalage vers le nord, en mètres. Par exemple la valeur 1000 indique que l'on
-     * s'intéresse à la valeur d'un paramètre environnemental 1 kilomètre au nord de l'observation.
+     * Retourne le dÃ©calage vers le nord, en mÃ¨tres. Par exemple la valeur 1000 indique que l'on
+     * s'intÃ©resse Ã  la valeur d'un paramÃ¨tre environnemental 1 kilomÃ¨tre au nord de l'observation.
      */
     double getNorthing();
 
     /**
-     * Retourne le décalage en altitude, en mètres. Par exemple la valeur 100 indique que l'on
-     * s'intéresse à la valeur d'un paramètre environnemental 100 mètres sous l'observation (par
-     * exemple sous la surface de la mer lorsque l'observation est une pêche de surface telle que
-     * la pêche à la senne).
+     * Retourne le dÃ©calage en altitude, en mÃ¨tres. Par exemple la valeur 100 indique que l'on
+     * s'intÃ©resse Ã  la valeur d'un paramÃ¨tre environnemental 100 mÃ¨tres sous l'observation (par
+     * exemple sous la surface de la mer lorsque l'observation est une pÃªche de surface telle que
+     * la pÃªche Ã  la senne).
      */
     double getAltitudeOffset();
 }

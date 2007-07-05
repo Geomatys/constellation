@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -32,45 +32,45 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * Classe de base d'un enregistrement dans une {@linkplain Table table} ou une requête. Chacune de
- * ces entrées représentera un {@linkplain Element element} (phénomène, procédure, série d'images,
- * <cite>etc.</cite>). Les entrées sont habituellement (mais pas obligatoirement) identifiées de
- * manière unique par leurs {@linkplain #getName noms}.
+ * Classe de base d'un enregistrement dans une {@linkplain Table table} ou une requÃªte. Chacune de
+ * ces entrÃ©es reprÃ©sentera un {@linkplain Element element} (phÃ©nomÃ¨ne, procÃ©dure, sÃ©rie d'images,
+ * <cite>etc.</cite>). Les entrÃ©es sont habituellement (mais pas obligatoirement) identifiÃ©es de
+ * maniÃ¨re unique par leurs {@linkplain #getName noms}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Entry implements Element, Serializable {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -7119518186999674633L;
 
     /**
-     * Nom de cette entrée. Dans certains cas, un nom peut être créé à la volé
-     * la première fois où il sera demandé (voir {@link #createName}).
+     * Nom de cette entrÃ©e. Dans certains cas, un nom peut Ãªtre crÃ©Ã© Ã  la volÃ©
+     * la premiÃ¨re fois oÃ¹ il sera demandÃ© (voir {@link #createName}).
      */
     private String name;
 
     /**
-     * Remarques s'appliquant à cette entrée, ou {@code null}.
+     * Remarques s'appliquant Ã  cette entrÃ©e, ou {@code null}.
      */
     private final String remarks;
 
     /**
-     * Construit une entrée avec le nom spécifié, mais sans remarques associées.
+     * Construit une entrÃ©e avec le nom spÃ©cifiÃ©, mais sans remarques associÃ©es.
      *
-     * @param name Nom de l'entrée.
+     * @param name Nom de l'entrÃ©e.
      */
     protected Entry(final String name) {
         this(name, null);
     }
 
     /**
-     * Construit une entrée avec le nom et les remarques spécifiés.
+     * Construit une entrÃ©e avec le nom et les remarques spÃ©cifiÃ©s.
      *
-     * @param name     Nom de l'entrée.
-     * @param remarks  Remarques s'appliquant à cette entrée, ou {@code null}.
+     * @param name     Nom de l'entrÃ©e.
+     * @param remarks  Remarques s'appliquant Ã  cette entrÃ©e, ou {@code null}.
      */
     protected Entry(final String name,
                     final String remarks)
@@ -80,15 +80,15 @@ public class Entry implements Element, Serializable {
     }
 
     /**
-     * Construit un nom à la volé. Si cet entrée a été construite avec un nom nul, alors
-     * cette méthode sera appelée la première fois où {@link #getName} sera demandée.
+     * Construit un nom Ã  la volÃ©. Si cet entrÃ©e a Ã©tÃ© construite avec un nom nul, alors
+     * cette mÃ©thode sera appelÃ©e la premiÃ¨re fois oÃ¹ {@link #getName} sera demandÃ©e.
      */
     StringBuilder createName() {
         throw new IllegalStateException();
     }
 
     /**
-     * Retourne le nom de cette entrée.
+     * Retourne le nom de cette entrÃ©e.
      */
     public final String getName() {
         if (name == null) {
@@ -98,16 +98,16 @@ public class Entry implements Element, Serializable {
     }
 
     /**
-     * Retourne les remarques associées à cette entrée, ou {@code null} s'il n'y en a pas.
+     * Retourne les remarques associÃ©es Ã  cette entrÃ©e, ou {@code null} s'il n'y en a pas.
      */
     public final String getRemarks() {
         return remarks;
     }
 
     /**
-     * Retourne un nom à afficher dans une interface utilisateur pour cette entrée. Cette méthode est
-     * appelée par différentes composantes <cite>Swing</cite>, par exemple {@link javax.swing.JTree}.
-     * L'implémentation par défaut retourne le même nom que {@link #getName}.
+     * Retourne un nom Ã  afficher dans une interface utilisateur pour cette entrÃ©e. Cette mÃ©thode est
+     * appelÃ©e par diffÃ©rentes composantes <cite>Swing</cite>, par exemple {@link javax.swing.JTree}.
+     * L'implÃ©mentation par dÃ©faut retourne le mÃªme nom que {@link #getName}.
      */
     @Override
     public String toString() {
@@ -116,9 +116,9 @@ public class Entry implements Element, Serializable {
     }
 
     /**
-     * Retourne une valeur hashée pour cette entrée. L'implémentation par défaut retourne une
-     * valeur basée sur le {@linkplain #getName nom} de cette entrée, sachant que chaque entrée
-     * est supposée avoir un nom à peu près unique.
+     * Retourne une valeur hashÃ©e pour cette entrÃ©e. L'implÃ©mentation par dÃ©faut retourne une
+     * valeur basÃ©e sur le {@linkplain #getName nom} de cette entrÃ©e, sachant que chaque entrÃ©e
+     * est supposÃ©e avoir un nom Ã  peu prÃ¨s unique.
      */
     @Override
     public int hashCode() {
@@ -126,13 +126,13 @@ public class Entry implements Element, Serializable {
     }
 
     /**
-     * Vérifie si cette entrée est identique à l'objet spécifié. L'implémentation par défaut compare
-     * le {@linkplain #getName nom} de cette entrée ainsi que les {@linkplain #getRemarks remarques},
-     * ce qui devrait être suffisant si chaque entrée d'une même classe a effectivement un nom unique,
-     * en supposant que toutes les entrées présentes dans cette machine virtuelle proviennent de la
-     * même base de données. Certaines classes dérivées feront un examen plus poussé, mais ça sera
-     * surtout par précaution. Cette méthode évitera donc de comparer les attributs qui pourraient
-     * se traduire par un chargement d'une grande quantité de données.
+     * VÃ©rifie si cette entrÃ©e est identique Ã  l'objet spÃ©cifiÃ©. L'implÃ©mentation par dÃ©faut compare
+     * le {@linkplain #getName nom} de cette entrÃ©e ainsi que les {@linkplain #getRemarks remarques},
+     * ce qui devrait Ãªtre suffisant si chaque entrÃ©e d'une mÃªme classe a effectivement un nom unique,
+     * en supposant que toutes les entrÃ©es prÃ©sentes dans cette machine virtuelle proviennent de la
+     * mÃªme base de donnÃ©es. Certaines classes dÃ©rivÃ©es feront un examen plus poussÃ©, mais Ã§a sera
+     * surtout par prÃ©caution. Cette mÃ©thode Ã©vitera donc de comparer les attributs qui pourraient
+     * se traduire par un chargement d'une grande quantitÃ© de donnÃ©es.
      */
     @Override
     public boolean equals(final Object object) {
@@ -148,12 +148,12 @@ public class Entry implements Element, Serializable {
     }
 
     /**
-     * Appelée automatiquement avant l'enregistrement binaire de cette méthode. Les classes dérivées
-     * devraient redéfinir cette méthode si elles ont besoin de compléter les informations contenues
-     * dans des champs qui ne devaient êtres renseignés que la première fois où elles étaient
-     * nécessaires.
+     * AppelÃ©e automatiquement avant l'enregistrement binaire de cette mÃ©thode. Les classes dÃ©rivÃ©es
+     * devraient redÃ©finir cette mÃ©thode si elles ont besoin de complÃ©ter les informations contenues
+     * dans des champs qui ne devaient Ãªtres renseignÃ©s que la premiÃ¨re fois oÃ¹ elles Ã©taient
+     * nÃ©cessaires.
      *
-     * @throws Exception si une erreur est survenue lors de la préparation. Sera typiquement
+     * @throws Exception si une erreur est survenue lors de la prÃ©paration. Sera typiquement
      *         {@link net.sicade.observation.CatalogException}, {@link java.sql.SQLException}
      *         ou {@link java.rmi.RemoteException}.
      */
@@ -161,7 +161,7 @@ public class Entry implements Element, Serializable {
     }
 
     /**
-     * Complète les informations spatio-temporelles avant l'enregistrement binaire.
+     * ComplÃ¨te les informations spatio-temporelles avant l'enregistrement binaire.
      */
     private synchronized void writeObject(final ObjectOutputStream out) throws IOException {
         try {

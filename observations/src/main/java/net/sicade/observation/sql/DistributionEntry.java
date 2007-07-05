@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ import static java.lang.Double.doubleToLongBits;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Distribution distribution}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain Distribution distribution}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -31,22 +31,22 @@ import static java.lang.Double.doubleToLongBits;
  */
 public class DistributionEntry extends Entry implements Distribution {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -9004700774687614563L;
 
     /**
-     * Une constante prédéfinie pour laquelle {@link #normalize} est l'opérateur identité.
+     * Une constante prÃ©dÃ©finie pour laquelle {@link #normalize} est l'opÃ©rateur identitÃ©.
      */
     public static Distribution NORMAL = new DistributionEntry("normale", 1, 0, false);
 
     /**
-     * Facteur par lequel on multiplie les données.
+     * Facteur par lequel on multiplie les donnÃ©es.
      */
     private final double scale;
     
     /**
-     * Constante à ajouter aux données.
+     * Constante Ã  ajouter aux donnÃ©es.
      */
     private final double offset;
     
@@ -56,7 +56,7 @@ public class DistributionEntry extends Entry implements Distribution {
     private final boolean log;
     
     /** 
-     * Crée une nouvelle distibution.
+     * CrÃ©e une nouvelle distibution.
      *
      * @param   name    le nom de la distribution.
      * @param   scale   le facteur multiplicatif.
@@ -73,9 +73,9 @@ public class DistributionEntry extends Entry implements Distribution {
     }
 
     /**
-     * Applique un changement de variable. Cette méthode calcule
-     * <code>value&times;scale + offset</code>, et éventuellement
-     * le logarithme naturel du résultat.
+     * Applique un changement de variable. Cette mÃ©thode calcule
+     * <code>value&times;scale + offset</code>, et Ã©ventuellement
+     * le logarithme naturel du rÃ©sultat.
      */
     public double normalize(double value) {
         value = scale*value + offset;
@@ -93,7 +93,7 @@ public class DistributionEntry extends Entry implements Distribution {
     }
 
     /**
-     * Vérifie que cette distribution est identique à l'objet spécifié
+     * VÃ©rifie que cette distribution est identique Ã  l'objet spÃ©cifiÃ©
      */
     @Override
     public boolean equals(final Object object) {

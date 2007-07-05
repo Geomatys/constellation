@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,16 +25,16 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Un descripteur du paysage océanique. Un descripteur est une variable explicative
- * donnée en entré aux modèles linéaires. Un descripteur du paysage océanique comprend:
+ * Un descripteur du paysage ocÃ©anique. Un descripteur est une variable explicative
+ * donnÃ©e en entrÃ© aux modÃ¨les linÃ©aires. Un descripteur du paysage ocÃ©anique comprend:
  * <p>
  * <ul>
- *   <li>une {@linkplain Series série d'images} contenant les données du paramètre environnemental;</li>
- *   <li>une {@linkplain Operation opération} à appliquer (par exemple un opérateur de Sobel pour
+ *   <li>une {@linkplain Series sÃ©rie d'images} contenant les donnÃ©es du paramÃ¨tre environnemental;</li>
+ *   <li>une {@linkplain Operation opÃ©ration} Ã  appliquer (par exemple un opÃ©rateur de Sobel pour
  *       calculer les gradients);</li>
- *   <li>une {@linkplain LocationOffset position relative} à laquelle évaluer le résultat de
- *       l'opération sur le paramètre environnemental;</li>
- *   <li>une {@linkplain Distribution distribution théorique}, que l'on essaiera de ramener à la
+ *   <li>une {@linkplain LocationOffset position relative} Ã  laquelle Ã©valuer le rÃ©sultat de
+ *       l'opÃ©ration sur le paramÃ¨tre environnemental;</li>
+ *   <li>une {@linkplain Distribution distribution thÃ©orique}, que l'on essaiera de ramener Ã  la
  *       distribution normale par un changement de variable.</li>
  * </ul>
  *
@@ -45,9 +45,9 @@ import net.sicade.observation.CatalogException;
 public interface Descriptor extends Observable {
     /**
      * Un comparateur pour classer des descripteurs en ordre croissant de
-     * {@linkplain LocationOffset#getDayOffset décalage temporel}. Si deux
-     * descripteurs ont le même décalage temporels, alors d'autres critères
-     * telles que le nom de la série peuvent être utilisés.
+     * {@linkplain LocationOffset#getDayOffset dÃ©calage temporel}. Si deux
+     * descripteurs ont le mÃªme dÃ©calage temporels, alors d'autres critÃ¨res
+     * telles que le nom de la sÃ©rie peuvent Ãªtre utilisÃ©s.
      */
     Comparator<Descriptor> TIME_ORDER = new Comparator<Descriptor>() {
         public int compare(final Descriptor d1, final Descriptor d2) {
@@ -64,56 +64,56 @@ public interface Descriptor extends Observable {
     };
 
     /**
-     * Retourne la série d'images d'où proviennent les données du paramètre environnemental étudié.
-     * Il peut s'agir par exemple d'une série d'images de température.
+     * Retourne la sÃ©rie d'images d'oÃ¹ proviennent les donnÃ©es du paramÃ¨tre environnemental Ã©tudiÃ©.
+     * Il peut s'agir par exemple d'une sÃ©rie d'images de tempÃ©rature.
      */
     Series getPhenomenon();
 
     /**
-     * Retourne l'opération appliquée sur les images de la série. Il peut s'agir par exemple
-     * d'un opérateur de gradient. Si aucune opération n'est appliquée, alors cette méthode
-     * retourne une opération identité.
+     * Retourne l'opÃ©ration appliquÃ©e sur les images de la sÃ©rie. Il peut s'agir par exemple
+     * d'un opÃ©rateur de gradient. Si aucune opÃ©ration n'est appliquÃ©e, alors cette mÃ©thode
+     * retourne une opÃ©ration identitÃ©.
      */
     Operation getProcedure();
 
     /**
-     * Retourne la position relative à laquelle évaluer les images de la série.
+     * Retourne la position relative Ã  laquelle Ã©valuer les images de la sÃ©rie.
      * Cette position est relative aux positions des observations.
      */
     LocationOffset getLocationOffset();
 
     /**
-     * Retourne le numéro de la bande dans laquelle extraire les valeurs des images.
+     * Retourne le numÃ©ro de la bande dans laquelle extraire les valeurs des images.
      */
     short getBand();
 
     /**
-     * Retourne {@code true} si ce descripteur est le <cite>descripteur identité</cite>.
-     * Le "descripteur identité" est un descripteur artificiel représentant une image
-     * dont tous les pixels auraient la valeur 1. Il est utilisé dans des expressions de
-     * la forme <code>y = C0 + C1*x + C2*x² + ...</code>, ou {@code C0} peut s'écrire
-     * <code>C0&times;identité</code>.
+     * Retourne {@code true} si ce descripteur est le <cite>descripteur identitÃ©</cite>.
+     * Le "descripteur identitÃ©" est un descripteur artificiel reprÃ©sentant une image
+     * dont tous les pixels auraient la valeur 1. Il est utilisÃ© dans des expressions de
+     * la forme <code>y = C0 + C1*x + C2*xÂ² + ...</code>, ou {@code C0} peut s'Ã©crire
+     * <code>C0&times;identitÃ©</code>.
      */
     boolean isIdentity();
 
     /**
-     * Retourne une vue des données de ce descripteur sous forme de fonction. Chaque valeur peut
-     * être évaluée à une position (<var>x</var>,<var>y</var>,<var>t</var>), en faisant intervenir
-     * des interpolations si nécessaire. Cette méthode retourne une fonction plus élaborée que celle
+     * Retourne une vue des donnÃ©es de ce descripteur sous forme de fonction. Chaque valeur peut
+     * Ãªtre Ã©valuÃ©e Ã  une position (<var>x</var>,<var>y</var>,<var>t</var>), en faisant intervenir
+     * des interpolations si nÃ©cessaire. Cette mÃ©thode retourne une fonction plus Ã©laborÃ©e que celle
      * de {@link Series#getCoverage} pour les raisons suivantes:
      * <p>
      * <ul>
-     *   <li>Une {@linkplain #getProcedure opération} peut-être appliquée sur les images (par
+     *   <li>Une {@linkplain #getProcedure opÃ©ration} peut-Ãªtre appliquÃ©e sur les images (par
      *       exemple calcul de un gradient)</li>
-     *   <li>Un {@linkplain #getLocationOffset décalage spatio-temporel} peut être appliquée
-     *       sur la position à laquelle évaluer les données.</li>
-     *   <li>En cas de donnée manquante, la {@linkplain Series#getFallback série de second
-     *       recours} est testée.</li>
-     *   <li>Les données peuvent être évaluées sur un serveur distant sans jamais transmettre
-     *       d'images complètes via le réseau.</li>
+     *   <li>Un {@linkplain #getLocationOffset dÃ©calage spatio-temporel} peut Ãªtre appliquÃ©e
+     *       sur la position Ã  laquelle Ã©valuer les donnÃ©es.</li>
+     *   <li>En cas de donnÃ©e manquante, la {@linkplain Series#getFallback sÃ©rie de second
+     *       recours} est testÃ©e.</li>
+     *   <li>Les donnÃ©es peuvent Ãªtre Ã©valuÃ©es sur un serveur distant sans jamais transmettre
+     *       d'images complÃ¨tes via le rÃ©seau.</li>
      * </ul>
      *
-     * @throws CatalogException si la fonction n'a pas pu être construite.
+     * @throws CatalogException si la fonction n'a pas pu Ãªtre construite.
      */
     DynamicCoverage getCoverage() throws CatalogException;
 }

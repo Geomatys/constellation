@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,21 +34,21 @@ import net.sicade.observation.coverage.Series;
 
 
 /**
- * Action ouvrant une nouvelle fenêtre contenant une {@linkplain MosaicWindow mosaïque d'images}.
- * Cette fenêtre est ouverte comme un document. Son ouverture est déclanchée par la sélection de
- * "Ouvrir" dans le menu contextuel du noeud représentant une série.
+ * Action ouvrant une nouvelle fenÃªtre contenant une {@linkplain MosaicWindow mosaÃ¯que d'images}.
+ * Cette fenÃªtre est ouverte comme un document. Son ouverture est dÃ©clanchÃ©e par la sÃ©lection de
+ * "Ouvrir" dans le menu contextuel du noeud reprÃ©sentant une sÃ©rie.
  * 
  * @author Martin Desruisseaux
  * @version $Id$
  */
 public final class OpenAction extends AbstractAction {
     /**
-     * L'icone pour cette action. Ne sera lue que la première fois où elle sera nécessaire.
+     * L'icone pour cette action. Ne sera lue que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private static Icon icon;
 
     /**
-     * La série d'images à ouvrir.
+     * La sÃ©rie d'images Ã  ouvrir.
      */
     private final Series series;
 
@@ -62,7 +62,7 @@ public final class OpenAction extends AbstractAction {
     }
 
     /**
-     * Retourne un icone partagé pour cette action.
+     * Retourne un icone partagÃ© pour cette action.
      */
     private static synchronized Icon getSharedIcon() {
         if (icon == null) {
@@ -72,7 +72,7 @@ public final class OpenAction extends AbstractAction {
     }
 
     /**
-     * Ouvre une {@linkplain MosaicWindow mosaïque d'images} d'une série.
+     * Ouvre une {@linkplain MosaicWindow mosaÃ¯que d'images} d'une sÃ©rie.
      */
     public void actionPerformed(final ActionEvent evt) {
         final TopComponent win = MosaicWindow.findInstance(series);

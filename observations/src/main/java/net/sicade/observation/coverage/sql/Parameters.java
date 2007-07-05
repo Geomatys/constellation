@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,9 +37,9 @@ import net.sicade.observation.coverage.Operation;
 
 
 /**
- * Bloc de paramètres pour une table {@link GridCoverageTable}. Les blocs de paramètres doivent
- * être immutables. Ce principe d'imutabilité s'applique aussi aux objets référencés par
- * les champs publiques, même si ces objets sont en principe mutables ({@link Rectangle2D},
+ * Bloc de paramÃ¨tres pour une table {@link GridCoverageTable}. Les blocs de paramÃ¨tres doivent
+ * Ãªtre immutables. Ce principe d'imutabilitÃ© s'applique aussi aux objets rÃ©fÃ©rencÃ©s par
+ * les champs publiques, mÃªme si ces objets sont en principe mutables ({@link Rectangle2D},
  * {@link Dimension2D}...).
  *
  * @version $Id$
@@ -47,23 +47,23 @@ import net.sicade.observation.coverage.Operation;
  */
 final class Parameters implements Serializable {
     /**
-     * Numéro de série (pour compatibilité avec des versions antérieures).
+     * NumÃ©ro de sÃ©rie (pour compatibilitÃ© avec des versions antÃ©rieures).
      */
     private static final long serialVersionUID = 6418640591318515042L;
 
     /**
-     * Réference vers la série d'images. Cette référence est construite à
-     * partir du champ ID dans la table "Series" de la base de données.
+     * RÃ©ference vers la sÃ©rie d'images. Cette rÃ©fÃ©rence est construite Ã 
+     * partir du champ ID dans la table "Series" de la base de donnÃ©es.
      */
     public final Series series;
 
     /**
-     * L'opération à appliquer sur les images lue, ou {@code null} s'il n'y en a aucune.
+     * L'opÃ©ration Ã  appliquer sur les images lue, ou {@code null} s'il n'y en a aucune.
      */
     public final Operation operation;
 
     /**
-     * Format à utiliser pour lire les images.
+     * Format Ã  utiliser pour lire les images.
      */
     public final FormatEntry format;
 
@@ -73,42 +73,42 @@ final class Parameters implements Serializable {
     public final String pathname;
 
     /**
-     * La partie temporelle de {@link #tableCRS}. Ne sera construit que la première fois
-     * où elle sera nécessaire.
+     * La partie temporelle de {@link #tableCRS}. Ne sera construit que la premiÃ¨re fois
+     * oÃ¹ elle sera nÃ©cessaire.
      */
     private transient DefaultTemporalCRS temporalCRS;
 
     /**
-     * Système de référence des coordonnées de la table. Le système de coordonnées de tête
-     * ("head") doit obligatoirement être un CRS horizontal. La seconde partie ("tail") sera
-     * ignorée; il s'agira typiquement de l'axe du temps ou de la profondeur.
+     * SystÃ¨me de rÃ©fÃ©rence des coordonnÃ©es de la table. Le systÃ¨me de coordonnÃ©es de tÃªte
+     * ("head") doit obligatoirement Ãªtre un CRS horizontal. La seconde partie ("tail") sera
+     * ignorÃ©e; il s'agira typiquement de l'axe du temps ou de la profondeur.
      */
     public final CoordinateReferenceSystem tableCRS;
 
     /**
-     * Système de référence des coordonnées de l'image. Ce sera habituellement
-     * (mais pas obligatoirement) le même que {@link #tableCRS}.
+     * SystÃ¨me de rÃ©fÃ©rence des coordonnÃ©es de l'image. Ce sera habituellement
+     * (mais pas obligatoirement) le mÃªme que {@link #tableCRS}.
      */
     public final CoordinateReferenceSystem coverageCRS;
 
     /**
-     * La transformation du système de références des coordonnées de la table
-     * ({@link #tableCRS}) vers le système de l'image ({@link #coverageCRS}).
+     * La transformation du systÃ¨me de rÃ©fÃ©rences des coordonnÃ©es de la table
+     * ({@link #tableCRS}) vers le systÃ¨me de l'image ({@link #coverageCRS}).
      */
     private transient MathTransform2D tableToCoverageCRS;
 
     /**
-     * Coordonnées horizontales de la région d'intéret.  Ces coordonnées
-     * sont exprimées selon la partie horizontale ("head") du système de
-     * coordonnées {@link #tableCRS}.
+     * CoordonnÃ©es horizontales de la rÃ©gion d'intÃ©ret.  Ces coordonnÃ©es
+     * sont exprimÃ©es selon la partie horizontale ("head") du systÃ¨me de
+     * coordonnÃ©es {@link #tableCRS}.
      */
     public final Rectangle2D geographicArea;
 
     /**
-     * Dimension logique désirée des pixels de l'images.   Cette information
+     * Dimension logique dÃ©sirÃ©e des pixels de l'images.   Cette information
      * n'est qu'approximative. Il n'est pas garantie que la lecture produira
-     * effectivement une image de cette résolution. Une valeur nulle signifie
-     * que la lecture doit se faire avec la meilleure résolution possible.
+     * effectivement une image de cette rÃ©solution. Une valeur nulle signifie
+     * que la lecture doit se faire avec la meilleure rÃ©solution possible.
      */
     public final Dimension2D resolution;
 
@@ -124,37 +124,37 @@ final class Parameters implements Serializable {
 
     /**
      * Encodage des noms de fichiers (typiquement {@code "UTF-8"}), ou {@code null} si aucun
-     * encodage ne doit être effectué.
+     * encodage ne doit Ãªtre effectuÃ©.
      */
     public final String encoding;
 
     /**
-     * Formatteur à utiliser pour écrire des dates pour l'utilisateur. Les caractères et
-     * les conventions linguistiques dépendront de la langue de l'utilisateur. Toutefois,
-     * le fuseau horaire devrait être celui de la région d'étude plutôt que celui du pays
+     * Formatteur Ã  utiliser pour Ã©crire des dates pour l'utilisateur. Les caractÃ¨res et
+     * les conventions linguistiques dÃ©pendront de la langue de l'utilisateur. Toutefois,
+     * le fuseau horaire devrait Ãªtre celui de la rÃ©gion d'Ã©tude plutÃ´t que celui du pays
      * de l'utilisateur.
      */
     private final DateFormat dateFormat;
 
     /**
-     * Construit un bloc de paramètres.
+     * Construit un bloc de paramÃ¨tres.
      *
-     * @param series Référence vers la série d'images.
-     * @param format Format à utiliser pour lire les images.
+     * @param series RÃ©fÃ©rence vers la sÃ©rie d'images.
+     * @param format Format Ã  utiliser pour lire les images.
      * @param pathname Chemin relatif des images.
-     * @param operation Opération à appliquer sur les images, ou {@code null}.
-     * @param tableCRS Système de référence des coordonnées de la table. Le système de
-     *        coordonnées de tête ("head") doit obligatoirement être un CRS horizontal.
-     * @param coverageCRS Système de référence des coordonnées de l'image. Ce sera
-     *        habituellement (mais pas obligatoirement) le même que {@link #tableCRS}.
-     * @param geographicArea Coordonnées horizontales de la région d'intéret,
-     *        dans le système de référence des coordonnées {@code tableCRS}.
-     * @param resolution Dimension logique approximative désirée des pixels,
-     *        ou {@code null} pour la meilleure résolution disponible.
-     *        Doit être exprimé dans le système de coordonnées {@code tableCRS}.
-     * @param dateFormat Formatteur à utiliser pour écrire des dates pour l'utilisateur.
-     * @param encoding Encodage des noms de fichiers, ou {@code null} si aucun encodage ne doit être
-     *        effectué.
+     * @param operation OpÃ©ration Ã  appliquer sur les images, ou {@code null}.
+     * @param tableCRS SystÃ¨me de rÃ©fÃ©rence des coordonnÃ©es de la table. Le systÃ¨me de
+     *        coordonnÃ©es de tÃªte ("head") doit obligatoirement Ãªtre un CRS horizontal.
+     * @param coverageCRS SystÃ¨me de rÃ©fÃ©rence des coordonnÃ©es de l'image. Ce sera
+     *        habituellement (mais pas obligatoirement) le mÃªme que {@link #tableCRS}.
+     * @param geographicArea CoordonnÃ©es horizontales de la rÃ©gion d'intÃ©ret,
+     *        dans le systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es {@code tableCRS}.
+     * @param resolution Dimension logique approximative dÃ©sirÃ©e des pixels,
+     *        ou {@code null} pour la meilleure rÃ©solution disponible.
+     *        Doit Ãªtre exprimÃ© dans le systÃ¨me de coordonnÃ©es {@code tableCRS}.
+     * @param dateFormat Formatteur Ã  utiliser pour Ã©crire des dates pour l'utilisateur.
+     * @param encoding Encodage des noms de fichiers, ou {@code null} si aucun encodage ne doit Ãªtre
+     *        effectuÃ©.
      */
     public Parameters(final Series                    series,
                       final FormatEntry               format,
@@ -184,7 +184,7 @@ final class Parameters implements Serializable {
     }
 
     /**
-     * Indique si ce bloc de paramètres est identique au bloc spécifié.
+     * Indique si ce bloc de paramÃ¨tres est identique au bloc spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object o) {
@@ -210,7 +210,7 @@ final class Parameters implements Serializable {
      * Retourne la partie temporelle de {@link #tableCRS}.
      */
     public DefaultTemporalCRS getTemporalCRS() {
-        // Pas besoin de synchroniser; ce n'est pas grave si le même CRS est construit deux fois.
+        // Pas besoin de synchroniser; ce n'est pas grave si le mÃªme CRS est construit deux fois.
         if (temporalCRS == null) {
             temporalCRS = DefaultTemporalCRS.wrap(CRSUtilities.getTemporalCRS(tableCRS));
         }
@@ -218,15 +218,15 @@ final class Parameters implements Serializable {
     }
 
     /**
-     * Projète le rectangle spécifié du système de références des coordonnées de la
-     * table ({@link #tableCRS}) vers le système de l'image ({@link #coverageCRS}).
+     * ProjÃ¨te le rectangle spÃ©cifiÃ© du systÃ¨me de rÃ©fÃ©rences des coordonnÃ©es de la
+     * table ({@link #tableCRS}) vers le systÃ¨me de l'image ({@link #coverageCRS}).
      *
-     * @param area Le rectangle à transformer.
-     * @param dest Le rectangle dans lequel écrire le résultat de la transformation,
-     *             <strong>SI</strong> une transformation était nécessaire. La valeur
-     *             {@code null} créera un nouveau rectangle si nécessaire.
-     * @return Le rectangle transformé, ou {@code area} (et non {@code dest}) si aucune
-     *         transformation n'était nécessaire.
+     * @param area Le rectangle Ã  transformer.
+     * @param dest Le rectangle dans lequel Ã©crire le rÃ©sultat de la transformation,
+     *             <strong>SI</strong> une transformation Ã©tait nÃ©cessaire. La valeur
+     *             {@code null} crÃ©era un nouveau rectangle si nÃ©cessaire.
+     * @return Le rectangle transformÃ©, ou {@code area} (et non {@code dest}) si aucune
+     *         transformation n'Ã©tait nÃ©cessaire.
      *
      * @todo Attention, getCRS2D ne tient pas compte des dimensions des GridCoverages
      */
@@ -250,7 +250,7 @@ final class Parameters implements Serializable {
     }
 
     /**
-     * Formate la date spécifiée.
+     * Formate la date spÃ©cifiÃ©e.
      */
     public String format(final Date date) {
         synchronized (dateFormat) {
@@ -259,7 +259,7 @@ final class Parameters implements Serializable {
     }
 
     /**
-     * Retourne un code représentant ce bloc de paramètres.
+     * Retourne un code reprÃ©sentant ce bloc de paramÃ¨tres.
      */
     @Override
     public int hashCode() {

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -48,23 +48,23 @@ import net.sicade.observation.coverage.LocationOffset;
 
 
 /**
- * Juxtapose des observations de différents types sur une même ligne. La première colonne pourrait
- * contenir par exemple des données de {@linkplain net.sicade.observation.fishery pêches}, et les
- * colonnes suivantes les valeurs de différents {@linkplain net.sicade.observation.coverage.Descriptor
- * descripteur du paysage océanique} aux positions de ces données de pêche. Cette classe interroge la
- * table {@code "Environments"} (ou une table équivalente) en la réarangeant d'une façon plus
- * appropriée pour l'analyse avec des logiciels statistiques. Les valeurs du paysage océanique
- * correspondant à un même échantillons (SST 5 jours avant, 10 jours avant, etc.) sont juxtaposées
- * sur une même ligne.
+ * Juxtapose des observations de diffÃ©rents types sur une mÃªme ligne. La premiÃ¨re colonne pourrait
+ * contenir par exemple des donnÃ©es de {@linkplain net.sicade.observation.fishery pÃªches}, et les
+ * colonnes suivantes les valeurs de diffÃ©rents {@linkplain net.sicade.observation.coverage.Descriptor
+ * descripteur du paysage ocÃ©anique} aux positions de ces donnÃ©es de pÃªche. Cette classe interroge la
+ * table {@code "Environments"} (ou une table Ã©quivalente) en la rÃ©arangeant d'une faÃ§on plus
+ * appropriÃ©e pour l'analyse avec des logiciels statistiques. Les valeurs du paysage ocÃ©anique
+ * correspondant Ã  un mÃªme Ã©chantillons (SST 5 jours avant, 10 jours avant, etc.) sont juxtaposÃ©es
+ * sur une mÃªme ligne.
  * <p>
- * Cette interrogation pourrait être faites dans un logiciel de base de données avec une requête
- * SQL classique. Mais cette requête est assez longue et très laborieuse à construire à la main.
- * Cette classe découpera cette requête monstre en une série de requêtes plus petites.
+ * Cette interrogation pourrait Ãªtre faites dans un logiciel de base de donnÃ©es avec une requÃªte
+ * SQL classique. Mais cette requÃªte est assez longue et trÃ¨s laborieuse Ã  construire Ã  la main.
+ * Cette classe dÃ©coupera cette requÃªte monstre en une sÃ©rie de requÃªtes plus petites.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @deprecated L'implémentation de cette classe n'est pas terminée. Il manque l'implémentation de
+ * @deprecated L'implÃ©mentation de cette classe n'est pas terminÃ©e. Il manque l'implÃ©mentation de
  *             {@link #getResultSet}.
  */
 public class MergedMeasurementTable extends Table {
@@ -76,32 +76,32 @@ public class MergedMeasurementTable extends Table {
     /**
      * Construit une nouvelle table.
      *
-     * @param database Connexion vers la base de données d'observations.
+     * @param database Connexion vers la base de donnÃ©es d'observations.
      */
     public MergedMeasurementTable(final Database database) {
         super(database);
     }
 
     /**
-     * Ajoute un observable à faire apparaître comme une colonne. Chaque objet {@code MergedMeasurementTable}
-     * nouvellement créé ne contient initialement qu'une seule colonne: le numéro ID des stations. Chaque appel
-     * à {@code add} ajoute une colonne. Cette colonne sera prise en compte lors du prochain appel de
-     * la méthode {@link #getResultSet}.
+     * Ajoute un observable Ã  faire apparaÃ®tre comme une colonne. Chaque objet {@code MergedMeasurementTable}
+     * nouvellement crÃ©Ã© ne contient initialement qu'une seule colonne: le numÃ©ro ID des stations. Chaque appel
+     * Ã  {@code add} ajoute une colonne. Cette colonne sera prise en compte lors du prochain appel de
+     * la mÃ©thode {@link #getResultSet}.
      *
-     * @param  observable pour la colonne à ajouter.
+     * @param  observable pour la colonne Ã  ajouter.
      */
     public final void add(final Observable observable) {
         add(observable, false);
     }
 
     /**
-     * Ajoute un observable à faire apparaître comme une colonne, en spécifiant si les valeurs
-     * nulles sont autorisées.
+     * Ajoute un observable Ã  faire apparaÃ®tre comme une colonne, en spÃ©cifiant si les valeurs
+     * nulles sont autorisÃ©es.
      *
-     * @param  observable pour la colonne à ajouter.
-     * @param  nullIncluded Indique si {@link #getResultSet} est autorisé à retourner des valeurs
-     *         nulles. La valeur par défaut est {@code false}, ce qui indique que tous les
-     *         enregistrements pour lesquels au moins un paramètre environnemental est manquant
+     * @param  observable pour la colonne Ã  ajouter.
+     * @param  nullIncluded Indique si {@link #getResultSet} est autorisÃ© Ã  retourner des valeurs
+     *         nulles. La valeur par dÃ©faut est {@code false}, ce qui indique que tous les
+     *         enregistrements pour lesquels au moins un paramÃ¨tre environnemental est manquant
      *         seront omis.
      */
     public synchronized void add(final Observable observable, final boolean nullIncluded) {
@@ -109,20 +109,20 @@ public class MergedMeasurementTable extends Table {
     }
 
     /**
-     * Retire un observable qui apparaissait comme une des colonnes. Cette méthode
-     * permet de retirer une colonne qui aurait été ajoutée précédement par un appel
-     * à <code>{@linkplain #add(Observable) add}(observable)</code>. Cette méthode
-     * ne fait rien si aucune colonne ne correspond à l'observable spécifié.
+     * Retire un observable qui apparaissait comme une des colonnes. Cette mÃ©thode
+     * permet de retirer une colonne qui aurait Ã©tÃ© ajoutÃ©e prÃ©cÃ©dement par un appel
+     * Ã  <code>{@linkplain #add(Observable) add}(observable)</code>. Cette mÃ©thode
+     * ne fait rien si aucune colonne ne correspond Ã  l'observable spÃ©cifiÃ©.
      *
-     * @param  observable pour la colonne à retirer.
+     * @param  observable pour la colonne Ã  retirer.
      */
     public synchronized void remove(final Observable observable) {
         observables.remove(observable);
     }
 
     /**
-     * Oublie tous les {@linkplain Observable observables} qui ont été déclarés avec
-     * la méthode {@link #add(Observable) add}.
+     * Oublie tous les {@linkplain Observable observables} qui ont Ã©tÃ© dÃ©clarÃ©s avec
+     * la mÃ©thode {@link #add(Observable) add}.
      */
     public synchronized void clear() {
         observables.clear();
@@ -130,16 +130,16 @@ public class MergedMeasurementTable extends Table {
 
     /**
      * Retourne le nombre d'{@linkplain Observable observables} dans cette table correspondant aux
-     * critères spécifiés. Si un ou plusieurs des arguments {@code phenomenon}, {@code procedure}
-     * ou {@code offset} est non-nul, alors cette méthode filtre les observables en ne comptant que
+     * critÃ¨res spÃ©cifiÃ©s. Si un ou plusieurs des arguments {@code phenomenon}, {@code procedure}
+     * ou {@code offset} est non-nul, alors cette mÃ©thode filtre les observables en ne comptant que
      * ceux qui correspondent aux arguments non-nuls. Par exemple {@code count(null,null,offset)}
-     * comptera tous les observables dont la position spatio-temporelle relative est égale à
+     * comptera tous les observables dont la position spatio-temporelle relative est Ã©gale Ã 
      * {@code offset}.
      *
-     * @param  phenomenon Phénomène à compter, ou {@code null} pour les compter tous.
+     * @param  phenomenon PhÃ©nomÃ¨ne Ã  compter, ou {@code null} pour les compter tous.
      * @param  procedure Si non-nul, alors seul les observables sur lesquelles on applique
-     *         cette procédure seront pris en compte.
-     * @param  offset Si non-nul, alors seul les observables à cette position relative seront
+     *         cette procÃ©dure seront pris en compte.
+     * @param  offset Si non-nul, alors seul les observables Ã  cette position relative seront
      *         pris en compte.
      */
     public synchronized int count(final Phenomenon phenomenon,
@@ -168,33 +168,33 @@ public class MergedMeasurementTable extends Table {
     }
 
     /**
-     * Retourne un itérateur qui parcourera l'ensemble des données sélectionnées. La première
-     * colonne de l'itérateur {@link ResultSet} contiendra le numéro identifiant les stations (ID).
+     * Retourne un itÃ©rateur qui parcourera l'ensemble des donnÃ©es sÃ©lectionnÃ©es. La premiÃ¨re
+     * colonne de l'itÃ©rateur {@link ResultSet} contiendra le numÃ©ro identifiant les stations (ID).
      * Toutes les colonnes suivantes contiendront les valeurs des {@linkplain Observable observables}
-     * qui auront été demandées par des appels de {@link #add(Observable) add(...)}.
+     * qui auront Ã©tÃ© demandÃ©es par des appels de {@link #add(Observable) add(...)}.
      * <p>
      * Note: <strong>Chaque objet {@code MergedMeasurementTable} ne maintient qu'un seul objet
-     *       {@code ResultSet} à la fois.</strong>  Si cette méthode est appelée plusieurs
-     *       fois, alors chaque nouvel appel fermera le {@link ResultSet} de l'appel précédent.
+     *       {@code ResultSet} Ã  la fois.</strong>  Si cette mÃ©thode est appelÃ©e plusieurs
+     *       fois, alors chaque nouvel appel fermera le {@link ResultSet} de l'appel prÃ©cÃ©dent.
      *
-     * @return Les données environnementales pour les captures.
+     * @return Les donnÃ©es environnementales pour les captures.
      *
-     * @todo Cette méthode n'est pas encore implémentée. Il faudrait construire ici une requête
-     *       qui enchaîne de nombreuses instruction {@code JOIN ON}, une pour chaque observable.
+     * @todo Cette mÃ©thode n'est pas encore implÃ©mentÃ©e. Il faudrait construire ici une requÃªte
+     *       qui enchaÃ®ne de nombreuses instruction {@code JOIN ON}, une pour chaque observable.
      */
     protected ResultSet getResultSet() throws SQLException {
-        throw new UnsupportedOperationException("Pas encore implémenté.");
+        throw new UnsupportedOperationException("Pas encore implÃ©mentÃ©.");
     }
 
     /**
-     * Affiche les enregistrements vers le flot spécifié.
-     * Cette méthode est surtout utile à des fins de vérification.
+     * Affiche les enregistrements vers le flot spÃ©cifiÃ©.
+     * Cette mÃ©thode est surtout utile Ã  des fins de vÃ©rification.
      *
      * @param  out Flot de sortie.
-     * @param  max Nombre maximal d'enregistrements à écrire.
-     * @return Nombre d'enregistrement écrits.
-     * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
-     * @throws IOException si une erreur est survenue lors de l'écriture.
+     * @param  max Nombre maximal d'enregistrements Ã  Ã©crire.
+     * @return Nombre d'enregistrement Ã©crits.
+     * @throws SQLException si une erreur est survenue lors de l'accÃ¨s Ã  la base de donnÃ©es.
+     * @throws IOException si une erreur est survenue lors de l'Ã©criture.
      */
     public synchronized int print(final Writer out, int max) throws SQLException, IOException {
         final ResultSet       result = getResultSet();
@@ -222,7 +222,7 @@ public class MergedMeasurementTable extends Table {
                 }
             }
             if (false) {
-                // Ajoute le code du type entre parenthèses.
+                // Ajoute le code du type entre parenthÃ¨ses.
                 final String code = String.valueOf(type);
                 out.write('(');
                 out.write(code);
@@ -270,15 +270,15 @@ public class MergedMeasurementTable extends Table {
     }
 
     /**
-     * Copie toutes les données de {@link #getRowSet} vers une table du nom
-     * spécifiée. Aucune table ne doit exister sous ce nom avant l'appel de
-     * cette méthode. Cette méthode construira elle-même la table nécessaire.
+     * Copie toutes les donnÃ©es de {@link #getRowSet} vers une table du nom
+     * spÃ©cifiÃ©e. Aucune table ne doit exister sous ce nom avant l'appel de
+     * cette mÃ©thode. Cette mÃ©thode construira elle-mÃªme la table nÃ©cessaire.
      *
-     * @param  connection La connection vers la base de données dans laquelle créer la table,
-     *         or {@code null} pour créer une table dans la base de données courante.
-     * @param  tableName Nom de la table à créer.
-     * @return Le nombre d'enregistrement copiés dans la nouvelle table.
-     * @throws SQLException si un accès à la base de données a échouée.
+     * @param  connection La connection vers la base de donnÃ©es dans laquelle crÃ©er la table,
+     *         or {@code null} pour crÃ©er une table dans la base de donnÃ©es courante.
+     * @param  tableName Nom de la table Ã  crÃ©er.
+     * @return Le nombre d'enregistrement copiÃ©s dans la nouvelle table.
+     * @throws SQLException si un accÃ¨s Ã  la base de donnÃ©es a Ã©chouÃ©e.
      */
     public synchronized int copyToTable(Connection connection, final String tableName)
             throws SQLException
@@ -309,14 +309,14 @@ public class MergedMeasurementTable extends Table {
                 buffer.append(meta.getColumnName(i+1));
                 buffer.append("\" ");
                 if (i == 0) {
-                    // TODO: Ce champ devrait probablement être une clé primaire...
+                    // TODO: Ce champ devrait probablement Ãªtre une clÃ© primaire...
                     buffer.append("INTEGER");
                 } else {
                     switch (meta.getColumnType(i+1)) {
                         case Types.DATE: // Fall through
                         case Types.TIME: // Fall through
                         case Types.TIMESTAMP: {
-                            // TODO: On aimerait déclarer que ce champ doit être indexé (avec doublons)...
+                            // TODO: On aimerait dÃ©clarer que ce champ doit Ãªtre indexÃ© (avec doublons)...
                             isDate[i] = true;
                             buffer.append("TIMESTAMP");
                             break;

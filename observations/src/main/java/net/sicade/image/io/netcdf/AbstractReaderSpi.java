@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import net.sicade.image.io.FileBasedReaderSpi;
 
 
 /**
- * Classe de base des fournisseurs de décodeurs d'images NetCDF.
+ * Classe de base des fournisseurs de dÃ©codeurs d'images NetCDF.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -45,19 +45,19 @@ public abstract class AbstractReaderSpi extends FileBasedReaderSpi {
     private static final String[] SUFFIXES = new String[] {"nc", "NC"};
 
     /**
-     * Le nom de la variable à lire.
+     * Le nom de la variable Ã  lire.
      */
     final String variable;
 
     /**
      * Construit une nouvelle instance de ce fournisseur de service.
      *
-     * @param variable Le nom de la variable à lire.
+     * @param variable Le nom de la variable Ã  lire.
      */
     public AbstractReaderSpi(final String variable) {
         names            = NAMES;
         suffixes         = SUFFIXES;
-        vendorName       = "Institut de Recherche pour le Développement";
+        vendorName       = "Institut de Recherche pour le DÃ©veloppement";
         version          = "1.0";
         pluginClassName  = "net.sicade.image.io.netcdf.DefaultReader";
         this.variable    = variable;
@@ -72,19 +72,19 @@ public abstract class AbstractReaderSpi extends FileBasedReaderSpi {
     }
 
     /**
-     * Vérifie si le flot spécifié semble être un fichier NetCDF lisible.
-     * Cette méthode tente simplement de lire les premiers octets du fichier.
-     * La valeur retournée par cette méthode n'est qu'à titre indicative.
-     * {@code true} n'implique pas que la lecture va forcément réussir,
+     * VÃ©rifie si le flot spÃ©cifiÃ© semble Ãªtre un fichier NetCDF lisible.
+     * Cette mÃ©thode tente simplement de lire les premiers octets du fichier.
+     * La valeur retournÃ©e par cette mÃ©thode n'est qu'Ã  titre indicative.
+     * {@code true} n'implique pas que la lecture va forcÃ©ment rÃ©ussir,
      * et {@code false} n'implique pas que la lecture va obligatoirement
-     * échouer.
+     * Ã©chouer.
      *
-     * @param  source Source dont on veut tester la lisibilité.
-     * @return {@code true} si la source <u>semble</u> être lisible.
+     * @param  source Source dont on veut tester la lisibilitÃ©.
+     * @return {@code true} si la source <u>semble</u> Ãªtre lisible.
      * @throws IOException si une erreur est survenue lors de la lecture.
      */
     public boolean canDecodeInput(final Object source) throws IOException {
-        // TODO: Effectuer la vérification en utilisant NetcdfFileCache.acquire(...)
+        // TODO: Effectuer la vÃ©rification en utilisant NetcdfFileCache.acquire(...)
         return true;
     }
 }

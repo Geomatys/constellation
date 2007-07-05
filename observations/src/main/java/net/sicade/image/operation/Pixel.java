@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,14 +20,14 @@ package net.sicade.image.operation;
 
 
 /**
- * Valeur et coordonnées d'un pixel.
+ * Valeur et coordonnÃ©es d'un pixel.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class Pixel implements Comparable<Pixel> {
     /**
-     * Coordonnées du pixel.
+     * CoordonnÃ©es du pixel.
      */
     int x,y;
 
@@ -37,21 +37,21 @@ final class Pixel implements Comparable<Pixel> {
     double value;
 
     /**
-     * Construit un nouveau pixel initialisé à 0.
+     * Construit un nouveau pixel initialisÃ© Ã  0.
      */
     Pixel() {
     }
 
     /**
-     * Compare ce pixel avec le pixel spécifié.
+     * Compare ce pixel avec le pixel spÃ©cifiÃ©.
      */
     public int compareTo(final Pixel other) {
         return Double.compare(value, other.value);
     }
 
     /**
-     * Retourne une représentation de ce pixel sous forme de chaîne de caractère.
-     * Utilisé qu'à des fins de déboguages.
+     * Retourne une reprÃ©sentation de ce pixel sous forme de chaÃ®ne de caractÃ¨re.
+     * UtilisÃ© qu'Ã  des fins de dÃ©boguages.
      */
     @Override
     public String toString() {

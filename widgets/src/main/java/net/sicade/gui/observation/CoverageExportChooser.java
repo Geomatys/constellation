@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ import javax.swing.event.EventListenerList;
 import java.util.Date;
 import java.util.Locale;
 
-// Entrés/sorties
+// EntrÃ©s/sorties
 import java.io.File;
 import java.io.Writer;
 import java.io.FileWriter;
@@ -83,7 +83,7 @@ import net.sicade.resources.seagis.ResourceKeys;
 
 
 /**
- * Boîte de dialogue invitant l'utilisateur à sélectionner un répertoire
+ * BoÃ®te de dialogue invitant l'utilisateur Ã  sÃ©lectionner un rÃ©pertoire
  * de destination et un format d'image.
  *
  * <p>&nbsp;</p>
@@ -95,30 +95,30 @@ import net.sicade.resources.seagis.ResourceKeys;
  */
 public final class CoverageExportChooser extends JPanel {
     /**
-     * Objet à utiliser pour sélectionner un répertoire de destination.
+     * Objet Ã  utiliser pour sÃ©lectionner un rÃ©pertoire de destination.
      */
     private final JFileChooser chooser;
 
     /**
-     * Ensemble des images à écrire. L'ordre des éléments doit être préservés.
+     * Ensemble des images Ã  Ã©crire. L'ordre des Ã©lÃ©ments doit Ãªtre prÃ©servÃ©s.
      */
     private final Set<CoverageReference> entries = new LinkedHashSet<CoverageReference>(256);
 
     /**
-     * Etiquette indiquant le nombre d'images à exporter.
+     * Etiquette indiquant le nombre d'images Ã  exporter.
      */
     private final JLabel count = new JLabel();
 
     /**
-     * Resources pour la construction des étiquettes.
+     * Resources pour la construction des Ã©tiquettes.
      */
     private final Resources resources = Resources.getResources(getLocale());
 
     /**
-     * Construit une boîte de dialogue.
+     * Construit une boÃ®te de dialogue.
      *
-     * @param directory Répertoire de destination par défaut, ou {@code null}
-     *                  pour utiliser le répertoire du compte de l'utilisateur.
+     * @param directory RÃ©pertoire de destination par dÃ©faut, ou {@code null}
+     *                  pour utiliser le rÃ©pertoire du compte de l'utilisateur.
      */
     public CoverageExportChooser(final File directory) {
         super(new GridBagLayout());
@@ -127,7 +127,7 @@ public final class CoverageExportChooser extends JPanel {
         count.setForeground(Color.YELLOW);
         count.setHorizontalAlignment(SwingConstants.CENTER);
         ///
-        /// Configure le paneau servant à choisir un répertoire.
+        /// Configure le paneau servant Ã  choisir un rÃ©pertoire.
         ///
         chooser = new JFileChooser(directory);
         chooser.setDialogType(JFileChooser.SAVE_DIALOG);
@@ -163,7 +163,7 @@ public final class CoverageExportChooser extends JPanel {
     }
 
     /**
-     * Met à jour l'étiquette qui indique le nombre d'images à exporter.
+     * Met Ã  jour l'Ã©tiquette qui indique le nombre d'images Ã  exporter.
      */
     private void updateCount() {
         count.setText(resources.getString(ResourceKeys.COVERAGES_TO_EXPORT_COUNT_$1,
@@ -171,9 +171,9 @@ public final class CoverageExportChooser extends JPanel {
     }
 
     /**
-     * Ajoute les entrées spécifiées à la liste des images à écrire. Les
-     * images seront écrites dans l'ordre qu'elles apparaissent dans le
-     * tableau {@code entries}. Toutefois, les doublons seront ignorés.
+     * Ajoute les entrÃ©es spÃ©cifiÃ©es Ã  la liste des images Ã  Ã©crire. Les
+     * images seront Ã©crites dans l'ordre qu'elles apparaissent dans le
+     * tableau {@code entries}. Toutefois, les doublons seront ignorÃ©s.
      */
     public synchronized void addEntries(final CoverageReference[] entries)  {
         for (int i=0; i<entries.length; i++) {
@@ -183,7 +183,7 @@ public final class CoverageExportChooser extends JPanel {
     }
 
     /**
-     * Retire les entrées spécifiées de la liste des images à écrire.
+     * Retire les entrÃ©es spÃ©cifiÃ©es de la liste des images Ã  Ã©crire.
      */
     public synchronized void removeEntries(final CoverageReference[] entries) {
         for (int i=entries.length; --i>=0;) {
@@ -193,7 +193,7 @@ public final class CoverageExportChooser extends JPanel {
     }
 
     /**
-     * Retire toutes les entrées de la liste des images à écrire.
+     * Retire toutes les entrÃ©es de la liste des images Ã  Ã©crire.
      */
     public synchronized void removeAllEntries() {
         entries.clear();
@@ -201,34 +201,34 @@ public final class CoverageExportChooser extends JPanel {
     }
 
     /**
-     * Retourne les entrées des images qui seront à écrire.
+     * Retourne les entrÃ©es des images qui seront Ã  Ã©crire.
      */
     public synchronized CoverageReference[] getEntries() {
         return entries.toArray(new CoverageReference[entries.size()]);
     }
 
     /**
-     * Retourne le répertoire dans lequel écrire les images. Ce répertoire a
-     * été spécifiée lors de la construction de cet objet, mais peut avoir été
-     * modifié par l'utilisateur.
+     * Retourne le rÃ©pertoire dans lequel Ã©crire les images. Ce rÃ©pertoire a
+     * Ã©tÃ© spÃ©cifiÃ©e lors de la construction de cet objet, mais peut avoir Ã©tÃ©
+     * modifiÃ© par l'utilisateur.
      */
     public File getDestinationDirectory() {
         return chooser.getSelectedFile();
     }
 
     /**
-     * Fait apparaître la boîte de dialogue. Si l'utilisateur n'a pas annulé
-     * l'opération en cours de route, l'exportation des images sera lancée
-     * dans un thread en arrière-plan. Cette méthode peut donc retourner pendant
-     * que les exportations sont en cours. Les progrès seront affichées dans
-     * une fenêtre.
+     * Fait apparaÃ®tre la boÃ®te de dialogue. Si l'utilisateur n'a pas annulÃ©
+     * l'opÃ©ration en cours de route, l'exportation des images sera lancÃ©e
+     * dans un thread en arriÃ¨re-plan. Cette mÃ©thode peut donc retourner pendant
+     * que les exportations sont en cours. Les progrÃ¨s seront affichÃ©es dans
+     * une fenÃªtre.
      *
-     * @param  owner Composante parente dans laquelle faire apparaître la
-     *         boîte de dialogue, ou {@code null} s'il n'y en a pas.
+     * @param  owner Composante parente dans laquelle faire apparaÃ®tre la
+     *         boÃ®te de dialogue, ou {@code null} s'il n'y en a pas.
      * @param  threadGroup Groupe de threads dans lequel placer celui qu'on
      *         va lancer.
-     * @return {@code true} si l'utilisateur a lancé les exportations,
-     *         ou {@code false} s'il a annulé l'opération.
+     * @return {@code true} si l'utilisateur a lancÃ© les exportations,
+     *         ou {@code false} s'il a annulÃ© l'opÃ©ration.
      */
     public boolean showDialogAndStart(final Component owner, final ThreadGroup threadGroup) {
         while (SwingUtilities.showOptionDialog(owner, this, chooser.getDialogTitle())) {
@@ -246,78 +246,78 @@ public final class CoverageExportChooser extends JPanel {
     }
 
     /**
-     * Classe ayant la charge d'exporter les images en arrière plan.  Le constructeur de cette
-     * classe fait une copie de tous les paramètres pertinents de {@link CoverageExportChooser},
-     * tels qu'ils étaient au moment de la construction. Par la suite, aucune référence vers
-     * {@link CoverageExportChooser} n'est conservée.
+     * Classe ayant la charge d'exporter les images en arriÃ¨re plan.  Le constructeur de cette
+     * classe fait une copie de tous les paramÃ¨tres pertinents de {@link CoverageExportChooser},
+     * tels qu'ils Ã©taient au moment de la construction. Par la suite, aucune rÃ©fÃ©rence vers
+     * {@link CoverageExportChooser} n'est conservÃ©e.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Worker implements Runnable, IIOReadWarningListener {
         /**
-         * Fenêtre dans laquelle écrire les progrès de l'opération.
-         * Cette fenêtre ne sera créée que la première fois où elle
-         * sera nécessaire.
+         * FenÃªtre dans laquelle Ã©crire les progrÃ¨s de l'opÃ©ration.
+         * Cette fenÃªtre ne sera crÃ©Ã©e que la premiÃ¨re fois oÃ¹ elle
+         * sera nÃ©cessaire.
          */
         private ProgressListener progress;
 
         /**
-         * Encodeur à utiliser pour écrire les images. Cet encodeur
-         * ne sera créé que lorsque les écritures d'images démarreront.
+         * Encodeur Ã  utiliser pour Ã©crire les images. Cet encodeur
+         * ne sera crÃ©Ã© que lorsque les Ã©critures d'images dÃ©marreront.
          */
         private ImageWriter writer;
 
         /**
-         * Entré en cours de lecture, ou {@code null}
+         * EntrÃ© en cours de lecture, ou {@code null}
          * s'il n'y en a pas encore.
          */
         private CoverageReference current;
 
         /**
-         * Liste des images à écrire.
+         * Liste des images Ã  Ã©crire.
          */
         private final CoverageReference[] entries;
 
         /**
-         * Répertoire de destination dans lequel
-         * seront écrites les images.
+         * RÃ©pertoire de destination dans lequel
+         * seront Ã©crites les images.
          */
         private final File directory;
 
         /**
          * Extension des fichiers d'images. Cette extension remplacera l'extension des
-         * fichiers d'images sources. La chaîne de caractères {@code extension}
-         * ne doit pas commencer par un point. Ce champ peut être {@code null}
-         * s'il n'y a pas d'extension connue pour le type de fichier à écrire.
+         * fichiers d'images sources. La chaÃ®ne de caractÃ¨res {@code extension}
+         * ne doit pas commencer par un point. Ce champ peut Ãªtre {@code null}
+         * s'il n'y a pas d'extension connue pour le type de fichier Ã  Ã©crire.
          */
         private final String extension;
 
         /**
-         * Objet qui avait la charge de filtrer les fichiers à afficher dans la
-         * boîte de dialogue. Cet objet connaît le format choisit par l'utilisateur
-         * et est capable de construire l'encodeur {@link ImageWriter} approprié.
+         * Objet qui avait la charge de filtrer les fichiers Ã  afficher dans la
+         * boÃ®te de dialogue. Cet objet connaÃ®t le format choisit par l'utilisateur
+         * et est capable de construire l'encodeur {@link ImageWriter} appropriÃ©.
          */
         private final ImageFileFilter filter;
 
         /**
-         * Buffer temporaire. Ce buffer est utilisé pour construire
+         * Buffer temporaire. Ce buffer est utilisÃ© pour construire
          * chacun des noms de fichier de destination des images.
          */
         private final StringBuilder buffer = new StringBuilder();
 
         /**
-         * Objet {@link MetadataBuilder} à utiliser pour écrire les propriétés d'un {@link GridCoverage2D}.
+         * Objet {@link MetadataBuilder} Ã  utiliser pour Ã©crire les propriÃ©tÃ©s d'un {@link GridCoverage2D}.
          */
         private transient MetadataBuilder propertyParser;
 
         /**
-         * Construit un objet qui procèdera aux écritures des images en arrière plan.
-         * Ce constructeur fera une copie des paramètres de la boîte de dialogue
-         * {@link CoverageExportChooser} spécifiée.
+         * Construit un objet qui procÃ¨dera aux Ã©critures des images en arriÃ¨re plan.
+         * Ce constructeur fera une copie des paramÃ¨tres de la boÃ®te de dialogue
+         * {@link CoverageExportChooser} spÃ©cifiÃ©e.
          *
-         * @param chooser Boîte de dialogue qui demandait à l'utilisateur
-         *        de choisir un répertoire de destination ainsi qu'un format.
+         * @param chooser BoÃ®te de dialogue qui demandait Ã  l'utilisateur
+         *        de choisir un rÃ©pertoire de destination ainsi qu'un format.
          */
         public Worker(final CoverageExportChooser chooser) {
             synchronized (chooser) {
@@ -329,14 +329,14 @@ public final class CoverageExportChooser extends JPanel {
         }
 
         /**
-         * Retourne le nom et le chemin du fichier de destination pour l'image spécifiée.
+         * Retourne le nom et le chemin du fichier de destination pour l'image spÃ©cifiÃ©e.
          */
         private File getDestinationFile(final int index) {
             return getDestinationFile(index, extension);
         }
 
         /**
-         * Retourne le nom et le chemin du fichier de destination pour l'image spécifiée.
+         * Retourne le nom et le chemin du fichier de destination pour l'image spÃ©cifiÃ©e.
          */
         private File getDestinationFile(final int index, final String extension) {
             File file = entries[index].getFile();
@@ -358,16 +358,16 @@ public final class CoverageExportChooser extends JPanel {
         }
 
         /**
-         * Vérifie si les images peuvent être écrites dans le répertoire choisi. Cette méthode
-         * vérifie d'abord si le répertoire est valide. Elle vérifie ensuite si le répertoire
-         * contient déjà des images qui risquent d'être écrasées. Si c'est le cas, alors cette
-         * méthode fait apparaître une boîte de dialogue qui demande à l'utilisateur de confirmer
-         * les écrasements. Cette méthode devrait toujours être appelée avant de lancer les exportations
+         * VÃ©rifie si les images peuvent Ãªtre Ã©crites dans le rÃ©pertoire choisi. Cette mÃ©thode
+         * vÃ©rifie d'abord si le rÃ©pertoire est valide. Elle vÃ©rifie ensuite si le rÃ©pertoire
+         * contient dÃ©jÃ  des images qui risquent d'Ãªtre Ã©crasÃ©es. Si c'est le cas, alors cette
+         * mÃ©thode fait apparaÃ®tre une boÃ®te de dialogue qui demande Ã  l'utilisateur de confirmer
+         * les Ã©crasements. Cette mÃ©thode devrait toujours Ãªtre appelÃ©e avant de lancer les exportations
          * des fichiers.
          *
-         * @param  owner Composante parente dans laquelle faire apparaître les éventuelles boîtes de dialogue.
-         * @return {@code true} si on peut procéder aux écritures des images, ou {@code false} si
-         *         l'utilisateur a demandé à arrêter l'opération.
+         * @param  owner Composante parente dans laquelle faire apparaÃ®tre les Ã©ventuelles boÃ®tes de dialogue.
+         * @return {@code true} si on peut procÃ©der aux Ã©critures des images, ou {@code false} si
+         *         l'utilisateur a demandÃ© Ã  arrÃªter l'opÃ©ration.
          */
         public boolean getUserConfirmation(final Component owner) {
             final Resources resources = Resources.getResources(owner.getLocale());
@@ -393,15 +393,15 @@ public final class CoverageExportChooser extends JPanel {
         }
 
         /**
-         * Démarre les exportations d'images. Cette méthode fait apparaître une fenêtre
-         * dans laquelle seront affichées les progrès de l'opération. Elle appèle ensuite
-         * {@link #run} dans un thread séparé, afin de faire les écritures en arrière plan.
-         * <strong>Plus aucune autre méthode de {@code Worker} ne devrait être appelée
-         * après {@code start}.</strong>
+         * DÃ©marre les exportations d'images. Cette mÃ©thode fait apparaÃ®tre une fenÃªtre
+         * dans laquelle seront affichÃ©es les progrÃ¨s de l'opÃ©ration. Elle appÃ¨le ensuite
+         * {@link #run} dans un thread sÃ©parÃ©, afin de faire les Ã©critures en arriÃ¨re plan.
+         * <strong>Plus aucune autre mÃ©thode de {@code Worker} ne devrait Ãªtre appelÃ©e
+         * aprÃ¨s {@code start}.</strong>
          *
          * @param  threadGroup Groupe de threads dans lequel placer celui qu'on va lancer.
-         * @param  owner Composante parente dans laquelle faire apparaître la fenêtre des progrès.
-         * @throws IOException si une erreur a empêché le démarrage des exportations.
+         * @param  owner Composante parente dans laquelle faire apparaÃ®tre la fenÃªtre des progrÃ¨s.
+         * @throws IOException si une erreur a empÃªchÃ© le dÃ©marrage des exportations.
          */
         public void start(final ThreadGroup threadGroup, final Component owner) throws IOException {
             final Resources resources = Resources.getResources(owner.getLocale());
@@ -413,10 +413,10 @@ public final class CoverageExportChooser extends JPanel {
         }
 
         /**
-         * Procède aux exportations d'images. Si une erreur survient en cours de route,
-         * un avertissement sera écrit dans la fenêtre des progrès. N'appelez pas cette
-         * méthode directement. Appelez plutôt {@link #start}, qui se chargera d'appeller
-         * {@code run()} dans un thread en arrière-plan.
+         * ProcÃ¨de aux exportations d'images. Si une erreur survient en cours de route,
+         * un avertissement sera Ã©crit dans la fenÃªtre des progrÃ¨s. N'appelez pas cette
+         * mÃ©thode directement. Appelez plutÃ´t {@link #start}, qui se chargera d'appeller
+         * {@code run()} dans un thread en arriÃ¨re-plan.
          */
         public void run() {
             final IIOListeners listeners = new IIOListeners();
@@ -460,7 +460,7 @@ public final class CoverageExportChooser extends JPanel {
         }
         
         /**
-         * Méthode appelée automatiquement lorsqu'un avertissement
+         * MÃ©thode appelÃ©e automatiquement lorsqu'un avertissement
          * est survenu pendant la lecture d'une image.
          */
         public void warningOccurred(final ImageReader source, final String warning) {
@@ -476,11 +476,11 @@ public final class CoverageExportChooser extends JPanel {
         }
 
         /**
-         * Ecrit les propriétés de l'image spécifiée. L'implémentation par défaut écrit les coordonnées
-         * géographiques des quatres coins de l'image, sa taille, nombre de bandes, etc.
+         * Ecrit les propriÃ©tÃ©s de l'image spÃ©cifiÃ©e. L'implÃ©mentation par dÃ©faut Ã©crit les coordonnÃ©es
+         * gÃ©ographiques des quatres coins de l'image, sa taille, nombre de bandes, etc.
          *
-         * @param coverage L'image pour laquelle écrire les propriétés.
-         * @param file Le fichier de destination. Ca sera généralement un fichier avec l'extension
+         * @param coverage L'image pour laquelle Ã©crire les propriÃ©tÃ©s.
+         * @param file Le fichier de destination. Ca sera gÃ©nÃ©ralement un fichier avec l'extension
          *             <code>".txt"</code>.
          */
         protected void writeProperties(final GridCoverage2D coverage, final File file) throws IOException {
@@ -488,16 +488,16 @@ public final class CoverageExportChooser extends JPanel {
                 propertyParser = new MetadataBuilder();
                 propertyParser.setFormatPattern(Date.class, "yyyy/MM/dd HH:mm zz");
                 propertyParser.setFormatPattern(Number.class, "#0.######");
-                propertyParser.addAlias(MetadataBuilder.Z_MINIMUM,    "Date de début");
+                propertyParser.addAlias(MetadataBuilder.Z_MINIMUM,    "Date de dÃ©but");
                 propertyParser.addAlias(MetadataBuilder.Z_MAXIMUM,    "Date de fin");
                 propertyParser.addAlias(MetadataBuilder.PROJECTION,   "Projection");
-                propertyParser.addAlias(MetadataBuilder.ELLIPSOID,    "Ellipsoïde");
+                propertyParser.addAlias(MetadataBuilder.ELLIPSOID,    "EllipsoÃ¯de");
                 propertyParser.addAlias(MetadataBuilder.Y_MAXIMUM,    "Limite Nord");
                 propertyParser.addAlias(MetadataBuilder.Y_MINIMUM,    "Limite Sud");
                 propertyParser.addAlias(MetadataBuilder.X_MAXIMUM,    "Limite Est");
                 propertyParser.addAlias(MetadataBuilder.X_MINIMUM,    "Limite Ouest");
-                propertyParser.addAlias(MetadataBuilder.Y_RESOLUTION, "Résolution en latitude");
-                propertyParser.addAlias(MetadataBuilder.X_RESOLUTION, "Résolution en longitude");
+                propertyParser.addAlias(MetadataBuilder.Y_RESOLUTION, "RÃ©solution en latitude");
+                propertyParser.addAlias(MetadataBuilder.X_RESOLUTION, "RÃ©solution en longitude");
                 propertyParser.addAlias(MetadataBuilder.WIDTH,        "Largeur (en pixels)");
                 propertyParser.addAlias(MetadataBuilder.HEIGHT,       "Hauteur (en pixels)");
             }

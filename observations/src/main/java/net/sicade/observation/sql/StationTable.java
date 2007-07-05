@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -55,11 +55,11 @@ import net.sicade.observation.CatalogException;
  */
 public class StationTable extends SingletonTable<Station> implements NumericAccess {
     /**
-     * Requête SQL pour obtenir une station à partir de son identifiant.
+     * RequÃªte SQL pour obtenir une station Ã  partir de son identifiant.
      *
      * @todo L'utilisation d'une clause {@code LIKE %} ne retourne pas les lignes dont la valeur est
-     *       nulle. C'est embêtant lorsque la recherche est faite sur la colonne {@code platform},
-     *       ce qui ce produit dans le cas {@code LIST} de la méthode {@link #getQuery}.
+     *       nulle. C'est embÃªtant lorsque la recherche est faite sur la colonne {@code platform},
+     *       ce qui ce produit dans le cas {@code LIST} de la mÃ©thode {@link #getQuery}.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Stations:SELECT",
             "SELECT identifier AS name, identifier, platform, quality, provider, \"startTime\", \"endTime\", x, y\n" +
@@ -67,44 +67,44 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
             " WHERE name LIKE ?\n"           +
             " ORDER BY identifier");
 
-    /** Numéro d'argument. */ private static final int  ARGUMENT_PLATFORM = 1;
+    /** NumÃ©ro d'argument. */ private static final int  ARGUMENT_PLATFORM = 1;
 
-    /** Numéro de colonne. */ private static final int  NAME       = 1;
-    /** Numéro de colonne. */ private static final int  IDENTIFIER = 2;
-    /** Numéro de colonne. */ private static final int  PLATFORM   = 3;
-    /** Numéro de colonne. */ private static final int  QUALITY    = 4;
-    /** Numéro de colonne. */ private static final int  PROVIDER   = 5;
-    /** Numéro de colonne. */ private static final int  START_TIME = 6;
-    /** Numéro de colonne. */ private static final int  END_TIME   = 7;
-    /** Numéro de colonne. */ private static final int  LONGITUDE  = 8;
-    /** Numéro de colonne. */ private static final int  LATITUDE   = 9;
+    /** NumÃ©ro de colonne. */ private static final int  NAME       = 1;
+    /** NumÃ©ro de colonne. */ private static final int  IDENTIFIER = 2;
+    /** NumÃ©ro de colonne. */ private static final int  PLATFORM   = 3;
+    /** NumÃ©ro de colonne. */ private static final int  QUALITY    = 4;
+    /** NumÃ©ro de colonne. */ private static final int  PROVIDER   = 5;
+    /** NumÃ©ro de colonne. */ private static final int  START_TIME = 6;
+    /** NumÃ©ro de colonne. */ private static final int  END_TIME   = 7;
+    /** NumÃ©ro de colonne. */ private static final int  LONGITUDE  = 8;
+    /** NumÃ©ro de colonne. */ private static final int  LATITUDE   = 9;
 
     /**
      * Connexion vers la table permettant d'obtenir les trajectoires des stations. Une table par
-     * défaut sera construite la première fois où elle sera nécessaire.
+     * dÃ©faut sera construite la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private LocationTable locations;
 
     /**
-     * Connexion vers la table des plateformes. Une table par défaut sera construite la première
-     * fois où elle sera nécessaire.
+     * Connexion vers la table des plateformes. Une table par dÃ©faut sera construite la premiÃ¨re
+     * fois oÃ¹ elle sera nÃ©cessaire.
      */
     private PlatformTable platforms;
 
     /**
-     * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
-     * sera construite la première fois où elle sera nécessaire.
+     * Connexion vers la table des mÃ©ta-donnÃ©es. Une table par dÃ©faut (Ã©ventuellement partagÃ©e)
+     * sera construite la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private MetadataTable metadata;
 
     /**
      * Connexion vers la table des observations.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private ObservationTable<? extends Observation> observations;
 
     /**
-     * La plateforme recherchée, ou {@code null} pour rechercher les stations de toutes les
+     * La plateforme recherchÃ©e, ou {@code null} pour rechercher les stations de toutes les
      * plateformes.
      */
     private Platform platform;
@@ -116,8 +116,8 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     private Set<Citation> providers;
 
     /**
-     * {@code true} si l'on autorise cette classe à construire des objets {@link StationEntry}
-     * qui contiennent moins d'informations, afin de réduire le nombre de requêtes SQL. Utile
+     * {@code true} si l'on autorise cette classe Ã  construire des objets {@link StationEntry}
+     * qui contiennent moins d'informations, afin de rÃ©duire le nombre de requÃªtes SQL. Utile
      * si l'on souhaite obtenir une {@linkplain #getEntries liste de nombreuses stations}.
      */
     private boolean abridged;
@@ -130,11 +130,11 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Définie la table des plateformes à utiliser. Cette méthode peut être appelée par {@link PlatformTable}
-     * immédiatement après la construction de {@code StationTable} et avant toute première utilisation.
+     * DÃ©finie la table des plateformes Ã  utiliser. Cette mÃ©thode peut Ãªtre appelÃ©e par {@link PlatformTable}
+     * immÃ©diatement aprÃ¨s la construction de {@code StationTable} et avant toute premiÃ¨re utilisation.
      *
-     * @param  platforms Table des plateformes à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des plateformes.
+     * @param  platforms Table des plateformes Ã  utiliser.
+     * @throws IllegalStateException si cette instance utilise dÃ©jÃ  une autre table des plateformes.
      */
     protected synchronized void setPlatformTable(final PlatformTable platforms)
             throws IllegalStateException
@@ -143,17 +143,17 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
             if (this.platforms != null) {
                 throw new IllegalStateException();
             }
-            this.platforms = platforms; // Doit être avant tout appel de setTable(this).
+            this.platforms = platforms; // Doit Ãªtre avant tout appel de setTable(this).
             platforms.setStationTable(this);
         }
     }
 
     /**
-     * Définie la table des observations à utiliser. Cette méthode peut être appelée par
-     * {@link ObservationTable} avant toute première utilisation de {@code StationTable}.
+     * DÃ©finie la table des observations Ã  utiliser. Cette mÃ©thode peut Ãªtre appelÃ©e par
+     * {@link ObservationTable} avant toute premiÃ¨re utilisation de {@code StationTable}.
      *
-     * @param  platforms Table des observations à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des observations.
+     * @param  platforms Table des observations Ã  utiliser.
+     * @throws IllegalStateException si cette instance utilise dÃ©jÃ  une autre table des observations.
      */
     protected synchronized void setObservationTable(final ObservationTable<? extends Observation> observations)
             throws IllegalStateException
@@ -162,13 +162,13 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
             if (this.observations != null) {
                 throw new IllegalStateException();
             }
-            this.observations = observations; // Doit être avant tout appel de setTable(this).
+            this.observations = observations; // Doit Ãªtre avant tout appel de setTable(this).
             observations.setStationTable(this);
         }
     }
 
     /**
-     * Retourne la table des positions à utiliser pour la création des objets {@link StationEntry}.
+     * Retourne la table des positions Ã  utiliser pour la crÃ©ation des objets {@link StationEntry}.
      */
     final LocationTable getLocationTable() {
         assert Thread.holdsLock(this);
@@ -179,7 +179,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Retourne la table des observations à utiliser pour la création des objets {@link StationEntry}.
+     * Retourne la table des observations Ã  utiliser pour la crÃ©ation des objets {@link StationEntry}.
      */
     final ObservationTable<? extends Observation> getObservationTable() {
         assert Thread.holdsLock(this);
@@ -190,7 +190,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Retourne la {@linkplain Platform platforme} des stations désirées. La valeur {@code null}
+     * Retourne la {@linkplain Platform platforme} des stations dÃ©sirÃ©es. La valeur {@code null}
      * signifie que cette table recherche les stations de toutes les plateformes.
      */
     public final Platform getPlatform() {
@@ -198,9 +198,9 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Définit la {@linkplain Platform platforme} des stations désirées. Les prochains appels à la
-     * méthode {@link #getEntries() getEntries()} ne retourneront que les stations de cette plateforme.
-     * La valeur {@code null} retire la contrainte des plateformes (c'est-à-dire que cette table
+     * DÃ©finit la {@linkplain Platform platforme} des stations dÃ©sirÃ©es. Les prochains appels Ã  la
+     * mÃ©thode {@link #getEntries() getEntries()} ne retourneront que les stations de cette plateforme.
+     * La valeur {@code null} retire la contrainte des plateformes (c'est-Ã -dire que cette table
      * recherchera les stations de toutes les plateformes).
      */
     public synchronized void setPlatform(final Platform platform) {
@@ -211,9 +211,9 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Indique que les stations en provenance du fournisseur de données spécifié sont acceptables.
-     * Toutes les stations qui ne proviennent pas de ce fournisseur ou d'un fournisseur spécifié
-     * lors d'un appel précédent de cette méthode ne seront pas retenues par la méthode
+     * Indique que les stations en provenance du fournisseur de donnÃ©es spÃ©cifiÃ© sont acceptables.
+     * Toutes les stations qui ne proviennent pas de ce fournisseur ou d'un fournisseur spÃ©cifiÃ©
+     * lors d'un appel prÃ©cÃ©dent de cette mÃ©thode ne seront pas retenues par la mÃ©thode
      * {@link #getEntries}.
      */
     public synchronized void acceptableProvider(final Citation provider) {
@@ -226,10 +226,10 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Indique que les stations en provenance du fournisseur de données spécifié sont acceptables.
-     * Cette méthode est similaire à celle du même nom qui attend un objet {@link Citation} en
-     * argument, excepté qu'elle tentera de déterminer le fournisseur à partir d'une chaîne de
-     * caractères qui peut être une clé primaire dans la base de données.
+     * Indique que les stations en provenance du fournisseur de donnÃ©es spÃ©cifiÃ© sont acceptables.
+     * Cette mÃ©thode est similaire Ã  celle du mÃªme nom qui attend un objet {@link Citation} en
+     * argument, exceptÃ© qu'elle tentera de dÃ©terminer le fournisseur Ã  partir d'une chaÃ®ne de
+     * caractÃ¨res qui peut Ãªtre une clÃ© primaire dans la base de donnÃ©es.
      */
     public synchronized void acceptableProvider(final String provider) {
         if (metadata == null) {
@@ -245,9 +245,9 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Indique si cette table est autorisée à construire des objets {@link Station}
-     * qui contiennent moins d'informations. Cet allègement permet de réduire le nombre de
-     * requêtes SQL, ce qui peut accélérer l'obtention d'une {@linkplain #getEntries liste
+     * Indique si cette table est autorisÃ©e Ã  construire des objets {@link Station}
+     * qui contiennent moins d'informations. Cet allÃ¨gement permet de rÃ©duire le nombre de
+     * requÃªtes SQL, ce qui peut accÃ©lÃ©rer l'obtention d'une {@linkplain #getEntries liste
      * de nombreuses stations}.
      *
      * @see #setAbridged
@@ -257,9 +257,9 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Spécifie si cette table est autorisée à construire des objets {@link Station}
-     * qui contiennent moins d'informations. Cet allègement permet de réduire le nombre de
-     * requêtes SQL, ce qui peut accélérer l'obtention d'une {@linkplain #getEntries liste
+     * SpÃ©cifie si cette table est autorisÃ©e Ã  construire des objets {@link Station}
+     * qui contiennent moins d'informations. Cet allÃ¨gement permet de rÃ©duire le nombre de
+     * requÃªtes SQL, ce qui peut accÃ©lÃ©rer l'obtention d'une {@linkplain #getEntries liste
      * de nombreuses stations}.
      *
      * @see #isAbridged
@@ -273,9 +273,9 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Configure la requête SQL spécifiée en fonction de la {@linkplain #getPlatform plateforme
-     * courante} de cette table. Cette méthode est appelée automatiquement lorsque cette table a
-     * {@linkplain #fireStateChanged changé d'état}.
+     * Configure la requÃªte SQL spÃ©cifiÃ©e en fonction de la {@linkplain #getPlatform plateforme
+     * courante} de cette table. Cette mÃ©thode est appelÃ©e automatiquement lorsque cette table a
+     * {@linkplain #fireStateChanged changÃ© d'Ã©tat}.
      */
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
@@ -290,7 +290,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Retourne la requête à utiliser pour obtenir les stations.
+     * Retourne la requÃªte Ã  utiliser pour obtenir les stations.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -308,9 +308,9 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Construit une station pour l'enregistrement courant. L'implémentation par extrait une
-     * première série d'informations telles que le {@linkplain Station#getName nom de la station},
-     * {@linkplain Station#getProvider son fournisseur}, <cite>etc.</cite> et appele la méthode
+     * Construit une station pour l'enregistrement courant. L'implÃ©mentation par extrait une
+     * premiÃ¨re sÃ©rie d'informations telles que le {@linkplain Station#getName nom de la station},
+     * {@linkplain Station#getProvider son fournisseur}, <cite>etc.</cite> et appele la mÃ©thode
      * <code>{@linkplain #createEntry(int,String,Platform,DataQuality,Citation,ResultSet)
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
@@ -346,28 +346,28 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Construit une station à partir des informations spécifiées. Cette méthode est appelée
-     * automatiquement par {@link #createEntry(ResultSet)} après avoir extrait les informations
-     * communes à tous les types de stations. L'implémentation par défaut ne fait que construire
-     * un objet {@link StationEntry} sans extraire davantage d'informations. Les classes dérivées
-     * devraient redéfinir cette méthode si elles souhaitent construire un type de station plus
-     * élaboré.
+     * Construit une station Ã  partir des informations spÃ©cifiÃ©es. Cette mÃ©thode est appelÃ©e
+     * automatiquement par {@link #createEntry(ResultSet)} aprÃ¨s avoir extrait les informations
+     * communes Ã  tous les types de stations. L'implÃ©mentation par dÃ©faut ne fait que construire
+     * un objet {@link StationEntry} sans extraire davantage d'informations. Les classes dÃ©rivÃ©es
+     * devraient redÃ©finir cette mÃ©thode si elles souhaitent construire un type de station plus
+     * Ã©laborÃ©.
      *
-     * @param table      La table qui a produit cette entrée.
-     * @param identifier L'identifiant numérique de la station.
+     * @param table      La table qui a produit cette entrÃ©e.
+     * @param identifier L'identifiant numÃ©rique de la station.
      * @param name       Le nom de la station.
-     * @param coordinate Une coordonnée représentative en degrés de longitude et de latitude,
+     * @param coordinate Une coordonnÃ©e reprÃ©sentative en degrÃ©s de longitude et de latitude,
      *                   ou {@code null} si inconue.
-     * @param timeRange  Plage de temps de cet élément, ou {@code null} si inconue.
-     * @param platform   La plateforme (par exemple un bateau) sur laquelle a été prise cette
+     * @param timeRange  Plage de temps de cet Ã©lÃ©ment, ou {@code null} si inconue.
+     * @param platform   La plateforme (par exemple un bateau) sur laquelle a Ã©tÃ© prise cette
      *                   station, ou {@code null} si inconnue.
-     * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
-     * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
-     * @param result     La ligne courante de la requête SQL. A utiliser seulement si les sous-classes
-     *                   ont besoin d'extraire davantage d'informations que celles qui ont été fournies
-     *                   par les arguments précédents.
+     * @param quality    La qualitÃ© de la donnÃ©e, ou {@code null} si inconnue.
+     * @param provider   La provenance de la donnÃ©e, ou {@code null} si inconnue.
+     * @param result     La ligne courante de la requÃªte SQL. A utiliser seulement si les sous-classes
+     *                   ont besoin d'extraire davantage d'informations que celles qui ont Ã©tÃ© fournies
+     *                   par les arguments prÃ©cÃ©dents.
      *
-     * @throws SQLException si un accès à la base de données était nécessaire et a échoué.
+     * @throws SQLException si un accÃ¨s Ã  la base de donnÃ©es Ã©tait nÃ©cessaire et a Ã©chouÃ©.
      */
     protected Station createEntry(final int          identifier,
                                   final String       name,
@@ -383,11 +383,11 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Indique si la méthode {@link #getEntries} devrait accepter la station spécifiée.
-     * L'implémentation par défaut vérifie si le {@linkplain Station#getProvider fournisseur}
-     * est l'un de ceux qui ont été spécifiés à la méthode {@link #acceptableProvider(Citation)
+     * Indique si la mÃ©thode {@link #getEntries} devrait accepter la station spÃ©cifiÃ©e.
+     * L'implÃ©mentation par dÃ©faut vÃ©rifie si le {@linkplain Station#getProvider fournisseur}
+     * est l'un de ceux qui ont Ã©tÃ© spÃ©cifiÃ©s Ã  la mÃ©thode {@link #acceptableProvider(Citation)
      * acceptableProvider}. Si la station ne donne pas d'indication sur le fournisseur, alors
-     * cette méthode va l'accepter comme approche conservative.
+     * cette mÃ©thode va l'accepter comme approche conservative.
      */
     @Override
     protected boolean accept(final Station entry) throws SQLException {

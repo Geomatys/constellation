@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,31 +23,31 @@ import net.sicade.observation.Phenomenon;
 
 
 /**
- * Implémentation d'une entrée représentant un {@linkplain Phenomenon phénomène}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant un {@linkplain Phenomenon phÃ©nomÃ¨ne}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
  */
 public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 5140595674231914861L;
 
     /**
-     * Construit un nouveau phénomène du nom spécifié.
+     * Construit un nouveau phÃ©nomÃ¨ne du nom spÃ©cifiÃ©.
      *
-     * @param name Le nom du phénomène.
+     * @param name Le nom du phÃ©nomÃ¨ne.
      */
     protected PhenomenonEntry(final String name) {
         super(name);
     }
 
     /** 
-     * Construit un nouveau phénomène du nom spécifié.
+     * Construit un nouveau phÃ©nomÃ¨ne du nom spÃ©cifiÃ©.
      *
-     * @param name    Le nom du phénomène.
-     * @param remarks Remarques s'appliquant à ce phénomène, ou {@code null}.
+     * @param name    Le nom du phÃ©nomÃ¨ne.
+     * @param remarks Remarques s'appliquant Ã  ce phÃ©nomÃ¨ne, ou {@code null}.
      */
     protected PhenomenonEntry(final String name, final String remarks) {
         super(name, remarks);

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,38 +24,38 @@ import javax.vecmath.MismatchedSizeException;
 
 
 /**
- * Une fabrique de {@linkplain Table tables} à partir de vecteurs <var>x</var> et <var>y</var>
- * spécifiés.
+ * Une fabrique de {@linkplain Table tables} Ã  partir de vecteurs <var>x</var> et <var>y</var>
+ * spÃ©cifiÃ©s.
  * <p>
- * Les données du vecteur <var>x</var> doivent obligatoirement être en ordre croissant ou
- * décroissant. Les premières données prises en compte par la table seront les données à la
- * {@linkplain DoubleBuffer#position() position courante} des vecteurs. Le nombre de données
- * pris en compte sera le {@linkplain DoubleBuffer#remaining() nombre de données restantes}
- * dans chacun de ces vecteurs. Après la construction de la table, les changements de
+ * Les donnÃ©es du vecteur <var>x</var> doivent obligatoirement Ãªtre en ordre croissant ou
+ * dÃ©croissant. Les premiÃ¨res donnÃ©es prises en compte par la table seront les donnÃ©es Ã  la
+ * {@linkplain DoubleBuffer#position() position courante} des vecteurs. Le nombre de donnÃ©es
+ * pris en compte sera le {@linkplain DoubleBuffer#remaining() nombre de donnÃ©es restantes}
+ * dans chacun de ces vecteurs. AprÃ¨s la construction de la table, les changements de
  * {@linkplain DoubleBuffer#position() position} ou de {@linkplain DoubleBuffer#limit() limite}
- * des objets {@code x} et {@code y} donnés en argument n'affecteront pas cette table. Toutefois
- * tout changement des données contenues dans les buffers affecteront cette table.
+ * des objets {@code x} et {@code y} donnÃ©s en argument n'affecteront pas cette table. Toutefois
+ * tout changement des donnÃ©es contenues dans les buffers affecteront cette table.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class TableFactory {
     /**
-     * La fabrique par défaut.
+     * La fabrique par dÃ©faut.
      */
     private static TableFactory factory;
 
     /**
-     * Construit une fabrique par défaut.
+     * Construit une fabrique par dÃ©faut.
      */
     protected TableFactory() {
     }
 
     /**
-     * Retourne l'instance par défaut de {@link TableFactory}.
+     * Retourne l'instance par dÃ©faut de {@link TableFactory}.
      */
     public static TableFactory getDefault() {
-        // Pas besoin de synchroniser. Ce n'est pas bien grave si deux instances sont créées.
+        // Pas besoin de synchroniser. Ce n'est pas bien grave si deux instances sont crÃ©Ã©es.
         if (factory == null) {
             factory = new TableFactory();
         }
@@ -63,17 +63,17 @@ public class TableFactory {
     }
 
     /**
-     * Construit une table à partir du buffer des <var>x</var> et des buffers des <var>y</var>
-     * spécifiés. La plupart des autres méthodes {@code create} de cette classes vont ultimement
-     * appeler cette méthode.
+     * Construit une table Ã  partir du buffer des <var>x</var> et des buffers des <var>y</var>
+     * spÃ©cifiÃ©s. La plupart des autres mÃ©thodes {@code create} de cette classes vont ultimement
+     * appeler cette mÃ©thode.
      *
-     * @param x Le vecteur des <var>x</var>, obligatoirement être en ordre croissant ou décroissant.
+     * @param x Le vecteur des <var>x</var>, obligatoirement Ãªtre en ordre croissant ou dÃ©croissant.
      * @param y Les vecteurs des <var>y</var>.
-     * @param type Type d'interpolation à utiliser pour obtenir une valeur <var>y</var> à partir
+     * @param type Type d'interpolation Ã  utiliser pour obtenir une valeur <var>y</var> Ã  partir
      *        d'une position <var>x</var>.
      * @throws IllegalArgumentException si les valeurs des <var>x</var> ne sont pas strictement
-     *         croissantes ou décroissantes.
-     * @throws MismatchedSizeException si deux vecteurs n'ont pas la même longueur.
+     *         croissantes ou dÃ©croissantes.
+     * @throws MismatchedSizeException si deux vecteurs n'ont pas la mÃªme longueur.
      */
     public Table create(final DoubleBuffer x, final DoubleBuffer[] y, final Interpolation type)
             throws IllegalArgumentException, MismatchedSizeException
@@ -82,7 +82,7 @@ public class TableFactory {
         switch (ord.getDataOrder()) {
             case STRICTLY_ASCENDING:  // Fall through
             case STRICTLY_DESCENDING: break;
-            default: throw new IllegalArgumentException("Les valeurs des x ne sont pas croissantes ou décroissantes.");
+            default: throw new IllegalArgumentException("Les valeurs des x ne sont pas croissantes ou dÃ©croissantes.");
         }
         switch (type) {
             case NEAREST: return new Table(ord, y);
@@ -91,17 +91,17 @@ public class TableFactory {
     }
 
     /**
-     * Construit une table à partir du tableau des <var>x</var> et des tableaux des <var>y</var>
-     * spécifiés. Cette méthode de commodité délègue son travail à {@link #create(DoubleBuffer,
+     * Construit une table Ã  partir du tableau des <var>x</var> et des tableaux des <var>y</var>
+     * spÃ©cifiÃ©s. Cette mÃ©thode de commoditÃ© dÃ©lÃ¨gue son travail Ã  {@link #create(DoubleBuffer,
      * DoubleBuffer[])}.
      *
-     * @param x Le vecteur des <var>x</var>, obligatoirement être en ordre croissant ou décroissant.
+     * @param x Le vecteur des <var>x</var>, obligatoirement Ãªtre en ordre croissant ou dÃ©croissant.
      * @param y Les vecteurs des <var>y</var>.
-     * @param type Type d'interpolation à utiliser pour obtenir une valeur <var>y</var> à partir
+     * @param type Type d'interpolation Ã  utiliser pour obtenir une valeur <var>y</var> Ã  partir
      *        d'une position <var>x</var>.
      * @throws IllegalArgumentException si les valeurs des <var>x</var> ne sont pas strictement
-     *         croissantes ou décroissantes.
-     * @throws MismatchedSizeException si deux vecteurs n'ont pas la même longueur.
+     *         croissantes ou dÃ©croissantes.
+     * @throws MismatchedSizeException si deux vecteurs n'ont pas la mÃªme longueur.
      */
     public Table create(final double[] x, final double[][] y, final Interpolation type)
             throws IllegalArgumentException, MismatchedSizeException
@@ -114,16 +114,16 @@ public class TableFactory {
     }
 
     /**
-     * Construit une table à partir du tableau des <var>x</var> et des <var>y</var> spécifiés.
-     * Cette méthode de commodité délègue son travail à {@link #create(double[], double[][])}.
+     * Construit une table Ã  partir du tableau des <var>x</var> et des <var>y</var> spÃ©cifiÃ©s.
+     * Cette mÃ©thode de commoditÃ© dÃ©lÃ¨gue son travail Ã  {@link #create(double[], double[][])}.
      *
-     * @param x Le vecteur des <var>x</var>, obligatoirement être en ordre croissant ou décroissant.
+     * @param x Le vecteur des <var>x</var>, obligatoirement Ãªtre en ordre croissant ou dÃ©croissant.
      * @param y Le vecteur des <var>y</var>.
-     * @param type Type d'interpolation à utiliser pour obtenir une valeur <var>y</var> à partir
+     * @param type Type d'interpolation Ã  utiliser pour obtenir une valeur <var>y</var> Ã  partir
      *        d'une position <var>x</var>.
      * @throws IllegalArgumentException si les valeurs des <var>x</var> ne sont pas strictement
-     *         croissantes ou décroissantes.
-     * @throws MismatchedSizeException si deux vecteurs n'ont pas la même longueur.
+     *         croissantes ou dÃ©croissantes.
+     * @throws MismatchedSizeException si deux vecteurs n'ont pas la mÃªme longueur.
      */
     public Table create(final double[] x, final double[] y, final Interpolation type)
             throws IllegalArgumentException, MismatchedSizeException

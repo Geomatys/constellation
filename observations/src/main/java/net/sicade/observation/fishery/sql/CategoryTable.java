@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ import net.sicade.observation.sql.SingletonTable;
 
 
 /**
- * Intéroge la base de données pour obtenir la liste des catégories d'espèces observées.
+ * IntÃ©roge la base de donnÃ©es pour obtenir la liste des catÃ©gories d'espÃ¨ces observÃ©es.
  *
  * @version $Id$
  * @author Antoine Hnawia
@@ -42,7 +42,7 @@ import net.sicade.observation.sql.SingletonTable;
  */
 public class CategoryTable extends SingletonTable<Category> implements NumericAccess, Shareable {
     /**
-     * Requête SQL pour obtenir une catégorie à partir de son identifiant.
+     * RequÃªte SQL pour obtenir une catÃ©gorie Ã  partir de son identifiant.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Categories:SELECT",
             "SELECT symbol, identifier, phenomenon, procedure, stage, NULL as remarks\n" +
@@ -51,43 +51,43 @@ public class CategoryTable extends SingletonTable<Category> implements NumericAc
             "   AND selected=TRUE\n"                                                     +
             " ORDER BY identifier");
 
-    /** Numéro de colonne. */ private static final int  SYMBOL     = 1;
-    /** Numéro de colonne. */ private static final int  IDENTIFIER = 2;
-    /** Numéro de colonne. */ private static final int  PHENOMENON = 3;
-    /** Numéro de colonne. */ private static final int  PROCEDURE  = 4;
-    /** Numéro de colonne. */ private static final int  STAGE      = 5;
-    /** Numéro de colonne. */ private static final int  REMARKS    = 6;
+    /** NumÃ©ro de colonne. */ private static final int  SYMBOL     = 1;
+    /** NumÃ©ro de colonne. */ private static final int  IDENTIFIER = 2;
+    /** NumÃ©ro de colonne. */ private static final int  PHENOMENON = 3;
+    /** NumÃ©ro de colonne. */ private static final int  PROCEDURE  = 4;
+    /** NumÃ©ro de colonne. */ private static final int  STAGE      = 5;
+    /** NumÃ©ro de colonne. */ private static final int  REMARKS    = 6;
 
     /**
-     * Table des espèces.
-     * Ne sera construite que la première fois où elle sera nécessaire/
+     * Table des espÃ¨ces.
+     * Ne sera construite que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire/
      */
     private transient SpeciesTable species;
 
     /**
-     * Table des stades de développement.
-     * Ne sera construite que la première fois où elle sera nécessaire/
+     * Table des stades de dÃ©veloppement.
+     * Ne sera construite que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire/
      */
     private transient StageTable stages;
 
     /**
-     * Type de pêche.
+     * Type de pÃªche.
      *
-     * @todo Codé en dur pour l'instant. Devra être puisé dans une table dans une version future.
+     * @todo CodÃ© en dur pour l'instant. Devra Ãªtre puisÃ© dans une table dans une version future.
      */
-    private static final FisheryTypeEntry fisheryType = new FisheryTypeEntry("pêche", null);
+    private static final FisheryTypeEntry fisheryType = new FisheryTypeEntry("pÃªche", null);
 
     /**
-     * Construit une connexion vers la table des catégories.
+     * Construit une connexion vers la table des catÃ©gories.
      *
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnÃ©es.
      */
     public CategoryTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la requête à utiliser pour obtenir une catégorie.
+     * Retourne la requÃªte Ã  utiliser pour obtenir une catÃ©gorie.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -98,7 +98,7 @@ public class CategoryTable extends SingletonTable<Category> implements NumericAc
     }
 
     /**
-     * Construit une catégorie pour l'enregistrement courant.
+     * Construit une catÃ©gorie pour l'enregistrement courant.
      */
     protected Category createEntry(final ResultSet result) throws SQLException, CatalogException {
         final String symbol     = result.getString(SYMBOL);

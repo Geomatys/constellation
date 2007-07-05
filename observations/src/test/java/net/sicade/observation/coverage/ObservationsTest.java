@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import net.sicade.observation.CatalogException;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.
+ * @todo Ajouter des tests sur le mÃªme modÃ¨le que ceux que l'on peut trouver dans le projet SICADE.
  */
 public class ObservationsTest extends TestCase {
     /**
@@ -43,7 +43,7 @@ public class ObservationsTest extends TestCase {
     }
 
     /**
-     * Teste la création d'un modèle de table à partir d'une série.
+     * Teste la crÃ©ation d'un modÃ¨le de table Ã  partir d'une sÃ©rie.
      */
     public void testCoverageTableModel() throws CatalogException {
         final Series series = Observations.getDefault().getSeries("CHL (Monde - mensuelles)");

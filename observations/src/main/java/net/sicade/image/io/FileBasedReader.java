@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import static org.geotools.resources.i18n.ErrorKeys.*;
 
 
 /**
- * Classe de base des décodeurs d'images nécessitant une source {@link File} plutôt que
+ * Classe de base des dÃ©codeurs d'images nÃ©cessitant une source {@link File} plutÃ´t que
  * {@link InputStream}.
  *
  * @version $Id$
@@ -49,18 +49,18 @@ import static org.geotools.resources.i18n.ErrorKeys.*;
  */
 public abstract class FileBasedReader extends ImageReader {
     /**
-     * Le journal à utiliser pour les événements de ce paquet.
+     * Le journal Ã  utiliser pour les Ã©vÃ©nements de ce paquet.
      */
     protected static final Logger LOGGER = Logger.getLogger("net.sicade.image.io");
 
     /**
-     * Types d'images acceptables pour ce décodeur. Ne sera construit que la première fois où
-     * cette information sera demandée.
+     * Types d'images acceptables pour ce dÃ©codeur. Ne sera construit que la premiÃ¨re fois oÃ¹
+     * cette information sera demandÃ©e.
      */
     private transient Set<ImageTypeSpecifier> imageTypes;
 
     /**
-     * Le fichier à lire. Identique à {@link #input} si ce dernier était déjà un objet
+     * Le fichier Ã  lire. Identique Ã  {@link #input} si ce dernier Ã©tait dÃ©jÃ  un objet
      * {@link File}, ou sera un fichier temporaire sinon.
      */
     private transient File inputFile;
@@ -71,9 +71,9 @@ public abstract class FileBasedReader extends ImageReader {
     private transient boolean isTemporary;
 
     /** 
-     * Construit un nouveau décodeur.
+     * Construit un nouveau dÃ©codeur.
      *
-     * @param spi Une description du service fournit par ce décodeur.
+     * @param spi Une description du service fournit par ce dÃ©codeur.
      */
     public FileBasedReader(final FileBasedReaderSpi spi) {
         super(spi);
@@ -83,7 +83,7 @@ public abstract class FileBasedReader extends ImageReader {
     }
 
     /**
-     * Spécifie la source des données à utiliser en entrée. Cette source doit être un objet de
+     * SpÃ©cifie la source des donnÃ©es Ã  utiliser en entrÃ©e. Cette source doit Ãªtre un objet de
      * type {@link File} ou {@link URL}.
      */
     @Override
@@ -100,7 +100,7 @@ public abstract class FileBasedReader extends ImageReader {
 
     /**
      * Retourne le chemin vers le fichier NetCDF. Si la source est un URL, alors le contenu
-     * sera copié vers un fichier temporaire afin de pouvoir l'ouvrir comme un fichier NetCDF.
+     * sera copiÃ© vers un fichier temporaire afin de pouvoir l'ouvrir comme un fichier NetCDF.
      */
     protected final File getInputFile() throws IOException {
         if (inputFile == null) {
@@ -127,22 +127,22 @@ public abstract class FileBasedReader extends ImageReader {
     }
 
     /**
-     * Retourne {@code true} si le fichier retourné par {@link #getInputFile} est temporaire.
+     * Retourne {@code true} si le fichier retournÃ© par {@link #getInputFile} est temporaire.
      */
     protected final boolean isTemporaryFile() {
         return isTemporary;
     }
 
     /**
-     * Retourne le nombre d'images, qui est fixé à 1 dans le cas de ce décodeur.
+     * Retourne le nombre d'images, qui est fixÃ© Ã  1 dans le cas de ce dÃ©codeur.
      */
     public int getNumImages(final boolean allowSearch) throws IOException {
         return 1;
     }
 
     /**
-     * Retourne {@code true} pour indiquer que ce format supporte les accès aléatoires
-     * de manière assez efficace.
+     * Retourne {@code true} pour indiquer que ce format supporte les accÃ¨s alÃ©atoires
+     * de maniÃ¨re assez efficace.
      */
     @Override
     public boolean isRandomAccessEasy(final int imageIndex) throws IOException {
@@ -150,8 +150,8 @@ public abstract class FileBasedReader extends ImageReader {
     }
 
     /**
-     * Retourne le type d'image que créera ce décodeur. L'implémentation par défaut extrait
-     * cette information à partir de {@link FileBasedReaderSpi#getRawImageType}.
+     * Retourne le type d'image que crÃ©era ce dÃ©codeur. L'implÃ©mentation par dÃ©faut extrait
+     * cette information Ã  partir de {@link FileBasedReaderSpi#getRawImageType}.
      */
     @Override
     public ImageTypeSpecifier getRawImageType(int imageIndex) throws IOException {
@@ -159,7 +159,7 @@ public abstract class FileBasedReader extends ImageReader {
     }
 
     /**
-     * Retourne les types d'image supportées. L'implémentation par défaut retourne un singleton
+     * Retourne les types d'image supportÃ©es. L'implÃ©mentation par dÃ©faut retourne un singleton
      * ne contenant que <code>{@linkplain #getRawImageType getRawImageType}(index)</code>.
      */
     public Iterator<ImageTypeSpecifier> getImageTypes(int imageIndex) throws IOException {
@@ -173,21 +173,21 @@ public abstract class FileBasedReader extends ImageReader {
     }
 
     /**
-     * Retourne les méta-données associées à l'ensemble du fichier courant.
+     * Retourne les mÃ©ta-donnÃ©es associÃ©es Ã  l'ensemble du fichier courant.
      */
     public IIOMetadata getStreamMetadata() throws IOException {
         return null;
     }
 
     /**
-     * Retourne les méta-données associées à une image précise du fichier courant.
+     * Retourne les mÃ©ta-donnÃ©es associÃ©es Ã  une image prÃ©cise du fichier courant.
      */
     public IIOMetadata getImageMetadata(int imageIndex) throws IOException {
         return null;
     }
 
     /**
-     * Libère toutes les ressources utilisées par cet objet.
+     * LibÃ¨re toutes les ressources utilisÃ©es par cet objet.
      */
     @Override
     public void dispose() {
@@ -197,7 +197,7 @@ public abstract class FileBasedReader extends ImageReader {
     }
 
     /**
-     * Libère toutes les ressources utilisées par cet objet.
+     * LibÃ¨re toutes les ressources utilisÃ©es par cet objet.
      */
     @Override
     protected void finalize() {

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,12 +37,12 @@ import net.sicade.observation.sql.ProcedureEntry;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Operation opération}. La méthode
- * {@link #doOperation} enchaîne les opérateurs d'images suivants, dans cet ordre:
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain Operation opÃ©ration}. La mÃ©thode
+ * {@link #doOperation} enchaÃ®ne les opÃ©rateurs d'images suivants, dans cet ordre:
  * <p>
  * <ul>
  *   <li>{@link org.geotools.coverage.processing.operation.NodataFilter}</li>
- *   <li>L'opération spécifiée au moment de la construction de cette entrée</li>
+ *   <li>L'opÃ©ration spÃ©cifiÃ©e au moment de la construction de cette entrÃ©e</li>
  *   <li>{@link org.geotools.coverage.processing.operation.Interpolate}</li>
  * </ul>
  *
@@ -51,25 +51,25 @@ import net.sicade.observation.sql.ProcedureEntry;
  */
 public class OperationEntry extends ProcedureEntry implements Operation {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -8790032968708208057L;
 
     /**
-     * Référence vers un processeur d'opérations.
+     * RÃ©fÃ©rence vers un processeur d'opÃ©rations.
      */
     private static final AbstractProcessor PROCESSOR = AbstractProcessor.getInstance();
 
     /**
-     * Un nom spécial qui évite l'application des opérations implicites ({@code "NodataFilter"}
+     * Un nom spÃ©cial qui Ã©vite l'application des opÃ©rations implicites ({@code "NodataFilter"}
      * et {@code "Interpolate"}). Ce nom est inconnu du {@linkplain #PROCESSOR processeur}.
-     * C'est plutôt à l'intérieur de cette classe que nous le prennons en compte.
+     * C'est plutÃ´t Ã  l'intÃ©rieur de cette classe que nous le prennons en compte.
      */
     private static final String DIRECT_VALUE = "DirectValue";
 
     /**
-     * Les interpolations à appliquer sur les images retournées. D'abord, une interpolation
-     * bicubique. Si elle échoue, une interpolation bilinéaire. Si cette dernière échoue aussi,
+     * Les interpolations Ã  appliquer sur les images retournÃ©es. D'abord, une interpolation
+     * bicubique. Si elle Ã©choue, une interpolation bilinÃ©aire. Si cette derniÃ¨re Ã©choue aussi,
      * alors le plus proche voisin.
      */
     private static final String[] INTERPOLATIONS = {
@@ -79,36 +79,36 @@ public class OperationEntry extends ProcedureEntry implements Operation {
     };
 
     /**
-     * L'opération par défaut. Elle n'est pas tout-à-fait une opération identitée puisqu'elle
+     * L'opÃ©ration par dÃ©faut. Elle n'est pas tout-Ã -fait une opÃ©ration identitÃ©e puisqu'elle
      * interpole les valeurs des pixels. Mais du point de vue des analyses statistiques, on
-     * peut la considérer comme une opération identitée.
+     * peut la considÃ©rer comme une opÃ©ration identitÃ©e.
      */
     public static final Operation DEFAULT = new OperationEntry();
 
     /**
-     * Le préfix à utiliser dans les noms composites. Les noms composites seront de la forme
-     * "<var>operation</var> - <var>paramètre</var> - <var>temps</var>" où <var>operation</var>
+     * Le prÃ©fix Ã  utiliser dans les noms composites. Les noms composites seront de la forme
+     * "<var>operation</var> - <var>paramÃ¨tre</var> - <var>temps</var>" oÃ¹ <var>operation</var>
      * est cet objet {@code Operation}. Exemple: <code>"&nabla;SST<sub>-15</sub>"</code>.
      */
     private final String prefix;
 
     /**
-     * Les paramètres des opérations à appliquer. Ces paramètres correspondront typiquement dans
-     * l'ordre aux opérations {@code "Interpolate"}, <cite>opération utilisateur</cite>,
+     * Les paramÃ¨tres des opÃ©rations Ã  appliquer. Ces paramÃ¨tres correspondront typiquement dans
+     * l'ordre aux opÃ©rations {@code "Interpolate"}, <cite>opÃ©ration utilisateur</cite>,
      * {@code "NodataFilter"}.
      */
     private final ParameterValueGroup[] parameters;
 
     /**
-     * Index dans le tableau {@code parameters} des paramètres qui s'appliquent à l'opération
-     * définie par l'utilisateur, ou -1 si aucun.
+     * Index dans le tableau {@code parameters} des paramÃ¨tres qui s'appliquent Ã  l'opÃ©ration
+     * dÃ©finie par l'utilisateur, ou -1 si aucun.
      */
     private final int userParameters;
 
     /**
-     * Construit une opération par défaut. Ce constructeur est différent de ce que l'on peut
-     * obtenir avec les constructeurs publiques ou protégées du fait qu'elle n'applique pas
-     * d'opération "NodataFilter". Elle n'applique que "Interpolate".
+     * Construit une opÃ©ration par dÃ©faut. Ce constructeur est diffÃ©rent de ce que l'on peut
+     * obtenir avec les constructeurs publiques ou protÃ©gÃ©es du fait qu'elle n'applique pas
+     * d'opÃ©ration "NodataFilter". Elle n'applique que "Interpolate".
      */
     private OperationEntry() {
         super("Default", null);
@@ -121,13 +121,13 @@ public class OperationEntry extends ProcedureEntry implements Operation {
     }
 
     /**
-     * Construit une opération. L'argument {@code prefix} est utilisé dans les noms composites de la
-     * forme "<var>operation</var> - <var>paramètre</var> - <var>temps</var>" où <var>operation</var>
+     * Construit une opÃ©ration. L'argument {@code prefix} est utilisÃ© dans les noms composites de la
+     * forme "<var>operation</var> - <var>paramÃ¨tre</var> - <var>temps</var>" oÃ¹ <var>operation</var>
      * est cet objet {@code Operation}. Exemple: <code>"&nabla;SST<sub>-15</sub>"</code>.
      *
-     * @param name      Le nom de cette opération.
-     * @param prefix    Le préfix à utiliser dans les noms composites.
-     * @param operation Un nom d'opération compris par le {@linkplain AbstractProcessor processeur}.
+     * @param name      Le nom de cette opÃ©ration.
+     * @param prefix    Le prÃ©fix Ã  utiliser dans les noms composites.
+     * @param operation Un nom d'opÃ©ration compris par le {@linkplain AbstractProcessor processeur}.
      *                  Exemple: {@code "GradientMagnitude"}.
      * @param remarks   Des commentaires, ou {@code null} s'il n'y en a pas.
      */
@@ -223,8 +223,8 @@ public class OperationEntry extends ProcedureEntry implements Operation {
     }
 
     /**
-     * Retourne les paramètres de l'opération, ou {@code null} si aucun. Ces paramètres peuvent
-     * être modifiées immédiatement après la construction par {@link OperationTable}, mais ne
+     * Retourne les paramÃ¨tres de l'opÃ©ration, ou {@code null} si aucun. Ces paramÃ¨tres peuvent
+     * Ãªtre modifiÃ©es immÃ©diatement aprÃ¨s la construction par {@link OperationTable}, mais ne
      * devraient plus changer par la suite.
      */
     protected ParameterValueGroup getParameters() {
@@ -232,7 +232,7 @@ public class OperationEntry extends ProcedureEntry implements Operation {
     }
     
     /**
-     * Compare cette entrée avec l'objet spécifié.
+     * Compare cette entrÃ©e avec l'objet spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object object) {
@@ -242,8 +242,8 @@ public class OperationEntry extends ProcedureEntry implements Operation {
         if (super.equals(object)) {
             final OperationEntry that = (OperationEntry) object;
             return Utilities.equals(this.prefix, that.prefix);
-            // Note: On ne compare pas les paramètres (on se fiera sur le caractère unique du nom),
-            //       vu que la synchronisation sur les deux objets en même temps pose problème. Ce
+            // Note: On ne compare pas les paramÃ¨tres (on se fiera sur le caractÃ¨re unique du nom),
+            //       vu que la synchronisation sur les deux objets en mÃªme temps pose problÃ¨me. Ce
             //       n'est pas du tout insurmontable, mais ne vaut probablement pas la peine.
         }
         return false;

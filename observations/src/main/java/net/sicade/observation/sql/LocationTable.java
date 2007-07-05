@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -44,15 +44,15 @@ import net.sicade.observation.CatalogException;
 /**
  * Obtient le chemin d'une {@linkplain net.sicade.observation.Station station} ou d'une
  * {@linkplain net.sicade.observation.Platform plateforme}. Cette classe relie les points
- * que contient la base de données pour une même station ou plateforme.
+ * que contient la base de donnÃ©es pour une mÃªme station ou plateforme.
  * <p>
- * Pour calculer la forme de la trajectoire, on récupère l'ensemble des positions et on relie les
- * points entre eux (deux à deux) à l'aide d'un objet {@link GeneralPath}. Mais on ne les relie pas
- * par une ligne droite car cela reviendrait à considérer que la vitesse est constante. On tient
- * compte de la vitesse (en considérant que l'accélération est constante) et la courbe que l'on
- * obtient est une courbe quadratique entre les deux points considérés en s'appuyant sur un point
- * de contrôle. Ce dernier est le point d'intersection des tangentes à la trajectoire, aux deux
- * points considérés.
+ * Pour calculer la forme de la trajectoire, on rÃ©cupÃ¨re l'ensemble des positions et on relie les
+ * points entre eux (deux Ã  deux) Ã  l'aide d'un objet {@link GeneralPath}. Mais on ne les relie pas
+ * par une ligne droite car cela reviendrait Ã  considÃ©rer que la vitesse est constante. On tient
+ * compte de la vitesse (en considÃ©rant que l'accÃ©lÃ©ration est constante) et la courbe que l'on
+ * obtient est une courbe quadratique entre les deux points considÃ©rÃ©s en s'appuyant sur un point
+ * de contrÃ´le. Ce dernier est le point d'intersection des tangentes Ã  la trajectoire, aux deux
+ * points considÃ©rÃ©s.
  *
  * @version $Id$
  * @author Antoine Hnawia
@@ -67,7 +67,7 @@ public class LocationTable extends Table implements Shareable {
      */
     public static class Station extends LocationTable {
         /**
-         * Requête SQL pour obtenir les positions d'une
+         * RequÃªte SQL pour obtenir les positions d'une
          * {@linkplain net.sicade.observation.Station station}.
          */
         private static final ConfigurationKey SELECT = new ConfigurationKey("Stations:PATH",
@@ -78,7 +78,7 @@ public class LocationTable extends Table implements Shareable {
         /**
          * Construit une nouvelle connexion vers la table des positions des stations.
          * 
-         * @param database La base de données à laquelle on se connecte.
+         * @param database La base de donnÃ©es Ã  laquelle on se connecte.
          */
         public Station(final Database database) {
             super(database, SELECT);
@@ -93,7 +93,7 @@ public class LocationTable extends Table implements Shareable {
      */
     public static class Platform extends LocationTable {
         /**
-         * Requête SQL pour obtenir les positions d'une
+         * RequÃªte SQL pour obtenir les positions d'une
          * {@linkplain net.sicade.observation.Platform plateforme}.
          */
         private static final ConfigurationKey SELECT = new ConfigurationKey("Platforms:PATH",
@@ -108,24 +108,24 @@ public class LocationTable extends Table implements Shareable {
         /**
          * Construit une nouvelle connexion vers la table des positions des platforme.
          * 
-         * @param database La base de données à laquelle on se connecte.
+         * @param database La base de donnÃ©es Ã  laquelle on se connecte.
          */
         public Platform(final Database database) {
             super(database, SELECT);
         }
     }
 
-    /** Numéro d'argument. */ private static final int  ARGUMENT_ID = 1;
-    /** Numéro de colonne. */ private static final int  DATE = 1;
-    /** Numéro de colonne. */ private static final int  X    = 2;
-    /** Numéro de colonne. */ private static final int  Y    = 3;
-    /** Numéro de colonne. */ private static final int  Z    = 4;
-    /** Numéro de colonne. */ private static final int  U    = 5;
-    /** Numéro de colonne. */ private static final int  V    = 6;
-    /** Numéro de colonne. */ private static final int  W    = 7;
+    /** NumÃ©ro d'argument. */ private static final int  ARGUMENT_ID = 1;
+    /** NumÃ©ro de colonne. */ private static final int  DATE = 1;
+    /** NumÃ©ro de colonne. */ private static final int  X    = 2;
+    /** NumÃ©ro de colonne. */ private static final int  Y    = 3;
+    /** NumÃ©ro de colonne. */ private static final int  Z    = 4;
+    /** NumÃ©ro de colonne. */ private static final int  U    = 5;
+    /** NumÃ©ro de colonne. */ private static final int  V    = 6;
+    /** NumÃ©ro de colonne. */ private static final int  W    = 7;
 
     /**
-     * La clé désignant la requête à utiliser.
+     * La clÃ© dÃ©signant la requÃªte Ã  utiliser.
      */
     private final ConfigurationKey select;
 
@@ -135,20 +135,20 @@ public class LocationTable extends Table implements Shareable {
     private final GeodeticCalculator calculator = new GeodeticCalculator();
 
     /**
-     * Position moyenne du dernier element retourné par {@link #getPath}.
+     * Position moyenne du dernier element retournÃ© par {@link #getPath}.
      */
     private double averageX=Double.NaN, averageY=Double.NaN;
 
     /**
-     * Date du début et de fin du dernier element retourné par {@link #getPath}.
+     * Date du dÃ©but et de fin du dernier element retournÃ© par {@link #getPath}.
      */
     private long startTime=Long.MAX_VALUE, endTime=Long.MIN_VALUE;
 
     /**
      * Construit une nouvelle connexion vers la table des positions des stations ou plateformes.
      * 
-     * @param database La base de données à laquelle on se connecte.
-     * @param select   La clé désignant la requête SQL à exécuter.
+     * @param database La base de donnÃ©es Ã  laquelle on se connecte.
+     * @param select   La clÃ© dÃ©signant la requÃªte SQL Ã  exÃ©cuter.
      */
     protected LocationTable(final Database database, final ConfigurationKey select) {
         super(database);
@@ -156,7 +156,7 @@ public class LocationTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne la valeur pour la colonne spécifiée, ou {@code NaN} si la colonne correspondante
+     * Retourne la valeur pour la colonne spÃ©cifiÃ©e, ou {@code NaN} si la colonne correspondante
      * n'a pas de valeur.
      */
     private static double getDouble(final ResultSet result, final int column) throws SQLException {
@@ -165,14 +165,14 @@ public class LocationTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne le chemin correspondant à la {@linkplain net.sicade.observation.Station station} ou
-     * à la {@linkplain net.sicade.observation.Platform plateforme} spécifiée. La nature de l'objet
-     * identifié (station ou plateforme) dépend de l'argument {@code select} qui a été spécifié au
+     * Retourne le chemin correspondant Ã  la {@linkplain net.sicade.observation.Station station} ou
+     * Ã  la {@linkplain net.sicade.observation.Platform plateforme} spÃ©cifiÃ©e. La nature de l'objet
+     * identifiÃ© (station ou plateforme) dÃ©pend de l'argument {@code select} qui a Ã©tÃ© spÃ©cifiÃ© au
      * {@linkplain #LocationTable(Database, ConfigurationKey) constructeur} de cette table.
      * 
-     * @param  identifier L'identifiant de la station ou de la plateforme concernée.
+     * @param  identifier L'identifiant de la station ou de la plateforme concernÃ©e.
      * @return Le chemin de la station ou plateforme, ou {@code null} s'il n'y en a pas.
-     * @throws SQLException si l'interrogation de la base de données a échoué.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ©.
      */
     public synchronized Shape getPath(final String identifier) throws SQLException {
         averageX  = 0;
@@ -241,7 +241,7 @@ public class LocationTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne la position moyenne du dernier élément retourné par {@link #getPath},
+     * Retourne la position moyenne du dernier Ã©lÃ©ment retournÃ© par {@link #getPath},
      * ou {@code null} s'il n'y en a pas.
      */
     public synchronized Point2D getLastPosition() {
@@ -252,7 +252,7 @@ public class LocationTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne la plage de temps du dernier élément retourné par {@link #getPath},
+     * Retourne la plage de temps du dernier Ã©lÃ©ment retournÃ© par {@link #getPath},
      * ou {@code null} s'il n'y en a pas.
      */
     public synchronized DateRange getLastTimeRange() {

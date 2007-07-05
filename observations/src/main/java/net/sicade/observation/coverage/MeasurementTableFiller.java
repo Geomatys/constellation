@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -47,11 +47,11 @@ import net.sicade.resources.XArray;
 
 
 /**
- * Remplit une table des {@linkplain Observation observations} à partir des données satellitaires.
- * La table {@code "Measurements"} contient les valeurs de descripteurs du paysage océanique tels
- * que la température, chlorophylle-<var>a</var>, hauteur de l'eau, <cite>etc.</cite> aux positions
- * des observations. Lorsque {@code MeasurementTableFiller} trouve une données environnementale à une
- * position d'une observation, il ajoute un enregistrement à la table {@code "Measurements"}.
+ * Remplit une table des {@linkplain Observation observations} Ã  partir des donnÃ©es satellitaires.
+ * La table {@code "Measurements"} contient les valeurs de descripteurs du paysage ocÃ©anique tels
+ * que la tempÃ©rature, chlorophylle-<var>a</var>, hauteur de l'eau, <cite>etc.</cite> aux positions
+ * des observations. Lorsque {@code MeasurementTableFiller} trouve une donnÃ©es environnementale Ã  une
+ * position d'une observation, il ajoute un enregistrement Ã  la table {@code "Measurements"}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -59,33 +59,33 @@ import net.sicade.resources.XArray;
  */
 public class MeasurementTableFiller implements Runnable {
     /**
-     * Mis à {@code true} quand l'utilisateur a demandé à annuler l'exécution de {@link #execute}.
+     * Mis Ã  {@code true} quand l'utilisateur a demandÃ© Ã  annuler l'exÃ©cution de {@link #execute}.
      */
     private volatile boolean cancel;
 
     /**
-     * Ensemble des stations concernées.
+     * Ensemble des stations concernÃ©es.
      */
     private final Set<Station> stations = new LinkedHashSet<Station>();
 
     /**
-     * Ensemble des descripteurs à utiliser pour remplir la table des mesures.
+     * Ensemble des descripteurs Ã  utiliser pour remplir la table des mesures.
      */
     private final Set<Descriptor> descriptors = new LinkedHashSet<Descriptor>();
 
     /**
-     * La table des mesures à modifier.
+     * La table des mesures Ã  modifier.
      */
     private final MeasurementTable measures;
 
     /**
-     * Composante graphique qui a lancé ce calcul, ou {@code null} si aucun.
-     * Utilisé uniquement pour l'affichage éventuel d'un message d'erreur.
+     * Composante graphique qui a lancÃ© ce calcul, ou {@code null} si aucun.
+     * UtilisÃ© uniquement pour l'affichage Ã©ventuel d'un message d'erreur.
      */
     private transient Component owner;
 
     /**
-     * Construit un objet qui procèdera au remplissage de la table des mesures spécifiée.
+     * Construit un objet qui procÃ¨dera au remplissage de la table des mesures spÃ©cifiÃ©e.
      */
     public MeasurementTableFiller(final MeasurementTable measures) {
         this.measures = measures;
@@ -93,16 +93,16 @@ public class MeasurementTableFiller implements Runnable {
 
     /**
      * Retourne l'ensemble des stations pour lesquelles on voudra calculer les descripteurs du
-     * paysage océanique. L'ensemble retourné est modifiable; il est possible d'ajouter ou de
-     * retirer des stations à prendre en compte en appelant {@link Set#add} ou {@link Set#remove}.
+     * paysage ocÃ©anique. L'ensemble retournÃ© est modifiable; il est possible d'ajouter ou de
+     * retirer des stations Ã  prendre en compte en appelant {@link Set#add} ou {@link Set#remove}.
      */
     public Set<Station> stations() {
         return stations;
     }
 
     /**
-     * Retourne l'ensemble des descripteurs à évaluer pour chaque station. L'ensemble retourné est
-     * modifiable; il est possible d'ajouter ou de retirer des descripteurs à prendre en compte en
+     * Retourne l'ensemble des descripteurs Ã  Ã©valuer pour chaque station. L'ensemble retournÃ© est
+     * modifiable; il est possible d'ajouter ou de retirer des descripteurs Ã  prendre en compte en
      * appelant {@link Set#add} ou {@link Set#remove}.
      */
     public Set<Descriptor> descriptors() {
@@ -110,11 +110,11 @@ public class MeasurementTableFiller implements Runnable {
     }
 
     /**
-     * Utilise un ensemble de stations par défaut pour lesquelles on voudra calculer les
-     * descripteurs du paysage océanique. Cet ensemble est constitué de stations pour lesquelles
-     * {@link MeasurementTable} pourrait avoir des données.
+     * Utilise un ensemble de stations par dÃ©faut pour lesquelles on voudra calculer les
+     * descripteurs du paysage ocÃ©anique. Cet ensemble est constituÃ© de stations pour lesquelles
+     * {@link MeasurementTable} pourrait avoir des donnÃ©es.
      *
-     * @throws CatalogException si l'interrogation de la base de données a échouée.
+     * @throws CatalogException si l'interrogation de la base de donnÃ©es a Ã©chouÃ©e.
      */
     public synchronized void addDefaultStations() throws CatalogException {
         Descriptor.LOGGER.info("Obtient l'ensemble des stations.");
@@ -126,9 +126,9 @@ public class MeasurementTableFiller implements Runnable {
     }
 
     /**
-     * Utilise un ensemble de descripteurs par défaut à évaluer pour chaque station.
+     * Utilise un ensemble de descripteurs par dÃ©faut Ã  Ã©valuer pour chaque station.
      *
-     * @throws CatalogException si l'interrogation de la base de données a échouée.
+     * @throws CatalogException si l'interrogation de la base de donnÃ©es a Ã©chouÃ©e.
      */
     public synchronized void addDefaultDescriptors() throws CatalogException {
         Descriptor.LOGGER.info("Obtient l'ensemble des descripteurs.");
@@ -140,7 +140,7 @@ public class MeasurementTableFiller implements Runnable {
     }
 
     /**
-     * Classe les éléments du tableau spécifié en ordre croissant.
+     * Classe les Ã©lÃ©ments du tableau spÃ©cifiÃ© en ordre croissant.
      */
     private static void sort(final Object[] array) throws CatalogException {
         try {
@@ -157,7 +157,7 @@ public class MeasurementTableFiller implements Runnable {
     /**
      * Lance le remplissage de la table {@code "Measurements"}.
      *
-     * @throws CatalogException si un problème est survenu lors des accès au catalogue.
+     * @throws CatalogException si un problÃ¨me est survenu lors des accÃ¨s au catalogue.
      */
     public synchronized void execute() throws CatalogException {
         final Set<Station>    stations    = stations();
@@ -170,20 +170,20 @@ public class MeasurementTableFiller implements Runnable {
             Descriptor.LOGGER.warning("L'ensemble des stations est vide.");
             return;
         }
-        int withoutPosition = 0; // Compte le nombre de stations sans coordonnées.
+        int withoutPosition = 0; // Compte le nombre de stations sans coordonnÃ©es.
         final LinkedList<Descriptor> remaining = new LinkedList<Descriptor>(descriptors);
         final MeasurementInserts updater = new MeasurementInserts(measures);
         updater.start();
         /*
-         * On traitera ensemble tous les descripteurs qui correspondent à la même série d'images,
-         * pour éviter de charger en mémoire les même images plusieurs fois.  On évite de traiter
-         * en même temps des séries d'images différentes pour éviter de consommer trop de mémoire
-         * lors de la création du tableau de paires stations-descripteurs plus bas.
+         * On traitera ensemble tous les descripteurs qui correspondent Ã  la mÃªme sÃ©rie d'images,
+         * pour Ã©viter de charger en mÃ©moire les mÃªme images plusieurs fois.  On Ã©vite de traiter
+         * en mÃªme temps des sÃ©ries d'images diffÃ©rentes pour Ã©viter de consommer trop de mÃ©moire
+         * lors de la crÃ©ation du tableau de paires stations-descripteurs plus bas.
          *
-         * Note: Nous remplaçont la variable de classe 'descriptors',  qui contenait l'ensemble
+         * Note: Nous remplaÃ§ont la variable de classe 'descriptors',  qui contenait l'ensemble
          *       des descripteurs, par une liste locale qui ne contient que les descripteurs de
-         *       la même série. Ca ne change rien pour l'algorithme qui suit,  excepté que cela
-         *       peut jouer sur les performances et la consommation de mémoire.
+         *       la mÃªme sÃ©rie. Ca ne change rien pour l'algorithme qui suit,  exceptÃ© que cela
+         *       peut jouer sur les performances et la consommation de mÃ©moire.
          */
         while (!remaining.isEmpty()) {
             final Series series = remaining.getFirst().getPhenomenon();
@@ -200,16 +200,16 @@ public class MeasurementTableFiller implements Runnable {
             }
             assert Collections.disjoint(descriptorList, remaining) : series;
             assert descriptors.containsAll(descriptorList) : series;
-            Descriptor.LOGGER.info("Traitement de la série \"" + series.getName() +
+            Descriptor.LOGGER.info("Traitement de la sÃ©rie \"" + series.getName() +
                                    "\" (" + descriptorList.size() + " descripteurs)");
             /*
              * La variable locale 'descriptorList' ne contient maintenant qu'un sous-ensemble des
-             * descripteurs pour une même série. On voudra évaluer ces descripteurs aux positions
-             * des stations, mais pas nécessairement dans l'ordre chronologique des stations.
-             * L'ordre dépendra aussi des décalages temporelles des descripteurs, car l'objectif
-             * est de traiter toutes les stations qui correspondant à une même image (incluant les
+             * descripteurs pour une mÃªme sÃ©rie. On voudra Ã©valuer ces descripteurs aux positions
+             * des stations, mais pas nÃ©cessairement dans l'ordre chronologique des stations.
+             * L'ordre dÃ©pendra aussi des dÃ©calages temporelles des descripteurs, car l'objectif
+             * est de traiter toutes les stations qui correspondant Ã  une mÃªme image (incluant les
              * stations 10 jours plus tard mais qui souhaite les valeurs environnementales 10 jours
-             * auparavant) avant de passer à l'image suivante.
+             * auparavant) avant de passer Ã  l'image suivante.
              */
             StationDescriptorPair[] pairs = new StationDescriptorPair[descriptorList.size() * stations.size()];
             final Map<Descriptor,SpatioTemporalCoverage3D> coverages = new IdentityHashMap<Descriptor,SpatioTemporalCoverage3D>();
@@ -233,10 +233,10 @@ public class MeasurementTableFiller implements Runnable {
             }
             pairs = XArray.resize(pairs, index);
             sort(pairs);
-            Descriptor.LOGGER.info("Évaluation de " + index + " valeurs.");
+            Descriptor.LOGGER.info("Ã‰valuation de " + index + " valeurs.");
             /*
              * Maintenant que l'on connait toutes les paires de descripteurs et de stations,
-             * procède à l'extraction des valeurs dans leur ordre chronologique.
+             * procÃ¨de Ã  l'extraction des valeurs dans leur ordre chronologique.
              */
             cancel = false;
             float[] values = null;
@@ -268,17 +268,17 @@ public class MeasurementTableFiller implements Runnable {
             }
         }
         if (withoutPosition != 0) {
-            Descriptor.LOGGER.warning("Les coordonnées de " + withoutPosition +
-                                      " couple(s) (station, descripteur) sont incomplètes.");
+            Descriptor.LOGGER.warning("Les coordonnÃ©es de " + withoutPosition +
+                                      " couple(s) (station, descripteur) sont incomplÃ¨tes.");
         }
         updater.finished();
-        Descriptor.LOGGER.info("Remplissage de la table des mesures terminé.");
+        Descriptor.LOGGER.info("Remplissage de la table des mesures terminÃ©.");
     }
 
     /**
-     * Lance le remplissage de la table {@code "Measurements"}. Cette méthode est identique
-     * à {@link #execute}, excepté qu'elle attrape les éventuelles exceptions et les fait
-     * apparaître dans une interface utilisateur.
+     * Lance le remplissage de la table {@code "Measurements"}. Cette mÃ©thode est identique
+     * Ã  {@link #execute}, exceptÃ© qu'elle attrape les Ã©ventuelles exceptions et les fait
+     * apparaÃ®tre dans une interface utilisateur.
      */
     public void run() {
         try {
@@ -289,7 +289,7 @@ public class MeasurementTableFiller implements Runnable {
     }
 
     /**
-     * Appelle {@link #run} dans un thread en arrière-plan.
+     * Appelle {@link #run} dans un thread en arriÃ¨re-plan.
      */
     public void start() {
         final Thread thread = new Thread(this, "Remplissage de la table des mesures");
@@ -298,7 +298,7 @@ public class MeasurementTableFiller implements Runnable {
     }
 
     /**
-     * Écrit un message dans le journal avec le niveau "info".
+     * Ã‰crit un message dans le journal avec le niveau "info".
      */
     private static void info(final int key, final Object arg) {
         LogRecord record = Resources.getResources(null).getLogRecord(Level.INFO, key, arg);
@@ -308,9 +308,9 @@ public class MeasurementTableFiller implements Runnable {
     }
 
     /**
-     * Indique qu'un point est en dehors de la région des données couvertes.
-     * Cette méthode écrit un avertissement dans le journal, à la condition
-     * qu'il n'y en avait pas déjà un.
+     * Indique qu'un point est en dehors de la rÃ©gion des donnÃ©es couvertes.
+     * Cette mÃ©thode Ã©crit un avertissement dans le journal, Ã  la condition
+     * qu'il n'y en avait pas dÃ©jÃ  un.
      */
     private static void warning(final SpatioTemporalCoverage3D      source, 
                                 final PointOutsideCoverageException exception) 
@@ -322,7 +322,7 @@ public class MeasurementTableFiller implements Runnable {
     }
 
     /**
-     * Interrompt l'exécution de {@link #execute}. Cette méthode peut être appelée à partir de
+     * Interrompt l'exÃ©cution de {@link #execute}. Cette mÃ©thode peut Ãªtre appelÃ©e Ã  partir de
      * n'importe quel thread.
      */
     public void cancel() {

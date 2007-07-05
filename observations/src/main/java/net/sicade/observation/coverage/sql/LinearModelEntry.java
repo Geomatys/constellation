@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -45,19 +45,19 @@ import net.sicade.observation.coverage.LinearModel.Term;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain LinearModel modèle linéaire}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain LinearModel modÃ¨le linÃ©aire}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class LinearModelEntry extends ModelEntry implements LinearModel {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 3859434295505042982L;
 
     /**
-     * Les termes d'un modèle linéaire calculant le paramètre.
+     * Les termes d'un modÃ¨le linÃ©aire calculant le paramÃ¨tre.
      */
     private final List<Term> terms;
 
@@ -67,14 +67,14 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
     private final List<Term> unmodifiable;
 
     /**
-     * Les descripteurs. La liste ne sera construite que la première fois où elle sera nécessaire.
+     * Les descripteurs. La liste ne sera construite que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private transient List<Descriptor> descriptors;
 
     /**
-     * Pour chaque terme du modèle linéaire, les index des descripteurs à utiliser dans la
-     * liste {@link #descriptors}. Ne sera construit que la première fois où ces index seront
-     * nécessaires.
+     * Pour chaque terme du modÃ¨le linÃ©aire, les index des descripteurs Ã  utiliser dans la
+     * liste {@link #descriptors}. Ne sera construit que la premiÃ¨re fois oÃ¹ ces index seront
+     * nÃ©cessaires.
      */
     private transient int[][] index;
 
@@ -84,10 +84,10 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
     private transient double[] coefficients;
 
     /**
-     * Construit un modèle linéaire.
+     * Construit un modÃ¨le linÃ©aire.
      *
-     * @param target  La série dans laquelle seront stockées les valeurs de la variable dépendante.
-     * @param terms   Les termes d'un modèle linéaire calculant le paramètre.
+     * @param target  La sÃ©rie dans laquelle seront stockÃ©es les valeurs de la variable dÃ©pendante.
+     * @param terms   Les termes d'un modÃ¨le linÃ©aire calculant le paramÃ¨tre.
      */
     public LinearModelEntry(final Series     target,
                             final List<Term> terms)
@@ -98,9 +98,9 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
     }
 
     /**
-     * Vérifie que les deux listes spécifiées contiennent les même éléments, mais sans tenir compte
-     * de l'ordre. Cette opération n'est valide que si l'opération appliquée entre chaque item est
-     * commucatif (par exemple la multiplication). Cette comparaison est différente de celle effectuée
+     * VÃ©rifie que les deux listes spÃ©cifiÃ©es contiennent les mÃªme Ã©lÃ©ments, mais sans tenir compte
+     * de l'ordre. Cette opÃ©ration n'est valide que si l'opÃ©ration appliquÃ©e entre chaque item est
+     * commucatif (par exemple la multiplication). Cette comparaison est diffÃ©rente de celle effectuÃ©e
      * par {@link Set#equals} du fait que les listes contiennent parfois des doublons.
      */
     private static boolean equalsIgnoreOrder(final List<Descriptor> d1, final List<Descriptor> d2) {
@@ -120,14 +120,14 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
     }
 
     /**
-     * Ajoute le terme spécifié à ce modèle linéaire. S'il existe un terme <var>t</var> dont le
-     * {@linkplain Term#getDescriptors produit de descripteurs} est le même que celui de {@code
-     * term}, alors le {@linkplain Term#getCoefficient coefficient} de {@code term} sera ajouté
-     * au coefficient de ce terme <var>t</var>. Sinon, {@code term} sera simplement ajouté à la
-     * liste des termes de ce modèle.
+     * Ajoute le terme spÃ©cifiÃ© Ã  ce modÃ¨le linÃ©aire. S'il existe un terme <var>t</var> dont le
+     * {@linkplain Term#getDescriptors produit de descripteurs} est le mÃªme que celui de {@code
+     * term}, alors le {@linkplain Term#getCoefficient coefficient} de {@code term} sera ajoutÃ©
+     * au coefficient de ce terme <var>t</var>. Sinon, {@code term} sera simplement ajoutÃ© Ã  la
+     * liste des termes de ce modÃ¨le.
      * <p>
-     * Cette méthode ne devrait être appelée que pendant la phase de construction du modèle
-     * linéaire. Une fois cette construction terminée, le modèle ne devrait plus être modifié.
+     * Cette mÃ©thode ne devrait Ãªtre appelÃ©e que pendant la phase de construction du modÃ¨le
+     * linÃ©aire. Une fois cette construction terminÃ©e, le modÃ¨le ne devrait plus Ãªtre modifiÃ©.
      */
     protected void add(final Term term) {
         final List<Descriptor> searchFor = term.getDescriptors();
@@ -147,35 +147,35 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
     }
 
     /**
-     * Remplace toutes les occurences du descripteur spécifié par la somme des termes spécifié.
+     * Remplace toutes les occurences du descripteur spÃ©cifiÃ© par la somme des termes spÃ©cifiÃ©.
      *
-     * @param  descriptor Descripteur à rechercher.
-     * @param  expansion  Termes remplaçant le descripteur spécifié.
+     * @param  descriptor Descripteur Ã  rechercher.
+     * @param  expansion  Termes remplaÃ§ant le descripteur spÃ©cifiÃ©.
      * @return Nombre d'occurences du descripteurs.
-     * @throws IllegalArgumentException si {@code expansion} contient le descripteur à remplacer.
+     * @throws IllegalArgumentException si {@code expansion} contient le descripteur Ã  remplacer.
      */
     protected int substitute(final Descriptor descriptor, final Term[] expansion)
             throws IllegalArgumentException
     {
         /*
-         * Vérification des arguments.
+         * VÃ©rification des arguments.
          */
         if (!descriptor.getDistribution().isIdentity()) {
-            throw new IllegalArgumentException("Distribution non-supportée.");
+            throw new IllegalArgumentException("Distribution non-supportÃ©e.");
         }
         for (final Term term : expansion) {
             final List<Descriptor> termDescriptors = term.getDescriptors();
             if (termDescriptors.contains(descriptor)) {
-                throw new IllegalArgumentException("Recursivité détectée.");
+                throw new IllegalArgumentException("RecursivitÃ© dÃ©tectÃ©e.");
             }
             for (final Descriptor check : termDescriptors) {
                 if (!check.getDistribution().isIdentity()) {
-                    throw new IllegalArgumentException("Distribution non-supportée.");
+                    throw new IllegalArgumentException("Distribution non-supportÃ©e.");
                 }
             }
         }
         /*
-         * Procède à la substitution.
+         * ProcÃ¨de Ã  la substitution.
          */
         int count=0, previous;
         do {
@@ -186,17 +186,17 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
                 for (int toReplace=termDescriptors.size(); --toReplace>=0;) {
                     if (descriptor.equals(termDescriptors.get(toReplace))) {
                         /*
-                         * Nous avons trouvé un terme qui contient le descripteur recherché.  Supprime
-                         * le terme trouvé (puisqu'il sera remplacé par une somme de termes) et ajoute
-                         * tous les termes spécifiés en argument multipliés par l'ancien terme (sans
+                         * Nous avons trouvÃ© un terme qui contient le descripteur recherchÃ©.  Supprime
+                         * le terme trouvÃ© (puisqu'il sera remplacÃ© par une somme de termes) et ajoute
+                         * tous les termes spÃ©cifiÃ©s en argument multipliÃ©s par l'ancien terme (sans
                          * le descripteur que l'on remplace).
                          */
                         if (terms.remove(i) != term) {
                             throw new AssertionError(); // Paranoiac check
                         }
                         for (final Term substitution : expansion) {
-                            // Ajoute term*substitution, mais dans lequel on a retiré le descripteur
-                            // de 'term' qui se trouve à l'index 'toReplace'.
+                            // Ajoute term*substitution, mais dans lequel on a retirÃ© le descripteur
+                            // de 'term' qui se trouve Ã  l'index 'toReplace'.
                             final Term product = new LinearModelTerm(term, substitution, toReplace);
                             add(product);
                         }
@@ -210,7 +210,7 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
     }
 
     /**
-     * Prévient cette implémentation que la liste des termes a changée.
+     * PrÃ©vient cette implÃ©mentation que la liste des termes a changÃ©e.
      */
     private void termsChanged() {
         descriptors  = null;
@@ -248,9 +248,9 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
         int[][] index = this.index;
         if (index == null) {
             /*
-             * Construit les index. Note: il n'est pas nécessaire de synchroniser;
+             * Construit les index. Note: il n'est pas nÃ©cessaire de synchroniser;
              * ce n'est pas grave si les index sont construit deux fois, puisque le
-             * résultat devrait être identique à chaque exécution.
+             * rÃ©sultat devrait Ãªtre identique Ã  chaque exÃ©cution.
              */
             int termIndice = 0;
             final Map<Descriptor,Integer> descriptors = new HashMap<Descriptor,Integer>();
@@ -279,9 +279,9 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
             this.coefficients = coeff;
         }
         /*
-         * Calcule maintenant le modèle linéaire en utilisant les index créés précédements.
-         * La plupart du temps, l'exécution de cette méthode commencera directement ici sans
-         * exécuter tout le bloc précédent.
+         * Calcule maintenant le modÃ¨le linÃ©aire en utilisant les index crÃ©Ã©s prÃ©cÃ©dements.
+         * La plupart du temps, l'exÃ©cution de cette mÃ©thode commencera directement ici sans
+         * exÃ©cuter tout le bloc prÃ©cÃ©dent.
          */
         double sum = 0;
         for (int i=0; i<index.length; i++) {
@@ -312,7 +312,7 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
             }
         }
         /*
-         * Obtient le nombre maximal de symboles (par exemple le symbole de l'opérateur
+         * Obtient le nombre maximal de symboles (par exemple le symbole de l'opÃ©rateur
          * nabla) devant les noms de descripteurs de chaque colonnes.
          */
         final int[] leadingSymbols = new int[count];
@@ -327,7 +327,7 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
             }
         }
         /*
-         * Procède au formattage.
+         * ProcÃ¨de au formattage.
          */
         final NumberFormat format = (locale != null) ? NumberFormat.getNumberInstance(locale)
                                                      : NumberFormat.getNumberInstance();
@@ -364,7 +364,7 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
     }
 
     /**
-     * Retourne le nombre de caractères autre qu'une lettre au début du symbole spécifié.
+     * Retourne le nombre de caractÃ¨res autre qu'une lettre au dÃ©but du symbole spÃ©cifiÃ©.
      */
     private static int leadingSymbols(final String name) {
         final int length = name.length();
@@ -377,7 +377,7 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
     }
 
     /**
-     * Vérifie si cet objet est égal à l'objet spécifié.
+     * VÃ©rifie si cet objet est Ã©gal Ã  l'objet spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object object) {

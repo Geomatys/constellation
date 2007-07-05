@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,31 +22,31 @@ import net.sicade.observation.Procedure;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Procedure procédure}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain Procedure procÃ©dure}.
  *
  * @version $Id$
  * @author Antoine Hnawia
  */
 public class ProcedureEntry extends Entry implements Procedure {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -1370011712794916454L;
 
     /**
-     * Construit une nouvelle procédure du nom spécifié.
+     * Construit une nouvelle procÃ©dure du nom spÃ©cifiÃ©.
      *
-     * @param name Le nom de la procédure.
+     * @param name Le nom de la procÃ©dure.
      */
     protected ProcedureEntry(final String name) {
         super(name);
     }
 
     /** 
-     * Construit une nouvelle procédure du nom spécifié avec les remarques spécifiées.
+     * Construit une nouvelle procÃ©dure du nom spÃ©cifiÃ© avec les remarques spÃ©cifiÃ©es.
      *
-     * @param name    Le nom de la procédure.
-     * @param remarks Remarques s'appliquant à cette procédure, ou {@code null}.
+     * @param name    Le nom de la procÃ©dure.
+     * @param remarks Remarques s'appliquant Ã  cette procÃ©dure, ou {@code null}.
      */
     protected ProcedureEntry(final String name, final String remarks) {
         super(name, remarks);

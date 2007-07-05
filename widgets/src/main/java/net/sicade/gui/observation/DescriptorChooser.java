@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -68,7 +68,7 @@ import net.sicade.observation.coverage.LocationOffset;
 
 
 /**
- * Sélectionne des descripteurs parmis une liste.
+ * SÃ©lectionne des descripteurs parmis une liste.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -76,19 +76,19 @@ import net.sicade.observation.coverage.LocationOffset;
 @SuppressWarnings("serial")
 public class DescriptorChooser extends JPanel {
     /**
-     * Une liste d'éléments mémorisée sour forme de tableau. Ce modèle sera utilisé
-     * par les listes de la première étape.
+     * Une liste d'Ã©lÃ©ments mÃ©morisÃ©e sour forme de tableau. Ce modÃ¨le sera utilisÃ©
+     * par les listes de la premiÃ¨re Ã©tape.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Model extends AbstractListModel {
         /**
-         * Les éléments dans cette liste.
+         * Les Ã©lÃ©ments dans cette liste.
          */
         private Element[] elements = new Element[0];
 
-        /** Spécifie l'ensemble des éléments à affecter à cette liste. */
+        /** SpÃ©cifie l'ensemble des Ã©lÃ©ments Ã  affecter Ã  cette liste. */
         public void setElements(final Set<? extends Element> newElements) {
             final int newLength = newElements.size();
             final int length = (elements != null) ? Math.max(elements.length, newLength) : newLength;
@@ -98,19 +98,19 @@ public class DescriptorChooser extends JPanel {
             }
         }
 
-        /** Retourne le nombre d'éléments dans cette liste. */
+        /** Retourne le nombre d'Ã©lÃ©ments dans cette liste. */
         public int getSize() {
             return elements.length;
         }
 
-        /** Retourne l'élément à l'index spécifié. */
+        /** Retourne l'Ã©lÃ©ment Ã  l'index spÃ©cifiÃ©. */
         public Element getElementAt(final int index) {
             return elements[index];
         }
     }
 
     /**
-     * Action exécuté lorsque l'un des boutons est appuyé.
+     * Action exÃ©cutÃ© lorsque l'un des boutons est appuyÃ©.
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -145,38 +145,38 @@ public class DescriptorChooser extends JPanel {
 
 
     /**
-     * Nom de la première étape, qui consiste à choisir les {@linkplain Series séries},
-     * {@linkplain Operation opérations} et {@link LocationOffset positions relatives}.
-     * Ce nom peut être spécifié en argument à {@link #setStep} pour sélectionner les
-     * listes à afficher.
+     * Nom de la premiÃ¨re Ã©tape, qui consiste Ã  choisir les {@linkplain Series sÃ©ries},
+     * {@linkplain Operation opÃ©rations} et {@link LocationOffset positions relatives}.
+     * Ce nom peut Ãªtre spÃ©cifiÃ© en argument Ã  {@link #setStep} pour sÃ©lectionner les
+     * listes Ã  afficher.
      */
     public static final String SELECT_PROPERTIES = "SelectProperties";
 
     /**
-     * Nom de la seconde étape, qui consiste à choisir les {@linkplain Descriptor descripteurs}
-     * eux-mêmes. Ce nom peut être spécifié en argument à {@link #setStep} pour sélectionner les
-     * listes à afficher.
+     * Nom de la seconde Ã©tape, qui consiste Ã  choisir les {@linkplain Descriptor descripteurs}
+     * eux-mÃªmes. Ce nom peut Ãªtre spÃ©cifiÃ© en argument Ã  {@link #setStep} pour sÃ©lectionner les
+     * listes Ã  afficher.
      */
     public static final String SELECT_DESCRIPTORS = "SelectDescriptors";
 
     /**
-     * Le nom de la feuille de préférences pour les derniers descripteurs utilisés.
+     * Le nom de la feuille de prÃ©fÃ©rences pour les derniers descripteurs utilisÃ©s.
      */
     private static final String LAST_DESCRIPTORS = "LastDescriptors";
 
     /**
-     * Ensemble des {@linkplain Descriptor descripteurs} dont on veut répartir les composantes
+     * Ensemble des {@linkplain Descriptor descripteurs} dont on veut rÃ©partir les composantes
      * dans les trois listes {@code phenomenons}, {@code operations} et {@code offsets}.
      */
     private final Map<Descriptor,Boolean> descriptors = new LinkedHashMap<Descriptor,Boolean>();
 
     /**
-     * Ensemble des {@linkplain Series séries} d'images.
+     * Ensemble des {@linkplain Series sÃ©ries} d'images.
      */
     private final Map<Series,Boolean> series = new LinkedHashMap<Series,Boolean>();
 
     /**
-     * Ensemble des {@linkplain Operation opérations}.
+     * Ensemble des {@linkplain Operation opÃ©rations}.
      */
     private final Map<Operation,Boolean> operations = new LinkedHashMap<Operation,Boolean>();
     
@@ -186,12 +186,12 @@ public class DescriptorChooser extends JPanel {
     private final Map<LocationOffset,Boolean> offsets = new LinkedHashMap<LocationOffset,Boolean>();
 
     /**
-     * Liste des {@linkplain Series séries} d'images.
+     * Liste des {@linkplain Series sÃ©ries} d'images.
      */
     private final JList seriesList;
 
     /**
-     * Liste des {@linkplain Operation opérations}.
+     * Liste des {@linkplain Operation opÃ©rations}.
      */
     private final JList operationList;
 
@@ -206,23 +206,23 @@ public class DescriptorChooser extends JPanel {
     private final DisjointLists descriptorList;
 
     /**
-     * L'étape courante, comme une des constantes {@link #SELECT_PROPERTIES} ou
+     * L'Ã©tape courante, comme une des constantes {@link #SELECT_PROPERTIES} ou
      * {@link #SELECT_DESCRIPTORS}.
      */
     private String currentStep;
 
     /**
-     * La composante graphique qui affichera les différentes étapes.
+     * La composante graphique qui affichera les diffÃ©rentes Ã©tapes.
      */
     private final JPanel cards;
 
     /**
-     * Le bouton pour revenir à l'étape précédente.
+     * Le bouton pour revenir Ã  l'Ã©tape prÃ©cÃ©dente.
      */
     private final JButton previous;
 
     /**
-     * Le bouton pour aller à l'étape suivante.
+     * Le bouton pour aller Ã  l'Ã©tape suivante.
      */
     private final JButton next;
 
@@ -232,7 +232,7 @@ public class DescriptorChooser extends JPanel {
     private final JButton cancel;
 
     /**
-     * Les préférences à utiliser pour mémoriser les derniers descripteurs utilisés.
+     * Les prÃ©fÃ©rences Ã  utiliser pour mÃ©moriser les derniers descripteurs utilisÃ©s.
      */
     private final Preferences preferences = Preferences.userNodeForPackage(DescriptorChooser.class);
 
@@ -243,13 +243,13 @@ public class DescriptorChooser extends JPanel {
         super(new BorderLayout(0,9));
         cards = new JPanel(new CardLayout());
         /*
-         * Construction de l'étape 1.
+         * Construction de l'Ã©tape 1.
          */
         JPanel step = new JPanel(new BorderLayout(0,9));
         JPanel pane = new JPanel(new GridLayout(1,3,9,0));
-        pane.add(new JLabel("Séries d'images", JLabel.CENTER));
-        pane.add(new JLabel("Opérations",      JLabel.CENTER));
-        pane.add(new JLabel("Décalages",       JLabel.CENTER));
+        pane.add(new JLabel("SÃ©ries d'images", JLabel.CENTER));
+        pane.add(new JLabel("OpÃ©rations",      JLabel.CENTER));
+        pane.add(new JLabel("DÃ©calages",       JLabel.CENTER));
         step.add(pane, BorderLayout.NORTH);
         pane = new JPanel(new GridLayout(1,3,9,0));
         pane.add(new JScrollPane(seriesList    = new JList(new Model())));
@@ -258,7 +258,7 @@ public class DescriptorChooser extends JPanel {
         step.add(pane, BorderLayout.CENTER);
         cards.add(step, SELECT_PROPERTIES);
         /*
-         * Construction de l'étape 2.
+         * Construction de l'Ã©tape 2.
          */
         descriptorList = new DisjointLists();
         descriptorList.setAutoSortEnabled(false);
@@ -269,7 +269,7 @@ public class DescriptorChooser extends JPanel {
          */
         add(cards, BorderLayout.CENTER);
         pane = new JPanel(new GridLayout(1,3,9,0));
-        pane.add(previous = new JButton("Précédent"));
+        pane.add(previous = new JButton("PrÃ©cÃ©dent"));
         pane.add(next     = new JButton("Suivant"));
         pane.add(cancel   = new JButton("Annuler"));
         pane.setBorder(BorderFactory.createEmptyBorder(15,0,0,0));
@@ -280,7 +280,7 @@ public class DescriptorChooser extends JPanel {
         setBorder(BorderFactory.createCompoundBorder(getBorder(),
                   BorderFactory.createEmptyBorder(12, 12, 12, 12)));
         /*
-         * Définition des actions.
+         * DÃ©finition des actions.
          */
         final Action action = new Action();
         previous.addActionListener(action);
@@ -290,9 +290,9 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Construit une nouvelle composante initialisée avec l'ensemble des descripteurs spécifié.
-     * Les descripteurs qui avaient été choisis par l'utilisateur lors de la dernière utilisation
-     * de cette composante seront automatiquement sélectionnés.
+     * Construit une nouvelle composante initialisÃ©e avec l'ensemble des descripteurs spÃ©cifiÃ©.
+     * Les descripteurs qui avaient Ã©tÃ© choisis par l'utilisateur lors de la derniÃ¨re utilisation
+     * de cette composante seront automatiquement sÃ©lectionnÃ©s.
      */
     public DescriptorChooser(final Collection<Descriptor> descriptors) {
         this();
@@ -301,9 +301,9 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Ajoute à cette composante l'ensemble des descripteurs spécifié. Aucun des nouveaux
-     * descripteurs ne sera initiallement sélectionné. Afin de pré-sélectionner ceux qui
-     * avaient été choisis par l'utilisateur lors de la dernière utilisation de cette
+     * Ajoute Ã  cette composante l'ensemble des descripteurs spÃ©cifiÃ©. Aucun des nouveaux
+     * descripteurs ne sera initiallement sÃ©lectionnÃ©. Afin de prÃ©-sÃ©lectionner ceux qui
+     * avaient Ã©tÃ© choisis par l'utilisateur lors de la derniÃ¨re utilisation de cette
      * composante, appelez {@link #loadSelection}.
      */
     public void addDescriptor(final Collection<Descriptor> toAdd) {
@@ -323,8 +323,8 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Ajoute à l'ensemble spécifié l'élément spécifié. Si l'élément n'existait pas déjà, il sera
-     * ajouté comme un élément non-sélectionné. S'il existait déjà, son état sera laissé inchangé.
+     * Ajoute Ã  l'ensemble spÃ©cifiÃ© l'Ã©lÃ©ment spÃ©cifiÃ©. Si l'Ã©lÃ©ment n'existait pas dÃ©jÃ , il sera
+     * ajoutÃ© comme un Ã©lÃ©ment non-sÃ©lectionnÃ©. S'il existait dÃ©jÃ , son Ã©tat sera laissÃ© inchangÃ©.
      */
     private static <T extends Element> boolean add(final Map<T,Boolean> map, final T element) {
         final Boolean old = map.put(element, FALSE);
@@ -340,8 +340,8 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Affecte au modèle de la liste spécifiée l'ensemble des éléments spécifié.
-     * La sélection sera définie en fonction des valeurs du dictionnaire.
+     * Affecte au modÃ¨le de la liste spÃ©cifiÃ©e l'ensemble des Ã©lÃ©ments spÃ©cifiÃ©.
+     * La sÃ©lection sera dÃ©finie en fonction des valeurs du dictionnaire.
      */
     private static void setElements(final JList list, final Map<? extends Element, Boolean> elements) {
         final Model model = (Model) list.getModel();
@@ -350,8 +350,8 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Sélectionne les éléments de la liste spécifiée en fonction du dictionnaire spécifié. Cette
-     * méthode peut être interprétée comme une copie de la sélection du dictionnaire {@code elements}
+     * SÃ©lectionne les Ã©lÃ©ments de la liste spÃ©cifiÃ©e en fonction du dictionnaire spÃ©cifiÃ©. Cette
+     * mÃ©thode peut Ãªtre interprÃ©tÃ©e comme une copie de la sÃ©lection du dictionnaire {@code elements}
      * <em>vers</em> la liste {@code list}.
      */
     private static <T extends Element> void copySelection(final Map<T,Boolean> elements, final JList list) {
@@ -369,8 +369,8 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Met à jour l'état du dictionnaire spécifié en fonction de la sélection de la liste spécifiée.
-     * Cette méthode peut être interprétée comme une copie de la sélection de la liste {@code list}
+     * Met Ã  jour l'Ã©tat du dictionnaire spÃ©cifiÃ© en fonction de la sÃ©lection de la liste spÃ©cifiÃ©e.
+     * Cette mÃ©thode peut Ãªtre interprÃ©tÃ©e comme une copie de la sÃ©lection de la liste {@code list}
      * <em>vers</em> le dictionnaire {@code elements}.
      */
     private static <T extends Element> void copySelection(final JList list, final Map<T,Boolean> elements) {
@@ -387,8 +387,8 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Met à jour les champs internes (notamment {@link #descriptors}) en fonction de la sélection
-     * des listes de séries, procédures et décalages spatio-temporelles. Cette opération intervient
+     * Met Ã  jour les champs internes (notamment {@link #descriptors}) en fonction de la sÃ©lection
+     * des listes de sÃ©ries, procÃ©dures et dÃ©calages spatio-temporelles. Cette opÃ©ration intervient
      * typiquement lorsque l'utilisateur appuie sur le bouton "Suivant".
      */
     private void commitPropertiesSelection() {
@@ -420,13 +420,13 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Met à jour les champs internes (notamment {@link #series}, {@link #operations} et {@link #offsets})
-     * en fonction de la sélection des descripteurs. Cette opération intervient typiquement lorsque
-     * l'utilisateur appuie sur le bouton "Précédent".
+     * Met Ã  jour les champs internes (notamment {@link #series}, {@link #operations} et {@link #offsets})
+     * en fonction de la sÃ©lection des descripteurs. Cette opÃ©ration intervient typiquement lorsque
+     * l'utilisateur appuie sur le bouton "PrÃ©cÃ©dent".
      * <p>
-     * Notez que cette méthode n'efface pas la sélection précédente des listes {@link #series},
-     * {@link #operations} et {@link #offsets}. Elle peut seulement l'étendre. Si vous souhaitez
-     * effacer les sélections précédentes au préalable, appelez d'abord
+     * Notez que cette mÃ©thode n'efface pas la sÃ©lection prÃ©cÃ©dente des listes {@link #series},
+     * {@link #operations} et {@link #offsets}. Elle peut seulement l'Ã©tendre. Si vous souhaitez
+     * effacer les sÃ©lections prÃ©cÃ©dentes au prÃ©alable, appelez d'abord
      * <code>{@link #selectAll selectAll}(..., FALSE)</code>.
      */
     private void commitDescriptorSelection() {
@@ -451,7 +451,7 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Affecte la valeur spécifiée à toutes les entrées du dictionnaire spécifié.
+     * Affecte la valeur spÃ©cifiÃ©e Ã  toutes les entrÃ©es du dictionnaire spÃ©cifiÃ©.
      */
     private static <T extends Element> void selectAll(final Map<T,Boolean> elements, final Boolean isSelected) {
         for (final Map.Entry<T,Boolean> entry : elements.entrySet()) {
@@ -460,9 +460,9 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Sélectionne les descripteurs qui avaient été choisies par l'utilisateur lors de
-     * la dernière utilisation de cette composante. Cette sélection est puisée dans
-     * les {@linkplain Preferences préférences}.
+     * SÃ©lectionne les descripteurs qui avaient Ã©tÃ© choisies par l'utilisateur lors de
+     * la derniÃ¨re utilisation de cette composante. Cette sÃ©lection est puisÃ©e dans
+     * les {@linkplain Preferences prÃ©fÃ©rences}.
      */
     public void loadSelection() {
         final String last = preferences.get(LAST_DESCRIPTORS, null);
@@ -496,9 +496,9 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Sauvegarde la sélection de l'utilisateur dans les {@linkplain Preferences préférences}.
-     * Cette sélection pourra être récupérée plus tard avec {@link #loadSelection}. Cette méthode
-     * est appelée automatiquement lorsque l'utilisateur appuie sur le bouton "Exécuter".
+     * Sauvegarde la sÃ©lection de l'utilisateur dans les {@linkplain Preferences prÃ©fÃ©rences}.
+     * Cette sÃ©lection pourra Ãªtre rÃ©cupÃ©rÃ©e plus tard avec {@link #loadSelection}. Cette mÃ©thode
+     * est appelÃ©e automatiquement lorsque l'utilisateur appuie sur le bouton "ExÃ©cuter".
      */
     public void saveSelection() {
         final StringBuilder buffer = new StringBuilder();
@@ -512,7 +512,7 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Spécifie l'étape à afficher. L'argument {@code step} doit être une des constantes
+     * SpÃ©cifie l'Ã©tape Ã  afficher. L'argument {@code step} doit Ãªtre une des constantes
      * suivantes: {@link #SELECT_PROPERTIES} ou {@link #SELECT_DESCRIPTORS}.
      */
     public void setStep(final String step) {
@@ -523,7 +523,7 @@ public class DescriptorChooser extends JPanel {
         } else if (SELECT_DESCRIPTORS.equals(step)) {
             commitPropertiesSelection();
             previous.setEnabled(true);
-            next.setText("Exécuter");
+            next.setText("ExÃ©cuter");
         } else {
             throw new IllegalArgumentException(step);
         }
@@ -532,8 +532,8 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Si {@code selected} est {@code true}, retourne l'ensemble des descripteurs sélectionnés par
-     * l'utilisateur. Sinon, retourne l'ensemble des descripteurs qui ne sont pas sélectionnés.
+     * Si {@code selected} est {@code true}, retourne l'ensemble des descripteurs sÃ©lectionnÃ©s par
+     * l'utilisateur. Sinon, retourne l'ensemble des descripteurs qui ne sont pas sÃ©lectionnÃ©s.
      */
     public Set<Descriptor> getDescriptors(final boolean selected) {
         if (SELECT_PROPERTIES.equals(currentStep)) {
@@ -545,29 +545,29 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Méthode appelée automatiquement lorsque l'utilisateur a appuyé sur le bouton "Exécuter".
-     * L'implémentation par défaut ne fait qu'appeller {@link #dispose}. Les classes dérivées
-     * devrait surcharger cette méthode afin d'exécuter l'action qu'elles souhaite effectuer
-     * à partir de l'{@linkplain #getSelectedDescriptors ensemble des descripteurs sélectionnés}.
+     * MÃ©thode appelÃ©e automatiquement lorsque l'utilisateur a appuyÃ© sur le bouton "ExÃ©cuter".
+     * L'implÃ©mentation par dÃ©faut ne fait qu'appeller {@link #dispose}. Les classes dÃ©rivÃ©es
+     * devrait surcharger cette mÃ©thode afin d'exÃ©cuter l'action qu'elles souhaite effectuer
+     * Ã  partir de l'{@linkplain #getSelectedDescriptors ensemble des descripteurs sÃ©lectionnÃ©s}.
      */
     protected void execute() {
         dispose();
     }
 
     /**
-     * Méthode appelée automatique lorsque l'utilisateur a appuyé sur le bouton "Annuler".
-     * L'implémentation par défaut ne fait qu'appeller {@link #dispose}. Les classes dérivées
-     * devrait surcharger cette méthode afin d'interrompre l'action lancée par {@link #execute}.
+     * MÃ©thode appelÃ©e automatique lorsque l'utilisateur a appuyÃ© sur le bouton "Annuler".
+     * L'implÃ©mentation par dÃ©faut ne fait qu'appeller {@link #dispose}. Les classes dÃ©rivÃ©es
+     * devrait surcharger cette mÃ©thode afin d'interrompre l'action lancÃ©e par {@link #execute}.
      */
     protected void cancel() {
         dispose();
     }
 
     /**
-     * Fait disparaître la fenêtre parente. Cette méthode est appelée automatiquement lorsque
-     * l'utilisateur appuie sur le bouton "Annuler". Elle peut aussi être appelée lorsque
-     * l'exécution de la tâche (celle qui est lancée après la sélection des descripteurs)
-     * est terminée.
+     * Fait disparaÃ®tre la fenÃªtre parente. Cette mÃ©thode est appelÃ©e automatiquement lorsque
+     * l'utilisateur appuie sur le bouton "Annuler". Elle peut aussi Ãªtre appelÃ©e lorsque
+     * l'exÃ©cution de la tÃ¢che (celle qui est lancÃ©e aprÃ¨s la sÃ©lection des descripteurs)
+     * est terminÃ©e.
      */
     public void dispose() {
         previous.setEnabled(false);
@@ -588,17 +588,17 @@ public class DescriptorChooser extends JPanel {
 
     /**
      * Affiche cette composante graphique. Si {@code owner} est nul, cette composante graphique
-     * sera affiché dans son propre {@link JFrame}. Sinon, elle apparaître comme une boîte de
-     * dialogue ou une fenêtre interne, en fonction du type de {@code owner}.
+     * sera affichÃ© dans son propre {@link JFrame}. Sinon, elle apparaÃ®tre comme une boÃ®te de
+     * dialogue ou une fenÃªtre interne, en fonction du type de {@code owner}.
      */
     public void show(final Component owner) {
-        final Component frame = SwingUtilities.toFrame(owner, this, "Sélection de descripteurs", null);
+        final Component frame = SwingUtilities.toFrame(owner, this, "SÃ©lection de descripteurs", null);
         frame.setVisible(true);
     }
 
     /**
-     * Affiche cette composante avec l'ensemble des descripteurs de la base de données par défaut.
-     * Cette méthode est utilisée principalement à des fins de tests.
+     * Affiche cette composante avec l'ensemble des descripteurs de la base de donnÃ©es par dÃ©faut.
+     * Cette mÃ©thode est utilisÃ©e principalement Ã  des fins de tests.
      *
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      */

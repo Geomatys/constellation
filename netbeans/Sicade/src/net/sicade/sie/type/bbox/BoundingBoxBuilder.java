@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,9 +31,9 @@ import net.sicade.observation.coverage.Series;
 
 
 /**
- * Complète la construction des objets {@link BoundingBox} en obtenant leurs séries de données.
- * Cette étape est exécutée en arrière plan, de sorte que les délais de connexion à la base de
- * données ne bloquent pas l'usage de l'application.
+ * ComplÃ¨te la construction des objets {@link BoundingBox} en obtenant leurs sÃ©ries de donnÃ©es.
+ * Cette Ã©tape est exÃ©cutÃ©e en arriÃ¨re plan, de sorte que les dÃ©lais de connexion Ã  la base de
+ * donnÃ©es ne bloquent pas l'usage de l'application.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -45,20 +45,20 @@ final class BoundingBoxBuilder implements Runnable {
     public static final BoundingBoxBuilder DEFAULT = new BoundingBoxBuilder();
 
     /**
-     * Liste des objets {@link BoundingBox} en attente d'avoir leurs séries de données.
+     * Liste des objets {@link BoundingBox} en attente d'avoir leurs sÃ©ries de donnÃ©es.
      */
     private final LinkedList<BoundingBox> queue = new LinkedList<BoundingBox>();
 
     /**
-     * L'objet en cours de traitement. Cet objet a été retiré de la liste {@link #queue},
-     * mais sa référence est conservée jusqu'à la fin du traitement afin d'éviter que
+     * L'objet en cours de traitement. Cet objet a Ã©tÃ© retirÃ© de la liste {@link #queue},
+     * mais sa rÃ©fÃ©rence est conservÃ©e jusqu'Ã  la fin du traitement afin d'Ã©viter que
      * {@link #add} ne l'ajoute encore inutilement.
      */
     private transient BoundingBox processing;
 
     /**
-     * Construit une instance de {@code BoundingBoxBuilder} qui sera immédiatement démarré
-     * dans un thread en arrière-plan.
+     * Construit une instance de {@code BoundingBoxBuilder} qui sera immÃ©diatement dÃ©marrÃ©
+     * dans un thread en arriÃ¨re-plan.
      */
     private BoundingBoxBuilder() {
         final Thread thread = new Thread(this, "BoundingBoxBuilder");
@@ -68,18 +68,18 @@ final class BoundingBoxBuilder implements Runnable {
     }
 
     /**
-     * Ajoute l'élément spécifié à la liste des objets à construire. Si l'objet spécifié était déjà
-     * dans la liste, alors il sera déplacé au début de la liste de façon à le rendre prioritaire.
-     * Autrement dit, si cette méthode est appelée plus d'une fois pour le même objet {@code bbox},
-     * alors tous les appels redondants sont considérés comme des "piqûres de rappel" indiquant que
-     * cet objet {@code bbox} a été demandé plusieurs fois (probablement par l'utilisateur) et
-     * devrait donc être traité en priorité.
+     * Ajoute l'Ã©lÃ©ment spÃ©cifiÃ© Ã  la liste des objets Ã  construire. Si l'objet spÃ©cifiÃ© Ã©tait dÃ©jÃ 
+     * dans la liste, alors il sera dÃ©placÃ© au dÃ©but de la liste de faÃ§on Ã  le rendre prioritaire.
+     * Autrement dit, si cette mÃ©thode est appelÃ©e plus d'une fois pour le mÃªme objet {@code bbox},
+     * alors tous les appels redondants sont considÃ©rÃ©s comme des "piqÃ»res de rappel" indiquant que
+     * cet objet {@code bbox} a Ã©tÃ© demandÃ© plusieurs fois (probablement par l'utilisateur) et
+     * devrait donc Ãªtre traitÃ© en prioritÃ©.
      */
     public void add(final BoundingBox bbox) {
         synchronized (queue) {
             if (bbox != processing) {
                 if (queue.remove(bbox)) {
-                    assert !queue.contains(bbox); // Vérifie qu'il n'y a pas de doublons.
+                    assert !queue.contains(bbox); // VÃ©rifie qu'il n'y a pas de doublons.
                     queue.addFirst(bbox);
                 } else {
                     queue.addLast(bbox);
@@ -90,14 +90,14 @@ final class BoundingBoxBuilder implements Runnable {
     }
 
     /**
-     * Obtient les séries de données pour tous les objets {@link BoundingBox} qui ont été
-     * {@linkplain #add ajoutés à la liste}.
+     * Obtient les sÃ©ries de donnÃ©es pour tous les objets {@link BoundingBox} qui ont Ã©tÃ©
+     * {@linkplain #add ajoutÃ©s Ã  la liste}.
      */
     public void run() {
         while (true) {
             /*
-             * Obtient le prochain élément à traiter. Le code suivant bloquera (le thread
-             * dormira) jusqu'à ce qu'au moins un élément soit disponible dans la liste.
+             * Obtient le prochain Ã©lÃ©ment Ã  traiter. Le code suivant bloquera (le thread
+             * dormira) jusqu'Ã  ce qu'au moins un Ã©lÃ©ment soit disponible dans la liste.
              */
             synchronized (queue) {
                 processing = queue.poll();
@@ -106,9 +106,9 @@ final class BoundingBoxBuilder implements Runnable {
                         queue.wait();
                     } catch (InterruptedException e) {
                         /*
-                         * L'attente a été interrompue. Il n'y a pas de raison pour que cela se
-                         * produise. Mais si c'est tout de même le cas, ce n'est pas un soucis.
-                         * Il suffit de retourner au boulot (vérifier si une nouvelle entrée est
+                         * L'attente a Ã©tÃ© interrompue. Il n'y a pas de raison pour que cela se
+                         * produise. Mais si c'est tout de mÃªme le cas, ce n'est pas un soucis.
+                         * Il suffit de retourner au boulot (vÃ©rifier si une nouvelle entrÃ©e est
                          * disponible, et continuer comme d'habitude).
                          */
                     }
@@ -116,10 +116,10 @@ final class BoundingBoxBuilder implements Runnable {
                 }
             }
             /*
-             * Obtient maintenant toutes les séries de données qui interceptent la région
-             * géographique et la plage de temps spécifiées. En cas d'exception autre que
+             * Obtient maintenant toutes les sÃ©ries de donnÃ©es qui interceptent la rÃ©gion
+             * gÃ©ographique et la plage de temps spÃ©cifiÃ©es. En cas d'exception autre que
              * java.lang.Error, on ne propage pas l'exception car il n'y aura personne pour
-             * la gérer au dessus de cette méthode, et l'on ne veut pas tuer ce thread.
+             * la gÃ©rer au dessus de cette mÃ©thode, et l'on ne veut pas tuer ce thread.
              */
             Series[] series = null;
             try {

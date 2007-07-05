@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -43,12 +43,12 @@ import net.sicade.resources.seagis.Resources;
 
 /**
  * Classe de base des connections vers la table des {@linkplain Observation observation}.
- * La requête SQL donné au constructeur doit répondre aux conditions suivantes:
+ * La requÃªte SQL donnÃ© au constructeur doit rÃ©pondre aux conditions suivantes:
  * <p>
  * <ul>
- *   <li>Les deux premiers arguments doivent être la {@linkplain Station station} et
- *       l'{@linkplain Observable observable} recherchés, dans cet ordre.</li>
- *   <li>Les deux premières colonnes retournées doivent aussi être les identifiants de la
+ *   <li>Les deux premiers arguments doivent Ãªtre la {@linkplain Station station} et
+ *       l'{@linkplain Observable observable} recherchÃ©s, dans cet ordre.</li>
+ *   <li>Les deux premiÃ¨res colonnes retournÃ©es doivent aussi Ãªtre les identifiants de la
  *       {@linkplain Station station} et de l'{@linkplain Observable observable}.</li>
  * </ul>
  * <p>
@@ -63,48 +63,48 @@ import net.sicade.resources.seagis.Resources;
  * @author Antoine Hnawia
  */
 public abstract class ObservationTable<EntryType extends Observation> extends Table {
-    /** Numéro de colonne et d'argument. */ static final int STATION    = 1;
-    /** Numéro de colonne et d'argument. */ static final int OBSERVABLE = 2;
+    /** NumÃ©ro de colonne et d'argument. */ static final int STATION    = 1;
+    /** NumÃ©ro de colonne et d'argument. */ static final int OBSERVABLE = 2;
 
     /**
      * Connexion vers la table des stations.
      * <p>
-     * <strong>NOTE:</strong> {@link StationTable} garde elle-même une référence vers cette instance
+     * <strong>NOTE:</strong> {@link StationTable} garde elle-mÃªme une rÃ©fÃ©rence vers cette instance
      * de {@code ObservationTable}, mais seule {@link StationEntry} l'utilise. L'ordre d'acquisition
-     * des verrous devrait toujours être {@code ObservationTable} d'abord, et {@code StationTable}
+     * des verrous devrait toujours Ãªtre {@code ObservationTable} d'abord, et {@code StationTable}
      * ensuite.
      */
     private StationTable stations;
 
     /**
      * Connexion vers la table des {@linkplain Observable observables}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private ObservableTable observables;
 
     /**
-     * La station pour laquelle on veut des observations, ou {@code null} pour récupérer les
+     * La station pour laquelle on veut des observations, ou {@code null} pour rÃ©cupÃ©rer les
      * observations de toutes les stations.
      */
     private Station station;
 
     /**
-     * L'observable pour lequel on veut des observations, ou {@code null} pour récupérer les
-     * observations correspondant à tous les observables.
+     * L'observable pour lequel on veut des observations, ou {@code null} pour rÃ©cupÃ©rer les
+     * observations correspondant Ã  tous les observables.
      */
     private Observable observable;
 
     /**
-     * La clé désignant la requête à utiliser pour obtenir des valeurs.
+     * La clÃ© dÃ©signant la requÃªte Ã  utiliser pour obtenir des valeurs.
      */
     private final ConfigurationKey select;
 
     /** 
      * Construit une nouvelle connexion vers la table des observations. Voyez la javadoc de
-     * cette classe pour les conditions que doivent remplir la requête donnée en argument.
+     * cette classe pour les conditions que doivent remplir la requÃªte donnÃ©e en argument.
      * 
-     * @param  database Connexion vers la base de données des observations.
-     * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
+     * @param  database Connexion vers la base de donnÃ©es des observations.
+     * @param  select   ClÃ© de la requÃªte SQL Ã  utiliser pour obtenir des valeurs.
      */
     protected ObservationTable(final Database       database,
                                final ConfigurationKey select)
@@ -114,10 +114,10 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     }
 
     /** 
-     * Construit une nouvelle connexion vers la table des observations pour les stations spécifiées.
+     * Construit une nouvelle connexion vers la table des observations pour les stations spÃ©cifiÃ©es.
      * 
-     * @param  stations La table des stations à utiliser.
-     * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
+     * @param  stations La table des stations Ã  utiliser.
+     * @param  select   ClÃ© de la requÃªte SQL Ã  utiliser pour obtenir des valeurs.
      */
     protected ObservationTable(final StationTable   stations,
                                final ConfigurationKey select)
@@ -127,11 +127,11 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     }
 
     /**
-     * Définie la table des stations à utiliser. Cette méthode peut être appelée par
-     * {@link StationTable} avant toute première utilisation de {@code ObservationTable}.
+     * DÃ©finie la table des stations Ã  utiliser. Cette mÃ©thode peut Ãªtre appelÃ©e par
+     * {@link StationTable} avant toute premiÃ¨re utilisation de {@code ObservationTable}.
      *
-     * @param  stations Table des stations à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des stations.
+     * @param  stations Table des stations Ã  utiliser.
+     * @throws IllegalStateException si cette instance utilise dÃ©jÃ  une autre table des stations.
      */
     protected synchronized void setStationTable(final StationTable stations)
             throws IllegalStateException
@@ -140,13 +140,13 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
             if (this.stations != null) {
                 throw new IllegalStateException();
             }
-            this.stations = stations; // Doit être avant tout appel de setTable(this).
+            this.stations = stations; // Doit Ãªtre avant tout appel de setTable(this).
             stations.setObservationTable(this);
         }
     }
 
     /**
-     * Retourne la table des stations, en la créant si nécessaire.
+     * Retourne la table des stations, en la crÃ©ant si nÃ©cessaire.
      */
     private synchronized StationTable getStationTable() {
         if (stations == null) {
@@ -156,12 +156,12 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     }
 
     /**
-     * Retourne la liste des stations qui pourrait avoir des données dans cette table.
+     * Retourne la liste des stations qui pourrait avoir des donnÃ©es dans cette table.
      */
     public Set<Station> getStations() throws CatalogException, SQLException {
         /*
-         * Ne PAS synchroniser cette méthode. StationTable est déjà synchronisée, et on veut
-         * éviter de garder un vérou à la fois sur ObservationTable et StationTable à cause
+         * Ne PAS synchroniser cette mÃ©thode. StationTable est dÃ©jÃ  synchronisÃ©e, et on veut
+         * Ã©viter de garder un vÃ©rou Ã  la fois sur ObservationTable et StationTable Ã  cause
          * du risque de "thread lock" que cela pourrait poser.
          */
         return getStationTable().getEntries();
@@ -175,7 +175,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     }
 
     /**
-     * Définit la station pour laquelle on recherche des observations.
+     * DÃ©finit la station pour laquelle on recherche des observations.
      * La valeur {@code null} recherche toutes les stations.
      */
     public synchronized void setStation(final Station station) {
@@ -193,7 +193,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     }
 
     /**
-     * Définit l'observable pour lequel on recherche des observations.
+     * DÃ©finit l'observable pour lequel on recherche des observations.
      * La valeur {@code null} retient tous les observables.
      */
     public synchronized void setObservable(final Observable observable) {
@@ -204,9 +204,9 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     }
 
     /**
-     * Configure la requête SQL spécifiée en fonction de la station et de l'observable recherchés
-     * par cette table. Cette méthode est appelée automatiquement lorsque cette table a
-     * {@linkplain #fireStateChanged changé d'état}.
+     * Configure la requÃªte SQL spÃ©cifiÃ©e en fonction de la station et de l'observable recherchÃ©s
+     * par cette table. Cette mÃ©thode est appelÃ©e automatiquement lorsque cette table a
+     * {@linkplain #fireStateChanged changÃ© d'Ã©tat}.
      */
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
@@ -214,17 +214,17 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
         if (station != null) {
             statement.setInt(STATION, station.getNumericIdentifier());
         } else {
-            throw new UnsupportedOperationException("La recherche sur toutes les stations n'est pas encore impléméntée.");
+            throw new UnsupportedOperationException("La recherche sur toutes les stations n'est pas encore implÃ©mÃ©ntÃ©e.");
         }
         if (observable != null) {
             statement.setInt(OBSERVABLE, observable.getNumericIdentifier());
         } else {
-            throw new UnsupportedOperationException("La recherche sur tous les observables n'est pas encore impléméntée.");
+            throw new UnsupportedOperationException("La recherche sur tous les observables n'est pas encore implÃ©mÃ©ntÃ©e.");
         }
     }
 
     /**
-     * Retourne {@code true} s'il existe au moins une entrée pour la station et l'observable
+     * Retourne {@code true} s'il existe au moins une entrÃ©e pour la station et l'observable
      * courant.
      */
     public synchronized boolean exists() throws SQLException {
@@ -236,13 +236,13 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     }
 
     /**
-     * Retourne les observations pour la station et l'observable courants. Cette méthode
+     * Retourne les observations pour la station et l'observable courants. Cette mÃ©thode
      * ne retourne jamais {@code null}, mais peut retourner un ensemble vide. L'ensemble
-     * retourné ne contiendra jamais plus d'un élément si une station et un observable
-     * non-nuls ont été spécifiés à cette table.
+     * retournÃ© ne contiendra jamais plus d'un Ã©lÃ©ment si une station et un observable
+     * non-nuls ont Ã©tÃ© spÃ©cifiÃ©s Ã  cette table.
      * 
      * @throws CatalogException si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     public synchronized Collection<EntryType> getEntries() throws CatalogException, SQLException {
         final List<EntryType> list = new ArrayList<EntryType>();
@@ -257,11 +257,11 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
 
     /**
      * Retourne une seule observation pour la station et l'observable courants, ou {@code null}
-     * s'il n'y en a pas. Cette méthode risque d'échouer si la station et l'observable n'ont pas
-     * été spécifiés tous les deux à cette table avec une valeur non-nulle.
+     * s'il n'y en a pas. Cette mÃ©thode risque d'Ã©chouer si la station et l'observable n'ont pas
+     * Ã©tÃ© spÃ©cifiÃ©s tous les deux Ã  cette table avec une valeur non-nulle.
      * 
      * @throws CatalogException si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     public synchronized EntryType getEntry() throws CatalogException, SQLException {
         final PreparedStatement statement = getStatement(select);
@@ -302,12 +302,12 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     }
 
     /**
-     * Construit une observation pour l'enregistrement courant. Les deux premières colonnes
-     * de l'enregistrement ont déjà été extraits et donnés en argument ({@code station} et
-     * {@code observable}). Les classes dérivées doivent extraires les colonnes restantes
-     * et construire l'entrée appropriée.
+     * Construit une observation pour l'enregistrement courant. Les deux premiÃ¨res colonnes
+     * de l'enregistrement ont dÃ©jÃ  Ã©tÃ© extraits et donnÃ©s en argument ({@code station} et
+     * {@code observable}). Les classes dÃ©rivÃ©es doivent extraires les colonnes restantes
+     * et construire l'entrÃ©e appropriÃ©e.
      * 
-     * @throws SQLException si une erreur est survenu lors de l'accès à la base de données.
+     * @throws SQLException si une erreur est survenu lors de l'accÃ¨s Ã  la base de donnÃ©es.
      */
     protected abstract EntryType createEntry(final Station    station,
                                              final Observable observable,

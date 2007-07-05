@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,22 +22,22 @@ import net.sicade.observation.Element;
 
 
 /**
- * Un sous-ensemble d'une {@linkplain Series série} d'image. Une série d'images peut être divisée
- * en plusieurs sous-ensembles, où chaque sous-ensemble partage des caractéristiques communes. Par
- * exemple une série d'images de température de surface de la mer (SST) en provenance du programme
- * <cite>Pathfinder</cite> de la Nasa peut être divisée en deux sous-ensembles:
+ * Un sous-ensemble d'une {@linkplain Series sÃ©rie} d'image. Une sÃ©rie d'images peut Ãªtre divisÃ©e
+ * en plusieurs sous-ensembles, oÃ¹ chaque sous-ensemble partage des caractÃ©ristiques communes. Par
+ * exemple une sÃ©rie d'images de tempÃ©rature de surface de la mer (SST) en provenance du programme
+ * <cite>Pathfinder</cite> de la Nasa peut Ãªtre divisÃ©e en deux sous-ensembles:
  * <p>
  * <ul>
- *   <li>Les données historiques "définitives" (pour une version donnée de la chaîne de traitement),
- *       souvent vieille d'un moins deux ans à cause de délai nécessaire à leur traitement.</li>
- *   <li>Les données plus récentes mais pas encore définitives, appelée "intérimaires".</li>
+ *   <li>Les donnÃ©es historiques "dÃ©finitives" (pour une version donnÃ©e de la chaÃ®ne de traitement),
+ *       souvent vieille d'un moins deux ans Ã  cause de dÃ©lai nÃ©cessaire Ã  leur traitement.</li>
+ *   <li>Les donnÃ©es plus rÃ©centes mais pas encore dÃ©finitives, appelÃ©e "intÃ©rimaires".</li>
  * </ul>
  * <p>
- * Une autre raison de diviser en sous-séries peut être un changement de format ou de chaîne de
- * traitement des données à partir d'une certaine date.
+ * Une autre raison de diviser en sous-sÃ©ries peut Ãªtre un changement de format ou de chaÃ®ne de
+ * traitement des donnÃ©es Ã  partir d'une certaine date.
  * <p>
  * Pour la plupart des utilisations, cette distinction n'est pas utile et l'on travaillera uniquement
- * sur des séries d'images. Toutefois pour certaines applications, il peut être nécessaire de faire
+ * sur des sÃ©ries d'images. Toutefois pour certaines applications, il peut Ãªtre nÃ©cessaire de faire
  * la distinction entre ces sous-ensembles.
  *
  * @version $Id$
@@ -45,7 +45,7 @@ import net.sicade.observation.Element;
  */
 public interface SubSeries extends Element {
     /**
-     * Retourne le format des images de cette sous-série.
+     * Retourne le format des images de cette sous-sÃ©rie.
      */
     Format getFormat();
 }

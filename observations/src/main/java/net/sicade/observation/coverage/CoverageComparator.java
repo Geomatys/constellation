@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -46,26 +46,26 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * Compare deux entrées {@link CoverageReference} en fonction d'un critère arbitraire. Ce
- * comparateur sert à classer un tableau d'images en fonction de leur intérêt par rapport
- * à ce qui avait été demandé. L'implémentation par défaut favorise les images dont la plage
- * de temps couvre le mieux la plage demandée (les dates de début et de fin), et n'examinera
- * la couverture spatiale que si deux images ont une couverture temporelle équivalente. Cette
- * politique est appropriée lorsque les images couvrent à peu près la même région, et que les
- * dates de ces images est le principal facteur qui varie. Les critères de comparaison utilisés
+ * Compare deux entrÃ©es {@link CoverageReference} en fonction d'un critÃ¨re arbitraire. Ce
+ * comparateur sert Ã  classer un tableau d'images en fonction de leur intÃ©rÃªt par rapport
+ * Ã  ce qui avait Ã©tÃ© demandÃ©. L'implÃ©mentation par dÃ©faut favorise les images dont la plage
+ * de temps couvre le mieux la plage demandÃ©e (les dates de dÃ©but et de fin), et n'examinera
+ * la couverture spatiale que si deux images ont une couverture temporelle Ã©quivalente. Cette
+ * politique est appropriÃ©e lorsque les images couvrent Ã  peu prÃ¨s la mÃªme rÃ©gion, et que les
+ * dates de ces images est le principal facteur qui varie. Les critÃ¨res de comparaison utilisÃ©s
  * sont:
  * <p>
  * <ul>
- *  <li>Pour chaque image, la quantité [<i>temps à l'intérieur de la plage de temps
- *      demandée</i>]-[<i>temps à l'extérieur de la plage de temps demandé</i>] sera
- *      calculée. Si une des image à une quantité plus grande, elle sera choisie.</li>
- *  <li>Sinon, si une image se trouve mieux centrée sur la plage de temps demandée, cette
+ *  <li>Pour chaque image, la quantitÃ© [<i>temps Ã  l'intÃ©rieur de la plage de temps
+ *      demandÃ©e</i>]-[<i>temps Ã  l'extÃ©rieur de la plage de temps demandÃ©</i>] sera
+ *      calculÃ©e. Si une des image Ã  une quantitÃ© plus grande, elle sera choisie.</li>
+ *  <li>Sinon, si une image se trouve mieux centrÃ©e sur la plage de temps demandÃ©e, cette
  *      image sera choisie.</li>
- *  <li>Sinon, pour chaque image, l'intersection entre la région de l'image et la région
- *      demandée sera obtenue, et la superficie de cette intersection calculée. Si une
+ *  <li>Sinon, pour chaque image, l'intersection entre la rÃ©gion de l'image et la rÃ©gion
+ *      demandÃ©e sera obtenue, et la superficie de cette intersection calculÃ©e. Si une
  *      des images obtient une valeur plus grande, cette image sera choisie.</li>
- *  <li>Sinon, la superficie moyenne des pixels des images seront calculées. Si une image
- *      a des pixels d'une meilleure résolution (couvrant une surface plus petite), cette
+ *  <li>Sinon, la superficie moyenne des pixels des images seront calculÃ©es. Si une image
+ *      a des pixels d'une meilleure rÃ©solution (couvrant une surface plus petite), cette
  *      image sera choisie.</li>
  * </ul>
  *
@@ -74,34 +74,34 @@ import org.geotools.resources.Utilities;
  */
 public class CoverageComparator implements Comparator<CoverageReference> {
     /**
-     * Object à utiliser pour construire des transformations de coordonnées.
+     * Object Ã  utiliser pour construire des transformations de coordonnÃ©es.
      */
     private final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory(null);
 
     /**
-     * Système de reference des coordonnées dans lequel faire les comparaisons. Il s'agit
-     * du système de coordonnées de la {@linkplain Series series} d'origine.
+     * SystÃ¨me de reference des coordonnÃ©es dans lequel faire les comparaisons. Il s'agit
+     * du systÃ¨me de coordonnÃ©es de la {@linkplain Series series} d'origine.
      */
     private final CoordinateReferenceSystem crs;
 
     /**
-     * Transformation permettant de passer du système de coordonnées d'un objet {@link CoverageReference}
-     * vers le système de coordonnées de la {@linkplain Series séries} (c'est-à-dire {@link #crs}).
-     * Cette transformation est conservée dans une cache interne afin d'éviter de construire
-     * cet objet trop fréquement.
+     * Transformation permettant de passer du systÃ¨me de coordonnÃ©es d'un objet {@link CoverageReference}
+     * vers le systÃ¨me de coordonnÃ©es de la {@linkplain Series sÃ©ries} (c'est-Ã -dire {@link #crs}).
+     * Cette transformation est conservÃ©e dans une cache interne afin d'Ã©viter de construire
+     * cet objet trop frÃ©quement.
      */
     private transient CoordinateOperation transformation;
 
     /**
-     * Ellispoïde à utiliser pour calculer les distances orthodromiques.
+     * EllispoÃ¯de Ã  utiliser pour calculer les distances orthodromiques.
      */
     private final DefaultEllipsoid ellipsoid;
 
     /**
-     * Coordonnées spatio-temporelles demandées. Ils s'agit des coordonnées qui avait été spécifiée
-     * à la {@linkplain Series series}. Cette envelope est exprimée selon le système de référence
-     * des coordonnées {@link #crs}. Cette enveloppe n'est pas clonée. Elle ne doit donc pas être
-     * modifiée.
+     * CoordonnÃ©es spatio-temporelles demandÃ©es. Ils s'agit des coordonnÃ©es qui avait Ã©tÃ© spÃ©cifiÃ©e
+     * Ã  la {@linkplain Series series}. Cette envelope est exprimÃ©e selon le systÃ¨me de rÃ©fÃ©rence
+     * des coordonnÃ©es {@link #crs}. Cette enveloppe n'est pas clonÃ©e. Elle ne doit donc pas Ãªtre
+     * modifiÃ©e.
      */
     private final Envelope target;
 
@@ -118,21 +118,21 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     private final int xDim, yDim, tDim;
 
     /**
-     * Construit un comparateur pour les images de la séries spécifiée.
+     * Construit un comparateur pour les images de la sÃ©ries spÃ©cifiÃ©e.
      *
-     * @param  Series series d'où proviennent les images qui seront à comparer.
-     * @throws RemoteException si la connexion au serveur a échoué.
+     * @param  Series series d'oÃ¹ proviennent les images qui seront Ã  comparer.
+     * @throws RemoteException si la connexion au serveur a Ã©chouÃ©.
      */
 //    public CoverageComparator(final Series series) throws RemoteException {
 //        this(series.getCoordinateReferenceSystem(), series.getEnvelope());
 //    }
 
     /**
-     * Construit un comparateur avec les plages spatio-temporelles spécifiées.
+     * Construit un comparateur avec les plages spatio-temporelles spÃ©cifiÃ©es.
      *
-     * @param crs Système de coordonnées dans lequel comparer les images.
-     * @param envelope Coordonnées spatio-temporelle de la région qui avait été demandée.
-     *        Ces coordonnées doivent être exprimées selon le système de coordonnées {@code crs}.
+     * @param crs SystÃ¨me de coordonnÃ©es dans lequel comparer les images.
+     * @param envelope CoordonnÃ©es spatio-temporelle de la rÃ©gion qui avait Ã©tÃ© demandÃ©e.
+     *        Ces coordonnÃ©es doivent Ãªtre exprimÃ©es selon le systÃ¨me de coordonnÃ©es {@code crs}.
      */
     public CoverageComparator(final CoordinateReferenceSystem crs, final Envelope envelope) {
         int xDim = -1;
@@ -155,8 +155,8 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     }
 
     /**
-     * Retourne une estimation de la superficie occupée par
-     * la composante horizontale de l'envelope spécifiée.
+     * Retourne une estimation de la superficie occupÃ©e par
+     * la composante horizontale de l'envelope spÃ©cifiÃ©e.
      */
     private double getArea(final Envelope envelope) {
         if (xDim<0 || yDim<0) {
@@ -167,8 +167,8 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     }
 
     /**
-     * Retourne une estimation de la superficie occupée par
-     * un rectangle délimitée par les coordonnées spécifiées.
+     * Retourne une estimation de la superficie occupÃ©e par
+     * un rectangle dÃ©limitÃ©e par les coordonnÃ©es spÃ©cifiÃ©es.
      */
     private double getArea(double xmin, double ymin, double xmax, double ymax) {
         final CoordinateSystem cs = crs.getCoordinateSystem();
@@ -191,13 +191,13 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     }
 
     /**
-     * Compare deux objets {@link CoverageReference}. Les classes dérivées peuvent
-     * redéfinir cette méthode pour définir un autre critère de comparaison
-     * que les critères par défaut.
+     * Compare deux objets {@link CoverageReference}. Les classes dÃ©rivÃ©es peuvent
+     * redÃ©finir cette mÃ©thode pour dÃ©finir un autre critÃ¨re de comparaison
+     * que les critÃ¨res par dÃ©faut.
      *
-     * @return +1 si l'image {@code entry1} représente le plus grand intérêt,
-     *         -1 si l'image {@code entry2} représente le plus grand intérêt, ou
-     *          0 si les deux images représentent le même intérêt.
+     * @return +1 si l'image {@code entry1} reprÃ©sente le plus grand intÃ©rÃªt,
+     *         -1 si l'image {@code entry2} reprÃ©sente le plus grand intÃ©rÃªt, ou
+     *          0 si les deux images reprÃ©sentent le mÃªme intÃ©rÃªt.
      */
     public int compare(final CoverageReference entry1, final CoverageReference entry2) {
         final Evaluator ev1 = evaluator(entry1);
@@ -230,9 +230,9 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     }
 
     /**
-     * Retourne un objet {@link Evaluator} pour l'image spécifiée. Cette méthode est
-     * habituellement appelée au début de {@link #compare},  afin d'obtenir une aide
-     * pour comparer les images. Si cette méthode n'a pas pu construire un
+     * Retourne un objet {@link Evaluator} pour l'image spÃ©cifiÃ©e. Cette mÃ©thode est
+     * habituellement appelÃ©e au dÃ©but de {@link #compare},  afin d'obtenir une aide
+     * pour comparer les images. Si cette mÃ©thode n'a pas pu construire un
      * {@code Evaluator}, alors elle retourne {@code null}.
      */
     protected Evaluator evaluator(final CoverageReference entry) {
@@ -251,7 +251,7 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     }
 
     /**
-     * Signale qu'une exception inatendue est survenue lors de l'exécution de {@link #evaluator}.
+     * Signale qu'une exception inatendue est survenue lors de l'exÃ©cution de {@link #evaluator}.
      */
     private static void unexpectedException(final Exception exception) {
         Utilities.unexpectedException("net.sicade.observation.coverage",
@@ -260,21 +260,21 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     }
 
     /**
-     * Evalue la qualité de la couverture d'une image par rapport à ce qui a été
-     * demandée. En général, deux instances de cette classe seront construites à
-     * l'intérieur de la méthode {@link CoverageComparator#compare}. Les méthodes
-     * de {@code Evaluator} seront ensuite appelées  (dans un ordre choisit
-     * par {@link CoverageComparator#compare}) afin de déterminer laquelle des deux
-     * images correspond le mieux à ce que l'utilisateur a demandé.
+     * Evalue la qualitÃ© de la couverture d'une image par rapport Ã  ce qui a Ã©tÃ©
+     * demandÃ©e. En gÃ©nÃ©ral, deux instances de cette classe seront construites Ã 
+     * l'intÃ©rieur de la mÃ©thode {@link CoverageComparator#compare}. Les mÃ©thodes
+     * de {@code Evaluator} seront ensuite appelÃ©es  (dans un ordre choisit
+     * par {@link CoverageComparator#compare}) afin de dÃ©terminer laquelle des deux
+     * images correspond le mieux Ã  ce que l'utilisateur a demandÃ©.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     protected class Evaluator {
         /**
-         * Coordonnées spatio-temporelle d'une image. Il s'agit des coordonnées de l'objet
-         * {@link CoverageReference} en cours de comparaison. Ces coordonnées doivent avoir
-         * été transformées selon le système de coordonnées {@link CoverageComparator#crs}.
+         * CoordonnÃ©es spatio-temporelle d'une image. Il s'agit des coordonnÃ©es de l'objet
+         * {@link CoverageReference} en cours de comparaison. Ces coordonnÃ©es doivent avoir
+         * Ã©tÃ© transformÃ©es selon le systÃ¨me de coordonnÃ©es {@link CoverageComparator#crs}.
          */
         private final Envelope source;
 
@@ -285,12 +285,12 @@ public class CoverageComparator implements Comparator<CoverageReference> {
         private final int width, height;
 
         /**
-         * Construit un évaluateur pour l'image spécifiée.
+         * Construit un Ã©valuateur pour l'image spÃ©cifiÃ©e.
          *
-         * @param  entry L'image qui sera a évaluer.
-         * @throws RemoteException si la connexion au serveur a échoué.
-         * @throws TransformException si une transformation était
-         *         nécessaire et n'a pas pu être effectuée.
+         * @param  entry L'image qui sera a Ã©valuer.
+         * @throws RemoteException si la connexion au serveur a Ã©chouÃ©.
+         * @throws TransformException si une transformation Ã©tait
+         *         nÃ©cessaire et n'a pas pu Ãªtre effectuÃ©e.
          */
         public Evaluator(final CoverageReference entry)
                 throws RemoteException, FactoryException, TransformException
@@ -324,10 +324,10 @@ public class CoverageComparator implements Comparator<CoverageReference> {
 
         /**
          * Retourne une mesure de la correspondance entre la plage de temps couverte par l'image
-         * et la plage de temps qui avait été demandée.  Une valeur de 0 indique que la plage de
-         * l'image correspond exactement à la plage demandée.  Une valeur supérieure à 0 indique
-         * que l'image ne couvre pas toute la plage demandée,   où qu'elle couvre aussi du temps
-         * en dehors de la plage demandée.
+         * et la plage de temps qui avait Ã©tÃ© demandÃ©e.  Une valeur de 0 indique que la plage de
+         * l'image correspond exactement Ã  la plage demandÃ©e.  Une valeur supÃ©rieure Ã  0 indique
+         * que l'image ne couvre pas toute la plage demandÃ©e,   oÃ¹ qu'elle couvre aussi du temps
+         * en dehors de la plage demandÃ©e.
          */
         public double uncoveredTime() {
             if (tDim<0) return Double.NaN;
@@ -343,10 +343,10 @@ public class CoverageComparator implements Comparator<CoverageReference> {
         }
 
         /**
-         * Retourne une mesure de l'écart entre la date de l'image et la date demandée.
-         * Une valeur de 0 indique que l'image est exactement centrée sur la plage de
-         * dates demandée. Une valeur supérieure à 0 indique que le centre de l'image
-         * est décalée.
+         * Retourne une mesure de l'Ã©cart entre la date de l'image et la date demandÃ©e.
+         * Une valeur de 0 indique que l'image est exactement centrÃ©e sur la plage de
+         * dates demandÃ©e. Une valeur supÃ©rieure Ã  0 indique que le centre de l'image
+         * est dÃ©calÃ©e.
          */
         public double timeOffset() {
             if (tDim<0) {
@@ -356,10 +356,10 @@ public class CoverageComparator implements Comparator<CoverageReference> {
         }
 
         /**
-         * Retourne une mesure de la correspondance entre la région géographique couverte
-         * par l'image et la région qui avait été demandée. Une valeur de 0 indique que
-         * l'image couvre au moins la totalité de la région demandée, tandis qu'une valeur
-         * supérieure à 0 indique que certaines régions ne sont pas couvertes.
+         * Retourne une mesure de la correspondance entre la rÃ©gion gÃ©ographique couverte
+         * par l'image et la rÃ©gion qui avait Ã©tÃ© demandÃ©e. Une valeur de 0 indique que
+         * l'image couvre au moins la totalitÃ© de la rÃ©gion demandÃ©e, tandis qu'une valeur
+         * supÃ©rieure Ã  0 indique que certaines rÃ©gions ne sont pas couvertes.
          */
         public double uncoveredArea() {
             if (xDim<0 || yDim<0) return Double.NaN;
@@ -370,8 +370,8 @@ public class CoverageComparator implements Comparator<CoverageReference> {
         }
 
         /**
-         * Retourne une estimation de la superficie occupée par les pixels.
-         * Une valeur de 0 signifierait qu'une image à une précision infinie...
+         * Retourne une estimation de la superficie occupÃ©e par les pixels.
+         * Une valeur de 0 signifierait qu'une image Ã  une prÃ©cision infinie...
          */
         public double resolution() {
             final int num = width*height;

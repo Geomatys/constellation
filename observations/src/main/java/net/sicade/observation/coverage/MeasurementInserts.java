@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,26 +30,26 @@ import net.sicade.observation.sql.MeasurementTable;
 
 
 /**
- * Séries d'instructions {@code INSERT} envoyées à la base de données par {@link MeasurementTableFiller}.
- * Exécutées dans un thread séparé pour ne pas bloquer les calculs des valeurs pendant que le logiciel de
- * base de données procède à l'insertion des valeurs.
+ * SÃ©ries d'instructions {@code INSERT} envoyÃ©es Ã  la base de donnÃ©es par {@link MeasurementTableFiller}.
+ * ExÃ©cutÃ©es dans un thread sÃ©parÃ© pour ne pas bloquer les calculs des valeurs pendant que le logiciel de
+ * base de donnÃ©es procÃ¨de Ã  l'insertion des valeurs.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class MeasurementInserts extends Thread {
     /**
-     * La table des mesures à modifier.
+     * La table des mesures Ã  modifier.
      */
     private final MeasurementTable measures;
 
     /**
-     * Liste des stations à insérer.
+     * Liste des stations Ã  insÃ©rer.
      */
     private final BlockingQueue<StationDescriptorPair> values = new LinkedBlockingQueue<StationDescriptorPair>();
     
     /**
-     * Valeur sentinelle indiquant que les insertions sont terminées.
+     * Valeur sentinelle indiquant que les insertions sont terminÃ©es.
      */
     private final StationDescriptorPair finish = new StationDescriptorPair(null, null);
 
@@ -66,7 +66,7 @@ final class MeasurementInserts extends Thread {
     }
 
     /**
-     * Ajoute la valeur spécifiée à la liste des valeurs à insérer.
+     * Ajoute la valeur spÃ©cifiÃ©e Ã  la liste des valeurs Ã  insÃ©rer.
      */
     public void add(final StationDescriptorPair value) throws CatalogException {
         assert isAlive();
@@ -78,8 +78,8 @@ final class MeasurementInserts extends Thread {
     }
 
     /**
-     * Indique qu'il n'y a plus d'autres valeurs à insérer. Cette méthode bloquera
-     * jusqu'à ce que toutes les valeurs restantes aient été insérées.
+     * Indique qu'il n'y a plus d'autres valeurs Ã  insÃ©rer. Cette mÃ©thode bloquera
+     * jusqu'Ã  ce que toutes les valeurs restantes aient Ã©tÃ© insÃ©rÃ©es.
      */
     public void finished() throws CatalogException {
         assert isAlive();
@@ -96,8 +96,8 @@ final class MeasurementInserts extends Thread {
     }
 
     /**
-     * Insére toutes les valeurs dans la queue. Si une exception se produit lors de l'insertion
-     * d'une valeur, alors cette méthode s'arrêtera.
+     * InsÃ©re toutes les valeurs dans la queue. Si une exception se produit lors de l'insertion
+     * d'une valeur, alors cette mÃ©thode s'arrÃªtera.
      */
     @Override
     public void run() {

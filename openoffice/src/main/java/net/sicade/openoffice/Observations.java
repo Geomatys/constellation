@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import net.sicade.observation.coverage.DynamicCoverage;
 
 
 /**
- * Implémentation de l'interface {@link XObservations} qui sera exportée vers
+ * ImplÃ©mentation de l'interface {@link XObservations} qui sera exportÃ©e vers
  * <A HREF="http://www.openoffice.org">OpenOffice</A>.
  *
  * @version $Id$
@@ -61,7 +61,7 @@ public class Observations extends Formulas implements XObservations {
     private static final Logger LOGGER = Logger.getLogger("net.sicade.openoffice");
 
     /**
-     * Le nom sous lequel sera enregistré cette composante.
+     * Le nom sous lequel sera enregistrÃ© cette composante.
      *
      * <strong>Note:</strong> Bien que ce nom de correspondent pas aux conventions
      * du Java, on ne peut le changer car il correspond au nom attendu par OpenOffice.
@@ -69,18 +69,18 @@ public class Observations extends Formulas implements XObservations {
     private static final String __serviceName = "net.sicade.openoffice.Observations";
 
     /**
-     * Le service que l'on étend.
+     * Le service que l'on Ã©tend.
      */
     private static final String ADDIN_SERVICE = "com.sun.star.sheet.AddIn";
 
     /**
-     * Ensemble des couvertures construites pour un descripteur donné.
+     * Ensemble des couvertures construites pour un descripteur donnÃ©.
      */
     private final Map<String, Reference<SpatioTemporalCoverage3D>> descriptors =
           new HashMap<String, Reference<SpatioTemporalCoverage3D>>();
 
     /**
-     * Tableau pré-alloué pour la méthode {@link #getDescriptorValue}.
+     * Tableau prÃ©-allouÃ© pour la mÃ©thode {@link #getDescriptorValue}.
      */
     private transient double[] values;
 
@@ -90,24 +90,24 @@ public class Observations extends Formulas implements XObservations {
     @SuppressWarnings("unchecked")
     public Observations() {
         methods.put("getDescriptorValue", new MethodInfo("Observations", "EVALUATE",
-            "Évalue la valeur d'un descripteur du paysage océanique " +
-            "à une position spatio-temporelle donnée.",
+            "Ã‰value la valeur d'un descripteur du paysage ocÃ©anique " +
+            "Ã  une position spatio-temporelle donnÃ©e.",
             new String[] {
                 "xOptions",    "Fournit par OpenOffice.",
-                "Descripteur", "Nom du descripteur du paysage océanique.",
-                "Date",        "Date et heure à laquelle évaluer le descripteur.",
-                "Longitude",   "Longitude (en degrés) à laquelle évaluer le descripteur.",
-                "Latitude",    "Latitude (en degrés) à laquelle évaluer le descripteur."
+                "Descripteur", "Nom du descripteur du paysage ocÃ©anique.",
+                "Date",        "Date et heure Ã  laquelle Ã©valuer le descripteur.",
+                "Longitude",   "Longitude (en degrÃ©s) Ã  laquelle Ã©valuer le descripteur.",
+                "Latitude",    "Latitude (en degrÃ©s) Ã  laquelle Ã©valuer le descripteur."
         }));
         methods.put("getVoxelCenter", new MethodInfo("Observations", "VOXEL.CENTER",
-            "Retourne la coordonnée spatio-temporelle au centre du voxel le plus proche. " +
-            "L'appel de la fonction EVALUATE à cette coordonnée ne devrait pas impliquer d'interpolations.",
+            "Retourne la coordonnÃ©e spatio-temporelle au centre du voxel le plus proche. " +
+            "L'appel de la fonction EVALUATE Ã  cette coordonnÃ©e ne devrait pas impliquer d'interpolations.",
             new String[] {
                 "xOptions",    "Fournit par OpenOffice.",
-                "Descripteur", "Nom du descripteur du paysage océanique.",
+                "Descripteur", "Nom du descripteur du paysage ocÃ©anique.",
                 "Date",        "Date et heure.",
-                "Longitude",   "Longitude (en degrés).",
-                "Latitude",    "Latitude (en degrés)."
+                "Longitude",   "Longitude (en degrÃ©s).",
+                "Latitude",    "Latitude (en degrÃ©s)."
         }));
     }
 
@@ -173,18 +173,18 @@ public class Observations extends Formulas implements XObservations {
     }
 
     /**
-     * Retourne les données pour un descripteur du nom spécifié.
+     * Retourne les donnÃ©es pour un descripteur du nom spÃ©cifiÃ©.
      *
      * @param  name Le nom du {@linkplain Descriptor descripteur}.
-     * @return La converture des données pour le descripteur spécifié.
-     * @throws NoSuchRecordException si aucun descripteur n'a été trouvée pour le nom spécifié.
+     * @return La converture des donnÃ©es pour le descripteur spÃ©cifiÃ©.
+     * @throws NoSuchRecordException si aucun descripteur n'a Ã©tÃ© trouvÃ©e pour le nom spÃ©cifiÃ©.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      */
     private SpatioTemporalCoverage3D getDescriptorCoverage(final String descriptor)
             throws CatalogException
     {
         final net.sicade.observation.Observations obs = net.sicade.observation.Observations.getDefault();
-        // Pour la synchronisation, utilise le même verrou que 'Observations.getDescriptorCoverage'.
+        // Pour la synchronisation, utilise le mÃªme verrou que 'Observations.getDescriptorCoverage'.
         synchronized (obs) {
             Reference<SpatioTemporalCoverage3D> ref = descriptors.get(descriptor);
             if (ref != null) {
@@ -240,7 +240,7 @@ public class Observations extends Formulas implements XObservations {
             Point2D position = new Point2D.Double(x,y);
             Date        date = getEpoch(xOptions);
             if (date == null) {
-                // Un message a déjà été enregistré dans le journal par getEpoch.
+                // Un message a dÃ©jÃ  Ã©tÃ© enregistrÃ© dans le journal par getEpoch.
                 return null;
             }
             final long epoch = date.getTime();
@@ -260,7 +260,7 @@ public class Observations extends Formulas implements XObservations {
     }
 
     /**
-     * Retourne le journal dans lequel écrire d'éventuels avertissements.
+     * Retourne le journal dans lequel Ã©crire d'Ã©ventuels avertissements.
      */
     @Override
     protected Logger getLogger() {

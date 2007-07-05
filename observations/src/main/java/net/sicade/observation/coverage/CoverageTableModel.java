@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -68,9 +68,9 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Modèle de tableau pour un affichage graphique d'informations sur des images. Ce modèle
- * fait le lien une {@linkplain Series séries d'images} et l'afficheur {@link JTable} de
- * <cite>Swing</cite>. Les données d'une table d'images peuvent être affichées comme suit:
+ * ModÃ¨le de tableau pour un affichage graphique d'informations sur des images. Ce modÃ¨le
+ * fait le lien une {@linkplain Series sÃ©ries d'images} et l'afficheur {@link JTable} de
+ * <cite>Swing</cite>. Les donnÃ©es d'une table d'images peuvent Ãªtre affichÃ©es comme suit:
  *
  * <blockquote><pre>
  * final {@linkplain Series}     series = ...;
@@ -78,10 +78,10 @@ import net.sicade.observation.CatalogException;
  * final {@linkplain JTable}     view   = new JTable(model);
  * </pre></blockquote>
  *
- * Les cellules de la table peuvent être affichées de différentes couleurs. Par
- * exemple les images qui ont été vues peuvent être écrites en bleu, tandis que
- * les images manquantes peuvent être écrites en rouge. Cet affichage coloré en
- * fonction des images peut être activé avec le code suivant:
+ * Les cellules de la table peuvent Ãªtre affichÃ©es de diffÃ©rentes couleurs. Par
+ * exemple les images qui ont Ã©tÃ© vues peuvent Ãªtre Ã©crites en bleu, tandis que
+ * les images manquantes peuvent Ãªtre Ã©crites en rouge. Cet affichage colorÃ© en
+ * fonction des images peut Ãªtre activÃ© avec le code suivant:
  *
  * <blockquote><pre>
  * {@linkplain TableCellRenderer} renderer = new {@linkplain CellRenderer}();
@@ -89,29 +89,29 @@ import net.sicade.observation.CatalogException;
  * view.setDefaultRenderer(  {@linkplain Date}.class, renderer);
  * </pre></blockquote>
  *
- * La classe {@code CoverageTableModel} garde une trace des images qui sont ajoutées ou retirées
- * de la table. Ces opérations peuvent être annulées. Les fonctions "annuler" et "refaire" peuvent
- * être activées avec le code suivant:
+ * La classe {@code CoverageTableModel} garde une trace des images qui sont ajoutÃ©es ou retirÃ©es
+ * de la table. Ces opÃ©rations peuvent Ãªtre annulÃ©es. Les fonctions "annuler" et "refaire" peuvent
+ * Ãªtre activÃ©es avec le code suivant:
  *
  * <blockquote><pre>
  * final {@linkplain UndoManager} undoManager = new UndoManager();
  * ((CoverageTableModel) model).addUndoableEditListener(undoManager);
  * </pre></blockquote>
  *
- * On peut ensuite utiliser les méthodes {@link UndoManager#undo} et {@link UndoManager#redo}
- * pour défaire ou refaire une opération.
+ * On peut ensuite utiliser les mÃ©thodes {@link UndoManager#undo} et {@link UndoManager#redo}
+ * pour dÃ©faire ou refaire une opÃ©ration.
  * <p>
- * La plupart des méthodes de cette classe peuvent être appelée de n'importe quel thread (pas
- * nécessairement celui de <cite>Swing</cite>). Si l'appel d'une méthode a changée le contenu
- * de la table, <cite>Swing</cite> en sera informé dans son propre thread même si les méthodes
- * ont été appelées d'un autre thread.
+ * La plupart des mÃ©thodes de cette classe peuvent Ãªtre appelÃ©e de n'importe quel thread (pas
+ * nÃ©cessairement celui de <cite>Swing</cite>). Si l'appel d'une mÃ©thode a changÃ©e le contenu
+ * de la table, <cite>Swing</cite> en sera informÃ© dans son propre thread mÃªme si les mÃ©thodes
+ * ont Ã©tÃ© appelÃ©es d'un autre thread.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class CoverageTableModel extends AbstractTableModel {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 6723633134014245147L;
 
@@ -120,9 +120,9 @@ public class CoverageTableModel extends AbstractTableModel {
      */
     private static final boolean REVERSE_ORDER = true;
 
-    /** Numéro de colonne des noms de fichiers.   */ private static final int NAME     = 0;
-    /** Numéro de colonne des dates des images.   */ private static final int DATE     = 1;
-    /** Numéro de colonne de la durée des images. */ private static final int DURATION = 2;
+    /** NumÃ©ro de colonne des noms de fichiers.   */ private static final int NAME     = 0;
+    /** NumÃ©ro de colonne des dates des images.   */ private static final int DATE     = 1;
+    /** NumÃ©ro de colonne de la durÃ©e des images. */ private static final int DURATION = 2;
 
     /**
      * Liste des titres des colonnes.
@@ -143,38 +143,38 @@ public class CoverageTableModel extends AbstractTableModel {
     };
 
     /**
-     * Série d'images représenté par cette table.
+     * SÃ©rie d'images reprÃ©sentÃ© par cette table.
      */
     private Series series;
 
     /**
-     * Liste des entrées contenues dans cette table. La longueur
+     * Liste des entrÃ©es contenues dans cette table. La longueur
      * de ce tableau est le nombre de lignes dans la table.
      */
     private CoverageReference[] entries;
 
     /**
-     * La langue à utiliser.
+     * La langue Ã  utiliser.
      */
     private final Locale locale = Locale.getDefault();
 
     /**
-     * Objet à utiliser pour formatter les dates des images.
+     * Objet Ã  utiliser pour formatter les dates des images.
      */
     private final DateFormat dateFormat;
 
     /**
-     * Objet à utiliser pour formatter les durées des images.
+     * Objet Ã  utiliser pour formatter les durÃ©es des images.
      */
     private final DateFormat timeFormat;
 
     /**
-     * Objet à utiliser pour formatter les nombres.
+     * Objet Ã  utiliser pour formatter les nombres.
      */
     private final NumberFormat numberFormat;
 
     /**
-     * Objet à utiliser pour obtenir la position d'un champ formatté.
+     * Objet Ã  utiliser pour obtenir la position d'un champ formattÃ©.
      */
     private transient FieldPosition fieldPosition;
 
@@ -205,11 +205,11 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Construit une table pour la série d'image spécifiée. Toutes les images de la séries seront
-     * ajoutées à cette table.
+     * Construit une table pour la sÃ©rie d'image spÃ©cifiÃ©e. Toutes les images de la sÃ©ries seront
+     * ajoutÃ©es Ã  cette table.
      *
-     * @param  series Séries que représentera cette table, ou {@code null} si elle n'est pas connue.
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @param  series SÃ©ries que reprÃ©sentera cette table, ou {@code null} si elle n'est pas connue.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     public CoverageTableModel(final Series series) throws CatalogException {
         this();
@@ -224,9 +224,9 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Construit une table qui contiendra une copie du contenu de la table spécifiée.
+     * Construit une table qui contiendra une copie du contenu de la table spÃ©cifiÃ©e.
      * La nouvelle table ne contiendra initialement aucun {@code Listener} (c'est
-     * à dire que les {@code Listener} de la table spécifiée ne seront pas copiés).
+     * Ã  dire que les {@code Listener} de la table spÃ©cifiÃ©e ne seront pas copiÃ©s).
      *
      * @param table Table dont on veut copier le contenu.
      */
@@ -250,7 +250,7 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Renverse l'ordre des éléments du tableau spécifié.
+     * Renverse l'ordre des Ã©lÃ©ments du tableau spÃ©cifiÃ©.
      */
     private static void reverse(final CoverageReference[] entries) {
         for (int i=entries.length/2; --i>=0;) {
@@ -262,20 +262,20 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne la série d'images représentée par cette table. Si la série n'est pas connue,
-     * alors cette méthode peut retourner {@code null}.
+     * Retourne la sÃ©rie d'images reprÃ©sentÃ©e par cette table. Si la sÃ©rie n'est pas connue,
+     * alors cette mÃ©thode peut retourner {@code null}.
      */
     public Series getSeries() {
         return series;
     }
 
     /**
-     * Remplace toutes les références vers les images par celles de la série spécifiée.
-     * Cette méthode peut être appelée de n'importe quel thread (pas nécessairement celui
+     * Remplace toutes les rÃ©fÃ©rences vers les images par celles de la sÃ©rie spÃ©cifiÃ©e.
+     * Cette mÃ©thode peut Ãªtre appelÃ©e de n'importe quel thread (pas nÃ©cessairement celui
      * de <cite>Swing</cite>).
      *
-     * @param  series La nouvelle série d'images, ou {@code null} si aucune.
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @param  series La nouvelle sÃ©rie d'images, ou {@code null} si aucune.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     public void setSeries(final Series series) throws CatalogException {
         final Collection<CoverageReference> entryList;
@@ -289,8 +289,8 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Remplace toutes les références vers les images par celles de la liste spécifiée.
-     * Cette méthode peut être appelée de n'importe quel thread (pas nécessairement celui
+     * Remplace toutes les rÃ©fÃ©rences vers les images par celles de la liste spÃ©cifiÃ©e.
+     * Cette mÃ©thode peut Ãªtre appelÃ©e de n'importe quel thread (pas nÃ©cessairement celui
      * de <cite>Swing</cite>).
      *
      * @param entryList Liste des nouvelles images.
@@ -323,13 +323,13 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne l'ensemble des objets {@link CoverageProxy} qui se trouvent dans le tableau spécifié.
-     * Cette méthode retourne {@code null} si aucun objets {@link CoverageProxy} n'a été trouvé.
+     * Retourne l'ensemble des objets {@link CoverageProxy} qui se trouvent dans le tableau spÃ©cifiÃ©.
+     * Cette mÃ©thode retourne {@code null} si aucun objets {@link CoverageProxy} n'a Ã©tÃ© trouvÃ©.
      *
-     * @param  entries Entrées dans lequel vérifier s'il y a des {@link CoverageProxy}.
-     * @param  proxies Dictionnaire dans lequel ajouter les {@link CoverageProxy} trouvés,
-     *         ou {@code null} si aucun dictionnaire n'a encore été créé.
-     * @return L'argument {@code proxies}, ou un nouvel objet {@link Map} si {@code proxies} était nul.
+     * @param  entries EntrÃ©es dans lequel vÃ©rifier s'il y a des {@link CoverageProxy}.
+     * @param  proxies Dictionnaire dans lequel ajouter les {@link CoverageProxy} trouvÃ©s,
+     *         ou {@code null} si aucun dictionnaire n'a encore Ã©tÃ© crÃ©Ã©.
+     * @return L'argument {@code proxies}, ou un nouvel objet {@link Map} si {@code proxies} Ã©tait nul.
      */
     private static Map<CoverageReference,CoverageProxy> getProxies(final CoverageReference[] entries,
                    Map<CoverageReference,CoverageProxy> proxies)
@@ -361,12 +361,12 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne les références vers toutes les images présentes dans la table. Les opérations de
-     * lectures effectuées sur les références retournées ne seront pas indiquées dans cette table
-     * (contrairement aux entrées retournées par {@link #getCoverageReferenceAt}, qui écrive en
+     * Retourne les rÃ©fÃ©rences vers toutes les images prÃ©sentes dans la table. Les opÃ©rations de
+     * lectures effectuÃ©es sur les rÃ©fÃ©rences retournÃ©es ne seront pas indiquÃ©es dans cette table
+     * (contrairement aux entrÃ©es retournÃ©es par {@link #getCoverageReferenceAt}, qui Ã©crive en
      * bleu les images lues).
      *
-     * @return Les références vers toutes les images de cette table. Ce tableau peut
+     * @return Les rÃ©fÃ©rences vers toutes les images de cette table. Ce tableau peut
      *         avoir une longueur de 0, mais ne sera jamais {@code null}.
      */
     public synchronized CoverageReference[] getCoverageReferences() {
@@ -379,12 +379,12 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne la référence de l'image qui se trouve à la ligne spécifiée. Pour économiser la mémoire,
-     * il est recommandé de ne pas retenir cette référence plus longtemps que la durée de vie de cette
+     * Retourne la rÃ©fÃ©rence de l'image qui se trouve Ã  la ligne spÃ©cifiÃ©e. Pour Ã©conomiser la mÃ©moire,
+     * il est recommandÃ© de ne pas retenir cette rÃ©fÃ©rence plus longtemps que la durÃ©e de vie de cette
      * table.
      *
-     * @param  row Index de l'entré désiré.
-     * @return Référence vers l'image à la ligne spécifiée.
+     * @param  row Index de l'entrÃ© dÃ©sirÃ©.
+     * @return RÃ©fÃ©rence vers l'image Ã  la ligne spÃ©cifiÃ©e.
      */
     public synchronized CoverageReference getCoverageReferenceAt(final int row) {
         CoverageReference entry = entries[row];
@@ -395,9 +395,9 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne les noms des images présentes dans cette table. Les noms sont obtenus par
-     * {@link #getCoverageName} et sont habituellement unique pour une série donnée. Cette
-     * méthode peut retourner un tableau de longueur 0, mais ne retourne jamais {@code null}.
+     * Retourne les noms des images prÃ©sentes dans cette table. Les noms sont obtenus par
+     * {@link #getCoverageName} et sont habituellement unique pour une sÃ©rie donnÃ©e. Cette
+     * mÃ©thode peut retourner un tableau de longueur 0, mais ne retourne jamais {@code null}.
      */
     public synchronized String[] getCoverageNames() {
         final String[] names = new String[(entries!=null) ? entries.length : 0];
@@ -408,8 +408,8 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne les noms des images aux lignes spécifiées. Les noms sont obtenus par
-     * {@link #getCoverageName}. Cette méthode peut retourner un tableau de longueur 0,
+     * Retourne les noms des images aux lignes spÃ©cifiÃ©es. Les noms sont obtenus par
+     * {@link #getCoverageName}. Cette mÃ©thode peut retourner un tableau de longueur 0,
      * mais ne retourne jamais {@code null}.
      */
     public synchronized String[] getCoverageNames(int[] rows) {
@@ -421,20 +421,20 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne les numéros de lignes qui correspondent aux images spécifiées. Les images sont
-     * désignées par leurs noms tels que retournés par {@link #getCoverageName}. Cette méthode
+     * Retourne les numÃ©ros de lignes qui correspondent aux images spÃ©cifiÃ©es. Les images sont
+     * dÃ©signÃ©es par leurs noms tels que retournÃ©s par {@link #getCoverageName}. Cette mÃ©thode
      * est l'inverse de {@link #getCoverageNames(int[])}.
      *
      * @param  names Noms des images.
-     * @return Numéro de lignes des images demandées. Ce tableau aura toujours la même longueur que
-     *         {@code names}. Les images qui n'ont pas été trouvées dans la table auront l'index -1.
+     * @return NumÃ©ro de lignes des images demandÃ©es. Ce tableau aura toujours la mÃªme longueur que
+     *         {@code names}. Les images qui n'ont pas Ã©tÃ© trouvÃ©es dans la table auront l'index -1.
      */
     public synchronized int[] indexOf(final String[] names) {
         final Map<String,int[]> map = new HashMap<String,int[]>(names.length*2);
         for (int i=0; i<names.length; i++) {
             int[] index = map.put(names[i], new int[]{i});
             if (index != null) {
-                // Cas où le même nom serait demandé plusieurs fois.
+                // Cas oÃ¹ le mÃªme nom serait demandÃ© plusieurs fois.
                 final int length = index.length;
                 index = XArray.resize(index, length+1);
                 index[length] = i;
@@ -443,8 +443,8 @@ public class CoverageTableModel extends AbstractTableModel {
         }
         final int[] rows = new int[names.length];
         Arrays.fill(rows, -1);
-        // Fait la boucle en sens inverse de façon à ce qu'en cas de doublons,
-        // l'occurence retenue soit la première apparaissant dans la liste.
+        // Fait la boucle en sens inverse de faÃ§on Ã  ce qu'en cas de doublons,
+        // l'occurence retenue soit la premiÃ¨re apparaissant dans la liste.
         for (int i=entries.length; --i>=0;) {
             final int[] index = map.get(getCoverageName(entries[i]));
             if (index != null) {
@@ -458,23 +458,23 @@ public class CoverageTableModel extends AbstractTableModel {
 
     /**
      * Retire une image de cette table. Si {@code toRemove} est
-     * nul ou n'apparaît pas dans la table, alors il sera ignoré.
+     * nul ou n'apparaÃ®t pas dans la table, alors il sera ignorÃ©.
      */
     public synchronized void remove(final CoverageReference toRemove) {
         remove(Collections.singleton(unwrap(toRemove)));
     }
 
     /**
-     * Retire l'image qui se trouve à l'index spécifié. L'index {@code row} correspond
-     * au numéro (à partir de 0) de la ligne à supprimer.
+     * Retire l'image qui se trouve Ã  l'index spÃ©cifiÃ©. L'index {@code row} correspond
+     * au numÃ©ro (Ã  partir de 0) de la ligne Ã  supprimer.
      */
     public synchronized void remove(final int row) {
         remove(entries[row]);
     }
 
     /**
-     * Retire plusieurs images de cette table. Les références nulles ainsi que celles
-     * qui n'apparaissent pas dans cette table seront ignorées.
+     * Retire plusieurs images de cette table. Les rÃ©fÃ©rences nulles ainsi que celles
+     * qui n'apparaissent pas dans cette table seront ignorÃ©es.
      */
     public synchronized void remove(final CoverageReference[] toRemove) {
         final Set<CoverageReference> toRemoveSet;
@@ -486,8 +486,8 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retire plusieurs images désignés par les index des lignes. Les index {@code rows} correspondent
-     * aux numéros (à partir de 0) des lignes à supprimer. Ces numéros de lignes peuvent être dans
+     * Retire plusieurs images dÃ©signÃ©s par les index des lignes. Les index {@code rows} correspondent
+     * aux numÃ©ros (Ã  partir de 0) des lignes Ã  supprimer. Ces numÃ©ros de lignes peuvent Ãªtre dans
      * n'importe quel ordre.
      */
     public synchronized void remove(final int[] rows) {
@@ -500,9 +500,9 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retire plusieurs images de cette table. Les références nulles ainsi que celles qui
-     * n'apparaissent pas dans cette table seront ignorées. Cette méthode peut être appelée
-     * de n'importe quel thread (pas nécessairement celui de <cite>Swing</cite>).
+     * Retire plusieurs images de cette table. Les rÃ©fÃ©rences nulles ainsi que celles qui
+     * n'apparaissent pas dans cette table seront ignorÃ©es. Cette mÃ©thode peut Ãªtre appelÃ©e
+     * de n'importe quel thread (pas nÃ©cessairement celui de <cite>Swing</cite>).
      */
     private synchronized void remove(final Set<CoverageReference> toRemove) {
         if (!EventQueue.isDispatchThread()) {
@@ -522,10 +522,10 @@ public class CoverageTableModel extends AbstractTableModel {
                 final int lower = i+1;
                 if (upper != lower) {
                     if (entries == oldEntries) {
-                        // Créé une copie, de façon à ne pas modifier le tableau 'entries' original.
+                        // CrÃ©Ã© une copie, de faÃ§on Ã  ne pas modifier le tableau 'entries' original.
                         entries = XArray.remove(entries, lower, upper-lower);
                     } else {
-                        // Si le tableau est déjà une copie, travaille directement sur lui.
+                        // Si le tableau est dÃ©jÃ  une copie, travaille directement sur lui.
                         System.arraycopy(entries, upper, entries, lower, entriesLength-upper);
                     }
                     entriesLength -= (upper-lower);
@@ -539,30 +539,30 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Copie les données de certaines lignes dans un objet transférable. Cet objet pourra être
-     * placé dans le presse papier pour être ensuite collé dans un tableur commercial par exemple.
-     * Le presse-papier du système peut être obtenu par un appel à:
+     * Copie les donnÃ©es de certaines lignes dans un objet transfÃ©rable. Cet objet pourra Ãªtre
+     * placÃ© dans le presse papier pour Ãªtre ensuite collÃ© dans un tableur commercial par exemple.
+     * Le presse-papier du systÃ¨me peut Ãªtre obtenu par un appel Ã :
      *
      * <blockquote><pre>
      * Toolkit.getDefaultToolkit().getSystemClipboard()
      * </pre></blockquote>
      *
-     * @param  rows Ligne à copier.
-     * @return Objet transférable contenant les lignes copiées.
+     * @param  rows Ligne Ã  copier.
+     * @return Objet transfÃ©rable contenant les lignes copiÃ©es.
      */
     public synchronized Transferable copy(final int[] rows) {
         if (fieldPosition == null) {
             fieldPosition = new FieldPosition(0);
         }
         final StringBuffer buffer = new StringBuffer(256); // On n'utilise pas le buffer des cellules.
-        final int[] clés = new int[] {
+        final int[] clÃ©s = new int[] {
             ResourceKeys.NAME,
             ResourceKeys.START_TIME,
             ResourceKeys.END_TIME
         };
-        for (int i=0; i<clés.length;) {
-            buffer.append(Resources.format(clés[i++]));
-            buffer.append((i<clés.length) ? '\t' : '\n');
+        for (int i=0; i<clÃ©s.length;) {
+            buffer.append(Resources.format(clÃ©s[i++]));
+            buffer.append((i<clÃ©s.length) ? '\t' : '\n');
         }
         for (int i=0; i<rows.length; i++) {
             Date date;
@@ -579,8 +579,8 @@ public class CoverageTableModel extends AbstractTableModel {
             }
             buffer.append('\n');
             // Note: on devrait utiliser System.getProperty("line.separator", "\n"),
-            //       mais ça donne un résultat bizarre quand on colle dans Excel. Il
-            //       met une ligne vierge entre chaque ligne de données.
+            //       mais Ã§a donne un rÃ©sultat bizarre quand on colle dans Excel. Il
+            //       met une ligne vierge entre chaque ligne de donnÃ©es.
         }
         return new StringSelection(buffer.toString());
         // TODO: Dans une version future, on pourra supporter une plus
@@ -603,7 +603,7 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne le nom de la colonne spécifiée.
+     * Retourne le nom de la colonne spÃ©cifiÃ©e.
      */
     @Override
     public String getColumnName(final int column) {
@@ -611,7 +611,7 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne la classe des objets de la colonne spécifiée.
+     * Retourne la classe des objets de la colonne spÃ©cifiÃ©e.
      */
     @Override
     public Class getColumnClass(final int column) {
@@ -619,11 +619,11 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne la valeur de la cellule aux index spécifiés.
+     * Retourne la valeur de la cellule aux index spÃ©cifiÃ©s.
      *
-     * @param  row    Numéro de ligne de la cellule, à partir de 0.
-     * @param  column Numéro de colonne de la cellule, à partir de 0.
-     * @return Valeur de la cellule aux index spécifiés.
+     * @param  row    NumÃ©ro de ligne de la cellule, Ã  partir de 0.
+     * @param  column NumÃ©ro de colonne de la cellule, Ã  partir de 0.
+     * @return Valeur de la cellule aux index spÃ©cifiÃ©s.
      */
     public synchronized Object getValueAt(final int row, final int column) {
         CoverageReference entry = entries[row];
@@ -657,11 +657,11 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne le nom de l'entrée spécifiée à utiliser pour l'affichage. L'implémentation par
-     * défaut retourne le {@linkplain CoverageReference#getName nom de l'entrée} en ne retenant
-     * que la partie qui suit le premier caractère {@code :}. Ca a pour effet d'omettre le nom
-     * de la sous-série qui précède le nom de fichier. Les classes dérivées peuvent redéfinir
-     * cette méthode si elles veulelent construire un nom différement.
+     * Retourne le nom de l'entrÃ©e spÃ©cifiÃ©e Ã  utiliser pour l'affichage. L'implÃ©mentation par
+     * dÃ©faut retourne le {@linkplain CoverageReference#getName nom de l'entrÃ©e} en ne retenant
+     * que la partie qui suit le premier caractÃ¨re {@code :}. Ca a pour effet d'omettre le nom
+     * de la sous-sÃ©rie qui prÃ©cÃ¨de le nom de fichier. Les classes dÃ©rivÃ©es peuvent redÃ©finir
+     * cette mÃ©thode si elles veulelent construire un nom diffÃ©rement.
      */
     protected String getCoverageName(final CoverageReference entry) {
         String name = entry.getName();
@@ -673,7 +673,7 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Convertit une date en chaîne de caractères.
+     * Convertit une date en chaÃ®ne de caractÃ¨res.
      */
     private String format(final Date date) {
         if (buffer        == null) buffer        = new StringBuffer ( );
@@ -684,14 +684,14 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne le fuseau horaire utilisé pour les écritures de dates.
+     * Retourne le fuseau horaire utilisÃ© pour les Ã©critures de dates.
      */
     public synchronized TimeZone getTimeZone() {
         return dateFormat.getTimeZone();
     }
 
     /**
-     * Définit le fuseau horaire à utiliser pour l'écriture des dates.
+     * DÃ©finit le fuseau horaire Ã  utiliser pour l'Ã©criture des dates.
      */
     public synchronized void setTimeZone(final TimeZone timezone) {
         dateFormat.setTimeZone(timezone);
@@ -701,31 +701,31 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Ajoute un objet à la liste des objets intéressés à être
-     * informés chaque fois qu'une édition anulable a été faite.
+     * Ajoute un objet Ã  la liste des objets intÃ©ressÃ©s Ã  Ãªtre
+     * informÃ©s chaque fois qu'une Ã©dition anulable a Ã©tÃ© faite.
      */
     public void addUndoableEditListener(final UndoableEditListener listener) {
         listenerList.add(UndoableEditListener.class, listener);
     }
 
     /**
-     * Retire un objet de la liste des objets intéressés à être
-     * informés chaque fois qu'une édition anulable a été faite.
+     * Retire un objet de la liste des objets intÃ©ressÃ©s Ã  Ãªtre
+     * informÃ©s chaque fois qu'une Ã©dition anulable a Ã©tÃ© faite.
      */
     public void removeUndoableEditListener(final UndoableEditListener listener) {
         listenerList.remove(UndoableEditListener.class, listener);
     }
 
     /**
-     * Prend en compte des changements qui viennent d'être apportées à la table.
-     * Cette méthode mettra à jour la variable {@link #backup} et préviendra tous
-     * les objets qui étaient intéressés à être informés des changements anulables.
+     * Prend en compte des changements qui viennent d'Ãªtre apportÃ©es Ã  la table.
+     * Cette mÃ©thode mettra Ã  jour la variable {@link #backup} et prÃ©viendra tous
+     * les objets qui Ã©taient intÃ©ressÃ©s Ã  Ãªtre informÃ©s des changements anulables.
      */
     private void commitEdit(final CoverageReference[] oldEntries,
                             final CoverageReference[] newEntries,
-                            final int clé) // NO synchronized!
+                            final int clÃ©) // NO synchronized!
     {
-        final String name = Resources.format(clé).toLowerCase();
+        final String name = Resources.format(clÃ©).toLowerCase();
         if (oldEntries != newEntries) {
             final Object[] listeners=listenerList.getListenerList();
             if (listeners.length != 0) {
@@ -745,9 +745,9 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Indique que la référence {@link #entry} a changé. Cette méthode recherche la ligne
-     * correspondant à cette référence et lance l'événement appropriée. Cette méthode peut
-     * être appelée à partir de n'importe quel thread (pas nécessairement celui de
+     * Indique que la rÃ©fÃ©rence {@link #entry} a changÃ©. Cette mÃ©thode recherche la ligne
+     * correspondant Ã  cette rÃ©fÃ©rence et lance l'Ã©vÃ©nement appropriÃ©e. Cette mÃ©thode peut
+     * Ãªtre appelÃ©e Ã  partir de n'importe quel thread (pas nÃ©cessairement celui de
      * <cite>Swing</cite>).
      */
     private void fireTableRowsUpdated(CoverageReference entry) { // NO synchronized
@@ -770,25 +770,25 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Classe des références vers des images. Cette classe redirige la plupart des appels de ses
-     * méthodes vers un autre objet {@link CoverageReference}. La principale exception est la méthode
-     * {@link #getCoverage}, qui intercepte les appels pour mettre à jour des variables internes
-     * indiquant si une image a été vue ou si sa lecture a échoué.
+     * Classe des rÃ©fÃ©rences vers des images. Cette classe redirige la plupart des appels de ses
+     * mÃ©thodes vers un autre objet {@link CoverageReference}. La principale exception est la mÃ©thode
+     * {@link #getCoverage}, qui intercepte les appels pour mettre Ã  jour des variables internes
+     * indiquant si une image a Ã©tÃ© vue ou si sa lecture a Ã©chouÃ©.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private final class CoverageProxy extends CoverageReference.Proxy {
         /**
-         * Numéro de série (pour compatibilité avec des versions antérieures).
+         * NumÃ©ro de sÃ©rie (pour compatibilitÃ© avec des versions antÃ©rieures).
          */
         private static final long serialVersionUID = 8398851451224196337L;
 
-        /** Drapeau indiquant qu'une image a été vue.        */ public static final byte VIEWED      = 1;
+        /** Drapeau indiquant qu'une image a Ã©tÃ© vue.        */ public static final byte VIEWED      = 1;
         /** Drapeau indiquant qu'un fichier est introuvable. */ public static final byte MISSING     = 2;
         /** Drapeau indiquant qu'un fichier est mauvais.     */ public static final byte CORRUPTED   = 4;
-        /** Drapeau indiquant qu'un appel RMI a échoué.      */ public static final byte RMI_FAILURE = 8;
-        /** Drapeau indiquant l'état de l'image courante.    */ public              byte flags;
+        /** Drapeau indiquant qu'un appel RMI a Ã©chouÃ©.      */ public static final byte RMI_FAILURE = 8;
+        /** Drapeau indiquant l'Ã©tat de l'image courante.    */ public              byte flags;
 
         /**
          * Construit un proxy.
@@ -799,9 +799,9 @@ public class CoverageTableModel extends AbstractTableModel {
         }
 
         /**
-         * Procède à la lecture d'une image. Si la lecture a réussi sans avoir été
-         * annulée par l'utilisateur, alors le drapeau {@link #VIEWED} sera levé.
-         * Si la lecture a échoué, alors le drapeau {@link #CORRUPTED} sera levé.
+         * ProcÃ¨de Ã  la lecture d'une image. Si la lecture a rÃ©ussi sans avoir Ã©tÃ©
+         * annulÃ©e par l'utilisateur, alors le drapeau {@link #VIEWED} sera levÃ©.
+         * Si la lecture a Ã©chouÃ©, alors le drapeau {@link #CORRUPTED} sera levÃ©.
          */
         @Override
         public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
@@ -823,8 +823,8 @@ public class CoverageTableModel extends AbstractTableModel {
         }
 
         /**
-         * Place ou retire les drapeaux spécifiés. Si l'appel de cette méthode a modifié
-         * l'état des drapeaux, alors {@link #fireTableRowsUpdated} sera appelée.
+         * Place ou retire les drapeaux spÃ©cifiÃ©s. Si l'appel de cette mÃ©thode a modifiÃ©
+         * l'Ã©tat des drapeaux, alors {@link #fireTableRowsUpdated} sera appelÃ©e.
          */
         public synchronized void setFlag(byte f, final boolean set) {
             if (set) f |= flags;
@@ -837,30 +837,30 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Classe du thread qui aura la charge de vérifier si les fichiers des images existent.
-     * Lorsqu'un nouvel objet {@link CoverageProxy} est créé, il peut appeler la méthode statique
-     * {@link #add} pour s'ajouter lui-même à la liste des images dont on vérifiera l'existence.
+     * Classe du thread qui aura la charge de vÃ©rifier si les fichiers des images existent.
+     * Lorsqu'un nouvel objet {@link CoverageProxy} est crÃ©Ã©, il peut appeler la mÃ©thode statique
+     * {@link #add} pour s'ajouter lui-mÃªme Ã  la liste des images dont on vÃ©rifiera l'existence.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private final static class FileChecker extends Thread {
         /**
-         * Thread ayant la charge de vérifier si des fichiers existent.
+         * Thread ayant la charge de vÃ©rifier si des fichiers existent.
          */
         private static FileChecker thread;
 
         /**
-         * Liste des fichiers dont on veut vérifier l'existence.
+         * Liste des fichiers dont on veut vÃ©rifier l'existence.
          */
         private final LinkedList<CoverageProxy> list = new LinkedList<CoverageProxy>();
 
         /**
-         * Construit un thread qui vérifiera l'existence des fichiers. Le processus démarrera
-         * immédiatement, mais bloquera presque aussitôt sur la méthode {@link #next}  (parce
-         * qu'elle est synchronisée sur le même moniteur que {@link #add}, la méthode qui
-         * appelle ce constructeur). L'exécution continuera lorsque la méthode {@link #add}
-         * aura terminé, ce qui garantit qu'il y aura au moins une image à vérifier.
+         * Construit un thread qui vÃ©rifiera l'existence des fichiers. Le processus dÃ©marrera
+         * immÃ©diatement, mais bloquera presque aussitÃ´t sur la mÃ©thode {@link #next}  (parce
+         * qu'elle est synchronisÃ©e sur le mÃªme moniteur que {@link #add}, la mÃ©thode qui
+         * appelle ce constructeur). L'exÃ©cution continuera lorsque la mÃ©thode {@link #add}
+         * aura terminÃ©, ce qui garantit qu'il y aura au moins une image Ã  vÃ©rifier.
          */
         private FileChecker() {
             super("FileChecker");
@@ -870,7 +870,7 @@ public class CoverageTableModel extends AbstractTableModel {
         }
 
         /**
-         * Ajoute une entrée à la liste des images à vérifier.
+         * Ajoute une entrÃ©e Ã  la liste des images Ã  vÃ©rifier.
          */
         public static synchronized void add(final CoverageProxy entry) {
             if (thread == null) {
@@ -880,10 +880,10 @@ public class CoverageTableModel extends AbstractTableModel {
         }
 
         /**
-         * Retourne la prochaine image à vérifier, ou {@code null}
+         * Retourne la prochaine image Ã  vÃ©rifier, ou {@code null}
          * s'il n'en reste plus. S'il ne reste plus d'images, alors cette
-         * méthode signalera que le thread va mourrir en donnant la valeur
-         * {@code null} à {@link #thread].
+         * mÃ©thode signalera que le thread va mourrir en donnant la valeur
+         * {@code null} Ã  {@link #thread].
          */
         private static synchronized CoverageProxy next(final LinkedList<CoverageProxy> list) {
             if (list.isEmpty()) {
@@ -894,10 +894,10 @@ public class CoverageTableModel extends AbstractTableModel {
         }
 
         /**
-         * Vérifie si les fichiers de la liste existent. Si un fichier
-         * n'existe pas, le drapeau {@link CoverageProxy#MISSING} sera lévé
-         * pour l'objet {@link CoverageProxy} correspondant. Cette vérification
-         * n'est pas effectuée pour les objets résidant sur un serveur distant.
+         * VÃ©rifie si les fichiers de la liste existent. Si un fichier
+         * n'existe pas, le drapeau {@link CoverageProxy#MISSING} sera lÃ©vÃ©
+         * pour l'objet {@link CoverageProxy} correspondant. Cette vÃ©rification
+         * n'est pas effectuÃ©e pour les objets rÃ©sidant sur un serveur distant.
          */
         @Override
         public void run() {
@@ -917,9 +917,9 @@ public class CoverageTableModel extends AbstractTableModel {
 
     /**
      * Classe pour afficher des cellules de {@link CoverageTableModel} dans une table
-     * {@link JTable}. Par défaut, cette classe affiche le texte des cellules avec
+     * {@link JTable}. Par dÃ©faut, cette classe affiche le texte des cellules avec
      * leur couleur habituelle (noir). Elle peut toutefois utiliser des couleurs
-     * différentes si l'image a été vue (bleu) ou si elle est manquante (rouge).
+     * diffÃ©rentes si l'image a Ã©tÃ© vue (bleu) ou si elle est manquante (rouge).
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -927,12 +927,12 @@ public class CoverageTableModel extends AbstractTableModel {
     @SuppressWarnings("serial")
     public static class CellRenderer extends DefaultTableCellRenderer {
         /**
-         * Couleur par défaut de la police.
+         * Couleur par dÃ©faut de la police.
          */
         private Color foreground;
 
         /**
-         * Couleur par défaut de l'arrière plan.
+         * Couleur par dÃ©faut de l'arriÃ¨re plan.
          */
         private Color background;
 
@@ -946,7 +946,7 @@ public class CoverageTableModel extends AbstractTableModel {
         }
 
         /**
-         * Définit la couleur de la police.
+         * DÃ©finit la couleur de la police.
          */
         @Override
         public void setForeground(final Color foreground) {
@@ -954,7 +954,7 @@ public class CoverageTableModel extends AbstractTableModel {
         }
 
         /**
-         * Définit la couleur de l'arrière-plan.
+         * DÃ©finit la couleur de l'arriÃ¨re-plan.
          */
         @Override
         public void setBackground(final Color background) {
@@ -962,10 +962,10 @@ public class CoverageTableModel extends AbstractTableModel {
         }
 
         /**
-         * Retourne une composante à utiliser pour dessiner le contenu des
-         * cellules de la table.  Cette méthode utilise une composante par
-         * défaut, mais en changeant la couleur du texte si l'entrée correspond
-         * à une image qui a déjà été lue.
+         * Retourne une composante Ã  utiliser pour dessiner le contenu des
+         * cellules de la table.  Cette mÃ©thode utilise une composante par
+         * dÃ©faut, mais en changeant la couleur du texte si l'entrÃ©e correspond
+         * Ã  une image qui a dÃ©jÃ  Ã©tÃ© lue.
          */
         @Override
         public Component getTableCellRendererComponent(final JTable table, Object value, final boolean isSelected,

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -35,8 +35,8 @@ import net.sicade.observation.IllegalRecordException;
 
 
 /**
- * Connexion vers la table des {@linkplain Thematic thèmes} traités par les
- * {@linkplain Series séries}.
+ * Connexion vers la table des {@linkplain Thematic thÃ¨mes} traitÃ©s par les
+ * {@linkplain Series sÃ©ries}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -44,34 +44,34 @@ import net.sicade.observation.IllegalRecordException;
  */
 public class ThematicTable extends SingletonTable<Thematic> implements Shareable {
     /**
-     * Requête SQL pour obtenir un thème.
+     * RequÃªte SQL pour obtenir un thÃ¨me.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Thematics:SELECT",
             "SELECT name, description\n" +
             "  FROM \"Thematics\"\n"     +
             " WHERE name=?");
 
-    /** Numéro de colonne. */ private static final int NAME    = 1;
-    /** Numéro de colonne. */ private static final int REMARKS = 2;
+    /** NumÃ©ro de colonne. */ private static final int NAME    = 1;
+    /** NumÃ©ro de colonne. */ private static final int REMARKS = 2;
 
     /**
-     * Une instance unique de la table des sous-séries. Sera créée par {@link #getSubSeriesTable} la
-     * première fois où elle sera nécessaire. <strong>Note:</strong> on évite de déclarer explicitement
-     * le type {@link SubSeriesTable} afin d'éviter de charger les classes correspondantes trop tôt.
+     * Une instance unique de la table des sous-sÃ©ries. Sera crÃ©Ã©e par {@link #getSubSeriesTable} la
+     * premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire. <strong>Note:</strong> on Ã©vite de dÃ©clarer explicitement
+     * le type {@link SubSeriesTable} afin d'Ã©viter de charger les classes correspondantes trop tÃ´t.
      */
     private transient Table subseries;
 
     /**
-     * Construit une table des thèmes.
+     * Construit une table des thÃ¨mes.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnÃ©es.
      */
     public ThematicTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les thèmes.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les thÃ¨mes.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -82,22 +82,22 @@ public class ThematicTable extends SingletonTable<Thematic> implements Shareable
     }
 
     /**
-     * Construit un thème pour l'enregistrement courant.
+     * Construit un thÃ¨me pour l'enregistrement courant.
      */
     protected Thematic createEntry(final ResultSet results) throws SQLException {
         return new ThematicEntry(results.getString(NAME), results.getString(REMARKS));
     }
 
     /**
-     * Retourne une instance unique de la table des sous-séries. Cette méthode est réservée à un
+     * Retourne une instance unique de la table des sous-sÃ©ries. Cette mÃ©thode est rÃ©servÃ©e Ã  un
      * usage strictement interne par {@link SeriesTable}. En principe, les {@link SubSeriesTable}
-     * ne sont pas {@linkplain Shareable partageable} car elle possèdent une méthode {@code set}.
+     * ne sont pas {@linkplain Shareable partageable} car elle possÃ¨dent une mÃ©thode {@code set}.
      * Dans le cas particulier de {@link SeriesTable} toutefois, toutes les utilisations de
-     * {@link SubSeriesTable} se font à l'intérieur d'un bloc synchronisé, de sorte qu'une
+     * {@link SubSeriesTable} se font Ã  l'intÃ©rieur d'un bloc synchronisÃ©, de sorte qu'une
      * instance unique suffit.
      *
-     * @param  type Doit obligatoirement être {@code SubSeriesTable.class}.
-     * @return La table des sous-séries.
+     * @param  type Doit obligatoirement Ãªtre {@code SubSeriesTable.class}.
+     * @return La table des sous-sÃ©ries.
      */
     final synchronized <T extends Table> T getTable(final Class<T> type) {
         if (subseries == null) {

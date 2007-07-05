@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,11 +23,11 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * Classe de base des éléments qui délègueront tous ou une partir de leur travail à un
- * autre élément. Ces classes sont utiles lorsque l'on veut modifier seulement quelques
- * aspect du travail d'un {@linkplain #getParent élément parent}.
+ * Classe de base des Ã©lÃ©ments qui dÃ©lÃ¨gueront tous ou une partir de leur travail Ã  un
+ * autre Ã©lÃ©ment. Ces classes sont utiles lorsque l'on veut modifier seulement quelques
+ * aspect du travail d'un {@linkplain #getParent Ã©lÃ©ment parent}.
  * <p>
- * Les proxy peuvent être enregistrés en binaires si l'{@linkplain #getParent élément parent}
+ * Les proxy peuvent Ãªtre enregistrÃ©s en binaires si l'{@linkplain #getParent Ã©lÃ©ment parent}
  * le peut aussi.
  *
  * @version $Id$
@@ -35,7 +35,7 @@ import org.geotools.resources.Utilities;
  */
 public abstract class Proxy implements Element, Serializable {
     /**
-     * Pour compatibilité entre des enregistrements binaires de versions différentes.
+     * Pour compatibilitÃ© entre des enregistrements binaires de versions diffÃ©rentes.
      */
     private static final long serialVersionUID = 6984331646382641188L;
 
@@ -46,12 +46,12 @@ public abstract class Proxy implements Element, Serializable {
     }
 
     /**
-     * Retourne l'élément enveloppé par ce proxy.
+     * Retourne l'Ã©lÃ©ment enveloppÃ© par ce proxy.
      */
     public abstract Element getParent();
 
     /**
-     * Retourne le nom de cet élément. L'implémentation par défaut délègue le travail
+     * Retourne le nom de cet Ã©lÃ©ment. L'implÃ©mentation par dÃ©faut dÃ©lÃ¨gue le travail
      * au {@linkplain #getParent parent}.
      */
     public String getName() {
@@ -59,22 +59,22 @@ public abstract class Proxy implements Element, Serializable {
     }
 
     /**
-     * Retourne des remarques s'appliquant à cette entrée, ou {@code null} s'il n'y en a pas.
-     * L'implémentation par défaut délègue le travail au {@linkplain #getParent parent}.
+     * Retourne des remarques s'appliquant Ã  cette entrÃ©e, ou {@code null} s'il n'y en a pas.
+     * L'implÃ©mentation par dÃ©faut dÃ©lÃ¨gue le travail au {@linkplain #getParent parent}.
      */
     public String getRemarks() {
         return getParent().getRemarks();
     }
 
     /**
-     * Retourne le nom de cet élément.
+     * Retourne le nom de cet Ã©lÃ©ment.
      */
     public String toString() {
         return getName();
     }
 
     /**
-     * Retourne un code pour cet élément. L'implémentation par défaut calcule un code à partir
+     * Retourne un code pour cet Ã©lÃ©ment. L'implÃ©mentation par dÃ©faut calcule un code Ã  partir
      * de celui du {@linkplain #getParent parent}.
      */
     @Override
@@ -83,8 +83,8 @@ public abstract class Proxy implements Element, Serializable {
     }
 
     /**
-     * Compare cet objet avec l'objet spécifié. L'implémentation par défaut vérifie si les deux
-     * objets sont de la même classe et leurs {@linkplain #getParent parents} sont eux-même égaux.
+     * Compare cet objet avec l'objet spÃ©cifiÃ©. L'implÃ©mentation par dÃ©faut vÃ©rifie si les deux
+     * objets sont de la mÃªme classe et leurs {@linkplain #getParent parents} sont eux-mÃªme Ã©gaux.
      */
     @Override
     public boolean equals(final Object object) {

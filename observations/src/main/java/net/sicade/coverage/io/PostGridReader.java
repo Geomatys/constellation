@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -69,7 +69,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * A reader of PostGrid DataBases, to obtain a Grid Coverage from these data. 
  * 
  * @version $Id$
- * @author Cédric Briançon
+ * @author CÃ©dric BrianÃ§on
  */
 public class PostGridReader extends AbstractGridCoverage2DReader implements GridCoverageReader {
     /**

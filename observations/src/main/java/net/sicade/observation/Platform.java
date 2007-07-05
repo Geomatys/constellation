@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,12 +22,12 @@ import java.util.Set;
 
 
 /**
- * Plateforme sur laquelle sont effectuées les {@linkplain Station stations}. Une plateforme peut être par
- * exemple un bateau que l'on suivra pendant une campagne d'échantillonage. Des campagnes d'échantillonages
- * différentes seront typiquement considérées comme des plateformes distinctes, même si le même bateau est
- * réutilisé (on pourrait faire valoir qu'une nouvelle mission océanographique embarque souvent des instruments
- * différents). Le choix d'utiliser des plateformes différentes ou pas est laissé au jugement du gestionnaire.
- * Le point clé est qu'une plateforme contient une série de stations que l'on peut relier entre elles par une
+ * Plateforme sur laquelle sont effectuÃ©es les {@linkplain Station stations}. Une plateforme peut Ãªtre par
+ * exemple un bateau que l'on suivra pendant une campagne d'Ã©chantillonage. Des campagnes d'Ã©chantillonages
+ * diffÃ©rentes seront typiquement considÃ©rÃ©es comme des plateformes distinctes, mÃªme si le mÃªme bateau est
+ * rÃ©utilisÃ© (on pourrait faire valoir qu'une nouvelle mission ocÃ©anographique embarque souvent des instruments
+ * diffÃ©rents). Le choix d'utiliser des plateformes diffÃ©rentes ou pas est laissÃ© au jugement du gestionnaire.
+ * Le point clÃ© est qu'une plateforme contient une sÃ©rie de stations que l'on peut relier entre elles par une
  * {@linkplain #getPath trajectoire}.
  *
  * @version $Id$
@@ -35,9 +35,9 @@ import java.util.Set;
  */
 public interface Platform extends LocatedElement {
     /**
-     * Retourne toutes les stations visitées par cette plateforme, en ordre chronologique.
+     * Retourne toutes les stations visitÃ©es par cette plateforme, en ordre chronologique.
      *
-     * @throws CatalogException si l'interrogation du catalogue a échoué.
+     * @throws CatalogException si l'interrogation du catalogue a Ã©chouÃ©.
      */
     Set<? extends Station> getStations() throws CatalogException;
 }

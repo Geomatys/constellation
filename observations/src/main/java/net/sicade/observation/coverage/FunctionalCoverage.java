@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -50,12 +50,12 @@ import static java.lang.Double.isInfinite;
 
 
 /**
- * Une couverture à une seule bande dont les valeurs sont calculées par une fonction plutôt que
- * déterminée à partir de données. Le système de référence des coordonnées est fixé à celui de
+ * Une couverture Ã  une seule bande dont les valeurs sont calculÃ©es par une fonction plutÃ´t que
+ * dÃ©terminÃ©e Ã  partir de donnÃ©es. Le systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es est fixÃ© Ã  celui de
  * {@link CRS#XYT}.
  * <p>
- * Un ensemble de couvertures sont pré-définies pour des descripteurs tels que {@code cos(t)}.
- * Ces couvertures peuvent être obtenues par un appel à {@link #getCoverage(String)}.
+ * Un ensemble de couvertures sont prÃ©-dÃ©finies pour des descripteurs tels que {@code cos(t)}.
+ * Ces couvertures peuvent Ãªtre obtenues par un appel Ã  {@link #getCoverage(String)}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -67,13 +67,13 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     private static final long serialVersionUID = 3894665589165786383L;
 
     /**
-     * Ensemble des couvertures prédéfinies.
+     * Ensemble des couvertures prÃ©dÃ©finies.
      */
     private static final Map<String,DynamicCoverage> COVERAGES = new HashMap<String,DynamicCoverage>();
 
     /**
-     * Ajoute à {@link #COVERAGES} des couvertures pré-définies.
-     * L'ajout est effectué par le constructeur de {@link FunctionalCoverage}.
+     * Ajoute Ã  {@link #COVERAGES} des couvertures prÃ©-dÃ©finies.
+     * L'ajout est effectuÃ© par le constructeur de {@link FunctionalCoverage}.
      */
     static {
         new Identity();
@@ -85,12 +85,12 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     }
 
     /**
-     * Construit une nouvelle instance pour le nom spécifié. L'instante construite sera
-     * automatiquement ajoutée à l'ensemble des {@linkplain #getCoverage couvertures pré-définies}.
+     * Construit une nouvelle instance pour le nom spÃ©cifiÃ©. L'instante construite sera
+     * automatiquement ajoutÃ©e Ã  l'ensemble des {@linkplain #getCoverage couvertures prÃ©-dÃ©finies}.
      *
      * @param  name Le nom de la nouvelle couverture.
-     * @param  crs Son système de référence des coordonnées.
-     * @throws IllegalArgumentException si une couverture était déjà enregistrée pour le nom spécifié.
+     * @param  crs Son systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es.
+     * @throws IllegalArgumentException si une couverture Ã©tait dÃ©jÃ  enregistrÃ©e pour le nom spÃ©cifiÃ©.
      */
     protected FunctionalCoverage(final String name) throws IllegalArgumentException {
         super(name, CRS.XYT.getCoordinateReferenceSystem(), null, null);
@@ -104,7 +104,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     }
 
     /**
-     * Retourne une couverture pour le nom spécifié, ou {@code null} s'il n'y en a pas.
+     * Retourne une couverture pour le nom spÃ©cifiÃ©, ou {@code null} s'il n'y en a pas.
      */
     public static DynamicCoverage getCoverage(final String name) {
         synchronized (COVERAGES) {
@@ -113,15 +113,15 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     }
 
     /**
-     * Retourne la valeur de la fonction pour la position spécifiée.
+     * Retourne la valeur de la fonction pour la position spÃ©cifiÃ©e.
      *
-     * @param  coord La coordonnées à laquelle évaluer cette fonction.
-     * @throws CannotEvaluateException si la valeur ne peut pas être calculée.
+     * @param  coord La coordonnÃ©es Ã  laquelle Ã©valuer cette fonction.
+     * @throws CannotEvaluateException si la valeur ne peut pas Ãªtre calculÃ©e.
      */
     protected abstract double compute(final DirectPosition coord) throws CannotEvaluateException;
 
     /**
-     * Retourne la valeur de la fonction pour la position spécifiée, sous forme
+     * Retourne la valeur de la fonction pour la position spÃ©cifiÃ©e, sous forme
      * d'un tableau de type {@code double[]} de longueur 1.
      */
     public final double[] evaluate(final DirectPosition coord) {
@@ -129,7 +129,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     }
 
     /**
-     * Retourne la valeur de la fonction pour la position spécifiée, sous forme
+     * Retourne la valeur de la fonction pour la position spÃ©cifiÃ©e, sous forme
      * d'un tableau de type {@code double[]} de longueur 1.
      */
     @Override
@@ -142,7 +142,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     }
 
     /**
-     * Retourne la valeur de la fonction pour la position spécifiée, sous forme
+     * Retourne la valeur de la fonction pour la position spÃ©cifiÃ©e, sous forme
      * d'un tableau de type {@code float[]} de longueur 1.
      */
     @Override
@@ -155,7 +155,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     }
 
     /**
-     * Retourne la valeur de la fonction pour la position spécifiée, sous forme
+     * Retourne la valeur de la fonction pour la position spÃ©cifiÃ©e, sous forme
      * d'un tableau de type {@code int[]} de longueur 1.
      */
     @Override
@@ -168,7 +168,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     }
 
     /**
-     * Retourne la valeur de la fonction pour la position spécifiée, sous forme
+     * Retourne la valeur de la fonction pour la position spÃ©cifiÃ©e, sous forme
      * d'un tableau de type {@code byte[]} de longueur 1.
      */
     @Override
@@ -181,7 +181,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     }
 
     /**
-     * Retourne la valeur de la fonction pour la position spécifiée, sous forme
+     * Retourne la valeur de la fonction pour la position spÃ©cifiÃ©e, sous forme
      * d'un tableau de type {@code boolean[]} de longueur 1.
      */
     @Override
@@ -204,14 +204,14 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     /**
      * Retourne une description de la bande.
      *
-     * @todo Pas encore implémentée.
+     * @todo Pas encore implÃ©mentÃ©e.
      */
     public final SampleDimension getSampleDimension(final int index) {
         throw new UnsupportedOperationException();
     }
 
     /**
-     * Retourne la position spécifiée inchangée.
+     * Retourne la position spÃ©cifiÃ©e inchangÃ©e.
      */
     public final DirectPosition snap(final DirectPosition position) {
         return position;
@@ -288,17 +288,17 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
      * Une couverture retournant le cosinus de la date. Cette couverture simule le calcul
      * {@code EXTRACT(DOY FROM TIMESTAMP ...)} de PostgreSQL, ou {@code DOY} signifie
      * <cite>Day Of Year</cite> et est une valeur entre 1 et (365 ou 366) inclusivement.
-     * Le facteur multiplicatif ({@code PI / 182.625}) doit être identique à celui qui
-     * est utilisé dans la requête {@code "AllEnvironments"}.
+     * Le facteur multiplicatif ({@code PI / 182.625}) doit Ãªtre identique Ã  celui qui
+     * est utilisÃ© dans la requÃªte {@code "AllEnvironments"}.
      */
     private static final class CosinusTime extends FunctionalCoverage {
         /**
-         * Le système de référence des coordonnées pour l'axe du temps.
+         * Le systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es pour l'axe du temps.
          */
         private final DefaultTemporalCRS crs;
 
         /**
-         * Le calendrier à utiliser pour manipuler les dates.
+         * Le calendrier Ã  utiliser pour manipuler les dates.
          */
         private final Calendar calendar;
 

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,8 +24,8 @@ import org.geotools.coverage.grid.GridCoverage2D;
 
 
 /**
- * Un décodeur pouvant lire une image en particulier, localement où via les RMI. Lorsque l'image
- * est transmise sur le réseau via les RMI, elle peut dans certains cas être dégradée pour une
+ * Un dÃ©codeur pouvant lire une image en particulier, localement oÃ¹ via les RMI. Lorsque l'image
+ * est transmise sur le rÃ©seau via les RMI, elle peut dans certains cas Ãªtre dÃ©gradÃ©e pour une
  * transmission plus compacte.
  *
  * @version $Id$
@@ -33,17 +33,17 @@ import org.geotools.coverage.grid.GridCoverage2D;
  */
 public interface CoverageLoader extends Remote {
     /**
-     * Procède au chargement de l'image. Cette méthode peut être exécutée sur une machine distante,
-     * qui ne renvoiera que le résultat final (une image potentiellement découpée, décimée et
-     * transformée). Cette méthode retourne toujours la version geophysique de l'image
+     * ProcÃ¨de au chargement de l'image. Cette mÃ©thode peut Ãªtre exÃ©cutÃ©e sur une machine distante,
+     * qui ne renvoiera que le rÃ©sultat final (une image potentiellement dÃ©coupÃ©e, dÃ©cimÃ©e et
+     * transformÃ©e). Cette mÃ©thode retourne toujours la version geophysique de l'image
      * (<code>{@linkplain GridCoverage2D#geophysics geophysics}(true)</code>).
      *
      * @return Image lue.
-     * @throws java.io.IOException si le fichier n'a pas été trouvé ou si une autre erreur
-     *         d'entrés/sorties est survenue.
-     * @throws javax.imageio.IIOException s'il n'y a pas de décodeur approprié pour l'image,
+     * @throws java.io.IOException si le fichier n'a pas Ã©tÃ© trouvÃ© ou si une autre erreur
+     *         d'entrÃ©s/sorties est survenue.
+     * @throws javax.imageio.IIOException s'il n'y a pas de dÃ©codeur appropriÃ© pour l'image,
      *         ou si l'image n'est pas valide.
-     * @throws java.rmi.RemoteException si un problème est survenu lors de la communication avec le
+     * @throws java.rmi.RemoteException si un problÃ¨me est survenu lors de la communication avec le
      *         serveur.
      */
     GridCoverage2D getCoverage() throws IOException;

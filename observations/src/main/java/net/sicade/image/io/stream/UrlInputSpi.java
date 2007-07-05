@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -49,7 +49,7 @@ public class UrlInputSpi extends ImageInputStreamSpi {
     /**
      * Le proxy.
      *
-     * @todo Ce champ devrait pouvoir être spécifié par l'utilisateur.
+     * @todo Ce champ devrait pouvoir Ãªtre spÃ©cifiÃ© par l'utilisateur.
      */
     private final Proxy proxy = Proxy.NO_PROXY;
 
@@ -57,7 +57,7 @@ public class UrlInputSpi extends ImageInputStreamSpi {
      * Creates a new instance of service provider interface.
      */
     public UrlInputSpi() {
-        super("Institut de Recherche pour le Développement",
+        super("Institut de Recherche pour le DÃ©veloppement",
               "1.0", URL.class);
     }
 
@@ -66,7 +66,7 @@ public class UrlInputSpi extends ImageInputStreamSpi {
      * provider and its associated implementation.
      */
     public String getDescription(final Locale locale) {
-        return "Flot d'entré à partir d'un URL, éventuellement via un proxy.";
+        return "Flot d'entrÃ© Ã  partir d'un URL, Ã©ventuellement via un proxy.";
     }
 
     /**
@@ -105,7 +105,7 @@ public class UrlInputSpi extends ImageInputStreamSpi {
                 // Quelqu'un ne veut pas nous laisser dormir. Retourne au boulot...
             }
             if (true) {
-                // L'expérience suggère que les appels à System.gc|runFinalization peuvent aider.
+                // L'expÃ©rience suggÃ¨re que les appels Ã  System.gc|runFinalization peuvent aider.
                 System.gc();
                 final FinalizationStopper stopper = new FinalizationStopper();
                 System.runFinalization();

@@ -27,7 +27,7 @@ import java.sql.SQLException;
  * Allows to manage connection to Java Database. 
  *
  * @source $URL$
- * @author Cédric Briançon
+ * @author CÃ©dric BrianÃ§on
  */
 public class JavaDbConnection {
     /**
@@ -72,7 +72,7 @@ public class JavaDbConnection {
             System.out.println(stat);
             ResultSet res = stat.executeQuery();
             if (res == null) {
-                System.out.println("manqué !");
+                System.out.println("manquÃ© !");
             }
             res.close();
             stat.close();

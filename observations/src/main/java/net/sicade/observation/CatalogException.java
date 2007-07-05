@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ package net.sicade.observation;
 
 
 /**
- * Classe de base des exceptions pouvant survenir lors d'une requête sur une base de données.
+ * Classe de base des exceptions pouvant survenir lors d'une requÃªte sur une base de donnÃ©es.
  *
  * @version $Id$
  * @author Remi Eve
@@ -28,27 +28,27 @@ package net.sicade.observation;
  */
 public class CatalogException extends Exception {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 3838293108990270182L;
 
     /**
-     * Nom de la table dans laquelle l'enregistrement était attendu, ou {@code null} si inconnu.
+     * Nom de la table dans laquelle l'enregistrement Ã©tait attendu, ou {@code null} si inconnu.
      */
     private String table;
 
     /**
-     * Construit une exception avec le message spécifié.
+     * Construit une exception avec le message spÃ©cifiÃ©.
      */
     public CatalogException(final String message) {
         super(message);
     }
 
     /**
-     * Construit une exception avec le message et le nom de table spécifié.
+     * Construit une exception avec le message et le nom de table spÃ©cifiÃ©.
      *
-     * @param message Message décrivant l'erreur.
-     * @param table Nom de la table dans laquelle un problème est survenu, ou {@code null} si inconnu.
+     * @param message Message dÃ©crivant l'erreur.
+     * @param table Nom de la table dans laquelle un problÃ¨me est survenu, ou {@code null} si inconnu.
      */
     public CatalogException(final String message, final String table) {
         super(message);
@@ -56,16 +56,16 @@ public class CatalogException extends Exception {
     }
 
     /** 
-     * Construit une exception avec la cause spécifiée.
-     * Le message sera déterminée à partir de la cause.
+     * Construit une exception avec la cause spÃ©cifiÃ©e.
+     * Le message sera dÃ©terminÃ©e Ã  partir de la cause.
      */
     public CatalogException(final Exception cause) {
         super(cause.getLocalizedMessage(), cause);
     }
 
     /** 
-     * Construit une exception avec la cause spécifiée.
-     * Le message sera déterminée à partir de la cause.
+     * Construit une exception avec la cause spÃ©cifiÃ©e.
+     * Le message sera dÃ©terminÃ©e Ã  partir de la cause.
      */
     CatalogException(final Exception cause, final String table) {
         this(cause);
@@ -73,7 +73,7 @@ public class CatalogException extends Exception {
     }
 
     /**
-     * Retourne le nom de la table dans laquelle un problème est survenu.
+     * Retourne le nom de la table dans laquelle un problÃ¨me est survenu.
      * Peut retourner {@code null} si le nom de la table n'est pas connu.
      */
     public String getTable() {

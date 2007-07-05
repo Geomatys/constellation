@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,46 +30,46 @@ import org.openide.util.NbBundle;
 
 
 /**
- * Lecteur de fichiers {@code .bbox} représentant une région d'intérêt. Ce lecteur construira des
- * objets {@link DataFile} à partir des fichiers {@code .bbox}, que l'on lira un à la fois.
+ * Lecteur de fichiers {@code .bbox} reprÃ©sentant une rÃ©gion d'intÃ©rÃªt. Ce lecteur construira des
+ * objets {@link DataFile} Ã  partir des fichiers {@code .bbox}, que l'on lira un Ã  la fois.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class Loader extends UniFileLoader {
     /**
-     * Pour compatibilité avec différentes versions de cette classe.
+     * Pour compatibilitÃ© avec diffÃ©rentes versions de cette classe.
      */
     private static final long serialVersionUID = -5699394674609456107L;
 
     /**
-     * Le type MIME des fichiers {@code .bbox} qui seront à lire.
+     * Le type MIME des fichiers {@code .bbox} qui seront Ã  lire.
      */
     public static final String REQUIRED_MIME = "application/x-bbox";
 
     /**
-     * L'extension des fichiers, incluant le point. Cette extension doit être cohérente
-     * avec l'extension déclarée dans le fichier {@code BoundingBoxResolver.xml}.
+     * L'extension des fichiers, incluant le point. Cette extension doit Ãªtre cohÃ©rente
+     * avec l'extension dÃ©clarÃ©e dans le fichier {@code BoundingBoxResolver.xml}.
      */
     static final String EXTENSION = "bbox";
 
     /**
-     * Le nom par défaut des nouvelles régions géographiques qui seront créées.
-     * Ce nom est utilisé par {@link AddAction}, qui y ajoutera un suffix tel
-     * que {@code " (1)"} si le nom sans suffix est déjà utilisé.
+     * Le nom par dÃ©faut des nouvelles rÃ©gions gÃ©ographiques qui seront crÃ©Ã©es.
+     * Ce nom est utilisÃ© par {@link AddAction}, qui y ajoutera un suffix tel
+     * que {@code " (1)"} si le nom sans suffix est dÃ©jÃ  utilisÃ©.
      */
-    static final String DEFAULT_BASE_NAME = "Nouvelle région";
+    static final String DEFAULT_BASE_NAME = "Nouvelle rÃ©gion";
 
     /**
-     * Construit un lecteur par défaut.
+     * Construit un lecteur par dÃ©faut.
      */
     public Loader() {
         super("net.sicade.sie.type.bbox.DataFile");
     }
 
     /**
-     * Initialise ce lecteur en enregistrant son type MIME. Cette méthode est appelée
-     * automatiquement par le système et n'a pas besoin d'être appelée directement.
+     * Initialise ce lecteur en enregistrant son type MIME. Cette mÃ©thode est appelÃ©e
+     * automatiquement par le systÃ¨me et n'a pas besoin d'Ãªtre appelÃ©e directement.
      */
     @Override
     protected void initialize() {
@@ -78,9 +78,9 @@ public final class Loader extends UniFileLoader {
     }
 
     /**
-     * Retourne le nom par défaut de ce lecteur. Ce nom sera retourné par
+     * Retourne le nom par dÃ©faut de ce lecteur. Ce nom sera retournÃ© par
      * {@link #getDisplayName getDisplayName()}, sauf si l'utilisateur l'a
-     * modifié avec {@link #setDisplayName setDisplayName(...)}.
+     * modifiÃ© avec {@link #setDisplayName setDisplayName(...)}.
      */
     @Override
     protected String defaultDisplayName() {
@@ -88,9 +88,9 @@ public final class Loader extends UniFileLoader {
     }
 
     /**
-     * Retourne le nom du contexte où seront listées les actions dans le fichier {@code layer.xml}.
-     * Pour ce lecteur, ce nom est {@code "Loaders/application/x-bbox/Actions"} et s'interprète
-     * comme un chemin menant à la liste des actions dans le fichier {@code layer.xml}.
+     * Retourne le nom du contexte oÃ¹ seront listÃ©es les actions dans le fichier {@code layer.xml}.
+     * Pour ce lecteur, ce nom est {@code "Loaders/application/x-bbox/Actions"} et s'interprÃ¨te
+     * comme un chemin menant Ã  la liste des actions dans le fichier {@code layer.xml}.
      */
     @Override
     protected String actionsContext() {
@@ -98,12 +98,12 @@ public final class Loader extends UniFileLoader {
     }
 
     /**
-     * Construit un objet représentant les données du fichier spécifié.
+     * Construit un objet reprÃ©sentant les donnÃ©es du fichier spÃ©cifiÃ©.
      *
-     * @param  primaryFile le fichier {@code .bbox} à lire.
-     * @return Un objet {@link DataFile} représentant les données sélectionnées.
-     * @throws DataObjectExistsException Si un object {@link DataFile} existe déjà
-     *         pour le fichier spécifié.
+     * @param  primaryFile le fichier {@code .bbox} Ã  lire.
+     * @return Un objet {@link DataFile} reprÃ©sentant les donnÃ©es sÃ©lectionnÃ©es.
+     * @throws DataObjectExistsException Si un object {@link DataFile} existe dÃ©jÃ 
+     *         pour le fichier spÃ©cifiÃ©.
      * @throws IOException si une erreur est survenue lors de la lecture du fichier {@code .bbox}.
      */
     protected MultiDataObject createMultiObject(final FileObject primaryFile)

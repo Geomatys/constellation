@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ import org.openide.DialogDescriptor;
 
 
 /**
- * Une action permettant de configurer la structure de l'arborescence. Cette action est proposée
+ * Une action permettant de configurer la structure de l'arborescence. Cette action est proposÃ©e
  * dans le menu contextuel de {@link RootNode}.
  *
  * @version $Id$
@@ -38,7 +38,7 @@ import org.openide.DialogDescriptor;
  */
 final class TreeLayoutAction extends AbstractAction {
     /**
-     * Le noeud sur lequel cette action sera exécutée.
+     * Le noeud sur lequel cette action sera exÃ©cutÃ©e.
      */
     private final RootNode node;
 
@@ -51,15 +51,15 @@ final class TreeLayoutAction extends AbstractAction {
     }
 
     /**
-     * Retourne le titre à utiliser pour l'item de cette action dans le menu contextuel,
-     * ainsi que pour le titre de la boîte de dialogue de l'assistant.
+     * Retourne le titre Ã  utiliser pour l'item de cette action dans le menu contextuel,
+     * ainsi que pour le titre de la boÃ®te de dialogue de l'assistant.
      */
     private static String getTitle() {
         return NbBundle.getMessage(TreeLayoutAction.class, "CTL_TreeLayoutAction");
     }
 
     /**
-     * Fait apparaître la boîte de dialogue qui permet à l'utilisateur de définir
+     * Fait apparaÃ®tre la boÃ®te de dialogue qui permet Ã  l'utilisateur de dÃ©finir
      * la structure de l'arborescence.
      */
     public void actionPerformed(final ActionEvent event) {

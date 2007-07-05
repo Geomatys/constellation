@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -45,22 +45,22 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 /**
  * Teste le fonctionnement de {@link CoverageStack#evaluate} avec des {@link Series}.
  * Ce test est un peu plus direct que {@link DescriptorTest} du fait qu'il construit
- * lui même le {@link CoverageStack} dans plusieurs cas.
+ * lui mÃªme le {@link CoverageStack} dans plusieurs cas.
  * 
  * 
- * @author Cédric Briançon
+ * @author CÃ©dric BrianÃ§on
  * @version $Id$
  */
 public class WritableGridCoverageTableTest extends AbstractTest {
     /**
-     * {@code true} pour désactiver tous les tests (sauf typiquement un test en particulier que l'on
-     * souhaite suivre pas à pas). La valeur de ce champ devrait être toujours {@code false} sauf en
-     * cas de déboguage d'une méthode bien spécifique.
+     * {@code true} pour dÃ©sactiver tous les tests (sauf typiquement un test en particulier que l'on
+     * souhaite suivre pas Ã  pas). La valeur de ce champ devrait Ãªtre toujours {@code false} sauf en
+     * cas de dÃ©boguage d'une mÃ©thode bien spÃ©cifique.
      */
     private static final boolean DISABLED = false;
 
     /**
-     * Connexion vers la table des séries.
+     * Connexion vers la table des sÃ©ries.
      */
     private static SeriesTable series;
 
@@ -80,7 +80,7 @@ public class WritableGridCoverageTableTest extends AbstractTest {
     }
 
     /**
-     * Exécute la suite de tests à partir de la ligne de commande.
+     * ExÃ©cute la suite de tests Ã  partir de la ligne de commande.
      */
     public static void main(final String[] args) {
         MonolineFormatter.init("org.geotools");
@@ -91,8 +91,8 @@ public class WritableGridCoverageTableTest extends AbstractTest {
     }
 
     /**
-     * Etablit la connexion avec la base de données. Cette connexion ne sera établie que la
-     * première fois où un test sera exécuté. Pour la fermeture des connections, on se fiera
+     * Etablit la connexion avec la base de donnÃ©es. Cette connexion ne sera Ã©tablie que la
+     * premiÃ¨re fois oÃ¹ un test sera exÃ©cutÃ©. Pour la fermeture des connections, on se fiera
      * au rammase-miettes et aux "shutdown hooks" mis en place par {@code Database}.
      */
     @Override
@@ -104,20 +104,20 @@ public class WritableGridCoverageTableTest extends AbstractTest {
     }
 
     /**
-     * Teste l'obtention de la liste des séries, incluant un filtrage par région géographique.
+     * Teste l'obtention de la liste des sÃ©ries, incluant un filtrage par rÃ©gion gÃ©ographique.
      */
     public void testWritableGCT() throws Exception {
         if (DISABLED) return;
         final SeriesTable table = database.getTable(SeriesTable.class);
         final Set<Series> all = table.getEntries();
-        final File file = new File("C:\\images\\Contrôles\\Afrique.png");
+        final File file = new File("C:\\images\\ContrÃ´les\\Afrique.png");
         final String fileNameWithExt = file.getName();
         final String fileName = fileNameWithExt.substring(0, fileNameWithExt.indexOf("."));
         assertFalse(all.isEmpty());
         final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(-180.0, 180.0, -90.0, 90.0);
         table.setGeographicBoundingBox(bbox);
         assertEquals(bbox, table.getGeographicBoundingBox());
-//        table.trimEnvelope(); // Devrait n'avoir aucun effet lorsque la sélection contient des image mondiales.
+//        table.trimEnvelope(); // Devrait n'avoir aucun effet lorsque la sÃ©lection contient des image mondiales.
 //        assertEquals(bbox, table.getGeographicBoundingBox());
         final Series selected = table.getEntry("Images de tests");
         System.out.println(selected.getSubSeries());

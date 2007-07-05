@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ import java.util.TimeZone;
 import java.awt.geom.Point2D;
 import java.sql.SQLException;
 
-// Entrés / sorties
+// EntrÃ©s / sorties
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.LineNumberReader;
@@ -55,68 +55,68 @@ import net.sicade.observation.NoSuchRecordException;
 
 
 /**
- * Utilitaire de lignes de commandes pour extraire des valeurs de la base de données d'images.
- * Cet utilitaire attend les entrées suivantes:
+ * Utilitaire de lignes de commandes pour extraire des valeurs de la base de donnÃ©es d'images.
+ * Cet utilitaire attend les entrÃ©es suivantes:
  * <p>
  *   <li><p>Les arguments optionnels suivants:
  *     <ul>
- *       <li>{@code -locale} spécifie les conventions à utiliser pour la lecture et le formattage des
- *           nombres et des dates. Par défaut, le {@linkplain java.util.Locale#getDefault format local}
- *           est utilisé. Pour forcer l'usage du point comme séparateur décimal, utilisez par exemple
+ *       <li>{@code -locale} spÃ©cifie les conventions Ã  utiliser pour la lecture et le formattage des
+ *           nombres et des dates. Par dÃ©faut, le {@linkplain java.util.Locale#getDefault format local}
+ *           est utilisÃ©. Pour forcer l'usage du point comme sÃ©parateur dÃ©cimal, utilisez par exemple
  *           {@code -locale=en_CA} (le code de pays {@code CA} utilise des dates au format
  *           {@code "dd/MM/yy"}).</li>
- *       <li>{@code -date-pattern} spécifie le format des dates. Les caractères autorisés sont
- *           {@linkplain SimpleDateFormat décrit ici}. Si cet argument n'est pas spécifié, alors
- *           le format est déterminé à partir de {@code -locale}.
+ *       <li>{@code -date-pattern} spÃ©cifie le format des dates. Les caractÃ¨res autorisÃ©s sont
+ *           {@linkplain SimpleDateFormat dÃ©crit ici}. Si cet argument n'est pas spÃ©cifiÃ©, alors
+ *           le format est dÃ©terminÃ© Ã  partir de {@code -locale}.
  *           <b>Exemple:</b> {@code -date-pattern="dd/MM/yyyy HH:mm"}.</li>
- *       <li>{@code -timezone} spécifie le fuseau horaire des dates. Si cet argument n'est pas spécifié,
- *           alors le fuseau horaire local est utilisé. <b>Exemple:</b> {@code -timezone=UTC}.</li>
- *       <li>{@code -precision} spécifie le nombre de chiffres après la virgule à conserver pour
- *           la sortie. Si cet argument n'est pas spécifié, alors la précision dépend de la valeur
+ *       <li>{@code -timezone} spÃ©cifie le fuseau horaire des dates. Si cet argument n'est pas spÃ©cifiÃ©,
+ *           alors le fuseau horaire local est utilisÃ©. <b>Exemple:</b> {@code -timezone=UTC}.</li>
+ *       <li>{@code -precision} spÃ©cifie le nombre de chiffres aprÃ¨s la virgule Ã  conserver pour
+ *           la sortie. Si cet argument n'est pas spÃ©cifiÃ©, alors la prÃ©cision dÃ©pend de la valeur
  *           de {@code -locale}.</li>
- *       <li>{@code -fromModel} indique que la valeur doit être calculée à partir du modèle plutôt
- *           que de tenter de lire les images pré-calculées. Ce paramètre n'a aucun effet sur les
- *           descripteurs qui ne possèdent pas de modèle.</li>
+ *       <li>{@code -fromModel} indique que la valeur doit Ãªtre calculÃ©e Ã  partir du modÃ¨le plutÃ´t
+ *           que de tenter de lire les images prÃ©-calculÃ©es. Ce paramÃ¨tre n'a aucun effet sur les
+ *           descripteurs qui ne possÃ¨dent pas de modÃ¨le.</li>
  *     </ul>
  *   </p></li>
  *   <li><p>Un nombre arbitraire d'arguments qui donnent les noms des {@linkplain Descriptor descripteurs}.
  *       Exemples: {@code SST}, {@code CHL}, {@code SLA}.</p></li>
- *   <li><p>Une suite de coordonnées (<var>date</var>, <var>x</var>,<var>y</var>) du
- *       {@linkplain System#in périphérique d'entrée standard}. Les lignes vierges et
- *       celles commençant par le caractère {@code #} sont ignorées.</p></li>
+ *   <li><p>Une suite de coordonnÃ©es (<var>date</var>, <var>x</var>,<var>y</var>) du
+ *       {@linkplain System#in pÃ©riphÃ©rique d'entrÃ©e standard}. Les lignes vierges et
+ *       celles commenÃ§ant par le caractÃ¨re {@code #} sont ignorÃ©es.</p></li>
  * </ul>
  * <p>
- * Les valeurs de chacun des descripteurs sont renvoyées sur le
- * {@linkplain System#out périphérique de sortie standard}. En cas d'erreur, la trace
- * de l'exception est envoyée sur le {@linkplain System#err périphérique d'erreur}.
+ * Les valeurs de chacun des descripteurs sont renvoyÃ©es sur le
+ * {@linkplain System#out pÃ©riphÃ©rique de sortie standard}. En cas d'erreur, la trace
+ * de l'exception est envoyÃ©e sur le {@linkplain System#err pÃ©riphÃ©rique d'erreur}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class Extractor extends Arguments {
     /**
-     * Le nom du fichier en cours de lecture, ou {@code null} pour le périphérique d'entrée standard.
+     * Le nom du fichier en cours de lecture, ou {@code null} pour le pÃ©riphÃ©rique d'entrÃ©e standard.
      */
     private final String inputFile;
 
     /**
-     * Le périphérique d'entrée, ou {@code null} s'il n'a pas encore été construit.
+     * Le pÃ©riphÃ©rique d'entrÃ©e, ou {@code null} s'il n'a pas encore Ã©tÃ© construit.
      */
     private LineNumberReader in;
 
     /**
-     * Le fuseau horaire, ou {@code null} pour le fuseau par défaut.
+     * Le fuseau horaire, ou {@code null} pour le fuseau par dÃ©faut.
      */
     private final String timezone;
 
     /**
-     * Le patron pour les dates, ou {@code null} pour la valeur par défaut.
+     * Le patron pour les dates, ou {@code null} pour la valeur par dÃ©faut.
      */
     private final String datePattern;
 
     /**
-     * Le nombre de chiffre après la virgule à utiliser pour la sortie, ou -1 pour la valeur
-     * par défaut.
+     * Le nombre de chiffre aprÃ¨s la virgule Ã  utiliser pour la sortie, ou -1 pour la valeur
+     * par dÃ©faut.
      */
     private final int precision;
 
@@ -126,14 +126,14 @@ public final class Extractor extends Arguments {
     private final boolean verbose;
 
     /**
-     * {@code true} pour calculer à partir du modèle plutôt que de tenter de lire les
-     * images pré-calculées. Ce paramètre n'a aucun effet sur les descripteurs qui ne
-     * possèdent pas de modèle.
+     * {@code true} pour calculer Ã  partir du modÃ¨le plutÃ´t que de tenter de lire les
+     * images prÃ©-calculÃ©es. Ce paramÃ¨tre n'a aucun effet sur les descripteurs qui ne
+     * possÃ¨dent pas de modÃ¨le.
      */
     private final boolean fromModel;
 
     /**
-     * Construit un extracteurs à partir des arguments spécifiés.
+     * Construit un extracteurs Ã  partir des arguments spÃ©cifiÃ©s.
      */
     private Extractor(final String[] arguments) {
         super(arguments);
@@ -148,25 +148,25 @@ public final class Extractor extends Arguments {
     }
 
     /**
-     * Signal qu'une erreur est survenue lors du traitement des données. Cette méthode est utilisée
-     * pour les exceptions prévisibles seulement (par exemple celles qui peuvent être dûes par un
-     * nombre mal formatté par l'utilisateur).
+     * Signal qu'une erreur est survenue lors du traitement des donnÃ©es. Cette mÃ©thode est utilisÃ©e
+     * pour les exceptions prÃ©visibles seulement (par exemple celles qui peuvent Ãªtre dÃ»es par un
+     * nombre mal formattÃ© par l'utilisateur).
      */
     private void reportUserError(final Exception exception) {
         out.flush();
         if (in != null) {
-            err.print("Erreur à la ligne ");
+            err.print("Erreur Ã  la ligne ");
             err.println(in.getLineNumber());
         }
         err.println(exception.getLocalizedMessage());
     }
 
     /**
-     * Procède à l'extraction des valeurs.
+     * ProcÃ¨de Ã  l'extraction des valeurs.
      */
     private void process(final String[] descriptors) throws CatalogException, SQLException, IOException {
         /*
-         * Etablit les connexions à la base de données.
+         * Etablit les connexions Ã  la base de donnÃ©es.
          */
         final SpatioTemporalCoverage3D[] coverages = new SpatioTemporalCoverage3D[descriptors.length];
         final Observations observations = Observations.getDefault();
@@ -185,7 +185,7 @@ public final class Extractor extends Arguments {
             coverages[i] = new SpatioTemporalCoverage3D(name, coverage);
         }
         /*
-         * Prépare une fois pour toute les objets qui seront nécessaires, et configure les formatteurs.
+         * PrÃ©pare une fois pour toute les objets qui seront nÃ©cessaires, et configure les formatteurs.
          */
         final double[]       samples    = new double[2];
         final Point2D.Double position   = new Point2D.Double();
@@ -216,7 +216,7 @@ public final class Extractor extends Arguments {
         }
         final int precision = format.getMaximumFractionDigits();
         /*
-         * Procède à la lecture des lignes du périphérique d'entrée standard.
+         * ProcÃ¨de Ã  la lecture des lignes du pÃ©riphÃ©rique d'entrÃ©e standard.
          */
         if (inputFile != null) {
             in = new LineNumberReader(new FileReader(inputFile));
@@ -237,7 +237,7 @@ public final class Extractor extends Arguments {
             position.x      = ((Number) parser.getValue(1)).doubleValue();
             position.y      = ((Number) parser.getValue(2)).doubleValue();
             /*
-             * Procède à l'extraction des valeurs et écrit vers le périphérique de sortie standard.
+             * ProcÃ¨de Ã  l'extraction des valeurs et Ã©crit vers le pÃ©riphÃ©rique de sortie standard.
              */
             for (int i=0; i<coverages.length; i++) {
                 final double[] values;
@@ -258,13 +258,13 @@ public final class Extractor extends Arguments {
     }
 
     /**
-     * Affiche les valeurs pour tous les descripteurs énumérés.
+     * Affiche les valeurs pour tous les descripteurs Ã©numÃ©rÃ©s.
      */
     public static void main(String[] descriptors) {
         final Extractor extractor = new Extractor(descriptors);
         descriptors = extractor.getRemainingArguments(Integer.MAX_VALUE);
         if (descriptors.length == 0) {
-            extractor.err.println("Des descripteurs doivent être spécifiés en argument.");
+            extractor.err.println("Des descripteurs doivent Ãªtre spÃ©cifiÃ©s en argument.");
         } else try {
             extractor.process(descriptors);
         } catch (Exception exception) {

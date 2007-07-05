@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -58,40 +58,40 @@ import net.sicade.resources.seagis.Resources;
 
 
 /**
- * Fournit des outils de lignes de commande pour l'administration de la base de données d'images.
- * Cette classe peut être exécutée à partir de la ligne de commande:
+ * Fournit des outils de lignes de commande pour l'administration de la base de donnÃ©es d'images.
+ * Cette classe peut Ãªtre exÃ©cutÃ©e Ã  partir de la ligne de commande:
  * <p>
  * <blockquote><pre>
  * java net.sicade.observation.coverage.Console <var>options</var>
  * </pre></blockquote>
  * <p>
- * Lorsque cette classe est exécutée avec l'argument {@code -config}, elle fait apparaître une boite
- * de dialogue permettant de configurer les requêtes SQL utilisées par la base de données. Les requêtes
- * modifiées seront sauvegardées dans un fichier de configuration.
+ * Lorsque cette classe est exÃ©cutÃ©e avec l'argument {@code -config}, elle fait apparaÃ®tre une boite
+ * de dialogue permettant de configurer les requÃªtes SQL utilisÃ©es par la base de donnÃ©es. Les requÃªtes
+ * modifiÃ©es seront sauvegardÃ©es dans un fichier de configuration.
  * <p>
- * Cette méthode peut aussi être utilisée pour afficher des informations vers le
- * {@linkplain System#out périphérique de sortie standard}. Les arguments valides sont:
+ * Cette mÃ©thode peut aussi Ãªtre utilisÃ©e pour afficher des informations vers le
+ * {@linkplain System#out pÃ©riphÃ©rique de sortie standard}. Les arguments valides sont:
  * <p>
  * <blockquote><pre>
- *  <b>-print thematics</b> <i></i>  Affiche l'arborescence des thèmes
- *  <b>-print procedures</b> <i></i> Affiche l'arborescence des procédures
- *  <b>-print series</b> <i></i>     Affiche l'arborescence des séries
- *  <b>-print subseries</b> <i></i>  Affiche l'arborescence des sous-séries
+ *  <b>-print thematics</b> <i></i>  Affiche l'arborescence des thÃ¨mes
+ *  <b>-print procedures</b> <i></i> Affiche l'arborescence des procÃ©dures
+ *  <b>-print series</b> <i></i>     Affiche l'arborescence des sÃ©ries
+ *  <b>-print subseries</b> <i></i>  Affiche l'arborescence des sous-sÃ©ries
  *  <b>-print formats</b> <i></i>    Affiche l'arborescence des formats
- *  <b>-print categories</b> <i></i> Affiche l'arborescence des catégories
- *  <b>-print decoders</b> <i></i>   Affiche l'arborescence des catégories à partir des formats
- *  <b>-browse</b> <i></i>           Affiche le contenu de toute la base de données (interface graphique)
- *  <b>-verify</b> <i></i>           Vérifie l'existence d'un fichier pour chaque image de chaque série
- *  <b>-config</b> <i></i>           Configure la base de données (interface graphique)
+ *  <b>-print categories</b> <i></i> Affiche l'arborescence des catÃ©gories
+ *  <b>-print decoders</b> <i></i>   Affiche l'arborescence des catÃ©gories Ã  partir des formats
+ *  <b>-browse</b> <i></i>           Affiche le contenu de toute la base de donnÃ©es (interface graphique)
+ *  <b>-verify</b> <i></i>           VÃ©rifie l'existence d'un fichier pour chaque image de chaque sÃ©rie
+ *  <b>-config</b> <i></i>           Configure la base de donnÃ©es (interface graphique)
  *  <b>-locale</b> <i>name</i>       Langue et conventions d'affichage (exemple: "fr_CA")
  *  <b>-encoding</b> <i>name</i>     Page de code pour les sorties     (exemple: "cp850")
- *  <b>-Xout</b> <i>filename</i>     Fichier de destination (le périphérique standard par défaut)
+ *  <b>-Xout</b> <i>filename</i>     Fichier de destination (le pÃ©riphÃ©rique standard par dÃ©faut)
  * </pre></blockquote>
  * <p>
- * L'argument {@code -encoding} est surtout utile lorsque ce programme est lancé à partir de la ligne
- * de commande MS-DOS: ce dernier n'utilise pas la même page de code que le reste du système Windows.
- * Il est alors nécessaire de préciser la page de code (souvent 850 ou 437) si on veut obtenir un
- * affichage correct des caractères étendus. La page de code en cours peut être obtenu en tappant
+ * L'argument {@code -encoding} est surtout utile lorsque ce programme est lancÃ© Ã  partir de la ligne
+ * de commande MS-DOS: ce dernier n'utilise pas la mÃªme page de code que le reste du systÃ¨me Windows.
+ * Il est alors nÃ©cessaire de prÃ©ciser la page de code (souvent 850 ou 437) si on veut obtenir un
+ * affichage correct des caractÃ¨res Ã©tendus. La page de code en cours peut Ãªtre obtenu en tappant
  * {@code chcp} sur la ligne de commande.
  *
  * @version $Id$
@@ -99,8 +99,8 @@ import net.sicade.resources.seagis.Resources;
  */
 public final class Console extends Arguments {
     /**
-     * Connexion vers la base de données. Cette connexion ne sera établie que la première
-     * fois où elle sera nécessaire.
+     * Connexion vers la base de donnÃ©es. Cette connexion ne sera Ã©tablie que la premiÃ¨re
+     * fois oÃ¹ elle sera nÃ©cessaire.
      */
     private transient Database database;
 
@@ -114,9 +114,9 @@ public final class Console extends Arguments {
     }
 
     /**
-     * Retourne la connexion vers la base de données.
+     * Retourne la connexion vers la base de donnÃ©es.
      *
-     * @throws SQLException si la connexion n'a pas pu être établie.
+     * @throws SQLException si la connexion n'a pas pu Ãªtre Ã©tablie.
      */
     private Database getDatabase() throws SQLException, IOException {
         if (database == null) {
@@ -126,33 +126,33 @@ public final class Console extends Arguments {
     }
 
     /**
-     * Affiche l'écran d'aide.
+     * Affiche l'Ã©cran d'aide.
      */
     private void help() {
         out.println();
-        out.println("Outils de ligne de commande pour la base de données d'images\n"+
-                    "1999-2005, Institut de Recherche pour le Développement\n"+
+        out.println("Outils de ligne de commande pour la base de donnÃ©es d'images\n"+
+                    "1999-2005, Institut de Recherche pour le DÃ©veloppement\n"+
                     "\n"+
                     "Options disponibles:\n"+
-                    "  -print thematics    Affiche l'arborescence des thèmes\n"+
-                    "  -print procedures   Affiche l'arborescence des procédures\n"+
-                    "  -print series       Affiche l'arborescence des séries\n"+
-                    "  -print subseries    Affiche l'arborescence des sous-séries\n"+
+                    "  -print thematics    Affiche l'arborescence des thÃ¨mes\n"+
+                    "  -print procedures   Affiche l'arborescence des procÃ©dures\n"+
+                    "  -print series       Affiche l'arborescence des sÃ©ries\n"+
+                    "  -print subseries    Affiche l'arborescence des sous-sÃ©ries\n"+
                     "  -print formats      Affiche l'arborescence des formats\n"+
-                    "  -print categories   Affiche l'arborescence des catégories\n"+
-                    "  -print decoders     Affiche l'arborescence des catégories à partir des formats\n"+
-                    "  -browse             Affiche le contenu de toute la base de données (interface graphique)\n"+
-                    "  -verify             Vérifie l'existence d'un fichier pour chaque image de chaque série\n"+
-                    "  -config             Configure la base de données (interface graphique)\n"+
+                    "  -print categories   Affiche l'arborescence des catÃ©gories\n"+
+                    "  -print decoders     Affiche l'arborescence des catÃ©gories Ã  partir des formats\n"+
+                    "  -browse             Affiche le contenu de toute la base de donnÃ©es (interface graphique)\n"+
+                    "  -verify             VÃ©rifie l'existence d'un fichier pour chaque image de chaque sÃ©rie\n"+
+                    "  -config             Configure la base de donnÃ©es (interface graphique)\n"+
                     "  -locale <name>      Langue et conventions d'affichage (exemple: \"fr_CA\")\n"+
                     "  -encoding <name>    Page de code pour les sorties     (exemple: \"cp850\")\n"+
-                    "  -Xout <filename>    Fichier de destination (le périphérique standard par défaut)");
+                    "  -Xout <filename>    Fichier de destination (le pÃ©riphÃ©rique standard par dÃ©faut)");
     }
 
     /**
-     * Affiche l'arborescence des séries  qui se trouvent dans la base
-     * de données. Cette méthode sert à vérifier le contenu de la base
-     * de données  ainsi que le bon fonctionnement de l'implémentation
+     * Affiche l'arborescence des sÃ©ries  qui se trouvent dans la base
+     * de donnÃ©es. Cette mÃ©thode sert Ã  vÃ©rifier le contenu de la base
+     * de donnÃ©es  ainsi que le bon fonctionnement de l'implÃ©mentation
      * de {@link SeriesTable}.
      */
     private void series(final TreeDepth depth) throws CatalogException, SQLException, IOException {
@@ -166,8 +166,8 @@ public final class Console extends Arguments {
     }
 
     /**
-     * Affiche la liste de tous les formats trouvés dans la base de données.
-     * Cette méthode sert à vérifier le contenu de la base de données, ainsi
+     * Affiche la liste de tous les formats trouvÃ©s dans la base de donnÃ©es.
+     * Cette mÃ©thode sert Ã  vÃ©rifier le contenu de la base de donnÃ©es, ainsi
      * que le bon fonctionnement des classes d'interrogation.
      */
     private void decoders() throws CatalogException, SQLException, IOException {
@@ -183,7 +183,7 @@ public final class Console extends Arguments {
     }
 
     /**
-     * Affiche dans une fenêtre <cite>Swing</cite> le contenu de toute la base de données.
+     * Affiche dans une fenÃªtre <cite>Swing</cite> le contenu de toute la base de donnÃ©es.
      */
     private void browse() throws CatalogException, SQLException, IOException {
         final Database               database = getDatabase();
@@ -211,7 +211,7 @@ public final class Console extends Arguments {
     }
 
     /**
-     * Vérifie la validité de chacune des images déclarées dans la base de données.
+     * VÃ©rifie la validitÃ© de chacune des images dÃ©clarÃ©es dans la base de donnÃ©es.
      */
     private void verify() throws CatalogException, SQLException, IOException {
         final Database database = getDatabase();
@@ -219,12 +219,12 @@ public final class Console extends Arguments {
         for (final Series series : database.getTable(SeriesTable.class).getEntries()) {
             if (series.getModel() != null) {
                 /*
-                 * Si les images sont obtenus à partir de modèles, ne vérifie pas ces images.
-                 * Elles peuvent être manquantes puisque elle sont parfois à recalculer.
+                 * Si les images sont obtenus Ã  partir de modÃ¨les, ne vÃ©rifie pas ces images.
+                 * Elles peuvent Ãªtre manquantes puisque elle sont parfois Ã  recalculer.
                  */
                 continue;
             }
-            if (series.getName().startsWith("Potentiel de pêche")) {
+            if (series.getName().startsWith("Potentiel de pÃªche")) {
                 // TODO: bricolage temporaire.
                 continue;
             }
@@ -236,14 +236,14 @@ public final class Console extends Arguments {
                     String message;
                     if (file.isFile()) try {
                         if (coverage.getFormat().getName().startsWith("HDF")) {
-                            // TODO: Lecture de fichier HDF désactivée pour l'instant.
+                            // TODO: Lecture de fichier HDF dÃ©sactivÃ©e pour l'instant.
                             continue;
                         }
                         final GridCoverage2D c = coverage.getCoverage(null);
                         if (c.geophysics(true) != c.geophysics(false)) {
                             continue;
                         }
-                        message = "Pas de vue géophysique.";
+                        message = "Pas de vue gÃ©ophysique.";
                     } catch (Exception e) {
                         message = Utilities.getShortClassName(e);
                         final String m = e.getLocalizedMessage();
@@ -263,32 +263,32 @@ public final class Console extends Arguments {
     }
 
     /**
-     * Affiche le modèle linéaire spécifié.
+     * Affiche le modÃ¨le linÃ©aire spÃ©cifiÃ©.
      *
-     * @throws CatalogException Si la base de données contient des enregistrements invalides.
-     * @throws SQLException si une requête SQL a échoué.
-     * @throws IOException si la lecture du fichier de configuration ou le formattage du modèle
-     *         a échoué.
+     * @throws CatalogException Si la base de donnÃ©es contient des enregistrements invalides.
+     * @throws SQLException si une requÃªte SQL a Ã©chouÃ©.
+     * @throws IOException si la lecture du fichier de configuration ou le formattage du modÃ¨le
+     *         a Ã©chouÃ©.
      */
     private void model(final String series) throws CatalogException, SQLException, IOException {
         final Model model = getDatabase().getTable(SeriesTable.class).getEntry(series).getModel();
         if (model == null) {
-            out.print("Aucun modèle n'est défini.");
+            out.print("Aucun modÃ¨le n'est dÃ©fini.");
         } else if (model instanceof LinearModel) {
             ((LinearModel) model).print(out, null);
         } else {
-            out.print("Le modèle n'est pas linéaire.");
+            out.print("Le modÃ¨le n'est pas linÃ©aire.");
         }
     }
 
     /**
-     * Exécute les instructions qui ont été passées au constructeur.
+     * ExÃ©cute les instructions qui ont Ã©tÃ© passÃ©es au constructeur.
      *
-     * @throws CatalogException Si la base de données contient des enregistrements invalides.
-     * @throws SQLException si une requête SQL a échoué.
-     * @throws IOException si la lecture du fichier de configuration a échoué.
+     * @throws CatalogException Si la base de donnÃ©es contient des enregistrements invalides.
+     * @throws SQLException si une requÃªte SQL a Ã©chouÃ©.
+     * @throws IOException si la lecture du fichier de configuration a Ã©chouÃ©.
      *
-     * @todo L'option {@code -config} est temporairement désactivée.
+     * @todo L'option {@code -config} est temporairement dÃ©sactivÃ©e.
      */
     protected void run() throws CatalogException, SQLException, IOException {
         final boolean config = getFlag("-config");
@@ -335,9 +335,9 @@ public final class Console extends Arguments {
     }
 
     /**
-     * Affiche l'arborescence des séries qui se trouvent dans la base
-     * de données. Cette méthode sert à vérifier le contenu de la base
-     * de données ainsi que le bon fonctionnement du paquet.
+     * Affiche l'arborescence des sÃ©ries qui se trouvent dans la base
+     * de donnÃ©es. Cette mÃ©thode sert Ã  vÃ©rifier le contenu de la base
+     * de donnÃ©es ainsi que le bon fonctionnement du paquet.
      */
     public static void main(String[] args) {
         MonolineFormatter.init("net.sicade");

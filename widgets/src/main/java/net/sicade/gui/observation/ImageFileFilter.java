@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * Filtre des fichiers en fonction du type d'images désiré.
+ * Filtre des fichiers en fonction du type d'images dÃ©sirÃ©.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -69,7 +69,7 @@ final class ImageFileFilter extends FileFilter {
     /**
      * Construit un filtre d'images.
      *
-     * @param spi    Objet décrivant un format d'image.
+     * @param spi    Objet dÃ©crivant un format d'image.
      * @param name   Un des noms du format.
      * @param suffix Liste des extensions des fichiers qu'accepte ce filtre.
      *               Ces extensions ne devraient pas commencer par le point ('.').
@@ -99,8 +99,8 @@ final class ImageFileFilter extends FileFilter {
     }
 
     /**
-     * Retourne une liste de filtres pour les lecture d'images. Les éléments de la liste apparaîtront dans
-     * l'ordre alphabétique de leur description, en ignorant les différences entre majuscules et minuscules.
+     * Retourne une liste de filtres pour les lecture d'images. Les Ã©lÃ©ments de la liste apparaÃ®tront dans
+     * l'ordre alphabÃ©tique de leur description, en ignorant les diffÃ©rences entre majuscules et minuscules.
      *
      * @param locale Langue dans laquelle retourner les descriptions des filtres,
      *               ou {@code null} pour utiliser les conventions locales.
@@ -110,8 +110,8 @@ final class ImageFileFilter extends FileFilter {
     }
 
     /**
-     * Retourne une liste de filtres pour les écritures d'images. Les éléments de la liste apparaîtront dans
-     * l'ordre alphabétique de leur description, en ignorant les différences entre majuscules et minuscules.
+     * Retourne une liste de filtres pour les Ã©critures d'images. Les Ã©lÃ©ments de la liste apparaÃ®tront dans
+     * l'ordre alphabÃ©tique de leur description, en ignorant les diffÃ©rences entre majuscules et minuscules.
      *
      * @param locale Langue dans laquelle retourner les descriptions des filtres,
      *               ou {@code null} pour utiliser les conventions locales.
@@ -121,10 +121,10 @@ final class ImageFileFilter extends FileFilter {
     }
 
     /**
-     * Retourne une liste de filtres d'images. Les éléments de la liste apparaîtront dans l'ordre
-     * alphabétique de leur description, en ignorant les différences entre majuscules et minuscules.
+     * Retourne une liste de filtres d'images. Les Ã©lÃ©ments de la liste apparaÃ®tront dans l'ordre
+     * alphabÃ©tique de leur description, en ignorant les diffÃ©rences entre majuscules et minuscules.
      *
-     * @param category Catégorie des filtres désirés (lecture ou écriture).
+     * @param category CatÃ©gorie des filtres dÃ©sirÃ©s (lecture ou Ã©criture).
      * @param loc Langue dans laquelle retourner les descriptions des filtres,
      *            ou {@code null} pour utiliser les conventions locales.
      */
@@ -148,11 +148,11 @@ final class ImageFileFilter extends FileFilter {
 
     /**
      * Construit et retourne un objet qui lira les images dans le format de ce filtre.
-     * Cette méthode ne peut être appelée que si ce filtre a été construit par un appel
-     * à {@link #getReaderFilters}.
+     * Cette mÃ©thode ne peut Ãªtre appelÃ©e que si ce filtre a Ã©tÃ© construit par un appel
+     * Ã  {@link #getReaderFilters}.
      *
-     * @return Un décodeur à utiliser pour lire les images.
-     * @throws IOException si le décodeur n'a pas pu être construit.
+     * @return Un dÃ©codeur Ã  utiliser pour lire les images.
+     * @throws IOException si le dÃ©codeur n'a pas pu Ãªtre construit.
      */
     public ImageReader getImageReader() throws IOException {
         if (spi instanceof ImageReaderSpi) {
@@ -163,12 +163,12 @@ final class ImageFileFilter extends FileFilter {
     }
 
     /**
-     * Construit et retourne un objet qui écrira les images dans le format de ce filtre.
-     * Cette méthode ne peut être appelée que si ce filtre a été construit par un appel
-     * à {@link #getWriterFilters}.
+     * Construit et retourne un objet qui Ã©crira les images dans le format de ce filtre.
+     * Cette mÃ©thode ne peut Ãªtre appelÃ©e que si ce filtre a Ã©tÃ© construit par un appel
+     * Ã  {@link #getWriterFilters}.
      *
-     * @return Un codeur à utiliser pour écrire les images.
-     * @throws IOException si le codeur n'a pas pu être construit.
+     * @return Un codeur Ã  utiliser pour Ã©crire les images.
+     * @throws IOException si le codeur n'a pas pu Ãªtre construit.
      */
     public ImageWriter getImageWriter() throws IOException {
         if (spi instanceof ImageWriterSpi) {
@@ -179,8 +179,8 @@ final class ImageFileFilter extends FileFilter {
     }
 
     /**
-     * Retourne une extension par défaut pour les noms de fichiers
-     * de ce format d'image. La chaîne retournée ne commencera pas
+     * Retourne une extension par dÃ©faut pour les noms de fichiers
+     * de ce format d'image. La chaÃ®ne retournÃ©e ne commencera pas
      * par un point.
      *
      * @return L'extension, ou {@code null} si l'extension n'est pas connue.
@@ -201,7 +201,7 @@ final class ImageFileFilter extends FileFilter {
     }
 
     /**
-     * Indique si ce filtre accepte le fichier spécifié.
+     * Indique si ce filtre accepte le fichier spÃ©cifiÃ©.
      */
     public boolean accept(final File file) {
         if (file != null) {
@@ -230,15 +230,15 @@ final class ImageFileFilter extends FileFilter {
 
     /**
      * Retourne la description de ce filtre. La description comprendra le
-     * nom du format des images acceptées ainsi que leurs extensions.
+     * nom du format des images acceptÃ©es ainsi que leurs extensions.
      */
     public String getDescription() {
         return name;
     }
 
     /**
-     * Retourne une chaîne de caractères décrivant ce filtre.
-     * Cette information ne sert qu'à des fins de déboguage.
+     * Retourne une chaÃ®ne de caractÃ¨res dÃ©crivant ce filtre.
+     * Cette information ne sert qu'Ã  des fins de dÃ©boguage.
      */
     @Override
     public String toString() {
@@ -246,10 +246,10 @@ final class ImageFileFilter extends FileFilter {
     }
 
     /**
-     * Envoie vers le périphérique de sortie standard une
-     * liste des filtres disponibles par défaut. La liste
-     * est construites à partir des encodeurs et décodeurs
-     * fournit sur le système.
+     * Envoie vers le pÃ©riphÃ©rique de sortie standard une
+     * liste des filtres disponibles par dÃ©faut. La liste
+     * est construites Ã  partir des encodeurs et dÃ©codeurs
+     * fournit sur le systÃ¨me.
      */
     public static void main(final String[] args) {
         final ImageFileFilter[] filters = getReaderFilters(null);

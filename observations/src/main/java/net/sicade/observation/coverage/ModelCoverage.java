@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -41,15 +41,15 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Une couverture qui délèguera les {@linkplain #evaluate(DirectPosition,double[]) évaluations} à
- * un {@linkplain Model modèle}, pas nécessairement linéaire.
+ * Une couverture qui dÃ©lÃ¨guera les {@linkplain #evaluate(DirectPosition,double[]) Ã©valuations} Ã 
+ * un {@linkplain Model modÃ¨le}, pas nÃ©cessairement linÃ©aire.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ModelCoverage extends AbstractCoverage {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -1327909083485951850L;
 
@@ -84,9 +84,9 @@ public class ModelCoverage extends AbstractCoverage {
     private transient GeneralEnvelope envelope;
 
     /**
-     * Construit une nouvelle couverture pour le modèle spécifié.
+     * Construit une nouvelle couverture pour le modÃ¨le spÃ©cifiÃ©.
      *
-     * @throws CatalogException si la couverture n'a pas pu être construite.
+     * @throws CatalogException si la couverture n'a pas pu Ãªtre construite.
      */
     public ModelCoverage(final Model model) throws CatalogException {
         super(model.getName(), getCoordinateReferenceSystem(model), null, null);
@@ -151,11 +151,11 @@ public class ModelCoverage extends AbstractCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée.
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     private synchronized double evaluateSingle(final DirectPosition position)
             throws CannotEvaluateException
@@ -173,12 +173,12 @@ public class ModelCoverage extends AbstractCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée.
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @param  samples Un tableau pré-alloué ou enregistrer le résultat, ou {@code null}.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @param  samples Un tableau prÃ©-allouÃ© ou enregistrer le rÃ©sultat, ou {@code null}.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     @Override
     public byte[] evaluate(final DirectPosition position, final byte[] samples) throws CannotEvaluateException {
@@ -192,12 +192,12 @@ public class ModelCoverage extends AbstractCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée.
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @param  samples Un tableau pré-alloué ou enregistrer le résultat, ou {@code null}.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @param  samples Un tableau prÃ©-allouÃ© ou enregistrer le rÃ©sultat, ou {@code null}.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     @Override
     public int[] evaluate(final DirectPosition position, final int[] samples) throws CannotEvaluateException {
@@ -211,12 +211,12 @@ public class ModelCoverage extends AbstractCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée.
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @param  samples Un tableau pré-alloué ou enregistrer le résultat, ou {@code null}.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @param  samples Un tableau prÃ©-allouÃ© ou enregistrer le rÃ©sultat, ou {@code null}.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     @Override
     public float[] evaluate(final DirectPosition position, final float[] samples) throws CannotEvaluateException {
@@ -230,12 +230,12 @@ public class ModelCoverage extends AbstractCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée.
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @param  samples Un tableau pré-alloué ou enregistrer le résultat, ou {@code null}.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @param  samples Un tableau prÃ©-allouÃ© ou enregistrer le rÃ©sultat, ou {@code null}.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     @Override
     public double[] evaluate(final DirectPosition position, final double[] samples) throws CannotEvaluateException {
@@ -249,11 +249,11 @@ public class ModelCoverage extends AbstractCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée.
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @return La valeur évaluée à la position spécifiée, sous forme de tableau {@code double[]}.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e, sous forme de tableau {@code double[]}.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     public Object evaluate(final DirectPosition position) throws CannotEvaluateException {
         return evaluate(position, (double[]) null);
@@ -261,14 +261,14 @@ public class ModelCoverage extends AbstractCoverage {
 
     /**
      * Retourne le nombre de bandes dans cette couverture. Pour ce type de couverture, il
-     * sera toujours égal à 1.
+     * sera toujours Ã©gal Ã  1.
      */
     public int getNumSampleDimensions() {
         return 1;
     }
 
     /**
-     * Retourne la bande à l'index spécifiée.
+     * Retourne la bande Ã  l'index spÃ©cifiÃ©e.
      *
      * @throws IndexOutOfBoundsException si {@code index} est en dehors des limites permises.
      */

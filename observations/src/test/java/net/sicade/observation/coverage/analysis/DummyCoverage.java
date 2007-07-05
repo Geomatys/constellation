@@ -8,7 +8,7 @@ import org.opengis.geometry.DirectPosition;
 
 /**
  *
- * @author Touraïvane
+ * @author TouraÃ¯vane
  */
 public class DummyCoverage extends AbstractCoverage {
     double [][][] donnees;

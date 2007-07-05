@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,21 +37,21 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import net.sicade.observation.sql.CRS;
 
 /**
- * Evalue les prédictions d'un modèle linéaire.
+ * Evalue les prÃ©dictions d'un modÃ¨le linÃ©aire.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.
+ * @todo Ajouter des tests sur le mÃªme modÃ¨le que ceux que l'on peut trouver dans le projet SICADE.
  */
 public class ModelTest extends AbstractTest {
     /**
-     * Définir à {@code true} pour afficher des informations de déboguage.
+     * DÃ©finir Ã  {@code true} pour afficher des informations de dÃ©boguage.
      */
     private static final boolean verbose = true;
 
     /**
-     * L'objet à utiliser pour lire des dates.
+     * L'objet Ã  utiliser pour lire des dates.
      */
     private DateFormat dateFormat;
 
@@ -73,7 +73,7 @@ public class ModelTest extends AbstractTest {
     }
 
     /**
-     * Retourne un objet {@code DirectPosition} pour les coordonnées spatio-temporelles spécifiées.
+     * Retourne un objet {@code DirectPosition} pour les coordonnÃ©es spatio-temporelles spÃ©cifiÃ©es.
      */
     private GeneralDirectPosition createPosition(final double longitude,
                                                  final double latitude,

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -36,13 +36,13 @@ import org.openide.util.NbBundle;
 
 
 /**
- * Une action représentant l'ajout d'une région géographique. Cette action fait apparaître les
- * boîtes de dialogues demandant à l'utilisateur de fournir les coordonnées spatio-temporelles.
- * L'action d'ajouter une nouvelle région géographique consiste à créer un nouveau fichier
- * {@code .bbox}. Aucune autre action n'est effectuée; l'ajout de ce fichier sera détecté par
- * l'explorateur de Netbeans, ce qui permettra à l'utilisateur de l'ouvrir pour le modifier.
+ * Une action reprÃ©sentant l'ajout d'une rÃ©gion gÃ©ographique. Cette action fait apparaÃ®tre les
+ * boÃ®tes de dialogues demandant Ã  l'utilisateur de fournir les coordonnÃ©es spatio-temporelles.
+ * L'action d'ajouter une nouvelle rÃ©gion gÃ©ographique consiste Ã  crÃ©er un nouveau fichier
+ * {@code .bbox}. Aucune autre action n'est effectuÃ©e; l'ajout de ce fichier sera dÃ©tectÃ© par
+ * l'explorateur de Netbeans, ce qui permettra Ã  l'utilisateur de l'ouvrir pour le modifier.
  * <p>
- * L'{@linkplain net.sicade.sie.window.series.ExplorerWindow explorateur des séries de données}
+ * L'{@linkplain net.sicade.sie.window.series.ExplorerWindow explorateur des sÃ©ries de donnÃ©es}
  * proposera cette action dans son menu contextuel, via sa
  * {@linkplain net.sicade.sie.window.series.RootNode racine}.
  *
@@ -51,7 +51,7 @@ import org.openide.util.NbBundle;
  */
 public final class AddAction extends AbstractAction {
     /**
-     * Le dossier racine dans lequel on ajoutera les noeuds représentant des séries de données.
+     * Le dossier racine dans lequel on ajoutera les noeuds reprÃ©sentant des sÃ©ries de donnÃ©es.
      */
     private final DataFolder folder;
 
@@ -65,22 +65,22 @@ public final class AddAction extends AbstractAction {
     }
 
     /**
-     * Retourne le titre à utiliser pour l'item de cette action dans le menu contextuel,
-     * ainsi que pour le titre de la boîte de dialogue de l'assistant.
+     * Retourne le titre Ã  utiliser pour l'item de cette action dans le menu contextuel,
+     * ainsi que pour le titre de la boÃ®te de dialogue de l'assistant.
      */
     private static String getTitle() {
         return NbBundle.getMessage(AddAction.class, "CTL_AddAction");
     }
 
     /**
-     * Ajoute une nouvelle région d'intérêt en fonction des informations fournies par
-     * l'utilisateur. L'appel de cette méthode fera apparaître un assistant qui guidera
-     * l'utilisateur pas à pas dans sa sélection d'une région spatio-temporelle.
+     * Ajoute une nouvelle rÃ©gion d'intÃ©rÃªt en fonction des informations fournies par
+     * l'utilisateur. L'appel de cette mÃ©thode fera apparaÃ®tre un assistant qui guidera
+     * l'utilisateur pas Ã  pas dans sa sÃ©lection d'une rÃ©gion spatio-temporelle.
      */
     public void actionPerformed(final ActionEvent event) {
         /*
-         * Recherche à partir de la racine le premier nom de fichier libre.
-         * Si un nom est déjà utilisé, on y ajoutera un suffix tel que " (1)".
+         * Recherche Ã  partir de la racine le premier nom de fichier libre.
+         * Si un nom est dÃ©jÃ  utilisÃ©, on y ajoutera un suffix tel que " (1)".
          */
         final FileObject file = folder.getPrimaryFile();
         String filename; // Sera le nom sans l'extension.
@@ -102,10 +102,10 @@ public final class AddAction extends AbstractAction {
             filename = Loader.DEFAULT_BASE_NAME;
         }
         /*
-         * Construit l'objet qui sera à enregistrer (bbox), puis fait apparaître l'assistant
-         * qui demandera à l'utilisateur de choisir une région géographique. L'objet bbox est
-         * initialisé avec des valeurs par défaut, mais ces valeurs seront modifiées par les
-         * différentes étapes de l'assistant via la méthode WizardPanel.storeSettings(bbox).
+         * Construit l'objet qui sera Ã  enregistrer (bbox), puis fait apparaÃ®tre l'assistant
+         * qui demandera Ã  l'utilisateur de choisir une rÃ©gion gÃ©ographique. L'objet bbox est
+         * initialisÃ© avec des valeurs par dÃ©faut, mais ces valeurs seront modifiÃ©es par les
+         * diffÃ©rentes Ã©tapes de l'assistant via la mÃ©thode WizardPanel.storeSettings(bbox).
          */
         final BoundingBox bbox = new BoundingBox(filename);
         final WizardDescriptor wizard = new WizardDescriptor(new WizardIterator(), bbox);
@@ -117,7 +117,7 @@ public final class AddAction extends AbstractAction {
         }
         filename = bbox.getName();
         /*
-         * Construit une nouvelle région géographique et crée le fichier correspondant.
+         * Construit une nouvelle rÃ©gion gÃ©ographique et crÃ©e le fichier correspondant.
          */
         try {
             bbox.save(file.createData(filename, Loader.EXTENSION));

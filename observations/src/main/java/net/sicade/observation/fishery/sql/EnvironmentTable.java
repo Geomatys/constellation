@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,14 +26,14 @@ import net.sicade.observation.sql.MeasurementTable;
 
 
 /**
- * Table des paramètres environnementaux aux positions de pêches.
+ * Table des paramÃ¨tres environnementaux aux positions de pÃªches.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class EnvironmentTable extends MeasurementTable {
     /**
-     * Requête SQL pour obtenir les mesures pour une station et un observable donnés.
+     * RequÃªte SQL pour obtenir les mesures pour une station et un observable donnÃ©s.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Environments:SELECT",
             "SELECT station, observable, value, error\n"  +
@@ -41,7 +41,7 @@ public class EnvironmentTable extends MeasurementTable {
             " WHERE (station = ?) AND (observable = ?)");
 
     /**
-     * Requête SQL pour insérer les mesures pour une station et un observable donnés.
+     * RequÃªte SQL pour insÃ©rer les mesures pour une station et un observable donnÃ©s.
      */
     private static final ConfigurationKey INSERT = new ConfigurationKey("Environments:INSERT",
             "INSERT INTO \"Environments\" (station, observable, value, error)\n"  +
@@ -50,16 +50,16 @@ public class EnvironmentTable extends MeasurementTable {
     /**
      * Construit une nouvelle connexion vers la table des mesures.
      *
-     * @param  database Connexion vers la base de données des observations.
+     * @param  database Connexion vers la base de donnÃ©es des observations.
      */
     public EnvironmentTable(final Database database) {
         super(database, SELECT, INSERT);
     }
 
     /** 
-     * Construit une nouvelle connexion vers la table des mesures pour les stations spécifiées.
+     * Construit une nouvelle connexion vers la table des mesures pour les stations spÃ©cifiÃ©es.
      * 
-     * @param  stations La table des stations à utiliser.
+     * @param  stations La table des stations Ã  utiliser.
      */
     public EnvironmentTable(final StationTable stations) {
         super(stations, SELECT, INSERT);
@@ -67,12 +67,12 @@ public class EnvironmentTable extends MeasurementTable {
 
     /**
      * Construit une nouvelle connexion vers la table des mesures en utilisant une table
-     * des stations du type spécifié.
+     * des stations du type spÃ©cifiÃ©.
      *
-     * @param  database Connexion vers la base de données des observations.
+     * @param  database Connexion vers la base de donnÃ©es des observations.
      * @param  type Type de table des stations que devra utiliser cette instance. Un argument
      *         typique est <code>{@linkplain LongLineTable}.class</code>.
-     * @param  providers Si les stations doivent être limitées à celles d'un fournisseur,
+     * @param  providers Si les stations doivent Ãªtre limitÃ©es Ã  celles d'un fournisseur,
      *         liste de ces fournisseurs.
      */
     public EnvironmentTable(final Database                  database,

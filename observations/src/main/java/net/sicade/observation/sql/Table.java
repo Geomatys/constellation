@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@
  */
 package net.sicade.observation.sql;
 
-// Base de données
+// Base de donnÃ©es
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
@@ -41,25 +41,25 @@ import net.sicade.observation.Element;
 import net.sicade.observation.ConfigurationKey;
 
 /**
- * Classe de base des connections vers une table de la base de données. Chaque instance de
+ * Classe de base des connections vers une table de la base de donnÃ©es. Chaque instance de
  * {@code Table} contient une et une seule instance de {@link PreparedStatement}, qui peut
- * changer (c'est-à-dire être fermée et une nouvelle instance recréée) plusieurs fois.
+ * changer (c'est-Ã -dire Ãªtre fermÃ©e et une nouvelle instance recrÃ©Ã©e) plusieurs fois.
  * <p>
- * Les classes dérivées devraient construire leur requête SQL seulement la première fois où elle sera
- * nécessaire, typiquement à l'intérieur d'une méthode {@code getEntry(...)} public et synchronisée.
- * La requête est construite en appelant une des méthodes {@link #getStatement(String) getStatement(...)}.
- * Notez que la requête ainsi construite peut être détruite à tout moment une fois sortit du bloc
- * synchronisé, de sorte que les classes dérivées ne devraient jamais compter sur sa pérénité.
- * L'exemple suivant donne une implémentation typique:
+ * Les classes dÃ©rivÃ©es devraient construire leur requÃªte SQL seulement la premiÃ¨re fois oÃ¹ elle sera
+ * nÃ©cessaire, typiquement Ã  l'intÃ©rieur d'une mÃ©thode {@code getEntry(...)} public et synchronisÃ©e.
+ * La requÃªte est construite en appelant une des mÃ©thodes {@link #getStatement(String) getStatement(...)}.
+ * Notez que la requÃªte ainsi construite peut Ãªtre dÃ©truite Ã  tout moment une fois sortit du bloc
+ * synchronisÃ©, de sorte que les classes dÃ©rivÃ©es ne devraient jamais compter sur sa pÃ©rÃ©nitÃ©.
+ * L'exemple suivant donne une implÃ©mentation typique:
  *
  * <blockquote><pre>
  * public <b>synchronized</b> {@linkplain Element} getEntry(String name) throws SQLException {
  *     PreparedStatement statement = {@linkplain #getStatement(ConfigurationKey) getStatement}(SELECT);
  *     statement.{@linkplain PreparedStatement#setString setString}(1, name);
  *     ResultSet r = statement.{@linkplain PreparedStatement#executeQuery() executeQuery}();
- *     // <i>Traiter ici les informations de la base de données...</i>
+ *     // <i>Traiter ici les informations de la base de donnÃ©es...</i>
  *     r.{@linkplain java.sql.ResultSet#close close}();
- *     // <i>Ne <b>pas</b> fermer </i>statement<i>, car il sera réutilisé autant que possible.</i>
+ *     // <i>Ne <b>pas</b> fermer </i>statement<i>, car il sera rÃ©utilisÃ© autant que possible.</i>
  * }
  * </pre></blockquote>
  *
@@ -68,37 +68,37 @@ import net.sicade.observation.ConfigurationKey;
  */
 public class Table {
     /**
-     * Utilisé pour fermer la requête {@link #statement} après un certain délai. On supposera
-     * qu'après quelques minutes d'inutilisation, les données désirées se trouvent dans une
-     * quelconque cache gérée par les sous-classes.
+     * UtilisÃ© pour fermer la requÃªte {@link #statement} aprÃ¨s un certain dÃ©lai. On supposera
+     * qu'aprÃ¨s quelques minutes d'inutilisation, les donnÃ©es dÃ©sirÃ©es se trouvent dans une
+     * quelconque cache gÃ©rÃ©e par les sous-classes.
      */
     private static final Timer TIMER = new Timer(true);
 
     /**
-     * Le délai d'inactivité (en millisecondes) après lequel la requête {@link #statement}
-     * sera fermée. La valeur actuelle est de 15 minutes.
+     * Le dÃ©lai d'inactivitÃ© (en millisecondes) aprÃ¨s lequel la requÃªte {@link #statement}
+     * sera fermÃ©e. La valeur actuelle est de 15 minutes.
      */
     private static final long DELAY = 15 * (60*1000L);
 
     /**
-     * Ensemble d'indices à donner à Geotools concernant les fabriques à utiliser.
-     * Ces indices permettent d'ajuster certains détails de l'implémentation des
+     * Ensemble d'indices Ã  donner Ã  Geotools concernant les fabriques Ã  utiliser.
+     * Ces indices permettent d'ajuster certains dÃ©tails de l'implÃ©mentation des
      * fabriques.
      */
     protected static final Hints FACTORY_HINTS = null;
 
     /**
-     * La base de données d'où provient cette table.
+     * La base de donnÃ©es d'oÃ¹ provient cette table.
      */
     protected final Database database;
 
     /**
-     * Calendrier pouvant être utilisé pour lire ou écrire des dates dans la base de données.
-     * Ce calendrier utilisera le fuseau horaire spécifié par la propriété {@link #TIMEZONE},
-     * qui devrait désigner le fuseau horaire des dates dans la base de données.
+     * Calendrier pouvant Ãªtre utilisÃ© pour lire ou Ã©crire des dates dans la base de donnÃ©es.
+     * Ce calendrier utilisera le fuseau horaire spÃ©cifiÃ© par la propriÃ©tÃ© {@link #TIMEZONE},
+     * qui devrait dÃ©signer le fuseau horaire des dates dans la base de donnÃ©es.
      * <p>
-     * Nous construisons une instance de {@link GregorianCalendar} pour chaque table (plutôt
-     * qu'une instance partagée par tous) afin d'éviter des problèmes en cas d'utilisation des
+     * Nous construisons une instance de {@link GregorianCalendar} pour chaque table (plutÃ´t
+     * qu'une instance partagÃ©e par tous) afin d'Ã©viter des problÃ¨mes en cas d'utilisation des
      * tables dans un environnement multi-thread.
      *
      * @see #getCalendar
@@ -106,35 +106,35 @@ public class Table {
     private transient Calendar calendar;
 
     /**
-     * Requête SQL à utiliser pour obtenir les données. Peut être {@code null} si la requête
-     * a été fermée.
+     * RequÃªte SQL Ã  utiliser pour obtenir les donnÃ©es. Peut Ãªtre {@code null} si la requÃªte
+     * a Ã©tÃ© fermÃ©e.
      */
     private PreparedStatement statement;
 
     /**
-     * La requête sous forme textuelle qui a servit à construire {@link #statement}, ou {@code null}.
+     * La requÃªte sous forme textuelle qui a servit Ã  construire {@link #statement}, ou {@code null}.
      */
     private String query;
 
     /**
-     * La dernière fois où {@link #statement} a été utilisée.
+     * La derniÃ¨re fois oÃ¹ {@link #statement} a Ã©tÃ© utilisÃ©e.
      */
     private long lastAccess;
 
     /**
-     * Tâche ayant la charge de fermer la requête {@link #statement} après une certaine
-     * période d'inactivité.
+     * TÃ¢che ayant la charge de fermer la requÃªte {@link #statement} aprÃ¨s une certaine
+     * pÃ©riode d'inactivitÃ©.
      */
     private TimerTask disposer;
 
     /**
-     * {@code true} si {@link #statement} a besoin d'être {@linkplain #configure configuré}.
+     * {@code true} si {@link #statement} a besoin d'Ãªtre {@linkplain #configure configurÃ©}.
      */
     private boolean changed;
 
     /**
-     * Tâche ayant la charge de fermer la requête {@link #statement} après une certaine
-     * période d'inactivité.
+     * TÃ¢che ayant la charge de fermer la requÃªte {@link #statement} aprÃ¨s une certaine
+     * pÃ©riode d'inactivitÃ©.
      */
     private final class Disposer extends TimerTask {
         public void run() {
@@ -156,9 +156,9 @@ public class Table {
     }
 
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
+     * Construit une table qui interrogera la base de donnÃ©es spÃ©cifiÃ©e.
      *
-     * @param database Connexion vers la base de données d'observations.
+     * @param database Connexion vers la base de donnÃ©es d'observations.
      */
     protected Table(final Database database) {
         this.database = database;
@@ -166,16 +166,16 @@ public class Table {
     }
 
     /**
-     * Retourne la base de données d'où provient cette table.
+     * Retourne la base de donnÃ©es d'oÃ¹ provient cette table.
      */
     public final Database getDatabase() {
         return database;
     }
 
     /**
-     * Retourne une propriété pour la clé spécifiée. Cette méthode extrait la propriété de la
-     * {@linkplain #database base de données} si elle est non-nulle, ou retourne une propriété
-     * par défaut sinon.
+     * Retourne une propriÃ©tÃ© pour la clÃ© spÃ©cifiÃ©e. Cette mÃ©thode extrait la propriÃ©tÃ© de la
+     * {@linkplain #database base de donnÃ©es} si elle est non-nulle, ou retourne une propriÃ©tÃ©
+     * par dÃ©faut sinon.
      */
     protected final String getProperty(final ConfigurationKey key) {
         if (key == null) {
@@ -194,43 +194,43 @@ public class Table {
     }
 
     /**
-     * Retourne une version pré-compilée de la requête désignée par la clé spécifiée. Cette méthode
+     * Retourne une version prÃ©-compilÃ©e de la requÃªte dÃ©signÃ©e par la clÃ© spÃ©cifiÃ©e. Cette mÃ©thode
      * est un racourci pour <code>{@linkplain #getStatement(String) getStatement}({@linkplain
      * #getProperty getProperty}(key))</code>.
      *
-     * @param  query Clé désignant la requête SQL à soumettre à la base de données, ou
-     *         {@code null} pour fermer la requête courante sans en construire de nouvelle.
-     * @return La requête pré-compilée, ou {@code null} si {@code query} était nul.
-     * @throws SQLException si la requête SQL n'a pas pu être construite.
+     * @param  query ClÃ© dÃ©signant la requÃªte SQL Ã  soumettre Ã  la base de donnÃ©es, ou
+     *         {@code null} pour fermer la requÃªte courante sans en construire de nouvelle.
+     * @return La requÃªte prÃ©-compilÃ©e, ou {@code null} si {@code query} Ã©tait nul.
+     * @throws SQLException si la requÃªte SQL n'a pas pu Ãªtre construite.
      */
     protected final PreparedStatement getStatement(final ConfigurationKey query) throws SQLException {
         return getStatement(getProperty(query));
     }
 
     /**
-     * Retourne une version pré-compilée de la requête spécifiée. Si le texte {@code query} décrit la
-     * même requête que celle qui a été construite la dernière fois que cette méthode a été appelée,
-     * et si cette requête pré-compilée n'a pas encore été fermée, alors cette méthode effectue les
-     * opérations suivantes:
+     * Retourne une version prÃ©-compilÃ©e de la requÃªte spÃ©cifiÃ©e. Si le texte {@code query} dÃ©crit la
+     * mÃªme requÃªte que celle qui a Ã©tÃ© construite la derniÃ¨re fois que cette mÃ©thode a Ã©tÃ© appelÃ©e,
+     * et si cette requÃªte prÃ©-compilÃ©e n'a pas encore Ã©tÃ© fermÃ©e, alors cette mÃ©thode effectue les
+     * opÃ©rations suivantes:
      * <p>
      * <ul>
-     *   <li>Si cette table a {@linkplain #fireStateChanged changé d'état} depuis le dernier appel
-     *       de cette méthode, alors {@linkplain #configure configure} la requête.</li>
+     *   <li>Si cette table a {@linkplain #fireStateChanged changÃ© d'Ã©tat} depuis le dernier appel
+     *       de cette mÃ©thode, alors {@linkplain #configure configure} la requÃªte.</li>
      * </ul>
      * <p>
-     * Dans tous les autres cas (la requête spécifiée n'est pas la même que la dernière fois, où la
-     * précédente requête pré-compilée a été fermée), alors cette méthode effectue les opérations
+     * Dans tous les autres cas (la requÃªte spÃ©cifiÃ©e n'est pas la mÃªme que la derniÃ¨re fois, oÃ¹ la
+     * prÃ©cÃ©dente requÃªte prÃ©-compilÃ©e a Ã©tÃ© fermÃ©e), alors cette mÃ©thode effectue les opÃ©rations
      * suivantes:
      * <p>
      * <ul>
-     *   <li>La requête courante (s'il y en a une) sera fermée.</li>
-     *   <li>Une nouvelle requête est pré-compilée et {@linkplain #configure configurée}.</li>
+     *   <li>La requÃªte courante (s'il y en a une) sera fermÃ©e.</li>
+     *   <li>Une nouvelle requÃªte est prÃ©-compilÃ©e et {@linkplain #configure configurÃ©e}.</li>
      * </ul>
      *
-     * @param  query La requête SQL à soumettre à la base de données, ou {@code null}
-     *         pour fermer la requête courante sans en construire de nouvelle.
-     * @return La requête pré-compilée, ou {@code null} si {@code query} était nul.
-     * @throws SQLException si la requête SQL n'a pas pu être construite.
+     * @param  query La requÃªte SQL Ã  soumettre Ã  la base de donnÃ©es, ou {@code null}
+     *         pour fermer la requÃªte courante sans en construire de nouvelle.
+     * @return La requÃªte prÃ©-compilÃ©e, ou {@code null} si {@code query} Ã©tait nul.
+     * @throws SQLException si la requÃªte SQL n'a pas pu Ãªtre construite.
      */
     protected final PreparedStatement getStatement(final String query) throws SQLException {
         assert Thread.holdsLock(this);
@@ -268,26 +268,26 @@ public class Table {
     }
 
     /**
-     * Retourne le type de requête actuellement en usage, ou {@code null} si aucun. Cette
-     * information peut être utilisée par les méthodes {@link #configure configure} (lorsque
-     * redéfinie dans des classes dérivées) afin d'adapter la configuration en fonction du
-     * type de requête à exécuter.
+     * Retourne le type de requÃªte actuellement en usage, ou {@code null} si aucun. Cette
+     * information peut Ãªtre utilisÃ©e par les mÃ©thodes {@link #configure configure} (lorsque
+     * redÃ©finie dans des classes dÃ©rivÃ©es) afin d'adapter la configuration en fonction du
+     * type de requÃªte Ã  exÃ©cuter.
      */
     QueryType getQueryType() {
         return null;
     }
 
     /**
-     * Appelée automatiquement lorsqu'une méthode {@link #getStatement(String) getStatement(...)}
-     * a déterminé que c'était nécessaire. Cette appel se produit lorsqu'une nouvelle requête vient
-     * d'être pré-compilée, ou que cette table a {@linkplain #fireStateChanged changé d'état}. Les
-     * classes dérivées devraient redéfinir cette méthode si des paramètres de la requête ont besoin
-     * d'être définie en fonction de l'état de la table. Les implémentations des classes dérivées
+     * AppelÃ©e automatiquement lorsqu'une mÃ©thode {@link #getStatement(String) getStatement(...)}
+     * a dÃ©terminÃ© que c'Ã©tait nÃ©cessaire. Cette appel se produit lorsqu'une nouvelle requÃªte vient
+     * d'Ãªtre prÃ©-compilÃ©e, ou que cette table a {@linkplain #fireStateChanged changÃ© d'Ã©tat}. Les
+     * classes dÃ©rivÃ©es devraient redÃ©finir cette mÃ©thode si des paramÃ¨tres de la requÃªte ont besoin
+     * d'Ãªtre dÃ©finie en fonction de l'Ã©tat de la table. Les implÃ©mentations des classes dÃ©rivÃ©es
      * devrait commencer par appeler {@code super.configure(statement)}.
      *
-     * @param  type Type de requête à configurer.
-     * @param  statement La requête à configurer (jamais {@code null}).
-     * @throws SQLException si la configuration de la requête a échoué.
+     * @param  type Type de requÃªte Ã  configurer.
+     * @param  statement La requÃªte Ã  configurer (jamais {@code null}).
+     * @throws SQLException si la configuration de la requÃªte a Ã©chouÃ©.
      */
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         assert Thread.holdsLock(this);
@@ -295,15 +295,15 @@ public class Table {
     }
 
     /**
-     * Retourne la chaîne spécifiée après avoir préfixé chaque caractères génériques par le
-     * caractère d'échappement. Cette méthode peut être utilisée pour effectuer une recherche
+     * Retourne la chaÃ®ne spÃ©cifiÃ©e aprÃ¨s avoir prÃ©fixÃ© chaque caractÃ¨res gÃ©nÃ©riques par le
+     * caractÃ¨re d'Ã©chappement. Cette mÃ©thode peut Ãªtre utilisÃ©e pour effectuer une recherche
      * exacte dans une instruction {@code LIKE}. Dans le cas particulier ou l'argument {@code text}
-     * est {@code null}, alors cette méthode retourne le caractère d'échappement {@code "%"}, qui
-     * accepte toutes les chaînes de caractères.
+     * est {@code null}, alors cette mÃ©thode retourne le caractÃ¨re d'Ã©chappement {@code "%"}, qui
+     * accepte toutes les chaÃ®nes de caractÃ¨res.
      *
-     * @param  text Le texte qui peut contenir les caractères génériques {@code '%'} et {@code '_'}.
-     * @return Le texte avec un caractère d'échappement devant chaque caractères génériques.
-     * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
+     * @param  text Le texte qui peut contenir les caractÃ¨res gÃ©nÃ©riques {@code '%'} et {@code '_'}.
+     * @return Le texte avec un caractÃ¨re d'Ã©chappement devant chaque caractÃ¨res gÃ©nÃ©riques.
+     * @throws SQLException si une erreur est survenue lors de l'accÃ¨s Ã  la base de donnÃ©es.
      */
     protected final String escapeSearch(final String text) throws SQLException {
         if (text == null) {
@@ -335,9 +335,9 @@ public class Table {
     }
 
     /**
-     * Extrait la partie {@code "SELECT ... FROM ..."} de la requête spécifiée. Cette méthode
-     * retourne la chaîne {@code query} à partir du début jusqu'au dernier caractère précédant
-     * la première clause {@code "WHERE"}. La clause {@code "WHERE"} et tout ce qui suit jusqu'à
+     * Extrait la partie {@code "SELECT ... FROM ..."} de la requÃªte spÃ©cifiÃ©e. Cette mÃ©thode
+     * retourne la chaÃ®ne {@code query} Ã  partir du dÃ©but jusqu'au dernier caractÃ¨re prÃ©cÃ©dant
+     * la premiÃ¨re clause {@code "WHERE"}. La clause {@code "WHERE"} et tout ce qui suit jusqu'Ã 
      * la clause {@code "GROUP"} ou {@code "ORDER"} ne sera pas inclue.
      */
     static String selectWithoutWhere(String query) {
@@ -358,10 +358,10 @@ public class Table {
     }
 
     /**
-     * Recherche une sous-chaîne dans une chaîne en ignorant les différences entre majuscules et
+     * Recherche une sous-chaÃ®ne dans une chaÃ®ne en ignorant les diffÃ©rences entre majuscules et
      * minuscules. Les racourcis du genre <code>text.toUpperCase().indexOf("SEARCH FOR")</code>
      * ne fonctionnent pas car {@code toUpperCase()} et {@code toLowerCase()} peuvent changer le
-     * nombre de caractères de la chaîne. De plus, cette méthode vérifie que le mot est délimité
+     * nombre de caractÃ¨res de la chaÃ®ne. De plus, cette mÃ©thode vÃ©rifie que le mot est dÃ©limitÃ©
      * par des espaces ou de la ponctuation.
      */
     private static int indexOfWord(final String text, final String searchFor, final int startAt) {
@@ -384,7 +384,7 @@ public class Table {
 
     /**
      * Retourne un calendrier utilisant le {@linkplain Database#getTimeZone fuseau horaire de la
-     * base de données}. Ce calendrier doit être utilisé pour lire les dates de la base de données,
+     * base de donnÃ©es}. Ce calendrier doit Ãªtre utilisÃ© pour lire les dates de la base de donnÃ©es,
      * comme dans l'exemple ci-dessous:
      *
      * <blockquote><pre>
@@ -393,15 +393,15 @@ public class Table {
      * Timestamp   endTime = resultSet.getTimestamp(2, calendar); 
      * </pre></blockquote>
      *
-     * Ce calendrier doit aussi être utilisé pour écrire des valeurs ou spécifier des paramètres.
+     * Ce calendrier doit aussi Ãªtre utilisÃ© pour Ã©crire des valeurs ou spÃ©cifier des paramÃ¨tres.
      * <p>
-     * <strong>Note à propos de l'implémentation:</strong> Les conventions locales utilisées seront
-     * celles du {@linkplain Locale#CANADA Canada anglais}, car elles sont proches de celles des États-Unis
-     * (utilisés sur la plupart des logiciels comme PostgreSQL) tout en étant un peu plus pratique
-     * (dates dans l'ordre <var>année</var>/<var>mois</var>/<var>jour</var>). Notez que nous
+     * <strong>Note Ã  propos de l'implÃ©mentation:</strong> Les conventions locales utilisÃ©es seront
+     * celles du {@linkplain Locale#CANADA Canada anglais}, car elles sont proches de celles des Ã‰tats-Unis
+     * (utilisÃ©s sur la plupart des logiciels comme PostgreSQL) tout en Ã©tant un peu plus pratique
+     * (dates dans l'ordre <var>annÃ©e</var>/<var>mois</var>/<var>jour</var>). Notez que nous
      * n'utilisons pas {@link Calendar#getInstance()}, car ce dernier peut retourner un calendrier
-     * bien plus élaboré que celui utilisé par la plupart des logiciels de bases de données existants,
-     * (par exemple un calendrier japonais), et nous voulons coller à ces derniers.
+     * bien plus Ã©laborÃ© que celui utilisÃ© par la plupart des logiciels de bases de donnÃ©es existants,
+     * (par exemple un calendrier japonais), et nous voulons coller Ã  ces derniers.
      */
     protected final Calendar getCalendar() {
         assert Thread.holdsLock(this);
@@ -416,12 +416,12 @@ public class Table {
     }
 
     /**
-     * Prévient que l'état de cette table a changé. Les classes dérivées devraient appeller cette
-     * méthode chaque fois qu'une méthode {@code setXXX(...)} a été appelée. L'implémentation par
-     * défaut lève un drapeau de façon à {@linkplain #configure configurer} la requête la prochaine
-     * fois qu'une méthode {@linkplain #getStatement(String) getStatement(...)} sera appelée.
+     * PrÃ©vient que l'Ã©tat de cette table a changÃ©. Les classes dÃ©rivÃ©es devraient appeller cette
+     * mÃ©thode chaque fois qu'une mÃ©thode {@code setXXX(...)} a Ã©tÃ© appelÃ©e. L'implÃ©mentation par
+     * dÃ©faut lÃ¨ve un drapeau de faÃ§on Ã  {@linkplain #configure configurer} la requÃªte la prochaine
+     * fois qu'une mÃ©thode {@linkplain #getStatement(String) getStatement(...)} sera appelÃ©e.
      *
-     * @param property Nom de la propriété qui a changée.
+     * @param property Nom de la propriÃ©tÃ© qui a changÃ©e.
      *
      * @todo Enregistrer les changements dans un journal.
      */
@@ -434,10 +434,10 @@ public class Table {
     }
 
     /**
-     * Indique qu'une erreur inatendue est survenue, mais que le programme peut quand-même
-     * continuer à fonctionner.
+     * Indique qu'une erreur inatendue est survenue, mais que le programme peut quand-mÃªme
+     * continuer Ã  fonctionner.
      *
-     * @param method Le nom de la méthode dans laquelle est survenue l'erreur.
+     * @param method Le nom de la mÃ©thode dans laquelle est survenue l'erreur.
      * @param exception L'erreur survenue.
      */
     protected final void logWarning(final String method, final Throwable exception) {
@@ -448,8 +448,8 @@ public class Table {
     }
 
     /**
-     * Retourne une représentation de cette table sous forme de chaîne de caractères.
-     * Cette méthode est principalement utilisée à des fins de déboguages.
+     * Retourne une reprÃ©sentation de cette table sous forme de chaÃ®ne de caractÃ¨res.
+     * Cette mÃ©thode est principalement utilisÃ©e Ã  des fins de dÃ©boguages.
      */
     @Override
     public synchronized String toString() {
@@ -457,7 +457,7 @@ public class Table {
         buffer.append('[');
         final long delay = System.currentTimeMillis() - lastAccess;
         if (delay > 0) {
-            buffer.append("Dernière utilisation il y a ");
+            buffer.append("DerniÃ¨re utilisation il y a ");
             buffer.append(delay / (60*1000));
             buffer.append(" minutes.");
         }
@@ -471,17 +471,17 @@ public class Table {
     }
 
     /**
-     * Libère les ressources utilisées par cette table si ce n'était pas déjà fait.
-     * Cette méthode est appellée automatiquement par le ramasse-miettes lorsqu'il
-     * a détecté que cette table n'est plus utilisée. L'implémentation par défaut
-     * ferme la requête pré-compilée courante, s'il y en a une.
+     * LibÃ¨re les ressources utilisÃ©es par cette table si ce n'Ã©tait pas dÃ©jÃ  fait.
+     * Cette mÃ©thode est appellÃ©e automatiquement par le ramasse-miettes lorsqu'il
+     * a dÃ©tectÃ© que cette table n'est plus utilisÃ©e. L'implÃ©mentation par dÃ©faut
+     * ferme la requÃªte prÃ©-compilÃ©e courante, s'il y en a une.
      * <p>
-     * Notez qu'il n'y a pas de méthode {@code close()}, car une table peut être
-     * {@linkplain Shareable partagée} par d'autres utilisateurs qui ont encore
-     * besoin de ses services. On se fiera plutôt au ramasse-miette pour fermer
-     * les connections lorsque cette table n'est plus du tout référencée.
+     * Notez qu'il n'y a pas de mÃ©thode {@code close()}, car une table peut Ãªtre
+     * {@linkplain Shareable partagÃ©e} par d'autres utilisateurs qui ont encore
+     * besoin de ses services. On se fiera plutÃ´t au ramasse-miette pour fermer
+     * les connections lorsque cette table n'est plus du tout rÃ©fÃ©rencÃ©e.
      *
-     * @throws SQLException si un problème est survenu lors de la disposition des ressources.
+     * @throws SQLException si un problÃ¨me est survenu lors de la disposition des ressources.
      */
     @Override
     protected synchronized void finalize() throws SQLException {

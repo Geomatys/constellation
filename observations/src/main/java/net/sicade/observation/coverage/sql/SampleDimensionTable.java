@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -47,10 +47,10 @@ import net.sicade.resources.seagis.ResourceKeys;
  * Connexion vers une table des {@linkplain GridSampleDimension bandes}. Cette table construit des
  * objets {@link GridSampleDimension} pour un format d'image individuel. Les bandes sont une des
  * composantes d'un objet {@link org.geotools.coverage.grid.GridCoverage2D}, mais ne correspondent
- * pas directement à un {@linkplain net.sicade.observation.Element élément} du paquet des
+ * pas directement Ã  un {@linkplain net.sicade.observation.Element Ã©lÃ©ment} du paquet des
  * observations.
  * <p>
- * Cette table est utilisée par {@link FormatTable}, qui construit des objets de
+ * Cette table est utilisÃ©e par {@link FormatTable}, qui construit des objets de
  * plus haut niveau.
  *
  * @version $Id$
@@ -60,8 +60,8 @@ import net.sicade.resources.seagis.ResourceKeys;
 @UsedBy(FormatTable.class)
 public class SampleDimensionTable extends Table implements Shareable {
     /**
-     * Requête SQL utilisée par cette classe pour obtenir la table des bandes.
-     * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par
+     * RequÃªte SQL utilisÃ©e par cette classe pour obtenir la table des bandes.
+     * L'ordre des colonnes est essentiel. Ces colonnes sont rÃ©fÃ©rencÃ©es par
      * les constantes {@link #BAND}, {@link #UNITS} et compagnie.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("SampleDimensions:SELECT",
@@ -71,33 +71,33 @@ public class SampleDimensionTable extends Table implements Shareable {
             "  FROM \"SampleDimensions\"\n" +
             " WHERE format=? ORDER BY band");
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_FORMAT = 1;
-    /** Numéro de colonne. */ private static final int ID              = 1;
-    /** Numéro de colonne. */ private static final int BAND            = 2;
-    /** Numéro de colonne. */ private static final int UNITS           = 3;
+    /** NumÃ©ro d'argument. */ private static final int ARGUMENT_FORMAT = 1;
+    /** NumÃ©ro de colonne. */ private static final int ID              = 1;
+    /** NumÃ©ro de colonne. */ private static final int BAND            = 2;
+    /** NumÃ©ro de colonne. */ private static final int UNITS           = 3;
 
     /**
-     * Connexion vers la table des {@linkplain Category catégories}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Connexion vers la table des {@linkplain Category catÃ©gories}.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private CategoryTable categories;
 
     /**
-     * Construit une table en utilisant la connexion spécifiée.
+     * Construit une table en utilisant la connexion spÃ©cifiÃ©e.
      *
-     * @param database  Connexion vers la base de données d'observations.
+     * @param database  Connexion vers la base de donnÃ©es d'observations.
      */
     public SampleDimensionTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne les bandes qui se rapportent au format spécifié.
+     * Retourne les bandes qui se rapportent au format spÃ©cifiÃ©.
      *
      * @param  format Nom du format pour lequel on veut les bandes.
-     * @return Les listes des bandes du format demandé.
-     * @throws IllegalRecordException si une incohérence a été trouvée dans les enregistrements.
-     * @throws SQLException si l'interrogation de la table a échoué.
+     * @return Les listes des bandes du format demandÃ©.
+     * @throws IllegalRecordException si une incohÃ©rence a Ã©tÃ© trouvÃ©e dans les enregistrements.
+     * @throws SQLException si l'interrogation de la table a Ã©chouÃ©.
      */
     public synchronized GridSampleDimension[] getSampleDimensions(final String format)
             throws CatalogException, SQLException
@@ -109,7 +109,7 @@ public class SampleDimensionTable extends Table implements Shareable {
         final ResultSet result = statement.executeQuery();
         while (result.next()) {
             final String identifier = result.getString(ID);
-            final int          band = result.getInt   (BAND); // Comptées à partir de 1.
+            final int          band = result.getInt   (BAND); // ComptÃ©es Ã  partir de 1.
             final String unitSymbol = result.getString(UNITS);
             final Unit         unit = (unitSymbol != null) ? Unit.searchSymbol(unitSymbol) : null;
             if (categories == null) {

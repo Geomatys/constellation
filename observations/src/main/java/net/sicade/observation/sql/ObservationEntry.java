@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Observation observation}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant une {@linkplain Observation observation}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -33,12 +33,12 @@ import org.geotools.resources.Utilities;
  */
 public class ObservationEntry extends Entry implements Observation {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 3269639171560208276L;
 
     /**
-     * La station à laquelle a été pris cet échantillon.
+     * La station Ã  laquelle a Ã©tÃ© pris cet Ã©chantillon.
      */
     private final Station station;
 
@@ -50,8 +50,8 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * Construit une observation.
      * 
-     * @param station     La station d'observation (par exemple une position de pêche).
-     * @param observable  Ce que l'on observe (température, quantité pêchée, <cite>etc.</cite>).
+     * @param station     La station d'observation (par exemple une position de pÃªche).
+     * @param observable  Ce que l'on observe (tempÃ©rature, quantitÃ© pÃªchÃ©e, <cite>etc.</cite>).
      */
     protected ObservationEntry(final Station    station, 
                                final Observable observable) 
@@ -62,7 +62,7 @@ public class ObservationEntry extends Entry implements Observation {
     }
 
     /**
-     * Construit un nom à partir des autres informations disponibles.
+     * Construit un nom Ã  partir des autres informations disponibles.
      */
     @Override
     StringBuilder createName() {
@@ -88,7 +88,7 @@ public class ObservationEntry extends Entry implements Observation {
     }
 
     /**
-     * Retourne un code représentant cette observation.
+     * Retourne un code reprÃ©sentant cette observation.
      */
     @Override
     public final int hashCode() {
@@ -96,7 +96,7 @@ public class ObservationEntry extends Entry implements Observation {
     }
     
     /**
-     * Vérifie si cette entré est identique à l'objet spécifié.
+     * VÃ©rifie si cette entrÃ© est identique Ã  l'objet spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object object) {

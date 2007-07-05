@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -49,7 +49,7 @@ public class TimeStampTest extends AbstractTest {
     }
 
     /**
-     * Tests la méthode {@link {@link ResultSet#getTimestamp(int,Calendar)}.
+     * Tests la mÃ©thode {@link {@link ResultSet#getTimestamp(int,Calendar)}.
      */
     public void testGet() throws SQLException {
         final TimeZone UTC = TimeZone.getTimeZone("UTC");
@@ -67,33 +67,33 @@ public class TimeStampTest extends AbstractTest {
             r.close();
             s.close();
         }
-        // 'offset' sera expliqué plus bas...
+        // 'offset' sera expliquÃ© plus bas...
         final int offset = TimeZone.getDefault().getOffset(t1.getTime());
         final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA);
         /*
-         * Vérifie la valeur formatée par Timestamp. L'heure t1 est construite de façon à ce qu'elle
-         * apparaissent correctement lorsque affichée selon le fuseau horaire local, tandis que l'on
-         * veut que t2 apparaisse correctement lorsque affichée selon le fuseau horaire UTC. On peut
-         * vérifier que c'est bien le cas avec les pilote plus récents (les plus anciens on un bug).
+         * VÃ©rifie la valeur formatÃ©e par Timestamp. L'heure t1 est construite de faÃ§on Ã  ce qu'elle
+         * apparaissent correctement lorsque affichÃ©e selon le fuseau horaire local, tandis que l'on
+         * veut que t2 apparaisse correctement lorsque affichÃ©e selon le fuseau horaire UTC. On peut
+         * vÃ©rifier que c'est bien le cas avec les pilote plus rÃ©cents (les plus anciens on un bug).
          */
         assertEquals("1986-01-01 00:00:00.0", String.valueOf(t1));
         assertEquals("1986-01-01 00:00:00",        df.format(t1));
         if (offset == 0) {
             assertEquals(t1, t2);
         } else {
-            assertFalse("Calendrier ignoré.", String.valueOf(t2).equals("1999-01-01 00:00:00.0"));
+            assertFalse("Calendrier ignorÃ©.", String.valueOf(t2).equals("1999-01-01 00:00:00.0"));
         }
         df.setTimeZone(UTC);
         assertEquals("1986-01-01 00:00:00", df.format(t2));
         /*
          * Tentative d'explication de ce qui se passe: offset est le laps de temps (en millisecondes)
          * qu'il faut ajouter au temps UTC afin d'obtenir le temps local. A l'est de Greenwich, cette
-         * valeur est positive (par exemple GMT+1 en France). Cela signifie que l'heure t1, qui était
-         * affichée comme 00:00 GMT+1, correspond à la valeur -01:00 UTC (ou 23:00 UTC de la veille)
-         * en mémoire, puisque toutes les dates sont représentées en heure UTC en Java. Si l'on veut
-         * que t2 soit affichée comme 00:00 UTC, on devrait avoir t2 = t1 + 01:00, donc t2 > t1.
+         * valeur est positive (par exemple GMT+1 en France). Cela signifie que l'heure t1, qui Ã©tait
+         * affichÃ©e comme 00:00 GMT+1, correspond Ã  la valeur -01:00 UTC (ou 23:00 UTC de la veille)
+         * en mÃ©moire, puisque toutes les dates sont reprÃ©sentÃ©es en heure UTC en Java. Si l'on veut
+         * que t2 soit affichÃ©e comme 00:00 UTC, on devrait avoir t2 = t1 + 01:00, donc t2 > t1.
          */
-        assertEquals("Bug corrigé?", t1.getTime(), t2.getTime() - offset);
+        assertEquals("Bug corrigÃ©?", t1.getTime(), t2.getTime() - offset);
         if (false) {
             // Affichage des heures en UTC.
             System.out.println(df.format(t1));

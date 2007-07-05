@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,19 +24,19 @@ import net.sicade.observation.fishery.FisheryType;
 
 
 /**
- * Implémentation d'une entrée représentant un {@linkplain FisheryType type de pêche}.
+ * ImplÃ©mentation d'une entrÃ©e reprÃ©sentant un {@linkplain FisheryType type de pÃªche}.
  * 
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class FisheryTypeEntry extends ProcedureEntry implements FisheryType {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 6718082896471037388L;
 
     /**
-     * Crée une nouvelle entrée du nom spécifié.
+     * CrÃ©e une nouvelle entrÃ©e du nom spÃ©cifiÃ©.
      */
     public FisheryTypeEntry(final String name, final String remarks) {
         super(name, remarks);

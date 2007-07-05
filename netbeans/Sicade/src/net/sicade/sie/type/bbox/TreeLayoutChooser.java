@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -29,14 +29,14 @@ import net.sicade.observation.coverage.sql.TreeDepth;
 
 
 /**
- * Offre à l'utilisateur de configurer la structure de l'arborescence.
+ * Offre Ã  l'utilisateur de configurer la structure de l'arborescence.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class TreeLayoutChooser extends JPanel implements ActionListener {
     /**
-     * Construit un nouveau panneau pour la structure d'arborescence spécifiée.
+     * Construit un nouveau panneau pour la structure d'arborescence spÃ©cifiÃ©e.
      */
     public TreeLayoutChooser(final BoundingBox bbox) {
         initComponents();
@@ -54,14 +54,14 @@ final class TreeLayoutChooser extends JPanel implements ActionListener {
         orderButton.setSelected(true);
         thematics  .setSelected( thematicIndex != Integer.MAX_VALUE);
         operations .setSelected(operationIndex != Integer.MAX_VALUE);
-        actionPerformed(null); // Pöur mettre à jour l'état des boutons radio.
+        actionPerformed(null); // PÃ¶ur mettre Ã  jour l'Ã©tat des boutons radio.
         operations.addActionListener(this);
         thematics. addActionListener(this);
     }
 
     /**
-     * Appelée automatiquement lorsque l'utilisateur modifie l'état d'une case à cocher.
-     * Le groupe "Ordre des éléments" sera activé ou désactivé en conséquence.
+     * AppelÃ©e automatiquement lorsque l'utilisateur modifie l'Ã©tat d'une case Ã  cocher.
+     * Le groupe "Ordre des Ã©lÃ©ments" sera activÃ© ou dÃ©sactivÃ© en consÃ©quence.
      */
     public void actionPerformed(final ActionEvent event) {
         final boolean enabled = (operations.isSelected() && thematics.isSelected());
@@ -71,9 +71,9 @@ final class TreeLayoutChooser extends JPanel implements ActionListener {
     }
 
     /**
-     * Retourne la structure de l'arborescence, en fonction des sélections de l'utilisateur.
-     * Le tableau retourner peut contenir des éléments nuls; la méthode
-     * {@link BoundingBox#setTreeLayout} saura gérer.
+     * Retourne la structure de l'arborescence, en fonction des sÃ©lections de l'utilisateur.
+     * Le tableau retourner peut contenir des Ã©lÃ©ments nuls; la mÃ©thode
+     * {@link BoundingBox#setTreeLayout} saura gÃ©rer.
      */
     final TreeDepth[] getTreeLayout() {
         final TreeDepth[] layout = new TreeDepth[2];

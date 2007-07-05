@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,10 +20,10 @@ package net.sicade.observation;
 
 
 /**
- * Représentation d'un {@linkplain Phenomenon phénomène} observé à l'aide d'une certaine
- * {@linkplain Procedure procedure}. Un observable peut être un paramètre physique tel que
- * la température de surface de la mer, un paramètre halieutique tel que la quantité d'espadons
- * pêchés, ou d'autre observables propres à un domaine d'étude.
+ * ReprÃ©sentation d'un {@linkplain Phenomenon phÃ©nomÃ¨ne} observÃ© Ã  l'aide d'une certaine
+ * {@linkplain Procedure procedure}. Un observable peut Ãªtre un paramÃ¨tre physique tel que
+ * la tempÃ©rature de surface de la mer, un paramÃ¨tre halieutique tel que la quantitÃ© d'espadons
+ * pÃªchÃ©s, ou d'autre observables propres Ã  un domaine d'Ã©tude.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -31,40 +31,40 @@ package net.sicade.observation;
  */
 public interface Observable extends Element {
     /**
-     * Retourne un numéro unique identifiant cet observable. Ce numéro est complémentaire (et dans
+     * Retourne un numÃ©ro unique identifiant cet observable. Ce numÃ©ro est complÃ©mentaire (et dans
      * une certaine mesure redondant) avec {@linkplain #getName le symbole} de l'observable. Il
      * existe parce que les observables, ainsi que les {@linkplain Station stations}, sont
-     * référencés dans des millions de lignes dans la table des observations.
+     * rÃ©fÃ©rencÃ©s dans des millions de lignes dans la table des observations.
      */
     int getNumericIdentifier();
 
     /**
-     * Retourne le phénomène observé. Si cet observable représente un paramètre physique tel
-     * que la température de surface de la mer, alors le phénomène retourné sera typiquement un
-     * {@linkplain net.sicade.observation.coverage.Thematic thème}. Si cet observable représente
-     * une quantité liée à une certaine espèce de poisson (par exemple la quantité pêchée, mais ça
-     * pourrait être d'autres quantités obtenues selon d'autres {@linkplain Procedure procédures}),
-     * alors le phénomène retourné sera typiquement une
-     * {@linkplain net.sicade.observation.fishery.Species espèce}.
+     * Retourne le phÃ©nomÃ¨ne observÃ©. Si cet observable reprÃ©sente un paramÃ¨tre physique tel
+     * que la tempÃ©rature de surface de la mer, alors le phÃ©nomÃ¨ne retournÃ© sera typiquement un
+     * {@linkplain net.sicade.observation.coverage.Thematic thÃ¨me}. Si cet observable reprÃ©sente
+     * une quantitÃ© liÃ©e Ã  une certaine espÃ¨ce de poisson (par exemple la quantitÃ© pÃªchÃ©e, mais Ã§a
+     * pourrait Ãªtre d'autres quantitÃ©s obtenues selon d'autres {@linkplain Procedure procÃ©dures}),
+     * alors le phÃ©nomÃ¨ne retournÃ© sera typiquement une
+     * {@linkplain net.sicade.observation.fishery.Species espÃ¨ce}.
      */
     Phenomenon getPhenomenon();
 
     /**
-     * Retourne la procedure utilisée. Si cet observable représente un paramètre physique tel que
-     * la température de surface de la mer, alors la procédure retournée sera typiquement un
-     * {@linkplain net.sicade.observation.coverage.Operation opérateur d'images}. Si cet observable
-     * représente une quantité de poisson pêchée, alors la procédure retournée sera typiquement un
-     * {@linkplain net.sicade.observation.fishery.FisheryType type de pêche}.
+     * Retourne la procedure utilisÃ©e. Si cet observable reprÃ©sente un paramÃ¨tre physique tel que
+     * la tempÃ©rature de surface de la mer, alors la procÃ©dure retournÃ©e sera typiquement un
+     * {@linkplain net.sicade.observation.coverage.Operation opÃ©rateur d'images}. Si cet observable
+     * reprÃ©sente une quantitÃ© de poisson pÃªchÃ©e, alors la procÃ©dure retournÃ©e sera typiquement un
+     * {@linkplain net.sicade.observation.fishery.FisheryType type de pÃªche}.
      */
     Procedure getProcedure();
 
     /**
      * Retourne la distribution statistique approximative des valeurs attendues. Cette distribution
-     * n'est pas nécessairement déterminée à partir des données, mais peut être un <cite>a-priori</cite>.
-     * Cette information est utilisée principalement par les
-     * {@linkplain net.sicade.observation.coverage.LinearModel modèles linéaires} qui ont besoin d'une
+     * n'est pas nÃ©cessairement dÃ©terminÃ©e Ã  partir des donnÃ©es, mais peut Ãªtre un <cite>a-priori</cite>.
+     * Cette information est utilisÃ©e principalement par les
+     * {@linkplain net.sicade.observation.coverage.LinearModel modÃ¨les linÃ©aires} qui ont besoin d'une
      * <A HREF="http://mathworld.wolfram.com/NormalDistribution.html">distribution normale</A>.
-     * Cette méthode retourne {@code null} si la distribution est inconnue ou n'est pas pertinente
+     * Cette mÃ©thode retourne {@code null} si la distribution est inconnue ou n'est pas pertinente
      * pour cet observable.
      */
     Distribution getDistribution();

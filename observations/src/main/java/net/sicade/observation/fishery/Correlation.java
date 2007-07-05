@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,8 +27,8 @@ import org.opengis.metadata.citation.Citation;
 
 
 /**
- * Une corrélation entre des {@linkplain Catch captures} et des {@linkplain Descriptor
- * descripteurs du paysage océanique}.
+ * Une corrÃ©lation entre des {@linkplain Catch captures} et des {@linkplain Descriptor
+ * descripteurs du paysage ocÃ©anique}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -36,28 +36,28 @@ import org.opengis.metadata.citation.Citation;
  */
 public interface Correlation extends Element {
     /**
-     * Retourne une référence vers le fournisseur des données utilisées pour
-     * le calcul de la {@linkplain #getCorrelation corrélation}.
+     * Retourne une rÃ©fÃ©rence vers le fournisseur des donnÃ©es utilisÃ©es pour
+     * le calcul de la {@linkplain #getCorrelation corrÃ©lation}.
      */
     Citation getProvider();
     
     /**
-     * Retourne une référence vers la catégorie corrélée.
+     * Retourne une rÃ©fÃ©rence vers la catÃ©gorie corrÃ©lÃ©e.
      */
     Category getCategory();
     
     /**
-     * Retourne une référence vers le descripteur corrélé. 
+     * Retourne une rÃ©fÃ©rence vers le descripteur corrÃ©lÃ©. 
      */
     Descriptor getDescriptor();
     
     /**
-     * Retourne la valeur de la corrélation.
+     * Retourne la valeur de la corrÃ©lation.
      */
     double getCorrelation();
     
     /**
-     * Retourne la propabilité que la {@linkplain #getCorrelation corrélation} ne soit
+     * Retourne la propabilitÃ© que la {@linkplain #getCorrelation corrÃ©lation} ne soit
      * <strong>pas</strong> significative.
      */
     double getPValue();

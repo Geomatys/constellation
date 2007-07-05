@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -35,20 +35,20 @@ import net.sicade.util.DateRange;
 
 
 /**
- * Une propriété simple en lecture seule, pour affichage dans la feuille des propriétés.
+ * Une propriÃ©tÃ© simple en lecture seule, pour affichage dans la feuille des propriÃ©tÃ©s.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class SimpleProperty extends PropertySupport.ReadOnly {
     /**
-     * La valeur de la propriété.
+     * La valeur de la propriÃ©tÃ©.
      */
     private final Object value;
 
     /**
-     * Procède à la construction de la propriété. Tous les constructeurs publiques
-     * délègueront leur travail à ce constructeur.
+     * ProcÃ¨de Ã  la construction de la propriÃ©tÃ©. Tous les constructeurs publiques
+     * dÃ©lÃ¨gueront leur travail Ã  ce constructeur.
      */
     private SimpleProperty(final String name, final Class type, final Object value) {
         super(name, type, NbBundle.getMessage(SimpleProperty.class, name), null);
@@ -56,29 +56,29 @@ final class SimpleProperty extends PropertySupport.ReadOnly {
     }
 
     /**
-     * Construit une nouvelle instance pour la valeur spécifiée.
+     * Construit une nouvelle instance pour la valeur spÃ©cifiÃ©e.
      */
     public SimpleProperty(final String name, final double value) {
         this(name, Double.TYPE, value);
     }
 
     /**
-     * Construit une nouvelle instance pour la date spécifiée.
+     * Construit une nouvelle instance pour la date spÃ©cifiÃ©e.
      */
     public SimpleProperty(final String name, final Date value) {
         this(name, Date.class, value);
     }
 
     /**
-     * Retourne la valeur de cette propriété.
+     * Retourne la valeur de cette propriÃ©tÃ©.
      */
     public Object getValue() {
         return value;
     }
 
     /**
-     * Méthode de commodité fabriquant une feuille de propriétés à partir des informations
-     * fournies. Chacun des arguments peut être nul.
+     * MÃ©thode de commoditÃ© fabriquant une feuille de propriÃ©tÃ©s Ã  partir des informations
+     * fournies. Chacun des arguments peut Ãªtre nul.
      */
     public static Sheet createSheet(final GeographicBoundingBox area,
                                     final DateRange             time,

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,9 +31,9 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Couverture de données dans un espace spatio-temporelle. L'aspect "dynamique" vient de l'axe
- * temporel. Sur le plan de l'implémentation, chaque appel à une méthode {@code evaluate} à une
- * date différente se traduira typiquement par le chargement d'une nouvelle image.
+ * Couverture de donnÃ©es dans un espace spatio-temporelle. L'aspect "dynamique" vient de l'axe
+ * temporel. Sur le plan de l'implÃ©mentation, chaque appel Ã  une mÃ©thode {@code evaluate} Ã  une
+ * date diffÃ©rente se traduira typiquement par le chargement d'une nouvelle image.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -45,24 +45,24 @@ public interface DynamicCoverage extends Coverage {
     InternationalString getName();
 
     /**
-     * Retourne les coordonnées au centre du voxel le plus proche des coordonnées spécifiées.
-     * Cette méthode recherche l'image la plus proche de la date spécifiée, puis recherche le
-     * pixel qui contient la coordonnée géographique spécifiée. La date de milieu de l'image,
-     * ainsi que les coordonnées géographiques au centre du pixel, sont retournées. Appeller
-     * la méthode {@link #evaluate evaluate} avec les coordonnées retournées devrait permettre
-     * d'obtenir une valeur non-interpollée.
+     * Retourne les coordonnÃ©es au centre du voxel le plus proche des coordonnÃ©es spÃ©cifiÃ©es.
+     * Cette mÃ©thode recherche l'image la plus proche de la date spÃ©cifiÃ©e, puis recherche le
+     * pixel qui contient la coordonnÃ©e gÃ©ographique spÃ©cifiÃ©e. La date de milieu de l'image,
+     * ainsi que les coordonnÃ©es gÃ©ographiques au centre du pixel, sont retournÃ©es. Appeller
+     * la mÃ©thode {@link #evaluate evaluate} avec les coordonnÃ©es retournÃ©es devrait permettre
+     * d'obtenir une valeur non-interpollÃ©e.
      *
      * @throws CatalogException si une erreur est survenue lors de l'interrogation de la
-     *         base de données.
+     *         base de donnÃ©es.
      */
     DirectPosition snap(DirectPosition position) throws CatalogException;
 
     /**
-     * Retourne les couvertures utilisées par les méthodes {@code evaluate} pour le temps <var>t</var>
-     * spécifié. L'ensemble retourné comprendra typiquement 0, 1 ou 2 éléments.
+     * Retourne les couvertures utilisÃ©es par les mÃ©thodes {@code evaluate} pour le temps <var>t</var>
+     * spÃ©cifiÃ©. L'ensemble retournÃ© comprendra typiquement 0, 1 ou 2 Ã©lÃ©ments.
      *
      * @throws CatalogException si une erreur est survenue lors de l'interrogation de la
-     *         base de données.
+     *         base de donnÃ©es.
      */
     List<Coverage> coveragesAt(double t) throws CatalogException;
 }

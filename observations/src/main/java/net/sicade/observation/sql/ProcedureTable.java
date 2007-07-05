@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,34 +26,34 @@ import net.sicade.observation.ConfigurationKey;
 
 
 /**
- * Connexion vers la table des {@linkplain Procedure procédures}.
+ * Connexion vers la table des {@linkplain Procedure procÃ©dures}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class ProcedureTable extends SingletonTable<Procedure> implements Shareable {
     /**
-     * Requête SQL pour obtenir une procédure.
+     * RequÃªte SQL pour obtenir une procÃ©dure.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Procedures:SELECT",
             "SELECT name, description\n" +
             "  FROM \"Procedures\"\n" +
             " WHERE name=?");
 
-    /** Numéro de colonne. */ private static final int NAME        = 1;
-    /** Numéro de colonne. */ private static final int DESCRIPTION = 2;
+    /** NumÃ©ro de colonne. */ private static final int NAME        = 1;
+    /** NumÃ©ro de colonne. */ private static final int DESCRIPTION = 2;
 
     /**
-     * Construit une table des procédures.
+     * Construit une table des procÃ©dures.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnÃ©es.
      */
     public ProcedureTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les procédures.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les procÃ©dures.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -64,7 +64,7 @@ public class ProcedureTable extends SingletonTable<Procedure> implements Shareab
     }
 
     /**
-     * Construit une procédure pour l'enregistrement courant.
+     * Construit une procÃ©dure pour l'enregistrement courant.
      */
     protected Procedure createEntry(final ResultSet results) throws SQLException {
         return new ProcedureEntry(results.getString(NAME),

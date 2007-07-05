@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -47,52 +47,52 @@ import net.sicade.sie.window.coverages.CoveragesWindow;
 
 
 /**
- * Fenêtre qui affichera une mosaïque d'images d'une série. Cette fenêtre peut être affichée
- * par {@link ViewAction}, une action qui sera proposée dans le menu "Window".
+ * FenÃªtre qui affichera une mosaÃ¯que d'images d'une sÃ©rie. Cette fenÃªtre peut Ãªtre affichÃ©e
+ * par {@link ViewAction}, une action qui sera proposÃ©e dans le menu "Window".
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 final class MosaicWindow extends TopComponent implements Runnable, ListSelectionListener {
     /**
-     * Pour compatibilité avec différentes versions de cette classe.
+     * Pour compatibilitÃ© avec diffÃ©rentes versions de cette classe.
      */
     private static final long serialVersionUID = -5719523277771255514L;
 
     /**
-     * Chemin vers l'icône utilisée pour cette fenêtre ainsi que pour l'action
+     * Chemin vers l'icÃ´ne utilisÃ©e pour cette fenÃªtre ainsi que pour l'action
      * {@link ViewAction} qui l'ouvrira.
      */
     static final String ICON_PATH = "net/sicade/sie/window/mosaic/Icon.gif";
 
     /**
-     * L'icone pour cette fenêtre. Ne sera lue que la première fois où elle sera nécessaire.
+     * L'icone pour cette fenÃªtre. Ne sera lue que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private static Image icon;
 
     /**
-     * Une chaîne de caractères qui représentera cette fenêtre au sein du {@linkplain WindowManager
-     * gestionnaire des fenêtres}. Cet ID sert à obtenir une instance unique de cette fenêtre par
-     * un appel à la méthode {@link #findInstance}.
+     * Une chaÃ®ne de caractÃ¨res qui reprÃ©sentera cette fenÃªtre au sein du {@linkplain WindowManager
+     * gestionnaire des fenÃªtres}. Cet ID sert Ã  obtenir une instance unique de cette fenÃªtre par
+     * un appel Ã  la mÃ©thode {@link #findInstance}.
      */
     private static final String PREFERRED_ID = "MosaicWindow";
 
     /**
-     * Ensemble des fenêtres déjà créées. Utilisé pour l'implémentation de {@link #findInstance}.
+     * Ensemble des fenÃªtres dÃ©jÃ  crÃ©Ã©es. UtilisÃ© pour l'implÃ©mentation de {@link #findInstance}.
      */
     private static final Map<Series,MosaicWindow> POOL = new HashMap<Series,MosaicWindow>();
 
     /**
-     * La séries d'images affichées dans cette mosaïque. Cette séries sera donnée à un objet
-     * {@link CoverageTableModel} (propre à cette série) qui pourra ensuite être affiché dans
+     * La sÃ©ries d'images affichÃ©es dans cette mosaÃ¯que. Cette sÃ©ries sera donnÃ©e Ã  un objet
+     * {@link CoverageTableModel} (propre Ã  cette sÃ©rie) qui pourra ensuite Ãªtre affichÃ© dans
      * une instance unique de {@link CoveragesWindow} (en fonction de l'objet {@code MosaicWindow}
      * actif).
      */
     private final Series series;
 
     /**
-     * Liste des images pour la {@linkplain #series séries affichée par cette fenêtre}.
-     * Cette table sera remplie en arrière plan par la méthode {@link #run}.
+     * Liste des images pour la {@linkplain #series sÃ©ries affichÃ©e par cette fenÃªtre}.
+     * Cette table sera remplie en arriÃ¨re plan par la mÃ©thode {@link #run}.
      */
     private final CoverageTableModel table = new CoverageTableModel();
 
@@ -104,7 +104,7 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     private final ImagePane imagePane = new ImagePane(8192*2);
 
     /**
-     * Construit une fenêtre contenant une mosaïque initialement vide.
+     * Construit une fenÃªtre contenant une mosaÃ¯que initialement vide.
      */
     private MosaicWindow(final Series series) {
         this.series = series;
@@ -133,14 +133,14 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Retourne le nom de la fenêtre pour la série spécifiée.
+     * Retourne le nom de la fenÃªtre pour la sÃ©rie spÃ©cifiÃ©e.
      */
     private static String getName(final Series series) {
         return PREFERRED_ID + ':' + series.getName();
     }
 
     /**
-     * Retourne un icone partagé pour cette action.
+     * Retourne un icone partagÃ© pour cette action.
      */
     private static synchronized Image getSharedIcon() {
         if (icon == null) {
@@ -150,7 +150,7 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Obtient une instance unique d'une fenêtre de cette classe pour la série spécifiée.
+     * Obtient une instance unique d'une fenÃªtre de cette classe pour la sÃ©rie spÃ©cifiÃ©e.
      */
     public static MosaicWindow findInstance(final Series series) {
         synchronized (POOL) {
@@ -164,10 +164,10 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Obtient la liste de toutes les images de la série donnée au constructeur de cet objet,
-     * et stocke cette liste sous forme d'objet {@link CoverageTableModel}. Cette méthode est
-     * exécutée dans un thread en arrière-plan. En cas d'échec, un message est affichée pour
-     * l'utilisateur et aucune liste d'images ne sera affichée.
+     * Obtient la liste de toutes les images de la sÃ©rie donnÃ©e au constructeur de cet objet,
+     * et stocke cette liste sous forme d'objet {@link CoverageTableModel}. Cette mÃ©thode est
+     * exÃ©cutÃ©e dans un thread en arriÃ¨re-plan. En cas d'Ã©chec, un message est affichÃ©e pour
+     * l'utilisateur et aucune liste d'images ne sera affichÃ©e.
      */
     public void run() {
         try {
@@ -178,8 +178,8 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Retourne l'identifiant des fenêtres de type {@code MosaicWindow} dans le
-     * gestionnaire des fenêtres.
+     * Retourne l'identifiant des fenÃªtres de type {@code MosaicWindow} dans le
+     * gestionnaire des fenÃªtres.
      */
     @Override
     protected String preferredID() {
@@ -187,10 +187,10 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Appelée automatiquement lorsque cette fenêtre est ouverte. Cette méthode démarre
-     * l'interrogation de la base de données en arrière-plan. Le contenu du tableau de
-     * {@link CoveragesWindow} sera mise à jour dès que la liste des images sera prête
-     * (si cette fenêtre est la fenêtre active).
+     * AppelÃ©e automatiquement lorsque cette fenÃªtre est ouverte. Cette mÃ©thode dÃ©marre
+     * l'interrogation de la base de donnÃ©es en arriÃ¨re-plan. Le contenu du tableau de
+     * {@link CoveragesWindow} sera mise Ã  jour dÃ¨s que la liste des images sera prÃªte
+     * (si cette fenÃªtre est la fenÃªtre active).
      */
     @Override
     protected void componentOpened() {
@@ -205,8 +205,8 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Appelée automatiquement lorsque cette fenêtre est fermée. Cette méthode vide le tableau
-     * {@link CoveragesWindow} de son contenu (si cette fenêtre est la fenêtre active).
+     * AppelÃ©e automatiquement lorsque cette fenÃªtre est fermÃ©e. Cette mÃ©thode vide le tableau
+     * {@link CoveragesWindow} de son contenu (si cette fenÃªtre est la fenÃªtre active).
      */
     @Override
     protected void componentClosed() {
@@ -223,9 +223,9 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Appelée automatiquement lorsque cette fenêtre devient la fenêtre active. Cette méthode
-     * signale à {@link CoveragesWindow} qu'il devrait afficher la liste d'images de cette
-     * fenêtre.
+     * AppelÃ©e automatiquement lorsque cette fenÃªtre devient la fenÃªtre active. Cette mÃ©thode
+     * signale Ã  {@link CoveragesWindow} qu'il devrait afficher la liste d'images de cette
+     * fenÃªtre.
      */
     @Override
     protected void componentActivated() {
@@ -234,10 +234,10 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Appelée automatiquement lorsque la sélection de l'utilisateur dans {@link CoveragesWindow}
-     * change. Cette méthode obtient les lignes modifiées et affiche les images qui y correspondent.
+     * AppelÃ©e automatiquement lorsque la sÃ©lection de l'utilisateur dans {@link CoveragesWindow}
+     * change. Cette mÃ©thode obtient les lignes modifiÃ©es et affiche les images qui y correspondent.
      *
-     * @todo L'implémentation ci-dessous est grossière.
+     * @todo L'implÃ©mentation ci-dessous est grossiÃ¨re.
      */
     public void valueChanged(final ListSelectionEvent event) {
         if (!event.getValueIsAdjusting()) {
@@ -253,8 +253,8 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Indique que les informations sur cette fenêtre ne doivent être enregistrées que si elle
-     * était ouverte.
+     * Indique que les informations sur cette fenÃªtre ne doivent Ãªtre enregistrÃ©es que si elle
+     * Ã©tait ouverte.
      */
     @Override
     public int getPersistenceType() {
@@ -262,8 +262,8 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Lors de l'écriture en binaire de cette fenêtre, écrit une classe sentinelle
-     * à la place de la totalité de {@code MosaicWindow}.
+     * Lors de l'Ã©criture en binaire de cette fenÃªtre, Ã©crit une classe sentinelle
+     * Ã  la place de la totalitÃ© de {@code MosaicWindow}.
      */
     @Override
     public Object writeReplace() {
@@ -271,33 +271,33 @@ final class MosaicWindow extends TopComponent implements Runnable, ListSelection
     }
 
     /**
-     * Les classes qui seront enregistrées en binaire à la place de {@link MosaicWindow}.
+     * Les classes qui seront enregistrÃ©es en binaire Ã  la place de {@link MosaicWindow}.
      * Lors de la lecture, cette classe appelera {@link MosaicWindow#getDefault} afin de
-     * reconstruire une fenêtre qui apparaîtra dans l'application de l'utilisateur.
+     * reconstruire une fenÃªtre qui apparaÃ®tra dans l'application de l'utilisateur.
      *
      * @author Martin Desruisseaux
      * @version $Id$
      */
     final static class ResolvableHelper implements Serializable {
         /**
-         * Pour compatibilité avec différentes versions de cette classe.
+         * Pour compatibilitÃ© avec diffÃ©rentes versions de cette classe.
          */
         private static final long serialVersionUID = -9126363576866407661L;
 
         /**
-         * Le nom de la séries.
+         * Le nom de la sÃ©ries.
          */
         private final String series;
 
         /**
-         * Construit un objet à enregistrer à la place de {@link MosaicWindow}.
+         * Construit un objet Ã  enregistrer Ã  la place de {@link MosaicWindow}.
          */
         public ResolvableHelper(final String series) {
             this.series = series;
         }
 
         /**
-         * Lors de la lecture binaire, remplace cet objet par une instance de la fenêtre
+         * Lors de la lecture binaire, remplace cet objet par une instance de la fenÃªtre
          * {@link CoveragesWindow}.
          */
         public Object readResolve() throws ObjectStreamException {

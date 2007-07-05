@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ package net.sicade.numeric.table;
 
 
 /**
- * Type d'interpolation à utiliser pour obtenir une valeur <var>y</var> à partir d'une position
+ * Type d'interpolation Ã  utiliser pour obtenir une valeur <var>y</var> Ã  partir d'une position
  * <var>x</var>.
  *
  * @author Martin Desruisseaux
@@ -32,7 +32,7 @@ public enum Interpolation {
     NEAREST,
 
     /**
-     * Interpolation linéaire.
+     * Interpolation linÃ©aire.
      */
     LINEAR
 }

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -49,7 +49,7 @@ import net.sicade.observation.IllegalRecordException;
 
 
 /**
- * Connexion vers la table des {@linkplain ParameterValueGroup paramètres des opérations}.
+ * Connexion vers la table des {@linkplain ParameterValueGroup paramÃ¨tres des opÃ©rations}.
  *
  * @version $Id$
  * @author Antoine Hnawia
@@ -58,35 +58,35 @@ import net.sicade.observation.IllegalRecordException;
 @UsedBy(OperationTable.class)
 public class OperationParameterTable extends Table implements Shareable {
     /**
-     * La requête SQL servant à interroger la table.
+     * La requÃªte SQL servant Ã  interroger la table.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("OperationParameters:SELECT",
             "SELECT parameter, value\n"        +
             "  FROM \"OperationParameters\"\n" +
             " WHERE operation=?");
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_OPERATION   = 1;
-    /** Numéro de colonne. */ private static final int PARAMETER            = 1;
-    /** Numéro de colonne. */ private static final int VALUE                = 2;
+    /** NumÃ©ro d'argument. */ private static final int ARGUMENT_OPERATION   = 1;
+    /** NumÃ©ro de colonne. */ private static final int PARAMETER            = 1;
+    /** NumÃ©ro de colonne. */ private static final int VALUE                = 2;
 
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
+     * Construit une table qui interrogera la base de donnÃ©es spÃ©cifiÃ©e.
      *
-     * @param database  Connexion vers la base de données d'observations.
+     * @param database  Connexion vers la base de donnÃ©es d'observations.
      */
     public OperationParameterTable(final Database database) {
         super(database);
     }
 
     /**
-     * Définie les valeurs du groupe de paramètres donné en argument.
+     * DÃ©finie les valeurs du groupe de paramÃ¨tres donnÃ© en argument.
      * 
-     * @param   operation   L'opération dont on veut connaître les paramètres.
-     * @param   parameters  Le groupe de paramètre dans lequel on va stocker les paramètres.
+     * @param   operation   L'opÃ©ration dont on veut connaÃ®tre les paramÃ¨tres.
+     * @param   parameters  Le groupe de paramÃ¨tre dans lequel on va stocker les paramÃ¨tres.
      * 
      * @throw   NullPointerException    Si l'argument {@code parameters} est {@code null}.
-     * @throws  SQLException            Si l'interrogation de la base de données a échoué.
-     * @throws  IllegalRecordException  Si un des paramètres trouvés dans la base de données
+     * @throws  SQLException            Si l'interrogation de la base de donnÃ©es a Ã©chouÃ©.
+     * @throws  IllegalRecordException  Si un des paramÃ¨tres trouvÃ©s dans la base de donnÃ©es
      *          n'est pas connu par le groupe {@code parameters}, ou a une valeur invalide.
      */
     protected synchronized void fillValues(final String operation, final ParameterValueGroup parameters)
@@ -101,17 +101,17 @@ public class OperationParameterTable extends Table implements Shareable {
             Class type = ((ParameterDescriptor) parameter.getDescriptor()).getValueClass();
             type = XMath.primitiveToWrapper(type);
             /*
-             * Cas des booléens. Certaines bases de données se chargent d'interpréter des
-             * caractères comme 'Y' et 'N'. On laissera la base base de données faire elle-
-             * même la conversion du champ texte en booléen, plutôt que de tenter cette
-             * conversion en Java. La même remarque s'applique pour tous les cas suivants.
+             * Cas des boolÃ©ens. Certaines bases de donnÃ©es se chargent d'interprÃ©ter des
+             * caractÃ¨res comme 'Y' et 'N'. On laissera la base base de donnÃ©es faire elle-
+             * mÃªme la conversion du champ texte en boolÃ©en, plutÃ´t que de tenter cette
+             * conversion en Java. La mÃªme remarque s'applique pour tous les cas suivants.
              */
             if (Boolean.class.isAssignableFrom(type)) {
                 parameter.setValue(results.getBoolean(VALUE));
             }
             /*
-             * Cas des entiers entre 8 et 32 bits. Notez que le type Long ne peut pas être
-             * géré par ce code, puisqu'il n'y a pas de méthode parameter.setValue(long).
+             * Cas des entiers entre 8 et 32 bits. Notez que le type Long ne peut pas Ãªtre
+             * gÃ©rÃ© par ce code, puisqu'il n'y a pas de mÃ©thode parameter.setValue(long).
              */
             else if (Byte   .class.isAssignableFrom(type) ||
                      Short  .class.isAssignableFrom(type) ||
@@ -121,15 +121,15 @@ public class OperationParameterTable extends Table implements Shareable {
             }
             /*
              * Cas de tous les autres type de nombres, incluant Long, Float et Double. On
-             * les lira comme des Double, qui est à peu près le format le plus générique
-             * pour l'API à notre disposition dans ParameterValue.
+             * les lira comme des Double, qui est Ã  peu prÃ¨s le format le plus gÃ©nÃ©rique
+             * pour l'API Ã  notre disposition dans ParameterValue.
              */
             else if (Number.class.isAssignableFrom(type)) {
                 parameter.setValue(results.getDouble(VALUE));
             }
             /*
-             * Cas particulier d'un noyau JAI. Le contenu numérique du noyau sera construit
-             * à partir du nom.
+             * Cas particulier d'un noyau JAI. Le contenu numÃ©rique du noyau sera construit
+             * Ã  partir du nom.
              */
             else if (KernelJAI.class.isAssignableFrom(type)) {
                 parameter.setValue(createKernel(name, results));
@@ -148,16 +148,16 @@ public class OperationParameterTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne un noyau de convolution pour le nom spécifié. Le nom doit être compris d'un mot
-     * clé (par exemple {@code "mean"} ou {@code "gauss"}) suivit de la taille du noyau entre
-     * parenthèses. Exemple: {@code "mean(3)"}.
+     * Retourne un noyau de convolution pour le nom spÃ©cifiÃ©. Le nom doit Ãªtre compris d'un mot
+     * clÃ© (par exemple {@code "mean"} ou {@code "gauss"}) suivit de la taille du noyau entre
+     * parenthÃ¨ses. Exemple: {@code "mean(3)"}.
      *
-     * @param  parameter Nom du paramètre. Utilisé uniquement en cas d'erreur pour construire un message.
-     * @param  results   Le résultat de la requête SQL. Seul l'enregistrement courant sera pris en compte.
+     * @param  parameter Nom du paramÃ¨tre. UtilisÃ© uniquement en cas d'erreur pour construire un message.
+     * @param  results   Le rÃ©sultat de la requÃªte SQL. Seul l'enregistrement courant sera pris en compte.
      * @return           Un objet {@link KernelJAI} correspondant au type voulue.
      *
-     * @throws  SQLException            Si l'interrogation de la base de données a échoué.
-     * @throws  IllegalRecordException  Si la chaîne de caractères {@code value} n'est pas reconnue.
+     * @throws  SQLException            Si l'interrogation de la base de donnÃ©es a Ã©chouÃ©.
+     * @throws  IllegalRecordException  Si la chaÃ®ne de caractÃ¨res {@code value} n'est pas reconnue.
      */
     private static KernelJAI createKernel(final String parameter, final ResultSet results)
             throws SQLException, IllegalRecordException
@@ -165,9 +165,9 @@ public class OperationParameterTable extends Table implements Shareable {
         final String value = results.getString(VALUE).trim();
         final int lp = value.indexOf('(');
         final int rp = value.indexOf(')');
-        if (lp > 0  &&  rp > lp       &&  // Vérifie la disposition des parenthèses.
-            rp == value.length()-1    &&  // Vérifie que ')' se trouve à la fin (implique qu'il y en a qu'une seule).
-            lp == value.lastIndexOf('(')) // Vérifie qu'il n'y a qu'une seule parenthèse ouvrante.
+        if (lp > 0  &&  rp > lp       &&  // VÃ©rifie la disposition des parenthÃ¨ses.
+            rp == value.length()-1    &&  // VÃ©rifie que ')' se trouve Ã  la fin (implique qu'il y en a qu'une seule).
+            lp == value.lastIndexOf('(')) // VÃ©rifie qu'il n'y a qu'une seule parenthÃ¨se ouvrante.
         {
             final int size;
             try {
@@ -190,12 +190,12 @@ public class OperationParameterTable extends Table implements Shareable {
             }
         }
         throw new IllegalRecordException(results.getMetaData().getTableName(VALUE),
-                "La valeur \"" + value + "\" n'est pas valide pour le paramètre \"" + parameter +
+                "La valeur \"" + value + "\" n'est pas valide pour le paramÃ¨tre \"" + parameter +
                 "\". Le format attendu est \"mean(3)\" par exemple.");
     }
 
     /**
-     * Crée un noyau de convolution de la taille spécifiée pour le calcul de moyenne.
+     * CrÃ©e un noyau de convolution de la taille spÃ©cifiÃ©e pour le calcul de moyenne.
      * 
      * @param   size    La taille de la matrice.
      * @return          Le noyau de convolution.
@@ -207,8 +207,8 @@ public class OperationParameterTable extends Table implements Shareable {
     }
 
     /**
-     * Crée un noyau de convolution de la taille spécifiée pour le calcul de moyenne
-     * pondérée par une gaussienne.
+     * CrÃ©e un noyau de convolution de la taille spÃ©cifiÃ©e pour le calcul de moyenne
+     * pondÃ©rÃ©e par une gaussienne.
      *
      * @param   size    La taille de la matrice.
      * @return          Le noyau de convolution.
@@ -230,30 +230,30 @@ public class OperationParameterTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne la racine carrée d'une extension de l'opérateur de Sobel. Pour chaque élément
-     * dont la position par rapport à l'élément central est (x,y), on calcule la composante
-     * horizontale avec le cosinus de l'angle divisé par la distance. On peut l'écrire comme
+     * Retourne la racine carrÃ©e d'une extension de l'opÃ©rateur de Sobel. Pour chaque Ã©lÃ©ment
+     * dont la position par rapport Ã  l'Ã©lÃ©ment central est (x,y), on calcule la composante
+     * horizontale avec le cosinus de l'angle divisÃ© par la distance. On peut l'Ã©crire comme
      * suit:
      *
      * <blockquote><pre>
-     *     cos(atan(y/x)) / sqrt(x²+y²)
+     *     cos(atan(y/x)) / sqrt(xÂ²+yÂ²)
      * </pre></blockquote>
      *
-     * En utilisant l'identité 1/cos² = (1+tan²), on peut réécrire l'équation comme suit:
+     * En utilisant l'identitÃ© 1/cosÂ² = (1+tanÂ²), on peut rÃ©Ã©crire l'Ã©quation comme suit:
      *
      * <blockquote><pre>
-     *     x / (x²+y²)
+     *     x / (xÂ²+yÂ²)
      * </pre></blockquote>
      *
-     * Cette méthode prend la racine carrée de tous les éléments.
+     * Cette mÃ©thode prend la racine carrÃ©e de tous les Ã©lÃ©ments.
      *
-     * @param size Taille de la matrice. Doit être un nombre positif et impair.
-     * @param horizontal {@code true} pour l'opérateur horizontal,
-     *        or {@code false} pour l'opérateur vertical.
+     * @param size Taille de la matrice. Doit Ãªtre un nombre positif et impair.
+     * @param horizontal {@code true} pour l'opÃ©rateur horizontal,
+     *        or {@code false} pour l'opÃ©rateur vertical.
      *
-     * @todo Ce code est une copie d'une méthode définie dans
+     * @todo Ce code est une copie d'une mÃ©thode dÃ©finie dans
      *       {@link org.geotools.gui.swing.GradientKernelEditor},
-     *       excepté pour l'appel de {@code sqrt}.
+     *       exceptÃ© pour l'appel de {@code sqrt}.
      */
     private static KernelJAI createIsotropicKernel(final int size, final boolean horizontal) {
         final int key = size/2;
@@ -281,8 +281,8 @@ public class OperationParameterTable extends Table implements Shareable {
     }
 
     /**
-     * Normalise le tableau spécifié en argument de façon à ce que la somme
-     * de tous les éléments soit égale à 1.
+     * Normalise le tableau spÃ©cifiÃ© en argument de faÃ§on Ã  ce que la somme
+     * de tous les Ã©lÃ©ments soit Ã©gale Ã  1.
      */
     private static void normalize(final float[] data) {
         double sum = 0;

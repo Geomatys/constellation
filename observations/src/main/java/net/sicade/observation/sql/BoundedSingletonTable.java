@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -51,76 +51,76 @@ import net.sicade.observation.CatalogException;
 
 /**
  * Classe de base des tables dans lesquelles chaque enregistrement est un singleton compris dans
- * certaines limites spatio-temporelles. En plus des méthodes abstraites définies dans la classe
- * parente, les implémentations de cette classe devraient redéfinir les méthodes suivantes:
+ * certaines limites spatio-temporelles. En plus des mÃ©thodes abstraites dÃ©finies dans la classe
+ * parente, les implÃ©mentations de cette classe devraient redÃ©finir les mÃ©thodes suivantes:
  * <p>
  * <ul>
- *   <li>{@link #getQuery} (héritée de la classe parente, mais avec de nouvelles conditions)
- *       pour retourner l'instruction SQL à utiliser pour obtenir les données à partir de son
- *       nom ou ID. Utilisée aussi ainsi pour obtenir la requête SQL à utiliser pour obtenir
- *       les coordonnées spatio-temporelles des enregistrements.</li>
+ *   <li>{@link #getQuery} (hÃ©ritÃ©e de la classe parente, mais avec de nouvelles conditions)
+ *       pour retourner l'instruction SQL Ã  utiliser pour obtenir les donnÃ©es Ã  partir de son
+ *       nom ou ID. UtilisÃ©e aussi ainsi pour obtenir la requÃªte SQL Ã  utiliser pour obtenir
+ *       les coordonnÃ©es spatio-temporelles des enregistrements.</li>
  * </ul>
  * <p>
- * Les limites spatio-temporelles sont définies par la propriété {@link #getEnvelope Envelope}.
- * Les propriétés {@link #getGeographicBoundingBox GeographicBoundingBox} et {@link #getTimeRange
- * TimeRange} peuvent être considérées comme les composantes spatiale et temporelle de l'envelope,
- * transformées selon un système de référence fixe par commodité.
+ * Les limites spatio-temporelles sont dÃ©finies par la propriÃ©tÃ© {@link #getEnvelope Envelope}.
+ * Les propriÃ©tÃ©s {@link #getGeographicBoundingBox GeographicBoundingBox} et {@link #getTimeRange
+ * TimeRange} peuvent Ãªtre considÃ©rÃ©es comme les composantes spatiale et temporelle de l'envelope,
+ * transformÃ©es selon un systÃ¨me de rÃ©fÃ©rence fixe par commoditÃ©.
  * <p>
- * La méthode {@link #trimEnvelope} permet de réduire l'envelope au minimum tout en englobant les
- * mêmes enregistrements.
+ * La mÃ©thode {@link #trimEnvelope} permet de rÃ©duire l'envelope au minimum tout en englobant les
+ * mÃªmes enregistrements.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class BoundedSingletonTable<E extends Element> extends SingletonTable<E> {
     /**
-     * Fin des données à explorer, spécifiée comme intervalle de temps par rapport
-     * à la date courante.
+     * Fin des donnÃ©es Ã  explorer, spÃ©cifiÃ©e comme intervalle de temps par rapport
+     * Ã  la date courante.
      */
     private static final long LOOK_AHEAD = 30 * 24 * 60 * 60 * 1000L;
 
     /**
-     * Type de système de référence des coordonnées utilisé.
+     * Type de systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es utilisÃ©.
      */
     private final CRS crsType;
 
     /**
-     * Plage de temps des enregistrements à extraire.
+     * Plage de temps des enregistrements Ã  extraire.
      */
     private long tMin, tMax;
 
     /**
-     * Coordonnées géographiques des enregistrements à extraire. La plage de longitudes est plus
-     * grande que nécessaire (±360° au lieu de ±180°) cas on ne sait pas à priori si la plage de
-     * longitudes utilisée va de -180 à +180° ou de 0 à 360°.
+     * CoordonnÃ©es gÃ©ographiques des enregistrements Ã  extraire. La plage de longitudes est plus
+     * grande que nÃ©cessaire (Â±360Â° au lieu de Â±180Â°) cas on ne sait pas Ã  priori si la plage de
+     * longitudes utilisÃ©e va de -180 Ã  +180Â° ou de 0 Ã  360Â°.
      */
     private double xMin, xMax, yMin, yMax;
 
     /**
-     * {@code true} si la méthode {@link #ensureTrimmed} a déjà réduit l'{@linkplain #getEnvelope
+     * {@code true} si la mÃ©thode {@link #ensureTrimmed} a dÃ©jÃ  rÃ©duit l'{@linkplain #getEnvelope
      * enveloppe spatio-temporelle} de cette table.
      */
     private boolean trimmed;
 
     /**
-     * {@code true} si l'utilisateur a appellé {@link #trimEnvelope}. Dans ce cas, la méthode
-     * {@link #ensureTrimmed} devra réduire l'{@linkplain #getEnvelope enveloppe spatio-temporelle}
-     * la prochaine fois où elle sera appellée.
+     * {@code true} si l'utilisateur a appellÃ© {@link #trimEnvelope}. Dans ce cas, la mÃ©thode
+     * {@link #ensureTrimmed} devra rÃ©duire l'{@linkplain #getEnvelope enveloppe spatio-temporelle}
+     * la prochaine fois oÃ¹ elle sera appellÃ©e.
      */
     private boolean trimRequested;
 
     /**
-     * La transformation allant du système de référence des coordonnées {@link #crsType} vers
-     * le système {@link #getCoordinateReferenceSystem}. Ne sera construit que la première fois
-     * où il sera nécessaire.
+     * La transformation allant du systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es {@link #crsType} vers
+     * le systÃ¨me {@link #getCoordinateReferenceSystem}. Ne sera construit que la premiÃ¨re fois
+     * oÃ¹ il sera nÃ©cessaire.
      */
     private transient MathTransform standardToUser;
 
     /**
-     * Construit une table pour la connexion spécifiée.
+     * Construit une table pour la connexion spÃ©cifiÃ©e.
      *
-     * @param  database Connexion vers la base de données d'observations.
-     * @param  crsType  Type de système de référence des coordonnées utilisé.
+     * @param  database Connexion vers la base de donnÃ©es d'observations.
+     * @param  crsType  Type de systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es utilisÃ©.
      */
     protected BoundedSingletonTable(final Database database, final CRS crsType) {
         super(database);
@@ -134,9 +134,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Construit une nouvelle table initialisée à la même couverture spatio-temporelle que la
-     * table spécifiée. Ce constructeur suppose que le {@linkplain #getCoordinateReferenceSystem
-     * système de référence des coordonnées} restera le même pour les deux tables.
+     * Construit une nouvelle table initialisÃ©e Ã  la mÃªme couverture spatio-temporelle que la
+     * table spÃ©cifiÃ©e. Ce constructeur suppose que le {@linkplain #getCoordinateReferenceSystem
+     * systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es} restera le mÃªme pour les deux tables.
      */
     protected BoundedSingletonTable(final BoundedSingletonTable table) {
         this(table.database, table.crsType);
@@ -152,26 +152,26 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Retourne le système de référence des coordonnées utilisé pour les coordonnées spatio-temporelles
-     * de {@code [get|set]Envelope}. L'implémentation par défaut retourne le système de référence
-     * correspondant au type spécifié au constructeur. Ce système peut comprendre les dimensions
+     * Retourne le systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es utilisÃ© pour les coordonnÃ©es spatio-temporelles
+     * de {@code [get|set]Envelope}. L'implÃ©mentation par dÃ©faut retourne le systÃ¨me de rÃ©fÃ©rence
+     * correspondant au type spÃ©cifiÃ© au constructeur. Ce systÃ¨me peut comprendre les dimensions
      * suivantes:
      * <p>
      * <ul>
-     *   <li>La longitude en degrés relatif au méridien de Greenwich</li>
-     *   <li>La latitude en degrés</li>
-     *   <li>L'altitude en mètres au dessus de l'ellipsoïde WGS 84</li>
-     *   <li>Le temps en nombre de jours écoulés depuis l'epoch.</li>
+     *   <li>La longitude en degrÃ©s relatif au mÃ©ridien de Greenwich</li>
+     *   <li>La latitude en degrÃ©s</li>
+     *   <li>L'altitude en mÃ¨tres au dessus de l'ellipsoÃ¯de WGS 84</li>
+     *   <li>Le temps en nombre de jours Ã©coulÃ©s depuis l'epoch.</li>
      * </ul>
      * <p>
-     * Ces coordonnées ne sont pas nécessairement toutes présentes; cela dépend de l'énumération
-     * utilisée. Par exemple le système désigné par {@link CRS#XYT} ne comprend pas l'altitude.
-     * Mais les coordonnées présentes seront toujours dans cet ordre.
+     * Ces coordonnÃ©es ne sont pas nÃ©cessairement toutes prÃ©sentes; cela dÃ©pend de l'Ã©numÃ©ration
+     * utilisÃ©e. Par exemple le systÃ¨me dÃ©signÃ© par {@link CRS#XYT} ne comprend pas l'altitude.
+     * Mais les coordonnÃ©es prÃ©sentes seront toujours dans cet ordre.
      * <p>
-     * Les classes dérivées peuvent retourner un autre système de référence, mais ce système doit
-     * être compatible avec le type spécifié au constructeur (c'est-à-dire qu'une transformation
-     * de coordonnées doit exister entre les deux systèmes) et ne doit jamais changer pour une
-     * instance donnée de cette classe.
+     * Les classes dÃ©rivÃ©es peuvent retourner un autre systÃ¨me de rÃ©fÃ©rence, mais ce systÃ¨me doit
+     * Ãªtre compatible avec le type spÃ©cifiÃ© au constructeur (c'est-Ã -dire qu'une transformation
+     * de coordonnÃ©es doit exister entre les deux systÃ¨mes) et ne doit jamais changer pour une
+     * instance donnÃ©e de cette classe.
      *
      * @see CRS
      */
@@ -180,11 +180,11 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Retourne la transformation allant du système de référence des coordonnées {@link #crsType}
-     * vers le système {@link #getCoordinateReferenceSystem}, ou {@code null} si cette
-     * transformation est la transformation identitée.
+     * Retourne la transformation allant du systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es {@link #crsType}
+     * vers le systÃ¨me {@link #getCoordinateReferenceSystem}, ou {@code null} si cette
+     * transformation est la transformation identitÃ©e.
      *
-     * @throws CatalogException si la transformation n'a pas pu être construite.
+     * @throws CatalogException si la transformation n'a pas pu Ãªtre construite.
      */
     private MathTransform getStandardToUser() throws CatalogException {
         assert Thread.holdsLock(this);
@@ -200,14 +200,14 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Retourne les coordonnées spatio-temporelles de la région d'intérêt. Le système de référence
-     * des coordonnées utilisé est celui retourné par {@link #getCoordinateReferenceSystem}.
-     * L'implémentation par défaut construit une envelope à partir des informations retournées par
-     * {@link #getGeographicBoundingBox} et {@link #getTimeRange}, en transformant les coordonnées
-     * si nécessaire.
+     * Retourne les coordonnÃ©es spatio-temporelles de la rÃ©gion d'intÃ©rÃªt. Le systÃ¨me de rÃ©fÃ©rence
+     * des coordonnÃ©es utilisÃ© est celui retournÃ© par {@link #getCoordinateReferenceSystem}.
+     * L'implÃ©mentation par dÃ©faut construit une envelope Ã  partir des informations retournÃ©es par
+     * {@link #getGeographicBoundingBox} et {@link #getTimeRange}, en transformant les coordonnÃ©es
+     * si nÃ©cessaire.
      *
      * @throws CatalogException si une erreur est survenue lors de l'obtention de l'enveloppe ou
-     *         de la transformation des coordonnnées.
+     *         de la transformation des coordonnnÃ©es.
      *
      * @see #getGeographicBoundingBox
      * @see #getTimeRange
@@ -233,13 +233,13 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Définit les coordonnées spatio-temporelles de la région d'intérêt. Le système de référence
-     * des coordonnées utilisé est celui retourné par {@link #getCoordinateReferenceSystem}.
-     * Appeler cette méthode équivaut à effectuer les transformations nécessaires des coordonnées,
+     * DÃ©finit les coordonnÃ©es spatio-temporelles de la rÃ©gion d'intÃ©rÃªt. Le systÃ¨me de rÃ©fÃ©rence
+     * des coordonnÃ©es utilisÃ© est celui retournÃ© par {@link #getCoordinateReferenceSystem}.
+     * Appeler cette mÃ©thode Ã©quivaut Ã  effectuer les transformations nÃ©cessaires des coordonnÃ©es,
      * puis appeler {@link #setTimeRange setTimeRange(...)} et
      * {@link #setGeographicBoundingBox setGeographicBoundingBox(...)}.
      *
-     * @throws CatalogException si une erreur est survenue lors de la transformation des coordonnnées.
+     * @throws CatalogException si une erreur est survenue lors de la transformation des coordonnnÃ©es.
      */
     public synchronized void setEnvelope(Envelope envelope) throws CatalogException {
         final MathTransform standardToUser = getStandardToUser();
@@ -260,18 +260,18 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Retourne les coordonnées géographiques englobeant les enregistrements. Cette région ne sera
-     * pas plus grande que la région qui a été spécifiée lors du dernier appel de la méthode
-     * {@link #setGeographicBoundingBox setGeographicBoundingBox(...)}. Elle peut toutefois être
-     * plus petite si la méthode {@link #trimEnvelope} a été appelée depuis.
+     * Retourne les coordonnÃ©es gÃ©ographiques englobeant les enregistrements. Cette rÃ©gion ne sera
+     * pas plus grande que la rÃ©gion qui a Ã©tÃ© spÃ©cifiÃ©e lors du dernier appel de la mÃ©thode
+     * {@link #setGeographicBoundingBox setGeographicBoundingBox(...)}. Elle peut toutefois Ãªtre
+     * plus petite si la mÃ©thode {@link #trimEnvelope} a Ã©tÃ© appelÃ©e depuis.
      *
-     * @return La région géographique des enregistrements recherchés par cette table.
+     * @return La rÃ©gion gÃ©ographique des enregistrements recherchÃ©s par cette table.
      *
      * @see #getTimeRange
      * @see #getEnvelope
      * @see #trimEnvelope
      *
-     * @throws CatalogException si l'enveloppe n'a pas pu être obtenue.
+     * @throws CatalogException si l'enveloppe n'a pas pu Ãªtre obtenue.
      */
     public synchronized GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         try {
@@ -283,14 +283,14 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Définit les coordonnées géographiques de la région dans laquelle on veut rechercher des
-     * enregistrements. Les coordonnées doivent être exprimées en degrés de longitude et de latitude
-     * selon l'ellipsoïde WGS&nbsp;1984. Tous les enregistrements qui interceptent cette région
+     * DÃ©finit les coordonnÃ©es gÃ©ographiques de la rÃ©gion dans laquelle on veut rechercher des
+     * enregistrements. Les coordonnÃ©es doivent Ãªtre exprimÃ©es en degrÃ©s de longitude et de latitude
+     * selon l'ellipsoÃ¯de WGS&nbsp;1984. Tous les enregistrements qui interceptent cette rÃ©gion
      * seront prises en compte lors du prochain appel de {@link #getEntries}.
      *
-     * @param  area Coordonnées géographiques de la région, en degrés de longitude et de latitude.
-     * @return {@code true} si la région d'intérêt à changée, ou {@code false} si les valeurs
-     *         spécifiées étaient les mêmes que la dernière fois.
+     * @param  area CoordonnÃ©es gÃ©ographiques de la rÃ©gion, en degrÃ©s de longitude et de latitude.
+     * @return {@code true} si la rÃ©gion d'intÃ©rÃªt Ã  changÃ©e, ou {@code false} si les valeurs
+     *         spÃ©cifiÃ©es Ã©taient les mÃªmes que la derniÃ¨re fois.
      */
     public synchronized boolean setGeographicBoundingBox(final GeographicBoundingBox area) {
         boolean change;
@@ -308,17 +308,17 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
 
     /**
      * Retourne la plage de dates des enregistrements. Cette plage de dates ne sera pas plus grande
-     * que la plage de dates spécifiée lors du dernier appel de la méthode {@link #setTimeRange
-     * setTimeRange(...)}.  Elle peut toutefois être plus petite si la méthode {@link #trimEnvelope}
-     * a été appelée depuis.
+     * que la plage de dates spÃ©cifiÃ©e lors du dernier appel de la mÃ©thode {@link #setTimeRange
+     * setTimeRange(...)}.  Elle peut toutefois Ãªtre plus petite si la mÃ©thode {@link #trimEnvelope}
+     * a Ã©tÃ© appelÃ©e depuis.
      *
-     * @return La plage de dates des enregistrements. Cette plage sera constituée d'objets {@link Date}.
+     * @return La plage de dates des enregistrements. Cette plage sera constituÃ©e d'objets {@link Date}.
      *
      * @see #getGeographicBoundingBox
      * @see #getEnvelope
      * @see #trimEnvelope
      *
-     * @throws CatalogException si l'enveloppe n'a pas pu être obtenue.
+     * @throws CatalogException si l'enveloppe n'a pas pu Ãªtre obtenue.
      */
     public synchronized DateRange getTimeRange() throws CatalogException {
         try {
@@ -330,14 +330,14 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Définit la plage de dates dans laquelle rechercher des enregistrements. Tous les
+     * DÃ©finit la plage de dates dans laquelle rechercher des enregistrements. Tous les
      * enregistrements qui interceptent cette plage de temps seront pris en compte lors
      * du prochain appel de {@link #getEntries}.
      *
      * @param  timeRange Plage de dates dans laquelle rechercher des enregistrements.
-     *         Cette plage doit être constituée d'objets {@link Date}.
-     * @return {@code true} si la plage de temps à changée, ou {@code false} si les valeurs
-     *         spécifiées étaient les mêmes que la dernière fois.
+     *         Cette plage doit Ãªtre constituÃ©e d'objets {@link Date}.
+     * @return {@code true} si la plage de temps Ã  changÃ©e, ou {@code false} si les valeurs
+     *         spÃ©cifiÃ©es Ã©taient les mÃªmes que la derniÃ¨re fois.
      */
     public final boolean setTimeRange(final DateRange timeRange) {
         Date startTime = timeRange.getMinValue();
@@ -352,14 +352,14 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Définit la plage de dates dans laquelle rechercher des enregistrements. Tous les
+     * DÃ©finit la plage de dates dans laquelle rechercher des enregistrements. Tous les
      * enregistrements qui interceptent cette plage de temps seront pris en compte lors
      * du prochain appel de {@link #getEntries}.
      *
-     * @param  startTime Date de début (inclusive) de la période d'intérêt.
-     * @param  endTime   Date de fin   (inclusive) de la période d'intérêt.
-     * @return {@code true} si la plage de temps à changée, ou {@code false} si les valeurs
-     *         spécifiées étaient les mêmes que la dernière fois.
+     * @param  startTime Date de dÃ©but (inclusive) de la pÃ©riode d'intÃ©rÃªt.
+     * @param  endTime   Date de fin   (inclusive) de la pÃ©riode d'intÃ©rÃªt.
+     * @return {@code true} si la plage de temps Ã  changÃ©e, ou {@code false} si les valeurs
+     *         spÃ©cifiÃ©es Ã©taient les mÃªmes que la derniÃ¨re fois.
      */
     public synchronized boolean setTimeRange(final Date startTime, final Date endTime) {
         boolean change;
@@ -374,13 +374,13 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Réduit l'{@linkplain #getEnvelope envelope spatio-temporelle} à la plus petite envelope
-     * englobant les enregistrements de cette table.  Cette méthode ne prend en compte que les
-     * enregistrements trouvés dans l'envelope définie lors des appels précédents aux méthodes
-     * {@code setXXX(...)}. Les valeurs retournées par les méthodes {@code getXXX(...)} seront
-     * modifiées de façon à définir la plus petite enveloppe contenant les mêmes enregistrements.
+     * RÃ©duit l'{@linkplain #getEnvelope envelope spatio-temporelle} Ã  la plus petite envelope
+     * englobant les enregistrements de cette table.  Cette mÃ©thode ne prend en compte que les
+     * enregistrements trouvÃ©s dans l'envelope dÃ©finie lors des appels prÃ©cÃ©dents aux mÃ©thodes
+     * {@code setXXX(...)}. Les valeurs retournÃ©es par les mÃ©thodes {@code getXXX(...)} seront
+     * modifiÃ©es de faÃ§on Ã  dÃ©finir la plus petite enveloppe contenant les mÃªmes enregistrements.
      * <p>
-     * L'implémentation par défaut utilise la requête retournée par
+     * L'implÃ©mentation par dÃ©faut utilise la requÃªte retournÃ©e par
      * <code>getQuery({@linkplain QueryType#BOUNDING_BOX BOUNDING_BOX})</code>
      */
     public synchronized void trimEnvelope() {
@@ -388,12 +388,12 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Procède à la réduction de l'enveloppe, si elle a été demandée par l'utilisateur
-     * (par un appel à {@link #trimEnvelope}) et que cette réduction n'a pas encore été
-     * effectuée. Cette méthode est appelée automatiquement par {@link #getGeographicBoundingBox}
+     * ProcÃ¨de Ã  la rÃ©duction de l'enveloppe, si elle a Ã©tÃ© demandÃ©e par l'utilisateur
+     * (par un appel Ã  {@link #trimEnvelope}) et que cette rÃ©duction n'a pas encore Ã©tÃ©
+     * effectuÃ©e. Cette mÃ©thode est appelÃ©e automatiquement par {@link #getGeographicBoundingBox}
      * et {@link #getTimeRange}.
      *
-     * @throws SQLException si l'accès à la base de données a échoué.
+     * @throws SQLException si l'accÃ¨s Ã  la base de donnÃ©es a Ã©chouÃ©.
      */
     private void ensureTrimmed() throws SQLException {
         assert Thread.holdsLock(this);
@@ -426,9 +426,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Configure la requête SQL spécifiée en fonction des limites spatio-temporelles définies
-     * dans cette table. Cette méthode est appelée automatiquement lorsque cette table a
-     * {@linkplain #fireStateChanged changé d'état}.
+     * Configure la requÃªte SQL spÃ©cifiÃ©e en fonction des limites spatio-temporelles dÃ©finies
+     * dans cette table. Cette mÃ©thode est appelÃ©e automatiquement lorsque cette table a
+     * {@linkplain #fireStateChanged changÃ© d'Ã©tat}.
      */
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
@@ -436,8 +436,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         switch (type) {
             case LIST: {
                 if (false) {
-                    // Activer cette ligne si on soupçonne que ça change les résultats.
-                    // En théorie, ça ne devrait rien changer.
+                    // Activer cette ligne si on soupÃ§onne que Ã§a change les rÃ©sultats.
+                    // En thÃ©orie, Ã§a ne devrait rien changer.
                     ensureTrimmed();
                 }
                 // Fall through
@@ -456,15 +456,15 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les données. Les requêtes retournées par
-     * cette méthode doivent répondre aux mêmes conditions que celles qui sont stipulées dans la
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les donnÃ©es. Les requÃªtes retournÃ©es par
+     * cette mÃ©thode doivent rÃ©pondre aux mÃªmes conditions que celles qui sont stipulÃ©es dans la
      * {@linkplain SingletonTable#getQuery classe parente}, avec l'extension suivante:
      * <p>
      * <ul>
-     *   <li><p>Dans le cas particulier ou {@code type} est {@link QueryType#LIST LIST}, la requête
+     *   <li><p>Dans le cas particulier ou {@code type} est {@link QueryType#LIST LIST}, la requÃªte
      *       doit attendre les arguments suivants:</p>
      *       <ul>
-     *         <li>La date de départ</li>
+     *         <li>La date de dÃ©part</li>
      *         <li>La date de fin</li>
      *         <li>La longitude minimale (ouest)</li>
      *         <li>La longitude maximale (est)</li>
@@ -473,9 +473,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      *       </ul>
      *   </li>
      *   <li><p>Dans le cas particulier ou {@code type} est {@link QueryType#BOUNDING_BOX BOUNDING_BOX},
-     *       les mêmes arguments que la requête {@link QueryType#LIST LIST} sont attendues. Les valeurs
-     *       retournées doivent être l'envelope spatio-temporelle d'une région toujours dans le même
-     *       ordre que précédemment.</p></li>
+     *       les mÃªmes arguments que la requÃªte {@link QueryType#LIST LIST} sont attendues. Les valeurs
+     *       retournÃ©es doivent Ãªtre l'envelope spatio-temporelle d'une rÃ©gion toujours dans le mÃªme
+     *       ordre que prÃ©cÃ©demment.</p></li>
      * </ul>
      */
     @Override

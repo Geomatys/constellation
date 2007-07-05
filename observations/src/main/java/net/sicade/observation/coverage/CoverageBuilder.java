@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -92,83 +92,83 @@ import net.sicade.observation.coverage.sql.WritableGridCoverageTable;
 
 
 /**
- * Une nouvelle image en cours de création. Cette image doit correspondre à une entrée de la base
- * de données, mais pour laquelle l'image n'existait pas encore ou sera à remplacer.
+ * Une nouvelle image en cours de crÃ©ation. Cette image doit correspondre Ã  une entrÃ©e de la base
+ * de donnÃ©es, mais pour laquelle l'image n'existait pas encore ou sera Ã  remplacer.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class CoverageBuilder {
     /**
-     * Fabrique à utiliser pour la création des objets {@link GridCoverage2D}.
+     * Fabrique Ã  utiliser pour la crÃ©ation des objets {@link GridCoverage2D}.
      */
     public static GridCoverageFactory FACTORY = FactoryFinder.getGridCoverageFactory(null);
 
     /**
-     * Extension (et format) à donner par défaut aux fichiers lorsqu'aucune extension
+     * Extension (et format) Ã  donner par dÃ©faut aux fichiers lorsqu'aucune extension
      * n'apparait dans le nom.
      */
     private static final String DEFAULT_SUFFIX = "png";
 
     /**
-     * Répertoire dans lequel écrire les images contrastées, si demandées.
+     * RÃ©pertoire dans lequel Ã©crire les images contrastÃ©es, si demandÃ©es.
      */
-    private static final String CONTRASTED_DIRECTORY = "Contrastées";
+    private static final String CONTRASTED_DIRECTORY = "ContrastÃ©es";
 
     /**
-     * Répertoire dans lequel écrire les descripteurs entrant dans la composition d'une image.
+     * RÃ©pertoire dans lequel Ã©crire les descripteurs entrant dans la composition d'une image.
      */
     private static final String DESCRIPTORS_DIRECTORY = "Descripteurs";
 
     /**
-     * Référence vers l'entrée de la base de données qui correspond à l'image à construire.
+     * RÃ©fÃ©rence vers l'entrÃ©e de la base de donnÃ©es qui correspond Ã  l'image Ã  construire.
      */
     private final CoverageReference entry;
 
     /**
-     * L'image en cours de création. Cette image utilise un {@link BufferedImage} recevant
-     * des données de type {@link DataBuffer#TYPE_FLOAT}.
+     * L'image en cours de crÃ©ation. Cette image utilise un {@link BufferedImage} recevant
+     * des donnÃ©es de type {@link DataBuffer#TYPE_FLOAT}.
      */
     private final GridCoverage2D coverage;
 
     /**
-     * Les données de {@link #coverage}.
+     * Les donnÃ©es de {@link #coverage}.
      */
     private final WritableRaster raster;
 
     /**
-     * Transformation des coordonnées de {@link #raster} vers les coordonnées de {@link #coverage}.
+     * Transformation des coordonnÃ©es de {@link #raster} vers les coordonnÃ©es de {@link #coverage}.
      */
     private final MathTransform gridToCRS;
 
     /**
      * Les dimensions <var>x</var> et <var>y</var> de la grille. Habituellement 0 et 1 respectivement,
-     * mais peuvent parfois être différents avec certains systèmes de coordonnées à plus de 2 dimensions.
+     * mais peuvent parfois Ãªtre diffÃ©rents avec certains systÃ¨mes de coordonnÃ©es Ã  plus de 2 dimensions.
      */
     private final int gridDimensionX, gridDimensionY;
 
     /**
-     * Un objet optionel à informer des progrès, ou {@code null} si aucun.
+     * Un objet optionel Ã  informer des progrÃ¨s, ou {@code null} si aucun.
      */
     private ProgressListener listener;
 
     /**
-     * Fichier dans lequel enregistrer l'image, ou {@code null} s'il n'a pas encore été déterminé.
+     * Fichier dans lequel enregistrer l'image, ou {@code null} s'il n'a pas encore Ã©tÃ© dÃ©terminÃ©.
      */
     private File file;
 
     /**
-     * {@code true} pour enregistrer une image représentant les descripteurs utilisés.
+     * {@code true} pour enregistrer une image reprÃ©sentant les descripteurs utilisÃ©s.
      */
     private boolean saveDescriptorImages;
 
     /**
-     * {@code true} pour enregistrer une version contrastée de l'image en plus de la version habituelle.
+     * {@code true} pour enregistrer une version contrastÃ©e de l'image en plus de la version habituelle.
      */
     private boolean saveContrasted;
 
     /**
-     * Construit une nouvelle image pour la référence spécifiée. La nouvelle image
+     * Construit une nouvelle image pour la rÃ©fÃ©rence spÃ©cifiÃ©e. La nouvelle image
      * aura une seule bande, et tous les pixels auront la valeur initiale 0.
      */
     public CoverageBuilder(final CoverageReference entry) {
@@ -192,22 +192,22 @@ public class CoverageBuilder {
     }
 
     /**
-     * Spécifie un objet à informer des progrès. La valeur {@code null} retire tous objets
-     * qui aurait été déclaré lors d'un appel précédent. 
+     * SpÃ©cifie un objet Ã  informer des progrÃ¨s. La valeur {@code null} retire tous objets
+     * qui aurait Ã©tÃ© dÃ©clarÃ© lors d'un appel prÃ©cÃ©dent. 
      */
     public void setProgressListener(final ProgressListener listener) {
         this.listener = listener;
     }
 
     /**
-     * Affecte à tous les pixels de cette image le résultat du modèle spécifié.
+     * Affecte Ã  tous les pixels de cette image le rÃ©sultat du modÃ¨le spÃ©cifiÃ©.
      *
-     * @param  model Le modèle à appliquer.
-     * @return Des statistiques sur les valeurs calculées.
-     * @throws CatalogException si une image ne peut pas être construite à partir du modèle.
+     * @param  model Le modÃ¨le Ã  appliquer.
+     * @return Des statistiques sur les valeurs calculÃ©es.
+     * @throws CatalogException si une image ne peut pas Ãªtre construite Ã  partir du modÃ¨le.
      * @throws CannotEvaluateException si une erreur est survenue lors d'un calcul d'un des points
      *         de l'image. La cause la plus courante est une date en dehors de la plage de temps
-     *         des données disponibles.
+     *         des donnÃ©es disponibles.
      */
     public Statistics compute(final Model model) throws CatalogException, CannotEvaluateException {
         if (listener != null) {
@@ -239,7 +239,7 @@ public class CoverageBuilder {
                 try {
                     position = gridToCRS.transform(source, target);
                 } catch (TransformException e) {
-                    // Laisse le pixel à 0 (habituellement NaN).
+                    // Laisse le pixel Ã  0 (habituellement NaN).
                     unexpectedException("compute", e);
                     continue;
                 }
@@ -286,18 +286,18 @@ public class CoverageBuilder {
     }
 
     /**
-     * Enregistre une image représentant un des termes entrant dans la composition d'un modèle
-     * linéaire. Cette méthode est utilisée essentiellement à des fins de vérifications. Pour
-     * cette raison, les éventuelles erreurs sont attrapées et écrite dans le fichier de destination
-     * plutôt que propagées.
+     * Enregistre une image reprÃ©sentant un des termes entrant dans la composition d'un modÃ¨le
+     * linÃ©aire. Cette mÃ©thode est utilisÃ©e essentiellement Ã  des fins de vÃ©rifications. Pour
+     * cette raison, les Ã©ventuelles erreurs sont attrapÃ©es et Ã©crite dans le fichier de destination
+     * plutÃ´t que propagÃ©es.
      */
     private void saveDescriptorImage(final DynamicCoverage coverage) throws CatalogException {
         if (coverage == null) {
             return;
         }
         /*
-         * Obtention du répertoire dans lequel écrire les images des descripteurs.
-         * Ce répertoire sera créé si nécessaire.
+         * Obtention du rÃ©pertoire dans lequel Ã©crire les images des descripteurs.
+         * Ce rÃ©pertoire sera crÃ©Ã© si nÃ©cessaire.
          */
         File directory;
         if (true) {
@@ -332,7 +332,7 @@ public class CoverageBuilder {
             }
         }
         /*
-         * En cas d'erreur ou d'avertissement, écriture d'un fichier de commentaires.
+         * En cas d'erreur ou d'avertissement, Ã©criture d'un fichier de commentaires.
          */
         if (message!=null || exception!=null) {
             final File file = new File(directory, name + ".txt");
@@ -354,13 +354,13 @@ public class CoverageBuilder {
     }
 
     /**
-     * Retourne le nom de fichier dans lequel sera {@linkplain #save enregistrée} l'image, ainsi que
-     * son répertoire de destination. Si un fichier a été spécifié explicitement par un appel à la
-     * méthode {@link #setFile setFile}, alors ce fichier est retourné. Sinon, le fichier est déterminé
-     * à partir de l'entrée spécifiée au {@linkplain #CoverageBuilder(CoverageReference) constructeur}
-     * en testant d'abord la valeur retournée par {@link CoverageReference#getFile()}. Si cette dernière
-     * est nulle, alors le nom de fichier sera déterminé à partir de {@link CoverageReference#getURL()}
-     * et le répertoire de destination sera le répertoire courant.
+     * Retourne le nom de fichier dans lequel sera {@linkplain #save enregistrÃ©e} l'image, ainsi que
+     * son rÃ©pertoire de destination. Si un fichier a Ã©tÃ© spÃ©cifiÃ© explicitement par un appel Ã  la
+     * mÃ©thode {@link #setFile setFile}, alors ce fichier est retournÃ©. Sinon, le fichier est dÃ©terminÃ©
+     * Ã  partir de l'entrÃ©e spÃ©cifiÃ©e au {@linkplain #CoverageBuilder(CoverageReference) constructeur}
+     * en testant d'abord la valeur retournÃ©e par {@link CoverageReference#getFile()}. Si cette derniÃ¨re
+     * est nulle, alors le nom de fichier sera dÃ©terminÃ© Ã  partir de {@link CoverageReference#getURL()}
+     * et le rÃ©pertoire de destination sera le rÃ©pertoire courant.
      */
     public File getFile() {
         if (file == null) {
@@ -384,20 +384,20 @@ public class CoverageBuilder {
     }
 
     /**
-     * Définit le nom de fichier dans lequel sera {@linkplain #save enregistrée} l'image, ainsi que
-     * son répertoire de destination. L'appel de cette méthode remplace toute valeur précédemment
-     * calculée par {@link #getFile}. Un argument {@code null} rétablit la valeur par défaut.
+     * DÃ©finit le nom de fichier dans lequel sera {@linkplain #save enregistrÃ©e} l'image, ainsi que
+     * son rÃ©pertoire de destination. L'appel de cette mÃ©thode remplace toute valeur prÃ©cÃ©demment
+     * calculÃ©e par {@link #getFile}. Un argument {@code null} rÃ©tablit la valeur par dÃ©faut.
      */
     public void setFile(final File file) {
         this.file = file;
     }
 
     /**
-     * Enregistre l'image. Le nom de fichier ainsi que le répertoire de destination seront obtenus
-     * par {@link #getFile}. Le format de l'image sera déterminé à partir de l'extension du nom de
+     * Enregistre l'image. Le nom de fichier ainsi que le rÃ©pertoire de destination seront obtenus
+     * par {@link #getFile}. Le format de l'image sera dÃ©terminÃ© Ã  partir de l'extension du nom de
      * fichier.
      *
-     * @throws IOException si l'enregistrement de l'image a échouée.
+     * @throws IOException si l'enregistrement de l'image a Ã©chouÃ©e.
      */
     public void save() throws IOException {
         final File   file     = getFile();
@@ -407,7 +407,7 @@ public class CoverageBuilder {
             listener.started();
         }
         /*
-         * Obtient un encodeur pour l'image. L'encodeur est déduit à partir
+         * Obtient un encodeur pour l'image. L'encodeur est dÃ©duit Ã  partir
          * de l'extension du fichier de destination.
          */
         final int       ext = filename.lastIndexOf('.');
@@ -418,8 +418,8 @@ public class CoverageBuilder {
         }
         final ImageWriter writer = (ImageWriter) it.next();
         /*
-         * Spécifie la sortie, en donnant directement l'objet File à l'encodeur s'il l'accepte.
-         * Sinon, on créera le flot de sortie nous-même, sans oublier de le fermer à la fin.
+         * SpÃ©cifie la sortie, en donnant directement l'objet File Ã  l'encodeur s'il l'accepte.
+         * Sinon, on crÃ©era le flot de sortie nous-mÃªme, sans oublier de le fermer Ã  la fin.
          */
         final ImageOutputStream out;
         if (contains(writer.getOriginatingProvider().getOutputTypes(), File.class)) {
@@ -429,7 +429,7 @@ public class CoverageBuilder {
             out = ImageIO.createImageOutputStream(file);
         }
         /*
-         * Procède à l'enregistrement de l'image, puis libère les ressources.
+         * ProcÃ¨de Ã  l'enregistrement de l'image, puis libÃ¨re les ressources.
          */
         final RenderedImage image = coverage.geophysics(false).getRenderedImage();
         writer.setOutput(out);
@@ -442,7 +442,7 @@ public class CoverageBuilder {
             listener.complete();
         }
         /*
-         * Enregistre une version constrastée de l'image.
+         * Enregistre une version constrastÃ©e de l'image.
          */
         if (saveContrasted) {
             final ColorModel cm = image.getColorModel();
@@ -457,13 +457,13 @@ public class CoverageBuilder {
                     // ATTENTION: On suppose ici que DEFAULT_SUFFIX correspond aussi au nom du format.
                 }
             } else {
-                Logger.getLogger("net.sicade.observation.coverage").warning("Modèle de couleurs incompatible.");
+                Logger.getLogger("net.sicade.observation.coverage").warning("ModÃ¨le de couleurs incompatible.");
             }
         }
     }
 
     /**
-     * Indique si la liste de types spécifiée contient le candidat spécifié.
+     * Indique si la liste de types spÃ©cifiÃ©e contient le candidat spÃ©cifiÃ©.
      */
     private static final boolean contains(final Class[] types, final Class candidate) {
         for (int i=0; i<types.length; i++) {
@@ -475,15 +475,15 @@ public class CoverageBuilder {
     }
 
     /**
-     * Ajoute une nouvelle entrée dans la base de données, qui correspondra à l'image juste
-     * après {@code lastSuccessful}.
+     * Ajoute une nouvelle entrÃ©e dans la base de donnÃ©es, qui correspondra Ã  l'image juste
+     * aprÃ¨s {@code lastSuccessful}.
      *
-     * @param  lastSuccessful Dernière image déclarée dans la base de données.
+     * @param  lastSuccessful DerniÃ¨re image dÃ©clarÃ©e dans la base de donnÃ©es.
      * @param  datePattern    Nomenclature du nom de fichier, avec la date en heure locale.
-     *                        Notez que l'heure "locale" peut avoir été définie comme étant
+     *                        Notez que l'heure "locale" peut avoir Ã©tÃ© dÃ©finie comme Ã©tant
      *                        l'heure "UTC" par la methode {@link #main}.
-     * @return Un singleton contenant l'image ajoutée, ou {@code null}.
-     * @throws CatalogException si une erreur est survenue lors de l'accès à la base de données.
+     * @return Un singleton contenant l'image ajoutÃ©e, ou {@code null}.
+     * @throws CatalogException si une erreur est survenue lors de l'accÃ¨s Ã  la base de donnÃ©es.
      */
     private static Set<CoverageReference> addNextEntry(final CoverageReference lastSuccessful,
                                                        final String            datePattern)
@@ -501,11 +501,11 @@ public class CoverageBuilder {
         final DateFormat   format = new SimpleDateFormat(datePattern, Locale.FRANCE);
         final String     filename = format.format(endTime);
 
-        // Etendue géographique et taille de l'image
+        // Etendue gÃ©ographique et taille de l'image
         final GeographicBoundingBox bbox = lastSuccessful.getGeographicBoundingBox();
         final Dimension size = lastSuccessful.getGridGeometry().getGridRange2D().getSize();
 
-        // Ajout de l'entrée
+        // Ajout de l'entrÃ©e
         final Observations     observations = Observations.getDefault();
         final WritableGridCoverageTable wgt = observations.getDatabase().getTable(
                                                 WritableGridCoverageTable.class);
@@ -521,78 +521,78 @@ public class CoverageBuilder {
     }
 
     /**
-     * Appelée lorsqu'une exception non-fatale est survenue.
+     * AppelÃ©e lorsqu'une exception non-fatale est survenue.
      */
     private static void unexpectedException(final String method, final Exception exception) {
         Utilities.unexpectedException("net.sicade.observation.coverage", "CoverageBuilder", method, exception);
     }
 
     /**
-     * Procède à la création de toutes les nouvelles images des séries spécifiées. Les images qui
-     * existent déjà seront sautées. Les progrès sont affichés sur le périphérique de sortie standard.
-     * Cette méthode peut être appelée à partir de la ligne de commande. Les arguments acceptées sont
-     * énumérés ci-dessous. Tous ces arguments sont optionels. Les arguments {@code -xmin}, {@code -xmax},
-     * {@code -ymin} et {@code -ymax} servent à limiter la consommation de mémoire en évitant de charger
-     * la totalité des images lorsque seule une sous-région nous intéresse. Si un de ces paramètres est
-     * spécifié, alors ils doivent l'être tous. L'argument {@code -limit} sert essentiellement à tester
-     * un modèle linéaire sur quelques images seulement.
+     * ProcÃ¨de Ã  la crÃ©ation de toutes les nouvelles images des sÃ©ries spÃ©cifiÃ©es. Les images qui
+     * existent dÃ©jÃ  seront sautÃ©es. Les progrÃ¨s sont affichÃ©s sur le pÃ©riphÃ©rique de sortie standard.
+     * Cette mÃ©thode peut Ãªtre appelÃ©e Ã  partir de la ligne de commande. Les arguments acceptÃ©es sont
+     * Ã©numÃ©rÃ©s ci-dessous. Tous ces arguments sont optionels. Les arguments {@code -xmin}, {@code -xmax},
+     * {@code -ymin} et {@code -ymax} servent Ã  limiter la consommation de mÃ©moire en Ã©vitant de charger
+     * la totalitÃ© des images lorsque seule une sous-rÃ©gion nous intÃ©resse. Si un de ces paramÃ¨tres est
+     * spÃ©cifiÃ©, alors ils doivent l'Ãªtre tous. L'argument {@code -limit} sert essentiellement Ã  tester
+     * un modÃ¨le linÃ©aire sur quelques images seulement.
      * <p>
      * <table>
      *   <tr>
      *     <td nowrap>{@code -xmin} <var>x</var></td>
-     *     <td>Limite ouest (en degrés de longitude) des données à charger en mémoire.</td>
+     *     <td>Limite ouest (en degrÃ©s de longitude) des donnÃ©es Ã  charger en mÃ©moire.</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -xmax} <var>x</var></td>
-     *     <td>Limite est (en degrés de longitude) des données à charger en mémoire.</td>
+     *     <td>Limite est (en degrÃ©s de longitude) des donnÃ©es Ã  charger en mÃ©moire.</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -ymin} <var>y</var></td>
-     *     <td>Limite sud (en degrés de latitude) des données à charger en mémoire.</td>
+     *     <td>Limite sud (en degrÃ©s de latitude) des donnÃ©es Ã  charger en mÃ©moire.</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -ymax} <var>y</var></td>
-     *     <td>Limite nord (en degrés de latitude) des données à charger en mémoire.</td>
+     *     <td>Limite nord (en degrÃ©s de latitude) des donnÃ©es Ã  charger en mÃ©moire.</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -limit} <var>n</var></td>
-     *     <td>Nombre maximal d'images à générer.</td>
+     *     <td>Nombre maximal d'images Ã  gÃ©nÃ©rer.</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -overwrite-last} <var>n</var></td>
-     *     <td>Si des images existent déjà, nombre d'images à écraser parmis les plus récentes.
-     *         Par exemple la valeur 5 recalculera inconditionnellement les 5 dernières images
-     *         même si elles existent déjà.</td>
+     *     <td>Si des images existent dÃ©jÃ , nombre d'images Ã  Ã©craser parmis les plus rÃ©centes.
+     *         Par exemple la valeur 5 recalculera inconditionnellement les 5 derniÃ¨res images
+     *         mÃªme si elles existent dÃ©jÃ .</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -cache} <var>n</var></td>
-     *     <td>Taille (en mega octets) à alouer à la cache des tuiles de JAI.</td>
+     *     <td>Taille (en mega octets) Ã  alouer Ã  la cache des tuiles de JAI.</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -save-descriptors}</td>
-     *     <td>Enregistre une image des descripteurs servant au calcul du modèle.</td>
+     *     <td>Enregistre une image des descripteurs servant au calcul du modÃ¨le.</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -save-contrasted}</td>
-     *     <td>Enregistre une version contrastée de l'image en plus de la version habituelle.</td>
+     *     <td>Enregistre une version contrastÃ©e de l'image en plus de la version habituelle.</td>
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -date-pattern}</td>
      *     <td>Nomenclature du nom de l'image (date incluse, en heure UTC). Si l'utilisateur ne fournit pas de 
-     *      {@code -date-pattern}, alors on ne rajoute pas d'entrée dans la table "{@code GridCoverages}".</td>
+     *      {@code -date-pattern}, alors on ne rajoute pas d'entrÃ©e dans la table "{@code GridCoverages}".</td>
      *   </tr>
      * </table>
      *
-     * @param  args Noms des séries pour lesquelles on veut créer des images. Exemple:
-     *              {@code "Potentiel de pêche ALB-optimal (Calédonie)"}.
-     * @throws CatalogException si une exception est survenue lors de l'interrogation de la base de données.
-     * @throws IOException si une exception est survenue lors de l'écriture de l'image.
+     * @param  args Noms des sÃ©ries pour lesquelles on veut crÃ©er des images. Exemple:
+     *              {@code "Potentiel de pÃªche ALB-optimal (CalÃ©donie)"}.
+     * @throws CatalogException si une exception est survenue lors de l'interrogation de la base de donnÃ©es.
+     * @throws IOException si une exception est survenue lors de l'Ã©criture de l'image.
      */
     public static void main(String[] args) throws CatalogException, IOException {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         /*
-         * Extraction des arguments et configuration globale (par exemple quantité
-         * de mémoire allouée à la cache des tuiles) en fonction de ces arguments.
+         * Extraction des arguments et configuration globale (par exemple quantitÃ©
+         * de mÃ©moire allouÃ©e Ã  la cache des tuiles) en fonction de ces arguments.
          */
         final Arguments arguments = new Arguments(args);
         final Double        xmin  = arguments.getOptionalDouble ("-xmin" );
@@ -625,12 +625,12 @@ public class CoverageBuilder {
         final char[]          separator = new char[72];
         Arrays.fill(separator, '_');
         /*
-         * Calcul des modèles linéaires pour chacune des séries déclarées sur la ligne de commande.
-         * Les séries non-trouvées où les modèles linéaires non-définis provoqueront l'arrêt du
-         * programme après affichage d'un message d'erreur à peu-près propre.
+         * Calcul des modÃ¨les linÃ©aires pour chacune des sÃ©ries dÃ©clarÃ©es sur la ligne de commande.
+         * Les sÃ©ries non-trouvÃ©es oÃ¹ les modÃ¨les linÃ©aires non-dÃ©finis provoqueront l'arrÃªt du
+         * programme aprÃ¨s affichage d'un message d'erreur Ã  peu-prÃ¨s propre.
          */
         nextSeries: for (int i=0; i<args.length; i++) {
-            out.print("Traitement de la série \"");
+            out.print("Traitement de la sÃ©rie \"");
             out.print(args[i]);
             out.println('"');
             final Series series;
@@ -644,17 +644,17 @@ public class CoverageBuilder {
             }
             final Model model = series.getModel();
             if (model == null) {
-                out.println("Aucun modèle numérique n'est défini pour cette série.");
+                out.println("Aucun modÃ¨le numÃ©rique n'est dÃ©fini pour cette sÃ©rie.");
                 return;
             }
             int remaining = (limit!=null) ? limit : Integer.MAX_VALUE;
-            CoverageReference lastSuccessful = null; // La dernière référence traitée avec succès.
+            CoverageReference lastSuccessful = null; // La derniÃ¨re rÃ©fÃ©rence traitÃ©e avec succÃ¨s.
             Set<CoverageReference> references = series.getCoverageReferences();
             int skipIfExist = (overwrite != null) ? references.size() - overwrite : Integer.MAX_VALUE;
             /*
-             * Pour chaque reférences déclarées dans la base de données pour la série courante,
-             * vérifie si le fichier correspondant à l'image existe. Les images déjà existantes
-             * seront ignorées silencieusement.
+             * Pour chaque refÃ©rences dÃ©clarÃ©es dans la base de donnÃ©es pour la sÃ©rie courante,
+             * vÃ©rifie si le fichier correspondant Ã  l'image existe. Les images dÃ©jÃ  existantes
+             * seront ignorÃ©es silencieusement.
              */
             do for (final CoverageReference reference : references) {
                 final CoverageBuilder builder = new CoverageBuilder(reference);
@@ -670,26 +670,26 @@ public class CoverageBuilder {
                     stats = builder.compute(model);
                 } catch (CatalogException exception) {
                     /*
-                     * Erreur d'accès au catalogue. C'est peut-être sérieux, alors on laisse l'exception
-                     * se propager après avoir sauté la ligne sur laquelle on écrivait les progrès (afin
-                     * que le nom de fichier ne soit pas écrasé).
+                     * Erreur d'accÃ¨s au catalogue. C'est peut-Ãªtre sÃ©rieux, alors on laisse l'exception
+                     * se propager aprÃ¨s avoir sautÃ© la ligne sur laquelle on Ã©crivait les progrÃ¨s (afin
+                     * que le nom de fichier ne soit pas Ã©crasÃ©).
                      */
                     out.println();
                     throw exception;
                 } catch (CannotEvaluateException exception) {
                     /*
-                     * Donnée manquante. C'est une erreur très courante, alors on écrit un message
+                     * DonnÃ©e manquante. C'est une erreur trÃ¨s courante, alors on Ã©crit un message
                      * pour l'utilisateur sans le "stack trace qui fait peur", et on passe gentiment
-                     * à la série suivante (on n'arrête pas complètement le programme parce qu'il peut
-                     * être normal que l'image la plus récente n'aie pas encore toutes les données, et
-                     * on ne pas que cette "erreur" empêche le traitement des séries suivantes).
+                     * Ã  la sÃ©rie suivante (on n'arrÃªte pas complÃ¨tement le programme parce qu'il peut
+                     * Ãªtre normal que l'image la plus rÃ©cente n'aie pas encore toutes les donnÃ©es, et
+                     * on ne pas que cette "erreur" empÃªche le traitement des sÃ©ries suivantes).
                      */
                     out.println();
                     out.println(exception.getLocalizedMessage());
                     if (exception instanceof OrdinateOutsideCoverageException) {
                         final Envelope envelope = ((OrdinateOutsideCoverageException) exception).getCoverageEnvelope();
                         if (envelope != null) {
-                            out.print("L'enveloppe des données source est ");
+                            out.print("L'enveloppe des donnÃ©es source est ");
                             out.println(envelope);
                         }
                     }
@@ -697,22 +697,22 @@ public class CoverageBuilder {
                     out.println(builder.coverage.getEnvelope());
                     continue nextSeries;
                 } catch (RuntimeException exception) {
-                    // Tout autre type d'erreur. Même traitement que CatalogException.
+                    // Tout autre type d'erreur. MÃªme traitement que CatalogException.
                     out.println();
                     throw exception;
                 }
                 /*
-                 * Affiche des statistiques sur l'image, ainsi que sur les ressources utilisées.
-                 * Ces dernières informations servent notamment à ajuster la valeur du paramètre
-                 * -Xmx spécifié au démarrage du Java. Puis procède à l'enregistrement de l'image.
+                 * Affiche des statistiques sur l'image, ainsi que sur les ressources utilisÃ©es.
+                 * Ces derniÃ¨res informations servent notamment Ã  ajuster la valeur du paramÃ¨tre
+                 * -Xmx spÃ©cifiÃ© au dÃ©marrage du Java. Puis procÃ¨de Ã  l'enregistrement de l'image.
                  */
                 final MemoryUsage mem = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
                 out.println(stats);
-                out.print("Mémoire utilisée: ");
+                out.print("MÃ©moire utilisÃ©e: ");
                 out.print(mem.getUsed() / (1024*1024));
                 out.print(" sur ");
                 out.print(mem.getCommitted() / (1024*1024));
-                out.println(" Mb réservé.");
+                out.println(" Mb rÃ©servÃ©.");
                 out.println(separator);
                 out.println();
                 builder.save();
@@ -721,10 +721,10 @@ public class CoverageBuilder {
                 }
             } while ((references = addNextEntry(lastSuccessful, datePattern)) != null);
             /*
-             * La ligne précédente ajoute dans la base de données une entrée pour la prochaine image.
-             * Cet ajout ne sera effectué que si une image existe ou a été créée pour toutes les entrées
+             * La ligne prÃ©cÃ©dente ajoute dans la base de donnÃ©es une entrÃ©e pour la prochaine image.
+             * Cet ajout ne sera effectuÃ© que si une image existe ou a Ã©tÃ© crÃ©Ã©e pour toutes les entrÃ©es
              * existantes, de sorte que si on n'ajoutait pas d'images, il n'y aurait plus de prochaine
-             * exécution du calcul du modèle linéaire.
+             * exÃ©cution du calcul du modÃ¨le linÃ©aire.
              */
         }
     }

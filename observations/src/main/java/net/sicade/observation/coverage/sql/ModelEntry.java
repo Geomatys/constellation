@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,39 +39,39 @@ import net.sicade.resources.XArray;
 
 
 /**
- * Classe de base d'une entrée représentant une {@linkplain Model modèle}, pas obligatoirement
- * linéaire. Il peut s'agir par exemple d'un réseau de neurones artificiels.
+ * Classe de base d'une entrÃ©e reprÃ©sentant une {@linkplain Model modÃ¨le}, pas obligatoirement
+ * linÃ©aire. Il peut s'agir par exemple d'un rÃ©seau de neurones artificiels.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class ModelEntry extends Entry implements Model {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 5614887885038525651L;
 
     /**
-     * La série dans laquelle seront stockées les valeurs de la variable dépendante <var>y</var>.
+     * La sÃ©rie dans laquelle seront stockÃ©es les valeurs de la variable dÃ©pendante <var>y</var>.
      */
     private final Series target;
 
     /**
-     * Les distributions de chaque descripteurs. Ne sera construite que la première
-     * fois où elle sera nécessaire.
+     * Les distributions de chaque descripteurs. Ne sera construite que la premiÃ¨re
+     * fois oÃ¹ elle sera nÃ©cessaire.
      */
     private transient Distribution[] distributions;
 
     /**
-     * Index des valeurs pour lesquelles une normalisation autre que la transformation identitée
-     * est nécessaire.
+     * Index des valeurs pour lesquelles une normalisation autre que la transformation identitÃ©e
+     * est nÃ©cessaire.
      */
     private transient int[] index;
 
     /**
-     * Construit un modèle.
+     * Construit un modÃ¨le.
      *
-     * @param target La série dans laquelle seront stockées les valeurs de la variable dépendante.
+     * @param target La sÃ©rie dans laquelle seront stockÃ©es les valeurs de la variable dÃ©pendante.
      */
     public ModelEntry(final Series target) {
         super(target.getName());
@@ -121,7 +121,7 @@ public abstract class ModelEntry extends Entry implements Model {
     }
 
     /**
-     * Vérifie si cet objet est égal à l'objet spécifié.
+     * VÃ©rifie si cet objet est Ã©gal Ã  l'objet spÃ©cifiÃ©.
      */
     @Override
     public boolean equals(final Object object) {

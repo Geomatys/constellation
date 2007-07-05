@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,20 +28,20 @@ import java.util.Arrays;
 
 
 /**
- * Construit une image indexé dont chaque valeurs (entre 0 et 255) apparait à la même fréquence.
+ * Construit une image indexÃ© dont chaque valeurs (entre 0 et 255) apparait Ã  la mÃªme frÃ©quence.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class Equalizer {
     /**
-     * Interdit la création d'instance de cette classe.
+     * Interdit la crÃ©ation d'instance de cette classe.
      */
     private Equalizer() {
     }
 
     /**
-     * Retourne un nouveau raster qui contient les valeurs distribuées à fréquence égales.
+     * Retourne un nouveau raster qui contient les valeurs distribuÃ©es Ã  frÃ©quence Ã©gales.
      */
     public static WritableRaster equalize(final RenderedImage source) {
         final int bands, width, height, txMin, tyMin, txMax, tyMax;

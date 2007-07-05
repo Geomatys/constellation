@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -51,15 +51,15 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Serveur RMI. La méthode {@link #main main} de cette classe est à lancer sur le serveur qui
- * exécutera les opérations sur les images et n'enverra que les résultats aux clients. Les
- * arguments acceptés sont:
+ * Serveur RMI. La mÃ©thode {@link #main main} de cette classe est Ã  lancer sur le serveur qui
+ * exÃ©cutera les opÃ©rations sur les images et n'enverra que les rÃ©sultats aux clients. Les
+ * arguments acceptÃ©s sont:
  * <p>
  * <ul>
- *   <li>{@code -start} Démarre le serveur.</li>
- *   <li>{@code -stop} Arrête le serveur.</li>
- *   <li>{@code -registry} lance l'utilitaire {@code rmiregistry}, de sorte qu'il s'exécutera dans
- *       la même machine virtuelle que le reste de l'application.</li>
+ *   <li>{@code -start} DÃ©marre le serveur.</li>
+ *   <li>{@code -stop} ArrÃªte le serveur.</li>
+ *   <li>{@code -registry} lance l'utilitaire {@code rmiregistry}, de sorte qu'il s'exÃ©cutera dans
+ *       la mÃªme machine virtuelle que le reste de l'application.</li>
  * </ul>
  *
  * @version $Id$
@@ -67,26 +67,26 @@ import net.sicade.observation.CatalogException;
  */
 public class Server extends UnicastRemoteObject implements DataConnectionFactory {
     /**
-     * Capacité de la cache des tuiles.
+     * CapacitÃ© de la cache des tuiles.
      */
     private static final long TILE_CACHE_SIZE = 0x8000000L; // 128 Mo.
 
     /**
-     * Connexion vers la base de données.
+     * Connexion vers la base de donnÃ©es.
      */
     private final Database database;
 
     /**
-     * Connexion vers la table des séries.
+     * Connexion vers la table des sÃ©ries.
      */
     private final SeriesTable series;
 
     /**
-     * Construit un nouveau serveur de connections vers les données.
+     * Construit un nouveau serveur de connections vers les donnÃ©es.
      *
-     * @param  datasource La source de données.
-     * @throws SQLException si la connexion à la base de données a échoué.
-     * @throws IOException si le fichier de configuration n'a pas pu être lu.
+     * @param  datasource La source de donnÃ©es.
+     * @throws SQLException si la connexion Ã  la base de donnÃ©es a Ã©chouÃ©.
+     * @throws IOException si le fichier de configuration n'a pas pu Ãªtre lu.
      * @throws RemoteException si ce serveur n'a pas pu s'exporter.
      */
     protected Server(final DataSource datasource) throws SQLException, IOException {
@@ -95,27 +95,27 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
     }
 
     /**
-     * Une base de données qui évitera de déléguer son travail à des serveurs distants si le nom
+     * Une base de donnÃ©es qui Ã©vitera de dÃ©lÃ©guer son travail Ã  des serveurs distants si le nom
      * du serveur est celui de cette machine.
      */
     private final class Local extends Database {
         /**
          * {@code true} si {@link #REMOTE_SERVER} pointe vers une adresse locale, ou
-         * {@code null} si ça n'a pas encore été déterminé.
+         * {@code null} si Ã§a n'a pas encore Ã©tÃ© dÃ©terminÃ©.
          */
         private Boolean isLoopback;
 
         /**
-         * Construit une base de données pour la source spécifiée.
+         * Construit une base de donnÃ©es pour la source spÃ©cifiÃ©e.
          */
         public Local(final DataSource datasource) throws SQLException, IOException {
             super(datasource);
         }
 
         /**
-         * Retourne une des propriétée de la base de données. Dans le cas particulier où la
-         * propriété demandée est le nom d'un serveur distant et que l'adresse de se serveur
-         * nous ramène à la machine locale, retourne {@code null} afin d'éviter les appels
+         * Retourne une des propriÃ©tÃ©e de la base de donnÃ©es. Dans le cas particulier oÃ¹ la
+         * propriÃ©tÃ© demandÃ©e est le nom d'un serveur distant et que l'adresse de se serveur
+         * nous ramÃ¨ne Ã  la machine locale, retourne {@code null} afin d'Ã©viter les appels
          * recursifs.
          */
         @Override
@@ -138,7 +138,7 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
 
         /**
          * Toutes les demandes d'un objet {@link DataConnectionFactory} retourneront l'instance de
-         * {@link Server} active. Cette méthode a besoin d'être redéfinit pour le fonctionnement
+         * {@link Server} active. Cette mÃ©thode a besoin d'Ãªtre redÃ©finit pour le fonctionnement
          * de {@link SeriesTable#postCreateEntry}.
          */
         @Override
@@ -185,15 +185,15 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
                 cache.setMemoryCapacity(TILE_CACHE_SIZE);
             }
             Naming.bind(REGISTRY_NAME, new Server(null));
-            arguments.out.println("Serveur RMI prêt.");
+            arguments.out.println("Serveur RMI prÃªt.");
         } catch (AlreadyBoundException exception) {
-            arguments.out.println("Le serveur tourne déjà.");
+            arguments.out.println("Le serveur tourne dÃ©jÃ .");
         }
         if (stop) try {
             Naming.unbind(REGISTRY_NAME);
-            arguments.out.println("Le serveur RMI sera arrêté d'ici quelques minutes.");
+            arguments.out.println("Le serveur RMI sera arrÃªtÃ© d'ici quelques minutes.");
         } catch (NotBoundException exception) {
-            arguments.out.println("Le serveur était déjà arrêté.");
+            arguments.out.println("Le serveur Ã©tait dÃ©jÃ  arrÃªtÃ©.");
         }
     }
 }

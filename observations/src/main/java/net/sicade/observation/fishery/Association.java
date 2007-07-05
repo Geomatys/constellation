@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ import net.sicade.observation.Element;
 
 
 /**
- * Type d'association entre un bancs de poissons et d'éventuels objets flottants.
+ * Type d'association entre un bancs de poissons et d'Ã©ventuels objets flottants.
  * 
  * @version $Id$
  * @author Antoine Hnawia

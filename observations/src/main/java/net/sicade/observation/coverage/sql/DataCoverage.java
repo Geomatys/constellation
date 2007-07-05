@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -52,36 +52,36 @@ import net.sicade.observation.ServerException;
 
 
 /**
- * Expose les données d'un {@linkplain Descriptor descripteur} sous forme d'un objet
- * {@link org.opengis.coverage.Coverage}. Les données peuvent être calculées sur un
- * serveur distant via une référence vers un objet {@link DataConnection}.
+ * Expose les donnÃ©es d'un {@linkplain Descriptor descripteur} sous forme d'un objet
+ * {@link org.opengis.coverage.Coverage}. Les donnÃ©es peuvent Ãªtre calculÃ©es sur un
+ * serveur distant via une rÃ©fÃ©rence vers un objet {@link DataConnection}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @todo Les déplacements horizontaux ne sont pas encore implémentés.
- * @todo Les transformations de coordonnées ne sont prises en compte.
+ * @todo Les dÃ©placements horizontaux ne sont pas encore implÃ©mentÃ©s.
+ * @todo Les transformations de coordonnÃ©es ne sont prises en compte.
  */
 public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -7029210034299675921L;
 
     /**
-     * Connexion vers la source de données.
+     * Connexion vers la source de donnÃ©es.
      */
     protected final DataConnection data;
 
     /**
-     * Sources de données de second recours, ou un tableau de longeur 0 si aucune.
+     * Sources de donnÃ©es de second recours, ou un tableau de longeur 0 si aucune.
      */
     private final DataConnection[] fallback;
 
     /**
-     * L'unique bande de cette couverture. Cette bande est déterminée dès la construction afin
-     * d'éviter d'avoir à retenir une référence vers {@link Descriptor}, qui contient des
-     * dépendences qui peuvent être assez lourdes.
+     * L'unique bande de cette couverture. Cette bande est dÃ©terminÃ©e dÃ¨s la construction afin
+     * d'Ã©viter d'avoir Ã  retenir une rÃ©fÃ©rence vers {@link Descriptor}, qui contient des
+     * dÃ©pendences qui peuvent Ãªtre assez lourdes.
      */
     private final SampleDimension sampleDimension;
 
@@ -89,35 +89,35 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
      * La position spatio-temporelle relative.
      */
     private final double dt;
-    private static final double dx=0, dy=0; // TODO: déplacements horizontaux pas encore implémentés.
+    private static final double dx=0, dy=0; // TODO: dÃ©placements horizontaux pas encore implÃ©mentÃ©s.
 
     /**
-     * Le numéro de bande dans laquelle évaluer les valeurs de pixels des images.
+     * Le numÃ©ro de bande dans laquelle Ã©valuer les valeurs de pixels des images.
      */
     private final short band;
 
     /**
-     * L'envelope. Sera cachée après la première invocation de {@link #getEnvelope}.
+     * L'envelope. Sera cachÃ©e aprÃ¨s la premiÃ¨re invocation de {@link #getEnvelope}.
      */
     private transient Envelope envelope;
 
     /**
-     * Construit une vue vers le descripteur spécifié. La {@linkplain DataConnection connexion
-     * vers les données} sera établie automatiquement à partir du descripteur spécifié.
+     * Construit une vue vers le descripteur spÃ©cifiÃ©. La {@linkplain DataConnection connexion
+     * vers les donnÃ©es} sera Ã©tablie automatiquement Ã  partir du descripteur spÃ©cifiÃ©.
      *
-     * @param  descriptor Descripteur pour lequel on veut une vue des données.
-     * @throws RemoteException si une connexion à un serveur distant a échoué.
+     * @param  descriptor Descripteur pour lequel on veut une vue des donnÃ©es.
+     * @throws RemoteException si une connexion Ã  un serveur distant a Ã©chouÃ©.
      */
     public DataCoverage(final Descriptor descriptor) throws RemoteException {
         this(descriptor, getDataConnection(descriptor));
     }
 
     /**
-     * Construit une vue vers le descripteur spécifié en utilisant la source de données spécifiée.
+     * Construit une vue vers le descripteur spÃ©cifiÃ© en utilisant la source de donnÃ©es spÃ©cifiÃ©e.
      *
-     * @param  descriptor Descripteur pour lequel on veut une vue des données.
-     * @param  data La source de données à utiliser.
-     * @throws RemoteException si une connexion à un serveur distant a échoué.
+     * @param  descriptor Descripteur pour lequel on veut une vue des donnÃ©es.
+     * @param  data La source de donnÃ©es Ã  utiliser.
+     * @throws RemoteException si une connexion Ã  un serveur distant a Ã©chouÃ©.
      */
     private DataCoverage(final Descriptor descriptor, final DataConnection data) throws RemoteException {
         super(descriptor.getName(), data.getCoordinateReferenceSystem(), null, null);
@@ -134,13 +134,13 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
             sampleDimension = null;
         }
         if (super.getCoordinateReferenceSystem().equals(net.sicade.observation.sql.CRS.XYT)) {
-            throw new UnsupportedOperationException("Transformation de coordonnées pas encore implémentée.");
+            throw new UnsupportedOperationException("Transformation de coordonnÃ©es pas encore implÃ©mentÃ©e.");
         }
         if (offset.getEasting()!=0 || offset.getNorthing()!=0) {
-            throw new UnsupportedOperationException("Les déplacements horizontaux ne sont pas encore implémentés.");
+            throw new UnsupportedOperationException("Les dÃ©placements horizontaux ne sont pas encore implÃ©mentÃ©s.");
         }
         /*
-         * Recherche les sources de données de second recours.
+         * Recherche les sources de donnÃ©es de second recours.
          */
         final Operation operation = descriptor.getProcedure();
         final List<DataConnection> fallback = new ArrayList<DataConnection>();
@@ -153,26 +153,26 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
                     continue;
                 }
             }
-            Series.LOGGER.warning("Série de second recours ignorée: \""+series.getName() + '"');
+            Series.LOGGER.warning("SÃ©rie de second recours ignorÃ©e: \""+series.getName() + '"');
         }
         this.fallback = fallback.toArray(new DataConnection[fallback.size()]);
     }
 
     /**
-     * Retourne la connexion vers les données. Ce code devrait apparaître directement
+     * Retourne la connexion vers les donnÃ©es. Ce code devrait apparaÃ®tre directement
      * dans le premier constructeur si seulement Sun voulait bien faire le RFE #4093999
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
     private static DataConnection getDataConnection(final Descriptor descriptor) throws RemoteException {
         final Series series = descriptor.getPhenomenon();
         if (!(series instanceof SeriesEntry)) {
-            throw new UnsupportedOperationException("Implémentation non-supportée de la série.");
+            throw new UnsupportedOperationException("ImplÃ©mentation non-supportÃ©e de la sÃ©rie.");
         }
         return ((SeriesEntry) series).getDataConnection(descriptor.getProcedure());
     }
 
     /**
-     * Retourne l'enveloppe spatio-temporelle des données.
+     * Retourne l'enveloppe spatio-temporelle des donnÃ©es.
      */
     @Override
     public Envelope getEnvelope() {
@@ -196,13 +196,13 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée. Cette méthode délègue le travail à
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e. Cette mÃ©thode dÃ©lÃ¨gue le travail Ã 
      * <code>{@linkplain #data}.{@linkplain DataConnection#evaluate evaluate}(<var>x</var>,
      * <var>y</var>, <var>t</var>, <var>band</var>)</code>.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     private double evaluateSingle(final DirectPosition position) throws CannotEvaluateException {
         final double x = position.getOrdinate(0) + dx;
@@ -227,14 +227,14 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée. Cette méthode délègue le travail à
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e. Cette mÃ©thode dÃ©lÃ¨gue le travail Ã 
      * <code>{@linkplain #data}.{@linkplain DataConnection#evaluate evaluate}(<var>x</var>,
      * <var>y</var>, <var>t</var>, <var>band</var>)</code>.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @param  samples Un tableau pré-alloué ou enregistrer le résultat, ou {@code null}.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @param  samples Un tableau prÃ©-allouÃ© ou enregistrer le rÃ©sultat, ou {@code null}.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     @Override
     public byte[] evaluate(final DirectPosition position, final byte[] samples) throws CannotEvaluateException {
@@ -248,14 +248,14 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée. Cette méthode délègue le travail à
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e. Cette mÃ©thode dÃ©lÃ¨gue le travail Ã 
      * <code>{@linkplain #data}.{@linkplain DataConnection#evaluate evaluate}(<var>x</var>,
      * <var>y</var>, <var>t</var>, <var>band</var>)</code>.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @param  samples Un tableau pré-alloué ou enregistrer le résultat, ou {@code null}.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @param  samples Un tableau prÃ©-allouÃ© ou enregistrer le rÃ©sultat, ou {@code null}.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     @Override
     public int[] evaluate(final DirectPosition position, final int[] samples) throws CannotEvaluateException {
@@ -269,14 +269,14 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée. Cette méthode délègue le travail à
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e. Cette mÃ©thode dÃ©lÃ¨gue le travail Ã 
      * <code>{@linkplain #data}.{@linkplain DataConnection#evaluate evaluate}(<var>x</var>,
      * <var>y</var>, <var>t</var>, <var>band</var>)</code>.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @param  samples Un tableau pré-alloué ou enregistrer le résultat, ou {@code null}.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @param  samples Un tableau prÃ©-allouÃ© ou enregistrer le rÃ©sultat, ou {@code null}.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     @Override
     public float[] evaluate(final DirectPosition position, final float[] samples) throws CannotEvaluateException {
@@ -290,14 +290,14 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée. Cette méthode délègue le travail à
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e. Cette mÃ©thode dÃ©lÃ¨gue le travail Ã 
      * <code>{@linkplain #data}.{@linkplain DataConnection#evaluate evaluate}(<var>x</var>,
      * <var>y</var>, <var>t</var>, <var>band</var>)</code>.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @param  samples Un tableau pré-alloué ou enregistrer le résultat, ou {@code null}.
-     * @return La valeur évaluée à la position spécifiée.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @param  samples Un tableau prÃ©-allouÃ© ou enregistrer le rÃ©sultat, ou {@code null}.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     @Override
     public double[] evaluate(final DirectPosition position, final double[] samples) throws CannotEvaluateException {
@@ -311,13 +311,13 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
     }
 
     /**
-     * Retourne la valeur à la position spécifiée. Cette méthode délègue le travail à
+     * Retourne la valeur Ã  la position spÃ©cifiÃ©e. Cette mÃ©thode dÃ©lÃ¨gue le travail Ã 
      * <code>{@linkplain #evaluate(DirectPosition,double[]) evaluate}(<var>position</var>,
      * null)</code>.
      *
-     * @param  position La position à laquelle évaluer le descripteur.
-     * @return La valeur évaluée à la position spécifiée, sous forme de tableau {@code double[]}.
-     * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
+     * @param  position La position Ã  laquelle Ã©valuer le descripteur.
+     * @return La valeur Ã©valuÃ©e Ã  la position spÃ©cifiÃ©e, sous forme de tableau {@code double[]}.
+     * @throws CannotEvaluateException si une erreur est survenue lors de l'Ã©valuation.
      */
     public Object evaluate(final DirectPosition position) throws CannotEvaluateException {
         return evaluate(position, (double[]) null);
@@ -355,15 +355,15 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
 
     /**
      * Retourne le nombre de bandes dans cette couverture. Pour ce type de couverture, il
-     * sera toujours égal à 1.
+     * sera toujours Ã©gal Ã  1.
      */
     public int getNumSampleDimensions() {
         return 1;
     }
 
     /**
-     * Retourne la bande à l'index spécifiée. Comme les couverture de type {@code DataCoverage}
-     * n'ont qu'une seule bande, l'argument {@code index} devrait toujours être 0.
+     * Retourne la bande Ã  l'index spÃ©cifiÃ©e. Comme les couverture de type {@code DataCoverage}
+     * n'ont qu'une seule bande, l'argument {@code index} devrait toujours Ãªtre 0.
      *
      * @throws IndexOutOfBoundsException si {@code index} est en dehors des limites permises.
      */

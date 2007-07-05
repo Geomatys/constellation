@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,37 +24,37 @@ import com.sun.star.beans.XPropertySet;
 
 
 /**
- * Pont en Java de l'interface IDL pour le service {@code XCoverage3D} déclaré dans
+ * Pont en Java de l'interface IDL pour le service {@code XCoverage3D} dÃ©clarÃ© dans
  * {@code XObservations.idl}. Cette interface existe principalement pour satisfaire les
- * environnements IDE. Le fichier JAR final devrait plutôt inclure le fichier {@code .class}
- * généré par l'outil {@code javamaker} du SDK d'OpenOffice.
+ * environnements IDE. Le fichier JAR final devrait plutÃ´t inclure le fichier {@code .class}
+ * gÃ©nÃ©rÃ© par l'outil {@code javamaker} du SDK d'OpenOffice.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface XObservations extends XInterface {
     /**
-     * Retourne la valeur d'un descripteur du paysage océanique à la position spatio-temporelle
-     * specifiée.
+     * Retourne la valeur d'un descripteur du paysage ocÃ©anique Ã  la position spatio-temporelle
+     * specifiÃ©e.
      *
-     * @param xOptions Propriétés fournies par OpenOffice.
-     * @param descriptor Nom du descripteur du paysage océanique.
-     * @param t La date à laquelle évaluer le descripteur.
-     * @param x Longitude à laquelle évaluer le descripteur.
-     * @param y Latitude à laquelle évaluer le descripteur.
-     * @return La valeur du descripteur du paysage océanique (première bande seulement).
+     * @param xOptions PropriÃ©tÃ©s fournies par OpenOffice.
+     * @param descriptor Nom du descripteur du paysage ocÃ©anique.
+     * @param t La date Ã  laquelle Ã©valuer le descripteur.
+     * @param x Longitude Ã  laquelle Ã©valuer le descripteur.
+     * @param y Latitude Ã  laquelle Ã©valuer le descripteur.
+     * @return La valeur du descripteur du paysage ocÃ©anique (premiÃ¨re bande seulement).
      */
     Object getDescriptorValue(XPropertySet xOptions, String descriptor, double t, double x, double y);
 
     /**
-     * Retourne la coordonnée au centre du voxel le plus proche de la coordonnées spécifiée.
+     * Retourne la coordonnÃ©e au centre du voxel le plus proche de la coordonnÃ©es spÃ©cifiÃ©e.
      *
-     * @param xOptions Propriétés fournies par OpenOffice.
-     * @param descriptor Nom du descripteur du paysage océanique.
+     * @param xOptions PropriÃ©tÃ©s fournies par OpenOffice.
+     * @param descriptor Nom du descripteur du paysage ocÃ©anique.
      * @param t La date.
-     * @param x Longitude, en degrés.
-     * @param y Latitude, en degrés.
-     * @return Coordonnées au centre du voxel le plus proche.
+     * @param x Longitude, en degrÃ©s.
+     * @param y Latitude, en degrÃ©s.
+     * @return CoordonnÃ©es au centre du voxel le plus proche.
      */
     double[][] getVoxelCenter(XPropertySet xOptions, String descriptor, double t, double x, double y);
 }

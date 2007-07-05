@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -54,9 +54,9 @@ import net.sicade.resources.seagis.Resources;
 
 
 /**
- * Connexion vers la table des {@linkplain CoordinateReferenceSystem systèmes de reférence des
- * coordonnées} utilisés par les images. Si une entrée de la table ne contient pas de dimension
- * temporelle, une dimension par défaut sera automatiquement ajoutée.
+ * Connexion vers la table des {@linkplain CoordinateReferenceSystem systÃ¨mes de refÃ©rence des
+ * coordonnÃ©es} utilisÃ©s par les images. Si une entrÃ©e de la table ne contient pas de dimension
+ * temporelle, une dimension par dÃ©faut sera automatiquement ajoutÃ©e.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -64,55 +64,55 @@ import net.sicade.resources.seagis.Resources;
 @UsedBy(GridCoverageTable.class)
 public class CoordinateReferenceSystemTable extends Table implements Shareable {
     /**
-     * Requête SQL utilisée par cette classe pour obtenir les CRS. L'ordre des colonnes est
-     * essentiel. Ces colonnes sont référencées par les constantes {@link #WKT} et compagnie.
+     * RequÃªte SQL utilisÃ©e par cette classe pour obtenir les CRS. L'ordre des colonnes est
+     * essentiel. Ces colonnes sont rÃ©fÃ©rencÃ©es par les constantes {@link #WKT} et compagnie.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("CoordinateReferenceSystems:SELECT",
             "SELECT \"WKT\"\n"                        +
             "  FROM \"CoordinateReferenceSystems\"\n" +
             " WHERE name=?");
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_NAME = 1;
-    /** Numéro de colonne. */ private static final int WKT           = 1;
+    /** NumÃ©ro d'argument. */ private static final int ARGUMENT_NAME = 1;
+    /** NumÃ©ro de colonne. */ private static final int WKT           = 1;
 
     /**
-     * Fabrique à utiliser pour construire des transformations de coordonnées.
-     * Ce champ est accédé par {@link Parameters}.
+     * Fabrique Ã  utiliser pour construire des transformations de coordonnÃ©es.
+     * Ce champ est accÃ©dÃ© par {@link Parameters}.
      */
     static final CoordinateOperationFactory TRANSFORMS = FactoryFinder.getCoordinateOperationFactory(FACTORY_HINTS);
 
     /**
-     * La fabrique de CRS à utiliser. Ne sera créée que la première fois où elle sera nécessaire.
+     * La fabrique de CRS Ã  utiliser. Ne sera crÃ©Ã©e que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private CRSFactory factory;
 
     /**
-     * Ensemble des systèmes de références qui ont déjà été créés.
+     * Ensemble des systÃ¨mes de rÃ©fÃ©rences qui ont dÃ©jÃ  Ã©tÃ© crÃ©Ã©s.
      */
     private final Map<String,CoordinateReferenceSystem> pool = new HashMap<String,CoordinateReferenceSystem>();
 
     /**
-     * Construit une table des systèmes de références des coordonnées.
+     * Construit une table des systÃ¨mes de rÃ©fÃ©rences des coordonnÃ©es.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnÃ©es.
      */
     public CoordinateReferenceSystemTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne le système de coordonnées spatio-temporel pour le nom spécifié.
+     * Retourne le systÃ¨me de coordonnÃ©es spatio-temporel pour le nom spÃ©cifiÃ©.
      *
-     * @param  name Le nom de l'entrée désirée.
-     * @return L'entrée demandée, ou {@code null} si {@code name} était nul.
-     * @throws CatalogException si aucun enregistrement ne correspond au nom demandé,
+     * @param  name Le nom de l'entrÃ©e dÃ©sirÃ©e.
+     * @return L'entrÃ©e demandÃ©e, ou {@code null} si {@code name} Ã©tait nul.
+     * @throws CatalogException si aucun enregistrement ne correspond au nom demandÃ©,
      *         ou si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     public synchronized CoordinateReferenceSystem getEntry(final String name)
             throws CatalogException, SQLException
     {
-        if (name.equalsIgnoreCase("Géographique")) {
+        if (name.equalsIgnoreCase("GÃ©ographique")) {
             return CRS.XYT.getCoordinateReferenceSystem();
         }
         CoordinateReferenceSystem entry = pool.get(name);
@@ -149,8 +149,8 @@ public class CoordinateReferenceSystemTable extends Table implements Shareable {
                       ResourceKeys.ERROR_KEY_NOT_FOUND_$2, table, name), table);
         }
         /*
-         * Ajoute une dimension temporelle (s'il n'y en avait pas déjà) et sauvegarde le
-         * résultat dans la cache pour réutilisation.
+         * Ajoute une dimension temporelle (s'il n'y en avait pas dÃ©jÃ ) et sauvegarde le
+         * rÃ©sultat dans la cache pour rÃ©utilisation.
          */
         TemporalCRS temporal = CRSUtilities.getTemporalCRS(entry);
         if (temporal == null) {

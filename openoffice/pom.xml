@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
   Configuration du module "openoffice" du projet Sicade.
@@ -24,23 +24,23 @@
   <version>1.0-SNAPSHOT</version>
   <name>Addin OpenOffice</name>
   <description>
-    Connexion aux méthodes du module "Observations et mesures" à partir d'OpenOffice.
+    Connexion aux mÃ©thodes du module "Observations et mesures" Ã  partir d'OpenOffice.
   </description>
 
 
 
   <!--
-    Liste des développeurs et des contributeurs.
+    Liste des dÃ©veloppeurs et des contributeurs.
   -->
   <developers>
     <developer>
       <id>desruisseaux</id>
       <name>Martin Desruisseaux</name>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Unité S140 (Espace)</organization>
+      <organization>UnitÃ© S140 (Espace)</organization>
       <roles>
         <role>Administrateur du projet</role>
-        <role>Développeur Java</role>
+        <role>DÃ©veloppeur Java</role>
       </roles>
       <timezone>+1</timezone>
     </developer>
@@ -49,7 +49,7 @@
 
 
   <!--
-    Dépendences.
+    DÃ©pendences.
   -->
   <dependencies>
     <dependency>
@@ -95,7 +95,7 @@
       <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>         <!-- Evite la dépendence vers la base de données ESPG sur HSQL, -->
+      <groupId>org.geotools</groupId>         <!-- Evite la dÃ©pendence vers la base de donnÃ©es ESPG sur HSQL, -->
       <artifactId>gt2-epsg-hsql</artifactId>  <!-- car on en utilisera une autre (EPSG sur PostgreSQL).       -->
       <scope>provided</scope>
     </dependency>
@@ -104,8 +104,8 @@
 
 
   <!--
-    Compilation et création du fichier JAR. Par rapport à la configuration
-    définie dans le pom.xml parent, on ajoute la création du fichier uno.pkg.
+    Compilation et crÃ©ation du fichier JAR. Par rapport Ã  la configuration
+    dÃ©finie dans le pom.xml parent, on ajoute la crÃ©ation du fichier uno.pkg.
   -->
   <build>
     <plugins>

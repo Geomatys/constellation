@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// Géométries et positions géographiques
+// GÃ©omÃ©tries et positions gÃ©ographiques
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -35,7 +35,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-// Base de données en entrés/sorties
+// Base de donnÃ©es en entrÃ©s/sorties
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -70,9 +70,9 @@ import net.sicade.resources.seagis.ResourceKeys;
 
 
 /**
- * Connexion vers une table d'images. Cette table contient des références vers des images sous
+ * Connexion vers une table d'images. Cette table contient des rÃ©fÃ©rences vers des images sous
  * forme d'objets {@link CoverageReference}. Une table {@code GridCoverageTable} est capable
- * de fournir la liste des images qui interceptent une certaines région géographique et une
+ * de fournir la liste des images qui interceptent une certaines rÃ©gion gÃ©ographique et une
  * certaine plage de dates.
  *
  * @version $Id$
@@ -82,8 +82,8 @@ import net.sicade.resources.seagis.ResourceKeys;
 @UsedBy(SeriesTable.class)
 public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> implements DataConnection {
     /**
-     * Requête SQL utilisée pour obtenir l'enveloppe spatio-temporelle couverte
-     * par toutes les images d'une série (ou de l'ensemble des séries).
+     * RequÃªte SQL utilisÃ©e pour obtenir l'enveloppe spatio-temporelle couverte
+     * par toutes les images d'une sÃ©rie (ou de l'ensemble des sÃ©ries).
      */
      static final ConfigurationKey BOUNDING_BOX = new ConfigurationKey("GridCoverages:BOX",
             "SELECT MIN(\"startTime\") "           + "AS \"tmin\", "  +
@@ -98,9 +98,9 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
              "   AND (series LIKE ?) AND visible=TRUE\n");
      
      /**
-      * Requête SQL utilisée pour obtenir l'enveloppe spatio-temporelle couverte
-      * par toutes les images d'une série (ou de l'ensemble des séries). Requête 
-      * utilisée avec des bases JavaDB.
+      * RequÃªte SQL utilisÃ©e pour obtenir l'enveloppe spatio-temporelle couverte
+      * par toutes les images d'une sÃ©rie (ou de l'ensemble des sÃ©ries). RequÃªte 
+      * utilisÃ©e avec des bases JavaDB.
       */
      static final ConfigurationKey BOUNDING_BOX_JAVADB = new ConfigurationKey("GridCoverages:BOX",
             "SELECT MIN(\"startTime\") "           + "AS \"tmin\", "  +
@@ -121,8 +121,8 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
              "   AND (series LIKE ?) AND visible=TRUE\n");
 
     /**
-     * Requête SQL utilisée par cette classe pour obtenir la liste des images.
-     * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par
+     * RequÃªte SQL utilisÃ©e par cette classe pour obtenir la liste des images.
+     * L'ordre des colonnes est essentiel. Ces colonnes sont rÃ©fÃ©rencÃ©es par
      * les constantes {@link #SERIES}, {@link #FILENAME} et compagnie.
      */
     private static final ConfigurationKey LIST = new ConfigurationKey("GridCoverages:LIST",
@@ -146,14 +146,14 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
              "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                    +
              "   AND (\"spatialExtent\" && ?)\n"                                         +
              "   AND (series LIKE ?) AND (filename LIKE ?) AND visible=TRUE\n"           +
-             " ORDER BY \"endTime\", series"); // DOIT être en ordre chronologique.
+             " ORDER BY \"endTime\", series"); // DOIT Ãªtre en ordre chronologique.
                                                   // Voir {@link GridCoverageEntry#compare}.
     
     /**
-     * Requête SQL utilisée par cette classe pour obtenir la liste des images.
-     * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par
+     * RequÃªte SQL utilisÃ©e par cette classe pour obtenir la liste des images.
+     * L'ordre des colonnes est essentiel. Ces colonnes sont rÃ©fÃ©rencÃ©es par
      * les constantes {@link #SERIES}, {@link #FILENAME} et compagnie. 
-     * Requête utilisée avec des bases JavaDB.
+     * RequÃªte utilisÃ©e avec des bases JavaDB.
      */
     private static final ConfigurationKey LIST_JAVADB = new ConfigurationKey("GridCoverages:LIST",
             "SELECT " + "series, "                +  // [01] SERIES
@@ -182,123 +182,123 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
              "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"        +
              "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"        +
              "   AND (series LIKE ?) AND (filename LIKE ?) AND visible=TRUE\n"           +
-             " ORDER BY \"endTime\", series"); // DOIT être en ordre chronologique.
+             " ORDER BY \"endTime\", series"); // DOIT Ãªtre en ordre chronologique.
                                                   // Voir {@link GridCoverageEntry#compare}.
 
 
-    /** Numéro d'argument. */         static final int ARGUMENT_SERIES   = 7;
-    /** Numéro d'argument. */ private static final int ARGUMENT_FILENAME = 8;
+    /** NumÃ©ro d'argument. */         static final int ARGUMENT_SERIES   = 7;
+    /** NumÃ©ro d'argument. */ private static final int ARGUMENT_FILENAME = 8;
 
-    /** Numéro de colonne. */ private static final int SERIES     =  1;
-    /** Numéro de colonne. */ private static final int SUB_SERIES =  2;
-    /** Numéro de colonne. */ private static final int PATHNAME   =  3;
-    /** Numéro de colonne. */ private static final int FILENAME   =  4;
-    /** Numéro de colonne. */ private static final int START_TIME =  5;
-    /** Numéro de colonne. */ private static final int END_TIME   =  6;
-    /** Numéro de colonne. */ private static final int XMIN       =  7;
-    /** Numéro de colonne. */ private static final int XMAX       =  8;
-    /** Numéro de colonne. */ private static final int YMIN       =  9;
-    /** Numéro de colonne. */ private static final int YMAX       = 10;
-    /** Numéro de colonne. */ private static final int WIDTH      = 11;
-    /** Numéro de colonne. */ private static final int HEIGHT     = 12;
-    /** Numéro de colonne. */ private static final int CRS        = 13;
-    /** Numéro de colonne. */ private static final int FORMAT     = 14;
-    /** Numéro de colonne. */ private static final int REMARKS    = 15;
+    /** NumÃ©ro de colonne. */ private static final int SERIES     =  1;
+    /** NumÃ©ro de colonne. */ private static final int SUB_SERIES =  2;
+    /** NumÃ©ro de colonne. */ private static final int PATHNAME   =  3;
+    /** NumÃ©ro de colonne. */ private static final int FILENAME   =  4;
+    /** NumÃ©ro de colonne. */ private static final int START_TIME =  5;
+    /** NumÃ©ro de colonne. */ private static final int END_TIME   =  6;
+    /** NumÃ©ro de colonne. */ private static final int XMIN       =  7;
+    /** NumÃ©ro de colonne. */ private static final int XMAX       =  8;
+    /** NumÃ©ro de colonne. */ private static final int YMIN       =  9;
+    /** NumÃ©ro de colonne. */ private static final int YMAX       = 10;
+    /** NumÃ©ro de colonne. */ private static final int WIDTH      = 11;
+    /** NumÃ©ro de colonne. */ private static final int HEIGHT     = 12;
+    /** NumÃ©ro de colonne. */ private static final int CRS        = 13;
+    /** NumÃ©ro de colonne. */ private static final int FORMAT     = 14;
+    /** NumÃ©ro de colonne. */ private static final int REMARKS    = 15;
 
     /**
-     * Le modèle à utiliser pour formatter des angles.
+     * Le modÃ¨le Ã  utiliser pour formatter des angles.
      */
-    static final String ANGLE_PATTERN = "D°MM.m'";
+    static final String ANGLE_PATTERN = "DÂ°MM.m'";
 
     /**
-     * Réference vers la série d'images.
+     * RÃ©ference vers la sÃ©rie d'images.
      */
     private Series series;
 
     /**
-     * L'opération à appliquer sur les images lue, ou {@code null} s'il n'y en a aucune.
+     * L'opÃ©ration Ã  appliquer sur les images lue, ou {@code null} s'il n'y en a aucune.
      */
     private Operation operation;
 
     /**
-     * Dimension logique (en degrés de longitude et de latitude) désirée des pixels
+     * Dimension logique (en degrÃ©s de longitude et de latitude) dÃ©sirÃ©e des pixels
      * de l'images. Cette information n'est qu'approximative. Il n'est pas garantie
-     * que les lectures produiront effectivement des images de cette résolution.
+     * que les lectures produiront effectivement des images de cette rÃ©solution.
      * Une valeur nulle signifie que les lectures doivent se faire avec la meilleure
-     * résolution possible.
+     * rÃ©solution possible.
      */
     private Dimension2D resolution;
 
     /**
-     * Index des ordonnées dans une position géographique qui correspondent aux coordonnées
+     * Index des ordonnÃ©es dans une position gÃ©ographique qui correspondent aux coordonnÃ©es
      * (<var>x</var>,<var>y</var>) dans une image.
      *
-     * @todo Codés en dure pour l'instant. Peut avoir besoin d'être paramètrables dans une
+     * @todo CodÃ©s en dure pour l'instant. Peut avoir besoin d'Ãªtre paramÃ¨trables dans une
      *       version future.
      */
     private static final int xDimension=0, yDimension=1;
 
     /**
-     * Formatteur à utiliser pour écrire des dates pour le journal. Les caractères et les
-     * conventions linguistiques dépendront de la langue de l'utilisateur. Toutefois, le
-     * fuseau horaire devrait être celui de la région d'étude (ou GMT) plutôt que celui
+     * Formatteur Ã  utiliser pour Ã©crire des dates pour le journal. Les caractÃ¨res et les
+     * conventions linguistiques dÃ©pendront de la langue de l'utilisateur. Toutefois, le
+     * fuseau horaire devrait Ãªtre celui de la rÃ©gion d'Ã©tude (ou GMT) plutÃ´t que celui
      * du pays de l'utilisateur.
      */
     private final DateFormat dateFormat;
 
     /**
-     * Table des systèmes de coordonnées. Ne sera construit que la première fois où elle
-     * sera nécessaire.
+     * Table des systÃ¨mes de coordonnÃ©es. Ne sera construit que la premiÃ¨re fois oÃ¹ elle
+     * sera nÃ©cessaire.
      */
     private transient CoordinateReferenceSystemTable crsTable;
 
     /**
-     * Table des formats. Cette table ne sera construite que la première fois
-     * où elle sera nécessaire.
+     * Table des formats. Cette table ne sera construite que la premiÃ¨re fois
+     * oÃ¹ elle sera nÃ©cessaire.
      */
     private transient FormatTable formatTable;
 
     /**
-     * Le comparateur à utiliser pour choisir une image parmis un ensemble d'images interceptant
-     * les coordonnées spatio-temporelles spécifiées. Ne sera construit que la première fois où
-     * il sera nécessaire.
+     * Le comparateur Ã  utiliser pour choisir une image parmis un ensemble d'images interceptant
+     * les coordonnÃ©es spatio-temporelles spÃ©cifiÃ©es. Ne sera construit que la premiÃ¨re fois oÃ¹
+     * il sera nÃ©cessaire.
      */
     private transient CoverageComparator comparator;
 
     /**
      * Envelope spatio-temporelle couvertes par l'ensemble des images de cette table, ou
-     * {@code null} si elle n'a pas encore été déterminée. Cette envelope est calculée par
-     * {@link BoundedSingletonTable#getEnvelope} et cachée ici pour des raisons de performances.
+     * {@code null} si elle n'a pas encore Ã©tÃ© dÃ©terminÃ©e. Cette envelope est calculÃ©e par
+     * {@link BoundedSingletonTable#getEnvelope} et cachÃ©e ici pour des raisons de performances.
      */
     private transient Envelope envelope;
 
     /**
-     * Derniers paramètres à avoir été construit. Ces paramètres sont
-     * retenus afin d'éviter d'avoir à les reconstruires trop souvent
-     * si c'est évitable.
+     * Derniers paramÃ¨tres Ã  avoir Ã©tÃ© construit. Ces paramÃ¨tres sont
+     * retenus afin d'Ã©viter d'avoir Ã  les reconstruires trop souvent
+     * si c'est Ã©vitable.
      */
     private transient Parameters parameters;
 
     /**
-     * Une vue tri-dimensionnelle de toutes les données d'une série.
-     * Ne sera construite que la première fois où elle sera nécessaire.
+     * Une vue tri-dimensionnelle de toutes les donnÃ©es d'une sÃ©rie.
+     * Ne sera construite que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private transient CoverageStack coverage3D;
 
     /**
-     * Une instance d'une coordonnées à utiliser avec {@link #evaluate}.
+     * Une instance d'une coordonnÃ©es Ã  utiliser avec {@link #evaluate}.
      */
     private transient GeneralDirectPosition position;
 
     /**
-     * Un buffer pré-alloué à utiliser avec {@link #evaluate}.
+     * Un buffer prÃ©-allouÃ© Ã  utiliser avec {@link #evaluate}.
      */
     private transient double[] samples;
 
     /**
-     * Construit une table pour la connexion spécifiée.
+     * Construit une table pour la connexion spÃ©cifiÃ©e.
      *
-     * @param  database Connexion vers la base de données d'observations.
+     * @param  database Connexion vers la base de donnÃ©es d'observations.
      */
     public GridCoverageTable(final Database database) {
         super(database, net.sicade.observation.sql.CRS.XYT);
@@ -307,8 +307,8 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Construit une nouvelle table avec la même configuration initiale que celle de la table
-     * spécifiée.
+     * Construit une nouvelle table avec la mÃªme configuration initiale que celle de la table
+     * spÃ©cifiÃ©e.
      */
     public GridCoverageTable(final GridCoverageTable table) {
         super(table);
@@ -333,16 +333,16 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Retourne la référence vers la séries d'images.
+     * Retourne la rÃ©fÃ©rence vers la sÃ©ries d'images.
      */
     public Series getSeries() {
         return series;
     }
 
     /**
-     * Définit la série dont on veut les images.
+     * DÃ©finit la sÃ©rie dont on veut les images.
      *
-     * @param  series Réference vers la série d'images.
+     * @param  series RÃ©ference vers la sÃ©rie d'images.
      */
     public synchronized void setSeries(final Series series) {
         if (!series.equals(this.series)) {
@@ -354,7 +354,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Définit la période de temps d'intérêt (dans laquelle rechercher des images).
+     * DÃ©finit la pÃ©riode de temps d'intÃ©rÃªt (dans laquelle rechercher des images).
      */
     @Override
     public synchronized boolean setTimeRange(final Date startTime, final Date endTime) {
@@ -373,7 +373,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Définit la région géographique d'intérêt dans laquelle rechercher des images.
+     * DÃ©finit la rÃ©gion gÃ©ographique d'intÃ©rÃªt dans laquelle rechercher des images.
      */
     @Override
     public synchronized boolean setGeographicBoundingBox(final GeographicBoundingBox area) {
@@ -389,31 +389,31 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Retourne la dimension désirée des pixels de l'images.
+     * Retourne la dimension dÃ©sirÃ©e des pixels de l'images.
      *
-     * @return Résolution préférée, ou {@code null} si la lecture doit se faire avec
-     *         la meilleure résolution disponible.
+     * @return RÃ©solution prÃ©fÃ©rÃ©e, ou {@code null} si la lecture doit se faire avec
+     *         la meilleure rÃ©solution disponible.
      */
     public synchronized Dimension2D getPreferredResolution() {
         return (resolution!=null) ? (Dimension2D)resolution.clone() : null;
     }
 
     /**
-     * Définit la dimension désirée des pixels de l'images.  Cette information n'est
+     * DÃ©finit la dimension dÃ©sirÃ©e des pixels de l'images.  Cette information n'est
      * qu'approximative. Il n'est pas garantie que la lecture produira effectivement
-     * des images de cette résolution. Une valeur nulle signifie que la lecture doit
-     * se faire avec la meilleure résolution disponible.
+     * des images de cette rÃ©solution. Une valeur nulle signifie que la lecture doit
+     * se faire avec la meilleure rÃ©solution disponible.
      *
-     * @param  pixelSize Taille préférée des pixels, en degrés de longitude et de latitude.
+     * @param  pixelSize Taille prÃ©fÃ©rÃ©e des pixels, en degrÃ©s de longitude et de latitude.
      */
     public synchronized void setPreferredResolution(final Dimension2D pixelSize) {
         if (!Utilities.equals(resolution, pixelSize)) {
             clearCache();
-            final int clé;
+            final int clÃ©;
             final Object param;
             if (pixelSize != null) {
                 resolution = (Dimension2D)pixelSize.clone();
-                clé = ResourceKeys.SET_RESOLUTION_$3;
+                clÃ© = ResourceKeys.SET_RESOLUTION_$3;
                 param = new Object[] {
                     new Double(resolution.getWidth()),
                     new Double(resolution.getHeight()),
@@ -421,64 +421,64 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
                 };
             } else {
                 resolution = null;
-                clé = ResourceKeys.UNSET_RESOLUTION_$1;
+                clÃ© = ResourceKeys.UNSET_RESOLUTION_$1;
                 param = series.getName();
             }
             fireStateChanged("PreferredResolution");
-            log("setPreferredResolution", Level.CONFIG, clé, param);
+            log("setPreferredResolution", Level.CONFIG, clÃ©, param);
         }
     }
 
     /**
-     * Retourne l'opération appliquée sur les images lues. L'opération retournée
-     * peut représenter par exemple un gradient. Si aucune opération n'est appliquée
-     * (c'est-à-dire si les images retournées représentent les données originales),
-     * alors cette méthode retourne {@code null}.
+     * Retourne l'opÃ©ration appliquÃ©e sur les images lues. L'opÃ©ration retournÃ©e
+     * peut reprÃ©senter par exemple un gradient. Si aucune opÃ©ration n'est appliquÃ©e
+     * (c'est-Ã -dire si les images retournÃ©es reprÃ©sentent les donnÃ©es originales),
+     * alors cette mÃ©thode retourne {@code null}.
      */
     public Operation getOperation() {
         return operation;
     }
 
     /**
-     * Définit l'opération à appliquer sur les images lues.
+     * DÃ©finit l'opÃ©ration Ã  appliquer sur les images lues.
      *
-     * @param  operation L'opération à appliquer sur les images, ou {@code null} pour
-     *         n'appliquer aucune opération.
+     * @param  operation L'opÃ©ration Ã  appliquer sur les images, ou {@code null} pour
+     *         n'appliquer aucune opÃ©ration.
      */
     public synchronized void setOperation(final Operation operation) {
         if (!Utilities.equals(operation, this.operation)) {
             clearCache();
             this.operation = operation;
-            final int clé;
+            final int clÃ©;
             final Object param;
             if (operation != null) {
                 param = new String[] {operation.getName(), series.getName()};
-                clé   = ResourceKeys.SET_OPERATION_$2;
+                clÃ©   = ResourceKeys.SET_OPERATION_$2;
             } else {
                 param = series.getName();
-                clé   = ResourceKeys.UNSET_OPERATION_$1;
+                clÃ©   = ResourceKeys.UNSET_OPERATION_$1;
             }
             fireStateChanged("Operation");
-            log("setOperation", Level.CONFIG, clé, param);
+            log("setOperation", Level.CONFIG, clÃ©, param);
         }
     }
 
     /**
-     * Retourne la liste des images disponibles dans la plage de coordonnées spatio-temporelles
-     * préalablement sélectionnées. Ces plages auront été spécifiées à l'aide des différentes
-     * méthodes {@code set...} de cette classe.
+     * Retourne la liste des images disponibles dans la plage de coordonnÃ©es spatio-temporelles
+     * prÃ©alablement sÃ©lectionnÃ©es. Ces plages auront Ã©tÃ© spÃ©cifiÃ©es Ã  l'aide des diffÃ©rentes
+     * mÃ©thodes {@code set...} de cette classe.
      *
-     * @return Liste d'images qui interceptent la plage de temps et la région géographique d'intérêt.
+     * @return Liste d'images qui interceptent la plage de temps et la rÃ©gion gÃ©ographique d'intÃ©rÃªt.
      * @throws CatalogException si un enregistrement est invalide.
-     * @throws SQLException si la base de données n'a pas pu être interrogée pour une autre raison.
+     * @throws SQLException si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e pour une autre raison.
      */
     @Override
     public Set<CoverageReference> getEntries() throws CatalogException, SQLException {
         if (envelope == null) {
             /*
-             * getEnvelope() doit être appelée au moins une fois (sauf si l'enveloppe n'a
-             * pas changé) avant super.getEntries() afin d'éviter que le java.sql.Statement
-             * de QueryType.LIST ne soit fermé en pleine itération pour exécuter le Statement
+             * getEnvelope() doit Ãªtre appelÃ©e au moins une fois (sauf si l'enveloppe n'a
+             * pas changÃ©) avant super.getEntries() afin d'Ã©viter que le java.sql.Statement
+             * de QueryType.LIST ne soit fermÃ© en pleine itÃ©ration pour exÃ©cuter le Statement
              * de QueryType.BOUNDING_BOX.
              */
             envelope = getEnvelope();
@@ -489,10 +489,10 @@ loop:   for (final CoverageReference newReference : entries) {
             if (newReference instanceof GridCoverageEntry) {
                 final GridCoverageEntry newEntry = (GridCoverageEntry) newReference;
                 /*
-                 * Vérifie si une entrée existait déjà précédemment pour les mêmes coordonnées
-                 * spatio-temporelle mais une autre résolution. Si c'était le cas, alors l'entrée
-                 * avec une résolution proche de la résolution demandée sera retenue et les autres
-                 * retirées de la liste.
+                 * VÃ©rifie si une entrÃ©e existait dÃ©jÃ  prÃ©cÃ©demment pour les mÃªmes coordonnÃ©es
+                 * spatio-temporelle mais une autre rÃ©solution. Si c'Ã©tait le cas, alors l'entrÃ©e
+                 * avec une rÃ©solution proche de la rÃ©solution demandÃ©e sera retenue et les autres
+                 * retirÃ©es de la liste.
                  */
                 for (int i=filtered.size(); --i>=0;) {
                     final CoverageReference oldReference = filtered.get(i);
@@ -526,24 +526,24 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Retourne une des images disponibles dans la plage de coordonnées spatio-temporelles
-     * préalablement sélectionnées. Si plusieurs images interceptent la région et la plage
-     * de temps (c'est-à-dire si {@link #getEntries} retourne un ensemble d'au moins deux
-     * entrées), alors le choix de l'image se fera en utilisant un objet
-     * {@link CoverageComparator} par défaut.
+     * Retourne une des images disponibles dans la plage de coordonnÃ©es spatio-temporelles
+     * prÃ©alablement sÃ©lectionnÃ©es. Si plusieurs images interceptent la rÃ©gion et la plage
+     * de temps (c'est-Ã -dire si {@link #getEntries} retourne un ensemble d'au moins deux
+     * entrÃ©es), alors le choix de l'image se fera en utilisant un objet
+     * {@link CoverageComparator} par dÃ©faut.
      *
-     * @return Une image choisie arbitrairement dans la région et la plage de date
-     *         sélectionnées, ou {@code null} s'il n'y a pas d'image dans ces plages.
+     * @return Une image choisie arbitrairement dans la rÃ©gion et la plage de date
+     *         sÃ©lectionnÃ©es, ou {@code null} s'il n'y a pas d'image dans ces plages.
      * @throws CatalogException si un enregistrement est invalide.
-     * @throws SQLException si la base de données n'a pas pu être interrogée pour une autre raison.
+     * @throws SQLException si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e pour une autre raison.
      */
     public synchronized CoverageReference getEntry() throws CatalogException, SQLException {
         /*
-         * Obtient la liste des entrées avant toute opération impliquant l'envelope,
-         * puisque cette envelope peut avoir été calculée par 'getEntries()'.
+         * Obtient la liste des entrÃ©es avant toute opÃ©ration impliquant l'envelope,
+         * puisque cette envelope peut avoir Ã©tÃ© calculÃ©e par 'getEntries()'.
          */
         final Set<CoverageReference> entries = getEntries();
-        assert getEnvelope().equals(envelope) : envelope; // Vérifie que l'enveloppe n'a pas changée.
+        assert getEnvelope().equals(envelope) : envelope; // VÃ©rifie que l'enveloppe n'a pas changÃ©e.
         CoverageReference best = null;
         if (comparator == null) {
             comparator = new CoverageComparator(getCoordinateReferenceSystem(), envelope);
@@ -557,14 +557,14 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Retourne l'entrée pour le nom de fichier spécifié. Ces noms sont habituellement unique pour
-     * une série donnée (mais pas obligatoirement). En cas de doublon, une exception sera lancée.
+     * Retourne l'entrÃ©e pour le nom de fichier spÃ©cifiÃ©. Ces noms sont habituellement unique pour
+     * une sÃ©rie donnÃ©e (mais pas obligatoirement). En cas de doublon, une exception sera lancÃ©e.
      *
      * @param  name Le nom du fichier.
-     * @return L'entrée demandée, ou {@code null} si {@code name} était nul.
-     * @throws CatalogException si aucun enregistrement ne correspond au nom demandé,
+     * @return L'entrÃ©e demandÃ©e, ou {@code null} si {@code name} Ã©tait nul.
+     * @throws CatalogException si aucun enregistrement ne correspond au nom demandÃ©,
      *         ou si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ© pour une autre raison.
      */
     @Override
     public synchronized CoverageReference getEntry(final String name) throws CatalogException, SQLException {
@@ -573,22 +573,22 @@ loop:   for (final CoverageReference newReference : entries) {
         }
         if (envelope == null) {
             envelope = getEnvelope();
-            // Voir le commentaire du code équivalent de 'getEntries()'
+            // Voir le commentaire du code Ã©quivalent de 'getEntries()'
         }
         return super.getEntry(escapeSearch(name));
     }
 
     /**
-     * Obtient les plages de temps et de coordonnées des images. L'objet retourné ne contiendra que
-     * les informations demandées. Par exemple si {@link DataAvailability#t} est {@code null}, alors
-     * la plage de temps ne sera pas examinée.
+     * Obtient les plages de temps et de coordonnÃ©es des images. L'objet retournÃ© ne contiendra que
+     * les informations demandÃ©es. Par exemple si {@link DataAvailability#t} est {@code null}, alors
+     * la plage de temps ne sera pas examinÃ©e.
      *
-     * @param  ranges L'objet dans lequel ajouter les plages de cette séries. Pour chaque champs
-     *         nul dans cet objet, les informations correspondantes ne seront pas interrogées.
-     * @return Un objet contenant les plages demandées. Il ne s'agira pas nécessairement du même
-     *         objet que celui qui a été spécifié en argument; ça dépendra si cette méthode est
-     *         appelée localement ou sur une machine distante.
-     * @throws SQLException si la base de données n'a pas pu être interrogée.
+     * @param  ranges L'objet dans lequel ajouter les plages de cette sÃ©ries. Pour chaque champs
+     *         nul dans cet objet, les informations correspondantes ne seront pas interrogÃ©es.
+     * @return Un objet contenant les plages demandÃ©es. Il ne s'agira pas nÃ©cessairement du mÃªme
+     *         objet que celui qui a Ã©tÃ© spÃ©cifiÃ© en argument; Ã§a dÃ©pendra si cette mÃ©thode est
+     *         appelÃ©e localement ou sur une machine distante.
+     * @throws SQLException si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e.
      */
     public synchronized DataAvailability getRanges(final DataAvailability ranges) throws SQLException {
         long  lastEndTime       = Long.MIN_VALUE;
@@ -603,9 +603,9 @@ loop:   for (final CoverageReference newReference : entries) {
                     final long lgEndTime = endTime.getTime();
                     final long checkTime = lgEndTime - timeInterval;
                     if (checkTime <= lastEndTime  &&  checkTime < startTime.getTime()) {
-                        // Il arrive parfois que des images soient prises à toutes les 24 heures,
-                        // mais pendant 12 heures seulement. On veut éviter que de telles images
-                        // apparaissent tout le temps entrecoupées d'images manquantes.
+                        // Il arrive parfois que des images soient prises Ã  toutes les 24 heures,
+                        // mais pendant 12 heures seulement. On veut Ã©viter que de telles images
+                        // apparaissent tout le temps entrecoupÃ©es d'images manquantes.
                         startTime.setTime(checkTime);
                     }
                     lastEndTime = lgEndTime;
@@ -628,7 +628,7 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir des références vers des images.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir des rÃ©fÃ©rences vers des images.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
@@ -641,7 +641,7 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Retourne l'index de l'argument pour le rôle spécifié. Cette méthode est résérvée à un usage
+     * Retourne l'index de l'argument pour le rÃ´le spÃ©cifiÃ©. Cette mÃ©thode est rÃ©sÃ©rvÃ©e Ã  un usage
      * interne (indirectement) pour {@link #getEntry(String)}.
      */
     @Override
@@ -653,8 +653,8 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Configure la requête spécifiée. Cette méthode est appelée automatiquement lorsque la table
-     * a {@linkplain #fireStateChanged changé d'état}.
+     * Configure la requÃªte spÃ©cifiÃ©e. Cette mÃ©thode est appelÃ©e automatiquement lorsque la table
+     * a {@linkplain #fireStateChanged changÃ© d'Ã©tat}.
      */
     @Override
     @SuppressWarnings("fallthrough")
@@ -678,8 +678,8 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Retourne l'image correspondant à l'enregistrement courant. Les classes dérivées peuvent
-     * redéfinir cette méthode si elle souhaite contruire autrement la référence vers l'image.
+     * Retourne l'image correspondant Ã  l'enregistrement courant. Les classes dÃ©rivÃ©es peuvent
+     * redÃ©finir cette mÃ©thode si elle souhaite contruire autrement la rÃ©fÃ©rence vers l'image.
      */
     @Override
     protected CoverageReference createEntry(final ResultSet result) throws CatalogException, SQLException {
@@ -703,23 +703,23 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Retourne les paramètres de cette table. Pour des raisons d'économie de mémoire (de très
-     * nombreux objets {@code Parameters} pouvant être créés), cette méthode retourne un exemplaire
-     * unique autant que possible. L'objet retourné ne doit donc pas être modifié!
+     * Retourne les paramÃ¨tres de cette table. Pour des raisons d'Ã©conomie de mÃ©moire (de trÃ¨s
+     * nombreux objets {@code Parameters} pouvant Ãªtre crÃ©Ã©s), cette mÃ©thode retourne un exemplaire
+     * unique autant que possible. L'objet retournÃ© ne doit donc pas Ãªtre modifiÃ©!
      * <p>
-     * Cette méthode est appelée par le constructeur de {@link GridCoverageEntry}.
+     * Cette mÃ©thode est appelÃ©e par le constructeur de {@link GridCoverageEntry}.
      *
-     * @param  seriesID Nom ID de la série, pour fin de vérification. Ce nom doit correspondre
-     *                  à celui de la série examinée par cette table.
+     * @param  seriesID Nom ID de la sÃ©rie, pour fin de vÃ©rification. Ce nom doit correspondre
+     *                  Ã  celui de la sÃ©rie examinÃ©e par cette table.
      * @param  formatID Nom ID du format des images.
-     * @param  crsID    Nom ID du système de référence des coordonnées.
+     * @param  crsID    Nom ID du systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es.
      * @param  pathname Chemin relatif des images.
      *
-     * @return Un objet incluant les paramètres demandées ainsi que ceux de la table.
-     * @throws CatalogException si les paramètres n'ont pas pu être obtenus.
-     * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
+     * @return Un objet incluant les paramÃ¨tres demandÃ©es ainsi que ceux de la table.
+     * @throws CatalogException si les paramÃ¨tres n'ont pas pu Ãªtre obtenus.
+     * @throws SQLException si une erreur est survenue lors de l'accÃ¨s Ã  la base de donnÃ©es.
      *
-     * @todo L'implémentation actuelle n'accepte pas d'autres impléméntations de Format que FormatEntry.
+     * @todo L'implÃ©mentation actuelle n'accepte pas d'autres implÃ©mÃ©ntations de Format que FormatEntry.
      */
     final synchronized Parameters getParameters(final String seriesID,
                                                 final String formatID,
@@ -732,15 +732,15 @@ loop:   for (final CoverageReference newReference : entries) {
             throw new CatalogException(Resources.format(ResourceKeys.ERROR_WRONG_SERIES_$1, seriesName));
         }
         /*
-         * Vérifie que l'enveloppe n'a pas changé. Note: getEnvelope() doit avoir été appelée au
-         * moins une fois (sauf si elle n'a pas changée) juste avant super.getEntries(), afin
-         * d'éviter que le java.sql.Statement de QueryType.LIST n'aie été fermé pour exécuter
+         * VÃ©rifie que l'enveloppe n'a pas changÃ©. Note: getEnvelope() doit avoir Ã©tÃ© appelÃ©e au
+         * moins une fois (sauf si elle n'a pas changÃ©e) juste avant super.getEntries(), afin
+         * d'Ã©viter que le java.sql.Statement de QueryType.LIST n'aie Ã©tÃ© fermÃ© pour exÃ©cuter
          * le Statement de QueryType.BOUNDING_BOX.
          */
         assert getEnvelope().equals(envelope) : envelope;
         /*
-         * Si les paramètres spécifiés sont identiques à ceux qui avaient été
-         * spécifiés la dernière fois, retourne le dernier bloc de paramètres.
+         * Si les paramÃ¨tres spÃ©cifiÃ©s sont identiques Ã  ceux qui avaient Ã©tÃ©
+         * spÃ©cifiÃ©s la derniÃ¨re fois, retourne le dernier bloc de paramÃ¨tres.
          */
         if (parameters != null &&
             Utilities.equals(parameters.format     .getName(), formatID) &&
@@ -750,8 +750,8 @@ loop:   for (final CoverageReference newReference : entries) {
             return parameters;
         }
         /*
-         * Construit un nouveau bloc de paramètres et projète les
-         * coordonnées vers le système de coordonnées de l'image.
+         * Construit un nouveau bloc de paramÃ¨tres et projÃ¨te les
+         * coordonnÃ©es vers le systÃ¨me de coordonnÃ©es de l'image.
          */
         final Rectangle2D geographicArea = XRectangle2D.createFromExtremums(
                             envelope.getMinimum(xDimension), envelope.getMinimum(yDimension),
@@ -778,7 +778,7 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Prépare l'évaluation d'un point.
+     * PrÃ©pare l'Ã©valuation d'un point.
      */
     @SuppressWarnings("fallthrough")
     private void prepare(final double x, final double y, final double t)
@@ -832,7 +832,7 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Vide la cache de toutes les références vers les entrées précédemment créées.
+     * Vide la cache de toutes les rÃ©fÃ©rences vers les entrÃ©es prÃ©cÃ©demment crÃ©Ã©es.
      */
     @Override
     protected void clearCache() {
@@ -841,9 +841,9 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Réinitialise les caches, mais en gardant les références vers les entrées déjà créées.
-     * Cette méthode devrait être appellée à la place de {@link #clearCache} lorsque l'état
-     * de la table a changé, mais que cet état n'affecte pas les prochaines entrées à créer.
+     * RÃ©initialise les caches, mais en gardant les rÃ©fÃ©rences vers les entrÃ©es dÃ©jÃ  crÃ©Ã©es.
+     * Cette mÃ©thode devrait Ãªtre appellÃ©e Ã  la place de {@link #clearCache} lorsque l'Ã©tat
+     * de la table a changÃ©, mais que cet Ã©tat n'affecte pas les prochaines entrÃ©es Ã  crÃ©er.
      */
     private void clearCacheKeepEntries() {
         coverage3D = null;
@@ -853,18 +853,18 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Enregistre un évènement dans le journal.
+     * Enregistre un Ã©vÃ¨nement dans le journal.
      */
-    private void log(final String method, final Level level, final int clé, final Object param) {
+    private void log(final String method, final Level level, final int clÃ©, final Object param) {
         final Resources resources = Resources.getResources(database.getLocale());
-        final LogRecord record = resources.getLogRecord(level, clé, param);
+        final LogRecord record = resources.getLogRecord(level, clÃ©, param);
         record.setSourceClassName("CoverageTable");
         record.setSourceMethodName(method);
         CoverageReference.LOGGER.log(record);
     }
 
     /**
-     * Retourne une chaîne de caractères décrivant cette table.
+     * Retourne une chaÃ®ne de caractÃ¨res dÃ©crivant cette table.
      */
     @Override
     public final String toString() {

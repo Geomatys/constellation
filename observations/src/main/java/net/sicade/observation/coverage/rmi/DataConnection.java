@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,145 +39,145 @@ import net.sicade.observation.coverage.CoverageReference;
 
 
 /**
- * Connexion vers les données environnementales. Cette interface permet de voir les données comme
- * une matrice tri-dimensionnelle, et d'évaluer ses valeurs sans nécessairement transférer des
- * images via le réseau. En effet, cette interface peut être utilisée dans le contexte des RMI
+ * Connexion vers les donnÃ©es environnementales. Cette interface permet de voir les donnÃ©es comme
+ * une matrice tri-dimensionnelle, et d'Ã©valuer ses valeurs sans nÃ©cessairement transfÃ©rer des
+ * images via le rÃ©seau. En effet, cette interface peut Ãªtre utilisÃ©e dans le contexte des RMI
  * (<cite>Remote Method Invocation</cite>), auquel cas le travail (chargement des images, calculs,
- * <cite>etc.</cite>) est effectué sur le serveur et seul le résultat est transféré sur le réseau.
+ * <cite>etc.</cite>) est effectuÃ© sur le serveur et seul le rÃ©sultat est transfÃ©rÃ© sur le rÃ©seau.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface DataConnection extends Remote {
     /**
-     * Retourne le système de référence des coordonnées selon lequel seront exprimées
-     * l'{@linkplain #getEnvelope enveloppe}, les {@linkplain #evaluate coordonnées
+     * Retourne le systÃ¨me de rÃ©fÃ©rence des coordonnÃ©es selon lequel seront exprimÃ©es
+     * l'{@linkplain #getEnvelope enveloppe}, les {@linkplain #evaluate coordonnÃ©es
      * des valeurs}, <cite>etc.</cite>
      *
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
      */
     CoordinateReferenceSystem getCoordinateReferenceSystem() throws RemoteException;
 
     /**
-     * Retourne l'enveloppe spatio-temporelle des données.
+     * Retourne l'enveloppe spatio-temporelle des donnÃ©es.
      *
-     * @throws CatalogException si la base de données n'a pas pu être interrogée.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
+     * @throws CatalogException si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
      */
     Envelope getEnvelope() throws CatalogException, RemoteException;
 
     /**
-     * Retourne la partie géographique de l'{@linkplain #getEnvelope enveloppe} des données.
+     * Retourne la partie gÃ©ographique de l'{@linkplain #getEnvelope enveloppe} des donnÃ©es.
      *
-     * @throws CatalogException si la base de données n'a pas pu être interrogée.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
+     * @throws CatalogException si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
      */
     GeographicBoundingBox getGeographicBoundingBox() throws CatalogException, RemoteException;
 
     /**
-     * Retourne la partie temporelle de l'{@linkplain #getEnvelope enveloppe} des données.
+     * Retourne la partie temporelle de l'{@linkplain #getEnvelope enveloppe} des donnÃ©es.
      *
-     * @throws CatalogException si la base de données n'a pas pu être interrogée.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
+     * @throws CatalogException si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
      */
     DateRange getTimeRange() throws CatalogException, RemoteException;
 
     /**
-     * Modifie la partie temporelle de l'{@linkplain #getEnvelope enveloppe} des données.
+     * Modifie la partie temporelle de l'{@linkplain #getEnvelope enveloppe} des donnÃ©es.
      * Toutes les images qui interceptent cette plage de temps seront pris en compte lors
      * du prochain appel de {@link #getEntries}.
      *
-     * @return {@code true} si la plage de temps à changée, ou {@code false} si les valeurs
-     *         spécifiées étaient les mêmes que la dernière fois.
+     * @return {@code true} si la plage de temps Ã  changÃ©e, ou {@code false} si les valeurs
+     *         spÃ©cifiÃ©es Ã©taient les mÃªmes que la derniÃ¨re fois.
      *
-     * @throws CatalogException si la base de données n'a pas pu être interrogée.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
+     * @throws CatalogException si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
      */
     boolean setTimeRange(final Date startTime, final Date endTime) throws CatalogException, RemoteException;
 
     /**
-     * Retourne la valeur d'une bande à une position interpolée dans l'ensemble des images de cette
-     * table. L'ensemble des données est traité comme une matrice tri-dimensionnelle. La coordonnée
-     * doit être exprimée selon le {@linkplain #getCoordinateReferenceSystem système de référence
-     * des coordonnées de la table}. Ces coordonnées sont habituellement (mais pas obligatoirement):
+     * Retourne la valeur d'une bande Ã  une position interpolÃ©e dans l'ensemble des images de cette
+     * table. L'ensemble des donnÃ©es est traitÃ© comme une matrice tri-dimensionnelle. La coordonnÃ©e
+     * doit Ãªtre exprimÃ©e selon le {@linkplain #getCoordinateReferenceSystem systÃ¨me de rÃ©fÃ©rence
+     * des coordonnÃ©es de la table}. Ces coordonnÃ©es sont habituellement (mais pas obligatoirement):
      * <p>
      * <ul>
-     *   <li>La longitude, en degrés décimaux par rapport au méridien de Greenwich</li>
-     *   <li>La latitude, en degrés décimaux</li>
+     *   <li>La longitude, en degrÃ©s dÃ©cimaux par rapport au mÃ©ridien de Greenwich</li>
+     *   <li>La latitude, en degrÃ©s dÃ©cimaux</li>
      *   <li>Le temps, en nombre de jours depuis le 1er janvier 1950 00:00 UTC.</li>
      * </ul>
      * <p>
-     * La signature de cette méthode (à base de types primitifs seulement) vise à réduire les temps
-     * de transfert sur le réseau dans le contexte des appels RMI.
+     * La signature de cette mÃ©thode (Ã  base de types primitifs seulement) vise Ã  rÃ©duire les temps
+     * de transfert sur le rÃ©seau dans le contexte des appels RMI.
      *
-     * @throws CatalogException si un enregistrement de la base de données est invalide.
-     * @throws SQLException     si la base de données n'a pas pu être interrogée pour une autre raison.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
-     * @throws IOException      si la lecture d'une image a échoué.
+     * @throws CatalogException si un enregistrement de la base de donnÃ©es est invalide.
+     * @throws SQLException     si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e pour une autre raison.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
+     * @throws IOException      si la lecture d'une image a Ã©chouÃ©.
      */
     double evaluate(double x, double y, double t, short band) throws CatalogException, SQLException, IOException;
 
     /**
-     * Retourne les coordonnées au centre du voxel le plus proche des coordonnées spécifiées.
-     * Cette méthode recherche l'image la plus proche de la date spécifiée, puis recherche le
-     * pixel qui contient la coordonnée géographique spécifiée. La date de milieu de l'image,
-     * ainsi que les coordonnées géographiques au centre du pixel, sont retournées. Appeller
-     * la méthode {@link #evaluate evaluate} avec les coordonnées retournées devrait permettre
-     * d'obtenir une valeur non-interpollée.
+     * Retourne les coordonnÃ©es au centre du voxel le plus proche des coordonnÃ©es spÃ©cifiÃ©es.
+     * Cette mÃ©thode recherche l'image la plus proche de la date spÃ©cifiÃ©e, puis recherche le
+     * pixel qui contient la coordonnÃ©e gÃ©ographique spÃ©cifiÃ©e. La date de milieu de l'image,
+     * ainsi que les coordonnÃ©es gÃ©ographiques au centre du pixel, sont retournÃ©es. Appeller
+     * la mÃ©thode {@link #evaluate evaluate} avec les coordonnÃ©es retournÃ©es devrait permettre
+     * d'obtenir une valeur non-interpollÃ©e.
      * <p>
-     * La signature de cette méthode (à base de types primitifs seulement) vise à réduire les temps
-     * de transfert sur le réseau dans le contexte des appels RMI. En particulier on retourne un
-     * tableau de {@code double} plutôt qu'un objet {@link DirectPosition} afin d'éviter le transfert
-     * d'un objet {@link CoordinateReferenceSystem} sur le réseau.
+     * La signature de cette mÃ©thode (Ã  base de types primitifs seulement) vise Ã  rÃ©duire les temps
+     * de transfert sur le rÃ©seau dans le contexte des appels RMI. En particulier on retourne un
+     * tableau de {@code double} plutÃ´t qu'un objet {@link DirectPosition} afin d'Ã©viter le transfert
+     * d'un objet {@link CoordinateReferenceSystem} sur le rÃ©seau.
      *
-     * @throws CatalogException si un enregistrement de la base de données est invalide.
-     * @throws SQLException     si la base de données n'a pas pu être interrogée pour une autre raison.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
-     * @throws IOException      si la lecture d'une image a échoué.
+     * @throws CatalogException si un enregistrement de la base de donnÃ©es est invalide.
+     * @throws SQLException     si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e pour une autre raison.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
+     * @throws IOException      si la lecture d'une image a Ã©chouÃ©.
      */
     double[] snap(double x, double y, double t) throws CatalogException, SQLException, IOException;
 
     /**
-     * Retourne les couvertures utilisées par les méthodes {@code evaluate} pour le temps <var>t</var>
-     * spécifié. L'ensemble retourné comprendra typiquement 0, 1 ou 2 éléments.
+     * Retourne les couvertures utilisÃ©es par les mÃ©thodes {@code evaluate} pour le temps <var>t</var>
+     * spÃ©cifiÃ©. L'ensemble retournÃ© comprendra typiquement 0, 1 ou 2 Ã©lÃ©ments.
      *
-     * @throws CatalogException si un enregistrement de la base de données est invalide.
-     * @throws SQLException     si la base de données n'a pas pu être interrogée pour une autre raison.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
-     * @throws IOException      si la lecture d'une image a échoué.
+     * @throws CatalogException si un enregistrement de la base de donnÃ©es est invalide.
+     * @throws SQLException     si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e pour une autre raison.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
+     * @throws IOException      si la lecture d'une image a Ã©chouÃ©.
      */
     List<Coverage> coveragesAt(double t) throws CatalogException, SQLException, IOException;
 
     /**
      * Retourne la liste des images disponibles.
      *
-     * @return Liste d'images qui interceptent la plage de temps et la région géographique d'intérêt.
-     * @throws CatalogException si un enregistrement de la base de données est invalide.
-     * @throws SQLException     si la base de données n'a pas pu être interrogée pour une autre raison.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
+     * @return Liste d'images qui interceptent la plage de temps et la rÃ©gion gÃ©ographique d'intÃ©rÃªt.
+     * @throws CatalogException si un enregistrement de la base de donnÃ©es est invalide.
+     * @throws SQLException     si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e pour une autre raison.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
      */
     Set<CoverageReference> getEntries() throws CatalogException, SQLException, RemoteException;
 
     /**
-     * Retourne une des images disponibles dans la plage de coordonnées spatio-temporelles
-     * préalablement sélectionnées. Si plusieurs images interceptent la région et la plage
-     * de temps (c'est-à-dire si {@link #getEntries} retourne un ensemble d'au moins deux
-     * entrées), alors le choix de l'image se fera en utilisant un objet
-     * {@link net.sicade.observation.coverage.CoverageComparator} par défaut.
+     * Retourne une des images disponibles dans la plage de coordonnÃ©es spatio-temporelles
+     * prÃ©alablement sÃ©lectionnÃ©es. Si plusieurs images interceptent la rÃ©gion et la plage
+     * de temps (c'est-Ã -dire si {@link #getEntries} retourne un ensemble d'au moins deux
+     * entrÃ©es), alors le choix de l'image se fera en utilisant un objet
+     * {@link net.sicade.observation.coverage.CoverageComparator} par dÃ©faut.
      *
-     * @return Une image choisie arbitrairement dans la région et la plage de date
-     *         sélectionnées, ou {@code null} s'il n'y a pas d'image dans ces plages.
+     * @return Une image choisie arbitrairement dans la rÃ©gion et la plage de date
+     *         sÃ©lectionnÃ©es, ou {@code null} s'il n'y a pas d'image dans ces plages.
      * @throws CatalogException si un enregistrement est invalide.
-     * @throws SQLException si la base de données n'a pas pu être interrogée pour une autre raison.
+     * @throws SQLException si la base de donnÃ©es n'a pas pu Ãªtre interrogÃ©e pour une autre raison.
      */
     CoverageReference getEntry() throws CatalogException, SQLException, RemoteException;
 
     /**
-     * Retourne une nouvelle connexion vers les données pour l'opération spécifiées.
-     * L'envelope spatio-temporelle restera la même.
+     * Retourne une nouvelle connexion vers les donnÃ©es pour l'opÃ©ration spÃ©cifiÃ©es.
+     * L'envelope spatio-temporelle restera la mÃªme.
      *
-     * @param  operation  L'opération à appliquer, ou {@code null} si aucune.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
+     * @param  operation  L'opÃ©ration Ã  appliquer, ou {@code null} si aucune.
+     * @throws RemoteException  si un problÃ¨me est survenu lors de la communication avec le serveur.
      */
     DataConnection newInstance(Operation operation) throws RemoteException;
 }

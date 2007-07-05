@@ -20,21 +20,21 @@ package net.sicade.observation;
 /**
  *
  * @source $URL$
- * @author Cédric Briançon
+ * @author CÃ©dric BrianÃ§on
  */
 public class SpatialConfigurationKey extends ConfigurationKey {
     
     /**
-     * La valeur de la clé contenant une partie spatiale.
+     * La valeur de la clÃ© contenant une partie spatiale.
      */
     private final transient String spatialValue;
     
     /**
-     * Construit une nouvelle clé spatiale.
+     * Construit une nouvelle clÃ© spatiale.
      *
-     * @param name          Le nom de la clé à créer. Ce nom doit être unique.
-     * @param defaultValue  Valeur par défaut associée à la clé, utilisée que si l'utilisateur n'a
-     *                      pas spécifié explicitement de valeur.
+     * @param name          Le nom de la clÃ© Ã  crÃ©er. Ce nom doit Ãªtre unique.
+     * @param defaultValue  Valeur par dÃ©faut associÃ©e Ã  la clÃ©, utilisÃ©e que si l'utilisateur n'a
+     *                      pas spÃ©cifiÃ© explicitement de valeur.
      * @param spatialValue  Valeur de la partie spatiale.
      */
     public SpatialConfigurationKey(final String name, final String defaultValue,
@@ -44,7 +44,7 @@ public class SpatialConfigurationKey extends ConfigurationKey {
     }
     
     /**
-     * Retourne la valeur de la partie spatiale associée à cette clé.
+     * Retourne la valeur de la partie spatiale associÃ©e Ã  cette clÃ©.
      */
     public String getSpatialValue() {
         return spatialValue;

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -34,10 +34,10 @@ import static net.sicade.observation.coverage.CoverageBuilder.FACTORY;
 
 
 /**
- * Un décodeur d'image qui sera exécuté sur un serveur distant. Une instance de {@code RemoteLoader} est
- * référencée par chaque {@link GridCoverageEntry} qui a été {@linkplain GridCoverageEntry#export exporté}
+ * Un dÃ©codeur d'image qui sera exÃ©cutÃ© sur un serveur distant. Une instance de {@code RemoteLoader} est
+ * rÃ©fÃ©rencÃ©e par chaque {@link GridCoverageEntry} qui a Ã©tÃ© {@linkplain GridCoverageEntry#export exportÃ©}
  * comme service RMI. Lors de la serialization du {@code GridCoverageEntry} dans le contexte des RMI, la
- * référence vers {@code RemoteLoader} sera automatiquement remplacée par une connexion vers le serveur
+ * rÃ©fÃ©rence vers {@code RemoteLoader} sera automatiquement remplacÃ©e par une connexion vers le serveur
  * d'origine.
  *
  * @version $Id$
@@ -45,34 +45,34 @@ import static net.sicade.observation.coverage.CoverageBuilder.FACTORY;
  */
 public class RemoteLoader extends UnicastRemoteObject implements CoverageLoader {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = -2228058795492073485L;
 
     /**
-     * Décodeur d'images sur lequel déléguer le travail.
+     * DÃ©codeur d'images sur lequel dÃ©lÃ©guer le travail.
      */
     private final CoverageLoader loader;
 
     /**
-     * Construit une instance de {@code RemoteLoader} qui délèguera sont travail au décodeur
-     * spécifié.
+     * Construit une instance de {@code RemoteLoader} qui dÃ©lÃ¨guera sont travail au dÃ©codeur
+     * spÃ©cifiÃ©.
      */
     public RemoteLoader(final CoverageLoader loader) throws RemoteException {
         this.loader = loader;
     }
 
     /**
-     * Procède à la lecture de l'image. Cette méthode ne retourne pas directement l'objet lu,
-     * mais l'enveloppe plutôt dans un nouveau {@link GridCoverage2D} qui ne conservera aucune
-     * référence vers ses sources. Si son image est le résultat d'une chaîne d'opération, seul
-     * le résultat sera conservée plutôt que la chaîne. Enfin, seule la version non-géophysique
-     * de l'image sera envoyée sur le réseau pour un transfert plus rapide. Il en résulte une
-     * image qui peut être de qualité dégradée par rapport à une image qui aurait été générée
+     * ProcÃ¨de Ã  la lecture de l'image. Cette mÃ©thode ne retourne pas directement l'objet lu,
+     * mais l'enveloppe plutÃ´t dans un nouveau {@link GridCoverage2D} qui ne conservera aucune
+     * rÃ©fÃ©rence vers ses sources. Si son image est le rÃ©sultat d'une chaÃ®ne d'opÃ©ration, seul
+     * le rÃ©sultat sera conservÃ©e plutÃ´t que la chaÃ®ne. Enfin, seule la version non-gÃ©ophysique
+     * de l'image sera envoyÃ©e sur le rÃ©seau pour un transfert plus rapide. Il en rÃ©sulte une
+     * image qui peut Ãªtre de qualitÃ© dÃ©gradÃ©e par rapport Ã  une image qui aurait Ã©tÃ© gÃ©nÃ©rÃ©e
      * localement.
      *
-     * @todo Essayer d'éviter d'appeller {@code geophysics(false)} si le format "naturel"
-     *       des données est géophysique. Les tests effectuées pour l'instant provoquent
+     * @todo Essayer d'Ã©viter d'appeller {@code geophysics(false)} si le format "naturel"
+     *       des donnÃ©es est gÃ©ophysique. Les tests effectuÃ©es pour l'instant provoquent
      *       un EOFException lors de la deserialisation.
      */
     public GridCoverage2D getCoverage() throws IOException {

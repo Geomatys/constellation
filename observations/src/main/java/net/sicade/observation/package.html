@@ -5,23 +5,23 @@
     <TITLE>package net.sicade.observation</TITLE>
   </HEAD>
   <BODY>
-  Interfaces communes à tous types d'observations supportées par Sicade. Le type le plus
-  couramment utilisé est la {@linkplain net.sicade.observation.Measurement mesure}, qui
-  est un cas particulier d'{@linkplain net.sicade.observation.Observation observation} où
-  la valeur observée est un scalaire. Chaque observation est associée (directement ou
-  indirectement) à un {@linkplain net.sicade.observation.Phenomenon phénomène} mesuré à
-  l'aide d'une certaine {@linkplain net.sicade.observation.Procedure procédure} à une
+  Interfaces communes Ã  tous types d'observations supportÃ©es par Sicade. Le type le plus
+  couramment utilisÃ© est la {@linkplain net.sicade.observation.Measurement mesure}, qui
+  est un cas particulier d'{@linkplain net.sicade.observation.Observation observation} oÃ¹
+  la valeur observÃ©e est un scalaire. Chaque observation est associÃ©e (directement ou
+  indirectement) Ã  un {@linkplain net.sicade.observation.Phenomenon phÃ©nomÃ¨ne} mesurÃ© Ã 
+  l'aide d'une certaine {@linkplain net.sicade.observation.Procedure procÃ©dure} Ã  une
   certaine {@linkplain net.sicade.observation.Station station}.
   <p>
-  Les notions de phénomène, procédure et de station peuvent être spécialisés en fonction de la
-  discipline étudiée. Ces spécialisations apparaissent dans des sous-paquets. Par exemple dans le
-  cas des images (sous-paquet {@link net.sicade.observation.coverage coverage}), une procédure est
-  une {@linkplain net.sicade.observation.coverage.Operation opération} appliquée sur les images. De
-  même dans le cas des pêches palangrières (sous paquet {@link net.sicade.observation.fishery fishery}),
+  Les notions de phÃ©nomÃ¨ne, procÃ©dure et de station peuvent Ãªtre spÃ©cialisÃ©s en fonction de la
+  discipline Ã©tudiÃ©e. Ces spÃ©cialisations apparaissent dans des sous-paquets. Par exemple dans le
+  cas des images (sous-paquet {@link net.sicade.observation.coverage coverage}), une procÃ©dure est
+  une {@linkplain net.sicade.observation.coverage.Operation opÃ©ration} appliquÃ©e sur les images. De
+  mÃªme dans le cas des pÃªches palangriÃ¨res (sous paquet {@link net.sicade.observation.fishery fishery}),
   une station est une {@linkplain net.sicade.observation.fishery.LongLine ligne de palangre} ou un
   {@linkplain net.sicade.observation.fishery.SeineSet coup de senne}.
   <p>
-  Le point de départ le plus pratique pour utiliser ce paquet est
+  Le point de dÃ©part le plus pratique pour utiliser ce paquet est
   {@link net.sicade.observation.Observations#getDefault()}.
   </BODY>
 </HTML>

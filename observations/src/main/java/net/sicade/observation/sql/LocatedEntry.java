@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -42,57 +42,57 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Une entrée représentant un élément à une certaine position spatio-temporelle.
+ * Une entrÃ©e reprÃ©sentant un Ã©lÃ©ment Ã  une certaine position spatio-temporelle.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class LocatedEntry extends Entry implements LocatedElement {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Pour compatibilitÃ©s entre les enregistrements binaires de diffÃ©rentes versions.
      */
     private static final long serialVersionUID = 9063512864495392613L;
 
     /**
-     * Objet à utiliser par défaut pour les écritures des dates.
+     * Objet Ã  utiliser par dÃ©faut pour les Ã©critures des dates.
      */
     private static DateFormat dateFormat;
 
     /**
-     * Objet à utiliser par défaut pour les écritures des coordonnées.
+     * Objet Ã  utiliser par dÃ©faut pour les Ã©critures des coordonnÃ©es.
      */
     private static AngleFormat angleFormat;
 
     /**
-     * Forme représentant la trajectoire de l'élément. Ne sera construit que la première
-     * fois où elle sera nécessaire.
+     * Forme reprÃ©sentant la trajectoire de l'Ã©lÃ©ment. Ne sera construit que la premiÃ¨re
+     * fois oÃ¹ elle sera nÃ©cessaire.
      */
     private Shape path;
 
     /**
-     * Position moyenne de l'élement. Ne sera calculée que la première fois où elle sera nécessaire.
+     * Position moyenne de l'Ã©lement. Ne sera calculÃ©e que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private double x, y;
 
     /**
-     * Plage de temps. Ne sera construit que la première fois où elle sera nécessaire.
+     * Plage de temps. Ne sera construit que la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private DateRange timeRange;
 
     /**
      * Connexion vers la table des positions.
-     * Sera mis à {@code null} lorsqu'elle ne sera plus nécessaire.
+     * Sera mis Ã  {@code null} lorsqu'elle ne sera plus nÃ©cessaire.
      */
     private transient LocationTable locations;
 
     /**
-     * Construit une entrée pour le nom spécifié.
+     * Construit une entrÃ©e pour le nom spÃ©cifiÃ©.
      *
-     * @param table      La table à utiliser pour localiser cet élément.
-     * @param name       Un nom unique identifiant cet élément.
-     * @param coordinate Une coordonnée représentative en degrés de longitude et de latitude,
+     * @param table      La table Ã  utiliser pour localiser cet Ã©lÃ©ment.
+     * @param name       Un nom unique identifiant cet Ã©lÃ©ment.
+     * @param coordinate Une coordonnÃ©e reprÃ©sentative en degrÃ©s de longitude et de latitude,
      *                   ou {@code null} si inconue.
-     * @param timeRange  Plage de temps de cet élément, ou {@code null} si inconue.
+     * @param timeRange  Plage de temps de cet Ã©lÃ©ment, ou {@code null} si inconue.
      */
     protected LocatedEntry(final LocationTable table,
                            final String         name,
@@ -134,11 +134,11 @@ public class LocatedEntry extends Entry implements LocatedElement {
     }
 
     /**
-     * Vérifie que les champs {@link #path} et {@link #timeRange} sont initialisés. Si ce n'est
-     * pas le cas, complète les informations et "oublie" la connexion à la base de données des
+     * VÃ©rifie que les champs {@link #path} et {@link #timeRange} sont initialisÃ©s. Si ce n'est
+     * pas le cas, complÃ¨te les informations et "oublie" la connexion Ã  la base de donnÃ©es des
      * positions (sans la fermer, car d'autres peuvent l'utiliser).
      *
-     * @throws SQLException si l'interrogation de la base de données a échoué.
+     * @throws SQLException si l'interrogation de la base de donnÃ©es a Ã©chouÃ©.
      */
     private synchronized void complete() throws SQLException {
         if (locations != null) {
@@ -180,8 +180,8 @@ public class LocatedEntry extends Entry implements LocatedElement {
      * {@inheritDoc}
      */
     public Date getTime() throws CatalogException {
-        // Note: les dates correspondant à MIN_VALUE ou MAX_VALUE
-        //       seront traitées comme représentant l'infinie.
+        // Note: les dates correspondant Ã  MIN_VALUE ou MAX_VALUE
+        //       seront traitÃ©es comme reprÃ©sentant l'infinie.
         final DateRange timeRange = getTimeRange();
         if (timeRange != null) {
             final Date min = timeRange.getMinValue();
@@ -249,7 +249,7 @@ public class LocatedEntry extends Entry implements LocatedElement {
     }
 
     /**
-     * Complète les informations manquantes avant l'enregistrement binaire de cette entrée.
+     * ComplÃ¨te les informations manquantes avant l'enregistrement binaire de cette entrÃ©e.
      */
     @Override
     protected void preSerialize() throws Exception {

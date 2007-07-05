@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -36,10 +36,10 @@ import net.sicade.observation.sql.Use;
 
 /**
  * Connexion vers une table des {@linkplain Format formats d'images}. Cette table construit
- * des objets {@link Format} pour un nom spécifié. Ces formats sont utilisés pour le décodage
+ * des objets {@link Format} pour un nom spÃ©cifiÃ©. Ces formats sont utilisÃ©s pour le dÃ©codage
  * d'objets {@link org.geotools.coverage.grid.GridCoverage2D}.
  * <p>
- * Cette table est utilisée par {@link GridCoverageTable}, qui construit des objets
+ * Cette table est utilisÃ©e par {@link GridCoverageTable}, qui construit des objets
  * de plus haut niveau.
  *
  * @version $Id$
@@ -49,7 +49,7 @@ import net.sicade.observation.sql.Use;
 @UsedBy({SubSeriesTable.class, GridCoverageTable.class})
 public class FormatTable extends SingletonTable<Format> implements Shareable {
     /**
-     * Requête SQL utilisée pour obtenir le type MIME du format
+     * RequÃªte SQL utilisÃ©e pour obtenir le type MIME du format
      * (par exemple "image/png") dans la table des formats.
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Formats:SELECT",
@@ -60,28 +60,28 @@ public class FormatTable extends SingletonTable<Format> implements Shareable {
             "  FROM \"Formats\"\n" +
             " WHERE name=?");
 
-    /** Numéro de colonne. */ private static final int NAME       = 1;
-    /** Numéro de colonne. */ private static final int MIME       = 2;
-    /** Numéro de colonne. */ private static final int EXTENSION  = 3;
-    /** Numéro de colonne. */ private static final int GEOPHYSICS = 4;
+    /** NumÃ©ro de colonne. */ private static final int NAME       = 1;
+    /** NumÃ©ro de colonne. */ private static final int MIME       = 2;
+    /** NumÃ©ro de colonne. */ private static final int EXTENSION  = 3;
+    /** NumÃ©ro de colonne. */ private static final int GEOPHYSICS = 4;
 
     /**
      * Connexion vers la table des bandes.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
      */
     private SampleDimensionTable bands;
 
     /**
-     * Construit une table en utilisant la connexion spécifiée.
+     * Construit une table en utilisant la connexion spÃ©cifiÃ©e.
      *
-     * @param  database Connexion vers la base de données d'observations.
+     * @param  database Connexion vers la base de donnÃ©es d'observations.
      */
     public FormatTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les formats.
+     * Retourne la requÃªte SQL Ã  utiliser pour obtenir les formats.
      */
     @Override
     protected String getQuery(final QueryType type) throws SQLException {

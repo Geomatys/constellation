@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2006, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import javax.imageio.spi.ImageReaderSpi;
 
 
 /**
- * Classe de base des fournisseurs de décodeurs {@link FileBasedReader}.
+ * Classe de base des fournisseurs de dÃ©codeurs {@link FileBasedReader}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -44,15 +44,15 @@ public abstract class FileBasedReaderSpi extends ImageReaderSpi {
      */
     public FileBasedReaderSpi() {
         inputTypes = INPUT_TYPES;
-        vendorName = "Institut de Recherche pour le Développement";
+        vendorName = "Institut de Recherche pour le DÃ©veloppement";
     }
 
     /**
-     * Retourne le type d'image que créera le décodeur HDF. Ce type d'image comprend généralement
-     * une palette de couleurs qui dépend du type de données (SST, CHL...), et donc de la classe
-     * dérivée.
+     * Retourne le type d'image que crÃ©era le dÃ©codeur HDF. Ce type d'image comprend gÃ©nÃ©ralement
+     * une palette de couleurs qui dÃ©pend du type de donnÃ©es (SST, CHL...), et donc de la classe
+     * dÃ©rivÃ©e.
      *
-     * @throws IOException si la palette de couleur n'a pas pu être obtenue.
+     * @throws IOException si la palette de couleur n'a pas pu Ãªtre obtenue.
      */
     protected abstract ImageTypeSpecifier getRawImageType() throws IOException;
 }

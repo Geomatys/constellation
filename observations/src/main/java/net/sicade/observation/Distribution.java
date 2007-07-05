@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,14 +20,14 @@ package net.sicade.observation;
 
 
 /**
- * Distribution statistique approximative des {@linkplain Measurement valeurs mesurées} pour un
- * {@linkplain Observable observable} donné. Cette distribution n'est pas nécessairement calculée
- * à partir des données; il peut s'agir d'un <cite>a-priori</cite>. Cette interface est utilisée
+ * Distribution statistique approximative des {@linkplain Measurement valeurs mesurÃ©es} pour un
+ * {@linkplain Observable observable} donnÃ©. Cette distribution n'est pas nÃ©cessairement calculÃ©e
+ * Ã  partir des donnÃ©es; il peut s'agir d'un <cite>a-priori</cite>. Cette interface est utilisÃ©e
  * pour effectuer des changements de variables avant injection des valeurs dans un
- * {@linkplain net.sicade.observation.coverage.LinearModel modèle linéaire}, de façon à obtenir
+ * {@linkplain net.sicade.observation.coverage.LinearModel modÃ¨le linÃ©aire}, de faÃ§on Ã  obtenir
  * une distribution des valeurs plus proche de la
  * <A HREF="http://mathworld.wolfram.com/NormalDistribution.html">distribution normale</A>.
- * Le changement de variable peut consister par exemple à calculer le logarithme d'une valeur,
+ * Le changement de variable peut consister par exemple Ã  calculer le logarithme d'une valeur,
  * afin de transformer une <A HREF="http://mathworld.wolfram.com/LogNormalDistribution.html">
  * distribution log-normale</A> en distribution normale.
  * 
@@ -37,17 +37,17 @@ package net.sicade.observation;
  */
 public interface Distribution extends Element {
     /**
-     * Applique un changement de variable, si nécessaire.
-     * Les valeurs retournées devraient avoir (au moins approximativement) une
+     * Applique un changement de variable, si nÃ©cessaire.
+     * Les valeurs retournÃ©es devraient avoir (au moins approximativement) une
      * <A HREF="http://mathworld.wolfram.com/NormalDistribution.html">distribution normale</A>.
-     * Si cette méthode ne sait pas transformer les valeurs, alors elle doit retourner {@code value}
-     * inchangé. Toutefois, le même traitement doit être appliqué à toutes les valeurs (cette méthode
-     * ne doit pas transformer certaines valeurs et retourner {@code value} inchangé pour d'autres
+     * Si cette mÃ©thode ne sait pas transformer les valeurs, alors elle doit retourner {@code value}
+     * inchangÃ©. Toutefois, le mÃªme traitement doit Ãªtre appliquÃ© Ã  toutes les valeurs (cette mÃ©thode
+     * ne doit pas transformer certaines valeurs et retourner {@code value} inchangÃ© pour d'autres
      * valeurs).
      *
-     * @param  value La valeur à transformer.
-     * @return La valeur transformée, ou {@code value} si la distribution des valeurs échantillonées
-     *         était déjà normale ou si cette interface ne sait pas transformer les valeurs.
+     * @param  value La valeur Ã  transformer.
+     * @return La valeur transformÃ©e, ou {@code value} si la distribution des valeurs Ã©chantillonÃ©es
+     *         Ã©tait dÃ©jÃ  normale ou si cette interface ne sait pas transformer les valeurs.
      */
     double normalize(double value);
 
