@@ -60,14 +60,11 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
      */
     private static final ConfigurationKey SELECT = new ConfigurationKey("Series:SELECT",
             "SELECT name, phenomenon, procedure, period, fallback, description\n" +
-            "  FROM \"Layers\"\n"                                                 +
+            " FROM \"Layers\"\n"                                                  +
             " WHERE name=?");
-
+    
     /**
      * Requête SQL utilisée pour obtenir une série à partir de son nom.
-     * @todo Adapter les colonnes de la requête à un objet postgresql.BOX3D concernant la recherche 
-     *       des limites de l'enveloppe (table "GridGeometries"). Dans le cas d'une base JavaDB,
-     *       utiliser la requête telle qu'actuellement, car l'objet BOX3D n'est pas reconnu.
      */
     private static final ConfigurationKey LIST = new ConfigurationKey("Series:LIST",
             "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
@@ -78,13 +75,32 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
             "   JOIN \"GridGeometries\""        + " ON extent=\"GridGeometries\".id\n" +
             "   WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                 +
             "     AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                 +
-            "     AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"     +
-            "     AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"     +
+            "     AND (\"spatialExtent\" && ?)\n"     +
             "  ) "                                                                     +
             "  AS \"Selected\" ON layer=\"Layers\".name\n"                             +
             "  WHERE visible=TRUE\n"                                                   +
             "  ORDER BY name");
-
+    
+    /**
+     * Requête SQL utilisée pour obtenir une série à partir de son nom.
+     */
+    private static final ConfigurationKey LIST_JAVADB = new ConfigurationKey("Series:LIST",
+            "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
+            "  FROM \"Layers\" "                                                       +
+            "  JOIN (\n"                                                               +
+            "   SELECT DISTINCT layer, visible FROM \"Series\"\n"                      +
+            "   JOIN \"GridCoverages\""         + " ON series=\"Series\".identifier\n" +
+            "   JOIN \"GridGeometries\""        + " ON extent=\"GridGeometries\".id\n" +
+            "   WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                 +
+            "     AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                 +
+            "     AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"     +
+            "     AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"     +
+            "     AND (\"altitudeMax\"       >=? AND \"altitudeMin\"<=?)\n"            +
+            "  ) "                                                                     +
+            "  AS \"Selected\" ON layer=\"Layers\".name\n"                             +
+            "  WHERE visible=TRUE\n"                                                   +
+            "  ORDER BY name");
+    
     /** Numéro de colonne. */ private static final int NAME      =  1;
     /** Numéro de colonne. */ private static final int THEMATIC  =  2;
     /** Numéro de colonne. */ private static final int PROCEDURE =  3;
@@ -163,9 +179,19 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
     @Override
     protected String getQuery(final QueryType type) throws SQLException {
         switch (type) {
-            case LIST:         return getProperty(LIST);
-            case SELECT:       return getProperty(SELECT);
-            case BOUNDING_BOX: return getProperty(GridCoverageTable.BOUNDING_BOX);
+            case LIST:
+                if (database.BOX3D_POSTGIS) {
+                    return getProperty(LIST);
+                } else {
+                    return getProperty(LIST_JAVADB);
+                }                
+            case SELECT: return getProperty(SELECT);
+            case BOUNDING_BOX: 
+                if (database.BOX3D_POSTGIS) {
+                    return getProperty(GridCoverageTable.BOUNDING_BOX);
+                } else {
+                    return getProperty(GridCoverageTable.BOUNDING_BOX_JAVADB);
+                }
             default:           return super.getQuery(type);
         }
     }
@@ -289,5 +315,9 @@ public class SeriesTable extends BoundedSingletonTable<Series> {
             models      = database.createTable(LinearModelTable.class); models.setDescriptorTable(descriptors);
         }
         entry.model = models.getEntry(entry);
+    }
+
+    public int getFALLBACK() {
+        return FALLBACK;
     }
 }

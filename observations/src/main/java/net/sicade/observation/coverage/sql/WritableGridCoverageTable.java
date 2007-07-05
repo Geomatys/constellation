@@ -72,8 +72,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      */
     private static final ConfigurationKey INSERT = new ConfigurationKey("GridCoverage:INSERT",
             "INSERT INTO coverages.\"GridCoverages\" " +
-                "(subseries, filename, \"startTime\", \"endTime\", extent)\n" +
-            "    VALUES (?, ?, ?, ?, ?)");
+                "(series, filename, \"startTime\", \"endTime\", extent)\n" +
+                "VALUES (?, ?, ?, ?, ?)");
 
     /**
      * Connexion vers la table des étendues géographiques.

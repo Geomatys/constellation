@@ -84,18 +84,33 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * Requête SQL utilisée pour obtenir l'enveloppe spatio-temporelle couverte
      * par toutes les images d'une série (ou de l'ensemble des séries).
-     *
-     * @todo Adapter les colonnes de la requête à un objet postgresql.BOX3D concernant la recherche 
-     *       des limites de l'enveloppe (table "GridGeometries"). Dans le cas d'une base JavaDB,
-     *       utiliser la requête telle qu'actuellement, car l'objet BOX3D n'est pas reconnu.
      */
      static final ConfigurationKey BOUNDING_BOX = new ConfigurationKey("GridCoverages:BOX",
+            "SELECT MIN(\"startTime\") "           + "AS \"tmin\", "  +
+                   "MAX(\"endTime\") "             + "AS \"tmax\", "  +
+                   "\"spatialExtent\"\n"           +
+             "  FROM \"GridCoverages\"\n"          +
+             "  JOIN \"GridGeometries\""           + " ON extent=\"GridGeometries\".id\n" +
+             "  JOIN \"Series\""                   + " ON layer=\"Series\".identifier\n"  +
+             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                     +
+             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                     +
+             "   AND (\"spatialExtent\" && ?)\n"                                          +
+             "   AND (series LIKE ?) AND visible=TRUE\n");
+     
+     /**
+      * Requête SQL utilisée pour obtenir l'enveloppe spatio-temporelle couverte
+      * par toutes les images d'une série (ou de l'ensemble des séries). Requête 
+      * utilisée avec des bases JavaDB.
+      */
+     static final ConfigurationKey BOUNDING_BOX_JAVADB = new ConfigurationKey("GridCoverages:BOX",
             "SELECT MIN(\"startTime\") "           + "AS \"tmin\", "  +
                    "MAX(\"endTime\") "             + "AS \"tmax\", "  +
                    "MIN(\"westBoundLongitude\") "  + "AS \"xmin\", "  +
                    "MAX(\"eastBoundLongitude\") "  + "AS \"xmax\", "  +
                    "MIN(\"southBoundLatitude\") "  + "AS \"ymin\", "  +
                    "MAX(\"northBoundLatitude\") "  + "AS \"ymax\"\n"  +
+                   "MIN(\"altitudeMin\") "         + "AS \"zmin\"\n"  +
+                   "MAX(\"altitudeMax\") "         + "AS \"zmax\"\n"  +
              "  FROM \"GridCoverages\"\n"          +
              "  JOIN \"GridGeometries\""           + " ON extent=\"GridGeometries\".id\n" +
              "  JOIN \"Series\""                   + " ON layer=\"Series\".identifier\n"  +
@@ -109,12 +124,38 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * Requête SQL utilisée par cette classe pour obtenir la liste des images.
      * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par
      * les constantes {@link #SERIES}, {@link #FILENAME} et compagnie.
-     *
-     * @todo Adapter les colonnes de la requête à un objet postgresql.BOX3D concernant la recherche 
-     *       des limites de l'enveloppe (table "GridGeometries"). Dans le cas d'une base JavaDB,
-     *       utiliser la requête telle qu'actuellement, car l'objet BOX3D n'est pas reconnu.
      */
     private static final ConfigurationKey LIST = new ConfigurationKey("GridCoverages:LIST",
+            "SELECT " + "series, "                +  // [01] SERIES
+                        "subseries, "             +  // [02] SUB_SERIES
+                        "pathname, "              +  // [03] PATHNAME
+                        "filename, "              +  // [04] FILENAME
+                      "\"startTime\", "           +  // [05] START_TIME
+                      "\"endTime\", "             +  // [06] END_TIME
+                      "\"spatialExtent\", "       +  // [07] SPATIAL_EXTENT
+                        "width, "                 +  // [08] WIDTH
+                        "height, "                +  // [09] HEIGHT
+                        "depth, "                 +  // [10] DEPTH
+                        "\"CRS\", "               +  // [11] CRS
+                        "format, "                +  // [12] FORMAT
+                        "NULL AS remarks\n"       +  // [13] REMARKS
+             "  FROM \"GridCoverages\"\n"                                                +
+             "  JOIN \"GridGeometries\""          + " ON extent=\"GridGeometries\".id\n" +
+             "  JOIN \"Series\""                  + " ON layer=\"Series\".identifier\n"  +
+             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                    +
+             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                    +
+             "   AND (\"spatialExtent\" && ?)\n"                                         +
+             "   AND (series LIKE ?) AND (filename LIKE ?) AND visible=TRUE\n"           +
+             " ORDER BY \"endTime\", series"); // DOIT être en ordre chronologique.
+                                                  // Voir {@link GridCoverageEntry#compare}.
+    
+    /**
+     * Requête SQL utilisée par cette classe pour obtenir la liste des images.
+     * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par
+     * les constantes {@link #SERIES}, {@link #FILENAME} et compagnie. 
+     * Requête utilisée avec des bases JavaDB.
+     */
+    private static final ConfigurationKey LIST_JAVADB = new ConfigurationKey("GridCoverages:LIST",
             "SELECT " + "series, "                +  // [01] SERIES
                         "subseries, "             +  // [02] SUB_SERIES
                         "pathname, "              +  // [03] PATHNAME
@@ -125,11 +166,14 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
                       "\"eastBoundLongitude\", "  +  // [08] XMAX
                       "\"southBoundLatitude\", "  +  // [09] YMIN
                       "\"northBoundLatitude\", "  +  // [10] YMAX
-                        "width, "                 +  // [11] WIDTH
-                        "height, "                +  // [12] HEIGHT
-                        "\"CRS\", "               +  // [13] CRS
-                        "format, "                +  // [14] FORMAT
-                        "NULL AS remarks\n"       +  // [15] REMARKS
+                      "\"altitudeMin\", "         +  // [11] ZMIN
+                      "\"altitudeMax\", "         +  // [12] ZMAX
+                        "width, "                 +  // [13] WIDTH
+                        "height, "                +  // [14] HEIGHT
+                        "depth, "                 +  // [15] DEPTH
+                        "\"CRS\", "               +  // [16] CRS
+                        "format, "                +  // [17] FORMAT
+                        "NULL AS remarks\n"       +  // [18] REMARKS
              "  FROM \"GridCoverages\"\n"                                                +
              "  JOIN \"GridGeometries\""          + " ON extent=\"GridGeometries\".id\n" +
              "  JOIN \"Series\""                  + " ON layer=\"Series\".identifier\n"  +

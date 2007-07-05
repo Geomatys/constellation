@@ -38,7 +38,7 @@ import org.opengis.util.InternationalString;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public final class ConfigurationKey implements Serializable {
+public class ConfigurationKey implements Serializable {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */

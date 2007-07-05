@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import net.sicade.observation.SpatialConfigurationKey;
 
 // Geotools
 import org.geotools.factory.Hints;
@@ -177,7 +178,19 @@ public class Table {
      * par défaut sinon.
      */
     protected final String getProperty(final ConfigurationKey key) {
-        return (key==null) ? null : (database!=null) ? database.getProperty(key) : key.getDefaultValue();
+        if (key == null) {
+            return null;
+        }
+        if (database != null) {
+            final String value = database.getProperty(key);
+            if (value != null) {
+                return value;
+            }
+        }
+        if (key instanceof SpatialConfigurationKey) {
+            return ((SpatialConfigurationKey) key).getSpatialValue();
+        }
+        return key.getDefaultValue();
     }
 
     /**

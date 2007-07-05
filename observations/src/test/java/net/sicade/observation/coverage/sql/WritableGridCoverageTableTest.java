@@ -29,6 +29,9 @@ import java.sql.SQLException;
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+// Seagis Dependencies
+import net.sicade.observation.coverage.AbstractTest;
 import net.sicade.observation.coverage.Series;
 
 // Geotools dependencies
@@ -36,7 +39,6 @@ import org.geotools.resources.Arguments;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import net.sicade.observation.coverage.AbstractTest;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 

@@ -154,6 +154,11 @@ public class Database {
             Entry.LOGGER.config("RMI désactivés.");
         }
     }
+    
+    /**
+     * Spécifie le type de base de données utilisée.
+     */
+    public static final boolean BOX3D_POSTGIS = true;
 
     /**
      * Source de données.
