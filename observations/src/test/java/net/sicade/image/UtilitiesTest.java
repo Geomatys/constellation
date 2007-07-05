@@ -63,7 +63,7 @@ public class UtilitiesTest extends TestCase {
      * Teste la palette retournée par {@link Utilities#getPaletteFactory}.
      */
     public void testPalette() throws IOException {
-        final PaletteFactory palette = Utilities.getPaletteFactory();
+        final PaletteFactory palette = Utilities.getPaletteFactory(null);
         final Color[] colors = palette.getColors("seawifs");
         assertNotNull("Les ressources ne sont pas accessibles.", colors);
         assertEquals(new Color(132, 0, 124), colors[0]);
