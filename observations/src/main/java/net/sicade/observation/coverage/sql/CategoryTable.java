@@ -217,6 +217,6 @@ public class CategoryTable extends Table implements Shareable {
              */
         }
         final URL url = new URL(colors);
-        return Utilities.getPaletteFactory().getColors(url.getPath());
+        return Utilities.getPaletteFactory(null).getColors(url.getPath());
     }
 }

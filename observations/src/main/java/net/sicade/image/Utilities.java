@@ -18,14 +18,12 @@
  */
 package net.sicade.image;
 
-// J2SE dependencies
 import java.util.Locale;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.awt.image.RenderedImage;
 import javax.swing.JFrame;
 
-// Geotools dependencies
 import org.geotools.image.io.PaletteFactory;
 
 
@@ -50,15 +48,16 @@ public final class Utilities {
     /**
      * Gets the default palette factory.
      */
-    public static synchronized PaletteFactory getPaletteFactory() {
+    public static synchronized PaletteFactory getPaletteFactory(final Locale locale) {
         if (factory == null) {
             factory = new PaletteFactory(
-            /* parent factory */ null,
+            /* parent factory */ PaletteFactory.getDefault(locale),
             /* class loader   */ Utilities.class,
             /* root directory */ new File("colors"),
             /* extension      */ ".pal",
             /* character set  */ Charset.forName("ISO-8859-1"),
-            /* locale         */ Locale.US);
+            /* locale         */ Locale.US,
+            /* warning locale */ locale);
         }
         return factory;
     }
@@ -72,6 +71,6 @@ public final class Utilities {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.add(new javax.media.jai.widget.ScrollingImagePanel(image, 400, 400));
         frame.pack();
-        frame.show();
+        frame.setVisible(true);
     }
 }

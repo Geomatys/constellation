@@ -49,7 +49,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * 
  * 
  * @author Cédric Briançon
- * @version $Id: WritableGridCoverageTableTest.java 20 2007-05-22 11:04:09Z cedricbr $
+ * @version $Id$
  */
 public class WritableGridCoverageTableTest extends AbstractTest {
     /**
