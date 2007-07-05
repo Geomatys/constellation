@@ -42,7 +42,7 @@ import net.sicade.observation.ServerException;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.sql.MeasurementTable;
 import net.sicade.observation.coverage.sql.DescriptorTable;
-import net.sicade.resources.seagis.Resources;
+import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.XArray;
 
 

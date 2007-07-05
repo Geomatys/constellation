@@ -52,8 +52,8 @@ import javax.swing.event.ChangeListener;
 import org.geotools.resources.SwingUtilities;
 
 // Seagis
-import net.sicade.resources.seasview.Resources;
-import net.sicade.resources.seasview.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**

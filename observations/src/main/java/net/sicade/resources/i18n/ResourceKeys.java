@@ -5,7 +5,7 @@
  *     THIS IS AN AUTOMATICALLY GENERATED FILE. DO NOT EDIT!
  *     Generated with: org.geotools.resources.ResourceCompiler
  */
-package net.sicade.resources.seasview;
+package net.sicade.resources.i18n;
 
 
 /**

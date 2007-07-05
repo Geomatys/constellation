@@ -17,18 +17,13 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package net.sicade.resources.seagis;
 
-// J2SE dependencoes
+package net.sicade.resources.i18n;
+
+// Miscellaneous
 import java.util.Locale;
 import java.util.MissingResourceException;
-
-// OpenGIS dependencies
-import org.opengis.util.InternationalString;
-
-// Geotools dependencies
-import org.geotools.resources.ResourceBundle;
-import org.geotools.util.ResourceInternationalString;
+import org.geotools.resources.i18n.IndexedResourceBundle;
 
 
 /**
@@ -39,40 +34,11 @@ import org.geotools.util.ResourceInternationalString;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Resources extends ResourceBundle {
-    /**
-     * Construct a resource bundle using english language.
-     * This is the default when no resource are available
-     * in user language.
-     */
-    public Resources() {
-        super(Resources_fr.FILEPATH);
-        
-//      super(// Set 'true' in front of language to use as default.
-//            false ? Resources_fr.FILEPATH :
-//             true ? Resources_en.FILEPATH :
-//             null);
-    }
-
-    /**
-     * Construct a resource bundle
-     * using the specified UTF8 file.
-     */
-    Resources(final String filepath) {
-        super(filepath);
-    }
-
-    /**
-     * Returns the name of the logger to use.
-     */
-    protected String getLoggerName() {
-        return "net.sicade";
-    }
-
+public class Resources extends IndexedResourceBundle {
     /**
      * Returns resources in the given locale.
      *
-     * @param  locale The locale, or {@code null} for the default locale.
+     * @param  local The locale, or {@code null} for the default locale.
      * @return Resources in the given locale.
      * @throws MissingResourceException if resources can't be found.
      */
@@ -84,18 +50,6 @@ public class Resources extends ResourceBundle {
         /*
          * We rely on cache capability of {@link java.util.ResourceBundle}.
          */
-    }
-
-    /**
-     * Gets an international string for the given key. This method do not check for the key
-     * validity. If the key is invalid, then a {@link MissingResourceException} may be thrown
-     * when a {@link InternationalString#toString} method is invoked.
-     *
-     * @param  key The key for the desired string.
-     * @return An international string for the given key.
-     */
-    public static InternationalString formatInternational(final int key) {
-        return new ResourceInternationalString(Resources.class.getName(), String.valueOf(key));
     }
 
     /**

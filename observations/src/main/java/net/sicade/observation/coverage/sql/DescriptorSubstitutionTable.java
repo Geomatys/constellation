@@ -34,8 +34,8 @@ import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
 import net.sicade.observation.coverage.LinearModel;
 import net.sicade.observation.coverage.Descriptor;
-import net.sicade.resources.seagis.ResourceKeys;
-import net.sicade.resources.seagis.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
 
 
 /**

@@ -65,8 +65,8 @@ import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.resources.seagis.Resources;
-import net.sicade.resources.seagis.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**

@@ -33,8 +33,8 @@ import net.sicade.observation.CatalogException;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
-import net.sicade.resources.seagis.Resources;
-import net.sicade.resources.seagis.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;

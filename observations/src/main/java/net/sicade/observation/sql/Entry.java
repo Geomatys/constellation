@@ -26,8 +26,8 @@ import java.io.InvalidObjectException;
 
 // Sicade dependencies
 import net.sicade.observation.Element;
-import net.sicade.resources.seagis.Resources;
-import net.sicade.resources.seagis.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 import org.geotools.resources.Utilities;
 
 

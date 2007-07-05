@@ -78,8 +78,8 @@ import net.sicade.observation.sql.Entry;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.coverage.Format;
 import net.sicade.observation.coverage.CoverageReference;
-import net.sicade.resources.seagis.Resources;
-import net.sicade.resources.seagis.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**

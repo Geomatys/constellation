@@ -53,8 +53,8 @@ import net.sicade.observation.coverage.sql.SeriesTable;
 import net.sicade.observation.coverage.sql.SeriesTree;
 import net.sicade.observation.coverage.sql.TreeDepth;
 import net.sicade.observation.sql.Database;
-import net.sicade.resources.seagis.ResourceKeys;
-import net.sicade.resources.seagis.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
 
 
 /**

@@ -90,8 +90,8 @@ import org.geotools.axis.NumberGraduation;
 import org.geotools.axis.AbstractGraduation;
 
 // Resources
-import net.sicade.resources.seasview.Resources;
-import net.sicade.resources.seasview.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**

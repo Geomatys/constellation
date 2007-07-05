@@ -17,8 +17,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-package net.sicade.resources.seasview;
+package net.sicade.resources.i18n;
 
 
 /**
@@ -28,15 +27,4 @@ package net.sicade.resources.seasview;
  * @author Martin Desruisseaux
  */
 public class Resources_fr extends Resources {
-    /**
-     * The resource file, using UTF-8 encoding.
-     */
-    static final String FILEPATH = "resources_fr.utf";
-
-    /**
-     * Construct resources for French.
-     */
-    public Resources_fr() {
-        super(FILEPATH);
-    }
 }

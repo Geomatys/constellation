@@ -44,8 +44,8 @@ import javax.swing.event.ListSelectionListener;
 import org.geotools.resources.SwingUtilities;
 
 // Divers
-import net.sicade.resources.seasview.Resources;
-import net.sicade.resources.seasview.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**

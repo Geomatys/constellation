@@ -42,8 +42,8 @@ import net.sicade.observation.sql.SingletonTable;
 import net.sicade.observation.sql.ProcedureTable;
 import net.sicade.observation.coverage.Format;
 import net.sicade.observation.coverage.Thematic;  // Pour javadoc
-import net.sicade.resources.seagis.Resources;
-import net.sicade.resources.seagis.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**

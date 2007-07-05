@@ -40,8 +40,8 @@ import net.sicade.observation.Element;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.NoSuchRecordException;
 import net.sicade.observation.IllegalRecordException;
-import net.sicade.resources.seagis.Resources;
-import net.sicade.resources.seagis.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**
