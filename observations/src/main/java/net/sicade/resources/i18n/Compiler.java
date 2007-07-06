@@ -1,8 +1,6 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,10 +15,7 @@
 package net.sicade.resources.i18n;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import org.geotools.resources.Arguments;
-import org.geotools.resources.ResourceCompiler;
+import org.geotools.resources.IndexedResourceCompiler;
 
 
 /**
@@ -29,7 +24,7 @@ import org.geotools.resources.ResourceCompiler;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class Compiler extends ResourceCompiler {
+public final class Compiler {
     /**
      * The base directory for {@code "java"} {@code "resources"} sub-directories.
      * The directory structure must be consistent with Maven conventions.
@@ -44,33 +39,15 @@ public final class Compiler extends ResourceCompiler {
     };
 
     /**
-     * Constructs a new compiler.
+     * Do not allows instantiation of this class.
      */
-    protected Compiler(final File sourceDirectory, final Class bundleClass, final PrintWriter out)
-            throws IOException
-    {
-        super(sourceDirectory, bundleClass, out);
+    private Compiler() {
     }
 
     /**
      * Run the resource compiler.
      */
-    public static void main(String[] args) {
-        final Arguments arguments = new Arguments(args);
-        final PrintWriter out = arguments.out;
-        args = arguments.getRemainingArguments(0);
-        if (!SOURCE_DIRECTORY.isDirectory()) {
-            out.print(SOURCE_DIRECTORY);
-            out.println(" not found or is not a directory.");
-            return;
-        }
-        for (int i=0; i<RESOURCES_TO_PROCESS.length; i++) {
-            try {
-                scanForResources(SOURCE_DIRECTORY, RESOURCES_TO_PROCESS[i], out);
-            } catch (IOException exception) {
-                out.println(exception.getLocalizedMessage());
-            }
-        }
-        out.flush();
+    public static void main(final String[] args) {
+        IndexedResourceCompiler.main(args, SOURCE_DIRECTORY, RESOURCES_TO_PROCESS);
     }
 }
