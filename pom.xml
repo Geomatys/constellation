@@ -417,6 +417,7 @@
   -->
   <modules>
     <module>numeric</module>
+    <module>postgrid</module>
     <module>observations</module>
     <module>widgets</module>
     <module>openoffice</module>

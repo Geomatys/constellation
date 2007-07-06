@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.sql;
 
@@ -94,7 +90,7 @@ public class ObservationEntry extends Entry implements Observation {
     public final int hashCode() {
         return station.hashCode() ^ observable.hashCode();
     }
-    
+
     /**
      * Vérifie si cette entré est identique à l'objet spécifié.
      */

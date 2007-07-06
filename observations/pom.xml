@@ -19,7 +19,7 @@
     Description du module.
   -->
   <groupId>net.sicade</groupId>
-  <artifactId>seagis-observations</artifactId>
+  <artifactId>observations</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>Observations et mesures</name>
@@ -37,7 +37,8 @@
       <id>desruisseaux</id>
       <name>Martin Desruisseaux</name>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>IRD Unité S140</organization>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <roles>
         <role>Administrateur du projet</role>
         <role>Développeur Java</role>
@@ -112,9 +113,9 @@
       <artifactId>gt2-widgets-swing</artifactId>
     </dependency>
     <dependency>
-      <groupId>edu.ucar</groupId>
-      <artifactId>netcdf</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <groupId>net.sicade</groupId>
+      <artifactId>postgrid</artifactId>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

@@ -19,7 +19,7 @@
     Description du module.
   -->
   <groupId>net.sicade</groupId>
-  <artifactId>seagis-openoffice</artifactId>
+  <artifactId>openoffice</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>Addin OpenOffice</name>
@@ -62,12 +62,12 @@
     </dependency>
     <dependency>
       <groupId>net.sicade</groupId>
-      <artifactId>seagis-numeric</artifactId>
+      <artifactId>numeric</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>net.sicade</groupId>
-      <artifactId>seagis-observations</artifactId>
+      <artifactId>observations</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
@@ -139,7 +139,7 @@
         <artifactId>gt2-unopkg</artifactId>
         <version>2.4-SNAPSHOT</version>
         <configuration>
-          <oxtName>seagis-${project.version}</oxtName>
+          <oxtName>${project.version}</oxtName>
         </configuration>
         <executions>
           <execution>

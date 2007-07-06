@@ -19,7 +19,7 @@
     Description du module.
   -->
   <groupId>net.sicade</groupId>
-  <artifactId>seagis-numeric</artifactId>
+  <artifactId>numeric</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>Algorithmes numériques</name>
@@ -37,7 +37,8 @@
       <id>desruisseaux</id>
       <name>Martin Desruisseaux</name>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Unité S140 (Espace)</organization>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <roles>
         <role>Administrateur du projet</role>
         <role>Développeur Java</role>

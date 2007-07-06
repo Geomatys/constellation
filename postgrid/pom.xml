@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Configuration du module "postgrid" du projet Sicade.
+  Version: $Id$
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.sicade</groupId>
+    <artifactId>seagis</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Description du module.
+  -->
+  <groupId>net.sicade</groupId>
+  <artifactId>postgrid</artifactId>
+  <packaging>jar</packaging>
+  <name>Base de données PostGrid</name>
+  <description>
+    Utilitaires dédiés à l'exploitation d'une base de données PostgreSQL contenant un ensemble d'images.
+  </description>
+
+
+
+  <!--
+    Liste des développeurs et des contributeurs.
+  -->
+  <developers>
+    <developer>
+      <id>desruisseaux</id>
+      <name>Martin Desruisseaux</name>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Administrateur du projet</role>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Antoine Hnawia</name>
+      <email>antoine.hnawia@noumea.ird.nc</email>
+      <organization>IRD Unité S140</organization>
+      <organizationUrl>http://www.espace.ird.nc</organizationUrl>
+      <roles>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+11</timezone>
+    </contributor>
+    <contributor>
+      <name>Touraivane</name>
+      <email>touraivane@univ-nc.nc</email>
+      <organization>Université de la Nouvelle-Calédonie</organization>
+      <organizationUrl>http://www.univ-nc.nc</organizationUrl>
+      <roles>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+11</timezone>
+    </contributor>
+    <contributor>
+      <name>Briançon Cédric</name>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+1</timezone>
+    </contributor>
+  </contributors>
+
+
+  <!--
+    Dépendences.
+  -->
+  <dependencies>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opengis</groupId>
+      <artifactId>geoapi-nogenerics</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-coverage</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-coverageio</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-widgets-swing</artifactId>
+    </dependency>
+  </dependencies>
+
+
+
+  <!--
+    Compilation et création du fichier JAR. Par rapport à la configuration
+    définie dans le pom.xml parent, on ajoute la compilation des stubs RMI.
+  -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>gt2-rmic</artifactId>
+        <version>2.4-SNAPSHOT</version>
+        <configuration>
+          <includes>
+            net.sicade.observation.coverage.rmi.Server,
+            net.sicade.observation.coverage.rmi.RemoteLoader,
+            net.sicade.observation.coverage.rmi.GridCoverageServer
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>rmic</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+        Exécution des tests. La propriété "rmi.enabled" indique si
+        la suite de tests est autorisée à se connecter au serveur RMI.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>rmi.enabled</name>
+              <value>false</value>
+            </property>
+          </systemProperties>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
