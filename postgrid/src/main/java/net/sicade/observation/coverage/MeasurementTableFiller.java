@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -175,36 +171,36 @@ public class MeasurementTableFiller implements Runnable {
         final MeasurementInserts updater = new MeasurementInserts(measures);
         updater.start();
         /*
-         * On traitera ensemble tous les descripteurs qui correspondent à la même série d'images,
+         * On traitera ensemble tous les descripteurs qui correspondent à la même couche d'images,
          * pour éviter de charger en mémoire les même images plusieurs fois.  On évite de traiter
-         * en même temps des séries d'images différentes pour éviter de consommer trop de mémoire
+         * en même temps des couches d'images différentes pour éviter de consommer trop de mémoire
          * lors de la création du tableau de paires stations-descripteurs plus bas.
          *
          * Note: Nous remplaçont la variable de classe 'descriptors',  qui contenait l'ensemble
          *       des descripteurs, par une liste locale qui ne contient que les descripteurs de
-         *       la même série. Ca ne change rien pour l'algorithme qui suit,  excepté que cela
+         *       la même couche. Ca ne change rien pour l'algorithme qui suit,  excepté que cela
          *       peut jouer sur les performances et la consommation de mémoire.
          */
         while (!remaining.isEmpty()) {
-            final Series series = remaining.getFirst().getPhenomenon();
+            final Layer layer = remaining.getFirst().getPhenomenon();
             final List<Descriptor> descriptorList = new ArrayList<Descriptor>(remaining.size());
             for (final Iterator<Descriptor> it=remaining.iterator(); it.hasNext();) {
                 final Descriptor descriptor = it.next();
-                if (Utilities.equals(descriptor.getPhenomenon(), series)) {
+                if (Utilities.equals(descriptor.getPhenomenon(), layer)) {
                     descriptorList.add(descriptor);
                     it.remove();
                 }
             }
             if (descriptorList.isEmpty()) {
-                throw new AssertionError(series);
+                throw new AssertionError(layer);
             }
-            assert Collections.disjoint(descriptorList, remaining) : series;
-            assert descriptors.containsAll(descriptorList) : series;
-            Descriptor.LOGGER.info("Traitement de la série \"" + series.getName() +
+            assert Collections.disjoint(descriptorList, remaining) : layer;
+            assert descriptors.containsAll(descriptorList) : layer;
+            Descriptor.LOGGER.info("Traitement de la couche \"" + layer.getName() +
                                    "\" (" + descriptorList.size() + " descripteurs)");
             /*
              * La variable locale 'descriptorList' ne contient maintenant qu'un sous-ensemble des
-             * descripteurs pour une même série. On voudra évaluer ces descripteurs aux positions
+             * descripteurs pour une même couche. On voudra évaluer ces descripteurs aux positions
              * des stations, mais pas nécessairement dans l'ordre chronologique des stations.
              * L'ordre dépendra aussi des décalages temporelles des descripteurs, car l'objectif
              * est de traiter toutes les stations qui correspondant à une même image (incluant les

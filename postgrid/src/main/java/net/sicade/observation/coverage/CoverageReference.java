@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -95,9 +91,9 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     String SOURCE_KEY = "net.sicade.observation.CoverageReference";
 
     /**
-     * Retourne la série à laquelle appartient cette image.
+     * Retourne la couche à laquelle appartient cette image.
      */
-    Series getSeries();
+    Layer getLayer();
 
     /**
      * Retourne le format de cette image.
@@ -126,7 +122,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
      *   <li>Le temps, en jours juliens depuis le 01/01/1950 00:00 UTC.</li>
      * </ul>
      * <p>
-     * Bien que toutes les images provenant d'une même {@linkplain Series série} ont en
+     * Bien que toutes les images provenant d'une même {@linkplain Layer couche} ont en
      * général le même système de référence des coordonnées, ce n'est pas toujours le cas.
      */
     CoordinateReferenceSystem getCoordinateReferenceSystem();
@@ -249,7 +245,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
         }
 
         public CoverageReference         getParent()                                           {return ref;}
-        public Series                    getSeries()                    {return ref.getSeries();}
+        public Layer                     getLayer()                     {return ref.getLayer();}
         public Format                    getFormat()                    {return ref.getFormat();}
         public File                      getFile()                      {return ref.getFile();}
         public URL                       getURL()                       {return ref.getURL();}

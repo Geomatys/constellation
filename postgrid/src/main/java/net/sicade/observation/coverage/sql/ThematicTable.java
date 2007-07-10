@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -23,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 // Sicade dependencies
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Thematic;
 import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.sql.Table;
@@ -36,7 +32,7 @@ import net.sicade.observation.IllegalRecordException;
 
 /**
  * Connexion vers la table des {@linkplain Thematic thèmes} traités par les
- * {@linkplain Series séries}.
+ * {@linkplain Layer couches}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -55,11 +51,11 @@ public class ThematicTable extends SingletonTable<Thematic> implements Shareable
     /** Numéro de colonne. */ private static final int REMARKS = 2;
 
     /**
-     * Une instance unique de la table des sous-séries. Sera créée par {@link #getSubSeriesTable} la
+     * Une instance unique de la table des séries. Sera créée par {@link #getSeriesTable} la
      * première fois où elle sera nécessaire. <strong>Note:</strong> on évite de déclarer explicitement
-     * le type {@link SubSeriesTable} afin d'éviter de charger les classes correspondantes trop tôt.
+     * le type {@link SeriesTable} afin d'éviter de charger les classes correspondantes trop tôt.
      */
-    private transient Table subseries;
+    private transient Table series;
 
     /**
      * Construit une table des thèmes.
@@ -89,20 +85,20 @@ public class ThematicTable extends SingletonTable<Thematic> implements Shareable
     }
 
     /**
-     * Retourne une instance unique de la table des sous-séries. Cette méthode est réservée à un
-     * usage strictement interne par {@link SeriesTable}. En principe, les {@link SubSeriesTable}
+     * Retourne une instance unique de la table des séries. Cette méthode est réservée à un
+     * usage strictement interne par {@link LayerTable}. En principe, les {@link SeriesTable}
      * ne sont pas {@linkplain Shareable partageable} car elle possèdent une méthode {@code set}.
-     * Dans le cas particulier de {@link SeriesTable} toutefois, toutes les utilisations de
-     * {@link SubSeriesTable} se font à l'intérieur d'un bloc synchronisé, de sorte qu'une
+     * Dans le cas particulier de {@link LayerTable} toutefois, toutes les utilisations de
+     * {@link SeriesTable} se font à l'intérieur d'un bloc synchronisé, de sorte qu'une
      * instance unique suffit.
      *
-     * @param  type Doit obligatoirement être {@code SubSeriesTable.class}.
-     * @return La table des sous-séries.
+     * @param  type Doit obligatoirement être {@code SeriesTable.class}.
+     * @return La table des séries.
      */
     final synchronized <T extends Table> T getTable(final Class<T> type) {
-        if (subseries == null) {
-            subseries = database.getTable(type);
+        if (series == null) {
+            series = database.getTable(type);
         }
-        return type.cast(subseries);
+        return type.cast(series);
     }
 }

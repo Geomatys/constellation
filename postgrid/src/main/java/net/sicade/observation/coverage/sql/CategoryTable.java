@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -38,7 +34,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
 // Geotools dependencies
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.Category;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.ReferencingFactoryFinder;
 
 // Sicade dependencies
 import net.sicade.observation.ConfigurationKey;
@@ -158,7 +154,7 @@ public class CategoryTable extends Table implements Shareable {
                 category = new Category(name, colors, range, c1, c0);
                 if (log) try {
                     // Catégorie quantitative et logarithmique.
-                    final MathTransformFactory factory = FactoryFinder.getMathTransformFactory(FACTORY_HINTS);
+                    final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(FACTORY_HINTS);
                     if (exponential == null) {
                         final ParameterValueGroup param = factory.getDefaultParameters("Exponential");
                         param.parameter("base").setValue(10.0); // Must be a 'double'

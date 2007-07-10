@@ -29,7 +29,7 @@ import org.geotools.resources.Utilities;
 
 /**
  * Classe de base d'un enregistrement dans une {@linkplain Table table} ou une requête. Chacune de
- * ces entrées représentera un {@linkplain Element element} (phénomène, procédure, série d'images,
+ * ces entrées représentera un {@linkplain Element element} (phénomène, procédure, couche d'images,
  * <cite>etc.</cite>). Les entrées sont habituellement (mais pas obligatoirement) identifiées de
  * manière unique par leurs {@linkplain #getName noms}.
  *

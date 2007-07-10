@@ -32,7 +32,7 @@ import junit.framework.TestSuite;
 
 // Seagis Dependencies
 import net.sicade.observation.coverage.AbstractTest;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
@@ -43,7 +43,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 
 
 /**
- * Teste le fonctionnement de {@link CoverageStack#evaluate} avec des {@link Series}.
+ * Teste le fonctionnement de {@link CoverageStack#evaluate} avec des {@link Layer}.
  * Ce test est un peu plus direct que {@link DescriptorTest} du fait qu'il construit
  * lui même le {@link CoverageStack} dans plusieurs cas.
  * 
@@ -60,9 +60,9 @@ public class WritableGridCoverageTableTest extends AbstractTest {
     private static final boolean DISABLED = false;
 
     /**
-     * Connexion vers la table des séries.
+     * Connexion vers la table des couches.
      */
-    private static SeriesTable series;
+    private static LayerTable layers;
 
     /**
      * Construit la suite de tests.
@@ -98,18 +98,18 @@ public class WritableGridCoverageTableTest extends AbstractTest {
     @Override
     protected void setUp() throws SQLException, IOException {
         super.setUp();
-        if (series == null) {
-            series = database.getTable(SeriesTable.class);
+        if (layers == null) {
+            layers = database.getTable(LayerTable.class);
         }
     }
 
     /**
-     * Teste l'obtention de la liste des séries, incluant un filtrage par région géographique.
+     * Teste l'obtention de la liste des couches, incluant un filtrage par région géographique.
      */
     public void testWritableGCT() throws Exception {
         if (DISABLED) return;
-        final SeriesTable table = database.getTable(SeriesTable.class);
-        final Set<Series> all = table.getEntries();
+        final LayerTable table = database.getTable(LayerTable.class);
+        final Set<Layer> all = table.getEntries();
         final File file = new File("C:\\images\\Contrôles\\Afrique.png");
         final String fileNameWithExt = file.getName();
         final String fileName = fileNameWithExt.substring(0, fileNameWithExt.indexOf("."));
@@ -119,10 +119,10 @@ public class WritableGridCoverageTableTest extends AbstractTest {
         assertEquals(bbox, table.getGeographicBoundingBox());
 //        table.trimEnvelope(); // Devrait n'avoir aucun effet lorsque la sélection contient des image mondiales.
 //        assertEquals(bbox, table.getGeographicBoundingBox());
-        final Series selected = table.getEntry("Images de tests");
-        System.out.println(selected.getSubSeries());
+        final Layer selected = table.getEntry("Images de tests");
+        System.out.println(selected.getSeries());
         WritableGridCoverageTable writableGCT = new WritableGridCoverageTable(database);
-        writableGCT.setSeries(selected);
+        writableGCT.setLayer(selected);
         writableGCT.addEntry(fileName, dateFormat.parse("17/06/2007"), 
                 dateFormat.parse("18/06/2007"), bbox, new Dimension(1024, 768));
     }

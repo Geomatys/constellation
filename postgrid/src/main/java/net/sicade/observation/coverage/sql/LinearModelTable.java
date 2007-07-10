@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -38,7 +34,7 @@ import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.LinearModel;
 
@@ -51,7 +47,7 @@ import net.sicade.observation.coverage.LinearModel;
  * @author Antoine Hnawia
  */
 @Use({DescriptorTable.class, DescriptorSubstitutionTable.class})
-@UsedBy(SeriesTable.class)
+@UsedBy(LayerTable.class)
 public class LinearModelTable extends Table implements Shareable {
     /**
      * La requête SQL servant à interroger la table.
@@ -90,7 +86,7 @@ public class LinearModelTable extends Table implements Shareable {
 
     /**
      * Définie la table des descripteurs à utiliser. Cette méthode peut être appelée par
-     * {@link SeriesTable} immédiatement après la construction de {@code LinearModelTable}
+     * {@link LayerTable} immédiatement après la construction de {@code LinearModelTable}
      * et avant toute première utilisation. Notez que les instances de {@code LinearModelTable}
      * ainsi créées ne devraient pas être partagées par {@link Database#getTable}.
      *
@@ -112,14 +108,14 @@ public class LinearModelTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne le modèle linéaire pour la série spécifiée. Si cette série n'est pas
+     * Retourne le modèle linéaire pour la couche spécifiée. Si cette couche n'est pas
      * le résultat d'un modèle linéaire, alors cette méthode retourne {@code null}.
      *
-     * @param  target La série d'images pour laquelle on veut le modèle linéaire.
+     * @param  target La couche d'images pour laquelle on veut le modèle linéaire.
      * @return Le modèle linéaire, ou {@code null} s'il n'y en a pas.
      * @throws SQLException si l'interrogation de la base de données a échoué.
      */
-    public synchronized LinearModel getEntry(final Series target) throws CatalogException, SQLException {
+    public synchronized LinearModel getEntry(final Layer target) throws CatalogException, SQLException {
         final List<LinearModel.Term> terms = getTerms(target);
         if (terms == null) {
             return null;
@@ -139,15 +135,15 @@ public class LinearModelTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne les termes de modèle linéaire pour la série d'images spécifiée. 
-     * Si cette série n'est pas le résultat d'un modèle linéaire, alors cette
+     * Retourne les termes de modèle linéaire pour la couche d'images spécifiée. 
+     * Si cette couche n'est pas le résultat d'un modèle linéaire, alors cette
      * méthode retourne {@code null}.
      *
-     * @param  target La série d'images pour laquelle on veut le modèle linéaire.
+     * @param  target La couche d'images pour laquelle on veut le modèle linéaire.
      * @return Les termes du modèle linéaire, ou {@code null} s'il n'y en a pas.
      * @throws SQLException si l'interrogation de la base de données a échoué.
      */
-    private List<LinearModel.Term> getTerms(final Series target) throws CatalogException, SQLException {
+    private List<LinearModel.Term> getTerms(final Layer target) throws CatalogException, SQLException {
         ArrayList<LinearModelTerm> terms = null;
         final PreparedStatement statement = getStatement(SELECT);
         statement.setString(ARGUMENT_TARGET, target.getName());
@@ -159,11 +155,11 @@ public class LinearModelTable extends Table implements Shareable {
              * Il est possible que nous l'utilisateur courant n'aie pas les droits d'accès à la
              * table des modèles linéaires. Les données de cette table sont parfois considérées
              * sensibles et l'accès restreint. Puisque les modèles linéaires ne sont pas une
-             * information essentielle au fonctionnement des séries et que 'null' est une valeur
-             * légale, on considèrera que la série demandée n'a pas de modèle linéaire associée.
+             * information essentielle au fonctionnement des couches et que 'null' est une valeur
+             * légale, on considèrera que la couche demandée n'a pas de modèle linéaire associée.
              */
             final LogRecord record = new LogRecord(Level.WARNING,
-                    "Le modèle linéaire n'est pas accessible pour la série \"" + target.getName() + "\".");
+                    "Le modèle linéaire n'est pas accessible pour la couche \"" + target.getName() + "\".");
             record.setSourceClassName("LinearModelTable");
             record.setSourceMethodName("getEntry");
             record.setThrown(e);

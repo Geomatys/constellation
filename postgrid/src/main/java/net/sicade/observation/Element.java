@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * Interface de base des éléments ayant un rapport avec les observations. Il s'agit en quelque sorte
  * de l'équivalent de la classe {@link Object}; une interface de base pouvant représenter à peu près
  * n'importe quoi. Les interfaces dérivées utiles comprennent les {@linkplain Observation observations}
- * et les {@linkplain net.sicade.observation.coverage.Series séries d'images} par exemple.
+ * et les {@linkplain net.sicade.observation.coverage.Layer couches} d'images par exemple.
  *
  * @version $Id$
  * @author Martin Desruisseaux

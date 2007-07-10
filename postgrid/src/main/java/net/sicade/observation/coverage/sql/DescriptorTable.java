@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -32,7 +28,7 @@ import net.sicade.observation.CatalogException;
 import net.sicade.observation.NoSuchRecordException;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.Operation;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.LocationOffset;
 import net.sicade.observation.sql.DistributionTable;
 import net.sicade.observation.sql.SingletonTable;
@@ -46,17 +42,17 @@ import net.sicade.observation.sql.Use;
 
 /**
  * Connexion vers la table des {@linkplain Descriptor descripteurs}. Les informations nécessaires à
- * la construction des descripteurs sont puisées principalement dans trois tables: {@link SeriesTable},
- * {@link LocationOffsetTable} et {@link OperationTable}. De ces trois tables, la table des séries
+ * la construction des descripteurs sont puisées principalement dans trois tables: {@link LayerTable},
+ * {@link LocationOffsetTable} et {@link OperationTable}. De ces trois tables, la table des couches
  * est particulière du fait qu'elle n'est pas sensée être {@linkplain Shareable partageable}. Cela
  * n'empêche toutefois pas {@code DescriptorTable} de l'être, puisqu'il utilise par défaut une table
- * des séries globales dont il ne modifiera pas la configuration.
+ * des couches globales dont il ne modifiera pas la configuration.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-@Use({SeriesTable.class, OperationTable.class, LocationOffsetTable.class, DistributionTable.class})
+@Use({LayerTable.class, OperationTable.class, LocationOffsetTable.class, DistributionTable.class})
 @UsedBy({LinearModelTable.class, DescriptorSubstitutionTable.class})
 public class DescriptorTable extends SingletonTable<Descriptor> implements NumericAccess, Shareable {
     /**
@@ -77,9 +73,9 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
     /** Numéro de colonne. */ private static final int DISTRIBUTION = 7;
 
     /**
-     * La table des séries. Elle sera construite la première fois où elle sera nécessaire.
+     * La table des couches. Elle sera construite la première fois où elle sera nécessaire.
      */
-    private SeriesTable series;
+    private LayerTable layer;
     
     /**
      * La table des opérations. Ne sera construite que la première fois où elle sera nécessaire.
@@ -108,22 +104,22 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
     }
 
     /**
-     * Définie la table des séries à utiliser. Cette méthode peut être appelée par {@link SeriesTable}
+     * Définie la table des couches à utiliser. Cette méthode peut être appelée par {@link LayerTable}
      * immédiatement après la construction de {@code DescriptorTable} et avant toute première utilisation.
      * Notez que les instances de {@code DescriptorTable} ainsi créées ne seront pas partagées par
      * {@link Database#getTable}.
      *
-     * @param  series Table des séries à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des séries.
+     * @param  layer Table des couches à utiliser.
+     * @throws IllegalStateException si cette instance utilise déjà une autre table des couches.
      */
-    protected synchronized void setSeriesTable(final SeriesTable series)
+    protected synchronized void setLayerTable(final LayerTable layer)
             throws IllegalStateException
     {
-        if (this.series != series) {
-            if (this.series != null) {
+        if (this.layer != layer) {
+            if (this.layer != null) {
                 throw new IllegalStateException();
             }
-            this.series = series;
+            this.layer = layer;
         }
     }
 
@@ -196,10 +192,10 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
             offsets = database.getTable(LocationOffsetTable.class);
         }
         final LocationOffset offset = offsets.getEntry(position);
-        if (series == null) {
-            setSeriesTable(database.getTable(SeriesTable.class));
+        if (layer == null) {
+            setLayerTable(database.getTable(LayerTable.class));
         }
-        final Series series = this.series.getEntry(phenomenon);
+        final Layer layer = this.layer.getEntry(phenomenon);
         if (operations == null) {
             operations = database.getTable(OperationTable.class);
         }
@@ -208,6 +204,6 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
             distributions = database.getTable(DistributionTable.class);
         }
         final Distribution distribution = distributions.getEntry(distrib);
-        return new DescriptorEntry(identifier, symbol, series, operation, band, offset, distribution, null);
+        return new DescriptorEntry(identifier, symbol, layer, operation, band, offset, distribution, null);
     }
 }

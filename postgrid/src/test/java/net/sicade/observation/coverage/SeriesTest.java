@@ -44,13 +44,13 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 // Sicade dependencies
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.coverage.sql.SeriesTable;
+import net.sicade.observation.coverage.sql.LayerTable;
 import net.sicade.observation.coverage.sql.OperationTable;
 import net.sicade.observation.coverage.sql.GridCoverageTable;
 
 
 /**
- * Teste le fonctionnement de {@link CoverageStack#evaluate} avec des {@link Series}.
+ * Teste le fonctionnement de {@link CoverageStack#evaluate} avec des {@link Layer}.
  * Ce test est un peu plus direct que {@link DescriptorTest} du fait qu'il construit
  * lui même le {@link CoverageStack} dans plusieurs cas.
  *
@@ -68,9 +68,9 @@ public class SeriesTest extends AbstractTest {
     private static final boolean DISABLED = false;
 
     /**
-     * Connexion vers la table des séries.
+     * Connexion vers la table des couches.
      */
-    private static SeriesTable series;
+    private static LayerTable layers;
 
     /**
      * Construit la suite de tests.
@@ -106,28 +106,28 @@ public class SeriesTest extends AbstractTest {
     @Override
     protected void setUp() throws SQLException, IOException {
         super.setUp();
-        if (series == null) {
-            series = database.getTable(SeriesTable.class);
+        if (layers == null) {
+            layers = database.getTable(LayerTable.class);
         }
     }
 
     /**
-     * Construit la couverture 3D pour la série spécifiée. La résultat sera placé
+     * Construit la couverture 3D pour la couche spécifiée. La résultat sera placé
      * dans le champ {@link #coverage}.
      *
-     * @param seriesName  Nom de la série pour laquelle on veut une couverture 3D.
+     * @param seriesName  Nom de la couche pour laquelle on veut une couverture 3D.
      * @param interpolate {@code true} si les interpolations sont autorisées.
      */
     private void createCoverage3D(final String seriesName, final boolean interpolate)
             throws CatalogException, SQLException, IOException
     {
-        final Series series = this.series.getEntry(seriesName);
+        final Layer layer = layers.getEntry(seriesName);
         final Coverage c;
         if (interpolate) {
-            c = series.getCoverage();
+            c = layer.getCoverage();
         } else {
             final GridCoverageTable table = database.getTable(GridCoverageTable.class);
-            table.setSeries(series);
+            table.setLayer(layer);
             table.setOperation(database.getTable(OperationTable.class).getEntry("Valeur directe"));
             final CoverageStack stack = new CoverageStack(seriesName,
                                                           table.getCoordinateReferenceSystem(),
@@ -139,19 +139,19 @@ public class SeriesTest extends AbstractTest {
     }
 
     /**
-     * Teste l'obtention de la liste des séries, incluant un filtrage par région géographique.
+     * Teste l'obtention de la liste des couches, incluant un filtrage par région géographique.
      */
     public void testSeries() throws Exception {
         if (DISABLED) return;
-        final SeriesTable table = database.getTable(SeriesTable.class);
-        final Set<Series> all = table.getEntries();
+        final LayerTable table = database.getTable(LayerTable.class);
+        final Set<Layer> all = table.getEntries();
         assertFalse(all.isEmpty());
         final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(-60, 40, 15, 80);
         table.setGeographicBoundingBox(bbox);
         assertEquals(bbox, table.getGeographicBoundingBox());
         table.trimEnvelope(); // Devrait n'avoir aucun effet lorsque la sélection contient des image mondiales.
         assertEquals(bbox, table.getGeographicBoundingBox());
-        final Set<Series> selected = table.getEntries();
+        final Set<Layer> selected = table.getEntries();
         assertFalse(selected.isEmpty());
         /* TODO: notre base a été épurée de certaines données, pour les tests on modifie la condition qui était
          * un inférieur strict par un inférieur ou égal (dans notre cas selected.size() et all.size() sont égaux.

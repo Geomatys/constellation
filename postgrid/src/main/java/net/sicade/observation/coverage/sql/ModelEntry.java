@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -32,7 +28,7 @@ import net.sicade.observation.sql.Entry;
 import net.sicade.observation.Distribution;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Model;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.ModelCoverage;
 import net.sicade.resources.XArray;
@@ -52,9 +48,9 @@ public abstract class ModelEntry extends Entry implements Model {
     private static final long serialVersionUID = 5614887885038525651L;
 
     /**
-     * La série dans laquelle seront stockées les valeurs de la variable dépendante <var>y</var>.
+     * La couche dans laquelle seront stockées les valeurs de la variable dépendante <var>y</var>.
      */
-    private final Series target;
+    private final Layer target;
 
     /**
      * Les distributions de chaque descripteurs. Ne sera construite que la première
@@ -71,9 +67,9 @@ public abstract class ModelEntry extends Entry implements Model {
     /**
      * Construit un modèle.
      *
-     * @param target La série dans laquelle seront stockées les valeurs de la variable dépendante.
+     * @param target La couche dans laquelle seront stockées les valeurs de la variable dépendante.
      */
-    public ModelEntry(final Series target) {
+    public ModelEntry(final Layer target) {
         super(target.getName());
         this.target = target;
     }
@@ -81,7 +77,7 @@ public abstract class ModelEntry extends Entry implements Model {
     /**
      * {inheritDoc}
      */
-    public Series getTarget() {
+    public Layer getTarget() {
         return target;
     }
 

@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -37,12 +33,10 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.util.Logging;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.datum.DefaultEllipsoid;
-
-//import org.geotools.resources.CTSUtilities;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.Utilities;
 
 
 /**
@@ -76,17 +70,17 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     /**
      * Object à utiliser pour construire des transformations de coordonnées.
      */
-    private final CoordinateOperationFactory factory = FactoryFinder.getCoordinateOperationFactory(null);
+    private final CoordinateOperationFactory factory = ReferencingFactoryFinder.getCoordinateOperationFactory(null);
 
     /**
      * Système de reference des coordonnées dans lequel faire les comparaisons. Il s'agit
-     * du système de coordonnées de la {@linkplain Series series} d'origine.
+     * du système de coordonnées de la {@linkplain Layer couche} d'origine.
      */
     private final CoordinateReferenceSystem crs;
 
     /**
      * Transformation permettant de passer du système de coordonnées d'un objet {@link CoverageReference}
-     * vers le système de coordonnées de la {@linkplain Series séries} (c'est-à-dire {@link #crs}).
+     * vers le système de coordonnées de la {@linkplain Layer couche} (c'est-à-dire {@link #crs}).
      * Cette transformation est conservée dans une cache interne afin d'éviter de construire
      * cet objet trop fréquement.
      */
@@ -99,7 +93,7 @@ public class CoverageComparator implements Comparator<CoverageReference> {
 
     /**
      * Coordonnées spatio-temporelles demandées. Ils s'agit des coordonnées qui avait été spécifiée
-     * à la {@linkplain Series series}. Cette envelope est exprimée selon le système de référence
+     * à la {@linkplain Layer couche}. Cette envelope est exprimée selon le système de référence
      * des coordonnées {@link #crs}. Cette enveloppe n'est pas clonée. Elle ne doit donc pas être
      * modifiée.
      */
@@ -118,13 +112,13 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     private final int xDim, yDim, tDim;
 
     /**
-     * Construit un comparateur pour les images de la séries spécifiée.
+     * Construit un comparateur pour les images de la couches spécifiée.
      *
-     * @param  Series series d'où proviennent les images qui seront à comparer.
+     * @param  layer Couche d'où proviennent les images qui seront à comparer.
      * @throws RemoteException si la connexion au serveur a échoué.
      */
-//    public CoverageComparator(final Series series) throws RemoteException {
-//        this(series.getCoordinateReferenceSystem(), series.getEnvelope());
+//    public CoverageComparator(final Layer layer) throws RemoteException {
+//        this(layer.getCoordinateReferenceSystem(), layer.getEnvelope());
 //    }
 
     /**
@@ -150,7 +144,7 @@ public class CoverageComparator implements Comparator<CoverageReference> {
         this.tDim      = tDim;
         this.crs       = crs;
         this.target    = envelope;
-        this.ellipsoid = DefaultEllipsoid.wrap(CRSUtilities.getEllipsoid(crs));
+        this.ellipsoid = DefaultEllipsoid.wrap(CRS.getEllipsoid(crs));
         this.area      = getArea(target);
     }
 
@@ -254,9 +248,8 @@ public class CoverageComparator implements Comparator<CoverageReference> {
      * Signale qu'une exception inatendue est survenue lors de l'exécution de {@link #evaluator}.
      */
     private static void unexpectedException(final Exception exception) {
-        Utilities.unexpectedException("net.sicade.observation.coverage",
-                                      "CoverageComparator",
-                                      "evaluator", exception);
+        Logging.unexpectedException("net.sicade.observation.coverage",
+                                    CoverageComparator.class, "evaluator", exception);
     }
 
     /**
@@ -297,15 +290,15 @@ public class CoverageComparator implements Comparator<CoverageReference> {
         {
             Envelope envelope = entry.getEnvelope();
             CoordinateReferenceSystem sourceCRS = entry.getCoordinateReferenceSystem();
-            if (!CRSUtilities.equalsIgnoreMetadata(crs, sourceCRS)) {
+            if (!CRS.equalsIgnoreMetadata(crs, sourceCRS)) {
                 if (transformation == null ||
-                    !CRSUtilities.equalsIgnoreMetadata(transformation.getSourceCRS(), sourceCRS))
+                    !CRS.equalsIgnoreMetadata(transformation.getSourceCRS(), sourceCRS))
                 {
                     transformation = factory.createOperation(sourceCRS, crs);
                 }
                 final MathTransform transform = transformation.getMathTransform();
                 if (!transform.isIdentity()) {
-                    envelope = CRSUtilities.transform(transform, envelope);
+                    envelope = CRS.transform(transform, envelope);
                 }
             }
             this.source = envelope;

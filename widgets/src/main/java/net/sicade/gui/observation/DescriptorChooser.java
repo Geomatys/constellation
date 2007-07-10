@@ -61,7 +61,7 @@ import net.sicade.resources.XArray;
 import net.sicade.observation.Element;
 import net.sicade.observation.Observations;
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.LocationOffset;
@@ -145,7 +145,7 @@ public class DescriptorChooser extends JPanel {
 
 
     /**
-     * Nom de la première étape, qui consiste à choisir les {@linkplain Series séries},
+     * Nom de la première étape, qui consiste à choisir les {@linkplain Layer couches},
      * {@linkplain Operation opérations} et {@link LocationOffset positions relatives}.
      * Ce nom peut être spécifié en argument à {@link #setStep} pour sélectionner les
      * listes à afficher.
@@ -171,9 +171,9 @@ public class DescriptorChooser extends JPanel {
     private final Map<Descriptor,Boolean> descriptors = new LinkedHashMap<Descriptor,Boolean>();
 
     /**
-     * Ensemble des {@linkplain Series séries} d'images.
+     * Ensemble des {@linkplain Layer couches} d'images.
      */
-    private final Map<Series,Boolean> series = new LinkedHashMap<Series,Boolean>();
+    private final Map<Layer,Boolean> layers = new LinkedHashMap<Layer,Boolean>();
 
     /**
      * Ensemble des {@linkplain Operation opérations}.
@@ -186,9 +186,9 @@ public class DescriptorChooser extends JPanel {
     private final Map<LocationOffset,Boolean> offsets = new LinkedHashMap<LocationOffset,Boolean>();
 
     /**
-     * Liste des {@linkplain Series séries} d'images.
+     * Liste des {@linkplain Layer couches} d'images.
      */
-    private final JList seriesList;
+    private final JList layerList;
 
     /**
      * Liste des {@linkplain Operation opérations}.
@@ -247,12 +247,12 @@ public class DescriptorChooser extends JPanel {
          */
         JPanel step = new JPanel(new BorderLayout(0,9));
         JPanel pane = new JPanel(new GridLayout(1,3,9,0));
-        pane.add(new JLabel("Séries d'images", JLabel.CENTER));
-        pane.add(new JLabel("Opérations",      JLabel.CENTER));
-        pane.add(new JLabel("Décalages",       JLabel.CENTER));
+        pane.add(new JLabel("Couches d'images", JLabel.CENTER));
+        pane.add(new JLabel("Opérations",       JLabel.CENTER));
+        pane.add(new JLabel("Décalages",        JLabel.CENTER));
         step.add(pane, BorderLayout.NORTH);
         pane = new JPanel(new GridLayout(1,3,9,0));
-        pane.add(new JScrollPane(seriesList    = new JList(new Model())));
+        pane.add(new JScrollPane(layerList     = new JList(new Model())));
         pane.add(new JScrollPane(operationList = new JList(new Model())));
         pane.add(new JScrollPane(offsetList    = new JList(new Model())));
         step.add(pane, BorderLayout.CENTER);
@@ -312,12 +312,12 @@ public class DescriptorChooser extends JPanel {
         boolean offsetModified    = false;
         for (final Descriptor descriptor : toAdd) {
             if (add(descriptors, descriptor)) {
-                seriesModified    |= add(series,     descriptor.getPhenomenon());
+                seriesModified    |= add(layers,     descriptor.getPhenomenon());
                 operationModified |= add(operations, descriptor.getProcedure());
                 offsetModified    |= add(offsets,    descriptor.getLocationOffset());
             }
         }
-        if (seriesModified)    setElements(seriesList,    series);
+        if (seriesModified)    setElements(layerList,     layers);
         if (operationModified) setElements(operationList, operations);
         if (offsetModified)    setElements(offsetList,    offsets);
     }
@@ -388,18 +388,18 @@ public class DescriptorChooser extends JPanel {
 
     /**
      * Met à jour les champs internes (notamment {@link #descriptors}) en fonction de la sélection
-     * des listes de séries, procédures et décalages spatio-temporelles. Cette opération intervient
+     * des listes de couches, procédures et décalages spatio-temporelles. Cette opération intervient
      * typiquement lorsque l'utilisateur appuie sur le bouton "Suivant".
      */
     private void commitPropertiesSelection() {
-        copySelection(seriesList,    series);
+        copySelection(layerList,     layers);
         copySelection(operationList, operations);
         copySelection(offsetList,    offsets);
         final Set<Descriptor> selected  = new HashSet<Descriptor>();
         final Set<Descriptor> confirmed = new HashSet<Descriptor>();
         for (final Map.Entry<Descriptor,Boolean> entry : descriptors.entrySet()) {
             final Descriptor descriptor = entry.getKey();
-            final boolean isSelected = TRUE.equals(series    .get(descriptor.getPhenomenon    ())) &&
+            final boolean isSelected = TRUE.equals(layers    .get(descriptor.getPhenomenon    ())) &&
                                        TRUE.equals(operations.get(descriptor.getProcedure     ())) &&
                                        TRUE.equals(offsets   .get(descriptor.getLocationOffset()));
             if (isSelected) {
@@ -420,11 +420,11 @@ public class DescriptorChooser extends JPanel {
     }
 
     /**
-     * Met à jour les champs internes (notamment {@link #series}, {@link #operations} et {@link #offsets})
+     * Met à jour les champs internes (notamment {@link #layers}, {@link #operations} et {@link #offsets})
      * en fonction de la sélection des descripteurs. Cette opération intervient typiquement lorsque
      * l'utilisateur appuie sur le bouton "Précédent".
      * <p>
-     * Notez que cette méthode n'efface pas la sélection précédente des listes {@link #series},
+     * Notez que cette méthode n'efface pas la sélection précédente des listes {@link #layers},
      * {@link #operations} et {@link #offsets}. Elle peut seulement l'étendre. Si vous souhaitez
      * effacer les sélections précédentes au préalable, appelez d'abord
      * <code>{@link #selectAll selectAll}(..., FALSE)</code>.
@@ -437,7 +437,7 @@ public class DescriptorChooser extends JPanel {
             final boolean    isSelected = selected.contains(descriptor);
             entry.setValue(isSelected);
             if (isSelected) {
-                if (series    .put(descriptor.getPhenomenon(),     TRUE) == null ||
+                if (layers    .put(descriptor.getPhenomenon(),     TRUE) == null ||
                     operations.put(descriptor.getProcedure(),      TRUE) == null ||
                     offsets   .put(descriptor.getLocationOffset(), TRUE) == null)
                 {
@@ -445,7 +445,7 @@ public class DescriptorChooser extends JPanel {
                 }
             }
         }
-        copySelection(series,     seriesList   );
+        copySelection(layers,     layerList    );
         copySelection(operations, operationList);
         copySelection(offsets,    offsetList   );
     }

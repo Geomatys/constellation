@@ -38,9 +38,9 @@ public interface DataConnectionFactory extends Remote {
     String REGISTRY_NAME = "DataConnectionFactory";
 
     /**
-     * Construit une nouvelle connexion vers les données de la série spécifiée.
+     * Construit une nouvelle connexion vers les données de la couche spécifiée.
      *
-     * @throws CatalogException si la table n'a pas pu être construite pour la série spécifiée.
+     * @throws CatalogException si la table n'a pas pu être construite pour la couche spécifiée.
      * @throws SQLException si la connexion à la base de données a échoué.
      * @throws RemoteException si la connexion n'a pas pu être établie.
      */
@@ -57,7 +57,7 @@ public interface DataConnectionFactory extends Remote {
      * Toutefois, faire exécuter ce code sur le serveur RMI distant permet d'éviter que le client
      * n'ouvre une connexion à la base de données.
      *
-     * @throws CatalogException si la table n'a pas pu être construite pour la série spécifiée.
+     * @throws CatalogException si la table n'a pas pu être construite pour la couche spécifiée.
      * @throws SQLException si la connexion à la base de données a échoué.
      * @throws RemoteException si la connexion n'a pas pu être établie.
      */

@@ -56,7 +56,7 @@ public class PostGridCoverageReaderTest extends TestCase {
     }        
     
     /**
-     * Test whether a {@code GridCoverage} has been found for the series in 
+     * Test whether a {@code GridCoverage} has been found for the layer in 
      * the PostGrid DataBase.
      */
     public void testGridCoverage() {

@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -36,7 +32,7 @@ import org.geotools.resources.Arguments;
 // Sicade
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.Observations;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 
 
 /**
@@ -93,7 +89,7 @@ public class UpdateGridCoverageTable {
     
     /**
      * La méthode principale attend comme argument sur la ligne de commande : 
-     *  - la série pour laquelle rajouter une image, 
+     *  - la couche pour laquelle rajouter une image, 
      *  - le nom de l'image à rajouter (sans son chemin ni son extension), 
      *  - la date de début, 
      *  - la date de fin, 
@@ -110,7 +106,7 @@ public class UpdateGridCoverageTable {
         }
         final Arguments     arguments    = new Arguments(args);
         final Observations  observations = Observations.getDefault();
-        final Series        series       = observations.getSeries(arguments.getRequiredString("-series"));
+        final Layer         layer        = observations.getLayer(arguments.getRequiredString("-layers"));
         final String        filename     = arguments.getRequiredString("-f");
         final Date          startTime    = getDate(arguments.getRequiredString("-startTime"));
         final Date          endTime      = getDate(arguments.getRequiredString("-endTime"));
@@ -122,7 +118,7 @@ public class UpdateGridCoverageTable {
         final Dimension     size         = new Dimension(arguments.getRequiredInteger("-width"), 
                                                          arguments.getRequiredInteger("-height"));
         final WritableGridCoverageTable wgt = observations.getDatabase().getTable(WritableGridCoverageTable.class);
-        wgt.setSeries(series);
+        wgt.setLayer(layer);
         wgt.addEntry(filename, startTime, endTime, new GeographicBoundingBoxImpl(bbox), size);
     }
     
@@ -130,10 +126,10 @@ public class UpdateGridCoverageTable {
      * Affiche l'aide.
      */
     private static void help() {
-        System.out.println("Usage: -series=subseries -f=filename -startTime=aaaammjj -endTime=aaaammjj " +
+        System.out.println("Usage: -layer=layer -f=filename -startTime=aaaammjj -endTime=aaaammjj " +
                 "-xmin=xmin -xmax=xmax -ymin=ymin -ymax=ymax -width=width -height=height");
         System.out.println();
-        System.out.println("  -series       La série pour laquelle il faut rajouter une entrée dans la table.");
+        System.out.println("  -layer        La couche pour laquelle il faut rajouter une entrée dans la table.");
         System.out.println("  -f            Le nom de l'image, sans son chemin ni son extension.");
         System.out.println("  -startTime    Le début de la plage de temps qui concerne l'image.");
         System.out.println("  -endTime      La fin de la plage de temps qui concerne l'image.");
@@ -148,7 +144,7 @@ public class UpdateGridCoverageTable {
         System.out.println();
         System.out.println("L'exemple suivant rajoute dans la table \"GridCoverages\" : ");
         System.out.println("    - l'image                   \"PP20070102\" ");
-        System.out.println("    - de la série               \"Potentiel de pêche (Calédonie) BET-optimal\" ");
+        System.out.println("    - de la couche              \"Potentiel de pêche (Calédonie) BET-optimal\" ");
         System.out.println("    - dont la date de début est \"20070101\" ");
         System.out.println("    - la date de fin est        \"20070102\" ");
         System.out.println("    - la bounding box est définie par : ");
@@ -161,7 +157,7 @@ public class UpdateGridCoverageTable {
         System.out.println("        - height                \"313\"");
         System.out.println();
         System.out.println("java net.sicade.observation.coverage.sql.UpdateGridCoverageTable "  +
-                                "-series=\"Potentiel de pêche (Calédonie) BET-optimal\" "       +
+                                "-layer=\"Potentiel de pêche (Calédonie) BET-optimal\" "       +
                                 "-f=PP20070102 -startTime=20070101 -endTime=20070102 "          +
                                 "-xmin=155 -xmax=175 -ymin=-29.6666666666667 -ymax=-14 "        +
                                 "-width=400 -height=height");

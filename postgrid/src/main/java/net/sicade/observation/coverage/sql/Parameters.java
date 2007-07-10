@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -29,10 +25,11 @@ import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Operation;
 
 
@@ -52,10 +49,10 @@ final class Parameters implements Serializable {
     private static final long serialVersionUID = 6418640591318515042L;
 
     /**
-     * Réference vers la série d'images. Cette référence est construite à
-     * partir du champ ID dans la table "Series" de la base de données.
+     * Réference vers la couche d'images. Cette référence est construite à
+     * partir du champ ID dans la table "Layers" de la base de données.
      */
-    public final Series series;
+    public final Layer layer;
 
     /**
      * L'opération à appliquer sur les images lue, ou {@code null} s'il n'y en a aucune.
@@ -139,7 +136,7 @@ final class Parameters implements Serializable {
     /**
      * Construit un bloc de paramètres.
      *
-     * @param series Référence vers la série d'images.
+     * @param layer Référence vers la couche d'images.
      * @param format Format à utiliser pour lire les images.
      * @param pathname Chemin relatif des images.
      * @param operation Opération à appliquer sur les images, ou {@code null}.
@@ -156,7 +153,7 @@ final class Parameters implements Serializable {
      * @param encoding Encodage des noms de fichiers, ou {@code null} si aucun encodage ne doit être
      *        effectué.
      */
-    public Parameters(final Series                    series,
+    public Parameters(final Layer                     layer,
                       final FormatEntry               format,
                       final String                    pathname,
                       final Operation                 operation,
@@ -169,7 +166,7 @@ final class Parameters implements Serializable {
                       final String                    rootURL,
                       final String                    encoding)
     {
-        this.series         = series;
+        this.layer          = layer;
         this.format         = format;
         this.pathname       = pathname;
         this.operation      = operation;
@@ -190,7 +187,7 @@ final class Parameters implements Serializable {
     public boolean equals(final Object o) {
         if (o instanceof Parameters) {
             final Parameters that = (Parameters) o;
-            return Utilities.equals(this.series         , that.series          ) &&
+            return Utilities.equals(this.layer          , that.layer           ) &&
                    Utilities.equals(this.format         , that.format          ) &&
                    Utilities.equals(this.pathname       , that.pathname        ) &&
                    Utilities.equals(this.operation      , that.operation       ) &&
@@ -212,7 +209,7 @@ final class Parameters implements Serializable {
     public DefaultTemporalCRS getTemporalCRS() {
         // Pas besoin de synchroniser; ce n'est pas grave si le même CRS est construit deux fois.
         if (temporalCRS == null) {
-            temporalCRS = DefaultTemporalCRS.wrap(CRSUtilities.getTemporalCRS(tableCRS));
+            temporalCRS = DefaultTemporalCRS.wrap(CRS.getTemporalCRS(tableCRS));
         }
         return temporalCRS;
     }
@@ -235,7 +232,7 @@ final class Parameters implements Serializable {
     {
         CoordinateReferenceSystem sourceCRS = tableCRS;
         CoordinateReferenceSystem targetCRS = coverageCRS;
-        if (!CRSUtilities.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
+        if (!CRS.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
             sourceCRS = CRSUtilities.getCRS2D(sourceCRS);
             targetCRS = CRSUtilities.getCRS2D(targetCRS);
             if (tableToCoverageCRS == null) try {
@@ -244,7 +241,7 @@ final class Parameters implements Serializable {
             } catch (FactoryException exception) {
                 throw new TransformException(exception.getLocalizedMessage(), exception);
             }
-            area = CRSUtilities.transform(tableToCoverageCRS, area, dest);
+            area = CRS.transform(tableToCoverageCRS, area, dest);
         }
         return area;
     }

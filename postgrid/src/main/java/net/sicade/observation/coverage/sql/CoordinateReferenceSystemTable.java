@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -34,8 +30,8 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 
 // Geotools dependencies
 import org.geotools.referencing.crs.DefaultCompoundCRS;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.resources.CRSUtilities;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import static org.geotools.referencing.CRS.getTemporalCRS;
 
 // Sicade dependencies
 import net.sicade.observation.sql.Use;
@@ -79,7 +75,7 @@ public class CoordinateReferenceSystemTable extends Table implements Shareable {
      * Fabrique à utiliser pour construire des transformations de coordonnées.
      * Ce champ est accédé par {@link Parameters}.
      */
-    static final CoordinateOperationFactory TRANSFORMS = FactoryFinder.getCoordinateOperationFactory(FACTORY_HINTS);
+    static final CoordinateOperationFactory TRANSFORMS = ReferencingFactoryFinder.getCoordinateOperationFactory(FACTORY_HINTS);
 
     /**
      * La fabrique de CRS à utiliser. Ne sera créée que la première fois où elle sera nécessaire.
@@ -125,7 +121,7 @@ public class CoordinateReferenceSystemTable extends Table implements Shareable {
         while (results.next()) {
             final String wkt = results.getString(WKT);
             if (factory == null) {
-                factory = FactoryFinder.getCRSFactory(FACTORY_HINTS);
+                factory = ReferencingFactoryFinder.getCRSFactory(FACTORY_HINTS);
             }
             final CoordinateReferenceSystem candidate;
             try {
@@ -152,9 +148,9 @@ public class CoordinateReferenceSystemTable extends Table implements Shareable {
          * Ajoute une dimension temporelle (s'il n'y en avait pas déjà) et sauvegarde le
          * résultat dans la cache pour réutilisation.
          */
-        TemporalCRS temporal = CRSUtilities.getTemporalCRS(entry);
+        TemporalCRS temporal = getTemporalCRS(entry);
         if (temporal == null) {
-            temporal = CRSUtilities.getTemporalCRS(CRS.XYT.getCoordinateReferenceSystem());
+            temporal = getTemporalCRS(CRS.XYT.getCoordinateReferenceSystem());
             entry = new DefaultCompoundCRS(name, entry, temporal);
         }
         if (pool.put(name, entry) != null) {

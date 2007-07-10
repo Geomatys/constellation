@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -28,7 +24,7 @@ import org.geotools.resources.Utilities;
 
 // Sicade dependencies
 import net.sicade.observation.Distribution;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.LocationOffset;
@@ -69,7 +65,7 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
 
     /**
      * Une vue des données de ce descripteur comme objet {@link DynamicCoverage}.
-     * Ne sera établie à partir de la série la première fois où elle sera nécessaire.
+     * Ne sera établie à partir de la couche la première fois où elle sera nécessaire.
      */
     private transient Reference<DynamicCoverage> coverage;
 
@@ -78,7 +74,7 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
      *
      * @param identifier   L'identifiant du descripteur.
      * @param symbol       Le symbole du descripteur.
-     * @param series       La séries de données ({@linkplain net.sicade.observation.Phenomenon phénomène}).
+     * @param layer        La couche de données ({@linkplain net.sicade.observation.Phenomenon phénomène}).
      * @param operation    L'opération associée ({@linkplain net.sicade.observation.Procedure  procédure}).
      * @param band         Le numéro de bande dans laquelle évaluer les valeurs de pixels, à partir de 0.
      * @param offset       La position relative.
@@ -87,14 +83,14 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
      */
     protected DescriptorEntry(final int            identifier,
                               final String         symbol,
-                              final Series         series,
+                              final Layer          layer,
                               final Operation      operation,
                               final short          band,
                               final LocationOffset offset,
                               final Distribution   distribution,
                               final String         remarks)
     {
-        super(identifier, symbol, series, operation, distribution, remarks);
+        super(identifier, symbol, layer, operation, distribution, remarks);
         this.band   = band;
         this.offset = offset;
     }
@@ -103,8 +99,8 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
      * {@inheritDoc}
      */
     @Override
-    public Series getPhenomenon() { 
-        return (Series) super.getPhenomenon();
+    public Layer getPhenomenon() { 
+        return (Layer) super.getPhenomenon();
     }
 
     /**

@@ -43,11 +43,11 @@ public class ObservationsTest extends TestCase {
     }
 
     /**
-     * Teste la création d'un modèle de table à partir d'une série.
+     * Teste la création d'un modèle de table à partir d'une couche.
      */
     public void testCoverageTableModel() throws CatalogException {
-        final Series series = Observations.getDefault().getSeries("CHL (Monde - mensuelles)");
+        final Layer layer = Observations.getDefault().getLayer("CHL (Monde - mensuelles)");
         final CoverageTableModel model = new CoverageTableModel();
-        model.setSeries(series);
+        model.setLayer(layer);
     }
 }

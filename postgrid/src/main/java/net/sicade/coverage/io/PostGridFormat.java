@@ -86,17 +86,16 @@ public class PostGridFormat extends AbstractGridFormat implements Format {
     }
     
     /**
-     * Gets a reader for the raster. Allows to specify a series value.
+     * Gets a reader for the raster. Allows to specify a layer value.
      * 
      * @param input The input object.
      * @param hints Hints value for the data.
-     * @param series The name of a Series.
+     * @param layer The name of a layer.
      * @return A reader on the grid coverage chosen.
      */
-    public GridCoverageReader getReader(final Object input, final Hints hints, 
-            final String series) {
+    public GridCoverageReader getReader(final Object input, final Hints hints, final String layer) {
         try {
-            return new PostGridReader(this, input, null, series);
+            return new PostGridReader(this, input, null, layer);
         } catch (DataSourceException ex) {
             throw new RuntimeException(ex); // TODO: trouver une meilleur exception.
         }

@@ -16,7 +16,7 @@ package net.sicade.resources.i18n;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
-import org.geotools.resources.i18n.IndexedResourceBundle;
+import org.geotools.resources.IndexedResourceBundle;
 
 
 /**

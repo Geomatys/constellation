@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -65,6 +61,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.util.ProgressListener;
 
 // Geotools dependencies
 import org.geotools.coverage.FactoryFinder;
@@ -76,7 +73,8 @@ import org.geotools.coverage.OrdinateOutsideCoverageException;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.gui.headless.ProgressPrinter;
-import org.geotools.util.ProgressListener;
+import org.geotools.util.Logging;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
 import org.geotools.math.Statistics;
@@ -183,7 +181,7 @@ public class CoverageBuilder {
         range          = geometry.getGridRange2D();
         gridDimensionX = geometry.gridDimensionX;
         gridDimensionY = geometry.gridDimensionY;
-        gridToCRS      = geometry.getGridToCoordinateSystem();
+        gridToCRS      = geometry.getGridToCRS();
         raster         = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT,
                          range.width, range.height, 1, new Point(range.x, range.y));
         image          = new BufferedImage(band.getColorModel(), raster, false, null);
@@ -211,7 +209,7 @@ public class CoverageBuilder {
      */
     public Statistics compute(final Model model) throws CatalogException, CannotEvaluateException {
         if (listener != null) {
-            listener.setDescription("Calcul de l'image \"" + coverage.getName() + '"');
+            listener.setTask(new SimpleInternationalString("Calcul de l'image \"" + coverage.getName() + '"'));
             listener.started();
         }
         final Coverage modelCoverage = model.asCoverage();
@@ -403,7 +401,7 @@ public class CoverageBuilder {
         final File   file     = getFile();
         final String filename = file.getName();
         if (listener != null) {
-            listener.setDescription("Enregistrement de l'image \"" + filename + '"');
+            listener.setTask(new SimpleInternationalString("Enregistrement de l'image \"" + filename + '"'));
             listener.started();
         }
         /*
@@ -493,8 +491,8 @@ public class CoverageBuilder {
             return null;
         } 
         // Dates et nom du fichier
-        final Series       series = lastSuccessful.getSeries();
-        final long   timeInterval = Math.round(series.getTimeInterval() * (24*60*60*1000L));
+        final Layer         layer = lastSuccessful.getLayer();
+        final long   timeInterval = Math.round(layer.getTimeInterval() * (24*60*60*1000L));
         final DateRange timeRange = lastSuccessful.getTimeRange();
         final Date      startTime = new Date(timeRange.getMinValue().getTime() + timeInterval);
         final Date        endTime = new Date(timeRange.getMaxValue().getTime() + timeInterval);
@@ -509,7 +507,7 @@ public class CoverageBuilder {
         final Observations     observations = Observations.getDefault();
         final WritableGridCoverageTable wgt = observations.getDatabase().getTable(
                                                 WritableGridCoverageTable.class);
-        wgt.setSeries(series);
+        wgt.setLayer(layer);
         final CoverageReference entry;
         try {
             wgt.addEntry(filename, startTime, endTime, bbox, size);
@@ -524,11 +522,11 @@ public class CoverageBuilder {
      * Appelée lorsqu'une exception non-fatale est survenue.
      */
     private static void unexpectedException(final String method, final Exception exception) {
-        Utilities.unexpectedException("net.sicade.observation.coverage", "CoverageBuilder", method, exception);
+        Logging.unexpectedException("net.sicade.observation.coverage", CoverageBuilder.class, method, exception);
     }
 
     /**
-     * Procède à la création de toutes les nouvelles images des séries spécifiées. Les images qui
+     * Procède à la création de toutes les nouvelles images des couches spécifiées. Les images qui
      * existent déjà seront sautées. Les progrès sont affichés sur le périphérique de sortie standard.
      * Cette méthode peut être appelée à partir de la ligne de commande. Les arguments acceptées sont
      * énumérés ci-dessous. Tous ces arguments sont optionels. Les arguments {@code -xmin}, {@code -xmax},
@@ -583,7 +581,7 @@ public class CoverageBuilder {
      *   </tr>
      * </table>
      *
-     * @param  args Noms des séries pour lesquelles on veut créer des images. Exemple:
+     * @param  args Noms des couches pour lesquelles on veut créer des images. Exemple:
      *              {@code "Potentiel de pêche ALB-optimal (Calédonie)"}.
      * @throws CatalogException si une exception est survenue lors de l'interrogation de la base de données.
      * @throws IOException si une exception est survenue lors de l'écriture de l'image.
@@ -625,34 +623,34 @@ public class CoverageBuilder {
         final char[]          separator = new char[72];
         Arrays.fill(separator, '_');
         /*
-         * Calcul des modèles linéaires pour chacune des séries déclarées sur la ligne de commande.
-         * Les séries non-trouvées où les modèles linéaires non-définis provoqueront l'arrêt du
+         * Calcul des modèles linéaires pour chacune des couches déclarées sur la ligne de commande.
+         * Les couches non-trouvées où les modèles linéaires non-définis provoqueront l'arrêt du
          * programme après affichage d'un message d'erreur à peu-près propre.
          */
         nextSeries: for (int i=0; i<args.length; i++) {
-            out.print("Traitement de la série \"");
+            out.print("Traitement de la couche \"");
             out.print(args[i]);
             out.println('"');
-            final Series series;
+            final Layer layer;
             try {
-                series = observations.getSeries(area, null, args[i]);
+                layer = observations.getLayer(area, null, args[i]);
             } catch (NoSuchRecordException e) {
                 out.print(Utilities.getShortClassName(e));
                 out.print(": ");
                 out.println(e.getLocalizedMessage());
                 return;
             }
-            final Model model = series.getModel();
+            final Model model = layer.getModel();
             if (model == null) {
-                out.println("Aucun modèle numérique n'est défini pour cette série.");
+                out.println("Aucun modèle numérique n'est défini pour cette couche.");
                 return;
             }
             int remaining = (limit!=null) ? limit : Integer.MAX_VALUE;
             CoverageReference lastSuccessful = null; // La dernière référence traitée avec succès.
-            Set<CoverageReference> references = series.getCoverageReferences();
+            Set<CoverageReference> references = layer.getCoverageReferences();
             int skipIfExist = (overwrite != null) ? references.size() - overwrite : Integer.MAX_VALUE;
             /*
-             * Pour chaque reférences déclarées dans la base de données pour la série courante,
+             * Pour chaque reférences déclarées dans la base de données pour la couche courante,
              * vérifie si le fichier correspondant à l'image existe. Les images déjà existantes
              * seront ignorées silencieusement.
              */
@@ -680,9 +678,9 @@ public class CoverageBuilder {
                     /*
                      * Donnée manquante. C'est une erreur très courante, alors on écrit un message
                      * pour l'utilisateur sans le "stack trace qui fait peur", et on passe gentiment
-                     * à la série suivante (on n'arrête pas complètement le programme parce qu'il peut
+                     * à la couche suivante (on n'arrête pas complètement le programme parce qu'il peut
                      * être normal que l'image la plus récente n'aie pas encore toutes les données, et
-                     * on ne pas que cette "erreur" empêche le traitement des séries suivantes).
+                     * on ne pas que cette "erreur" empêche le traitement des couches suivantes).
                      */
                     out.println();
                     out.println(exception.getLocalizedMessage());

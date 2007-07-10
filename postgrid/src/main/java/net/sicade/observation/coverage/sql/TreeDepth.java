@@ -11,25 +11,21 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
 import net.sicade.observation.Procedure;          // Pour javadoc
 import net.sicade.observation.coverage.Thematic;  // Pour javadoc
-import net.sicade.observation.coverage.Series;    // Pour javadoc
+import net.sicade.observation.coverage.Layer;     // Pour javadoc
 import net.sicade.observation.coverage.Format;    // Pour javadoc
 import org.opengis.coverage.SampleDimension;      // Pour javadoc
 import org.geotools.coverage.Category;            // Pour javadoc
 
 
 /**
- * Indique la profondeur de l'arborescence attendue de {@link SeriesTree#getTree}. Les arborescences
+ * Indique la profondeur de l'arborescence attendue de {@link LayerTree#getTree}. Les arborescences
  * peuvent contenir des chemins de la forme "{@linkplain Thematic thématique}/{@linkplain Procedure
- * procédure}/{@linkplain Series série}/{@linkplain Format format}/{@linkplain SampleDimension
+ * procédure}/{@linkplain Layer couche}/{@linkplain Format format}/{@linkplain SampleDimension
  * bande}/{@linkplain Category catégorie}".
  *
  * @version $Id$
@@ -39,32 +35,32 @@ public enum TreeDepth {
     /**
      * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Thematic thèmes}.
      */
-    THEMATIC(SeriesTree.THEMATIC),
+    THEMATIC(LayerTree.THEMATIC),
 
     /**
      * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Procedure procédures}.
      */
-    PROCEDURE(SeriesTree.PROCEDURE),
+    PROCEDURE(LayerTree.PROCEDURE),
 
     /**
-     * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Series séries}.
+     * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Layer couches}.
      */
-    SERIES(SeriesTree.SERIES),
+    LAYER(LayerTree.LAYER),
 
     /**
-     * Indique que l'arborescence ne doit pas aller plus loin que les sous-séries (après les séries).
+     * Indique que l'arborescence ne doit pas aller plus loin que les séries (après les couches).
      */
-    SUBSERIES(SeriesTree.SUBSERIES),
+    SERIES(LayerTree.SERIES),
 
     /**
      * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Format formats}.
      */
-    FORMAT(SeriesTree.FORMAT),
+    FORMAT(LayerTree.FORMAT),
 
     /**
      * Indique que l'arborescence doit aller jusqu'aux catégories (après les formats).
      */
-    CATEGORY(SeriesTree.FORMAT + 2);
+    CATEGORY(LayerTree.FORMAT + 2);
 
     /**
      * La profondeur de l'arborescence, comptée comme le nombre de noeuds à traverser jusqu'à la

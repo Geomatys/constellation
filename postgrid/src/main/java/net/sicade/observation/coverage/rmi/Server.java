@@ -43,7 +43,7 @@ import org.geotools.resources.Arguments;
 // Sicade dependencies
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.coverage.DynamicCoverage;
-import net.sicade.observation.coverage.sql.SeriesTable;
+import net.sicade.observation.coverage.sql.LayerTable;
 import net.sicade.observation.coverage.sql.DescriptorTable;
 import net.sicade.observation.coverage.sql.GridCoverageTable;
 import net.sicade.observation.ConfigurationKey;
@@ -77,9 +77,9 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
     private final Database database;
 
     /**
-     * Connexion vers la table des séries.
+     * Connexion vers la table des couches.
      */
-    private final SeriesTable series;
+    private final LayerTable layer;
 
     /**
      * Construit un nouveau serveur de connections vers les données.
@@ -91,7 +91,7 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
      */
     protected Server(final DataSource datasource) throws SQLException, IOException {
         database = new Local(datasource);
-        series = database.getTable(SeriesTable.class);
+        layer = database.getTable(LayerTable.class);
     }
 
     /**
@@ -139,7 +139,7 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
         /**
          * Toutes les demandes d'un objet {@link DataConnectionFactory} retourneront l'instance de
          * {@link Server} active. Cette méthode a besoin d'être redéfinit pour le fonctionnement
-         * de {@link SeriesTable#postCreateEntry}.
+         * de {@link LayerTable#postCreateEntry}.
          */
         @Override
         public Remote getRemote(final String name) throws RemoteException {
@@ -154,9 +154,9 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
     /**
      * {@inheritDoc}
      */
-    public DataConnection connectSeries(final String series) throws CatalogException, SQLException, RemoteException {
+    public DataConnection connectSeries(final String layer) throws CatalogException, SQLException, RemoteException {
         final GridCoverageTable data = database.getTable(GridCoverageTable.class);
-        data.setSeries(this.series.getEntry(series));
+        data.setLayer(this.layer.getEntry(layer));
         return new GridCoverageServer(data);
     }
 

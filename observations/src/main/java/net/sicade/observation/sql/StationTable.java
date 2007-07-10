@@ -304,7 +304,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     }
 
     /**
-     * Construit une station pour l'enregistrement courant. L'implémentation par extrait une
+     * Construit une station pour l'enregistrement courant. L'implémentation par défaut extrait une
      * première série d'informations telles que le {@linkplain Station#getName nom de la station},
      * {@linkplain Station#getProvider son fournisseur}, <cite>etc.</cite> et appele la méthode
      * <code>{@linkplain #createEntry(int,String,Platform,DataQuality,Citation,ResultSet)

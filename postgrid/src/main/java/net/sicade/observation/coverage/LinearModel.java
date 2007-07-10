@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -79,7 +75,7 @@ public interface LinearModel extends Model {
      * <p>
      * Les variables indépendantes <var>x</var><sub>1</sub>, <var>x</var><sub>2</sub>,
      * <cite>etc.</cite> sont les {@linkplain Descriptor descripteurs du paysage océanique},
-     * eux-mêmes dérivés d'une {@linkplain Series série d'images} représentant un paramètre
+     * eux-mêmes dérivés d'une {@linkplain Layer couche} d'images représentant un paramètre
      * environnemental.
      * <p>
      * La variable dépendante <var>y</var> sera stockée dans un nouveau paramètre 

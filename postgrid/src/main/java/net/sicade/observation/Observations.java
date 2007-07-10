@@ -34,10 +34,10 @@ import org.geotools.util.WeakValueHashMap;
 import net.sicade.util.DateRange;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.coverage.Model;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.DynamicCoverage;
-import net.sicade.observation.coverage.sql.SeriesTable;
+import net.sicade.observation.coverage.sql.LayerTable;
 import net.sicade.observation.coverage.sql.DescriptorTable;
 import net.sicade.observation.coverage.rmi.DataConnectionFactory;
 
@@ -63,11 +63,11 @@ public class Observations {
     private Database database;
 
     /**
-     * Connections vers les table des séries pour différentes enveloppes spatio-temporelles.
+     * Connections vers les table des couches pour différentes enveloppes spatio-temporelles.
      * Chaque connexion ne sera construite que la première fois où elle sera nécessaire. La
-     * valeur associée à la clé {@code null} sera la table de toutes les séries sans restriction.
+     * valeur associée à la clé {@code null} sera la table de toutes les couches sans restriction.
      */
-    private final Map<Envelope,SeriesTable> series = new HashMap<Envelope,SeriesTable>();
+    private final Map<Envelope,LayerTable> layers = new HashMap<Envelope,LayerTable>();
 
     /**
      * L'ensemble des couvertures de données obtenues par {@link #getCoverage}.
@@ -125,16 +125,16 @@ public class Observations {
     }
 
     /**
-     * Retourne la table des séries pour la région spatio-temporelle spécifiée.
+     * Retourne la table des couches pour la région spatio-temporelle spécifiée.
      *
-     * @param  area La région géographique des séries désirées, ou {@code null} pour ne placer aucune
+     * @param  area La région géographique des couches désirées, ou {@code null} pour ne placer aucune
      *         restriction géographique.
-     * @param  timeRange La plage de temps des séries désirées, ou {@code null} pour ne placer aucune
+     * @param  timeRange La plage de temps des couches désirées, ou {@code null} pour ne placer aucune
      *         restriction temporelle.
-     * @return La table des séries interceptant la région géographique et la plage de temps spécifiées.
+     * @return La table des couches interceptant la région géographique et la plage de temps spécifiées.
      * @throws SQLException si une erreur est survenue lors de l'interrogation de la base de données.
      */
-    private SeriesTable getSeriesTable(final GeographicBoundingBox area, final DateRange timeRange)
+    private LayerTable getLayerTable(final GeographicBoundingBox area, final DateRange timeRange)
             throws CatalogException, SQLException
     {
         final Envelope envelope;
@@ -143,78 +143,78 @@ public class Observations {
         } else {
             envelope = null;
         }
-        SeriesTable table = series.get(envelope);
+        LayerTable table = layers.get(envelope);
         if (table == null) {
-            table = getDatabase().getTable(SeriesTable.class);
+            table = getDatabase().getTable(LayerTable.class);
             if (area != null) {
                 table.setGeographicBoundingBox(area);
             }
             if (timeRange != null) {
                 table.setTimeRange(timeRange);
             }
-            series.put(envelope, table);
+            layers.put(envelope, table);
         }
         return table;
     }
 
     /**
-     * Retourne l'ensemble des séries disponibles dans la base de données. Si une région géographique
-     * ou une plage de temps sont spécifiées, alors seules les séries interceptant ces régions seront
+     * Retourne l'ensemble des couches disponibles dans la base de données. Si une région géographique
+     * ou une plage de temps sont spécifiées, alors seules les couches interceptant ces régions seront
      * retournées.
      *
-     * @param  area La région géographique des séries désirées, ou {@code null} pour ne placer aucune
+     * @param  area La région géographique des couches désirées, ou {@code null} pour ne placer aucune
      *         restriction géographique.
-     * @param  timeRange La plage de temps des séries désirées, ou {@code null} pour ne placer aucune
+     * @param  timeRange La plage de temps des couches désirées, ou {@code null} pour ne placer aucune
      *         restriction temporelle.
-     * @return L'ensemble des séries interceptant la région géographique et la plage de temps spécifiées.
+     * @return L'ensemble des couches interceptant la région géographique et la plage de temps spécifiées.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      */
-    public synchronized Set<Series> getSeries(final GeographicBoundingBox area,
-                                              final DateRange        timeRange)
+    public synchronized Set<Layer> getLayer(final GeographicBoundingBox area,
+                                            final DateRange        timeRange)
             throws CatalogException
     {
         try {
-            return getSeriesTable(area, timeRange).getEntries();
+            return getLayerTable(area, timeRange).getEntries();
         } catch (SQLException exception) {
             throw new ServerException(exception);
         }
     }
 
     /**
-     * Retourne la séries de données du nom spécifié dans la région spatio-temporelle spécifiée.
+     * Retourne la couches de données du nom spécifié dans la région spatio-temporelle spécifiée.
      *
-     * @param  area La région géographique des séries désirées, ou {@code null} pour ne placer aucune
+     * @param  area La région géographique des couches désirées, ou {@code null} pour ne placer aucune
      *         restriction géographique.
-     * @param  timeRange La plage de temps des séries désirées, ou {@code null} pour ne placer aucune
+     * @param  timeRange La plage de temps des couches désirées, ou {@code null} pour ne placer aucune
      *         restriction temporelle.
-     * @param  name Nom de la série désirée.
-     * @return Une série de nom spécifié.
-     * @throws NoSuchRecordException si aucune série n'a été trouvée pour le nom spécifié.
+     * @param  name Nom de la couche désirée.
+     * @return Une couche de nom spécifié.
+     * @throws NoSuchRecordException si aucune couche n'a été trouvée pour le nom spécifié.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      */
-    public synchronized Series getSeries(final GeographicBoundingBox area,
-                                         final DateRange        timeRange,
-                                         final String                name)
+    public synchronized Layer getLayer(final GeographicBoundingBox area,
+                                       final DateRange        timeRange,
+                                       final String                name)
             throws CatalogException
     {
         try {
-            return getSeriesTable(area, timeRange).getEntry(name);
+            return getLayerTable(area, timeRange).getEntry(name);
         } catch (SQLException exception) {
             throw new ServerException(exception);
         }
     }
 
     /**
-     * Retourne la séries de données du nom spécifié.
+     * Retourne la couches de données du nom spécifié.
      *
-     * @param  name Nom de la série désirée.
-     * @return Une série de nom spécifié.
-     * @throws NoSuchRecordException si aucune série n'a été trouvée pour le nom spécifié.
+     * @param  name Nom de la couche désirée.
+     * @return Une couche de nom spécifié.
+     * @throws NoSuchRecordException si aucune couche n'a été trouvée pour le nom spécifié.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      */
-    public synchronized Series getSeries(final String name) throws CatalogException {
+    public synchronized Layer getLayer(final String name) throws CatalogException {
         try {
-            return getSeriesTable(null, null).getEntry(name);
+            return getLayerTable(null, null).getEntry(name);
         } catch (SQLException exception) {
             throw new ServerException(exception);
         }
@@ -256,27 +256,27 @@ public class Observations {
     /**
      * Retourne les données pour un modèle du nom spécifié.
      *
-     * @param  name Le nom du {@linkplain Descriptor descripteur} ou de la {@linkplain Series série}.
-     * @return Le modèle pour le descripteur ou la série spécifié, ou {@code null} si la série n'a pas de modèle.
-     * @throws NoSuchRecordException si aucun descripteur ou série n'a été trouvée pour le nom spécifié.
+     * @param  name Le nom du {@linkplain Descriptor descripteur} ou de la {@linkplain Layer couche}.
+     * @return Le modèle pour le descripteur ou la couche spécifié, ou {@code null} si la couche n'a pas de modèle.
+     * @throws NoSuchRecordException si aucun descripteur ou couche n'a été trouvée pour le nom spécifié.
      * @throws CatalogException si une erreur est survenue lors de l'interrogation du catalogue.
      *
      * @todo Faire en sorte que le boulot soit entièrement fait du côté du serveur RMI (sans
      *       qu'il ne soit néssaire de faire une connexion à la base de données ici).
      */
     public synchronized Coverage getModelCoverage(final String name) throws CatalogException {
-        Series series;
+        Layer layer;
         final Database database = getDatabase();
         try {
-            series = getSeries(name);
+            layer = getLayer(name);
         } catch (NoSuchRecordException ignore) {
             try {
-                series = getDescriptorTable().getEntryLenient(name).getPhenomenon();
+                layer = getDescriptorTable().getEntryLenient(name).getPhenomenon();
             } catch (SQLException exception) {
                 throw new ServerException(exception);
             }
         }
-        final Model model = series.getModel();
+        final Model model = layer.getModel();
         return (model != null) ? model.asCoverage() : null;
     }
 
@@ -296,20 +296,20 @@ public class Observations {
     /**
      * Une enveloppe représentée par une {@linkplain GeographicBoundingBox région géographique} et
      * une {@linkplain DateRange plage de temps}. Cette classe sert uniquement de clés pour la cache
-     * des {@linkplain SeriesTable tables des séries}.
+     * des {@linkplain LayerTable tables des couches}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     private static final class Envelope {
         /**
-         * La région géographique des séries désirées, ou {@code null} pour ne placer aucune
+         * La région géographique des couches désirées, ou {@code null} pour ne placer aucune
          * restriction géographique.
          */
         private final GeographicBoundingBox bbox;
 
         /**
-         * La plage de temps des séries désirées, ou {@code null} pour ne placer aucune
+         * La plage de temps des couches désirées, ou {@code null} pour ne placer aucune
          * restriction temporelle.
          */
         private final DateRange timeRange;

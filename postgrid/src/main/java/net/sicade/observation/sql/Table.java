@@ -73,9 +73,9 @@ public class Table {
 
     /**
      * Le délai d'inactivité (en millisecondes) après lequel la requête {@link #statement}
-     * sera fermée. La valeur actuelle est de 15 minutes.
+     * sera fermée. La valeur actuelle est de 2 minutes.
      */
-    private static final long DELAY = 15 * (60*1000L);
+    private static final long DELAY = 2 * (60*1000L);
 
     /**
      * Ensemble d'indices à donner à Geotools concernant les fabriques à utiliser.

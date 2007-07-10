@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -23,9 +19,9 @@ import net.sicade.observation.Phenomenon;
 
 
 /**
- * Un thème de série(s) d'images. Un thème peut être par exemple la température, où les concentrations
- * en chlorophylle-<var>a</var>. Notez qu'un thème est différent d'une {@linkplain Series série} du
- * fait qu'une même série représente souvent un même thème (par exemple la température) mesuré par le
+ * Un thème de couche(s) d'images. Un thème peut être par exemple la température, où les concentrations
+ * en chlorophylle-<var>a</var>. Notez qu'un thème est différent d'une {@linkplain Layer couche} du
+ * fait qu'une même couche représente souvent un même thème (par exemple la température) mesuré par le
  * même capteur (par exemple les satellites NOAA) sur la même région géographique. La notion de thème
  * représentée ici est plus générale.
  *

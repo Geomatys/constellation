@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -65,9 +61,9 @@ public class OperationParameterTable extends Table implements Shareable {
             "  FROM \"OperationParameters\"\n" +
             " WHERE operation=?");
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_OPERATION   = 1;
-    /** Numéro de colonne. */ private static final int PARAMETER            = 1;
-    /** Numéro de colonne. */ private static final int VALUE                = 2;
+    /** Numéro d'argument. */ private static final int ARGUMENT_OPERATION = 1;
+    /** Numéro de colonne. */ private static final int PARAMETER          = 1;
+    /** Numéro de colonne. */ private static final int VALUE              = 2;
 
     /**
      * Construit une table qui interrogera la base de données spécifiée.
@@ -210,8 +206,8 @@ public class OperationParameterTable extends Table implements Shareable {
      * Crée un noyau de convolution de la taille spécifiée pour le calcul de moyenne
      * pondérée par une gaussienne.
      *
-     * @param   size    La taille de la matrice.
-     * @return          Le noyau de convolution.
+     * @param  size La taille de la matrice.
+     * @return      Le noyau de convolution.
      */
     private static KernelJAI createGaussKernel(final int size) {
         final float[] data = new float[size*size];

@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -47,41 +43,41 @@ import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**
- * Construction d'une arborescence des {@linkplain Series séries}. Cette classe possède une méthode
+ * Construction d'une arborescence des {@linkplain Layer couches}. Cette classe possède une méthode
  * {@link #getTree} capable de retrouver les {@linkplain Thematic thématiques} et les {@linkplain
- * Procedure procédures} qui constituent les séries, et de placer ces informations dans une arborescence.
+ * Procedure procédures} qui constituent les couches, et de placer ces informations dans une arborescence.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SeriesTree extends Table implements Shareable {
+public class LayerTree extends Table implements Shareable {
     /**
-     * Requête SQL utilisée pour obtenir l'arborescence des séries. L'ordre des colonnes est
-     * essentiel. Ces colonnes sont référencées par les constantes {@link #SERIES_NAME},
-     * {@link #SUBSERIES_NAME} et compagnie.
+     * Requête SQL utilisée pour obtenir l'arborescence des couches. L'ordre des colonnes est
+     * essentiel. Ces colonnes sont référencées par les constantes {@link #LAYER_NAME},
+     * {@link #SERIES_NAME} et compagnie.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Series:TREE",
+    private static final ConfigurationKey SELECT = new ConfigurationKey("Layer:TREE",
             "SELECT t.name,"                                     +
                   " p.name,"                                     +
-                  " s.name,"                                     +
-                  " g.identifier,"                               +
+                  " l.name,"                                     +
+                  " s.identifier,"                               +
                     " format\n"                                  +
-            "  FROM \"Series\"     AS g\n"                       +
-            "  JOIN \"Layers\"     AS s ON s.name=layers\n"      +
+            "  FROM \"Series\"     AS s\n"                       +
+            "  JOIN \"Layers\"     AS l ON l.name=layers\n"      +
             "  JOIN \"Procedures\" AS p ON p.name=procedure\n"   +
             "  JOIN \"Thematics\"  AS t ON t.name=phenomenon\n"  +
             " WHERE visible=TRUE\n"                              +
             " ORDER BY t.name,"                                  +
                      " p.name,"                                  +
-                     " s.name,"                                  +
-                     " g.identifier");
+                     " l.name,"                                  +
+                     " s.identifier");
 
 
-    /** Numéro de colonne.  */ static final int THEMATIC   =  1;
-    /** Numéro de colonne.  */ static final int PROCEDURE  =  2;
-    /** Numéro de colonne.  */ static final int SERIES     =  3;
-    /** Numéro de colonne.  */ static final int SUBSERIES  =  4;
-    /** Numéro de colonne.  */ static final int FORMAT     =  5;
+    /** Numéro de colonne.  */ static final int THEMATIC  =  1;
+    /** Numéro de colonne.  */ static final int PROCEDURE =  2;
+    /** Numéro de colonne.  */ static final int LAYER     =  3;
+    /** Numéro de colonne.  */ static final int SERIES    =  4;
+    /** Numéro de colonne.  */ static final int FORMAT    =  5;
 
     /**
      * Les types de table pour chacune des colonnes identifiées par les constantes
@@ -92,8 +88,8 @@ public class SeriesTree extends Table implements Shareable {
     static {
         TYPES[THEMATIC ] =  ThematicTable.class;
         TYPES[PROCEDURE] = ProcedureTable.class;
+        TYPES[LAYER    ] =     LayerTable.class;
         TYPES[SERIES   ] =    SeriesTable.class;
-        TYPES[SUBSERIES] = SubSeriesTable.class;
         TYPES[FORMAT   ] =    FormatTable.class;
     }
 
@@ -107,7 +103,7 @@ public class SeriesTree extends Table implements Shareable {
      *
      * @param database  Connexion vers la base de données d'observations.
      */
-    public SeriesTree(final Database database) {
+    public LayerTree(final Database database) {
         super(database);
     }
 
@@ -122,7 +118,7 @@ public class SeriesTree extends Table implements Shareable {
      * @param  depth La profondeur de l'arborescence.
      * @param  createEntries Indique s'il faut contruire les {@linkplain Element éléments}
      *         pour chaque noeud.
-     * @return Arborescence des séries de la base de données.
+     * @return Arborescence des couches de la base de données.
      * @throws CatalogException si un enregitrement est invalide.
      * @throws SQLException si l'interrogation du catalogue a échoué pour une autre raison.
      */
@@ -143,7 +139,7 @@ public class SeriesTree extends Table implements Shareable {
       scan: for (int i=1; i<=branchCount; i++) {
                 /*
                  * Vérifie s'il existe déjà une branche pour la thématique, procédure où la
-                 * série de l'enregistrement courant. Si une de ces branches n'existe pas,
+                 * couche de l'enregistrement courant. Si une de ces branches n'existe pas,
                  * elle sera créée au passage.
                  */
                 final String name = result.getString(i).trim();

@@ -18,13 +18,9 @@
  */
 package net.sicade.observation.coverage.analysis;
 
-import junit.awtui.ProgressBar;
 import junit.framework.*;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.gui.headless.ProgressPrinter;
-import org.geotools.util.ProgressListener;
 import org.opengis.geometry.Envelope;
-
 
 
 /**

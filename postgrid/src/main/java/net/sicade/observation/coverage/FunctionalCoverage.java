@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -35,9 +31,9 @@ import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.geometry.DirectPosition;
 
 // Geotools dependencies
-import org.geotools.resources.CRSUtilities;
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
+import static org.geotools.referencing.CRS.getTemporalCRS;
 
 // Sicade dependencies
 import net.sicade.observation.sql.CRS;
@@ -307,7 +303,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
          */
         public CosinusTime() {
             super("cos(t)");
-            crs = DefaultTemporalCRS.wrap(CRSUtilities.getTemporalCRS(getCoordinateReferenceSystem()));
+            crs = DefaultTemporalCRS.wrap(getTemporalCRS(getCoordinateReferenceSystem()));
             calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"), Locale.CANADA);
         }
 

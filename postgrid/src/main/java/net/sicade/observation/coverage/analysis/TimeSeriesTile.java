@@ -33,6 +33,7 @@ import javax.imageio.ImageIO;
 import javax.media.jai.RasterFactory;
 
 // OpenGIS dependencies
+import org.opengis.util.ProgressListener;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.referencing.operation.MathTransform;
@@ -42,6 +43,8 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.util.Logging;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -50,7 +53,6 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.util.ProgressListener;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -127,7 +129,7 @@ public class TimeSeriesTile {
     /**
      * Le tableau de séries temporelles.
      */
-    private final TimeSeries[] series;
+    private final TimeSeries[] layer;
 
     /**
      * Le fichier temporaire qui correspond au canal {@link #channel}.
@@ -136,7 +138,7 @@ public class TimeSeriesTile {
     private final File file;
 
     /**
-     * Le canal dans lequel lire et écrire les valeurs des série temporelle.
+     * Le canal dans lequel lire et écrire les valeurs des séries temporelles.
      * Chaque objet {@link TimeSeries} écrira dans une portion différente de
      * ce canal, qui commencera à {@link TimeSeries#base}.
      */
@@ -215,8 +217,8 @@ public class TimeSeriesTile {
          * direction qui se calcule en fonction du pas défini pour cette direction. On
          * ajustera l'enveloppe de façon à ce qu'elle couvre un nombre entier de ces points.
          *
-         * "nSeries" définit la taille du tableau "series". C'est un tableau qui contiendra
-         * la liste des séries temporelles qui nous intéresse, en omettant le nombre de points
+         * "nSeries" définit la taille du tableau "layer". C'est un tableau qui contiendra
+         * la liste des séries temporelles qui nous intéressent, en omettant le nombre de points
          * selon l'axe du temps (puisque ces valeurs seront gérées par les objets TimeSeries).
          *
          * Note sur l'usage de Math.floor au lieu de Math.ceil: il ne faut pas compter le nombres
@@ -235,7 +237,7 @@ public class TimeSeriesTile {
                 nSeries *= n;
             }
         }
-        series = new TimeSeries[nSeries];
+        layer = new TimeSeries[nSeries];
         /*
          * Les éléments extraits de la couverture seront stockés dans un fichier temporaire.
          * Ce dernier sera détruit lorsque cette instance de TimeSeriesTile sera disposée.
@@ -250,7 +252,7 @@ public class TimeSeriesTile {
          */
         final GeneralGridRange gridRange = new GeneralGridRange(new int[size.length], size);
         final GeneralGridGeometry gridGeometry = new GeneralGridGeometry(gridRange, envelope);
-        gridToCRS = gridGeometry.getGridToCoordinateSystem();
+        gridToCRS = gridGeometry.getGridToCRS();
         /*
          * Le tableau 'index' sert à simuler un suite de boucles imbriquées. Dans le cas où la
          * dimension est 2, on aurait fait une double boucle imbriquée. Dans notre cas, la
@@ -265,7 +267,7 @@ public class TimeSeriesTile {
                 position.ordinates[i] = index[i];
             }
             final DirectPosition pos = gridToCRS.transform(position, position);
-            series[count] = new TimeSeries(this, pos, count);
+            layer[count] = new TimeSeries(this, pos, count);
             count++;
             for (int d=dimension; --d>=0; ) {
                 if (d != varyingDimension) {
@@ -293,8 +295,8 @@ public class TimeSeriesTile {
         try {
             samples = coverage.evaluate(position, samples);
         } catch (CannotEvaluateException exception) {
-            Utilities.unexpectedException("net.sicade.observation.coverage",
-                                          "TimeSeriesTile", "evaluate", exception);
+            Logging.unexpectedException("net.sicade.observation.coverage",
+                                        TimeSeriesTile.class, "evaluate", exception);
             return Double.NaN;
         }
         return samples[band];
@@ -308,7 +310,7 @@ public class TimeSeriesTile {
      */
     private void fillSeries(final ProgressListener listener) throws IOException {
         if (listener != null) {
-            listener.setDescription("Chargement des données");
+            listener.setTask(new SimpleInternationalString("Chargement des données"));
             listener.started();
         }
         final int seriesLength = size[varyingDimension];
@@ -319,12 +321,12 @@ public class TimeSeriesTile {
                 listener.progress(100f / seriesLength * i);
             }
             final double t = tmin + timeStep*i;
-            for (int j=0; j<series.length; j++) {
-                series[j].evaluate(t);
+            for (int j=0; j<layer.length; j++) {
+                layer[j].evaluate(t);
             }
         }
-        for (int i=0; i<series.length; i++) {
-            series[i].flush();
+        for (int i=0; i<layer.length; i++) {
+            layer[i].flush();
         }
         if (listener != null) {
             listener.complete();
@@ -342,12 +344,12 @@ public class TimeSeriesTile {
      * @return Toutes les séries temporelles dans cette collection.
      * @throws IOException si une erreur est survenue lors de l'écriture du fichier temporaire.
      */
-    public synchronized TimeSeries[] getSeries(final ProgressListener listener) throws IOException {
+    public synchronized TimeSeries[] getLayer(final ProgressListener listener) throws IOException {
         if (!filled) {
             fillSeries(listener);
             filled = true;
         }
-        return (TimeSeries[]) series.clone();
+        return (TimeSeries[]) layer.clone();
     }
 
     /**
@@ -356,11 +358,11 @@ public class TimeSeriesTile {
      * <code>{@link #getSeries getSeries}(null).length</code>.
      */
     public final int getSeriesCount() {
-        return series.length;
+        return layer.length;
     }
 
     /**
-     * Retourne la longueur de chaque séries temporelle, en nombre de données.
+     * Retourne la longueur de chaque série temporelle, en nombre de données.
      */
     public final int getSeriesLength() {
         return size[varyingDimension];
@@ -395,20 +397,20 @@ public class TimeSeriesTile {
                                          final ProgressListener listener)
             throws IOException
     {
-        final TimeSeries[] series = getSeries(listener);
+        final TimeSeries[] layer = getLayer(listener);
         if (listener != null) {
-            listener.setDescription("Création des images");
+            listener.setTask(new SimpleInternationalString("Création des images"));
             listener.started();
         }
-        // le nombre total de positions temporelles = le nombre total d'images pour les series temporelles
+        // le nombre total de positions temporelles = le nombre total d'images pour les couche temporelles
         final int seriesLength = size[varyingDimension];
         // le nombre de positions temporelles que l'on va utiliser = le nombre d'images prises en compte.
         final int imageCount   = seriesLength / tSubsampling;
         final WritableRaster raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT,
                                       size[xDimension], size[yDimension], 1, null);
         // remise à zéro des buffeurs... pour chaque TimeSeries
-        for (int i=0; i<series.length; i++) {
-            series[i].rewind();
+        for (int i=0; i<layer.length; i++) {
+            layer[i].rewind();
         }
         
         // Pour chaque pas de temps...
@@ -420,7 +422,7 @@ public class TimeSeriesTile {
             // ... et on écrit celles-ci "dans" le raster
             for (int x=0; x<size[xDimension]; x++) {
                 for (int y=0; y<size[yDimension]; y++) {
-                    raster.setSample(x, y, 0, series[(x*size[yDimension])+y].next());
+                    raster.setSample(x, y, 0, layer[(x*size[yDimension])+y].next());
                 }
             }
             
@@ -478,8 +480,8 @@ public class TimeSeriesTile {
         final StringBuffer  buffer = new StringBuffer();
         final FieldPosition  dummy = new FieldPosition(0);
         final String lineSeparator = System.getProperty("line.separator", "\n");
-        for (int j=0; j<series.length; j++) {
-            final DirectPosition position = series[j].position;
+        for (int j=0; j<layer.length; j++) {
+            final DirectPosition position = layer[j].position;
             final int dimension = position.getDimension();
             boolean firstColumn = true;
             for (int i=0; i<dimension; i++) {
@@ -517,25 +519,25 @@ public class TimeSeriesTile {
         if (format == null) {
             format = getDefaultFormat();
         }
-        final TimeSeries[]  series = getSeries(listener);
+        final TimeSeries[]  layer  = getLayer(listener);
         final StringBuffer  buffer = new StringBuffer();
-        final FieldPosition  dummy = new FieldPosition(0);
+        final FieldPosition dummy  = new FieldPosition(0);
         final String lineSeparator = System.getProperty("line.separator", "\n");
         if (listener != null) {
-            listener.setDescription("Écriture des valeurs");
+            listener.setTask(new SimpleInternationalString("Écriture des valeurs"));
             listener.started();
         }
-        for (int i=0; i<series.length; i++) {
-            series[i].rewind();
+        for (int i=0; i<layer.length; i++) {
+            layer[i].rewind();
         }
         final int seriesLength = getSeriesLength();
         for (int j=0; j<seriesLength; j++) {
-            for (int i=-1; i<series.length; i++) {
+            for (int i=-1; i<layer.length; i++) {
                 final double value;
                 if (i < 0) {
                     value = getTime(j);
                 } else {
-                    value = series[i].next();
+                    value = layer[i].next();
                     out.write('\t');
                 }
                 buffer.setLength(0);
@@ -567,10 +569,10 @@ public class TimeSeriesTile {
         //       Il faut aussi faire une méthode 'write' qui écrit vers un flot.
         final String lineSeparator = System.getProperty("line.separator", "\n");
         final StringBuilder buffer = new StringBuilder();
-        for (int i=0; i<series.length; i++) {
+        for (int i=0; i<layer.length; i++) {
             final double[] data;
             try {
-                data = series[i].getData(null);
+                data = layer[i].getData(null);
             } catch (IOException e) {
                 buffer.append(Utilities.getShortClassName(e));
                 final String message = e.getLocalizedMessage();

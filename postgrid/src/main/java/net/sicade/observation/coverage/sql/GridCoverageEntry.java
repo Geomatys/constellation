@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -73,8 +69,10 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 // Geotools (resources)
+import org.geotools.util.Logging;
 import org.geotools.util.NumberRange;
-import org.geotools.util.WeakHashSet;
+import org.geotools.util.CanonicalSet;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -82,7 +80,7 @@ import org.geotools.resources.geometry.XRectangle2D;
 // Seagis
 import net.sicade.util.DateRange;
 import net.sicade.observation.sql.Entry;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Format;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.CoverageReference;
@@ -125,7 +123,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      * que possible de retourner des entrées qui existent déjà en mémoire afin de leur donner une chance
      * de faire un meilleur travail de cache sur les images.
      */
-    private static final WeakHashSet POOL = new WeakHashSet();
+    private static final CanonicalSet POOL = new CanonicalSet();
 
     /**
      * Liste des derniers {@link GridCoverageEntry} pour lesquels la méthode {@link #getCoverage}
@@ -203,7 +201,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
 
     /**
      * Construit une entré contenant des informations sur une image. Un {@linkplain #getName nom unique}
-     * sera construit à partir de la sous-série et du nom de fichiers (les colonnes {@code subseries} et
+     * sera construit à partir de la série et du nom de fichiers (les colonnes {@code series} et
      * {@code filename}, qui constituent habituellement la clé primaire de la table).
      * <p>
      * <strong>NOTE:</strong> Les coordonnées {@code xmin}, {@code xmax}, {@code ymin} et {@code ymax}
@@ -216,8 +214,8 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
      */
     protected GridCoverageEntry(final GridCoverageTable table,
+                                final String            layer,
                                 final String            series,
-                                final String            subseries,
                                 final String            pathname,
                                 final String            filename,
                                 final Date              startTime,
@@ -233,11 +231,11 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                                 final String            remarks)
             throws CatalogException, SQLException
     {
-        super(subseries.trim() + ':' + filename, remarks);
+        super(series.trim() + ':' + filename, remarks);
         this.filename   = filename;
         this.width      = width;
         this.height     = height;
-        this.parameters = table.getParameters(series, format, crs, pathname);
+        this.parameters = table.getParameters(layer, format, crs, pathname);
         this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
         final XRectangle2D box = XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
@@ -245,7 +243,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
             // TODO: localize
             throw new IllegalRecordException(null, "L'enveloppe spatio-temporelle est vide.");
         }
-        boundingBox = (Rectangle2D) POOL.canonicalize(box);
+        boundingBox = (Rectangle2D) POOL.unique(box);
     }
 
     /**
@@ -261,14 +259,14 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      * si {@code u.equals(v)} est vrai.
      */
     public GridCoverageEntry canonicalize() {
-        return (GridCoverageEntry) POOL.canonicalize(this);
+        return (GridCoverageEntry) POOL.unique(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Series getSeries() {
-        return parameters.series;
+    public Layer getLayer() {
+        return parameters.layer;
     }
 
     /**
@@ -288,7 +286,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                 return (File) input;
             }
         } catch (IOException exception) {
-            Utilities.unexpectedException(LOGGER.getName(), "GridCoverageEntry", "getFile", exception);
+            Logging.unexpectedException(LOGGER, GridCoverageEntry.class, "getFile", exception);
         }
         return null;
     }
@@ -303,7 +301,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                 return (URL) input;
             }
         } catch (IOException exception) {
-            Utilities.unexpectedException(LOGGER.getName(), "GridCoverageEntry", "getURL", exception);
+            Logging.unexpectedException(LOGGER, GridCoverageEntry.class, "getURL", exception);
         }
         return null;
     }
@@ -340,7 +338,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                 return new URL(buffer.toString());
             }
         }
-        return (local) ? file : file.toURL();
+        return (local) ? file : file.toURI().toURL();
     }
 
     /**
@@ -410,7 +408,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      */
     public GeographicBoundingBox getGeographicBoundingBox() {
         try {
-            assert CRSUtilities.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84,
+            assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84,
                    CRSUtilities.getCRS2D(getCoordinateReferenceSystem()));
         } catch (TransformException e) {
             throw new AssertionError(e);
@@ -811,7 +809,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      * leurs résolutions sont incompatibles, alors cette méthode retourne {@code null}.
      */
     final GridCoverageEntry getLowestResolution(final GridCoverageEntry that) {
-        if (Utilities.equals(this.parameters.series, that.parameters.series) && sameEnvelope(that)) {
+        if (Utilities.equals(this.parameters.layer, that.parameters.layer) && sameEnvelope(that)) {
             if (this.width<=that.width && this.height<=that.height) return this;
             if (this.width>=that.width && this.height>=that.height) return that;
         }
@@ -821,13 +819,13 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     /**
      * Indique si l'image de cette entrée couvre la même région géographique et la même plage
      * de temps que celles de l'entré spécifiée. Les deux entrés peuvent toutefois appartenir
-     * à des séries différentes.
+     * à des couches différentes.
      */
     private boolean sameEnvelope(final GridCoverageEntry that) {
         return this.startTime == that.startTime &&
                this.endTime   == that.endTime   &&
                Utilities.equals(this.boundingBox, that.boundingBox) &&
-               CRSUtilities.equalsIgnoreMetadata(parameters.tableCRS, that.parameters.tableCRS);
+               CRS.equalsIgnoreMetadata(parameters.tableCRS, that.parameters.tableCRS);
     }
 
     /**

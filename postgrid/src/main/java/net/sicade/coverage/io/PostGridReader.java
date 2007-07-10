@@ -42,7 +42,7 @@ import javax.media.jai.PlanarImage;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.Observations;
 import net.sicade.observation.coverage.CoverageReference;
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -83,9 +83,9 @@ public class PostGridReader extends AbstractGridCoverage2DReader implements Grid
     private final Format format;
     
     /**
-     * The series where to fetch image from.
+     * The layer where to fetch image from.
      */
-    private String series;
+    private String layer;
     
     /**
      * The default date to work with.
@@ -98,16 +98,16 @@ public class PostGridReader extends AbstractGridCoverage2DReader implements Grid
     private final Date date = stringToDate(SDATE, "dd/MM/yyyy hh:mm:ss");
     
     /**
-     * Constructs a reader with the specified series.
+     * Constructs a reader with the specified layer.
      *
-     * @param series The string name of the series.
+     * @param layer  The string name of the layer.
      * @param format The default format.
-     * @param input The input file or URL on the local system directory. May be null.
-     * @throws CatalogException if the series can't be found.
+     * @param input  The input file or URL on the local system directory. May be null.
+     * @throws CatalogException if the layer can't be found.
      */
-    public PostGridReader(final String series, final Format format, final Object input) {
-        if (!series.equals("")) {
-            this.series = series;
+    public PostGridReader(final String layer, final Format format, final Object input) {
+        if (!layer.equals("")) {
+            this.layer = layer;
         }
         if (input != null) {
             this.source = input;
@@ -143,7 +143,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader implements Grid
     }
     
     /**
-     * Constructs a reader based on the input file. The series will stay to a null value.
+     * Constructs a reader based on the input file. The layer will stay to a null value.
      *
      * @param format The default format.
      * @param input The input file or URL on the local system directory. May be null.
@@ -161,12 +161,12 @@ public class PostGridReader extends AbstractGridCoverage2DReader implements Grid
      * @param format The default format.
      * @param input The input file or URL on the local system directory. May be null.
      * @param hints
-     * @param series The string name of the series.
+     * @param layer The string name of the layer.
      * @throws DataSourceException
      */
-    public PostGridReader(final Format format, Object input, Hints hints, String series) throws DataSourceException {
+    public PostGridReader(final Format format, Object input, Hints hints, String layer) throws DataSourceException {
         this(format, input, hints);
-        this.series = series;
+        this.layer = layer;
     }    
     
     /**
@@ -177,18 +177,18 @@ public class PostGridReader extends AbstractGridCoverage2DReader implements Grid
     }
     
     /**
-     * Gets the series name.
+     * Gets the layer name.
      */
-    public String getSeries() {
-        return series;
+    public String getLayer() {
+        return layer;
     }
     
     /**
-     * Convenience method to set a new value for the series.
-     * @param series A string value which will be used.
+     * Convenience method to set a new value for the layer.
+     * @param layer A string value which will be used.
      */
-    public void setSeries(String series) {
-        this.series = series;
+    public void setLayer(String layer) {
+        this.layer = layer;
     }
        
     /**
@@ -203,7 +203,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader implements Grid
         Observations obs = Observations.getDefault();
         CoverageReference ref = null;
         try {
-            Series s = obs.getSeries(series);
+            Layer s = obs.getLayer(layer);
             ref = s.getCoverageReference(date);            
         } catch (CatalogException ex) {
             throw new IIOException(ex.getLocalizedMessage(), ex);

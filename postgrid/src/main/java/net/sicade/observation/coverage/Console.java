@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -44,13 +40,13 @@ import org.geotools.resources.Utilities;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.gui.swing.tree.Trees;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
-import org.geotools.util.MonolineFormatter;
+import org.geotools.util.Logging;
 
 // Sicade dependencies
 import net.sicade.observation.coverage.sql.GridCoverageTable;
 import net.sicade.observation.coverage.sql.FormatTable;
-import net.sicade.observation.coverage.sql.SeriesTable;
-import net.sicade.observation.coverage.sql.SeriesTree;
+import net.sicade.observation.coverage.sql.LayerTable;
+import net.sicade.observation.coverage.sql.LayerTree;
 import net.sicade.observation.coverage.sql.TreeDepth;
 import net.sicade.observation.sql.Database;
 import net.sicade.resources.i18n.ResourceKeys;
@@ -75,13 +71,13 @@ import net.sicade.resources.i18n.Resources;
  * <blockquote><pre>
  *  <b>-print thematics</b> <i></i>  Affiche l'arborescence des thèmes
  *  <b>-print procedures</b> <i></i> Affiche l'arborescence des procédures
+ *  <b>-print layers</b> <i></i>     Affiche l'arborescence des couches
  *  <b>-print series</b> <i></i>     Affiche l'arborescence des séries
- *  <b>-print subseries</b> <i></i>  Affiche l'arborescence des sous-séries
  *  <b>-print formats</b> <i></i>    Affiche l'arborescence des formats
  *  <b>-print categories</b> <i></i> Affiche l'arborescence des catégories
  *  <b>-print decoders</b> <i></i>   Affiche l'arborescence des catégories à partir des formats
  *  <b>-browse</b> <i></i>           Affiche le contenu de toute la base de données (interface graphique)
- *  <b>-verify</b> <i></i>           Vérifie l'existence d'un fichier pour chaque image de chaque série
+ *  <b>-verify</b> <i></i>           Vérifie l'existence d'un fichier pour chaque image de chaque couche
  *  <b>-config</b> <i></i>           Configure la base de données (interface graphique)
  *  <b>-locale</b> <i>name</i>       Langue et conventions d'affichage (exemple: "fr_CA")
  *  <b>-encoding</b> <i>name</i>     Page de code pour les sorties     (exemple: "cp850")
@@ -136,13 +132,13 @@ public final class Console extends Arguments {
                     "Options disponibles:\n"+
                     "  -print thematics    Affiche l'arborescence des thèmes\n"+
                     "  -print procedures   Affiche l'arborescence des procédures\n"+
+                    "  -print layers       Affiche l'arborescence des couches\n"+
                     "  -print series       Affiche l'arborescence des séries\n"+
-                    "  -print subseries    Affiche l'arborescence des sous-séries\n"+
                     "  -print formats      Affiche l'arborescence des formats\n"+
                     "  -print categories   Affiche l'arborescence des catégories\n"+
                     "  -print decoders     Affiche l'arborescence des catégories à partir des formats\n"+
                     "  -browse             Affiche le contenu de toute la base de données (interface graphique)\n"+
-                    "  -verify             Vérifie l'existence d'un fichier pour chaque image de chaque série\n"+
+                    "  -verify             Vérifie l'existence d'un fichier pour chaque image de chaque couche\n"+
                     "  -config             Configure la base de données (interface graphique)\n"+
                     "  -locale <name>      Langue et conventions d'affichage (exemple: \"fr_CA\")\n"+
                     "  -encoding <name>    Page de code pour les sorties     (exemple: \"cp850\")\n"+
@@ -150,16 +146,16 @@ public final class Console extends Arguments {
     }
 
     /**
-     * Affiche l'arborescence des séries  qui se trouvent dans la base
+     * Affiche l'arborescence des couches  qui se trouvent dans la base
      * de données. Cette méthode sert à vérifier le contenu de la base
      * de données  ainsi que le bon fonctionnement de l'implémentation
-     * de {@link SeriesTable}.
+     * de {@link LayerTable}.
      */
-    private void series(final TreeDepth depth) throws CatalogException, SQLException, IOException {
+    private void layers(final TreeDepth depth) throws CatalogException, SQLException, IOException {
         boolean createSeries = false;
         assert (createSeries = true); // Intentional side-effect
-        final SeriesTree series = getDatabase().getTable(SeriesTree.class);
-        final TreeModel   model = series.getTree(depth, createSeries);
+        final LayerTree layers = getDatabase().getTable(LayerTree.class);
+        final TreeModel model  = layers.getTree(depth, createSeries);
         out.println();
         out.println(Trees.toString(model));
         out.flush();
@@ -186,21 +182,21 @@ public final class Console extends Arguments {
      * Affiche dans une fenêtre <cite>Swing</cite> le contenu de toute la base de données.
      */
     private void browse() throws CatalogException, SQLException, IOException {
-        final Database               database = getDatabase();
-        final SeriesTree            treeTable = database.getTable(SeriesTree.class);
-        final TreeModel             treeModel = treeTable.getTree(TreeDepth.CATEGORY, true);
-        final JComponent             treePane = new JScrollPane(new JTree(treeModel));
-        final JTabbedPane          tabbedPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
-        final JSplitPane            splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, treePane, tabbedPane);
-        final TableCellRenderer      renderer = new CoverageTableModel.CellRenderer();
-        final SeriesTable         seriesTable = database.getTable(SeriesTable.class);
-        for (final Series series : seriesTable.getEntries()) {
-            final TableModel model = new CoverageTableModel(series);
+        final Database          database = getDatabase();
+        final LayerTree        treeTable = database.getTable(LayerTree.class);
+        final TreeModel        treeModel = treeTable.getTree(TreeDepth.CATEGORY, true);
+        final JComponent        treePane = new JScrollPane(new JTree(treeModel));
+        final JTabbedPane     tabbedPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
+        final JSplitPane       splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, treePane, tabbedPane);
+        final TableCellRenderer renderer = new CoverageTableModel.CellRenderer();
+        final LayerTable      layerTable = database.getTable(LayerTable.class);
+        for (final Layer layer : layerTable.getEntries()) {
+            final TableModel model = new CoverageTableModel(layer);
             if (model.getRowCount() != 0) {
                 final JTable table = new JTable(model);
                 table.setDefaultRenderer(String.class, renderer);
                 table.setDefaultRenderer(  Date.class, renderer);
-                tabbedPane.addTab(series.getName(), new JScrollPane(table));
+                tabbedPane.addTab(layer.getName(), new JScrollPane(table));
             }
         }
         final JFrame frame = new JFrame(Resources.format(ResourceKeys.DATABASE));
@@ -216,20 +212,20 @@ public final class Console extends Arguments {
     private void verify() throws CatalogException, SQLException, IOException {
         final Database database = getDatabase();
         final GridCoverageTable coverages = database.getTable(GridCoverageTable.class);
-        for (final Series series : database.getTable(SeriesTable.class).getEntries()) {
-            if (series.getModel() != null) {
+        for (final Layer layer : database.getTable(LayerTable.class).getEntries()) {
+            if (layer.getModel() != null) {
                 /*
                  * Si les images sont obtenus à partir de modèles, ne vérifie pas ces images.
                  * Elles peuvent être manquantes puisque elle sont parfois à recalculer.
                  */
                 continue;
             }
-            if (series.getName().startsWith("Potentiel de pêche")) {
+            if (layer.getName().startsWith("Potentiel de pêche")) {
                 // TODO: bricolage temporaire.
                 continue;
             }
-            coverages.setSeries(series);
-            out.println(series);
+            coverages.setLayer(layer);
+            out.println(layer);
             for (final CoverageReference coverage : coverages.getEntries()) {
                 final File file = coverage.getFile();
                 if (file != null) {
@@ -270,8 +266,8 @@ public final class Console extends Arguments {
      * @throws IOException si la lecture du fichier de configuration ou le formattage du modèle
      *         a échoué.
      */
-    private void model(final String series) throws CatalogException, SQLException, IOException {
-        final Model model = getDatabase().getTable(SeriesTable.class).getEntry(series).getModel();
+    private void model(final String layer) throws CatalogException, SQLException, IOException {
+        final Model model = getDatabase().getTable(LayerTable.class).getEntry(layer).getModel();
         if (model == null) {
             out.print("Aucun modèle n'est défini.");
         } else if (model instanceof LinearModel) {
@@ -308,8 +304,8 @@ public final class Console extends Arguments {
             }
             else if (print.equalsIgnoreCase("categories")) depth = TreeDepth.CATEGORY;
             else if (print.equalsIgnoreCase("formats"   )) depth = TreeDepth.FORMAT;
-            else if (print.equalsIgnoreCase("subseries" )) depth = TreeDepth.SUBSERIES;
             else if (print.equalsIgnoreCase("series"    )) depth = TreeDepth.SERIES;
+            else if (print.equalsIgnoreCase("layers"    )) depth = TreeDepth.LAYER;
             else if (print.equalsIgnoreCase("procedures")) depth = TreeDepth.PROCEDURE;
             else if (print.equalsIgnoreCase("thematics" )) depth = TreeDepth.THEMATIC;
             else {
@@ -317,7 +313,7 @@ public final class Console extends Arguments {
                 out.println(print);
             }
             if (depth != null) {
-                series(depth);
+                layers(depth);
             }
         }
         if (model != null) {
@@ -335,12 +331,12 @@ public final class Console extends Arguments {
     }
 
     /**
-     * Affiche l'arborescence des séries qui se trouvent dans la base
+     * Affiche l'arborescence des couches qui se trouvent dans la base
      * de données. Cette méthode sert à vérifier le contenu de la base
      * de données ainsi que le bon fonctionnement du paquet.
      */
     public static void main(String[] args) {
-        MonolineFormatter.init("net.sicade");
+        Logging.ALL.forceMonolineConsoleOutput();
         final Console console = new Console(args);
         try {
             console.run();

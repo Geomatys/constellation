@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -40,8 +36,8 @@ import org.geotools.geometry.GeneralDirectPosition;
 
 // Sicade dependencies
 import net.sicade.observation.coverage.Format;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Series;
-import net.sicade.observation.coverage.SubSeries;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.LocationOffset;
@@ -125,9 +121,9 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
         this.data       = data;
         this.dt         = offset.getDayOffset();
         this.band       = descriptor.getBand();
-        final Set<SubSeries> subseries = descriptor.getPhenomenon().getSubSeries();
-        if (!subseries.isEmpty()) {
-            final Format format = subseries.iterator().next().getFormat();
+        final Set<Series> series = descriptor.getPhenomenon().getSeries();
+        if (!series.isEmpty()) {
+            final Format format = series.iterator().next().getFormat();
             final SampleDimension[] sd = format.getSampleDimensions();
             sampleDimension = sd[band];
         } else {
@@ -144,16 +140,16 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
          */
         final Operation operation = descriptor.getProcedure();
         final List<DataConnection> fallback = new ArrayList<DataConnection>();
-        Series series = descriptor.getPhenomenon();
-        while ((series=series.getFallback()) != null) {
-            if (series instanceof SeriesEntry) {
-                final DataConnection candidate = ((SeriesEntry) series).getDataConnection(operation);
+        Layer layer = descriptor.getPhenomenon();
+        while ((layer=layer.getFallback()) != null) {
+            if (layer instanceof LayerEntry) {
+                final DataConnection candidate = ((LayerEntry) layer).getDataConnection(operation);
                 if (crs.equals(candidate.getCoordinateReferenceSystem())) {
                     fallback.add(candidate);
                     continue;
                 }
             }
-            Series.LOGGER.warning("Série de second recours ignorée: \""+series.getName() + '"');
+            Layer.LOGGER.warning("Couche de second recours ignorée: \""+layer.getName() + '"');
         }
         this.fallback = fallback.toArray(new DataConnection[fallback.size()]);
     }
@@ -164,11 +160,11 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
     private static DataConnection getDataConnection(final Descriptor descriptor) throws RemoteException {
-        final Series series = descriptor.getPhenomenon();
-        if (!(series instanceof SeriesEntry)) {
-            throw new UnsupportedOperationException("Implémentation non-supportée de la série.");
+        final Layer layer = descriptor.getPhenomenon();
+        if (!(layer instanceof LayerEntry)) {
+            throw new UnsupportedOperationException("Implémentation non-supportée de la couche.");
         }
-        return ((SeriesEntry) series).getDataConnection(descriptor.getProcedure());
+        return ((LayerEntry) layer).getDataConnection(descriptor.getProcedure());
     }
 
     /**

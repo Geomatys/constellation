@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -29,7 +25,7 @@ import net.sicade.observation.CatalogException;
  * donnée en entré aux modèles linéaires. Un descripteur du paysage océanique comprend:
  * <p>
  * <ul>
- *   <li>une {@linkplain Series série d'images} contenant les données du paramètre environnemental;</li>
+ *   <li>une {@linkplain Layer couche} d'images contenant les données du paramètre environnemental;</li>
  *   <li>une {@linkplain Operation opération} à appliquer (par exemple un opérateur de Sobel pour
  *       calculer les gradients);</li>
  *   <li>une {@linkplain LocationOffset position relative} à laquelle évaluer le résultat de
@@ -47,7 +43,7 @@ public interface Descriptor extends Observable {
      * Un comparateur pour classer des descripteurs en ordre croissant de
      * {@linkplain LocationOffset#getDayOffset décalage temporel}. Si deux
      * descripteurs ont le même décalage temporels, alors d'autres critères
-     * telles que le nom de la série peuvent être utilisés.
+     * telles que le nom de la couche peuvent être utilisés.
      */
     Comparator<Descriptor> TIME_ORDER = new Comparator<Descriptor>() {
         public int compare(final Descriptor d1, final Descriptor d2) {
@@ -64,20 +60,20 @@ public interface Descriptor extends Observable {
     };
 
     /**
-     * Retourne la série d'images d'où proviennent les données du paramètre environnemental étudié.
-     * Il peut s'agir par exemple d'une série d'images de température.
+     * Retourne la couche d'images d'où proviennent les données du paramètre environnemental étudié.
+     * Il peut s'agir par exemple d'une couche d'images de température.
      */
-    Series getPhenomenon();
+    Layer getPhenomenon();
 
     /**
-     * Retourne l'opération appliquée sur les images de la série. Il peut s'agir par exemple
+     * Retourne l'opération appliquée sur les images de la couche. Il peut s'agir par exemple
      * d'un opérateur de gradient. Si aucune opération n'est appliquée, alors cette méthode
      * retourne une opération identité.
      */
     Operation getProcedure();
 
     /**
-     * Retourne la position relative à laquelle évaluer les images de la série.
+     * Retourne la position relative à laquelle évaluer les images de la couche.
      * Cette position est relative aux positions des observations.
      */
     LocationOffset getLocationOffset();
@@ -100,14 +96,14 @@ public interface Descriptor extends Observable {
      * Retourne une vue des données de ce descripteur sous forme de fonction. Chaque valeur peut
      * être évaluée à une position (<var>x</var>,<var>y</var>,<var>t</var>), en faisant intervenir
      * des interpolations si nécessaire. Cette méthode retourne une fonction plus élaborée que celle
-     * de {@link Series#getCoverage} pour les raisons suivantes:
+     * de {@link Layer#getCoverage} pour les raisons suivantes:
      * <p>
      * <ul>
      *   <li>Une {@linkplain #getProcedure opération} peut-être appliquée sur les images (par
      *       exemple calcul de un gradient)</li>
      *   <li>Un {@linkplain #getLocationOffset décalage spatio-temporel} peut être appliquée
      *       sur la position à laquelle évaluer les données.</li>
-     *   <li>En cas de donnée manquante, la {@linkplain Series#getFallback série de second
+     *   <li>En cas de donnée manquante, la {@linkplain Layer#getFallback couche de second
      *       recours} est testée.</li>
      *   <li>Les données peuvent être évaluées sur un serveur distant sans jamais transmettre
      *       d'images complètes via le réseau.</li>

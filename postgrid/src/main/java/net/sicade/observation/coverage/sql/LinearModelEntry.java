@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -38,7 +34,7 @@ import org.geotools.io.TableWriter;
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.sicade.observation.coverage.Series;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.LinearModel;
 import net.sicade.observation.coverage.LinearModel.Term;
@@ -86,10 +82,10 @@ public class LinearModelEntry extends ModelEntry implements LinearModel {
     /**
      * Construit un modèle linéaire.
      *
-     * @param target  La série dans laquelle seront stockées les valeurs de la variable dépendante.
+     * @param target  La couche dans laquelle seront stockées les valeurs de la variable dépendante.
      * @param terms   Les termes d'un modèle linéaire calculant le paramètre.
      */
-    public LinearModelEntry(final Series     target,
+    public LinearModelEntry(final Layer      target,
                             final List<Term> terms)
     {
         super(target);

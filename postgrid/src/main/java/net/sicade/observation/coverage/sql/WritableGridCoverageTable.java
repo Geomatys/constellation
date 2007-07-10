@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage.sql;
 
@@ -37,8 +33,8 @@ import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.LoggingLevel;
 import net.sicade.observation.sql.Database;
+import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Series;
-import net.sicade.observation.coverage.SubSeries;
 import net.sicade.observation.sql.QueryType;
 
 // Geotools dependencies
@@ -91,21 +87,21 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Retourne la sous-séries à utiliser.
+     * Retourne la séries à utiliser.
      * 
-     * @throws CatalogException si aucune série n'a été spécifiée, ou si la série ne contient pas 
-     *                          exactement une sous-série.
+     * @throws CatalogException si aucune couche n'a été spécifiée, ou si la couche ne contient pas 
+     *                          exactement une série.
      */
-    private SubSeries getSubSeries() throws CatalogException {
-        final Series series = getSeries();
-        if (series == null) {
-            throw new CatalogException("Aucune série n'a été spécifiée.");
+    private Series getSeries() throws CatalogException {
+        final Layer layer = getLayer();
+        if (layer == null) {
+            throw new CatalogException("Aucune couche n'a été spécifiée.");
         }
-        final Set<SubSeries> subseries = series.getSubSeries();
-        if (subseries.size() != 1) {
-            throw new CatalogException("La série devrait contenir exactement une sous-série.");
+        final Set<Series> series = layer.getSeries();
+        if (series.size() != 1) {
+            throw new CatalogException("La couche devrait contenir exactement une série.");
         }
-        return subseries.iterator().next();
+        return series.iterator().next();
     }
 
     /**
@@ -146,7 +142,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
     
     /**
-     * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setSeries}
+     * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setLayer}
      * doit d'abord avoir été appelée au moins une fois.
      * 
      * @param   file        Le fichier image avec son chemin complet.
@@ -180,7 +176,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
     
     /**
-     * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setSeries}
+     * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setLayer}
      * doit d'abord avoir été appelée au moins une fois.
      * 
      * @param   filename    Le nom de l'image, sans son chemin ni son extension.
@@ -206,9 +202,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             throw new CatalogException("L'étendue géographique n'est pas déclarée dans la base de données.");
         }
         final Calendar          calendar  = getCalendar();
-        final SubSeries         subseries = getSubSeries();
+        final Series            series    = getSeries();
         final PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString   (1, subseries.getName());
+        statement.setString   (1, series.getName());
         statement.setString   (2, filename);
         statement.setTimestamp(3, new Timestamp(startTime.getTime()), calendar);
         statement.setTimestamp(4, new Timestamp(endTime.getTime())  , calendar);
@@ -216,7 +212,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         if (statement.executeUpdate() != 1) {
             throw new CatalogException("L'image n'a pas été ajoutée.");
         }
-        logUpdate(getProperty(INSERT), subseries.getName(), filename, startTime, endTime, bbox);
+        logUpdate(getProperty(INSERT), series.getName(), filename, startTime, endTime, bbox);
     }
 
     /**

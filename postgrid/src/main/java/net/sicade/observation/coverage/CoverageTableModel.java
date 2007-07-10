@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.observation.coverage;
 
@@ -69,13 +65,13 @@ import net.sicade.observation.CatalogException;
 
 /**
  * Modèle de tableau pour un affichage graphique d'informations sur des images. Ce modèle
- * fait le lien une {@linkplain Series séries d'images} et l'afficheur {@link JTable} de
+ * fait le lien une {@linkplain Layer couche} d'images et l'afficheur {@link JTable} de
  * <cite>Swing</cite>. Les données d'une table d'images peuvent être affichées comme suit:
  *
  * <blockquote><pre>
- * final {@linkplain Series}     series = ...;
- * final {@linkplain TableModel} model  = new CoverageTableModel(series);
- * final {@linkplain JTable}     view   = new JTable(model);
+ * final {@linkplain Layer}      layer = ...;
+ * final {@linkplain TableModel} model = new CoverageTableModel(layer);
+ * final {@linkplain JTable}     view  = new JTable(model);
  * </pre></blockquote>
  *
  * Les cellules de la table peuvent être affichées de différentes couleurs. Par
@@ -143,9 +139,9 @@ public class CoverageTableModel extends AbstractTableModel {
     };
 
     /**
-     * Série d'images représenté par cette table.
+     * Couche d'images représenté par cette table.
      */
-    private Series series;
+    private Layer layer;
 
     /**
      * Liste des entrées contenues dans cette table. La longueur
@@ -205,17 +201,17 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Construit une table pour la série d'image spécifiée. Toutes les images de la séries seront
+     * Construit une table pour la couche d'image spécifiée. Toutes les images de la couches seront
      * ajoutées à cette table.
      *
-     * @param  series Séries que représentera cette table, ou {@code null} si elle n'est pas connue.
+     * @param  layer Couche que représentera cette table, ou {@code null} si elle n'est pas connue.
      * @throws CatalogException si l'interrogation du catalogue a échoué.
      */
-    public CoverageTableModel(final Series series) throws CatalogException {
+    public CoverageTableModel(final Layer layer) throws CatalogException {
         this();
-        this.series = series;
-        if (series != null) {
-            final Collection<CoverageReference> entryList = series.getCoverageReferences();
+        this.layer = layer;
+        if (layer != null) {
+            final Collection<CoverageReference> entryList = layer.getCoverageReferences();
             entries = entryList.toArray(new CoverageReference[entryList.size()]);
             if (REVERSE_ORDER) {
                 reverse(entries);
@@ -232,7 +228,7 @@ public class CoverageTableModel extends AbstractTableModel {
      */
     public CoverageTableModel(final CoverageTableModel table) {
         synchronized (table) {
-            series       =                       table.series;
+            layer        =                       table.layer;
             numberFormat =    (NumberFormat)     table.numberFormat.clone();
             dateFormat   =      (DateFormat)     table.  dateFormat.clone();
             timeFormat   =      (DateFormat)     table.  timeFormat.clone();
@@ -262,29 +258,29 @@ public class CoverageTableModel extends AbstractTableModel {
     }
 
     /**
-     * Retourne la série d'images représentée par cette table. Si la série n'est pas connue,
+     * Retourne la couche d'images représentée par cette table. Si la couche n'est pas connue,
      * alors cette méthode peut retourner {@code null}.
      */
-    public Series getSeries() {
-        return series;
+    public Layer getLayer() {
+        return layer;
     }
 
     /**
-     * Remplace toutes les références vers les images par celles de la série spécifiée.
+     * Remplace toutes les références vers les images par celles de la couche spécifiée.
      * Cette méthode peut être appelée de n'importe quel thread (pas nécessairement celui
      * de <cite>Swing</cite>).
      *
-     * @param  series La nouvelle série d'images, ou {@code null} si aucune.
+     * @param  layer La nouvelle couche d'images, ou {@code null} si aucune.
      * @throws CatalogException si l'interrogation du catalogue a échoué.
      */
-    public void setSeries(final Series series) throws CatalogException {
+    public void setLayer(final Layer layer) throws CatalogException {
         final Collection<CoverageReference> entryList;
-        if (series != null) {
-            entryList = series.getCoverageReferences();
+        if (layer != null) {
+            entryList = layer.getCoverageReferences();
         } else {
             entryList = Collections.emptyList();
         }
-        this.series = series;
+        this.layer = layer;
         setCoverageReferences(entryList);
     }
 
@@ -396,7 +392,7 @@ public class CoverageTableModel extends AbstractTableModel {
 
     /**
      * Retourne les noms des images présentes dans cette table. Les noms sont obtenus par
-     * {@link #getCoverageName} et sont habituellement unique pour une série donnée. Cette
+     * {@link #getCoverageName} et sont habituellement unique pour une couche donnée. Cette
      * méthode peut retourner un tableau de longueur 0, mais ne retourne jamais {@code null}.
      */
     public synchronized String[] getCoverageNames() {
@@ -660,7 +656,7 @@ public class CoverageTableModel extends AbstractTableModel {
      * Retourne le nom de l'entrée spécifiée à utiliser pour l'affichage. L'implémentation par
      * défaut retourne le {@linkplain CoverageReference#getName nom de l'entrée} en ne retenant
      * que la partie qui suit le premier caractère {@code :}. Ca a pour effet d'omettre le nom
-     * de la sous-série qui précède le nom de fichier. Les classes dérivées peuvent redéfinir
+     * de la série qui précède le nom de fichier. Les classes dérivées peuvent redéfinir
      * cette méthode si elles veulelent construire un nom différement.
      */
     protected String getCoverageName(final CoverageReference entry) {
