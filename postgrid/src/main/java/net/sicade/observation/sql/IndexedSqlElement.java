@@ -1,0 +1,144 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package net.sicade.observation.sql;
+
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.util.Arrays;
+import java.util.EnumSet;
+
+
+/**
+ * Base class for SQL language elements accessible by index number.
+ * The two main language elements that are concerned are:
+ * <p>
+ * <ul>
+ *   <li>{@linkplain Column Columns}, which are accessible by index using
+ *       {@link ResultSet#getString(int)}</li>
+ *   <li>{@linkplain Parameter Parameters}, which are accessible by index using
+ *       {@link PreparedStatement#setString(int, String)}</li>
+ * </ul>
+ *
+ * @version $Id$
+ * @author Martin Desruisseaux
+ */
+public abstract class IndexedSqlElement {
+    /**
+     * The parameter index for each {@linkplain query type}. If a query type is not
+     * supported by this element, then the corresponding index will be 0. Otherwise
+     * index should be equals or greater than 1.
+     */
+    private final short[] index;
+
+    /**
+     * Creates a new language element for the specified query.
+     *
+     * @param query  The query for which the element is created.
+     * @param types  The query types for which the element applies, or {@code null} for all.
+     */
+    protected IndexedSqlElement(final Query query, final QueryType[] types) {
+        int length = 0;
+        /*
+         * Creates the enum set from the 'types' array, and
+         * computes the index array length in the same occasion.
+         */
+        final EnumSet<QueryType> typeSet;
+        if (types == null) {
+            typeSet = EnumSet.allOf(QueryType.class);
+            length  = typeSet.size();
+        } else {
+            typeSet = EnumSet.noneOf(QueryType.class);
+            for (final QueryType type : types) {
+                final int ordinal = type.ordinal();
+                if (ordinal >= length) {
+                    length = ordinal + 1;
+                }
+                typeSet.add(type);
+            }
+        }
+        /*
+         * Computes the index. For each QueryType supported by this language element, we scan
+         * the previous elements until we find one supporting the same QueryType. The index
+         * is then the previous index + columnSpan.
+         */
+        index = new short[length];
+        if (query != null) {
+            final IndexedSqlElement[] existingElements = query.add(this);
+search:     for (final QueryType type : typeSet) {
+                final int typeOrdinal = type.ordinal();
+                for (int i=existingElements.length; --i>=0;) {
+                    final IndexedSqlElement previous = existingElements[i];
+                    if (typeOrdinal < previous.index.length) {
+                        short position = previous.index[typeOrdinal];
+                        if (position != 0) {
+                            position += previous.columnSpan();
+                            if (position < 0) {
+                                throw new IndexOutOfBoundsException(); // Overflow
+                            }
+                            index[typeOrdinal] = position;
+                            continue search;
+                        }
+                    }
+                }
+                index[typeOrdinal] = 1;
+            }
+        }
+    }
+
+    /**
+     * The number of consecutive columns or parameter represented by this element. This is
+     * always 1, except for {@linkplain SpatialColumn} or {@linkplain SpatialParameter} on
+     * non-spatial database.
+     */
+    short columnSpan() {
+        return 1;
+    }
+
+    /**
+     * Returns the element ({@linkplain Column column} or {@linkplain Parameter parameter}) index
+     * when used in a query of the given type. Valid index numbers start at 1. This method returns
+     * 0 if this language element is not applicable to a query of the specified type.
+     *
+     * @param  type The query type.
+     * @return The element index in the SQL prepared statment, or 0 if none.
+     */
+    public int indexOf(final QueryType type) {
+        final int ordinal = type.ordinal();
+        if (ordinal>=0 && ordinal<index.length) {
+            return index[ordinal];
+        }
+        return 0;
+    }
+
+    /**
+     * Returns a hash code value for this language element.
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(index);
+    }
+
+    /**
+     * Compares this language element with the specified object for equality.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object!=null && object.getClass().equals(getClass())) {
+            final IndexedSqlElement that = (IndexedSqlElement) object;
+            return Arrays.equals(this.index, that.index);
+        }
+        return false;
+    }
+}

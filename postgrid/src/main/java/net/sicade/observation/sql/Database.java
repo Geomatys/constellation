@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +15,7 @@
  */
 package net.sicade.observation.sql;
 
-// Bases de données
+// Database
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -22,8 +23,7 @@ import javax.sql.DataSource;
 import org.postgis.PGbox3d;
 import org.postgresql.PGConnection;
 
-// Entrés/sorties (incluant RMI)
-import java.net.URL;
+// Input / Output
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ import java.rmi.RemoteException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 
-// Utilitaires
+// Miscenaleous
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,6 +48,8 @@ import java.util.TimeZone;
 import java.util.Properties;
 import java.util.NoSuchElementException;
 import java.lang.reflect.Constructor;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 // Geotools
 import org.geotools.util.Logging;
@@ -60,85 +62,78 @@ import net.sicade.observation.ConfigurationKey;
 
 
 /**
- * Connexion vers une base de données d'observations via JDBC (<cite>Java Database Connectivity</cite>).
- * Les requêtes SQL sont sauvegardées dans un fichier de configuration {@code "DatabaseQueries.xml"}
- * placé dans le répertoire {@code "Application Data\Sicade"} (sous Windows) ou {@code ".Sicade"} (sous Unix)
- * de l'utilisateur.
+ * Connection to an observation database through JDBC (<cite>Java Database Connectivity</cite>).
+ * Connection parameters are stored in a {@code "DatabaseQueries.xml"} configuration file stored
+ * in the {@code "Application Data\Sicade"} user directory on Windows, or {@code ".Sicade"} user
+ * directory on Unix.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Database {
     /**
-     * Paramètres de connexions à une {@linkplain Database base de données d'observations}. En plus
-     * des informations de connexion, cette interface peut fournir un URL optionel vers un fichier
-     * de configuration qui contiendra les requêtes URL à utiliser pour interroger la base de données.
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    public interface Source extends DataSource {
-        /**
-         * Retourne l'URL vers le fichier de configuration, or {@code null} s'il n'y en a pas.
-         */
-        URL getConfiguration();
-    }
-
-    /**
-     * Le sous-répertoire pour enregistrer la configuration.
+     * The user directory where to store the configuration file.
      */
     private static final String CONFIG_DIRECTORY = "Sicade";
 
     /**
-     * Le nom du fichier de configuration.
+     * The file where to store configuration parameters.
      */
     private static final String CONFIG_FILENAME = "DatabaseQueries.xml";
 
     /**
-     * Le pilote de la base de données. Utilisé seulement si aucun {@link DataSource} n'a été
-     * spécifié au constructeur. Exemple: {@code org.postgresql.Driver}.
+     * Property key for database driver. Example: {@code org.postgresql.Driver}.
+     * Used only if no {@linkplain DataSource data source} has been given to the constructor.
+     *
+     * @see #getProperty
      */
     public static final ConfigurationKey DRIVER = new ConfigurationKey("Driver", null);
 
     /**
-     * L'URL vers la base de données. Utilisé seulement si aucun {@link DataSource} n'a été
-     * spécifié au constructeur. Exemple: {@code jdbc:postgresql://monserveur.com/mabase}.
+     * Property key for URL to the database. Example: {@code jdbc:postgresql://myserver.com/mydatabase}.
+     * Used only if no {@linkplain DataSource data source} has been given to the constructor.
+     *
+     * @see #getProperty
      */
     public static final ConfigurationKey DATABASE = new ConfigurationKey("Database", null);
 
     /**
-     * L'utilisateur se connectant à la {@linkplain #DATABASE base de données}.
-     * Utilisé seulement si aucun {@link DataSource} n'a été spécifié au constructeur.
+     * Property key for user name connecting to the {@linkplain #DATABASE database}.
+     * Used only if no {@linkplain DataSource data source} has been given to the constructor.
+     *
+     * @see #getProperty
      */
     public static final ConfigurationKey USER = new ConfigurationKey("User", null);
 
     /**
-     * Le mot de passe de l'{@linkplain #USER utilisateur}. Utilisé seulement si aucun
-     * {@link DataSource} n'a été spécifié au constructeur.
+     * Property key for {@linkplain #USER user} password.
+     * Used only if no {@linkplain DataSource data source} has been given to the constructor.
+     *
+     * @see #getProperty
      */
     public static final ConfigurationKey PASSWORD = new ConfigurationKey("Password", null);
 
     /**
-     * Clé désignant le serveur RMI distant (<cite>Remote Method Invocation</cite>). La valeur par
-     * défaut est {@code null}, ce qui signifie que les images devront être rapatriées par FTP et
-     * traitées localement plutôt que de laisser un serveur distant n'envoyer que les résultats.
+     * Property key for the RMI server (<cite>Remote Method Invocation</cite>). The default value
+     * is {@code null}, which means that images will be downloaded by FTP processed locally instead
+     * of delagating the work to some distant server.
+     *
+     * @see #getProperty
      */
     public static final ConfigurationKey REMOTE_SERVER = new ConfigurationKey("RemoteServer", null);
 
     /**
-     * Clé désignant le fuseau horaire de dates comprises dans la base de données.
-     * Ce fuseau horaire peut être configurée par l'utilisateur. Si aucun fuseau
-     * n'est spécifié, alors le fuseau horaire local est utilisé.
+     * Property key for the timezone. This apply to the date that appears in the database.
+     * If no timezone is given, then the local timezone is used.
      *
      * @see #getProperty
      */
-    public static final ConfigurationKey TIMEZONE = new ConfigurationKey("TimeZone", "UTC");
+    public static final ConfigurationKey TIMEZONE = new ConfigurationKey("TimeZone", null);
 
     /**
-     * {@code false} si les RMI devraient être désactivés. Ce drapeau est définie à partir de
-     * la ligne de commande avec l'option {@code -Drmi.enabled=false}. Il est utile de désactiver
-     * les RMI pendant les déboguages si l'on souhaite faire du pas-à-pas dans le code qui aurait
-     * normalement été exécuté sur le serveur.
+     * {@code false} if RMI should be disabled. This flag is set on the command line using the
+     * {@code -Drmi.enabled=false} option. We recommand disabling RMI while debugging in order
+     * to make easier to step into code that would be normaly be executed on a distant server.
      */
     private static final boolean RMI_ENABLED;
     static {
@@ -155,89 +150,77 @@ public class Database {
     }
     
     /**
-     * Source de données.
+     * The data source, or {@code null} if none.
      */
     private final DataSource source;
 
     /**
-     * Connexion vers la base de données.
+     * Connection to the database. Will be etablished only when first needed.
      */
     private Connection connection;
 
     /**
-     * {@code true} si la base de données supporte les extensions spatiales.
+     * {@code true} if the database supports spatial extension, like the {code BBOX3D} type.
      */
     private boolean isSpatialEnabled;
 
     /**
-     * Ensemble des tables qui ont été créées.
+     * The tables created up to date.
      */
     private final Map<Class<? extends Table>, Table> tables = new HashMap<Class<? extends Table>, Table>();
 
     /**
-     * Ensemble des connections RMI déjà obtenues avec {@link #getRemote}.
+     * The RMI connections created up to date with the {@link #getRemote} method.
      */
     private final Map<String, Remote> remotes = new HashMap<String, Remote>();
 
     /**
-     * Fuseau horaire à utiliser pour lire ou écrire des dates dans la base de données.
-     * Ce fuseau horaire peut être spécifié par la propriété {@link #TIMEZONE}, et sera
-     * utilisé pour construire le calendrier retourné par {@link Table#getCalendar}.
+     * The timezone to use for reading and writing date in the database. This timezone
+     * can be set by the {@link #TIMEZONE} property and will be used for creating the
+     * calendar returned by {@link Table#getCalendar}.
      */
-    final TimeZone timezone;
+    private final TimeZone timezone;
 
     /**
-     * Propriétés à utiliser pour extraire les valeurs du fichier de configuration.
+     * The properties read from the {@value #CONFIG_FILENAME} file.
      */
     private final Properties properties;
 
     /**
-     * Indique si les propriétés ont été modifiées.
+     * Set to {@code true} if the {@linkplain #properties} have been modified.
+     * In such case, they will be saved when the database will be {@linkplain #close closed}.
      */
     private boolean modified;
 
     /**
-     * Appellé automatiquement lors de l'arrêt de la machine virtuelle. Ferme les
-     * connections à la base de données si l'utilisateur ne l'avait pas fait lui-même.
+     * Invoked automatically when the virtual machine is about to shutdown.
+     * The finalizer invokes {@link #close}.
      */
     private Thread finalizer;
 
     /**
-     * Prépare une connection vers une base de données en n'utilisant que les informations trouvées
-     * dans le fichier de configuration.
+     * Opens a new connection using only the information provided in the configuration file.
      *
-     * @throws IOException si le fichier de configuration existe mais n'a pas pu être ouvert.
+     * @throws IOException if an error occured while reading the configuration file.
      */
     public Database() throws IOException {
         this(null);
     }
 
     /**
-     * Prépare une connection vers une base de données en utilisant la source spécifiée.
+     * Opens a new connection using the provided data source.
      *
-     * @param  source Source de données.
-     * @throws IOException si le fichier de configuration existe mais n'a pas pu être ouvert.
+     * @param  source The data source.
+     * @throws IOException if an error occured while reading the configuration file.
      */
     public Database(final DataSource source) throws IOException {
+        this.source = source;
         /*
          * Procède d'abord à la lecture du fichier de configuration,  afin de permettre
          * à la méthode 'getProperty' de fonctionner. Cette dernière sera utilisée dans
          * les lignes suivantes, et risque aussi d'être surchargée.
          */
         properties = new Properties();
-        this.source = source;
-        if (source instanceof Source) {
-            final URL url = ((Source) source).getConfiguration();
-            if (url != null) {
-                final InputStream in = new BufferedInputStream(url.openStream());
-                properties.loadFromXML(in);
-                in.close();
-            }
-        }
-        /*
-         * Ecrase la configuration récupérée sur le réseau par la configuration spécifiée
-         * explicitement par l'utilisateur, s'il l'a définie.
-         */
         final File file = getConfigurationFile(false);
         if (file!=null && file.exists()) {
             final InputStream in = new BufferedInputStream(new FileInputStream(file));
@@ -286,14 +269,14 @@ public class Database {
     }
 
     /**
-     * Retourne la connexion à la base de données. Si une {@linkplain DataSource source de données}
-     * a été spécifié au constructeur, elle sera utilisée mais en écrasant éventuellement le nom de
-     * l'utilisateur et le mot de passe par ceux qui ont été spécifiés dans le fichier de configuration.
-     * Si aucune source de donnée n'a été spécifié, alors on utilisera les propriétés définies pas
-     * {@link #DATABASE} et {@link #DRIVER}.
+     * Returns the connection to the database. If a {@linkplain DataSource data source} has
+     * been specified at construction time, it will be used but the configuration file will
+     * have precedence for the {@linkplain #USER user} and {@linkplain #PASSWORD password}
+     * properties. If no data source was specified at construction time, then the
+     * {@link #DATABASE} et {@link #DRIVER} properties will be queried.
      *
-     * @return La connexion à la base de données.
-     * @throws SQLException si la connexion n'a pas pu être établie.
+     * @return The connection to the database.
+     * @throws SQLException if the connection can not be created.
      */
     protected synchronized Connection getConnection() throws SQLException {
         if (connection == null) {
@@ -313,13 +296,16 @@ public class Database {
                 } else {
                     connection = null;
                 }
-                if (connection != null) {
-                    Element.LOGGER.info("Connecté à la base de données " + connection.getMetaData().getURL());
-                }
+            }
+            if (connection != null) {
+                Element.LOGGER.info("Connecté à la base de données " + connection.getMetaData().getURL());
             }
             /*
              * Dans le cas d'une connection sur une base de type PostgreSQL, le type de données 
              * "box3d" doit être spécifié, afin de permettre son utilisation dans les tables.
+             *
+             * TODO: Following code is PostgreSQL specific. Need to make it more generic,
+             *       or at the very least optional.
              */
             isSpatialEnabled = false;
             if (connection instanceof PGConnection) {
@@ -332,9 +318,16 @@ public class Database {
     }
 
     /**
-     * Retourne le fuseau horaire des dates exprimées dans cette base de données. Cette
-     * information peut être spécifiée par la propriétée {@link #TIMEZONE} et est utilisée
-     * pour convertir des dates du fuseau horaire de la base de données vers le fuseau UTC.
+     * Returns the locale for international message formatting.
+     */
+    public Locale getLocale() {
+        return Locale.getDefault();
+    }
+
+    /**
+     * Returns the timezone in which the dates in the database are expressed. This information
+     * can be specified through the {@link #TIMEZONE} property. It is used in order to convert
+     * the dates from the database timezone to UTC.
      *
      * @see Table#getCalendar
      */
@@ -343,52 +336,50 @@ public class Database {
     }
 
     /**
-     * Retourne la langue dans laquelle formatter les messages.
+     * Creates and returns a new calendar using the database timezone.
+     * <p>
+     * <strong>Note à propos de l'implémentation:</strong> Les conventions locales utilisées
+     * seront celles du {@linkplain Locale#CANADA Canada anglais}, car elles sont proches de
+     * celles des États-Unis (utilisées sur la plupart des logiciels comme PostgreSQL) tout en
+     * étant un peu plus pratique (dates dans l'ordre "yyyy/mm/dd"). Notez que nous n'utilisons
+     * pas {@link Calendar#getInstance()}, car ce dernier peut retourner un calendrier très
+     * différent de celui utilisé par la plupart des logiciels de bases de données existants
+     * (par exemple un calendrier japonais).
+     *
+     * @param database The database, which may be {@code null}.
      */
-    public Locale getLocale() {
-        return Locale.getDefault();
+    static Calendar getCalendar(final Database database) {
+        if (database != null) {
+            return new GregorianCalendar(database.timezone, Locale.CANADA);
+        } else {
+            return new GregorianCalendar(Locale.CANADA);
+        }
     }
 
     /**
-     * Retourne une des propriétée de la base de données. La clé {@code name}
-     * est habituellement une constante comme {@link #TIMEZONE}. Cette méthode
-     * retourne {@code null} si la propriété demandée n'est pas définie.
+     * Returns a property. The key is usually a constant like {@link #TIMEZONE}.
+     *
+     * @param key The key for the property to fetch.
+     * @return The property value, or {@code null} if none.
      */
     public String getProperty(final ConfigurationKey key) {
-        // Pas besoin de synchroniser; 'Properties' l'est déjà.
+        // No need to synchronize since 'Properties' is already synchronized.
         String value = properties.getProperty(key.getName(), key.getDefaultValue());
         if (value == null) {
             if (key.equals(TIMEZONE)) {
-                return timezone.getID();
+                return ((timezone != null) ? timezone : TimeZone.getDefault()).getID();
             }
         }
         return value;
     }
 
     /**
-     * Obtient la valeur de la propriété spécifiée, ou de {@code fallback} si aucune propriété
-     * n'est définie pour {@code key}. Si une valeur non-null est trouvée, elle sera copiée
-     * dans l'ensemble {@code properties} spécifié sous la clé {@code targetKey} spécifiée.
-     */
-    final void getProperty(final ConfigurationKey key, final ConfigurationKey fallback,
-                           final Properties properties, final String targetKey)
-    {
-        String candidate = getProperty(key);
-        if (candidate == null) {
-            candidate = getProperty(fallback);
-            if (candidate == null) {
-                return;
-            }
-        }
-        properties.put(targetKey, candidate);
-    }
-
-    /**
-     * Affecte une nouvelle valeur sous la clé spécifiée. Cette valeur sera sauvegardée dans
-     * le fichier de configuration qui se trouve dans le répertoire locale de l'utilisateur.
+     * Sets a new property value for the given key. This new value will be saved in the
+     * configuration file at some later time. The value may not be taken in account before
+     * the database is {@linkplain #close closed} and restarted.
      *
-     * @param key   La clé.
-     * @param value Nouvelle valeur, ou {@code null} pour rétablir la propriété à sa valeur par défaut.
+     * @param key   The property key.
+     * @param value The new value, or {@code null} for restoring the default value.
      */
     public void setProperty(final ConfigurationKey key, final String value) {
         synchronized (properties) {
@@ -405,22 +396,12 @@ public class Database {
     }
 
     /**
-     * Retourne une table du type spécifié. Cette méthode peut retourner une instance d'une table
-     * déjà existante si elle répond aux conditions suivantes:
-     * <p>
-     * <ul>
-     *   <li>Une instance de la table demandée avait déjà été créée précédement.</li>
-     *   <li>La table implémente l'interface {@link Shareable}.</li>
-     *   <li>La table n'a pas été fermée.</li>
-     * </ul>
-     * <p>
-     * Si les conditions ci-dessous ne sont pas remplies, alors cette méthode créera une nouvelle
-     * instance en appellant la méthode <code>{@linkplain #createTable createTable}(type)</code>,
-     * et le résultat sera éventuellement conservée dans une cache interne pour les appels ultérieurs.
+     * Returns a table of the specified type. This method may returns a cached instance if
+     * it is {@linkplain Shareable shareable}.
      *
-     * @param  type Le type de la table (par exemple <code>{@linkplain StationTable}.class</code>).
-     * @return Une instance d'une table du type spécifié.
-     * @throws NoSuchElementException si le type spécifié n'est pas connu.
+     * @param  type The table class (e.g. <code>{@linkplain StationTable}.class</code>).
+     * @return An instance of a table of the specified type.
+     * @throws NoSuchElementException if the specified type is unknown to this database.
      */
     public final <T extends Table> T getTable(final Class<T> type) throws NoSuchElementException {
         synchronized (tables) {
@@ -449,6 +430,7 @@ public class Database {
      * @return Une nouvelle instance d'une table du type spécifié.
      * @throws NoSuchElementException si le type spécifié n'est pas connu.
      */
+    @Deprecated // Investigate why this method is public; it should not be.
     public <T extends Table> T createTable(final Class<T> type) throws NoSuchElementException {
         try {
             final Constructor<T> c = type.getConstructor(Database.class);
@@ -535,9 +517,9 @@ public class Database {
     }
 
     /**
-     * Retourne {@code true} si la base de données supporte les extensions spatiales.
-     * Par exemple PostGIS est une extension spatiale optionnelle de PostgreSQL. Ces
-     * extensions définissent de nouveaux types tels que {@code BOX3D}.
+     * Returns {@code true} if the database support spatial extensions. For example
+     * PostGIS is an optional spatial extension to PostgreSQL. Those extensions define
+     * new types like {@code BOX3D}.
      */
     public boolean isSpatialEnabled() {
         return isSpatialEnabled;
@@ -553,14 +535,17 @@ public class Database {
     }
 
     /**
-     * Ferme la connexion avec la base de données.
+     * Closes the connection to the database. If the connection was already closed, then this
+     * method do nothing.
      *
-     * @throws SQLException si un problème est survenu lors de la fermeture de la connexion.
-     * @throws IOException si la configuration de l'utilisateur n'a pas pu être sauvegardée.
+     * @throws SQLException if an error occured while closing the connection.
+     * @throws IOException if some {@linkplain #setProperty properties changed} but can't be saved.
      */
     public void close() throws SQLException, IOException {
         /*
-         * Ferme les connections.
+         * Closes connections. There is no Table.close() method because the user never know
+         * if a table is shared by an other user.  However Table.getStatement(null) has the
+         * side effect of closing the statement and canceling the timer.
          */
         synchronized (tables) {
             if (finalizer != null) {
@@ -568,7 +553,13 @@ public class Database {
                 finalizer = null;
             }
             for (final Iterator<Table> it=tables.values().iterator(); it.hasNext();) {
-                it.next().finalize();
+                final Table table = it.next();
+                synchronized (table) {
+                    if (table.getStatement((String) null) != null) {
+                        throw new AssertionError(table); // Should never occurs
+                    }
+                    table.clearCache();
+                }
                 it.remove();
             }
             tables.clear(); // Paranoiac safety.
@@ -578,7 +569,7 @@ public class Database {
             }
         }
         /*
-         * Enregistre les propriétés.
+         * Saves properties if they were modified.
          */
         synchronized (properties) {
             if (modified) {
@@ -586,7 +577,7 @@ public class Database {
                 final File file = getConfigurationFile(true);
                 if (file != null) {
                     final BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
-                    properties.storeToXML(out, "SQL queries", "ISO-8859-1");
+                    properties.storeToXML(out, "PostGrid configuration", "UTF-8");
                     out.close();
                 } else {
                     // TODO: provide a localized message.
@@ -597,10 +588,8 @@ public class Database {
     }
 
     /**
-     * Libère les ressources utilisées par cette base de données si ce n'était pas déjà fait.
-     * Cette méthode est appellée automatiquement par le ramasse-miettes lorsqu'il a détecté
-     * que cette base de données n'est plus utilisée. L'implémentation par défaut ne fait
-     * qu'appeller {@link #close}.
+     * Invoked when this object is no longer referenced in the Java Virtual Machine.
+     * The default implementation just invokes {@link #close}.
      */
     @Override
     protected void finalize() throws Throwable {

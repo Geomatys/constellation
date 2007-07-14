@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import static java.lang.Math.min;
 import static java.lang.Math.max;
+import static java.lang.Double.doubleToLongBits;
 
 // OpenGIS dependencies
 import org.opengis.geometry.Envelope;
@@ -33,10 +35,11 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
+import org.geotools.util.NumberRange;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.referencing.ReferencingFactoryFinder;
 import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
+import static org.geotools.referencing.CRS.findMathTransform;
 import static org.geotools.referencing.CRS.transform;
 
 // Sicade dependencies
@@ -47,77 +50,66 @@ import net.sicade.observation.CatalogException;
 
 
 /**
- * Classe de base des tables dans lesquelles chaque enregistrement est un singleton compris dans
- * certaines limites spatio-temporelles. En plus des méthodes abstraites définies dans la classe
- * parente, les implémentations de cette classe devraient redéfinir les méthodes suivantes:
- * <p>
- * <ul>
- *   <li>{@link #getQuery} (héritée de la classe parente, mais avec de nouvelles conditions)
- *       pour retourner l'instruction SQL à utiliser pour obtenir les données à partir de son
- *       nom ou ID. Utilisée aussi ainsi pour obtenir la requête SQL à utiliser pour obtenir
- *       les coordonnées spatio-temporelles des enregistrements.</li>
- * </ul>
- * <p>
- * Les limites spatio-temporelles sont définies par la propriété {@link #getEnvelope Envelope}.
- * Les propriétés {@link #getGeographicBoundingBox GeographicBoundingBox} et {@link #getTimeRange
- * TimeRange} peuvent être considérées comme les composantes spatiale et temporelle de l'envelope,
- * transformées selon un système de référence fixe par commodité.
- * <p>
- * La méthode {@link #trimEnvelope} permet de réduire l'envelope au minimum tout en englobant les
- * mêmes enregistrements.
+ * Base class for tables with a {@code getEntry(...)} method restricted to the elements
+ * contained in some spatio-temporal bounding box. The bounding box is defined either by
+ * an {@link #getEnvelope Envelope} expressed in this {@linkplain #getCoordinateReferenceSystem
+ * table CRS}, or by a combinaison of {@link #getGeographicBoundingBox GeographicBoundingBox},
+ * {@link #getVerticalRange VerticalRange} and {@link #getTimeRange TimeRange} expressed in
+ * standard CRS.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class BoundedSingletonTable<E extends Element> extends SingletonTable<E> {
     /**
-     * Fin des données à explorer, spécifiée comme intervalle de temps par rapport
-     * à la date courante.
+     * The upper limit for the default envelope temporal component,
+     * as milliseconds after the current time.
      */
     private static final long LOOK_AHEAD = 30 * 24 * 60 * 60 * 1000L;
 
     /**
-     * Type de système de référence des coordonnées utilisé.
+     * The type of the CRS used.
      */
     private final CRS crsType;
 
     /**
-     * Plage de temps des enregistrements à extraire.
+     * The envelope time component, in milliseconds since January 1st, 1970.
      */
     private long tMin, tMax;
 
     /**
-     * Coordonnées géographiques des enregistrements à extraire. La plage de longitudes est plus
-     * grande que nécessaire (±360° au lieu de ±180°) cas on ne sait pas à priori si la plage de
-     * longitudes utilisée va de -180 à +180° ou de 0 à 360°.
+     * The envelope spatial component. The longitude range may be larger than needed
+     * (±360° instead of ±180°) because we don't know in advance if the longitudes
+     * are inside the [-180 .. +180°} range or the [0 .. 360°] range.
      */
-    private double xMin, xMax, yMin, yMax;
+    private double xMin, xMax, yMin, yMax, zMin, zMax;
 
     /**
-     * {@code true} si la méthode {@link #ensureTrimmed} a déjà réduit l'{@linkplain #getEnvelope
-     * enveloppe spatio-temporelle} de cette table.
+     * {@code true} if the {@link #ensureTrimmed} method already shrinked the
+     * {@linkplain #getEnvelope spatio-temporal envelope} for this table.
      */
     private boolean trimmed;
 
     /**
-     * {@code true} si l'utilisateur a appellé {@link #trimEnvelope}. Dans ce cas, la méthode
-     * {@link #ensureTrimmed} devra réduire l'{@linkplain #getEnvelope enveloppe spatio-temporelle}
-     * la prochaine fois où elle sera appellée.
+     * {@code true} if the user invoked {@link #trimEnvelope}. In such case, {@link #ensureTrimmed}
+     * will need to shrink the {@linkplain #getEnvelope spatio-temporal envelope} next time it will
+     * be invoked.
      */
     private boolean trimRequested;
 
     /**
-     * La transformation allant du système de référence des coordonnées {@link #crsType} vers
-     * le système {@link #getCoordinateReferenceSystem}. Ne sera construit que la première fois
-     * où il sera nécessaire.
+     * The transform from the reference system designated by {@link #crsType} to
+     * {@link #getCoordinateReferenceSystem}. Will be created only when first needed.
      */
     private transient MathTransform standardToUser;
 
     /**
-     * Construit une table pour la connexion spécifiée.
+     * Creates a new table connected to the specified database. Subclass constructors should
+     * add {@link Column} and {@code Parameter} instances to their {@linkplain #query query}.
+     * See {@linkplain Table class javadoc}.
      *
-     * @param  database Connexion vers la base de données d'observations.
-     * @param  crsType  Type de système de référence des coordonnées utilisé.
+     * @param database The database that contains this table.
+     * @param crsType  The type of the {@linkplain #getEnvelope envelope} coordinate reference system.
      */
     protected BoundedSingletonTable(final Database database, final CRS crsType) {
         super(database);
@@ -128,47 +120,53 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         xMax = +360;
         yMin =  -90;
         yMax =  +90;
+        zMin = Double.NEGATIVE_INFINITY;
+        zMax = Double.POSITIVE_INFINITY;
     }
 
     /**
-     * Construit une nouvelle table initialisée à la même couverture spatio-temporelle que la
-     * table spécifiée. Ce constructeur suppose que le {@linkplain #getCoordinateReferenceSystem
-     * système de référence des coordonnées} restera le même pour les deux tables.
+     * Creates a new table connected to the same {@linkplain #database database} and using
+     * the same {@linkplain #query query} than the specified table. Subclass constructors
+     * should <strong>not</strong> modify the query.
+     * <p>
+     * In addition, the new table is initialized to the same spatio-temporal envelope than the
+     * specified table. This constructor assumes that the {@linkplain #getCoordinateReferenceSystem
+     * coordinate reference system} stay the same for the two tables.
      */
-    protected BoundedSingletonTable(final BoundedSingletonTable table) {
-        this(table.database, table.crsType);
+    protected BoundedSingletonTable(final BoundedSingletonTable<E> table) {
+        super(table);
+        crsType        = table.crsType;
         tMin           = table.tMin;
         tMax           = table.tMax;
         xMin           = table.xMin;
         xMax           = table.xMax;
         yMin           = table.yMin;
         yMax           = table.yMax;
+        zMin           = table.zMin;
+        zMax           = table.zMax;
         trimmed        = table.trimmed;
         trimRequested  = table.trimRequested;
         standardToUser = table.standardToUser;
     }
 
     /**
-     * Retourne le système de référence des coordonnées utilisé pour les coordonnées spatio-temporelles
-     * de {@code [get|set]Envelope}. L'implémentation par défaut retourne le système de référence
-     * correspondant au type spécifié au constructeur. Ce système peut comprendre les dimensions
-     * suivantes:
+     * Returns the coordinate reference system used by {@code [get|set]Envelope} methods. The default
+     * implementation returns a CRS inferred from the {@code crsType} argument given to the constructor.
+     * This CRS may contain the following dimensions:
      * <p>
      * <ul>
-     *   <li>La longitude en degrés relatif au méridien de Greenwich</li>
-     *   <li>La latitude en degrés</li>
-     *   <li>L'altitude en mètres au dessus de l'ellipsoïde WGS 84</li>
-     *   <li>Le temps en nombre de jours écoulés depuis l'epoch.</li>
+     *   <li>The longitude in decimal degrees relative to Greenwich meridian.</li>
+     *   <li>The latitude in decimal degrees.</li>
+     *   <li>Altitude in metres above the WGS 84 ellipsoid.</li>
+     *   <li>Time in fractional days since epoch.</li>
      * </ul>
      * <p>
-     * Ces coordonnées ne sont pas nécessairement toutes présentes; cela dépend de l'énumération
-     * utilisée. Par exemple le système désigné par {@link CRS#XYT} ne comprend pas l'altitude.
-     * Mais les coordonnées présentes seront toujours dans cet ordre.
+     * Not all those dimensions need to be present. For example {@link CRS#XYT}
+     * does not contain an altitude axis.
      * <p>
-     * Les classes dérivées peuvent retourner un autre système de référence, mais ce système doit
-     * être compatible avec le type spécifié au constructeur (c'est-à-dire qu'une transformation
-     * de coordonnées doit exister entre les deux systèmes) et ne doit jamais changer pour une
-     * instance donnée de cette classe.
+     * Subclasses can override this method in order to return a different CRS, but the CRS must
+     * be compatible with the value given to the constructor, i.e. a transform must exists between
+     * them.
      *
      * @see CRS
      */
@@ -185,43 +183,55 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      */
     private MathTransform getStandardToUser() throws CatalogException {
         assert Thread.holdsLock(this);
-        final CoordinateReferenceSystem sourceCRS = crsType.getCoordinateReferenceSystem();
-        final CoordinateReferenceSystem targetCRS =    this.getCoordinateReferenceSystem();
-        if (!equalsIgnoreMetadata(sourceCRS, targetCRS) && standardToUser!=null) try {
-            standardToUser = ReferencingFactoryFinder.getCoordinateOperationFactory(FACTORY_HINTS)
-                             .createOperation(sourceCRS, targetCRS).getMathTransform();
-        } catch (FactoryException exception) {
-            throw new ServerException(exception);
+        if (standardToUser == null) {
+            final CoordinateReferenceSystem sourceCRS = crsType.getCoordinateReferenceSystem();
+            final CoordinateReferenceSystem targetCRS =    this.getCoordinateReferenceSystem();
+            try {
+                standardToUser = findMathTransform(sourceCRS, targetCRS);
+            } catch (FactoryException exception) {
+                throw new ServerException(exception);
+            }
         }
         return standardToUser;
     }
 
     /**
-     * Retourne les coordonnées spatio-temporelles de la région d'intérêt. Le système de référence
-     * des coordonnées utilisé est celui retourné par {@link #getCoordinateReferenceSystem}.
-     * L'implémentation par défaut construit une envelope à partir des informations retournées par
-     * {@link #getGeographicBoundingBox} et {@link #getTimeRange}, en transformant les coordonnées
-     * si nécessaire.
+     * Returns the spatio-temporal envelope of the elements to be read by this table. The
+     * {@linkplain Envelope#getCoordinateReferenceSystem envelope CRS} is the one returned
+     * by {@link #getCoordinateReferenceSystem}.
+     * <p>
+     * The default implementation creates an envelope from the informations returned by
+     * {@link #getGeographicBoundingBox}, {@link #getVerticalRange} and {@link #getTimeRange},
+     * applying a coordinate transformation if needed.
      *
-     * @throws CatalogException si une erreur est survenue lors de l'obtention de l'enveloppe ou
-     *         de la transformation des coordonnnées.
+     * @throws CatalogException if the envelope can not be obtained or an error occured
+     *         during the transformation.
      *
      * @see #getGeographicBoundingBox
+     * @see #getVerticalRange
      * @see #getTimeRange
      * @see #trimEnvelope
      */
     public synchronized Envelope getEnvelope() throws CatalogException {
-        final DateRange            time = getTimeRange();
         final GeographicBoundingBox box = getGeographicBoundingBox();
+        final NumberRange      altitude = getVerticalRange();
+        final DateRange            time = getTimeRange();
         GeneralEnvelope envelope = new GeneralEnvelope(crsType.getCoordinateReferenceSystem());
-        envelope.setRange(CRS.X_DIMENSION, box.getWestBoundLongitude(), box.getEastBoundLongitude());
-        envelope.setRange(CRS.Y_DIMENSION, box.getSouthBoundLatitude(), box.getNorthBoundLatitude());
-        if (crsType.T_DIMENSION >= 0) {
-            envelope.setRange(crsType.T_DIMENSION, CRS.TEMPORAL.toValue((Date) time.getMinValue()),
-                                                   CRS.TEMPORAL.toValue((Date) time.getMaxValue()));
+        if (crsType.xdim >= 0) {
+            envelope.setRange(crsType.xdim, box.getWestBoundLongitude(), box.getEastBoundLongitude());
+        }
+        if (crsType.ydim >= 0) {
+            envelope.setRange(crsType.ydim, box.getSouthBoundLatitude(), box.getNorthBoundLatitude());
+        }
+        if (crsType.zdim >= 0) {
+            envelope.setRange(crsType.zdim, altitude.getMinimum(), altitude.getMaximum());
+        }
+        if (crsType.tdim >= 0) {
+            envelope.setRange(crsType.tdim, CRS.TEMPORAL.toValue((Date) time.getMinValue()),
+                                            CRS.TEMPORAL.toValue((Date) time.getMaxValue()));
         }
         final MathTransform standardToUser = getStandardToUser();
-        if (standardToUser != null) try {
+        if (!standardToUser.isIdentity()) try {
             envelope = transform(standardToUser, envelope);
         } catch (TransformException exception) {
             throw new ServerException(exception);
@@ -230,49 +240,73 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Définit les coordonnées spatio-temporelles de la région d'intérêt. Le système de référence
-     * des coordonnées utilisé est celui retourné par {@link #getCoordinateReferenceSystem}.
-     * Appeler cette méthode équivaut à effectuer les transformations nécessaires des coordonnées,
-     * puis appeler {@link #setTimeRange setTimeRange(...)} et
-     * {@link #setGeographicBoundingBox setGeographicBoundingBox(...)}.
+     * Sets the spatio-temporal envelope of the elements to be read by this table.
+     * Any element intercepting this envelope will be considered by next calls to
+     * {@link #getEntries}.
+     * <p>
+     * The default implementation delegates to {@link #setGeographicBoundingBox},
+     * {@link #setVerticalRange} and {@link #setTimeRange}, applying a coordinate
+     * transformation if needed.
      *
-     * @throws CatalogException si une erreur est survenue lors de la transformation des coordonnnées.
+     * @param  envelope The envelope.
+     * @return {@code true} if the envelope changed as a result of this call, or
+     *         {@code false} if the specified envelope is equals to the one already set.
+     * @throws CatalogException if an error occured during the transformation or
+     *         the envelope can not be set.
      */
-    public synchronized void setEnvelope(Envelope envelope) throws CatalogException {
-        final MathTransform standardToUser = getStandardToUser();
-        if (standardToUser != null) try {
-            envelope = transform(standardToUser.inverse(), envelope);
+    public synchronized boolean setEnvelope(Envelope envelope) throws CatalogException {
+        final MathTransform userToStandard;
+        final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
+        try {
+            if (crs == null || equalsIgnoreMetadata(crs, getCoordinateReferenceSystem())) {
+                userToStandard = getStandardToUser().inverse();
+            } else {
+                userToStandard = findMathTransform(crs, crsType.getCoordinateReferenceSystem());
+            }
+            if (!userToStandard.isIdentity()) {
+                envelope = transform(userToStandard, envelope);
+            }
+        } catch (FactoryException exception) {
+            throw new ServerException(exception);
         } catch (TransformException exception) {
             throw new ServerException(exception);
         }
-        setGeographicBoundingBox(new GeographicBoundingBoxImpl(
-                                        envelope.getMinimum(CRS.X_DIMENSION),
-                                        envelope.getMaximum(CRS.X_DIMENSION),
-                                        envelope.getMinimum(CRS.Y_DIMENSION),
-                                        envelope.getMaximum(CRS.Y_DIMENSION)));
-        if (crsType.T_DIMENSION >= 0) {
-            setTimeRange(CRS.TEMPORAL.toDate(envelope.getMinimum(crsType.T_DIMENSION)),
-                         CRS.TEMPORAL.toDate(envelope.getMaximum(crsType.T_DIMENSION)));
+        boolean changed = false;
+        if (crsType.xdim >= 0 && crsType.ydim >= 0) {
+            changed |= setGeographicBoundingBox(new GeographicBoundingBoxImpl(
+                    envelope.getMinimum(crsType.xdim),
+                    envelope.getMaximum(crsType.xdim),
+                    envelope.getMinimum(crsType.ydim),
+                    envelope.getMaximum(crsType.ydim)));
         }
+        if (crsType.zdim >= 0) {
+            changed |= setVerticalRange(envelope.getMinimum(crsType.zdim),
+                                        envelope.getMaximum(crsType.zdim));
+        }
+        if (crsType.tdim >= 0) {
+            changed |= setTimeRange(CRS.TEMPORAL.toDate(envelope.getMinimum(crsType.tdim)),
+                                    CRS.TEMPORAL.toDate(envelope.getMaximum(crsType.tdim)));
+        }
+        return changed;
     }
 
     /**
-     * Retourne les coordonnées géographiques englobeant les enregistrements. Cette région ne sera
-     * pas plus grande que la région qui a été spécifiée lors du dernier appel de la méthode
-     * {@link #setGeographicBoundingBox setGeographicBoundingBox(...)}. Elle peut toutefois être
-     * plus petite si la méthode {@link #trimEnvelope} a été appelée depuis.
+     * Returns the geographic bounding box of the elements to be read by this table.
+     * This bounding box will not be greater than the box specified at the last call
+     * to {@link #setGeographicBoundingBox setGeographicBoundingBox(...)}, but it may
+     * be smaller if {@link #trimEnvelope} has been invoked.
      *
-     * @return La région géographique des enregistrements recherchés par cette table.
+     * @return The bounding box of the elements to be read.
+     * @throws CatalogException if the bounding box can not be obtained.
      *
+     * @see #getVerticalRange
      * @see #getTimeRange
      * @see #getEnvelope
      * @see #trimEnvelope
-     *
-     * @throws CatalogException si l'enveloppe n'a pas pu être obtenue.
      */
     public synchronized GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         try {
-            ensureTrimmed();
+            ensureTrimmed(QueryType.BOUNDING_BOX);
         } catch (SQLException e) {
             throw new ServerException(e);
         }
@@ -280,14 +314,13 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Définit les coordonnées géographiques de la région dans laquelle on veut rechercher des
-     * enregistrements. Les coordonnées doivent être exprimées en degrés de longitude et de latitude
-     * selon l'ellipsoïde WGS&nbsp;1984. Tous les enregistrements qui interceptent cette région
-     * seront prises en compte lors du prochain appel de {@link #getEntries}.
+     * Sets the geographic bounding box of the elements to be read by this table.
+     * Coordinates must be in degrees of longitude and latitude on the WGS&nbsp;1984
+     * ellipsoid.
      *
-     * @param  area Coordonnées géographiques de la région, en degrés de longitude et de latitude.
-     * @return {@code true} si la région d'intérêt à changée, ou {@code false} si les valeurs
-     *         spécifiées étaient les mêmes que la dernière fois.
+     * @param  area The geographic bounding box in in degrees of longitude and latitude.
+     * @return {@code true} if the bounding box changed as a result of this call, or
+     *         {@code false} if the specified box is equals to the one already set.
      */
     public synchronized boolean setGeographicBoundingBox(final GeographicBoundingBox area) {
         boolean change;
@@ -304,22 +337,78 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Retourne la plage de dates des enregistrements. Cette plage de dates ne sera pas plus grande
-     * que la plage de dates spécifiée lors du dernier appel de la méthode {@link #setTimeRange
-     * setTimeRange(...)}.  Elle peut toutefois être plus petite si la méthode {@link #trimEnvelope}
-     * a été appelée depuis.
+     * Returns the vertical range of the elements to be read by this table.
+     * This vertical range will not be greater than the box specified at the last call
+     * to {@link #setVerticalRange setVerticalRange(...)}, but it may be smaller if
+     * {@link #trimEnvelope} has been invoked.
      *
-     * @return La plage de dates des enregistrements. Cette plage sera constituée d'objets {@link Date}.
+     * @return The vertical range of the elements to be read.
+     * @throws CatalogException if the vertical range can not be obtained.
      *
      * @see #getGeographicBoundingBox
+     * @see #getTimeRange
      * @see #getEnvelope
      * @see #trimEnvelope
+     */
+    public synchronized NumberRange getVerticalRange() throws CatalogException {
+        try {
+            ensureTrimmed(QueryType.BOUNDING_BOX);
+        } catch (SQLException e) {
+            throw new ServerException(e);
+        }
+        return new NumberRange(zMin, zMax);
+    }
+
+    /**
+     * Sets the vertical range of the elements to be read by this table.
+     * The range should be specified in metres above the WGS&nbsp;1984 ellipsoid.
      *
-     * @throws CatalogException si l'enveloppe n'a pas pu être obtenue.
+     * @param  range The vertical range.
+     * @return {@code true} if the vertical range changed as a result of this call, or
+     *         {@code false} if the specified range is equals to the one already set.
+     */
+    public final boolean setVerticalRange(final NumberRange range) {
+        return setVerticalRange(range.getMinimum(true), range.getMaximum(true));
+    }
+
+    /**
+     * Sets the vertical range of the elements to be read by this table.
+     * The range should be specified in metres above the WGS&nbsp;1984 ellipsoid.
+     *
+     * @param  minimum The minimal <var>z</var> value.
+     * @param  maximum The maximal <var>z</var> value.
+     * @return {@code true} if the vertical range changed as a result of this call, or
+     *         {@code false} if the specified range is equals to the one already set.
+     */
+    public synchronized boolean setVerticalRange(final double minimum, final double maximum) {
+        boolean change;
+        change  = (doubleToLongBits(zMin) != doubleToLongBits(zMin = minimum));
+        change |= (doubleToLongBits(zMax) != doubleToLongBits(zMax = maximum));
+        trimRequested = false;
+        if (change) {
+            trimmed = false;
+            fireStateChanged("VerticalRange");
+        }
+        return change;
+    }
+
+    /**
+     * Returns the time range of the elements to be read by this table.
+     * This time range will not be greater than the box specified at the last call
+     * to {@link #setTimeRange setTimeRange(...)}, but it may be smaller if
+     * {@link #trimEnvelope} has been invoked.
+     *
+     * @return The time range of the elements to be read.
+     * @throws CatalogException if the time range can not be obtained.
+     *
+     * @see #getGeographicBoundingBox
+     * @see #getVerticalRange
+     * @see #getEnvelope
+     * @see #trimEnvelope
      */
     public synchronized DateRange getTimeRange() throws CatalogException {
         try {
-            ensureTrimmed();
+            ensureTrimmed(QueryType.BOUNDING_BOX);
         } catch (SQLException e) {
             throw new ServerException(e);
         }
@@ -327,14 +416,11 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Définit la plage de dates dans laquelle rechercher des enregistrements. Tous les
-     * enregistrements qui interceptent cette plage de temps seront pris en compte lors
-     * du prochain appel de {@link #getEntries}.
+     * Sets the time range of the elements to be read by this table.
      *
-     * @param  timeRange Plage de dates dans laquelle rechercher des enregistrements.
-     *         Cette plage doit être constituée d'objets {@link Date}.
-     * @return {@code true} si la plage de temps à changée, ou {@code false} si les valeurs
-     *         spécifiées étaient les mêmes que la dernière fois.
+     * @param  timeRange The time range.
+     * @return {@code true} if the time range changed as a result of this call, or
+     *         {@code false} if the specified range is equals to the one already set.
      */
     public final boolean setTimeRange(final DateRange timeRange) {
         Date startTime = timeRange.getMinValue();
@@ -349,14 +435,12 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Définit la plage de dates dans laquelle rechercher des enregistrements. Tous les
-     * enregistrements qui interceptent cette plage de temps seront pris en compte lors
-     * du prochain appel de {@link #getEntries}.
+     * Sets the time range of the elements to be read by this table.
      *
-     * @param  startTime Date de début (inclusive) de la période d'intérêt.
-     * @param  endTime   Date de fin   (inclusive) de la période d'intérêt.
-     * @return {@code true} si la plage de temps à changée, ou {@code false} si les valeurs
-     *         spécifiées étaient les mêmes que la dernière fois.
+     * @param  startTime The start time, inclusive.
+     * @param  endTime   The end time, <strong>inclusive</strong>.
+     * @return {@code true} if the time range changed as a result of this call, or
+     *         {@code false} if the specified range is equals to the one already set.
      */
     public synchronized boolean setTimeRange(final Date startTime, final Date endTime) {
         boolean change;
@@ -371,49 +455,63 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Réduit l'{@linkplain #getEnvelope envelope spatio-temporelle} à la plus petite envelope
-     * englobant les enregistrements de cette table.  Cette méthode ne prend en compte que les
-     * enregistrements trouvés dans l'envelope définie lors des appels précédents aux méthodes
-     * {@code setXXX(...)}. Les valeurs retournées par les méthodes {@code getXXX(...)} seront
-     * modifiées de façon à définir la plus petite enveloppe contenant les mêmes enregistrements.
-     * <p>
-     * L'implémentation par défaut utilise la requête retournée par
-     * <code>getQuery({@linkplain QueryType#BOUNDING_BOX BOUNDING_BOX})</code>
+     * Shrinks the {@linkplain #getEnvelope spatio-temporal envelope} to a smaller envelope
+     * containing all the elements to be returned by this table.  This method iterates over
+     * the elements that intercept the envelope specified by {@code setXXX(...)} methods.
+     * Then the envelope is altered in such a way that the {@code getXXX(...)} method returns
+     * an identical or smaller envelope intercepting the same set of elements.
      */
     public synchronized void trimEnvelope() {
         trimRequested = true;
     }
 
     /**
-     * Procède à la réduction de l'enveloppe, si elle a été demandée par l'utilisateur
-     * (par un appel à {@link #trimEnvelope}) et que cette réduction n'a pas encore été
-     * effectuée. Cette méthode est appelée automatiquement par {@link #getGeographicBoundingBox}
-     * et {@link #getTimeRange}.
+     * Process to envelope shrinking, if not already done. This method is invoked when needed by
+     * {@link #getGeographicBoundingBox}, {@link #getVerticalRange} and {@link #getTimeRange}. A
+     * shrinking is performed only if explicitly requested by a call to {@link #trimEnvelope}.
      *
-     * @throws SQLException si l'accès à la base de données a échoué.
+     * @throws SQLException if an error occured while reading the database.
      */
-    private void ensureTrimmed() throws SQLException {
+    private void ensureTrimmed(final QueryType type) throws SQLException {
         assert Thread.holdsLock(this);
         if (trimRequested && !trimmed) {
-            final PreparedStatement statement = getStatement(QueryType.BOUNDING_BOX);
+            final PreparedStatement statement = getStatement(type);
             if (statement != null) {
+                final int timeParameter = query.indexOfParameter(type, Role.TIME_RANGE);
+                final int bboxParameter = query.indexOfParameter(type, Role.SPATIAL_ENVELOPE);
+                final Column bboxColumn = query.getColumns(type).get(bboxParameter);
                 final ResultSet result = statement.executeQuery();
-                if (result.next()) {
+                while (result.next()) { // Should contains only one record.
                     Date time;
                     final Calendar calendar = getCalendar();
-                    time = result.getTimestamp(1, calendar);
+                    time = result.getTimestamp(timeParameter, calendar);
                     if (time != null) {
                         tMin = max(tMin, time.getTime());
                     }
-                    time = result.getTimestamp(2, calendar);
+                    time = result.getTimestamp(timeParameter + 1, calendar);
                     if (time != null) {
                         tMax = min(tMax, time.getTime());
                     }
-                    double v;
-                    v=result.getDouble(3); if (!result.wasNull() && v>xMin) xMin = v;
-                    v=result.getDouble(4); if (!result.wasNull() && v<xMax) xMax = v;
-                    v=result.getDouble(5); if (!result.wasNull() && v>yMin) yMin = v;
-                    v=result.getDouble(6); if (!result.wasNull() && v<yMax) yMax = v;
+                    final Envelope envelope; // Defined in this context as always (x,y,z)
+                    if (bboxColumn instanceof SpatialColumn.Box) {
+                        envelope = ((SpatialColumn.Box) bboxColumn).getEnvelope(result, type);
+                    } else {
+                        envelope = SpatialColumn.Box.getEnvelope(result, bboxParameter);
+                    }
+                    final int dimension = envelope.getDimension();
+                    for (int i=0; i<dimension; i++) {
+                        final double min = envelope.getMinimum(i);
+                        final double max = envelope.getMaximum(i);
+                        switch (i) {
+                            case 0: if (min > xMin) xMin = min;
+                                    if (max < xMax) xMax = max; break;
+                            case 1: if (min > yMin) yMin = min;
+                                    if (max < yMax) yMax = max; break;
+                            case 2: if (min > zMin) zMin = min;
+                                    if (max < zMax) zMax = max; break;
+                            default: break; // Ignore extra dimensions, if any.
+                        }
+                    }
                 }
                 result.close();
                 fireStateChanged("Envelope");
@@ -430,56 +528,24 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        switch (type) {
-            case LIST: {
-                if (false) {
-                    // Activer cette ligne si on soupçonne que ça change les résultats.
-                    // En théorie, ça ne devrait rien changer.
-                    ensureTrimmed();
-                }
-                // Fall through
-            }
-            case BOUNDING_BOX: {
-                final Calendar calendar = getCalendar();
-                statement.setTimestamp(1, new Timestamp(tMin), calendar);
-                statement.setTimestamp(2, new Timestamp(tMax), calendar);
-                statement.setDouble   (3, xMin);
-                statement.setDouble   (4, xMax);
-                statement.setDouble   (5, yMin);
-                statement.setDouble   (6, yMax);
-                break;
-            }
+        int index = query.indexOfParameter(type, Role.TIME_RANGE);
+        if (index != 0) {
+            final Calendar calendar = getCalendar();
+            statement.setTimestamp(index,     new Timestamp(tMin), calendar);
+            statement.setTimestamp(index + 1, new Timestamp(tMax), calendar);
         }
+        index = query.indexOfParameter(type, Role.SPATIAL_ENVELOPE);
+        // TODO
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les données. Les requêtes retournées par
-     * cette méthode doivent répondre aux mêmes conditions que celles qui sont stipulées dans la
-     * {@linkplain SingletonTable#getQuery classe parente}, avec l'extension suivante:
-     * <p>
-     * <ul>
-     *   <li><p>Dans le cas particulier ou {@code type} est {@link QueryType#LIST LIST}, la requête
-     *       doit attendre les arguments suivants:</p>
-     *       <ul>
-     *         <li>La date de départ</li>
-     *         <li>La date de fin</li>
-     *         <li>La longitude minimale (ouest)</li>
-     *         <li>La longitude maximale (est)</li>
-     *         <li>La latitude minimale (sud)</li>
-     *         <li>La latitude maximale (nord)</li>
-     *       </ul>
-     *   </li>
-     *   <li><p>Dans le cas particulier ou {@code type} est {@link QueryType#BOUNDING_BOX BOUNDING_BOX},
-     *       les mêmes arguments que la requête {@link QueryType#LIST LIST} sont attendues. Les valeurs
-     *       retournées doivent être l'envelope spatio-temporelle d'une région toujours dans le même
-     *       ordre que précédemment.</p></li>
-     * </ul>
+     * Notifies that this table state changed.
      */
     @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case BOUNDING_BOX: return null;
-            default: return super.getQuery(type);
+    protected void fireStateChanged(final String property) {
+        super.fireStateChanged(property);
+        if ("CoordinateReferenceSystem".equalsIgnoreCase(property)) {
+            standardToUser = null;
         }
     }
 }

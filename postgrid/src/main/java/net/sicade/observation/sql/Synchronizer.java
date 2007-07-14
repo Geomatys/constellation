@@ -44,6 +44,7 @@ import net.sicade.observation.CatalogException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class Synchronizer {
     /**
      * Connections vers les bases de données source. Cette connexion ne doit pas être fermée,
@@ -200,7 +201,7 @@ public class Synchronizer {
      */
     private static void log(final Level level, final String method, final String message) {
         final LogRecord record = new LogRecord(level, message);
-        record.setSourceClassName("Synchronize");
+        record.setSourceClassName(Synchronizer.class.getName());
         record.setSourceMethodName(method);
         Element.LOGGER.log(record);
     }

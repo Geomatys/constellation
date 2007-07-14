@@ -76,22 +76,22 @@ public enum CRS {
     /**
      * Dimension de la longitude.
      */
-    static final int X_DIMENSION = 0;
+    final int xdim;
 
     /**
      * Dimension de la latitude.
      */
-    static final int Y_DIMENSION = 1;
+    final int ydim;
 
     /**
      * Dimension de la profondeur, ou -1 s'il n'y en a pas.
      */
-    final int Z_DIMENSION;
+    final int zdim;
 
     /**
      * Dimension du temps, ou -1 s'il n'y en a pas.
      */
-    final int T_DIMENSION;
+    final int tdim;
 
     /**
      * Le système de référence des coordonnées.
@@ -116,8 +116,10 @@ public enum CRS {
      * Construit une énumération.
      */
     private CRS(final int z, final int t) {
-        Z_DIMENSION = z;
-        T_DIMENSION = t;
+        xdim = 0;
+        ydim = 1;
+        zdim = z;
+        tdim = t;
     }
 
     /**

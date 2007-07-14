@@ -17,17 +17,16 @@ package net.sicade.observation.coverage.sql;
 // J2SE dependencies
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-// Sicade dependencies
-import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Thematic;
-import net.sicade.observation.ConfigurationKey;
+import net.sicade.observation.sql.Column;
+import net.sicade.observation.sql.Parameter;
+import net.sicade.observation.sql.QueryType;
+import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
-import net.sicade.observation.IllegalRecordException;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -40,15 +39,14 @@ import net.sicade.observation.IllegalRecordException;
  */
 public class ThematicTable extends SingletonTable<Thematic> implements Shareable {
     /**
-     * Requête SQL pour obtenir un thème.
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Thematics:SELECT",
-            "SELECT name, description\n" +
-            "  FROM \"Thematics\"\n"     +
-            " WHERE name=?");
+    private final Column name, remarks;
 
-    /** Numéro de colonne. */ private static final int NAME    = 1;
-    /** Numéro de colonne. */ private static final int REMARKS = 2;
+    /**
+     * Parameter declared in the {@linkplain #query query}.
+     */
+    private final Parameter byName;
 
     /**
      * Une instance unique de la table des séries. Sera créée par {@link #getSeriesTable} la
@@ -64,24 +62,19 @@ public class ThematicTable extends SingletonTable<Thematic> implements Shareable
      */
     public ThematicTable(final Database database) {
         super(database);
-    }
-
-    /**
-     * Retourne la requête SQL à utiliser pour obtenir les thèmes.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default:     return super.getQuery(type);
-        }
+        final QueryType[] usage = {SELECT, LIST};
+        name    = new Column   (query, "Thematics", "name",        usage);
+        remarks = new Column   (query, "Thematics", "description", usage);
+        byName  = new Parameter(query, name, SELECT);
+        name.setRole(Role.NAME);
     }
 
     /**
      * Construit un thème pour l'enregistrement courant.
      */
     protected Thematic createEntry(final ResultSet results) throws SQLException {
-        return new ThematicEntry(results.getString(NAME), results.getString(REMARKS));
+        return new ThematicEntry(results.getString(name   .indexOf(SELECT)),
+                                 results.getString(remarks.indexOf(SELECT)));
     }
 
     /**
@@ -97,7 +90,7 @@ public class ThematicTable extends SingletonTable<Thematic> implements Shareable
      */
     final synchronized <T extends Table> T getTable(final Class<T> type) {
         if (series == null) {
-            series = database.getTable(type);
+            series = getDatabase().getTable(type);
         }
         return type.cast(series);
     }

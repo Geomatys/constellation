@@ -14,6 +14,9 @@
  */
 package net.sicade.observation.sql;
 
+import java.util.logging.Level;
+import net.sicade.observation.LoggingLevel;
+
 
 /**
  * Type de requête exécutée par {@link SingletonTable}.
@@ -26,28 +29,40 @@ public enum QueryType {
      * Tous les enregistrements seront listés. C'est le type de requête sélectionné
      * lorsque la méthode {@link SingletonTable#getEntries} est appelée.
      */
-    LIST,
+    LIST(LoggingLevel.SELECT),
 
     /**
      * Un enregistrement sera sélectionné en fonction de son nom. C'est le type de requête
      * sélectionné lorsque la méthode {@link SingletonTable#getEntry(String)} est appelée.
      */
-    SELECT,
+    SELECT(LoggingLevel.SELECT),
 
     /**
      * Un enregistrement sera sélectionné en fonction de son numéro d'identifiant. C'est le type
      * de requête sélectionné lorsque la méthode {@link SingletonTable#getEntry(int)} est appelée.
      */
-    SELECT_BY_IDENTIFIER,
+    SELECT_BY_IDENTIFIER(LoggingLevel.SELECT),
 
     /**
      * Sélectionne les coordonnées spatio-temporelles d'un ensemble d'enregistrements. C'est le
      * type de requête que peut exécuter {@link BoundedSingletonTable#getGeographicBoundingBox}.
      */
-    BOUNDING_BOX,
+    BOUNDING_BOX(LoggingLevel.SELECT),
 
     /**
      * Un enregistrement sera ajouté.
      */
-    INSERT
+    INSERT(LoggingLevel.INSERT);
+
+    /**
+     * The suggested level for logging SQL statement of this kind.
+     */
+    final Level level;
+
+    /**
+     * Creates a query type.
+     */
+    private QueryType(final Level level) {
+        this.level = level;
+    }
 }

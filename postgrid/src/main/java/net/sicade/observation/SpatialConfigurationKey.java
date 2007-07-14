@@ -25,6 +25,7 @@ package net.sicade.observation;
  * @author Cédric Briançon
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class SpatialConfigurationKey extends ConfigurationKey {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.

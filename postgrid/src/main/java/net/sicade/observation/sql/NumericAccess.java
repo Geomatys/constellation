@@ -39,5 +39,6 @@ import net.sicade.observation.Element;
  * @see SingletonTable#getEntry(int)
  * @see SingletonTable#getQuery(QueryType)
  */
+@Deprecated
 public interface NumericAccess {
 }

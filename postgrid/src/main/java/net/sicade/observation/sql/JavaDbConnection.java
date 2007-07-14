@@ -29,6 +29,7 @@ import java.sql.SQLException;
  *
  * @deprecated Contient des valeurs codées en dur pour l'instant.
  */
+@Deprecated
 public class JavaDbConnection {
     /**
      * The name of the database.

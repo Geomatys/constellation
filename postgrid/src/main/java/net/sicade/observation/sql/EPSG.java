@@ -91,11 +91,30 @@ public class EPSG extends SimpleDataSource {
      */
     private static Properties getProperties(final Database database) {
         final Properties properties = new Properties();
-        database.getProperty(DRIVER,   Database.DRIVER,   properties, "driver"  );
-        database.getProperty(DATABASE, Database.DATABASE, properties, "url"     );
-        database.getProperty(SCHEMA,   null,              properties, "schema"  );
-        database.getProperty(USER,     Database.USER,     properties, "user"    );
-        database.getProperty(PASSWORD, Database.PASSWORD, properties, "password");
+        getProperty(database, DRIVER,   Database.DRIVER,   properties, "driver"  );
+        getProperty(database, DATABASE, Database.DATABASE, properties, "url"     );
+        getProperty(database, SCHEMA,   null,              properties, "schema"  );
+        getProperty(database, USER,     Database.USER,     properties, "user"    );
+        getProperty(database, PASSWORD, Database.PASSWORD, properties, "password");
         return properties;
+    }
+
+    /**
+     * Obtient la valeur de la propriété spécifiée, ou de {@code fallback} si aucune propriété
+     * n'est définie pour {@code key}. Si une valeur non-null est trouvée, elle sera copiée
+     * dans l'ensemble {@code properties} spécifié sous la clé {@code targetKey} spécifiée.
+     */
+    private static void getProperty(final Database database,
+            final ConfigurationKey key, final ConfigurationKey fallback,
+            final Properties properties, final String targetKey)
+    {
+        String candidate = database.getProperty(key);
+        if (candidate == null) {
+            candidate = database.getProperty(fallback);
+            if (candidate == null) {
+                return;
+            }
+        }
+        properties.put(targetKey, candidate);
     }
 }

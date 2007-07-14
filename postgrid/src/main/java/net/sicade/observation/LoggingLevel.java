@@ -28,6 +28,8 @@ import java.util.logging.Level;
  * @author Martin Desruisseaux
  *
  * @see Element#LOGGER
+ *
+ * @todo Move to the {@code net.sicade.observation.sql} package and turn into a package-privated class.
  */
 public final class LoggingLevel extends Level {
     /**
