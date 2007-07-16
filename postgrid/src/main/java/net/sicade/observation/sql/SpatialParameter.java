@@ -36,11 +36,14 @@ public class SpatialParameter extends Parameter {
     /**
      * Creates a new parameter for the specified query.
      *
-     * @param query  The query for which the parameter is created.
-     * @param column The column on which the parameter is applied.
-     * @param types  The query types for which the parameter applies.
+     * @param  query  The query for which the parameter is created.
+     * @param  column The column on which the parameter is applied.
+     * @param  types  The query types for which the parameter applies.
+     * @throws SQLException if an error occured while reading the database.
      */
-    public SpatialParameter(final Query query, final Column column, final QueryType... types) {
+    public SpatialParameter(final Query query, final Column column, final QueryType... types)
+            throws SQLException
+    {
         super(query, column, types);
         spatialEnabled = (query.database != null) && query.database.isSpatialEnabled();
     }
@@ -56,8 +59,11 @@ public class SpatialParameter extends Parameter {
          * @param query  The query for which the parameter is created.
          * @param column The column on which the parameter is applied.
          * @param types  The query types for which the parameter applies.
+         * @throws SQLException if an error occured while reading the database.
          */
-        public Box(final Query query, final Column column, final QueryType... types) {
+        public Box(final Query query, final Column column, final QueryType... types)
+                throws SQLException
+        {
             super(query, column, types);
         }
 

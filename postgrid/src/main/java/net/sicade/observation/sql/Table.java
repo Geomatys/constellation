@@ -302,7 +302,7 @@ public class Table {
      * table state. Overriding methods should invoke {@code super.configure(type, statement)}
      * first.
      *
-     * @param  type The query type (mat be {@code null}).
+     * @param  type The query type.
      * @param  statement The statement to configure (never {@code null}).
      * @throws SQLException If the statement can not be configured.
      */

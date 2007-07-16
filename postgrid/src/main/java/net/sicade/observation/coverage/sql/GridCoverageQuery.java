@@ -15,6 +15,7 @@
  */
 package net.sicade.observation.coverage.sql;
 
+import java.sql.SQLException;
 import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.Database;
@@ -46,8 +47,10 @@ final class GridCoverageQuery extends Query {
 
     /**
      * Creates a new query for the specified database.
+     *
+     * @throws SQLException if an error occured while reading the database.
      */
-    public GridCoverageQuery(final Database database) {
+    public GridCoverageQuery(final Database database) throws SQLException {
         super(database);
         final QueryType[] usage = {SELECT, LIST};
         layer           = new Column   (this, "Series",         "layer",         usage);

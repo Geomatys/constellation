@@ -207,8 +207,9 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * Construit une table pour la connexion spécifiée.
      *
      * @param  database Connexion vers la base de données d'observations.
+     * @throws SQLException if an error occured while reading the database.
      */
-    public GridCoverageTable(final Database database) {
+    public GridCoverageTable(final Database database) throws SQLException {
         super(new GridCoverageQuery(database), net.sicade.observation.sql.CRS.XYT);
         this.dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
         this.dateFormat.setTimeZone(database.getTimeZone());

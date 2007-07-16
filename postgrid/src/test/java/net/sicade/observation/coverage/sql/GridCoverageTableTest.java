@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.CoverageReference;
@@ -54,20 +55,17 @@ public class GridCoverageTableTest extends DatabaseTest {
      */
     @Test
     public void testSelectAndList() throws CatalogException, SQLException, ParseException {
-        testConnection(); // TODO: remove this test once 'Database.isSpatialEnabled()' connect itself.
-
         final GridCoverageTable table = new GridCoverageTable(database);
         table.setLayer(new LayerEntry(LayerTableTest.SAMPLE_NAME, null, null, 1, null));
         final CoverageReference entry = table.getEntry(SAMPLE_NAME);
         assertEquals(SeriesTableTest.SAMPLE_NAME + ':' + SAMPLE_NAME, entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
 
-        table.setTimeRange(date("1985-08-01"), date("1985-08-15"));
-        final CoverageReference byRange = table.getEntry();
-
-//        final Set<CoverageReference> entries = table.getEntries();
-//        assertFalse(entries.isEmpty());
-//        assertTrue(entries.contains(entry));
+        table.setTimeRange(date("1986-01-05"), date("1986-01-20"));
+        final Set<CoverageReference> entries = table.getEntries();
+        assertEquals(3, entries.size());
+        assertTrue(entries.contains(entry));
+        assertSame(entry, table.getEntry());
     }
 
     /**

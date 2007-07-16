@@ -40,7 +40,7 @@ import static net.sicade.observation.sql.QueryType.*;
  * Connection to a table of series. This connection is used internally by the
  * {@linkplain LayerTable layer table}.
  *
- * @version $Id: SeriesTable.java 31 2007-07-05 15:23:06Z desruisseaux $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 @Use(FormatTable.class)
@@ -148,7 +148,7 @@ public class SeriesTable extends SingletonTable<Series> {
      * {@link LayerTable} internal working only. This class had to be public because it needs
      * to be accessible to {@link Database#getTable}.
      *
-     * @version $Id: SeriesTable.java 31 2007-07-05 15:23:06Z desruisseaux $
+     * @version $Id$
      * @author Martin Desruisseaux
      *
      * @todo Replace by a {@code getEntries(Layer)} method.

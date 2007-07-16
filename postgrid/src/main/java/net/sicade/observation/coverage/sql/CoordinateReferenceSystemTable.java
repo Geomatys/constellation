@@ -19,6 +19,7 @@ package net.sicade.observation.coverage.sql;
 import java.util.Map;
 import java.util.HashMap;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.TemporalCRS;
@@ -32,6 +33,7 @@ import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.CatalogException;
+import net.sicade.observation.sql.Query;
 
 
 /**
@@ -58,7 +60,7 @@ public class CoordinateReferenceSystemTable extends Table implements Shareable {
      * @param database Connection to the database.
      */
     public CoordinateReferenceSystemTable(final Database database) {
-        super(database);
+        super(new Query(database));
     }
 
     /**
@@ -74,23 +76,28 @@ public class CoordinateReferenceSystemTable extends Table implements Shareable {
     public synchronized CoordinateReferenceSystem getEntry(final String name)
             throws CatalogException, SQLException
     {
-        if (name.equalsIgnoreCase("IRD:WGS84(xy)")) {
-            return CRS.XY.getCoordinateReferenceSystem();
-        }
-        if (name.equalsIgnoreCase("IRD:WGS84(xyz)")) {
-            return CRS.XYZ.getCoordinateReferenceSystem();
-        }
-        if (name.equalsIgnoreCase("IRD:WGS84(xyt)")) {
-            return CRS.XYT.getCoordinateReferenceSystem();
-        }
-        if (name.equalsIgnoreCase("IRD:WGS84(xyzt)")) {
-            return CRS.XYZT.getCoordinateReferenceSystem();
+        /*
+         * Special processing for the "xy", "xyz", "xyt" and "xyzt" codes.
+         */
+        final String authority = "IRD:WGS84(";
+        final String asUpper = name.trim().toUpperCase(Locale.ENGLISH);
+        if (asUpper.startsWith(authority)) {
+            final int last = asUpper.lastIndexOf(')');
+            if (last >= 0) {
+                final String code = asUpper.substring(authority.length(), last);
+                try {
+                    return CRS.valueOf(code).getCoordinateReferenceSystem();
+                } catch (IllegalArgumentException cause) {
+                    // Ignore. We will try the authority below.
+                }
+            }
         }
         CoordinateReferenceSystem entry = pool.get(name);
         if (entry != null) {
             return entry;
         }
         if (true) {
+            // TODO
             throw new CatalogException("Not yet implemented.");
         }
         /*

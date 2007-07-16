@@ -532,10 +532,10 @@ public class Database {
      * PostGIS is an optional spatial extension to PostgreSQL. Those extensions define
      * new types like {@code BOX3D}.
      */
-    public boolean isSpatialEnabled() {
+    public boolean isSpatialEnabled() throws SQLException {
         if (connection == null) {
-            // TODO: connect automatically.
-            throw new IllegalStateException();
+            // Force the computation of 'isSpatialEnabled' flag.
+            getConnection();
         }
         return isSpatialEnabled;
     }

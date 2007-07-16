@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import net.sicade.resources.XArray;
 
 
 /**
@@ -117,11 +118,13 @@ public class Query {
         final IndexedSqlElement[] old;
         if (element instanceof Column) {
             old = columns;
-            columns = Arrays.copyOf(columns, old.length + 1);
+            columns = XArray.resize(columns, old.length + 1);
+//          columns = Arrays.copyOf(columns, old.length + 1);  // Java 6
             columns[old.length] = (Column) element;
         } else if (element instanceof Parameter) {
             old = parameters;
-            parameters = Arrays.copyOf(parameters, old.length + 1);
+            parameters = XArray.resize(parameters, old.length + 1);
+//          parameters = Arrays.copyOf(parameters, old.length + 1);  // Java 6
             parameters[old.length] = (Parameter) element;
         } else {
             throw new AssertionError(element); // Should never happen.
