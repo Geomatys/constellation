@@ -55,6 +55,11 @@ public enum QueryType {
     BOUNDING_BOX(LoggingLevel.SELECT),
 
     /**
+     * Selects a list of available date or depth.
+     */
+    AVAILABLE_DATA(LoggingLevel.SELECT),
+
+    /**
      * A record will be added to a table.
      */
     INSERT(LoggingLevel.INSERT);

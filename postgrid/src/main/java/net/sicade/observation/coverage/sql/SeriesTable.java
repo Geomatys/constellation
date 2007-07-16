@@ -163,5 +163,17 @@ public class SeriesTable extends SingletonTable<Series> {
         public Shareable(final Database database) {
             super(database);
         }
+
+        /**
+         * VERY BAD TRICK HERE. We need to do something better.
+         */
+        @Deprecated
+        protected void fireStateChanged(final String property) {
+            try {
+                super.fireStateChanged(property);
+            } catch (IllegalStateException e) {
+                // Ignore the fact that we are violating the Shareable contract.
+            }
+        }
     }
 }

@@ -52,30 +52,31 @@ final class GridCoverageQuery extends Query {
      */
     public GridCoverageQuery(final Database database) throws SQLException {
         super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        layer           = new Column   (this, "Series",         "layer",         usage);
-        series          = new Column   (this, "GridCoverages",  "series",        usage);
-        pathname        = new Column   (this, "Series",         "pathname",      usage);
-        filename        = new Column   (this, "GridCoverages",  "filename",      usage);
-        extension       = new Column   (this, "Series",         "extension",     usage);
-        startTime       = new Column   (this, "GridCoverages",  "startTime",     usage);
-        endTime         = new Column   (this, "GridCoverages",  "endTime",       usage);
-        spatialExtent   = new SpatialColumn.Box(this, "GridGeometries", "spatialExtent", usage);
-        width           = new Column   (this, "GridGeometries", "width",         usage);
-        height          = new Column   (this, "GridGeometries", "height",        usage);
-        depth           = new Column   (this, "GridGeometries", "depth",         usage);
-        crs             = new Column   (this, "GridGeometries", "CRS",           usage);
-        format          = new Column   (this, "Series",         "format",        usage);
-        visibility      = new Column   (this, "Series",         "visible",       usage);
+        final QueryType[] SL  = {SELECT, LIST};
+        final QueryType[] SLA = {SELECT, LIST, AVAILABLE_DATA};
+        layer           = new Column   (this, "Series",         "layer",         SL );
+        series          = new Column   (this, "GridCoverages",  "series",        SL );
+        pathname        = new Column   (this, "Series",         "pathname",      SL );
+        filename        = new Column   (this, "GridCoverages",  "filename",      SL );
+        extension       = new Column   (this, "Series",         "extension",     SL );
+        startTime       = new Column   (this, "GridCoverages",  "startTime",     SLA);
+        endTime         = new Column   (this, "GridCoverages",  "endTime",       SLA);
+        spatialExtent   = new SpatialColumn.Box(this, "GridGeometries", "spatialExtent", SLA);
+        width           = new Column   (this, "GridGeometries", "width",         SL );
+        height          = new Column   (this, "GridGeometries", "height",        SL );
+        depth           = new Column   (this, "GridGeometries", "depth",         SL );
+        crs             = new Column   (this, "GridGeometries", "CRS",           SL );
+        format          = new Column   (this, "Series",         "format",        SL );
+        visibility      = new Column   (this, "Series",         "visible",       SLA);
         byFilename      = new Parameter(this, filename,      SELECT);
-        byLayer         = new Parameter(this, layer,         usage);
-        byStartTime     = new Parameter(this, startTime,     usage);
-        byEndTime       = new Parameter(this, endTime,       usage);
-        bySpatialExtent = new SpatialParameter.Box(this, spatialExtent, usage);
-        byVisibility    = new Parameter(this, visibility,    usage);
+        byLayer         = new Parameter(this, layer,         SLA);
+        byStartTime     = new Parameter(this, startTime,     SLA);
+        byEndTime       = new Parameter(this, endTime,       SLA);
+        bySpatialExtent = new SpatialParameter.Box(this, spatialExtent, SLA);
+        byVisibility    = new Parameter(this, visibility,    SLA);
         if (SpatialColumn.WORKAROUND_POSTGIS) {
             // PostGIS doesn't seem to be able to apply conversions by itself.
-            bySpatialExtent.setFunction("::text", usage);
+            bySpatialExtent.setFunction("::text", SLA);
         }
         filename       .setRole(Role.NAME);
         spatialExtent  .setRole(Role.SPATIAL_ENVELOPE);

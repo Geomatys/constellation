@@ -56,7 +56,7 @@ public class GridCoverageTableTest extends DatabaseTest {
     @Test
     public void testSelectAndList() throws CatalogException, SQLException, ParseException {
         final GridCoverageTable table = new GridCoverageTable(database);
-        table.setLayer(new LayerEntry(LayerTableTest.SAMPLE_NAME, null, null, 1, null));
+        table.setLayer(LayerTableTest.SAMPLE_NAME);
         final CoverageReference entry = table.getEntry(SAMPLE_NAME);
         assertEquals(SeriesTableTest.SAMPLE_NAME + ':' + SAMPLE_NAME, entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
@@ -66,6 +66,10 @@ public class GridCoverageTableTest extends DatabaseTest {
         assertEquals(3, entries.size());
         assertTrue(entries.contains(entry));
         assertSame(entry, table.getEntry());
+
+        final Set<Date> times = table.getAvailableTimes();
+        assertEquals(entries.size(), times.size());
+        assertTrue(times.contains(date("1986-01-09")));
     }
 
     /**

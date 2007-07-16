@@ -133,14 +133,12 @@ public class LayerEntry extends ObservableEntry implements Layer {
      * @param timeInterval L'intervalle de temps typique des images de cette couche (en nombre
      *                     de jours), ou {@link Double#NaN} si elle est inconnue.
      * @param remarks      Remarques s'appliquant à cette entrée, ou {@code null}.
-     *
-     * @throws CatalogException Si cette entrée n'a pas pu être construite.
      */
     protected LayerEntry(final String    name,
                          final Thematic  thematic,
                          final Procedure procedure,
                          final double    timeInterval,
-                         final String    remarks) throws CatalogException
+                         final String    remarks)
     {
         super(name.hashCode() ^ (int)serialVersionUID, // Simulation d'un identifiant numérique.
               name, thematic, procedure, null, remarks);

@@ -383,10 +383,10 @@ public class Table {
      */
     protected void fireStateChanged(final String property) {
         assert Thread.holdsLock(this);
-        if (this instanceof Shareable) {
-            throw new IllegalStateException("Violation du contrat des tables partageables.");
-        }
         changed = true;
+        if (this instanceof Shareable) {
+            throw new IllegalStateException("Violation du contrat des tables partagées.");
+        }
     }
 
     /**

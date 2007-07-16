@@ -228,9 +228,10 @@ public class SpatialColumn extends Column {
                         try {
                             coordinates[i++] = Double.parseDouble(t);
                         } catch (NumberFormatException exception) {
-                            throw new SQLException("Coordonnée invalide: " + t, exception);
+                            // TODO: uncomment the cause with Java 6
+                            throw new SQLException("Coordonnée invalide: " + t/*, exception*/);
                         } catch (ArrayIndexOutOfBoundsException exception) {
-                            throw new SQLException("Trop de valeurs dans " + bbox);
+                            throw new SQLException("Trop de valeurs dans " + bbox/*, exception*/);
                         }
                     }
                     final GeneralEnvelope envelope = new GeneralEnvelope(dimension);

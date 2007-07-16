@@ -17,6 +17,7 @@ package net.sicade.observation.coverage.sql;
 
 // Utilitaires
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
@@ -263,6 +264,14 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
+     * Sets the later as a string. This methode should be avoided as much as possible -
+     * use {@link #setLayer(Layer)} instead. However it still useful for debugging purpose.
+     */
+    public void setLayer(final String layer) {
+        setLayer(new LayerEntry(layer, null, null, 1, null));
+    }
+
+    /**
      * Définit la période de temps d'intérêt (dans laquelle rechercher des images).
      */
     @Override
@@ -485,6 +494,39 @@ loop:   for (final CoverageReference newReference : entries) {
             // Voir le commentaire du code équivalent de 'getEntries()'
         }
         return super.getEntry(name);
+    }
+
+    /**
+     * Returns the date for which an image is available.
+     *
+     * @throws SQLException If an error occured while reading the database.
+     */
+    public synchronized Set<Date> getAvailableTimes() throws CatalogException, SQLException {
+        final Set<Date>         times     = new TreeSet<Date>();
+        final Calendar          calendar  = getCalendar();
+        final GridCoverageQuery query     = (GridCoverageQuery) super.query;
+        final PreparedStatement statement = getStatement(QueryType.AVAILABLE_DATA);
+        final ResultSet         results   = statement.executeQuery();
+        final int startTimeIndex = indexOf(query.startTime);
+        final int endTimeIndex   = indexOf(query.startTime);
+        while (results.next()) {
+            final Date startTime = results.getTimestamp(startTimeIndex, calendar);
+            final Date   endTime = results.getTimestamp(  endTimeIndex, calendar);
+            final Date      time;
+            if (startTime != null) {
+                if (endTime != null) {
+                    time = new Date((startTime.getTime() + endTime.getTime()) / 2);
+                } else {
+                    time = new Date(startTime.getTime());
+                }
+            } else if (endTime != null) {
+                time = new Date(endTime.getTime());
+            } else {
+                continue;
+            }
+            times.add(time);
+        }
+        return times;
     }
 
     /**
