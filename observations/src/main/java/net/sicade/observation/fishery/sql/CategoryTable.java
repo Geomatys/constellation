@@ -87,17 +87,6 @@ public class CategoryTable extends SingletonTable<Category> implements NumericAc
     }
 
     /**
-     * Retourne la requête à utiliser pour obtenir une catégorie.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default: return super.getQuery(type);
-        }
-    }
-
-    /**
      * Construit une catégorie pour l'enregistrement courant.
      */
     protected Category createEntry(final ResultSet result) throws SQLException, CatalogException {
@@ -108,10 +97,10 @@ public class CategoryTable extends SingletonTable<Category> implements NumericAc
         final String stage      = result.getString(STAGE);
         final String remarks    = result.getString(REMARKS);
         if (species == null) {
-            species = database.getTable(SpeciesTable.class);
+            species = getDatabase().getTable(SpeciesTable.class);
         }
         if (stages == null) {
-            stages = database.getTable(StageTable.class);
+            stages = getDatabase().getTable(StageTable.class);
         }
         return new CategoryEntry(identifier, symbol, species.getEntry(phenomenon),
                                  stages.getEntry(stage), fisheryType, remarks);

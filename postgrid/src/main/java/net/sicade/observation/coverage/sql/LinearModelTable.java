@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -27,16 +28,19 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
 // Sicade
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.coverage.Layer;
+import net.sicade.observation.coverage.Descriptor;
+import net.sicade.observation.coverage.LinearModel;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
-import net.sicade.observation.ConfigurationKey;
-import net.sicade.observation.CatalogException;
-import net.sicade.observation.coverage.Layer;
-import net.sicade.observation.coverage.Descriptor;
-import net.sicade.observation.coverage.LinearModel;
+import net.sicade.observation.sql.Column;
+import net.sicade.observation.sql.Parameter;
+import net.sicade.observation.sql.QueryType;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -50,18 +54,14 @@ import net.sicade.observation.coverage.LinearModel;
 @UsedBy(LayerTable.class)
 public class LinearModelTable extends Table implements Shareable {
     /**
-     * La requête SQL servant à interroger la table.
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("LinearModels:SELECT",
-            "SELECT source1, source2, coefficient\n" +
-            "  FROM \"LinearModelTerms\"\n"          +
-            " WHERE target=?\n" +
-            " ORDER BY source1, source2");
+    private final Column target, source1, source2, coefficient;
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_TARGET = 1;
-    /** Numéro de colonne. */ private static final int SOURCE1         = 1;
-    /** Numéro de colonne. */ private static final int SOURCE2         = 2;
-    /** Numéro de colonne. */ private static final int COEFFICIENT     = 3;
+    /**
+     * Parameter declared in the {@linkplain #query query}.
+     */
+    private final Parameter byTarget;
 
     /**
      * La table des descripteurs du paysage océanique. Ne sera construit que la première fois
@@ -82,6 +82,14 @@ public class LinearModelTable extends Table implements Shareable {
      */
     public LinearModelTable(final Database database) {
         super(database);
+        final QueryType[] usage = {SELECT};
+        target      = new Column   (query, "LinearModelTerms", "target",      LIST);
+        source1     = new Column   (query, "LinearModelTerms", "source1",     usage);
+        source2     = new Column   (query, "LinearModelTerms", "source2",     usage);
+        coefficient = new Column   (query, "LinearModelTerms", "coefficient", usage);
+        byTarget    = new Parameter(query, target, SELECT);
+        source1.setOrdering("ASC");
+        source2.setOrdering("ASC");
     }
 
     /**
@@ -122,7 +130,7 @@ public class LinearModelTable extends Table implements Shareable {
         }
         LinearModelEntry model = new LinearModelEntry(target, terms);
         if (substitution == null) {
-            substitution = database.createTable(DescriptorSubstitutionTable.class);
+            substitution = getDatabase().createTable(DescriptorSubstitutionTable.class);
             substitution.setDescriptorTable(descriptors);
         }
         for (final Descriptor descriptor : model.getDescriptors()) {
@@ -146,7 +154,7 @@ public class LinearModelTable extends Table implements Shareable {
     private List<LinearModel.Term> getTerms(final Layer target) throws CatalogException, SQLException {
         ArrayList<LinearModelTerm> terms = null;
         final PreparedStatement statement = getStatement(SELECT);
-        statement.setString(ARGUMENT_TARGET, target.getName());
+        statement.setString(indexOf(byTarget), target.getName());
         final ResultSet results;
         try {
             results = statement.executeQuery();
@@ -171,10 +179,13 @@ public class LinearModelTable extends Table implements Shareable {
          * construction complète des descripteurs ne sera effectuée qu'après la fermeture du
          * 'ResultSet', afin d'éviter des problèmes lors d'appels recursifs à cette méthode.
          */
+        final int s1 = indexOf(source1);
+        final int s2 = indexOf(source2);
+        final int cf = indexOf(coefficient);
         while (results.next()) {
-            final String source1     = results.getString(SOURCE1);
-            final String source2     = results.getString(SOURCE2);
-            final double coefficient = results.getDouble(COEFFICIENT);
+            final String source1     = results.getString(s1);
+            final String source2     = results.getString(s2);
+            final double coefficient = results.getDouble(cf);
             if (terms == null) {
                 terms = new ArrayList<LinearModelTerm>();
             }
@@ -193,7 +204,7 @@ public class LinearModelTable extends Table implements Shareable {
             final String source1 = names[0];
             final String source2 = names[1];
             if (descriptors == null) {
-                setDescriptorTable(database.getTable(DescriptorTable.class));
+                setDescriptorTable(getDatabase().getTable(DescriptorTable.class));
             }
             final Descriptor descriptor1 = descriptors.getEntry(source1);
             final Descriptor descriptor2 = descriptors.getEntry(source2);

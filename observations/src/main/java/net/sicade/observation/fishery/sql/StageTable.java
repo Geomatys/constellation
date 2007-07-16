@@ -61,17 +61,6 @@ public class StageTable extends SingletonTable<Stage> implements Shareable {
     }
 
     /**
-     * Retourne la requête à utiliser pour obtenir un stage de développement.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default: return super.getQuery(type);
-        }
-    }
-
-    /**
      * Construit un stage de développement pour l'enregistrement courant.
      */
     protected Stage createEntry(final ResultSet result) throws SQLException {

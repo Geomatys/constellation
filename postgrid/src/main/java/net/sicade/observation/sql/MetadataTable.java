@@ -77,7 +77,7 @@ public class MetadataTable extends Table implements Shareable {
         T candidate = type.cast(p.get(identifier));
         if (candidate == null) {
             if (source == null) {
-                source = new MetadataSource(database.getConnection());
+                source = new MetadataSource(getDatabase().getConnection());
             }
             candidate = type.cast(source.getEntry(type, identifier));
             /*

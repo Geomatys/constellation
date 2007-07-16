@@ -14,8 +14,10 @@
  */
 package net.sicade.observation.coverage.sql;
 
-import java.sql.DatabaseMetaData;
+import java.util.Set;
 import java.sql.SQLException;
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.coverage.Thematic;
 import net.sicade.observation.sql.DatabaseTest;
 
 import org.junit.*;
@@ -23,33 +25,29 @@ import static org.junit.Assert.*;
 
 
 /**
- * Tests the SQL queries used by the PostGrid database.
+ * Tests {@link ThematicTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SchemaTest extends DatabaseTest {
+public class ThematicTableTest extends DatabaseTest {
     /**
-     * Creates a new instance.
+     * The name of the thematic to be tested.
      */
-    public SchemaTest() {
-    }
+    public static final String SAMPLE_NAME = "Température";
 
     /**
-     * Tests the SQL statements used by the {@link ThematicTable}.
+     * Tests the {@link ThematicTable#getEntry} and {@link ThematicTable#getEntries} methods.
      */
     @Test
-    public void testThematic() throws SQLException {
+    public void testSelectAndList() throws CatalogException, SQLException {
         final ThematicTable table = new ThematicTable(database);
-        trySelectAll(table);
-    }
+        final Thematic      entry = table.getEntry(SAMPLE_NAME);
+        assertEquals(SAMPLE_NAME, entry.getName());
+        assertSame(entry, table.getEntry(SAMPLE_NAME));
 
-    /**
-     * Tests the SQL statements used by the {@link OperationParameterTable}.
-     */
-    @Test
-    public void testOperationParameters() throws SQLException {
-        final OperationParameterTable table = new OperationParameterTable(database);
-        trySelectAll(table);
+        final Set<Thematic> entries = table.getEntries();
+        assertFalse(entries.isEmpty());
+        assertTrue(entries.contains(entry));
     }
 }

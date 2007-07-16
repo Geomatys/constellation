@@ -21,7 +21,6 @@ package net.sicade.observation.coverage;
 // J2SE dependencies
 import java.util.Set;
 import java.util.Locale;
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -31,14 +30,12 @@ import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
-import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 // Geotools dependencies
+import org.geotools.util.Logging;
 import org.geotools.resources.Arguments;
-import org.geotools.util.MonolineFormatter;
 import org.geotools.coverage.CoverageStack;
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
@@ -91,8 +88,7 @@ public class SeriesTest extends AbstractTest {
      * Exécute la suite de tests à partir de la ligne de commande.
      */
     public static void main(final String[] args) {
-        MonolineFormatter.init("org.geotools");
-        MonolineFormatter.init("net.sicade");
+        Logging.ALL.forceMonolineConsoleOutput();
         final Arguments arguments = new Arguments(args);
         Locale.setDefault(arguments.locale);
         junit.textui.TestRunner.run(suite());

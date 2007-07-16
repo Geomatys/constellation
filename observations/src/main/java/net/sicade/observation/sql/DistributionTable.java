@@ -52,17 +52,6 @@ public class DistributionTable extends SingletonTable<Distribution> implements S
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les distributions.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default:     return super.getQuery(type);
-        }
-    }
-
-    /**
      * Construit une distribution pour l'enregistrement courant.
      */
     protected Distribution createEntry(final ResultSet results) throws SQLException {

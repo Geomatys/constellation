@@ -63,17 +63,6 @@ public class SpeciesTable extends SingletonTable<Species> implements Shareable {
     }
 
     /**
-     * Retourne la requête à utiliser pour obtenir une espèce.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default: return super.getQuery(type);
-        }
-    }
-
-    /**
      * Construit une espèce pour l'enregistrement courant.
      */
     protected Species createEntry(final ResultSet result) throws SQLException {

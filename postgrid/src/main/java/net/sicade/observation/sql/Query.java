@@ -15,6 +15,7 @@
 package net.sicade.observation.sql;
 
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -39,6 +40,11 @@ public class Query {
      * implementations require {@code "INNER JOIN"} instead of {@code "JOIN"}.
      */
     private static final String JOIN = " JOIN ";
+
+    /**
+     * A condition handled in a special way.
+     */
+    private static final String SPECIAL_CONDITION = "IS NULL OR";
 
     /**
      * An empty array of columns.
@@ -124,13 +130,35 @@ public class Query {
     }
 
     /**
-     * Returns the columns for the specified type.
+     * Returns the columns for the specified type. For a statement created from the
+     * <code>{@linkplain #select select}(type)</code> query, the value returned by
+     * <code>{@linkplain ResultSet#getString(int) ResultSet.getString}(i)</code>
+     * correponds to the {@linkplain Column column} at index <var>i</var>-1 in the list.
      *
      * @param  type The query type.
      * @return An immutable list of columns.
+     *
+     * @todo Current implementation do not handle correctly {@link SpatialColumn}
+     *       using more than one column.
      */
     public List<Column> getColumns(final QueryType type) {
         return new IndexedSqlElementList<Column>(type, columns);
+    }
+
+    /**
+     * Returns the parameters for the specified type. For a statement created from the
+     * <code>{@linkplain #select select}(type)</code> query, the parameter set by
+     * <code>{@linkplain PreparedStatement#setString(int,String) PreparedStatement.setString}(i, ...)</code>
+     * correponds to the {@linkplain Parameter parameter} at index <var>i</var>-1 in the list.
+     *
+     * @param  type The query type.
+     * @return An immutable list of parameters.
+     *
+     * @todo Current implementation do not handle correctly {@link SpatialParameter}
+     *       using more than one parameter.
+     */
+    public List<Parameter> getParameters(final QueryType type) {
+        return new IndexedSqlElementList<Parameter>(type, parameters);
     }
 
     /**
@@ -284,10 +312,89 @@ scan:       while (!tables.isEmpty()) {
         String separator = " WHERE ";
         for (final Parameter p : parameters) {
             if (p.indexOf(type) != 0) {
-                buffer.append(separator).append(quote).append(p.getColumnName()).append(quote).append("=?");
+                buffer.append(separator).append('(');
+                final String variable   = p.getColumnName();
+                final String function   = p.getColumnFunction(type);
+                final String comparator = p.getComparator();
+                final String[] comparators;
+                if (comparator.startsWith(SPECIAL_CONDITION)) {
+                    comparators = new String[] {
+                        SPECIAL_CONDITION,
+                        comparator.substring(SPECIAL_CONDITION.length()).trim(),
+                    };
+                } else {
+                    comparators = new String[] {
+                        comparator
+                    };
+                }
+                for (int i=0; i<comparators.length; i++) {
+                    if (function != null) {
+                        buffer.append(function).append('(');
+                    }
+                    buffer.append(quote).append(variable).append(quote);
+                    if (function != null) {
+                        buffer.append(')');
+                    }
+                    buffer.append(' ').append(comparators[i]).append(' ');
+                }
+                final String f = p.getFunction(type);
+                if (f != null) {
+                    if (f.indexOf('?') >= 0) {
+                        buffer.append(f).append(')');
+                    } else if (f.startsWith("::")) {
+                        buffer.append('?').append(f).append(')');
+                    } else {
+                        buffer.append(f).append("(?))");
+                    }
+                } else {
+                    buffer.append("?)");
+                }
                 separator = " AND ";
             }
         }
+    }
+
+    /**
+     * Appends the {@code "ORDER BY"} clause to the given SQL statement.
+     *
+     * @param  buffer The buffer in which to write the SQL statement.
+     * @param  type The query type.
+     * @param  metadata The database metadata.
+     * @throws SQLException if an error occured while reading the database.
+     */
+    private void appendOrdering(final StringBuilder buffer, final QueryType type,
+                                final DatabaseMetaData metadata) throws SQLException
+    {
+        final String quote = metadata.getIdentifierQuoteString().trim();
+        String separator = " ORDER BY ";
+        for (final Column c : columns) {
+            if (c.indexOf(type) != 0) {
+                String ordering = c.getOrdering();
+                if (ordering != null) {
+                    buffer.append(separator).append(quote).append(c.name).append(quote);
+                    if (!ordering.equals("ASC")) {
+                        buffer.append(' ').append(ordering);
+                    }
+                    separator = ", ";
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates the SQL statement for the query of the given type with no {@code WHERE} clause.
+     * This is used for testing purpose.
+     *
+     * @param  type The query type.
+     * @return The SQL statement.
+     * @throws SQLException if an error occured while reading the database.
+     */
+    final String selectAll(final QueryType type) throws SQLException {
+        final DatabaseMetaData metadata = database.getConnection().getMetaData();
+        final StringBuilder buffer = new StringBuilder();
+        selectAll     (buffer, type, metadata);
+        appendOrdering(buffer, type, metadata);
+        return buffer.toString();
     }
 
     /**
@@ -306,6 +413,7 @@ scan:       while (!tables.isEmpty()) {
                 final StringBuilder buffer = new StringBuilder();
                 selectAll       (buffer, type, metadata);
                 appendParameters(buffer, type, metadata);
+                appendOrdering  (buffer, type, metadata);
                 sql = buffer.toString();
                 cachedSQL.put(type, sql);
             }

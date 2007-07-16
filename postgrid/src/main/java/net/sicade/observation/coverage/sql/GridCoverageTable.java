@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -49,7 +50,6 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 // Sicade
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.SpatialConfigurationKey;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.CoverageReference;
@@ -57,13 +57,15 @@ import net.sicade.observation.coverage.DataAvailability;
 import net.sicade.observation.coverage.CoverageComparator;
 import net.sicade.observation.coverage.rmi.DataConnection;
 import net.sicade.observation.sql.BoundedSingletonTable;
-import net.sicade.observation.sql.Role;
+import net.sicade.observation.sql.SpatialColumn;
+import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -82,112 +84,34 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * Requête SQL utilisée pour obtenir l'enveloppe spatio-temporelle couverte
      * par toutes les images d'une couche (ou de l'ensemble des couches).
      */
-     static final SpatialConfigurationKey BOUNDING_BOX = new SpatialConfigurationKey("GridCoverages:BOX",
-            "SELECT MIN(\"startTime\") "           + "AS \"tmin\", "  +
-                   "MAX(\"endTime\") "             + "AS \"tmax\", "  +
-                   "MIN(\"westBoundLongitude\") "  + "AS \"xmin\", "  +
-                   "MAX(\"eastBoundLongitude\") "  + "AS \"xmax\", "  +
-                   "MIN(\"southBoundLatitude\") "  + "AS \"ymin\", "  +
-                   "MAX(\"northBoundLatitude\") "  + "AS \"ymax\"\n"  +
-                   "MIN(\"altitudeMin\") "         + "AS \"zmin\"\n"  +
-                   "MAX(\"altitudeMax\") "         + "AS \"zmax\"\n"  +
-             "  FROM \"GridCoverages\"\n"          +
-             "  JOIN \"GridGeometries\" ON extent=\"GridGeometries\".id\n"        +
-             "  JOIN \"Series\" ON layer=\"Series\".identifier\n"                 +
-             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"             +
-             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"             +
-             "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n" +
-             "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n" +
-             "   AND (series LIKE ?) AND visible=TRUE\n",
-
-            "SELECT MIN(\"startTime\") AS \"tmin\", " +
-                   "MAX(\"endTime\") AS \"tmax\", " +
-                   "\"spatialExtent\"\n"  +
-             "  FROM \"GridCoverages\"\n" +
-             "  JOIN \"GridGeometries\" ON extent=\"GridGeometries\".id\n" +
-             "  JOIN \"Series\" ON layer=\"Series\".identifier\n"          +
-             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"      +
-             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"      +
-             "   AND (\"spatialExtent\" && ?)\n"                           +
-             "   AND (series LIKE ?) AND visible=TRUE\n");
-
-    /**
-     * Requête SQL utilisée par cette classe pour obtenir la liste des images.
-     * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par
-     * les constantes {@link #LAYER}, {@link #FILENAME} et compagnie.
-     */
-    private static final SpatialConfigurationKey LIST = new SpatialConfigurationKey("GridCoverages:LIST",
-            "SELECT " + "layer, "                 +  // [01] LAYER
-                        "series, "                +  // [02] SERIES
-                        "pathname, "              +  // [03] PATHNAME
-                        "filename, "              +  // [04] FILENAME
-                      "\"startTime\", "           +  // [05] START_TIME
-                      "\"endTime\", "             +  // [06] END_TIME
-                      "\"westBoundLongitude\", "  +  // [07] XMIN
-                      "\"eastBoundLongitude\", "  +  // [08] XMAX
-                      "\"southBoundLatitude\", "  +  // [09] YMIN
-                      "\"northBoundLatitude\", "  +  // [10] YMAX
-                      "\"altitudeMin\", "         +  // [11] ZMIN
-                      "\"altitudeMax\", "         +  // [12] ZMAX
-                        "width, "                 +  // [13] WIDTH
-                        "height, "                +  // [14] HEIGHT
-                        "depth, "                 +  // [15] DEPTH
-                        "\"CRS\", "               +  // [16] CRS
-                        "format, "                +  // [17] FORMAT
-                        "NULL AS remarks\n"       +  // [18] REMARKS
-             "  FROM \"GridCoverages\"\n"                                                +
-             "  JOIN \"GridGeometries\""          + " ON extent=\"GridGeometries\".id\n" +
-             "  JOIN \"Series\""                  + " ON layer=\"Series\".identifier\n"  +
-             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                    +
-             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                    +
-             "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"        +
-             "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"        +
-             "   AND (series LIKE ?) AND (filename LIKE ?) AND visible=TRUE\n"           +
-             " ORDER BY \"endTime\", series",  // DOIT être en ordre chronologique.
-                                               // Voir {@link GridCoverageEntry#compare}.
-
-            "SELECT " + "layer, "                 +  // [01] LAYER
-                        "series, "                +  // [02] SERIES
-                        "pathname, "              +  // [03] PATHNAME
-                        "filename, "              +  // [04] FILENAME
-                      "\"startTime\", "           +  // [05] START_TIME
-                      "\"endTime\", "             +  // [06] END_TIME
-                      "\"spatialExtent\", "       +  // [07] SPATIAL_EXTENT
-                        "width, "                 +  // [08] WIDTH
-                        "height, "                +  // [09] HEIGHT
-                        "depth, "                 +  // [10] DEPTH
-                        "\"CRS\", "               +  // [11] CRS
-                        "format, "                +  // [12] FORMAT
-                        "NULL AS remarks\n"       +  // [13] REMARKS
-             "  FROM \"GridCoverages\"\n"                                                +
-             "  JOIN \"GridGeometries\""          + " ON extent=\"GridGeometries\".id\n" +
-             "  JOIN \"Series\""                  + " ON layer=\"Series\".identifier\n"  +
-             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                    +
-             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                    +
-             "   AND (\"spatialExtent\" && ?)\n"                                         +
-             "   AND (series LIKE ?) AND (filename LIKE ?) AND visible=TRUE\n"           +
-             " ORDER BY \"endTime\", series"); // DOIT être en ordre chronologique.
-                                               // Voir {@link GridCoverageEntry#compare}.
-
-
-    /** Numéro d'argument. */         static final int ARGUMENT_LAYER    = 7;
-    /** Numéro d'argument. */ private static final int ARGUMENT_FILENAME = 8;
-
-    /** Numéro de colonne. */ private static final int LAYER      =  1;
-    /** Numéro de colonne. */ private static final int SERIES     =  2;
-    /** Numéro de colonne. */ private static final int PATHNAME   =  3;
-    /** Numéro de colonne. */ private static final int FILENAME   =  4;
-    /** Numéro de colonne. */ private static final int START_TIME =  5;
-    /** Numéro de colonne. */ private static final int END_TIME   =  6;
-    /** Numéro de colonne. */ private static final int XMIN       =  7;
-    /** Numéro de colonne. */ private static final int XMAX       =  8;
-    /** Numéro de colonne. */ private static final int YMIN       =  9;
-    /** Numéro de colonne. */ private static final int YMAX       = 10;
-    /** Numéro de colonne. */ private static final int WIDTH      = 11;
-    /** Numéro de colonne. */ private static final int HEIGHT     = 12;
-    /** Numéro de colonne. */ private static final int CRS        = 13;
-    /** Numéro de colonne. */ private static final int FORMAT     = 14;
-    /** Numéro de colonne. */ private static final int REMARKS    = 15;
+//     static final SpatialConfigurationKey BOUNDING_BOX = new SpatialConfigurationKey("GridCoverages:BOX",
+//            "SELECT MIN(\"startTime\") "           + "AS \"tmin\", "  +
+//                   "MAX(\"endTime\") "             + "AS \"tmax\", "  +
+//                   "MIN(\"westBoundLongitude\") "  + "AS \"xmin\", "  +
+//                   "MAX(\"eastBoundLongitude\") "  + "AS \"xmax\", "  +
+//                   "MIN(\"southBoundLatitude\") "  + "AS \"ymin\", "  +
+//                   "MAX(\"northBoundLatitude\") "  + "AS \"ymax\"\n"  +
+//                   "MIN(\"altitudeMin\") "         + "AS \"zmin\"\n"  +
+//                   "MAX(\"altitudeMax\") "         + "AS \"zmax\"\n"  +
+//             "  FROM \"GridCoverages\"\n"          +
+//             "  JOIN \"GridGeometries\" ON extent=\"GridGeometries\".id\n"        +
+//             "  JOIN \"Series\" ON layer=\"Series\".identifier\n"                 +
+//             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"             +
+//             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"             +
+//             "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n" +
+//             "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n" +
+//             "   AND (series LIKE ?) AND visible=TRUE\n",
+//
+//            "SELECT MIN(\"startTime\") AS \"tmin\", " +
+//                   "MAX(\"endTime\") AS \"tmax\", " +
+//                   "\"spatialExtent\"\n"  +
+//             "  FROM \"GridCoverages\"\n" +
+//             "  JOIN \"GridGeometries\" ON extent=\"GridGeometries\".id\n" +
+//             "  JOIN \"Series\" ON layer=\"Series\".identifier\n"          +
+//             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"      +
+//             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"      +
+//             "   AND (\"spatialExtent\" && ?)\n"                           +
+//             "   AND (series LIKE ?) AND visible=TRUE\n");
 
     /**
      * Le modèle à utiliser pour formatter des angles.
@@ -285,7 +209,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * @param  database Connexion vers la base de données d'observations.
      */
     public GridCoverageTable(final Database database) {
-        super(database, net.sicade.observation.sql.CRS.XYT);
+        super(new GridCoverageQuery(database), net.sicade.observation.sql.CRS.XYT);
         this.dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
         this.dateFormat.setTimeZone(database.getTimeZone());
     }
@@ -365,7 +289,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
         if (change) {
             clearCache();
             log("setGeographicArea", Level.CONFIG, ResourceKeys.SET_GEOGRAPHIC_AREA_$2, new String[] {
-                GeographicBoundingBoxImpl.toString(area, ANGLE_PATTERN, database.getLocale()),
+                GeographicBoundingBoxImpl.toString(area, ANGLE_PATTERN, getDatabase().getLocale()),
                 layer.getName()
             });
         }
@@ -559,7 +483,7 @@ loop:   for (final CoverageReference newReference : entries) {
             envelope = getEnvelope();
             // Voir le commentaire du code équivalent de 'getEntries()'
         }
-        return super.getEntry(escapeSearch(name));
+        return super.getEntry(name);
     }
 
     /**
@@ -574,15 +498,24 @@ loop:   for (final CoverageReference newReference : entries) {
      *         appelée localement ou sur une machine distante.
      * @throws SQLException si la base de données n'a pas pu être interrogée.
      */
-    public synchronized DataAvailability getRanges(final DataAvailability ranges) throws SQLException {
-        long  lastEndTime       = Long.MIN_VALUE;
-        final Calendar calendar = getCalendar();
-        final ResultSet  result = getStatement(QueryType.SELECT).executeQuery();
+    public synchronized DataAvailability getRanges(final DataAvailability ranges)
+            throws CatalogException, SQLException
+    {
+        final GridCoverageQuery query = (GridCoverageQuery) super.query;
+        long  lastEndTime        = Long.MIN_VALUE;
+        final Calendar calendar  = getCalendar();
+        final ResultSet  result  = getStatement(SELECT).executeQuery();
+        final int startTimeIndex = indexOf(query.startTime);
+        final int   endTimeIndex = indexOf(query.endTime);
+        final int xminIndex      = indexOf(query.spatialExtent);
+        final int xmaxIndex      = indexOf(query.spatialExtent);  // TODO
+        final int yminIndex      = indexOf(query.spatialExtent);  // TODO
+        final int ymaxIndex      = indexOf(query.spatialExtent);  // TODO
         while (result.next()) {
             if (ranges.t != null) {
                 final long timeInterval = Math.round(layer.getTimeInterval() * LocationOffsetEntry.DAY);
-                final Date    startTime = result.getTimestamp(START_TIME, calendar);
-                final Date      endTime = result.getTimestamp(  END_TIME, calendar);
+                final Date    startTime = result.getTimestamp(startTimeIndex, calendar);
+                final Date      endTime = result.getTimestamp(  endTimeIndex, calendar);
                 if (startTime!=null && endTime!=null) {
                     final long lgEndTime = endTime.getTime();
                     final long checkTime = lgEndTime - timeInterval;
@@ -597,43 +530,18 @@ loop:   for (final CoverageReference newReference : entries) {
                 }
             }
             if (ranges.x != null) {
-                final double xmin = result.getDouble(XMIN);
-                final double xmax = result.getDouble(XMAX);
+                final double xmin = result.getDouble(xminIndex);
+                final double xmax = result.getDouble(xmaxIndex);
                 ranges.x.add(new Longitude(xmin), new Longitude(xmax));
             }
             if (ranges.y != null) {
-                final double ymin = result.getDouble(YMIN);
-                final double ymax = result.getDouble(YMAX);
+                final double ymin = result.getDouble(yminIndex);
+                final double ymax = result.getDouble(ymaxIndex);
                 ranges.y.add(new Latitude(ymin), new Latitude(ymax));
             }
         }
         result.close();
         return ranges;
-    }
-
-    /**
-     * Retourne la requête SQL à utiliser pour obtenir des références vers des images.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT:       // Fall through
-            case LIST:         return getProperty(LIST);
-            case BOUNDING_BOX: return getProperty(BOUNDING_BOX);
-            default:           return super.getQuery(type);
-        }
-    }
-
-    /**
-     * Retourne l'index de l'argument pour le rôle spécifié. Cette méthode est résérvée à un usage
-     * interne (indirectement) pour {@link #getEntry(String)}.
-     */
-    @Override
-    protected int getArgumentIndex(final Role role) {
-        switch (role) {
-            case IDENTIFIER: return ARGUMENT_FILENAME;
-            default: return super.getArgumentIndex(role);
-        }
     }
 
     /**
@@ -644,20 +552,16 @@ loop:   for (final CoverageReference newReference : entries) {
     @SuppressWarnings("fallthrough")
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        switch (type) {
-            case SELECT: {
-                super.configure(QueryType.BOUNDING_BOX, statement);
-                // Fall through
-            }
-            case LIST: {
-                statement.setString(ARGUMENT_FILENAME, "%");
-                // Fall through
-            }
-            case BOUNDING_BOX: {
-                final String name = (layer != null) ? layer.getName() : null;
-                statement.setString(ARGUMENT_LAYER, escapeSearch(name));
-                break;
-            }
+        final GridCoverageQuery query = (GridCoverageQuery) super.query;
+        int index = query.byLayer.indexOf(type);
+        if (index != 0) {
+            final String name = (layer != null) ? layer.getName() : null;
+            statement.setString(index, name);
+            // TODO: need to take in account the case where the layer is null.
+        }
+        index = query.byVisibility.indexOf(type);
+        if (index != 0) {
+            statement.setBoolean(index, true);
         }
     }
 
@@ -669,21 +573,28 @@ loop:   for (final CoverageReference newReference : entries) {
     protected CoverageReference createEntry(final ResultSet result) throws CatalogException, SQLException {
         assert Thread.holdsLock(this);
         final Calendar calendar = getCalendar();
-        return new GridCoverageEntry(this, result.getString    (LAYER),
-                                           result.getString    (SERIES),
-                                           result.getString    (PATHNAME),
-                                           result.getString    (FILENAME),
-                                           result.getTimestamp (START_TIME, calendar),
-                                           result.getTimestamp (END_TIME,   calendar),
-                                           result.getDouble    (XMIN),
-                                           result.getDouble    (XMAX),
-                                           result.getDouble    (YMIN),
-                                           result.getDouble    (YMAX),
-                                           result.getShort     (WIDTH),
-                                           result.getShort     (HEIGHT),
-                                           result.getString    (CRS),
-                                           result.getString    (FORMAT),
-                                           result.getString    (REMARKS)).canonicalize();
+        final GridCoverageQuery query = (GridCoverageQuery) super.query;
+        final String layer     = result.getString   (indexOf(query.layer));
+        final String series    = result.getString   (indexOf(query.series));
+        final String pathname  = result.getString   (indexOf(query.pathname));
+        final String filename  = result.getString   (indexOf(query.filename));
+        final String extension = result.getString   (indexOf(query.extension));
+        final Date   startTime = result.getTimestamp(indexOf(query.startTime), calendar);
+        final Date   endTime   = result.getTimestamp(indexOf(query.endTime),   calendar);
+        final Envelope envelope;
+        final int index = indexOf(query.spatialExtent);
+        final Column column = query.getColumns(SELECT).get(index - 1);
+        if (column instanceof SpatialColumn.Box) {
+            envelope = ((SpatialColumn.Box) column).getEnvelope(result, SELECT);
+        } else {
+            envelope = SpatialColumn.Box.getEnvelope(result, index);
+        }
+        final short  width     = result.getShort    (indexOf(query.width));
+        final short  height    = result.getShort    (indexOf(query.height));
+        final String crs       = result.getString   (indexOf(query.crs));
+        final String format    = result.getString   (indexOf(query.format));
+        return new GridCoverageEntry(this, layer, series, pathname, filename, extension, startTime,
+                    endTime, envelope, width, height, crs, format, null).canonicalize();
     }
 
     /**
@@ -693,11 +604,12 @@ loop:   for (final CoverageReference newReference : entries) {
      * <p>
      * Cette méthode est appelée par le constructeur de {@link GridCoverageEntry}.
      *
-     * @param  seriesID Nom ID de la couche, pour fin de vérification. Ce nom doit correspondre
-     *                  à celui de la couche examinée par cette table.
-     * @param  formatID Nom ID du format des images.
-     * @param  crsID    Nom ID du système de référence des coordonnées.
-     * @param  pathname Chemin relatif des images.
+     * @param  seriesID  Nom ID de la couche, pour fin de vérification. Ce nom doit correspondre
+     *                   à celui de la couche examinée par cette table.
+     * @param  formatID  Nom ID du format des images.
+     * @param  crsID     Nom ID du système de référence des coordonnées.
+     * @param  pathname  Chemin relatif des images.
+     * @param  extension Extension (sans le point) des noms de fichier des images à lire.
      *
      * @return Un objet incluant les paramètres demandées ainsi que ceux de la table.
      * @throws CatalogException si les paramètres n'ont pas pu être obtenus.
@@ -708,7 +620,8 @@ loop:   for (final CoverageReference newReference : entries) {
     final synchronized Parameters getParameters(final String seriesID,
                                                 final String formatID,
                                                 final String crsID,
-                                                final String pathname)
+                                                final String pathname,
+                                                final String extension)
             throws CatalogException, SQLException
     {
         final String seriesName = layer.getName();
@@ -729,7 +642,8 @@ loop:   for (final CoverageReference newReference : entries) {
         if (parameters != null &&
             Utilities.equals(parameters.format     .getName(), formatID) &&
             Utilities.equals(parameters.coverageCRS.getName(), crsID)    &&
-            Utilities.equals(parameters.pathname,              pathname))
+            Utilities.equals(parameters.pathname,              pathname) &&
+            Utilities.equals(parameters.extension,             extension))
         {
             return parameters;
         }
@@ -741,14 +655,15 @@ loop:   for (final CoverageReference newReference : entries) {
                             envelope.getMinimum(xDimension), envelope.getMinimum(yDimension),
                             envelope.getMaximum(xDimension), envelope.getMaximum(yDimension));
         if (formatTable == null) {
-            formatTable = database.getTable(FormatTable.class);
+            formatTable = getDatabase().getTable(FormatTable.class);
         }
         if (crsTable == null) {
-            crsTable = database.getTable(CoordinateReferenceSystemTable.class);
+            crsTable = getDatabase().getTable(CoordinateReferenceSystemTable.class);
         }
         parameters = new Parameters(layer,
                                     (FormatEntry) formatTable.getEntry(formatID),
                                     pathname.intern(),
+                                    extension.intern(),
                                     operation,
                                     getCoordinateReferenceSystem(),
                                     crsTable.getEntry(crsID),
@@ -840,7 +755,7 @@ loop:   for (final CoverageReference newReference : entries) {
      * Enregistre un évènement dans le journal.
      */
     private void log(final String method, final Level level, final int clé, final Object param) {
-        final Resources resources = Resources.getResources(database.getLocale());
+        final Resources resources = Resources.getResources(getDatabase().getLocale());
         final LogRecord record = resources.getLogRecord(level, clé, param);
         record.setSourceClassName("CoverageTable");
         record.setSourceMethodName(method);
@@ -855,7 +770,7 @@ loop:   for (final CoverageReference newReference : entries) {
         String area;
         try {
             area = GeographicBoundingBoxImpl.toString(getGeographicBoundingBox(),
-                                                      ANGLE_PATTERN, database.getLocale());
+                                                      ANGLE_PATTERN, getDatabase().getLocale());
         } catch (CatalogException e) {
             area = e.getLocalizedMessage();
         }

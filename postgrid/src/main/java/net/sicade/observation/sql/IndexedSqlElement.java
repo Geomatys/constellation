@@ -17,6 +17,7 @@ package net.sicade.observation.sql;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.EnumSet;
 
 
@@ -41,6 +42,11 @@ public abstract class IndexedSqlElement {
      * index should be equals or greater than 1.
      */
     private final short[] index;
+
+    /**
+     * The functions to apply on this column or parameter. Will be created only if needed.
+     */
+    private EnumMap<QueryType,String> functions;
 
     /**
      * Creates a new language element for the specified query.
@@ -83,8 +89,7 @@ search:     for (final QueryType type : typeSet) {
                     if (typeOrdinal < previous.index.length) {
                         short position = previous.index[typeOrdinal];
                         if (position != 0) {
-                            position += previous.columnSpan();
-                            if (position < 0) {
+                            if (++position < 0) {
                                 throw new IndexOutOfBoundsException(); // Overflow
                             }
                             index[typeOrdinal] = position;
@@ -95,15 +100,6 @@ search:     for (final QueryType type : typeSet) {
                 index[typeOrdinal] = 1;
             }
         }
-    }
-
-    /**
-     * The number of consecutive columns or parameter represented by this element. This is
-     * always 1, except for {@linkplain SpatialColumn} or {@linkplain SpatialParameter} on
-     * non-spatial database.
-     */
-    short columnSpan() {
-        return 1;
     }
 
     /**
@@ -120,6 +116,27 @@ search:     for (final QueryType type : typeSet) {
             return index[ordinal];
         }
         return 0;
+    }
+
+    /**
+     * Returns the function for this column or parameter when used in a query of the given type,
+     * or {@code null} if none. The functions are typically "MIN" or "MAX".
+     */
+    public String getFunction(final QueryType type) {
+        return (functions != null && type != null) ? functions.get(type) : null;
+    }
+
+    /**
+     * Sets a function for this column or parameter when used in a query of the given type.
+     * The functions are typically "MIN" or "MAX".
+     */
+    public void setFunction(final String function, final QueryType... types) {
+        if (functions == null) {
+            functions = new EnumMap<QueryType,String>(QueryType.class);
+        }
+        for (final QueryType type : types) {
+            functions.put(type, function);
+        }
     }
 
     /**

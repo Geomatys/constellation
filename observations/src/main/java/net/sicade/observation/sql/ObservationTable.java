@@ -118,7 +118,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     protected ObservationTable(final StationTable   stations,
                                final ConfigurationKey select)
     {
-        this(stations.database, select);
+        this(stations.getDatabase(), select);
         setStationTable(stations);
     }
 
@@ -146,7 +146,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      */
     private synchronized StationTable getStationTable() {
         if (stations == null) {
-            setStationTable(database.getTable(StationTable.class));
+            setStationTable(getDatabase().getTable(StationTable.class));
         }
         return stations;
     }
@@ -224,7 +224,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * courant.
      */
     public synchronized boolean exists() throws SQLException {
-        final PreparedStatement statement = getStatement(select);
+        final PreparedStatement statement = getStatement(getProperty(select));
         final ResultSet result = statement.executeQuery();
         final boolean exists = result.next();
         result.close();
@@ -242,7 +242,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      */
     public synchronized Collection<EntryType> getEntries() throws CatalogException, SQLException {
         final List<EntryType> list = new ArrayList<EntryType>();
-        final PreparedStatement statement = getStatement(select);
+        final PreparedStatement statement = getStatement(getProperty(select));
         final ResultSet result = statement.executeQuery();
         while (result.next()) {
             list.add(createEntry(result));
@@ -260,7 +260,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
      */
     public synchronized EntryType getEntry() throws CatalogException, SQLException {
-        final PreparedStatement statement = getStatement(select);
+        final PreparedStatement statement = getStatement(getProperty(select));
         final ResultSet result = statement.executeQuery();
         EntryType observation = null;
         while (result.next()) {
@@ -290,7 +290,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
         Observable observable = this.observable;
         if (observable == null) {
             if (observables == null) {
-                observables = database.getTable(ObservableTable.class);
+                observables = getDatabase().getTable(ObservableTable.class);
             }
             observable = observables.getEntry(result.getString(OBSERVABLE));
         }

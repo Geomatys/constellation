@@ -125,9 +125,10 @@ public class LayerTree extends Table implements Shareable {
     public synchronized TreeModel getTree(final TreeDepth depth, final boolean createEntries)
             throws CatalogException, SQLException
     {
-        final Locale    locale = database.getLocale();
-        final ResultSet result = getStatement(SELECT).executeQuery();
-        final int  branchCount = Math.min(FORMAT, depth.rank);
+        final Database database = getDatabase();
+        final Locale     locale = database.getLocale();
+        final ResultSet  result = getStatement(getProperty(SELECT)).executeQuery();
+        final int   branchCount = Math.min(FORMAT, depth.rank);
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode(
                 Resources.getResources(locale).getString(ResourceKeys.SERIES));
         /*

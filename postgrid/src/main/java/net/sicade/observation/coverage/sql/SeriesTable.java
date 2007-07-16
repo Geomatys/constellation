@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,91 +15,87 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE dependencies
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.util.Set;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
-
-// Sicade dependencies
-import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Format;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Series;
+import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
+import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.QueryType;
+import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.SingletonTable;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers la table des séries. Cette connexion est utilisée en interne par le
- * {@linkplain LayerTable table des couches}.
+ * Connection to a table of series. This connection is used internally by the
+ * {@linkplain LayerTable layer table}.
  *
- * @version $Id$
+ * @version $Id: SeriesTable.java 31 2007-07-05 15:23:06Z desruisseaux $
  * @author Martin Desruisseaux
  */
 @Use(FormatTable.class)
 @UsedBy(LayerTable.class)
 public class SeriesTable extends SingletonTable<Series> {
     /**
-     * Requête SQL utilisée pour obtenir une séries par son nom.
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Series:SELECT",
-        "SELECT identifier, layer, format, NULL as remarks\n"  +
-        "  FROM \"Series\"\n"                                  +
-        " WHERE identifier=?");
+    private final Column name, owner, format;
 
     /**
-     * Requête SQL utilisée pour obtenir une liste de séries.
+     * Parameter declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey LIST = new ConfigurationKey("Series:LIST",
-        "SELECT identifier, layer, format, NULL as remarks\n"  +
-        "  FROM \"Series\"\n"                                  +
-        " WHERE layer LIKE ?\n"                                +
-        " ORDER BY identifier");
-
-    /** Numéro de colonne. */ private static final int NAME    = 1;
-    /** Numéro de colonne. */ private static final int LAYER   = 2;
-    /** Numéro de colonne. */ private static final int FORMAT  = 3;
-    /** Numéro de colonne. */ private static final int REMARKS = 4;
+    private final Parameter byName, byOwner;
 
     /**
-     * Connexion vers la table des formats.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Connection to the format table. This connection will be etablished
+     * when first needed and may be shared by many series tables.
      */
     private FormatTable formats;
 
     /**
-     * Couche dont on veut les séries, ou {@code null} pour les prendre tous.
+     * The layer for which we want the series, {@code null} for fetching all series.
      */
     private Layer layer;
 
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
-     *
-     * @param database  Connexion vers la base de données d'observations.
+     * Creates a series table.
+     * 
+     * @param database Connection to the database.
      */
     public SeriesTable(final Database database) {
         super(database);
+        final QueryType[] usage = {SELECT, LIST, FILTERED_LIST};
+        name    = new Column   (query, "Series", "identifier", usage);
+        owner   = new Column   (query, "Series", "layer",      usage);
+        format  = new Column   (query, "Series", "format",     usage);
+        byName  = new Parameter(query, name,  SELECT);
+        byOwner = new Parameter(query, owner, FILTERED_LIST);
+        name.setRole(Role.NAME);
+        name.setOrdering("ASC");
     }
 
     /**
-     * Retourne la couche d'images dont on veut les séries, ou {@code null} si toutes les
-     * séries sont retenues.
+     * Returns the layer for the series to be returned by {@link #getEntries() getEntries()}.
+     * The default value is {@code null}, which means that no filtering should be performed.
      */
     public Layer getLayer() {
         return layer;
     }
 
     /**
-     * Définit la couche d'images dont on veut les séries. Les prochains appels de la métohdes
-     * {@link #getEntries() getEntries()} ne retourneront que les séries de cette couche. La
-     * valeur {@code null} fera retourner toutes les séries.
+     * Sets the layer for the series to be returned. Next call to {@link #getEntries() getEntries()}
+     * will filters the series in order to returns only the one in this layer. A {@code null} value
+     * will remove the filtering, so all series will be returned no matter their layer.
      */
     public synchronized void setLayer(final Layer layer) {
         if (!Utilities.equals(layer, this.layer)) {
@@ -108,42 +105,63 @@ public class SeriesTable extends SingletonTable<Series> {
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les séries.
+     * Returns the series available in the database. If {@link #getLayer} has been invoked with
+     * a non-null value, then only the series for that layer are returned.
+     *
+     * @return The set of series. May be empty, but never {@code null}.
+     * @throws CatalogException if a series contains invalid data.
+     * @throws SQLException if an error occured will reading from the database.
      */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            case LIST:   return getProperty(LIST);
-            default:     return super.getQuery(type);
-        }
+    public synchronized Set<Series> getEntries() throws CatalogException, SQLException {
+        return getEntries(layer==null ? LIST : FILTERED_LIST);
     }
 
     /**
-     * Configure la requête SQL spécifiée en fonction de la {@linkplain #getLayer couche recherchée}
-     * par cette table. Cette méthode est appelée automatiquement lorsque cette table a
-     * {@linkplain #fireStateChanged changé d'état}.
+     * Invoked automatically by for a newly created statement or when this table changed its state.
+     * The default implementation setup the SQL parameter for the {@linkplain #getLayer currently
+     * selected layer}.
      */
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        switch (type) {
-            case LIST: {
-                statement.setString(1, escapeSearch(layer!=null ? layer.getName() : null));
-            }
+        final int index = byOwner.indexOf(type);
+        if (index != 0) {
+            statement.setString(1, layer!=null ? layer.getName() : null);
         }
     }
 
     /**
-     * Construit une série pour l'enregistrement courant.
+     * Creates a series entry for the current row in the specified result set.
      */
     protected Series createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final String name    = results.getString(NAME);
-        final String remarks = results.getString(REMARKS);
+        final String name = results.getString(indexOf(this.name));
+        final String remarks = null;
         if (formats == null) {
-            formats = database.getTable(FormatTable.class);
+            formats = getDatabase().getTable(FormatTable.class);
         }
-        final Format format = formats.getEntry(results.getString(FORMAT));
+        final Format format = formats.getEntry(results.getString(indexOf(this.format)));
         return new SeriesEntry(name, format, remarks);
+    }
+
+    /**
+     * A shareable instance of {@link SeriesTable}. <strong>Do not use</strong>. This is for
+     * {@link LayerTable} internal working only. This class had to be public because it needs
+     * to be accessible to {@link Database#getTable}.
+     *
+     * @version $Id: SeriesTable.java 31 2007-07-05 15:23:06Z desruisseaux $
+     * @author Martin Desruisseaux
+     *
+     * @todo Replace by a {@code getEntries(Layer)} method.
+     */
+    @Deprecated
+    public static final class Shareable extends SeriesTable implements net.sicade.observation.sql.Shareable {
+        /**
+         * Creates a series table.
+         * 
+         * @param database Connection to the database.
+         */
+        public Shareable(final Database database) {
+            super(database);
+        }
     }
 }

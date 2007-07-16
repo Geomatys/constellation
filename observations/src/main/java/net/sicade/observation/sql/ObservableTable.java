@@ -76,17 +76,6 @@ public class ObservableTable extends SingletonTable<Observable> implements Share
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les observables.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default:     return super.getQuery(type);
-        }
-    }
-
-    /**
      * Construit un observable pour l'entrée courante.
      */
     protected Observable createEntry(final ResultSet result) throws CatalogException, SQLException {
@@ -97,15 +86,15 @@ public class ObservableTable extends SingletonTable<Observable> implements Share
         final String distributionID = result.getString(DISTRIBUTION);
         final String remarks        = result.getString(REMARKS);
         if (phenomenons == null) {
-            phenomenons = database.getTable(PhenomenonTable.class);
+            phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
         final Phenomenon phenomenon = phenomenons.getEntry(phenomenonID);
         if (procedures == null) {
-            procedures = database.getTable(ProcedureTable.class);
+            procedures = getDatabase().getTable(ProcedureTable.class);
         }
         final Procedure procedure = procedures.getEntry(procedureID);
         if (distributions == null) {
-            distributions = database.getTable(DistributionTable.class);
+            distributions = getDatabase().getTable(DistributionTable.class);
         }
         final Distribution distribution = distributions.getEntry(distributionID);
         return new ObservableEntry(identifier, name, phenomenon, procedure, distribution, remarks);

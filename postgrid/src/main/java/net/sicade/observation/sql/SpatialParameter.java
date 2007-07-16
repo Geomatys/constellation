@@ -26,6 +26,7 @@ import static net.sicade.observation.sql.SpatialColumn.Box.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class SpatialParameter extends Parameter {
     /**
      * {@code true} if the database is spatial enabled (e.g. PostgreSQL with a PostGIS extension).
@@ -47,6 +48,7 @@ public class SpatialParameter extends Parameter {
     /**
      * A parameter for the {@code BOX3D} type.
      */
+    @Deprecated
     public static class Box extends SpatialParameter {
         /**
          * Creates a new parameter for the specified query.
@@ -60,35 +62,45 @@ public class SpatialParameter extends Parameter {
         }
 
         /**
-         * The number of consecutive columns or parameter represented by this element.
-         */
-        @Override
-        short columnSpan() {
-            return spatialEnabled ? 1 : (short) (2 * DIMENSION);
-        }
-
-        /**
          * Set the parameter to an envelope. If the {@linkplain Database database} is spatial
          * enabled, then this method sets a single {@code BOX} or {@code BOX3D} parameter.
-         * Otherwise this method sets 6 consecutive parameters with (<var>xmin</var>, <var>xmax</var>,
-         * <var>ymin</var>, <var>ymax</var>, <var>zmin</var>, <var>zmax</var>) values.
+         * Otherwise this method sets up to 6 consecutive parameters with (<var>xmin</var>,
+         * <var>xmax</var>, <var>ymin</var>, <var>ymax</var>, <var>zmin</var>, <var>zmax</var>)
+         * values.
          *
          * @param  statement The statement in which to set the parameter.
          * @param  type      The query type.
-         * @param  envelope  The envelope to set as parameter.
+         * @param  envelope  The three-dimensional envelope to set as parameter.
          * @throws SQLException if the parameters can not be set.
          */
         public void setEnvelope(final PreparedStatement statement, final QueryType type,
                                 final Envelope envelope) throws SQLException
         {
-            int parameter = indexOf(type);
+            final int index = indexOf(type);
             if (spatialEnabled) {
-                statement.setString(parameter, format(envelope));
+                statement.setString(index, format(envelope));
             } else {
-                for (int i=0; i<DIMENSION; i++) {
-                    statement.setDouble(parameter++, envelope.getMinimum(i));
-                    statement.setDouble(parameter++, envelope.getMaximum(i));
-                }
+                setEnvelope(statement, index, envelope);
+            }
+        }
+
+        /**
+         * Set the parameter to an envelope. This method sets up to 6 consecutive parameters with
+         * (<var>xmin</var>, <var>xmax</var>, <var>ymin</var>, <var>ymax</var>, <var>zmin</var>,
+         * <var>zmax</var>) values.
+         *
+         * @param  statement The statement in which to set the parameter.
+         * @param  index     Index of the first parameter to set.
+         * @param  envelope  The three-dimensional envelope to set as parameter.
+         * @throws SQLException if the parameters can not be set.
+         */
+        public static void setEnvelope(final PreparedStatement statement, int index,
+                                       final Envelope envelope) throws SQLException
+        {
+            final int dimension = Math.min(envelope.getDimension(), DIMENSION);
+            for (int i=0; i<dimension; i++) {
+                statement.setDouble(index++, envelope.getMinimum(i));
+                statement.setDouble(index++, envelope.getMaximum(i));
             }
         }
     }

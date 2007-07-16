@@ -28,6 +28,11 @@ public class Parameter extends IndexedSqlElement {
     private final Column column;
 
     /**
+     * The comparaison operator to put in the prepared statement.
+     */
+    private String comparator = "=";
+
+    /**
      * Creates a new parameter for the specified query.
      *
      * @param query  The query for which the parameter is created.
@@ -47,10 +52,35 @@ public class Parameter extends IndexedSqlElement {
     }
 
     /**
+     * Returns the function applied on the column, or {@code null} if none.
+     */
+    public String getColumnFunction(final QueryType type) {
+        if (column.name.equals(column.alias)) {
+            return column.getFunction(type);
+        }
+        return null;
+    }
+
+    /**
      * Returns the role of the column on which this parameter is applied.
      */
     public Role getColumnRole() {
         return column.getRole();
+    }
+
+    /**
+     * Returns the comparaison operator to put in the prepared statement.
+     * The default value is {@code "="}.
+     */
+    public String getComparator() {
+        return comparator;
+    }
+
+    /**
+     * Sets the comparaison operator to put in the prepared statement.
+     */
+    public void setComparator(final String comparator) {
+        this.comparator = comparator;
     }
 
     /**

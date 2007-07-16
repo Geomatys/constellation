@@ -169,7 +169,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     final LocationTable getLocationTable() {
         assert Thread.holdsLock(this);
         if (locations == null) {
-            locations = database.getTable(LocationTable.Station.class);
+            locations = getDatabase().getTable(LocationTable.Station.class);
         }
         return locations;
     }
@@ -180,7 +180,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
     final ObservationTable<? extends Observation> getObservationTable() {
         assert Thread.holdsLock(this);
         if (observations == null) {
-            setObservationTable(database.getTable(MeasurementTable.class));
+            setObservationTable(getDatabase().getTable(MeasurementTable.class));
         }
         return observations;
     }
@@ -229,7 +229,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
      */
     public synchronized void acceptableProvider(final String provider) {
         if (metadata == null) {
-            metadata = database.getTable(MetadataTable.class);
+            metadata = getDatabase().getTable(MetadataTable.class);
         }
         Citation citation;
         try {
@@ -279,26 +279,8 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
         switch (type) {
             case LIST: {
                 final String name = (platform != null) ? platform.getName() : null;
-                statement.setString(ARGUMENT_PLATFORM, escapeSearch(name));
+                statement.setString(ARGUMENT_PLATFORM, name);
                 break;
-            }
-        }
-    }
-
-    /**
-     * Retourne la requête à utiliser pour obtenir les stations.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: {
-                return getProperty(SELECT);
-            }
-            case LIST: {
-                return changeArgumentTarget(getQuery(QueryType.SELECT), 3);
-            }
-            default: {
-                return super.getQuery(type);
             }
         }
     }
@@ -316,14 +298,14 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
         final Platform owner;
         if (platform == null && !abridged) {
             if (platforms == null) {
-                setPlatformTable(database.getTable(PlatformTable.class));
+                setPlatformTable(getDatabase().getTable(PlatformTable.class));
             }
             owner = platforms.getEntry(result.getString(PLATFORM));
         } else {
             owner = platform;
         }
         if (metadata == null) {
-            metadata = database.getTable(MetadataTable.class);
+            metadata = getDatabase().getTable(MetadataTable.class);
         }
         final DataQuality quality = metadata.getEntry(DataQuality.class, result.getString(QUALITY ));
         final Citation   provider = metadata.getEntry(Citation.class,    result.getString(PROVIDER));
@@ -386,7 +368,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
      * cette méthode va l'accepter comme approche conservative.
      */
     @Override
-    protected boolean accept(final Station entry) throws SQLException {
+    protected boolean accept(final Station entry) throws CatalogException, SQLException {
         if (providers != null) {
             final Citation provider = entry.getProvider();
             if (provider != null) {

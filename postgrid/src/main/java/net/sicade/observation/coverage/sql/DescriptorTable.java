@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,30 +15,29 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE dependencies
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import net.sicade.observation.sql.Role;
 
-// Geotools dependencies
 import org.geotools.resources.CharUtilities;
 
-// Sicade dependencies
 import net.sicade.observation.Distribution;
-import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.NoSuchRecordException;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.LocationOffset;
+import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.DistributionTable;
 import net.sicade.observation.sql.SingletonTable;
-import net.sicade.observation.sql.NumericAccess;
 import net.sicade.observation.sql.Shareable;
-import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.sql.Database;
+import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Use;
+import net.sicade.observation.sql.QueryType;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -54,23 +54,16 @@ import net.sicade.observation.sql.Use;
  */
 @Use({LayerTable.class, OperationTable.class, LocationOffsetTable.class, DistributionTable.class})
 @UsedBy({LinearModelTable.class, DescriptorSubstitutionTable.class})
-public class DescriptorTable extends SingletonTable<Descriptor> implements NumericAccess, Shareable {
+public class DescriptorTable extends SingletonTable<Descriptor> implements Shareable {
     /**
-     * Requête SQL pour obtenir un descripteur du paysage océanique.
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Descriptors:SELECT",
-            "SELECT symbol, identifier, phenomenon, procedure, \"offset\", band, distribution\n" +
-            "  FROM \"Descriptors\"\n"                                                           +
-            " WHERE symbol=?\n"                                                                  +
-            " ORDER BY identifier");
-    
-    /** Numéro de colonne. */ private static final int SYMBOL       = 1;
-    /** Numéro de colonne. */ private static final int IDENTIFIER   = 2;
-    /** Numéro de colonne. */ private static final int PHENOMENON   = 3;
-    /** Numéro de colonne. */ private static final int PROCEDURE    = 4;
-    /** Numéro de colonne. */ private static final int OFFSET       = 5;
-    /** Numéro de colonne. */ private static final int BAND         = 6;
-    /** Numéro de colonne. */ private static final int DISTRIBUTION = 7;
+    private final Column symbol, identifier, phenomenon, procedure, offset, band, distribution;
+
+    /**
+     * Parameter declared in the {@linkplain #query query}.
+     */
+    private final Parameter bySymbol, byIdentifier;
 
     /**
      * La table des couches. Elle sera construite la première fois où elle sera nécessaire.
@@ -101,6 +94,19 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
      */
     public DescriptorTable(final Database database) {
         super(database);
+        final QueryType[] usage = {SELECT, LIST};
+        symbol       = new Column   (query, "Descriptors", "symbol",       usage);
+        identifier   = new Column   (query, "Descriptors", "identifier",   usage);
+        phenomenon   = new Column   (query, "Descriptors", "phenomenon",   usage);
+        procedure    = new Column   (query, "Descriptors", "procedure",    usage);
+        offset       = new Column   (query, "Descriptors", "offset",       usage);
+        band         = new Column   (query, "Descriptors", "band",         usage);
+        distribution = new Column   (query, "Descriptors", "distribution", usage);
+        bySymbol     = new Parameter(query, symbol,     SELECT);
+        byIdentifier = new Parameter(query, identifier, SELECT);
+        symbol    .setRole(Role.NAME);
+        identifier.setRole(Role.IDENTIFIER);
+        identifier.setOrdering("ASC");
     }
 
     /**
@@ -167,43 +173,32 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Numer
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les descripteurs.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default:     return super.getQuery(type);
-        }
-    }
-
-    /**
      * Construit un descripteur pour l'enregistrement courant.
      */
     protected Descriptor createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final String    symbol      = results.getString (SYMBOL);
-        final int       identifier  = results.getInt    (IDENTIFIER);
-        final String    phenomenon  = results.getString (PHENOMENON);
-        final String    procedure   = results.getString (PROCEDURE);
-        final String    position    = results.getString (OFFSET);
-        final short     band =(short)(results.getShort  (BAND) - 1);
-        final String    distrib     = results.getString (DISTRIBUTION);
+        final String    symbol       = results.getString (indexOf(this.symbol      ));
+        final int       identifier   = results.getInt    (indexOf(this.identifier  ));
+        final String    phenomenon   = results.getString (indexOf(this.phenomenon  ));
+        final String    procedure    = results.getString (indexOf(this.procedure   ));
+        final String    position     = results.getString (indexOf(this.offset      ));
+        final short     band = (short)(results.getShort  (indexOf(this.band        )) - 1);
+        final String    distribution = results.getString (indexOf(this.distribution));
         if (offsets == null) {
-            offsets = database.getTable(LocationOffsetTable.class);
+            offsets = getDatabase().getTable(LocationOffsetTable.class);
         }
         final LocationOffset offset = offsets.getEntry(position);
         if (layer == null) {
-            setLayerTable(database.getTable(LayerTable.class));
+            setLayerTable(getDatabase().getTable(LayerTable.class));
         }
         final Layer layer = this.layer.getEntry(phenomenon);
         if (operations == null) {
-            operations = database.getTable(OperationTable.class);
+            operations = getDatabase().getTable(OperationTable.class);
         }
         final Operation operation = operations.getEntry(procedure);
         if (distributions == null) {
-            distributions = database.getTable(DistributionTable.class);
+            distributions = getDatabase().getTable(DistributionTable.class);
         }
-        final Distribution distribution = distributions.getEntry(distrib);
-        return new DescriptorEntry(identifier, symbol, layer, operation, band, offset, distribution, null);
+        final Distribution distributionEntry = distributions.getEntry(distribution);
+        return new DescriptorEntry(identifier, symbol, layer, operation, band, offset, distributionEntry, null);
     }
 }

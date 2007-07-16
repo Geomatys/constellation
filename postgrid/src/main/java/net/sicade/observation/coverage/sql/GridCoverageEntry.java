@@ -218,12 +218,10 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                                 final String            series,
                                 final String            pathname,
                                 final String            filename,
+                                final String            extension,
                                 final Date              startTime,
                                 final Date              endTime,
-                                final double            xmin,
-                                final double            xmax,
-                                final double            ymin,
-                                final double            ymax,
+                                final Envelope          envelope,
                                 final short             width,
                                 final short             height,
                                 final String            crs,
@@ -235,9 +233,13 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         this.filename   = filename;
         this.width      = width;
         this.height     = height;
-        this.parameters = table.getParameters(layer, format, crs, pathname);
+        this.parameters = table.getParameters(layer, format, crs, pathname, extension);
         this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
+        final double xmin = envelope.getMinimum(0);
+        final double xmax = envelope.getMaximum(0);
+        final double ymin = envelope.getMinimum(1);
+        final double ymax = envelope.getMaximum(1);
         final XRectangle2D box = XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
         if (box.isEmpty() || this.startTime >= this.endTime) {
             // TODO: localize
@@ -315,7 +317,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      *         and an {@link URL} object if {@code local} was {@code false}.
      */
     private Object getInput(final boolean local) throws IOException {
-        final File file = new File(parameters.pathname, filename+'.'+parameters.format.extension);
+        final File file = new File(parameters.pathname, filename + '.' + parameters.extension);
         if (!file.isAbsolute()) {
             if (local) {
                 if (parameters.rootDirectory != null) {

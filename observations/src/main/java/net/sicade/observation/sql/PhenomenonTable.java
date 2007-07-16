@@ -49,17 +49,6 @@ public class PhenomenonTable extends SingletonTable<Phenomenon> implements Share
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les procédures.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default:     return super.getQuery(type);
-        }
-    }
-
-    /**
      * Construit un phénomène pour l'enregistrement courant.
      */
     protected Phenomenon createEntry(final ResultSet results) throws SQLException {

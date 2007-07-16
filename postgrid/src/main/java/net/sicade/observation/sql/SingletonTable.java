@@ -79,8 +79,16 @@ public abstract class SingletonTable<E extends Element> extends Table {
      *
      * @param database The database that contains this table.
      */
+    @Deprecated
     protected SingletonTable(final Database database) {
         super(database);
+    }
+
+    /**
+     * Creates a new table using the specified query.
+     */
+    protected SingletonTable(final Query query) {
+        super(query);
     }
 
     /**
@@ -276,13 +284,26 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * Returns all entries available in the database. Modification in the returned
      * set will not alter this table.
      *
-     * @retirn The set of entries. May be empty, but neven {@code null}.
+     * @return The set of entries. May be empty, but neven {@code null}.
      * @throws CatalogException if an element contains invalid data.
      * @throws SQLException if an error occured will reading from the database.
      */
     public synchronized Set<E> getEntries() throws CatalogException, SQLException {
+        return getEntries(QueryType.LIST);
+    }
+
+    /**
+     * Returns all entries available in the database using the specified query type.
+     *
+     * @param  The query type, usually {@link QueryType#LIST}.
+     * @return The set of entries. May be empty, but neven {@code null}.
+     * @throws CatalogException if an element contains invalid data.
+     * @throws SQLException if an error occured will reading from the database.
+     */
+    protected Set<E> getEntries(final QueryType type) throws CatalogException, SQLException {
+        assert Thread.holdsLock(this);
         final Map<E,Boolean> set = new LinkedHashMap<E,Boolean>();
-        final PreparedStatement statement = getStatement(QueryType.LIST);
+        final PreparedStatement statement = getStatement(type);
         final ResultSet results = statement.executeQuery();
         try {
             while (results.next()) {

@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,19 +15,20 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE dependencies
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-// Sicade dependencies
-import net.sicade.observation.ConfigurationKey;
-import net.sicade.observation.sql.Use;
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.coverage.LocationOffset;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
-import net.sicade.observation.coverage.LocationOffset;
+import net.sicade.observation.sql.Column;
+import net.sicade.observation.sql.Parameter;
+import net.sicade.observation.sql.Role;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -40,18 +42,14 @@ import net.sicade.observation.coverage.LocationOffset;
 @UsedBy(DescriptorTable.class)
 public class LocationOffsetTable extends SingletonTable<LocationOffset> implements Shareable {
     /**
-     * La requête SQL à utiliser pour obtnir une position relative.
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("LocationOffsets:SELECT",
-            "SELECT name, dx, dy, dz, dt\n" +
-            "  FROM \"LocationOffsets\"\n"  +
-            " WHERE name=? ORDER BY dt DESC, dz DESC, dy DESC, dx DESC");
+    private final Column name, dx, dy, dz, dt;
 
-    /** Numéro de colonne. */ private static final int NAME = 1;
-    /** Numéro de colonne. */ private static final int DX   = 2;
-    /** Numéro de colonne. */ private static final int DY   = 3;
-    /** Numéro de colonne. */ private static final int DZ   = 4;
-    /** Numéro de colonne. */ private static final int DT   = 5;
+    /**
+     * Parameter declared in the {@linkplain #query query}.
+     */
+    private final Parameter byName;
 
     /**
      * Construit une table en utilisant la connexion spécifiée.
@@ -60,27 +58,29 @@ public class LocationOffsetTable extends SingletonTable<LocationOffset> implemen
      */
     public LocationOffsetTable(final Database database) {
         super(database);
-    }
-
-    /**
-     * Retourne la requête SQL à utiliser pour obtenir les décalages spatio-temporels.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default:     return super.getQuery(type);
-        }
+        final QueryType[] usage = {SELECT, LIST};
+        name = new Column   (query, "LocationOffsets", "name", usage);
+        dx   = new Column   (query, "LocationOffsets", "dx",   usage);
+        dy   = new Column   (query, "LocationOffsets", "dy",   usage);
+        dz   = new Column   (query, "LocationOffsets", "dz",   usage);
+        dt   = new Column   (query, "LocationOffsets", "dt",   usage);
+        byName  = new Parameter(query, name,  SELECT);
+        name.setRole(Role.NAME);
+        dt.setOrdering("DESC");
+        dz.setOrdering("DESC");
+        dy.setOrdering("DESC");
+        dx.setOrdering("DESC");
     }
 
     /**
      * Construit un décalage spatio-temporel pour l'enregistrement courant.
      */
-    protected LocationOffset createEntry(final ResultSet results) throws SQLException {
-        return new LocationOffsetEntry(results.getString(NAME),
-                                       results.getDouble(DX),
-                                       results.getDouble(DY),
-                                       results.getDouble(DZ),
-                            Math.round(results.getDouble(DT) * LocationOffsetEntry.DAY));
+    protected LocationOffset createEntry(final ResultSet results) throws SQLException, CatalogException {
+        return new LocationOffsetEntry(
+                results.getString(indexOf(name)),
+                results.getDouble(indexOf(dx  )),
+                results.getDouble(indexOf(dy  )),
+                results.getDouble(indexOf(dz  )),
+                Math.round(results.getDouble(indexOf(dt)) * LocationOffsetEntry.DAY));
     }
 }

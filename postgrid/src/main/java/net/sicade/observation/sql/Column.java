@@ -14,7 +14,7 @@
  */
 package net.sicade.observation.sql;
 
-import java.util.EnumMap;
+import java.util.Locale;
 import org.geotools.resources.Utilities;
 
 
@@ -46,9 +46,9 @@ public class Column extends IndexedSqlElement {
     private Role role;
 
     /**
-     * The functions to apply on this column. Will be created only if needed.
+     * The ordering: {@code "ASC"}, {@code "DESC"} or {@code null} if none.
      */
-    private EnumMap<QueryType,String> functions;
+    private String ordering;
 
     /**
      * Creates a column from the specified table with the specified name but no alias.
@@ -116,22 +116,22 @@ public class Column extends IndexedSqlElement {
     }
 
     /**
-     * Returns the function for this column when used in a query of the given type,
-     * or {@code null} if none. The functions are typically "MIN" or "MAX".
+     * Returns the ordering: {@code "ASC"}, {@code "DESC"} or {@code null} if none.
      */
-    public String getFunction(final QueryType type) {
-        return (functions != null && type != null) ? functions.get(type) : null;
+    public String getOrdering() {
+        return ordering;
     }
 
     /**
-     * Sets a function for this column when used in a query of the given type.
-     * The functions are typically "MIN" or "MAX".
+     * Sets the ordering to the specified value.
+     *
+     * @todo Need to preserve the order in which this method has been invoked.
      */
-    public void setFunction(final QueryType type, final String function) {
-        if (functions == null) {
-            functions = new EnumMap<QueryType,String>(QueryType.class);
+    public void setOrdering(String ordering) {
+        if (ordering != null) {
+            ordering = ordering.trim().toUpperCase(Locale.ENGLISH);
         }
-        functions.put(type, function);
+        this.ordering = ordering;
     }
 
     /**

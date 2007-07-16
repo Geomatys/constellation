@@ -19,38 +19,43 @@ import net.sicade.observation.LoggingLevel;
 
 
 /**
- * Type de requête exécutée par {@link SingletonTable}.
+ * The kind of query to be executed by {@link SingletonTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public enum QueryType {
     /**
-     * Tous les enregistrements seront listés. C'est le type de requête sélectionné
-     * lorsque la méthode {@link SingletonTable#getEntries} est appelée.
-     */
-    LIST(LoggingLevel.SELECT),
-
-    /**
-     * Un enregistrement sera sélectionné en fonction de son nom. C'est le type de requête
-     * sélectionné lorsque la méthode {@link SingletonTable#getEntry(String)} est appelée.
+     * Only one record will be selected using a name. This is the kind of query executed by
+     * {@link SingletonTable#getEntry(String)}.
      */
     SELECT(LoggingLevel.SELECT),
 
     /**
-     * Un enregistrement sera sélectionné en fonction de son numéro d'identifiant. C'est le type
-     * de requête sélectionné lorsque la méthode {@link SingletonTable#getEntry(int)} est appelée.
+     * Only one record will be selected using a numeric identifier. This is the kind of
+     * query executed by {@link SingletonTable#getEntry(int)}.
      */
     SELECT_BY_IDENTIFIER(LoggingLevel.SELECT),
 
     /**
-     * Sélectionne les coordonnées spatio-temporelles d'un ensemble d'enregistrements. C'est le
-     * type de requête que peut exécuter {@link BoundedSingletonTable#getGeographicBoundingBox}.
+     * Every records will be listed. This is the kind of query executed by
+     * {@link SingletonTable#getEntries}.
+     */
+    LIST(LoggingLevel.SELECT),
+
+    /**
+     * Records will be listed using some filter.
+     */
+    FILTERED_LIST(LoggingLevel.SELECT),
+
+    /**
+     * Selects spatio-temporal envelope in a set of records. This is the kind of
+     * query executed by {@link BoundedSingletonTable#getGeographicBoundingBox}.
      */
     BOUNDING_BOX(LoggingLevel.SELECT),
 
     /**
-     * Un enregistrement sera ajouté.
+     * A record will be added to a table.
      */
     INSERT(LoggingLevel.INSERT);
 

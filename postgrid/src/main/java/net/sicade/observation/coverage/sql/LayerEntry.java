@@ -145,7 +145,6 @@ public class LayerEntry extends ObservableEntry implements Layer {
         super(name.hashCode() ^ (int)serialVersionUID, // Simulation d'un identifiant numérique.
               name, thematic, procedure, null, remarks);
         this.timeInterval = timeInterval;
-        this.series       = series;
     }
 
     /**

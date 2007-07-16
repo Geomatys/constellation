@@ -141,7 +141,7 @@ public class MeasurementTable extends ObservationTable<Measurement> {
         if (Float.isNaN(value)) {
             return;
         }
-        final PreparedStatement statement = getStatement(insert);
+        final PreparedStatement statement = getStatement(getProperty(insert));
         statement.setInt  (STATION,    station   .getNumericIdentifier());
         statement.setInt  (OBSERVABLE, observable.getNumericIdentifier());
         statement.setFloat(VALUE, value);

@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,65 +19,29 @@ package net.sicade.observation.coverage.sql;
 import java.util.Map;
 import java.util.HashMap;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
-// OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-
-// Geotools dependencies
 import org.geotools.referencing.crs.DefaultCompoundCRS;
-import org.geotools.referencing.ReferencingFactoryFinder;
 import static org.geotools.referencing.CRS.getTemporalCRS;
 
-// Sicade dependencies
-import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.CRS;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
-import net.sicade.observation.ServerException;
-import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.NoSuchRecordException;
-import net.sicade.observation.IllegalRecordException;
-import net.sicade.resources.i18n.ResourceKeys;
-import net.sicade.resources.i18n.Resources;
 
 
 /**
- * Connexion vers la table des {@linkplain CoordinateReferenceSystem systèmes de reférence des
- * coordonnées} utilisés par les images. Si une entrée de la table ne contient pas de dimension
- * temporelle, une dimension par défaut sera automatiquement ajoutée.
+ * Connection to a source of {@linkplain CoordinateReferenceSystem coordinate reference system}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 @UsedBy(GridCoverageTable.class)
 public class CoordinateReferenceSystemTable extends Table implements Shareable {
-    /**
-     * Requête SQL utilisée par cette classe pour obtenir les CRS. L'ordre des colonnes est
-     * essentiel. Ces colonnes sont référencées par les constantes {@link #WKT} et compagnie.
-     */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("CoordinateReferenceSystems:SELECT",
-            "SELECT \"WKT\"\n"                        +
-            "  FROM \"CoordinateReferenceSystems\"\n" +
-            " WHERE name=?");
-
-    /** Numéro d'argument. */ private static final int ARGUMENT_NAME = 1;
-    /** Numéro de colonne. */ private static final int WKT           = 1;
-
-    /**
-     * Fabrique à utiliser pour construire des transformations de coordonnées.
-     * Ce champ est accédé par {@link Parameters}.
-     */
-    static final CoordinateOperationFactory TRANSFORMS = ReferencingFactoryFinder.getCoordinateOperationFactory(FACTORY_HINTS);
-
     /**
      * La fabrique de CRS à utiliser. Ne sera créée que la première fois où elle sera nécessaire.
      */
@@ -88,61 +53,45 @@ public class CoordinateReferenceSystemTable extends Table implements Shareable {
     private final Map<String,CoordinateReferenceSystem> pool = new HashMap<String,CoordinateReferenceSystem>();
 
     /**
-     * Construit une table des systèmes de références des coordonnées.
+     * Creates a CRS table.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param database Connection to the database.
      */
     public CoordinateReferenceSystemTable(final Database database) {
         super(database);
     }
 
     /**
-     * Retourne le système de coordonnées spatio-temporel pour le nom spécifié.
+     * Returns the CRS for the specified name.
      *
-     * @param  name Le nom de l'entrée désirée.
-     * @return L'entrée demandée, ou {@code null} si {@code name} était nul.
-     * @throws CatalogException si aucun enregistrement ne correspond au nom demandé,
-     *         ou si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @param  name CRS identifier.
+     * @return The CRS.
+     * @throws CatalogException if the requested CRS can not be obtained.
+     * @throws SQLException if an error occured while reading the database.
+     *
+     * @todo Not yet fully implemented.
      */
     public synchronized CoordinateReferenceSystem getEntry(final String name)
             throws CatalogException, SQLException
     {
-        if (name.equalsIgnoreCase("Géographique")) {
+        if (name.equalsIgnoreCase("IRD:WGS84(xy)")) {
+            return CRS.XY.getCoordinateReferenceSystem();
+        }
+        if (name.equalsIgnoreCase("IRD:WGS84(xyz)")) {
+            return CRS.XYZ.getCoordinateReferenceSystem();
+        }
+        if (name.equalsIgnoreCase("IRD:WGS84(xyt)")) {
             return CRS.XYT.getCoordinateReferenceSystem();
+        }
+        if (name.equalsIgnoreCase("IRD:WGS84(xyzt)")) {
+            return CRS.XYZT.getCoordinateReferenceSystem();
         }
         CoordinateReferenceSystem entry = pool.get(name);
         if (entry != null) {
             return entry;
         }
-        final PreparedStatement statement = getStatement(SELECT);
-        statement.setString(ARGUMENT_NAME, name);
-        final ResultSet results = statement.executeQuery();
-        while (results.next()) {
-            final String wkt = results.getString(WKT);
-            if (factory == null) {
-                factory = ReferencingFactoryFinder.getCRSFactory(FACTORY_HINTS);
-            }
-            final CoordinateReferenceSystem candidate;
-            try {
-                candidate = factory.createFromWKT(wkt);
-            } catch (FactoryException e) {
-                throw new ServerException(e);
-            }
-            if (entry == null) {
-                entry = candidate;
-            } else if (!entry.equals(candidate)) {
-                final String table = results.getMetaData().getTableName(1);
-                results.close();
-                throw new IllegalRecordException(table, Resources.format(
-                          ResourceKeys.ERROR_DUPLICATED_RECORD_$1, name));
-            }
-        }
-        if (entry == null) {
-            final String table = results.getMetaData().getTableName(1);
-            results.close();
-            throw new NoSuchRecordException(Resources.format(
-                      ResourceKeys.ERROR_KEY_NOT_FOUND_$2, table, name), table);
+        if (true) {
+            throw new CatalogException("Not yet implemented.");
         }
         /*
          * Ajoute une dimension temporelle (s'il n'y en avait pas déjà) et sauvegarde le

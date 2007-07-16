@@ -123,7 +123,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
     final StationTable getStationTable() {
         assert Thread.holdsLock(this);
         if (stations == null) {
-            setStationTable(database.getTable(StationTable.class));
+            setStationTable(getDatabase().getTable(StationTable.class));
         }
         return stations;
     }
@@ -134,7 +134,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
     final LocationTable getLocationTable() {
         assert Thread.holdsLock(this);
         if (locations == null) {
-            locations = database.getTable(LocationTable.Platform.class);
+            locations = getDatabase().getTable(LocationTable.Platform.class);
         }
         return locations;
     }
@@ -170,25 +170,10 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
         switch (type) {
             case LIST: // Fall through
             case BOUNDING_BOX: {
-                statement.setString(ARGUMENT_PROVIDER, escapeSearch(provider));
+                statement.setString(ARGUMENT_PROVIDER, provider);
                 break;
             }
         }
-    }
-
-    /**
-     * Retourne la requête SQL à utiliser pour obtenir les plateformes.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        final ConfigurationKey key;
-        switch (type) {
-            case LIST:         key=LIST;         break;
-            case SELECT:       key=SELECT;       break;
-            case BOUNDING_BOX: key=BOUNDING_BOX; break;
-            default:           return super.getQuery(type);
-        }
-        return getProperty(key);
     }
 
     /**

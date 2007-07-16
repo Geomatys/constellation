@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,23 +15,23 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE dependencies
 import java.sql.SQLException;
 import java.sql.ResultSet;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
-
-// Sicade dependencies
-import net.sicade.observation.ConfigurationKey;
+import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
 import net.sicade.observation.coverage.Operation;
+import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
+import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.QueryType;
+import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -45,21 +46,14 @@ import net.sicade.observation.sql.SingletonTable;
 @UsedBy(DescriptorTable.class)
 public class OperationTable extends SingletonTable<Operation> implements Shareable {
     /**
-     * Requête SQL utilisée par cette classe pour obtenir les opérations.
-     * L'ordre des colonnes est essentiel. 
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Operations:SELECT", 
-            "SELECT name, "            +   // [01] name
-                   "prefix, "          +   // [02] prefix
-                   "operation, "       +   // [03] operation
-                   "description\n"     +   // [04] description
-            "  FROM \"Operations\"\n"  +
-            " WHERE name=?");
+    private final Column name, prefix, operation, remarks;
 
-    /** Numéro de colonne. */ private static final int NAME         =  1;
-    /** Numéro de colonne. */ private static final int PREFIX       =  2;
-    /** Numéro de colonne. */ private static final int OPERATION    =  3;
-    /** Numéro de colonne. */ private static final int DESCRIPTION  =  4;
+    /**
+     * Parameter declared in the {@linkplain #query query}.
+     */
+    private final Parameter byName;
 
     /** 
      * La table des paramètres des opérations. Ne sera construite que la première fois
@@ -74,17 +68,13 @@ public class OperationTable extends SingletonTable<Operation> implements Shareab
      */
     public OperationTable(final Database database) {
         super(database);
-    }
-
-    /**
-     * Retourne la requête SQL à utiliser pour obtenir les opérations.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default:     return super.getQuery(type);
-        }
+        final QueryType[] usage = {SELECT, LIST};
+        name      = new Column   (query, "Operations", "name",        usage);
+        prefix    = new Column   (query, "Operations", "prefix",      usage);
+        operation = new Column   (query, "Operations", "operation",   usage);
+        remarks   = new Column   (query, "Operations", "description", usage);
+        byName    = new Parameter(query, name, SELECT);
+        name.setRole(Role.NAME);
     }
 
     /**
@@ -94,16 +84,16 @@ public class OperationTable extends SingletonTable<Operation> implements Shareab
      * @throws  IllegalRecordException  Si un des paramètres trouvés dans la base de données
      *          n'est pas connu par le groupe {@code parameters}, ou a une valeur invalide.
      */
-    protected Operation createEntry(final ResultSet results) throws SQLException, IllegalRecordException {
-        final String              name      = results.getString(NAME);
-        final String              prefix    = results.getString(PREFIX);
-        final String              operation = results.getString(OPERATION);
-        final String              remarks   = results.getString(DESCRIPTION);
+    protected Operation createEntry(final ResultSet results) throws SQLException, CatalogException {
+        final String              name      = results.getString(indexOf(this.name     ));
+        final String              prefix    = results.getString(indexOf(this.prefix   ));
+        final String              operation = results.getString(indexOf(this.operation));
+        final String              remarks   = results.getString(indexOf(this.remarks  ));
         final OperationEntry      entry     = new OperationEntry(name, prefix, operation, remarks);
         final ParameterValueGroup values    = entry.getParameters();
         if (values != null) {
             if (parameters == null) {
-                parameters = database.getTable(OperationParameterTable.class);
+                parameters = getDatabase().getTable(OperationParameterTable.class);
             }
             parameters.fillValues(name, values);
         }

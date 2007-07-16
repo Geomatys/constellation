@@ -14,8 +14,10 @@
  */
 package net.sicade.observation.coverage.sql;
 
-import java.sql.DatabaseMetaData;
+import java.util.Set;
 import java.sql.SQLException;
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.coverage.Format;
 import net.sicade.observation.sql.DatabaseTest;
 
 import org.junit.*;
@@ -23,33 +25,29 @@ import static org.junit.Assert.*;
 
 
 /**
- * Tests the SQL queries used by the PostGrid database.
+ * Tests {@link FormatTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SchemaTest extends DatabaseTest {
+public class FormatTableTest extends DatabaseTest {
     /**
-     * Creates a new instance.
+     * The name of the format to be tested.
      */
-    public SchemaTest() {
-    }
+    public static final String SAMPLE_NAME = "PNG Température [-3 .. 35,25 °C]";
 
     /**
-     * Tests the SQL statements used by the {@link ThematicTable}.
+     * Tests the {@link FormatTable#getEntry} and {@link FormatTable#getEntries} methods.
      */
     @Test
-    public void testThematic() throws SQLException {
-        final ThematicTable table = new ThematicTable(database);
-        trySelectAll(table);
-    }
+    public void testSelectAndList() throws CatalogException, SQLException {
+        final FormatTable table = new FormatTable(database);
+        final Format      entry = table.getEntry(SAMPLE_NAME);
+        assertEquals(SAMPLE_NAME, entry.getName());
+        assertSame(entry, table.getEntry(SAMPLE_NAME));
 
-    /**
-     * Tests the SQL statements used by the {@link OperationParameterTable}.
-     */
-    @Test
-    public void testOperationParameters() throws SQLException {
-        final OperationParameterTable table = new OperationParameterTable(database);
-        trySelectAll(table);
+        final Set<Format> entries = table.getEntries();
+        assertFalse(entries.isEmpty());
+        assertTrue(entries.contains(entry));
     }
 }

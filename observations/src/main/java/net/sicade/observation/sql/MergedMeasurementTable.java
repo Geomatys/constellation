@@ -280,7 +280,7 @@ public class MergedMeasurementTable extends Table {
             throws SQLException
     {
         if (connection == null) {
-            connection = database.getConnection();
+            connection = getDatabase().getConnection();
         }
         final Calendar      calendar = getCalendar();
         final ResultSet       source = getResultSet();

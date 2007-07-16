@@ -29,12 +29,18 @@ import org.geotools.geometry.GeneralEnvelope;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class SpatialColumn extends Column {
+    /**
+     * Enable work around what seems to be PostGIS limitations.
+     */
+    public static final boolean WORKAROUND_POSTGIS = true;
+
     /**
      * The number of dimensions for spatial column.
      * Our database uses only 3 dimensional boxes or points.
      */
-    static final short DIMENSION = 3;
+    static final int DIMENSION = 3;
 
     /**
      * {@code true} if the database is spatial enabled (e.g. PostgreSQL with a PostGIS extension).
@@ -69,6 +75,7 @@ public class SpatialColumn extends Column {
     /**
      * A column for the {@code BOX3D} type.
      */
+    @Deprecated
     public static class Box extends SpatialColumn {
         /**
          * Creates a column from the specified table with the specified name but no alias.
@@ -91,14 +98,6 @@ public class SpatialColumn extends Column {
          */
         public Box(final Query query, final String table, final String name, final QueryType... types) {
             super(query, table, name, types);
-        }
-
-        /**
-         * The number of consecutive columns or parameter represented by this element.
-         */
-        @Override
-        short columnSpan() {
-            return spatialEnabled ? 1 : (short) (2 * DIMENSION);
         }
 
         /**
@@ -149,22 +148,39 @@ public class SpatialColumn extends Column {
         }
 
         /**
+         * Replace infinitie values by pad values.
+         *
+         * @todo Current implementation use arbitrary values for infinities.
+         *       We need to do something better.
+         */
+        static double toPadValue(double value) {
+            if (value == Double.NEGATIVE_INFINITY) {
+                value = -1000;
+            } else if (value == Double.POSITIVE_INFINITY) {
+                value = +1000;
+            }
+            return value;
+        }
+
+        /**
          * Formats a {@code BOX3D} element.
          */
         static String format(final Envelope envelope) {
             final int dimension = envelope.getDimension();
-            final StringBuilder buffer = new StringBuilder("BOX");
-            if (dimension != 2) {
-                buffer.append(dimension).append('D');
+            final StringBuilder buffer = new StringBuilder("BOX").append(dimension).append('D');
+            if (WORKAROUND_POSTGIS) {
+                // I have been unable to make PostGIS understand BOX3D.
+                buffer.setLength(0);
+                buffer.append("MULTIPOINT");
             }
             char separator = '(';
             for (int i=0; i<dimension; i++) {
-                buffer.append(separator).append(envelope.getMinimum(i));
+                buffer.append(separator).append(toPadValue(envelope.getMinimum(i)));
                 separator = ' ';
             }
             separator = ',';
             for (int i=0; i<dimension; i++) {
-                buffer.append(separator).append(envelope.getMaximum(i));
+                buffer.append(separator).append(toPadValue(envelope.getMaximum(i)));
                 separator = ' ';
             }
             return buffer.append(')').toString();
@@ -219,7 +235,7 @@ public class SpatialColumn extends Column {
          * Returns the dimension of the specified WKT keyword, or 0 if unknown.
          */
         private static int getDimension(final String prefix) {
-            if (prefix.equals("BOX")) {
+            if (prefix.equals("BOX2D")) {
                 return 2;
             }
             if (prefix.equals("BOX3D")) {

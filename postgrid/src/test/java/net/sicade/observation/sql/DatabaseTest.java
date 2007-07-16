@@ -17,6 +17,7 @@ package net.sicade.observation.sql;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -80,7 +81,7 @@ public class DatabaseTest extends TestCase {
     }
 
     /**
-     * Tries to executes the specified query statement.
+     * Tries to executes the specified query statement and to read one row.
      *
      * @param  query the statement to test.
      * @throws SQLException if an query error occured.
@@ -88,7 +89,16 @@ public class DatabaseTest extends TestCase {
     protected static void tryStatement(final String query) throws SQLException {
         final Statement s = database.getConnection().createStatement();
         final ResultSet r = s.executeQuery(query);
-        assertTrue(r.next());
+        if (r.next()) {
+            final ResultSetMetaData metadata = r.getMetaData();
+            final int num = metadata.getColumnCount();
+            for (int i=1; i<=num; i++) {
+                final String value = r.getString(i);
+                if (metadata.isNullable(i) == ResultSetMetaData.columnNoNulls) {
+                    assertNotNull(value);
+                }
+            }
+        }
         r.close();
         s.close();
     }
@@ -97,7 +107,7 @@ public class DatabaseTest extends TestCase {
      * Tries the {@link Query#selectAll} method on the specified table.
      */
     protected static void trySelectAll(final Table table) throws SQLException {
-        final String query = table.query.select(QueryType.SELECT);
+        final String query = table.query.selectAll(QueryType.SELECT);
         assertNotNull(query);
         tryStatement(query);
     }

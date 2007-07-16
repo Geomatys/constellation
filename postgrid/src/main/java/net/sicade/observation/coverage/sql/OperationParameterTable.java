@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2006, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +15,6 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE and JAI dependencies
 import java.util.Arrays;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,29 +23,26 @@ import javax.media.jai.KernelJAI;
 import static java.lang.Math.exp;
 import static java.lang.Math.sqrt;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterValueException;
-
-// Geotools dependencies
 import org.geotools.resources.XMath;
-import org.geotools.coverage.processing.operation.GradientMagnitude;
-
-// Sicade dependencies
-import net.sicade.observation.sql.Use;
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.IllegalRecordException;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
-import net.sicade.observation.ConfigurationKey;
-import net.sicade.observation.IllegalRecordException;
+import net.sicade.observation.sql.Column;
+import net.sicade.observation.sql.Parameter;
+import net.sicade.observation.sql.QueryType;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers la table des {@linkplain ParameterValueGroup paramètres des opérations}.
+ * Connection to a table of {@linkplain ParameterValueGroup operation parameters}.
  *
  * @version $Id$
  * @author Antoine Hnawia
@@ -54,45 +51,50 @@ import net.sicade.observation.IllegalRecordException;
 @UsedBy(OperationTable.class)
 public class OperationParameterTable extends Table implements Shareable {
     /**
-     * La requête SQL servant à interroger la table.
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("OperationParameters:SELECT",
-            "SELECT parameter, value\n"        +
-            "  FROM \"OperationParameters\"\n" +
-            " WHERE operation=?");
-
-    /** Numéro d'argument. */ private static final int ARGUMENT_OPERATION = 1;
-    /** Numéro de colonne. */ private static final int PARAMETER          = 1;
-    /** Numéro de colonne. */ private static final int VALUE              = 2;
+    private final Column operation, parameter, value;
 
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
-     *
-     * @param database  Connexion vers la base de données d'observations.
+     * Parameter declared in the {@linkplain #query query}.
+     */
+    private final Parameter byOperation;
+
+    /**
+     * Creates a operation parameter table.
+     * 
+     * @param database Connection to the database.
      */
     public OperationParameterTable(final Database database) {
         super(database);
+        final QueryType[] usage = {SELECT, LIST};
+        operation   = new Column   (query, "OperationParameters", "operation", LIST);
+        parameter   = new Column   (query, "OperationParameters", "parameter", usage);
+        value       = new Column   (query, "OperationParameters", "value",     usage);
+        byOperation = new Parameter(query, operation, SELECT);
     }
 
     /**
-     * Définie les valeurs du groupe de paramètres donné en argument.
+     * Fills the specified parameter group with the values found in the database for the given
+     * operation name.
      * 
-     * @param   operation   L'opération dont on veut connaître les paramètres.
-     * @param   parameters  Le groupe de paramètre dans lequel on va stocker les paramètres.
+     * @param   operation   The operation name in the database.
+     * @param   parameters  The parameter group where to store the parameter values.
      * 
-     * @throw   NullPointerException    Si l'argument {@code parameters} est {@code null}.
-     * @throws  SQLException            Si l'interrogation de la base de données a échoué.
-     * @throws  IllegalRecordException  Si un des paramètres trouvés dans la base de données
-     *          n'est pas connu par le groupe {@code parameters}, ou a une valeur invalide.
+     * @throw   NullPointerException    If {@code parameters} is {@code null}.
+     * @throws  SQLException            If an error occured while reading the database.
+     * @throws  IllegalRecordException  If the database contains an invalid parameter.
      */
     protected synchronized void fillValues(final String operation, final ParameterValueGroup parameters)
-            throws SQLException, IllegalRecordException
+            throws SQLException, CatalogException
     {
+        final int paramIndex = indexOf(parameter);
+        final int valueIndex = indexOf(value    );
         final PreparedStatement statement = getStatement(SELECT);
-        statement.setString(ARGUMENT_OPERATION, operation);
+        statement.setString(indexOf(byOperation), operation);
         final ResultSet results = statement.executeQuery();
         while (results.next()) try {
-            final String         name      = results.getString(PARAMETER).trim();
+            final String name = results.getString(paramIndex).trim();
             final ParameterValue parameter = parameters.parameter(name);
             Class type = ((ParameterDescriptor) parameter.getDescriptor()).getValueClass();
             type = XMath.primitiveToWrapper(type);
@@ -103,7 +105,7 @@ public class OperationParameterTable extends Table implements Shareable {
              * conversion en Java. La même remarque s'applique pour tous les cas suivants.
              */
             if (Boolean.class.isAssignableFrom(type)) {
-                parameter.setValue(results.getBoolean(VALUE));
+                parameter.setValue(results.getBoolean(valueIndex));
             }
             /*
              * Cas des entiers entre 8 et 32 bits. Notez que le type Long ne peut pas être
@@ -113,7 +115,7 @@ public class OperationParameterTable extends Table implements Shareable {
                      Short  .class.isAssignableFrom(type) ||
                      Integer.class.isAssignableFrom(type))
             {
-                parameter.setValue(results.getInt(VALUE));
+                parameter.setValue(results.getInt(valueIndex));
             }
             /*
              * Cas de tous les autres type de nombres, incluant Long, Float et Double. On
@@ -121,25 +123,25 @@ public class OperationParameterTable extends Table implements Shareable {
              * pour l'API à notre disposition dans ParameterValue.
              */
             else if (Number.class.isAssignableFrom(type)) {
-                parameter.setValue(results.getDouble(VALUE));
+                parameter.setValue(results.getDouble(valueIndex));
             }
             /*
              * Cas particulier d'un noyau JAI. Le contenu numérique du noyau sera construit
              * à partir du nom.
              */
             else if (KernelJAI.class.isAssignableFrom(type)) {
-                parameter.setValue(createKernel(name, results));
+                parameter.setValue(createKernel(name, results, valueIndex));
             }
             /*
              * Tous les autres cas.
              */
             else {
-                parameter.setValue(results.getString(VALUE));
+                parameter.setValue(results.getString(valueIndex));
             }
         } catch (ParameterNotFoundException exception) {
-            throw new IllegalRecordException(results.getMetaData().getTableName(PARAMETER), exception);
+            throw new IllegalRecordException(results.getMetaData().getTableName(paramIndex), exception);
         } catch (InvalidParameterValueException exception) {
-            throw new IllegalRecordException(results.getMetaData().getTableName(VALUE), exception);
+            throw new IllegalRecordException(results.getMetaData().getTableName(valueIndex), exception);
         }
     }
 
@@ -155,10 +157,10 @@ public class OperationParameterTable extends Table implements Shareable {
      * @throws  SQLException            Si l'interrogation de la base de données a échoué.
      * @throws  IllegalRecordException  Si la chaîne de caractères {@code value} n'est pas reconnue.
      */
-    private static KernelJAI createKernel(final String parameter, final ResultSet results)
+    private static KernelJAI createKernel(final String parameter, final ResultSet results, final int valueIndex)
             throws SQLException, IllegalRecordException
     {
-        final String value = results.getString(VALUE).trim();
+        final String value = results.getString(valueIndex).trim();
         final int lp = value.indexOf('(');
         final int rp = value.indexOf(')');
         if (lp > 0  &&  rp > lp       &&  // Vérifie la disposition des parenthèses.
@@ -169,7 +171,7 @@ public class OperationParameterTable extends Table implements Shareable {
             try {
                 size = Integer.parseInt(value.substring(lp+1, rp));
             } catch (NumberFormatException exception) {
-                throw new IllegalRecordException(results.getMetaData().getTableName(VALUE), exception);
+                throw new IllegalRecordException(results.getMetaData().getTableName(valueIndex), exception);
             }
             final String name = value.substring(0, lp).trim();
             if (name.equalsIgnoreCase("mean")) {
@@ -185,7 +187,7 @@ public class OperationParameterTable extends Table implements Shareable {
                 return createIsotropicKernel(size, false);
             }
         }
-        throw new IllegalRecordException(results.getMetaData().getTableName(VALUE),
+        throw new IllegalRecordException(results.getMetaData().getTableName(valueIndex),
                 "La valeur \"" + value + "\" n'est pas valide pour le paramètre \"" + parameter +
                 "\". Le format attendu est \"mean(3)\" par exemple.");
     }

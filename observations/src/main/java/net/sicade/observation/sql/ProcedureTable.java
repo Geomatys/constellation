@@ -49,17 +49,6 @@ public class ProcedureTable extends SingletonTable<Procedure> implements Shareab
     }
 
     /**
-     * Retourne la requête SQL à utiliser pour obtenir les procédures.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: return getProperty(SELECT);
-            default:     return super.getQuery(type);
-        }
-    }
-
-    /**
      * Construit une procédure pour l'enregistrement courant.
      */
     protected Procedure createEntry(final ResultSet results) throws SQLException {

@@ -195,7 +195,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             throws CatalogException, SQLException 
     {
         if (geographicBoundingBoxes == null) {
-            geographicBoundingBoxes = database.getTable(GeographicBoundingBoxTable.class);
+            geographicBoundingBoxes = getDatabase().getTable(GeographicBoundingBoxTable.class);
         }
         final String bboxID = geographicBoundingBoxes.getIdentifier(bbox, size);
         if (bboxID == null) {
@@ -213,16 +213,5 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             throw new CatalogException("L'image n'a pas été ajoutée.");
         }
         logUpdate(getProperty(INSERT), series.getName(), filename, startTime, endTime, bbox);
-    }
-
-    /**
-     * Retourne la requête SQL à utiliser pour le type spécifié.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case INSERT: return getProperty(INSERT);
-            default:     return super.getQuery(type);
-        }
     }
 }

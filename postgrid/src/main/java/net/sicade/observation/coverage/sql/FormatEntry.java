@@ -110,11 +110,6 @@ public class FormatEntry extends Entry implements Format {
     private final String mimeType;
 
     /**
-     * Extension (sans le point) des noms de fichier des images à lire.
-     */
-    final String extension;
-
-    /**
      * Liste des bandes appartenant à ce format. Les éléments de ce tableau doivent
      * correspondre dans l'ordre aux bandes {@code [0,1,2...]} de l'image.
      */
@@ -142,13 +137,11 @@ public class FormatEntry extends Entry implements Format {
      */
     protected FormatEntry(final String  name,
                           final String  mimeType,
-                          final String  extension,
                           final boolean geophysics,
                           final GridSampleDimension[] bands)
     {
         super(name);
         this.mimeType   = mimeType.trim().intern();
-        this.extension  = extension.trim().intern();
         this.geophysics = geophysics;
         this.bands      = bands;
         for (int i=0; i<bands.length; i++) {
@@ -219,14 +212,7 @@ public class FormatEntry extends Entry implements Format {
         if (reader != null) {
             return reader;
         }
-        Iterator<ImageReader> readers;
-        if (mimeType.length() != 0) {
-            readers = ImageIO.getImageReadersByMIMEType(mimeType);
-            if (readers.hasNext()) {
-                return reader = readers.next();
-            }
-        }
-        readers = ImageIO.getImageReadersByFormatName(extension);
+        final Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(mimeType);
         if (readers.hasNext()) {
             return reader = readers.next();
         }
@@ -501,7 +487,7 @@ public class FormatEntry extends Entry implements Format {
                         new Integer(active.booleanValue() ? 1 : 0));
             record.setSourceClassName("CoverageReference");
             record.setSourceMethodName("abort");
-            Format.LOGGER.log(record);
+            LOGGER.log(record);
         }
     }
 
@@ -596,7 +582,6 @@ public class FormatEntry extends Entry implements Format {
         if (super.equals(object)) {
             final FormatEntry that = (FormatEntry) object;
             return Utilities.equals(this.mimeType,   that.mimeType )  &&
-                   Utilities.equals(this.extension,  that.extension)  &&
                       Arrays.equals(this.bands,      that.bands    )  &&
                                     this.geophysics==that.geophysics;
         }

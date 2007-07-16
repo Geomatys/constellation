@@ -61,21 +61,6 @@ public class LongLineTable extends StationTable {
     }
 
     /**
-     * Retourne la requête à utiliser pour obtenir les lignes de palangres.
-     */
-    @Override
-    protected String getQuery(final QueryType type) throws SQLException {
-        switch (type) {
-            case SELECT: {
-                return getProperty(SELECT);
-            }
-            default: {
-                return super.getQuery(type);
-            }
-        }
-    }
-
-    /**
      * Construit une station à partir des informations spécifiées.
      *
      * @todo A mettre à jour lorsque l'on aura implémenté une classe {@code LongLineEntry}.

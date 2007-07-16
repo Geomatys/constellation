@@ -111,8 +111,25 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * @param database The database that contains this table.
      * @param crsType  The type of the {@linkplain #getEnvelope envelope} coordinate reference system.
      */
+    @Deprecated
     protected BoundedSingletonTable(final Database database, final CRS crsType) {
         super(database);
+        this.crsType = crsType;
+        tMin =  0;
+        tMax =  System.currentTimeMillis() + LOOK_AHEAD;
+        xMin = -360;
+        xMax = +360;
+        yMin =  -90;
+        yMax =  +90;
+        zMin = Double.NEGATIVE_INFINITY;
+        zMax = Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Creates a new table using the specified query.
+     */
+    protected BoundedSingletonTable(final Query query, final CRS crsType) {
+        super(query);
         this.crsType = crsType;
         tMin =  0;
         tMax =  System.currentTimeMillis() + LOOK_AHEAD;
@@ -479,7 +496,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             if (statement != null) {
                 final int timeParameter = query.indexOfParameter(type, Role.TIME_RANGE);
                 final int bboxParameter = query.indexOfParameter(type, Role.SPATIAL_ENVELOPE);
-                final Column bboxColumn = query.getColumns(type).get(bboxParameter);
+                final Column bboxColumn = query.getColumns(type).get(bboxParameter - 1);
                 final ResultSet result = statement.executeQuery();
                 while (result.next()) { // Should contains only one record.
                     Date time;
@@ -521,9 +538,13 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Configure la requête SQL spécifiée en fonction des limites spatio-temporelles définies
-     * dans cette table. Cette méthode est appelée automatiquement lorsque cette table a
-     * {@linkplain #fireStateChanged changé d'état}.
+     * Invoked automatically by for a newly created statement or when this table
+     * {@linkplain #fireStateChanged changed its state}. The default implementation
+     * set the parameter values to the spatio-temporal bounding box.
+     *
+     * @param  type The query type (mat be {@code null}).
+     * @param  statement The statement to configure (never {@code null}).
+     * @throws SQLException If the statement can not be configured.
      */
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
@@ -531,11 +552,21 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         int index = query.indexOfParameter(type, Role.TIME_RANGE);
         if (index != 0) {
             final Calendar calendar = getCalendar();
-            statement.setTimestamp(index,     new Timestamp(tMin), calendar);
-            statement.setTimestamp(index + 1, new Timestamp(tMax), calendar);
+            statement.setTimestamp(index + 1, new Timestamp(tMin), calendar);
+            statement.setTimestamp(index,     new Timestamp(tMax), calendar);
         }
         index = query.indexOfParameter(type, Role.SPATIAL_ENVELOPE);
-        // TODO
+        if (index != 0) {
+            final GeneralEnvelope envelope = new GeneralEnvelope(
+                    new double[] {xMin, yMin, zMin},
+                    new double[] {xMax, yMax, zMax});
+            final Parameter parameter = query.getParameters(type).get(index - 1);
+            if (parameter instanceof SpatialParameter.Box) {
+                ((SpatialParameter.Box) parameter).setEnvelope(statement, type, envelope);
+            } else {
+                SpatialParameter.Box.setEnvelope(statement, index, envelope);
+            }
+        }
     }
 
     /**

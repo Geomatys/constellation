@@ -21,6 +21,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.postgis.PGbox3d;
+import org.postgis.PGgeometry;
 import org.postgresql.PGConnection;
 
 // Input / Output
@@ -163,6 +164,13 @@ public class Database {
      * {@code true} if the database supports spatial extension, like the {code BBOX3D} type.
      */
     private boolean isSpatialEnabled;
+
+    /**
+     * {@code true} if the {@code toString()} method on {@link PreparedStatement} instances
+     * returns the SQL query with parameters filled in. This is the case with the PostgreSQL
+     * JDBC driver.
+     */
+    private boolean isStatementFormatted;
 
     /**
      * The tables created up to date.
@@ -308,10 +316,13 @@ public class Database {
              *       or at the very least optional.
              */
             isSpatialEnabled = false;
+            isStatementFormatted = false;
             if (connection instanceof PGConnection) {
                 final PGConnection pgc = (PGConnection) connection;
-                pgc.addDataType("box3d", PGbox3d.class);
+                pgc.addDataType("box3d",    PGbox3d.class);
+                pgc.addDataType("geometry", PGgeometry.class);
                 isSpatialEnabled = true;
+                isStatementFormatted = true;
             }
         }
         return connection;
@@ -522,7 +533,23 @@ public class Database {
      * new types like {@code BOX3D}.
      */
     public boolean isSpatialEnabled() {
+        if (connection == null) {
+            // TODO: connect automatically.
+            throw new IllegalStateException();
+        }
         return isSpatialEnabled;
+    }
+
+    /**
+     * Returns {@code true} if the {@code toString()} method on {@link PreparedStatement}
+     * instances returns the SQL query with parameters filled in. This is the case with the
+     * PostgreSQL JDBC driver.
+     */
+    final boolean isStatementFormatted() {
+        if (connection == null) {
+            throw new IllegalStateException();
+        }
+        return isStatementFormatted;
     }
 
     /**

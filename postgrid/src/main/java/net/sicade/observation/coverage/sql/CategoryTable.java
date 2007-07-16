@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +15,6 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE dependencies
 import java.net.URL;
 import java.awt.Color;
 import java.util.List;
@@ -25,19 +25,14 @@ import java.sql.PreparedStatement;
 import java.io.IOException;
 import java.text.ParseException;
 
-// OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransformFactory;
-
-// Geotools dependencies
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.Category;
 import org.geotools.referencing.ReferencingFactoryFinder;
 
-// Sicade dependencies
-import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.ServerException;
 import net.sicade.observation.IllegalRecordException;
@@ -45,8 +40,11 @@ import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.UsedBy;
-import net.sicade.observation.sql.Use;
 import net.sicade.image.Utilities;
+import net.sicade.observation.sql.Column;
+import net.sicade.observation.sql.Parameter;
+import net.sicade.observation.sql.QueryType;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -64,29 +62,14 @@ import net.sicade.image.Utilities;
 @UsedBy(SampleDimensionTable.class)
 public class CategoryTable extends Table implements Shareable {
     /**
-     * Requête SQL utilisée par cette classe pour obtenir la table des catégories.
-     * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par les
-     * constantes {@link #NAME}, {@link #UPPER} et compagnie.
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Categories:SELECT",
-            "SELECT name, "           +   // [01] NAME
-                   "lower, "          +   // [02] LOWER
-                   "upper, "          +   // [03] UPPER
-                   "c0, "             +   // [04] C0
-                   "c1, "             +   // [05] C1
-                   "log, "            +   // [06] LOG
-                   "colors\n"         +   // [07] COLORS
-            "  FROM \"Categories\"\n" +
-            " WHERE band=? ORDER BY lower");
+    private final Column name, band, lower, upper, c0, c1, function, colors;
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_BAND = 1;
-    /** Numéro de colonne. */ private static final int NAME          = 1;
-    /** Numéro de colonne. */ private static final int LOWER         = 2;
-    /** Numéro de colonne. */ private static final int UPPER         = 3;
-    /** Numéro de colonne. */ private static final int C0            = 4;
-    /** Numéro de colonne. */ private static final int C1            = 5;
-    /** Numéro de colonne. */ private static final int LOG           = 6;
-    /** Numéro de colonne. */ private static final int COLORS        = 7;
+    /**
+     * Parameter declared in the {@linkplain #query query}.
+     */
+    private final Parameter byBand;
 
     /**
      * Transformation <code>f(x) = 10<sup>x</sup></code>. Utilisée pour le décodage des images de
@@ -102,6 +85,17 @@ public class CategoryTable extends Table implements Shareable {
      */
     public CategoryTable(final Database database) {
         super(database);
+        final QueryType[] usage = {LIST, FILTERED_LIST};
+        name     = new Column   (query, "Categories", "name",     usage);
+        band     = new Column   (query, "Categories", "band",     LIST );
+        lower    = new Column   (query, "Categories", "lower",    usage);
+        upper    = new Column   (query, "Categories", "upper",    usage);
+        c0       = new Column   (query, "Categories", "c0",       usage);
+        c1       = new Column   (query, "Categories", "c1",       usage);
+        function = new Column   (query, "Categories", "function", usage);
+        colors   = new Column   (query, "Categories", "colors",   usage);
+        byBand   = new Parameter(query, band, FILTERED_LIST);
+        lower.setOrdering("ASC");
     }
 
     /**
@@ -113,19 +107,26 @@ public class CategoryTable extends Table implements Shareable {
      * @throws SQLException si l'interrogation de la table a échoué pour une autre raison.
      */
     public synchronized Category[] getCategories(final String band) throws CatalogException, SQLException {
-        final PreparedStatement statement = getStatement(SELECT);
-        statement.setString(ARGUMENT_BAND, band);
+        final PreparedStatement statement = getStatement(FILTERED_LIST);
+        statement.setString(indexOf(byBand), band);
+        final int nameIndex     = indexOf(name    );
+        final int lowerIndex    = indexOf(lower   );
+        final int upperIndex    = indexOf(upper   );
+        final int c0Index       = indexOf(c0      );
+        final int c1Index       = indexOf(c1      );
+        final int functionIndex = indexOf(function);
+        final int colorsIndex   = indexOf(colors  );
         final List<Category> categories = new ArrayList<Category>();
         final ResultSet result = statement.executeQuery();
         while (result.next()) {
             boolean isQuantifiable = true;
-            final String    name = result.getString (NAME);
-            final int      lower = result.getInt    (LOWER);
-            final int      upper = result.getInt    (UPPER);
-            final double      c0 = result.getDouble (C0); isQuantifiable &= !result.wasNull();
-            final double      c1 = result.getDouble (C1); isQuantifiable &= !result.wasNull();
-            final boolean    log = result.getBoolean(LOG);
-            final String colorID = result.getString (COLORS);
+            final String     name = result.getString(nameIndex);
+            final int       lower = result.getInt   (lowerIndex);
+            final int       upper = result.getInt   (upperIndex);
+            final double       c0 = result.getDouble(c0Index); isQuantifiable &= !result.wasNull();
+            final double       c1 = result.getDouble(c1Index); isQuantifiable &= !result.wasNull();
+            final String function = result.getString(functionIndex);
+            final String  colorID = result.getString(colorsIndex);
             /*
              * Procède maintenant au décodage du champ "colors". Ce champ contient
              * une chaîne de caractère qui indique soit le code RGB d'une couleur
@@ -134,10 +135,10 @@ public class CategoryTable extends Table implements Shareable {
             Color[] colors = null;
             if (colorID != null) try {
                 colors = decode(colorID);
-            } catch (IOException exception) {
-                throw new IllegalRecordException(result.getMetaData().getTableName(COLORS), exception);
-            } catch (ParseException exception) {
-                throw new IllegalRecordException(result.getMetaData().getTableName(COLORS), exception);
+            } catch (Exception exception) { // Includes IOException and ParseException
+                final String table = result.getMetaData().getTableName(colorsIndex);
+                result.close();
+                throw new IllegalRecordException(table, exception);
             }
             /*
              * Construit une catégorie correspondant à l'enregistrement qui vient d'être lu.
@@ -152,19 +153,26 @@ public class CategoryTable extends Table implements Shareable {
             } else {
                 // Catégorie quantitative
                 category = new Category(name, colors, range, c1, c0);
-                if (log) try {
-                    // Catégorie quantitative et logarithmique.
-                    final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(FACTORY_HINTS);
-                    if (exponential == null) {
-                        final ParameterValueGroup param = factory.getDefaultParameters("Exponential");
-                        param.parameter("base").setValue(10.0); // Must be a 'double'
-                        exponential = (MathTransform1D) factory.createParameterizedTransform(param);
+                if (function != null) {
+                    if (function.equalsIgnoreCase("log")) try {
+                        // Catégorie quantitative et logarithmique.
+                        final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
+                        if (exponential == null) {
+                            final ParameterValueGroup param = factory.getDefaultParameters("Exponential");
+                            param.parameter("base").setValue(10.0); // Must be a 'double'
+                            exponential = (MathTransform1D) factory.createParameterizedTransform(param);
+                        }
+                        MathTransform1D tr = category.getSampleToGeophysics();
+                        tr = (MathTransform1D) factory.createConcatenatedTransform(tr, exponential);
+                        category = new Category(name, colors, range, tr);
+                    } catch (FactoryException exception) {
+                        result.close();
+                        throw new ServerException(exception);
+                    } else {
+                        final String table = result.getMetaData().getTableName(functionIndex);
+                        result.close();
+                        throw new IllegalRecordException(table, "Fonction inconnue: " + function);
                     }
-                    MathTransform1D tr = category.getSampleToGeophysics();
-                    tr = (MathTransform1D) factory.createConcatenatedTransform(tr, exponential);
-                    category = new Category(name, colors, range, tr);
-                } catch (FactoryException exception) {
-                    throw new ServerException(exception);
                 }
             }
             categories.add(category);

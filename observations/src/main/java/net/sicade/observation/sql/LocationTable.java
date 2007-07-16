@@ -184,7 +184,7 @@ public class LocationTable extends Table implements Shareable {
         final  Line tangeant1 = new Line();
         final  Line tangeant2 = new Line();
         final  GeneralPath path = new GeneralPath();
-        final  PreparedStatement statement = getStatement(select);
+        final  PreparedStatement statement = getStatement(getProperty(select));
         statement.setString(ARGUMENT_ID, identifier);
         final ResultSet result  = statement.executeQuery();
         final Calendar calendar = getCalendar();

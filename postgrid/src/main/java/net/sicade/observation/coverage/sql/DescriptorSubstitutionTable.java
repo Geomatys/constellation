@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,24 +15,25 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE dependencies
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
-// Sicade dependencies
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
-import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
 import net.sicade.observation.coverage.LinearModel;
 import net.sicade.observation.coverage.Descriptor;
+import net.sicade.observation.sql.Column;
+import net.sicade.observation.sql.Parameter;
+import net.sicade.observation.sql.QueryType;
 import net.sicade.resources.i18n.ResourceKeys;
 import net.sicade.resources.i18n.Resources;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -49,24 +51,32 @@ import net.sicade.resources.i18n.Resources;
 @UsedBy(LinearModelTable.class)
 public class DescriptorSubstitutionTable extends Table implements Shareable {
     /**
-     * Requête SQL pour obtenir un descripteur.
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("DescriptorSubstitutions:SELECT",
-            "SELECT symbol1, symbol2\n"                    +
-            "  FROM \"TemporalGradientDescriptors\"\n" +
-            " WHERE symbol=?");
+    private final Column symbol, symbol1, symbol2;
 
     /**
-     * La table des descripteurs du paysage océanique. Ne sera construit que la première fois
-     * où elle sera nécessaire.
+     * Parameter declared in the {@linkplain #query query}.
+     */
+    private final Parameter bySymbol;
+
+    /**
+     * The descriptor table. Will be created only when first needed.
      */
     private DescriptorTable descriptors;
 
     /**
-     * Construit une nouvelle instance de cette table pour la base de données spécifiée.
+     * Creates a descriptor substitution table.
+     * 
+     * @param database Connection to the database.
      */
     public DescriptorSubstitutionTable(final Database database) {
         super(database);
+        final QueryType[] usage = {SELECT, LIST};
+        symbol   = new Column   (query, "TemporalGradientDescriptors", "symbol",  LIST);
+        symbol1  = new Column   (query, "TemporalGradientDescriptors", "symbol1", usage);
+        symbol2  = new Column   (query, "TemporalGradientDescriptors", "symbol2", usage);
+        bySymbol = new Parameter(query, symbol, SELECT);
     }
 
     /**
@@ -100,14 +110,14 @@ public class DescriptorSubstitutionTable extends Table implements Shareable {
     {
         final PreparedStatement statement = getStatement(SELECT);
         final String key = descriptor.getName();
-        statement.setString(1, key);
+        statement.setString(indexOf(bySymbol), key);
         final ResultSet results = statement.executeQuery();
         if (!results.next()) {
             results.close();
             return null;
         }
-        final String symbol1 = results.getString(1);
-        final String symbol2 = results.getString(2);
+        final String symbol1 = results.getString(indexOf(this.symbol1));
+        final String symbol2 = results.getString(indexOf(this.symbol2));
         if (results.next()) {
             final String table = results.getMetaData().getTableName(1);
             results.close();
@@ -119,7 +129,7 @@ public class DescriptorSubstitutionTable extends Table implements Shareable {
             throw new IllegalRecordException(null, "Définition récursive d'un gradient temporel.");
         }
         if (descriptors == null) {
-            descriptors = database.getTable(DescriptorTable.class);
+            descriptors = getDatabase().getTable(DescriptorTable.class);
         }
         final Descriptor d1 = descriptors.getEntry(symbol1);
         final Descriptor d2 = descriptors.getEntry(symbol2);

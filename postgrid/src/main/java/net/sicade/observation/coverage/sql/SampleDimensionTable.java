@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,18 +26,19 @@ import javax.units.Unit;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
-
-// Sicade dependencies
-import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
+import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
+import net.sicade.observation.sql.Parameter;
+import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
+import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -56,21 +58,14 @@ import net.sicade.resources.i18n.ResourceKeys;
 @UsedBy(FormatTable.class)
 public class SampleDimensionTable extends Table implements Shareable {
     /**
-     * Requête SQL utilisée par cette classe pour obtenir la table des bandes.
-     * L'ordre des colonnes est essentiel. Ces colonnes sont référencées par
-     * les constantes {@link #BAND}, {@link #UNITS} et compagnie.
+     * Column name declared in the {@linkplain #query query}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("SampleDimensions:SELECT",
-            "SELECT identifier, "           +   // [01] ID
-                   "band, "                 +   // [02] BAND
-                   "units\n"                +   // [04] UNITS
-            "  FROM \"SampleDimensions\"\n" +
-            " WHERE format=? ORDER BY band");
+    private final Column identifier, format, band, units;
 
-    /** Numéro d'argument. */ private static final int ARGUMENT_FORMAT = 1;
-    /** Numéro de colonne. */ private static final int ID              = 1;
-    /** Numéro de colonne. */ private static final int BAND            = 2;
-    /** Numéro de colonne. */ private static final int UNITS           = 3;
+    /**
+     * Parameter declared in the {@linkplain #query query}.
+     */
+    private final Parameter byFormat;
 
     /**
      * Connexion vers la table des {@linkplain Category catégories}.
@@ -85,6 +80,13 @@ public class SampleDimensionTable extends Table implements Shareable {
      */
     public SampleDimensionTable(final Database database) {
         super(database);
+        final QueryType[] usage = {LIST, FILTERED_LIST};
+        identifier = new Column   (query, "SampleDimensions", "identifier", usage);
+        format     = new Column   (query, "SampleDimensions", "format",     LIST );
+        band       = new Column   (query, "SampleDimensions", "band",       usage);
+        units      = new Column   (query, "SampleDimensions", "units",      usage);
+        byFormat   = new Parameter(query, format, FILTERED_LIST);
+        band.setOrdering("ASC");
     }
 
     /**
@@ -98,28 +100,31 @@ public class SampleDimensionTable extends Table implements Shareable {
     public synchronized GridSampleDimension[] getSampleDimensions(final String format)
             throws CatalogException, SQLException
     {
-        final PreparedStatement statement = getStatement(SELECT);
-        statement.setString(ARGUMENT_FORMAT, format);
+        final PreparedStatement statement = getStatement(FILTERED_LIST);
+        statement.setString(indexOf(byFormat), format);
+        final int idIndex   = indexOf(identifier);
+        final int bandIndex = indexOf(band);
+        final int unitIndex = indexOf(units);
         int lastBand = 0;
         final List<GridSampleDimension> sampleDimensions = new ArrayList<GridSampleDimension>();
         final ResultSet result = statement.executeQuery();
         while (result.next()) {
-            final String identifier = result.getString(ID);
-            final int          band = result.getInt   (BAND); // Comptées à partir de 1.
-            final String unitSymbol = result.getString(UNITS);
+            final String identifier = result.getString(idIndex);
+            final int          band = result.getInt   (bandIndex); // Comptées à partir de 1.
+            final String unitSymbol = result.getString(unitIndex);
             final Unit         unit = (unitSymbol != null) ? Unit.searchSymbol(unitSymbol) : null;
             if (categories == null) {
-                categories = database.getTable(CategoryTable.class);
+                categories = getDatabase().getTable(CategoryTable.class);
             }
             final Category[] categoryArray = categories.getCategories(identifier);
             final GridSampleDimension sampleDimension;
             try {
                 sampleDimension = new GridSampleDimension(identifier, categoryArray, unit);
             } catch (IllegalArgumentException exception) {
-                throw new IllegalRecordException(result.getMetaData().getTableName(ID), exception);
+                throw new IllegalRecordException(result.getMetaData().getTableName(idIndex), exception);
             }
             if (band-1 != lastBand) {
-                throw new IllegalRecordException(result.getMetaData().getTableName(BAND),
+                throw new IllegalRecordException(result.getMetaData().getTableName(bandIndex),
                                 Resources.format(ResourceKeys.ERROR_NON_CONSECUTIVE_BANDS_$2,
                                                  new Integer(lastBand), new Integer(band)));
             }

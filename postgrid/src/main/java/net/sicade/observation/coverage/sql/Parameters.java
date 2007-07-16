@@ -70,6 +70,11 @@ final class Parameters implements Serializable {
     public final String pathname;
 
     /**
+     * Extension (sans le point) des noms de fichier des images à lire.
+     */
+    public final String extension;
+
+    /**
      * La partie temporelle de {@link #tableCRS}. Ne sera construit que la première fois
      * où elle sera nécessaire.
      */
@@ -139,6 +144,7 @@ final class Parameters implements Serializable {
      * @param layer Référence vers la couche d'images.
      * @param format Format à utiliser pour lire les images.
      * @param pathname Chemin relatif des images.
+     * @param extension Extension (sans le point) des noms de fichier des images à lire.
      * @param operation Opération à appliquer sur les images, ou {@code null}.
      * @param tableCRS Système de référence des coordonnées de la table. Le système de
      *        coordonnées de tête ("head") doit obligatoirement être un CRS horizontal.
@@ -156,6 +162,7 @@ final class Parameters implements Serializable {
     public Parameters(final Layer                     layer,
                       final FormatEntry               format,
                       final String                    pathname,
+                      final String                    extension,
                       final Operation                 operation,
                       final CoordinateReferenceSystem tableCRS,
                       final CoordinateReferenceSystem coverageCRS,
@@ -169,6 +176,7 @@ final class Parameters implements Serializable {
         this.layer          = layer;
         this.format         = format;
         this.pathname       = pathname;
+        this.extension      = extension;
         this.operation      = operation;
         this.tableCRS       = tableCRS;
         this.coverageCRS    = coverageCRS;
@@ -190,6 +198,7 @@ final class Parameters implements Serializable {
             return Utilities.equals(this.layer          , that.layer           ) &&
                    Utilities.equals(this.format         , that.format          ) &&
                    Utilities.equals(this.pathname       , that.pathname        ) &&
+                   Utilities.equals(this.extension      , that.extension       ) &&
                    Utilities.equals(this.operation      , that.operation       ) &&
                    Utilities.equals(this.tableCRS       , that.tableCRS        ) &&
                    Utilities.equals(this.coverageCRS    , that.coverageCRS     ) &&
@@ -236,8 +245,7 @@ final class Parameters implements Serializable {
             sourceCRS = CRSUtilities.getCRS2D(sourceCRS);
             targetCRS = CRSUtilities.getCRS2D(targetCRS);
             if (tableToCoverageCRS == null) try {
-                tableToCoverageCRS = (MathTransform2D) CoordinateReferenceSystemTable.TRANSFORMS
-                        .createOperation(sourceCRS, targetCRS).getMathTransform();
+                tableToCoverageCRS = (MathTransform2D) CRS.findMathTransform(sourceCRS, targetCRS);
             } catch (FactoryException exception) {
                 throw new TransformException(exception.getLocalizedMessage(), exception);
             }

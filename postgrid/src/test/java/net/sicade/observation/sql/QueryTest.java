@@ -108,6 +108,7 @@ public class QueryTest extends DatabaseTest {
         final Parameter byId       = new Parameter(query, identifier, SELECT_BY_IDENTIFIER);
         name      .setRole(Role.NAME);
         identifier.setRole(Role.IDENTIFIER);
+        byId.setComparator("IS NULL OR >=");
 
         assertEquals(1, name      .indexOf(SELECT));
         assertEquals(1, name      .indexOf(SELECT_BY_IDENTIFIER));
@@ -135,11 +136,11 @@ public class QueryTest extends DatabaseTest {
         assertEquals(expectedAll, actual);
 
         actual = query.select(SELECT);
-        String expected = expectedAll + " WHERE \"name\"=?";
+        String expected = expectedAll + " WHERE (\"name\" = ?)";
         assertEquals(expected, actual);
 
         actual = query.select(SELECT_BY_IDENTIFIER);
-        expected = expectedAll + " WHERE \"identifier\"=?";
+        expected = expectedAll + " WHERE (\"identifier\" IS NULL OR \"identifier\" >= ?)";
         assertEquals(expected, actual);
     }
 }

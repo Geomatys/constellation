@@ -23,7 +23,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import org.geotools.factory.Hints;
+import java.util.logging.Logger;
 import org.geotools.resources.Utilities;
 import net.sicade.observation.Element;
 import net.sicade.observation.ConfigurationKey;
@@ -66,6 +66,11 @@ import net.sicade.observation.CatalogException;
  */
 public class Table {
     /**
+     * The logger for table-related events.
+     */
+    protected static final Logger LOGGER = Element.LOGGER;
+
+    /**
      * A timer for closing {@link #statement} after some delay. Some subclasses cache their
      * values, so the statement may not be needed anymore even if the table still in use.
      */
@@ -75,19 +80,6 @@ public class Table {
      * The minimal delay (in millisecondes) to wait before to close {@link #statement}.
      */
     private static final long DELAY = 3 * (60*1000L);
-
-    /**
-     * The hints to be given to Geotools {@code FactoryFinder}.
-     */
-    protected static final Hints FACTORY_HINTS = null;
-
-    /**
-     * The database that contains this table.
-     *
-     * @deprecated Use {@link #getDatabase} instead.
-     */
-    @Deprecated
-    protected final Database database;
 
     /**
      * The query to execute. Subclasses should create {@link Column} and {@code Parameter}
@@ -178,9 +170,16 @@ public class Table {
      *
      * @param database The database that contains this table.
      */
+    @Deprecated
     protected Table(final Database database) {
-        this.database = database;
-        query = new Query(database);
+        this(new Query(database));
+    }
+
+    /**
+     * Creates a new table using the specified query.
+     */
+    protected Table(final Query query) {
+        this.query = query;
         lastAccess = System.currentTimeMillis();
     }
 
@@ -190,7 +189,6 @@ public class Table {
      * <strong>not</strong> modify the query.
      */
     protected Table(final Table table) {
-        database   = table.database;
         query      = table.query;
         lastAccess = System.currentTimeMillis();
     }
@@ -270,12 +268,16 @@ public class Table {
         if (statement != null) {
             if (changed) {
                 configure(queryType, statement);
+                final Level level = queryType!=null ? queryType.level : Level.FINE;
+                if (LOGGER.isLoggable(level)) {
+                    final LogRecord record = new LogRecord(level,
+                            getDatabase().isStatementFormatted() ? statement.toString() : query);
+                    record.setSourceClassName(getClass().getName());
+                    record.setSourceMethodName(getCallerMethodName(queryType));
+                    LOGGER.log(record);
+                }
             }
             lastAccess = System.currentTimeMillis();
-            final LogRecord record = new LogRecord(queryType!=null ? queryType.level : Level.FINE, query);
-            record.setSourceClassName(getClass().getName());
-            record.setSourceMethodName(getCallerMethodName(queryType));
-            Element.LOGGER.log(record);
         }
         return statement;
     }
@@ -307,6 +309,25 @@ public class Table {
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         assert Thread.holdsLock(this);
         changed = false;
+    }
+
+    /**
+     * Delegates to <code>element.{@linkplain IndexedSqlElement#indexOf indexOf}(type)</code>,
+     * except that an exception is thrown if the specified element is not applicable to the
+     * current query type. The {@code type} value is the argument given to the last call to
+     * {@link #getStatement(QueryType)}.
+     *
+     * @param  role The element.
+     * @return The element index (starting with 1).
+     * @throws CatalogException if the specified element is not applicable.
+     */
+    protected final int indexOf(final IndexedSqlElement element) throws CatalogException {
+        final int index = element.indexOf(queryType);
+        if (index > 0) {
+            return index;
+        } else {
+            throw new CatalogException("L'élément " + element + " ne s'applique pas au type " + queryType);
+        }
     }
 
     /**

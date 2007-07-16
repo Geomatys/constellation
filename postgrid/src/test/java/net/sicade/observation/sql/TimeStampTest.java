@@ -14,7 +14,6 @@
  */
 package net.sicade.observation.sql;
 
-// J2SE dependencies
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,9 +24,7 @@ import java.util.Calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
-
-// Sicade dependencies
-import net.sicade.observation.coverage.AbstractTest;
+import org.junit.*;
 
 
 /**
@@ -36,17 +33,11 @@ import net.sicade.observation.coverage.AbstractTest;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TimeStampTest extends AbstractTest {
-    /**
-     * Construit la suite de tests.
-     */
-    public TimeStampTest(final String name) {
-        super(name);
-    }
-
+public class TimeStampTest extends DatabaseTest {
     /**
      * Tests la méthode {@link {@link ResultSet#getTimestamp(int,Calendar)}.
      */
+    @Test
     public void testGet() throws SQLException {
         final TimeZone UTC = TimeZone.getTimeZone("UTC");
         final Calendar cal = new GregorianCalendar(UTC, Locale.CANADA);
