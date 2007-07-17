@@ -37,9 +37,9 @@ public class Parameter extends IndexedSqlElement {
      *
      * @param query  The query for which the parameter is created.
      * @param column The column on which the parameter is applied.
-     * @param types  The query types for which the parameter applies.
+     * @param types Types of the queries where the parameter shall appears.
      */
-    public Parameter(final Query query, final Column column, final QueryType... types) {
+    protected Parameter(final Query query, final Column column, final QueryType... types) {
         super(query, types);
         this.column = column;
     }

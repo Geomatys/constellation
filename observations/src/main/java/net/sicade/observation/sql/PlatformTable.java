@@ -95,7 +95,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
      * spécifiée.
      */
     public PlatformTable(final Database database) {
-        super(database, CRS.XYZT);
+        super(new Query(database), CRS.XYZT); // TODO
     }
 
     /**

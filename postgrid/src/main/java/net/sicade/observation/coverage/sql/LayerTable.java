@@ -15,13 +15,11 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE dependencies
 import java.util.Collections;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.rmi.RemoteException;
 
-// Sicade dependencies
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.DynamicCoverage;
 import net.sicade.observation.CatalogException;
@@ -30,19 +28,14 @@ import net.sicade.observation.sql.CRS;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.sql.ProcedureTable;
 import net.sicade.observation.sql.BoundedSingletonTable;
 import net.sicade.observation.coverage.rmi.DataConnection;
 import net.sicade.observation.coverage.rmi.DataConnectionFactory;
-import net.sicade.observation.sql.Column;
-import net.sicade.observation.sql.Parameter;
-import net.sicade.observation.sql.Role;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers la table des {@linkplain Layer couches}.
+ * Connection to a table of {@linkplain Layer layers}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -57,47 +50,6 @@ import static net.sicade.observation.sql.QueryType.*;
 @Use({ThematicTable.class, ProcedureTable.class, LinearModelTable.class, SeriesTable.class, GridCoverageTable.class})
 @UsedBy(DescriptorTable.class)
 public class LayerTable extends BoundedSingletonTable<Layer> {
-    /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column name, thematic, period, fallback, remarks;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byName;
-    
-//    private static final SpatialConfigurationKey LIST = new SpatialConfigurationKey("Layer:LIST",
-//            "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
-//            "  FROM \"Layers\" "                                                       +
-//            "  JOIN (\n"                                                               +
-//            "   SELECT DISTINCT layer, visible FROM \"Series\"\n"                      +
-//            "   JOIN \"GridCoverages\""         + " ON series=\"Series\".identifier\n" +
-//            "   JOIN \"GridGeometries\""        + " ON extent=\"GridGeometries\".id\n" +
-//            "   WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                 +
-//            "     AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                 +
-//            "     AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"     +
-//            "     AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"     +
-//            "     AND (\"altitudeMax\"       >=? AND \"altitudeMin\"<=?)\n"            +
-//            "  ) "                                                                     +
-//            "  AS \"Selected\" ON layer=\"Layers\".name\n"                             +
-//            "  WHERE visible=TRUE\n"                                                   +
-//            "  ORDER BY name",
-//
-//            "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
-//            "  FROM \"Layers\" "                                                       +
-//            "  JOIN (\n"                                                               +
-//            "   SELECT DISTINCT layer, visible FROM \"Series\"\n"                      +
-//            "   JOIN \"GridCoverages\""         + " ON series=\"Series\".identifier\n" +
-//            "   JOIN \"GridGeometries\""        + " ON extent=\"GridGeometries\".id\n" +
-//            "   WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                 +
-//            "     AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                 +
-//            "     AND (\"spatialExtent\" && ?)\n"     +
-//            "  ) "                                                                     +
-//            "  AS \"Selected\" ON layer=\"Layers\".name\n"                             +
-//            "  WHERE visible=TRUE\n"                                                   +
-//            "  ORDER BY name");
-
     /**
      * Connexion vers la table des thématiques.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
@@ -149,34 +101,32 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     }
 
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
-     *
-     * @param database Connexion vers la base de données d'observations.
+     * Creates a layer table.
+     * 
+     * @param database Connection to the database.
      */
     public LayerTable(final Database database) {
-        super(database, CRS.XYT);
-        final QueryType[] usage = {SELECT, LIST};
-        name      = new Column   (query, "Layers", "name",        usage);
-        thematic  = new Column   (query, "Layers", "thematic",    usage);
-        period    = new Column   (query, "Layers", "period",      usage);
-        fallback  = new Column   (query, "Layers", "fallback",    usage);
-        remarks   = new Column   (query, "Layers", "description", usage);
-        byName    = new Parameter(query, name, SELECT);
-        name.setRole(Role.NAME);
+        super(new LayerQuery(database), CRS.XYT);
     }
 
     /**
-     * Construit une couche pour l'enregistrement courant.
+     * Creates a layer for the current row in the specified result set.
+     *
+     * @param  results The result set to read.
+     * @return The entry for current row in the specified result set.
+     * @throws CatalogException if an inconsistent record is found in the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     protected Layer createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final String name      = results.getString(indexOf(this.name     ));
-        final String thematic  = results.getString(indexOf(this.thematic ));
-        double       period    = results.getDouble(indexOf(this.period   ));
+        final LayerQuery query = (LayerQuery) super.query;
+        final String name      = results.getString(indexOf(query.name     ));
+        final String thematic  = results.getString(indexOf(query.thematic ));
+        double       period    = results.getDouble(indexOf(query.period   ));
         if (results.wasNull()) {
             period = Double.NaN;
         }
-        final String fallback  = results.getString(indexOf(this.fallback));
-        final String remarks   = results.getString(indexOf(this.remarks ));
+        final String fallback  = results.getString(indexOf(query.fallback));
+        final String remarks   = results.getString(indexOf(query.remarks ));
         if (thematics == null) {
             thematics = getDatabase().getTable(ThematicTable.class);
         }
@@ -192,13 +142,14 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     }
 
     /**
-     * Complète la construction de la couche. Cette méthode construit les éléments suivants:
+     * Completes the creation of the specified element. This method add the following piece
+     * to the given layer:
      * <p>
      * <ul>
-     *   <li>La  {@linkplain Layer#getFallback couche de second recours}, s'il y en a une.</li>
-     *   <li>Les {@linkplain Layer#getSeries séries}.</li>
-     *   <li>La  {@linkplain LayerEntry#setDataConnection connexion aux données}.</li>
-     *   <li>Le  {@linkplain LayerEntry#getModel modèle linéaire}.</li>
+     *   <li>The {@linkplain Layer#getFallback fallback layer}, if any.</li>
+     *   <li>The {@linkplain Layer#getSeries series}.</li>
+     *   <li>The {@linkplain LayerEntry#setDataConnection data connection}.</li>
+     *   <li>The {@linkplain LayerEntry#getModel linear model}, if any.</li>
      * </ul>
      */
     @Override
@@ -255,16 +206,13 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
             throw new ServerException(exception);
         }
         entry.setDataConnection(data);
-        /*
-         * Construit le modèle linéaire. Notez que l'on utilise 'createTable' plutôt que
-         * 'getTable' car on ne veut pas partager cette instance de 'LinearModelTable',
-         * à cause de notre appel à 'setDescriptorTable'.
-         */
         if (models == null) {
-            final DescriptorTable descriptors;
             final Database database = getDatabase();
-            descriptors = database.createTable(DescriptorTable .class); descriptors.setLayerTable(this);
-            models      = database.createTable(LinearModelTable.class); models.setDescriptorTable(descriptors);
+            DescriptorTable descriptors = database.getTable(DescriptorTable.class);
+            descriptors = new DescriptorTable(descriptors); // Protect the shared instance from changes.
+            descriptors.setLayerTable(this);
+            models = new LinearModelTable(database.getTable(LinearModelTable.class));
+            models.setDescriptorTable(descriptors);
         }
         entry.model = models.getEntry(entry);
     }

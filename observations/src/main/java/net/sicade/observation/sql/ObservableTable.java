@@ -72,7 +72,7 @@ public class ObservableTable extends SingletonTable<Observable> implements Share
      * @param  database Connexion vers la base de données.
      */
     public ObservableTable(final Database database) {
-        super(database);
+        super(new Query(database)); // TODO
     }
 
     /**

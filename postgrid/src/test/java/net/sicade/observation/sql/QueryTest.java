@@ -71,8 +71,8 @@ public class QueryTest extends DatabaseTest {
         final Column layer     = new Column(query, "Series",         "layer");
         final Column pathname  = new Column(query, "Series",         "pathname");
         final Column filename  = new Column(query, "GridCoverages",  "filename");
-        final Column startTime = new Column(query, "GridCoverages",  "startTime", "tmin");
-        final Column endTime   = new Column(query, "GridCoverages",  "endTime",   "tmax");
+        final Column startTime = new Column(query, "GridCoverages",  "startTime", "tmin", (QueryType[]) null);
+        final Column endTime   = new Column(query, "GridCoverages",  "endTime",   "tmax", (QueryType[]) null);
         final Column width     = new Column(query, "GridGeometries", "width");
         final Column height    = new Column(query, "GridGeometries", "height");
         final Column format    = new Column(query, "Series",         "format");
@@ -102,7 +102,7 @@ public class QueryTest extends DatabaseTest {
     public void testParameters() throws SQLException {
         final Query     query      = new Query(database);
         final Column    name       = new Column   (query, "Categories", "name");
-        final Column    identifier = new Column   (query, "Categories", "lower", "identifier");
+        final Column    identifier = new Column   (query, "Categories", "lower", "identifier", (QueryType[]) null);
         final Column    colors     = new Column   (query, "Categories", "colors");
         final Parameter byName     = new Parameter(query, name,       SELECT);
         final Parameter byId       = new Parameter(query, identifier, SELECT_BY_IDENTIFIER);

@@ -62,6 +62,7 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @todo Beaucoup de parties de cette classe ne sont pas encore fonctionnelles.
  */
+@Deprecated
 public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * The SQL instruction for inserting a new grid coverage.

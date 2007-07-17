@@ -73,28 +73,18 @@ public abstract class SingletonTable<E extends Element> extends Table {
     private final Map<Object,E> pool = new WeakValueHashMap();
 
     /**
-     * Creates a new table connected to the specified database. Subclass constructors should
-     * add {@link Column} and {@code Parameter} instances to their {@linkplain #query query}.
-     * See {@linkplain Table class javadoc}.
-     *
-     * @param database The database that contains this table.
-     */
-    @Deprecated
-    protected SingletonTable(final Database database) {
-        super(database);
-    }
-
-    /**
-     * Creates a new table using the specified query.
+     * Creates a new table using the specified query. The query given in argument should be some
+     * subclass with {@link Query#addColumn addColumn} or {@link Query#addParameter addParameter}
+     * methods invoked in its constructor.
      */
     protected SingletonTable(final Query query) {
         super(query);
     }
 
     /**
-     * Creates a new table connected to the same {@linkplain #database database} and using
-     * the same {@linkplain #query query} than the specified table. Subclass constructors
-     * should <strong>not</strong> modify the query.
+     * Creates a new table connected to the same {@linkplain #getDatabase database} and using
+     * the same {@linkplain #query query} than the specified table. Subclass constructors should
+     * not modify the query, since it is shared.
      */
     protected SingletonTable(final SingletonTable<E> table) {
         super(table);

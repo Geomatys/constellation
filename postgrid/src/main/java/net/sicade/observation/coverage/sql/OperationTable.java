@@ -17,26 +17,19 @@ package net.sicade.observation.coverage.sql;
 
 import java.sql.SQLException;
 import java.sql.ResultSet;
-
 import org.opengis.parameter.ParameterValueGroup;
+
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.IllegalRecordException;
 import net.sicade.observation.coverage.Operation;
-import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Parameter;
-import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers la table des {@linkplain Operation opérations} susceptibles d'être appliquées
- * sur des images.
+ * Connection to the table of image {@linkplain Operation operations}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
@@ -45,16 +38,6 @@ import static net.sicade.observation.sql.QueryType.*;
 @Use(OperationParameterTable.class)
 @UsedBy(DescriptorTable.class)
 public class OperationTable extends SingletonTable<Operation> implements Shareable {
-    /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column name, prefix, operation, remarks;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byName;
-
     /** 
      * La table des paramètres des opérations. Ne sera construite que la première fois
      * où elle sera nécessaire.
@@ -62,35 +45,30 @@ public class OperationTable extends SingletonTable<Operation> implements Shareab
     private OperationParameterTable parameters;
 
     /** 
-     * Construit une table des opérations.
+     * Creates an operation table.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param database Connection to the database.
      */
     public OperationTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        name      = new Column   (query, "Operations", "name",        usage);
-        prefix    = new Column   (query, "Operations", "prefix",      usage);
-        operation = new Column   (query, "Operations", "operation",   usage);
-        remarks   = new Column   (query, "Operations", "description", usage);
-        byName    = new Parameter(query, name, SELECT);
-        name.setRole(Role.NAME);
+        super(new OperationQuery(database));
     }
 
     /**
-     * Construit une opération pour l'enregistrement courant.
+     * Creates an operation for the current row in the specified result set.
      *
-     * @throws  SQLException            Si l'interrogation de la base de données a échoué.
-     * @throws  IllegalRecordException  Si un des paramètres trouvés dans la base de données
-     *          n'est pas connu par le groupe {@code parameters}, ou a une valeur invalide.
+     * @param  results The result set to read.
+     * @return The entry for current row in the specified result set.
+     * @throws CatalogException if an inconsistent record is found in the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     protected Operation createEntry(final ResultSet results) throws SQLException, CatalogException {
-        final String              name      = results.getString(indexOf(this.name     ));
-        final String              prefix    = results.getString(indexOf(this.prefix   ));
-        final String              operation = results.getString(indexOf(this.operation));
-        final String              remarks   = results.getString(indexOf(this.remarks  ));
-        final OperationEntry      entry     = new OperationEntry(name, prefix, operation, remarks);
-        final ParameterValueGroup values    = entry.getParameters();
+        final OperationQuery query = (OperationQuery) super.query;
+        final String name      = results.getString(indexOf(query.name     ));
+        final String prefix    = results.getString(indexOf(query.prefix   ));
+        final String operation = results.getString(indexOf(query.operation));
+        final String remarks   = results.getString(indexOf(query.remarks  ));
+        final OperationEntry entry = new OperationEntry(name, prefix, operation, remarks);
+        final ParameterValueGroup values = entry.getParameters();
         if (values != null) {
             if (parameters == null) {
                 parameters = getDatabase().getTable(OperationParameterTable.class);

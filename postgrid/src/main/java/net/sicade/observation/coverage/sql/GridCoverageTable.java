@@ -15,32 +15,29 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// Utilitaires
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-
-// Géométries et positions géographiques
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
-
-// Base de données en entrés/sorties
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.text.DateFormat;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
-// Geotools et GeoAPI
 import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -49,7 +46,6 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-// Sicade
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Operation;
@@ -142,7 +138,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * Index des ordonnées dans une position géographique qui correspondent aux coordonnées
      * (<var>x</var>,<var>y</var>) dans une image.
      *
-     * @todo Codés en dure pour l'instant. Peut avoir besoin d'être paramètrables dans une
+     * @todo Codés en dur pour l'instant. Peut avoir besoin d'être paramètrables dans une
      *       version future.
      */
     private static final int xDimension=0, yDimension=1;
@@ -182,11 +178,17 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private transient Envelope envelope;
 
     /**
-     * Derniers paramètres à avoir été construit. Ces paramètres sont
+     * Derniers paramètres à avoir été construits. Ces paramètres sont
      * retenus afin d'éviter d'avoir à les reconstruires trop souvent
      * si c'est évitable.
      */
     private transient Parameters parameters;
+
+    /**
+     * The set of available depths for each dates. Will be computed by
+     * {@link #getAvailableCentroids} when first needed.
+     */
+    private transient Map<Date, Set<Number>> availableCentroids;
 
     /**
      * Une vue tri-dimensionnelle de toutes les données d'une couche.
@@ -497,36 +499,82 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Returns the date for which an image is available.
+     * Returns the set of dates for which a coverage is available. Only the images in
+     * the currently {@linkplain #setTimeRange selected time range} are considered.
      *
+     * @return The set of dates.
      * @throws SQLException If an error occured while reading the database.
      */
-    public synchronized Set<Date> getAvailableTimes() throws CatalogException, SQLException {
-        final Set<Date>         times     = new TreeSet<Date>();
-        final Calendar          calendar  = getCalendar();
-        final GridCoverageQuery query     = (GridCoverageQuery) super.query;
-        final PreparedStatement statement = getStatement(QueryType.AVAILABLE_DATA);
-        final ResultSet         results   = statement.executeQuery();
-        final int startTimeIndex = indexOf(query.startTime);
-        final int endTimeIndex   = indexOf(query.startTime);
-        while (results.next()) {
-            final Date startTime = results.getTimestamp(startTimeIndex, calendar);
-            final Date   endTime = results.getTimestamp(  endTimeIndex, calendar);
-            final Date      time;
-            if (startTime != null) {
-                if (endTime != null) {
-                    time = new Date((startTime.getTime() + endTime.getTime()) / 2);
+    public Set<Date> getAvailableTimes() throws SQLException {
+        return getAvailableCentroids().keySet();
+    }
+
+    /**
+     * Returns the available altitudes for each dates. This method returns portion of "centroids",
+     * i.e. vertical ranges are replaced by the middle vertical points and temporal ranges are
+     * replaced by the middle time. This method considers only the vertical and temporal axis.
+     * The horizontal axis are omitted.
+     *
+     * @return An immutable collection of centroids. Keys are the dates, are values ar the set
+     *         of altitudes for that date.
+     * @throws SQLException If an error occured while reading the database.
+     */
+    public synchronized Map<Date, Set<Number>> getAvailableCentroids() throws SQLException {
+        if (availableCentroids == null) {
+            availableCentroids = new TreeMap<Date, Set<Number>>();
+            final GridCoverageQuery  query     = (GridCoverageQuery) super.query;
+            final Calendar           calendar  = getCalendar();
+            final PreparedStatement  statement = getStatement(QueryType.AVAILABLE_DATA);
+            final ResultSet          results   = statement.executeQuery();
+            final int startTimeIndex = indexOf(query.startTime);
+            final int endTimeIndex   = indexOf(query.  endTime);
+            final int zminIndex      = indexOf(query.zmin);
+            final int zmaxIndex      = indexOf(query.zmax);
+            while (results.next()) {
+                final Date startTime = results.getTimestamp(startTimeIndex, calendar);
+                final Date   endTime = results.getTimestamp(  endTimeIndex, calendar);
+                final Date      time;
+                if (startTime != null) {
+                    if (endTime != null) {
+                        time = new Date((startTime.getTime() + endTime.getTime()) / 2);
+                    } else {
+                        time = new Date(startTime.getTime());
+                    }
+                } else if (endTime != null) {
+                    time = new Date(endTime.getTime());
                 } else {
-                    time = new Date(startTime.getTime());
+                    continue;
                 }
-            } else if (endTime != null) {
-                time = new Date(endTime.getTime());
-            } else {
-                continue;
+                Set<Number> depths = availableCentroids.get(time);
+                if (depths == null) {
+                    depths = new TreeSet<Number>();
+                    availableCentroids.put(time, depths);
+                }
+                double zmin = results.getDouble(zminIndex); if (results.wasNull()) zmin=Double.NEGATIVE_INFINITY;
+                double zmax = results.getDouble(zmaxIndex); if (results.wasNull()) zmax=Double.POSITIVE_INFINITY;
+                double z = (zmin + zmax) / 2;
+                if (!Double.isNaN(z) && !Double.isInfinite(z)) {
+                    depths.add(z);
+                }
             }
-            times.add(time);
+            /*
+             * Replaces the depths tree by shared instances, in order to reduce memory usage.
+             * It is quite common to have many dates (if not all) associated with identical
+             * set of depth values.
+             */
+            final Map<Set<Number>, Set<Number>> pool = new HashMap<Set<Number>, Set<Number>>();
+            for (final Map.Entry<Date, Set<Number>> entry : availableCentroids.entrySet()) {
+                Set<Number> current = entry.getValue();
+                Set<Number> shared  = pool.get(current);
+                if (shared == null) {
+                    shared = Collections.unmodifiableSet(current);
+                    pool.put(current, shared);
+                }
+                entry.setValue(shared);
+            }
+            availableCentroids = Collections.unmodifiableMap(availableCentroids);
         }
-        return times;
+        return availableCentroids;
     }
 
     /**
@@ -542,18 +590,18 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws SQLException si la base de données n'a pas pu être interrogée.
      */
     public synchronized DataAvailability getRanges(final DataAvailability ranges)
-            throws CatalogException, SQLException
+            throws SQLException
     {
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
         long  lastEndTime        = Long.MIN_VALUE;
         final Calendar calendar  = getCalendar();
-        final ResultSet  result  = getStatement(SELECT).executeQuery();
+        final ResultSet  result  = getStatement(AVAILABLE_DATA).executeQuery();
         final int startTimeIndex = indexOf(query.startTime);
         final int   endTimeIndex = indexOf(query.endTime);
-        final int xminIndex      = indexOf(query.spatialExtent);
-        final int xmaxIndex      = indexOf(query.spatialExtent);  // TODO
-        final int yminIndex      = indexOf(query.spatialExtent);  // TODO
-        final int ymaxIndex      = indexOf(query.spatialExtent);  // TODO
+        final int xminIndex      = indexOf(query.xmin);
+        final int xmaxIndex      = indexOf(query.xmax);
+        final int yminIndex      = indexOf(query.ymin);
+        final int ymaxIndex      = indexOf(query.ymax);
         while (result.next()) {
             if (ranges.t != null) {
                 final long timeInterval = Math.round(layer.getTimeInterval() * LocationOffsetEntry.DAY);
@@ -792,6 +840,7 @@ loop:   for (final CoverageReference newReference : entries) {
         parameters = null;
         comparator = null;
         envelope   = null;
+        availableCentroids = null;
     }
 
     /**

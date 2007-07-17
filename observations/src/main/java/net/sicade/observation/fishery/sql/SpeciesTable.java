@@ -59,7 +59,7 @@ public class SpeciesTable extends SingletonTable<Species> implements Shareable {
      * @param  database Connexion vers la base de données.
      */
     public SpeciesTable(final Database database) {
-        super(database);
+        super(new net.sicade.observation.sql.Query(database)); // TODO
     }
 
     /**

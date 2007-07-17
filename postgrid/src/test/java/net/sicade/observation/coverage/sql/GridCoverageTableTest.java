@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import net.sicade.observation.CatalogException;
@@ -67,9 +68,12 @@ public class GridCoverageTableTest extends DatabaseTest {
         assertTrue(entries.contains(entry));
         assertSame(entry, table.getEntry());
 
-        final Set<Date> times = table.getAvailableTimes();
-        assertEquals(entries.size(), times.size());
-        assertTrue(times.contains(date("1986-01-09")));
+        final Map<Date, Set<Number>> data = table.getAvailableCentroids();
+        assertEquals(entries.size(), data.size());
+        final Set<Number> depths = data.get(date("1986-01-13"));
+        assertNotNull(depths);
+        assertFalse(depths.isEmpty());
+        assertTrue(depths.contains(0.0));
     }
 
     /**

@@ -35,10 +35,7 @@ import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
-import net.sicade.observation.sql.Column;
-import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.QueryType;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -51,27 +48,12 @@ import static net.sicade.observation.sql.QueryType.*;
 @UsedBy(OperationTable.class)
 public class OperationParameterTable extends Table implements Shareable {
     /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column operation, parameter, value;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byOperation;
-
-    /**
      * Creates a operation parameter table.
      * 
      * @param database Connection to the database.
      */
     public OperationParameterTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        operation   = new Column   (query, "OperationParameters", "operation", LIST);
-        parameter   = new Column   (query, "OperationParameters", "parameter", usage);
-        value       = new Column   (query, "OperationParameters", "value",     usage);
-        byOperation = new Parameter(query, operation, SELECT);
+        super(new OperationParameterQuery(database));
     }
 
     /**
@@ -88,10 +70,11 @@ public class OperationParameterTable extends Table implements Shareable {
     protected synchronized void fillValues(final String operation, final ParameterValueGroup parameters)
             throws SQLException, CatalogException
     {
-        final int paramIndex = indexOf(parameter);
-        final int valueIndex = indexOf(value    );
-        final PreparedStatement statement = getStatement(SELECT);
-        statement.setString(indexOf(byOperation), operation);
+        final OperationParameterQuery query = (OperationParameterQuery) super.query;
+        final int paramIndex = indexOf(query.parameter);
+        final int valueIndex = indexOf(query.value    );
+        final PreparedStatement statement = getStatement(QueryType.SELECT);
+        statement.setString(indexOf(query.byOperation), operation);
         final ResultSet results = statement.executeQuery();
         while (results.next()) try {
             final String name = results.getString(paramIndex).trim();

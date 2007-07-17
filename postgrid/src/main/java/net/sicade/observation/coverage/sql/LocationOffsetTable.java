@@ -32,8 +32,8 @@ import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers la table des {@linkplain LocationOffset décalage spatio-temporels} relatifs aux
- * positions des {@linkplain net.sicade.observation.Observation observations}.
+ * Connection to the table of {@linkplain LocationOffset spatio-temporal offsets} relative
+ * to the position of observations.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -42,45 +42,29 @@ import static net.sicade.observation.sql.QueryType.*;
 @UsedBy(DescriptorTable.class)
 public class LocationOffsetTable extends SingletonTable<LocationOffset> implements Shareable {
     /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column name, dx, dy, dz, dt;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byName;
-
-    /**
-     * Construit une table en utilisant la connexion spécifiée.
-     *
-     * @param  database Connexion vers la base de données d'observations.
+     * Creates a location offset table.
+     * 
+     * @param database Connection to the database.
      */
     public LocationOffsetTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        name = new Column   (query, "LocationOffsets", "name", usage);
-        dx   = new Column   (query, "LocationOffsets", "dx",   usage);
-        dy   = new Column   (query, "LocationOffsets", "dy",   usage);
-        dz   = new Column   (query, "LocationOffsets", "dz",   usage);
-        dt   = new Column   (query, "LocationOffsets", "dt",   usage);
-        byName  = new Parameter(query, name,  SELECT);
-        name.setRole(Role.NAME);
-        dt.setOrdering("DESC");
-        dz.setOrdering("DESC");
-        dy.setOrdering("DESC");
-        dx.setOrdering("DESC");
+        super(new LocationOffsetQuery(database));
     }
 
     /**
-     * Construit un décalage spatio-temporel pour l'enregistrement courant.
+     * Creates an entry for the current row in the specified result set.
+     *
+     * @param  results The result set to read.
+     * @return The entry for current row in the specified result set.
+     * @throws CatalogException if an inconsistent record is found in the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     protected LocationOffset createEntry(final ResultSet results) throws SQLException, CatalogException {
+        final LocationOffsetQuery query = (LocationOffsetQuery) super.query;
         return new LocationOffsetEntry(
-                results.getString(indexOf(name)),
-                results.getDouble(indexOf(dx  )),
-                results.getDouble(indexOf(dy  )),
-                results.getDouble(indexOf(dz  )),
-                Math.round(results.getDouble(indexOf(dt)) * LocationOffsetEntry.DAY));
+                results.getString(indexOf(query.name)),
+                results.getDouble(indexOf(query.dx  )),
+                results.getDouble(indexOf(query.dy  )),
+                results.getDouble(indexOf(query.dz  )),
+                Math.round(results.getDouble(indexOf(query.dt)) * LocationOffsetEntry.DAY));
     }
 }

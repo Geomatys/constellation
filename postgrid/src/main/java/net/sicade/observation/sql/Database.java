@@ -434,15 +434,13 @@ public class Database {
      * automatiquement par <code>{@linkplain #getTable getTable}(type)</code> lorsque cette
      * dernière a déterminée que la création d'une nouvelle instance de la table est nécessaire.
      * L'implémentation par défaut tente d'appeller un constructeur qui attend pour seul argument
-     * un objet {@code Database}. Les classes dérivées devraient redéfinir cette méthode si elles
-     * veulent prendre en compte un plus grand nombre de tables.
+     * un objet {@code Database}.
      *
      * @param  type Le type de la table (par exemple <code>{@linkplain StationTable}.class</code>).
      * @return Une nouvelle instance d'une table du type spécifié.
      * @throws NoSuchElementException si le type spécifié n'est pas connu.
      */
-    @Deprecated // Investigate why this method is public; it should not be.
-    public <T extends Table> T createTable(final Class<T> type) throws NoSuchElementException {
+    private <T extends Table> T createTable(final Class<T> type) throws NoSuchElementException {
         try {
             final Constructor<T> c = type.getConstructor(Database.class);
             return c.newInstance(this);

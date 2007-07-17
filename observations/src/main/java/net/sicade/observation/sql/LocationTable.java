@@ -147,7 +147,7 @@ public class LocationTable extends Table implements Shareable {
      * @param select   La clé désignant la requête SQL à exécuter.
      */
     protected LocationTable(final Database database, final ConfigurationKey select) {
-        super(database);
+        super(new Query(database)); // TODO
         this.select = select;
     }
 

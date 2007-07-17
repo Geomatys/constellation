@@ -45,7 +45,7 @@ public class PhenomenonTable extends SingletonTable<Phenomenon> implements Share
      * @param  database Connexion vers la base de données.
      */
     public PhenomenonTable(final Database database) {
-        super(database);
+        super(new Query(database)); // TODO
     }
 
     /**

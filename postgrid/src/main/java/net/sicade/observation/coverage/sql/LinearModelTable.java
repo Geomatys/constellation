@@ -44,7 +44,7 @@ import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers la table des {@linkplain LinearModel modèles linéaires}.
+ * Connection to the table of {@linkplain LinearModel linear model}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -53,16 +53,6 @@ import static net.sicade.observation.sql.QueryType.*;
 @Use({DescriptorTable.class, DescriptorSubstitutionTable.class})
 @UsedBy(LayerTable.class)
 public class LinearModelTable extends Table implements Shareable {
-    /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column target, source1, source2, coefficient;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byTarget;
-
     /**
      * La table des descripteurs du paysage océanique. Ne sera construit que la première fois
      * où elle sera nécessaire.
@@ -76,30 +66,34 @@ public class LinearModelTable extends Table implements Shareable {
     private DescriptorSubstitutionTable substitution;
 
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
-     *
-     * @param database  Connexion vers la base de données d'observations.
+     * Creates a linear model table.
+     * 
+     * @param database Connection to the database.
      */
     public LinearModelTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {SELECT};
-        target      = new Column   (query, "LinearModelTerms", "target",      LIST);
-        source1     = new Column   (query, "LinearModelTerms", "source1",     usage);
-        source2     = new Column   (query, "LinearModelTerms", "source2",     usage);
-        coefficient = new Column   (query, "LinearModelTerms", "coefficient", usage);
-        byTarget    = new Parameter(query, target, SELECT);
-        source1.setOrdering("ASC");
-        source2.setOrdering("ASC");
+        super(new LinearModelQuery(database));
     }
 
     /**
-     * Définie la table des descripteurs à utiliser. Cette méthode peut être appelée par
-     * {@link LayerTable} immédiatement après la construction de {@code LinearModelTable}
-     * et avant toute première utilisation. Notez que les instances de {@code LinearModelTable}
-     * ainsi créées ne devraient pas être partagées par {@link Database#getTable}.
+     * Creates a new table using the same connection than the specified table.
+     * This is useful when we want to change the configuration of the new table
+     * while preserving the original table from changes.
      *
-     * @param  descriptors Table des descripteurs à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des descripteurs.
+     * @param table The table to clone.
+     *
+     * @see #setDescriptorTable
+     */
+    protected LinearModelTable(final LinearModelTable table) {
+        super(table);
+    }
+
+    /**
+     * Sets the descriptor table to use. This method is invoked by {@link LayerTable}
+     * immediately after the creation of this {@code LinearModelTable}. Note that
+     * the instance given to this method should not be cached by {@link Database#getTable}.
+     *
+     * @param  descriptors The descriptor table to use.
+     * @throws IllegalStateException if this table is already associated to an other descriptor table.
      */
     protected synchronized void setDescriptorTable(final DescriptorTable descriptors)
             throws IllegalStateException
@@ -116,12 +110,12 @@ public class LinearModelTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne le modèle linéaire pour la couche spécifiée. Si cette couche n'est pas
-     * le résultat d'un modèle linéaire, alors cette méthode retourne {@code null}.
+     * Returns the linear model for the given layer, or {@code null} if none.
      *
-     * @param  target La couche d'images pour laquelle on veut le modèle linéaire.
-     * @return Le modèle linéaire, ou {@code null} s'il n'y en a pas.
-     * @throws SQLException si l'interrogation de la base de données a échoué.
+     * @param  target The layer to query for a linear model.
+     * @return The linear model, or {@code null} if none.
+     * @throws CatalogException if an inconsistent record is found in the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     public synchronized LinearModel getEntry(final Layer target) throws CatalogException, SQLException {
         final List<LinearModel.Term> terms = getTerms(target);
@@ -130,7 +124,9 @@ public class LinearModelTable extends Table implements Shareable {
         }
         LinearModelEntry model = new LinearModelEntry(target, terms);
         if (substitution == null) {
-            substitution = getDatabase().createTable(DescriptorSubstitutionTable.class);
+            // Note: we wraps in new DescriptorSubstitutionTable(...)
+            // in order to protect the shared instance from changes.
+            substitution = new DescriptorSubstitutionTable(getDatabase().getTable(DescriptorSubstitutionTable.class));
             substitution.setDescriptorTable(descriptors);
         }
         for (final Descriptor descriptor : model.getDescriptors()) {
@@ -152,9 +148,10 @@ public class LinearModelTable extends Table implements Shareable {
      * @throws SQLException si l'interrogation de la base de données a échoué.
      */
     private List<LinearModel.Term> getTerms(final Layer target) throws CatalogException, SQLException {
+        final LinearModelQuery query = (LinearModelQuery) super.query;
         ArrayList<LinearModelTerm> terms = null;
         final PreparedStatement statement = getStatement(SELECT);
-        statement.setString(indexOf(byTarget), target.getName());
+        statement.setString(indexOf(query.byTarget), target.getName());
         final ResultSet results;
         try {
             results = statement.executeQuery();
@@ -179,9 +176,9 @@ public class LinearModelTable extends Table implements Shareable {
          * construction complète des descripteurs ne sera effectuée qu'après la fermeture du
          * 'ResultSet', afin d'éviter des problèmes lors d'appels recursifs à cette méthode.
          */
-        final int s1 = indexOf(source1);
-        final int s2 = indexOf(source2);
-        final int cf = indexOf(coefficient);
+        final int s1 = indexOf(query.source1);
+        final int s2 = indexOf(query.source2);
+        final int cf = indexOf(query.coefficient);
         while (results.next()) {
             final String source1     = results.getString(s1);
             final String source2     = results.getString(s2);

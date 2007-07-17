@@ -31,8 +31,11 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.Category;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.referencing.ReferencingFactoryFinder;
 
+import net.sicade.image.Utilities;
+import net.sicade.observation.Element;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.ServerException;
 import net.sicade.observation.IllegalRecordException;
@@ -40,37 +43,19 @@ import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.UsedBy;
-import net.sicade.image.Utilities;
-import net.sicade.observation.sql.Column;
-import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.QueryType;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers une table des {@linkplain Category catégories}. Cette table construit des objets
- * {@link Category} pour une bande individuelle. Les categories sont une des composantes d'un objet
- * {@link org.geotools.coverage.grid.GridCoverage2D}, mais ne correspondent pas directement à un
- * {@linkplain net.sicade.observation.Element élément} du paquet des observations.
- * <p>
- * Cette table est utilisée par {@link SampleDimensionTable}, qui construit des objets de
- * plus haut niveau.
+ * Connection to a table of {@linkplain Category categories}. This table creates a list of
+ * {@link Category} objects for a given sample dimension. Categories are one of the components
+ * required for creating a {@link GridCoverage2D}; they are not an {@link Element} subinterface.
  *
  * @author Martin Desruisseaux
  * @version $Id$
  */
 @UsedBy(SampleDimensionTable.class)
 public class CategoryTable extends Table implements Shareable {
-    /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column name, band, lower, upper, c0, c1, function, colors;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byBand;
-
     /**
      * Transformation <code>f(x) = 10<sup>x</sup></code>. Utilisée pour le décodage des images de
      * concentrations en chlorophylle-a. Ne sera construite que la première fois où elle sera
@@ -79,43 +64,33 @@ public class CategoryTable extends Table implements Shareable {
     private transient MathTransform1D exponential;
 
     /**
-     * Construit une table en utilisant la connexion spécifiée.
-     *
-     * @param database  Connexion vers la base de données d'observations.
+     * Creates a category table.
+     * 
+     * @param database Connection to the database.
      */
     public CategoryTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {LIST, FILTERED_LIST};
-        name     = new Column   (query, "Categories", "name",     usage);
-        band     = new Column   (query, "Categories", "band",     LIST );
-        lower    = new Column   (query, "Categories", "lower",    usage);
-        upper    = new Column   (query, "Categories", "upper",    usage);
-        c0       = new Column   (query, "Categories", "c0",       usage);
-        c1       = new Column   (query, "Categories", "c1",       usage);
-        function = new Column   (query, "Categories", "function", usage);
-        colors   = new Column   (query, "Categories", "colors",   usage);
-        byBand   = new Parameter(query, band, FILTERED_LIST);
-        lower.setOrdering("ASC");
+        super(new CategoryQuery(database));
     }
 
     /**
-     * Retourne la liste des catégories qui appartiennent à la bande spécifiée.
+     * Returns the list of categories for the given sample dimension.
      *
-     * @param  band Identificateur de la bande pour lequel on veut les catégories.
-     * @return Les catégories de la bande demandée.
-     * @throws IllegalRecordException si une incohérence a été trouvée dans les enregistrements.
-     * @throws SQLException si l'interrogation de la table a échoué pour une autre raison.
+     * @param  band The name of the sample dimension.
+     * @return The categories for the given sample dimension.
+     * @throws CatalogException if an inconsistent record is found in the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     public synchronized Category[] getCategories(final String band) throws CatalogException, SQLException {
-        final PreparedStatement statement = getStatement(FILTERED_LIST);
-        statement.setString(indexOf(byBand), band);
-        final int nameIndex     = indexOf(name    );
-        final int lowerIndex    = indexOf(lower   );
-        final int upperIndex    = indexOf(upper   );
-        final int c0Index       = indexOf(c0      );
-        final int c1Index       = indexOf(c1      );
-        final int functionIndex = indexOf(function);
-        final int colorsIndex   = indexOf(colors  );
+        final CategoryQuery query = (CategoryQuery) this.query;
+        final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+        statement.setString(indexOf(query.byBand), band);
+        final int nameIndex     = indexOf(query.name    );
+        final int lowerIndex    = indexOf(query.lower   );
+        final int upperIndex    = indexOf(query.upper   );
+        final int c0Index       = indexOf(query.c0      );
+        final int c1Index       = indexOf(query.c1      );
+        final int functionIndex = indexOf(query.function);
+        final int colorsIndex   = indexOf(query.colors  );
         final List<Category> categories = new ArrayList<Category>();
         final ResultSet result = statement.executeQuery();
         while (result.next()) {

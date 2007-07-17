@@ -48,7 +48,7 @@ public class DistributionTable extends SingletonTable<Distribution> implements S
      * @param  database Connexion vers la base de données.
      */
     public DistributionTable(final Database database) {
-        super(database);
+        super(new Query(database)); // TODO
     }
 
     /**

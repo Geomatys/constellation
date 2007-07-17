@@ -164,19 +164,9 @@ public class Table {
     private transient Calendar calendar;
 
     /**
-     * Creates a new table connected to the specified database. Subclass constructors should
-     * add {@link Column} and {@code Parameter} instances to their {@linkplain #query}.
-     * See {@linkplain Table class javadoc}.
-     *
-     * @param database The database that contains this table.
-     */
-    @Deprecated
-    protected Table(final Database database) {
-        this(new Query(database));
-    }
-
-    /**
-     * Creates a new table using the specified query.
+     * Creates a new table using the specified query. The query given in argument should be some
+     * subclass with {@link Query#addColumn addColumn} or {@link Query#addParameter addParameter}
+     * methods invoked in its constructor.
      */
     protected Table(final Query query) {
         this.query = query;
@@ -186,7 +176,7 @@ public class Table {
     /**
      * Creates a new table connected to the same {@linkplain #getDatabase database} and using
      * the same {@linkplain #query} than the specified table. Subclass constructors should
-     * <strong>not</strong> modify the query.
+     * not modify the query, since it is shared.
      */
     protected Table(final Table table) {
         query      = table.query;
@@ -319,14 +309,14 @@ public class Table {
      *
      * @param  role The element.
      * @return The element index (starting with 1).
-     * @throws CatalogException if the specified element is not applicable.
+     * @throws SQLException if the specified element is not applicable.
      */
-    protected final int indexOf(final IndexedSqlElement element) throws CatalogException {
+    protected final int indexOf(final IndexedSqlElement element) throws SQLException {
         final int index = element.indexOf(queryType);
         if (index > 0) {
             return index;
         } else {
-            throw new CatalogException("L'élément " + element + " ne s'applique pas au type " + queryType);
+            throw new SQLException("L'élément " + element + " ne s'applique pas au type " + queryType);
         }
     }
 

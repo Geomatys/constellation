@@ -122,7 +122,7 @@ public class StationTable extends SingletonTable<Station> implements NumericAcce
      * Construit une nouvelle connexion vers la table des stations.
      */
     public StationTable(final Database database) {
-        super(database);
+        super(new Query(database)); // TODO
     }
 
     /**

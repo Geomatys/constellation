@@ -18,7 +18,6 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE dependencies
 import java.awt.Dimension;
 import java.io.File;
 import java.util.Set;
@@ -26,20 +25,17 @@ import java.util.Locale;
 import java.io.IOException;
 import java.sql.SQLException;
 
-// JUnit dependencies
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.geotools.resources.Arguments;
+import org.geotools.util.Logging;
+import org.geotools.coverage.CoverageStack;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-// Seagis Dependencies
 import net.sicade.observation.coverage.AbstractTest;
 import net.sicade.observation.coverage.Layer;
 
-// Geotools dependencies
-import org.geotools.resources.Arguments;
-import org.geotools.util.MonolineFormatter;
-import org.geotools.coverage.CoverageStack;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.opengis.metadata.extent.GeographicBoundingBox;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 /**
@@ -83,8 +79,7 @@ public class WritableGridCoverageTableTest extends AbstractTest {
      * Exécute la suite de tests à partir de la ligne de commande.
      */
     public static void main(final String[] args) {
-        MonolineFormatter.init("org.geotools");
-        MonolineFormatter.init("net.sicade");
+        Logging.ALL.forceMonolineConsoleOutput();
         final Arguments arguments = new Arguments(args);
         Locale.setDefault(arguments.locale);
         junit.textui.TestRunner.run(suite());

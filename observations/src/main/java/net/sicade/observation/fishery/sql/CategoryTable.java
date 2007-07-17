@@ -83,7 +83,7 @@ public class CategoryTable extends SingletonTable<Category> implements NumericAc
      * @param  database Connexion vers la base de données.
      */
     public CategoryTable(final Database database) {
-        super(database);
+        super(new net.sicade.observation.sql.Query(database)); // TODO
     }
 
     /**

@@ -53,28 +53,13 @@ public class SpatialColumn extends Column {
      * @param query The query for which the column is created.
      * @param table The table name in which this column appears.
      * @param name  The column name.
-     * @throws SQLException if an error occured while reading the database.
-     */
-    public SpatialColumn(final Query query, final String table, final String name)
-            throws SQLException
-    {
-        super(query, table, name);
-        spatialEnabled = (query.database != null) && query.database.isSpatialEnabled();
-    }
-
-    /**
-     * Creates a column from the specified table with the specified name but no alias.
-     *
-     * @param query The query for which the column is created.
-     * @param table The table name in which this column appears.
-     * @param name  The column name.
      * @param types The query for which to include this column, or {@code null} for all.
      * @throws SQLException if an error occured while reading the database.
      */
     public SpatialColumn(final Query query, final String table, final String name, final QueryType... types)
             throws SQLException
     {
-        super(query, table, name, types);
+        super(query, table, name, name, types);
         spatialEnabled = (query.database != null) && query.database.isSpatialEnabled();
     }
 
@@ -83,20 +68,6 @@ public class SpatialColumn extends Column {
      */
     @Deprecated
     public static class Box extends SpatialColumn {
-        /**
-         * Creates a column from the specified table with the specified name but no alias.
-         *
-         * @param query The query for which the column is created.
-         * @param table The table name in which this column appears.
-         * @param name  The column name.
-         * @throws SQLException if an error occured while reading the database.
-         */
-        public Box(final Query query, final String table, final String name)
-                throws SQLException
-        {
-            super(query, table, name);
-        }
-
         /**
          * Creates a column from the specified table with the specified name but no alias.
          *

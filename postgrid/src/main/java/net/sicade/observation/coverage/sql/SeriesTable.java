@@ -25,15 +25,11 @@ import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Format;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Series;
-import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.SingletonTable;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -46,16 +42,6 @@ import static net.sicade.observation.sql.QueryType.*;
 @Use(FormatTable.class)
 @UsedBy(LayerTable.class)
 public class SeriesTable extends SingletonTable<Series> {
-    /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column name, owner, format;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byName, byOwner;
-
     /**
      * Connection to the format table. This connection will be etablished
      * when first needed and may be shared by many series tables.
@@ -73,15 +59,7 @@ public class SeriesTable extends SingletonTable<Series> {
      * @param database Connection to the database.
      */
     public SeriesTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {SELECT, LIST, FILTERED_LIST};
-        name    = new Column   (query, "Series", "identifier", usage);
-        owner   = new Column   (query, "Series", "layer",      usage);
-        format  = new Column   (query, "Series", "format",     usage);
-        byName  = new Parameter(query, name,  SELECT);
-        byOwner = new Parameter(query, owner, FILTERED_LIST);
-        name.setRole(Role.NAME);
-        name.setOrdering("ASC");
+        super(new SeriesQuery(database));
     }
 
     /**
@@ -113,7 +91,7 @@ public class SeriesTable extends SingletonTable<Series> {
      * @throws SQLException if an error occured will reading from the database.
      */
     public synchronized Set<Series> getEntries() throws CatalogException, SQLException {
-        return getEntries(layer==null ? LIST : FILTERED_LIST);
+        return getEntries(layer==null ? QueryType.LIST : QueryType.FILTERED_LIST);
     }
 
     /**
@@ -124,7 +102,8 @@ public class SeriesTable extends SingletonTable<Series> {
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        final int index = byOwner.indexOf(type);
+        final SeriesQuery query = (SeriesQuery) super.query;
+        final int index = query.byOwner.indexOf(type);
         if (index != 0) {
             statement.setString(1, layer!=null ? layer.getName() : null);
         }
@@ -134,12 +113,13 @@ public class SeriesTable extends SingletonTable<Series> {
      * Creates a series entry for the current row in the specified result set.
      */
     protected Series createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final String name = results.getString(indexOf(this.name));
+        final SeriesQuery query = (SeriesQuery) super.query;
+        final String name = results.getString(indexOf(query.name));
         final String remarks = null;
         if (formats == null) {
             formats = getDatabase().getTable(FormatTable.class);
         }
-        final Format format = formats.getEntry(results.getString(indexOf(this.format)));
+        final Format format = formats.getEntry(results.getString(indexOf(query.format)));
         return new SeriesEntry(name, format, remarks);
     }
 

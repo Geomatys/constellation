@@ -133,6 +133,45 @@ public class Query {
     }
 
     /**
+     * Creates a new column from the specified table with the specified name but no alias.
+     *
+     * @param table The name of the table that contains the column.
+     * @param name  The column name.
+     * @param types Types of the queries where the column shall appears, or {@code null}
+     *              if the column is applicable to any kind of queries.
+     * @return The newly added column.
+     */
+    protected Column addColumn(final String table, final String name, final QueryType... types) {
+        return addColumn(table, name, name, types);
+    }
+
+    /**
+     * Adds a new column from the specified table with the specified name and alias.
+     *
+     * @param table The name of the table that contains the column.
+     * @param name  The column name.
+     * @param alias An alias for the column.
+     * @param types Types of the queries where the column shall appears, or {@code null}
+     *              if the column is applicable to any kind of queries.
+     * @return The newly added column.
+     */
+    protected Column addColumn(final String table, final String name, final String alias, final QueryType... types) {
+        return new Column(this, table, name, alias, types);
+        // The addition into this query is performed by the Column constructor.
+    }
+
+    /**
+     * Adds a new parameter for the specified query.
+     *
+     * @param column The column on which the parameter is applied.
+     * @param types Types of the queries where the parameter shall appears.
+     * @return The newly added parameter.
+     */
+    protected Parameter addParameter(final Column column, final QueryType... types) {
+        return new Parameter(this, column, types);
+    }
+
+    /**
      * Returns the columns for the specified type. For a statement created from the
      * <code>{@linkplain #select select}(type)</code> query, the value returned by
      * <code>{@linkplain ResultSet#getString(int) ResultSet.getString}(i)</code>
@@ -440,5 +479,24 @@ scan:       while (!tables.isEmpty()) {
             }
         }
         return 0;
+    }
+
+    /**
+     * Returns a string representation of this query, for debugging purpose.
+     */
+    @Override
+    public String toString() {
+        for (final QueryType type : QueryType.values()) {
+            final String sql;
+            try {
+                sql = select(QueryType.SELECT);
+            } catch (SQLException e) {
+                return e.toString();
+            }
+            if (sql.length() != 0) {
+                return sql;
+            }
+        }
+        return "<empty>";
     }
 }

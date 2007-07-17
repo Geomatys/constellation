@@ -104,29 +104,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     private transient MathTransform standardToUser;
 
     /**
-     * Creates a new table connected to the specified database. Subclass constructors should
-     * add {@link Column} and {@code Parameter} instances to their {@linkplain #query query}.
-     * See {@linkplain Table class javadoc}.
-     *
-     * @param database The database that contains this table.
-     * @param crsType  The type of the {@linkplain #getEnvelope envelope} coordinate reference system.
-     */
-    @Deprecated
-    protected BoundedSingletonTable(final Database database, final CRS crsType) {
-        super(database);
-        this.crsType = crsType;
-        tMin =  0;
-        tMax =  System.currentTimeMillis() + LOOK_AHEAD;
-        xMin = -360;
-        xMax = +360;
-        yMin =  -90;
-        yMax =  +90;
-        zMin = Double.NEGATIVE_INFINITY;
-        zMax = Double.POSITIVE_INFINITY;
-    }
-
-    /**
-     * Creates a new table using the specified query.
+     * Creates a new table using the specified query. The query given in argument should be some
+     * subclass with {@link Query#addColumn addColumn} or {@link Query#addParameter addParameter}
+     * methods invoked in its constructor.
      */
     protected BoundedSingletonTable(final Query query, final CRS crsType) {
         super(query);
@@ -142,13 +122,13 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Creates a new table connected to the same {@linkplain #database database} and using
-     * the same {@linkplain #query query} than the specified table. Subclass constructors
-     * should <strong>not</strong> modify the query.
+     * Creates a new table connected to the same {@linkplain #getDatabase database} and using
+     * the same {@linkplain #query query} than the specified table. Subclass constructors should
+     * not modify the query, since it is shared.
      * <p>
      * In addition, the new table is initialized to the same spatio-temporal envelope than the
-     * specified table. This constructor assumes that the {@linkplain #getCoordinateReferenceSystem
-     * coordinate reference system} stay the same for the two tables.
+     * specified table. If the {@link #getCoordinateReferenceSystem} method has been overriden,
+     * then is shall returns the same value.
      */
     protected BoundedSingletonTable(final BoundedSingletonTable<E> table) {
         super(table);

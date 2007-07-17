@@ -45,6 +45,7 @@ import net.sicade.observation.coverage.Layer;
  *
  * @todo Envisager de déplacer ce code vers {@link WritableGridCoverageTable}.
  */
+@Deprecated
 public class UpdateGridCoverageTable {
     /**
      * Interdit les instantiations de cette classe.

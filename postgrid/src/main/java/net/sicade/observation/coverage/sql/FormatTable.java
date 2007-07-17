@@ -15,33 +15,23 @@
  */
 package net.sicade.observation.coverage.sql;
 
-// J2SE dependencies
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import net.sicade.observation.IllegalRecordException;
+import org.geotools.coverage.grid.GridCoverage2D;
 
-// Seagis dependencies
 import net.sicade.observation.coverage.Format;
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.sql.Column;
+import net.sicade.observation.IllegalRecordException;
 import net.sicade.observation.sql.SingletonTable;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Parameter;
-import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Use;
-import net.sicade.observation.sql.QueryType;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers une table des {@linkplain Format formats d'images}. Cette table construit
- * des objets {@link Format} pour un nom spécifié. Ces formats sont utilisés pour le décodage
- * d'objets {@link org.geotools.coverage.grid.GridCoverage2D}.
- * <p>
- * Cette table est utilisée par {@link GridCoverageTable}, qui construit des objets
- * de plus haut niveau.
+ * Connection to a table of image {@linkplain Format}. Those format are used for reading
+ * {@link GridCoverage2D}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -50,55 +40,44 @@ import static net.sicade.observation.sql.QueryType.*;
 @UsedBy({SeriesTable.class, GridCoverageTable.class})
 public class FormatTable extends SingletonTable<Format> implements Shareable {
     /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column name, mime, type;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byName;
-
-    /**
      * Connexion vers la table des bandes.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     private SampleDimensionTable bands;
 
     /**
-     * Construit une table en utilisant la connexion spécifiée.
-     *
-     * @param  database Connexion vers la base de données d'observations.
+     * Creates a format table.
+     * 
+     * @param database Connection to the database.
      */
     public FormatTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        name   = new Column   (query, "Formats", "name", usage);
-        mime   = new Column   (query, "Formats", "mime", usage);
-        type   = new Column   (query, "Formats", "type", usage);
-        byName = new Parameter(query, name, SELECT);
-        name.setRole(Role.NAME);
-        name.setOrdering("ASC");
+        super(new FormatQuery(database));
     }
 
     /**
-     * Construit un format pour l'enregistrement courant.
+     * Creates a format for the current row in the specified result set.
+     *
+     * @param  results The result set to read.
+     * @return The entry for current row in the specified result set.
+     * @throws CatalogException if an inconsistent record is found in the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     protected Format createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final String name     = results.getString(indexOf(this.name));
-        final String mimeType = results.getString(indexOf(this.mime));
-        final String type     = results.getString(indexOf(this.type));
+        final FormatQuery query = (FormatQuery) super.query;
+        final String name     = results.getString(indexOf(query.name));
+        final String mimeType = results.getString(indexOf(query.mimeType));
+        final String encoding = results.getString(indexOf(query.encoding));
         if (bands == null) {
             bands = getDatabase().getTable(SampleDimensionTable.class);
         }
         final boolean geophysics;
-        if ("geophysics".equalsIgnoreCase(type)) {
+        if ("geophysics".equalsIgnoreCase(encoding)) {
             geophysics = true;
-        } else if ("native".equalsIgnoreCase(type)) {
+        } else if ("native".equalsIgnoreCase(encoding)) {
             geophysics = false;
         } else {
-            final String table = results.getMetaData().getTableName(indexOf(this.type));
-            throw new IllegalRecordException(table, "Type d'image inconnu: " + type);
+            final String table = results.getMetaData().getTableName(indexOf(query.encoding));
+            throw new IllegalRecordException(table, "Type d'image inconnu: " + encoding);
         }
         return new FormatEntry(name, mimeType, geophysics, bands.getSampleDimensions(name));
     }

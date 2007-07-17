@@ -17,7 +17,6 @@ package net.sicade.observation.coverage.sql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import net.sicade.observation.sql.Role;
 
 import org.geotools.resources.CharUtilities;
 
@@ -28,25 +27,18 @@ import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.LocationOffset;
-import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.DistributionTable;
 import net.sicade.observation.sql.SingletonTable;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Use;
-import net.sicade.observation.sql.QueryType;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers la table des {@linkplain Descriptor descripteurs}. Les informations nécessaires à
- * la construction des descripteurs sont puisées principalement dans trois tables: {@link LayerTable},
- * {@link LocationOffsetTable} et {@link OperationTable}. De ces trois tables, la table des couches
- * est particulière du fait qu'elle n'est pas sensée être {@linkplain Shareable partageable}. Cela
- * n'empêche toutefois pas {@code DescriptorTable} de l'être, puisqu'il utilise par défaut une table
- * des couches globales dont il ne modifiera pas la configuration.
+ * Connection to a table of {@linkplain Descriptor descriptors}. The informations required by the
+ * descriptors are splitted in three tables: {@link LayerTable}, {@link LocationOffsetTable} and
+ * {@link OperationTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -56,71 +48,62 @@ import static net.sicade.observation.sql.QueryType.*;
 @UsedBy({LinearModelTable.class, DescriptorSubstitutionTable.class})
 public class DescriptorTable extends SingletonTable<Descriptor> implements Shareable {
     /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column symbol, identifier, phenomenon, procedure, offset, band, distribution;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter bySymbol, byIdentifier;
-
-    /**
      * La table des couches. Elle sera construite la première fois où elle sera nécessaire.
      */
     private LayerTable layer;
-    
+
     /**
      * La table des opérations. Ne sera construite que la première fois où elle sera nécessaire.
      */
     private OperationTable operations;
-    
+
     /**
      * La table des positions relatives.
      * Ne sera construite que la première fois où elle sera nécessaire.
      */
     private LocationOffsetTable offsets;
-    
+
     /**
      * La table des distributions.
      * Ne sera construite que la première fois où elle sera nécessaire.
      */
     private DistributionTable distributions;
-    
+
     /**
-     * Construit une table qui interrogera la base de données spécifiée.
-     *
-     * @param database  Connexion vers la base de données d'observations.
+     * Creates a format table.
+     * 
+     * @param database Connection to the database.
      */
     public DescriptorTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        symbol       = new Column   (query, "Descriptors", "symbol",       usage);
-        identifier   = new Column   (query, "Descriptors", "identifier",   usage);
-        phenomenon   = new Column   (query, "Descriptors", "phenomenon",   usage);
-        procedure    = new Column   (query, "Descriptors", "procedure",    usage);
-        offset       = new Column   (query, "Descriptors", "offset",       usage);
-        band         = new Column   (query, "Descriptors", "band",         usage);
-        distribution = new Column   (query, "Descriptors", "distribution", usage);
-        bySymbol     = new Parameter(query, symbol,     SELECT);
-        byIdentifier = new Parameter(query, identifier, SELECT);
-        symbol    .setRole(Role.NAME);
-        identifier.setRole(Role.IDENTIFIER);
-        identifier.setOrdering("ASC");
+        super(new DescriptorQuery(database));
     }
 
     /**
-     * Définie la table des couches à utiliser. Cette méthode peut être appelée par {@link LayerTable}
-     * immédiatement après la construction de {@code DescriptorTable} et avant toute première utilisation.
-     * Notez que les instances de {@code DescriptorTable} ainsi créées ne seront pas partagées par
-     * {@link Database#getTable}.
+     * Creates a new table using the same connection than the specified table.
+     * This is useful when we want to change the configuration of the new table
+     * while preserving the original table from changes.
      *
-     * @param  layer Table des couches à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des couches.
+     * @param table The table to clone.
+     *
+     * @see #setLayerTable
      */
-    protected synchronized void setLayerTable(final LayerTable layer)
-            throws IllegalStateException
-    {
+    protected DescriptorTable(final DescriptorTable table) {
+        super(table);
+    }
+
+    /**
+     * Sets the layer table to use. This method is invoked by {@link LayerTable} immediately after
+     * the creation of this {@code DescriptorTable}. Note that the instance given to this method
+     * should not be cached by {@link Database#getTable}.
+     * <p>
+     * Implementation note: in theory, {@code LayerTable} are not {@linkplain Shareable shareable}.
+     * However this restriction doesn't prevent {@code DescriptorTable} implements {@link Shareable}
+     * because it doesn't modify the {@code LayerTable} configuration.
+     *
+     * @param  layer The layer table to use.
+     * @throws IllegalStateException if this table is already associated to an other layer table.
+     */
+    protected synchronized void setLayerTable(final LayerTable layer) throws IllegalStateException {
         if (this.layer != layer) {
             if (this.layer != null) {
                 throw new IllegalStateException();
@@ -130,10 +113,17 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Share
     }
 
     /**
-     * Retourne une entrée pour le nom spécifié. Cette méthode est tolérante au nom: si ce dernier
-     * est purement numérique, alors {@link #getEntry(int)} est appelée. Sinon, les chiffres qui
-     * apparaissent à la fin du nom peuvent être remplacés par les caractères unicodes représentant
-     * ces mêmes chiffres sous forme d'indices.
+     * Returns a new entry for the given name. If no entry is found for the given name and if
+     * the name contains only digit characters, then this method tries to parse the name as an
+     * {@linkplain Integer integer} and invokes {@link #getEntry(int)}. Otherwise, if the name
+     * ends with some digits, those digits are converted to some unicode characters (e.g. digits
+     * as indices) and the new name is tried again.
+     *
+     * @param  name The name of the element to fetch.
+     * @return The element for the given name, or {@code null} if {@code name} was null.
+     * @throws CatalogException if no element has been found for the specified name,
+     *         or if an element contains invalid data.
+     * @throws SQLException if an error occured will reading from the database.
      */
     public Descriptor getEntryLenient(final String name) throws CatalogException, SQLException {
         try {
@@ -173,16 +163,22 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Share
     }
 
     /**
-     * Construit un descripteur pour l'enregistrement courant.
+     * Creates a descriptor for the current row in the specified result set.
+     *
+     * @param  results The result set to read.
+     * @return The entry for current row in the specified result set.
+     * @throws CatalogException if an inconsistent record is found in the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     protected Descriptor createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final String    symbol       = results.getString (indexOf(this.symbol      ));
-        final int       identifier   = results.getInt    (indexOf(this.identifier  ));
-        final String    phenomenon   = results.getString (indexOf(this.phenomenon  ));
-        final String    procedure    = results.getString (indexOf(this.procedure   ));
-        final String    position     = results.getString (indexOf(this.offset      ));
-        final short     band = (short)(results.getShort  (indexOf(this.band        )) - 1);
-        final String    distribution = results.getString (indexOf(this.distribution));
+        final DescriptorQuery query = (DescriptorQuery) super.query;
+        final String    symbol       = results.getString (indexOf(query.symbol      ));
+        final int       identifier   = results.getInt    (indexOf(query.identifier  ));
+        final String    phenomenon   = results.getString (indexOf(query.phenomenon  ));
+        final String    procedure    = results.getString (indexOf(query.procedure   ));
+        final String    position     = results.getString (indexOf(query.offset      ));
+        final short     band = (short)(results.getShort  (indexOf(query.band        )) - 1);
+        final String    distribution = results.getString (indexOf(query.distribution));
         if (offsets == null) {
             offsets = getDatabase().getTable(LocationOffsetTable.class);
         }

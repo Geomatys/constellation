@@ -20,14 +20,9 @@ import java.sql.SQLException;
 
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Thematic;
-import net.sicade.observation.sql.Column;
-import net.sicade.observation.sql.Parameter;
-import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
@@ -39,28 +34,12 @@ import static net.sicade.observation.sql.QueryType.*;
  */
 public class ThematicTable extends SingletonTable<Thematic> implements Shareable {
     /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column name, remarks;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byName;
-
-    /**
      * Creates a thematic table.
      * 
      * @param database Connection to the database.
      */
     public ThematicTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        name    = new Column   (query, "Thematics", "name",        usage);
-        remarks = new Column   (query, "Thematics", "description", usage);
-        byName  = new Parameter(query, name, SELECT);
-        name.setRole(Role.NAME);
-        name.setOrdering("ASC");
+        super(new ThematicQuery(database));
     }
 
     /**
@@ -69,7 +48,8 @@ public class ThematicTable extends SingletonTable<Thematic> implements Shareable
      * @throws SQLException if an error occured while reading the database.
      */
     protected Thematic createEntry(final ResultSet results) throws CatalogException, SQLException {
-        return new ThematicEntry(results.getString(indexOf(name   )),
-                                 results.getString(indexOf(remarks)));
+        final ThematicQuery query = (ThematicQuery) super.query;
+        return new ThematicEntry(results.getString(indexOf(query.name   )),
+                                 results.getString(indexOf(query.remarks)));
     }
 }

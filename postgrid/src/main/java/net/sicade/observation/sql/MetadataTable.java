@@ -57,7 +57,7 @@ public class MetadataTable extends Table implements Shareable {
      * @param  database Connexion vers la table des plateformes qui utilisera cette table des stations.
      */
     public MetadataTable(final Database database) {
-        super(database);
+        super(new Query(database)); // TODO
     }
 
     /**

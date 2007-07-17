@@ -25,25 +25,21 @@ import java.util.logging.LogRecord;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 import net.sicade.observation.Element;
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Parameter;
-import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.Shareable;
-import net.sicade.observation.sql.SpatialColumn;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.SpatialParameter;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion à la table des étendues géographiques des images.
+ * Connection to a table of geographic bounding box.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -51,100 +47,59 @@ import static net.sicade.observation.sql.QueryType.*;
  */
 public class GeographicBoundingBoxTable extends Table implements Shareable {
     /**
-     * Facteur de tolérance pour la comparaison des limites géographiques.
-     */
-    private static final double EPSILON = 1E-7;
-
-    /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column name, width, height, depth;
-
-    /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final SpatialColumn.Box spatialExtent;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final SpatialParameter.Box byExtent;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byWidth, byHeight, byDepth;
-
-    /**
-     * The SQL instruction for inserting a new geographic bounding box.
-     *
-     * @todo Choose the CRS.
-     */
-//    private static final SpatialConfigurationKey INSERT = new SpatialConfigurationKey("GeographicBoundingBoxes:INSERT",
-//            "INSERT INTO \"GridGeometries\"\n" +
-//            "  (id, \"westBoundLongitude\",\n" +
-//            "       \"eastBoundLongitude\",\n" +
-//            "       \"southBoundLatitude\",\n" +
-//            "       \"northBoundLatitude\",\n" +
-//            "       \"altitudeMin\",\n"        +
-//            "       \"altitudeMax\",\n"        +
-//            "       \"CRS\",\n"                +
-//            "       width, height, depth)\n"   +
-//            "  VALUES (?, ?, ?, ?, ?, ?, ?, 'IRD:WGS84(xyt)', ?, ?, ?)",
-//
-//            "INSERT INTO coverages.\"GridGeometries\"\n"+
-//            "  (id, \"spatialExtent\",\n"               +
-//            "       \"CRS\",\n"                         +
-//            "       width, height, depth)\n"            +
-//            "  VALUES (?, ?, 'IRD:WGS84(xyt)', ?, ?, ?)");
-
-    /**
      * Constructs a new {@code GeographicBoundingBoxTable}.
      *
      * @param  connection The connection to the database.
      * @throws SQLException if the table can't be constructed.
      */
     public GeographicBoundingBoxTable(final Database database) throws SQLException {
-        super(database);
-        final QueryType[] usageLW = {LIST,   INSERT};
-        final QueryType[] usageRW = {SELECT, INSERT};
-        name          = new Column              (query, "GridGeometries", "id",            usageRW);
-        spatialExtent = new SpatialColumn.Box   (query, "GridGeometries", "spatialExtent", usageLW);
-        width         = new Column              (query, "GridGeometries", "width",         usageLW);
-        height        = new Column              (query, "GridGeometries", "height",        usageLW);
-        depth         = new Column              (query, "GridGeometries", "depth",         usageLW);
-        byExtent      = new SpatialParameter.Box(query, spatialExtent,                     usageRW);
-        byWidth       = new Parameter           (query, width,                             usageRW);
-        byHeight      = new Parameter           (query, height,                            usageRW);
-        byDepth       = new Parameter           (query, depth,                             usageRW);
-        name.setRole(Role.NAME);
+        super(new GeographicBoundingBoxQuery(database));
     }
 
     /**
-     * Retourne l'identifieur de l'étendue géographique et la dimension d'image spécifiées.
-     * Si aucun enregistrement n'a été trouvée, alors cette méthode retourne {@code null}.
+     * Returns the identifier for the specified geographic bounding box and dimension.
+     * If no matching record is found, then this method returns {@code null}. This is
+     * a convenience method for the two-dimensional case. The <var>z</var> value is
+     * set to 0 and the depth (in pixels) is set to 1.
      *
      * @param  bbox The geographic bounding box.
      * @param  size The image size, in pixels.
      * @throws SQLException if the operation failed.
      */
-    public synchronized String getIdentifier(final GeographicBoundingBox bbox, final Dimension size)
+    public String getIdentifier(final GeographicBoundingBox bbox, final Dimension size)
             throws SQLException, CatalogException
     {
-        return getIdentifier(new GeneralEnvelope(bbox), size);
+        final GeneralEnvelope envelope = new GeneralEnvelope(DefaultGeographicCRS.WGS84_3D);
+        envelope.setRange(0, bbox.getWestBoundLongitude(), bbox.getEastBoundLongitude());
+        envelope.setRange(1, bbox.getSouthBoundLatitude(), bbox.getNorthBoundLatitude());
+        // The 2th dimension is initialized to 0, which is exactly what we want.
+        return getIdentifier(envelope, new int[] {size.width, size.height, 1});
     }
 
     /**
-     * Todo: revisit and make public in replacement of previous method.
+     * Returns the identifier for the specified envelope and grid range.
+     * If no matching record is found, then this method returns {@code null}.
+     *
+     * @param  spatialExtent The three-dimensional envelope.
+     * @param  size The image width, height and depth (in pixels) as an array of length 3.
+     * @throws SQLException if the operation failed.
      */
-    private String getIdentifier(final Envelope spatialExtent, final Dimension size)
-            throws SQLException, CatalogException
+    public synchronized String getIdentifier(final Envelope spatialExtent, final int[] size)
+            throws SQLException
     {
-        final PreparedStatement statement = getStatement(SELECT);
-        byExtent.setEnvelope(statement, SELECT, spatialExtent);
-        statement.setInt(indexOf(byWidth ), size.width);
-        statement.setInt(indexOf(byHeight), size.height);
-        statement.setInt(indexOf(byDepth ), 1); // TODO
+        final GeographicBoundingBoxQuery query = (GeographicBoundingBoxQuery) super.query;
+        final PreparedStatement statement = getStatement(QueryType.SELECT);
+        query.byExtent.setEnvelope(statement, QueryType.SELECT, spatialExtent);
+        for (int i=0; i<3; i++) {
+            final Parameter p;
+            switch (i) {
+                case 0: p = query.byWidth;  break;
+                case 1: p = query.byHeight; break;
+                case 2: p = query.byDepth;  break;
+                default: throw new AssertionError(i);
+            }
+            statement.setInt(indexOf(p), i < size.length ? size[i] : 1);
+        }
         String ID = null;
         final ResultSet result = statement.executeQuery();
         while (result.next()) {
@@ -177,7 +132,7 @@ public class GeographicBoundingBoxTable extends Table implements Shareable {
         if (true) {
             throw new CatalogException("Not yet implemented.");
         }
-        final PreparedStatement statement = getStatement(INSERT);
+        final PreparedStatement statement = getStatement(QueryType.INSERT);
         statement.setString(1, identifier);
 //        setBoundingBox(statement, 1, bbox, size);
         if (statement.executeUpdate() != 1) {

@@ -24,25 +24,20 @@ import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Shareable;
+import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
 import net.sicade.observation.coverage.LinearModel;
 import net.sicade.observation.coverage.Descriptor;
-import net.sicade.observation.sql.Column;
-import net.sicade.observation.sql.Parameter;
-import net.sicade.observation.sql.QueryType;
 import net.sicade.resources.i18n.ResourceKeys;
 import net.sicade.resources.i18n.Resources;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers une table pouvant substituer un {@linkplain Descriptor descripteur} par une
- * somme de {@linkplain LinearModel.Term termes}. Cette table est utilisée notamment pour substituer
- * les gradients temporels. Ces derniers sont des descripteurs virtuels, calculés à la volé par
- * PostgreSQL à partir de la différence entre deux descripteurs "bruts". Cette table permet de
- * {@linkplain LinearModelEntry#substitute substituer} un descripteur virtuel par les descripteurs
- * réels qui le compose.
+ * Connection to a table capable to substitute a {@linkplain Descriptor descriptor} by a sum of
+ * {@linkplain LinearModel.Term linear terms}. Such substitution may be applied for example in
+ * order to compute a temporal gradient on the fly. The {@link #expand} method replaces a single
+ * descriptor by a linear combinaison of other descriptors.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -50,16 +45,6 @@ import static net.sicade.observation.sql.QueryType.*;
 @Use(DescriptorTable.class)
 @UsedBy(LinearModelTable.class)
 public class DescriptorSubstitutionTable extends Table implements Shareable {
-    /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column symbol, symbol1, symbol2;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter bySymbol;
-
     /**
      * The descriptor table. Will be created only when first needed.
      */
@@ -71,22 +56,29 @@ public class DescriptorSubstitutionTable extends Table implements Shareable {
      * @param database Connection to the database.
      */
     public DescriptorSubstitutionTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        symbol   = new Column   (query, "TemporalGradientDescriptors", "symbol",  LIST);
-        symbol1  = new Column   (query, "TemporalGradientDescriptors", "symbol1", usage);
-        symbol2  = new Column   (query, "TemporalGradientDescriptors", "symbol2", usage);
-        bySymbol = new Parameter(query, symbol, SELECT);
+        super(new DescriptorSubstitutionQuery(database));
     }
 
     /**
-     * Définie la table des descripteurs à utiliser. Cette méthode peut être appelée par
-     * {@link LinearModelTable} immédiatement après la construction de cette table et avant
-     * toute première utilisation. Notez que les instances ainsi créées ne devraient pas être
-     * partagées par {@link Database#getTable}.
+     * Creates a new table using the same connection than the specified table.
+     * This is useful when we want to change the configuration of the new table
+     * while preserving the original table from changes.
      *
-     * @param  descriptors Table des descripteurs à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des descripteurs.
+     * @param table The table to clone.
+     *
+     * @see #setDescriptorTable
+     */
+    protected DescriptorSubstitutionTable(final DescriptorSubstitutionTable table) {
+        super(table);
+    }
+
+    /**
+     * Sets the descriptor table to use. This method is invoked by {@link LinearModelTable}
+     * immediately after the creation of this {@code DescriptorSubstitutionTable}. Note that
+     * the instance given to this method should not be cached by {@link Database#getTable}.
+     *
+     * @param  descriptors The descriptor table to use.
+     * @throws IllegalStateException if this table is already associated to an other descriptor table.
      */
     protected synchronized void setDescriptorTable(final DescriptorTable descriptors)
             throws IllegalStateException
@@ -100,24 +92,29 @@ public class DescriptorSubstitutionTable extends Table implements Shareable {
     }
 
     /**
-     * Retourne les termes de modèles linéaire pour le descripteur spécifié, ou {@code null}
-     * s'il n'y en a pas. Si cette méthode retourne un tableau non-nul, alors le descripteur
-     * spécifié sera remplacé par la somme de tous les termes retournés lors de la construction
-     * d'un modèle linéaire.
+     * Returns the linear model terms for the specified descriptor, or {@code null} if none.
+     * If this method returns a non-null value, then the descriptor given in argument can be
+     * computed by a linear model described by the returned terms.
+     *
+     * @param  descriptor The descriptor to replace.
+     * @return The linear model terms, or {@code null} if none.
+     * @throws CatalogException if an inconsistent record is found in the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     public synchronized LinearModel.Term[] expand(final Descriptor descriptor)
             throws CatalogException, SQLException
     {
-        final PreparedStatement statement = getStatement(SELECT);
+        final DescriptorSubstitutionQuery query = (DescriptorSubstitutionQuery) super.query;
+        final PreparedStatement statement = getStatement(QueryType.SELECT);
         final String key = descriptor.getName();
-        statement.setString(indexOf(bySymbol), key);
+        statement.setString(indexOf(query.bySymbol), key);
         final ResultSet results = statement.executeQuery();
         if (!results.next()) {
             results.close();
             return null;
         }
-        final String symbol1 = results.getString(indexOf(this.symbol1));
-        final String symbol2 = results.getString(indexOf(this.symbol2));
+        final String symbol1 = results.getString(indexOf(query.symbol1));
+        final String symbol2 = results.getString(indexOf(query.symbol2));
         if (results.next()) {
             final String table = results.getMetaData().getTableName(1);
             results.close();

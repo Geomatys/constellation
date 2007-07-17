@@ -45,7 +45,7 @@ public class ProcedureTable extends SingletonTable<Procedure> implements Shareab
      * @param  database Connexion vers la base de données.
      */
     public ProcedureTable(final Database database) {
-        super(database);
+        super(new Query(database)); // TODO
     }
 
     /**

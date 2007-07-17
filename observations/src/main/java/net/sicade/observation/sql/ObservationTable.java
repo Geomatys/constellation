@@ -105,7 +105,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     protected ObservationTable(final Database       database,
                                final ConfigurationKey select)
     {
-        super(database);
+        super(new Query(database)); // TODO
         this.select = select;
     }
 

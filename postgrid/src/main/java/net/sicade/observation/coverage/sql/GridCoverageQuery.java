@@ -38,7 +38,8 @@ final class GridCoverageQuery extends Query {
      * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column layer, series, pathname, filename, extension,
-            startTime, endTime, spatialExtent, width, height, depth, crs, format, visibility;
+            startTime, endTime, spatialExtent, xmin, xmax, ymin, ymax, zmin, zmax,
+            width, height, depth, crs, format, visibility;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -48,36 +49,50 @@ final class GridCoverageQuery extends Query {
     /**
      * Creates a new query for the specified database.
      *
+     * @param  database The database for which this query is created.
      * @throws SQLException if an error occured while reading the database.
      */
     public GridCoverageQuery(final Database database) throws SQLException {
         super(database);
-        final QueryType[] SL  = {SELECT, LIST};
+        final QueryType[] SL  = {SELECT, LIST                 };
         final QueryType[] SLA = {SELECT, LIST, AVAILABLE_DATA};
-        layer           = new Column   (this, "Series",         "layer",         SL );
-        series          = new Column   (this, "GridCoverages",  "series",        SL );
-        pathname        = new Column   (this, "Series",         "pathname",      SL );
-        filename        = new Column   (this, "GridCoverages",  "filename",      SL );
-        extension       = new Column   (this, "Series",         "extension",     SL );
-        startTime       = new Column   (this, "GridCoverages",  "startTime",     SLA);
-        endTime         = new Column   (this, "GridCoverages",  "endTime",       SLA);
-        spatialExtent   = new SpatialColumn.Box(this, "GridGeometries", "spatialExtent", SLA);
-        width           = new Column   (this, "GridGeometries", "width",         SL );
-        height          = new Column   (this, "GridGeometries", "height",        SL );
-        depth           = new Column   (this, "GridGeometries", "depth",         SL );
-        crs             = new Column   (this, "GridGeometries", "CRS",           SL );
-        format          = new Column   (this, "Series",         "format",        SL );
-        visibility      = new Column   (this, "Series",         "visible",       SLA);
-        byFilename      = new Parameter(this, filename,      SELECT);
-        byLayer         = new Parameter(this, layer,         SLA);
-        byStartTime     = new Parameter(this, startTime,     SLA);
-        byEndTime       = new Parameter(this, endTime,       SLA);
+        final QueryType[]   A = {              AVAILABLE_DATA};
+        layer           = addColumn("Series",         "layer",     SL );
+        series          = addColumn("GridCoverages",  "series",    SL );
+        pathname        = addColumn("Series",         "pathname",  SL );
+        filename        = addColumn("GridCoverages",  "filename",  SL );
+        extension       = addColumn("Series",         "extension", SL );
+        startTime       = addColumn("GridCoverages",  "startTime", SLA);
+        endTime         = addColumn("GridCoverages",  "endTime",   SLA);
+        spatialExtent   = new SpatialColumn.Box(this, "GridGeometries", "spatialExtent", SL);
+        xmin            = addColumn("GridGeometries", "spatialExtent", "xmin", A);
+        xmax            = addColumn("GridGeometries", "spatialExtent", "xmax", A);
+        ymin            = addColumn("GridGeometries", "spatialExtent", "ymin", A);
+        ymax            = addColumn("GridGeometries", "spatialExtent", "ymax", A);
+        zmin            = addColumn("GridGeometries", "spatialExtent", "zmin", A);
+        zmax            = addColumn("GridGeometries", "spatialExtent", "zmax", A);
+        width           = addColumn("GridGeometries", "width",     SL );
+        height          = addColumn("GridGeometries", "height",    SL );
+        depth           = addColumn("GridGeometries", "depth",     SL );
+        crs             = addColumn("GridGeometries", "CRS",       SL );
+        format          = addColumn("Series",         "format",    SL );
+        visibility      = addColumn("Series",         "visible",   SLA);
+        byFilename      = addParameter(filename,   SELECT);
+        byLayer         = addParameter(layer,      SLA);
+        byStartTime     = addParameter(startTime,  SLA);
+        byEndTime       = addParameter(endTime,    SLA);
         bySpatialExtent = new SpatialParameter.Box(this, spatialExtent, SLA);
-        byVisibility    = new Parameter(this, visibility,    SLA);
+        byVisibility    = addParameter(visibility, SLA);
         if (SpatialColumn.WORKAROUND_POSTGIS) {
             // PostGIS doesn't seem to be able to apply conversions by itself.
             bySpatialExtent.setFunction("::text", SLA);
         }
+        xmin           .setFunction("xmin", A);
+        xmax           .setFunction("xmax", A);
+        ymin           .setFunction("ymin", A);
+        ymax           .setFunction("ymax", A);
+        zmin           .setFunction("zmin", A);
+        zmax           .setFunction("zmax", A);
         filename       .setRole(Role.NAME);
         spatialExtent  .setRole(Role.SPATIAL_ENVELOPE);
         startTime      .setRole(Role.TIME_RANGE);

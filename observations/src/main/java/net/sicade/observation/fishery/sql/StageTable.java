@@ -57,7 +57,7 @@ public class StageTable extends SingletonTable<Stage> implements Shareable {
      * @param  database Connexion vers la base de données.
      */
     public StageTable(final Database database) {
-        super(database);
+        super(new net.sicade.observation.sql.Query(database)); // TODO
     }
 
     /**

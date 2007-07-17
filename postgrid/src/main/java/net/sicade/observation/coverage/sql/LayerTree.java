@@ -104,7 +104,7 @@ public class LayerTree extends Table implements Shareable {
      * @param database  Connexion vers la base de données d'observations.
      */
     public LayerTree(final Database database) {
-        super(database);
+        super(new net.sicade.observation.sql.Query(database)); // TODO
     }
 
     /**

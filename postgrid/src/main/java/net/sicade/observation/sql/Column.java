@@ -57,44 +57,22 @@ public class Column extends IndexedSqlElement {
      * @param table The table name in which this column appears.
      * @param name  The column name.
      */
-    public Column(final Query query, final String table, final String name) {
-        this(query, table, name, name);
-    }
-
-    /**
-     * Creates a column from the specified table with the specified name but no alias.
-     *
-     * @param query The query for which the column is created.
-     * @param table The table name in which this column appears.
-     * @param name  The column name.
-     * @param types The query for which to include this column, or {@code null} for all.
-     */
-    public Column(final Query query, final String table, final String name, final QueryType... types) {
-        this(query, table, name, name, types);
+    Column(final Query query, final String table, final String name) {
+        this(query, table, name, name, (QueryType[]) null);
     }
 
     /**
      * Creates a column from the specified table with the specified name and alias.
+     * The new column is automatically added to the specified query.
      *
      * @param query The query for which the column is created.
-     * @param table The table name in which this column appears.
+     * @param table The name of the table that contains the column.
      * @param name  The column name.
-     * @param alias The alias.
+     * @param alias An alias for the column.
+     * @param types Types of the queries where the column shall appears, or {@code null}
+     *              if the column is applicable to any kind of queries.
      */
-    public Column(final Query query, final String table, final String name, final String alias) {
-        this(query, table, name, alias, (QueryType[]) null);
-    }
-
-    /**
-     * Creates a column from the specified table with the specified name and alias.
-     *
-     * @param query The query for which the column is created.
-     * @param table The table name in which this column appears.
-     * @param name  The column name.
-     * @param alias The alias.
-     * @param types The query for which to include this column, or {@code null} for all.
-     */
-    public Column(final Query query, final String table, final String name, final String alias, final QueryType... types) {
+    protected Column(final Query query, final String table, final String name, final String alias, final QueryType... types) {
         super(query, types);
         this.table = table.trim();
         this.name  = name .trim();

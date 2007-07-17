@@ -26,30 +26,23 @@ import javax.units.Unit;
 // Geotools dependencies
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GridCoverage2D;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
-import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.sql.Shareable;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
-import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connexion vers une table des {@linkplain GridSampleDimension bandes}. Cette table construit des
- * objets {@link GridSampleDimension} pour un format d'image individuel. Les bandes sont une des
- * composantes d'un objet {@link org.geotools.coverage.grid.GridCoverage2D}, mais ne correspondent
- * pas directement à un {@linkplain net.sicade.observation.Element élément} du paquet des
- * observations.
- * <p>
- * Cette table est utilisée par {@link FormatTable}, qui construit des objets de
- * plus haut niveau.
+ * Connection to a table of {@linkplain GridSampleDimension sample dimensions}. This table creates
+ * instances of {@link GridSampleDimension} for a given format. Sample dimensions are one of the
+ * components needed for creation of {@link GridCoverage2D}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -58,53 +51,37 @@ import static net.sicade.observation.sql.QueryType.*;
 @UsedBy(FormatTable.class)
 public class SampleDimensionTable extends Table implements Shareable {
     /**
-     * Column name declared in the {@linkplain #query query}.
-     */
-    private final Column identifier, format, band, units;
-
-    /**
-     * Parameter declared in the {@linkplain #query query}.
-     */
-    private final Parameter byFormat;
-
-    /**
      * Connexion vers la table des {@linkplain Category catégories}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     private CategoryTable categories;
 
     /**
-     * Construit une table en utilisant la connexion spécifiée.
-     *
-     * @param database  Connexion vers la base de données d'observations.
+     * Creates a sample dimension table.
+     * 
+     * @param database Connection to the database.
      */
     public SampleDimensionTable(final Database database) {
-        super(database);
-        final QueryType[] usage = {LIST, FILTERED_LIST};
-        identifier = new Column   (query, "SampleDimensions", "identifier", usage);
-        format     = new Column   (query, "SampleDimensions", "format",     LIST );
-        band       = new Column   (query, "SampleDimensions", "band",       usage);
-        units      = new Column   (query, "SampleDimensions", "units",      usage);
-        byFormat   = new Parameter(query, format, FILTERED_LIST);
-        band.setOrdering("ASC");
+        super(new SampleDimensionQuery(database));
     }
 
     /**
-     * Retourne les bandes qui se rapportent au format spécifié.
+     * Returns the sample dimensions for the given format.
      *
-     * @param  format Nom du format pour lequel on veut les bandes.
-     * @return Les listes des bandes du format demandé.
-     * @throws IllegalRecordException si une incohérence a été trouvée dans les enregistrements.
-     * @throws SQLException si l'interrogation de la table a échoué.
+     * @param  format The format name.
+     * @return The sample dimensions for the given format.
+     * @throws CatalogException if an inconsistent record is found in the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     public synchronized GridSampleDimension[] getSampleDimensions(final String format)
             throws CatalogException, SQLException
     {
-        final PreparedStatement statement = getStatement(FILTERED_LIST);
-        statement.setString(indexOf(byFormat), format);
-        final int idIndex   = indexOf(identifier);
-        final int bandIndex = indexOf(band);
-        final int unitIndex = indexOf(units);
+        final SampleDimensionQuery query = (SampleDimensionQuery) super.query;
+        final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+        statement.setString(indexOf(query.byFormat), format);
+        final int idIndex   = indexOf(query.identifier);
+        final int bandIndex = indexOf(query.band);
+        final int unitIndex = indexOf(query.units);
         int lastBand = 0;
         final List<GridSampleDimension> sampleDimensions = new ArrayList<GridSampleDimension>();
         final ResultSet result = statement.executeQuery();
