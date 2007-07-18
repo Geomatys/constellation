@@ -19,9 +19,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.CoverageReference;
@@ -68,12 +70,19 @@ public class GridCoverageTableTest extends DatabaseTest {
         assertTrue(entries.contains(entry));
         assertSame(entry, table.getEntry());
 
-        final Map<Date, Set<Number>> data = table.getAvailableCentroids();
-        assertEquals(entries.size(), data.size());
-        final Set<Number> depths = data.get(date("1986-01-13"));
+        final SortedMap<Date, SortedSet<Number>> centroids = table.getAvailableCentroids();
+        assertEquals(entries.size(), centroids.size());
+        final Set<Number> depths = centroids.get(date("1986-01-13"));
         assertNotNull(depths);
         assertFalse(depths.isEmpty());
         assertTrue(depths.contains(0.0));
+
+        final Set<Date> availableTimes = table.getAvailableTimes();
+        assertEquals(centroids.keySet(), availableTimes);
+
+        final Set<Number> altitudes = table.getAvailableAltitudes();
+        assertEquals(1, altitudes.size());
+        assertEquals(new Double(0), altitudes.iterator().next());
     }
 
     /**

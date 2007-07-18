@@ -22,16 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -185,10 +176,22 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private transient Parameters parameters;
 
     /**
-     * The set of available depths for each dates. Will be computed by
+     * The set of available altitudes. Will be computed by
+     * {@link #getAvailableAltitudes} when first needed.
+     */
+    private transient SortedSet<Number> availableAltitudes;
+
+    /**
+     * The set of available dates. Will be computed by
+     * {@link #getAvailableTimes} when first needed.
+     */
+    private transient SortedSet<Date> availableTimes;
+
+    /**
+     * The set of available altitudes for each dates. Will be computed by
      * {@link #getAvailableCentroids} when first needed.
      */
-    private transient Map<Date, Set<Number>> availableCentroids;
+    private transient SortedMap<Date, SortedSet<Number>> availableCentroids;
 
     /**
      * Une vue tri-dimensionnelle de toutes les données d'une couche.
@@ -499,14 +502,60 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
+     * Returns the set of altitudes where a coverage is available. Only the images in
+     * the currently {@linkplain #getEnvelope selected envelope} are considered.
+     * <p>
+     * If different images have different set of altitudes, then this method returns
+     * only the altitudes found in every images.
+     *
+     * @return The set of altitudes. May be empty, but will never be null.
+     * @throws SQLException If an error occured while reading the database.
+     */
+    public synchronized SortedSet<Number> getAvailableAltitudes() throws SQLException {
+        if (availableAltitudes == null) {
+            final SortedSet<Number> commons = new TreeSet<Number>();
+            final SortedMap<Date, SortedSet<Number>> centroids = getAvailableCentroids();
+            final Iterator<SortedSet<Number>> iterator = centroids.values().iterator();
+            if (iterator.hasNext()) {
+                commons.addAll(iterator.next());
+                while (iterator.hasNext()) {
+                    final SortedSet<Number> altitudes = iterator.next();
+                    for (final Iterator<Number> it=commons.iterator(); it.hasNext();) {
+                        if (!altitudes.contains(it.next())) {
+                            it.remove();
+                        }
+                    }
+                    if (commons.isEmpty()) {
+                        break; // No need to continue.
+                    }
+                }
+            }
+            availableAltitudes = Collections.unmodifiableSortedSet(commons);
+        }
+        return availableAltitudes;
+    }
+
+    /**
      * Returns the set of dates for which a coverage is available. Only the images in
-     * the currently {@linkplain #setTimeRange selected time range} are considered.
+     * the currently {@linkplain #getEnvelope selected envelope} are considered.
      *
      * @return The set of dates.
      * @throws SQLException If an error occured while reading the database.
      */
-    public Set<Date> getAvailableTimes() throws SQLException {
-        return getAvailableCentroids().keySet();
+    public synchronized SortedSet<Date> getAvailableTimes() throws SQLException {
+        if (availableTimes == null) {
+            final SortedMap<Date, SortedSet<Number>> centroids = getAvailableCentroids();
+            /*
+             * The above line should have computed 'availableTimes' as a side effect. If it was
+             * not the case (for example because the user overrided the method), then cast the
+             * centroids key set. Note that the cast is likely to fail; the user would be well
+             * advised to override getAvailableTimes() in addition of getAvailableCentroids().
+             */
+            if (availableTimes == null) {
+                availableTimes = (SortedSet<Date>) centroids.keySet();
+            }
+        }
+        return availableTimes;
     }
 
     /**
@@ -519,9 +568,10 @@ loop:   for (final CoverageReference newReference : entries) {
      *         of altitudes for that date.
      * @throws SQLException If an error occured while reading the database.
      */
-    public synchronized Map<Date, Set<Number>> getAvailableCentroids() throws SQLException {
+    public synchronized SortedMap<Date, SortedSet<Number>> getAvailableCentroids() throws SQLException {
         if (availableCentroids == null) {
-            availableCentroids = new TreeMap<Date, Set<Number>>();
+            availableCentroids = new TreeMap<Date, SortedSet<Number>>();
+            final Map<Number,Number> numbers   = new HashMap<Number,Number>(); // For sharing instances.
             final GridCoverageQuery  query     = (GridCoverageQuery) super.query;
             final Calendar           calendar  = getCalendar();
             final PreparedStatement  statement = getStatement(QueryType.AVAILABLE_DATA);
@@ -545,7 +595,7 @@ loop:   for (final CoverageReference newReference : entries) {
                 } else {
                     continue;
                 }
-                Set<Number> depths = availableCentroids.get(time);
+                SortedSet<Number> depths = availableCentroids.get(time);
                 if (depths == null) {
                     depths = new TreeSet<Number>();
                     availableCentroids.put(time, depths);
@@ -554,7 +604,13 @@ loop:   for (final CoverageReference newReference : entries) {
                 double zmax = results.getDouble(zmaxIndex); if (results.wasNull()) zmax=Double.POSITIVE_INFINITY;
                 double z = (zmin + zmax) / 2;
                 if (!Double.isNaN(z) && !Double.isInfinite(z)) {
-                    depths.add(z);
+                    final Number value = z;
+                    Number shared = numbers.get(value);
+                    if (shared == null) {
+                        shared = value;
+                        numbers.put(value, value);
+                    }
+                    depths.add(shared);
                 }
             }
             /*
@@ -562,19 +618,48 @@ loop:   for (final CoverageReference newReference : entries) {
              * It is quite common to have many dates (if not all) associated with identical
              * set of depth values.
              */
-            final Map<Set<Number>, Set<Number>> pool = new HashMap<Set<Number>, Set<Number>>();
-            for (final Map.Entry<Date, Set<Number>> entry : availableCentroids.entrySet()) {
-                Set<Number> current = entry.getValue();
-                Set<Number> shared  = pool.get(current);
+            final Map<SortedSet<Number>, SortedSet<Number>> pool = new HashMap<SortedSet<Number>, SortedSet<Number>>();
+            for (final Map.Entry<Date, SortedSet<Number>> entry : availableCentroids.entrySet()) {
+                SortedSet<Number> current = entry.getValue();
+                SortedSet<Number> shared  = pool.get(current);
                 if (shared == null) {
-                    shared = Collections.unmodifiableSet(current);
+                    shared = Collections.unmodifiableSortedSet(current);
                     pool.put(current, shared);
                 }
                 entry.setValue(shared);
             }
-            availableCentroids = Collections.unmodifiableMap(availableCentroids);
+            // AvailableTimes must be determined before we wrap 'availableCentroids' in an unmodifiable map.
+            availableTimes = Collections.unmodifiableSortedSet((SortedSet<Date>) availableCentroids.keySet());
+            availableCentroids = Collections.unmodifiableSortedMap(availableCentroids);
         }
         return availableCentroids;
+    }
+
+    /**
+     * Returns a list of dates when the images have the same set of altitudes (<var>z</var>). For the
+     * {@linkplain #getLayer selected layer}, every images at the {@linkplain CommonAltitudes#getDates
+     * given dates} have data available at the {@linkplain CommonAltitudes#getAltitudes given altitudes}.
+     *
+     * @return An list of common altitudes.
+     * @throws SQLException If an error occured while reading the database.
+     */
+    public List<CommonAltitudes> getCommonAltitudes() throws SQLException {
+        final SortedMap<Date, SortedSet<Number>> centroids = getAvailableCentroids();
+        final Map<SortedSet<Number>, SortedSet<Date>> byAltitudes = new LinkedHashMap<SortedSet<Number>, SortedSet<Date>>();
+        for (final Map.Entry<Date, SortedSet<Number>> entry : centroids.entrySet()) {
+            final SortedSet<Number> altitude = entry.getValue();
+            SortedSet<Date> times = byAltitudes.get(altitude);
+            if (times == null) {
+                times = new TreeSet<Date>();
+                byAltitudes.put(altitude, times);
+            }
+            times.add(entry.getKey());
+        }
+        final List<CommonAltitudes> commons = new ArrayList<CommonAltitudes>(byAltitudes.size());
+        for (final Map.Entry<SortedSet<Number>, SortedSet<Date>> entry : byAltitudes.entrySet()) {
+            commons.add(new CommonAltitudes(layer, entry.getValue(), entry.getKey()));
+        }
+        return commons;
     }
 
     /**
@@ -840,6 +925,8 @@ loop:   for (final CoverageReference newReference : entries) {
         parameters = null;
         comparator = null;
         envelope   = null;
+        availableAltitudes = null;
+        availableTimes     = null;
         availableCentroids = null;
     }
 
