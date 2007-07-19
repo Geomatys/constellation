@@ -34,12 +34,12 @@ final class SeriesQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, owner, format;
+    protected final Column name, format;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName, byOwner;
+    protected final Parameter byLayer;
 
     /**
      * Creates a new query for the specified database.
@@ -48,12 +48,14 @@ final class SeriesQuery extends Query {
      */
     public SeriesQuery(final Database database) {
         super(database);
+        final Column layer;
+        final Parameter byName;
         final QueryType[] usage = {SELECT, LIST, FILTERED_LIST};
         name    = addColumn   ("Series", "identifier", usage);
-        owner   = addColumn   ("Series", "layer",      usage);
+        layer   = addColumn   ("Series", "layer",      usage);
         format  = addColumn   ("Series", "format",     usage);
         byName  = addParameter(name,  SELECT);
-        byOwner = addParameter(owner, FILTERED_LIST);
+        byLayer = addParameter(layer, FILTERED_LIST);
         name.setRole(Role.NAME);
         name.setOrdering("ASC");
     }

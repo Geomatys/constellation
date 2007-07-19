@@ -36,11 +36,6 @@ final class OperationQuery extends Query {
      */
     protected final Column name, prefix, operation, remarks;
 
-    /**
-     * Parameter to appear after the {@code "FROM"} clause.
-     */
-    protected final Parameter byName;
-
     /** 
      * Creates a new query for the specified database.
      *
@@ -48,6 +43,7 @@ final class OperationQuery extends Query {
      */
     public OperationQuery(final Database database) {
         super(database);
+        final Parameter byName;
         final QueryType[] usage = {SELECT, LIST};
         name      = addColumn   ("Operations", "name",        usage);
         prefix    = addColumn   ("Operations", "prefix",      usage);

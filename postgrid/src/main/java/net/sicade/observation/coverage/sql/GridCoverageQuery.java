@@ -39,12 +39,12 @@ final class GridCoverageQuery extends Query {
      */
     protected final Column layer, series, pathname, filename, extension,
             startTime, endTime, spatialExtent, xmin, xmax, ymin, ymax, zmin, zmax,
-            width, height, depth, crs, format, visibility;
+            width, height, depth, crs, format;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byFilename, byLayer, byStartTime, byEndTime, bySpatialExtent, byVisibility;
+    protected final Parameter byLayer, byVisibility;
 
     /**
      * Creates a new query for the specified database.
@@ -54,6 +54,8 @@ final class GridCoverageQuery extends Query {
      */
     public GridCoverageQuery(final Database database) throws SQLException {
         super(database);
+        final Column visibility;
+        final Parameter byFilename, byStartTime, byEndTime, bySpatialExtent;
         final QueryType[] SL  = {SELECT, LIST                 };
         final QueryType[] SLA = {SELECT, LIST, AVAILABLE_DATA};
         final QueryType[]   A = {              AVAILABLE_DATA};

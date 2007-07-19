@@ -33,7 +33,7 @@ final class SampleDimensionQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column identifier, format, band, units;
+    protected final Column identifier, band, units;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -47,6 +47,7 @@ final class SampleDimensionQuery extends Query {
      */
     public SampleDimensionQuery(final Database database) {
         super(database);
+        final Column format;
         final QueryType[] usage = {LIST, FILTERED_LIST};
         identifier = addColumn   ("SampleDimensions", "identifier", usage);
         format     = addColumn   ("SampleDimensions", "format",     LIST );

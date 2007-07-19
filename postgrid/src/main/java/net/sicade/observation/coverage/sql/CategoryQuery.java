@@ -34,7 +34,7 @@ final class CategoryQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, band, lower, upper, c0, c1, function, colors;
+    protected final Column name, lower, upper, c0, c1, function, colors;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -48,6 +48,7 @@ final class CategoryQuery extends Query {
      */
     public CategoryQuery(final Database database) {
         super(database);
+        final Column band;
         final QueryType[] usage = {LIST, FILTERED_LIST};
         name     = addColumn   ("Categories", "name",     usage);
         band     = addColumn   ("Categories", "band",     LIST );

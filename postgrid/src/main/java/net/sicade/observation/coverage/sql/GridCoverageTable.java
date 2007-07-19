@@ -629,37 +629,17 @@ loop:   for (final CoverageReference newReference : entries) {
                 entry.setValue(shared);
             }
             // AvailableTimes must be determined before we wrap 'availableCentroids' in an unmodifiable map.
-            availableTimes = Collections.unmodifiableSortedSet((SortedSet<Date>) availableCentroids.keySet());
+            Set<Date> keySet = availableCentroids.keySet();
+            if (!(keySet instanceof SortedSet)) {
+                keySet = new TreeSet<Date>(keySet);
+                // This is a hack for Java 5 (Java 6 returns directly an instance of SortedSet).
+                // TODO: remove this hack when we will be allowed to target Java 6, and invoke
+                //       TreeSet.navigableKeySet() instead.
+            }
+            availableTimes = Collections.unmodifiableSortedSet((SortedSet<Date>) keySet);
             availableCentroids = Collections.unmodifiableSortedMap(availableCentroids);
         }
         return availableCentroids;
-    }
-
-    /**
-     * Returns a list of dates when the images have the same set of altitudes (<var>z</var>). For the
-     * {@linkplain #getLayer selected layer}, every images at the {@linkplain CommonAltitudes#getDates
-     * given dates} have data available at the {@linkplain CommonAltitudes#getAltitudes given altitudes}.
-     *
-     * @return An list of common altitudes.
-     * @throws SQLException If an error occured while reading the database.
-     */
-    public List<CommonAltitudes> getCommonAltitudes() throws SQLException {
-        final SortedMap<Date, SortedSet<Number>> centroids = getAvailableCentroids();
-        final Map<SortedSet<Number>, SortedSet<Date>> byAltitudes = new LinkedHashMap<SortedSet<Number>, SortedSet<Date>>();
-        for (final Map.Entry<Date, SortedSet<Number>> entry : centroids.entrySet()) {
-            final SortedSet<Number> altitude = entry.getValue();
-            SortedSet<Date> times = byAltitudes.get(altitude);
-            if (times == null) {
-                times = new TreeSet<Date>();
-                byAltitudes.put(altitude, times);
-            }
-            times.add(entry.getKey());
-        }
-        final List<CommonAltitudes> commons = new ArrayList<CommonAltitudes>(byAltitudes.size());
-        for (final Map.Entry<SortedSet<Number>, SortedSet<Date>> entry : byAltitudes.entrySet()) {
-            commons.add(new CommonAltitudes(layer, entry.getValue(), entry.getKey()));
-        }
-        return commons;
     }
 
     /**
@@ -687,6 +667,7 @@ loop:   for (final CoverageReference newReference : entries) {
         final int xmaxIndex      = indexOf(query.xmax);
         final int yminIndex      = indexOf(query.ymin);
         final int ymaxIndex      = indexOf(query.ymax);
+        // TODO: add z range
         while (result.next()) {
             if (ranges.t != null) {
                 final long timeInterval = Math.round(layer.getTimeInterval() * LocationOffsetEntry.DAY);
@@ -767,6 +748,7 @@ loop:   for (final CoverageReference newReference : entries) {
         }
         final short  width     = result.getShort    (indexOf(query.width));
         final short  height    = result.getShort    (indexOf(query.height));
+        // TODO: What to do with depth?
         final String crs       = result.getString   (indexOf(query.crs));
         final String format    = result.getString   (indexOf(query.format));
         return new GridCoverageEntry(this, layer, series, pathname, filename, extension, startTime,

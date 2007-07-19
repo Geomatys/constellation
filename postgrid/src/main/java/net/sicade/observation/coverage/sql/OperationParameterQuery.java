@@ -33,7 +33,7 @@ final class OperationParameterQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column operation, parameter, value;
+    protected final Column parameter, value;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -47,6 +47,7 @@ final class OperationParameterQuery extends Query {
      */
     public OperationParameterQuery(final Database database) {
         super(database);
+        final Column operation;
         final QueryType[] usage = {SELECT, LIST};
         operation   = addColumn   ("OperationParameters", "operation", LIST);
         parameter   = addColumn   ("OperationParameters", "parameter", usage);

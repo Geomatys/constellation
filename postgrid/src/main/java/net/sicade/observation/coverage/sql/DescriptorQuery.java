@@ -37,17 +37,13 @@ final class DescriptorQuery extends Query {
     protected final Column symbol, identifier, phenomenon, procedure, offset, band, distribution;
 
     /**
-     * Parameter to appear after the {@code "FROM"} clause.
-     */
-    protected final Parameter bySymbol, byIdentifier;
-
-    /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
     public DescriptorQuery(final Database database) {
         super(database);
+        final Parameter bySymbol, byIdentifier;
         final QueryType[] usage = {SELECT, LIST};
         symbol       = addColumn   ("Descriptors", "symbol",       usage);
         identifier   = addColumn   ("Descriptors", "identifier",   usage);

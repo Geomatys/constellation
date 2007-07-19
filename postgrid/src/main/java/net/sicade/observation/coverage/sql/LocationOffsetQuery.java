@@ -37,17 +37,13 @@ final class LocationOffsetQuery extends Query {
     protected final Column name, dx, dy, dz, dt;
 
     /**
-     * Parameter to appear after the {@code "FROM"} clause.
-     */
-    protected final Parameter byName;
-
-    /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
     public LocationOffsetQuery(final Database database) {
         super(database);
+        final Parameter byName;
         final QueryType[] usage = {SELECT, LIST};
         name   = addColumn("LocationOffsets", "name", usage);
         dx     = addColumn("LocationOffsets", "dx",   usage);

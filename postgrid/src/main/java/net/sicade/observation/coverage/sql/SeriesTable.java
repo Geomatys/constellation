@@ -103,7 +103,7 @@ public class SeriesTable extends SingletonTable<Series> {
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
         final SeriesQuery query = (SeriesQuery) super.query;
-        final int index = query.byOwner.indexOf(type);
+        final int index = query.byLayer.indexOf(type);
         if (index != 0) {
             statement.setString(1, layer!=null ? layer.getName() : null);
         }

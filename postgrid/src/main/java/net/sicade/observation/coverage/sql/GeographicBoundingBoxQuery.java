@@ -35,16 +35,6 @@ import static net.sicade.observation.sql.QueryType.*;
  */
 final class GeographicBoundingBoxQuery extends Query {
     /**
-     * Column to appear after the {@code "SELECT"} clause.
-     */
-    protected final Column name, width, height, depth;
-
-    /**
-     * Column to appear after the {@code "SELECT"} clause.
-     */
-    protected final SpatialColumn.Box spatialExtent;
-
-    /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
     protected final SpatialParameter.Box byExtent;
@@ -84,6 +74,8 @@ final class GeographicBoundingBoxQuery extends Query {
      */
     public GeographicBoundingBoxQuery(final Database database) throws SQLException {
         super(database);
+        final Column name, width, height, depth;
+        final SpatialColumn.Box spatialExtent;
         final QueryType[] usageLW = {LIST,   INSERT};
         final QueryType[] usageRW = {SELECT, INSERT};
         name          = addColumn   ("GridGeometries", "id",     usageRW);

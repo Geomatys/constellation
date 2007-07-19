@@ -33,7 +33,7 @@ final class LinearModelQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column target, source1, source2, coefficient;
+    protected final Column source1, source2, coefficient;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -47,6 +47,7 @@ final class LinearModelQuery extends Query {
      */
     public LinearModelQuery(final Database database) {
         super(database);
+        final Column target;
         final QueryType[] usage = {SELECT};
         target      = addColumn   ("LinearModelTerms", "target",      LIST);
         source1     = addColumn   ("LinearModelTerms", "source1",     usage);

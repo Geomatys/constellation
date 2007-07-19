@@ -35,11 +35,6 @@ final class LayerQuery extends Query {
      * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column name, thematic, period, fallback, remarks;
-
-    /**
-     * Parameter to appear after the {@code "FROM"} clause.
-     */
-    protected final Parameter byName;
     
 //    private static final SpatialConfigurationKey LIST = new SpatialConfigurationKey("Layer:LIST",
 //            "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
@@ -79,6 +74,7 @@ final class LayerQuery extends Query {
      */
     public LayerQuery(final Database database) {
         super(database);
+        final Parameter byName;
         final QueryType[] usage = {SELECT, LIST};
         name      = addColumn   ("Layers", "name",        usage);
         thematic  = addColumn   ("Layers", "thematic",    usage);

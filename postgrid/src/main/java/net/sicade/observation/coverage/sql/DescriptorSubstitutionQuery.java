@@ -33,7 +33,7 @@ final class DescriptorSubstitutionQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column symbol, symbol1, symbol2;
+    protected final Column symbol1, symbol2;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -47,6 +47,7 @@ final class DescriptorSubstitutionQuery extends Query {
      */
     public DescriptorSubstitutionQuery(final Database database) {
         super(database);
+        final Column symbol;
         final QueryType[] usage = {SELECT, LIST};
         symbol   = addColumn   ("TemporalGradientDescriptors", "symbol",  LIST);
         symbol1  = addColumn   ("TemporalGradientDescriptors", "symbol1", usage);

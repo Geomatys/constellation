@@ -37,17 +37,13 @@ final class FormatQuery extends Query {
     protected final Column name, mimeType, encoding;
 
     /**
-     * Parameter to appear after the {@code "FROM"} clause.
-     */
-    protected final Parameter byName;
-
-    /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
     public FormatQuery(final Database database) {
         super(database);
+        final Parameter byName;
         final QueryType[] usage = {SELECT, LIST};
         name     = addColumn   ("Formats", "name",     usage);
         mimeType = addColumn   ("Formats", "mime",     usage);
