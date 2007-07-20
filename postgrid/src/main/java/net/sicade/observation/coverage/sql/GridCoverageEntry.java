@@ -163,6 +163,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     /** Envelope géographique.           */ private final Rectangle2D boundingBox;
     /** Nombre de pixels en largeur.     */ private final short       width;
     /** Nombre de pixels en hauteur.     */ private final short       height;
+    /** Vertical extent, or {@code null}.*/ private final NumberRange verticalExtent;
 
     /**
      * Bloc de paramètres de la table d'images. On retient ce bloc de paramètres plutôt qu'une
@@ -246,6 +247,13 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
             throw new IllegalRecordException(null, "L'enveloppe spatio-temporelle est vide.");
         }
         boundingBox = (Rectangle2D) POOL.unique(box);
+        if (envelope.getDimension() >= 3) {
+            final double zmin = envelope.getMinimum(2);
+            final double zmax = envelope.getMaximum(2);
+            verticalExtent = (NumberRange) POOL.unique(new NumberRange(zmin, zmax));
+        } else {
+            verticalExtent = null;
+        }
     }
 
     /**
@@ -388,6 +396,8 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      *       (définie dans {@link net.sicade.observation.sql.CRS}) qui sait représenter les
      *       plages de temps illimitées par {@link Double#POSITIVE_INFINITY} ou
      *       {@link Double#NEGATIVE_INFINITY}.
+     *
+     * @todo Revisit now that we are 4D.
      */
     public NumberRange getZRange() {
         final DefaultTemporalCRS temporalCRS = parameters.getTemporalCRS();
@@ -827,6 +837,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         return this.startTime == that.startTime &&
                this.endTime   == that.endTime   &&
                Utilities.equals(this.boundingBox, that.boundingBox) &&
+               Utilities.equals(this.verticalExtent, that.verticalExtent) &&
                CRS.equalsIgnoreMetadata(parameters.tableCRS, that.parameters.tableCRS);
     }
 

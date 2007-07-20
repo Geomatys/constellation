@@ -18,6 +18,7 @@ package net.sicade.observation.coverage.sql;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -25,6 +26,8 @@ import java.text.DateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import static java.lang.reflect.Array.getLength;
+import static java.lang.reflect.Array.getDouble;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
@@ -580,6 +583,7 @@ loop:   for (final CoverageReference newReference : entries) {
             final int endTimeIndex   = indexOf(query.  endTime);
             final int zminIndex      = indexOf(query.zmin);
             final int zmaxIndex      = indexOf(query.zmax);
+            final int altitudesIndex = indexOf(query.altitudes);
             while (results.next()) {
                 final Date startTime = results.getTimestamp(startTimeIndex, calendar);
                 final Date   endTime = results.getTimestamp(  endTimeIndex, calendar);
@@ -600,11 +604,28 @@ loop:   for (final CoverageReference newReference : entries) {
                     depths = new TreeSet<Number>();
                     availableCentroids.put(time, depths);
                 }
-                double zmin = results.getDouble(zminIndex); if (results.wasNull()) zmin=Double.NEGATIVE_INFINITY;
-                double zmax = results.getDouble(zmaxIndex); if (results.wasNull()) zmax=Double.POSITIVE_INFINITY;
-                double z = (zmin + zmax) / 2;
-                if (!Double.isNaN(z) && !Double.isInfinite(z)) {
-                    final Number value = z;
+                /*
+                 * Adds altitude values. If those values are explicitly defined in the GridGeometries
+                 * table, we will use them. Otherwise we will compute a mean value from the envelope.
+                 */
+                final Object data;
+                final Array altitudes = results.getArray(altitudesIndex);
+                if (altitudes != null) {
+                    data = altitudes.getArray();
+//                  data.free(); // TODO: uncomment when we will be allowed to use Java 6.
+                } else {
+                    double zmin = results.getDouble(zminIndex); if (results.wasNull()) zmin=Double.NEGATIVE_INFINITY;
+                    double zmax = results.getDouble(zmaxIndex); if (results.wasNull()) zmax=Double.POSITIVE_INFINITY;
+                    double z = (zmin + zmax) / 2;
+                    if (!Double.isNaN(z) && !Double.isInfinite(z)) {
+                        data = new double[] {z};
+                    } else {
+                        data = new double[0];
+                    }
+                }
+                final int length = getLength(data);
+                for (int i=0; i<length; i++) {
+                    final Number value = getDouble(data, i);
                     Number shared = numbers.get(value);
                     if (shared == null) {
                         shared = value;

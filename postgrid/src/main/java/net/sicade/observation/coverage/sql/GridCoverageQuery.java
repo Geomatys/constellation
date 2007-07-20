@@ -39,7 +39,7 @@ final class GridCoverageQuery extends Query {
      */
     protected final Column layer, series, pathname, filename, extension,
             startTime, endTime, spatialExtent, xmin, xmax, ymin, ymax, zmin, zmax,
-            width, height, depth, crs, format;
+            width, height, depth, altitudes, crs, format;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -76,6 +76,7 @@ final class GridCoverageQuery extends Query {
         width           = addColumn("GridGeometries", "width",     SL );
         height          = addColumn("GridGeometries", "height",    SL );
         depth           = addColumn("GridGeometries", "depth",     SL );
+        altitudes       = addColumn("GridGeometries", "altitudes",   A);
         crs             = addColumn("GridGeometries", "CRS",       SL );
         format          = addColumn("Series",         "format",    SL );
         visibility      = addColumn("Series",         "visible",   SLA);

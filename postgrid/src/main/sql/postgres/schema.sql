@@ -242,11 +242,10 @@ CREATE TABLE "GridCoverages" (
     filename character varying(30) NOT NULL,
     "startTime" timestamp without time zone,
     "endTime" timestamp without time zone,
-    extent character(4) NOT NULL,
+    extent character varying(8) NOT NULL,
     CONSTRAINT "TemporalExtent_range" CHECK (((("startTime" IS NULL) AND ("endTime" IS NULL)) OR ((("startTime" IS NOT NULL) AND ("endTime" IS NOT NULL)) AND ("startTime" < "endTime"))))
 );
 ALTER TABLE ONLY "GridCoverages" ALTER COLUMN series SET STORAGE PLAIN;
-ALTER TABLE ONLY "GridCoverages" ALTER COLUMN extent SET STORAGE PLAIN;
 
 
 --
@@ -303,12 +302,14 @@ COMMENT ON CONSTRAINT "TemporalExtent_range" ON "GridCoverages" IS 'Les dates de
 --
 
 CREATE TABLE "GridGeometries" (
-    id character(4) NOT NULL,
+    id character varying(8) NOT NULL,
     "spatialExtent" box3d NOT NULL,
     "CRS" character varying DEFAULT 'CRS:84'::character varying NOT NULL,
     width integer NOT NULL,
     height integer NOT NULL,
     depth integer DEFAULT 1 NOT NULL,
+    altitudes double precision[],
+    CONSTRAINT "GridCoverageAltitudes" CHECK (((altitudes IS NULL) OR (((array_upper(altitudes, 1) - array_lower(altitudes, 1)) + 1) = depth))),
     CONSTRAINT "GridCoverageSize" CHECK (((width > 0) AND (height > 0)))
 );
 
@@ -360,6 +361,20 @@ COMMENT ON COLUMN "GridGeometries".height IS 'Nombre de pixels en hauteur dans l
 --
 
 COMMENT ON COLUMN "GridGeometries".depth IS 'Nombre de pixels en profondeur dans l''image, si elle est à trois dimensions.';
+
+
+--
+-- Name: COLUMN "GridGeometries".altitudes; Type: COMMENT; Schema: postgrid; Owner: -
+--
+
+COMMENT ON COLUMN "GridGeometries".altitudes IS 'Valeurs z de chacunes des couches d''une image 3D.';
+
+
+--
+-- Name: CONSTRAINT "GridCoverageAltitudes" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: -
+--
+
+COMMENT ON CONSTRAINT "GridCoverageAltitudes" ON "GridGeometries" IS 'La longueur du tableau d''altitudes doit correspondre à la valeur ''depth'' déclarée.';
 
 
 --
@@ -686,6 +701,14 @@ ALTER TABLE ONLY "GridGeometries"
 
 
 --
+-- Name: Layers_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY "Layers"
+    ADD CONSTRAINT "Layers_pkey" PRIMARY KEY (name);
+
+
+--
 -- Name: OperationParameters_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: -; Tablespace: 
 --
 
@@ -744,16 +767,8 @@ ALTER TABLE ONLY "SampleDimensions"
 -- Name: Series_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY "Layers"
-    ADD CONSTRAINT "Series_pkey" PRIMARY KEY (name);
-
-
---
--- Name: SubSeries_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: -; Tablespace: 
---
-
 ALTER TABLE ONLY "Series"
-    ADD CONSTRAINT "SubSeries_pkey" PRIMARY KEY (identifier);
+    ADD CONSTRAINT "Series_pkey" PRIMARY KEY (identifier);
 
 
 --
