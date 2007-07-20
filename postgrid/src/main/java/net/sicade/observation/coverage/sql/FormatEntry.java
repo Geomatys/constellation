@@ -191,7 +191,7 @@ public class FormatEntry extends Entry implements Format {
         for (int j=0; j<bandCount; j++) {
             final int srcBand = (srcBands!=null) ? srcBands[j] : j;
             final int dstBand = (dstBands!=null) ? dstBands[j] : j;
-            selectedBands[dstBand] = bands[srcBand];
+            selectedBands[dstBand] = bands[srcBand % bandCount];
         }
         return selectedBands;
     }

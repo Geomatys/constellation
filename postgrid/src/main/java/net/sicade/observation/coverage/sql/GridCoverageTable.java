@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import static java.lang.reflect.Array.getLength;
 import static java.lang.reflect.Array.getDouble;
+import org.geotools.util.NumberRange;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
@@ -614,14 +615,11 @@ loop:   for (final CoverageReference newReference : entries) {
                     data = altitudes.getArray();
 //                  data.free(); // TODO: uncomment when we will be allowed to use Java 6.
                 } else {
-                    double zmin = results.getDouble(zminIndex); if (results.wasNull()) zmin=Double.NEGATIVE_INFINITY;
-                    double zmax = results.getDouble(zmaxIndex); if (results.wasNull()) zmax=Double.POSITIVE_INFINITY;
-                    double z = (zmin + zmax) / 2;
-                    if (!Double.isNaN(z) && !Double.isInfinite(z)) {
-                        data = new double[] {z};
-                    } else {
-                        data = new double[0];
-                    }
+                    final double zmin = results.getDouble(zminIndex); if (results.wasNull()) continue;
+                    final double zmax = results.getDouble(zmaxIndex); if (results.wasNull()) continue;
+                    final double z = (zmin + zmax) / 2;
+                    data = new double[] {z};
+                    // TODO: we should compute an array using the information provided in 'depth'.
                 }
                 final int length = getLength(data);
                 for (int i=0; i<length; i++) {
@@ -772,8 +770,28 @@ loop:   for (final CoverageReference newReference : entries) {
         // TODO: What to do with depth?
         final String crs       = result.getString   (indexOf(query.crs));
         final String format    = result.getString   (indexOf(query.format));
+
+        short band = 0;
+        final NumberRange verticalRange = getVerticalRange();
+        final double searchFor = 0.5*(verticalRange.getMinimum() + verticalRange.getMaximum());
+        if (!Double.isNaN(searchFor) && !Double.isInfinite(searchFor)) {
+            final Array altitudes = result.getArray(indexOf(query.altitudes));
+            if (altitudes != null) {
+                // TODO: need a better algorithm (with binarySearch, etc.).
+                final Object data = altitudes.getArray();
+                final int length = getLength(data);
+                for (int i=0; i<length; i++) {
+                    final double candidate = getDouble(data, i);
+                    if (Math.abs(candidate - searchFor) < 1E-6) {
+                        band = (short) i;
+                        break;
+                    }
+                }
+            }
+//          altitudes.free();  // TODO: uncomment when we will be allowed to target Java 6.
+        }
         return new GridCoverageEntry(this, layer, series, pathname, filename, extension, startTime,
-                    endTime, envelope, width, height, crs, format, null).canonicalize();
+                    endTime, envelope, width, height, band, crs, format, null).canonicalize();
     }
 
     /**

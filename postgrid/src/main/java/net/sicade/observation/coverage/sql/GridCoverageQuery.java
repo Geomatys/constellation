@@ -56,10 +56,11 @@ final class GridCoverageQuery extends Query {
         super(database);
         final Column visibility;
         final Parameter byFilename, byStartTime, byEndTime, bySpatialExtent;
+        final QueryType[] hiden = {};
         final QueryType[] SL  = {SELECT, LIST                 };
         final QueryType[] SLA = {SELECT, LIST, AVAILABLE_DATA};
         final QueryType[]   A = {              AVAILABLE_DATA};
-        layer           = addColumn("Series",         "layer",     SL );
+        layer           = addColumn("Series",         "layer",     SLA); // TODO: Avoid the "A"
         series          = addColumn("GridCoverages",  "series",    SL );
         pathname        = addColumn("Series",         "pathname",  SL );
         filename        = addColumn("GridCoverages",  "filename",  SL );
@@ -76,10 +77,10 @@ final class GridCoverageQuery extends Query {
         width           = addColumn("GridGeometries", "width",     SL );
         height          = addColumn("GridGeometries", "height",    SL );
         depth           = addColumn("GridGeometries", "depth",     SL );
-        altitudes       = addColumn("GridGeometries", "altitudes",   A);
+        altitudes       = addColumn("GridGeometries", "altitudes", SLA);
         crs             = addColumn("GridGeometries", "CRS",       SL );
         format          = addColumn("Series",         "format",    SL );
-        visibility      = addColumn("Series",         "visible",   SLA);
+        visibility      = addColumn("Series",         "visible",   hiden);
         byFilename      = addParameter(filename,   SELECT);
         byLayer         = addParameter(layer,      SLA);
         byStartTime     = addParameter(startTime,  SLA);

@@ -164,6 +164,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     /** Nombre de pixels en largeur.     */ private final short       width;
     /** Nombre de pixels en hauteur.     */ private final short       height;
     /** Vertical extent, or {@code null}.*/ private final NumberRange verticalExtent;
+    /** The band to read, or 0.          */ private final short       band;
 
     /**
      * Bloc de paramètres de la table d'images. On retient ce bloc de paramètres plutôt qu'une
@@ -225,15 +226,17 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                                 final Envelope          envelope,
                                 final short             width,
                                 final short             height,
+                                final short             band,
                                 final String            crs,
                                 final String            format,
                                 final String            remarks)
             throws CatalogException, SQLException
     {
-        super(series.trim() + ':' + filename, remarks);
+        super(createName(series, filename, band), remarks);
         this.filename   = filename;
         this.width      = width;
         this.height     = height;
+        this.band       = band;
         this.parameters = table.getParameters(layer, format, crs, pathname, extension);
         this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
@@ -254,6 +257,19 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         } else {
             verticalExtent = null;
         }
+    }
+
+    /**
+     * Workaround for RFE #4093999
+     * ("Relax constraint on placement of this()/super() call in constructors").
+     */
+    private static String createName(final String series, final String filename, final short band) {
+        final StringBuilder buffer = new StringBuilder(series.trim());
+        buffer.append(':').append(filename);
+        if (band != 0) {
+            buffer.append(':').append(band);
+        }
+        return buffer.toString();
     }
 
     /**
@@ -694,6 +710,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                     }
                     param.setSourceSubsampling(subsampling.x,   subsampling.y,
                                                subsampling.x/2, subsampling.y/2);
+                    if (band != 0) {
+                        param.setSourceBands(new int[] {band});
+                    }
                     if (image == null) {
                         image = format.read(getInput(true), imageIndex, param, listeners,
                                             new Dimension(width, height), this);
@@ -834,7 +853,8 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      * à des couches différentes.
      */
     private boolean sameEnvelope(final GridCoverageEntry that) {
-        return this.startTime == that.startTime &&
+        return this.band      == that.band      &&
+               this.startTime == that.startTime &&
                this.endTime   == that.endTime   &&
                Utilities.equals(this.boundingBox, that.boundingBox) &&
                Utilities.equals(this.verticalExtent, that.verticalExtent) &&
