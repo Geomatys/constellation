@@ -21,7 +21,7 @@ package net.sicade.observation.sql;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Parameter extends IndexedSqlElement {
+public final class Parameter extends IndexedSqlElement {
     /**
      * The column on which this parameter applies.
      */
@@ -42,6 +42,13 @@ public class Parameter extends IndexedSqlElement {
     protected Parameter(final Query query, final Column column, final QueryType... types) {
         super(query, types);
         this.column = column;
+    }
+
+    /**
+     * Returns the table name of the column on which this parameter is applied.
+     */
+    final String getColumnTable() {
+        return column.table;
     }
 
     /**

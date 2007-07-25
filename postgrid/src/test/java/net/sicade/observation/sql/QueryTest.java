@@ -39,14 +39,14 @@ public class QueryTest extends DatabaseTest {
         final Query  query = new Query(database);
         final Column name  = new Column(query, "Formats", "name");
         final Column mime  = new Column(query, "Formats", "mime");
-        final Column type  = new Column(query, "Formats", "type");
+        final Column type  = new Column(query, "Formats", "encoding");
         final String SQL   = query.select(SELECT);
 
         assertEquals(1, name.indexOf(SELECT));
         assertEquals(2, mime.indexOf(SELECT));
         assertEquals(3, type.indexOf(SELECT));
         assertEquals(Arrays.asList(name, mime, type), query.getColumns(SELECT));
-        assertEquals("SELECT \"name\", \"mime\", \"type\" FROM \"Formats\"", SQL);
+        assertEquals("SELECT \"name\", \"mime\", \"encoding\" FROM \"Formats\"", SQL);
         tryStatement(SQL);
 
         final ListIterator<Column> iterator = query.getColumns(SELECT).listIterator(2);
@@ -91,7 +91,7 @@ public class QueryTest extends DatabaseTest {
         assertEquals("SELECT \"layer\", \"pathname\", \"filename\", \"startTime\" AS \"tmin\", " +
                 "\"endTime\" AS \"tmax\", \"width\", \"height\", \"format\" FROM \"GridCoverages\" " +
                 "JOIN \"Series\" ON \"GridCoverages\".\"series\"=\"Series\".\"identifier\" " +
-                "JOIN \"GridGeometries\" ON \"GridCoverages\".\"extent\"=\"GridGeometries\".\"id\"", SQL);
+                "JOIN \"GridGeometries\" ON \"GridCoverages\".\"extent\"=\"GridGeometries\".\"identifier\"", SQL);
         tryStatement(SQL);
     }
 

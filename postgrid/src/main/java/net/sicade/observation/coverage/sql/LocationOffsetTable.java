@@ -51,7 +51,7 @@ public class LocationOffsetTable extends SingletonTable<LocationOffset> implemen
     }
 
     /**
-     * Creates an entry for the current row in the specified result set.
+     * Creates an entry from the current row in the specified result set.
      *
      * @param  results The result set to read.
      * @return The entry for current row in the specified result set.

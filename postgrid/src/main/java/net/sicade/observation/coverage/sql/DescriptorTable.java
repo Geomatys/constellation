@@ -163,7 +163,7 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Share
     }
 
     /**
-     * Creates a descriptor for the current row in the specified result set.
+     * Creates a descriptor from the current row in the specified result set.
      *
      * @param  results The result set to read.
      * @return The entry for current row in the specified result set.

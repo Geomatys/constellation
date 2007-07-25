@@ -22,8 +22,6 @@ import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.SpatialColumn;
-import net.sicade.observation.sql.SpatialParameter;
 import static net.sicade.observation.sql.QueryType.*;
 
 
@@ -38,8 +36,7 @@ final class GridCoverageQuery extends Query {
      * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column layer, series, pathname, filename, extension,
-            startTime, endTime, spatialExtent, xmin, xmax, ymin, ymax, zmin, zmax,
-            width, height, depth, altitudes, crs, format;
+            startTime, endTime, spatialExtent, format;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -54,57 +51,43 @@ final class GridCoverageQuery extends Query {
      */
     public GridCoverageQuery(final Database database) throws SQLException {
         super(database);
-        final Column visibility;
-        final Parameter byFilename, byStartTime, byEndTime, bySpatialExtent;
-        final QueryType[] hiden = {};
-        final QueryType[] SL  = {SELECT, LIST                 };
-        final QueryType[] SLA = {SELECT, LIST, AVAILABLE_DATA};
-        final QueryType[]   A = {              AVAILABLE_DATA};
-        layer           = addColumn("Series",         "layer",     SLA); // TODO: Avoid the "A"
-        series          = addColumn("GridCoverages",  "series",    SL );
-        pathname        = addColumn("Series",         "pathname",  SL );
-        filename        = addColumn("GridCoverages",  "filename",  SL );
-        extension       = addColumn("Series",         "extension", SL );
-        startTime       = addColumn("GridCoverages",  "startTime", SLA);
-        endTime         = addColumn("GridCoverages",  "endTime",   SLA);
-        spatialExtent   = new SpatialColumn.Box(this, "GridGeometries", "spatialExtent", SL);
-        xmin            = addColumn("GridGeometries", "spatialExtent", "xmin", A);
-        xmax            = addColumn("GridGeometries", "spatialExtent", "xmax", A);
-        ymin            = addColumn("GridGeometries", "spatialExtent", "ymin", A);
-        ymax            = addColumn("GridGeometries", "spatialExtent", "ymax", A);
-        zmin            = addColumn("GridGeometries", "spatialExtent", "zmin", A);
-        zmax            = addColumn("GridGeometries", "spatialExtent", "zmax", A);
-        width           = addColumn("GridGeometries", "width",     SL );
-        height          = addColumn("GridGeometries", "height",    SL );
-        depth           = addColumn("GridGeometries", "depth",     SL );
-        altitudes       = addColumn("GridGeometries", "altitudes", SLA);
-        crs             = addColumn("GridGeometries", "CRS",       SL );
-        format          = addColumn("Series",         "format",    SL );
-        visibility      = addColumn("Series",         "visible",   hiden);
-        byFilename      = addParameter(filename,   SELECT);
-        byLayer         = addParameter(layer,      SLA);
-        byStartTime     = addParameter(startTime,  SLA);
-        byEndTime       = addParameter(endTime,    SLA);
-        bySpatialExtent = new SpatialParameter.Box(this, spatialExtent, SLA);
-        byVisibility    = addParameter(visibility, SLA);
-        if (SpatialColumn.WORKAROUND_POSTGIS) {
-            // PostGIS doesn't seem to be able to apply conversions by itself.
-            bySpatialExtent.setFunction("::text", SLA);
+        final Column horizontalExtent, visibility;
+        final Parameter byFilename, byStartTime, byEndTime, byHorizontalExtent;
+        final QueryType[] hiden = {                            };
+        final QueryType[] SL    = {SELECT, LIST                };
+        final QueryType[] SLA   = {SELECT, LIST, AVAILABLE_DATA};
+        final QueryType[]   A   = {              AVAILABLE_DATA};
+        layer            = addColumn("Series",         "layer",            SL   );
+        series           = addColumn("GridCoverages",  "series",           SL   );
+        pathname         = addColumn("Series",         "pathname",         SL   );
+        filename         = addColumn("GridCoverages",  "filename",         SL   );
+        extension        = addColumn("Series",         "extension",        SL   );
+        startTime        = addColumn("GridCoverages",  "startTime",        SLA  );
+        endTime          = addColumn("GridCoverages",  "endTime",          SLA  );
+        spatialExtent    = addColumn("GridCoverages",  "extent",           SLA  );
+        horizontalExtent = addColumn("GridGeometries", "horizontalExtent", hiden);
+        format           = addColumn("Series",         "format",           SL   );
+        visibility       = addColumn("Series",         "visible",          hiden);
+
+        filename        .setRole(Role.NAME);
+        startTime       .setRole(Role.TIME_RANGE);
+        endTime         .setRole(Role.TIME_RANGE);
+        horizontalExtent.setRole(Role.SPATIAL_ENVELOPE);
+        endTime         .setOrdering("ASC");
+//      series          .setOrdering("ASC"); // TODO: enable once declaration order is taken in account.
+        byFilename         = addParameter(filename, SELECT);
+        byLayer            = addParameter(layer,       SLA);
+        byStartTime        = addParameter(startTime,   SLA);
+        byEndTime          = addParameter(endTime,     SLA);
+        byHorizontalExtent = addParameter(horizontalExtent, SLA);
+        byVisibility = addParameter(visibility,  SLA);
+        if (database.isSpatialEnabled()) {
+            byHorizontalExtent.setComparator("&&");
+            byHorizontalExtent.setFunction("GeometryFromText(?,4326)", SLA);
+        } else {
+            // TODO: revisit.
         }
-        xmin           .setFunction("xmin", A);
-        xmax           .setFunction("xmax", A);
-        ymin           .setFunction("ymin", A);
-        ymax           .setFunction("ymax", A);
-        zmin           .setFunction("zmin", A);
-        zmax           .setFunction("zmax", A);
-        filename       .setRole(Role.NAME);
-        spatialExtent  .setRole(Role.SPATIAL_ENVELOPE);
-        startTime      .setRole(Role.TIME_RANGE);
-        endTime        .setRole(Role.TIME_RANGE);
-        endTime        .setOrdering("ASC");
-//      series         .setOrdering("ASC"); // TODO: enable once declaration order is taken in account.
-        byStartTime    .setComparator("IS NULL OR <=");
-        byEndTime      .setComparator("IS NULL OR >=");
-        bySpatialExtent.setComparator("&&");
+        byStartTime.setComparator("IS NULL OR <=");
+        byEndTime  .setComparator("IS NULL OR >=");
     }
 }

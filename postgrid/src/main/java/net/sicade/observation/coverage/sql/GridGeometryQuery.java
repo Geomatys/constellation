@@ -22,34 +22,32 @@ import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
 import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.sql.Role;
-import net.sicade.observation.sql.SpatialColumn;
-import net.sicade.observation.sql.SpatialParameter;
 import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * The query to execute for a {@link CategoryTable}.
+ * The query to execute for a {@link GridGeometryTable}.
  *
  * @author Martin Desruisseaux
  * @version $Id$
  */
-final class GeographicBoundingBoxQuery extends Query {
+final class GridGeometryQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final SpatialParameter.Box byExtent;
+    protected final Column identifier, width, height, horizontalExtent, verticalOrdinates;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byWidth, byHeight, byDepth;
+//    protected final Parameter byWidth, byHeight, byDepth, byExtent;
 
     /**
      * The SQL instruction for inserting a new geographic bounding box.
      *
      * @todo Choose the CRS.
      */
-//    private static final SpatialConfigurationKey INSERT = new SpatialConfigurationKey("GeographicBoundingBoxes:INSERT",
+//    private static final SpatialConfigurationKey INSERT = new SpatialConfigurationKey("GridGeometryes:INSERT",
 //            "INSERT INTO \"GridGeometries\"\n" +
 //            "  (id, \"westBoundLongitude\",\n" +
 //            "       \"eastBoundLongitude\",\n" +
@@ -72,21 +70,23 @@ final class GeographicBoundingBoxQuery extends Query {
      *
      * @param database The database for which this query is created.
      */
-    public GeographicBoundingBoxQuery(final Database database) throws SQLException {
+    public GridGeometryQuery(final Database database) throws SQLException {
         super(database);
-        final Column name, width, height, depth;
-        final SpatialColumn.Box spatialExtent;
-        final QueryType[] usageLW = {LIST,   INSERT};
-        final QueryType[] usageRW = {SELECT, INSERT};
-        name          = addColumn   ("GridGeometries", "id",     usageRW);
-        spatialExtent = new SpatialColumn.Box(this, "GridGeometries", "spatialExtent", usageLW);
-        width         = addColumn   ("GridGeometries", "width",  usageLW);
-        height        = addColumn   ("GridGeometries", "height", usageLW);
-        depth         = addColumn   ("GridGeometries", "depth",  usageLW);
-        byExtent      = new SpatialParameter.Box(this, spatialExtent, usageRW);
-        byWidth       = addParameter(width,                      usageRW);
-        byHeight      = addParameter(height,                     usageRW);
-        byDepth       = addParameter(depth,                      usageRW);
-        name.setRole(Role.NAME);
+        final QueryType[] LSI = {LIST, SELECT, INSERT};
+        final Parameter byIdentifier;
+        identifier        = addColumn("GridGeometries", "identifier",        LSI);
+        width             = addColumn("GridGeometries", "width",             LSI);
+        height            = addColumn("GridGeometries", "height",            LSI);
+        horizontalExtent  = addColumn("GridGeometries", "horizontalExtent",  LSI);
+        verticalOrdinates = addColumn("GridGeometries", "verticalOrdinates", LSI);
+        if (database.isSpatialEnabled()) {
+            horizontalExtent.setFunction("box3d", LIST, SELECT);
+        }
+        identifier.setRole(Role.NAME);
+        byIdentifier = addParameter(identifier, SELECT);
+//        byWidth      = addParameter(width,            SI);
+//        byHeight     = addParameter(height,           SI);
+//        byDepth      = addParameter(depth,            SI);
+//        byExtent     = addParameter(horizontalExtent, SI);
     }
 }

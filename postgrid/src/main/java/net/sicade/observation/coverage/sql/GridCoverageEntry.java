@@ -227,12 +227,12 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                                 final short             width,
                                 final short             height,
                                 final short             band,
-                                final String            crs,
                                 final String            format,
                                 final String            remarks)
             throws CatalogException, SQLException
     {
         super(createName(series, filename, band), remarks);
+        CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
         this.filename   = filename;
         this.width      = width;
         this.height     = height;

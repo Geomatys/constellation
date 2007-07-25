@@ -74,15 +74,13 @@ public class GridCoverageTableTest extends DatabaseTest {
         assertEquals(entries.size(), centroids.size());
         final Set<Number> depths = centroids.get(date("1986-01-13"));
         assertNotNull(depths);
-        assertFalse(depths.isEmpty());
-        assertTrue(depths.contains(0.0));
+        assertTrue(depths.isEmpty());
 
         final Set<Date> availableTimes = table.getAvailableTimes();
         assertEquals(centroids.keySet(), availableTimes);
 
         final Set<Number> altitudes = table.getAvailableAltitudes();
-        assertEquals(1, altitudes.size());
-        assertEquals(new Double(0), altitudes.iterator().next());
+        assertTrue(altitudes.isEmpty());
     }
 
     /**

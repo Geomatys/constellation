@@ -22,7 +22,7 @@ import org.opengis.geometry.Envelope;
 import org.postgis.PGbox3d;
 
 import org.junit.*;
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
 
 /**
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  * @author Cédric Briançon
  * @author Martin Desruisseaux
  */
-public class SpatialColumnTest extends DatabaseTest {
+public class SpatialFunctionsTest extends TestCase {
     /**
      * Tests the parsing and formating of a BOX3D element.
      */
@@ -43,17 +43,21 @@ public class SpatialColumnTest extends DatabaseTest {
 
         // 2D case
         wkt = "BOX(-180 -90,180 90)";
-        envelope = SpatialColumn.Box.parse(wkt);
+        envelope = SpatialFunctions.parse(wkt);
         assertEquals(2, envelope.getDimension());
         assertEquals(-180, envelope.getMinimum(0), 0);
         assertEquals( 180, envelope.getMaximum(0), 0);
         assertEquals( -90, envelope.getMinimum(1), 0);
         assertEquals(  90, envelope.getMaximum(1), 0);
-        assertEquals("BOX(-180.0 -90.0,180.0 90.0)", SpatialColumn.Box.format(envelope));
+        assertEquals("BOX2D(-180.0 -90.0,180.0 90.0)", SpatialFunctions.formatBox(envelope));
+
+        final String polygon = SpatialFunctions.formatPolygon(envelope);
+        assertEquals("POLYGON((-180.0 -90.0,-180.0 90.0,180.0 90.0,180.0 -90.0,-180.0 -90.0))", polygon);
+        assertEquals(envelope, SpatialFunctions.parse(polygon));
 
         // 3D case
         wkt = "BOX3D(-180 -90 10,180 90 30)";
-        envelope = SpatialColumn.Box.parse(wkt);
+        envelope = SpatialFunctions.parse(wkt);
         assertEquals(3, envelope.getDimension());
         assertEquals(-180, envelope.getMinimum(0), 0);
         assertEquals( 180, envelope.getMaximum(0), 0);
@@ -61,22 +65,6 @@ public class SpatialColumnTest extends DatabaseTest {
         assertEquals(  90, envelope.getMaximum(1), 0);
         assertEquals(  10, envelope.getMinimum(2), 0);
         assertEquals(  30, envelope.getMaximum(2), 0);
-        assertEquals("BOX3D(-180.0 -90.0 10.0,180.0 90.0 30.0)", SpatialColumn.Box.format(envelope));
-    }
-
-    /**
-     * Make sure that {@link PGbox3d} is properly registered.
-     */
-    public void testPGbox3d() throws SQLException {
-        final Connection c = database.getConnection();
-        final Statement  s = database.getConnection().createStatement();
-        final ResultSet  r = s.executeQuery("SELECT \"spatialExtent\" FROM \"GridGeometries\"");
-        assertTrue(r.next());
-        final Object b = r.getObject("spatialExtent");
-        assertTrue(b instanceof PGbox3d);
-        assertTrue(b.toString().startsWith("BOX3D"));
-        r.close();
-        s.close();
-        // Do not close the connection.
+        assertEquals("BOX3D(-180.0 -90.0 10.0,180.0 90.0 30.0)", SpatialFunctions.formatBox(envelope));
     }
 }

@@ -110,7 +110,7 @@ public class SeriesTable extends SingletonTable<Series> {
     }
 
     /**
-     * Creates a series entry for the current row in the specified result set.
+     * Creates a series from the current row in the specified result set.
      */
     protected Series createEntry(final ResultSet results) throws CatalogException, SQLException {
         final SeriesQuery query = (SeriesQuery) super.query;

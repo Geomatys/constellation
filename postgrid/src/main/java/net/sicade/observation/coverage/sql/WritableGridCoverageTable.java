@@ -75,7 +75,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Connexion vers la table des étendues géographiques.
      */
-    private GeographicBoundingBoxTable geographicBoundingBoxes;
+    private GridGeometryTable gridGeometries;
 
     /**
      * Constructs a new {@code WritableGridCoverageTable}.
@@ -195,10 +195,10 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                                       final Dimension             size)
             throws CatalogException, SQLException 
     {
-        if (geographicBoundingBoxes == null) {
-            geographicBoundingBoxes = getDatabase().getTable(GeographicBoundingBoxTable.class);
+        if (gridGeometries == null) {
+            gridGeometries = getDatabase().getTable(GridGeometryTable.class);
         }
-        final String bboxID = geographicBoundingBoxes.getIdentifier(bbox, size);
+        final String bboxID = null; // TODO gridGeometries.getIdentifier(bbox, size);
         if (bboxID == null) {
             throw new CatalogException("L'étendue géographique n'est pas déclarée dans la base de données.");
         }

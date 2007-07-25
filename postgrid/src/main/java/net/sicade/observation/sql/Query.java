@@ -15,10 +15,8 @@
 package net.sicade.observation.sql;
 
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -210,10 +208,13 @@ public class Query {
      * @param  buffer The buffer in which to write the SQL statement.
      * @param  type The query type.
      * @param  metadata The database metadata, used for inspection of primary and foreigner keys.
+     * @param  joinParameters {@code true} if we should take parameters in account for determining
+     *         the {@code JOIN ... ON} clauses.
      * @throws SQLException if an error occured while reading the database.
      */
     private void selectAll(final StringBuilder buffer, final QueryType type,
-                           final DatabaseMetaData metadata) throws SQLException
+                           final DatabaseMetaData metadata, final boolean joinParameters)
+            throws SQLException
     {
         /*
          * List all columns after the "SELECT" clause.
@@ -240,6 +241,13 @@ public class Query {
             }
             separator = ", ";
             tables.put(column.table, null); // ForeignerKeys will be determined later.
+        }
+        if (joinParameters) {
+            for (final Parameter parameter : parameters) {
+                if (parameter.indexOf(type) != 0) {
+                    tables.put(parameter.getColumnTable(), null);
+                }
+            }
         }
         /*
          * Optionally update the table order. First, we search for foreigner keys. We will use
@@ -382,15 +390,16 @@ scan:       while (!tables.isEmpty()) {
                 final String f = p.getFunction(type);
                 if (f != null) {
                     if (f.indexOf('?') >= 0) {
-                        buffer.append(f).append(')');
+                        buffer.append(f);
                     } else if (f.startsWith("::")) {
-                        buffer.append('?').append(f).append(')');
+                        buffer.append('?').append(f);
                     } else {
-                        buffer.append(f).append("(?))");
+                        buffer.append(f).append("(?)");
                     }
                 } else {
-                    buffer.append("?)");
+                    buffer.append('?');
                 }
+                buffer.append(')');
                 separator = " AND ";
             }
         }
@@ -434,7 +443,7 @@ scan:       while (!tables.isEmpty()) {
     final String selectAll(final QueryType type) throws SQLException {
         final DatabaseMetaData metadata = database.getConnection().getMetaData();
         final StringBuilder buffer = new StringBuilder();
-        selectAll     (buffer, type, metadata);
+        selectAll     (buffer, type, metadata, false);
         appendOrdering(buffer, type, metadata);
         return buffer.toString();
     }
@@ -453,7 +462,7 @@ scan:       while (!tables.isEmpty()) {
             if (sql == null) {
                 final DatabaseMetaData metadata = database.getConnection().getMetaData();
                 final StringBuilder buffer = new StringBuilder();
-                selectAll       (buffer, type, metadata);
+                selectAll       (buffer, type, metadata, true);
                 appendParameters(buffer, type, metadata);
                 appendOrdering  (buffer, type, metadata);
                 sql = buffer.toString();

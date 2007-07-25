@@ -47,6 +47,7 @@ import net.sicade.util.DateRange;
 import net.sicade.observation.Element;
 import net.sicade.observation.ServerException;
 import net.sicade.observation.CatalogException;
+import net.sicade.observation.IllegalRecordException;
 
 
 /**
@@ -468,32 +469,33 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * shrinking is performed only if explicitly requested by a call to {@link #trimEnvelope}.
      *
      * @throws SQLException if an error occured while reading the database.
+     * @throws IllegalRecordException if a record contains an illegal value.
      */
-    private void ensureTrimmed(final QueryType type) throws SQLException {
+    private void ensureTrimmed(final QueryType type) throws IllegalRecordException, SQLException {
         assert Thread.holdsLock(this);
         if (trimRequested && !trimmed) {
             final PreparedStatement statement = getStatement(type);
             if (statement != null) {
                 final int timeParameter = query.indexOfParameter(type, Role.TIME_RANGE);
                 final int bboxParameter = query.indexOfParameter(type, Role.SPATIAL_ENVELOPE);
-                final Column bboxColumn = query.getColumns(type).get(bboxParameter - 1);
-                final ResultSet result = statement.executeQuery();
-                while (result.next()) { // Should contains only one record.
+                final ResultSet results = statement.executeQuery();
+                while (results.next()) { // Should contains only one record.
                     Date time;
                     final Calendar calendar = getCalendar();
-                    time = result.getTimestamp(timeParameter, calendar);
+                    time = results.getTimestamp(timeParameter, calendar);
                     if (time != null) {
                         tMin = max(tMin, time.getTime());
                     }
-                    time = result.getTimestamp(timeParameter + 1, calendar);
+                    time = results.getTimestamp(timeParameter + 1, calendar);
                     if (time != null) {
                         tMax = min(tMax, time.getTime());
                     }
-                    final Envelope envelope; // Defined in this context as always (x,y,z)
-                    if (bboxColumn instanceof SpatialColumn.Box) {
-                        envelope = ((SpatialColumn.Box) bboxColumn).getEnvelope(result, type);
-                    } else {
-                        envelope = SpatialColumn.Box.getEnvelope(result, bboxParameter);
+                    final String bbox = results.getString(bboxParameter);
+                    final Envelope envelope;
+                    try {
+                        envelope = SpatialFunctions.parse(bbox);
+                    } catch (NumberFormatException e) {
+                        throw new IllegalRecordException(results.getMetaData().getTableName(bboxParameter), e);
                     }
                     final int dimension = envelope.getDimension();
                     for (int i=0; i<dimension; i++) {
@@ -510,7 +512,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
                         }
                     }
                 }
-                result.close();
+                results.close();
                 fireStateChanged("Envelope");
             }
             trimmed = true;
@@ -540,12 +542,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             final GeneralEnvelope envelope = new GeneralEnvelope(
                     new double[] {xMin, yMin, zMin},
                     new double[] {xMax, yMax, zMax});
-            final Parameter parameter = query.getParameters(type).get(index - 1);
-            if (parameter instanceof SpatialParameter.Box) {
-                ((SpatialParameter.Box) parameter).setEnvelope(statement, type, envelope);
-            } else {
-                SpatialParameter.Box.setEnvelope(statement, index, envelope);
-            }
+            statement.setString(index, SpatialFunctions.formatPolygon(envelope));
         }
     }
 

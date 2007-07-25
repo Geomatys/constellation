@@ -110,7 +110,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     }
 
     /**
-     * Creates a layer for the current row in the specified result set.
+     * Creates a layer from the current row in the specified result set.
      *
      * @param  results The result set to read.
      * @return The entry for current row in the specified result set.

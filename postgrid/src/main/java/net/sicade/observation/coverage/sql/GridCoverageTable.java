@@ -18,7 +18,6 @@ package net.sicade.observation.coverage.sql;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -26,31 +25,27 @@ import java.text.DateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import static java.lang.reflect.Array.getLength;
-import static java.lang.reflect.Array.getDouble;
-import org.geotools.util.NumberRange;
 
-import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
+import org.opengis.coverage.Coverage;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.measure.Latitude;
-import org.geotools.measure.Longitude;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.coverage.CoverageStack;
+import org.geotools.util.NumberRange;
+import org.geotools.util.RangeSet;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.CoverageReference;
-import net.sicade.observation.coverage.DataAvailability;
 import net.sicade.observation.coverage.CoverageComparator;
 import net.sicade.observation.coverage.rmi.DataConnection;
 import net.sicade.observation.sql.BoundedSingletonTable;
-import net.sicade.observation.sql.SpatialColumn;
-import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
@@ -69,7 +64,7 @@ import static net.sicade.observation.sql.QueryType.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-@Use({FormatTable.class, CoordinateReferenceSystemTable.class})
+@Use({FormatTable.class, GridGeometryTable.class})
 @UsedBy(LayerTable.class)
 public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> implements DataConnection {
     /**
@@ -147,10 +142,9 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private final DateFormat dateFormat;
 
     /**
-     * Table des systèmes de coordonnées. Ne sera construit que la première fois où elle
-     * sera nécessaire.
+     * Table of grid geometry. Will be created only when first needed.
      */
-    private transient CoordinateReferenceSystemTable crsTable;
+    private transient GridGeometryTable gridGeometryTable;
 
     /**
      * Table des formats. Cette table ne sera construite que la première fois
@@ -231,15 +225,15 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      */
     public GridCoverageTable(final GridCoverageTable table) {
         super(table);
-        layer       = table.layer;
-        operation   = table.operation;
-        resolution  = table.resolution;
-        dateFormat  = table.dateFormat;
-        crsTable    = table.crsTable;
-        formatTable = table.formatTable;
-        comparator  = table.comparator;
-        parameters  = table.parameters;
-        coverage3D  = table.coverage3D;
+        layer             = table.layer;
+        operation         = table.operation;
+        resolution        = table.resolution;
+        dateFormat        = table.dateFormat;
+        gridGeometryTable = table.gridGeometryTable;
+        formatTable       = table.formatTable;
+        comparator        = table.comparator;
+        parameters        = table.parameters;
+        coverage3D        = table.coverage3D;
     }
 
     /**
@@ -514,8 +508,11 @@ loop:   for (final CoverageReference newReference : entries) {
      *
      * @return The set of altitudes. May be empty, but will never be null.
      * @throws SQLException If an error occured while reading the database.
+     * @throws CatalogException if an illegal record was found.
      */
-    public synchronized SortedSet<Number> getAvailableAltitudes() throws SQLException {
+    public synchronized SortedSet<Number> getAvailableAltitudes()
+            throws SQLException, CatalogException
+    {
         if (availableAltitudes == null) {
             final SortedSet<Number> commons = new TreeSet<Number>();
             final SortedMap<Date, SortedSet<Number>> centroids = getAvailableCentroids();
@@ -545,8 +542,11 @@ loop:   for (final CoverageReference newReference : entries) {
      *
      * @return The set of dates.
      * @throws SQLException If an error occured while reading the database.
+     * @throws CatalogException if an illegal record was found.
      */
-    public synchronized SortedSet<Date> getAvailableTimes() throws SQLException {
+    public synchronized SortedSet<Date> getAvailableTimes()
+            throws SQLException, CatalogException
+    {
         if (availableTimes == null) {
             final SortedMap<Date, SortedSet<Number>> centroids = getAvailableCentroids();
             /*
@@ -572,19 +572,18 @@ loop:   for (final CoverageReference newReference : entries) {
      *         of altitudes for that date.
      * @throws SQLException If an error occured while reading the database.
      */
-    public synchronized SortedMap<Date, SortedSet<Number>> getAvailableCentroids() throws SQLException {
+    final synchronized SortedMap<Date, SortedSet<Number>> getAvailableCentroids()
+            throws SQLException, CatalogException
+    {
         if (availableCentroids == null) {
-            availableCentroids = new TreeMap<Date, SortedSet<Number>>();
-            final Map<Number,Number> numbers   = new HashMap<Number,Number>(); // For sharing instances.
-            final GridCoverageQuery  query     = (GridCoverageQuery) super.query;
-            final Calendar           calendar  = getCalendar();
-            final PreparedStatement  statement = getStatement(QueryType.AVAILABLE_DATA);
-            final ResultSet          results   = statement.executeQuery();
+            final SortedMap<Date,List<String>> centroids = new TreeMap<Date,List<String>>();
+            final GridCoverageQuery query     = (GridCoverageQuery) super.query;
+            final Calendar          calendar  = getCalendar();
+            final PreparedStatement statement = getStatement(QueryType.AVAILABLE_DATA);
+            final ResultSet         results   = statement.executeQuery();
             final int startTimeIndex = indexOf(query.startTime);
-            final int endTimeIndex   = indexOf(query.  endTime);
-            final int zminIndex      = indexOf(query.zmin);
-            final int zmaxIndex      = indexOf(query.zmax);
-            final int altitudesIndex = indexOf(query.altitudes);
+            final int endTimeIndex   = indexOf(query.endTime);
+            final int extentIndex    = indexOf(query.spatialExtent);
             while (results.next()) {
                 final Date startTime = results.getTimestamp(startTimeIndex, calendar);
                 final Date   endTime = results.getTimestamp(  endTimeIndex, calendar);
@@ -600,54 +599,26 @@ loop:   for (final CoverageReference newReference : entries) {
                 } else {
                     continue;
                 }
-                SortedSet<Number> depths = availableCentroids.get(time);
-                if (depths == null) {
-                    depths = new TreeSet<Number>();
-                    availableCentroids.put(time, depths);
-                }
                 /*
-                 * Adds altitude values. If those values are explicitly defined in the GridGeometries
-                 * table, we will use them. Otherwise we will compute a mean value from the envelope.
+                 * Now get the spatial extent identifiers. We do not extract the altitudes now,
+                 * because many records will typically use the same spatial extents. So we just
+                 * extract the identifiers for now, and will get the altitudes only once later.
                  */
-                final Object data;
-                final Array altitudes = results.getArray(altitudesIndex);
-                if (altitudes != null) {
-                    data = altitudes.getArray();
-//                  data.free(); // TODO: uncomment when we will be allowed to use Java 6.
-                } else {
-                    final double zmin = results.getDouble(zminIndex); if (results.wasNull()) continue;
-                    final double zmax = results.getDouble(zmaxIndex); if (results.wasNull()) continue;
-                    final double z = (zmin + zmax) / 2;
-                    data = new double[] {z};
-                    // TODO: we should compute an array using the information provided in 'depth'.
+                List<String> extents = centroids.get(time);
+                if (extents == null) {
+                    extents = new ArrayList<String>(1); // We will usually have only one element.
+                    centroids.put(time, extents);
                 }
-                final int length = getLength(data);
-                for (int i=0; i<length; i++) {
-                    final Number value = getDouble(data, i);
-                    Number shared = numbers.get(value);
-                    if (shared == null) {
-                        shared = value;
-                        numbers.put(value, value);
-                    }
-                    depths.add(shared);
-                }
+                extents.add(results.getString(extentIndex));
             }
             /*
-             * Replaces the depths tree by shared instances, in order to reduce memory usage.
-             * It is quite common to have many dates (if not all) associated with identical
-             * set of depth values.
+             * Now get the altitudes for all dates. Note: 'availableTimes' must be
+             * determined before we wrap 'availableCentroids' in an unmodifiable map.
              */
-            final Map<SortedSet<Number>, SortedSet<Number>> pool = new HashMap<SortedSet<Number>, SortedSet<Number>>();
-            for (final Map.Entry<Date, SortedSet<Number>> entry : availableCentroids.entrySet()) {
-                SortedSet<Number> current = entry.getValue();
-                SortedSet<Number> shared  = pool.get(current);
-                if (shared == null) {
-                    shared = Collections.unmodifiableSortedSet(current);
-                    pool.put(current, shared);
-                }
-                entry.setValue(shared);
+            if (gridGeometryTable == null) {
+                gridGeometryTable = getDatabase().getTable(GridGeometryTable.class);
             }
-            // AvailableTimes must be determined before we wrap 'availableCentroids' in an unmodifiable map.
+            availableCentroids = gridGeometryTable.identifiersToAltitudes(centroids);
             Set<Date> keySet = availableCentroids.keySet();
             if (!(keySet instanceof SortedSet)) {
                 keySet = new TreeSet<Date>(keySet);
@@ -662,62 +633,42 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Obtient les plages de temps et de coordonnées des images. L'objet retourné ne contiendra que
-     * les informations demandées. Par exemple si {@link DataAvailability#t} est {@code null}, alors
-     * la plage de temps ne sera pas examinée.
+     * Returns the range of date of available images.
      *
-     * @param  ranges L'objet dans lequel ajouter les plages de cette couche. Pour chaque champs
-     *         nul dans cet objet, les informations correspondantes ne seront pas interrogées.
-     * @return Un objet contenant les plages demandées. Il ne s'agira pas nécessairement du même
-     *         objet que celui qui a été spécifié en argument; ça dépendra si cette méthode est
-     *         appelée localement ou sur une machine distante.
-     * @throws SQLException si la base de données n'a pas pu être interrogée.
+     * @param  addTo If non-null, the set where to add the time range of available coverages.
+     * @return The time range of available coverages. This method returns {@code addTo} if it
+     *         was non-null or a new object otherwise.
+     * @throws SQLException If an error occured while reading the database.
      */
-    public synchronized DataAvailability getRanges(final DataAvailability ranges)
-            throws SQLException
-    {
+    public synchronized RangeSet getAvailableTimeRanges(RangeSet addTo) throws SQLException {
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
         long  lastEndTime        = Long.MIN_VALUE;
         final Calendar calendar  = getCalendar();
         final ResultSet  result  = getStatement(AVAILABLE_DATA).executeQuery();
         final int startTimeIndex = indexOf(query.startTime);
         final int   endTimeIndex = indexOf(query.endTime);
-        final int xminIndex      = indexOf(query.xmin);
-        final int xmaxIndex      = indexOf(query.xmax);
-        final int yminIndex      = indexOf(query.ymin);
-        final int ymaxIndex      = indexOf(query.ymax);
-        // TODO: add z range
+        if (addTo == null) {
+            addTo = new RangeSet(Date.class);
+        }
         while (result.next()) {
-            if (ranges.t != null) {
-                final long timeInterval = Math.round(layer.getTimeInterval() * LocationOffsetEntry.DAY);
-                final Date    startTime = result.getTimestamp(startTimeIndex, calendar);
-                final Date      endTime = result.getTimestamp(  endTimeIndex, calendar);
-                if (startTime!=null && endTime!=null) {
-                    final long lgEndTime = endTime.getTime();
-                    final long checkTime = lgEndTime - timeInterval;
-                    if (checkTime <= lastEndTime  &&  checkTime < startTime.getTime()) {
-                        // Il arrive parfois que des images soient prises à toutes les 24 heures,
-                        // mais pendant 12 heures seulement. On veut éviter que de telles images
-                        // apparaissent tout le temps entrecoupées d'images manquantes.
-                        startTime.setTime(checkTime);
-                    }
-                    lastEndTime = lgEndTime;
-                    ranges.t.add(startTime, endTime);
+            final long timeInterval = Math.round(layer.getTimeInterval() * LocationOffsetEntry.DAY);
+            final Date    startTime = result.getTimestamp(startTimeIndex, calendar);
+            final Date      endTime = result.getTimestamp(  endTimeIndex, calendar);
+            if (startTime!=null && endTime!=null) {
+                final long lgEndTime = endTime.getTime();
+                final long checkTime = lgEndTime - timeInterval;
+                if (checkTime <= lastEndTime  &&  checkTime < startTime.getTime()) {
+                    // Il arrive parfois que des images soient prises à toutes les 24 heures,
+                    // mais pendant 12 heures seulement. On veut éviter que de telles images
+                    // apparaissent tout le temps entrecoupées d'images manquantes.
+                    startTime.setTime(checkTime);
                 }
-            }
-            if (ranges.x != null) {
-                final double xmin = result.getDouble(xminIndex);
-                final double xmax = result.getDouble(xmaxIndex);
-                ranges.x.add(new Longitude(xmin), new Longitude(xmax));
-            }
-            if (ranges.y != null) {
-                final double ymin = result.getDouble(yminIndex);
-                final double ymax = result.getDouble(ymaxIndex);
-                ranges.y.add(new Latitude(ymin), new Latitude(ymax));
+                lastEndTime = lgEndTime;
+                addTo.add(startTime, endTime);
             }
         }
         result.close();
-        return ranges;
+        return addTo;
     }
 
     /**
@@ -757,41 +708,20 @@ loop:   for (final CoverageReference newReference : entries) {
         final String extension = result.getString   (indexOf(query.extension));
         final Date   startTime = result.getTimestamp(indexOf(query.startTime), calendar);
         final Date   endTime   = result.getTimestamp(indexOf(query.endTime),   calendar);
-        final Envelope envelope;
-        final int index = indexOf(query.spatialExtent);
-        final Column column = query.getColumns(SELECT).get(index - 1);
-        if (column instanceof SpatialColumn.Box) {
-            envelope = ((SpatialColumn.Box) column).getEnvelope(result, SELECT);
-        } else {
-            envelope = SpatialColumn.Box.getEnvelope(result, index);
-        }
-        final short  width     = result.getShort    (indexOf(query.width));
-        final short  height    = result.getShort    (indexOf(query.height));
-        // TODO: What to do with depth?
-        final String crs       = result.getString   (indexOf(query.crs));
+        final String extent    = result.getString   (indexOf(query.spatialExtent));
         final String format    = result.getString   (indexOf(query.format));
-
-        short band = 0;
-        final NumberRange verticalRange = getVerticalRange();
-        final double searchFor = 0.5*(verticalRange.getMinimum() + verticalRange.getMaximum());
-        if (!Double.isNaN(searchFor) && !Double.isInfinite(searchFor)) {
-            final Array altitudes = result.getArray(indexOf(query.altitudes));
-            if (altitudes != null) {
-                // TODO: need a better algorithm (with binarySearch, etc.).
-                final Object data = altitudes.getArray();
-                final int length = getLength(data);
-                for (int i=0; i<length; i++) {
-                    final double candidate = getDouble(data, i);
-                    if (Math.abs(candidate - searchFor) < 1E-6) {
-                        band = (short) i;
-                        break;
-                    }
-                }
-            }
-//          altitudes.free();  // TODO: uncomment when we will be allowed to target Java 6.
+        if (gridGeometryTable == null) {
+            gridGeometryTable = getDatabase().getTable(GridGeometryTable.class);
         }
+        final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
+        final Envelope          envelope = geometry.getEnvelope();
+        final GridRange            range = geometry.getGridRange();
+        final NumberRange  verticalRange = getVerticalRange();
+        final short width  = (short) range.getLength(0);
+        final short height = (short) range.getLength(1);
+        final short band   = geometry.indexOf(0.5*(verticalRange.getMinimum() + verticalRange.getMaximum()));
         return new GridCoverageEntry(this, layer, series, pathname, filename, extension, startTime,
-                    endTime, envelope, width, height, band, crs, format, null).canonicalize();
+                    endTime, envelope, width, height, band, format, null).canonicalize();
     }
 
     /**
@@ -812,11 +742,11 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws CatalogException si les paramètres n'ont pas pu être obtenus.
      * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
      *
-     * @todo L'implémentation actuelle n'accepte pas d'autres impléméntations de Format que FormatEntry.
+     * @todo L'implémentation actuelle n'accepte pas d'autres implémentations de Format que FormatEntry.
      */
     final synchronized Parameters getParameters(final String seriesID,
                                                 final String formatID,
-                                                final String crsID,
+                                                final CoordinateReferenceSystem coverageCRS,
                                                 final String pathname,
                                                 final String extension)
             throws CatalogException, SQLException
@@ -837,10 +767,10 @@ loop:   for (final CoverageReference newReference : entries) {
          * spécifiés la dernière fois, retourne le dernier bloc de paramètres.
          */
         if (parameters != null &&
-            Utilities.equals(parameters.format     .getName(), formatID) &&
-            Utilities.equals(parameters.coverageCRS.getName(), crsID)    &&
-            Utilities.equals(parameters.pathname,              pathname) &&
-            Utilities.equals(parameters.extension,             extension))
+            Utilities.equals(parameters.format.getName(), formatID) &&
+            Utilities.equals(parameters.coverageCRS,   coverageCRS) &&
+            Utilities.equals(parameters.pathname,         pathname) &&
+            Utilities.equals(parameters.extension,       extension))
         {
             return parameters;
         }
@@ -854,16 +784,13 @@ loop:   for (final CoverageReference newReference : entries) {
         if (formatTable == null) {
             formatTable = getDatabase().getTable(FormatTable.class);
         }
-        if (crsTable == null) {
-            crsTable = getDatabase().getTable(CoordinateReferenceSystemTable.class);
-        }
         parameters = new Parameters(layer,
                                     (FormatEntry) formatTable.getEntry(formatID),
                                     pathname.intern(),
                                     extension.intern(),
                                     operation,
                                     getCoordinateReferenceSystem(),
-                                    crsTable.getEntry(crsID),
+                                    coverageCRS,
                                     geographicArea,
                                     resolution,
                                     dateFormat,

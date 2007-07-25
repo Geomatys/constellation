@@ -55,7 +55,7 @@ public class FormatTable extends SingletonTable<Format> implements Shareable {
     }
 
     /**
-     * Creates a format for the current row in the specified result set.
+     * Creates a format from the current row in the specified result set.
      *
      * @param  results The result set to read.
      * @return The entry for current row in the specified result set.

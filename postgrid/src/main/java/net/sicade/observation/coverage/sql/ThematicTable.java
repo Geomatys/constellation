@@ -43,7 +43,7 @@ public class ThematicTable extends SingletonTable<Thematic> implements Shareable
     }
 
     /**
-     * Creates a thematic entry for the current row in the specified result set.
+     * Creates a thematic entry from the current row in the specified result set.
      *
      * @throws SQLException if an error occured while reading the database.
      */

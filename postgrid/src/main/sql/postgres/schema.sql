@@ -302,16 +302,22 @@ COMMENT ON CONSTRAINT "TemporalExtent_range" ON "GridCoverages" IS 'Les dates de
 --
 
 CREATE TABLE "GridGeometries" (
-    id character varying(8) NOT NULL,
-    "spatialExtent" box3d NOT NULL,
-    "CRS" character varying DEFAULT 'CRS:84'::character varying NOT NULL,
+    identifier character varying(8) NOT NULL,
     width integer NOT NULL,
     height integer NOT NULL,
-    depth integer DEFAULT 1 NOT NULL,
-    altitudes double precision[],
-    CONSTRAINT "GridCoverageAltitudes" CHECK (((altitudes IS NULL) OR (((array_upper(altitudes, 1) - array_lower(altitudes, 1)) + 1) = depth))),
-    CONSTRAINT "GridCoverageSize" CHECK (((width > 0) AND (height > 0)))
+    "horizontalExtent" geometry,
+    "verticalOrdinates" double precision[],
+    CONSTRAINT "GridCoverageSize" CHECK (((width > 0) AND (height > 0))),
+    CONSTRAINT "enforce_dims_horizontalExtent" CHECK ((ndims("horizontalExtent") = 2)),
+    CONSTRAINT "enforce_geotype_horizontalExtent" CHECK (((geometrytype("horizontalExtent") = 'POLYGON'::text) OR ("horizontalExtent" IS NULL))),
+    CONSTRAINT "enforce_srid_horizontalExtent" CHECK ((srid("horizontalExtent") = 4326))
 );
+
+--
+-- Data for Name: geometry_columns; Type: TABLE DATA; Schema: postgis; Owner: -
+--
+
+INSERT INTO geometry_columns (f_table_catalog, f_table_schema, f_table_name, f_geometry_column, coord_dimension, srid, "type") VALUES ('', 'postgrid', 'GridGeometries', 'horizontalExtent', 2, 4326, 'POLYGON');
 
 
 --
@@ -322,24 +328,10 @@ COMMENT ON TABLE "GridGeometries" IS 'Envelope spatiales des images ainsi que la
 
 
 --
--- Name: COLUMN "GridGeometries".id; Type: COMMENT; Schema: postgrid; Owner: -
+-- Name: COLUMN "GridGeometries".identifier; Type: COMMENT; Schema: postgrid; Owner: -
 --
 
-COMMENT ON COLUMN "GridGeometries".id IS 'Identifiant unique.';
-
-
---
--- Name: COLUMN "GridGeometries"."spatialExtent"; Type: COMMENT; Schema: postgrid; Owner: -
---
-
-COMMENT ON COLUMN "GridGeometries"."spatialExtent" IS 'Étendue spatiale à 3 dimensions.';
-
-
---
--- Name: COLUMN "GridGeometries"."CRS"; Type: COMMENT; Schema: postgrid; Owner: -
---
-
-COMMENT ON COLUMN "GridGeometries"."CRS" IS 'Identifiant du système de référence des coordonnées. Le CRS peut avoir jusqu''à 4 dimensions (x,y,z,t).';
+COMMENT ON COLUMN "GridGeometries".identifier IS 'Identifiant unique.';
 
 
 --
@@ -357,24 +349,17 @@ COMMENT ON COLUMN "GridGeometries".height IS 'Nombre de pixels en hauteur dans l
 
 
 --
--- Name: COLUMN "GridGeometries".depth; Type: COMMENT; Schema: postgrid; Owner: -
+-- Name: COLUMN "GridGeometries"."horizontalExtent"; Type: COMMENT; Schema: postgrid; Owner: -
 --
 
-COMMENT ON COLUMN "GridGeometries".depth IS 'Nombre de pixels en profondeur dans l''image, si elle est à trois dimensions.';
-
-
---
--- Name: COLUMN "GridGeometries".altitudes; Type: COMMENT; Schema: postgrid; Owner: -
---
-
-COMMENT ON COLUMN "GridGeometries".altitudes IS 'Valeurs z de chacunes des couches d''une image 3D.';
+COMMENT ON COLUMN "GridGeometries"."horizontalExtent" IS 'Étendue spatiale à l''horizontal.';
 
 
 --
--- Name: CONSTRAINT "GridCoverageAltitudes" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: -
+-- Name: COLUMN "GridGeometries"."verticalOrdinates"; Type: COMMENT; Schema: postgrid; Owner: -
 --
 
-COMMENT ON CONSTRAINT "GridCoverageAltitudes" ON "GridGeometries" IS 'La longueur du tableau d''altitudes doit correspondre à la valeur ''depth'' déclarée.';
+COMMENT ON COLUMN "GridGeometries"."verticalOrdinates" IS 'Valeurs z de chacunes des couches d''une image 3D.';
 
 
 --
@@ -382,6 +367,20 @@ COMMENT ON CONSTRAINT "GridCoverageAltitudes" ON "GridGeometries" IS 'La longueu
 --
 
 COMMENT ON CONSTRAINT "GridCoverageSize" ON "GridGeometries" IS 'Les dimensions des images doivent être positives.';
+
+
+--
+-- Name: CONSTRAINT "enforce_dims_horizontalExtent" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: -
+--
+
+COMMENT ON CONSTRAINT "enforce_dims_horizontalExtent" ON "GridGeometries" IS 'Vérifie que l''étendue horizontale est à deux dimensions.';
+
+
+--
+-- Name: CONSTRAINT "enforce_geotype_horizontalExtent" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: -
+--
+
+COMMENT ON CONSTRAINT "enforce_geotype_horizontalExtent" ON "GridGeometries" IS 'Vérifie que l''étendue horizontale est un polygone.';
 
 
 --
@@ -697,7 +696,7 @@ COMMENT ON CONSTRAINT "GridCoverages_uniqueness" ON "GridCoverages" IS 'Le nom d
 --
 
 ALTER TABLE ONLY "GridGeometries"
-    ADD CONSTRAINT "GridGeometries_pkey" PRIMARY KEY (id);
+    ADD CONSTRAINT "GridGeometries_pkey" PRIMARY KEY (identifier);
 
 
 --
@@ -822,6 +821,13 @@ CREATE INDEX "Format_index" ON "SampleDimensions" USING btree (format);
 
 
 --
+-- Name: HorizontalExtent_index; Type: INDEX; Schema: postgrid; Owner: -; Tablespace: 
+--
+
+CREATE INDEX "HorizontalExtent_index" ON "GridGeometries" USING gist ("horizontalExtent" gist_geometry_ops);
+
+
+--
 -- Name: Layers_index; Type: INDEX; Schema: postgrid; Owner: -; Tablespace: 
 --
 
@@ -878,6 +884,13 @@ COMMENT ON INDEX "Time_index" IS 'Recherche de toutes les images à l''intérieu
 
 
 --
+-- Name: Visibility_index; Type: INDEX; Schema: postgrid; Owner: -; Tablespace: 
+--
+
+CREATE INDEX "Visibility_index" ON "Series" USING btree (visible);
+
+
+--
 -- Name: Fallback_reference; Type: FK CONSTRAINT; Schema: postgrid; Owner: -
 --
 
@@ -927,7 +940,7 @@ COMMENT ON CONSTRAINT "Format_reference" ON "Series" IS 'Toutes les images d''un
 --
 
 ALTER TABLE ONLY "GridCoverages"
-    ADD CONSTRAINT "GridGeometry_reference" FOREIGN KEY (extent) REFERENCES "GridGeometries"(id);
+    ADD CONSTRAINT "GridGeometry_reference" FOREIGN KEY (extent) REFERENCES "GridGeometries"(identifier) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
