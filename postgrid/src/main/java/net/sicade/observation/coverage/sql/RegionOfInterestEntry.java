@@ -16,14 +16,14 @@ package net.sicade.observation.coverage.sql;
 
 import org.geotools.resources.Utilities;
 import net.sicade.observation.sql.Entry;
-import net.sicade.observation.coverage.LocationOffset;
+import net.sicade.observation.coverage.RegionOfInterest;
 
 import static java.lang.Double.compare;
 import static java.lang.Double.doubleToLongBits;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain LocationOffset décalage spatio-temporel}.
+ * Implémentation d'une entrée représentant une {@linkplain RegionOfInterest décalage spatio-temporel}.
  * Ces entrées sont comparables entre elles. Leur ordre naturel place les entrées en ordre croissant
  * de {@linkplain #getDayOffset décalage spatio-temporel}. Si deux entrées ont le même décalage temporel,
  * alors ils seront ordonnés selon leur {@linkplain #getAltitudeOffset décalage d'altitude}, et ainsi
@@ -34,7 +34,7 @@ import static java.lang.Double.doubleToLongBits;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class LocationOffsetEntry extends Entry implements LocationOffset, Comparable<LocationOffsetEntry> {
+public class RegionOfInterestEntry extends Entry implements RegionOfInterest, Comparable<RegionOfInterestEntry> {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -43,7 +43,7 @@ public class LocationOffsetEntry extends Entry implements LocationOffset, Compar
     /**
      * Une entrée à utiliser à la place de {@code null}.
      */
-    public static final LocationOffsetEntry NULL = new LocationOffsetEntry("", 0, 0, 0, 0); 
+    public static final RegionOfInterestEntry NULL = new RegionOfInterestEntry("", 0, 0, 0, 0); 
 
     /**
      * Nombre de millisecondes dans une journée.
@@ -81,11 +81,11 @@ public class LocationOffsetEntry extends Entry implements LocationOffset, Compar
      * @param dt   Ecart de temps (en nombre de millisecondes) entre la date de l'observation
      *             et la date à prendre en compte dans les paramètres environnementaux.
      */
-    protected LocationOffsetEntry(final String  name,
-                                  final double  dx,
-                                  final double  dy, 
-                                  final double  dz, 
-                                  final long    dt)
+    protected RegionOfInterestEntry(final String  name,
+                                    final double  dx,
+                                    final double  dy, 
+                                    final double  dz, 
+                                    final long    dt)
     {
         super(name);
         this.timeOffset = dt;
@@ -131,7 +131,7 @@ public class LocationOffsetEntry extends Entry implements LocationOffset, Compar
             return true;
         }
         if (super.equals(object)) {
-            final LocationOffsetEntry that = (LocationOffsetEntry) object;
+            final RegionOfInterestEntry that = (RegionOfInterestEntry) object;
             return this.timeOffset           == that.timeOffset           &&
                    doubleToLongBits(this.dx) == doubleToLongBits(that.dx) &&
                    doubleToLongBits(this.dy) == doubleToLongBits(that.dy) &&
@@ -143,7 +143,7 @@ public class LocationOffsetEntry extends Entry implements LocationOffset, Compar
     /**
      * Compare l'objet spécifié avec cette entré.
      */
-    public int compareTo(final LocationOffsetEntry that) {
+    public int compareTo(final RegionOfInterestEntry that) {
         if (this.timeOffset < that.timeOffset) return -1;
         if (this.timeOffset > that.timeOffset) return +1;
         int c;

@@ -64,7 +64,7 @@ import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.Descriptor;
-import net.sicade.observation.coverage.LocationOffset;
+import net.sicade.observation.coverage.RegionOfInterest;
 
 
 /**
@@ -146,7 +146,7 @@ public class DescriptorChooser extends JPanel {
 
     /**
      * Nom de la première étape, qui consiste à choisir les {@linkplain Layer couches},
-     * {@linkplain Operation opérations} et {@link LocationOffset positions relatives}.
+     * {@linkplain Operation opérations} et {@link RegionOfInterest positions relatives}.
      * Ce nom peut être spécifié en argument à {@link #setStep} pour sélectionner les
      * listes à afficher.
      */
@@ -181,9 +181,9 @@ public class DescriptorChooser extends JPanel {
     private final Map<Operation,Boolean> operations = new LinkedHashMap<Operation,Boolean>();
     
     /**
-     * Ensemble des {@linkplain LocationOffset positions spatio-temporelles relatives}.
+     * Ensemble des {@linkplain RegionOfInterest positions spatio-temporelles relatives}.
      */
-    private final Map<LocationOffset,Boolean> offsets = new LinkedHashMap<LocationOffset,Boolean>();
+    private final Map<RegionOfInterest,Boolean> offsets = new LinkedHashMap<RegionOfInterest,Boolean>();
 
     /**
      * Liste des {@linkplain Layer couches} d'images.
@@ -196,7 +196,7 @@ public class DescriptorChooser extends JPanel {
     private final JList operationList;
 
     /**
-     * Liste des {@linkplain LocationOffset positions spatio-temporelles relatives}.
+     * Liste des {@linkplain RegionOfInterest positions spatio-temporelles relatives}.
      */
     private final JList offsetList;
 
@@ -314,7 +314,7 @@ public class DescriptorChooser extends JPanel {
             if (add(descriptors, descriptor)) {
                 seriesModified    |= add(layers,     descriptor.getPhenomenon());
                 operationModified |= add(operations, descriptor.getProcedure());
-                offsetModified    |= add(offsets,    descriptor.getLocationOffset());
+                offsetModified    |= add(offsets,    descriptor.getRegionOfInterest());
             }
         }
         if (seriesModified)    setElements(layerList,     layers);
@@ -399,9 +399,9 @@ public class DescriptorChooser extends JPanel {
         final Set<Descriptor> confirmed = new HashSet<Descriptor>();
         for (final Map.Entry<Descriptor,Boolean> entry : descriptors.entrySet()) {
             final Descriptor descriptor = entry.getKey();
-            final boolean isSelected = TRUE.equals(layers    .get(descriptor.getPhenomenon    ())) &&
-                                       TRUE.equals(operations.get(descriptor.getProcedure     ())) &&
-                                       TRUE.equals(offsets   .get(descriptor.getLocationOffset()));
+            final boolean isSelected = TRUE.equals(layers    .get(descriptor.getPhenomenon      ())) &&
+                                       TRUE.equals(operations.get(descriptor.getProcedure       ())) &&
+                                       TRUE.equals(offsets   .get(descriptor.getRegionOfInterest()));
             if (isSelected) {
                 if (!selected.add(descriptor)) {
                     throw new AssertionError(descriptor);
@@ -437,9 +437,9 @@ public class DescriptorChooser extends JPanel {
             final boolean    isSelected = selected.contains(descriptor);
             entry.setValue(isSelected);
             if (isSelected) {
-                if (layers    .put(descriptor.getPhenomenon(),     TRUE) == null ||
-                    operations.put(descriptor.getProcedure(),      TRUE) == null ||
-                    offsets   .put(descriptor.getLocationOffset(), TRUE) == null)
+                if (layers    .put(descriptor.getPhenomenon(),       TRUE) == null ||
+                    operations.put(descriptor.getProcedure(),        TRUE) == null ||
+                    offsets   .put(descriptor.getRegionOfInterest(), TRUE) == null)
                 {
                     throw new AssertionError(descriptor);
                 }

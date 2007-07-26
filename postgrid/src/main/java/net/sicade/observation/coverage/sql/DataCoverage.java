@@ -40,7 +40,7 @@ import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Series;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.Descriptor;
-import net.sicade.observation.coverage.LocationOffset;
+import net.sicade.observation.coverage.RegionOfInterest;
 import net.sicade.observation.coverage.DynamicCoverage;
 import net.sicade.observation.coverage.rmi.DataConnection;
 import net.sicade.observation.CatalogException;
@@ -117,7 +117,7 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
      */
     private DataCoverage(final Descriptor descriptor, final DataConnection data) throws RemoteException {
         super(descriptor.getName(), data.getCoordinateReferenceSystem(), null, null);
-        final LocationOffset offset = descriptor.getLocationOffset();
+        final RegionOfInterest offset = descriptor.getRegionOfInterest();
         this.data       = data;
         this.dt         = offset.getDayOffset();
         this.band       = descriptor.getBand();

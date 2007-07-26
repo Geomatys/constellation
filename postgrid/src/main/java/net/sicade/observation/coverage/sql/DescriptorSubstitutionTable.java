@@ -125,8 +125,8 @@ public class DescriptorSubstitutionTable extends Table {
         }
         final Descriptor d1 = descriptors.getEntry(symbol1);
         final Descriptor d2 = descriptors.getEntry(symbol2);
-        final double scale = 1.0 / (d2.getLocationOffset().getDayOffset() -
-                                    d1.getLocationOffset().getDayOffset());
+        final double scale = 1.0 / (d2.getRegionOfInterest().getDayOffset() -
+                                    d1.getRegionOfInterest().getDayOffset());
         return new LinearModelTerm[] {
             new LinearModelTerm( scale, d2),
             new LinearModelTerm(-scale, d1)

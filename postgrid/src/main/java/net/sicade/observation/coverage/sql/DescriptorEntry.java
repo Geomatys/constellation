@@ -27,7 +27,7 @@ import net.sicade.observation.Distribution;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.Descriptor;
-import net.sicade.observation.coverage.LocationOffset;
+import net.sicade.observation.coverage.RegionOfInterest;
 import net.sicade.observation.coverage.DynamicCoverage;
 import net.sicade.observation.coverage.FunctionalCoverage;
 import net.sicade.observation.sql.ObservableEntry;
@@ -56,7 +56,7 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
     /**
      * La position relative.
      */
-    private final LocationOffset offset;
+    private final RegionOfInterest offset;
 
     /**
      * Le numéro de bande dans laquelle évaluer les valeurs de pixels des images.
@@ -86,7 +86,7 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
                               final Layer          layer,
                               final Operation      operation,
                               final short          band,
-                              final LocationOffset offset,
+                              final RegionOfInterest offset,
                               final Distribution   distribution,
                               final String         remarks)
     {
@@ -114,7 +114,7 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
     /**
      * {@inheritDoc}
      */
-    public LocationOffset getLocationOffset() {
+    public RegionOfInterest getRegionOfInterest() {
         return offset;
     }
 

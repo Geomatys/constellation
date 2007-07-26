@@ -15,8 +15,8 @@
  */
 package net.sicade.observation.coverage.sql;
 
-import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Column;
+import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
 import net.sicade.observation.sql.QueryType;
@@ -24,16 +24,16 @@ import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * The query to execute for a {@link LocationOffsetTable}.
+ * The query to execute for a {@link DistributionTable}.
  *
  * @author Martin Desruisseaux
  * @version $Id$
  */
-final class LocationOffsetQuery extends Query {
+final class DistributionQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, dx, dy, dz, dt;
+    protected final Column name, scale, offset, log;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -45,18 +45,13 @@ final class LocationOffsetQuery extends Query {
      *
      * @param database The database for which this query is created.
      */
-    public LocationOffsetQuery(final Database database) {
+    public DistributionQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        name   = addColumn("LocationOffsets", "name", usage);
-        dx     = addColumn("LocationOffsets", "dx",   usage);
-        dy     = addColumn("LocationOffsets", "dy",   usage);
-        dz     = addColumn("LocationOffsets", "dz",   usage);
-        dt     = addColumn("LocationOffsets", "dt",   usage);
-        byName = addParameter(name,  SELECT);
-        dt.setOrdering("DESC");
-        dz.setOrdering("DESC");
-        dy.setOrdering("DESC");
-        dx.setOrdering("DESC");
+        final QueryType[] usage  = {SELECT, LIST};
+        name   = addColumn   ("Distributions", "name",   usage);
+        scale  = addColumn   ("Distributions", "scale",  usage);
+        offset = addColumn   ("Distributions", "offset", usage);
+        log    = addColumn   ("Distributions", "log",    usage);
+        byName = addParameter(name, SELECT);
     }
 }

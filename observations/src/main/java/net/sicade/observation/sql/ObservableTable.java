@@ -23,6 +23,7 @@ import net.sicade.observation.Procedure;
 import net.sicade.observation.Distribution;
 import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
+import net.sicade.observation.coverage.sql.DistributionTable;
 
 
 /**

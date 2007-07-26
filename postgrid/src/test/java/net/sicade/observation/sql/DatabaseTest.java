@@ -106,9 +106,9 @@ public class DatabaseTest extends TestCase {
     /**
      * Tries the {@link Query#selectAll} method on the specified table.
      */
-    protected static void trySelectAll(final Table table) throws SQLException {
-        final String query = table.query.selectAll(QueryType.SELECT);
-        assertNotNull(query);
-        tryStatement(query);
+    protected static void trySelectAll(final Query query) throws SQLException {
+        final String sql = query.selectAll(QueryType.SELECT);
+        assertNotNull(sql);
+        tryStatement(sql);
     }
 }

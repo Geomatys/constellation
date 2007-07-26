@@ -39,7 +39,7 @@ import net.sicade.observation.Procedure;
 import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Observable;
 import net.sicade.observation.coverage.Descriptor;
-import net.sicade.observation.coverage.LocationOffset;
+import net.sicade.observation.coverage.RegionOfInterest;
 
 
 /**
@@ -139,7 +139,7 @@ public class MergedMeasurementTable extends Table {
      */
     public synchronized int count(final Phenomenon phenomenon,
                                   final Procedure   procedure,
-                                  final LocationOffset offset)
+                                  final RegionOfInterest offset)
     {
         if (phenomenon == null && procedure == null && offset == null) {
             return observables.size();
@@ -153,7 +153,7 @@ public class MergedMeasurementTable extends Table {
                 continue;
             }
             if (offset != null && !(observable instanceof Descriptor &&
-                offset.equals(((Descriptor) observable).getLocationOffset())))
+                offset.equals(((Descriptor) observable).getRegionOfInterest())))
             {
                 continue;
             }

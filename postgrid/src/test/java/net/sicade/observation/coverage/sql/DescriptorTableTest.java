@@ -14,8 +14,9 @@
  */
 package net.sicade.observation.coverage.sql;
 
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.sql.DatabaseTest;
 
 import org.junit.*;
@@ -23,33 +24,27 @@ import static org.junit.Assert.*;
 
 
 /**
- * Tests the SQL queries used by the PostGrid database.
+ * Tests {@link DescriptorTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SchemaTest extends DatabaseTest {
+public class DescriptorTableTest extends DatabaseTest {
     /**
-     * Creates a new instance.
+     * The name of the descriptor to be tested.
      */
-    public SchemaTest() {
-    }
+    public static final String SAMPLE_NAME = "∇₃SST";
 
     /**
-     * Tests the SQL statements used by the {@link ThematicTable}.
+     * Tests the {@link DescriptorTable#getEntry} method.
      */
     @Test
-    public void testThematic() throws SQLException {
-        final ThematicQuery query = new ThematicQuery(database);
-        trySelectAll(query);
-    }
-
-    /**
-     * Tests the SQL statements used by the {@link OperationParameterTable}.
-     */
-    @Test
-    public void testOperationParameters() throws SQLException {
-        final OperationParameterQuery query = new OperationParameterQuery(database);
-        trySelectAll(query);
+    public void testSelectAndList() throws CatalogException, SQLException {
+        final DescriptorTable table = new DescriptorTable(database);
+        final Descriptor      entry = table.getEntry(SAMPLE_NAME);
+        assertEquals(SAMPLE_NAME, entry.getName());
+        assertSame(entry, table.getEntry(SAMPLE_NAME));
+        assertEquals(LayerTableTest.SAMPLE_NAME, entry.getPhenomenon().getName());
+        assertEquals(OperationTableTest.SAMPLE_NAME, entry.getProcedure().getName());
     }
 }

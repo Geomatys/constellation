@@ -650,7 +650,7 @@ loop:   for (final CoverageReference newReference : entries) {
             addTo = new RangeSet(Date.class);
         }
         while (result.next()) {
-            final long timeInterval = Math.round(layer.getTimeInterval() * LocationOffsetEntry.DAY);
+            final long timeInterval = Math.round(layer.getTimeInterval() * RegionOfInterestEntry.DAY);
             final Date    startTime = result.getTimestamp(startTimeIndex, calendar);
             final Date      endTime = result.getTimestamp(  endTimeIndex, calendar);
             if (startTime!=null && endTime!=null) {

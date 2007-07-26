@@ -27,7 +27,7 @@ import net.sicade.observation.fishery.Species;
 import net.sicade.observation.fishery.Category;
 import net.sicade.observation.fishery.FisheryType;
 import net.sicade.observation.sql.ObservableEntry;
-import net.sicade.observation.sql.DistributionEntry;
+import net.sicade.observation.coverage.sql.DistributionEntry;
 
 
 /**

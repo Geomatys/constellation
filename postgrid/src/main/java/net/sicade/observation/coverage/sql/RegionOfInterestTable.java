@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.coverage.LocationOffset;
+import net.sicade.observation.coverage.RegionOfInterest;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.sql.SingletonTable;
@@ -29,22 +29,22 @@ import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * Connection to the table of {@linkplain LocationOffset spatio-temporal offsets} relative
+ * Connection to the table of {@linkplain RegionOfInterest spatio-temporal offsets} relative
  * to the position of observations.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class LocationOffsetTable extends SingletonTable<LocationOffset> {
+public class RegionOfInterestTable extends SingletonTable<RegionOfInterest> {
     /**
      * Creates a location offset table.
      * 
      * @param database Connection to the database.
      */
-    public LocationOffsetTable(final Database database) {
-        super(new LocationOffsetQuery(database));
-        setIdentifierParameters(((LocationOffsetQuery) query).byName, null);
+    public RegionOfInterestTable(final Database database) {
+        super(new RegionOfInterestQuery(database));
+        setIdentifierParameters(((RegionOfInterestQuery) query).byName, null);
     }
 
     /**
@@ -55,13 +55,13 @@ public class LocationOffsetTable extends SingletonTable<LocationOffset> {
      * @throws CatalogException if an inconsistent record is found in the database.
      * @throws SQLException if an error occured while reading the database.
      */
-    protected LocationOffset createEntry(final ResultSet results) throws SQLException, CatalogException {
-        final LocationOffsetQuery query = (LocationOffsetQuery) super.query;
-        return new LocationOffsetEntry(
+    protected RegionOfInterest createEntry(final ResultSet results) throws SQLException, CatalogException {
+        final RegionOfInterestQuery query = (RegionOfInterestQuery) super.query;
+        return new RegionOfInterestEntry(
                 results.getString(indexOf(query.name)),
                 results.getDouble(indexOf(query.dx  )),
                 results.getDouble(indexOf(query.dy  )),
                 results.getDouble(indexOf(query.dz  )),
-                Math.round(results.getDouble(indexOf(query.dt)) * LocationOffsetEntry.DAY));
+                Math.round(results.getDouble(indexOf(query.dt)) * RegionOfInterestEntry.DAY));
     }
 }

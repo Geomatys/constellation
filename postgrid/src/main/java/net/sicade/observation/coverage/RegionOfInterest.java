@@ -28,8 +28,10 @@ import net.sicade.observation.Observation;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
+ *
+ * @todo Not yet a real ROI, but we plan to revisit this interface later.
  */
-public interface LocationOffset extends Element {
+public interface RegionOfInterest extends Element {
     /**
      * Retourne le décalage temporelle, en nombre de jours. Par exemple la valeur -2 indique que
      * l'on s'intéressera à la valeur d'un paramètre environnemental (par exemple la température)

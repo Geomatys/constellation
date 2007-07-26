@@ -26,15 +26,14 @@ import net.sicade.observation.NoSuchRecordException;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.Operation;
 import net.sicade.observation.coverage.Layer;
-import net.sicade.observation.coverage.LocationOffset;
-import net.sicade.observation.sql.DistributionTable;
+import net.sicade.observation.coverage.RegionOfInterest;
 import net.sicade.observation.sql.SingletonTable;
 import net.sicade.observation.sql.Database;
 
 
 /**
  * Connection to a table of {@linkplain Descriptor descriptors}. The informations required by the
- * descriptors are splitted in three tables: {@link LayerTable}, {@link LocationOffsetTable} and
+ * descriptors are splitted in three tables: {@link LayerTable}, {@link RegionOfInterestTable} and
  * {@link OperationTable}.
  *
  * @version $Id$
@@ -56,7 +55,7 @@ public class DescriptorTable extends SingletonTable<Descriptor> {
      * La table des positions relatives.
      * Ne sera construite que la première fois où elle sera nécessaire.
      */
-    private LocationOffsetTable offsets;
+    private RegionOfInterestTable offsets;
 
     /**
      * La table des distributions.
@@ -171,15 +170,15 @@ public class DescriptorTable extends SingletonTable<Descriptor> {
         final DescriptorQuery query = (DescriptorQuery) super.query;
         final String    symbol       = results.getString (indexOf(query.symbol      ));
         final int       identifier   = results.getInt    (indexOf(query.identifier  ));
-        final String    phenomenon   = results.getString (indexOf(query.phenomenon  ));
-        final String    procedure    = results.getString (indexOf(query.procedure   ));
-        final String    position     = results.getString (indexOf(query.offset      ));
+        final String    phenomenon   = results.getString (indexOf(query.layer       ));
+        final String    procedure    = results.getString (indexOf(query.operation   ));
+        final String    position     = results.getString (indexOf(query.region      ));
         final short     band = (short)(results.getShort  (indexOf(query.band        )) - 1);
         final String    distribution = results.getString (indexOf(query.distribution));
         if (offsets == null) {
-            offsets = getDatabase().getTable(LocationOffsetTable.class);
+            offsets = getDatabase().getTable(RegionOfInterestTable.class);
         }
-        final LocationOffset offset = offsets.getEntry(position);
+        final RegionOfInterest offset = offsets.getEntry(position);
         if (layer == null) {
             setLayerTable(getDatabase().getTable(LayerTable.class));
         }

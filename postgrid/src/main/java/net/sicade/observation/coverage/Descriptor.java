@@ -28,7 +28,7 @@ import net.sicade.observation.CatalogException;
  *   <li>une {@linkplain Layer couche} d'images contenant les données du paramètre environnemental;</li>
  *   <li>une {@linkplain Operation opération} à appliquer (par exemple un opérateur de Sobel pour
  *       calculer les gradients);</li>
- *   <li>une {@linkplain LocationOffset position relative} à laquelle évaluer le résultat de
+ *   <li>une {@linkplain RegionOfInterest position relative} à laquelle évaluer le résultat de
  *       l'opération sur le paramètre environnemental;</li>
  *   <li>une {@linkplain Distribution distribution théorique}, que l'on essaiera de ramener à la
  *       distribution normale par un changement de variable.</li>
@@ -41,14 +41,14 @@ import net.sicade.observation.CatalogException;
 public interface Descriptor extends Observable {
     /**
      * Un comparateur pour classer des descripteurs en ordre croissant de
-     * {@linkplain LocationOffset#getDayOffset décalage temporel}. Si deux
+     * {@linkplain RegionOfInterest#getDayOffset décalage temporel}. Si deux
      * descripteurs ont le même décalage temporels, alors d'autres critères
      * telles que le nom de la couche peuvent être utilisés.
      */
     Comparator<Descriptor> TIME_ORDER = new Comparator<Descriptor>() {
         public int compare(final Descriptor d1, final Descriptor d2) {
-            final double dt1 = d1.getLocationOffset().getDayOffset();
-            final double dt2 = d2.getLocationOffset().getDayOffset();
+            final double dt1 = d1.getRegionOfInterest().getDayOffset();
+            final double dt2 = d2.getRegionOfInterest().getDayOffset();
             if (dt1 < dt2) return -1;
             if (dt1 > dt2) return +1;
             int c = d1.getPhenomenon().getName().compareTo(d2.getPhenomenon().getName());
@@ -76,7 +76,7 @@ public interface Descriptor extends Observable {
      * Retourne la position relative à laquelle évaluer les images de la couche.
      * Cette position est relative aux positions des observations.
      */
-    LocationOffset getLocationOffset();
+    RegionOfInterest getRegionOfInterest();
 
     /**
      * Retourne le numéro de la bande dans laquelle extraire les valeurs des images.
@@ -101,7 +101,7 @@ public interface Descriptor extends Observable {
      * <ul>
      *   <li>Une {@linkplain #getProcedure opération} peut-être appliquée sur les images (par
      *       exemple calcul de un gradient)</li>
-     *   <li>Un {@linkplain #getLocationOffset décalage spatio-temporel} peut être appliquée
+     *   <li>Un {@linkplain #getRegionOfInterest décalage spatio-temporel} peut être appliquée
      *       sur la position à laquelle évaluer les données.</li>
      *   <li>En cas de donnée manquante, la {@linkplain Layer#getFallback couche de second
      *       recours} est testée.</li>

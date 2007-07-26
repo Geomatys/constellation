@@ -15,8 +15,8 @@
  */
 package net.sicade.observation.coverage.sql;
 
-import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Database;
+import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
 import net.sicade.observation.sql.QueryType;
@@ -24,39 +24,39 @@ import static net.sicade.observation.sql.QueryType.*;
 
 
 /**
- * The query to execute for a {@link DescriptorTable}.
+ * The query to execute for a {@link RegionOfInterestTable}.
  *
  * @author Martin Desruisseaux
  * @version $Id$
  */
-final class DescriptorQuery extends Query {
+final class RegionOfInterestQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column identifier, symbol, layer, operation, region, band, distribution;
+    protected final Column name, dx, dy, dz, dt;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter bySymbol, byIdentifier;
+    protected final Parameter byName;
 
     /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
-    public DescriptorQuery(final Database database) {
+    public RegionOfInterestQuery(final Database database) {
         super(database);
-        final QueryType[] usage  = {SELECT, SELECT_BY_IDENTIFIER, LIST};
-        identifier   = addColumn   ("Descriptors", "identifier",   usage);
-        symbol       = addColumn   ("Descriptors", "symbol",       usage);
-        layer        = addColumn   ("Descriptors", "layer",        usage);
-        operation    = addColumn   ("Descriptors", "operation",    usage);
-        region       = addColumn   ("Descriptors", "region",       usage);
-        band         = addColumn   ("Descriptors", "band",         usage);
-        distribution = addColumn   ("Descriptors", "distribution", usage);
-        bySymbol     = addParameter(symbol,     SELECT);
-        byIdentifier = addParameter(identifier, SELECT_BY_IDENTIFIER);
-        identifier.setOrdering("ASC");
+        final QueryType[] usage = {SELECT, LIST};
+        name   = addColumn("RegionOfInterests", "name", usage);
+        dx     = addColumn("RegionOfInterests", "dx",   usage);
+        dy     = addColumn("RegionOfInterests", "dy",   usage);
+        dz     = addColumn("RegionOfInterests", "dz",   usage);
+        dt     = addColumn("RegionOfInterests", "dt",   usage);
+        byName = addParameter(name,  SELECT);
+        dt.setOrdering("DESC");
+        dz.setOrdering("DESC");
+        dy.setOrdering("DESC");
+        dx.setOrdering("DESC");
     }
 }

@@ -67,10 +67,10 @@ public class OperationParameterTable extends Table {
     protected synchronized void fillValues(final String operation, final ParameterValueGroup parameters)
             throws SQLException, CatalogException
     {
+        final PreparedStatement statement = getStatement(QueryType.SELECT);
         final OperationParameterQuery query = (OperationParameterQuery) super.query;
         final int paramIndex = indexOf(query.parameter);
         final int valueIndex = indexOf(query.value    );
-        final PreparedStatement statement = getStatement(QueryType.SELECT);
         statement.setString(indexOf(query.byOperation), operation);
         final ResultSet results = statement.executeQuery();
         while (results.next()) try {

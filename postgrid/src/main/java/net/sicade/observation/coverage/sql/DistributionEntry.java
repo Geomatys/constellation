@@ -12,14 +12,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation.sql;
+package net.sicade.observation.coverage.sql;
 
+import net.sicade.observation.sql.Entry;
 import net.sicade.observation.Distribution;
 import static java.lang.Double.doubleToLongBits;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Distribution distribution}.
+ * Implementation of a {@linkplain Distribution distribution} entry.
  * 
  * @version $Id$
  * @author Antoine Hnawia

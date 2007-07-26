@@ -121,7 +121,7 @@ public interface Layer extends Observable, Phenomenon {
      * celle de {@link Descriptor#getCoverage} pour les raisons suivantes:
      * <p>
      * <ul>
-     *   <li>Il n'y a ni {@linkplain Operation opération}, ni {@link LocationOffset décalage
+     *   <li>Il n'y a ni {@linkplain Operation opération}, ni {@link RegionOfInterest décalage
      *       spatio-temporel} d'appliqués sur les données à évaluer.</li>
      *   <li>Les valeurs sont évaluées directement sur les images de cette couche, jamais sur
      *       celles de la {@linkplain #getFallback couche de second recours}.</li>

@@ -70,7 +70,7 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
              */
             return Long.MAX_VALUE;
         }
-        return time.getTime() + Math.round((24*60*60*1000) * descriptor.getLocationOffset().getDayOffset());
+        return time.getTime() + Math.round((24*60*60*1000) * descriptor.getRegionOfInterest().getDayOffset());
     }
 
     /**

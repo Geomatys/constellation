@@ -14,8 +14,10 @@
  */
 package net.sicade.observation.coverage.sql;
 
-import java.sql.DatabaseMetaData;
+import java.util.Set;
 import java.sql.SQLException;
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.coverage.RegionOfInterest;
 import net.sicade.observation.sql.DatabaseTest;
 
 import org.junit.*;
@@ -23,33 +25,30 @@ import static org.junit.Assert.*;
 
 
 /**
- * Tests the SQL queries used by the PostGrid database.
+ * Tests {@link CategoryTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SchemaTest extends DatabaseTest {
+public class RegionOfInterestTableTest extends DatabaseTest {
     /**
-     * Creates a new instance.
+     * The name of a ROI to be tested.
      */
-    public SchemaTest() {
-    }
+    public static final String SAMPLE_NAME = "+00";
 
     /**
-     * Tests the SQL statements used by the {@link ThematicTable}.
+     * Tests the {@link RegionOfInterestTable#getEntry} method.
      */
     @Test
-    public void testThematic() throws SQLException {
-        final ThematicQuery query = new ThematicQuery(database);
-        trySelectAll(query);
-    }
+    public void testSelect() throws CatalogException, SQLException {
+        final RegionOfInterestTable table   = new RegionOfInterestTable(database);
+        final RegionOfInterest entry = table.getEntry(SAMPLE_NAME);
+        assertEquals(0.0, entry.getNorthing(),       0.0);
+        assertEquals(0.0, entry.getEasting(),        0.0);
+        assertEquals(0.0, entry.getAltitudeOffset(), 0.0);
+        assertEquals(0.0, entry.getDayOffset(),      0.0);
 
-    /**
-     * Tests the SQL statements used by the {@link OperationParameterTable}.
-     */
-    @Test
-    public void testOperationParameters() throws SQLException {
-        final OperationParameterQuery query = new OperationParameterQuery(database);
-        trySelectAll(query);
+        final Set<RegionOfInterest> entries = table.getEntries();
+        assertTrue(entries.contains(entry));
     }
 }

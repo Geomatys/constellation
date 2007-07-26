@@ -133,7 +133,7 @@ public class OperationEntry extends ProcedureEntry implements Operation {
                              final String remarks)
     {
         super(name, remarks);
-        this.prefix = prefix;
+        this.prefix = prefix.trim();
         if (operation != null) {
             operation = operation.trim();
         } else {

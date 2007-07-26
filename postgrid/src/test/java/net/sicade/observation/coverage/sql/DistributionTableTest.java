@@ -14,8 +14,10 @@
  */
 package net.sicade.observation.coverage.sql;
 
-import java.sql.DatabaseMetaData;
+import java.util.Set;
 import java.sql.SQLException;
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.Distribution;
 import net.sicade.observation.sql.DatabaseTest;
 
 import org.junit.*;
@@ -23,33 +25,29 @@ import static org.junit.Assert.*;
 
 
 /**
- * Tests the SQL queries used by the PostGrid database.
+ * Tests {@link DistributionTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SchemaTest extends DatabaseTest {
+public class DistributionTableTest extends DatabaseTest {
     /**
-     * Creates a new instance.
+     * The name of the thematic to be tested.
      */
-    public SchemaTest() {
-    }
+    public static final String SAMPLE_NAME = "amplitude ∇SST";
 
     /**
-     * Tests the SQL statements used by the {@link ThematicTable}.
+     * Tests the {@link DistributionTable#getEntry} and {@link DistributionTable#getEntries} methods.
      */
     @Test
-    public void testThematic() throws SQLException {
-        final ThematicQuery query = new ThematicQuery(database);
-        trySelectAll(query);
-    }
+    public void testSelectAndList() throws CatalogException, SQLException {
+        final DistributionTable table = new DistributionTable(database);
+        final Distribution      entry = table.getEntry(SAMPLE_NAME);
+        assertEquals(SAMPLE_NAME, entry.getName());
+        assertSame(entry, table.getEntry(SAMPLE_NAME));
 
-    /**
-     * Tests the SQL statements used by the {@link OperationParameterTable}.
-     */
-    @Test
-    public void testOperationParameters() throws SQLException {
-        final OperationParameterQuery query = new OperationParameterQuery(database);
-        trySelectAll(query);
+        final Set<Distribution> entries = table.getEntries();
+        assertFalse(entries.isEmpty());
+        assertTrue(entries.contains(entry));
     }
 }
