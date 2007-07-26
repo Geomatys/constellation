@@ -20,14 +20,11 @@ import java.sql.SQLException;
 
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.LocationOffset;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
 import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Parameter;
-import net.sicade.observation.sql.Role;
 import static net.sicade.observation.sql.QueryType.*;
 
 
@@ -39,8 +36,7 @@ import static net.sicade.observation.sql.QueryType.*;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-@UsedBy(DescriptorTable.class)
-public class LocationOffsetTable extends SingletonTable<LocationOffset> implements Shareable {
+public class LocationOffsetTable extends SingletonTable<LocationOffset> {
     /**
      * Creates a location offset table.
      * 
@@ -48,6 +44,7 @@ public class LocationOffsetTable extends SingletonTable<LocationOffset> implemen
      */
     public LocationOffsetTable(final Database database) {
         super(new LocationOffsetQuery(database));
+        setIdentifierParameters(((LocationOffsetQuery) query).byName, null);
     }
 
     /**

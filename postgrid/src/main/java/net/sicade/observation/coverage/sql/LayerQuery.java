@@ -20,7 +20,6 @@ import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Role;
 import static net.sicade.observation.sql.QueryType.*;
 
 
@@ -35,7 +34,12 @@ final class LayerQuery extends Query {
      * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column name, thematic, period, fallback, remarks;
-    
+
+    /**
+     * Parameter to appear after the {@code "FROM"} clause.
+     */
+    protected final Parameter byName;
+
 //    private static final SpatialConfigurationKey LIST = new SpatialConfigurationKey("Layer:LIST",
 //            "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
 //            "  FROM \"Layers\" "                                                       +
@@ -74,7 +78,6 @@ final class LayerQuery extends Query {
      */
     public LayerQuery(final Database database) {
         super(database);
-        final Parameter byName;
         final QueryType[] usage = {SELECT, LIST};
         name      = addColumn   ("Layers", "name",        usage);
         thematic  = addColumn   ("Layers", "thematic",    usage);
@@ -82,6 +85,5 @@ final class LayerQuery extends Query {
         fallback  = addColumn   ("Layers", "fallback",    usage);
         remarks   = addColumn   ("Layers", "description", usage);
         byName    = addParameter(name, SELECT);
-        name.setRole(Role.NAME);
     }
 }

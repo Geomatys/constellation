@@ -31,7 +31,7 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import net.sicade.observation.Element;
 import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.CatalogException;
-import net.sicade.observation.LoggingLevel;
+import net.sicade.observation.sql.LoggingLevel;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Series;

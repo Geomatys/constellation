@@ -177,9 +177,6 @@ public class Query {
      *
      * @param  type The query type.
      * @return An immutable list of columns.
-     *
-     * @todo Current implementation do not handle correctly {@link SpatialColumn}
-     *       using more than one column.
      */
     public List<Column> getColumns(final QueryType type) {
         return new IndexedSqlElementList<Column>(type, columns);
@@ -193,9 +190,6 @@ public class Query {
      *
      * @param  type The query type.
      * @return An immutable list of parameters.
-     *
-     * @todo Current implementation do not handle correctly {@link SpatialParameter}
-     *       using more than one parameter.
      */
     public List<Parameter> getParameters(final QueryType type) {
         return new IndexedSqlElementList<Parameter>(type, parameters);
@@ -221,7 +215,7 @@ public class Query {
          * Keep trace of all involved tables in the process.
          */
         final String quote = metadata.getIdentifierQuoteString().trim();
-        Map<String,ForeignerKey> tables = new LinkedHashMap<String,ForeignerKey>();
+        Map<String,CrossReference> tables = new LinkedHashMap<String,CrossReference>();
         String separator = "SELECT ";
         for (final Column column : columns) {
             if (column.indexOf(type) == 0) {
@@ -245,7 +239,7 @@ public class Query {
         if (joinParameters) {
             for (final Parameter parameter : parameters) {
                 if (parameter.indexOf(type) != 0) {
-                    tables.put(parameter.getColumnTable(), null);
+                    tables.put(parameter.column.table, null);
                 }
             }
         }
@@ -255,7 +249,7 @@ public class Query {
          * the "JOIN ... ON" clauses.
          */
         if (tables.size() >= 2) {
-            for (final Map.Entry<String,ForeignerKey> entry : tables.entrySet()) {
+            for (final Map.Entry<String,CrossReference> entry : tables.entrySet()) {
                 final String table = entry.getKey();
                 final ResultSet pks = metadata.getExportedKeys(catalog, schema, table);
                 while (pks.next()) {
@@ -282,10 +276,11 @@ public class Query {
                         pks.close();
                         throw new SQLException("Clé étrangère sur plusieurs colonnes dans la table \"" + table + "\".");
                     }
-                    final Column       pk = new Column(null, table, pkColumn);
-                    final ForeignerKey fk = new ForeignerKey(null, fkTable, fkColumn, pk);
-                    final ForeignerKey ok = entry.setValue(fk);
-                    if (ok != null && !fk.equals(ok)) {
+                    final Column pk = new Column(null,   table, pkColumn);
+                    final Column fk = new Column(null, fkTable, fkColumn);
+                    final CrossReference ref = new CrossReference(fk, pk);
+                    final CrossReference old = entry.setValue(ref);
+                    if (old != null && !ref.equals(old)) {
                         // Current implementation supports only one foreigner key per table.
                         pks.close();
                         throw new SQLException("Multiple clés étrangères pour la table \"" + table + "\".");
@@ -297,16 +292,16 @@ public class Query {
              * Copies the table in a new map with a potentially different order.
              * We try to move last the tables that use foreigner keys.
              */
-            final Map<String,ForeignerKey> ordered = new LinkedHashMap<String,ForeignerKey>();
+            final Map<String,CrossReference> ordered = new LinkedHashMap<String,CrossReference>();
 scan:       while (!tables.isEmpty()) {
-                for (final Iterator<Map.Entry<String,ForeignerKey>> it=tables.entrySet().iterator(); it.hasNext();) {
-                    final Map.Entry<String,ForeignerKey> entry = it.next();
+                for (final Iterator<Map.Entry<String,CrossReference>> it=tables.entrySet().iterator(); it.hasNext();) {
+                    final Map.Entry<String,CrossReference> entry = it.next();
                     final String table = entry.getKey();
-                    final ForeignerKey fk = entry.getValue();
-                    if (fk == null || ordered.containsKey(fk.table)) {
+                    final CrossReference ref = entry.getValue();
+                    if (ref == null || ordered.containsKey(ref.foreignerKey.table)) {
                         // This table is unreferenced, or is referenced by a table already listed
                         // in the "FROM" or "JOIN" clause. Copy it to the ordered table list.
-                        ordered.put(table, fk);
+                        ordered.put(table, ref);
                         it.remove();
                         continue scan;
                     }
@@ -322,7 +317,7 @@ scan:       while (!tables.isEmpty()) {
          * Write the "FROM" and "JOIN" clauses.
          */
         separator = " FROM ";
-        for (final Map.Entry<String,ForeignerKey> entry : tables.entrySet()) {
+        for (final Map.Entry<String,CrossReference> entry : tables.entrySet()) {
             final String table = entry.getKey();
             buffer.append(separator).append(quote).append(table).append(quote);
             if (separator != JOIN) {
@@ -334,16 +329,15 @@ scan:       while (!tables.isEmpty()) {
              * At this point, we know that our "SELECT" clause uses more than one table.
              * Infer the "JOIN ... ON ..." statements from the primary and foreigner keys.
              */
-            final ForeignerKey fk = entry.getValue();
-            if (fk == null) {
+            final CrossReference ref = entry.getValue();
+            if (ref == null) {
                 throw new SQLException("Aucune clé étrangère trouvée pour la table \"" + table + "\".");
             }
-            final Column pk = fk.primaryKey;
-            assert table.equals(pk.table) : table;
+            assert table.equals(ref.primaryKey.table) : table;
             buffer.append(" ON ");
-            fk.qualified(buffer, quote);
+            ref.foreignerKey.qualified(buffer, quote);
             buffer.append('=');
-            pk.qualified(buffer, quote);
+            ref.primaryKey.qualified(buffer, quote);
         }
     }
 
@@ -363,7 +357,7 @@ scan:       while (!tables.isEmpty()) {
         for (final Parameter p : parameters) {
             if (p.indexOf(type) != 0) {
                 buffer.append(separator).append('(');
-                final String variable   = p.getColumnName();
+                final String variable   = p.column.alias;
                 final String function   = p.getColumnFunction(type);
                 final String comparator = p.getComparator();
                 final String[] comparators;
@@ -470,24 +464,6 @@ scan:       while (!tables.isEmpty()) {
             }
         }
         return sql;
-    }
-
-    /**
-     * Returns the index of the first parameter having the specified role.
-     * Parameter index start with 1. This method returns 0 if no suitable
-     * parameter has been found.
-     *
-     * @param  type The query type on which the parameter apply.
-     * @param  role The role for the parameter.
-     * @return The parameter index (starting with 1), or 0 if none.
-     */
-    public int indexOfParameter(final QueryType type, final Role role) {
-        for (final Parameter p : parameters) {
-            if (p.getColumnRole() == role && p.indexOf(type) != 0) {
-                return p.indexOf(type);
-            }
-        }
-        return 0;
     }
 
     /**

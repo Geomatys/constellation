@@ -21,10 +21,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Operation;
-import net.sicade.observation.sql.Use;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
 
 
@@ -35,9 +32,7 @@ import net.sicade.observation.sql.SingletonTable;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-@Use(OperationParameterTable.class)
-@UsedBy(DescriptorTable.class)
-public class OperationTable extends SingletonTable<Operation> implements Shareable {
+public class OperationTable extends SingletonTable<Operation> {
     /** 
      * La table des paramètres des opérations. Ne sera construite que la première fois
      * où elle sera nécessaire.
@@ -51,6 +46,7 @@ public class OperationTable extends SingletonTable<Operation> implements Shareab
      */
     public OperationTable(final Database database) {
         super(new OperationQuery(database));
+        setIdentifierParameters(((OperationQuery) query).byName, null);
     }
 
     /**

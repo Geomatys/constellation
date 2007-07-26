@@ -28,8 +28,6 @@ import net.sicade.observation.CatalogException;
 import net.sicade.observation.fishery.Category;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Shareable;
-import net.sicade.observation.sql.NumericAccess;
 import net.sicade.observation.sql.SingletonTable;
 
 
@@ -40,7 +38,7 @@ import net.sicade.observation.sql.SingletonTable;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class CategoryTable extends SingletonTable<Category> implements NumericAccess, Shareable {
+public class CategoryTable extends SingletonTable<Category> {
     /**
      * Requête SQL pour obtenir une catégorie à partir de son identifiant.
      */

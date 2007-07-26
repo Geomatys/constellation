@@ -24,7 +24,7 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class Column extends IndexedSqlElement {
+public final class Column extends IndexedSqlElement {
     /**
      * The table name in which this column appears.
      */
@@ -39,11 +39,6 @@ public class Column extends IndexedSqlElement {
      * The alias, or {@code name} if none.
      */
     final String alias;
-
-    /**
-     * The column or parameter role, or {@code null} if none.
-     */
-    private Role role;
 
     /**
      * The ordering: {@code "ASC"}, {@code "DESC"} or {@code null} if none.
@@ -77,20 +72,6 @@ public class Column extends IndexedSqlElement {
         this.table = table.trim();
         this.name  = name .trim();
         this.alias = alias.trim();
-    }
-
-    /**
-     * Returns the role for this column, or {@code null} if none.
-     */
-    public Role getRole() {
-        return role;
-    }
-
-    /**
-     * Sets the role for this column.
-     */
-    public void setRole(final Role role) {
-        this.role = role;
     }
 
     /**
@@ -141,7 +122,7 @@ public class Column extends IndexedSqlElement {
             return Utilities.equals(this.table, that.table) &&
                    Utilities.equals(this.name,  that.name ) &&
                    Utilities.equals(this.alias, that.alias) &&
-                   Utilities.equals(this.role,  that.role );
+                   Utilities.equals(this.ordering, that.ordering);
         }
         return false;
     }

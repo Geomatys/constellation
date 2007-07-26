@@ -29,7 +29,6 @@ import org.geotools.resources.Arguments;
 
 // Sicade dependencies
 import net.sicade.observation.Element;
-import net.sicade.observation.LoggingLevel;
 import net.sicade.observation.Observations;
 import net.sicade.observation.ServerException;
 import net.sicade.observation.CatalogException;

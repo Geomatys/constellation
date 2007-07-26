@@ -28,9 +28,10 @@ import java.util.logging.Logger;
  */
 public interface Element {
     /**
-     * Le journal dans lequel enregistrer les événements qui ont rapport avec les données d'observations.
-     * Ce journal peut archiver des événements relatifs à certaines {@linkplain LoggingLevel#SELECT
-     * consultations} de la base de données, et surtout aux {@linkplain LoggingLevel#UPDATE mises à jour}.
+     * Le journal dans lequel enregistrer les événements qui ont rapport avec les données
+     * d'observations. Ce journal peut archiver des événements relatifs à certaines
+     * {@linkplain net.sicade.observation.sql.LoggingLevel#SELECT consultations} de la base de données,
+     * et surtout aux {@linkplain net.sicade.observation.sql.LoggingLevel#UPDATE mises à jour}.
      */
     Logger LOGGER = Logger.getLogger("net.sicade.observation");
 

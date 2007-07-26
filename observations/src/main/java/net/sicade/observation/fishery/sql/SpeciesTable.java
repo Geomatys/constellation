@@ -27,7 +27,6 @@ import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.fishery.Species;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
 
 
@@ -38,7 +37,7 @@ import net.sicade.observation.sql.SingletonTable;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class SpeciesTable extends SingletonTable<Species> implements Shareable {
+public class SpeciesTable extends SingletonTable<Species> {
     /**
      * Requête SQL pour obtenir un stage de développement à partir de son identifiant.
      */

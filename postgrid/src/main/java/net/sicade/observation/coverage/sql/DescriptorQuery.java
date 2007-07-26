@@ -15,7 +15,6 @@
  */
 package net.sicade.observation.coverage.sql;
 
-import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Parameter;
@@ -37,14 +36,18 @@ final class DescriptorQuery extends Query {
     protected final Column symbol, identifier, phenomenon, procedure, offset, band, distribution;
 
     /**
+     * Parameter to appear after the {@code "FROM"} clause.
+     */
+    protected final Parameter bySymbol, byIdentifier;
+
+    /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
     public DescriptorQuery(final Database database) {
         super(database);
-        final Parameter bySymbol, byIdentifier;
-        final QueryType[] usage = {SELECT, LIST};
+        final QueryType[] usage  = {SELECT, SELECT_BY_IDENTIFIER, LIST};
         symbol       = addColumn   ("Descriptors", "symbol",       usage);
         identifier   = addColumn   ("Descriptors", "identifier",   usage);
         phenomenon   = addColumn   ("Descriptors", "phenomenon",   usage);
@@ -53,9 +56,7 @@ final class DescriptorQuery extends Query {
         band         = addColumn   ("Descriptors", "band",         usage);
         distribution = addColumn   ("Descriptors", "distribution", usage);
         bySymbol     = addParameter(symbol,     SELECT);
-        byIdentifier = addParameter(identifier, SELECT);
-        symbol    .setRole(Role.NAME);
-        identifier.setRole(Role.IDENTIFIER);
+        byIdentifier = addParameter(identifier, SELECT_BY_IDENTIFIER);
         identifier.setOrdering("ASC");
     }
 }

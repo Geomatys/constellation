@@ -36,6 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.util.NumberRange;
+import org.geotools.resources.Utilities;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
@@ -67,6 +68,20 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * as milliseconds after the current time.
      */
     private static final long LOOK_AHEAD = 30 * 24 * 60 * 60 * 1000L;
+
+    /**
+     * The parameter to use for looking an element by time range, or {@code null} if unset.
+     *
+     * @see #setExtentParameters
+     */
+    private Parameter byTimeRange;
+
+    /**
+     * The parameter to use for looking an element by spatial extent, or {@code null} if unset.
+     *
+     * @see #setExtentParameters
+     */
+    private Parameter bySpatialExtent;
 
     /**
      * The type of the CRS used.
@@ -145,6 +160,22 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         trimmed        = table.trimmed;
         trimRequested  = table.trimRequested;
         standardToUser = table.standardToUser;
+    }
+
+    /**
+     * Sets the parameter to use for looking an element by extent. This information is
+     * usually specified at construction time.
+     *
+     * @param  byTimeRange The parameter for looking an element by time range, or {@code null} if none.
+     * @param  bySpatialExtent The parameter for looking an element by spatial extent, or {@code null} if none.
+     */
+    protected synchronized void setExtentParameters(final Parameter byTimeRange, final Parameter bySpatialExtent) {
+        if (!Utilities.equals(this.byTimeRange, byTimeRange) || !Utilities.equals(this.bySpatialExtent, bySpatialExtent)) {
+            this.byTimeRange     = byTimeRange;
+            this.bySpatialExtent = bySpatialExtent;
+            clearCache();
+            fireStateChanged("extentParameters");
+        }
     }
 
     /**
@@ -476,26 +507,26 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         if (trimRequested && !trimmed) {
             final PreparedStatement statement = getStatement(type);
             if (statement != null) {
-                final int timeParameter = query.indexOfParameter(type, Role.TIME_RANGE);
-                final int bboxParameter = query.indexOfParameter(type, Role.SPATIAL_ENVELOPE);
+                final int timeColumn = (byTimeRange     != null) ? byTimeRange    .column.indexOf(type) : 0;
+                final int bboxColumn = (bySpatialExtent != null) ? bySpatialExtent.column.indexOf(type) : 0;
                 final ResultSet results = statement.executeQuery();
                 while (results.next()) { // Should contains only one record.
                     Date time;
                     final Calendar calendar = getCalendar();
-                    time = results.getTimestamp(timeParameter, calendar);
+                    time = results.getTimestamp(timeColumn, calendar);
                     if (time != null) {
                         tMin = max(tMin, time.getTime());
                     }
-                    time = results.getTimestamp(timeParameter + 1, calendar);
+                    time = results.getTimestamp(timeColumn + 1, calendar);
                     if (time != null) {
                         tMax = min(tMax, time.getTime());
                     }
-                    final String bbox = results.getString(bboxParameter);
+                    final String bbox = results.getString(bboxColumn);
                     final Envelope envelope;
                     try {
                         envelope = SpatialFunctions.parse(bbox);
                     } catch (NumberFormatException e) {
-                        throw new IllegalRecordException(results.getMetaData().getTableName(bboxParameter), e);
+                        throw new IllegalRecordException(results.getMetaData().getTableName(bboxColumn), e);
                     }
                     final int dimension = envelope.getDimension();
                     for (int i=0; i<dimension; i++) {
@@ -531,18 +562,22 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        int index = query.indexOfParameter(type, Role.TIME_RANGE);
-        if (index != 0) {
-            final Calendar calendar = getCalendar();
-            statement.setTimestamp(index + 1, new Timestamp(tMin), calendar);
-            statement.setTimestamp(index,     new Timestamp(tMax), calendar);
+        if (byTimeRange != null) {
+            final int index = byTimeRange.indexOf(type);
+            if (index != 0) {
+                final Calendar calendar = getCalendar();
+                statement.setTimestamp(index + 1, new Timestamp(tMin), calendar);
+                statement.setTimestamp(index,     new Timestamp(tMax), calendar);
+            }
         }
-        index = query.indexOfParameter(type, Role.SPATIAL_ENVELOPE);
-        if (index != 0) {
-            final GeneralEnvelope envelope = new GeneralEnvelope(
-                    new double[] {xMin, yMin, zMin},
-                    new double[] {xMax, yMax, zMax});
-            statement.setString(index, SpatialFunctions.formatPolygon(envelope));
+        if (bySpatialExtent != null) {
+            final int index = bySpatialExtent.indexOf(type);
+            if (index != 0) {
+                final GeneralEnvelope envelope = new GeneralEnvelope(
+                        new double[] {xMin, yMin, zMin},
+                        new double[] {xMax, yMax, zMax});
+                statement.setString(index, SpatialFunctions.formatPolygon(envelope));
+            }
         }
     }
 

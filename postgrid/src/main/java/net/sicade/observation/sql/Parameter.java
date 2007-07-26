@@ -25,7 +25,7 @@ public final class Parameter extends IndexedSqlElement {
     /**
      * The column on which this parameter applies.
      */
-    private final Column column;
+    final Column column;
 
     /**
      * The comparaison operator to put in the prepared statement.
@@ -45,34 +45,13 @@ public final class Parameter extends IndexedSqlElement {
     }
 
     /**
-     * Returns the table name of the column on which this parameter is applied.
-     */
-    final String getColumnTable() {
-        return column.table;
-    }
-
-    /**
-     * Returns the name or alias of the column on which this parameter is applied.
-     */
-    public String getColumnName() {
-        return column.alias;
-    }
-
-    /**
      * Returns the function applied on the column, or {@code null} if none.
      */
-    public String getColumnFunction(final QueryType type) {
+    final String getColumnFunction(final QueryType type) {
         if (column.name.equals(column.alias)) {
             return column.getFunction(type);
         }
         return null;
-    }
-
-    /**
-     * Returns the role of the column on which this parameter is applied.
-     */
-    public Role getColumnRole() {
-        return column.getRole();
     }
 
     /**
@@ -95,6 +74,6 @@ public final class Parameter extends IndexedSqlElement {
      */
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '[' + getColumnName() + ']';
+        return getClass().getSimpleName() + '[' + column.alias + ']';
     }
 }

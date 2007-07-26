@@ -106,8 +106,6 @@ public class QueryTest extends DatabaseTest {
         final Column    colors     = new Column   (query, "Categories", "colors");
         final Parameter byName     = new Parameter(query, name,       SELECT);
         final Parameter byId       = new Parameter(query, identifier, SELECT_BY_IDENTIFIER);
-        name      .setRole(Role.NAME);
-        identifier.setRole(Role.IDENTIFIER);
         byId.setComparator("IS NULL OR >=");
 
         assertEquals(1, name      .indexOf(SELECT));
@@ -121,11 +119,6 @@ public class QueryTest extends DatabaseTest {
         assertEquals(0, byId      .indexOf(SELECT));
         assertEquals(1, byId      .indexOf(SELECT_BY_IDENTIFIER));
         assertEquals(Arrays.asList(name, identifier, colors), query.getColumns(SELECT));
-
-        assertEquals(0, query.indexOfParameter(SELECT,               Role.IDENTIFIER));
-        assertEquals(0, query.indexOfParameter(SELECT_BY_IDENTIFIER, Role.NAME));
-        assertEquals(1, query.indexOfParameter(SELECT,               Role.NAME));
-        assertEquals(1, query.indexOfParameter(SELECT_BY_IDENTIFIER, Role.IDENTIFIER));
 
         String actual = query.select(LIST);
         String expectedAll = "SELECT \"name\", \"lower\" AS \"identifier\", \"colors\" FROM \"Categories\"";

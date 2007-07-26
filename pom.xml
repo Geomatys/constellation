@@ -307,9 +307,6 @@
           <encoding>UTF-8</encoding>      <!-- Specifies the encoding name of the source files.                   -->
           <charset>UTF-8</charset>        <!-- Specifies the HTML character set for this document.                -->
           <locale>fr</locale>            <!-- The locale that javadoc uses when generating documentation.        -->
-          <overview>                     <!-- The text for the overview documentation.                           -->
-            ${project.build.sourceDirectory}/overview.html
-          </overview>
           <additionalparam>-keywords</additionalparam>
           <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
           <links>

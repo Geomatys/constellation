@@ -15,7 +15,6 @@
 package net.sicade.observation.sql;
 
 import java.util.logging.Level;
-import net.sicade.observation.LoggingLevel;
 
 
 /**
@@ -29,35 +28,35 @@ public enum QueryType {
      * Only one record will be selected using a name. This is the kind of query executed by
      * {@link SingletonTable#getEntry(String)}.
      */
-    SELECT(LoggingLevel.SELECT),
+    SELECT(),
 
     /**
      * Only one record will be selected using a numeric identifier. This is the kind of
      * query executed by {@link SingletonTable#getEntry(int)}.
      */
-    SELECT_BY_IDENTIFIER(LoggingLevel.SELECT),
+    SELECT_BY_IDENTIFIER(),
 
     /**
      * Every records will be listed. This is the kind of query executed by
      * {@link SingletonTable#getEntries}.
      */
-    LIST(LoggingLevel.SELECT),
+    LIST(),
 
     /**
      * Records will be listed using some filter.
      */
-    FILTERED_LIST(LoggingLevel.SELECT),
+    FILTERED_LIST(),
 
     /**
      * Selects spatio-temporal envelope in a set of records. This is the kind of
      * query executed by {@link BoundedSingletonTable#getGeographicBoundingBox}.
      */
-    BOUNDING_BOX(LoggingLevel.SELECT),
+    BOUNDING_BOX(),
 
     /**
      * Selects a list of available date or depth.
      */
-    AVAILABLE_DATA(LoggingLevel.SELECT),
+    AVAILABLE_DATA(),
 
     /**
      * A record will be added to a table.
@@ -68,6 +67,13 @@ public enum QueryType {
      * The suggested level for logging SQL statement of this kind.
      */
     final Level level;
+
+    /**
+     * Creates a query type with the default {@link LoggingLevel#SELECT}.
+     */
+    private QueryType() {
+        this(LoggingLevel.SELECT);
+    }
 
     /**
      * Creates a query type.

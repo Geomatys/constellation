@@ -20,7 +20,6 @@ import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Role;
 import static net.sicade.observation.sql.QueryType.*;
 
 
@@ -39,7 +38,12 @@ final class SeriesQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byLayer;
+    protected final Parameter byName, byLayer;
+
+    /**
+     * A shared series table. For internal usage by {@link SeriesTable#getShared} only.
+     */
+    transient SeriesTable sharedTable;
 
     /**
      * Creates a new query for the specified database.
@@ -49,14 +53,12 @@ final class SeriesQuery extends Query {
     public SeriesQuery(final Database database) {
         super(database);
         final Column layer;
-        final Parameter byName;
         final QueryType[] usage = {SELECT, LIST, FILTERED_LIST};
         name    = addColumn   ("Series", "identifier", usage);
         layer   = addColumn   ("Series", "layer",      usage);
         format  = addColumn   ("Series", "format",     usage);
         byName  = addParameter(name,  SELECT);
         byLayer = addParameter(layer, FILTERED_LIST);
-        name.setRole(Role.NAME);
         name.setOrdering("ASC");
     }
 }

@@ -407,8 +407,7 @@ public class Database {
     }
 
     /**
-     * Returns a table of the specified type. This method may returns a cached instance if
-     * it is {@linkplain Shareable shareable}.
+     * Returns a table of the specified type.
      *
      * @param  type The table class (e.g. <code>{@linkplain StationTable}.class</code>).
      * @return An instance of a table of the specified type.
@@ -419,12 +418,10 @@ public class Database {
             T table = type.cast(tables.get(type));
             if (table == null) {
                 table = createTable(type);
-                if (table instanceof Shareable) {
-                    tables.put(type, table);
-                }
-            } else {
-                assert table instanceof Shareable : table;
+                table.freeze();
+                tables.put(type, table);
             }
+            assert !table.isModifiable() : table;
             return table;
         }
     }

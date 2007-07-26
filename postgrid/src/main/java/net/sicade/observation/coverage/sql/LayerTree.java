@@ -33,7 +33,6 @@ import net.sicade.observation.Element;
 import net.sicade.observation.Procedure;          // Pour javadoc
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
 import net.sicade.observation.sql.ProcedureTable;
 import net.sicade.observation.coverage.Format;
@@ -50,7 +49,7 @@ import net.sicade.resources.i18n.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class LayerTree extends Table implements Shareable {
+public class LayerTree extends Table {
     /**
      * Requête SQL utilisée pour obtenir l'arborescence des couches. L'ordre des colonnes est
      * essentiel. Ces colonnes sont référencées par les constantes {@link #LAYER_NAME},

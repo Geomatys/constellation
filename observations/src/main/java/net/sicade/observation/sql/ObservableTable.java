@@ -32,7 +32,7 @@ import net.sicade.observation.CatalogException;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class ObservableTable extends SingletonTable<Observable> implements Shareable {
+public class ObservableTable extends SingletonTable<Observable> {
     /**
      * Requête permettant de récupérer une entrée de la table des observables.
      */

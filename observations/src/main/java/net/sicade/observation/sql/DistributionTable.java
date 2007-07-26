@@ -28,7 +28,7 @@ import net.sicade.observation.ConfigurationKey;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class DistributionTable extends SingletonTable<Distribution> implements Shareable {
+public class DistributionTable extends SingletonTable<Distribution> {
     /**
      * Requête SQL pour obtenir une distribution.
      */

@@ -19,11 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
-import net.sicade.observation.sql.Use;
 import net.sicade.observation.sql.Table;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
@@ -42,9 +39,7 @@ import net.sicade.resources.i18n.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-@Use(DescriptorTable.class)
-@UsedBy(LinearModelTable.class)
-public class DescriptorSubstitutionTable extends Table implements Shareable {
+public class DescriptorSubstitutionTable extends Table {
     /**
      * The descriptor table. Will be created only when first needed.
      */

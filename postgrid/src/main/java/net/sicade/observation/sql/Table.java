@@ -27,39 +27,13 @@ import java.util.logging.Logger;
 import org.geotools.resources.Utilities;
 import net.sicade.observation.Element;
 import net.sicade.observation.ConfigurationKey;
-import net.sicade.observation.CatalogException;
 
 
 /**
- * Base class for connections to a database. Every table instance contains a {@link PreparedStatement}
- * which may change (i.e. be closed and created again for a different SQL statement).
- * <p>
- * Subclasses should initialize their {@linkplain #query} at construction time, as in the code
- * below:
- *
- * <blockquote><pre>
- * public MyTable(Database database) {
- *     super(database);
- *     name    = new Column   (query, "Thematics", "name");
- *     remarks = new Column   (query, "Thematics", "description");
- *     byName  = new Parameter(query, name, QueryType.SELECT);
- * }
- * </pre></blockquote>
- *
- * A prepared statement can be obtained using {@link #getStatement(QueryType)} in a synchronized
- * block. The example below gives a typical implementation. Note that the statement may be altered
- * or disposed at any time after the synchronized lock has been released.
- *
- * <blockquote><pre>
- * public <b>synchronized</b> {@linkplain Element} getEntry(String name) throws SQLException {
- *     PreparedStatement statement = {@linkplain #getStatement(QueryType) getStatement}({@linkplain QueryType#SELECT});
- *     statement.{@linkplain PreparedStatement#setString setString}(byName.index, name);
- *     ResultSet r = statement.{@linkplain PreparedStatement#executeQuery() executeQuery}();
- *     // <i>Create here the element...</i>
- *     r.{@linkplain java.sql.ResultSet#close close}();
- *     // <i>Do <b>not</b> close </i>statement<i>, because it will be reused when possible.</i>
- * }
- * </pre></blockquote>
+ * Base class for connections to a database. A {@linkplain PreparedStatement prepared statement}
+ * can be obtained using the {@link #getStatement(QueryType)} method in a synchronized block.
+ * Note that the statement may be altered or disposed at any time after the synchronized lock
+ * has been released.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -82,8 +56,7 @@ public class Table {
     private static final long DELAY = 3 * (60*1000L);
 
     /**
-     * The query to execute. Subclasses should create {@link Column} and {@code Parameter}
-     * instances for this query in their constructor. See {@linkplain Table class javadoc}.
+     * The query to execute.
      *
      * @see #getStatement(QueryType)
      */
@@ -116,6 +89,13 @@ public class Table {
      * This is the case when a new statement has just been created.
      */
     private boolean changed;
+
+    /**
+     * {@code true} if this table is unmodifiable (i.e. no {@code set} method are allowed).
+     * A table is always modifiable upon construction, but may become unmodifiable at some
+     * later stage (when {@link #freeze} is invoked).
+     */
+    private boolean unmodifiable;
 
     /**
      * Last time that {@link #statement} has been used. This is used by the {@linkplain #disposer}
@@ -321,25 +301,6 @@ public class Table {
     }
 
     /**
-     * Delegates to <code>{@linkplain #query}.{@linkplain Query#indexOfParameter
-     * indexOfParameter}(type, role)</code>, except that an exception is thrown
-     * if no suitable parameter is found. The {@code type} value is the argument
-     * given to the last call to {@link #getStatement(QueryType)}.
-     *
-     * @param  role The role for the parameter.
-     * @return The parameter index (starting with 1).
-     * @throws CatalogException if no suitable parameter is found.
-     */
-    protected final int indexOfParameter(final Role role) throws CatalogException {
-        final int index = query.indexOfParameter(queryType, role);
-        if (index > 0) {
-            return index;
-        } else {
-            throw new CatalogException("Aucun paramètre trouvé pour le rôle " + role + '.');
-        }
-    }
-
-    /**
      * Returns a calendar using the {@linkplain Database#getTimeZone database time zone}.
      * This calendar should be used for fetching dates from the database as in the example
      * below:
@@ -374,9 +335,23 @@ public class Table {
     protected void fireStateChanged(final String property) {
         assert Thread.holdsLock(this);
         changed = true;
-        if (this instanceof Shareable) {
+        if (unmodifiable) {
             throw new IllegalStateException("Violation du contrat des tables partagées.");
         }
+    }
+
+    /**
+     * Returns {@code true} if this table is modifiable.
+     */
+    protected final boolean isModifiable() {
+        return !unmodifiable;
+    }
+
+    /**
+     * Marks this table as unmodifiable.
+     */
+    final void freeze() {
+        unmodifiable = true;
     }
 
     /**
@@ -409,7 +384,8 @@ public class Table {
 
     /**
      * Clears the cache, if any. This method is overriden and given {@code protected}
-     * access by {@link SingletonTable}.
+     * access by {@link SingletonTable}. An empty method with package-private access
+     * is defined here as a hook invoked by {@link Database#close}.
      */
     void clearCache() {
         assert Thread.holdsLock(this);

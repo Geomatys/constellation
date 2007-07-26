@@ -46,8 +46,6 @@ import net.sicade.observation.coverage.CoverageReference;
 import net.sicade.observation.coverage.CoverageComparator;
 import net.sicade.observation.coverage.rmi.DataConnection;
 import net.sicade.observation.sql.BoundedSingletonTable;
-import net.sicade.observation.sql.Use;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
 import net.sicade.resources.i18n.Resources;
@@ -64,8 +62,6 @@ import static net.sicade.observation.sql.QueryType.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-@Use({FormatTable.class, GridGeometryTable.class})
-@UsedBy(LayerTable.class)
 public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> implements DataConnection {
     /**
      * Requête SQL utilisée pour obtenir l'enveloppe spatio-temporelle couverte
@@ -215,6 +211,9 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      */
     public GridCoverageTable(final Database database) throws SQLException {
         super(new GridCoverageQuery(database), net.sicade.observation.sql.CRS.XYT);
+        final GridCoverageQuery query = (GridCoverageQuery) super.query;
+        setIdentifierParameters(query.byFilename, null);
+        setExtentParameters(query.byStartTime, query.byHorizontalExtent);
         this.dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
         this.dateFormat.setTimeZone(database.getTimeZone());
     }

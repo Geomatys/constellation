@@ -27,7 +27,7 @@ import net.sicade.observation.ConfigurationKey;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class PhenomenonTable extends SingletonTable<Phenomenon> implements Shareable {
+public class PhenomenonTable extends SingletonTable<Phenomenon> {
     /**
      * Requête SQL pour obtenir un phénomène.
      */

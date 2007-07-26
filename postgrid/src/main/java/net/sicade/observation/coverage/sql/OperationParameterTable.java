@@ -31,10 +31,8 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.geotools.resources.XMath;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.QueryType;
 
 
@@ -45,8 +43,7 @@ import net.sicade.observation.sql.QueryType;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-@UsedBy(OperationTable.class)
-public class OperationParameterTable extends Table implements Shareable {
+public class OperationParameterTable extends Table {
     /**
      * Creates a operation parameter table.
      * 

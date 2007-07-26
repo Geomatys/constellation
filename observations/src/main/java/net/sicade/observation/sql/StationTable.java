@@ -49,7 +49,7 @@ import net.sicade.observation.CatalogException;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class StationTable extends SingletonTable<Station> implements NumericAccess {
+public class StationTable extends SingletonTable<Station> {
     /**
      * Requête SQL pour obtenir une station à partir de son identifiant.
      *

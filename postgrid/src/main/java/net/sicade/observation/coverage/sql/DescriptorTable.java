@@ -29,10 +29,7 @@ import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.LocationOffset;
 import net.sicade.observation.sql.DistributionTable;
 import net.sicade.observation.sql.SingletonTable;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.UsedBy;
-import net.sicade.observation.sql.Use;
 
 
 /**
@@ -44,9 +41,7 @@ import net.sicade.observation.sql.Use;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-@Use({LayerTable.class, OperationTable.class, LocationOffsetTable.class, DistributionTable.class})
-@UsedBy({LinearModelTable.class, DescriptorSubstitutionTable.class})
-public class DescriptorTable extends SingletonTable<Descriptor> implements Shareable {
+public class DescriptorTable extends SingletonTable<Descriptor> {
     /**
      * La table des couches. Elle sera construite la première fois où elle sera nécessaire.
      */
@@ -76,6 +71,8 @@ public class DescriptorTable extends SingletonTable<Descriptor> implements Share
      */
     public DescriptorTable(final Database database) {
         super(new DescriptorQuery(database));
+        final DescriptorQuery query = (DescriptorQuery) this.query;
+        setIdentifierParameters(query.bySymbol, query.byIdentifier);
     }
 
     /**

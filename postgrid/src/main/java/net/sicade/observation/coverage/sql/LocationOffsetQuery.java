@@ -20,7 +20,6 @@ import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Role;
 import static net.sicade.observation.sql.QueryType.*;
 
 
@@ -37,13 +36,17 @@ final class LocationOffsetQuery extends Query {
     protected final Column name, dx, dy, dz, dt;
 
     /**
+     * Parameter to appear after the {@code "FROM"} clause.
+     */
+    protected final Parameter byName;
+
+    /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
     public LocationOffsetQuery(final Database database) {
         super(database);
-        final Parameter byName;
         final QueryType[] usage = {SELECT, LIST};
         name   = addColumn("LocationOffsets", "name", usage);
         dx     = addColumn("LocationOffsets", "dx",   usage);
@@ -51,7 +54,6 @@ final class LocationOffsetQuery extends Query {
         dz     = addColumn("LocationOffsets", "dz",   usage);
         dt     = addColumn("LocationOffsets", "dt",   usage);
         byName = addParameter(name,  SELECT);
-        name.setRole(Role.NAME);
         dt.setOrdering("DESC");
         dz.setOrdering("DESC");
         dy.setOrdering("DESC");

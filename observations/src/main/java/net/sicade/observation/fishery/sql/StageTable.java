@@ -27,7 +27,6 @@ import net.sicade.observation.ConfigurationKey;
 import net.sicade.observation.fishery.Stage;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
 
 
@@ -39,7 +38,7 @@ import net.sicade.observation.sql.SingletonTable;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class StageTable extends SingletonTable<Stage> implements Shareable {
+public class StageTable extends SingletonTable<Stage> {
     /**
      * Requête SQL pour obtenir un stage de développement à partir de son identifiant.
      */

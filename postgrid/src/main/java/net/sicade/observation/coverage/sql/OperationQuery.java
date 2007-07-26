@@ -20,7 +20,6 @@ import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Role;
 import static net.sicade.observation.sql.QueryType.*;
 
 
@@ -36,6 +35,11 @@ final class OperationQuery extends Query {
      */
     protected final Column name, prefix, operation, remarks;
 
+    /**
+     * Parameter to appear after the {@code "FROM"} clause.
+     */
+    protected final Parameter byName;
+
     /** 
      * Creates a new query for the specified database.
      *
@@ -43,13 +47,11 @@ final class OperationQuery extends Query {
      */
     public OperationQuery(final Database database) {
         super(database);
-        final Parameter byName;
         final QueryType[] usage = {SELECT, LIST};
         name      = addColumn   ("Operations", "name",        usage);
         prefix    = addColumn   ("Operations", "prefix",      usage);
         operation = addColumn   ("Operations", "operation",   usage);
         remarks   = addColumn   ("Operations", "description", usage);
         byName    = addParameter(name, SELECT);
-        name.setRole(Role.NAME);
     }
 }

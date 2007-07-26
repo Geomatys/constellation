@@ -23,10 +23,7 @@ import net.sicade.observation.coverage.Format;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
 import net.sicade.observation.sql.SingletonTable;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.UsedBy;
-import net.sicade.observation.sql.Use;
 
 
 /**
@@ -36,9 +33,7 @@ import net.sicade.observation.sql.Use;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-@Use(SampleDimensionTable.class)
-@UsedBy({SeriesTable.class, GridCoverageTable.class})
-public class FormatTable extends SingletonTable<Format> implements Shareable {
+public class FormatTable extends SingletonTable<Format> {
     /**
      * Connexion vers la table des bandes.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
@@ -52,6 +47,7 @@ public class FormatTable extends SingletonTable<Format> implements Shareable {
      */
     public FormatTable(final Database database) {
         super(new FormatQuery(database));
+        setIdentifierParameters(((FormatQuery) query).byName, null);
     }
 
     /**

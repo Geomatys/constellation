@@ -39,10 +39,8 @@ import net.sicade.observation.Element;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.ServerException;
 import net.sicade.observation.IllegalRecordException;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Table;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.QueryType;
 
 
@@ -54,8 +52,7 @@ import net.sicade.observation.sql.QueryType;
  * @author Martin Desruisseaux
  * @version $Id$
  */
-@UsedBy(SampleDimensionTable.class)
-public class CategoryTable extends Table implements Shareable {
+public class CategoryTable extends Table {
     /**
      * Transformation <code>f(x) = 10<sup>x</sup></code>. Utilisée pour le décodage des images de
      * concentrations en chlorophylle-a. Ne sera construite que la première fois où elle sera

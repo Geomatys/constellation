@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation;
+package net.sicade.observation.sql;
 
 import java.util.logging.Level;
 
@@ -28,8 +28,6 @@ import java.util.logging.Level;
  * @author Martin Desruisseaux
  *
  * @see Element#LOGGER
- *
- * @todo Move to the {@code net.sicade.observation.sql} package and turn into a package-privated class.
  */
 public final class LoggingLevel extends Level {
     /**

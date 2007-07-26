@@ -32,11 +32,8 @@ import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Descriptor;
 import net.sicade.observation.coverage.LinearModel;
-import net.sicade.observation.sql.Use;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.QueryType;
@@ -50,9 +47,7 @@ import static net.sicade.observation.sql.QueryType.*;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-@Use({DescriptorTable.class, DescriptorSubstitutionTable.class})
-@UsedBy(LayerTable.class)
-public class LinearModelTable extends Table implements Shareable {
+public class LinearModelTable extends Table {
     /**
      * La table des descripteurs du paysage océanique. Ne sera construit que la première fois
      * où elle sera nécessaire.

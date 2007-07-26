@@ -17,7 +17,6 @@ package net.sicade.observation.coverage.sql;
 
 import java.sql.SQLException;
 import net.sicade.observation.sql.Column;
-import net.sicade.observation.sql.Role;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
@@ -41,7 +40,7 @@ final class GridCoverageQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byLayer, byVisibility;
+    protected final Parameter byFilename, byLayer, byStartTime, byEndTime, byHorizontalExtent, byVisibility;
 
     /**
      * Creates a new query for the specified database.
@@ -52,7 +51,6 @@ final class GridCoverageQuery extends Query {
     public GridCoverageQuery(final Database database) throws SQLException {
         super(database);
         final Column horizontalExtent, visibility;
-        final Parameter byFilename, byStartTime, byEndTime, byHorizontalExtent;
         final QueryType[] hiden = {                            };
         final QueryType[] SL    = {SELECT, LIST                };
         final QueryType[] SLA   = {SELECT, LIST, AVAILABLE_DATA};
@@ -69,10 +67,6 @@ final class GridCoverageQuery extends Query {
         format           = addColumn("Series",         "format",           SL   );
         visibility       = addColumn("Series",         "visible",          hiden);
 
-        filename        .setRole(Role.NAME);
-        startTime       .setRole(Role.TIME_RANGE);
-        endTime         .setRole(Role.TIME_RANGE);
-        horizontalExtent.setRole(Role.SPATIAL_ENVELOPE);
         endTime         .setOrdering("ASC");
 //      series          .setOrdering("ASC"); // TODO: enable once declaration order is taken in account.
         byFilename         = addParameter(filename, SELECT);

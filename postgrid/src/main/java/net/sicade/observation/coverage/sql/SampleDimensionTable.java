@@ -29,12 +29,9 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.IllegalRecordException;
-import net.sicade.observation.sql.Use;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Table;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
 
@@ -47,9 +44,7 @@ import net.sicade.resources.i18n.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-@Use(CategoryTable.class)
-@UsedBy(FormatTable.class)
-public class SampleDimensionTable extends Table implements Shareable {
+public class SampleDimensionTable extends Table {
     /**
      * Connexion vers la table des {@linkplain Category catégories}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.

@@ -40,7 +40,7 @@ import org.geotools.metadata.iso.quality.DataQualityImpl;
  * @todo Le mécanisme de cache serait plus efficace à l'intérieur de {@link MetadataSource}.
  */
 @Deprecated
-public class MetadataTable extends Table implements Shareable {
+public class MetadataTable extends Table {
     /**
      * Connexion vers la base des méta-données.
      */

@@ -15,19 +15,15 @@
  */
 package net.sicade.observation.sql;
 
-// Database
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
-
-// Collections
 import java.util.Set;
 import java.util.Map;
 import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import org.geotools.util.WeakValueHashMap;
 
-// Sicade
 import net.sicade.observation.Element;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.NoSuchRecordException;
@@ -61,6 +57,32 @@ import net.sicade.resources.i18n.ResourceKeys;
  */
 public abstract class SingletonTable<E extends Element> extends Table {
     /**
+     * The query to use for selecting a record by its name.
+     */
+    private static final QueryType SELECT_BY_NAME = QueryType.SELECT;
+
+    /**
+     * The query to use for selecting a record by its number.
+     */
+    private static final QueryType SELECT_BY_NUMBER = QueryType.SELECT_BY_IDENTIFIER;
+
+    /**
+     * The parameter to use for looking an element by name, or {@code 0} if unset.
+     * This is usually the parameter for the value to search in the primary key column.
+     *
+     * @see #setIdentifierParameters
+     */
+    private int indexByName;
+
+    /**
+     * The parameter to use for looking an element by its numeric identifier,
+     * or {@code 0} if unset.
+     *
+     * @see #setIdentifierParameters
+     */
+    private int indexByNumber;
+
+    /**
      * The elements created up to date. The key should be {@link Integer} or {@link String}
      * instances only.
      * <p>
@@ -88,6 +110,63 @@ public abstract class SingletonTable<E extends Element> extends Table {
      */
     protected SingletonTable(final SingletonTable<E> table) {
         super(table);
+    }
+
+    /**
+     * Sets the parameter to use for looking an element by identifier. This is usually the
+     * parameter for the value to search in the primary key column. This information is needed
+     * for {@link #getEntry(String)} execution and is usually specified at construction time.
+     *
+     * @param  byName   The parameter for looking an element by name, or {@code null} if none.
+     * @param  byNumber The parameter for looking an element by its numeric identifier, or
+     *                  {@code null} if none. Most table do not provide a numeric identifer.
+     * @throws IllegalArgumentException if the specified parameters are not one of those
+     *         declared for {@link QueryType#SELECT} or {@link QueryType#SELECT_BY_IDENTIFIER}.
+     */
+    protected synchronized void setIdentifierParameters(final Parameter byName, final Parameter byNumber)
+            throws IllegalArgumentException
+    {
+        int   newByName = 0;
+        int newByNumber = 0;
+        boolean success = true;
+        String    name = "byName";
+        Parameter param = byName;
+        if (byName == null) {
+            if (byNumber != null) {
+                newByName = byNumber.indexOf(SELECT_BY_NAME);
+                // Optional, so don't test for success.
+            }
+        } else {
+            if (success = query.getParameters(SELECT_BY_NAME).contains(byName)) {
+                newByName = byName.indexOf(SELECT_BY_NAME);
+                success = (newByName != 0);
+            }
+        }
+        if (success) {
+            name = "byNumber";
+            param = byNumber;
+            if (byNumber == null) {
+                if (byName != null) {
+                    newByNumber = byName.indexOf(SELECT_BY_NUMBER);
+                    // Optional, so don't test for success.
+                }
+            } else {
+                if (success = query.getParameters(SELECT_BY_NUMBER).contains(byNumber)) {
+                    newByNumber = byNumber.indexOf(SELECT_BY_NUMBER);
+                    success = (newByNumber != 0);
+                }
+            }
+        }
+        if (success) {
+            if ((newByName != indexByName) || (newByNumber != indexByNumber)) {
+                indexByName   = newByName;
+                indexByNumber = newByNumber;
+                clearCache();
+                fireStateChanged("identifierParameters");
+            }
+            return;
+        }
+        throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_ARGUMENT_$2, name, param));
     }
 
     /**
@@ -242,8 +321,11 @@ public abstract class SingletonTable<E extends Element> extends Table {
         if (entry != null) {
             return entry;
         }
-        final PreparedStatement statement = getStatement(QueryType.SELECT_BY_IDENTIFIER);
-        statement.setInt(indexOfParameter(Role.IDENTIFIER), identifier);
+        if (indexByNumber == 0) {
+            throw new IllegalStateException();
+        }
+        final PreparedStatement statement = getStatement(SELECT_BY_NUMBER);
+        statement.setInt(indexByNumber, identifier);
         return executeQuery(statement, key);
     }
 
@@ -265,8 +347,11 @@ public abstract class SingletonTable<E extends Element> extends Table {
         if (entry != null) {
             return entry;
         }
-        final PreparedStatement statement = getStatement(QueryType.SELECT);
-        statement.setString(indexOfParameter(Role.NAME), name);
+        if (indexByName == 0) {
+            throw new IllegalStateException();
+        }
+        final PreparedStatement statement = getStatement(SELECT_BY_NAME);
+        statement.setString(indexByName, name);
         return executeQuery(statement, name);
     }
 
@@ -364,10 +449,10 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Clears this table cache. The default implementation of {@code SingletonTable} do not invoke
-     * this method. However subclasses may invoke it when the table {@linkplain #fireStateChanged
-     * state changed} in some way that affect the {@linkplain #createEntry entries to be created},
-     * not just the set of entries to be returned.
+     * Clears this table cache. Subclasses should invoke this method when the table
+     * {@linkplain #fireStateChanged state changed} in some way that affect the
+     * {@linkplain #createEntry entries to be created}, not just the set of entries
+     * to be returned.
      */
     @Override
     protected void clearCache() {

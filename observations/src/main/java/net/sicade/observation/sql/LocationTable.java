@@ -54,7 +54,7 @@ import net.sicade.observation.CatalogException;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class LocationTable extends Table implements Shareable {
+public class LocationTable extends Table {
     /**
      * Obtient le chemin d'une {@linkplain net.sicade.observation.Station station}.
      *

@@ -25,8 +25,6 @@ import net.sicade.observation.coverage.DynamicCoverage;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.ServerException;
 import net.sicade.observation.sql.CRS;
-import net.sicade.observation.sql.Use;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.ProcedureTable;
 import net.sicade.observation.sql.BoundedSingletonTable;
@@ -47,8 +45,6 @@ import net.sicade.observation.coverage.rmi.DataConnectionFactory;
  *
  * @todo Bounding box disabled for now.
  */
-@Use({ThematicTable.class, ProcedureTable.class, LinearModelTable.class, SeriesTable.class, GridCoverageTable.class})
-@UsedBy(DescriptorTable.class)
 public class LayerTable extends BoundedSingletonTable<Layer> {
     /**
      * Connexion vers la table des thématiques.
@@ -82,7 +78,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
          * {@inheritDoc}
          */
         public DataConnection connectSeries(final String layer) throws CatalogException, SQLException {
-            final GridCoverageTable table = getDatabase().getTable(GridCoverageTable.class);
+            final GridCoverageTable table = new GridCoverageTable(getDatabase().getTable(GridCoverageTable.class));
             table.setLayer(getEntry(layer));
             table.setEnvelope(getEnvelope());
             table.trimEnvelope();
@@ -107,6 +103,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
      */
     public LayerTable(final Database database) {
         super(new LayerQuery(database), CRS.XYT);
+        setIdentifierParameters(((LayerQuery) query).byName, null);
     }
 
     /**
@@ -157,7 +154,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         super.postCreateEntry(layer);
         final LayerEntry entry = (LayerEntry) layer;
         if (series == null) {
-            series = getDatabase().getTable(SeriesTable.Shareable.class);
+            series = getDatabase().getTable(SeriesTable.class).getShared();
             // We use a shareable instance because we will always use it in synchronized block.
         }
         synchronized (series) {

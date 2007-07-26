@@ -30,7 +30,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-import net.sicade.observation.LoggingLevel;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;

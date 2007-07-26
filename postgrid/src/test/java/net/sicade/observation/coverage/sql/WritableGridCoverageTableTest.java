@@ -18,85 +18,46 @@
  */
 package net.sicade.observation.coverage.sql;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.util.Set;
-import java.util.Locale;
-import java.io.IOException;
-import java.sql.SQLException;
 
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.resources.Arguments;
-import org.geotools.util.Logging;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-import net.sicade.observation.coverage.AbstractTest;
 import net.sicade.observation.coverage.Layer;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import net.sicade.observation.sql.DatabaseTest;
 
 
 /**
  * Teste le fonctionnement de {@link CoverageStack#evaluate} avec des {@link Layer}.
  * Ce test est un peu plus direct que {@link DescriptorTest} du fait qu'il construit
  * lui même le {@link CoverageStack} dans plusieurs cas.
- * 
- * 
+ *
  * @author Cédric Briançon
  * @version $Id$
  */
-public class WritableGridCoverageTableTest extends AbstractTest {
+@Deprecated
+public class WritableGridCoverageTableTest extends DatabaseTest {
     /**
      * {@code true} pour désactiver tous les tests (sauf typiquement un test en particulier que l'on
      * souhaite suivre pas à pas). La valeur de ce champ devrait être toujours {@code false} sauf en
      * cas de déboguage d'une méthode bien spécifique.
      */
-    private static final boolean DISABLED = false;
-
-    /**
-     * Connexion vers la table des couches.
-     */
-    private static LayerTable layers;
-
-    /**
-     * Construit la suite de tests.
-     */
-    public WritableGridCoverageTableTest(final String name) {
-        super(name);
-    }
-
-    /**
-     * Retourne la suite de tests.
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite(WritableGridCoverageTableTest.class);
-        return suite;
-    }
-
-    /**
-     * Exécute la suite de tests à partir de la ligne de commande.
-     */
-    public static void main(final String[] args) {
-        Logging.ALL.forceMonolineConsoleOutput();
-        final Arguments arguments = new Arguments(args);
-        Locale.setDefault(arguments.locale);
-        junit.textui.TestRunner.run(suite());
-    }
+    private static final boolean DISABLED = true;
 
     /**
      * Etablit la connexion avec la base de données. Cette connexion ne sera établie que la
      * première fois où un test sera exécuté. Pour la fermeture des connections, on se fiera
      * au rammase-miettes et aux "shutdown hooks" mis en place par {@code Database}.
      */
-    @Override
-    protected void setUp() throws SQLException, IOException {
-        super.setUp();
-        if (layers == null) {
-            layers = database.getTable(LayerTable.class);
-        }
-    }
+//    @Override
+//    protected void setUp() throws SQLException, IOException {
+//        super.setUp();
+//        if (layers == null) {
+//            layers = database.getTable(LayerTable.class);
+//        }
+//    }
 
     /**
      * Teste l'obtention de la liste des couches, incluant un filtrage par région géographique.
@@ -114,11 +75,11 @@ public class WritableGridCoverageTableTest extends AbstractTest {
         assertEquals(bbox, table.getGeographicBoundingBox());
 //        table.trimEnvelope(); // Devrait n'avoir aucun effet lorsque la sélection contient des image mondiales.
 //        assertEquals(bbox, table.getGeographicBoundingBox());
-        final Layer selected = table.getEntry("Images de tests");
-        System.out.println(selected.getSeries());
-        WritableGridCoverageTable writableGCT = new WritableGridCoverageTable(database);
-        writableGCT.setLayer(selected);
-        writableGCT.addEntry(fileName, dateFormat.parse("17/06/2007"), 
-                dateFormat.parse("18/06/2007"), bbox, new Dimension(1024, 768));
+//        final Layer selected = table.getEntry("Images de tests");
+//        System.out.println(selected.getSeries());
+//        WritableGridCoverageTable writableGCT = new WritableGridCoverageTable(database);
+//        writableGCT.setLayer(selected);
+//        writableGCT.addEntry(fileName, dateFormat.parse("17/06/2007"), 
+//                dateFormat.parse("18/06/2007"), bbox, new Dimension(1024, 768));
     }
 }

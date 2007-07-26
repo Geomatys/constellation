@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Thematic;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Shareable;
 import net.sicade.observation.sql.SingletonTable;
 
 
@@ -32,7 +31,7 @@ import net.sicade.observation.sql.SingletonTable;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public class ThematicTable extends SingletonTable<Thematic> implements Shareable {
+public class ThematicTable extends SingletonTable<Thematic> {
     /**
      * Creates a thematic table.
      * 
@@ -40,6 +39,7 @@ public class ThematicTable extends SingletonTable<Thematic> implements Shareable
      */
     public ThematicTable(final Database database) {
         super(new ThematicQuery(database));
+        setIdentifierParameters(((ThematicQuery) query).byName, null);
     }
 
     /**

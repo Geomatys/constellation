@@ -21,7 +21,6 @@ import net.sicade.observation.sql.Column;
 import net.sicade.observation.sql.Parameter;
 import net.sicade.observation.sql.Query;
 import net.sicade.observation.sql.QueryType;
-import net.sicade.observation.sql.Role;
 import static net.sicade.observation.sql.QueryType.*;
 
 
@@ -36,6 +35,11 @@ final class GridGeometryQuery extends Query {
      * Parameter to appear after the {@code "FROM"} clause.
      */
     protected final Column identifier, width, height, horizontalExtent, verticalOrdinates;
+
+    /**
+     * Parameter to appear after the {@code "FROM"} clause.
+     */
+    protected final Parameter byIdentifier;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -73,7 +77,6 @@ final class GridGeometryQuery extends Query {
     public GridGeometryQuery(final Database database) throws SQLException {
         super(database);
         final QueryType[] LSI = {LIST, SELECT, INSERT};
-        final Parameter byIdentifier;
         identifier        = addColumn("GridGeometries", "identifier",        LSI);
         width             = addColumn("GridGeometries", "width",             LSI);
         height            = addColumn("GridGeometries", "height",            LSI);
@@ -82,7 +85,6 @@ final class GridGeometryQuery extends Query {
         if (database.isSpatialEnabled()) {
             horizontalExtent.setFunction("box3d", LIST, SELECT);
         }
-        identifier.setRole(Role.NAME);
         byIdentifier = addParameter(identifier, SELECT);
 //        byWidth      = addParameter(width,            SI);
 //        byHeight     = addParameter(height,           SI);

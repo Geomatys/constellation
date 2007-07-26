@@ -27,7 +27,7 @@ import net.sicade.observation.ConfigurationKey;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ProcedureTable extends SingletonTable<Procedure> implements Shareable {
+public class ProcedureTable extends SingletonTable<Procedure> {
     /**
      * Requête SQL pour obtenir une procédure.
      */

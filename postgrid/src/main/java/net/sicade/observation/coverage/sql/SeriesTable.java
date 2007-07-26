@@ -25,8 +25,6 @@ import net.sicade.observation.CatalogException;
 import net.sicade.observation.coverage.Format;
 import net.sicade.observation.coverage.Layer;
 import net.sicade.observation.coverage.Series;
-import net.sicade.observation.sql.Use;
-import net.sicade.observation.sql.UsedBy;
 import net.sicade.observation.sql.Database;
 import net.sicade.observation.sql.QueryType;
 import net.sicade.observation.sql.SingletonTable;
@@ -39,8 +37,6 @@ import net.sicade.observation.sql.SingletonTable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-@Use(FormatTable.class)
-@UsedBy(LayerTable.class)
 public class SeriesTable extends SingletonTable<Series> {
     /**
      * Connection to the format table. This connection will be etablished
@@ -60,6 +56,28 @@ public class SeriesTable extends SingletonTable<Series> {
      */
     public SeriesTable(final Database database) {
         super(new SeriesQuery(database));
+        setIdentifierParameters(((SeriesQuery) query).byName, null);
+    }
+
+    /**
+     * Creates a series table connected to the same database than the specified one.
+     */
+    private SeriesTable(final SeriesTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a modifiable, shared instance of this table.
+     * For internal use by {@link LayerTable} only.
+     */
+    final SeriesTable getShared() {
+        synchronized (query) {
+            final SeriesQuery query = (SeriesQuery) super.query;
+            if (query.sharedTable == null) {
+                query.sharedTable = new SeriesTable(this);
+            }
+            return query.sharedTable;
+        }
     }
 
     /**
@@ -121,39 +139,5 @@ public class SeriesTable extends SingletonTable<Series> {
         }
         final Format format = formats.getEntry(results.getString(indexOf(query.format)));
         return new SeriesEntry(name, format, remarks);
-    }
-
-    /**
-     * A shareable instance of {@link SeriesTable}. <strong>Do not use</strong>. This is for
-     * {@link LayerTable} internal working only. This class had to be public because it needs
-     * to be accessible to {@link Database#getTable}.
-     *
-     * @version $Id$
-     * @author Martin Desruisseaux
-     *
-     * @todo Replace by a {@code getEntries(Layer)} method.
-     */
-    @Deprecated
-    public static final class Shareable extends SeriesTable implements net.sicade.observation.sql.Shareable {
-        /**
-         * Creates a series table.
-         * 
-         * @param database Connection to the database.
-         */
-        public Shareable(final Database database) {
-            super(database);
-        }
-
-        /**
-         * VERY BAD TRICK HERE. We need to do something better.
-         */
-        @Deprecated
-        protected void fireStateChanged(final String property) {
-            try {
-                super.fireStateChanged(property);
-            } catch (IllegalStateException e) {
-                // Ignore the fact that we are violating the Shareable contract.
-            }
-        }
     }
 }

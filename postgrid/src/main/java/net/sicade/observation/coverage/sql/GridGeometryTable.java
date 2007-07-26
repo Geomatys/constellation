@@ -34,7 +34,6 @@ import net.sicade.observation.IllegalRecordException;
 import net.sicade.observation.sql.SpatialFunctions;
 import net.sicade.observation.sql.SingletonTable;
 import net.sicade.observation.sql.Database;
-import net.sicade.observation.sql.Shareable;
 
 
 /**
@@ -44,7 +43,7 @@ import net.sicade.observation.sql.Shareable;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class GridGeometryTable extends SingletonTable<GridGeometryEntry> implements Shareable {
+public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     /**
      * Constructs a new {@code GridGeometryTable}.
      *
@@ -53,6 +52,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> impleme
      */
     public GridGeometryTable(final Database database) throws SQLException {
         super(new GridGeometryQuery(database));
+        setIdentifierParameters(((GridGeometryQuery) query).byIdentifier, null);
     }
 
     /**
