@@ -15,6 +15,7 @@
 package net.sicade.observation.sql;
 
 import net.sicade.observation.Procedure;
+import net.sicade.sql.Entry;
 
 
 /**

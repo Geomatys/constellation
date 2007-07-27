@@ -16,6 +16,7 @@ package net.sicade.observation.sql;
 
 // Sicade dependencies
 import net.sicade.observation.Phenomenon;
+import net.sicade.sql.Entry;
 
 
 /**

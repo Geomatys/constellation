@@ -30,6 +30,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import net.sicade.sql.Database;
+import net.sicade.sql.LoggingLevel;
+import net.sicade.sql.Query;
+import net.sicade.sql.Table;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -38,8 +42,8 @@ import org.geotools.resources.Utilities;
 import net.sicade.observation.Procedure;
 import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Observable;
-import net.sicade.observation.coverage.Descriptor;
-import net.sicade.observation.coverage.RegionOfInterest;
+import net.sicade.coverage.catalog.Descriptor;
+import net.sicade.coverage.catalog.RegionOfInterest;
 
 
 /**

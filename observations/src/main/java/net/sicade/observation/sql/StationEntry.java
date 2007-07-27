@@ -30,8 +30,8 @@ import net.sicade.observation.Station;
 import net.sicade.observation.Platform;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
-import net.sicade.observation.ServerException;
-import net.sicade.observation.CatalogException;
+import net.sicade.coverage.catalog.ServerException;
+import net.sicade.coverage.catalog.CatalogException;
 
 
 /**

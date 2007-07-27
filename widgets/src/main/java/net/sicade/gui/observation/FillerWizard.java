@@ -25,10 +25,10 @@ import java.util.Set;
 import org.geotools.resources.Arguments;
 
 // Sicade dependencies
-import net.sicade.observation.Observations;
-import net.sicade.observation.CatalogException;
-import net.sicade.observation.coverage.Descriptor;
-import net.sicade.observation.coverage.MeasurementTableFiller;
+import net.sicade.coverage.catalog.Observations;
+import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.coverage.catalog.Descriptor;
+import net.sicade.coverage.catalog.MeasurementTableFiller;
 import net.sicade.observation.fishery.sql.EnvironmentTable;
 import net.sicade.observation.sql.MeasurementTable;
 import net.sicade.observation.sql.StationTable;

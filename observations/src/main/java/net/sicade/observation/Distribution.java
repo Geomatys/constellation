@@ -14,6 +14,8 @@
  */
 package net.sicade.observation;
 
+import net.sicade.coverage.catalog.Element;
+
 
 /**
  * Distribution statistique approximative des {@linkplain Measurement valeurs mesurées} pour un

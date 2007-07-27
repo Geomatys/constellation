@@ -24,6 +24,7 @@ import java.awt.geom.Rectangle2D;
 import java.sql.SQLException;
 import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
+import net.sicade.sql.Entry;
 
 // Geotools dependencies
 import org.geotools.measure.Latitude;
@@ -33,8 +34,8 @@ import org.geotools.measure.AngleFormat;
 // Sicade dependencies
 import net.sicade.util.DateRange;
 import net.sicade.observation.LocatedElement;
-import net.sicade.observation.ServerException;
-import net.sicade.observation.CatalogException;
+import net.sicade.coverage.catalog.ServerException;
+import net.sicade.coverage.catalog.CatalogException;
 
 
 /**

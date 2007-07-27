@@ -20,7 +20,7 @@ package net.sicade.gui.event;
 
 import java.util.EventObject;
 import org.opengis.coverage.grid.GridCoverage;
-import net.sicade.observation.coverage.CoverageReference;
+import net.sicade.coverage.catalog.CoverageReference;
 
 
 /**

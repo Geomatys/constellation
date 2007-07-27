@@ -18,6 +18,11 @@ package net.sicade.observation.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import net.sicade.sql.BoundedSingletonTable;
+import net.sicade.sql.CRS;
+import net.sicade.sql.Database;
+import net.sicade.sql.Query;
+import net.sicade.sql.QueryType;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -25,7 +30,7 @@ import org.geotools.resources.Utilities;
 // Sicade dependencies
 import net.sicade.observation.Station;
 import net.sicade.observation.Platform;
-import net.sicade.observation.ConfigurationKey;
+import net.sicade.coverage.catalog.ConfigurationKey;
 
 
 /**

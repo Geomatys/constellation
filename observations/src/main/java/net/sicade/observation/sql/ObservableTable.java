@@ -21,9 +21,12 @@ import net.sicade.observation.Observable;
 import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Procedure;
 import net.sicade.observation.Distribution;
-import net.sicade.observation.ConfigurationKey;
-import net.sicade.observation.CatalogException;
+import net.sicade.coverage.catalog.ConfigurationKey;
+import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.observation.coverage.sql.DistributionTable;
+import net.sicade.sql.Database;
+import net.sicade.sql.Query;
+import net.sicade.sql.SingletonTable;
 
 
 /**

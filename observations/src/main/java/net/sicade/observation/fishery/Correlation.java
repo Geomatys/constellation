@@ -19,8 +19,8 @@
 package net.sicade.observation.fishery;
 
 // Sicade dependencies
-import net.sicade.observation.Element;
-import net.sicade.observation.coverage.Descriptor;
+import net.sicade.coverage.catalog.Element;
+import net.sicade.coverage.catalog.Descriptor;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;

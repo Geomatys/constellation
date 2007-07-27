@@ -15,6 +15,7 @@
 package net.sicade.observation;
 
 import java.util.Set;
+import net.sicade.coverage.catalog.CatalogException;
 
 
 /**

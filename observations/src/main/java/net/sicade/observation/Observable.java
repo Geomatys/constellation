@@ -14,6 +14,8 @@
  */
 package net.sicade.observation;
 
+import net.sicade.coverage.catalog.Element;
+
 
 /**
  * Représentation d'un {@linkplain Phenomenon phénomène} observé à l'aide d'une certaine

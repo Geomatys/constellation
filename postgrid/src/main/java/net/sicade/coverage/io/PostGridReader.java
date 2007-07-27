@@ -39,10 +39,10 @@ import javax.imageio.ImageReader;
 import javax.media.jai.PlanarImage;
 
 // SEAGIS dependencies
-import net.sicade.observation.CatalogException;
-import net.sicade.observation.Observations;
-import net.sicade.observation.coverage.CoverageReference;
-import net.sicade.observation.coverage.Layer;
+import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.coverage.catalog.Observations;
+import net.sicade.coverage.catalog.CoverageReference;
+import net.sicade.coverage.catalog.Layer;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.GeneralGridRange;

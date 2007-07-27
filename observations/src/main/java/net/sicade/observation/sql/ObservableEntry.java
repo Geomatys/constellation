@@ -14,6 +14,7 @@
  */
 package net.sicade.observation.sql;
 
+import net.sicade.sql.Entry;
 import org.geotools.resources.Utilities;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Phenomenon;

@@ -15,7 +15,7 @@
 package net.sicade.observation;
 
 // Sicade
-import net.sicade.observation.Element;
+import net.sicade.coverage.catalog.Element;
 
 
 /**

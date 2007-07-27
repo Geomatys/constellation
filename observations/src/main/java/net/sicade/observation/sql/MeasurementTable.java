@@ -19,6 +19,7 @@ import java.sql.Types;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import net.sicade.sql.Database;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -27,8 +28,8 @@ import org.geotools.resources.Utilities;
 import net.sicade.observation.Station;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Measurement;
-import net.sicade.observation.ConfigurationKey;
-import net.sicade.observation.CatalogException;
+import net.sicade.coverage.catalog.ConfigurationKey;
+import net.sicade.coverage.catalog.CatalogException;
 
 
 /**

@@ -77,7 +77,7 @@ import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.CRSUtilities;
 
 // Sicade
-import net.sicade.observation.coverage.CoverageReference;
+import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
 

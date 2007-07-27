@@ -19,7 +19,7 @@
 package net.sicade.observation.fishery;
 
 // Sicade dependencies
-import net.sicade.observation.Element;
+import net.sicade.coverage.catalog.Element;
 
 
 /**

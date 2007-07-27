@@ -15,6 +15,7 @@
 package net.sicade.observation;
 
 import java.util.Collection;
+import net.sicade.coverage.catalog.CatalogException;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.DataQuality;
 

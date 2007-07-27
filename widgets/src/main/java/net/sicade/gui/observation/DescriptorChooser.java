@@ -58,13 +58,13 @@ import org.geotools.resources.SwingUtilities;
 
 // J2SE dependencies
 import net.sicade.resources.XArray;
-import net.sicade.observation.Element;
-import net.sicade.observation.Observations;
-import net.sicade.observation.CatalogException;
-import net.sicade.observation.coverage.Layer;
-import net.sicade.observation.coverage.Operation;
-import net.sicade.observation.coverage.Descriptor;
-import net.sicade.observation.coverage.RegionOfInterest;
+import net.sicade.coverage.catalog.Element;
+import net.sicade.coverage.catalog.Observations;
+import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.coverage.catalog.Layer;
+import net.sicade.coverage.catalog.Operation;
+import net.sicade.coverage.catalog.Descriptor;
+import net.sicade.coverage.catalog.RegionOfInterest;
 
 
 /**

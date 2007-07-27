@@ -29,23 +29,23 @@ public class PostGridSuite extends TestSuite {
      * Creates the test suite. The tests are added in an approximative dependency order.
      */
     public PostGridSuite() {
-        addTestSuite(net.sicade.observation.sql.         SpatialFunctionsTest         .class);
-        addTestSuite(net.sicade.observation.sql.         TimeStampTest                .class);
-        addTestSuite(net.sicade.observation.sql.         QueryTest                    .class);
-        addTestSuite(net.sicade.observation.coverage.sql.SchemaTest                   .class);
-        addTestSuite(net.sicade.observation.coverage.sql.CategoryTableTest            .class);
-        addTestSuite(net.sicade.observation.coverage.sql.SampleDimensionTableTest     .class);
-        addTestSuite(net.sicade.observation.coverage.sql.FormatTableTest              .class);
-        addTestSuite(net.sicade.observation.coverage.sql.RegionOfInterestTableTest    .class);
-        addTestSuite(net.sicade.observation.coverage.sql.OperationTableTest           .class);
-        addTestSuite(net.sicade.observation.coverage.sql.DistributionTableTest        .class);
-        addTestSuite(net.sicade.observation.coverage.sql.DescriptorTableTest          .class);
-        addTestSuite(net.sicade.observation.coverage.sql.ThematicTableTest            .class);
-        addTestSuite(net.sicade.observation.coverage.sql.SeriesTableTest              .class);
-        addTestSuite(net.sicade.observation.coverage.sql.LayerTableTest               .class);
-        addTestSuite(net.sicade.observation.coverage.sql.GridGeometryTableTest        .class);
-        addTestSuite(net.sicade.observation.coverage.sql.GridCoverageTableTest        .class);
-        addTestSuite(net.sicade.observation.coverage.sql.WritableGridCoverageTableTest.class);
+        addTestSuite(net.sicade.sql.         SpatialFunctionsTest         .class);
+        addTestSuite(net.sicade.sql.         TimeStampTest                .class);
+        addTestSuite(net.sicade.sql.         QueryTest                    .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.SchemaTest                   .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.CategoryTableTest            .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.SampleDimensionTableTest     .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.FormatTableTest              .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.RegionOfInterestTableTest    .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.OperationTableTest           .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.DistributionTableTest        .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.DescriptorTableTest          .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.ThematicTableTest            .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.SeriesTableTest              .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.LayerTableTest               .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.GridGeometryTableTest        .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.GridCoverageTableTest        .class);
+        addTestSuite(net.sicade.coverage.catalog.sql.WritableGridCoverageTableTest.class);
     }
 
     /**

@@ -23,6 +23,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.awt.geom.Point2D;
+import net.sicade.sql.Database;
+import net.sicade.sql.MetadataTable;
+import net.sicade.sql.Query;
+import net.sicade.sql.QueryType;
+import net.sicade.sql.SingletonTable;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -38,8 +43,8 @@ import net.sicade.util.DateRange;
 import net.sicade.observation.Station;
 import net.sicade.observation.Platform;
 import net.sicade.observation.Observation;
-import net.sicade.observation.ConfigurationKey;
-import net.sicade.observation.CatalogException;
+import net.sicade.coverage.catalog.ConfigurationKey;
+import net.sicade.coverage.catalog.CatalogException;
 
 
 /**
