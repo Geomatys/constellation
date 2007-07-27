@@ -18,11 +18,7 @@ import java.util.logging.Level;
 
 
 /**
- * Niveaux utilisés dans le paquet {@code net.sicade.observation} pour la journalisation d'événéments.
- * Les événements archivés peuvent être des {@linkplain #SELECT consultations} et surtout des
- * {@linkplain #UPDATE mises à jour}. Du côté du serveur, ils correspondent à des instructions
- * SQL {@code SELECT} et {@code UPDATE} (ou {@code INSERT}) respectivement. Du côté du client,
- * ils correspondent à des appels à des méthodes distances via les RMI.
+ * Logging levels for SQL instructions executed on the catalog database.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -36,29 +32,34 @@ public final class LoggingLevel extends Level {
     private static final long serialVersionUID = 7505485471495575298L;
 
     /**
-     * Le niveau pour les instructions SQL {@code SELECT}.
+     * The base level. Current value is between {@link Level#CONFIG} and {@link Level#INFO}.
      */
-    public static final Level SELECT = new LoggingLevel("SQL SELECT", FINE.intValue()+50);
+    private static final int BASE = 750;
 
     /**
-     * Le niveau pour les instructions SQL {@code DELETE}.
+     * Logging level for SQL {@code SELECT} statements.
      */
-    public static final Level DELETE = new LoggingLevel("SQL DELETE", INFO.intValue()-50);
+    public static final Level SELECT = new LoggingLevel("SELECT", BASE);
 
     /**
-     * Le niveau pour les instructions SQL {@code INSERT}.
+     * Logging level for SQL {@code INSERT} statements.
      */
-    public static final Level INSERT = new LoggingLevel("SQL INSERT", DELETE.intValue());
+    public static final Level INSERT = new LoggingLevel("INSERT", BASE + 10);
 
     /**
-     * Le niveau pour les instructions SQL {@code UPDATE}.
+     * Logging level for SQL {@code UPDATE} statements.
      */
-    public static final Level UPDATE = new LoggingLevel("SQL UPDATE", INSERT.intValue());
+    public static final Level UPDATE = new LoggingLevel("UPDATE", BASE + 20);
 
     /**
-     * Le niveau pour les instructions SQL {@code CREATE}.
+     * Logging level for SQL {@code DELETE} statements.
      */
-    public static final Level CREATE = new LoggingLevel("SQL CREATE", INFO.intValue()-25);
+    public static final Level DELETE = new LoggingLevel("DELETE", BASE + 30);
+
+    /**
+     * Logging level for SQL {@code CREATE} statements.
+     */
+    public static final Level CREATE = new LoggingLevel("CREATE", BASE + 40);
 
     /**
      * Construit un nouveau niveau de journalisation.

@@ -14,7 +14,7 @@
  */
 package net.sicade.observation;
 
-import net.sicade.coverage.catalog.Element;
+import net.sicade.catalog.Element;
 
 
 /**

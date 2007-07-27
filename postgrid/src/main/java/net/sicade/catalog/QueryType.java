@@ -18,7 +18,7 @@ import java.util.logging.Level;
 
 
 /**
- * The kind of query to be executed by {@link SingletonTable}.
+ * The kind of query to be executed.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -38,18 +38,19 @@ public enum QueryType {
 
     /**
      * Every records will be listed. This is the kind of query executed by
-     * {@link SingletonTable#getEntries}.
+     * {@link SingletonTable#getEntries()}.
      */
     LIST(),
 
     /**
-     * Records will be listed using some filter.
+     * Records will be listed using some filter. This is the same as {@link #LIST},
+     * but with some additional criterions left to {@link Table} implementations.
      */
     FILTERED_LIST(),
 
     /**
      * Selects spatio-temporal envelope in a set of records. This is the kind of
-     * query executed by {@link BoundedSingletonTable#getGeographicBoundingBox}.
+     * query executed by {@link BoundedSingletonTable#getEnvelope()}.
      */
     BOUNDING_BOX(),
 
@@ -59,7 +60,7 @@ public enum QueryType {
     AVAILABLE_DATA(),
 
     /**
-     * A record will be added to a table.
+     * A record to be added in a table.
      */
     INSERT(LoggingLevel.INSERT);
 

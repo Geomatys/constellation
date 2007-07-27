@@ -14,6 +14,8 @@
  */
 package net.sicade.coverage.catalog;
 
+import net.sicade.catalog.Element;
+
 /**
  * Un sous-ensemble d'une {@linkplain Layer couche} d'image. Une couche d'images peut être divisée
  * en plusieurs sous-ensembles, où chaque sous-ensemble partage des caractéristiques communes. Par

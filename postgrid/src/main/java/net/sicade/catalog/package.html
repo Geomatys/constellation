@@ -2,33 +2,22 @@
 
 <HTML>
   <HEAD>
-    <TITLE>package net.sicade.observation.sql</TITLE>
+    <TITLE>package net.sicade.catalog</TITLE>
   </HEAD>
   <BODY>
-  Implémentations des interfaces du paquet {@link net.sicade.observation observation}. Les classes
-  définies dans ce paquet fournissent assez de fonctionalités pour un service de base utilisant des requêtes
-  SQL pour se connecter à une base de données. Ces classes peuvent être étendues dans des paquets spécialisés,
-  par exemple {@link net.sicade.observation.fishery.sql fishery}. Les classes définies dans ce paquet
-  se répartissent en deux branches:
-  <ul>
-    <li><p>{@link net.sicade.observation.sql.Table} est la racine des classes qui représenteront
-        une connexion SQL (<cite>Structured Language Query</cite>) à une base de données. Toutes les
-        tables sont conçues pour accéder aux données d'un serveur distant, la plupart du temps en envoyant
-        simplement la requête SQL sur le réseau. Toutefois certaines tables préviligieront plutôt une
-        utilisation via les RMI (<cite>Remote Method Invocation</cite>). Un exemple de table accédée à
-        distance via RMI est {@link net.sicade.observation.coverage.sql.GridCoverageTable}, car elle peut
-        manipuler des données volumineuses que l'on ne souhaite pas forcément transférer chez le client.</p></li>
+  Base classes for the {@linkplain net.sicade.coverage.catalog coverage catalog}
+  and the {@linkplain net.sicade.observation.catalog observation catalog}. Those
+  base classes provide helper methods for a catalog backed by a SQL database.
 
-    <li><p>{@link net.sicade.observation.sql.Entry} est la racine des implémentations des interfaces définies
-        dans le paquet {@link net.sicade.observation observation} et les sous-paquets spécialisés. Il s'agira
-        souvent (mais pas obligatoirement) d'un enregistrement dans une
-        {@linkplain net.sicade.observation.sql.Table table}, d'où le nom {@code Entry}.</p></li>
-  </ul>
-  <p>
-  Les {@linkplain net.sicade.observation.sql.Table tables} sont liées de près aux bases de données sous-jacentes
-  et sont internes aux implémentations; les utilisateurs des interfaces du paquet {@linkplain net.sicade.observation
-  observation} ne devraient pas les voir. Ces tables seront référencées dans les objets {@link net.sicade.observation.sql.Entry},
-  par exemple pour obtenir l'ensemble des {@linkplain net.sicade.observation.sql.ObservationEntry observations}
-  à une {@linkplain net.sicade.observation.sql.StationEntry station}.
+  <P>{@link net.sicade.catalog.Element} is the parent of all interfaces providing an
+  access to the catalog. Implementations may delegate their work to a remote server,
+  using a JDBC query in most cases, or using RMI (<cite>Remote Method Invocation</cite>)
+  in a few other cases (for example when a single pixel is evaluated in a grid coverage;
+  we don't want to transfer the full image through the network. Note that <cite>Web
+  Coverage Service</cite> is an other way to provide the same functionality).</P>
+
+  <P>{@link net.sicade.catalog.Entry} is the root class of most {@link net.sicade.catalog.Element}
+  implementations. It is often (but not always) a record from a {@link net.sicade.catalog.Table},
+  which is why it is named {@code Entry}.</P>
   </BODY>
 </HTML>

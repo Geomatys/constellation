@@ -16,6 +16,7 @@ package net.sicade.coverage.catalog;
 
 // J2SE dependencies
 import java.util.List;
+import net.sicade.catalog.Element;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;

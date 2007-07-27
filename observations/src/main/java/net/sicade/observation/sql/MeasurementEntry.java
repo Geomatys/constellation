@@ -67,15 +67,12 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      * {@inheritDoc}
      */
     @Override
-    protected StringBuilder createName() {
-        final StringBuilder name = super.createName();
-        name.append(" = ");
-        name.append(value);
+    protected String createName() {
+        final StringBuilder name = new StringBuilder(super.createName()).append(" = ").append(value);
         if (!Float.isNaN(error)) {
-            name.append(" \u00B1 ");
-            name.append(error);
+            name.append(" \u00B1 ").append(error);
         }
-        return name;
+        return name.toString();
     }
 
     /**

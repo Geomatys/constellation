@@ -15,6 +15,7 @@
 package net.sicade.coverage.catalog;
 
 import java.util.Locale;
+import net.sicade.catalog.Element;
 import org.opengis.coverage.SampleDimension;
 import org.geotools.gui.swing.tree.MutableTreeNode;
 

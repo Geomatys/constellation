@@ -35,7 +35,7 @@ import java.util.EnumSet;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class IndexedSqlElement {
+abstract class IndexedSqlElement {
     /**
      * The parameter index for each {@linkplain query type}. If a query type is not
      * supported by this element, then the corresponding index will be 0. Otherwise
@@ -110,7 +110,7 @@ search:     for (final QueryType type : typeSet) {
      * @param  type The query type.
      * @return The element index in the SQL prepared statment, or 0 if none.
      */
-    public int indexOf(final QueryType type) {
+    int indexOf(final QueryType type) {
         final int ordinal = type.ordinal();
         if (ordinal>=0 && ordinal<index.length) {
             return index[ordinal];
@@ -120,17 +120,16 @@ search:     for (final QueryType type : typeSet) {
 
     /**
      * Returns the function for this column or parameter when used in a query of the given type,
-     * or {@code null} if none. The functions are typically "MIN" or "MAX".
+     * or {@code null} if none.
      */
-    public String getFunction(final QueryType type) {
+    String getFunction(final QueryType type) {
         return (functions != null && type != null) ? functions.get(type) : null;
     }
 
     /**
      * Sets a function for this column or parameter when used in a query of the given type.
-     * The functions are typically "MIN" or "MAX".
      */
-    public void setFunction(final String function, final QueryType... types) {
+    void setFunction(final String function, final QueryType... types) {
         if (functions == null) {
             functions = new EnumMap<QueryType,String>(QueryType.class);
         }

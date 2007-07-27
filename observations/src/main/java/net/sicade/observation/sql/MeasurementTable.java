@@ -42,21 +42,22 @@ import net.sicade.observation.Measurement;
  * @see MergedMeasurementTable
  * @see net.sicade.observation.coverage.MeasurementTableFiller
  */
+@Deprecated
 public class MeasurementTable extends ObservationTable<Measurement> {
     /**
      * Requête SQL pour obtenir les mesures pour une station et un observable donnés.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Measurements:SELECT",
-            "SELECT station, observable, value, error\n"  +
-            "  FROM \"Measurements\"\n"                   +
-            " WHERE (station = ?) AND (observable = ?)");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Measurements:SELECT",
+//            "SELECT station, observable, value, error\n"  +
+//            "  FROM \"Measurements\"\n"                   +
+//            " WHERE (station = ?) AND (observable = ?)");
 
     /**
      * Requête SQL pour insérer les mesures pour une station et un observable donnés.
      */
-    private static final ConfigurationKey INSERT = new ConfigurationKey("Measurements:INSERT",
-            "INSERT INTO \"Measurements\" (station, observable, value, error)\n"  +
-            "VALUES (?, ?, ?, ?)");
+    private static final ConfigurationKey INSERT = null; // new ConfigurationKey("Measurements:INSERT",
+//            "INSERT INTO \"Measurements\" (station, observable, value, error)\n"  +
+//            "VALUES (?, ?, ?, ?)");
 
     /** Numéro de colonne. */ private static final int VALUE = 3;
     /** Numéro de colonne. */ private static final int ERROR = 4;

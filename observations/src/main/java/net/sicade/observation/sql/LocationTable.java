@@ -57,6 +57,7 @@ import net.sicade.coverage.catalog.CatalogException;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class LocationTable extends Table {
     /**
      * Obtient le chemin d'une {@linkplain net.sicade.observation.Station station}.
@@ -64,15 +65,16 @@ public class LocationTable extends Table {
      * @version $Id$
      * @author Martin Desruisseaux
      */
+    @Deprecated
     public static class Station extends LocationTable {
         /**
          * Requête SQL pour obtenir les positions d'une
          * {@linkplain net.sicade.observation.Station station}.
          */
-        private static final ConfigurationKey SELECT = new ConfigurationKey("Stations:PATH",
-                "SELECT date, x, y, z, u, v, w\n"   +
-                "  FROM \"Locations\"\n"            +
-                " WHERE station=? ORDER BY date");
+        private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Stations:PATH",
+//                "SELECT date, x, y, z, u, v, w\n"   +
+//                "  FROM \"Locations\"\n"            +
+//                " WHERE station=? ORDER BY date");
 
         /**
          * Construit une nouvelle connexion vers la table des positions des stations.
@@ -90,19 +92,20 @@ public class LocationTable extends Table {
      * @version $Id$
      * @author Martin Desruisseaux
      */
+    @Deprecated
     public static class Platform extends LocationTable {
         /**
          * Requête SQL pour obtenir les positions d'une
          * {@linkplain net.sicade.observation.Platform plateforme}.
          */
-        private static final ConfigurationKey SELECT = new ConfigurationKey("Platforms:PATH",
-                "SELECT MIN(date) date, AVG(x) AS x, AVG(y) AS y, AVG(z) AS z,"  +
-                                      " AVG(u) AS u, AVG(v) AS v, AVG(w) AS w\n" +
-                "  FROM \"Locations\"\n"                                         +
-                "  JOIN \"Stations\" ON station=identifier\n"                    +
-                " WHERE platform=?\n"                                            +
-                " GROUP BY station\n"                                            +
-                " ORDER BY date");
+        private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Platforms:PATH",
+//                "SELECT MIN(date) date, AVG(x) AS x, AVG(y) AS y, AVG(z) AS z,"  +
+//                                      " AVG(u) AS u, AVG(v) AS v, AVG(w) AS w\n" +
+//                "  FROM \"Locations\"\n"                                         +
+//                "  JOIN \"Stations\" ON station=identifier\n"                    +
+//                " WHERE platform=?\n"                                            +
+//                " GROUP BY station\n"                                            +
+//                " ORDER BY date");
 
         /**
          * Construit une nouvelle connexion vers la table des positions des platforme.

@@ -27,42 +27,42 @@ import org.geotools.referencing.datum.DefaultTemporalDatum;
 
 
 /**
- * Ensemble de systèmes de référence des coordonnées prédéfinis. Ces systèmes de référence représentent
- * des coordonnées géographiques (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>) par rapport à
- * l'elllipsoïde WGS&nbsp;84 et l'epoch 01/01/1950 00:00 UTC, soit dans l'ordre:
+ * Set of predefined coordinate reference systems. They are geographic CRS using
+ * (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>) axis on WGS&nbsp;84
+ * ellipsoid and 01/01/1950 00:00 UTC epoch. More specifically, the axis are:
  * <p>
  * <ul>
- *   <li>La longitude en degrés relatif au méridien de Greenwich</li>
- *   <li>La latitude en degrés</li>
- *   <li>L'altitude en mètres au dessus de l'ellipsoïde WGS 84</li>
- *   <li>Le temps en nombre de jours écoulés depuis l'epoch.</li>
+ *   <li>Longitude in decimal degrees relative to Greenwich meridian</li>
+ *   <li>Latitude in decimal degrees</li>
+ *   <li>Altitude in metre over the WGS 84 ellipsoid</li>
+ *   <li>Time as the amount of day ellapsed since January 1st, 1950.</li>
  * </ul>
  * <p>
- * Ces coordonnées ne sont pas nécessairement toutes présentes; cela dépend de l'énumération
- * utilisée. Par exemple le système désigné par {@link #XYT} ne comprend pas l'altitude. Mais
- * les coordonnées présentes seront toujours dans cet ordre.
+ * Not all those axis need to be present; the set of axis is determined from the enumeration
+ * used. For example the CRS designated by {@link #XYT} do not have an altitude axis. However
+ * when an axis is present, it shall appears in the above-cited order.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public enum CRS {
     /**
-     * Un système de référence de coordonnées (<var>x</var>, <var>y</var>)
+     * A (<var>x</var>, <var>y</var>) coordinate system.
      */
     XY(-1, -1),
 
     /**
-     * Un système de référence de coordonnées (<var>x</var>, <var>y</var>, <var>t</var>)
+     * A (<var>x</var>, <var>y</var>, <var>t</var>) coordinate system.
      */
     XYT(-1, 2),
     
     /**
-     * Un système de référence de coordonnées (<var>x</var>, <var>y</var>, <var>z</var>)
+     * A (<var>x</var>, <var>y</var>, <var>z</var>) coordinate system.
      */
     XYZ(2, -1),
     
     /**
-     * Un système de référence de coordonnées (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>)
+     * A (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>) coordinate system.
      */
     XYZT(2, 3);
 
@@ -123,7 +123,7 @@ public enum CRS {
     }
 
     /**
-     * Retourne le système de référence des coordonnées correspondant à cette énumération.
+     * Returns the coordinate reference system for this enumeration.
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crs;

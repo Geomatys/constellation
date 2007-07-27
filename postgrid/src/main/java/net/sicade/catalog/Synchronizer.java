@@ -14,7 +14,6 @@
  */
 package net.sicade.catalog;
 
-// J2SE dependencies
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -24,11 +23,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// Geotools dependencies
 import org.geotools.resources.Arguments;
-
-// Sicade dependencies
-import net.sicade.coverage.catalog.Element;
 import net.sicade.coverage.catalog.Catalog;
 import net.sicade.coverage.catalog.ServerException;
 import net.sicade.coverage.catalog.CatalogException;

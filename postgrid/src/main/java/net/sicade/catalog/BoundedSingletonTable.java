@@ -15,7 +15,6 @@
  */
 package net.sicade.catalog;
 
-// J2SE dependencies
 import java.util.Date;
 import java.util.Calendar;
 import java.sql.Timestamp;
@@ -26,26 +25,23 @@ import static java.lang.Math.min;
 import static java.lang.Math.max;
 import static java.lang.Double.doubleToLongBits;
 
-// OpenGIS dependencies
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import static org.geotools.referencing.CRS.getCoordinateOperationFactory;
 import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
-import static org.geotools.referencing.CRS.findMathTransform;
 import static org.geotools.referencing.CRS.transform;
 
-// Sicade dependencies
 import net.sicade.util.DateRange;
-import net.sicade.coverage.catalog.Element;
 import net.sicade.coverage.catalog.ServerException;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.IllegalRecordException;
@@ -58,16 +54,22 @@ import net.sicade.coverage.catalog.IllegalRecordException;
  * table CRS}, or by a combinaison of {@link #getGeographicBoundingBox GeographicBoundingBox},
  * {@link #getVerticalRange VerticalRange} and {@link #getTimeRange TimeRange} expressed in
  * standard CRS.
+ * <p>
+ * Subclasses should invoke {@link #setExtentParameters} in their constructor.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class BoundedSingletonTable<E extends Element> extends SingletonTable<E> {
     /**
-     * The upper limit for the default envelope temporal component,
-     * as milliseconds after the current time.
+     * The default start time, in milliseconds since January 1st, 1970.
      */
-    private static final long LOOK_AHEAD = 30 * 24 * 60 * 60 * 1000L;
+    private static final long DEFAULT_START_TIME = 0;
+
+    /**
+     * The default end time, in milliseconds after current time.
+     */
+    private static final long DEFAULT_END_TIME = 30 * 24 * 60 * 60 * 1000L;
 
     /**
      * The parameter to use for looking an element by time range, or {@code null} if unset.
@@ -84,12 +86,21 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     private Parameter bySpatialExtent;
 
     /**
-     * The type of the CRS used.
+     * The type of the CRS used for the {@linkplain #getEnvelope envelope}.
      */
     private final CRS crsType;
 
     /**
+     * The transform from the reference system designated by {@link #crsType} to
+     * {@link #getCoordinateReferenceSystem}. Will be created only when first needed.
+     * If non-null, then the source CRS must be {@link CRS#getCoordinateReferenceSystem}
+     * and the target CRS is the one returned by {@link #getCoordinateReferenceSystem}.
+     */
+    private CoordinateOperation standardToUser;
+
+    /**
      * The envelope time component, in milliseconds since January 1st, 1970.
+     * May be {@link Long#MIN_VALUE} or {@link Long#MAX_VALUE} if unbounded.
      */
     private long tMin, tMax;
 
@@ -114,21 +125,15 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     private boolean trimRequested;
 
     /**
-     * The transform from the reference system designated by {@link #crsType} to
-     * {@link #getCoordinateReferenceSystem}. Will be created only when first needed.
-     */
-    private transient MathTransform standardToUser;
-
-    /**
      * Creates a new table using the specified query. The query given in argument should be some
-     * subclass with {@link Query#addColumn addColumn} or {@link Query#addParameter addParameter}
+     * subclass with {@link Query#addColumn addColumn} and {@link Query#addParameter addParameter}
      * methods invoked in its constructor.
      */
     protected BoundedSingletonTable(final Query query, final CRS crsType) {
         super(query);
         this.crsType = crsType;
-        tMin =  0;
-        tMax =  System.currentTimeMillis() + LOOK_AHEAD;
+        tMin =  Long.MIN_VALUE;
+        tMax =  Long.MAX_VALUE;
         xMin = -360;
         xMax = +360;
         yMin =  -90;
@@ -142,9 +147,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * the same {@linkplain #query query} than the specified table. Subclass constructors should
      * not modify the query, since it is shared.
      * <p>
-     * In addition, the new table is initialized to the same spatio-temporal envelope than the
-     * specified table. If the {@link #getCoordinateReferenceSystem} method has been overriden,
-     * then is shall returns the same value.
+     * In addition, the new table is initialized to the same spatio-temporal envelope and the
+     * same {@linkplain #getCoordinateReferenceSystem coordinate reference system} than the
+     * specified table.
      */
     protected BoundedSingletonTable(final BoundedSingletonTable<E> table) {
         super(table);
@@ -179,9 +184,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Returns the coordinate reference system used by {@code [get|set]Envelope} methods. The default
-     * implementation returns a CRS inferred from the {@code crsType} argument given to the constructor.
-     * This CRS may contain the following dimensions:
+     * Returns the coordinate reference system used by {@code [get|set]Envelope} methods. The
+     * default CRS is inferred from the {@code crsType} argument given to the constructor. This
+     * CRS may contain the following dimensions:
      * <p>
      * <ul>
      *   <li>The longitude in decimal degrees relative to Greenwich meridian.</li>
@@ -192,36 +197,40 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * <p>
      * Not all those dimensions need to be present. For example {@link CRS#XYT}
      * does not contain an altitude axis.
-     * <p>
-     * Subclasses can override this method in order to return a different CRS, but the CRS must
-     * be compatible with the value given to the constructor, i.e. a transform must exists between
-     * them.
      *
      * @see CRS
      */
-    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-        return crsType.getCoordinateReferenceSystem();
+    public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        final CoordinateOperation standardToUser = this.standardToUser; // Protect from change.
+        return (standardToUser != null) ? standardToUser.getTargetCRS() : crsType.getCoordinateReferenceSystem();
     }
 
     /**
-     * Retourne la transformation allant du système de référence des coordonnées {@link #crsType}
-     * vers le système {@link #getCoordinateReferenceSystem}, ou {@code null} si cette
-     * transformation est la transformation identitée.
+     * Sets the coordinate reference system used by {@code [get|set]Envelope} methods.
      *
-     * @throws CatalogException si la transformation n'a pas pu être construite.
+     * @param  crs The new CRS, or {@code null} for restoring the default one.
+     * @throws CatalogException if the specified CRS is not compatible with the CRS type
+     *         given to the constructor.
      */
-    private MathTransform getStandardToUser() throws CatalogException {
-        assert Thread.holdsLock(this);
-        if (standardToUser == null) {
-            final CoordinateReferenceSystem sourceCRS = crsType.getCoordinateReferenceSystem();
-            final CoordinateReferenceSystem targetCRS =    this.getCoordinateReferenceSystem();
-            try {
-                standardToUser = findMathTransform(sourceCRS, targetCRS);
-            } catch (FactoryException exception) {
-                throw new ServerException(exception);
-            }
+    public synchronized void setCoordinateReferenceSystem(CoordinateReferenceSystem crs)
+            throws CatalogException
+    {
+        final CoordinateReferenceSystem sourceCRS = crsType.getCoordinateReferenceSystem();
+        if (crs == null || crs.equals(sourceCRS)) {
+            standardToUser = null;
+            return;
         }
-        return standardToUser;
+        final CoordinateOperationFactory factory = getCoordinateOperationFactory(true);
+        final CoordinateOperation candidate;
+        try {
+            candidate = factory.createOperation(sourceCRS, crs);
+        } catch (FactoryException exception) {
+            throw new ServerException(exception);
+        }
+        if (!candidate.equals(standardToUser)) {
+            standardToUser = candidate;
+            fireStateChanged("CoordinateReferenceSystem");
+        }
     }
 
     /**
@@ -256,11 +265,13 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             envelope.setRange(crsType.zdim, altitude.getMinimum(), altitude.getMaximum());
         }
         if (crsType.tdim >= 0) {
-            envelope.setRange(crsType.tdim, CRS.TEMPORAL.toValue((Date) time.getMinValue()),
-                                            CRS.TEMPORAL.toValue((Date) time.getMaxValue()));
+            final Date startTime = time.getMinValue();
+            final Date   endTime = time.getMaxValue();
+            envelope.setRange(crsType.tdim,
+                    startTime!=null ? CRS.TEMPORAL.toValue(startTime) : Double.NEGATIVE_INFINITY,
+                      endTime!=null ? CRS.TEMPORAL.toValue(  endTime) : Double.POSITIVE_INFINITY);
         }
-        final MathTransform standardToUser = getStandardToUser();
-        if (!standardToUser.isIdentity()) try {
+        if (standardToUser != null) try {
             envelope = transform(standardToUser, envelope);
         } catch (TransformException exception) {
             throw new ServerException(exception);
@@ -284,21 +295,21 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      *         the envelope can not be set.
      */
     public synchronized boolean setEnvelope(Envelope envelope) throws CatalogException {
-        final MathTransform userToStandard;
-        final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
-        try {
-            if (crs == null || equalsIgnoreMetadata(crs, getCoordinateReferenceSystem())) {
-                userToStandard = getStandardToUser().inverse();
-            } else {
-                userToStandard = findMathTransform(crs, crsType.getCoordinateReferenceSystem());
+        final CoordinateReferenceSystem sourceCRS = envelope.getCoordinateReferenceSystem();
+        if (sourceCRS != null) {
+            final CoordinateReferenceSystem targetCRS = getCoordinateReferenceSystem();
+            if (!equalsIgnoreMetadata(sourceCRS, targetCRS)) {
+                final CoordinateOperationFactory factory = getCoordinateOperationFactory(true);
+                final CoordinateOperation userToStandard;
+                try {
+                    userToStandard = factory.createOperation(sourceCRS, targetCRS);
+                    envelope = transform(userToStandard, envelope);
+                } catch (FactoryException exception) {
+                    throw new ServerException(exception);
+                } catch (TransformException exception) {
+                    throw new ServerException(exception);
+                }
             }
-            if (!userToStandard.isIdentity()) {
-                envelope = transform(userToStandard, envelope);
-            }
-        } catch (FactoryException exception) {
-            throw new ServerException(exception);
-        } catch (TransformException exception) {
-            throw new ServerException(exception);
         }
         boolean changed = false;
         if (crsType.xdim >= 0 && crsType.ydim >= 0) {
@@ -441,7 +452,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         } catch (SQLException e) {
             throw new ServerException(e);
         }
-        return new DateRange(new Date(tMin), new Date(tMax));
+        return new DateRange(tMin != Long.MIN_VALUE ? new Date(tMin) : null,
+                             tMax != Long.MAX_VALUE ? new Date(tMax) : null);
     }
 
     /**
@@ -455,10 +467,10 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         Date startTime = timeRange.getMinValue();
         Date   endTime = timeRange.getMaxValue();
         if (!timeRange.isMinIncluded()) {
-            startTime = new Date(startTime.getTime()+1);
+            startTime = new Date(startTime.getTime() + 1);
         }
         if (!timeRange.isMaxIncluded()) {
-            endTime = new Date(endTime.getTime()-1);
+            endTime = new Date(endTime.getTime() - 1);
         }
         return setTimeRange(startTime, endTime);
     }
@@ -473,8 +485,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      */
     public synchronized boolean setTimeRange(final Date startTime, final Date endTime) {
         boolean change;
-        change  = (tMin != (tMin = startTime.getTime()));
-        change |= (tMax != (tMax =   endTime.getTime()));
+        change  = (tMin != (tMin = (startTime != null) ? startTime.getTime() : Long.MIN_VALUE));
+        change |= (tMax != (tMax = (  endTime != null) ?   endTime.getTime() : Long.MAX_VALUE));
         trimRequested = false;
         if (change) {
             trimmed = false;
@@ -565,9 +577,11 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         if (byTimeRange != null) {
             final int index = byTimeRange.indexOf(type);
             if (index != 0) {
+                final long min = (tMin != Long.MIN_VALUE) ? tMin : DEFAULT_START_TIME;
+                final long max = (tMax != Long.MAX_VALUE) ? tMax : DEFAULT_END_TIME + System.currentTimeMillis();
                 final Calendar calendar = getCalendar();
-                statement.setTimestamp(index + 1, new Timestamp(tMin), calendar);
-                statement.setTimestamp(index,     new Timestamp(tMax), calendar);
+                statement.setTimestamp(index + 1, new Timestamp(min), calendar);
+                statement.setTimestamp(index,     new Timestamp(max), calendar);
             }
         }
         if (bySpatialExtent != null) {
@@ -578,17 +592,6 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
                         new double[] {xMax, yMax, zMax});
                 statement.setString(index, SpatialFunctions.formatPolygon(envelope));
             }
-        }
-    }
-
-    /**
-     * Notifies that this table state changed.
-     */
-    @Override
-    protected void fireStateChanged(final String property) {
-        super.fireStateChanged(property);
-        if ("CoordinateReferenceSystem".equalsIgnoreCase(property)) {
-            standardToUser = null;
         }
     }
 }

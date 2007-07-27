@@ -24,7 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import org.geotools.util.WeakValueHashMap;
 
-import net.sicade.coverage.catalog.Element;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.NoSuchRecordException;
 import net.sicade.coverage.catalog.IllegalRecordException;
@@ -91,12 +90,11 @@ public abstract class SingletonTable<E extends Element> extends Table {
      *       visible. Une solution possible serait de prévoir un Listener à appeller lorsque la base
      *       de données a été mise à jour.
      */
-    @SuppressWarnings("unchecked")
     private final Map<Object,E> pool = new WeakValueHashMap();
 
     /**
      * Creates a new table using the specified query. The query given in argument should be some
-     * subclass with {@link Query#addColumn addColumn} or {@link Query#addParameter addParameter}
+     * subclass with {@link Query#addColumn addColumn} and {@link Query#addParameter addParameter}
      * methods invoked in its constructor.
      */
     protected SingletonTable(final Query query) {

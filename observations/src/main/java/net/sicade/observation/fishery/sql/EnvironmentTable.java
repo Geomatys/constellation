@@ -31,21 +31,22 @@ import net.sicade.observation.sql.MeasurementTable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class EnvironmentTable extends MeasurementTable {
     /**
      * Requête SQL pour obtenir les mesures pour une station et un observable donnés.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Environments:SELECT",
-            "SELECT station, observable, value, error\n"  +
-            "  FROM \"AllEnvironments\"\n"                +
-            " WHERE (station = ?) AND (observable = ?)");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Environments:SELECT",
+//            "SELECT station, observable, value, error\n"  +
+//            "  FROM \"AllEnvironments\"\n"                +
+//            " WHERE (station = ?) AND (observable = ?)");
 
     /**
      * Requête SQL pour insérer les mesures pour une station et un observable donnés.
      */
-    private static final ConfigurationKey INSERT = new ConfigurationKey("Environments:INSERT",
-            "INSERT INTO \"Environments\" (station, observable, value, error)\n"  +
-            "VALUES (?, ?, ?, ?)");
+    private static final ConfigurationKey INSERT = null; // new ConfigurationKey("Environments:INSERT",
+//            "INSERT INTO \"Environments\" (station, observable, value, error)\n"  +
+//            "VALUES (?, ?, ?, ?)");
 
     /**
      * Construit une nouvelle connexion vers la table des mesures.

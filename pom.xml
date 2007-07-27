@@ -128,6 +128,16 @@
         <version>1.0</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <version>10.2.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derbyLocale_fr</artifactId>
+        <version>10.2.2.0</version>
+      </dependency>
+      <dependency>
         <groupId>javax.units</groupId>
         <artifactId>jsr108</artifactId>
         <version>0.01</version>

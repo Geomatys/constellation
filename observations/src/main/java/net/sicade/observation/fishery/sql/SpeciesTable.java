@@ -37,14 +37,15 @@ import net.sicade.catalog.SingletonTable;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
+@Deprecated
 public class SpeciesTable extends SingletonTable<Species> {
     /**
      * Requête SQL pour obtenir un stage de développement à partir de son identifiant.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Species:SELECT",
-            "SELECT name, english, french, latin, NULL AS remarks\n" +
-            "  FROM \"Species\"\n" +
-            " WHERE name LIKE ?");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Species:SELECT",
+//            "SELECT name, english, french, latin, NULL AS remarks\n" +
+//            "  FROM \"Species\"\n" +
+//            " WHERE name LIKE ?");
 
     /** Numéro de colonne. */ private static final int  NAME    = 1;
     /** Numéro de colonne. */ private static final int  ENGLISH = 2;

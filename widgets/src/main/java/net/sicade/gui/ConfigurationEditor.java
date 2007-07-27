@@ -144,7 +144,7 @@ public class ConfigurationEditor extends JPanel {
          * Retourne l'instruction à l'index spécifié.
          */
         public Object getElementAt(final int index) {
-            return keySQL.get(index).getName();
+            return keySQL.get(index).getKey();
         }
 
         /**
@@ -321,7 +321,7 @@ public class ConfigurationEditor extends JPanel {
                 }
                 configuration.setProperty(key, value);
                 if (logger != null) {
-                    logger.config(Resources.format(clé, key.getName()));
+                    logger.config(Resources.format(clé, key.getKey()));
                 }
             }
         }

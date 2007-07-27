@@ -42,27 +42,6 @@ import net.sicade.coverage.catalog.rmi.DataConnectionFactory;
  */
 public class Catalog {
     /**
-     * Clé pour récupérer le répertoire racine des images. La valeur de cette propriété
-     * peut être {@code null} si les fichiers ne sont pas accessibles localement, auquel
-     * cas les fichiers devront être accédés en utilisant un URL construit à partir de
-     * {@link #ROOT_URL}. La valeur par défaut est {@code null}.
-     */
-    public static final ConfigurationKey ROOT_DIRECTORY = new ConfigurationKey("RootDirectory", null);
-
-    /**
-     * Clé pour récupérer la racine des images sous forme d'adresse {@code ftp://}.
-     * La valeur par défaut est {@code "ftp://localhost/"}.
-     */
-    public static final ConfigurationKey ROOT_URL = new ConfigurationKey("RootURL", "ftp://localhost/");
-
-    /**
-     * Clé pour récupérer l'encodage des adresses URL. Des valeurs typiques sont {@code "UTF-8"}
-     * et {@code "ISO-8859-1"}. La valeur par défaut est {@code null}, ce qui signifie qu'aucun
-     * encodage ne sera appliqué sur les adresses URL.
-     */
-    public static final ConfigurationKey URL_ENCODING = new ConfigurationKey("URL_encoding", null);
-
-    /**
      * Une instance de {@code Catalog} connectée à la base de données par défaut. Cette
      * base de données est habituellement déclarée dans un fichier {@code DatabaseQueries.xml}
      * situé dans le répertoire de l'utilisateur.

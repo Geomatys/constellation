@@ -30,14 +30,15 @@ import net.sicade.catalog.SingletonTable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class ProcedureTable extends SingletonTable<Procedure> {
     /**
      * Requête SQL pour obtenir une procédure.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Procedures:SELECT",
-            "SELECT name, description\n" +
-            "  FROM \"Procedures\"\n" +
-            " WHERE name=?");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Procedures:SELECT",
+//            "SELECT name, description\n" +
+//            "  FROM \"Procedures\"\n" +
+//            " WHERE name=?");
 
     /** Numéro de colonne. */ private static final int NAME        = 1;
     /** Numéro de colonne. */ private static final int DESCRIPTION = 2;

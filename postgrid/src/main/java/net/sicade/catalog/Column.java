@@ -19,7 +19,8 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * A column in a SQL {@linkplain Query query}.
+ * A column in a SQL {@linkplain Query query}. Columns are created by
+ * the {@link Query#addColumn addColumn(...)} method.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -67,11 +68,42 @@ public final class Column extends IndexedSqlElement {
      * @param types Types of the queries where the column shall appears, or {@code null}
      *              if the column is applicable to any kind of queries.
      */
-    protected Column(final Query query, final String table, final String name, final String alias, final QueryType... types) {
+    Column(final Query query, final String table, final String name, final String alias, final QueryType... types) {
         super(query, types);
         this.table = table.trim();
         this.name  = name .trim();
         this.alias = alias.trim();
+    }
+
+    /**
+     * Returns the column index when used in a query of the given type. Valid index numbers
+     * start at 1. This method returns 0 if this column is not applicable to a query of the
+     * specified type.
+     *
+     * @param  type The query type.
+     * @return The column index in the SQL prepared statment, or 0 if none.
+     */
+    @Override
+    public int indexOf(final QueryType type) {
+        return super.indexOf(type);
+    }
+
+    /**
+     * Returns the function for this column when used in a query of the given type,
+     * or {@code null} if none.
+     */
+    @Override
+    public String getFunction(final QueryType type) {
+        return super.getFunction(type);
+    }
+
+    /**
+     * Sets a function for this column when used in a query of the given type.
+     * They are typically aggregate functions like {@code "MIN"} or {@code "MAX"}.
+     */
+    @Override
+    public void setFunction(final String function, final QueryType... types) {
+        super.setFunction(function, types);
     }
 
     /**

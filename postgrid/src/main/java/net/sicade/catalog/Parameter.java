@@ -16,7 +16,8 @@ package net.sicade.catalog;
 
 
 /**
- * A SQL parameter for the selection of a singleton using a {@link Query}.
+ * A parameter in a SQL {@linkplain Query query}. Parameters are created by
+ * the {@link Query#addParameter addParameter(...)} method.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -39,7 +40,7 @@ public final class Parameter extends IndexedSqlElement {
      * @param column The column on which the parameter is applied.
      * @param types Types of the queries where the parameter shall appears.
      */
-    protected Parameter(final Query query, final Column column, final QueryType... types) {
+    Parameter(final Query query, final Column column, final QueryType... types) {
         super(query, types);
         this.column = column;
     }
@@ -52,6 +53,41 @@ public final class Parameter extends IndexedSqlElement {
             return column.getFunction(type);
         }
         return null;
+    }
+
+    /**
+     * Returns the parameter index when used in a query of the given type. Valid index numbers
+     * start at 1. This method returns 0 if this parameter is not applicable to a query of the
+     * specified type.
+     *
+     * @param  type The query type.
+     * @return The parameter index in the SQL prepared statment, or 0 if none.
+     */
+    @Override
+    public int indexOf(final QueryType type) {
+        return super.indexOf(type);
+    }
+
+    /**
+     * Returns the function for this parameter when used in a query of the given type,
+     * or {@code null} if none. The functions are typically "MIN" or "MAX".
+     */
+    @Override
+    public String getFunction(final QueryType type) {
+        return super.getFunction(type);
+    }
+
+    /**
+     * Sets a function for this parameter when used in a query of the given type.
+     * They are typically conversion functions like {@code "GeometryFromText(?,4326)"}.
+     * The function must contains a question mark as in the above example.
+     */
+    @Override
+    public void setFunction(final String function, final QueryType... types) {
+        if (function.indexOf('?') == 0) {
+            throw new IllegalArgumentException(function);
+        }
+        super.setFunction(function, types);
     }
 
     /**

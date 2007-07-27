@@ -64,7 +64,7 @@ public final class GridGeometryEntry extends Entry {
     protected GridGeometryEntry(final String name, final GeographicBoundingBox bbox,
             final Dimension dimension, final double[] verticalOrdinates)
     {
-        super(name, null);
+        super(name);
         this.verticalOrdinates = verticalOrdinates;
         final int[] size;
         if (verticalOrdinates != null) {

@@ -14,12 +14,13 @@
  */
 package net.sicade.observation.sql;
 
-// J2SE dependencies
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectOutputStream;
 import java.util.Set;
 import java.util.Collections;
 import java.sql.SQLException;
 
-// Sicade dependencies
 import net.sicade.observation.Station;
 import net.sicade.observation.Platform;
 import net.sicade.coverage.catalog.ServerException;
@@ -84,13 +85,20 @@ public class PlatformEntry extends LocatedEntry implements Platform {
     }
 
     /**
-     * Complète les informations manquantes avant l'enregistrement binaire de cette entrée.
+     * Complete the station informations before serialization.
+     *
+     * @param  out The output stream where to serialize this object.
+     * @throws IOException if the serialization failed.
      */
     @Override
-    protected void preSerialize() throws Exception {
-        super.preSerialize();
-        if (elements == null) {
+    protected synchronized void writeObject(final ObjectOutputStream out) throws IOException {
+        if (elements == null) try {
             elements = getStations();
+        } catch (CatalogException exception) {
+            final InvalidObjectException e = new InvalidObjectException(exception.toString());
+            e.initCause(exception);
+            throw e;
         }
+        super.writeObject(out);
     }
 }

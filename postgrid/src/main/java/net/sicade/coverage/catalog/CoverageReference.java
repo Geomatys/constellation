@@ -19,6 +19,7 @@ import java.net.URL;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import net.sicade.catalog.Element;
 
 import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.Envelope;

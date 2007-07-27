@@ -36,14 +36,15 @@ import net.sicade.catalog.SingletonTable;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
+@Deprecated
 public class ObservableTable extends SingletonTable<Observable> {
     /**
      * Requête permettant de récupérer une entrée de la table des observables.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Observables:SELECT",
-            "SELECT identifier AS name, identifier, phenomenon, procedure, NULL AS distribution, NULL AS description\n" +
-            "  FROM \"Observables\"\n" + 
-            " WHERE identifier=?");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Observables:SELECT",
+//            "SELECT identifier AS name, identifier, phenomenon, procedure, NULL AS distribution, NULL AS description\n" +
+//            "  FROM \"Observables\"\n" + 
+//            " WHERE identifier=?");
 
     /** Numéro de colonne. */ static final int NAME         = 1;
     /** Numéro de colonne. */ static final int IDENTIFIER   = 2;

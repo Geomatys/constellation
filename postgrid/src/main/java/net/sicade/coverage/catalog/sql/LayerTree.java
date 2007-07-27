@@ -29,7 +29,7 @@ import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 // Seagis dependencies
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.Element;
+import net.sicade.catalog.Element;
 import net.sicade.observation.Procedure;          // Pour javadoc
 import net.sicade.catalog.Table;
 import net.sicade.catalog.Database;
@@ -49,27 +49,28 @@ import net.sicade.resources.i18n.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class LayerTree extends Table {
     /**
      * Requête SQL utilisée pour obtenir l'arborescence des couches. L'ordre des colonnes est
      * essentiel. Ces colonnes sont référencées par les constantes {@link #LAYER_NAME},
      * {@link #SERIES_NAME} et compagnie.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Layer:TREE",
-            "SELECT t.name,"                                     +
-                  " p.name,"                                     +
-                  " l.name,"                                     +
-                  " s.identifier,"                               +
-                    " format\n"                                  +
-            "  FROM \"Series\"     AS s\n"                       +
-            "  JOIN \"Layers\"     AS l ON l.name=layers\n"      +
-            "  JOIN \"Procedures\" AS p ON p.name=procedure\n"   +
-            "  JOIN \"Thematics\"  AS t ON t.name=phenomenon\n"  +
-            " WHERE visible=TRUE\n"                              +
-            " ORDER BY t.name,"                                  +
-                     " p.name,"                                  +
-                     " l.name,"                                  +
-                     " s.identifier");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Layer:TREE",
+//            "SELECT t.name,"                                     +
+//                  " p.name,"                                     +
+//                  " l.name,"                                     +
+//                  " s.identifier,"                               +
+//                    " format\n"                                  +
+//            "  FROM \"Series\"     AS s\n"                       +
+//            "  JOIN \"Layers\"     AS l ON l.name=layers\n"      +
+//            "  JOIN \"Procedures\" AS p ON p.name=procedure\n"   +
+//            "  JOIN \"Thematics\"  AS t ON t.name=phenomenon\n"  +
+//            " WHERE visible=TRUE\n"                              +
+//            " ORDER BY t.name,"                                  +
+//                     " p.name,"                                  +
+//                     " l.name,"                                  +
+//                     " s.identifier");
 
 
     /** Numéro de colonne.  */ static final int THEMATIC  =  1;

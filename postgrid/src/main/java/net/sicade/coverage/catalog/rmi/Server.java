@@ -121,7 +121,7 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
         @Override
         public String getProperty(final ConfigurationKey key) {
             String value = super.getProperty(key);
-            if (value!=null && REMOTE_SERVER.equals(key)) {
+            if (value!=null && ConfigurationKey.REMOTE_SERVER.equals(key)) {
                 if (isLoopback == null) try {
                     final InetAddress address = InetAddress.getByName(value);
                     isLoopback = Boolean.valueOf(address.isLoopbackAddress() ||

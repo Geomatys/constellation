@@ -30,14 +30,15 @@ import net.sicade.catalog.SingletonTable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class PhenomenonTable extends SingletonTable<Phenomenon> {
     /**
      * Requête SQL pour obtenir un phénomène.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Phenomenons:SELECT",
-            "SELECT name, NULL as description\n" +
-            "  FROM \"Phenomenons\"\n"           +
-            " WHERE name=?");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Phenomenons:SELECT",
+//            "SELECT name, NULL as description\n" +
+//            "  FROM \"Phenomenons\"\n"           +
+//            " WHERE name=?");
 
     /** Numéro de colonne. */ private static final int NAME    = 1;
     /** Numéro de colonne. */ private static final int REMARKS = 2;

@@ -25,8 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.geotools.resources.Utilities;
-import net.sicade.coverage.catalog.Element;
-import net.sicade.catalog.ConfigurationKey;
 
 
 /**
@@ -145,7 +143,7 @@ public class Table {
 
     /**
      * Creates a new table using the specified query. The query given in argument should be some
-     * subclass with {@link Query#addColumn addColumn} or {@link Query#addParameter addParameter}
+     * subclass with {@link Query#addColumn addColumn} and {@link Query#addParameter addParameter}
      * methods invoked in its constructor.
      */
     protected Table(final Query query) {
@@ -241,7 +239,7 @@ public class Table {
                 final Level level = queryType!=null ? queryType.level : Level.FINE;
                 if (LOGGER.isLoggable(level)) {
                     final LogRecord record = new LogRecord(level,
-                            getDatabase().isStatementFormatted() ? statement.toString() : query);
+                            getDatabase().isStatementFormatted ? statement.toString() : query);
                     record.setSourceClassName(getClass().getName());
                     record.setSourceMethodName(getCallerMethodName(queryType));
                     LOGGER.log(record);
@@ -260,7 +258,7 @@ public class Table {
      * @throws SQLException if the statement can not be created.
      */
     protected final PreparedStatement getStatement(final QueryType type) throws SQLException {
-        final String sql = (query != null) ? query.select(type) : null;
+        final String sql = (type != null) ? query.select(type) : null;
         queryType = type;
         return getStatement(sql);
     }
@@ -282,21 +280,40 @@ public class Table {
     }
 
     /**
-     * Delegates to <code>element.{@linkplain IndexedSqlElement#indexOf indexOf}(type)</code>,
-     * except that an exception is thrown if the specified element is not applicable to the
+     * Delegates to <code>column.{@linkplain Column#indexOf indexOf}(type)</code>,
+     * except that an exception is thrown if the specified column is not applicable to the
      * current query type. The {@code type} value is the argument given to the last call to
      * {@link #getStatement(QueryType)}.
      *
-     * @param  role The element.
-     * @return The element index (starting with 1).
-     * @throws SQLException if the specified element is not applicable.
+     * @param  column The column.
+     * @return The column index (starting with 1).
+     * @throws SQLException if the specified column is not applicable.
      */
-    protected final int indexOf(final IndexedSqlElement element) throws SQLException {
-        final int index = element.indexOf(queryType);
+    protected final int indexOf(final Column column) throws SQLException {
+        final int index = column.indexOf(queryType);
         if (index > 0) {
             return index;
         } else {
-            throw new SQLException("L'élément " + element + " ne s'applique pas au type " + queryType);
+            throw new SQLException("La colonne " + column + " ne s'applique pas au type " + queryType);
+        }
+    }
+
+    /**
+     * Delegates to <code>parameter.{@linkplain Parameter#indexOf indexOf}(type)</code>,
+     * except that an exception is thrown if the specified parameter is not applicable to the
+     * current query type. The {@code type} value is the argument given to the last call to
+     * {@link #getStatement(QueryType)}.
+     *
+     * @param  parameter The parameter.
+     * @return The parameter index (starting with 1).
+     * @throws SQLException if the specified parameter is not applicable.
+     */
+    protected final int indexOf(final Parameter parameter) throws SQLException {
+        final int index = parameter.indexOf(queryType);
+        if (index > 0) {
+            return index;
+        } else {
+            throw new SQLException("Le paramètre " + parameter + " ne s'applique pas au type " + queryType);
         }
     }
 

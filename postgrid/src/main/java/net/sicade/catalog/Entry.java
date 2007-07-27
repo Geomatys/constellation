@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,31 +15,21 @@
  */
 package net.sicade.catalog;
 
-// J2SE dependencies
-import java.io.IOException;
+import java.util.UUID;
 import java.io.Serializable;
-import java.io.ObjectOutputStream;
-import java.io.InvalidObjectException;
-
-// Sicade dependencies
-import net.sicade.coverage.catalog.Element;
-import net.sicade.resources.i18n.Resources;
-import net.sicade.resources.i18n.ResourceKeys;
 import org.geotools.resources.Utilities;
 
 
 /**
- * Classe de base d'un enregistrement dans une {@linkplain Table table} ou une requête. Chacune de
- * ces entrées représentera un {@linkplain Element element} (phénomène, procédure, couche d'images,
- * <cite>etc.</cite>). Les entrées sont habituellement (mais pas obligatoirement) identifiées de
- * manière unique par leurs {@linkplain #getName noms}.
+ * Base class of {@linkplain Element element} created from a record in a
+ * {@linkplain Table table}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class Entry implements Element, Serializable {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * For cross-platform compatibility.
      */
     private static final long serialVersionUID = -7119518186999674633L;
 
@@ -54,67 +45,68 @@ public class Entry implements Element, Serializable {
     private final String remarks;
 
     /**
-     * Construit une entrée avec le nom spécifié, mais sans remarques associées.
+     * Creates an entry for the specified name without remarks. If a {@code null} name
+     * is specified, then a name will be {@linkplain #createName generated} on the fly
+     * when first needed.
      *
-     * @param name Nom de l'entrée.
+     * @param name The element name, or {@code null} if none.
      */
     protected Entry(final String name) {
         this(name, null);
     }
 
     /**
-     * Construit une entrée avec le nom et les remarques spécifiés.
+     * Creates an entry for the specified name and remarks. If a {@code null} name
+     * is specified, then a name will be {@linkplain #createName generated} on the
+     * fly when first needed.
      *
-     * @param name     Nom de l'entrée.
-     * @param remarks  Remarques s'appliquant à cette entrée, ou {@code null}.
+     * @param name The element name, or {@code null} if none.
+     * @param remarks The remarks, or {@code null} if none.
      */
-    protected Entry(final String name,
-                    final String remarks)
-    {
-        this.name    = (name!=null) ? name.trim() : null;
+    protected Entry(final String name, final String remarks) {
+        this.name = (name!=null) ? name.trim() : null;
         this.remarks = remarks;
     }
 
     /**
-     * Construit un nom à la volé. Si cette entrée a été construite avec un nom nul, alors
-     * cette méthode sera appelée la première fois où {@link #getName} sera demandée.
+     * Creates a name of the fly. This method is invoked when first needed if the entry
+     * has been created with a {@code null} name.
      */
-    protected StringBuilder createName() {
-        throw new IllegalStateException();
+    protected String createName() {
+        return UUID.randomUUID().toString();
     }
 
     /**
-     * Retourne le nom de cette entrée.
+     * Returns the name for this entry.
      */
     public final String getName() {
         if (name == null) {
-            name = createName().toString();
+            name = createName();
         }
         return name;
     }
 
     /**
-     * Retourne les remarques associées à cette entrée, ou {@code null} s'il n'y en a pas.
+     * Returns the remarks for this entry, or {@code null} if none.
      */
     public final String getRemarks() {
         return remarks;
     }
 
     /**
-     * Retourne un nom à afficher dans une interface utilisateur pour cette entrée. Cette méthode est
-     * appelée par différentes composantes <cite>Swing</cite>, par exemple {@link javax.swing.JTree}.
-     * L'implémentation par défaut retourne le même nom que {@link #getName}.
+     * Returns a string representation of the entry. This string may be used in graphical user
+     * interface, for example a <cite>Swing</cite> {@link javax.swing.JTree}. The default
+     * implementation returns the entry {@linkplain #getName name}.
      */
     @Override
     public String toString() {
-        final String name = getName();
-        return (name==null || name.length()==0) ? Resources.format(ResourceKeys.UNNAMED) : name;
+        return String.valueOf(getName());
     }
 
     /**
-     * Retourne une valeur hashée pour cette entrée. L'implémentation par défaut retourne une
-     * valeur basée sur le {@linkplain #getName nom} de cette entrée, sachant que chaque entrée
-     * est supposée avoir un nom à peu près unique.
+     * Returns a hash code value for this entry. The default implementation computes the hash
+     * code from the {@linkplain #getName nom}. Because entry name should be unique, this is
+     * often suffisient.
      */
     @Override
     public int hashCode() {
@@ -122,13 +114,12 @@ public class Entry implements Element, Serializable {
     }
 
     /**
-     * Vérifie si cette entrée est identique à l'objet spécifié. L'implémentation par défaut compare
-     * le {@linkplain #getName nom} de cette entrée ainsi que les {@linkplain #getRemarks remarques},
-     * ce qui devrait être suffisant si chaque entrée d'une même classe a effectivement un nom unique,
-     * en supposant que toutes les entrées présentes dans cette machine virtuelle proviennent de la
-     * même base de données. Certaines classes dérivées feront un examen plus poussé, mais ça sera
-     * surtout par précaution. Cette méthode évitera donc de comparer les attributs qui pourraient
-     * se traduire par un chargement d'une grande quantité de données.
+     * Compares this entry with the specified object for equality. The default implementation
+     * compares the {@linkplain #getClass class}, {@linkplain #getName name} and {@linkplain
+     * #getRemarks remarks}. If should be suffisient when every entries have a unique name, for
+     * example when the name is the primary key in a database table. Subclasses should compare
+     * other attributes as a safety when affordable, but should avoid any comparaison that may
+     * force the loading of a large amount of data.
      */
     @Override
     public boolean equals(final Object object) {
@@ -141,32 +132,5 @@ public class Entry implements Element, Serializable {
                    Utilities.equals(this.getRemarks(), that.getRemarks());
         }
         return false;
-    }
-
-    /**
-     * Appelée automatiquement avant l'enregistrement binaire de cette méthode. Les classes dérivées
-     * devraient redéfinir cette méthode si elles ont besoin de compléter les informations contenues
-     * dans des champs qui ne devaient êtres renseignés que la première fois où elles étaient
-     * nécessaires.
-     *
-     * @throws Exception si une erreur est survenue lors de la préparation. Sera typiquement
-     *         {@link net.sicade.observation.CatalogException}, {@link java.sql.SQLException}
-     *         ou {@link java.rmi.RemoteException}.
-     */
-    protected void preSerialize() throws Exception {
-    }
-
-    /**
-     * Complète les informations spatio-temporelles avant l'enregistrement binaire.
-     */
-    private synchronized void writeObject(final ObjectOutputStream out) throws IOException {
-        try {
-            preSerialize();
-        } catch (Exception exception) {
-            final InvalidObjectException e = new InvalidObjectException("Can't complete before serialization.");
-            e.initCause(exception);
-            throw e;
-        }
-        out.defaultWriteObject();
     }
 }

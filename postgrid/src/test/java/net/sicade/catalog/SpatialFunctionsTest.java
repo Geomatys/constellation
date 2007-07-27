@@ -14,12 +14,8 @@
  */
 package net.sicade.catalog;
 
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.opengis.geometry.Envelope;
-import org.postgis.PGbox3d;
 
 import org.junit.*;
 import junit.framework.TestCase;

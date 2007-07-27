@@ -19,7 +19,7 @@
 package net.sicade.observation.fishery;
 
 // Sicade dependencies
-import net.sicade.coverage.catalog.Element;
+import net.sicade.catalog.Element;
 import net.sicade.coverage.catalog.Descriptor;
 
 // OpenGIS dependencies

@@ -39,13 +39,13 @@ import org.geotools.util.RangeSet;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XRectangle2D;
 
-import net.sicade.coverage.catalog.Catalog;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.coverage.catalog.rmi.DataConnection;
 import net.sicade.catalog.BoundedSingletonTable;
+import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.resources.i18n.Resources;
@@ -793,9 +793,9 @@ loop:   for (final CoverageReference newReference : entries) {
                                     geographicArea,
                                     resolution,
                                     dateFormat,
-                                    getProperty(Catalog.ROOT_DIRECTORY),
-                                    getProperty(Catalog.ROOT_URL),
-                                    getProperty(Catalog.URL_ENCODING));
+                                    getProperty(ConfigurationKey.ROOT_DIRECTORY),
+                                    getProperty(ConfigurationKey.ROOT_URL),
+                                    getProperty(ConfigurationKey.URL_ENCODING));
         return parameters;
     }
 

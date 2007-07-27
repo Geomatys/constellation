@@ -35,7 +35,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.referencing.ReferencingFactoryFinder;
 
 import net.sicade.image.Utilities;
-import net.sicade.coverage.catalog.Element;
+import net.sicade.catalog.Element;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.ServerException;
 import net.sicade.coverage.catalog.IllegalRecordException;

@@ -38,14 +38,15 @@ import net.sicade.catalog.SingletonTable;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class StageTable extends SingletonTable<Stage> {
     /**
      * Requête SQL pour obtenir un stage de développement à partir de son identifiant.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Stages:SELECT",
-            "SELECT name, NULL AS remarks\n" +
-            "  FROM \"Stages\"\n" +
-            " WHERE name LIKE ?");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Stages:SELECT",
+//            "SELECT name, NULL AS remarks\n" +
+//            "  FROM \"Stages\"\n" +
+//            " WHERE name LIKE ?");
 
     /** Numéro de colonne. */ private static final int  NAME    = 1;
     /** Numéro de colonne. */ private static final int  REMARKS = 2;

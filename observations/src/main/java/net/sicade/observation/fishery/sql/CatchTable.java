@@ -32,14 +32,15 @@ import net.sicade.observation.sql.MeasurementTable;
  *
  * @todo Retourner une instance de {@link Catch}.
  */
+@Deprecated
 public class CatchTable extends MeasurementTable {
     /**
      * Requête SQL pour obtenir les captures pour une station et un observable donnés.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Catchs:SELECT",
-            "SELECT station, observable, value, error\n"  +
-            "  FROM \"Catchs\"\n"                         +
-            " WHERE (station LIKE ?) AND (observable LIKE ?)");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Catchs:SELECT",
+//            "SELECT station, observable, value, error\n"  +
+//            "  FROM \"Catchs\"\n"                         +
+//            " WHERE (station LIKE ?) AND (observable LIKE ?)");
 
     /**
      * Construit une nouvelle connexion vers la table des captures.

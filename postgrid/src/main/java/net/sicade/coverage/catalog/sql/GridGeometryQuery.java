@@ -15,7 +15,6 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-import java.sql.SQLException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Column;
 import net.sicade.catalog.Parameter;
@@ -74,7 +73,7 @@ final class GridGeometryQuery extends Query {
      *
      * @param database The database for which this query is created.
      */
-    public GridGeometryQuery(final Database database) throws SQLException {
+    public GridGeometryQuery(final Database database) {
         super(database);
         final QueryType[] LSI = {LIST, SELECT, INSERT};
         identifier        = addColumn("GridGeometries", "identifier",        LSI);

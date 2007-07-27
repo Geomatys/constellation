@@ -58,7 +58,7 @@ import org.geotools.resources.SwingUtilities;
 
 // J2SE dependencies
 import net.sicade.resources.XArray;
-import net.sicade.coverage.catalog.Element;
+import net.sicade.catalog.Element;
 import net.sicade.coverage.catalog.Catalog;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;

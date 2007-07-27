@@ -15,7 +15,6 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-import java.sql.SQLException;
 import net.sicade.catalog.Column;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Parameter;
@@ -46,9 +45,8 @@ final class GridCoverageQuery extends Query {
      * Creates a new query for the specified database.
      *
      * @param  database The database for which this query is created.
-     * @throws SQLException if an error occured while reading the database.
      */
-    public GridCoverageQuery(final Database database) throws SQLException {
+    public GridCoverageQuery(final Database database) {
         super(database);
         final Column horizontalExtent, visibility;
         final QueryType[] hiden = {                            };

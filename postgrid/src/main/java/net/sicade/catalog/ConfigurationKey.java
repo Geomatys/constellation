@@ -14,34 +14,86 @@
  */
 package net.sicade.catalog;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.io.Serializable;
+import java.util.Properties;
 
 
 /**
- * Clé désignant un aspect d'une configuration d'une base de données. Une clé peut désigner
- * par exemple le pilote JDBC à utiliser pour la connexion, ou une des requête SQL utilisée.
- * Un ensemble de clés sont prédéfinies comme variables statiques dans les implémentations
- * côté serveur des différentes interfaces. Les valeurs correspondantes peuvent être modifiées
- * par {@link net.sicade.gui.swing.ConfigurationEditor}.
+ * A key for a configurable aspect of a {@linkplain Database database}. They are typically keys
+ * in a {@linkplain Properties properties map}. A key may be used in order to specify the JDBC
+ * driver to use.
  *
  * @version $Id$
  * @author Remi Eve
  * @author Martin Desruisseaux
+ *
+ * @see Database#getProperty
+ * @see net.sicade.gui.swing.ConfigurationEditor
  */
-public class ConfigurationKey implements Serializable {
+public enum ConfigurationKey {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * Key for the local data directory root. The value may be {@code null} if data are not accessible
+     * locally. In such case, data may be accessible remotely from the {@link #ROOT_URL}.
+     * <p>
+     * The default value is {@code null}.
      */
-    private static final long serialVersionUID = 3068136990916953221L;
+    ROOT_DIRECTORY("RootDirectory", null),
 
     /**
-     * Ensemble des clés déjà créées dans cette machine virtuelle. Chaque clé est créée une fois
-     * pour toute et ajoutée à cet ensemble. La création des clés se fait habituellement lors de
-     * l'initialisation des classes qui les contient comme variables statiques.
+     * Key for the URL to the server that host the data.
+     * <p>
+     * The default value is {@code "ftp://localhost/"}.
      */
-    private static final Map<String,ConfigurationKey> POOL = new HashMap<String,ConfigurationKey>();
+    ROOT_URL("RootURL", "ftp://localhost/"),
+
+    /**
+     * Key for the URL encoding. Typical values are {@code "UTF-8"} and {@code "ISO-8859-1"}.
+     * The default value is {@code null}, which means that no encoding will be applied on the
+     * URL.
+     */
+    URL_ENCODING("URL_encoding", null),
+
+    /**
+     * Key for the database driver. A typical value is {@code "org.postgresql.Driver"}. This is
+     * used only if no data source has been given explicitly to the {@linkplain Database database}
+     * constructor.
+     * <p>
+     * The default value is {@code "org.apache.derby.jdbc.EmbeddedDriver"}.
+     */
+    DRIVER("Driver", "org.apache.derby.jdbc.EmbeddedDriver"),
+
+    /**
+     * Key for URL to the database. Example: {@code "jdbc:postgresql://myserver.com/mydatabase"}.
+     * used only if no data source has been given explicitly to the {@linkplain Database database}
+     * constructor.
+     * <p>
+     * The default value is {@code "jdbc:derby:postgrid"}.
+     */
+    DATABASE("Database", "jdbc:derby:postgrid"),
+
+    /**
+     * Key for user name connecting to the {@linkplain #DATABASE database}.
+     */
+    USER("User", null),
+
+    /**
+     * Key for {@linkplain #USER user} password.
+     */
+    PASSWORD("Password", null),
+
+    /**
+     * Key for the RMI (<cite>Remote Method Invocation</cite>) server. The default value
+     * is {@code null}, which means that images will be downloaded by FTP processed locally
+     * instead of delagating the work to some distant server.
+     */
+    REMOTE_SERVER("RemoteServer", null),
+
+    /**
+     * Key for the timezone. This apply to the dates that appear in the database.
+     * The {@code "local"} value is a special string for the local timezone.
+     * <p>
+     * The default value is {@code "UTC"}.
+     */
+    TIMEZONE("TimeZone", "UTC");
 
     /**
      * Le nom de la clé courante. Chaque clé a un nom unique.
@@ -61,38 +113,28 @@ public class ConfigurationKey implements Serializable {
      * @param name          Le nom de la clé à créer. Ce nom doit être unique.
      * @param defaultValue  Valeur par défaut associée à la clé, utilisée que si l'utilisateur n'a
      *                      pas spécifié explicitement de valeur.
-     *
-     * @throws IllegalStateException si une clé a déjà été créée précédemment pour le nom spécifié.
      */
-    public ConfigurationKey(final String name, final String defaultValue) throws IllegalStateException {
+    private ConfigurationKey(final String name, final String defaultValue) {
         this.name         = name.trim();
         this.defaultValue = defaultValue;
-        synchronized (POOL) {
-            if (POOL.put(name, this) != null) {
-                throw new IllegalStateException("Doublon dans les noms de clés."); // TODO: localize
-            }
-        }
     }
 
     /**
-     * Retourne le nom de la clé courante. Chaque clé a un nom unique.
+     * Returns the key to be used in {@link Properties} map.
      */
-    public String getName() {
+    public String getKey() {
         return name;
     }
 
     /**
-     * Retourne la valeur par défaut associée à la clé. Cette valeur est codée en dur dans
-     * les implémentations qui définissent des clés comme variables statiques. Cette valeur
-     * par défaut ne sera utilisée que si l'utilisateur n'a pas spécifié explicitement de
-     * valeur dans le fichier de configuration.
+     * Returns the default value for this key.
      */
     public String getDefaultValue() {
         return defaultValue;
     }
 
     /**
-     * Retourne le nom de cette clé, pour inclusion dans une interface graphique.
+     * Returns this key name, for inclusion in a graphical user interface.
      */
     @Override
     public String toString() {

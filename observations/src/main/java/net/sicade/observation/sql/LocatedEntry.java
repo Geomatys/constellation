@@ -14,23 +14,23 @@
  */
 package net.sicade.observation.sql;
 
-// J2SE dependencies
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 
-// Geotools dependencies
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
 import org.geotools.measure.AngleFormat;
 
-// Sicade dependencies
 import net.sicade.util.DateRange;
 import net.sicade.catalog.Entry;
 import net.sicade.observation.LocatedElement;
@@ -246,11 +246,19 @@ public class LocatedEntry extends Entry implements LocatedElement {
     }
 
     /**
-     * Complète les informations manquantes avant l'enregistrement binaire de cette entrée.
+     * Complete spatio-temporal informations before serialization.
+     *
+     * @param  out The output stream where to serialize this object.
+     * @throws IOException if the serialization failed.
      */
-    @Override
-    protected void preSerialize() throws Exception {
-        super.preSerialize();
-        complete();
+    protected synchronized void writeObject(final ObjectOutputStream out) throws IOException {
+        try {
+            complete();
+        } catch (SQLException exception) {
+            final InvalidObjectException e = new InvalidObjectException(exception.toString());
+            e.initCause(exception);
+            throw e;
+        }
+        out.defaultWriteObject();
     }
 }

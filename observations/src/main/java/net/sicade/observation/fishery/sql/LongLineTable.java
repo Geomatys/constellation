@@ -43,15 +43,16 @@ import net.sicade.observation.sql.StationTable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class LongLineTable extends StationTable {
     /**
      * Requête SQL pour obtenir une station à partir de son identifiant.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("LongLines:SELECT",
-            "SELECT identifier AS name, identifier, platform, quality, provider, \"startTime\", \"endTime\", x, y\n" +
-            "  FROM \"LongLinesLocations\"\n" +
-            " WHERE name LIKE ?\n"            +
-            " ORDER BY identifier");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("LongLines:SELECT",
+//            "SELECT identifier AS name, identifier, platform, quality, provider, \"startTime\", \"endTime\", x, y\n" +
+//            "  FROM \"LongLinesLocations\"\n" +
+//            " WHERE name LIKE ?\n"            +
+//            " ORDER BY identifier");
 
     /**
      * Construit une nouvelle connexion vers la table des lignes de palangres.

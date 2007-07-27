@@ -38,16 +38,17 @@ import net.sicade.observation.fishery.Category;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class CategoryTable extends SingletonTable<Category> {
     /**
      * Requête SQL pour obtenir une catégorie à partir de son identifiant.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Categories:SELECT",
-            "SELECT symbol, identifier, phenomenon, procedure, stage, NULL as remarks\n" +
-            "  FROM \"Categories\"\n"                                                    +
-            " WHERE symbol LIKE ?\n"                                                     +
-            "   AND selected=TRUE\n"                                                     +
-            " ORDER BY identifier");
+    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Categories:SELECT",
+//            "SELECT symbol, identifier, phenomenon, procedure, stage, NULL as remarks\n" +
+//            "  FROM \"Categories\"\n"                                                    +
+//            " WHERE symbol LIKE ?\n"                                                     +
+//            "   AND selected=TRUE\n"                                                     +
+//            " ORDER BY identifier");
 
     /** Numéro de colonne. */ private static final int  SYMBOL     = 1;
     /** Numéro de colonne. */ private static final int  IDENTIFIER = 2;

@@ -15,24 +15,17 @@
  */
 package net.sicade.catalog;
 
-// Database
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.sql.DataSource;
-import org.postgis.PGbox3d;
-import org.postgis.PGgeometry;
-import org.postgresql.PGConnection;
 
-// Input / Output
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.Remote;
@@ -40,7 +33,6 @@ import java.rmi.RemoteException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 
-// Miscenaleous
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,19 +44,15 @@ import java.lang.reflect.Constructor;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-// Geotools
 import org.geotools.util.Logging;
 import org.geotools.resources.JDBC;
 import org.geotools.resources.Utilities;
-
-// Sicade
-import net.sicade.coverage.catalog.Element;
 
 
 /**
  * Connection to an observation database through JDBC (<cite>Java Database Connectivity</cite>).
  * Connection parameters are stored in a {@code "DatabaseQueries.xml"} configuration file stored
- * in the {@code "Application Data\Sicade"} user directory on Windows, or {@code ".Sicade"} user
+ * in the {@code "Application Data\Sicade"} user directory on Windows, or {@code ".sicade"} user
  * directory on Unix.
  *
  * @version $Id$
@@ -72,63 +60,19 @@ import net.sicade.coverage.catalog.Element;
  */
 public class Database {
     /**
-     * The user directory where to store the configuration file.
+     * The user directory where to store the configuration file on Unix platforms.
      */
-    private static final String CONFIG_DIRECTORY = "Sicade";
+    private static final String UNIX_DIRECTORY = ".sicade";
+
+    /**
+     * The user directory where to store the configuration file on Windows platforms.
+     */
+    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
     /**
      * The file where to store configuration parameters.
      */
     private static final String CONFIG_FILENAME = "DatabaseQueries.xml";
-
-    /**
-     * Property key for database driver. Example: {@code org.postgresql.Driver}.
-     * Used only if no {@linkplain DataSource data source} has been given to the constructor.
-     *
-     * @see #getProperty
-     */
-    public static final ConfigurationKey DRIVER = new ConfigurationKey("Driver", null);
-
-    /**
-     * Property key for URL to the database. Example: {@code jdbc:postgresql://myserver.com/mydatabase}.
-     * Used only if no {@linkplain DataSource data source} has been given to the constructor.
-     *
-     * @see #getProperty
-     */
-    public static final ConfigurationKey DATABASE = new ConfigurationKey("Database", null);
-
-    /**
-     * Property key for user name connecting to the {@linkplain #DATABASE database}.
-     * Used only if no {@linkplain DataSource data source} has been given to the constructor.
-     *
-     * @see #getProperty
-     */
-    public static final ConfigurationKey USER = new ConfigurationKey("User", null);
-
-    /**
-     * Property key for {@linkplain #USER user} password.
-     * Used only if no {@linkplain DataSource data source} has been given to the constructor.
-     *
-     * @see #getProperty
-     */
-    public static final ConfigurationKey PASSWORD = new ConfigurationKey("Password", null);
-
-    /**
-     * Property key for the RMI server (<cite>Remote Method Invocation</cite>). The default value
-     * is {@code null}, which means that images will be downloaded by FTP processed locally instead
-     * of delagating the work to some distant server.
-     *
-     * @see #getProperty
-     */
-    public static final ConfigurationKey REMOTE_SERVER = new ConfigurationKey("RemoteServer", null);
-
-    /**
-     * Property key for the timezone. This apply to the date that appears in the database.
-     * If no timezone is given, then the local timezone is used.
-     *
-     * @see #getProperty
-     */
-    public static final ConfigurationKey TIMEZONE = new ConfigurationKey("TimeZone", null);
 
     /**
      * {@code false} if RMI should be disabled. This flag is set on the command line using the
@@ -162,14 +106,14 @@ public class Database {
     /**
      * {@code true} if the database supports spatial extension, like the {code BBOX3D} type.
      */
-    private boolean isSpatialEnabled;
+    private final boolean isSpatialEnabled;
 
     /**
      * {@code true} if the {@code toString()} method on {@link PreparedStatement} instances
      * returns the SQL query with parameters filled in. This is the case with the PostgreSQL
      * JDBC driver.
      */
-    private boolean isStatementFormatted;
+    final boolean isStatementFormatted;
 
     /**
      * The tables created up to date.
@@ -182,7 +126,7 @@ public class Database {
     private final Map<String, Remote> remotes = new HashMap<String, Remote>();
 
     /**
-     * The timezone to use for reading and writing date in the database. This timezone
+     * The timezone to use for reading and writing dates in the database. This timezone
      * can be set by the {@link #TIMEZONE} property and will be used for creating the
      * calendar returned by {@link Table#getCalendar}.
      */
@@ -217,7 +161,7 @@ public class Database {
     /**
      * Opens a new connection using the provided data source.
      *
-     * @param  source The data source.
+     * @param  source The data source, or {@code null} if none.
      * @throws IOException if an error occured while reading the configuration file.
      */
     public Database(final DataSource source) throws IOException {
@@ -230,12 +174,24 @@ public class Database {
         properties = new Properties();
         final File file = getConfigurationFile(false);
         if (file!=null && file.exists()) {
-            final InputStream in = new BufferedInputStream(new FileInputStream(file));
+            final InputStream in = new FileInputStream(file);
             properties.loadFromXML(in);
             in.close();
         }
-        final String ID = getProperty(TIMEZONE);
-        timezone = (ID!=null) ? TimeZone.getTimeZone(ID) : TimeZone.getDefault();
+        final String ID = getProperty(ConfigurationKey.TIMEZONE);
+        timezone = (ID!=null && !ID.equalsIgnoreCase("local")) ? TimeZone.getTimeZone(ID) : TimeZone.getDefault();
+        /*
+         * Checks if the database is spatial-enabled.
+         * TODO: Following code is PostgreSQL specific. We need to make it more generic.
+         */
+        final String driver = (source!=null) ? source.getClass().getName() : getProperty(ConfigurationKey.DRIVER);
+        if (driver.startsWith("org.postgresql")) {
+            isSpatialEnabled = true;
+            isStatementFormatted = true;
+        } else {
+            isSpatialEnabled = false;
+            isStatementFormatted = false;
+        }
         /*
          * Prépare un processus qui fermera automatiquement les connections lors de l'arrêt
          * de la machine virtuelle si l'utilisateur n'appelle par close() lui-même.
@@ -245,11 +201,16 @@ public class Database {
     }
 
     /**
-     * Retourne le fichier de configuration de l'utilisateur, ou {@code null} s'il n'a pas
-     * été trouvé. Le répertoire {@value #CONFIG_DIRECTORY} ne sera créé que si l'argument
-     * {@code create} est {@code true}.
+     * Returns the file where to read or write user configuration. If no such file is found,
+     * then this method returns {@code null}. This method is allowed to create the destination
+     * directory if and only if {@code create} is {@code true}.
+     * <p>
+     * Subclasses may override this method in order to search for an other file than the default one.
+     *
+     * @param  create {@code true} if this method is allowed to create the destination directory.
+     * @return The configuration file, or {@code null} if none.
      */
-    private static File getConfigurationFile(final boolean create) {
+    File getConfigurationFile(final boolean create) {
         /*
          * Donne priorité au fichier de configuration dans le répertoire courant, s'il existe.
          */
@@ -261,11 +222,10 @@ public class Database {
          * Recherche dans le répertoire de configuration de l'utilisateur.
          */
         final String home = System.getProperty("user.home");
-        path = new File(home, "Application Data");
-        if (path.isDirectory()) {
-            path = new File(path, CONFIG_DIRECTORY);
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+            path = new File(path, WINDOWS_DIRECTORY);
         } else {
-            path = new File(home, '.'+CONFIG_DIRECTORY);
+            path = new File(home, UNIX_DIRECTORY);
         }
         if (!path.exists()) {
             if (!create || !path.mkdir()) {
@@ -276,19 +236,25 @@ public class Database {
     }
 
     /**
-     * Returns the connection to the database. If a {@linkplain DataSource data source} has
-     * been specified at construction time, it will be used but the configuration file will
-     * have precedence for the {@linkplain #USER user} and {@linkplain #PASSWORD password}
-     * properties. If no data source was specified at construction time, then the
-     * {@link #DATABASE} et {@link #DRIVER} properties will be queried.
+     * Returns the connection to the database. If a {@linkplain DataSource data source} has been
+     * specified at construction time. If {@linkplain ConfigurationKey#USER user} and {@linkplain
+     * ConfigurationKey#PASSWORD password} properties are defined, they will have precedence over
+     * the value specified in the {@linkplain DataSource data source}. If no data source was specified
+     * at construction time, then the {@linkplain ConfigurationKey#DATABASE database} and
+     * {@linkplain ConfigurationKey#DRIVER driver} properties will be queried.
      *
      * @return The connection to the database.
      * @throws SQLException if the connection can not be created.
      */
     public synchronized Connection getConnection() throws SQLException {
+        // The following assertions are used in order to reduce the risk
+        // of deadlock in the 'close()' method.
+        assert !Thread.holdsLock(properties);
+        assert !Thread.holdsLock(tables);
+        assert !Thread.holdsLock(remotes);
         if (connection == null) {
-            final String user     = getProperty(USER);
-            final String password = getProperty(PASSWORD);
+            final String user     = getProperty(ConfigurationKey.USER);
+            final String password = getProperty(ConfigurationKey.PASSWORD);
             if (source != null) {
                 if (user!=null && password!=null) {
                     connection = source.getConnection(user, password);
@@ -296,9 +262,9 @@ public class Database {
                     connection = source.getConnection();
                 }
             } else {
-                final String database = getProperty(DATABASE);
+                final String database = getProperty(ConfigurationKey.DATABASE);
                 if (database != null) {
-                    JDBC.loadDriver(getProperty(DRIVER));
+                    JDBC.loadDriver(getProperty(ConfigurationKey.DRIVER));
                     connection = DriverManager.getConnection(database, user, password);
                 } else {
                     connection = null;
@@ -306,22 +272,6 @@ public class Database {
             }
             if (connection != null) {
                 Element.LOGGER.info("Connecté à la base de données " + connection.getMetaData().getURL());
-            }
-            /*
-             * Dans le cas d'une connection sur une base de type PostgreSQL, le type de données 
-             * "box3d" doit être spécifié, afin de permettre son utilisation dans les tables.
-             *
-             * TODO: Following code is PostgreSQL specific. Need to make it more generic,
-             *       or at the very least optional.
-             */
-            isSpatialEnabled = false;
-            isStatementFormatted = false;
-            if (connection instanceof PGConnection) {
-                final PGConnection pgc = (PGConnection) connection;
-                pgc.addDataType("box3d",    PGbox3d.class);
-                pgc.addDataType("geometry", PGgeometry.class);
-                isSpatialEnabled = true;
-                isStatementFormatted = true;
             }
         }
         return connection;
@@ -336,8 +286,8 @@ public class Database {
 
     /**
      * Returns the timezone in which the dates in the database are expressed. This information
-     * can be specified through the {@link #TIMEZONE} property. It is used in order to convert
-     * the dates from the database timezone to UTC.
+     * can be specified through the {@link ConfigurationKey#TIMEZONE} property. It is used in
+     * order to convert the dates from the database timezone to UTC.
      *
      * @see Table#getCalendar
      */
@@ -367,17 +317,17 @@ public class Database {
     }
 
     /**
-     * Returns a property. The key is usually a constant like {@link #TIMEZONE}.
+     * Returns a property. The key is usually a constant like {@link ConfigurationKey#TIMEZONE}.
      *
      * @param key The key for the property to fetch.
      * @return The property value, or {@code null} if none.
      */
     public String getProperty(final ConfigurationKey key) {
         // No need to synchronize since 'Properties' is already synchronized.
-        String value = properties.getProperty(key.getName(), key.getDefaultValue());
+        String value = properties.getProperty(key.getKey(), key.getDefaultValue());
         if (value == null) {
-            if (key.equals(TIMEZONE)) {
-                return ((timezone != null) ? timezone : TimeZone.getDefault()).getID();
+            if (key.equals(ConfigurationKey.TIMEZONE)) {
+                return timezone.getID();
             }
         }
         return value;
@@ -394,11 +344,11 @@ public class Database {
     public void setProperty(final ConfigurationKey key, final String value) {
         synchronized (properties) {
             if (value != null) {
-                if (!value.equals(properties.setProperty(key.getName(), value))) {
+                if (!value.equals(properties.setProperty(key.getKey(), value))) {
                     modified = true;
                 }
             } else {
-                if (properties.remove(key.getName()) != null) {
+                if (properties.remove(key.getKey()) != null) {
                     modified = true;
                 }
             }
@@ -408,7 +358,7 @@ public class Database {
     /**
      * Returns a table of the specified type.
      *
-     * @param  type The table class (e.g. <code>{@linkplain StationTable}.class</code>).
+     * @param  type The table class.
      * @return An instance of a table of the specified type.
      * @throws NoSuchElementException if the specified type is unknown to this database.
      */
@@ -452,21 +402,21 @@ public class Database {
     }
 
     /**
-     * Obtient un objet distant du nom spécifié. Si l'objet {@code name} avait déjà été demandée
-     * lors d'un précédent appel, le même objet sera retourné. Sinon, un nouvel objet sera obtenu
-     * et retourné.
+     * Returns an remote object for the specified name. The name should be registered on the remote server.
+     * A typical value is {@value net.sicade.coverage.catalog.rmi.DataConnectionFactory#REGISTRY_NAME}.
      * <p>
-     * Si l'objet distant du nom spécifié n'a pas pu être obtenu par ce qu'aucun objet de ce nom
-     * n'est défini ou parce que le serveur a refusé la connexion, alors cette methode retourne
-     * {@code null}. Si l'objet n'a pas pu être obtenu pour une autre raison, alors une exception
-     * est lancée.
+     * If this method has already been invoked previously with the specified name, the same object
+     * is returned. Otherwise, a new connection is etablished and the object returned. If the object
+     * can't be obtained because no object is defined for the specified name or because the server
+     * refused the connection (for example because the server is down), then this method returns
+     * {@code null}. If the object can't be obtained for an other reason, then an exception is
+     * thrown.
      *
-     * @param  name Le nom de l'objet désiré (sans le nom du serveur). Typiquement une constante
-     *         telle que {@link net.sicade.observation.coverage.rmi.DataConnectionFactory#REGISTRY_NAME
-     *         REGISTRY_NAME}.
-     * @return Une instance partagée (entre les différents appels de cette méthode) de l'objet distant,
-     *         ou {@code null} si aucun objet du nom de spécifié n'est disponible.
-     * @throws RemoteException si la connexion au serveur a échouée.
+     * @param  name The name of the remote object to fetch, or {@code null} if none.
+     * @return A shared instance of the specified object, or {@code null} if no object is available
+     *         on the server for that name.
+     * @throws RemoteException if the operation failed for an other reason than non-existant
+     *         object or server not responding.
      */
     public Remote getRemote(final String name) throws RemoteException {
         if (!RMI_ENABLED) {
@@ -475,7 +425,7 @@ public class Database {
         synchronized (remotes) {
             Remote candidate = remotes.get(name);
             if (candidate==null && !remotes.containsKey(name)) {
-                final String server = getProperty(REMOTE_SERVER);
+                final String server = getProperty(ConfigurationKey.REMOTE_SERVER);
                 if (server != null) {
                     final StringBuilder url = new StringBuilder();
                     if (!server.startsWith("/")) {
@@ -526,24 +476,8 @@ public class Database {
      * PostGIS is an optional spatial extension to PostgreSQL. Those extensions define
      * new types like {@code BOX3D}.
      */
-    public boolean isSpatialEnabled() throws SQLException {
-        if (connection == null) {
-            // Force the computation of 'isSpatialEnabled' flag.
-            getConnection();
-        }
+    public boolean isSpatialEnabled() {
         return isSpatialEnabled;
-    }
-
-    /**
-     * Returns {@code true} if the {@code toString()} method on {@link PreparedStatement}
-     * instances returns the SQL query with parameters filled in. This is the case with the
-     * PostgreSQL JDBC driver.
-     */
-    final boolean isStatementFormatted() {
-        if (connection == null) {
-            throw new IllegalStateException();
-        }
-        return isStatementFormatted;
     }
 
     /**
@@ -557,12 +491,17 @@ public class Database {
 
     /**
      * Closes the connection to the database. If the connection was already closed, then this
-     * method do nothing.
+     * method does nothing.
      *
      * @throws SQLException if an error occured while closing the connection.
      * @throws IOException if some {@linkplain #setProperty properties changed} but can't be saved.
      */
-    public void close() throws SQLException, IOException {
+    public synchronized void close() throws SQLException, IOException {
+        // We should not have a deadlock here since 'getRemote' and 'getProperty' do not
+        // synchronize on 'this'. We use Thread.holdLocks(...) assertions for checking that.
+        synchronized (remotes) {
+            remotes.clear();
+        }
         /*
          * Closes connections. There is no Table.close() method because the user never know
          * if a table is shared by an other user.  However Table.getStatement(null) has the
@@ -576,7 +515,7 @@ public class Database {
             for (final Iterator<Table> it=tables.values().iterator(); it.hasNext();) {
                 final Table table = it.next();
                 synchronized (table) {
-                    if (table.getStatement((String) null) != null) {
+                    if (table.getStatement((QueryType) null) != null) {
                         throw new AssertionError(table); // Should never occurs
                     }
                     table.clearCache();
@@ -584,9 +523,25 @@ public class Database {
                 it.remove();
             }
             tables.clear(); // Paranoiac safety.
-            if (connection != null) {
-                connection.close();
-                connection = null;
+        }
+        /*
+         * Shutdown the Derby database engine.
+         */
+        if (connection != null) {
+            connection.close();
+            connection = null;
+        }
+        String database = getProperty(ConfigurationKey.DATABASE);
+        if (database != null && database.startsWith("jdbc:derby:")) {
+            final int param = database.indexOf(';');
+            if (param >= 0) {
+                database = database.substring(0, param);
+            }
+            database += ";shutdown=true";
+            try {
+                DriverManager.getConnection(database);
+            } catch (SQLException e) {
+                // This is the expected exception according Derby documentation.
             }
         }
         /*
@@ -600,9 +555,6 @@ public class Database {
                     final BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
                     properties.storeToXML(out, "PostGrid configuration", "UTF-8");
                     out.close();
-                } else {
-                    // TODO: provide a localized message.
-                    throw new FileNotFoundException("Aucun fichier où enregistrer la configuration.");
                 }
             }
         }
@@ -610,7 +562,7 @@ public class Database {
 
     /**
      * Invoked when this object is no longer referenced in the Java Virtual Machine.
-     * The default implementation just invokes {@link #close}.
+     * The default implementation invokes {@link #close}.
      */
     @Override
     protected void finalize() throws Throwable {

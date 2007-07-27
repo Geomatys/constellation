@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -11,27 +12,36 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package net.sicade.observation.fishery;
+package net.sicade.catalog;
 
-// Sicade dependencies
-import net.sicade.catalog.Element;
+import java.util.logging.Logger;
 
 
 /**
- * Type d'association entre un bancs de poissons et d'éventuels objets flottants.
- * 
+ * Base interface for catalog elements.
+ *
  * @version $Id$
- * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public interface Association extends Element {
+public interface Element {
     /**
-     * Retourne {@code true} si le bancs est libre.
+     * The logger for events related to catalog elements.
+     *
+     * @see LoggingLevel
      */
-    boolean isFree();
+    Logger LOGGER = Logger.getLogger("net.sicade.catalog");
+
+    /**
+     * Returns the name for this element. It is often (but not always) the primary key value
+     * in a database table. The name should be meaningful enough for inclusion in a graphical
+     * user interface.
+     */
+    String getName();
+
+    /**
+     * Returns comments applicable to this element, or {@code null} if none. The remarks may
+     * be used as "<cite>tooltip text</cite>" in a graphical user interface.
+     */
+    String getRemarks();
 }

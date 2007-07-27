@@ -26,9 +26,7 @@ import net.sicade.resources.XArray;
 
 
 /**
- * A SQL query which may optionnaly expressed in a "spatial enabled" form. Spatial enabled
- * queries may include additional types as {@code BBOX}. They are typically defined in
- * optional extension like the PostGIS extension for PostgreSQL.
+ * A SQL query build from {@linkplain Column columns} and {@linkplain Parameter parameters}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -383,13 +381,7 @@ scan:       while (!tables.isEmpty()) {
                 }
                 final String f = p.getFunction(type);
                 if (f != null) {
-                    if (f.indexOf('?') >= 0) {
-                        buffer.append(f);
-                    } else if (f.startsWith("::")) {
-                        buffer.append('?').append(f);
-                    } else {
-                        buffer.append(f).append("(?)");
-                    }
+                    buffer.append(f);
                 } else {
                     buffer.append('?');
                 }

@@ -62,12 +62,8 @@ public class ObservationEntry extends Entry implements Observation {
      * Construit un nom à partir des autres informations disponibles.
      */
     @Override
-    protected StringBuilder createName() {
-        final StringBuilder buffer = new StringBuilder(observable.getName());
-        buffer.append('(');
-        buffer.append(station.getName());
-        buffer.append(')');
-        return buffer;
+    protected String createName() {
+        return observable.getName() + '(' + station.getName() + ')';
     }
 
     /**

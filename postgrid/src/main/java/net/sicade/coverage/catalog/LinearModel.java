@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.io.Writer;
 import java.io.IOException;
+import net.sicade.catalog.Element;
 
 /**
  * Un modèle linéaire.

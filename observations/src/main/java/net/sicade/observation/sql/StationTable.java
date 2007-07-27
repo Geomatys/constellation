@@ -54,6 +54,7 @@ import net.sicade.coverage.catalog.CatalogException;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class StationTable extends SingletonTable<Station> {
     /**
      * Requête SQL pour obtenir une station à partir de son identifiant.
@@ -62,11 +63,11 @@ public class StationTable extends SingletonTable<Station> {
      *       nulle. C'est embêtant lorsque la recherche est faite sur la colonne {@code platform},
      *       ce qui ce produit dans le cas {@code LIST} de la méthode {@link #getQuery}.
      */
-    private static final ConfigurationKey SELECT = new ConfigurationKey("Stations:SELECT",
-            "SELECT identifier AS name, identifier, platform, quality, provider, \"startTime\", \"endTime\", x, y\n" +
-            "  FROM \"StationsLocations\"\n" +
-            " WHERE name LIKE ?\n"           +
-            " ORDER BY identifier");
+    private static final ConfigurationKey SELECT = null; //new ConfigurationKey("Stations:SELECT",
+//            "SELECT identifier AS name, identifier, platform, quality, provider, \"startTime\", \"endTime\", x, y\n" +
+//            "  FROM \"StationsLocations\"\n" +
+//            " WHERE name LIKE ?\n"           +
+//            " ORDER BY identifier");
 
     /** Numéro d'argument. */ private static final int  ARGUMENT_PLATFORM = 1;
 

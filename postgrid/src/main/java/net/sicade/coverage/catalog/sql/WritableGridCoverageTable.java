@@ -32,7 +32,7 @@ import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.LoggingLevel;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
-import net.sicade.coverage.catalog.Element;
+import net.sicade.catalog.Element;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Series;
@@ -67,10 +67,10 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * The SQL instruction for inserting a new grid coverage.
      */
-    private static final ConfigurationKey INSERT = new ConfigurationKey("GridCoverage:INSERT",
-            "INSERT INTO coverages.\"GridCoverages\" " +
-                "(series, filename, \"startTime\", \"endTime\", extent)\n" +
-                "VALUES (?, ?, ?, ?, ?)");
+    private static final ConfigurationKey INSERT = null; // new ConfigurationKey("GridCoverage:INSERT",
+//            "INSERT INTO coverages.\"GridCoverages\" " +
+//                "(series, filename, \"startTime\", \"endTime\", extent)\n" +
+//                "VALUES (?, ?, ?, ?, ?)");
 
     /**
      * Connexion vers la table des étendues géographiques.

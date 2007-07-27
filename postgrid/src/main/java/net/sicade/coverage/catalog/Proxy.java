@@ -15,6 +15,7 @@
 package net.sicade.coverage.catalog;
 
 import java.io.Serializable;
+import net.sicade.catalog.Element;
 import org.geotools.resources.Utilities;
 
 

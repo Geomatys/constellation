@@ -19,7 +19,7 @@ import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.Element;
+import net.sicade.catalog.Element;
 import net.sicade.util.DateRange;
 
 

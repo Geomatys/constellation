@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -11,27 +11,34 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package net.sicade.observation.fishery;
+package net.sicade.catalog;
 
-// Sicade dependencies
-import net.sicade.catalog.Element;
+import java.io.File;
+import java.io.IOException;
 
 
 /**
- * Type d'association entre un bancs de poissons et d'éventuels objets flottants.
- * 
+ * A temporary Derby database to be created for testing purpose only.
+ * If a previous database existed, it will be destroyed.
+ *
  * @version $Id$
- * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public interface Association extends Element {
+final class TemporaryDatabase extends Database {
     /**
-     * Retourne {@code true} si le bancs est libre.
+     * Creates a temporary database.
      */
-    boolean isFree();
+    public TemporaryDatabase() throws IOException {
+        setProperty(ConfigurationKey.DATABASE, "postgrid-test;restoreFrom=postgrid2");
+    }
+
+    /**
+     * Returns always {@code null} if order to bypass user configuration.
+     * The default configuration should be suitable for the Derby database.
+     */
+    @Override
+    File getConfigurationFile(final boolean create) {
+        return null;
+    }
 }
