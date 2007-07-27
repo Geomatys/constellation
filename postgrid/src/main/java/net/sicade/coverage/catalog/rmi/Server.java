@@ -41,12 +41,12 @@ import javax.media.jai.TileCache;
 import org.geotools.resources.Arguments;
 
 // Sicade dependencies
-import net.sicade.sql.Database;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.ConfigurationKey;
 import net.sicade.coverage.catalog.DynamicCoverage;
 import net.sicade.coverage.catalog.sql.LayerTable;
 import net.sicade.coverage.catalog.sql.DescriptorTable;
 import net.sicade.coverage.catalog.sql.GridCoverageTable;
-import net.sicade.coverage.catalog.ConfigurationKey;
 import net.sicade.coverage.catalog.CatalogException;
 
 

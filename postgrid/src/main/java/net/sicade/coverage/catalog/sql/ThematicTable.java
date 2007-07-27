@@ -20,8 +20,8 @@ import java.sql.SQLException;
 
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Thematic;
-import net.sicade.sql.Database;
-import net.sicade.sql.SingletonTable;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.SingletonTable;
 
 
 /**

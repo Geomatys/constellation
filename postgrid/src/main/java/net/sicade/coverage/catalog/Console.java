@@ -14,13 +14,11 @@
  */
 package net.sicade.coverage.catalog;
 
-// J2SE dependencies
 import java.util.Date;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-// Swing dependencies
 import javax.swing.JTree;
 import javax.swing.JTable;
 import javax.swing.JFrame;
@@ -33,7 +31,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
-// Geotools dependencies
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -41,13 +38,12 @@ import org.geotools.gui.swing.tree.Trees;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.util.Logging;
 
-// Sicade dependencies
+import net.sicade.catalog.Database;
 import net.sicade.coverage.catalog.sql.GridCoverageTable;
 import net.sicade.coverage.catalog.sql.FormatTable;
 import net.sicade.coverage.catalog.sql.LayerTable;
 import net.sicade.coverage.catalog.sql.LayerTree;
 import net.sicade.coverage.catalog.sql.TreeDepth;
-import net.sicade.sql.Database;
 import net.sicade.resources.i18n.ResourceKeys;
 import net.sicade.resources.i18n.Resources;
 
@@ -92,6 +88,7 @@ import net.sicade.resources.i18n.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public final class Console extends Arguments {
     /**
      * Connexion vers la base de données. Cette connexion ne sera établie que la première

@@ -24,8 +24,8 @@ import org.opengis.coverage.Coverage;
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.sicade.sql.Entry;
-import net.sicade.observation.Distribution;
+import net.sicade.catalog.Entry;
+import net.sicade.coverage.catalog.Distribution;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Model;
 import net.sicade.coverage.catalog.Layer;

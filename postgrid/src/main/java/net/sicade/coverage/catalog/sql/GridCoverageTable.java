@@ -39,18 +39,18 @@ import org.geotools.util.RangeSet;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XRectangle2D;
 
+import net.sicade.coverage.catalog.Catalog;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.CoverageReference;
-import net.sicade.coverage.catalog.CoverageComparator;
 import net.sicade.coverage.catalog.rmi.DataConnection;
-import net.sicade.sql.BoundedSingletonTable;
-import net.sicade.sql.Database;
-import net.sicade.sql.QueryType;
+import net.sicade.catalog.BoundedSingletonTable;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
-import static net.sicade.sql.QueryType.*;
+import static net.sicade.catalog.QueryType.*;
 
 
 /**
@@ -210,7 +210,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * @throws SQLException if an error occured while reading the database.
      */
     public GridCoverageTable(final Database database) throws SQLException {
-        super(new GridCoverageQuery(database), net.sicade.sql.CRS.XYT);
+        super(new GridCoverageQuery(database), net.sicade.catalog.CRS.XYT);
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
         setIdentifierParameters(query.byFilename, null);
         setExtentParameters(query.byStartTime, query.byHorizontalExtent);
@@ -793,9 +793,9 @@ loop:   for (final CoverageReference newReference : entries) {
                                     geographicArea,
                                     resolution,
                                     dateFormat,
-                                    getProperty(CoverageReference.ROOT_DIRECTORY),
-                                    getProperty(CoverageReference.ROOT_URL),
-                                    getProperty(CoverageReference.URL_ENCODING));
+                                    getProperty(Catalog.ROOT_DIRECTORY),
+                                    getProperty(Catalog.ROOT_URL),
+                                    getProperty(Catalog.URL_ENCODING));
         return parameters;
     }
 

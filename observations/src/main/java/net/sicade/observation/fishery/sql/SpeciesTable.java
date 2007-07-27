@@ -23,11 +23,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 // Sicade dependencies
-import net.sicade.coverage.catalog.ConfigurationKey;
 import net.sicade.observation.fishery.Species;
-import net.sicade.sql.Database;
-import net.sicade.sql.QueryType;
-import net.sicade.sql.SingletonTable;
+import net.sicade.catalog.ConfigurationKey;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
+import net.sicade.catalog.SingletonTable;
 
 
 /**
@@ -58,7 +58,7 @@ public class SpeciesTable extends SingletonTable<Species> {
      * @param  database Connexion vers la base de données.
      */
     public SpeciesTable(final Database database) {
-        super(new net.sicade.sql.Query(database)); // TODO
+        super(new net.sicade.catalog.Query(database)); // TODO
     }
 
     /**

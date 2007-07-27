@@ -23,7 +23,7 @@ import java.lang.ref.SoftReference;
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.sicade.observation.Distribution;
+import net.sicade.coverage.catalog.Distribution;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.Descriptor;

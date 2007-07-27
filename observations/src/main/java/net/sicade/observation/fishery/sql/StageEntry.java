@@ -19,7 +19,7 @@
 package net.sicade.observation.fishery.sql;
 
 // Sicade dependencies
-import net.sicade.sql.Entry;
+import net.sicade.catalog.Entry;
 import net.sicade.observation.fishery.Stage;
 
 

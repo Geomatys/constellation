@@ -16,7 +16,7 @@ package net.sicade.coverage.catalog;
 
 import java.util.Comparator;
 import net.sicade.observation.Observable;
-import net.sicade.observation.Distribution;     // Pour javadoc
+import net.sicade.coverage.catalog.Distribution;     // Pour javadoc
 
 /**
  * Un descripteur du paysage océanique. Un descripteur est une variable explicative

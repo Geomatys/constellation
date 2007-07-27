@@ -33,7 +33,7 @@ import org.geotools.geometry.GeneralEnvelope;
 //import org.geotools.gui.headless.ProgressPrinter;
 
 // Sicade dependencies
-import net.sicade.coverage.catalog.Observations;
+import net.sicade.coverage.catalog.Catalog;
 import net.sicade.coverage.catalog.CatalogException;
 import org.geotools.resources.image.ImageUtilities;
 
@@ -58,7 +58,7 @@ public class SeriesCreator {
             throws CatalogException, TransformException, IOException 
     {
         ImageUtilities.allowNativeCodec("png", true, false);
-        final Coverage coverage = Observations.getDefault().getDescriptorCoverage("SST");
+        final Coverage coverage = Catalog.getDefault().getDescriptorCoverage("SST");
         final GeneralEnvelope e = new GeneralEnvelope(coverage.getEnvelope());
         e.setRange(0,   136,   196);  // Plage de longitudes
         e.setRange(0,   136,   180);  // (coupe à la ligne +/-180)

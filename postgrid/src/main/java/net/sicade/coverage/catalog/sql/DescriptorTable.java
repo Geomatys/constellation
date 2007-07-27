@@ -20,15 +20,15 @@ import java.sql.SQLException;
 
 import org.geotools.resources.CharUtilities;
 
-import net.sicade.observation.Distribution;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.SingletonTable;
+import net.sicade.coverage.catalog.Distribution;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.NoSuchRecordException;
 import net.sicade.coverage.catalog.Descriptor;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.RegionOfInterest;
-import net.sicade.sql.SingletonTable;
-import net.sicade.sql.Database;
 
 
 /**

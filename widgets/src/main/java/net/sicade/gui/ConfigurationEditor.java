@@ -49,8 +49,8 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 
 // Sicade
-import net.sicade.sql.Database;
-import net.sicade.coverage.catalog.ConfigurationKey;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.ConfigurationKey;
 import net.sicade.resources.i18n.ResourceKeys;
 import net.sicade.resources.i18n.Resources;
 

@@ -31,9 +31,9 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.IllegalRecordException;
-import net.sicade.sql.SpatialFunctions;
-import net.sicade.sql.SingletonTable;
-import net.sicade.sql.Database;
+import net.sicade.catalog.SpatialFunctions;
+import net.sicade.catalog.SingletonTable;
+import net.sicade.catalog.Database;
 
 
 /**

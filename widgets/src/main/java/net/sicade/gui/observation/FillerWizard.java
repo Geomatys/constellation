@@ -25,10 +25,10 @@ import java.util.Set;
 import org.geotools.resources.Arguments;
 
 // Sicade dependencies
-import net.sicade.coverage.catalog.Observations;
+import net.sicade.coverage.catalog.Catalog;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Descriptor;
-import net.sicade.coverage.catalog.MeasurementTableFiller;
+import net.sicade.observation.MeasurementTableFiller;
 import net.sicade.observation.fishery.sql.EnvironmentTable;
 import net.sicade.observation.sql.MeasurementTable;
 import net.sicade.observation.sql.StationTable;
@@ -107,7 +107,7 @@ public class FillerWizard extends DescriptorChooser {
         final MeasurementTable table;
         final MeasurementTableFiller filler;
         try {
-            table  = new EnvironmentTable(Observations.getDefault().getDatabase(), StationTable.class, provider);
+            table  = new EnvironmentTable(Catalog.getDefault().getDatabase(), StationTable.class, provider);
             filler = new MeasurementTableFiller(table);
             filler.addDefaultDescriptors();
             filler.addDefaultStations();

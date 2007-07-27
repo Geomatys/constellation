@@ -18,10 +18,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.sicade.observation.Phenomenon;
-import net.sicade.coverage.catalog.ConfigurationKey;
-import net.sicade.sql.Database;
-import net.sicade.sql.Query;
-import net.sicade.sql.SingletonTable;
+import net.sicade.catalog.ConfigurationKey;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.Query;
+import net.sicade.catalog.SingletonTable;
 
 
 /**

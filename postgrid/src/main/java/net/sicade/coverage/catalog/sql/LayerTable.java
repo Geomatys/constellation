@@ -20,14 +20,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.rmi.RemoteException;
 
+import net.sicade.catalog.CRS;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.BoundedSingletonTable;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.DynamicCoverage;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.ServerException;
-import net.sicade.sql.CRS;
-import net.sicade.sql.Database;
 import net.sicade.observation.sql.ProcedureTable;
-import net.sicade.sql.BoundedSingletonTable;
 import net.sicade.coverage.catalog.rmi.DataConnection;
 import net.sicade.coverage.catalog.rmi.DataConnectionFactory;
 

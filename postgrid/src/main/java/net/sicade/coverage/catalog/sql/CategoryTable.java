@@ -39,9 +39,9 @@ import net.sicade.coverage.catalog.Element;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.ServerException;
 import net.sicade.coverage.catalog.IllegalRecordException;
-import net.sicade.sql.Database;
-import net.sicade.sql.Table;
-import net.sicade.sql.QueryType;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.Table;
+import net.sicade.catalog.QueryType;
 
 
 /**

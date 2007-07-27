@@ -18,7 +18,7 @@ import java.util.Set;
 import java.sql.SQLException;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.RegionOfInterest;
-import net.sicade.sql.DatabaseTest;
+import net.sicade.catalog.DatabaseTest;
 
 import org.junit.*;
 import static org.junit.Assert.*;

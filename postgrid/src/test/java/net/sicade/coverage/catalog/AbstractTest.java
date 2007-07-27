@@ -33,7 +33,7 @@ import java.sql.SQLException;
 // Other dependencies
 import junit.framework.TestCase;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
-import net.sicade.sql.Database;
+import net.sicade.catalog.Database;
 
 
 /**

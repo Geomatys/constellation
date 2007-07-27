@@ -21,8 +21,8 @@ import org.opengis.geometry.Envelope;
 import org.opengis.coverage.grid.GridRange;
 
 import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.sql.DatabaseTest;
-import net.sicade.sql.CRS;
+import net.sicade.catalog.DatabaseTest;
+import net.sicade.catalog.CRS;
 
 import org.junit.*;
 import static org.junit.Assert.*;

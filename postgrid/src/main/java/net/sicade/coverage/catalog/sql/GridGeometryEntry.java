@@ -21,8 +21,8 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.resources.Utilities;
-import net.sicade.sql.Entry;
-import net.sicade.sql.CRS;
+import net.sicade.catalog.Entry;
+import net.sicade.catalog.CRS;
 
 
 /**

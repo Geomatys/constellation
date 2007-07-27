@@ -19,9 +19,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
-import net.sicade.sql.Table;
-import net.sicade.sql.Database;
-import net.sicade.sql.QueryType;
+import net.sicade.catalog.Table;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.IllegalRecordException;
 import net.sicade.coverage.catalog.LinearModel;

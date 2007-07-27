@@ -40,7 +40,7 @@ import javax.media.jai.PlanarImage;
 
 // SEAGIS dependencies
 import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.Observations;
+import net.sicade.coverage.catalog.Catalog;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.coverage.catalog.Layer;
 
@@ -200,7 +200,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader implements Grid
      * @throws IOException
      */
     public GridCoverage read(GeneralParameterValue[] params) throws IllegalArgumentException, IOException {
-        Observations obs = Observations.getDefault();
+        Catalog obs = Catalog.getDefault();
         CoverageReference ref = null;
         try {
             Layer s = obs.getLayer(layer);

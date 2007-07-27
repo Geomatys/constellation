@@ -14,8 +14,8 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-import net.sicade.sql.Entry;
-import net.sicade.observation.Distribution;
+import net.sicade.catalog.Entry;
+import net.sicade.coverage.catalog.Distribution;
 import static java.lang.Double.doubleToLongBits;
 
 

@@ -25,9 +25,9 @@ import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Format;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Series;
-import net.sicade.sql.Database;
-import net.sicade.sql.QueryType;
-import net.sicade.sql.SingletonTable;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
+import net.sicade.catalog.SingletonTable;
 
 
 /**

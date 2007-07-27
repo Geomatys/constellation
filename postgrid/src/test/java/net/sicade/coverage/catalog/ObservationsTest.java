@@ -22,11 +22,11 @@ package net.sicade.coverage.catalog;
 import junit.framework.TestCase;
 
 /**
- * Teste l'utilisation de la classe {@link Observations}.
- *
- * @version $Id$
+ * Teste l'utilisation de la classe {@link Catalog}.
+ * 
+ * 
  * @author Martin Desruisseaux
- *
+ * @version $Id$
  * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.
  */
 public class ObservationsTest extends TestCase {
@@ -41,7 +41,7 @@ public class ObservationsTest extends TestCase {
      * Teste la création d'un modèle de table à partir d'une couche.
      */
     public void testCoverageTableModel() throws CatalogException {
-        final Layer layer = Observations.getDefault().getLayer("CHL (Monde - mensuelles)");
+        final Layer layer = Catalog.getDefault().getLayer("CHL (Monde - mensuelles)");
         final CoverageTableModel model = new CoverageTableModel();
         model.setLayer(layer);
     }

@@ -32,12 +32,12 @@ import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Descriptor;
 import net.sicade.coverage.catalog.LinearModel;
-import net.sicade.sql.Table;
-import net.sicade.sql.Database;
-import net.sicade.sql.Column;
-import net.sicade.sql.Parameter;
-import net.sicade.sql.QueryType;
-import static net.sicade.sql.QueryType.*;
+import net.sicade.catalog.Table;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.Column;
+import net.sicade.catalog.Parameter;
+import net.sicade.catalog.QueryType;
+import static net.sicade.catalog.QueryType.*;
 
 
 /**

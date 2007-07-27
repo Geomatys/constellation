@@ -16,12 +16,12 @@
 package net.sicade.coverage.catalog.sql;
 
 import org.geotools.coverage.Category;
-import net.sicade.sql.Database;
-import net.sicade.sql.Column;
-import net.sicade.sql.Parameter;
-import net.sicade.sql.Query;
-import net.sicade.sql.QueryType;
-import static net.sicade.sql.QueryType.*;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.Column;
+import net.sicade.catalog.Parameter;
+import net.sicade.catalog.Query;
+import net.sicade.catalog.QueryType;
+import static net.sicade.catalog.QueryType.*;
 
 
 /**

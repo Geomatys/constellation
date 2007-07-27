@@ -129,7 +129,7 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
         } else {
             sampleDimension = null;
         }
-        if (super.getCoordinateReferenceSystem().equals(net.sicade.sql.CRS.XYT)) {
+        if (super.getCoordinateReferenceSystem().equals(net.sicade.catalog.CRS.XYT)) {
             throw new UnsupportedOperationException("Transformation de coordonnées pas encore implémentée.");
         }
         if (offset.getEasting()!=0 || offset.getNorthing()!=0) {

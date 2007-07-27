@@ -25,9 +25,6 @@ import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.Calendar;
 import static java.lang.Double.isNaN;
-import net.sicade.sql.Database;
-import net.sicade.sql.Query;
-import net.sicade.sql.Table;
 
 // GeoTools
 import org.geotools.math.Line;
@@ -36,7 +33,10 @@ import org.geotools.resources.geometry.ShapeUtilities;
 
 // Sicade
 import net.sicade.util.DateRange;
-import net.sicade.coverage.catalog.ConfigurationKey;
+import net.sicade.catalog.ConfigurationKey;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.Query;
+import net.sicade.catalog.Table;
 import net.sicade.coverage.catalog.CatalogException;
 
 

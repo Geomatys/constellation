@@ -14,29 +14,25 @@
  */
 package net.sicade.coverage.catalog;
 
-// J2SE dependencies
 import java.util.Date;
 import java.net.URL;
 import java.io.File;
 import java.io.IOException;
-import java.rmi.RemoteException;   // For javadoc
+import java.rmi.RemoteException;
 
-// OpenGIS dependencies
 import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.image.io.IIOListeners;
 import org.geotools.coverage.CoverageStack;
-import org.geotools.coverage.GridSampleDimension;  // Pour javadoc
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.util.NumberRange;
 
-// Sicade dependencies
 import net.sicade.util.DateRange;
+
 
 /**
  * Méta-données concernant une image, et éventuellement une référence vers l'image elle-même.
@@ -52,27 +48,6 @@ import net.sicade.util.DateRange;
  * @author Martin Desruisseaux
  */
 public interface CoverageReference extends Element, CoverageStack.Element {
-    /**
-     * Clé pour récupérer le répertoire racine des images. La valeur de cette propriété
-     * peut être {@code null} si les fichiers ne sont pas accessibles localement, auquel
-     * cas les fichiers devront être accédés en utilisant un URL construit à partir de
-     * {@link #ROOT_URL}. La valeur par défaut est {@code null}.
-     */
-    ConfigurationKey ROOT_DIRECTORY = new ConfigurationKey("RootDirectory", null);
-
-    /**
-     * Clé pour récupérer la racine des images sous forme d'adresse {@code ftp://}.
-     * La valeur par défaut est {@code "ftp://localhost/"}.
-     */
-    ConfigurationKey ROOT_URL = new ConfigurationKey("RootURL", "ftp://localhost/");
-
-    /**
-     * Clé pour récupérer l'encodage des adresses URL. Des valeurs typiques sont {@code "UTF-8"}
-     * et {@code "ISO-8859-1"}. La valeur par défaut est {@code null}, ce qui signifie qu'aucun
-     * encodage ne sera appliqué sur les adresses URL.
-     */
-    ConfigurationKey URL_ENCODING = new ConfigurationKey("URL_encoding", null);
-
     /**
      * Clé sous laquelle mémoriser l'objet {@code CoverageReference} source dans les propriétés de
      * {@link GridCoverage2D}. Cette propriété permet de retrouver l'objet {@code CoverageReference}

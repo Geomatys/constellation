@@ -19,11 +19,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.geotools.coverage.grid.GridCoverage2D;
 
+import net.sicade.catalog.Database;
+import net.sicade.catalog.SingletonTable;
 import net.sicade.coverage.catalog.Format;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.IllegalRecordException;
-import net.sicade.sql.SingletonTable;
-import net.sicade.sql.Database;
 
 
 /**

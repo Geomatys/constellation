@@ -31,7 +31,7 @@ import org.geotools.resources.Arguments;
 
 // Sicade
 import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.Observations;
+import net.sicade.coverage.catalog.Catalog;
 import net.sicade.coverage.catalog.Layer;
 
 
@@ -106,7 +106,7 @@ public class UpdateGridCoverageTable {
             return;
         }
         final Arguments     arguments    = new Arguments(args);
-        final Observations  observations = Observations.getDefault();
+        final Catalog  observations = Catalog.getDefault();
         final Layer         layer        = observations.getLayer(arguments.getRequiredString("-layers"));
         final String        filename     = arguments.getRequiredString("-f");
         final Date          startTime    = getDate(arguments.getRequiredString("-startTime"));

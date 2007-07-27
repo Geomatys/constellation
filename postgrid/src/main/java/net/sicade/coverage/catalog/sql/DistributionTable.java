@@ -18,9 +18,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.coverage.catalog.CatalogException;
 
-import net.sicade.observation.Distribution;
-import net.sicade.sql.Database;
-import net.sicade.sql.SingletonTable;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.SingletonTable;
+import net.sicade.coverage.catalog.Distribution;
 
 
 /**

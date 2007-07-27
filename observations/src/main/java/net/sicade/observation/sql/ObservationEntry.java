@@ -14,10 +14,10 @@
  */
 package net.sicade.observation.sql;
 
+import net.sicade.catalog.Entry;
 import net.sicade.observation.Station;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
-import net.sicade.sql.Entry;
 import org.geotools.resources.Utilities;
 
 

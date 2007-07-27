@@ -16,7 +16,7 @@ package net.sicade.coverage.catalog.sql;
 
 import java.sql.SQLException;
 import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.sql.DatabaseTest;
+import net.sicade.catalog.DatabaseTest;
 import org.geotools.coverage.Category;
 
 import org.junit.*;

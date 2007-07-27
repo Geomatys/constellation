@@ -20,12 +20,12 @@ import java.sql.SQLException;
 
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.RegionOfInterest;
-import net.sicade.sql.Database;
-import net.sicade.sql.QueryType;
-import net.sicade.sql.SingletonTable;
-import net.sicade.sql.Column;
-import net.sicade.sql.Parameter;
-import static net.sicade.sql.QueryType.*;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
+import net.sicade.catalog.SingletonTable;
+import net.sicade.catalog.Column;
+import net.sicade.catalog.Parameter;
+import static net.sicade.catalog.QueryType.*;
 
 
 /**

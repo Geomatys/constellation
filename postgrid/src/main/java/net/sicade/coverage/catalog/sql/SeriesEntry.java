@@ -15,7 +15,7 @@
 package net.sicade.coverage.catalog.sql;
 
 import org.geotools.resources.Utilities;
-import net.sicade.sql.Entry;
+import net.sicade.catalog.Entry;
 import net.sicade.coverage.catalog.Format;
 import net.sicade.coverage.catalog.Series;
 

@@ -36,7 +36,7 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import static org.geotools.referencing.CRS.getTemporalCRS;
 
 // Sicade dependencies
-import net.sicade.sql.CRS;
+import net.sicade.catalog.CRS;
 
 // Static imports
 import static java.lang.Math.*;

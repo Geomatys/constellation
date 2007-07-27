@@ -34,7 +34,7 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 
 // Sicade dependencies
-import net.sicade.sql.CRS;
+import net.sicade.catalog.CRS;
 
 /**
  * Evalue les prédictions d'un modèle linéaire.

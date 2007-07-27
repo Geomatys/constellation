@@ -70,8 +70,8 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 
 // Sicade dependencies
-import net.sicade.sql.Entry;
-import net.sicade.sql.Database;
+import net.sicade.catalog.Entry;
+import net.sicade.catalog.Database;
 import net.sicade.coverage.catalog.Format;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.resources.i18n.Resources;

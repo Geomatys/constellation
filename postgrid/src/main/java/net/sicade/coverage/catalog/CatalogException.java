@@ -16,7 +16,7 @@ package net.sicade.coverage.catalog;
 
 
 /**
- * Classe de base des exceptions pouvant survenir lors d'une requête sur une base de données.
+ * Base class for exceptions that may occur while querying the catalog.
  *
  * @version $Id$
  * @author Remi Eve
@@ -29,22 +29,24 @@ public class CatalogException extends Exception {
     private static final long serialVersionUID = 3838293108990270182L;
 
     /**
-     * Nom de la table dans laquelle l'enregistrement était attendu, ou {@code null} si inconnu.
+     * The database table name where a problem occured, or {@code null} if unknown.
      */
     private String table;
 
     /**
-     * Construit une exception avec le message spécifié.
+     * Creates an exception with the specified message.
+     *
+     * @param message The detail message.
      */
     public CatalogException(final String message) {
         super(message);
     }
 
     /**
-     * Construit une exception avec le message et le nom de table spécifié.
+     * Creates an exception with the specified message and table name.
      *
-     * @param message Message décrivant l'erreur.
-     * @param table Nom de la table dans laquelle un problème est survenu, ou {@code null} si inconnu.
+     * @param message The detail message.
+     * @param table The database table name where a problem occured, or {@code null} if unknown.
      */
     public CatalogException(final String message, final String table) {
         super(message);
@@ -52,16 +54,21 @@ public class CatalogException extends Exception {
     }
 
     /** 
-     * Construit une exception avec la cause spécifiée.
-     * Le message sera déterminée à partir de la cause.
+     * Creates an exception from the specified cause. The details message
+     * is copied from the cause.
+     *
+     * @param cause The cause for this exception.
      */
     public CatalogException(final Exception cause) {
         super(cause.getLocalizedMessage(), cause);
     }
 
     /** 
-     * Construit une exception avec la cause spécifiée.
-     * Le message sera déterminée à partir de la cause.
+     * Creates an exception from the specified cause. The details message
+     * is copied from the cause.
+     *
+     * @param cause The cause for this exception.
+     * @param table The database table name where a problem occured, or {@code null} if unknown.
      */
     CatalogException(final Exception cause, final String table) {
         this(cause);
@@ -69,8 +76,9 @@ public class CatalogException extends Exception {
     }
 
     /**
-     * Retourne le nom de la table dans laquelle un problème est survenu.
-     * Peut retourner {@code null} si le nom de la table n'est pas connu.
+     * Returns the database table name where a problem occured, or {@code null} if unknown.
+     *
+     * @return The database table name.
      */
     public String getTable() {
         if (table != null) {

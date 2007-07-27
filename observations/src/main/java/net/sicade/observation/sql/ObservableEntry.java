@@ -14,12 +14,12 @@
  */
 package net.sicade.observation.sql;
 
-import net.sicade.sql.Entry;
-import org.geotools.resources.Utilities;
+import net.sicade.catalog.Entry;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Procedure;
-import net.sicade.observation.Distribution;
+import net.sicade.coverage.catalog.Distribution;
+import org.geotools.resources.Utilities;
 
 
 /**

@@ -88,6 +88,10 @@
       <artifactId>postgresql</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.postgis</groupId>
+      <artifactId>postgis-driver</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opengis</groupId>
       <artifactId>geoapi-nogenerics</artifactId>
     </dependency>
@@ -127,9 +131,9 @@
         <version>2.4-SNAPSHOT</version>
         <configuration>
           <includes>
-            net.sicade.observation.coverage.rmi.Server,
-            net.sicade.observation.coverage.rmi.RemoteLoader,
-            net.sicade.observation.coverage.rmi.GridCoverageServer
+            net.sicade.coverage.catalog.rmi.Server,
+            net.sicade.coverage.catalog.rmi.RemoteLoader,
+            net.sicade.coverage.catalog.rmi.GridCoverageServer
           </includes>
         </configuration>
         <executions>

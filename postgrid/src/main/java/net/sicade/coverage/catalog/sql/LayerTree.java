@@ -27,13 +27,13 @@ import org.geotools.gui.swing.tree.NamedTreeNode;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 
 // Seagis dependencies
-import net.sicade.coverage.catalog.ConfigurationKey;
+import net.sicade.catalog.ConfigurationKey;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.Element;
 import net.sicade.observation.Procedure;          // Pour javadoc
-import net.sicade.sql.Table;
-import net.sicade.sql.Database;
-import net.sicade.sql.SingletonTable;
+import net.sicade.catalog.Table;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.SingletonTable;
 import net.sicade.observation.sql.ProcedureTable;
 import net.sicade.coverage.catalog.Format;
 import net.sicade.coverage.catalog.Thematic;  // Pour javadoc
@@ -103,7 +103,7 @@ public class LayerTree extends Table {
      * @param database  Connexion vers la base de données d'observations.
      */
     public LayerTree(final Database database) {
-        super(new net.sicade.sql.Query(database)); // TODO
+        super(new net.sicade.catalog.Query(database)); // TODO
     }
 
     /**

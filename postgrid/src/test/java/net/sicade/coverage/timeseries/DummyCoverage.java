@@ -1,6 +1,6 @@
 package net.sicade.coverage.timeseries;
 
-import net.sicade.sql.CRS;
+import net.sicade.catalog.CRS;
 import org.geotools.coverage.AbstractCoverage;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.SampleDimension;

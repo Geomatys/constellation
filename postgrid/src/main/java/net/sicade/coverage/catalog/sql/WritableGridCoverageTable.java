@@ -28,14 +28,14 @@ import java.util.logging.LogRecord;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 
 // Seagis dependencies
+import net.sicade.catalog.ConfigurationKey;
+import net.sicade.catalog.LoggingLevel;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.coverage.catalog.Element;
-import net.sicade.coverage.catalog.ConfigurationKey;
 import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.sql.LoggingLevel;
-import net.sicade.sql.Database;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Series;
-import net.sicade.sql.QueryType;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;

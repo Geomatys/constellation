@@ -47,8 +47,8 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:https://svn.sourceforge.net/svnroot/seagis/trunk</connection>
-    <url>http://svn.sourceforge.net/viewcvs.cgi/seagis/trunk</url>
+    <connection>scm:svn:https://seagis.svn.sourceforge.net/svnroot/seagis/trunk</connection>
+    <url>http://seagis.svn.sourceforge.net/viewcvs.cgi/seagis/trunk</url>
   </scm>
 
 
@@ -121,6 +121,11 @@
         <groupId>postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>8.1-407.jdbc3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.postgis</groupId>
+        <artifactId>postgis-driver</artifactId>
+        <version>1.0</version>
       </dependency>
       <dependency>
         <groupId>javax.units</groupId>
@@ -415,7 +420,7 @@
   <modules>
     <module>numeric</module>
     <module>postgrid</module>
-    <module>observations</module>
+<!-- <module>observations</module> -->
     <module>widgets</module>
     <module>openoffice</module>
   </modules>

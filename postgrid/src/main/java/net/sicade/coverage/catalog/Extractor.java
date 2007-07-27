@@ -159,7 +159,7 @@ public final class Extractor extends Arguments {
          * Etablit les connexions à la base de données.
          */
         final SpatioTemporalCoverage3D[] coverages = new SpatioTemporalCoverage3D[descriptors.length];
-        final Observations observations = Observations.getDefault();
+        final Catalog observations = Catalog.getDefault();
         for (int i=0; i<descriptors.length; i++) {
             final String name = descriptors[i];
             Coverage coverage = null;

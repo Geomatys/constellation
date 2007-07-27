@@ -14,14 +14,19 @@
  */
 package net.sicade.coverage.catalog;
 
-// J2SE and JAI dependencies
-import java.awt.Dimension;
 import java.util.Set;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.logging.Logger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.awt.Point;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
@@ -35,13 +40,6 @@ import javax.media.jai.JAI;
 import javax.media.jai.TileCache;
 import javax.media.jai.RasterFactory;
 
-// Input / Output
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.logging.Logger;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.sql.SQLException;
 import java.net.URL;
 import java.io.File;
@@ -53,7 +51,6 @@ import javax.imageio.ImageWriter;
 import javax.imageio.IIOException;
 import javax.imageio.stream.ImageOutputStream;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.geometry.Envelope;
@@ -63,7 +60,6 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.util.ProgressListener;
 
-// Geotools dependencies
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -79,7 +75,6 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
 import org.geotools.math.Statistics;
 
-// Sicade dependencies
 import net.sicade.util.DateRange;
 import net.sicade.image.operation.Equalizer;
 import net.sicade.coverage.catalog.sql.WritableGridCoverageTable;
@@ -92,6 +87,7 @@ import net.sicade.coverage.catalog.sql.WritableGridCoverageTable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class CoverageBuilder {
     /**
      * Fabrique à utiliser pour la création des objets {@link GridCoverage2D}.
@@ -500,7 +496,7 @@ public class CoverageBuilder {
         final Dimension size = lastSuccessful.getGridGeometry().getGridRange2D().getSize();
 
         // Ajout de l'entrée
-        final Observations     observations = Observations.getDefault();
+        final Catalog     observations = Catalog.getDefault();
         final WritableGridCoverageTable wgt = observations.getDatabase().getTable(
                                                 WritableGridCoverageTable.class);
         wgt.setLayer(layer);
@@ -614,7 +610,7 @@ public class CoverageBuilder {
             area = null;
         }
         final PrintWriter           out = arguments.out;
-        final Observations observations = Observations.getDefault();
+        final Catalog observations = Catalog.getDefault();
         final ProgressListener listener = new ProgressPrinter(out);
         final char[]          separator = new char[72];
         Arrays.fill(separator, '_');

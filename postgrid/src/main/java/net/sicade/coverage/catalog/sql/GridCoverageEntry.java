@@ -79,7 +79,7 @@ import org.geotools.resources.geometry.XRectangle2D;
 
 // Seagis
 import net.sicade.util.DateRange;
-import net.sicade.sql.Entry;
+import net.sicade.catalog.Entry;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Format;
 import net.sicade.coverage.catalog.Operation;

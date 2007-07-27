@@ -17,8 +17,8 @@ package net.sicade.coverage.catalog.sql;
 import java.util.Set;
 import java.sql.SQLException;
 import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.observation.Distribution;
-import net.sicade.sql.DatabaseTest;
+import net.sicade.coverage.catalog.Distribution;
+import net.sicade.catalog.DatabaseTest;
 
 import org.junit.*;
 import static org.junit.Assert.*;

@@ -29,11 +29,11 @@ import org.opengis.metadata.quality.DataQuality;
 
 // Sicade dependencies
 import net.sicade.util.DateRange;
+import net.sicade.catalog.ConfigurationKey;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.observation.Station;
 import net.sicade.observation.Platform;
-import net.sicade.coverage.catalog.ConfigurationKey;
-import net.sicade.sql.Database;
-import net.sicade.sql.QueryType;
 import net.sicade.observation.sql.StationTable;
 
 

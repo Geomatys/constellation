@@ -19,17 +19,17 @@ import java.sql.Types;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
-import net.sicade.sql.Database;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
+import net.sicade.catalog.ConfigurationKey;
+import net.sicade.catalog.Database;
+import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.observation.Station;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Measurement;
-import net.sicade.coverage.catalog.ConfigurationKey;
-import net.sicade.coverage.catalog.CatalogException;
 
 
 /**

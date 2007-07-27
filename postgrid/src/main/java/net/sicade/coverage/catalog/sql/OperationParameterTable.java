@@ -29,11 +29,12 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.geotools.resources.XMath;
+
+import net.sicade.catalog.Table;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.IllegalRecordException;
-import net.sicade.sql.Table;
-import net.sicade.sql.Database;
-import net.sicade.sql.QueryType;
 
 
 /**

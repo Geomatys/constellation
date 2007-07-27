@@ -32,7 +32,7 @@ import org.geotools.coverage.AbstractCoverage;
 import org.geotools.geometry.GeneralEnvelope;
 
 // Sicade dependencies
-import net.sicade.sql.CRS;
+import net.sicade.catalog.CRS;
 
 /**
  * Une couverture qui délèguera les {@linkplain #evaluate(DirectPosition,double[]) évaluations} à

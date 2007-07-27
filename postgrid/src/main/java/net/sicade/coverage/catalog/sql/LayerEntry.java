@@ -38,7 +38,7 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 // Sicade dependencies
 import net.sicade.util.DateRange;
-import net.sicade.sql.Entry;
+import net.sicade.catalog.Entry;
 import net.sicade.observation.sql.ObservableEntry;
 import net.sicade.coverage.catalog.CatalogException;
 import net.sicade.coverage.catalog.ServerException;

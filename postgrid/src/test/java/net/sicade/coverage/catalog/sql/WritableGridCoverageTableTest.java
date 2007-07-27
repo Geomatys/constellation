@@ -26,7 +26,7 @@ import org.geotools.coverage.CoverageStack;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import net.sicade.coverage.catalog.Layer;
-import net.sicade.sql.DatabaseTest;
+import net.sicade.catalog.DatabaseTest;
 
 
 /**
