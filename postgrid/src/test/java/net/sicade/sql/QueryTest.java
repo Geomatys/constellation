@@ -17,6 +17,7 @@ package net.sicade.sql;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.ListIterator;
+import static net.sicade.sql.QueryType.*;
 
 import org.junit.*;
 import static org.junit.Assert.*;

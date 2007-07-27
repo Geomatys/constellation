@@ -67,7 +67,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      * {@inheritDoc}
      */
     @Override
-    StringBuilder createName() {
+    protected StringBuilder createName() {
         final StringBuilder name = super.createName();
         name.append(" = ");
         name.append(value);

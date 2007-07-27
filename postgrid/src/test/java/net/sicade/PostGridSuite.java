@@ -29,9 +29,9 @@ public class PostGridSuite extends TestSuite {
      * Creates the test suite. The tests are added in an approximative dependency order.
      */
     public PostGridSuite() {
-        addTestSuite(net.sicade.sql.         SpatialFunctionsTest         .class);
-        addTestSuite(net.sicade.sql.         TimeStampTest                .class);
-        addTestSuite(net.sicade.sql.         QueryTest                    .class);
+        addTestSuite(net.sicade.sql.                 SpatialFunctionsTest         .class);
+        addTestSuite(net.sicade.sql.                 TimeStampTest                .class);
+        addTestSuite(net.sicade.sql.                 QueryTest                    .class);
         addTestSuite(net.sicade.coverage.catalog.sql.SchemaTest                   .class);
         addTestSuite(net.sicade.coverage.catalog.sql.CategoryTableTest            .class);
         addTestSuite(net.sicade.coverage.catalog.sql.SampleDimensionTableTest     .class);

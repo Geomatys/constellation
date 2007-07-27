@@ -286,7 +286,7 @@ public class Database {
      * @return The connection to the database.
      * @throws SQLException if the connection can not be created.
      */
-    protected synchronized Connection getConnection() throws SQLException {
+    public synchronized Connection getConnection() throws SQLException {
         if (connection == null) {
             final String user     = getProperty(USER);
             final String password = getProperty(PASSWORD);

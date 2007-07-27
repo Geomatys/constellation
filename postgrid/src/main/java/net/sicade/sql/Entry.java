@@ -76,10 +76,10 @@ public class Entry implements Element, Serializable {
     }
 
     /**
-     * Construit un nom à la volé. Si cet entrée a été construite avec un nom nul, alors
+     * Construit un nom à la volé. Si cette entrée a été construite avec un nom nul, alors
      * cette méthode sera appelée la première fois où {@link #getName} sera demandée.
      */
-    StringBuilder createName() {
+    protected StringBuilder createName() {
         throw new IllegalStateException();
     }
 
