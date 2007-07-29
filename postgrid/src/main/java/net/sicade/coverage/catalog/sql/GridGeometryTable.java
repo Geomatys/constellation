@@ -15,7 +15,6 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-import java.awt.Dimension;
 import java.util.*;
 import java.sql.Array;
 import java.sql.ResultSet;
@@ -23,10 +22,20 @@ import java.sql.SQLException;
 import static java.lang.reflect.Array.getLength;
 import static java.lang.reflect.Array.getDouble;
 
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.datum.PixelInCell;
+
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.operation.matrix.MatrixFactory;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import net.sicade.coverage.catalog.CatalogException;
@@ -45,12 +54,19 @@ import net.sicade.catalog.Database;
  */
 public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     /**
+     * The authority for CRS.
+     *
+     * @todo Should be obtained from the "spatial_ref_sys" table instead.
+     *       We should also parse the WKT if the code is not found.
+     */
+    private static final String CRS_AUTHORITY = "EPSG:";
+
+    /**
      * Constructs a new {@code GridGeometryTable}.
      *
-     * @param  connection The connection to the database.
-     * @throws SQLException if the table can't be constructed.
+     * @param connection The connection to the database.
      */
-    public GridGeometryTable(final Database database) throws SQLException {
+    public GridGeometryTable(final Database database) {
         super(new GridGeometryQuery(database));
         setIdentifierParameters(((GridGeometryQuery) query).byIdentifier, null);
     }
@@ -65,48 +81,109 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      */
     protected GridGeometryEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final GridGeometryQuery query = (GridGeometryQuery) super.query;
-        final String identifier = results.getString(indexOf(query.identifier));
-        final int    width      = results.getInt   (indexOf(query.width));
-        final int    height     = results.getInt   (indexOf(query.height));
-        final String geometry   = results.getString(indexOf(query.horizontalExtent));
-        final Array  vertical   = results.getArray (indexOf(query.verticalOrdinates));
+        final String identifier       = results.getString(indexOf(query.identifier));
+        final int    width            = results.getInt   (indexOf(query.width));
+        final int    height           = results.getInt   (indexOf(query.height));
+        final double scaleX           = results.getDouble(indexOf(query.scaleX));
+        final double scaleY           = results.getDouble(indexOf(query.scaleY));
+        final double translateX       = results.getDouble(indexOf(query.translateX));
+        final double translateY       = results.getDouble(indexOf(query.translateY));
+        final double shearX           = results.getDouble(indexOf(query.shearX));
+        final double shearY           = results.getDouble(indexOf(query.shearY));
+        final int    horizontalSRID   = results.getInt   (indexOf(query.horizontalSRID));
+        final String horizontalExtent = results.getString(indexOf(query.horizontalExtent));
+        final int    verticalSRID     = results.getInt   (indexOf(query.verticalSRID));
+        final Array  vertical         = results.getArray (indexOf(query.verticalOrdinates));
+        /*
+         * Creates the horizontal CRS. We will append a vertical CRS later if
+         * the vertical, ordinates array is non-null, and a temporal CRS last.
+         */
+        CoordinateReferenceSystem crs;
+        try {
+            crs = CRS.decode(CRS_AUTHORITY + horizontalSRID);
+        } catch (FactoryException exception) {
+            throw new IllegalRecordException(results.getMetaData().getTableName(indexOf(query.horizontalSRID)), exception);
+        }
+        /*
+         * Copies the vertical ordinates in an array of type double[].
+         * The array will be 'null' if there is no vertical ordinates.
+         */
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
         final double[] altitudes;
         if (vertical != null) {
             final Object data = vertical.getArray();
             final int length = getLength(data);
             altitudes = new double[length];
             for (int i=0; i<length; i++) {
-                altitudes[i] = getDouble(data, i);
+                final double z = getDouble(data, i);
+                altitudes[i] = z;
+                if (z < min) min = z;
+                if (z > max) max = z;
             }
 //          altitudes.free(); // TODO: uncomment when we will be allowed to use Java 6.
+            final CoordinateReferenceSystem verticalCRS;
+            try {
+                verticalCRS = CRS.decode(CRS_AUTHORITY + verticalSRID);
+            } catch (FactoryException exception) {
+                throw new IllegalRecordException(results.getMetaData().getTableName(indexOf(query.verticalSRID)), exception);
+            }
+            crs = new DefaultCompoundCRS(crs.getName().getCode() + ", " + verticalCRS.getName().getCode(), crs, verticalCRS);
         } else {
             altitudes = null;
         }
-        final GeneralEnvelope envelope;
-        try {
-            envelope = SpatialFunctions.parse(geometry);
-        } catch (NumberFormatException e) {
-            throw new IllegalRecordException(getSpatialColumnName(results), e);
+        /*
+         * Adds the temporal axis. TODO: HARD CODED FOR NOW. We need to do something better.
+         */
+        crs = new DefaultCompoundCRS(crs.getName().getCode(), crs,
+                CRS.getTemporalCRS(net.sicade.catalog.CRS.XYT.getCoordinateReferenceSystem()));
+        /*
+         * Creates the "grid to CRS" transform as a matrix. The coefficients for the vertical
+         * axis assume that the vertical ordinates are evenly spaced. This is not always true;
+         * a special processing will be performed later.
+         */
+        final int dim = crs.getCoordinateSystem().getDimension();
+        final int[] lower = new int[dim];
+        final int[] upper = new int[dim];
+        final Matrix gridToCRS = MatrixFactory.create(dim + 1);
+        gridToCRS.setElement(0, 0,   scaleX);
+        gridToCRS.setElement(1, 1,   scaleY);
+        gridToCRS.setElement(0, 1,   shearX);
+        gridToCRS.setElement(1, 0,   shearY);
+        gridToCRS.setElement(0, dim, translateX);
+        gridToCRS.setElement(1, dim, translateY);
+        if (altitudes != null) {
+            upper[2] = altitudes.length;
+            switch (altitudes.length) { // Fall through in every cases.
+                default: gridToCRS.setElement(2, 2, (max - min) / altitudes.length);
+                case 1:  gridToCRS.setElement(2, dim, min);
+                case 0:  break;
+            }
         }
-        // TODO: Select a more appropriate CRS.
-        switch (envelope.getDimension()) {
-            case 2: envelope.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84   ); break;
-            case 3: envelope.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84_3D); break;
+        upper[1] = height;
+        upper[0] = width;
+        /*
+         * Computes the envelope from the affine transform and creates the entry.
+         */
+        final GridRange gridRange = new GeneralGridRange(lower, upper);
+        final GeneralEnvelope envelope = new GeneralEnvelope(gridRange, PixelInCell.CELL_CORNER,
+                ProjectiveTransform.create(gridToCRS), crs);
+        if (altitudes != null) {
+            envelope.setRange(2, min, max); // For fixing rounding errors.
+        }
+        final GeneralEnvelope geographicEnvelope;
+        if (horizontalExtent != null) {
+            geographicEnvelope = SpatialFunctions.parse(horizontalExtent);
+        } else {
+            geographicEnvelope = envelope;
         }
         final GeographicBoundingBox bbox;
         try {
-            bbox = new GeographicBoundingBoxImpl(envelope);
-        } catch (TransformException e) {
-            throw new IllegalRecordException(getSpatialColumnName(results), e);
+            bbox = new GeographicBoundingBoxImpl(geographicEnvelope);
+        } catch (TransformException exception) {
+            throw new IllegalRecordException(results.getMetaData().getTableName(indexOf(query.horizontalExtent)), exception);
         }
-        return new GridGeometryEntry(identifier, bbox, new Dimension(width, height), altitudes);
-    }
-
-    /**
-     * Returns the name of the spatial column.
-     */
-    private String getSpatialColumnName(final ResultSet results) throws SQLException {
-        return results.getMetaData().getTableName(indexOf(((GridGeometryQuery) query).horizontalExtent));
+        return new GridGeometryEntry(identifier, gridRange, envelope, bbox, altitudes);
     }
 
     /**

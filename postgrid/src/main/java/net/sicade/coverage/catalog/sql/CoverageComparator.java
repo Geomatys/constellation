@@ -67,7 +67,7 @@ import org.geotools.referencing.datum.DefaultEllipsoid;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CoverageComparator implements Comparator<CoverageReference> {
+final class CoverageComparator implements Comparator<CoverageReference> {
     /**
      * Object à utiliser pour construire des transformations de coordonnées.
      */
@@ -110,7 +110,7 @@ public class CoverageComparator implements Comparator<CoverageReference> {
      * Dimension des axes des <var>x</var> (longitude),
      * <var>y</var> (latitude) et <var>t</var> (temps).
      */
-    private final int xDim, yDim, tDim;
+    private final int xDim, yDim, zDim, tDim;
 
     /**
      * Construit un comparateur pour les images de la couches spécifiée.
@@ -132,16 +132,19 @@ public class CoverageComparator implements Comparator<CoverageReference> {
     public CoverageComparator(final CoordinateReferenceSystem crs, final Envelope envelope) {
         int xDim = -1;
         int yDim = -1;
+        int zDim = -1;
         int tDim = -1;
         final CoordinateSystem cs = crs.getCoordinateSystem();
         for (int i=cs.getDimension(); --i>=0;) {
             final AxisDirection orientation = cs.getAxis(i).getDirection().absolute();
             if (orientation.equals(AxisDirection.EAST  )) xDim = i;
             if (orientation.equals(AxisDirection.NORTH )) yDim = i;
+            if (orientation.equals(AxisDirection.UP    )) zDim = i;
             if (orientation.equals(AxisDirection.FUTURE)) tDim = i;
         }
         this.xDim      = xDim;
         this.yDim      = yDim;
+        this.zDim      = zDim;
         this.tDim      = tDim;
         this.crs       = crs;
         this.target    = envelope;
@@ -230,7 +233,7 @@ public class CoverageComparator implements Comparator<CoverageReference> {
      * pour comparer les images. Si cette méthode n'a pas pu construire un
      * {@code Evaluator}, alors elle retourne {@code null}.
      */
-    protected Evaluator evaluator(final CoverageReference entry) {
+    private Evaluator evaluator(final CoverageReference entry) {
         try {
             return new Evaluator(entry);
         } catch (FactoryException exception) {
@@ -264,7 +267,7 @@ public class CoverageComparator implements Comparator<CoverageReference> {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    protected class Evaluator {
+    private final class Evaluator {
         /**
          * Coordonnées spatio-temporelle d'une image. Il s'agit des coordonnées de l'objet
          * {@link CoverageReference} en cours de comparaison. Ces coordonnées doivent avoir
@@ -297,10 +300,7 @@ public class CoverageComparator implements Comparator<CoverageReference> {
                 {
                     transformation = factory.createOperation(sourceCRS, crs);
                 }
-                final MathTransform transform = transformation.getMathTransform();
-                if (!transform.isIdentity()) {
-                    envelope = CRS.transform(transform, envelope);
-                }
+                envelope = CRS.transform(transformation, envelope);
             }
             this.source = envelope;
             int xDim = -1;

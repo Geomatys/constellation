@@ -27,6 +27,26 @@ COMMENT ON SCHEMA postgrid IS 'Metadata for grid coverages';
 SET search_path = postgrid, pg_catalog;
 
 --
+-- Name: ComputeDefaultExtent(); Type: FUNCTION; Schema: postgrid; Owner: geoadmin
+--
+
+CREATE FUNCTION "ComputeDefaultExtent"() RETURNS "trigger"
+    AS $$
+  BEGIN
+    IF NEW."horizontalExtent" IS NULL THEN
+      NEW."horizontalExtent" := Transform(Affine(GeometryFromText(
+        'POLYGON((0 0,0 ' || NEW."height" || ',' || NEW."width" || ' ' || NEW."height" || ',' || NEW."width" || ' 0,0 0))',
+        NEW."horizontalSRID"), NEW."scaleX", NEW."shearX", NEW."shearY", NEW."scaleY", NEW."translateX", NEW."translateY"), 4326);
+    END IF;
+    RETURN NEW;
+  END;
+$$
+    LANGUAGE plpgsql;
+
+
+ALTER FUNCTION postgrid."ComputeDefaultExtent"() OWNER TO geoadmin;
+
+--
 -- Name: ReplaceModelDescriptors(); Type: FUNCTION; Schema: postgrid; Owner: geoadmin
 --
 
@@ -399,6 +419,184 @@ COMMENT ON COLUMN "Distributions".log IS 'Indique si les analyses statistiques d
 
 
 --
+-- Name: GridGeometries; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+--
+
+CREATE TABLE "GridGeometries" (
+    identifier character varying(8) NOT NULL,
+    width integer NOT NULL,
+    height integer NOT NULL,
+    "translateX" double precision DEFAULT 0 NOT NULL,
+    "translateY" double precision DEFAULT 0 NOT NULL,
+    "scaleX" double precision DEFAULT 1 NOT NULL,
+    "scaleY" double precision DEFAULT 1 NOT NULL,
+    "shearX" double precision DEFAULT 0 NOT NULL,
+    "shearY" double precision DEFAULT 0 NOT NULL,
+    "horizontalSRID" integer DEFAULT 4326 NOT NULL,
+    "horizontalExtent" postgis.geometry NOT NULL,
+    "verticalSRID" integer,
+    "verticalOrdinates" double precision[],
+    CONSTRAINT "GridCoverageSize" CHECK (((width > 0) AND (height > 0))),
+    CONSTRAINT "enforce_dims_horizontalExtent" CHECK ((postgis.ndims("horizontalExtent") = 2)),
+    CONSTRAINT "enforce_geotype_horizontalExtent" CHECK (((postgis.geometrytype("horizontalExtent") = 'POLYGON'::text) OR ("horizontalExtent" IS NULL))),
+    CONSTRAINT "enforce_srid_horizontalExtent" CHECK ((postgis.srid("horizontalExtent") = 4326)),
+    CONSTRAINT "enforce_srid_verticalOrdinates" CHECK (((("verticalSRID" IS NULL) AND ("verticalOrdinates" IS NULL)) OR (("verticalSRID" IS NOT NULL) AND ("verticalOrdinates" IS NOT NULL))))
+);
+
+
+ALTER TABLE postgrid."GridGeometries" OWNER TO geoadmin;
+
+--
+-- Name: TABLE "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON TABLE "GridGeometries" IS 'Envelope spatiales des images ainsi que la dimension de leurs grilles.';
+
+
+--
+-- Name: COLUMN "GridGeometries".identifier; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries".identifier IS 'Identifiant unique.';
+
+
+--
+-- Name: COLUMN "GridGeometries".width; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries".width IS 'Nombre de pixels en largeur dans l''image.';
+
+
+--
+-- Name: COLUMN "GridGeometries".height; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries".height IS 'Nombre de pixels en hauteur dans l''image.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."translateX"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."translateX" IS 'Élement (0,2) de la transformation affine. Il correspond habituellement à la coordonnées x du coin supérieur gauche.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."translateY"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."translateY" IS 'Élement (1,2) de la transformation affine. Il correspond habituellement à la coordonnées y du coin supérieur gauche.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."scaleX"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."scaleX" IS 'Élement (0,0) de la transformation affine. Il correspond habituellement à la taille selon x des pixels.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."scaleY"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."scaleY" IS 'Élement (1,1) de la transformation affine. Il correspond habituellement à la taille selon y des pixels. Cette valeur est souvent négative puisque la numérotation des lignes d''une image augmente vers le bas.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."shearX"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."shearX" IS 'Élement (0,1) de la transformation affine. Toujours à 0 s''il n''y a pas de rotation.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."shearY"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."shearY" IS 'Élement (1,0) de la transformation affine. Toujours à 0 s''il n''y a pas de rotation.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."horizontalSRID"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."horizontalSRID" IS 'Code du système de référence des coordonnées horizontales.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."horizontalExtent"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."horizontalExtent" IS 'Étendue spatiale à l''horizontal.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."verticalSRID"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."verticalSRID" IS 'Code du système de référence des coordonnées verticales.';
+
+
+--
+-- Name: COLUMN "GridGeometries"."verticalOrdinates"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridGeometries"."verticalOrdinates" IS 'Valeurs z de chacunes des couches d''une image 3D.';
+
+
+--
+-- Name: CONSTRAINT "GridCoverageSize" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON CONSTRAINT "GridCoverageSize" ON "GridGeometries" IS 'Les dimensions des images doivent être positives.';
+
+
+--
+-- Name: CONSTRAINT "enforce_dims_horizontalExtent" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON CONSTRAINT "enforce_dims_horizontalExtent" ON "GridGeometries" IS 'Vérifie que l''étendue horizontale est à deux dimensions.';
+
+
+--
+-- Name: CONSTRAINT "enforce_geotype_horizontalExtent" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON CONSTRAINT "enforce_geotype_horizontalExtent" ON "GridGeometries" IS 'Vérifie que l''étendue horizontale est un polygone.';
+
+
+--
+-- Name: CONSTRAINT "enforce_srid_horizontalExtent" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON CONSTRAINT "enforce_srid_horizontalExtent" ON "GridGeometries" IS 'Vérifie que l''étendue horizontale est exprimée selon le CRS attendu.';
+
+
+--
+-- Name: CONSTRAINT "enforce_srid_verticalOrdinates" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON CONSTRAINT "enforce_srid_verticalOrdinates" ON "GridGeometries" IS 'Les coordonnées verticales et leur SRID doivent être nul ou non-nul en même temps.';
+
+
+--
+-- Name: GeometriesCheck; Type: VIEW; Schema: postgrid; Owner: geoadmin
+--
+
+CREATE VIEW "GeometriesCheck" AS
+    SELECT "GridGeometries".identifier, postgis.box2d(postgis.transform(postgis.affine(postgis.geometryfromtext((((((((('POLYGON((0 0,0 '::text || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' '::text) || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' 0,0 0))'::text), "GridGeometries"."horizontalSRID"), "GridGeometries"."scaleX", "GridGeometries"."shearX", "GridGeometries"."shearY", "GridGeometries"."scaleY", "GridGeometries"."translateX", "GridGeometries"."translateY"), 4326)) AS "computedBox", postgis.box2d("GridGeometries"."horizontalExtent") AS "declaredBox", postgis.astext("GridGeometries"."horizontalExtent") AS "declaredPolygon" FROM "GridGeometries";
+
+
+ALTER TABLE postgrid."GeometriesCheck" OWNER TO geoadmin;
+
+--
+-- Name: VIEW "GeometriesCheck"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON VIEW "GeometriesCheck" IS 'Comparaison entre les enveloppes calculées et les enveloppes déclarées.';
+
+
+--
 -- Name: GridCoverages; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
 --
 
@@ -462,95 +660,6 @@ COMMENT ON COLUMN "GridCoverages".extent IS 'Coordonnées de la région géograp
 --
 
 COMMENT ON CONSTRAINT "TemporalExtent_range" ON "GridCoverages" IS 'Les dates de début et de fin doivent être nulles ou non-nulles en même temps, et la date de début doit être inférieure à la date de fin.';
-
-
---
--- Name: GridGeometries; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
---
-
-CREATE TABLE "GridGeometries" (
-    identifier character varying(8) NOT NULL,
-    width integer NOT NULL,
-    height integer NOT NULL,
-    "horizontalExtent" postgis.geometry,
-    "verticalOrdinates" double precision[],
-    CONSTRAINT "GridCoverageSize" CHECK (((width > 0) AND (height > 0))),
-    CONSTRAINT "enforce_dims_horizontalExtent" CHECK ((postgis.ndims("horizontalExtent") = 2)),
-    CONSTRAINT "enforce_geotype_horizontalExtent" CHECK (((postgis.geometrytype("horizontalExtent") = 'POLYGON'::text) OR ("horizontalExtent" IS NULL))),
-    CONSTRAINT "enforce_srid_horizontalExtent" CHECK ((postgis.srid("horizontalExtent") = 4326))
-);
-
-
-ALTER TABLE postgrid."GridGeometries" OWNER TO geoadmin;
- 
---
--- Data for Name: geometry_columns; Type: TABLE DATA; Schema: postgis; Owner: -
---
- 
-INSERT INTO postgis.geometry_columns (f_table_catalog, f_table_schema, f_table_name, f_geometry_column, coord_dimension, srid, "type") VALUES ('', 'postgrid', 'GridGeometries', 'horizontalExtent', 2, 4326, 'POLYGON');
-
-
---
--- Name: TABLE "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON TABLE "GridGeometries" IS 'Envelope spatiales des images ainsi que la dimension de leurs grilles.';
-
-
---
--- Name: COLUMN "GridGeometries".identifier; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON COLUMN "GridGeometries".identifier IS 'Identifiant unique.';
-
-
---
--- Name: COLUMN "GridGeometries".width; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON COLUMN "GridGeometries".width IS 'Nombre de pixels en largeur dans l''image.';
-
-
---
--- Name: COLUMN "GridGeometries".height; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON COLUMN "GridGeometries".height IS 'Nombre de pixels en hauteur dans l''image.';
-
-
---
--- Name: COLUMN "GridGeometries"."horizontalExtent"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON COLUMN "GridGeometries"."horizontalExtent" IS 'Étendue spatiale à l''horizontal.';
-
-
---
--- Name: COLUMN "GridGeometries"."verticalOrdinates"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON COLUMN "GridGeometries"."verticalOrdinates" IS 'Valeurs z de chacunes des couches d''une image 3D.';
-
-
---
--- Name: CONSTRAINT "GridCoverageSize" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON CONSTRAINT "GridCoverageSize" ON "GridGeometries" IS 'Les dimensions des images doivent être positives.';
-
-
---
--- Name: CONSTRAINT "enforce_dims_horizontalExtent" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON CONSTRAINT "enforce_dims_horizontalExtent" ON "GridGeometries" IS 'Vérifie que l''étendue horizontale est à deux dimensions.';
-
-
---
--- Name: CONSTRAINT "enforce_geotype_horizontalExtent" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON CONSTRAINT "enforce_geotype_horizontalExtent" ON "GridGeometries" IS 'Vérifie que l''étendue horizontale est un polygone.';
 
 
 --
@@ -1298,6 +1407,23 @@ COMMENT ON TRIGGER "ReplaceModelDescriptors_trigger" ON "LinearModelTerms" IS 'R
 
 
 --
+-- Name: addDefaultExtent; Type: TRIGGER; Schema: postgrid; Owner: geoadmin
+--
+
+CREATE TRIGGER "addDefaultExtent"
+    BEFORE INSERT OR UPDATE ON "GridGeometries"
+    FOR EACH ROW
+    EXECUTE PROCEDURE "ComputeDefaultExtent"();
+
+
+--
+-- Name: TRIGGER "addDefaultExtent" ON "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON TRIGGER "addDefaultExtent" ON "GridGeometries" IS 'Ajoute une enveloppe par défaut si aucune n''était définie explicitement.';
+
+
+--
 -- Name: Descriptor1_reference; Type: FK CONSTRAINT; Schema: postgrid; Owner: geoadmin
 --
 
@@ -1546,6 +1672,22 @@ COMMENT ON CONSTRAINT "Series_reference" ON "GridCoverages" IS 'Chaque image app
 
 
 --
+-- Name: fk_SRID; Type: FK CONSTRAINT; Schema: postgrid; Owner: geoadmin
+--
+
+ALTER TABLE ONLY "GridGeometries"
+    ADD CONSTRAINT "fk_SRID" FOREIGN KEY ("horizontalSRID") REFERENCES postgis.spatial_ref_sys(srid) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: fk_VERT_SRID; Type: FK CONSTRAINT; Schema: postgrid; Owner: geoadmin
+--
+
+ALTER TABLE ONLY "GridGeometries"
+    ADD CONSTRAINT "fk_VERT_SRID" FOREIGN KEY ("verticalSRID") REFERENCES postgis.spatial_ref_sys(srid) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
 -- Name: postgrid; Type: ACL; Schema: -; Owner: geoadmin
 --
 
@@ -1553,6 +1695,16 @@ REVOKE ALL ON SCHEMA postgrid FROM PUBLIC;
 REVOKE ALL ON SCHEMA postgrid FROM geoadmin;
 GRANT ALL ON SCHEMA postgrid TO geoadmin;
 GRANT USAGE ON SCHEMA postgrid TO PUBLIC;
+
+
+--
+-- Name: ComputeDefaultExtent(); Type: ACL; Schema: postgrid; Owner: geoadmin
+--
+
+REVOKE ALL ON FUNCTION "ComputeDefaultExtent"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "ComputeDefaultExtent"() FROM geoadmin;
+GRANT ALL ON FUNCTION "ComputeDefaultExtent"() TO geoadmin;
+GRANT ALL ON FUNCTION "ComputeDefaultExtent"() TO PUBLIC;
 
 
 --
@@ -1626,16 +1778,6 @@ GRANT SELECT ON TABLE "Distributions" TO PUBLIC;
 
 
 --
--- Name: GridCoverages; Type: ACL; Schema: postgrid; Owner: geoadmin
---
-
-REVOKE ALL ON TABLE "GridCoverages" FROM PUBLIC;
-REVOKE ALL ON TABLE "GridCoverages" FROM geoadmin;
-GRANT ALL ON TABLE "GridCoverages" TO geoadmin;
-GRANT SELECT ON TABLE "GridCoverages" TO PUBLIC;
-
-
---
 -- Name: GridGeometries; Type: ACL; Schema: postgrid; Owner: geoadmin
 --
 
@@ -1643,6 +1785,26 @@ REVOKE ALL ON TABLE "GridGeometries" FROM PUBLIC;
 REVOKE ALL ON TABLE "GridGeometries" FROM geoadmin;
 GRANT ALL ON TABLE "GridGeometries" TO geoadmin;
 GRANT SELECT ON TABLE "GridGeometries" TO PUBLIC;
+
+
+--
+-- Name: GeometriesCheck; Type: ACL; Schema: postgrid; Owner: geoadmin
+--
+
+REVOKE ALL ON TABLE "GeometriesCheck" FROM PUBLIC;
+REVOKE ALL ON TABLE "GeometriesCheck" FROM geoadmin;
+GRANT ALL ON TABLE "GeometriesCheck" TO geoadmin;
+GRANT SELECT ON TABLE "GeometriesCheck" TO PUBLIC;
+
+
+--
+-- Name: GridCoverages; Type: ACL; Schema: postgrid; Owner: geoadmin
+--
+
+REVOKE ALL ON TABLE "GridCoverages" FROM PUBLIC;
+REVOKE ALL ON TABLE "GridCoverages" FROM geoadmin;
+GRANT ALL ON TABLE "GridCoverages" TO geoadmin;
+GRANT SELECT ON TABLE "GridCoverages" TO PUBLIC;
 
 
 --

@@ -103,7 +103,7 @@ public enum CRS {
      */
     static {
         final Map<String,Object> properties = new HashMap<String,Object>(4);
-        properties.put(CoordinateReferenceSystem.NAME_KEY, "SEAS");
+        properties.put(CoordinateReferenceSystem.NAME_KEY, "WGS84");
         properties.put(CoordinateReferenceSystem.VALID_AREA_KEY, ExtentImpl.WORLD);
 
         XY  .crs = DefaultGeographicCRS.WGS84;

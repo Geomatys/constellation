@@ -28,7 +28,6 @@ import java.util.logging.LogRecord;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.coverage.Coverage;
-import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -204,12 +203,11 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private transient double[] samples;
 
     /**
-     * Construit une table pour la connexion spécifiée.
+     * Constructs a new {@code GridCoverageTable}.
      *
-     * @param  database Connexion vers la base de données d'observations.
-     * @throws SQLException if an error occured while reading the database.
+     * @param connection The connection to the database.
      */
-    public GridCoverageTable(final Database database) throws SQLException {
+    public GridCoverageTable(final Database database) {
         super(new GridCoverageQuery(database), net.sicade.catalog.CRS.XYT);
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
         setIdentifierParameters(query.byFilename, null);
@@ -713,14 +711,10 @@ loop:   for (final CoverageReference newReference : entries) {
             gridGeometryTable = getDatabase().getTable(GridGeometryTable.class);
         }
         final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
-        final Envelope          envelope = geometry.getEnvelope();
-        final GridRange            range = geometry.getGridRange();
         final NumberRange  verticalRange = getVerticalRange();
-        final short width  = (short) range.getLength(0);
-        final short height = (short) range.getLength(1);
-        final short band   = geometry.indexOf(0.5*(verticalRange.getMinimum() + verticalRange.getMaximum()));
+        final short band = geometry.indexOf(0.5*(verticalRange.getMinimum() + verticalRange.getMaximum()));
         return new GridCoverageEntry(this, layer, series, pathname, filename, extension, startTime,
-                    endTime, envelope, width, height, band, format, null).canonicalize();
+                    endTime, geometry, band, format, null).canonicalize();
     }
 
     /**
@@ -730,12 +724,12 @@ loop:   for (final CoverageReference newReference : entries) {
      * <p>
      * Cette méthode est appelée par le constructeur de {@link GridCoverageEntry}.
      *
-     * @param  seriesID  Nom ID de la couche, pour fin de vérification. Ce nom doit correspondre
-     *                   à celui de la couche examinée par cette table.
-     * @param  formatID  Nom ID du format des images.
-     * @param  crsID     Nom ID du système de référence des coordonnées.
-     * @param  pathname  Chemin relatif des images.
-     * @param  extension Extension (sans le point) des noms de fichier des images à lire.
+     * @param  seriesID    Nom ID de la couche, pour fin de vérification. Ce nom doit correspondre
+     *                     à celui de la couche examinée par cette table.
+     * @param  formatID    Nom ID du format des images.
+     * @param  coverageCRS Système de référence des coordonnées.
+     * @param  pathname    Chemin relatif des images.
+     * @param  extension   Extension (sans le point) des noms de fichier des images à lire.
      *
      * @return Un objet incluant les paramètres demandées ainsi que ceux de la table.
      * @throws CatalogException si les paramètres n'ont pas pu être obtenus.

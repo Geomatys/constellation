@@ -80,10 +80,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Constructs a new {@code WritableGridCoverageTable}.
      *
-     * @param  connection The connection to the database.
-     * @throws SQLException if the table can't be constructed.
+     * @param connection The connection to the database.
      */
-    public WritableGridCoverageTable(final Database database) throws SQLException {
+    public WritableGridCoverageTable(final Database database) {
         super(database);
     }
 

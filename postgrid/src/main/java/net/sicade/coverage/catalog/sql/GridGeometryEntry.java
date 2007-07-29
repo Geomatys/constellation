@@ -14,104 +14,133 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-import java.awt.Dimension;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
+
+import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.resources.geometry.XRectangle2D;
+
 import net.sicade.catalog.Entry;
-import net.sicade.catalog.CRS;
 
 
 /**
- * Implementation of a three-dimensionan grid geometry.
+ * Implementation of a three-dimensional grid geometry. This class assumes that the two first
+ * axis are always for the horizontal component of the CRS (no matter if it is (x,y) or (y,x))
+ * and that the vertical component, if any, is the third axis. Some of those assumptions are
+ * checked by assertions at construction time.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class GridGeometryEntry extends Entry {
+final class GridGeometryEntry extends Entry {
     /**
      * For cross-version compatibility.
      */
     private static final long serialVersionUID = -3529884841649813534L;
 
     /**
-     * The grid range.
+     * The immutable grid range, which may be 2D, 3D or 4D.
      */
-    private final GridRange gridRange;
+    final GridRange gridRange;
 
     /**
-     * The envelope.
+     * The "grid to CRS" affine transform for the horizontal part. The vertical
+     * transform is not included because the {@link #verticalOrdinates} may not
+     * be regular.
+     */
+//    private final AffineTransform gridToCRS;
+
+    /**
+     * The full envelope, including the vertical and temporal extent if any.
      */
     private final GeneralEnvelope envelope;
 
     /**
-     * The vertical extent, or {@code null}.
+     * Same as the envelope, but in WGS 84 geographic coordinates. This field is read
+     * by {@link GridCoverageEntry} only. It should never be modified.
+     */
+    final XRectangle2D geographicEnvelope;
+
+    /**
+     * The vertical ordinates, or {@code null}.
      */
     private final double[] verticalOrdinates;
 
     /**
      * Creates an entry from the given geographic bounding box.
+     * <strong>Note:</strong> This constructor do not clone any of its arguments.
+     * Do not modify the arguments after construction.
      *
      * @param name The identifier of this grid geometry.
-     * @param bbox The envelope in geographic coordinates.
-     * @param size The image size.
+     * @param gridRange The image dimension. May be 2D or 3D.
+     * @param envelope The spatio-temporal envelope.
+     * @param bbox Same as the envelope, but as a  geographic bounding box.
      * @param verticalOrdinates The vertical ordinate values, or {@code null} if none.
-     *        <strong>Note:</strong> This array is not cloned; do not modify after construction.
      */
-    protected GridGeometryEntry(final String name, final GeographicBoundingBox bbox,
-            final Dimension dimension, final double[] verticalOrdinates)
+    GridGeometryEntry(final String name, final GridRange gridRange, final GeneralEnvelope envelope,
+            final GeographicBoundingBox bbox, final double[] verticalOrdinates)
     {
         super(name);
+        this.gridRange         = gridRange;
+        this.envelope          = envelope;
         this.verticalOrdinates = verticalOrdinates;
-        final int[] size;
         if (verticalOrdinates != null) {
             if (verticalOrdinates.length > Short.MAX_VALUE) {
                 // See 'indexOf' for this limitation.
                 throw new IllegalArgumentException();
             }
-            envelope = new GeneralEnvelope(CRS.XYZT.getCoordinateReferenceSystem());
-            double min = Double.POSITIVE_INFINITY;
-            double max = Double.NEGATIVE_INFINITY;
-            for (int i=0; i<verticalOrdinates.length; i++) {
-                final double z = verticalOrdinates[i];
-                if (z < min) min = z;
-                if (z > max) max = z;
-            }
-            if (min < max) {
-                envelope.setRange(2, min, max);
-            }
-            size = new int[4];
-            size[2] = verticalOrdinates.length;
-            size[3] = 1; // The time
-        } else {
-            envelope = new GeneralEnvelope(CRS.XYT.getCoordinateReferenceSystem());
-            size = new int[3];
-            size[2] = 1; // The time
         }
-        envelope.setRange(0, bbox.getWestBoundLongitude(), bbox.getEastBoundLongitude());
-        envelope.setRange(1, bbox.getSouthBoundLatitude(), bbox.getNorthBoundLatitude());
-        size[0] = dimension.width;
-        size[1] = dimension.height;
-        gridRange = new GeneralGridRange(new int[size.length], size);
+        // Checks for assumptions - see class javadoc.
+        final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
+        if (crs == null) {
+            throw new AssertionError(envelope);
+        }
+        try {
+            assert CRS.getHorizontalCRS(crs) == CRSUtilities.getCRS2D(crs) : crs;
+            assert (CRS.getVerticalCRS(crs) == null) == (verticalOrdinates == null) : crs;
+        } catch (TransformException e) {
+            throw new AssertionError(e);
+        }
+        geographicEnvelope = XRectangle2D.createFromExtremums(
+                bbox.getWestBoundLongitude(), bbox.getSouthBoundLatitude(),
+                bbox.getEastBoundLongitude(), bbox.getNorthBoundLatitude());
     }
 
     /**
-     * Returns the grid range.
+     * Returns the coordinate reference system.
      */
-    public GridRange getGridRange() {
-        return gridRange;
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return envelope.getCoordinateReferenceSystem();
     }
 
     /**
      * Returns the envelope.
-     *
-     * @todo Time is not set in this envelope.
      */
     public Envelope getEnvelope() {
         return (Envelope) envelope.clone();
+    }
+
+    /**
+     * Returns the envelope with altitude restricted to the specified band.
+     *
+     * @param The band number. Numbering start at 0.
+     */
+    final Envelope getEnvelope(final int band) {
+        final GeneralEnvelope envelope = (GeneralEnvelope) this.envelope.clone();
+        if (verticalOrdinates != null && verticalOrdinates.length > 1) {
+            final double z = verticalOrdinates[band];
+            final int floor = Math.max(0, band - 1);
+            final int ceil  = Math.min(band + 1, verticalOrdinates.length - 1);
+            envelope.setRange(2, z - 0.5*Math.abs(verticalOrdinates[floor+1] - verticalOrdinates[floor]),
+                                 z + 0.5*Math.abs(verticalOrdinates[ceil] - verticalOrdinates[ceil-1]));
+        }
+        return envelope;
     }
 
     /**
@@ -143,6 +172,15 @@ public final class GridGeometryEntry extends Entry {
     }
 
     /**
+     * Returns {@code true} if the specified entry has the same envelope than this entry,
+     * regardless the grid size.
+     */
+    final boolean sameEnvelope(final GridGeometryEntry that) {
+        return Utilities.equals(this.envelope,          that.envelope) &&
+               Utilities.equals(this.verticalOrdinates, that.verticalOrdinates);
+    }
+
+    /**
      * Compares this grid geometry with the specified object for equality.
      */
     @Override
@@ -153,7 +191,7 @@ public final class GridGeometryEntry extends Entry {
         if (super.equals(object)) {
             final GridGeometryEntry that = (GridGeometryEntry) object;
             return Utilities.equals(this.gridRange,         that.gridRange) &&
-                   Utilities.equals(this.envelope,          that.envelope)  &&
+                   Utilities.equals(this.envelope,          that.envelope) &&
                    Utilities.equals(this.verticalOrdinates, that.verticalOrdinates);
         }
         return false;

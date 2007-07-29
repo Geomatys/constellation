@@ -60,10 +60,12 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 // Geotools
 import org.geotools.image.io.IIOListeners;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -88,7 +90,6 @@ import net.sicade.coverage.catalog.rmi.RemoteLoader;
 import net.sicade.coverage.catalog.rmi.CoverageLoader;
 import net.sicade.coverage.catalog.IllegalRecordException;
 import net.sicade.coverage.catalog.CatalogException;
-import static net.sicade.coverage.catalog.CoverageBuilder.FACTORY;
 
 
 /**
@@ -113,6 +114,11 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     }
 
     /**
+     * Fabrique à utiliser pour la création des objets {@link GridCoverage2D}.
+     */
+    private static GridCoverageFactory FACTORY = FactoryFinder.getGridCoverageFactory(null);
+
+    /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = -5725249398707248625L;
@@ -122,6 +128,8 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      * encore été réclamées par le ramasse-miettes. La classe {@link GridCoverageTable} tentera autant
      * que possible de retourner des entrées qui existent déjà en mémoire afin de leur donner une chance
      * de faire un meilleur travail de cache sur les images.
+     *
+     * @deprecated Use the cache inherited from SingletonTable instead.
      */
     private static final CanonicalSet POOL = new CanonicalSet();
 
@@ -157,14 +165,16 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      */
     private static final int MIN_SIZE = 64;
 
-    /** Nom du fichier.                  */ private final String      filename;
-    /** Date du début de l'acquisition.  */ private final long        startTime;
-    /** Date de la fin de l'acquisition. */ private final long        endTime;
-    /** Envelope géographique.           */ private final Rectangle2D boundingBox;
-    /** Nombre de pixels en largeur.     */ private final short       width;
-    /** Nombre de pixels en hauteur.     */ private final short       height;
-    /** Vertical extent, or {@code null}.*/ private final NumberRange verticalExtent;
-    /** The band to read, or 0.          */ private final short       band;
+    /** The file name.               */ private final String filename;
+    /** Image start time, inclusive. */ private final long   startTime;
+    /** Image end time, exclusive.   */ private final long   endTime;
+    /** The band to read, or 0.      */ private final short  band;
+
+    /**
+     * The grid geometry. Include the image size (in pixels), the geographic envelope
+     * and the vertical ordinate values.
+     */
+    private final GridGeometryEntry geometry;
 
     /**
      * Bloc de paramètres de la table d'images. On retient ce bloc de paramètres plutôt qu'une
@@ -223,39 +233,24 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                                 final String            extension,
                                 final Date              startTime,
                                 final Date              endTime,
-                                final Envelope          envelope,
-                                final short             width,
-                                final short             height,
+                                final GridGeometryEntry geometry,
                                 final short             band,
                                 final String            format,
                                 final String            remarks)
             throws CatalogException, SQLException
     {
         super(createName(series, filename, band), remarks);
-        CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
+        // TODO: need to include the temporal CRS here.
+        CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem();
         this.filename   = filename;
-        this.width      = width;
-        this.height     = height;
+        this.geometry   = geometry;
         this.band       = band;
         this.parameters = table.getParameters(layer, format, crs, pathname, extension);
         this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
-        final double xmin = envelope.getMinimum(0);
-        final double xmax = envelope.getMaximum(0);
-        final double ymin = envelope.getMinimum(1);
-        final double ymax = envelope.getMaximum(1);
-        final XRectangle2D box = XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
-        if (box.isEmpty() || this.startTime >= this.endTime) {
+        if (this.startTime >= this.endTime) {
             // TODO: localize
             throw new IllegalRecordException(null, "L'enveloppe spatio-temporelle est vide.");
-        }
-        boundingBox = (Rectangle2D) POOL.unique(box);
-        if (envelope.getDimension() >= 3) {
-            final double zmin = envelope.getMinimum(2);
-            final double zmax = envelope.getMaximum(2);
-            verticalExtent = (NumberRange) POOL.unique(new NumberRange(zmin, zmax));
-        } else {
-            verticalExtent = null;
         }
     }
 
@@ -436,12 +431,11 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      */
     public GeographicBoundingBox getGeographicBoundingBox() {
         try {
-            assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84,
-                   CRSUtilities.getCRS2D(getCoordinateReferenceSystem()));
+            assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, CRSUtilities.getCRS2D(parameters.tableCRS));
         } catch (TransformException e) {
             throw new AssertionError(e);
         }
-        return new GeographicBoundingBoxImpl(boundingBox);
+        return new GeographicBoundingBoxImpl(geometry.geographicEnvelope);
     }
 
     /**
@@ -449,6 +443,8 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      *
      * @todo L'implémentation actuelle suppose que le CRS de la table a toujours des axes dans
      *       l'ordre (x,y).
+     *
+     * @todo Should compute the geometry by {@link GridGeometryEntry} instead.
      */
     public GridGeometry2D getGridGeometry() {
         final Rectangle clipPixels = new Rectangle();
@@ -466,7 +462,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         final int[]   lower = new int[dimension];
         final int[]   upper = new int[dimension];
         switch (dimension) {
-            // Fall through on every cases.
+            // Fall through in every cases.
             default: Arrays.fill(upper, 2, dimension, 1);
             case 2:  upper[1] = clipPixels.height;
             case 1:  upper[0] = clipPixels.width;
@@ -504,6 +500,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
     private GeneralEnvelope computeBounds(final Rectangle clipPixel, final Point subsampling)
             throws TransformException
     {
+        final int width  = geometry.gridRange.getLength(0);
+        final int height = geometry.gridRange.getLength(1);
+        final XRectangle2D boundingBox = geometry.geographicEnvelope;
         /*
          * Obtient les coordonnées géographiques et la résolution désirées. Notez que ces
          * rectangles ne sont pas encore exprimées dans le système de coordonnées de l'image.
@@ -575,8 +574,8 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
              * Vérifie que les coordonnées obtenues sont bien
              * dans les limites de la dimension de l'image.
              */
-            final int clipX2 = min(this.width,  clipPixel.width  + clipPixel.x);
-            final int clipY2 = min(this.height, clipPixel.height + clipPixel.y);
+            final int clipX2 = min(width,  clipPixel.width  + clipPixel.x);
+            final int clipY2 = min(height, clipPixel.height + clipPixel.y);
             if (clipPixel.x < 0) clipPixel.x = 0;
             if (clipPixel.y < 0) clipPixel.y = 0;
             clipPixel.width  = clipX2-clipPixel.x;
@@ -715,7 +714,8 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
                     }
                     if (image == null) {
                         image = format.read(getInput(true), imageIndex, param, listeners,
-                                            new Dimension(width, height), this);
+                                new Dimension(geometry.gridRange.getLength(0),
+                                              geometry.gridRange.getLength(1)), this);
                         if (image == null) {
                             return null;
                         }
@@ -829,6 +829,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      *         demandée. Cette méthode retourne {@code false} si {@code resolution} était nul.
      */
     final boolean hasEnoughResolution(final Dimension2D resolution) {
+        final int width  = geometry.gridRange.getLength(0);
+        final int height = geometry.gridRange.getLength(1);
+        final XRectangle2D boundingBox = geometry.geographicEnvelope;
         return (resolution != null) &&
                (1+EPS)*resolution.getWidth()  >= boundingBox.getWidth() /width &&
                (1+EPS)*resolution.getHeight() >= boundingBox.getHeight()/height;
@@ -840,9 +843,13 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      * leurs résolutions sont incompatibles, alors cette méthode retourne {@code null}.
      */
     final GridCoverageEntry getLowestResolution(final GridCoverageEntry that) {
+        final int width   = this.geometry.gridRange.getLength(0);
+        final int height  = this.geometry.gridRange.getLength(1);
+        final int width2  = that.geometry.gridRange.getLength(0);
+        final int height2 = that.geometry.gridRange.getLength(1);
         if (Utilities.equals(this.parameters.layer, that.parameters.layer) && sameEnvelope(that)) {
-            if (this.width<=that.width && this.height<=that.height) return this;
-            if (this.width>=that.width && this.height>=that.height) return that;
+            if (width <= width2 && height <= height2) return this;
+            if (width >= width2 && height >= height2) return that;
         }
         return null;
     }
@@ -856,8 +863,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         return this.band      == that.band      &&
                this.startTime == that.startTime &&
                this.endTime   == that.endTime   &&
-               Utilities.equals(this.boundingBox, that.boundingBox) &&
-               Utilities.equals(this.verticalExtent, that.verticalExtent) &&
+               geometry.sameEnvelope(that.geometry) &&
                CRS.equalsIgnoreMetadata(parameters.tableCRS, that.parameters.tableCRS);
     }
 
@@ -877,11 +883,12 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         }
         if (super.equals(object)) {
             final GridCoverageEntry that = (GridCoverageEntry) object;
-            return Utilities.equals(this.filename,   that.filename  ) &&
-                   Utilities.equals(this.parameters, that.parameters) &&
-                                   (this.width    == that.width     ) &&
-                                   (this.height   == that.height    ) &&
-                                    sameEnvelope(that);
+            return this.band      == that.band      &&
+                   this.startTime == that.startTime &&
+                   this.endTime   == that.endTime   &&
+                   Utilities.equals(this.filename,   that.filename  ) &&
+                   Utilities.equals(this.geometry,   that.geometry  ) &&
+                   Utilities.equals(this.parameters, that.parameters);
         }
         return false;
     }
