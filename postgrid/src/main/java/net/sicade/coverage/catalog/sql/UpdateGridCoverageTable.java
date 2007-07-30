@@ -30,7 +30,7 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.Arguments;
 
 // Sicade
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Catalog;
 import net.sicade.coverage.catalog.Layer;
 

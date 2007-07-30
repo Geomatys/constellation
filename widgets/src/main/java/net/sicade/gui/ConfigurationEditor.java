@@ -260,8 +260,7 @@ public class ConfigurationEditor extends JPanel {
         //       que l'on ajoute sur la barre des boutons (en plus de "Ok" et "Annuler").
         //       Pour afficher le bouton "Rétablir" malgré ces défauts, ne pas mettre
         //       'model' en commentaire.
-        final boolean ok = SwingUtilities.showOptionDialog(owner, this,
-                           Resources.format(ResourceKeys.SQL_QUERIES)/*, model*/);
+        final boolean ok = SwingUtilities.showOptionDialog(owner, this, "Configuration"/*, model*/);
         model.commit();
         if (ok) save();
         return ok;

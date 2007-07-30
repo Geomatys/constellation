@@ -18,6 +18,8 @@ package net.sicade.observation;
 import java.sql.SQLException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.ServerException;
 import net.sicade.coverage.catalog.*;
 import net.sicade.observation.sql.MeasurementTable;
 
@@ -105,7 +107,7 @@ final class MeasurementInserts extends Thread {
             if (pair == finish) {
                 break;
             }
-            measures.setObservable(pair.descriptor);
+            //measures.setObservable(pair.descriptor);  // TODO
             measures.setStation   (pair.station);
             try {
                 measures.setValue(pair.value, Float.NaN);

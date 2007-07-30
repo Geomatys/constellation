@@ -16,7 +16,7 @@ package net.sicade.coverage.catalog.sql;
 
 import java.util.Set;
 import java.sql.SQLException;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Format;
 import net.sicade.catalog.DatabaseTest;
 

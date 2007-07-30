@@ -26,7 +26,7 @@ import org.geotools.resources.Arguments;
 
 // Sicade dependencies
 import net.sicade.coverage.catalog.Catalog;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Descriptor;
 import net.sicade.observation.MeasurementTableFiller;
 import net.sicade.observation.fishery.sql.EnvironmentTable;

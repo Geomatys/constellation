@@ -33,7 +33,7 @@ import net.sicade.catalog.LoggingLevel;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.Element;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Series;
 

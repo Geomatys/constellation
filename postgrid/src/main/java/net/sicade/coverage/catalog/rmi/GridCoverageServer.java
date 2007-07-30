@@ -32,7 +32,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import net.sicade.util.DateRange;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.coverage.catalog.sql.GridCoverageTable;

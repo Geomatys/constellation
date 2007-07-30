@@ -14,11 +14,9 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Map;
 import java.util.Date;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Collections;
 import java.lang.ref.Reference;
@@ -27,31 +25,25 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.rmi.RemoteException;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-
-// Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-// Sicade dependencies
 import net.sicade.util.DateRange;
 import net.sicade.catalog.Entry;
-import net.sicade.observation.sql.ObservableEntry;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.ServerException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.ServerException;
 import net.sicade.observation.Procedure;
 import net.sicade.coverage.catalog.Model;
 import net.sicade.coverage.catalog.Layer;
-import net.sicade.coverage.catalog.Format;
 import net.sicade.coverage.catalog.Thematic;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.Series;
 import net.sicade.coverage.catalog.CoverageReference;
+import net.sicade.coverage.catalog.Distribution;
 import net.sicade.coverage.catalog.rmi.DataConnection;
-
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Layer couche d'images}.
@@ -59,7 +51,7 @@ import net.sicade.coverage.catalog.rmi.DataConnection;
  * @author Martin Desruisseaux
  * @version $Id$
  */
-public class LayerEntry extends ObservableEntry implements Layer {
+public class LayerEntry extends Entry implements Layer {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -69,6 +61,16 @@ public class LayerEntry extends ObservableEntry implements Layer {
      * Nombre de millisecondes dans une journée.
      */
     private static final long MILLIS_IN_DAY = 24*60*60*1000L;
+
+    /**
+     * Référence vers le {@linkplain Phenomenon phénomène} observé.
+     */
+    private final Thematic phenomenon;
+
+    /**
+     * Référence vers la {@linkplain Procedure procédure} associée à cet observable.
+     */
+    private final Procedure procedure;
 
     /**
      * L'intervalle de temps typique des images de cette couche (en nombre
@@ -140,17 +142,24 @@ public class LayerEntry extends ObservableEntry implements Layer {
                          final double    timeInterval,
                          final String    remarks)
     {
-        super(name.hashCode() ^ (int)serialVersionUID, // Simulation d'un identifiant numérique.
-              name, thematic, procedure, null, remarks);
+        super(name, remarks);
+        this.phenomenon   = thematic;
+        this.procedure    = procedure;
         this.timeInterval = timeInterval;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     public Thematic getPhenomenon() {
-        return (Thematic) super.getPhenomenon();
+        return phenomenon;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Procedure getProcedure() {
+        return procedure;
     }
 
     /**
@@ -321,7 +330,9 @@ public class LayerEntry extends ObservableEntry implements Layer {
         }
         if (super.equals(object)) {
             final LayerEntry that = (LayerEntry) object;
-            return Double.doubleToLongBits(this.timeInterval) ==
+            return Utilities.equals(this.phenomenon,   that.phenomenon)   &&
+                   Utilities.equals(this.procedure,    that.procedure)    &&
+                   Double.doubleToLongBits(this.timeInterval) ==
                    Double.doubleToLongBits(that.timeInterval);
             /*
              * On ne teste pas 'fallback' car la méthode 'equals' doit fonctionner dès que la

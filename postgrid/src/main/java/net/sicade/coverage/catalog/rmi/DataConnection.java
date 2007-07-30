@@ -32,7 +32,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Sicade dependencies
 import net.sicade.util.DateRange;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.CoverageReference;
 

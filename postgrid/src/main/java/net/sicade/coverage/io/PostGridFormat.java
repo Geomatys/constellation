@@ -18,24 +18,19 @@
  */
 package net.sicade.coverage.io;
 
-// J2SE dependencies
 import java.util.Date;
 import java.util.HashMap;
 
-// Geotools dependencies
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.GeneralParameterDescriptor;
+
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
-import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
-
-// OpenGIS dependencies
-import org.opengis.coverage.grid.Format;
-import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.coverage.grid.GridCoverageWriter;
-import org.opengis.parameter.GeneralParameterDescriptor;
 
 
 /**
@@ -44,19 +39,19 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * @version $Id$
  * @author Cédric Briançon
  */
-public class PostGridFormat extends AbstractGridFormat implements Format {    
+public class PostGridFormat extends AbstractGridFormat {    
     /**
      *
      */
-    private static final DefaultParameterDescriptor TIME      = new DefaultParameterDescriptor(
+    private static final DefaultParameterDescriptor TIME = new DefaultParameterDescriptor(
             "TIME", Date.class, null, null);
-    
+
     /**
      *
      */
     private static final DefaultParameterDescriptor ELEVATION = new DefaultParameterDescriptor(
             "ELEVATION", Integer.TYPE, null, null);
-    
+
     /**
      * Creates a new instance of PostGridFormat.
      * Contains the main information about the PostGrid DataBase format.
@@ -67,8 +62,8 @@ public class PostGridFormat extends AbstractGridFormat implements Format {
         mInfo.put("name", "PostGrid");
         mInfo.put("description", "PostGrid"); 
         mInfo.put("vendor", "Geomatys");
-	mInfo.put("docURL", "http://www.geomatys.fr/");
-	mInfo.put("version", "1.0");
+        mInfo.put("docURL", "http://www.geomatys.fr/");
+        mInfo.put("version", "1.0");
         readParameters = new ParameterGroup(
                 new DefaultParameterDescriptorGroup(mInfo,
                 new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D, TIME, ELEVATION }));
@@ -92,27 +87,7 @@ public class PostGridFormat extends AbstractGridFormat implements Format {
      * @return A reader on the grid coverage chosen.
      */
     public GridCoverageReader getReader(final Object input, final Hints hints) {
-        try {
-            return new PostGridReader(this, input, null);
-        } catch (DataSourceException ex) {
-            throw new RuntimeException(ex); // TODO: trouver une meilleur exception.
-        }
-    }
-    
-    /**
-     * Gets a reader for the raster. Allows to specify a layer value.
-     * 
-     * @param input The input object.
-     * @param hints Hints value for the data.
-     * @param layer The name of a layer.
-     * @return A reader on the grid coverage chosen.
-     */
-    public GridCoverageReader getReader(final Object input, final Hints hints, final String layer) {
-        try {
-            return new PostGridReader(this, input, null, layer);
-        } catch (DataSourceException ex) {
-            throw new RuntimeException(ex); // TODO: trouver une meilleur exception.
-        }
+        return new PostGridReader("SST (Monde - Coriolis)", this, input, null);
     }
 
     /**
@@ -135,13 +110,11 @@ public class PostGridFormat extends AbstractGridFormat implements Format {
     public boolean accepts(Object object) {
         return true;
     }
-    
+
     /**
      * Not used in our implementation.
      */
     public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
         return null;
     }
-   
-
 }

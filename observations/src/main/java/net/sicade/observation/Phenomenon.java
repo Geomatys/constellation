@@ -19,9 +19,7 @@ import net.sicade.catalog.Element;
 
 /**
  * Représentation d'un phénomène observé. Cette interface est étendue dans des paquets
- * spécialisés. Par exemple pour les images, les phénomènes observé sont appelés
- * {@linkplain net.sicade.observation.coverage.Thematic thèmes}. Pour les données de pêches,
- * les phénomèmes sont appelés {@linkplain net.sicade.observation.fishery.Species espèces}.
+ * spécialisés.
  * <p>
  * La combinaison d'un phénomène avec une {@linkplain Procedure procedure} donne un
  * {@linkplain Observable observable}.

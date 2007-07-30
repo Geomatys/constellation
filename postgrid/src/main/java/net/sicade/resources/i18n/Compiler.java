@@ -29,7 +29,7 @@ public final class Compiler {
      * The base directory for {@code "java"} {@code "resources"} sub-directories.
      * The directory structure must be consistent with Maven conventions.
      */
-    private static final File SOURCE_DIRECTORY = new File("observations/src/main");
+    private static final File SOURCE_DIRECTORY = new File("postgrid/src/main");
 
     /**
      * The resources to process.

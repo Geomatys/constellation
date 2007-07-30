@@ -18,6 +18,7 @@ package net.sicade.coverage.catalog;
 import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
+import net.sicade.catalog.CatalogException;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;

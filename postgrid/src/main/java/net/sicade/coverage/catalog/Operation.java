@@ -53,7 +53,7 @@ public interface Operation extends Procedure {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static class Proxy extends net.sicade.coverage.catalog.Proxy implements Operation {
+    public static class Proxy extends net.sicade.catalog.Proxy implements Operation {
         /**
          * Pour compatibilités entre les enregistrements binaires de différentes versions.
          */

@@ -12,10 +12,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.coverage.catalog;
+package net.sicade.catalog;
 
 import java.io.Serializable;
-import net.sicade.catalog.Element;
 import org.geotools.resources.Utilities;
 
 

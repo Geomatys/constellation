@@ -33,8 +33,8 @@ import org.geotools.resources.XMath;
 import net.sicade.catalog.Table;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.IllegalRecordException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.IllegalRecordException;
 
 
 /**
@@ -74,55 +74,57 @@ public class OperationParameterTable extends Table {
         final int valueIndex = indexOf(query.value    );
         statement.setString(indexOf(query.byOperation), operation);
         final ResultSet results = statement.executeQuery();
-        while (results.next()) try {
+        while (results.next()) {
             final String name = results.getString(paramIndex).trim();
-            final ParameterValue parameter = parameters.parameter(name);
-            Class type = ((ParameterDescriptor) parameter.getDescriptor()).getValueClass();
-            type = XMath.primitiveToWrapper(type);
-            /*
-             * Cas des booléens. Certaines bases de données se chargent d'interpréter des
-             * caractères comme 'Y' et 'N'. On laissera la base base de données faire elle-
-             * même la conversion du champ texte en booléen, plutôt que de tenter cette
-             * conversion en Java. La même remarque s'applique pour tous les cas suivants.
-             */
-            if (Boolean.class.isAssignableFrom(type)) {
-                parameter.setValue(results.getBoolean(valueIndex));
+            try {
+                final ParameterValue parameter = parameters.parameter(name);
+                Class type = ((ParameterDescriptor) parameter.getDescriptor()).getValueClass();
+                type = XMath.primitiveToWrapper(type);
+                /*
+                 * Cas des booléens. Certaines bases de données se chargent d'interpréter des
+                 * caractères comme 'Y' et 'N'. On laissera la base base de données faire elle-
+                 * même la conversion du champ texte en booléen, plutôt que de tenter cette
+                 * conversion en Java. La même remarque s'applique pour tous les cas suivants.
+                 */
+                if (Boolean.class.isAssignableFrom(type)) {
+                    parameter.setValue(results.getBoolean(valueIndex));
+                }
+                /*
+                 * Cas des entiers entre 8 et 32 bits. Notez que le type Long ne peut pas être
+                 * géré par ce code, puisqu'il n'y a pas de méthode parameter.setValue(long).
+                 */
+                else if (Byte   .class.isAssignableFrom(type) ||
+                         Short  .class.isAssignableFrom(type) ||
+                         Integer.class.isAssignableFrom(type))
+                {
+                    parameter.setValue(results.getInt(valueIndex));
+                }
+                /*
+                 * Cas de tous les autres type de nombres, incluant Long, Float et Double. On
+                 * les lira comme des Double, qui est à peu près le format le plus générique
+                 * pour l'API à notre disposition dans ParameterValue.
+                 */
+                else if (Number.class.isAssignableFrom(type)) {
+                    parameter.setValue(results.getDouble(valueIndex));
+                }
+                /*
+                 * Cas particulier d'un noyau JAI. Le contenu numérique du noyau sera construit
+                 * à partir du nom.
+                 */
+                else if (KernelJAI.class.isAssignableFrom(type)) {
+                    parameter.setValue(createKernel(name, results, valueIndex));
+                }
+                /*
+                 * Tous les autres cas.
+                 */
+                else {
+                    parameter.setValue(results.getString(valueIndex));
+                }
+            } catch (ParameterNotFoundException exception) {
+                throw new IllegalRecordException(exception, results, paramIndex, name);
+            } catch (InvalidParameterValueException exception) {
+                throw new IllegalRecordException(exception, results, valueIndex, name);
             }
-            /*
-             * Cas des entiers entre 8 et 32 bits. Notez que le type Long ne peut pas être
-             * géré par ce code, puisqu'il n'y a pas de méthode parameter.setValue(long).
-             */
-            else if (Byte   .class.isAssignableFrom(type) ||
-                     Short  .class.isAssignableFrom(type) ||
-                     Integer.class.isAssignableFrom(type))
-            {
-                parameter.setValue(results.getInt(valueIndex));
-            }
-            /*
-             * Cas de tous les autres type de nombres, incluant Long, Float et Double. On
-             * les lira comme des Double, qui est à peu près le format le plus générique
-             * pour l'API à notre disposition dans ParameterValue.
-             */
-            else if (Number.class.isAssignableFrom(type)) {
-                parameter.setValue(results.getDouble(valueIndex));
-            }
-            /*
-             * Cas particulier d'un noyau JAI. Le contenu numérique du noyau sera construit
-             * à partir du nom.
-             */
-            else if (KernelJAI.class.isAssignableFrom(type)) {
-                parameter.setValue(createKernel(name, results, valueIndex));
-            }
-            /*
-             * Tous les autres cas.
-             */
-            else {
-                parameter.setValue(results.getString(valueIndex));
-            }
-        } catch (ParameterNotFoundException exception) {
-            throw new IllegalRecordException(results.getMetaData().getTableName(paramIndex), exception);
-        } catch (InvalidParameterValueException exception) {
-            throw new IllegalRecordException(results.getMetaData().getTableName(valueIndex), exception);
         }
     }
 
@@ -152,7 +154,7 @@ public class OperationParameterTable extends Table {
             try {
                 size = Integer.parseInt(value.substring(lp+1, rp));
             } catch (NumberFormatException exception) {
-                throw new IllegalRecordException(results.getMetaData().getTableName(valueIndex), exception);
+                throw new IllegalRecordException(exception, results, valueIndex, parameter);
             }
             final String name = value.substring(0, lp).trim();
             if (name.equalsIgnoreCase("mean")) {
@@ -168,9 +170,7 @@ public class OperationParameterTable extends Table {
                 return createIsotropicKernel(size, false);
             }
         }
-        throw new IllegalRecordException(results.getMetaData().getTableName(valueIndex),
-                "La valeur \"" + value + "\" n'est pas valide pour le paramètre \"" + parameter +
-                "\". Le format attendu est \"mean(3)\" par exemple.");
+        throw new IllegalRecordException("La valeur \"" + value + "\" n'est pas reconnue.", results, valueIndex, parameter);
     }
 
     /**

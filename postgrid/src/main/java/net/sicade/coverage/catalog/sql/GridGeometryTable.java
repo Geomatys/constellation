@@ -38,8 +38,8 @@ import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.IllegalRecordException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.IllegalRecordException;
 import net.sicade.catalog.SpatialFunctions;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.catalog.Database;
@@ -100,14 +100,15 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
          */
         CoordinateReferenceSystem crs;
         try {
-            crs = CRS.decode(CRS_AUTHORITY + horizontalSRID);
+            crs = CRS.decode(CRS_AUTHORITY + horizontalSRID, true);
         } catch (FactoryException exception) {
-            throw new IllegalRecordException(results.getMetaData().getTableName(indexOf(query.horizontalSRID)), exception);
+            throw new IllegalRecordException(exception, results, indexOf(query.horizontalSRID), identifier);
         }
         /*
          * Copies the vertical ordinates in an array of type double[].
          * The array will be 'null' if there is no vertical ordinates.
          */
+        CoordinateReferenceSystem verticalCRS = null;
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
         final double[] altitudes;
@@ -122,21 +123,24 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
                 if (z > max) max = z;
             }
 //          altitudes.free(); // TODO: uncomment when we will be allowed to use Java 6.
-            final CoordinateReferenceSystem verticalCRS;
             try {
                 verticalCRS = CRS.decode(CRS_AUTHORITY + verticalSRID);
             } catch (FactoryException exception) {
-                throw new IllegalRecordException(results.getMetaData().getTableName(indexOf(query.verticalSRID)), exception);
+                throw new IllegalRecordException(exception, results, indexOf(query.verticalSRID), identifier);
             }
-            crs = new DefaultCompoundCRS(crs.getName().getCode() + ", " + verticalCRS.getName().getCode(), crs, verticalCRS);
         } else {
             altitudes = null;
         }
         /*
          * Adds the temporal axis. TODO: HARD CODED FOR NOW. We need to do something better.
          */
-        crs = new DefaultCompoundCRS(crs.getName().getCode(), crs,
-                CRS.getTemporalCRS(net.sicade.catalog.CRS.XYT.getCoordinateReferenceSystem()));
+        final CoordinateReferenceSystem temporalCRS = CRS.getTemporalCRS(net.sicade.catalog.CRS.XYT.getCoordinateReferenceSystem());
+        if (verticalCRS != null) {
+            final String name = crs.getName().getCode() + ", " + verticalCRS.getName().getCode();
+            crs = new DefaultCompoundCRS(name, new CoordinateReferenceSystem[] {crs, verticalCRS, temporalCRS});
+        } else {
+            crs = new DefaultCompoundCRS(crs.getName().getCode(), crs, temporalCRS);
+        }
         /*
          * Creates the "grid to CRS" transform as a matrix. The coefficients for the vertical
          * axis assume that the vertical ordinates are evenly spaced. This is not always true;
@@ -181,9 +185,17 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         try {
             bbox = new GeographicBoundingBoxImpl(geographicEnvelope);
         } catch (TransformException exception) {
-            throw new IllegalRecordException(results.getMetaData().getTableName(indexOf(query.horizontalExtent)), exception);
+            throw new IllegalRecordException(exception, results, indexOf(query.horizontalExtent), identifier);
         }
-        return new GridGeometryEntry(identifier, gridRange, envelope, bbox, altitudes);
+        /*
+         * Creates the entry and performs some final checks.
+         */
+        final GridGeometryEntry entry = new GridGeometryEntry(identifier, gridRange, envelope, bbox, altitudes);
+        if (entry.geographicEnvelope.isEmpty()) {
+            throw new IllegalRecordException("L'enveloppe géographique est vide. Elle a été calculée à partir de \"" +
+                    horizontalExtent + "\".", results, indexOf(query.horizontalExtent), identifier);
+        }
+        return entry;
     }
 
     /**

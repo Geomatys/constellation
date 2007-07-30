@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import net.sicade.catalog.CatalogException;
 
 import org.geotools.resources.Arguments;
 import org.geotools.util.MonolineFormatter;

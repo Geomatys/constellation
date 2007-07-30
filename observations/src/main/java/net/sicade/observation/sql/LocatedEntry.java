@@ -34,8 +34,8 @@ import org.geotools.measure.AngleFormat;
 import net.sicade.util.DateRange;
 import net.sicade.catalog.Entry;
 import net.sicade.observation.LocatedElement;
-import net.sicade.coverage.catalog.ServerException;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.ServerException;
+import net.sicade.catalog.CatalogException;
 
 
 /**

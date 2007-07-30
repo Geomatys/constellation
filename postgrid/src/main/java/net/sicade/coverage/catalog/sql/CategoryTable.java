@@ -36,9 +36,9 @@ import org.geotools.referencing.ReferencingFactoryFinder;
 
 import net.sicade.image.Utilities;
 import net.sicade.catalog.Element;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.ServerException;
-import net.sicade.coverage.catalog.IllegalRecordException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.ServerException;
+import net.sicade.catalog.IllegalRecordException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Table;
 import net.sicade.catalog.QueryType;
@@ -89,16 +89,16 @@ public class CategoryTable extends Table {
         final int functionIndex = indexOf(query.function);
         final int colorsIndex   = indexOf(query.colors  );
         final List<Category> categories = new ArrayList<Category>();
-        final ResultSet result = statement.executeQuery();
-        while (result.next()) {
+        final ResultSet results = statement.executeQuery();
+        while (results.next()) {
             boolean isQuantifiable = true;
-            final String     name = result.getString(nameIndex);
-            final int       lower = result.getInt   (lowerIndex);
-            final int       upper = result.getInt   (upperIndex);
-            final double       c0 = result.getDouble(c0Index); isQuantifiable &= !result.wasNull();
-            final double       c1 = result.getDouble(c1Index); isQuantifiable &= !result.wasNull();
-            final String function = result.getString(functionIndex);
-            final String  colorID = result.getString(colorsIndex);
+            final String     name = results.getString(nameIndex);
+            final int       lower = results.getInt   (lowerIndex);
+            final int       upper = results.getInt   (upperIndex);
+            final double       c0 = results.getDouble(c0Index); isQuantifiable &= !results.wasNull();
+            final double       c1 = results.getDouble(c1Index); isQuantifiable &= !results.wasNull();
+            final String function = results.getString(functionIndex);
+            final String  colorID = results.getString(colorsIndex);
             /*
              * Procède maintenant au décodage du champ "colors". Ce champ contient
              * une chaîne de caractère qui indique soit le code RGB d'une couleur
@@ -108,9 +108,7 @@ public class CategoryTable extends Table {
             if (colorID != null) try {
                 colors = decode(colorID);
             } catch (Exception exception) { // Includes IOException and ParseException
-                final String table = result.getMetaData().getTableName(colorsIndex);
-                result.close();
-                throw new IllegalRecordException(table, exception);
+                throw new IllegalRecordException(exception, results, colorsIndex, name);
             }
             /*
              * Construit une catégorie correspondant à l'enregistrement qui vient d'être lu.
@@ -138,18 +136,16 @@ public class CategoryTable extends Table {
                         tr = (MathTransform1D) factory.createConcatenatedTransform(tr, exponential);
                         category = new Category(name, colors, range, tr);
                     } catch (FactoryException exception) {
-                        result.close();
+                        results.close();
                         throw new ServerException(exception);
                     } else {
-                        final String table = result.getMetaData().getTableName(functionIndex);
-                        result.close();
-                        throw new IllegalRecordException(table, "Fonction inconnue: " + function);
+                        throw new IllegalRecordException("Fonction inconnue: " + function, results, functionIndex, name);
                     }
                 }
             }
             categories.add(category);
         }
-        result.close();
+        results.close();
         return categories.toArray(new Category[categories.size()]);
     }
 

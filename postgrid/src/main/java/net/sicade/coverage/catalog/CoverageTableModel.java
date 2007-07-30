@@ -52,6 +52,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CannotRedoException;
+import net.sicade.catalog.CatalogException;
 
 import org.geotools.image.io.IIOListeners;
 import org.geotools.coverage.grid.GridCoverage2D;

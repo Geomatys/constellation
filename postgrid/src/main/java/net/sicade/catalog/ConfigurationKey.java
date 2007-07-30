@@ -71,6 +71,12 @@ public enum ConfigurationKey {
     DATABASE("Database", "jdbc:derby:postgrid"),
 
     /**
+     * Key for the {@linkplain java.sql.Connection#setReadOnly read only} state
+     * of the database connection. The default value is {@code true}.
+     */
+    READONLY("ReadOnly", "true"),
+
+    /**
      * Key for user name connecting to the {@linkplain #DATABASE database}.
      */
     USER("User", null),

@@ -21,7 +21,7 @@ package net.sicade.coverage.catalog.rmi;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.DynamicCoverage;
 
 

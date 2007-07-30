@@ -17,13 +17,13 @@ package net.sicade.coverage.catalog.sql;
 import java.util.Set;
 import java.sql.SQLException;
 import javax.media.jai.KernelJAI;
-import net.sicade.coverage.catalog.CatalogException;
+import org.opengis.parameter.ParameterValueGroup;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.catalog.DatabaseTest;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-import org.opengis.parameter.ParameterValueGroup;
 
 
 /**

@@ -19,18 +19,22 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import net.sicade.coverage.catalog.CatalogException;
+import org.opengis.geometry.Envelope;
+import org.opengis.referencing.crs.GeographicCRS;
+import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.catalog.DatabaseTest;
 
 import org.junit.*;
 import static org.junit.Assert.*;
+import static org.geotools.referencing.CRS.getHorizontalCRS;
 
 
 /**
@@ -60,9 +64,17 @@ public class GridCoverageTableTest extends DatabaseTest {
     public void testSelectAndList() throws CatalogException, SQLException, ParseException {
         final GridCoverageTable table = new GridCoverageTable(database);
         table.setLayer(LayerTableTest.SAMPLE_NAME);
+        final Set<Date> allTimes = table.getAvailableTimes();
         final CoverageReference entry = table.getEntry(SAMPLE_NAME);
         assertEquals(SeriesTableTest.SAMPLE_NAME + ':' + SAMPLE_NAME, entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
+
+        final Envelope envelope = entry.getEnvelope();
+        assertTrue(getHorizontalCRS(envelope.getCoordinateReferenceSystem()) instanceof GeographicCRS);
+        assertEquals(-180, envelope.getMinimum(0), 0.0);
+        assertEquals(+180, envelope.getMaximum(0), 0.0);
+        assertEquals( -90, envelope.getMinimum(1), 0.0);
+        assertEquals( +90, envelope.getMaximum(1), 0.0);
 
         table.setTimeRange(date("1986-01-05"), date("1986-01-20"));
         final Set<CoverageReference> entries = table.getEntries();
@@ -78,9 +90,33 @@ public class GridCoverageTableTest extends DatabaseTest {
 
         final Set<Date> availableTimes = table.getAvailableTimes();
         assertEquals(centroids.keySet(), availableTimes);
+        assertTrue(allTimes.containsAll(availableTimes));
+        assertFalse(availableTimes.containsAll(allTimes));
 
         final Set<Number> altitudes = table.getAvailableAltitudes();
         assertTrue(altitudes.isEmpty());
+    }
+
+    /**
+     * Tests the table for NetCDF images. They use a Mercator projection.
+     */
+    @Test
+    public void testNetCDF() throws CatalogException, SQLException, ParseException {
+        final GridCoverageTable table = new GridCoverageTable(database);
+        table.setLayer("SST (Monde - Coriolis)");
+        final CoverageReference entry = table.getEntry();
+        final Envelope envelope = entry.getEnvelope();
+        assertTrue(getHorizontalCRS(envelope.getCoordinateReferenceSystem()) instanceof ProjectedCRS);
+        assertEquals(-2.00375E7, envelope.getMinimum(0), 100.0);
+        assertEquals( 2.00375E7, envelope.getMaximum(0), 100.0);
+        assertEquals(-1.38176E7, envelope.getMinimum(1), 100.0);
+        assertEquals( 1.38176E7, envelope.getMaximum(1), 100.0);
+
+        final GeographicBoundingBox bbox = entry.getGeographicBoundingBox();
+        assertEquals(-180, bbox.getWestBoundLongitude(), 0.0);
+        assertEquals(+180, bbox.getEastBoundLongitude(), 0.0);
+        assertEquals( -77, bbox.getSouthBoundLatitude(), 0.1);
+        assertEquals( +77, bbox.getNorthBoundLatitude(), 0.1);
     }
 
     /**

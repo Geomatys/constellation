@@ -22,8 +22,9 @@ import java.sql.PreparedStatement;
 import net.sicade.catalog.Table;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.IllegalRecordException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.IllegalRecordException;
+import net.sicade.catalog.DuplicatedRecordException;
 import net.sicade.coverage.catalog.LinearModel;
 import net.sicade.coverage.catalog.Descriptor;
 import net.sicade.resources.i18n.ResourceKeys;
@@ -102,7 +103,8 @@ public class DescriptorSubstitutionTable extends Table {
         final DescriptorSubstitutionQuery query = (DescriptorSubstitutionQuery) super.query;
         final PreparedStatement statement = getStatement(QueryType.SELECT);
         final String key = descriptor.getName();
-        statement.setString(indexOf(query.bySymbol), key);
+        final int bySymbol = indexOf(query.bySymbol);
+        statement.setString(bySymbol, key);
         final ResultSet results = statement.executeQuery();
         if (!results.next()) {
             results.close();
@@ -111,15 +113,14 @@ public class DescriptorSubstitutionTable extends Table {
         final String symbol1 = results.getString(indexOf(query.symbol1));
         final String symbol2 = results.getString(indexOf(query.symbol2));
         if (results.next()) {
-            final String table = results.getMetaData().getTableName(1);
-            results.close();
-            throw new IllegalRecordException(table, Resources.format(
-                      ResourceKeys.ERROR_DUPLICATED_RECORD_$1, key));
+            throw new DuplicatedRecordException(results, bySymbol, key);
+        }
+        if (key.equals(symbol1) || key.equals(symbol2)) {
+            IllegalRecordException e = new IllegalRecordException("Définition récursive d'un gradient temporel.");
+            e.setMetadata(results, bySymbol, key);
+            throw e;
         }
         results.close();
-        if (key.equals(symbol1) || key.equals(symbol2)) {
-            throw new IllegalRecordException(null, "Définition récursive d'un gradient temporel.");
-        }
         if (descriptors == null) {
             descriptors = getDatabase().getTable(DescriptorTable.class);
         }

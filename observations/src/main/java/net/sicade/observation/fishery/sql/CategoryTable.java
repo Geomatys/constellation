@@ -27,7 +27,7 @@ import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.observation.fishery.Category;
 
 

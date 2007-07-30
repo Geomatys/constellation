@@ -60,7 +60,7 @@ import org.geotools.resources.SwingUtilities;
 import net.sicade.resources.XArray;
 import net.sicade.catalog.Element;
 import net.sicade.coverage.catalog.Catalog;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.Descriptor;

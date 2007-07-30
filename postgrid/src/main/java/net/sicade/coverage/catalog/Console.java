@@ -30,6 +30,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+import net.sicade.catalog.CatalogException;
 
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;

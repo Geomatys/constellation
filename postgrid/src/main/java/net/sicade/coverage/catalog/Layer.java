@@ -14,19 +14,17 @@
  */
 package net.sicade.coverage.catalog;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Date;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.Element;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
-// Sicade dependencies
 import net.sicade.util.DateRange;
-import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Procedure;
-import net.sicade.observation.Observable;
+
 
 /**
  * Représentation une couche d'images. Chaque couche d'images portent sur un
@@ -48,7 +46,7 @@ import net.sicade.observation.Observable;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public interface Layer extends Observable, Phenomenon {
+public interface Layer extends Element {
     /**
      * Retourne la thématique de cette couche d'images. Des exemples de thématiques sont
      * la <cite>température</cite>, l'<cite>anomalie de la hauteur de l'eau</cite>,

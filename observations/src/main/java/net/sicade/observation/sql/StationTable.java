@@ -44,7 +44,7 @@ import net.sicade.observation.Station;
 import net.sicade.observation.Platform;
 import net.sicade.observation.Observation;
 import net.sicade.catalog.ConfigurationKey;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 
 
 /**

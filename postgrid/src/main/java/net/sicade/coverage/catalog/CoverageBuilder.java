@@ -50,6 +50,9 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.IIOException;
 import javax.imageio.stream.ImageOutputStream;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.NoSuchRecordException;
+import net.sicade.catalog.ServerException;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.CannotEvaluateException;

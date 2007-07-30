@@ -28,7 +28,7 @@ import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 
 // Seagis dependencies
 import net.sicade.catalog.ConfigurationKey;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Element;
 import net.sicade.observation.Procedure;          // Pour javadoc
 import net.sicade.catalog.Table;

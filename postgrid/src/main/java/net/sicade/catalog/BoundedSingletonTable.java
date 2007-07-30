@@ -42,9 +42,6 @@ import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
 import static org.geotools.referencing.CRS.transform;
 
 import net.sicade.util.DateRange;
-import net.sicade.coverage.catalog.ServerException;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.IllegalRecordException;
 
 
 /**
@@ -153,18 +150,20 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      */
     protected BoundedSingletonTable(final BoundedSingletonTable<E> table) {
         super(table);
-        crsType        = table.crsType;
-        tMin           = table.tMin;
-        tMax           = table.tMax;
-        xMin           = table.xMin;
-        xMax           = table.xMax;
-        yMin           = table.yMin;
-        yMax           = table.yMax;
-        zMin           = table.zMin;
-        zMax           = table.zMax;
-        trimmed        = table.trimmed;
-        trimRequested  = table.trimRequested;
-        standardToUser = table.standardToUser;
+        crsType         = table.crsType;
+        tMin            = table.tMin;
+        tMax            = table.tMax;
+        xMin            = table.xMin;
+        xMax            = table.xMax;
+        yMin            = table.yMin;
+        yMax            = table.yMax;
+        zMin            = table.zMin;
+        zMax            = table.zMax;
+        trimmed         = table.trimmed;
+        trimRequested   = table.trimRequested;
+        standardToUser  = table.standardToUser;
+        byTimeRange     = table.byTimeRange;
+        bySpatialExtent = table.bySpatialExtent;
     }
 
     /**
@@ -538,7 +537,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
                     try {
                         envelope = SpatialFunctions.parse(bbox);
                     } catch (NumberFormatException e) {
-                        throw new IllegalRecordException(results.getMetaData().getTableName(bboxColumn), e);
+                        throw new IllegalRecordException(e, results, bboxColumn, null);
                     }
                     final int dimension = envelope.getDimension();
                     for (int i=0; i<dimension; i++) {

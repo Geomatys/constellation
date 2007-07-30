@@ -47,7 +47,7 @@ import net.sicade.coverage.catalog.DynamicCoverage;
 import net.sicade.coverage.catalog.sql.LayerTable;
 import net.sicade.coverage.catalog.sql.DescriptorTable;
 import net.sicade.coverage.catalog.sql.GridCoverageTable;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 
 
 /**

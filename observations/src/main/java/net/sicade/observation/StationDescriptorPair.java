@@ -17,6 +17,7 @@ package net.sicade.observation;
 // J2SE dependencies
 import java.util.Date;
 import java.lang.reflect.UndeclaredThrowableException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.*;
 
 // Geotools dependencies

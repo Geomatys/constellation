@@ -23,8 +23,8 @@ import java.sql.SQLException;
 
 import net.sicade.observation.Station;
 import net.sicade.observation.Platform;
-import net.sicade.coverage.catalog.ServerException;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.ServerException;
+import net.sicade.catalog.CatalogException;
 
 
 /**

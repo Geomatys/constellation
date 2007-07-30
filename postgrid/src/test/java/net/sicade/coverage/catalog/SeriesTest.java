@@ -27,6 +27,7 @@ import java.sql.SQLException;
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import net.sicade.catalog.CatalogException;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;

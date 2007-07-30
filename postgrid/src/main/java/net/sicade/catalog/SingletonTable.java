@@ -23,10 +23,6 @@ import java.util.Map;
 import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import org.geotools.util.WeakValueHashMap;
-
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.NoSuchRecordException;
-import net.sicade.coverage.catalog.IllegalRecordException;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
 
@@ -108,6 +104,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
      */
     protected SingletonTable(final SingletonTable<E> table) {
         super(table);
+        indexByName   = table.indexByName;
+        indexByNumber = table.indexByNumber;
     }
 
     /**
@@ -168,6 +166,29 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
+     * Invokes the user's {@link #createEntry(ResultSet)} method, but wraps {@link SQLException}
+     * into {@link ServerException} because the later provides more informations.
+     */
+    private E createEntry(final ResultSet results, final Object key, final int index)
+            throws CatalogException, SQLException
+    {
+        try {
+            return createEntry(results);
+        } catch (CatalogException exception) {
+            if (!exception.isMetadataInitialized()) {
+                exception.setMetadata(results, index, (key!=null) ? key.toString() : null);
+                exception.clearColumnName();
+            }
+            throw exception;
+        } catch (SQLException cause) {
+            final ServerException exception = new ServerException(cause);
+            exception.setMetadata(results, index, (key!=null) ? key.toString() : null);
+            exception.clearColumnName();
+            throw exception;
+        }
+    }
+
+    /**
      * Creates an {@link Element} object for the current {@linkplain ResultSet result set} row.
      * This method is invoked automatically by {@link #getEntry(String)} and {@link #getEntries()}.
      *
@@ -215,20 +236,22 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Retourne une seule entrée pour l'objet {@link #statement} courant. Tous les arguments de
-     * {@link #statement} doivent avoir été définis avent d'appeler cette méthode. Cette méthode
-     * suppose que l'appellant a déjà vérifié qu'aucune entrée n'existait préalablement dans la
-     * cache pour la clé spécifiée. La requête sera exécutée et {@link #createEntry} appelée.
-     * Le résultat sera alors placé dans la cache, et {@link #postCreateEntry} appelée.
+     * Returns a single entry for the specified {@code statement}. All SQL parameters must have been
+     * set on the prepared {@code statement} before this method is invoked. This method assumes that
+     * the caller has already checked that there is not entry in the cache for the given key.
+     * <p>
+     * This method executes the query, invokes {@link #createEntry}, puts the result in the
+     * cache, close the result set and finally invokes {@link #postCreateEntry}.
      *
-     * @param  statement Requête SQL à exécuter.
-     * @param  key Clé identifiant l'entré.
-     * @return L'entré pour la clé spécifiée et l'état courant de {@link #statement}.
-     * @throws CatalogException si aucun enregistrement ne correspond à l'identifiant demandé,
-     *         ou si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
+     * @param  statement The statement to execute.
+     * @param  key The primary key for the record to look for.
+     * @param  index The primary key column. Used mostly for formatting error messages.
+     * @return The record (never {@code null}).
+     * @throws CatalogException if no record was found for the specified key, or if a
+     *         record is invalid.
+     * @throws SQLException if a SQL error occured while reading the database.
      */
-    private E executeQuery(final PreparedStatement statement, Object key)
+    private E executeQuery(final PreparedStatement statement, Object key, final int index)
             throws CatalogException, SQLException
     {
         assert Thread.holdsLock(this);
@@ -236,28 +259,15 @@ public abstract class SingletonTable<E extends Element> extends Table {
         E entry = null;
         final ResultSet results = statement.executeQuery();
         while (results.next()) {
-            final E candidate = createEntry(results);
+            final E candidate = createEntry(results, key, index);
             if (entry == null) {
                 entry = candidate;
             } else if (!entry.equals(candidate)) {
-                final String table = results.getMetaData().getTableName(1);
-                results.close();
-                throw new IllegalRecordException(table, Resources.format(
-                          ResourceKeys.ERROR_DUPLICATED_RECORD_$1, key));
+                throw new DuplicatedRecordException(results, index, String.valueOf(key));
             }
         }
         if (entry == null) {
-            String table = results.getMetaData().getTableName(1);
-            results.close();
-            if (table==null || (table=table.trim()).length()==0) {
-                table = getClass().getSimpleName();
-                final String suffix = "Table";
-                if (table.endsWith(suffix)) {
-                    table = table.substring(0, table.length()-suffix.length());
-                }
-            }
-            throw new NoSuchRecordException(Resources.format(
-                      ResourceKeys.ERROR_KEY_NOT_FOUND_$2, table, key), table);
+            throw new NoSuchRecordException(results, index, String.valueOf(key));
         }
         results.close();
         /*
@@ -324,7 +334,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
         }
         final PreparedStatement statement = getStatement(SELECT_BY_NUMBER);
         statement.setInt(indexByNumber, identifier);
-        return executeQuery(statement, key);
+        return executeQuery(statement, key, indexByNumber);
     }
 
     /**
@@ -350,7 +360,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
         }
         final PreparedStatement statement = getStatement(SELECT_BY_NAME);
         statement.setString(indexByName, name);
-        return executeQuery(statement, name);
+        return executeQuery(statement, name, indexByName);
     }
 
     /**
@@ -380,7 +390,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
         final ResultSet results = statement.executeQuery();
         try {
             while (results.next()) {
-                E entry = createEntry(results);
+                E entry = createEntry(results, null, indexByName);
                 if (accept(entry)) {
                     final String name = entry.getName();
                     /*
@@ -396,8 +406,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
                         cache(name, entry);
                     }
                     if (set.put(entry, initialized) != null) {
-                        throw new IllegalRecordException(results.getMetaData().getTableName(1),
-                                Resources.format(ResourceKeys.ERROR_DUPLICATED_RECORD_$1, name));
+                        throw new DuplicatedRecordException(results, indexByName, name);
                     }
                 }
             }

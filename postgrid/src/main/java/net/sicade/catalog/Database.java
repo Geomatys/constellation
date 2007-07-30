@@ -51,8 +51,8 @@ import org.geotools.resources.Utilities;
 
 /**
  * Connection to an observation database through JDBC (<cite>Java Database Connectivity</cite>).
- * Connection parameters are stored in a {@code "DatabaseQueries.xml"} configuration file stored
- * in the {@code "Application Data\Sicade"} user directory on Windows, or {@code ".sicade"} user
+ * Connection parameters are stored in a {@code "config.xml"} configuration file stored in the
+ * {@code "Application Data\Sicade"} user directory on Windows, or {@code ".sicade"} user
  * directory on Unix.
  *
  * @version $Id$
@@ -72,7 +72,7 @@ public class Database {
     /**
      * The file where to store configuration parameters.
      */
-    private static final String CONFIG_FILENAME = "DatabaseQueries.xml";
+    private static final String CONFIG_FILENAME = "config.xml";
 
     /**
      * {@code false} if RMI should be disabled. This flag is set on the command line using the
@@ -92,7 +92,7 @@ public class Database {
             Entry.LOGGER.config("RMI désactivés.");
         }
     }
-    
+
     /**
      * The data source, or {@code null} if none.
      */
@@ -133,9 +133,14 @@ public class Database {
     private final TimeZone timezone;
 
     /**
-     * The properties read from the {@value #CONFIG_FILENAME} file.
+     * The properties read from the {@link #configFilename} file.
      */
     private final Properties properties;
+
+    /**
+     * The configuration filename. Should be {@value #CONFIG_FILENAME} in most cases.
+     */
+    private final String configFilename;
 
     /**
      * Set to {@code true} if the {@linkplain #properties} have been modified.
@@ -165,7 +170,19 @@ public class Database {
      * @throws IOException if an error occured while reading the configuration file.
      */
     public Database(final DataSource source) throws IOException {
+        this(source, CONFIG_FILENAME);
+    }
+
+    /**
+     * Opens a new connection using the provided data source and configuration file.
+     *
+     * @param  source The data source, or {@code null} if none.
+     * @param  configFilename The configuration filename.
+     * @throws IOException if an error occured while reading the configuration file.
+     */
+    Database(final DataSource source, final String configFilename) throws IOException {
         this.source = source;
+        this.configFilename = configFilename;
         /*
          * Procède d'abord à la lecture du fichier de configuration,  afin de permettre
          * à la méthode 'getProperty' de fonctionner. Cette dernière sera utilisée dans
@@ -214,7 +231,7 @@ public class Database {
         /*
          * Donne priorité au fichier de configuration dans le répertoire courant, s'il existe.
          */
-        File path = new File(CONFIG_FILENAME);
+        File path = new File(configFilename);
         if (path.isFile()) {
             return path;
         }
@@ -223,7 +240,7 @@ public class Database {
          */
         final String home = System.getProperty("user.home");
         if (System.getProperty("os.name", "").startsWith("Windows")) {
-            path = new File(path, WINDOWS_DIRECTORY);
+            path = new File(home, WINDOWS_DIRECTORY);
         } else {
             path = new File(home, UNIX_DIRECTORY);
         }
@@ -232,7 +249,7 @@ public class Database {
                 return null;
             }
         }
-        return new File(path, CONFIG_FILENAME);
+        return new File(path, configFilename);
     }
 
     /**
@@ -271,6 +288,7 @@ public class Database {
                 }
             }
             if (connection != null) {
+                connection.setReadOnly(Boolean.valueOf(getProperty(ConfigurationKey.READONLY)));
                 Element.LOGGER.info("Connecté à la base de données " + connection.getMetaData().getURL());
             }
         }

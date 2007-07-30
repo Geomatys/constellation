@@ -22,6 +22,8 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.awt.Component;
 import java.awt.geom.Point2D;
 import java.sql.SQLException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.ServerException;
 import net.sicade.coverage.catalog.*;
 
 // OpenGIS dependencies
@@ -209,7 +211,7 @@ public class MeasurementTableFiller implements Runnable {
                 if (coverages.put(descriptor, new SpatioTemporalCoverage3D(null, descriptor.getCoverage())) != null) {
                     throw new AssertionError(descriptor);
                 }
-                measures.setObservable(descriptor);
+                //measures.setObservable(descriptor);  // TODO
                 for (final Station station : stations) {
                     measures.setStation(station);
                     try {

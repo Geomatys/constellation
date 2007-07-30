@@ -224,8 +224,8 @@ public class Table {
                     disposer = null;
                 }
             } else {
-                statement  = getDatabase().getConnection().prepareStatement(query);
-                changed    = true;
+                statement = getDatabase().getConnection().prepareStatement(query);
+                changed   = true;
                 if (disposer == null) {
                     disposer = new Disposer();
                     TIMER.schedule(disposer, DELAY, DELAY);

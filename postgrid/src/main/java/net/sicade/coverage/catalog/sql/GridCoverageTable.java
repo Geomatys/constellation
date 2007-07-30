@@ -38,7 +38,7 @@ import org.geotools.util.RangeSet;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XRectangle2D;
 
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.CoverageReference;
@@ -673,7 +673,6 @@ loop:   for (final CoverageReference newReference : entries) {
      * a {@linkplain #fireStateChanged changé d'état}.
      */
     @Override
-    @SuppressWarnings("fallthrough")
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
         final GridCoverageQuery query = (GridCoverageQuery) super.query;

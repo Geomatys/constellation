@@ -21,7 +21,7 @@ import java.sql.PreparedStatement;
 import java.util.Set;
 
 import org.geotools.resources.Utilities;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Format;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Series;

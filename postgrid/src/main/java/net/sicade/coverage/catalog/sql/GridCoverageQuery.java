@@ -67,12 +67,12 @@ final class GridCoverageQuery extends Query {
 
         endTime         .setOrdering("ASC");
 //      series          .setOrdering("ASC"); // TODO: enable once declaration order is taken in account.
-        byFilename         = addParameter(filename, SELECT);
-        byLayer            = addParameter(layer,       SLA);
-        byStartTime        = addParameter(startTime,   SLA);
-        byEndTime          = addParameter(endTime,     SLA);
+        byFilename         = addParameter(filename,      SELECT);
+        byLayer            = addParameter(layer,            SLA);
+        byStartTime        = addParameter(startTime,        SLA);
+        byEndTime          = addParameter(endTime,          SLA);
         byHorizontalExtent = addParameter(horizontalExtent, SLA);
-        byVisibility = addParameter(visibility,  SLA);
+        byVisibility       = addParameter(visibility,       SLA);
         if (database.isSpatialEnabled()) {
             byHorizontalExtent.setComparator("&&");
             byHorizontalExtent.setFunction("GeometryFromText(?,4326)", SLA);

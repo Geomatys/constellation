@@ -294,7 +294,10 @@ final class CoverageComparator implements Comparator<CoverageReference> {
         {
             Envelope envelope = entry.getEnvelope();
             CoordinateReferenceSystem sourceCRS = entry.getCoordinateReferenceSystem();
-            if (!CRS.equalsIgnoreMetadata(crs, sourceCRS)) {
+            ///////////////////////////////////////////////////////////////////////
+            //// TODO: DISABLED FOR NOW. We seems to have a Geotools bug here. ////
+            ///////////////////////////////////////////////////////////////////////
+            if (false && !CRS.equalsIgnoreMetadata(crs, sourceCRS)) {
                 if (transformation == null ||
                     !CRS.equalsIgnoreMetadata(transformation.getSourceCRS(), sourceCRS))
                 {

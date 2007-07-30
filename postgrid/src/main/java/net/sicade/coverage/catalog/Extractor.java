@@ -33,6 +33,8 @@ import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.NoSuchRecordException;
 import org.geotools.io.LineFormat;
 
 // OpenGIS

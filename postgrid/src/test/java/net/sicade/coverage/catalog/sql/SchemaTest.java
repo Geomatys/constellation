@@ -14,7 +14,6 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import net.sicade.catalog.DatabaseTest;
 

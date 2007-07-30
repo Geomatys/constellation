@@ -34,7 +34,7 @@ import org.geotools.geometry.GeneralEnvelope;
 
 // Sicade dependencies
 import net.sicade.coverage.catalog.Catalog;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import org.geotools.resources.image.ImageUtilities;
 
 

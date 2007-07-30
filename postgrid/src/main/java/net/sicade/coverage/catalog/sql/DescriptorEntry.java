@@ -14,15 +14,11 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-// J2SE dependencies
 import java.rmi.RemoteException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
-
-// Sicade dependencies
 import net.sicade.coverage.catalog.Distribution;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Operation;
@@ -30,9 +26,9 @@ import net.sicade.coverage.catalog.Descriptor;
 import net.sicade.coverage.catalog.RegionOfInterest;
 import net.sicade.coverage.catalog.DynamicCoverage;
 import net.sicade.coverage.catalog.FunctionalCoverage;
-import net.sicade.observation.sql.ObservableEntry;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.ServerException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.Entry;
+import net.sicade.catalog.ServerException;
 
 
 /**
@@ -42,7 +38,7 @@ import net.sicade.coverage.catalog.ServerException;
  * @author Martin Desruisseaux 
  * @author Antoine Hnawia
  */
-public class DescriptorEntry extends ObservableEntry implements Descriptor {
+public class DescriptorEntry extends Entry implements Descriptor {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -52,6 +48,26 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
      * L'identifiant du descripteur identité.
      */
     private static final int IDENTITY_ID = 10000;
+
+    /**
+     * Identifiant de l'observable.
+     */
+    protected final int identifier;
+
+    /**
+     * Référence vers le {@linkplain Phenomenon phénomène} observé.
+     */
+    private final Layer phenomenon;
+
+    /**
+     * Référence vers la {@linkplain Procedure procédure} associée à cet observable.
+     */
+    private final Operation procedure;
+
+    /**
+     * Référence vers la {@linkplain Distribution distribution} associée à cet observable.
+     */
+    private final Distribution distribution;
 
     /**
      * La position relative.
@@ -90,25 +106,49 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
                               final Distribution   distribution,
                               final String         remarks)
     {
-        super(identifier, symbol, layer, operation, distribution, remarks);
-        this.band   = band;
-        this.offset = offset;
+        super(symbol, remarks);
+        this.identifier   = identifier;
+        this.phenomenon   = layer;
+        this.procedure    = operation;
+        this.distribution = distribution;
+        this.band         = band;
+        this.offset       = offset;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int getNumericIdentifier() {
+        return identifier;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Layer getPhenomenon() { 
-        return (Layer) super.getPhenomenon();
+    public Layer getPhenomenon() {
+        return phenomenon;
     }
 
     /**
      * {@inheritDoc}
      */
+    public Operation getProcedure() {
+        return procedure;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Distribution getDistribution() {
+        return distribution;
+    }
+
+    /**
+     * Retourne le code numérique identifiant cette entrée.
+     */
     @Override
-    public Operation getProcedure() { 
-        return (Operation) super.getProcedure();
+    public int hashCode() {
+        return identifier;
     }
 
     /**
@@ -166,8 +206,12 @@ public class DescriptorEntry extends ObservableEntry implements Descriptor {
         }
         if (super.equals(object)) {
             final DescriptorEntry that = (DescriptorEntry) object;
-            return                  this.band == that.band &&
-                   Utilities.equals(this.offset, that.offset);
+            return                 (this.identifier == that.identifier)   &&
+                   Utilities.equals(this.phenomenon,   that.phenomenon)   &&
+                   Utilities.equals(this.procedure,    that.procedure)    &&
+                   Utilities.equals(this.distribution, that.distribution) &&
+                   Utilities.equals(this.offset,       that.offset)       &&
+                   this.band == that.band;
         }
         return false;
     }

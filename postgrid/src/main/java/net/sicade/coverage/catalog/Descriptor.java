@@ -15,8 +15,9 @@
 package net.sicade.coverage.catalog;
 
 import java.util.Comparator;
-import net.sicade.observation.Observable;
-import net.sicade.coverage.catalog.Distribution;     // Pour javadoc
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.Element;
+
 
 /**
  * Un descripteur du paysage océanique. Un descripteur est une variable explicative
@@ -36,7 +37,7 @@ import net.sicade.coverage.catalog.Distribution;     // Pour javadoc
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public interface Descriptor extends Observable {
+public interface Descriptor extends Element {
     /**
      * Un comparateur pour classer des descripteurs en ordre croissant de
      * {@linkplain RegionOfInterest#getDayOffset décalage temporel}. Si deux
@@ -58,6 +59,14 @@ public interface Descriptor extends Observable {
     };
 
     /**
+     * Retourne un numéro unique identifiant cet observable. Ce numéro est complémentaire (et dans
+     * une certaine mesure redondant) avec {@linkplain #getName le symbole} de l'observable. Il
+     * existe parce que les observables, ainsi que les {@linkplain Station stations}, sont
+     * référencés dans des millions de lignes dans la table des observations.
+     */
+    int getNumericIdentifier();
+
+    /**
      * Retourne la couche d'images d'où proviennent les données du paramètre environnemental étudié.
      * Il peut s'agir par exemple d'une couche d'images de température.
      */
@@ -69,6 +78,17 @@ public interface Descriptor extends Observable {
      * retourne une opération identité.
      */
     Operation getProcedure();
+
+    /**
+     * Retourne la distribution statistique approximative des valeurs attendues. Cette distribution
+     * n'est pas nécessairement déterminée à partir des données, mais peut être un <cite>a-priori</cite>.
+     * Cette information est utilisée principalement par les
+     * {@linkplain net.sicade.observation.coverage.LinearModel modèles linéaires} qui ont besoin d'une
+     * <A HREF="http://mathworld.wolfram.com/NormalDistribution.html">distribution normale</A>.
+     * Cette méthode retourne {@code null} si la distribution est inconnue ou n'est pas pertinente
+     * pour cet observable.
+     */
+    Distribution getDistribution();
 
     /**
      * Retourne la position relative à laquelle évaluer les images de la couche.

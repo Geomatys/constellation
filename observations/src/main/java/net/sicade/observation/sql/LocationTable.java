@@ -37,7 +37,7 @@ import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Query;
 import net.sicade.catalog.Table;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 
 
 /**

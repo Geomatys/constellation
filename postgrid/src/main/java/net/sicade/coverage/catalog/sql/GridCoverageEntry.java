@@ -88,8 +88,8 @@ import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.coverage.catalog.rmi.RemoteLoader;
 import net.sicade.coverage.catalog.rmi.CoverageLoader;
-import net.sicade.coverage.catalog.IllegalRecordException;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.IllegalRecordException;
+import net.sicade.catalog.CatalogException;
 
 
 /**
@@ -248,9 +248,9 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
         this.parameters = table.getParameters(layer, format, crs, pathname, extension);
         this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
-        if (this.startTime >= this.endTime) {
+        if (geometry.geographicEnvelope.isEmpty() || this.startTime >= this.endTime) {
             // TODO: localize
-            throw new IllegalRecordException(null, "L'enveloppe spatio-temporelle est vide.");
+            throw new IllegalRecordException("L'enveloppe spatio-temporelle est vide.");
         }
     }
 

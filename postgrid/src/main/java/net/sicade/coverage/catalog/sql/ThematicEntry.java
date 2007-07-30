@@ -14,17 +14,17 @@
  */
 package net.sicade.coverage.catalog.sql;
 
+import net.sicade.catalog.Entry;
 import net.sicade.coverage.catalog.Thematic;
-import net.sicade.observation.sql.PhenomenonEntry;
 
 
 /**
- * Implémentation d'une entrée représentant un {@linkplain Thematic thème}.
+ * Implementation of a {@linkplain Thematic thematic} entry in the database.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ThematicEntry extends PhenomenonEntry implements Thematic {
+public class ThematicEntry extends Entry implements Thematic {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */

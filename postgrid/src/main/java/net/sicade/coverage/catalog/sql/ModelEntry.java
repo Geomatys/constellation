@@ -26,7 +26,7 @@ import org.geotools.resources.Utilities;
 // Sicade dependencies
 import net.sicade.catalog.Entry;
 import net.sicade.coverage.catalog.Distribution;
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Model;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Descriptor;

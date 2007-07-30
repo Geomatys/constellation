@@ -2,34 +2,24 @@
 
 <HTML>
   <HEAD>
-    <TITLE>package net.sicade.observation.coverage.sql</TITLE>
+    <TITLE>package net.sicade.coverage.catalog.sql</TITLE>
   </HEAD>
   <BODY>
-    Implémentation des interfaces du paquet {@link net.sicade.observation.coverage coverage}.
+  Implementation of {@link net.sicade.coverage.catalog} interfaces. The coverage data are stored
+  as images in arbitrary formats (PNG, RAW, ASCII, JPEG-2000, <cite>etc.</cite> - note that the
+  classic JPEG format is not recommanded). A <A HREF="http://www.postgresql.org/">PostgreSQL</A>
+  database is used for storing coverage metadata like geographic envelopes, meaning of pixel values,
+  <cite>etc.</cite>. The database is also used as an index for searching image files. The connection
+  to the database is performed through JDBC, which can work over the network. The pixel values can
+  be obtained over the network in two ways:
 
-    <p align="justify">Quelques unes des tables de ce paquet ne produisent
-    pas d'{@linkplain net.sicade.observation.Element éléments} du paquet
-    {@link net.sicade.observation observation}, mais produisent plutôt divers composantes qui
-    serviront à la création d'un objet {@link org.geotools.coverage.grid.GridCoverage2D}. Ces
-    composantes sont (en partant du plus haut niveau vers le plus détaillé):</p>
+  <ul>
+    <li>Images can be downloaded and processed on the client side. This approach requires less CPU
+    on the server side, but requires a large bandwidth.</li>
 
-    <ul>
-      <li><p align="justify">Une vue à trois dimensions (<var>x</var>,<var>y</var>,<var>t</var>) de
-          l'ensemble des données d'une {@linkplain net.sicade.observation.coverage.Descriptor descripteur},
-          que l'on peut accéder par la méthode {@linkplain net.sicade.observation.coverage.Descriptor#getCoverage
-          getCoverage()} sans se soucier des détails apparaissant ci-dessous.</p></li>
-
-      <li><p align="justify">Chaque couches d'images du point précédent possède un ensemble
-          d'objets {@link org.geotools.coverage.grid.GridCoverage2D}, qui sont créés par
-          {@link net.sicade.observation.coverage.sql.GridCoverageTable}.</p></li>
-
-      <li><p align="justify">Chaque object {@code GridCoverage2D} du point précédent possède
-          un ensemble d'objets {@link org.geotools.coverage.SampleDimension}, qui sont créés
-          par {@link net.sicade.observation.coverage.sql.SampleDimensionTable}.</p></li>
-
-      <li><p align="justify">Chaque objet {@code SampleDimension} du point précédent possède
-          un ensemble d'objets {@link org.geotools.coverage.Category}, qui sont créés par
-          {@link net.sicade.observation.coverage.sql.CategoryTable}.</p></li>
-    </ul>
+    <li>The client can connect to the serveur using RMI (<cite>Remote Method Invocation</cite>). This
+    approach requires more CPU on the server side, but less bandwidth if only a few pixel values will
+    be requested.</li>
+  </ul>
   </BODY>
 </HTML>

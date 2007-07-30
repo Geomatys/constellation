@@ -18,16 +18,10 @@
  */
 package net.sicade.coverage.io;
 
-// J2SE dependencies
-import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
-// OpenGIS dependencies
 import org.opengis.coverage.grid.Format;
-
-// Geotools dependencies
 import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 
 
@@ -39,10 +33,11 @@ import org.geotools.coverage.grid.io.GridFormatFactorySpi;
  */
 public class PostGridFormatFactorySpi implements GridFormatFactorySpi {    
     /**
-     * Not used in this implementation.
+     * Default constructor.
      */
-    public PostGridFormatFactorySpi() {}
-      
+    public PostGridFormatFactorySpi() {
+    }
+
     /**
      * The format is created if the needed classes in JAI and JAI Image IO are found.
      */
@@ -51,10 +46,9 @@ public class PostGridFormatFactorySpi implements GridFormatFactorySpi {
             throw new UnsupportedOperationException(
                     "The PostGrid plugin requires the JAI and JAI ImageI/O libraries.");
         }
-        
         return new PostGridFormat();
     }
-    
+
     /**
      * Verifies if the JAI and JAI-IO package are installed on your machine and reachables.
      *
@@ -71,7 +65,7 @@ public class PostGridFormatFactorySpi implements GridFormatFactorySpi {
         }
         return available;
     }
-    
+
     /**
      * Returns the implementation hints. The default implementation returns en
      * empty map.
@@ -81,5 +75,4 @@ public class PostGridFormatFactorySpi implements GridFormatFactorySpi {
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;
     }
-
 }

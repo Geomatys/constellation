@@ -43,8 +43,8 @@ import net.sicade.coverage.catalog.Descriptor;
 import net.sicade.coverage.catalog.RegionOfInterest;
 import net.sicade.coverage.catalog.DynamicCoverage;
 import net.sicade.coverage.catalog.rmi.DataConnection;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.ServerException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.ServerException;
 
 
 /**

@@ -27,8 +27,8 @@ import javax.units.Unit;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.IllegalRecordException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.IllegalRecordException;
 import net.sicade.catalog.Table;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
@@ -79,11 +79,11 @@ public class SampleDimensionTable extends Table {
         final int unitIndex = indexOf(query.units);
         int lastBand = 0;
         final List<GridSampleDimension> sampleDimensions = new ArrayList<GridSampleDimension>();
-        final ResultSet result = statement.executeQuery();
-        while (result.next()) {
-            final String identifier = result.getString(idIndex);
-            final int          band = result.getInt   (bandIndex); // Comptées à partir de 1.
-            final String unitSymbol = result.getString(unitIndex);
+        final ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            final String identifier = results.getString(idIndex);
+            final int          band = results.getInt   (bandIndex); // Comptées à partir de 1.
+            final String unitSymbol = results.getString(unitIndex);
             final Unit         unit = (unitSymbol != null) ? Unit.searchSymbol(unitSymbol) : null;
             if (categories == null) {
                 categories = getDatabase().getTable(CategoryTable.class);
@@ -93,17 +93,16 @@ public class SampleDimensionTable extends Table {
             try {
                 sampleDimension = new GridSampleDimension(identifier, categoryArray, unit);
             } catch (IllegalArgumentException exception) {
-                throw new IllegalRecordException(result.getMetaData().getTableName(idIndex), exception);
+                throw new IllegalRecordException(exception, results, idIndex, format);
             }
             if (band-1 != lastBand) {
-                throw new IllegalRecordException(result.getMetaData().getTableName(bandIndex),
-                                Resources.format(ResourceKeys.ERROR_NON_CONSECUTIVE_BANDS_$2,
-                                                 new Integer(lastBand), new Integer(band)));
+                throw new IllegalRecordException(Resources.format(ResourceKeys.ERROR_NON_CONSECUTIVE_BANDS_$2,
+                        new Integer(lastBand), new Integer(band)), results, bandIndex, format);
             }
             lastBand = band;
             sampleDimensions.add(sampleDimension);
         }
-        result.close();
+        results.close();
         return sampleDimensions.toArray(new GridSampleDimension[sampleDimensions.size()]);
     }
 }

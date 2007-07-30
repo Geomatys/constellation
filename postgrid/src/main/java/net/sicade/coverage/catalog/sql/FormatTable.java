@@ -22,8 +22,8 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.coverage.catalog.Format;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.IllegalRecordException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.IllegalRecordException;
 
 
 /**
@@ -72,8 +72,7 @@ public class FormatTable extends SingletonTable<Format> {
         } else if ("native".equalsIgnoreCase(encoding)) {
             geophysics = false;
         } else {
-            final String table = results.getMetaData().getTableName(indexOf(query.encoding));
-            throw new IllegalRecordException(table, "Type d'image inconnu: " + encoding);
+            throw new IllegalRecordException("Type d'image inconnu: " + encoding, results, indexOf(query.encoding), name);
         }
         return new FormatEntry(name, mimeType, geophysics, bands.getSampleDimensions(name));
     }

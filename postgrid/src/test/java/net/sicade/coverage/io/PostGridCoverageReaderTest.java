@@ -18,15 +18,13 @@
  */
 package net.sicade.coverage.io;
 
-// J2SE dependencies
 import java.io.IOException;
 import java.util.logging.Logger;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-// Geotools dependencies
 import org.geotools.coverage.grid.GridCoverage2D;
+
 
 /**
  * Test class for PostGrid plugin.
@@ -34,46 +32,43 @@ import org.geotools.coverage.grid.GridCoverage2D;
  * @author Cédric Briançon
  */
 public class PostGridCoverageReaderTest extends TestCase {
-    
     /**
      * The entry to log messages during the process.
      */
     private static final Logger LOGGER = Logger.getLogger(
             PostGridCoverageReaderTest.class.toString());    
-        
+
     /**
      * Creates a new instance of PostGridCoverageReaderTest
      */
     public PostGridCoverageReaderTest() {
         super("PostGrid Coverage Reader Test");
     }
-    
+
     /**
      * Launch all the tests.
      */
     public static Test suite() {
         return new TestSuite(PostGridCoverageReaderTest.class);
     }        
-    
+
     /**
-     * Test whether a {@code GridCoverage} has been found for the layer in 
+     * Tests whether a {@code GridCoverage} has been found for the layer in 
      * the PostGrid DataBase.
      */
     public void testGridCoverage() {
-        final PostGridReader obs = new PostGridReader("SST (Monde - mensuelles)",
-                null, null);
+        final PostGridReader obs = new PostGridReader("SST (Monde - mensuelles)", null, null, null);
         GridCoverage2D gridCoverage2D = null;
         try {
             gridCoverage2D = (GridCoverage2D) obs.read(null);
         } catch (IllegalArgumentException ex) {
-            LOGGER.severe("The serie specified does not exist in the postgrid " +
-                    "database. "+ ex.getMessage());
+            LOGGER.severe("The serie specified does not exist in the postgrid database. "+ ex.getMessage());
         } catch (IOException ex) {
             LOGGER.severe("Enable to get the coverage. "+ ex.getMessage());
         }        
         assertNotNull(gridCoverage2D);        
     }
-    
+
     /**
      * 
      * @param args the command line arguments
@@ -81,5 +76,4 @@ public class PostGridCoverageReaderTest extends TestCase {
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
     }
-    
 }

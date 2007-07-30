@@ -14,8 +14,8 @@
  */
 package net.sicade.catalog;
 
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -24,106 +24,103 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import org.geotools.resources.Arguments;
-import net.sicade.coverage.catalog.Catalog;
-import net.sicade.coverage.catalog.ServerException;
-import net.sicade.coverage.catalog.CatalogException;
 
 
 /**
- * Copie le contenu de tables vers des tables équivalentes d'une autre base de données. Cette classe
- * est utilisée lorsque l'on a deux copies d'une base de données (typiquement une copie expérimentale
- * et une copie opérationnelle), et que l'on souhaite copier de temps à autre le contenu de la table
- * expérimentale vers sa contrepartie opérationnelle.
+ * Copies the content of a table from a database to an other database. This class is used when
+ * there is two copies of a database (typically an experimental copy and an operational copy)
+ * and we want to copy the content of the experimental database to the operational database.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-@Deprecated
 public class Synchronizer {
     /**
-     * Connections vers les bases de données source. Cette connexion ne doit pas être fermée,
-     * car elle restera utilisée par les méthodes de {@link Catalog}.
+     * The connection to the source database.
      */
-    private final Connection source;
-    
-    /**
-     * Connections vers les bases de données destination.
-     */
-    private final Connection target;
+    private final Database source;
 
     /**
-     * Construit un objet qui synchronisera le contenu de la base de données spécifiée.
-     * La base de données source sera la base de données par défaut, telle que configurée
-     * sur le poste du client.
-     *
-     * @param  target L'URL vers la base de données destination.
-     * @throws CatalogException si une connexion n'a pas pu être établie.
+     * The connection to the target database.
      */
-    public Synchronizer(final String target, final String user, final String password) throws CatalogException {
-        this(Catalog.getDefault().getDatabase(), target, user, password);
+    private final Database target;
+
+    /**
+     * Creates a synchronizer reading the configuration from the
+     * {@code "config-source.xml"} and {@code "config-target.xml"} files.
+     * Those files are read from the current directory if present, or from
+     * the user directory as specified in {@link Database} javadoc otherwise.
+     */
+    private Synchronizer() throws IOException {
+        this("config-source.xml", "config-target.xml");
     }
 
     /**
-     * Construit un objet qui synchronisera le contenu de la base de données spécifiée.
+     * Creates a synchronizer reading the configuration from the specified files.
+     * Those files are read from the current directory if present, or from the user
+     * directory as specified in {@link Database} javadoc otherwise.
      *
-     * @param  source La base de données source.
-     * @param  target L'URL vers la base de données destination.
-     * @throws CatalogException si une connexion n'a pas pu être établie.
+     * @param source The source configuration file. Default to {@code "config-source.xml"}.
+     * @param target The target configuration file. Default to {@code "config-target.xml"}.
      */
-    public Synchronizer(final Database source, final String target, final String user, final String password)
-            throws CatalogException
-    {
-        try {
-            this.source = source.getConnection();
-            this.target = DriverManager.getConnection(target, user, password);
-            this.target.setAutoCommit(false);
-        } catch (SQLException exception) {
-            throw new ServerException(exception);
+    private Synchronizer(final String source, final String target) throws IOException {
+        this.source = new Database(null, source);
+        this.target = new Database(null, target);
+    }
+
+    /**
+     * Replaces the content of the specified table in the target database. The content of the target
+     * table will be cleared before the new content is added. If {@code condition} is {@code null},
+     * then the whole table will be replaced. If {@code condition} is not null, then only the records
+     * matching the specified condition will be replaced.
+     *
+     * @param  table The name of the table in which to replace the records.
+     * @param  condition A SQL condition (to be put after a {@code WHERE} clause) for the records to
+     *         be replaced, or {@code null} for replacing the whole table.
+     * @throws SQLException if a reading or writing operation failed.
+     */
+    private void replace(String table, String condition) throws SQLException {
+        /*
+         * Arguments check.
+         */
+        table = table.trim();
+        if (condition != null) {
+            condition = condition.trim();
+            if (condition.length() == 0) {
+                condition = null;
+            }
         }
-    }
-
-    /**
-     * Remplace le contenu de la table spécifiée dans la base de données destination.
-     * Si des enregistrements existaient déjà dans la table destination, ils seront
-     * supprimées avant la copie. Si {@code condition} est non-nul, alors seuls les
-     * enregistrements répondant à cette condition seront affectées.
-     *
-     * @param table Le nom de la table dont on veut remplacer les enregistrements.
-     * @param condition Une condition SQL désignant les enregistrements à remplacer,
-     *        ou {@code null} pour remplacer tous les enregistrements.
-     */
-    public void replace(String table, String condition) throws SQLException {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append("DELETE FROM \"").append(table).append('"');
+        if (condition != null) {
+            buffer.append(" WHERE ").append(condition);
+        }
+        String sql = buffer.toString();
+        /*
+         * Gets the connections to the databases.
+         */
+        final Connection source = this.source.getConnection();
+        final Connection target = this.target.getConnection();
+        source.setReadOnly(true);
+        target.setAutoCommit(false);
         final Statement sourceStmt = source.createStatement();
         final Statement targetStmt = target.createStatement();
         boolean success = false;
         try {
-            final StringBuilder  b = new StringBuilder();
             /*
-             * Supprime les anciens enregistrements de la table destination.
+             * Delete the old records from the target table.
              */
-            b.append("DELETE FROM \"");
-            b.append(table = table.trim());
-            b.append('"');
-            if (condition != null && (condition=condition.trim()).length() != 0) {
-                b.append(" WHERE ");
-                b.append(condition);
-            }
-            String sql = b.toString();
             int count = targetStmt.executeUpdate(sql);
             log(LoggingLevel.DELETE, "replace", sql + '\n' + count + " lignes supprimées.");
             /*
-             * Obtient les nouveaux enregistrements de la table source,
-             * ainsi que les noms de toutes les colonnes impliquées.
+             * Fetch the new records from the source table, together with the name of all columns.
              */
-            b.setLength(0);
-            b.append("SELECT * FROM \"");
-            b.append(table = table.trim());
-            b.append('"');
-            if (condition != null && condition.length() != 0) {
-                b.append(" WHERE ");
-                b.append(condition);
+            buffer.setLength(0);
+            buffer.append("SELECT * FROM \"").append(table).append('"');
+            if (condition != null) {
+                buffer.append(" WHERE ").append(condition);
             }
-            sql = b.toString();
+            sql = buffer.toString();
             final ResultSet          sources = sourceStmt.executeQuery(sql);
             final ResultSetMetaData metadata = sources.getMetaData();
             final String[]           columns = new String[metadata.getColumnCount()];
@@ -132,34 +129,28 @@ public class Synchronizer {
             }
             log(LoggingLevel.SELECT, "replace", sql);
             /*
-             * Copie les enregistrements dans la table destination.
+             * Copies the records in the target table.
              */
-            b.setLength(0);
-            b.append("INSERT INTO \"");
-            b.append(table);
-            b.append("\" (");
+            buffer.setLength(0);
+            buffer.append("INSERT INTO \"").append(table).append("\" (");
             for (int i=0; i<columns.length; i++) {
                 if (i != 0) {
-                    b.append(',');
+                    buffer.append(',');
                 }
-                b.append('"');
-                b.append(columns[i]);
-                b.append('"');
+                buffer.append('"').append(columns[i]).append('"');
             }
-            b.append(") VALUES (");
-            final int valuesStart = b.length();
+            buffer.append(") VALUES (");
+            final int valuesStart = buffer.length();
             while (sources.next()) {
-                b.setLength(valuesStart);
+                buffer.setLength(valuesStart);
                 for (int i=0; i<columns.length;) {
                     if (i != 0) {
-                        b.append(',');
+                        buffer.append(',');
                     }
-                    b.append('\'');
-                    b.append(sources.getString(++i));
-                    b.append('\'');
+                    buffer.append('\'').append(sources.getString(++i)).append('\'');
                 }
-                b.append(')');
-                sql = b.toString();
+                buffer.append(')');
+                sql = buffer.toString();
                 count = targetStmt.executeUpdate(sql);
                 if (count != 1) {
                     break;
@@ -183,15 +174,15 @@ public class Synchronizer {
     }
 
     /**
-     * Libère les resources utilisées par cet objet.
+     * Closes the database connections.
      */
-    public void close() throws SQLException {
-        // Ne PAS fermer 'source', car il reste utilisé par Catalog.
+    private void close() throws SQLException, IOException {
         target.close();
+        source.close();
     }
 
     /**
-     * Enregistre un événement du niveau spécifié dans le journal.
+     * Writes an event to the logger.
      */
     private static void log(final Level level, final String method, final String message) {
         final LogRecord record = new LogRecord(level, message);
@@ -201,27 +192,14 @@ public class Synchronizer {
     }
 
     /**
-     * Lance {@link #replace} à partir de la ligne de commande.
+     * Synchronizes the content of the given table.
      */
-    public static void main(String[] args) throws CatalogException, SQLException {
-        if (false) {
-            // A des fins de déboguages seulement.
-            args = new String[] {
-                "-target",      "jdbc:postgresql://server/database",
-                "-user",        "",
-                "-password",    "",
-                "-table",       "LinearModelTerms",
-                "-condition",   "target = 'Potentiel de pêche ALB-optimal (Calédonie)'"
-            };
-        }
+    public static void main(String[] args) throws IOException, SQLException {
         final Arguments arguments = new Arguments(args);
-        final String target    = arguments.getRequiredString("-target");
-        final String user      = arguments.getRequiredString("-user");
-        final String password  = arguments.getRequiredString("-password");
         final String table     = arguments.getRequiredString("-table");
         final String condition = arguments.getOptionalString("-condition");
         args = arguments.getRemainingArguments(0);
-        final Synchronizer synchronizer = new Synchronizer(target, user, password);
+        final Synchronizer synchronizer = new Synchronizer();
         synchronizer.replace(table, condition);
         synchronizer.close();
     }

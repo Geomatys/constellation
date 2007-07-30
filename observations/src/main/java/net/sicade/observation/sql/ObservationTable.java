@@ -14,7 +14,6 @@
  */
 package net.sicade.observation.sql;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
@@ -23,22 +22,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
-// Geotools dependencies
 import org.geotools.resources.Utilities;
-
-// Sicade dependencies
 import net.sicade.observation.Station;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.IllegalRecordException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.DuplicatedRecordException;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Query;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.Table;
-import net.sicade.resources.i18n.ResourceKeys;
-import net.sicade.resources.i18n.Resources;
 
 
 /**
@@ -265,20 +259,17 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      */
     public synchronized EntryType getEntry() throws CatalogException, SQLException {
         final PreparedStatement statement = getStatement(getProperty(select));
-        final ResultSet result = statement.executeQuery();
+        final ResultSet results = statement.executeQuery();
         EntryType observation = null;
-        while (result.next()) {
-            final EntryType candidate = createEntry(result);
+        while (results.next()) {
+            final EntryType candidate = createEntry(results);
             if (observation == null) {
                 observation = candidate;
             } else if (!observation.equals(candidate)) {
-                final String table = result.getMetaData().getTableName(1);
-                result.close();
-                throw new IllegalRecordException(table, Resources.format(
-                          ResourceKeys.ERROR_DUPLICATED_RECORD_$1, observable));
+                throw new DuplicatedRecordException(results, 1, String.valueOf(observable));
             }
         }
-        result.close();
+        results.close();
         return observation;
     }
 

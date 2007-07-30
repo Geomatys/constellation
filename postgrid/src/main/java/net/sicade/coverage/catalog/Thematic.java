@@ -14,18 +14,17 @@
  */
 package net.sicade.coverage.catalog;
 
-import net.sicade.observation.Phenomenon;
+import net.sicade.catalog.Element;
 
 
 /**
- * Un thème de couche(s) d'images. Un thème peut être par exemple la température, où les concentrations
- * en chlorophylle-<var>a</var>. Notez qu'un thème est différent d'une {@linkplain Layer couche} du
- * fait qu'une même couche représente souvent un même thème (par exemple la température) mesuré par le
- * même capteur (par exemple les satellites NOAA) sur la même région géographique. La notion de thème
- * représentée ici est plus générale.
+ * A thematic (or <cite>phenomenon</cite>) for a set of {@linkplain Layer layers}. Examples are
+ * are <cite>Sea Surface Temperature</cite> (SST) or <cite>Chlorophylle-a concentration</cite>.
+ * This is slightly more generic than a {@linkplain Layer layer}, since the later is often about
+ * a phenomenon measured by a given sensor, for example SST measured by NOAA.
  *
  * @version $Id$
  * @author Antoine Hnawia
  */
-public interface Thematic extends Phenomenon {
+public interface Thematic extends Element {
 }

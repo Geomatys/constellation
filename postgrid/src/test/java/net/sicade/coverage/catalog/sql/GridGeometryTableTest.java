@@ -16,11 +16,8 @@ package net.sicade.coverage.catalog.sql;
 
 import java.util.Set;
 import java.sql.SQLException;
-
 import org.opengis.geometry.Envelope;
-import org.opengis.coverage.grid.GridRange;
-
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.DatabaseTest;
 import net.sicade.catalog.CRS;
 

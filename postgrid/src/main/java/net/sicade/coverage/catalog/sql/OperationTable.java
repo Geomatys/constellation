@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 import org.opengis.parameter.ParameterValueGroup;
 
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;

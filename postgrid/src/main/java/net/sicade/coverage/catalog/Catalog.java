@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.rmi.RemoteException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.NoSuchRecordException;
+import net.sicade.catalog.ServerException;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;

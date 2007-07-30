@@ -28,7 +28,7 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
 // Sicade
-import net.sicade.coverage.catalog.CatalogException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Descriptor;
 import net.sicade.coverage.catalog.LinearModel;

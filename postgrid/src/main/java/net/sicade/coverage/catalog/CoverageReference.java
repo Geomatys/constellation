@@ -196,7 +196,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    public static class Proxy extends net.sicade.coverage.catalog.Proxy implements CoverageReference {
+    public static class Proxy extends net.sicade.catalog.Proxy implements CoverageReference {
         /**
          * Pour compatibilités entre les enregistrements binaires de différentes versions.
          */
