@@ -18,39 +18,34 @@
  */
 package net.sicade.coverage.io;
 
-// J2SE dependencies
-import java.awt.Rectangle;
-import java.awt.image.ColorModel;
-import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel;
-import java.awt.image.WritableRaster;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.logging.Logger;
 import javax.imageio.IIOException;
-import javax.imageio.ImageReader;
-import javax.media.jai.PlanarImage;
 
 // SEAGIS dependencies
-import net.sicade.coverage.catalog.CatalogException;
-import net.sicade.coverage.catalog.Catalog;
-import net.sicade.coverage.catalog.CoverageReference;
-import net.sicade.coverage.catalog.Layer;
+import net.sicade.observation.CatalogException;
+import net.sicade.observation.coverage.CoverageReference;
+import net.sicade.observation.coverage.sql.GridCoverageTable;
+import net.sicade.observation.sql.Database;
+import org.geotools.coverage.FactoryFinder;
 
 // Geotools dependencies
 import org.geotools.coverage.grid.GeneralGridRange;
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
-import org.geotools.coverage.processing.Operations;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -59,8 +54,8 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
@@ -72,6 +67,16 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * @author Cédric Briançon
  */
 public class PostGridReader extends AbstractGridCoverage2DReader implements GridCoverageReader {
+    /**
+     * The database to connect to. Will be instantiate when first needed.
+     */
+    private static Database database;
+
+    /**
+     * The images table. Will be created when first needed.
+     */
+    private static GridCoverageTable table;
+
     /**
      * The entry to log messages during the process.
      */
@@ -200,17 +205,136 @@ public class PostGridReader extends AbstractGridCoverage2DReader implements Grid
      * @throws IOException
      */
     public GridCoverage read(GeneralParameterValue[] params) throws IllegalArgumentException, IOException {
-        Catalog obs = Catalog.getDefault();
+        /*Observations obs = Observations.getDefault();
         CoverageReference ref = null;
         try {
             Layer s = obs.getLayer(layer);
-            ref = s.getCoverageReference(date);            
+            ref = s.getCoverageReference(date);
         } catch (CatalogException ex) {
             throw new IIOException(ex.getLocalizedMessage(), ex);
         } 
         
         GridCoverage2D coverage = ref.getCoverage(null); 
-        return coverage.geophysics(false);        
+        return coverage.geophysics(false);*/
+        Date time = null;
+        Number elevation = null;
+        for (int i=0; i<params.length; i++) {
+            final GeneralParameterValue param = params[i];
+            if (param instanceof ParameterValue) {
+                final ParameterValue value = (ParameterValue) param;
+                final String name = value.getDescriptor().getName().getCode().trim();
+                if (name.equalsIgnoreCase("TIME")) {
+                    time = (Date) value.getValue();
+                }
+                if (name.equalsIgnoreCase("ELEVATION")) {
+                    elevation = (Number) value.getValue();
+                }
+            }
+        }
+        try {
+            if (time == null) {
+                time = getAvailableTimes().iterator().next();
+            }
+            if (elevation == null) {
+                elevation = getAvailableAltitudes().iterator().next();
+            }
+            return read("SST (Monde - Coriolis)", time, elevation);
+        } catch (SQLException s) {
+            throw new IIOException("Erreur connexion à la base de données.", s);
+        } catch (CatalogException c) {
+            throw new IIOException("Erreur connexion à la base de données.", c);
+        }
+    }
+
+    /**
+     * Returns a Set of all dates available for a request. In our implementation, these dates must be between 
+     * the reference date (in 1970) and today.
+     * @todo Get the series specified by the user.
+     *
+     * @return A set of dates available.
+     * @throws SQLException
+     * @throws IOException
+     * @throws CatalogException
+     */
+    public static Set<Date> getAvailableTimes() throws SQLException, IOException, CatalogException {
+        final GridCoverageTable table = getTable();
+        table.setLayer("SST (Monde - Coriolis)"); // TODO
+        table.setTimeRange(new Date(0), new Date());
+        return table.getAvailableTimes();
+    }
+    
+    /**
+     * Returns a Map of all dates available for a request, with their appropriate elevations. In our implementation,
+     * these dates must be between the reference date (in 1970) and today.
+     * @todo Get the series specified by the user.
+     *
+     * @return A map of dates available, with their appropriate elevations.
+     * @throws SQLException
+     * @throws IOException
+     * @throws CatalogException
+     */
+    public static SortedMap<Date, SortedSet<Number>> getAvailableCentroids() throws SQLException, IOException, CatalogException {
+        final GridCoverageTable table = getTable();
+        table.setLayer("SST (Monde - Coriolis)"); // TODO
+        table.setTimeRange(new Date(0), new Date());
+        return table.getAvailableCentroids();
+    }
+    
+    /**
+     * Returns a set of elevations that are commons to every dates present in the database. In our implementation, 
+     * these dates must be between the reference date (in 1970) and today.
+     * @todo Get the series specified by the user.
+     *
+     * @return A set of elevations common for all dates.
+     * @throws SQLException
+     * @throws IOException
+     * @throws CatalogException
+     */
+    public static SortedSet<Number> getAvailableAltitudes() throws SQLException, IOException, CatalogException {
+        final GridCoverageTable table = getTable();
+        table.setLayer("SST (Monde - Coriolis)"); // TODO
+        table.setTimeRange(new Date(0), new Date());
+        return table.getAvailableAltitudes();
+    }
+
+    /**
+     * Returns the image table.
+     */
+    private static synchronized GridCoverageTable getTable() throws SQLException, IOException {
+        if (database == null) {
+            database = new Database();
+        }
+        if (table == null) {
+            table = database.getTable(GridCoverageTable.class);
+        }
+        return table;
+    }
+
+    /**
+     * Returns an image for the given layer at the given date.
+     */
+    private GridCoverage read(final String layer, final Date time, final Number elevation) throws SQLException, IOException, CatalogException {
+        final long TIMESPAN = 12*60*60*1000L;  // 12 hours
+        final GridCoverageTable table = getTable();
+        table.setLayer(layer);
+        table.setTimeRange(new Date(time.getTime() - TIMESPAN), new Date(time.getTime() + TIMESPAN));
+        if (elevation != null) {
+            double z = elevation.doubleValue();
+            table.setVerticalRange(z,z);
+        } else {
+            table.setVerticalRange(0,0);
+        }
+        final CoverageReference ref = table.getEntry();
+        System.out.println(ref);
+        if (ref != null) {
+            
+            return ref.getCoverage(null).geophysics(false);
+        }
+        final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.drawString("Pas d'images à la date " + date, 10, 200);
+        g.dispose();
+        return FactoryFinder.getGridCoverageFactory(null).create("Erreur", image, new Envelope2D(null, -180, -90, 360, 180));
     }
     
     /**
@@ -219,7 +343,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader implements Grid
      * @param sFormat The format of the date.
      * @return A date using the appropriate format.
      */
-    public static Date stringToDate(String sDate, String sFormat) {
+    private static Date stringToDate(String sDate, String sFormat) {
         SimpleDateFormat sdf = new SimpleDateFormat(sFormat);
         try {
             return sdf.parse(sDate);

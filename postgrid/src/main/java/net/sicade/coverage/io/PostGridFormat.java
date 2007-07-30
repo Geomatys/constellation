@@ -19,6 +19,7 @@
 package net.sicade.coverage.io;
 
 // J2SE dependencies
+import java.util.Date;
 import java.util.HashMap;
 
 // Geotools dependencies
@@ -26,6 +27,7 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
+import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 
@@ -44,6 +46,18 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  */
 public class PostGridFormat extends AbstractGridFormat implements Format {    
     /**
+     *
+     */
+    private static final DefaultParameterDescriptor TIME      = new DefaultParameterDescriptor(
+            "TIME", Date.class, null, null);
+    
+    /**
+     *
+     */
+    private static final DefaultParameterDescriptor ELEVATION = new DefaultParameterDescriptor(
+            "ELEVATION", Integer.TYPE, null, null);
+    
+    /**
      * Creates a new instance of PostGridFormat.
      * Contains the main information about the PostGrid DataBase format.
      */
@@ -57,7 +71,7 @@ public class PostGridFormat extends AbstractGridFormat implements Format {
 	mInfo.put("version", "1.0");
         readParameters = new ParameterGroup(
                 new DefaultParameterDescriptorGroup(mInfo,
-                new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
+                new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D, TIME, ELEVATION }));
     }
 
     /**
