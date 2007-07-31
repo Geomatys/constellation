@@ -59,16 +59,6 @@ public class Query {
     protected final Database database;
 
     /**
-     * The catalog, or {@code null} if none.
-     */
-    private final String catalog;
-
-    /**
-     * The schema, or {@code null} if none.
-     */
-    private final String schema;
-
-    /**
      * The columns in this query.
      */
     private Column[] columns = EMPTY_COLUMNS;
@@ -101,8 +91,6 @@ public class Query {
      */
     private Query(final Database database, final String catalog, final String schema) {
         this.database = database;
-        this.catalog  = catalog;
-        this.schema   = schema;
     }
 
     /**
@@ -246,6 +234,8 @@ public class Query {
          * this information later both for altering the table order and in order to construct
          * the "JOIN ... ON" clauses.
          */
+        final String catalog = database.catalog;
+        final String schema  = database.schema;
         if (tables.size() >= 2) {
             for (final Map.Entry<String,CrossReference> entry : tables.entrySet()) {
                 final String table = entry.getKey();

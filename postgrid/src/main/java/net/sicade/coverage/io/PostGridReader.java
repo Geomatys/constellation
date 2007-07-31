@@ -164,17 +164,11 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
             }
         }
         try {
-            if (time == null) {
-                time = getAvailableTimes().iterator().next();
-            }
-            if (elevation == null) {
-                elevation = getAvailableAltitudes().iterator().next();
-            }
             return read(time, elevation);
         } catch (SQLException e) {
-            throw new IIOException("Erreur connexion à la base de données.", e);
+            throw new IIOException(e.toString(), e);
         } catch (CatalogException e) {
-            throw new IIOException("Erreur connexion à la base de données.", e);
+            throw new IIOException(e.toString(), e);
         }
     }
 
@@ -232,24 +226,32 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
         final long TIMESPAN = 12*60*60*1000L;  // 12 hours
         final GridCoverageTable table = getTable();
         table.setLayer(layer);
-        table.setTimeRange(new Date(time.getTime() - TIMESPAN), new Date(time.getTime() + TIMESPAN));
+        String name = null;
+        if (time != null) {
+            table.setTimeRange(new Date(time.getTime() - TIMESPAN), new Date(time.getTime() + TIMESPAN));
+        } else {
+            table.setTimeRange(new Date(0), new Date());
+            name = "coriolis";
+        }
         if (elevation != null) {
             double z = elevation.doubleValue();
             table.setVerticalRange(z,z);
         } else {
             table.setVerticalRange(0,0);
+            name = "coriolis";
         }
         CoverageReference ref = table.getEntry();
-        System.out.println(ref);
+        System.out.println(ref); // TODO: remove after debugging.
         if (ref != null) {
-            return trimTo2D(ref.getCoverage(null));
+            return trimTo2D(name, ref.getCoverage(null));
         }
         if (true) {
             // Returns an arbitrary image. TODO: we need to do something better.
-            table.setTimeRange(new Date(0), new Date());
-            ref = table.getEntry();
-            if (ref != null) {
-                return trimTo2D(ref.getCoverage(null));
+            if (table.setTimeRange(new Date(0), new Date())) {
+                ref = table.getEntry();
+                if (ref != null) {
+                    return trimTo2D("coriolis", ref.getCoverage(null));
+                }
             }
         }            
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_INT_ARGB);
@@ -262,10 +264,13 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
     /**
      * Reduces the specified coverage to a 2D form.
      */
-    private static GridCoverage2D trimTo2D(GridCoverage2D coverage) {
+    private static GridCoverage2D trimTo2D(CharSequence name, GridCoverage2D coverage) {
         coverage = coverage.geophysics(false);
+        if (name == null) {
+            name = coverage.getName();
+        }
         final GridGeometry2D geometry = (GridGeometry2D) coverage.getGridGeometry();
-        coverage = FactoryFinder.getGridCoverageFactory(null).create(coverage.getName(),
+        coverage = FactoryFinder.getGridCoverageFactory(null).create(name,
                 coverage.getRenderedImage(), geometry.getCoordinateReferenceSystem2D(),
                 geometry.getGridToCRS2D(), coverage.getSampleDimensions(), null, null);
         return coverage.geophysics(false);

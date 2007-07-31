@@ -71,6 +71,19 @@ public enum ConfigurationKey {
     DATABASE("Database", "jdbc:derby:postgrid"),
 
     /**
+     * The database catalog to use, or {@code null} if none. This is not widely used except
+     * by Oracle.
+     */
+    CATALOG("Catalog", null),
+
+    /**
+     * The database schema to use, or {@code null} if none. In the later case, the tables
+     * will be located using the default mechanism on the underlying database. On PostgreSQL,
+     * the search order is determined by the {@code "search_path"} database variable.
+     */
+    SCHEMA("Schema", null),
+
+    /**
      * Key for the {@linkplain java.sql.Connection#setReadOnly read only} state
      * of the database connection. The default value is {@code true}.
      */

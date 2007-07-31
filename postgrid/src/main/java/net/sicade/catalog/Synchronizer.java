@@ -16,10 +16,12 @@ package net.sicade.catalog;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -46,6 +48,11 @@ public class Synchronizer {
     private final Database target;
 
     /**
+     * The metadata for the target database. Will be fetch when first needed.
+     */
+    private transient DatabaseMetaData metadata;
+
+    /**
      * Creates a synchronizer reading the configuration from the
      * {@code "config-source.xml"} and {@code "config-target.xml"} files.
      * Those files are read from the current directory if present, or from
@@ -69,14 +76,132 @@ public class Synchronizer {
     }
 
     /**
+     * Deletes the content of the specified table in the target database.
+     *
+     * @param  table The name of the table in which to replace the records.
+     * @param  condition A SQL condition (to be put after a {@code WHERE} clause) for
+     *         the records to be deleted, or {@code null} for deleting the whole table.
+     * @throws SQLException if a reading or writing operation failed.
+     */
+    private void delete(final String table, final String condition) throws SQLException {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append("DELETE FROM \"").append(table).append('"');
+        if (condition != null) {
+            buffer.append(" WHERE ").append(condition);
+        }
+        final String sql = buffer.toString();
+        final Statement targetStmt = target.getConnection().createStatement();
+        final int count = targetStmt.executeUpdate(sql);
+        log(LoggingLevel.DELETE, "delete", sql + '\n' + count + " lignes supprimées.");
+        targetStmt.close();
+    }
+
+    /**
+     * Copies the content of the specified table from source to the target database.
+     *
+     * @param  table The name of the table to copy.
+     * @param  condition A SQL condition (to be put after a {@code WHERE} clause) for
+     *         the records to be copied, or {@code null} for copying the whole table.
+     * @throws SQLException if a reading or writing operation failed.
+     */
+    private void insert(final String table, final String condition) throws SQLException {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append("SELECT * FROM \"").append(table).append('"');
+        if (condition != null) {
+            buffer.append(" WHERE ").append(condition);
+        }
+        String sql = buffer.toString();
+        final Statement sourceStmt = source.getConnection().createStatement();
+        final Statement targetStmt = target.getConnection().createStatement();
+        final ResultSet          sources = sourceStmt.executeQuery(sql);
+        final ResultSetMetaData metadata = sources.getMetaData();
+        final String[]           columns = new String[metadata.getColumnCount()];
+        for (int i=0; i<columns.length;) {
+            columns[i] = metadata.getColumnName(++i);
+        }
+        log(LoggingLevel.SELECT, "insert", sql);
+        buffer.setLength(0);
+        buffer.append("INSERT INTO \"").append(table).append("\" (");
+        for (int i=0; i<columns.length; i++) {
+            if (i != 0) {
+                buffer.append(',');
+            }
+            buffer.append('"').append(columns[i]).append('"');
+        }
+        buffer.append(") VALUES (");
+        final int valuesStart = buffer.length();
+        while (sources.next()) {
+            buffer.setLength(valuesStart);
+            for (int i=0; i<columns.length;) {
+                if (i != 0) {
+                    buffer.append(',');
+                }
+                buffer.append('\'').append(sources.getString(++i)).append('\'');
+            }
+            buffer.append(')');
+            sql = buffer.toString();
+            final int count = targetStmt.executeUpdate(sql);
+            if (count == 1) {
+                log(LoggingLevel.INSERT, "insert", sql);
+            } else {
+                log(Level.WARNING, "insert", String.valueOf(count) + " enregistrements ajoutés.");
+            }
+        }
+        sources.close();
+        sourceStmt.close();
+        targetStmt.close();
+    }
+
+    /**
+     * Replaces the content of the specified table. The {@linkplain Map#keySet map keys} shall
+     * contains the set of every tables to take in account; table not listed in this set will
+     * be untouched. The associated values are the SLQ conditions to put in the {@code WHERE}
+     * clauses.
+     * <p>
+     * This method process {@code table} as well as dependencies found in {@code tables}.
+     */
+    private void replace(final String table, final Map<String,String> tables) throws SQLException {
+        final String condition = tables.remove(table);
+        delete(table, condition);
+        /*
+         * Before to insert any new records, check if this table has some foreigner keys
+         * toward other table. If such tables are found, they will be processed them before
+         * we add any record to the current table.
+         */
+        final String catalog = target.catalog;
+        final String schema  = target.schema;
+        if (metadata == null) {
+            metadata = target.getConnection().getMetaData();
+        }
+        final ResultSet dependencies = metadata.getImportedKeys(catalog, schema, table);
+        while (dependencies.next()) {
+            String dependency = dependencies.getString("PKTABLE_CAT");
+            if (catalog!=null && !catalog.equals(dependency)) {
+                continue;
+            }
+            dependency = dependencies.getString("PKTABLE_SCHEM");
+            if (schema!=null && !schema.equals(dependency)) {
+                continue;
+            }
+            dependency = dependencies.getString("PKTABLE_NAME");
+            if (tables.containsKey(dependency)) {
+                replace(dependency, tables);
+            }
+        }
+        dependencies.close();
+
+        insert(table, condition);
+    }
+
+    /**
      * Replaces the content of the specified table in the target database. The content of the target
      * table will be cleared before the new content is added. If {@code condition} is {@code null},
      * then the whole table will be replaced. If {@code condition} is not null, then only the records
      * matching the specified condition will be replaced.
      *
      * @param  table The name of the table in which to replace the records.
-     * @param  condition A SQL condition (to be put after a {@code WHERE} clause) for the records to
-     *         be replaced, or {@code null} for replacing the whole table.
+     * @param  condition A SQL condition (to be put after a {@code WHERE} clause) for the
+     *         records to be replaced, or {@code null} for replacing the whole table.
      * @throws SQLException if a reading or writing operation failed.
      */
     private void replace(String table, String condition) throws SQLException {

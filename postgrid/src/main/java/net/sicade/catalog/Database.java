@@ -99,6 +99,16 @@ public class Database {
     private final DataSource source;
 
     /**
+     * The catalog, or {@code null} if none.
+     */
+    final String catalog;
+
+    /**
+     * The schema, or {@code null} if none.
+     */
+    final String schema;
+
+    /**
      * Connection to the database. Will be etablished only when first needed.
      */
     private Connection connection;
@@ -197,6 +207,8 @@ public class Database {
         }
         final String ID = getProperty(ConfigurationKey.TIMEZONE);
         timezone = (ID!=null && !ID.equalsIgnoreCase("local")) ? TimeZone.getTimeZone(ID) : TimeZone.getDefault();
+        catalog = getProperty(ConfigurationKey.CATALOG);
+        schema = getProperty(ConfigurationKey.SCHEMA);
         /*
          * Checks if the database is spatial-enabled.
          * TODO: Following code is PostgreSQL specific. We need to make it more generic.
