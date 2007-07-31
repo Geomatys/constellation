@@ -217,7 +217,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
             }
         }
 
-        public CoverageReference         getParent()                                           {return ref;}
+        public CoverageReference         getBackingElement()            {return ref;}
         public Layer                     getLayer()                     {return ref.getLayer();}
         public Format                    getFormat()                    {return ref.getFormat();}
         public File                      getFile()                      {return ref.getFile();}

@@ -420,13 +420,12 @@ scan:       while (!tables.isEmpty()) {
 
     /**
      * Creates the SQL statement for the query of the given type with no {@code WHERE} clause.
-     * This is used for testing purpose.
      *
      * @param  type The query type.
      * @return The SQL statement.
      * @throws SQLException if an error occured while reading the database.
      */
-    final String selectAll(final QueryType type) throws SQLException {
+    public String selectAll(final QueryType type) throws SQLException {
         final DatabaseMetaData metadata = database.getConnection().getMetaData();
         final StringBuilder buffer = new StringBuilder();
         selectAll     (buffer, type, metadata, false);

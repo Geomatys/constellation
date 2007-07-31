@@ -14,8 +14,8 @@
  */
 package net.sicade.coverage.catalog;
 
+import net.sicade.catalog.Element;
 import org.opengis.coverage.Coverage;
-import net.sicade.observation.Procedure;
 
 
 /**
@@ -25,7 +25,7 @@ import net.sicade.observation.Procedure;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public interface Operation extends Procedure {
+public interface Operation extends Element {
     /**
      * Retourne le préfix à utiliser dans les noms composites. Les noms composites
      * seront de la forme "<cite>operation - paramètre - temps</cite>", par exemple
@@ -74,7 +74,7 @@ public interface Operation extends Procedure {
         /**
          * Retourne l'opération envelopée.
          */
-        public Operation getParent() {
+        public Operation getBackingElement() {
             return parent;
         }
 

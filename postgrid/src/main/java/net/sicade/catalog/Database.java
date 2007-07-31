@@ -548,6 +548,7 @@ public class Database {
         if (connection != null) {
             connection.close();
             connection = null;
+            Element.LOGGER.info("Connexion à la base de données fermée.");
         }
         String database = getProperty(ConfigurationKey.DATABASE);
         if (database != null && database.startsWith("jdbc:derby:")) {

@@ -14,22 +14,17 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-// J2SE
 import java.util.List;
 import java.util.ArrayList;
 
-// OpenGIS
 import org.opengis.coverage.Coverage;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-
-// Geotools
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.processing.AbstractProcessor;
 
-// Sicade
+import net.sicade.catalog.Entry;
 import net.sicade.coverage.catalog.Operation;
-import net.sicade.observation.sql.ProcedureEntry;
 
 
 /**
@@ -45,7 +40,7 @@ import net.sicade.observation.sql.ProcedureEntry;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class OperationEntry extends ProcedureEntry implements Operation {
+public class OperationEntry extends Entry implements Operation {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */

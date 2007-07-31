@@ -66,7 +66,6 @@ import net.sicade.resources.i18n.Resources;
  * <p>
  * <blockquote><pre>
  *  <b>-print thematics</b> <i></i>  Affiche l'arborescence des thèmes
- *  <b>-print procedures</b> <i></i> Affiche l'arborescence des procédures
  *  <b>-print layers</b> <i></i>     Affiche l'arborescence des couches
  *  <b>-print series</b> <i></i>     Affiche l'arborescence des séries
  *  <b>-print formats</b> <i></i>    Affiche l'arborescence des formats
@@ -128,7 +127,6 @@ public final class Console extends Arguments {
                     "\n"+
                     "Options disponibles:\n"+
                     "  -print thematics    Affiche l'arborescence des thèmes\n"+
-                    "  -print procedures   Affiche l'arborescence des procédures\n"+
                     "  -print layers       Affiche l'arborescence des couches\n"+
                     "  -print series       Affiche l'arborescence des séries\n"+
                     "  -print formats      Affiche l'arborescence des formats\n"+
@@ -303,7 +301,6 @@ public final class Console extends Arguments {
             else if (print.equalsIgnoreCase("formats"   )) depth = TreeDepth.FORMAT;
             else if (print.equalsIgnoreCase("series"    )) depth = TreeDepth.SERIES;
             else if (print.equalsIgnoreCase("layers"    )) depth = TreeDepth.LAYER;
-            else if (print.equalsIgnoreCase("procedures")) depth = TreeDepth.PROCEDURE;
             else if (print.equalsIgnoreCase("thematics" )) depth = TreeDepth.THEMATIC;
             else {
                 out.print("Option inconnue: ");

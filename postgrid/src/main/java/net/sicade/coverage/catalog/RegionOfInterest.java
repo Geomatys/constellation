@@ -15,11 +15,10 @@
 package net.sicade.coverage.catalog;
 
 import net.sicade.catalog.Element;
-import net.sicade.observation.Observation;
 
 
 /**
- * Position spatio-temporelle relative à une {@linkplain Observation observation}.
+ * Position spatio-temporelle relative à une observation.
  * Il s'agit du décalage entre une observation (pêche, <cite>etc.</cite>) et un paramètre
  * environnemental (température, <cite>etc.</cite>) utilisé pour décrire l'environnement
  * de cette observation. Un décalage spatio-temporelle est une des trois composantes du

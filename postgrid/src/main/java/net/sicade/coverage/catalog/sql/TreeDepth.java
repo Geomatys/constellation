@@ -14,19 +14,17 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-import net.sicade.observation.Procedure;          // Pour javadoc
-import net.sicade.coverage.catalog.Thematic;  // Pour javadoc
-import net.sicade.coverage.catalog.Layer;     // Pour javadoc
-import net.sicade.coverage.catalog.Format;    // Pour javadoc
-import org.opengis.coverage.SampleDimension;      // Pour javadoc
-import org.geotools.coverage.Category;            // Pour javadoc
+import net.sicade.coverage.catalog.Thematic;
+import net.sicade.coverage.catalog.Layer;
+import net.sicade.coverage.catalog.Format;
+import org.opengis.coverage.SampleDimension;
+import org.geotools.coverage.Category;
 
 
 /**
  * Indique la profondeur de l'arborescence attendue de {@link LayerTree#getTree}. Les arborescences
- * peuvent contenir des chemins de la forme "{@linkplain Thematic thématique}/{@linkplain Procedure
- * procédure}/{@linkplain Layer couche}/{@linkplain Format format}/{@linkplain SampleDimension
- * bande}/{@linkplain Category catégorie}".
+ * peuvent contenir des chemins de la forme "{@linkplain Thematic thématique}//{@linkplain Layer
+ * couche}/{@linkplain Format format}/{@linkplain SampleDimension bande}/{@linkplain Category catégorie}".
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -36,11 +34,6 @@ public enum TreeDepth {
      * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Thematic thèmes}.
      */
     THEMATIC(LayerTree.THEMATIC),
-
-    /**
-     * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Procedure procédures}.
-     */
-    PROCEDURE(LayerTree.PROCEDURE),
 
     /**
      * Indique que l'arborescence ne doit pas aller plus loin que les {@linkplain Layer couches}.

@@ -236,7 +236,7 @@ public class CoverageTableModel extends AbstractTableModel {
             for (int i=entries.length; --i>=0;) {
                 if (entries[i] instanceof CoverageProxy) {
                     final CoverageProxy oldProxy = (CoverageProxy) entries[i];
-                    final CoverageProxy newProxy = new CoverageProxy(unwrap(oldProxy.getParent()));
+                    final CoverageProxy newProxy = new CoverageProxy(unwrap(oldProxy.getBackingElement()));
                     newProxy.flags = oldProxy.flags;
                     entries[i] = newProxy;
                 }
@@ -337,7 +337,7 @@ public class CoverageTableModel extends AbstractTableModel {
                         proxies = new HashMap<CoverageReference,CoverageProxy>();
                     }
                     final CoverageProxy proxy = (CoverageProxy) entry;
-                    proxies.put(proxy.getParent(), proxy);
+                    proxies.put(proxy.getBackingElement(), proxy);
                 }
             }
         }
@@ -350,7 +350,7 @@ public class CoverageTableModel extends AbstractTableModel {
      */
     private static CoverageReference unwrap(CoverageReference entry) {
         while (entry instanceof CoverageProxy) {
-            entry = ((CoverageProxy) entry).getParent();
+            entry = ((CoverageProxy) entry).getBackingElement();
         }
         return entry;
     }
@@ -801,7 +801,7 @@ public class CoverageTableModel extends AbstractTableModel {
         @Override
         public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
             try {
-                final GridCoverage2D image = getParent().getCoverage(listeners);
+                final GridCoverage2D image = getBackingElement().getCoverage(listeners);
                 setFlag((byte)(MISSING|CORRUPTED|RMI_FAILURE), false);
                 setFlag(VIEWED, image!=null);
                 return image;
@@ -826,7 +826,7 @@ public class CoverageTableModel extends AbstractTableModel {
             else     f  = (byte) (flags & ~f);
             if (flags != f) {
                 flags = f;
-                fireTableRowsUpdated(getParent());
+                fireTableRowsUpdated(getBackingElement());
             }
         }
     }
@@ -900,7 +900,7 @@ public class CoverageTableModel extends AbstractTableModel {
             while ((entry=next(list)) != null) {
                 CoverageReference check = entry;
                 do {
-                    check = ((CoverageReference.Proxy) check).getParent();
+                    check = ((CoverageReference.Proxy) check).getBackingElement();
                 } while (check instanceof CoverageReference.Proxy);
                 final File file = entry.getFile();
                 if (file != null) {

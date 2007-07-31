@@ -30,21 +30,18 @@ import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Element;
-import net.sicade.observation.Procedure;          // Pour javadoc
 import net.sicade.catalog.Table;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.observation.sql.ProcedureTable;
 import net.sicade.coverage.catalog.Format;
-import net.sicade.coverage.catalog.Thematic;  // Pour javadoc
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**
  * Construction d'une arborescence des {@linkplain Layer couches}. Cette classe possède une méthode
- * {@link #getTree} capable de retrouver les {@linkplain Thematic thématiques} et les {@linkplain
- * Procedure procédures} qui constituent les couches, et de placer ces informations dans une arborescence.
+ * {@link #getTree} capable de retrouver les {@linkplain Thematic thématiques} qui constituent les
+ * couches, et de placer ces informations dans une arborescence.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -74,10 +71,9 @@ public class LayerTree extends Table {
 
 
     /** Numéro de colonne.  */ static final int THEMATIC  =  1;
-    /** Numéro de colonne.  */ static final int PROCEDURE =  2;
-    /** Numéro de colonne.  */ static final int LAYER     =  3;
-    /** Numéro de colonne.  */ static final int SERIES    =  4;
-    /** Numéro de colonne.  */ static final int FORMAT    =  5;
+    /** Numéro de colonne.  */ static final int LAYER     =  2;
+    /** Numéro de colonne.  */ static final int SERIES    =  3;
+    /** Numéro de colonne.  */ static final int FORMAT    =  4;
 
     /**
      * Les types de table pour chacune des colonnes identifiées par les constantes
@@ -87,7 +83,6 @@ public class LayerTree extends Table {
     private static final Class<? extends SingletonTable>[] TYPES = new Class[FORMAT + 1];
     static {
         TYPES[THEMATIC ] =  ThematicTable.class;
-        TYPES[PROCEDURE] = ProcedureTable.class;
         TYPES[LAYER    ] =     LayerTable.class;
         TYPES[SERIES   ] =    SeriesTable.class;
         TYPES[FORMAT   ] =    FormatTable.class;

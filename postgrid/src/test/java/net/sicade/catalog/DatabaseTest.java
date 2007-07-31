@@ -38,23 +38,38 @@ public class DatabaseTest extends TestCase {
     protected static Database database;
 
     /**
-     * For JUnit 3 compatibility. We rely on the shutdown hook for tear down.
+     * {@code true} if we should keep the database connection opened.
+     */
+    static boolean keepOpen = false;
+
+    /**
+     * For JUnit 3 compatibility.
      */
     @Override
     protected void setUp() throws Exception {
-        if (database == null) {
-            openDatabase();
-        }
+        super.setUp();
+        openDatabase();
+    }
+
+    /**
+     * For JUnit 3 compatibility.
+     */
+    @Override
+    protected void tearDown() throws Exception {
+        closeDatabase();
+        super.tearDown();
     }
 
     /**
      * Opens the connection to the database.
      *
-     * @throws IOException  if an I/O error occured.
+     * @throws IOException if an I/O error occured.
      */
     @BeforeClass
     public static void openDatabase() throws IOException {
-        database = new Database();
+        if (database == null) {
+            database = new Database();
+        }
     }
 
     /**
@@ -65,7 +80,44 @@ public class DatabaseTest extends TestCase {
      */
     @AfterClass
     public static void closeDatabase() throws IOException, SQLException {
-        database.close();
+        if (database != null && !keepOpen) {
+            database.close();
+            database = null;
+        }
+    }
+
+    /**
+     * Puts this class as the first element in a test suite in order to keep the database
+     * connection open for the full suite. This is an optimization in order to avoid to
+     * open and close the connection for every test class.
+     */
+    public static final class Open extends DatabaseTest {
+        @Override
+        protected void setUp() throws Exception {
+            super.setUp();
+            openOnce();
+        }
+
+        @BeforeClass
+        public static void openOnce() {
+            keepOpen = true;
+        }
+    }
+
+    /**
+     * Puts this class as the last element in a test suite after {@link DatabaseTest#Open}.
+     */
+    public static final class Close extends DatabaseTest {
+        @Override
+        protected void tearDown() throws Exception {
+            closeOnce();
+            super.tearDown();
+        }
+
+        @AfterClass
+        public static void closeOnce() {
+            keepOpen = false;
+        }
     }
 
     /**
@@ -101,14 +153,5 @@ public class DatabaseTest extends TestCase {
         }
         r.close();
         s.close();
-    }
-
-    /**
-     * Tries the {@link Query#selectAll} method on the specified table.
-     */
-    protected static void trySelectAll(final Query query) throws SQLException {
-        final String sql = query.selectAll(QueryType.SELECT);
-        assertNotNull(sql);
-        tryStatement(sql);
     }
 }

@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 import javax.imageio.IIOException;
+import org.geotools.coverage.grid.GridGeometry2D;
 
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -43,6 +44,7 @@ import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.coverage.catalog.sql.GridCoverageTable;
 import net.sicade.catalog.Database;
+import org.geotools.coverage.grid.GridCoverage2D;
 
 
 /**
@@ -240,14 +242,14 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
         CoverageReference ref = table.getEntry();
         System.out.println(ref);
         if (ref != null) {
-            return ref.getCoverage(null).geophysics(false);
+            return trimTo2D(ref.getCoverage(null));
         }
         if (true) {
             // Returns an arbitrary image. TODO: we need to do something better.
             table.setTimeRange(new Date(0), new Date());
             ref = table.getEntry();
             if (ref != null) {
-                return ref.getCoverage(null).geophysics(false);
+                return trimTo2D(ref.getCoverage(null));
             }
         }            
         final BufferedImage image = new BufferedImage(400, 400, BufferedImage.TYPE_INT_ARGB);
@@ -255,5 +257,17 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
         g.drawString("Pas d'images à la date " + time, 10, 200);
         g.dispose();
         return FactoryFinder.getGridCoverageFactory(null).create("Erreur", image, new Envelope2D(null, -180, -90, 360, 180));
+    }
+
+    /**
+     * Reduces the specified coverage to a 2D form.
+     */
+    private static GridCoverage2D trimTo2D(GridCoverage2D coverage) {
+        coverage = coverage.geophysics(false);
+        final GridGeometry2D geometry = (GridGeometry2D) coverage.getGridGeometry();
+        coverage = FactoryFinder.getGridCoverageFactory(null).create(coverage.getName(),
+                coverage.getRenderedImage(), geometry.getCoordinateReferenceSystem2D(),
+                geometry.getGridToCRS2D(), coverage.getSampleDimensions(), null, null);
+        return coverage.geophysics(false);
     }
 }

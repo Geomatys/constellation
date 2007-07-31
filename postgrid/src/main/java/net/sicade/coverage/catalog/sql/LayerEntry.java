@@ -35,15 +35,14 @@ import net.sicade.util.DateRange;
 import net.sicade.catalog.Entry;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
-import net.sicade.observation.Procedure;
 import net.sicade.coverage.catalog.Model;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Thematic;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.Series;
 import net.sicade.coverage.catalog.CoverageReference;
-import net.sicade.coverage.catalog.Distribution;
 import net.sicade.coverage.catalog.rmi.DataConnection;
+
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Layer couche d'images}.
@@ -66,11 +65,6 @@ public class LayerEntry extends Entry implements Layer {
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
      */
     private final Thematic phenomenon;
-
-    /**
-     * Référence vers la {@linkplain Procedure procédure} associée à cet observable.
-     */
-    private final Procedure procedure;
 
     /**
      * L'intervalle de temps typique des images de cette couche (en nombre
@@ -131,20 +125,17 @@ public class LayerEntry extends Entry implements Layer {
      *
      * @param name         Le nom de la couche.
      * @param thematic     La thématique de cette couche de données.
-     * @param procedure    La procédure ayant servit à obtenir les données de cette couche.
      * @param timeInterval L'intervalle de temps typique des images de cette couche (en nombre
      *                     de jours), ou {@link Double#NaN} si elle est inconnue.
      * @param remarks      Remarques s'appliquant à cette entrée, ou {@code null}.
      */
     protected LayerEntry(final String    name,
                          final Thematic  thematic,
-                         final Procedure procedure,
                          final double    timeInterval,
                          final String    remarks)
     {
         super(name, remarks);
         this.phenomenon   = thematic;
-        this.procedure    = procedure;
         this.timeInterval = timeInterval;
     }
 
@@ -153,13 +144,6 @@ public class LayerEntry extends Entry implements Layer {
      */
     public Thematic getPhenomenon() {
         return phenomenon;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Procedure getProcedure() {
-        return procedure;
     }
 
     /**
@@ -330,8 +314,7 @@ public class LayerEntry extends Entry implements Layer {
         }
         if (super.equals(object)) {
             final LayerEntry that = (LayerEntry) object;
-            return Utilities.equals(this.phenomenon,   that.phenomenon)   &&
-                   Utilities.equals(this.procedure,    that.procedure)    &&
+            return Utilities.equals(this.phenomenon, that.phenomenon) &&
                    Double.doubleToLongBits(this.timeInterval) ==
                    Double.doubleToLongBits(that.timeInterval);
             /*

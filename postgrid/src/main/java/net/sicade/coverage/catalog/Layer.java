@@ -23,7 +23,6 @@ import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import net.sicade.util.DateRange;
-import net.sicade.observation.Procedure;
 
 
 /**
@@ -53,12 +52,6 @@ public interface Layer extends Element {
      * la <cite>concentration en chlorophylle-a</cite>, etc.
      */
     Thematic getPhenomenon();
-
-    /**
-     * Retourne la procédure utilisée pour collecter les images. Par exemple il peut d'agir d'une
-     * synthèse des données captées par plusieurs satellites NOAA.
-     */
-    Procedure getProcedure();
 
     /**
      * Une couche de second recours qui peut être utilisée si aucune données n'est disponible

@@ -268,7 +268,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * use {@link #setLayer(Layer)} instead. However it still useful for debugging purpose.
      */
     public void setLayer(final String layer) {
-        setLayer(new LayerEntry(layer, null, null, 1, null));
+        setLayer(new LayerEntry(layer, null, 1, null));
     }
 
     /**

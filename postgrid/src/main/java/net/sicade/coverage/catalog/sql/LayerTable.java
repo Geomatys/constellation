@@ -27,7 +27,6 @@ import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.DynamicCoverage;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
-import net.sicade.observation.sql.ProcedureTable;
 import net.sicade.coverage.catalog.rmi.DataConnection;
 import net.sicade.coverage.catalog.rmi.DataConnectionFactory;
 
@@ -133,7 +132,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
          * utilisée ici ne devra jamais être accessible publiquement.
          */
         final LayerEntry entry;
-        entry = new LayerEntry(name, thematics.getEntry(thematic), null, period, remarks);
+        entry = new LayerEntry(name, thematics.getEntry(thematic), period, remarks);
         entry.fallback = fallback;
         return entry;
     }

@@ -29,6 +29,7 @@ public class PostGridSuite extends TestSuite {
      * Creates the test suite. The tests are added in an approximative dependency order.
      */
     public PostGridSuite() {
+        addTestSuite(net.sicade.catalog.DatabaseTest.Open.class); // Must be first
         addTestSuite(net.sicade.catalog.             SpatialFunctionsTest         .class);
         addTestSuite(net.sicade.catalog.             TimeStampTest                .class);
         addTestSuite(net.sicade.catalog.             QueryTest                    .class);
@@ -46,10 +47,11 @@ public class PostGridSuite extends TestSuite {
         addTestSuite(net.sicade.coverage.catalog.sql.GridGeometryTableTest        .class);
         addTestSuite(net.sicade.coverage.catalog.sql.GridCoverageTableTest        .class);
         addTestSuite(net.sicade.coverage.catalog.sql.WritableGridCoverageTableTest.class);
+        addTestSuite(net.sicade.catalog.DatabaseTest.Close.class); // Must be last
     }
 
     /**
-     * Returns the test suite.
+     * Returns the test suite, for JUnit 3 compatibility.
      */
     public static TestSuite suite() {
         return new PostGridSuite();

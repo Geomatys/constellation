@@ -19,68 +19,67 @@ import org.geotools.resources.Utilities;
 
 
 /**
- * Classe de base des éléments qui délègueront tous ou une partir de leur travail à un
- * autre élément. Ces classes sont utiles lorsque l'on veut modifier seulement quelques
- * aspect du travail d'un {@linkplain #getParent élément parent}.
- * <p>
- * Les proxy peuvent être enregistrés en binaires si l'{@linkplain #getParent élément parent}
- * le peut aussi.
+ * Base class for {@linkplain Element element} implementations that delegate their work to an
+ * other element.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public abstract class Proxy implements Element, Serializable {
     /**
-     * Pour compatibilité entre des enregistrements binaires de versions différentes.
+     * For cross version compatibility.
      */
     private static final long serialVersionUID = 6984331646382641188L;
 
     /**
-     * Construit un proxy.
+     * Creates a new proxy.
      */
     public Proxy() {
     }
 
     /**
-     * Retourne l'élément enveloppé par ce proxy.
+     * Returns the wrapped element.
      */
-    public abstract Element getParent();
+    public abstract Element getBackingElement();
 
     /**
-     * Retourne le nom de cet élément. L'implémentation par défaut délègue le travail
-     * au {@linkplain #getParent parent}.
+     * Returns the name of this element. The default implementation delegates to
+     * the {@linkplain #getBackingElement backing element}.
      */
     public String getName() {
-        return getParent().getName();
+        return getBackingElement().getName();
     }
 
     /**
-     * Retourne des remarques s'appliquant à cette entrée, ou {@code null} s'il n'y en a pas.
-     * L'implémentation par défaut délègue le travail au {@linkplain #getParent parent}.
+     * Returns remarks about this element, or {@code null} if none. The default
+     * implementation delegates to the {@linkplain #getBackingElement backing element}.
      */
     public String getRemarks() {
-        return getParent().getRemarks();
+        return getBackingElement().getRemarks();
     }
 
     /**
-     * Retourne le nom de cet élément.
+     * Returns a string representation of this element. The default implementation
+     * returns the {@linkplain #getName name}.
      */
+    @Override
     public String toString() {
         return getName();
     }
 
     /**
-     * Retourne un code pour cet élément. L'implémentation par défaut calcule un code à partir
-     * de celui du {@linkplain #getParent parent}.
+     * Returns a hash code value for this element. The default implementation derives a
+     * code from the one computed by the {@linkplain #getBackingElement backing element}.
      */
     @Override
     public int hashCode() {
-        return getParent().hashCode() ^ (int)serialVersionUID;
+        return getBackingElement().hashCode() ^ (int)serialVersionUID;
     }
 
     /**
-     * Compare cet objet avec l'objet spécifié. L'implémentation par défaut vérifie si les deux
-     * objets sont de la même classe et leurs {@linkplain #getParent parents} sont eux-même égaux.
+     * Compares this element with the specified object for equality. The default implementation
+     * returns {@code true} if the specified object is the same {@code Proxy} subclass and uses
+     * an equals {@linkplain #getBackingElement backing element}.
      */
     @Override
     public boolean equals(final Object object) {
@@ -89,7 +88,7 @@ public abstract class Proxy implements Element, Serializable {
         }
         if (object!=null && object.getClass().equals(getClass())) {
             final Proxy that = (Proxy) object;
-            return Utilities.equals(this.getParent(), that.getParent());
+            return Utilities.equals(this.getBackingElement(), that.getBackingElement());
         }
         return false;
     }
