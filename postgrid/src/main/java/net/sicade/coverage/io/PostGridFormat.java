@@ -87,7 +87,7 @@ public class PostGridFormat extends AbstractGridFormat {
      * @return A reader on the grid coverage chosen.
      */
     public GridCoverageReader getReader(final Object input, final Hints hints) {
-        return new PostGridReader("SST (Monde - Coriolis)", this, input, null);
+        return new PostGridReader(this, input, null);
     }
 
     /**

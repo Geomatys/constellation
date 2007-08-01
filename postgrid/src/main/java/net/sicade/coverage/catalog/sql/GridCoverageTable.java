@@ -169,16 +169,16 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private transient Parameters parameters;
 
     /**
-     * The set of available altitudes. Will be computed by
-     * {@link #getAvailableAltitudes} when first needed.
-     */
-    private transient SortedSet<Number> availableAltitudes;
-
-    /**
      * The set of available dates. Will be computed by
      * {@link #getAvailableTimes} when first needed.
      */
     private transient SortedSet<Date> availableTimes;
+
+    /**
+     * The set of available altitudes. Will be computed by
+     * {@link #getAvailableElevations} when first needed.
+     */
+    private transient SortedSet<Number> availableElevations;
 
     /**
      * The set of available altitudes for each dates. Will be computed by
@@ -497,44 +497,7 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Returns the set of altitudes where a coverage is available. Only the images in
-     * the currently {@linkplain #getEnvelope selected envelope} are considered.
-     * <p>
-     * If different images have different set of altitudes, then this method returns
-     * only the altitudes found in every images.
-     *
-     * @return The set of altitudes. May be empty, but will never be null.
-     * @throws SQLException If an error occured while reading the database.
-     * @throws CatalogException if an illegal record was found.
-     */
-    public synchronized SortedSet<Number> getAvailableAltitudes()
-            throws SQLException, CatalogException
-    {
-        if (availableAltitudes == null) {
-            final SortedSet<Number> commons = new TreeSet<Number>();
-            final SortedMap<Date, SortedSet<Number>> centroids = getAvailableCentroids();
-            final Iterator<SortedSet<Number>> iterator = centroids.values().iterator();
-            if (iterator.hasNext()) {
-                commons.addAll(iterator.next());
-                while (iterator.hasNext()) {
-                    final SortedSet<Number> altitudes = iterator.next();
-                    for (final Iterator<Number> it=commons.iterator(); it.hasNext();) {
-                        if (!altitudes.contains(it.next())) {
-                            it.remove();
-                        }
-                    }
-                    if (commons.isEmpty()) {
-                        break; // No need to continue.
-                    }
-                }
-            }
-            availableAltitudes = Collections.unmodifiableSortedSet(commons);
-        }
-        return availableAltitudes;
-    }
-
-    /**
-     * Returns the set of dates for which a coverage is available. Only the images in
+     * Returns the set of dates when a coverage is available. Only the images in
      * the currently {@linkplain #getEnvelope selected envelope} are considered.
      *
      * @return The set of dates.
@@ -557,6 +520,43 @@ loop:   for (final CoverageReference newReference : entries) {
             }
         }
         return availableTimes;
+    }
+
+    /**
+     * Returns the set of altitudes where a coverage is available. Only the images in
+     * the currently {@linkplain #getEnvelope selected envelope} are considered.
+     * <p>
+     * If different images have different set of altitudes, then this method returns
+     * only the altitudes found in every images.
+     *
+     * @return The set of altitudes. May be empty, but will never be null.
+     * @throws SQLException If an error occured while reading the database.
+     * @throws CatalogException if an illegal record was found.
+     */
+    public synchronized SortedSet<Number> getAvailableElevations()
+            throws SQLException, CatalogException
+    {
+        if (availableElevations == null) {
+            final SortedSet<Number> commons = new TreeSet<Number>();
+            final SortedMap<Date, SortedSet<Number>> centroids = getAvailableCentroids();
+            final Iterator<SortedSet<Number>> iterator = centroids.values().iterator();
+            if (iterator.hasNext()) {
+                commons.addAll(iterator.next());
+                while (iterator.hasNext()) {
+                    final SortedSet<Number> altitudes = iterator.next();
+                    for (final Iterator<Number> it=commons.iterator(); it.hasNext();) {
+                        if (!altitudes.contains(it.next())) {
+                            it.remove();
+                        }
+                    }
+                    if (commons.isEmpty()) {
+                        break; // No need to continue.
+                    }
+                }
+            }
+            availableElevations = Collections.unmodifiableSortedSet(commons);
+        }
+        return availableElevations;
     }
 
     /**
@@ -865,7 +865,7 @@ loop:   for (final CoverageReference newReference : entries) {
         parameters = null;
         comparator = null;
         envelope   = null;
-        availableAltitudes = null;
+        availableElevations = null;
         availableTimes     = null;
         availableCentroids = null;
     }

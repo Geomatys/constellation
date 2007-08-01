@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.SortedSet;
 import java.util.Collections;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -64,7 +65,7 @@ public class LayerEntry extends Entry implements Layer {
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
      */
-    private final Thematic phenomenon;
+    private final Thematic thematic;
 
     /**
      * L'intervalle de temps typique des images de cette couche (en nombre
@@ -135,15 +136,15 @@ public class LayerEntry extends Entry implements Layer {
                          final String    remarks)
     {
         super(name, remarks);
-        this.phenomenon   = thematic;
+        this.thematic   = thematic;
         this.timeInterval = timeInterval;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Thematic getPhenomenon() {
-        return phenomenon;
+    public Thematic getThematic() {
+        return thematic;
     }
 
     /**
@@ -175,6 +176,34 @@ public class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    public SortedSet<Date> getAvailableTimes() throws CatalogException {
+        if (server != null) try {
+            return server.getAvailableTimes();
+        } catch (SQLException e) {
+            throw new ServerException(e);
+        } catch (RemoteException e) {
+            throw new ServerException(e);
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SortedSet<Number> getAvailableElevations() throws CatalogException {
+        if (server != null) try {
+            return server.getAvailableElevations();
+        } catch (SQLException e) {
+            throw new ServerException(e);
+        } catch (RemoteException e) {
+            throw new ServerException(e);
+        }
+        return null;        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public DateRange getTimeRange() throws CatalogException {
         if (server != null) try {
             return server.getTimeRange();
@@ -199,7 +228,9 @@ public class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    public synchronized CoverageReference getCoverageReference(final Date time) throws CatalogException {
+    public synchronized CoverageReference getCoverageReference(final Date time, final Number elevation)
+            throws CatalogException
+    {
         long delay = Math.round(timeInterval * (MILLIS_IN_DAY/2));
         if (delay <= 0) {
             delay = MILLIS_IN_DAY / 2;
@@ -212,6 +243,8 @@ public class LayerEntry extends Entry implements Layer {
                 singleCoverageServer = server.newInstance(null);
             }
             singleCoverageServer.setTimeRange(startTime, endTime);
+            final double z = (elevation != null) ? elevation.doubleValue() : 0;
+            singleCoverageServer.setVerticalRange(z, z); // TODO: choose a better range.
             return singleCoverageServer.getEntry();
         } catch (RemoteException exception) {
             throw new ServerException(exception);
@@ -314,7 +347,7 @@ public class LayerEntry extends Entry implements Layer {
         }
         if (super.equals(object)) {
             final LayerEntry that = (LayerEntry) object;
-            return Utilities.equals(this.phenomenon, that.phenomenon) &&
+            return Utilities.equals(this.thematic, that.thematic) &&
                    Double.doubleToLongBits(this.timeInterval) ==
                    Double.doubleToLongBits(that.timeInterval);
             /*

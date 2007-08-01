@@ -159,6 +159,11 @@ public class Synchronizer {
      * clauses.
      * <p>
      * This method process {@code table} as well as dependencies found in {@code tables}.
+     * Processed dependencies are removed from the {@code tables} map.
+     *
+     * @param table  The table to process.
+     * @param tables The (<var>table</var>, <var>condition</var>) mapping. This map will be modified.
+     * @throws SQLException if an error occured while reading or writting in the database.
      */
     private void replace(final String table, final Map<String,String> tables) throws SQLException {
         final String condition = tables.remove(table);
@@ -170,9 +175,6 @@ public class Synchronizer {
          */
         final String catalog = target.catalog;
         final String schema  = target.schema;
-        if (metadata == null) {
-            metadata = target.getConnection().getMetaData();
-        }
         final ResultSet dependencies = metadata.getImportedKeys(catalog, schema, table);
         while (dependencies.next()) {
             String dependency = dependencies.getString("PKTABLE_CAT");
@@ -189,112 +191,47 @@ public class Synchronizer {
             }
         }
         dependencies.close();
-
         insert(table, condition);
     }
 
     /**
-     * Replaces the content of the specified table in the target database. The content of the target
-     * table will be cleared before the new content is added. If {@code condition} is {@code null},
-     * then the whole table will be replaced. If {@code condition} is not null, then only the records
-     * matching the specified condition will be replaced.
+     * Replaces the content of the specified tables. The {@linkplain Map#keySet map keys} shall
+     * contains the set of every tables to take in account; table not listed in this set will
+     * be untouched. The associated values are the SLQ conditions to put in the {@code WHERE}
+     * clauses.
      *
-     * @param  table The name of the table in which to replace the records.
-     * @param  condition A SQL condition (to be put after a {@code WHERE} clause) for the
-     *         records to be replaced, or {@code null} for replacing the whole table.
-     * @throws SQLException if a reading or writing operation failed.
+     * @param tables The (<var>table</var>, <var>condition</var>) mapping. This map will be modified.
+     * @throws SQLException if an error occured while reading or writting in the database.
      */
-    private void replace(String table, String condition) throws SQLException {
-        /*
-         * Arguments check.
-         */
-        table = table.trim();
-        if (condition != null) {
-            condition = condition.trim();
-            if (condition.length() == 0) {
-                condition = null;
-            }
-        }
-        final StringBuilder buffer = new StringBuilder();
-        buffer.append("DELETE FROM \"").append(table).append('"');
-        if (condition != null) {
-            buffer.append(" WHERE ").append(condition);
-        }
-        String sql = buffer.toString();
-        /*
-         * Gets the connections to the databases.
-         */
-        final Connection source = this.source.getConnection();
-        final Connection target = this.target.getConnection();
-        source.setReadOnly(true);
-        target.setAutoCommit(false);
-        final Statement sourceStmt = source.createStatement();
-        final Statement targetStmt = target.createStatement();
-        boolean success = false;
-        try {
-            /*
-             * Delete the old records from the target table.
-             */
-            int count = targetStmt.executeUpdate(sql);
-            log(LoggingLevel.DELETE, "replace", sql + '\n' + count + " lignes supprimées.");
-            /*
-             * Fetch the new records from the source table, together with the name of all columns.
-             */
-            buffer.setLength(0);
-            buffer.append("SELECT * FROM \"").append(table).append('"');
-            if (condition != null) {
-                buffer.append(" WHERE ").append(condition);
-            }
-            sql = buffer.toString();
-            final ResultSet          sources = sourceStmt.executeQuery(sql);
-            final ResultSetMetaData metadata = sources.getMetaData();
-            final String[]           columns = new String[metadata.getColumnCount()];
-            for (int i=0; i<columns.length;) {
-                columns[i] = metadata.getColumnName(++i);
-            }
-            log(LoggingLevel.SELECT, "replace", sql);
-            /*
-             * Copies the records in the target table.
-             */
-            buffer.setLength(0);
-            buffer.append("INSERT INTO \"").append(table).append("\" (");
-            for (int i=0; i<columns.length; i++) {
-                if (i != 0) {
-                    buffer.append(',');
-                }
-                buffer.append('"').append(columns[i]).append('"');
-            }
-            buffer.append(") VALUES (");
-            final int valuesStart = buffer.length();
-            while (sources.next()) {
-                buffer.setLength(valuesStart);
-                for (int i=0; i<columns.length;) {
-                    if (i != 0) {
-                        buffer.append(',');
+    private void replace(final Map<String,String> tables) throws SQLException {
+        final String catalog = target.catalog;
+        final String schema  = target.schema;
+        metadata = target.getConnection().getMetaData();
+search: while (!tables.isEmpty()) {
+            for (final String table : tables.keySet()) {
+                // Skips all tables that have dependencies.
+                final ResultSet dependents = metadata.getExportedKeys(catalog, schema, table);
+                while (dependents.next()) {
+                    if ((catalog==null || catalog.equals(dependents.getString("FKTABLE_CAT"))) &&
+                        (schema ==null || schema .equals(dependents.getString("FKTABLE_SCHEM"))))
+                    {
+                        final String dependent = dependents.getString("FKTABLE_NAME");
+                        if (tables.containsKey(dependent)) {
+                            continue;
+                        }
                     }
-                    buffer.append('\'').append(sources.getString(++i)).append('\'');
                 }
-                buffer.append(')');
-                sql = buffer.toString();
-                count = targetStmt.executeUpdate(sql);
-                if (count != 1) {
-                    break;
-                }
-                log(LoggingLevel.INSERT, "replace", sql);
+                dependents.close();
+                // We have found a table which have no dependencies (a leaf).
+                replace(table, tables);
+                continue search;
             }
-            sources.close();
-            success = true;
-        } finally {
-            if (success) {
-                target.commit();
-            } else {
-                target.rollback();
+            // We have been unable to find any leaf. Take a chance: process the first table.
+            // An exception is likely to be throw, but we will have tried.
+            for (final String table : tables.keySet()) {
+                replace(table, tables);
+                continue search;
             }
-        }
-        sourceStmt.close();
-        targetStmt.close();
-        if (!success) {
-            throw new SQLException("Certains enregistrements n'ont pas pu être ajoutés.");
         }
     }
 
@@ -324,8 +261,23 @@ public class Synchronizer {
         final String table     = arguments.getRequiredString("-table");
         final String condition = arguments.getOptionalString("-condition");
         args = arguments.getRemainingArguments(0);
+
         final Synchronizer synchronizer = new Synchronizer();
-        synchronizer.replace(table, condition);
+        final Connection source = synchronizer.source.getConnection();
+        final Connection target = synchronizer.target.getConnection();
+        source.setReadOnly(true);
+        target.setAutoCommit(false);
+        boolean success = false;
+        try {
+//            synchronizer.replace(table, condition);
+            success = true;
+        } finally {
+            if (success) {
+                target.commit();
+            } else {
+                target.rollback();
+            }
+        }
         synchronizer.close();
     }
 }

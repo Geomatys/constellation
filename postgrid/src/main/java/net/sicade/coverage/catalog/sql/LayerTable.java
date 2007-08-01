@@ -180,7 +180,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
          *
          * 3) Exécution comme serveur:
          *    ------------------------
-         *    Si ce code est exécuté par net.sicade.observation.coverage.rmi.Server, alors
+         *    Si ce code est exécuté par net.sicade.coverage.catalog.rmi.Server, alors
          *    DataConnectionFactory a déjà été exporté comme service RMI. On ne veut pas créer
          *    de nouvelle instance locale, mais réutiliser le service qui existe déjà. La
          *    méthode Database.getRemote aura été redéfinit par Server en ce sens.

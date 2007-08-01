@@ -16,13 +16,12 @@ package net.sicade.coverage.catalog;
 
 import java.util.Set;
 import java.util.Date;
-import net.sicade.catalog.CatalogException;
-import net.sicade.catalog.Element;
-
+import java.util.SortedSet;
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-
 import net.sicade.util.DateRange;
+import net.sicade.catalog.Element;
+import net.sicade.catalog.CatalogException;
 
 
 /**
@@ -51,7 +50,7 @@ public interface Layer extends Element {
      * la <cite>température</cite>, l'<cite>anomalie de la hauteur de l'eau</cite>,
      * la <cite>concentration en chlorophylle-a</cite>, etc.
      */
-    Thematic getPhenomenon();
+    Thematic getThematic();
 
     /**
      * Une couche de second recours qui peut être utilisée si aucune données n'est disponible
@@ -61,7 +60,7 @@ public interface Layer extends Element {
     Layer getFallback();
 
     /**
-     * Retourne les séries de cette couches.
+     * Returns all series for this layer.
      */
     Set<Series> getSeries();
 
@@ -71,6 +70,24 @@ public interface Layer extends Element {
      * jours. Cette méthode retourne {@link Double#NaN} si l'intervalle de temps est inconnu.
      */
     double getTimeInterval();
+
+    /**
+     * Returns the set of dates when a coverage is available.
+     *
+     * @return The set of dates.
+     * @throws CatalogException if the set can not be obtained.
+     */
+    SortedSet<Date> getAvailableTimes() throws CatalogException;
+
+    /**
+     * Returns the set of altitudes where a coverage is available. If different images
+     * have different set of altitudes, then this method returns only the altitudes
+     * found in every images.
+     *
+     * @return The set of altitudes. May be empty, but will never be null.
+     * @throws CatalogException if the set can not be obtained.
+     */
+    SortedSet<Number> getAvailableElevations() throws CatalogException;
 
     /**
      * Retourne la plage de temps englobeant toutes les images de cette couche.
@@ -91,7 +108,7 @@ public interface Layer extends Element {
      *
      * @throws CatalogException si le catalogue n'a pas pu être interrogé.
      */
-    CoverageReference getCoverageReference(Date time) throws CatalogException;
+    CoverageReference getCoverageReference(Date time, Number elevation) throws CatalogException;
 
     /**
      * Retourne la liste des images disponibles dans la plage de coordonnées spatio-temporelles

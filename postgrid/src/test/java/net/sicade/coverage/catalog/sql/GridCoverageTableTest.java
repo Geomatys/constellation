@@ -93,8 +93,8 @@ public class GridCoverageTableTest extends DatabaseTest {
         assertTrue(allTimes.containsAll(availableTimes));
         assertFalse(availableTimes.containsAll(allTimes));
 
-        final Set<Number> altitudes = table.getAvailableAltitudes();
-        assertTrue(altitudes.isEmpty());
+        final Set<Number> elevations = table.getAvailableElevations();
+        assertTrue(elevations.isEmpty());
     }
 
     /**

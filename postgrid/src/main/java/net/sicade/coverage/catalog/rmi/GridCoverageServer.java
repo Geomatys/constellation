@@ -21,6 +21,7 @@ package net.sicade.coverage.catalog.rmi;
 import java.util.Set;
 import java.util.List;
 import java.util.Date;
+import java.util.SortedSet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.rmi.RemoteException;
@@ -30,6 +31,7 @@ import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.util.NumberRange;
 
 import net.sicade.util.DateRange;
 import net.sicade.catalog.CatalogException;
@@ -111,6 +113,20 @@ public class GridCoverageServer extends UnicastRemoteObject implements DataConne
     /**
      * {@inheritDoc}
      */
+    public SortedSet<Date> getAvailableTimes() throws CatalogException, SQLException, RemoteException {
+        return table.getAvailableTimes();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SortedSet<Number> getAvailableElevations() throws CatalogException, SQLException, RemoteException {
+        return table.getAvailableElevations();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public DateRange getTimeRange() throws CatalogException, RemoteException {
         return table.getTimeRange();
     }
@@ -120,6 +136,22 @@ public class GridCoverageServer extends UnicastRemoteObject implements DataConne
      */
     public boolean setTimeRange(final Date startTime, final Date endTime) throws CatalogException, RemoteException {
         return table.setTimeRange(startTime, endTime);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public NumberRange getVerticalRange() throws CatalogException, RemoteException {
+        return table.getVerticalRange();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean setVerticalRange(double minimum, double maximum)
+            throws CatalogException, RemoteException
+    {
+        return table.setVerticalRange(minimum, maximum);
     }
 
     /**

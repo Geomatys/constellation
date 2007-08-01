@@ -14,23 +14,22 @@
  */
 package net.sicade.coverage.catalog.rmi;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.List;
 import java.util.Date;
+import java.util.SortedSet;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.io.IOException;
 import java.sql.SQLException;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.util.NumberRange;
 
-// Sicade dependencies
 import net.sicade.util.DateRange;
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Operation;
@@ -74,6 +73,28 @@ public interface DataConnection extends Remote {
     GeographicBoundingBox getGeographicBoundingBox() throws CatalogException, RemoteException;
 
     /**
+     * Returns the set of dates when a coverage is available.
+     *
+     * @return The set of dates.
+     * @throws CatalogException if an illegal record was found.
+     * @throws SQLException If an error occured while reading the database.
+     * @throws RemoteException if a problem occured while communicating with the remote server.
+     */
+    SortedSet<Date> getAvailableTimes() throws CatalogException, SQLException, RemoteException;
+
+    /**
+     * Returns the set of altitudes where a coverage is available. If different images
+     * have different set of altitudes, then this method returns only the altitudes
+     * found in every images.
+     *
+     * @return The set of altitudes. May be empty, but will never be null.
+     * @throws CatalogException if an illegal record was found.
+     * @throws SQLException If an error occured while reading the database.
+     * @throws RemoteException if a problem occured while communicating with the remote server.
+     */
+    SortedSet<Number> getAvailableElevations() throws CatalogException, SQLException, RemoteException;
+
+    /**
      * Retourne la partie temporelle de l'{@linkplain #getEnvelope enveloppe} des données.
      *
      * @throws CatalogException si la base de données n'a pas pu être interrogée.
@@ -93,6 +114,27 @@ public interface DataConnection extends Remote {
      * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
      */
     boolean setTimeRange(final Date startTime, final Date endTime) throws CatalogException, RemoteException;
+
+    /**
+     * Returns the vertical range of the data.
+     *
+     * @return The vertical range of the data.
+     * @throws CatalogException if the vertical range can not be obtained.
+     * @throws RemoteException if a problem occured while communicating with the remote server.
+     */
+    NumberRange getVerticalRange() throws CatalogException, RemoteException;
+
+    /**
+     * Sets the vertical range of the data.
+     *
+     * @param  minimum The minimal <var>z</var> value.
+     * @param  maximum The maximal <var>z</var> value.
+     * @return {@code true} if the vertical range changed as a result of this call, or
+     *         {@code false} if the specified range is equals to the one already set.
+     * @throws CatalogException if the vertical range can not be obtained.
+     * @throws RemoteException if a problem occured while communicating with the remote server.
+     */
+    boolean setVerticalRange(double minimum, double maximum) throws CatalogException, RemoteException;
 
     /**
      * Retourne la valeur d'une bande à une position interpolée dans l'ensemble des images de cette
