@@ -177,6 +177,7 @@ public class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
+        final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
             return server.getAvailableTimes();
         } catch (SQLException e) {
@@ -191,6 +192,7 @@ public class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
+        final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
             return server.getAvailableElevations();
         } catch (SQLException e) {
@@ -205,6 +207,7 @@ public class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public DateRange getTimeRange() throws CatalogException {
+        final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
             return server.getTimeRange();
         } catch (RemoteException e) {
@@ -217,6 +220,7 @@ public class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
+        final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
             return server.getGeographicBoundingBox();
         } catch (RemoteException e) {
@@ -257,7 +261,7 @@ public class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public Set<CoverageReference> getCoverageReferences() throws CatalogException {
-        final DataConnection server = this.server;   // Avoid synchronization.
+        final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
             return server.getEntries();
         } catch (RemoteException exception) {

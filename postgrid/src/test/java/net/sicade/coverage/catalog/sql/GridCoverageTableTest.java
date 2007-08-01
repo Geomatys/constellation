@@ -15,15 +15,11 @@
 package net.sicade.coverage.catalog.sql;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TimeZone;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
@@ -50,14 +46,6 @@ public class GridCoverageTableTest extends DatabaseTest {
     public static final String SAMPLE_NAME = "198602";
 
     /**
-     * The format for the date used in this test.
-     */
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
-    static {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-
-    /**
      * Tests the {@link GridCoverageTable#getEntry} and {@link GridCoverageTable#getEntries} methods.
      */
     @Test
@@ -76,7 +64,7 @@ public class GridCoverageTableTest extends DatabaseTest {
         assertEquals( -90, envelope.getMinimum(1), 0.0);
         assertEquals( +90, envelope.getMaximum(1), 0.0);
 
-        table.setTimeRange(date("1986-01-05"), date("1986-01-20"));
+        table.setTimeRange(LayerTableTest.START_TIME, LayerTableTest.END_TIME);
         final Set<CoverageReference> entries = table.getEntries();
         assertEquals(3, entries.size());
         assertTrue(entries.contains(entry));
@@ -84,7 +72,7 @@ public class GridCoverageTableTest extends DatabaseTest {
 
         final SortedMap<Date, SortedSet<Number>> centroids = table.getAvailableCentroids();
         assertEquals(entries.size(), centroids.size());
-        final Set<Number> depths = centroids.get(date("1986-01-13"));
+        final Set<Number> depths = centroids.get(LayerTableTest.SAMPLE_TIME);
         assertNotNull(depths);
         assertTrue(depths.isEmpty());
 
@@ -117,12 +105,5 @@ public class GridCoverageTableTest extends DatabaseTest {
         assertEquals(+180, bbox.getEastBoundLongitude(), 0.0);
         assertEquals( -77, bbox.getSouthBoundLatitude(), 0.1);
         assertEquals( +77, bbox.getNorthBoundLatitude(), 0.1);
-    }
-
-    /**
-     * Returns the specified date.
-     */
-    private static Date date(final String asText) throws ParseException {
-        return DATE_FORMAT.parse(asText);
     }
 }
