@@ -16,6 +16,7 @@
 package net.sicade.catalog;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.sql.DataSource;
@@ -45,8 +46,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.geotools.util.Logging;
+import org.geotools.io.TableWriter;
 import org.geotools.resources.JDBC;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.Arguments;
 
 
 /**
@@ -624,5 +627,35 @@ public class Database {
                 }
             }
         }
+    }
+
+    /**
+     * Tries the connection to the database.
+     */
+    public static void main(String[] args) throws IOException, SQLException {
+        final Arguments arguments = new Arguments(args);
+        args = arguments.getRemainingArguments(0);
+        final Database database = new Database();
+        final DatabaseMetaData metadata = database.getConnection().getMetaData();
+        final TableWriter table = new TableWriter(arguments.out, 1);
+        table.write("Database:\t");
+        table.write(metadata.getDatabaseProductName());
+        table.write(' ');
+        table.write(metadata.getDatabaseProductVersion());
+        table.nextLine();
+        table.write("JDBC:\t");
+        table.write(metadata.getDriverVersion());
+        table.nextLine();
+        table.write("JAI:\t");
+        String version;
+        try {
+            version = String.valueOf(Class.forName("javax.media.jai.JAI")
+                    .getMethod("getBuildVersion", (Class[]) null).invoke(null, (Object[]) null));
+        } catch (Exception e) {
+            version = e.toString();
+        }
+        table.write(version);
+        table.flush();
+        database.close();
     }
 }

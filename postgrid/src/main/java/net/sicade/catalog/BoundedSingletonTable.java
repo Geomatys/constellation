@@ -65,8 +65,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
 
     /**
      * The default end time, in milliseconds after current time.
+     * The current value is 30 days.
      */
-    private static final long DEFAULT_END_TIME = 30 * 24 * 60 * 60 * 1000L;
+    private static final long DEFAULT_END_TIME = 30 * (24 * 60 * 60 * 1000L);
 
     /**
      * The parameter to use for looking an element by time range, or {@code null} if unset.
@@ -577,7 +578,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             final int index = byTimeRange.indexOf(type);
             if (index != 0) {
                 final long min = (tMin != Long.MIN_VALUE) ? tMin : DEFAULT_START_TIME;
-                final long max = (tMax != Long.MAX_VALUE) ? tMax : DEFAULT_END_TIME + System.currentTimeMillis();
+                final long max = (tMax != Long.MAX_VALUE) ? tMax : (DEFAULT_END_TIME + System.currentTimeMillis());
                 final Calendar calendar = getCalendar();
                 statement.setTimestamp(index + 1, new Timestamp(min), calendar);
                 statement.setTimestamp(index,     new Timestamp(max), calendar);
