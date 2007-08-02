@@ -44,6 +44,11 @@ public class LayerTableTest extends DatabaseTest {
     public static final String SAMPLE_NAME = "SST (Monde - hebdomadaires)";
 
     /**
+     * The name of the NetCDF layer to be tested.
+     */
+    public static final String NETCDF_NAME = "SST (Monde - Coriolis)";
+
+    /**
      * The start time, end time, and a sample time between them.
      */
     public static final Date START_TIME, END_TIME, SAMPLE_TIME;
@@ -83,5 +88,21 @@ public class LayerTableTest extends DatabaseTest {
         final CoverageReference reference = entry.getCoverageReference(SAMPLE_TIME, null);
         assertTrue(references.contains(reference));
         assertSame("Should be cached.", availableTimes, entry.getAvailableTimes());
+    }
+
+    /**
+     * Tests the layer for NetCDF images.
+     */
+    @Test
+    public void testNetCDF() throws CatalogException, SQLException, ParseException {
+        /*
+         * Note: for the test above, we really want to invoke 'table.getEntry' immediately after
+         * construction; we don't want to invoke 'setTimeRange' before. In some previous version,
+         * we had a bug when this method was invoked early without explicit time range.
+         */
+        final LayerTable table = new LayerTable(database);
+        final Layer entry = table.getEntry(NETCDF_NAME);
+        final Set<CoverageReference> references = entry.getCoverageReferences();
+        assertEquals(3, references.size());
     }
 }

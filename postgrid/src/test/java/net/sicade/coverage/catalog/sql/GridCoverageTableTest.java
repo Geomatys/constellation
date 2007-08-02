@@ -91,7 +91,10 @@ public class GridCoverageTableTest extends DatabaseTest {
     @Test
     public void testNetCDF() throws CatalogException, SQLException, ParseException {
         final GridCoverageTable table = new GridCoverageTable(database);
-        table.setLayer("SST (Monde - Coriolis)");
+        table.setLayer(LayerTableTest.NETCDF_NAME);
+        final Set<Date> availableTimes = table.getAvailableTimes();
+        assertEquals(3, availableTimes.size());
+
         final CoverageReference entry = table.getEntry();
         final Envelope envelope = entry.getEnvelope();
         assertTrue(getHorizontalCRS(envelope.getCoordinateReferenceSystem()) instanceof ProjectedCRS);

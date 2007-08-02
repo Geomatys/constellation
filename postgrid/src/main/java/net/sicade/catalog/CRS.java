@@ -159,5 +159,17 @@ public enum CRS {
             if (t == Long.MAX_VALUE) return Double.POSITIVE_INFINITY;
             return super.toValue(time);
         }
+
+        /**
+         * Converts the specified value to a date, returning {@code null} if the value is infinity.
+         * Those null values will be processed in a special way by {@link BoundedSingletonTable}.
+         * Returning {@code null} pose a risk, but returning {@code Date(Long.MIN_VALUE)} would be
+         * yet more dangerous; it is better to have a {@link NullPointerException} soon than
+         * performing some computation on a wrong date value.
+         */
+        @Override
+        public Date toDate(final double value) {
+            return Double.isInfinite(value) || Double.isNaN(value) ? null : super.toDate(value);
+        }
     }
 }
