@@ -62,9 +62,9 @@ import net.sicade.catalog.Element;
 import net.sicade.coverage.catalog.Catalog;
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
-import net.sicade.coverage.catalog.Operation;
-import net.sicade.coverage.catalog.Descriptor;
-import net.sicade.coverage.catalog.RegionOfInterest;
+import net.sicade.coverage.model.Operation;
+import net.sicade.coverage.model.Descriptor;
+import net.sicade.coverage.model.RegionOfInterest;
 
 
 /**

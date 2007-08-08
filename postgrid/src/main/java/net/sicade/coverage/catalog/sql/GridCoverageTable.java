@@ -42,7 +42,7 @@ import org.geotools.resources.geometry.XRectangle2D;
 
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Layer;
-import net.sicade.coverage.catalog.Operation;
+import net.sicade.coverage.model.Operation;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.coverage.catalog.rmi.DataConnection;
 import net.sicade.catalog.BoundedSingletonTable;
@@ -101,6 +101,11 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * Le modèle à utiliser pour formatter des angles.
      */
     static final String ANGLE_PATTERN = "D°MM.m'";
+
+    /**
+     * Nombre de millisecondes dans une journée.
+     */
+    private static final double DAY = 24*60*60*1000.0;
 
     /**
      * Réference vers la couche d'images.
@@ -650,7 +655,7 @@ loop:   for (final CoverageReference newReference : entries) {
             addTo = new RangeSet(Date.class);
         }
         while (result.next()) {
-            final long timeInterval = Math.round(layer.getTimeInterval() * RegionOfInterestEntry.DAY);
+            final long timeInterval = Math.round(layer.getTimeInterval() * DAY);
             final Date    startTime = result.getTimestamp(startTimeIndex, calendar);
             final Date      endTime = result.getTimestamp(  endTimeIndex, calendar);
             if (startTime!=null && endTime!=null) {

@@ -84,7 +84,7 @@ import net.sicade.util.DateRange;
 import net.sicade.catalog.Entry;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Format;
-import net.sicade.coverage.catalog.Operation;
+import net.sicade.coverage.model.Operation;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.coverage.catalog.rmi.RemoteLoader;
 import net.sicade.coverage.catalog.rmi.CoverageLoader;
@@ -743,7 +743,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
              */
             Operation operation = parameters.operation;
             if (operation == null) {
-                operation = OperationEntry.DEFAULT;
+                operation = Operation.DEFAULT;
             }
             coverage = (GridCoverage2D) operation.doOperation(coverage);
         }

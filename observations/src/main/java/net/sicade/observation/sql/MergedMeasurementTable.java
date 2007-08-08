@@ -42,8 +42,8 @@ import org.geotools.resources.Utilities;
 import net.sicade.observation.Procedure;
 import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Observable;
-import net.sicade.coverage.catalog.Descriptor;
-import net.sicade.coverage.catalog.RegionOfInterest;
+import net.sicade.coverage.model.Descriptor;
+import net.sicade.coverage.model.RegionOfInterest;
 
 
 /**

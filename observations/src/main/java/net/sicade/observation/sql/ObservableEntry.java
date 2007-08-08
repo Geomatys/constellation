@@ -18,7 +18,7 @@ import net.sicade.catalog.Entry;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Procedure;
-import net.sicade.coverage.catalog.Distribution;
+import net.sicade.coverage.model.Distribution;
 import org.geotools.resources.Utilities;
 
 

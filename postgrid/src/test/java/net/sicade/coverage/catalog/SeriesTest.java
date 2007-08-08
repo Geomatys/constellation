@@ -40,7 +40,7 @@ import org.geotools.coverage.CoverageStack;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import net.sicade.coverage.catalog.sql.LayerTable;
-import net.sicade.coverage.catalog.sql.OperationTable;
+import net.sicade.coverage.model.OperationTable;
 import net.sicade.coverage.catalog.sql.GridCoverageTable;
 
 

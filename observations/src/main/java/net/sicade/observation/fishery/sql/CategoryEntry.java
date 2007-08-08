@@ -22,12 +22,12 @@ package net.sicade.observation.fishery.sql;
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
+import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.fishery.Stage;
 import net.sicade.observation.fishery.Species;
 import net.sicade.observation.fishery.Category;
 import net.sicade.observation.fishery.FisheryType;
 import net.sicade.observation.sql.ObservableEntry;
-import net.sicade.coverage.catalog.sql.DistributionEntry;
 
 
 /**
@@ -64,7 +64,7 @@ public class CategoryEntry extends ObservableEntry implements Category {
                             final FisheryType  procedure,
                             final String       remarks)
     {
-        super(identifier, symbol, species, procedure, DistributionEntry.NORMAL, remarks);
+        super(identifier, symbol, species, procedure, Distribution.NORMAL, remarks);
         this.stage = stage;
     }
 

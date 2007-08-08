@@ -31,6 +31,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import net.sicade.catalog.CatalogException;
+import net.sicade.coverage.model.LinearModel;
+import net.sicade.coverage.model.Model;
 
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;

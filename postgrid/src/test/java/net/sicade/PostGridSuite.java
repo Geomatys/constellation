@@ -40,13 +40,13 @@ public class PostGridSuite extends TestSuite {
         addTestSuite(net.sicade.coverage.catalog.sql.GridGeometryTableTest        .class);
         addTestSuite(net.sicade.coverage.catalog.sql.GridCoverageTableTest        .class);
         addTestSuite(net.sicade.coverage.catalog.sql.WritableGridCoverageTableTest.class);
-        addTestSuite(net.sicade.coverage.catalog.sql.RegionOfInterestTableTest    .class);
-        addTestSuite(net.sicade.coverage.catalog.sql.OperationTableTest           .class);
-        addTestSuite(net.sicade.coverage.catalog.sql.DistributionTableTest        .class);
-        addTestSuite(net.sicade.coverage.catalog.sql.DescriptorTableTest          .class);
         addTestSuite(net.sicade.coverage.catalog.sql.ThematicTableTest            .class);
         addTestSuite(net.sicade.coverage.catalog.sql.SeriesTableTest              .class);
         addTestSuite(net.sicade.coverage.catalog.sql.LayerTableTest               .class);
+        addTestSuite(net.sicade.coverage.model      .RegionOfInterestTableTest    .class);
+        addTestSuite(net.sicade.coverage.model      .OperationTableTest           .class);
+        addTestSuite(net.sicade.coverage.model      .DistributionTableTest        .class);
+        addTestSuite(net.sicade.coverage.model      .DescriptorTableTest          .class);
         addTestSuite(net.sicade.catalog.DatabaseTest.Close.class); // Must be last
     }
 

@@ -30,7 +30,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 
 // Sicade dependencies
 import net.sicade.coverage.catalog.sql.GridCoverageEntry;  // Pour javadoc
-import static net.sicade.coverage.catalog.CoverageBuilder.FACTORY;
+import static net.sicade.coverage.model.CoverageBuilder.FACTORY;
 
 
 /**

@@ -154,4 +154,13 @@ public class DatabaseTest extends TestCase {
         r.close();
         s.close();
     }
+
+    /**
+     * Tries the {@link Query#selectAll} method on the specified table.
+     */
+    protected static void trySelectAll(final Query query) throws SQLException {
+        final String sql = query.selectAll(QueryType.SELECT);
+        assertNotNull(sql);
+        tryStatement(sql);
+    }
 }

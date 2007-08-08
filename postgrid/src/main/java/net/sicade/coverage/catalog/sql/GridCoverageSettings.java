@@ -30,7 +30,7 @@ import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 
 import net.sicade.coverage.catalog.Layer;
-import net.sicade.coverage.catalog.Operation;
+import net.sicade.coverage.model.Operation;
 
 
 /**

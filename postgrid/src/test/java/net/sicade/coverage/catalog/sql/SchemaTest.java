@@ -16,8 +16,6 @@ package net.sicade.coverage.catalog.sql;
 
 import java.sql.SQLException;
 import net.sicade.catalog.DatabaseTest;
-import net.sicade.catalog.Query;
-import net.sicade.catalog.QueryType;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -43,23 +41,5 @@ public class SchemaTest extends DatabaseTest {
     public void testThematic() throws SQLException {
         final ThematicQuery query = new ThematicQuery(database);
         trySelectAll(query);
-    }
-
-    /**
-     * Tests the SQL statements used by the {@link OperationParameterTable}.
-     */
-    @Test
-    public void testOperationParameters() throws SQLException {
-        final OperationParameterQuery query = new OperationParameterQuery(database);
-        trySelectAll(query);
-    }
-
-    /**
-     * Tries the {@link Query#selectAll} method on the specified table.
-     */
-    private static void trySelectAll(final Query query) throws SQLException {
-        final String sql = query.selectAll(QueryType.SELECT);
-        assertNotNull(sql);
-        tryStatement(sql);
     }
 }

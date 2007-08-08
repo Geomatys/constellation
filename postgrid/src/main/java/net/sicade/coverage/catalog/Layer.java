@@ -22,6 +22,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import net.sicade.util.DateRange;
 import net.sicade.catalog.Element;
 import net.sicade.catalog.CatalogException;
+import net.sicade.coverage.model.Model;
 
 
 /**

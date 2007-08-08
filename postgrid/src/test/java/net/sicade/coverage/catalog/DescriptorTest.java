@@ -28,7 +28,7 @@ import net.sicade.catalog.CatalogException;
 import org.geotools.resources.Arguments;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
-import net.sicade.coverage.catalog.sql.DescriptorTable;
+import net.sicade.coverage.model.DescriptorTable;
 
 
 

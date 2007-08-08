@@ -29,6 +29,8 @@ import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
 import net.sicade.coverage.catalog.rmi.DataConnection;
 import net.sicade.coverage.catalog.rmi.DataConnectionFactory;
+import net.sicade.coverage.model.DescriptorTable;
+import net.sicade.coverage.model.LinearModelTable;
 
 
 /**

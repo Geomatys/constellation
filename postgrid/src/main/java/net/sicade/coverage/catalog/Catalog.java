@@ -23,6 +23,8 @@ import java.rmi.RemoteException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.NoSuchRecordException;
 import net.sicade.catalog.ServerException;
+import net.sicade.coverage.model.Descriptor;
+import net.sicade.coverage.model.Model;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -33,7 +35,7 @@ import net.sicade.util.DateRange;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.coverage.catalog.sql.LayerTable;
-import net.sicade.coverage.catalog.sql.DescriptorTable;
+import net.sicade.coverage.model.DescriptorTable;
 import net.sicade.coverage.catalog.rmi.DataConnectionFactory;
 
 

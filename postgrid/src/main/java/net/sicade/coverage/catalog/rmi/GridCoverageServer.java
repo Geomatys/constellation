@@ -36,7 +36,7 @@ import org.geotools.util.NumberRange;
 
 import net.sicade.util.DateRange;
 import net.sicade.catalog.CatalogException;
-import net.sicade.coverage.catalog.Operation;
+import net.sicade.coverage.model.Operation;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.coverage.catalog.sql.GridCoverageTable;
 import net.sicade.coverage.catalog.sql.GridCoverageEntry;
