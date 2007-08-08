@@ -25,37 +25,27 @@ import net.sicade.catalog.CatalogException;
 
 
 /**
- * Représentation une couche d'images. Chaque couche d'images portent sur un
- * {@linkplain Phenomenon phénomène} (par exemple la température) observé à l'aide d'une certaine
- * {@linkplain Procedure procédure} (par exemple une synthèse des données de plusieurs satellites
- * NOAA). Chaque couche d'images étant la combinaison d'un phénomène avec une procédure, elles
- * forment donc des {@linkplain Observable observables}.
- * <p>
- * Dans le contexte particulier des couches d'images, le <cite>phénomène</cite> est appelé
- * {@linkplain Thematic thématique}.
- * <p>
- * Des opérations supplémentaires peuvent être appliquées sur une couche d'image. Par exemple une
- * couche peut représenter des images de températures, et un calcul statistique peut travailler
- * sur les gradients de ces images de température. Aux yeux d'entités de plus haut niveau (tels
- * les {@linkplain Descriptor descripteurs du paysage océanique}), une couche d'images peut donc
- * être considérée comme un phénomène à combiner avec une autre procédure, en l'occurence une
- * {@linkplain Operation opération}.
+ * A layer of {@linkplain Coverage coverages} sharing common properties.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface Layer extends Element {
     /**
-     * Retourne la thématique de cette couche d'images. Des exemples de thématiques sont
-     * la <cite>température</cite>, l'<cite>anomalie de la hauteur de l'eau</cite>,
-     * la <cite>concentration en chlorophylle-a</cite>, etc.
+     * Returns the thematic for this layer. Examples: <cite>temperature</cite>,
+     * <cite>sea level anomaly</cite>, <cite>chlorophylle-a concentration</cite>, etc.
+     *
+     * @return The thematic for this layer.
      */
     Thematic getThematic();
 
     /**
-     * Une couche de second recours qui peut être utilisée si aucune données n'est disponible
-     * dans cette couche à une certaine position spatio-temporelle. Retourne {@code null} s'il
-     * n'y a pas de couche de second recours.
+     * A layer to use as a fallback if no data is available in this layer for a given position. For
+     * example if no data is available in a weekly averaged <cite>Sea Surface Temperature</cite>
+     * (SST) coverage because a location is masked by clouds, we may want to look in the mounthly
+     * averaged SST coverage as a fallback.
+     *
+     * @return The fallback layer, or {@code null} if none.
      */
     Layer getFallback();
 
@@ -65,9 +55,12 @@ public interface Layer extends Element {
     Set<Series> getSeries();
 
     /**
-     * Retourne l'intervalle de temps typique entre deux images consécutives de cette couche.
-     * Cette information n'est qu'à titre indicative. L'intervalle est exprimée en nombre de
-     * jours. Cette méthode retourne {@link Double#NaN} si l'intervalle de temps est inconnu.
+     * Returns a typical time intervale (in days) between two coverages of this layer. For example
+     * a layer of weekly <cite>Sea Surface Temperature</cite> (SST) coverages may returns 7, while
+     * a layer of mounthly SST coverage may returns 30. This value is only approximative.
+     *
+     * @return A typical, approximative time interval between coverages in this layer,
+     *         or {@link Double#NaN} if unknown or not applicable.
      */
     double getTimeInterval();
 
@@ -80,9 +73,9 @@ public interface Layer extends Element {
     SortedSet<Date> getAvailableTimes() throws CatalogException;
 
     /**
-     * Returns the set of altitudes where a coverage is available. If different images
-     * have different set of altitudes, then this method returns only the altitudes
-     * found in every images.
+     * Returns the set of altitudes where a coverage is available. If different coverages
+     * have different set of altitudes, then this method returns only the altitudes that
+     * are common to every coverages.
      *
      * @return The set of altitudes. May be empty, but will never be null.
      * @throws CatalogException if the set can not be obtained.
@@ -90,60 +83,62 @@ public interface Layer extends Element {
     SortedSet<Number> getAvailableElevations() throws CatalogException;
 
     /**
-     * Retourne la plage de temps englobeant toutes les images de cette couche.
+     * Returns a time range encompassing all coverages in this layer.
      *
-     * @throws CatalogException si le catalogue n'a pas pu être interrogé.
+     * @throws CatalogException if the time range can not be obtained.
      */
     DateRange getTimeRange() throws CatalogException;
 
     /**
-     * Retourne les coordonnées géographiques englobeant toutes les images de cette couche.
+     * Returns a geographic bounding box encompassing all coverages in this layer.
      *
-     * @throws CatalogException si le catalogue n'a pas pu être interrogé.
+     * @throws CatalogException if the bounding box can not be obtained.
      */
     GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
 
     /**
-     * Retourne une image appropriée pour la date spécifiée.
+     * Returns a reference to a coverage for the given date and elevation.
      *
-     * @throws CatalogException si le catalogue n'a pas pu être interrogé.
+     * @param  time The date, or {@code null} if not applicable.
+     * @param  elevation The elevation, or {@code null} if not applicable.
+     * @throws CatalogException if an error occured while querying the catalog.
      */
     CoverageReference getCoverageReference(Date time, Number elevation) throws CatalogException;
 
     /**
-     * Retourne la liste des images disponibles dans la plage de coordonnées spatio-temporelles
-     * de cette couche. Les images ne seront pas immédiatement chargées; seules des références
-     * vers ces images seront retournées.
+     * Returns a reference to every coverages available in this layer. Note that the set of
+     * coverages is rectricted by the layer {@linkplain #getTimeRange time range} and
+     * {@linkplain #getGeographicBoundingBox geographic bounding box}.
+     * <p>
+     * Note that coverages are not immediately loaded; only references are returned.
      *
-     * @return Liste d'images qui interceptent la plage de temps et la région géographique d'intérêt.
-     * @throws CatalogException si le catalogue n'a pas pu être interrogé.
+     * @return The set of coverages in the layer.
+     * @throws CatalogException if an error occured while querying the catalog.
      */
     Set<CoverageReference> getCoverageReferences() throws CatalogException;
 
     /**
-     * Retourne une vue des données de cette couches sous forme de fonction. Chaque valeur peut
-     * être évaluée à une position (<var>x</var>,<var>y</var>,<var>t</var>), en faisant intervenir
-     * des interpolations si nécessaire. Cette méthode retourne une fonction moins élaborée que
-     * celle de {@link Descriptor#getCoverage} pour les raisons suivantes:
+     * Returns a view of this layer as a coverage. This coverage can be evaluated at
+     * (<var>x</var>,<var>y</var>,<var>z</var>,<var>t</var>) location, using interpolations
+     * if needed. Note that this coverage is less elaborated than {@link Descriptor#getCoverage}:
      * <p>
      * <ul>
-     *   <li>Il n'y a ni {@linkplain Operation opération}, ni {@link RegionOfInterest décalage
-     *       spatio-temporel} d'appliqués sur les données à évaluer.</li>
-     *   <li>Les valeurs sont évaluées directement sur les images de cette couche, jamais sur
-     *       celles de la {@linkplain #getFallback couche de second recours}.</li>
-     *   <li>Des images entières peuvent être transiter sur le réseau, plutôt que seulement
-     *       les valeurs à évaluer.</li>
+     *   <li>No {@linkplain Operation operation} or {@link RegionOfInterest region of interest}
+     *       are applied.</li>
+     *   <li>Values are evaluated on this layer only, never on the {@linkplain #getFallback fallback}.</li>
+     *   <li>This method may send a whole images through the network, instead of performing the
+     *       evaluations on a remote server.</li>
      * </ul>
      *
-     * @throws CatalogException si la fonction n'a pas pu être construite.
+     * @throws CatalogException if the coverage can not be created.
      */
     Coverage getCoverage() throws CatalogException;
 
     /**
-     * Si cette couche est le résultat d'un modèle numérique, retourne ce modèle.
-     * Sinon, retourne {@code null}.
+     * If this layer is the result of a numerical model, returns this model.
+     * Otherwise returns {@code null}.
      *
-     * @throws CatalogException si la base de données n'a pas pu être construite.
+     * @throws CatalogException if an error occured while querying the catalog.
      */
     Model getModel() throws CatalogException;
 }

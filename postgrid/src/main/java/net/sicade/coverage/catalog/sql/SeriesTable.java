@@ -138,6 +138,6 @@ public class SeriesTable extends SingletonTable<Series> {
             formats = getDatabase().getTable(FormatTable.class);
         }
         final Format format = formats.getEntry(results.getString(indexOf(query.format)));
-        return new SeriesEntry(name, format, remarks);
+        return new SeriesEntry(name, layer, format, remarks);
     }
 }

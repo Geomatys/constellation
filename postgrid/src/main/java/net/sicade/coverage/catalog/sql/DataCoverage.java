@@ -41,7 +41,7 @@ import net.sicade.coverage.catalog.Series;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.Descriptor;
 import net.sicade.coverage.catalog.RegionOfInterest;
-import net.sicade.coverage.catalog.DynamicCoverage;
+import net.sicade.coverage.catalog.GridCoverage;
 import net.sicade.coverage.catalog.rmi.DataConnection;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
@@ -58,7 +58,7 @@ import net.sicade.catalog.ServerException;
  * @todo Les déplacements horizontaux ne sont pas encore implémentés.
  * @todo Les transformations de coordonnées ne sont prises en compte.
  */
-public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
+public class DataCoverage extends AbstractCoverage implements GridCoverage {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -121,7 +121,7 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
         this.data       = data;
         this.dt         = offset.getDayOffset();
         this.band       = descriptor.getBand();
-        final Set<Series> series = descriptor.getPhenomenon().getSeries();
+        final Set<Series> series = descriptor.getLayer().getSeries();
         if (!series.isEmpty()) {
             final Format format = series.iterator().next().getFormat();
             final SampleDimension[] sd = format.getSampleDimensions();
@@ -138,9 +138,9 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
         /*
          * Recherche les sources de données de second recours.
          */
-        final Operation operation = descriptor.getProcedure();
+        final Operation operation = descriptor.getOperation();
         final List<DataConnection> fallback = new ArrayList<DataConnection>();
-        Layer layer = descriptor.getPhenomenon();
+        Layer layer = descriptor.getLayer();
         while ((layer=layer.getFallback()) != null) {
             if (layer instanceof LayerEntry) {
                 final DataConnection candidate = ((LayerEntry) layer).getDataConnection(operation);
@@ -160,11 +160,11 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
     private static DataConnection getDataConnection(final Descriptor descriptor) throws RemoteException {
-        final Layer layer = descriptor.getPhenomenon();
+        final Layer layer = descriptor.getLayer();
         if (!(layer instanceof LayerEntry)) {
             throw new UnsupportedOperationException("Implémentation non-supportée de la couche.");
         }
-        return ((LayerEntry) layer).getDataConnection(descriptor.getProcedure());
+        return ((LayerEntry) layer).getDataConnection(descriptor.getOperation());
     }
 
     /**
@@ -339,9 +339,14 @@ public class DataCoverage extends AbstractCoverage implements DynamicCoverage {
     /**
      * {@inheritDoc}
      */
-    public List<Coverage> coveragesAt(final double t) throws CatalogException {
+    public List<Coverage> coveragesAt(DirectPosition position) throws CatalogException {
+        if (dt != 0) {
+            position = new GeneralDirectPosition(position);
+            final int dim = position.getDimension() - 1;
+            position.setOrdinate(dim, position.getOrdinate(dim) + dt);
+        }
         try {
-            return data.coveragesAt(t + dt);
+            return data.coveragesAt(position);
         } catch (SQLException exception) {
             throw new ServerException(exception);
         } catch (IOException exception) {

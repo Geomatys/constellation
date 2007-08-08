@@ -19,7 +19,7 @@ import java.net.URL;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import net.sicade.catalog.Element;
+import javax.imageio.IIOException;
 
 import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.Envelope;
@@ -28,187 +28,161 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.geotools.image.io.IIOListeners;
 import org.geotools.coverage.CoverageStack;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.util.NumberRange;
 
+import net.sicade.catalog.Element;
 import net.sicade.util.DateRange;
 
 
 /**
- * Méta-données concernant une image, et éventuellement une référence vers l'image elle-même.
- * Un objet {@code CoverageReference} permet d'obtenir quelques propriétés sur une image telles
- * que sa date et sa couverture géographique, sans nécessiter une connexion à l'image elle-même.
- * L'image ne sera téléchargée que la première fois où elle sera demandée, lors d'un appel à la
- * méthode {@link #getCoverage}.
+ * Reference to a {@linkplain Coverage coverage}. This object holds some metadata about the coverage
+ * ({@linkplain #getTimeRange time range}, {@linkplain #getGeographicBoundingBox geographic bounding
+ * box}, <cite>etc.</cite>) without the need to load the coverage itself. Coverage loading will
+ * occurs only when {@link #getCoverage} is invoked for the first time.
  * <p>
- * Les objets {@code CoverageReference} sont imutables et sécuritaires dans un environnement
- * multi-threads.
+ * {@code CoverageReference} instances are immutable and thread-safe.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface CoverageReference extends Element, CoverageStack.Element {
     /**
-     * Clé sous laquelle mémoriser l'objet {@code CoverageReference} source dans les propriétés de
-     * {@link GridCoverage2D}. Cette propriété permet de retrouver l'objet {@code CoverageReference}
-     * qui a produit un objet {@code GridCoverage2D}. Exemple:
-     *
+     * Key to use for storing a {@code CoverageReference} as {@link GridCoverage2D} property.
+     * Users can obtain a {@code CoverageReference} from a {@code GridCoverage2D} as below:
+     * 
      * <blockquote><pre>
      * CoverageReference reference = ...
      * GridCoverage2D    coverage  = reference.{@linkplain #getCoverage getCoverage}(null);
-     * CoverageReference source    = (CoverageReference) coverage.getProperty(CoverageReference.SOURCE_KEY);
+     * CoverageReference source    = (CoverageReference) coverage.getProperty(CoverageReference.REFERENCE_KEY);
      * assert source == reference;
      * </pre></blockquote>
      */
-    String SOURCE_KEY = "net.sicade.observation.CoverageReference";
+    String REFERENCE_KEY = "net.sicade.observation.CoverageReference";
 
     /**
-     * Retourne la couche à laquelle appartient cette image.
+     * Returns the layer of this coverage reference.
+     *
+     * @deprecated We need to replace this method by a {@code getSeries()} method.
      */
+    @Deprecated
     Layer getLayer();
 
     /**
-     * Retourne le format de cette image.
+     * Returns the format of this coverage reference.
+     *
+     * @deprecated We need to replace this method by a {@code getSeries()} method.
      */
+    @Deprecated
     Format getFormat();
 
     /**
-     * Retourne le chemin de l'image, ou {@code null} si le fichier n'est pas accessible localement.
-     * Dans ce dernier cas, {@link #getURL} devra être utilisé à la place.
+     * Returns the path to the image file, or {@code null} if the file is not accessible
+     * on the local machine. In the later case, {@link #getURL} should be used instead.
      */
     File getFile();
 
     /**
-     * Retourne l'URL de l'image, ou {@code null} si le fichier n'est pas accessible ni localement,
-     * ni à travers un réseau.
+     * Returns the URL to the image data, or {@code null} if none. The data may or may not
+     * be a file hosted on the local machine.
      */
     URL getURL();
 
     /**
-     * Retourne le système de référence des coordonnées de l'image. En général, ce système de
-     * référence aura trois dimensions (la dernière dimension étant le temps), soit dans l'ordre:
-     * <p>
-     * <ul>
-     *   <li>Les longitudes, en degrés selon l'ellipsoïde WGS 1984.</li>
-     *   <li>Les latitudes,  en degrés selon l'ellipsoïde WGS 1984.</li>
-     *   <li>Le temps, en jours juliens depuis le 01/01/1950 00:00 UTC.</li>
-     * </ul>
-     * <p>
-     * Bien que toutes les images provenant d'une même {@linkplain Layer couche} ont en
-     * général le même système de référence des coordonnées, ce n'est pas toujours le cas.
+     * Returns the coordinate reference system for the {@linkplain #getCoverage coverage}.
+     * This is also the CRS for the {@linkplain #getEnvelope coverage envelope}.
      */
     CoordinateReferenceSystem getCoordinateReferenceSystem();
 
     /**
-     * Retourne les coordonnées spatio-temporelles de l'image. Le système de référence des
-     * coordonnées utilisé est {@linkplain #getCoordinateReferenceSystem celui de l'image}.
+     * Returns the spatio-temporal envelope for the {@linkplain #getCoverage coverage}.
      */
     Envelope getEnvelope();
 
     /**
-     * Retourne la plage de temps couverte par l'image, selon les unités de l'axe temporel.
-     * Cette méthode est fournit principalement afin de supporter l'interface
-     * {@link org.geotools.coverage.CoverageStack.Element}. Pour les autres usage,
-     * la méthode {@link #getTimeRange} peut être une alternative plus pratique.
-     */
-    NumberRange getZRange();
-
-    /**
-     * Retourne la plage de temps couverte par l'image. Cette plage sera délimitée
-     * par des objets {@link Date}. Appeler cette méthode équivaut à n'extraire que
-     * la partie temporelle de l'{@linkplain #getEnvelope enveloppe} et à transformer
-     * les coordonnées si nécessaire.
+     * Returns the temporal part of the {@linkplain #getEnvelope coverage envelope}.
+     * Invoking this method is equivalent to extracting the temporal component of the
+     * envelope and transform the coordinates if needed.
      */
     DateRange getTimeRange();
 
     /**
-     * Retourne les coordonnées géographiques de la région couverte par l'image. Les coordonnées
-     * seront exprimées en degrés de longitudes et de latitudes selon l'ellipsoïde WGS 1984.
-     * Appeler cette méthode équivaut parfois à n'extraire que la partie horizontale de
-     * l'{@linkplain #getEnvelope enveloppe} et à transformer les coordonnées si nécessaire.
-     * Toutefois dans certains cas cette méthode peut retourner une région géographique plus
-     * grande que l'{@linkplain #getEnvelope enveloppe}, par exemple comme un effet des
-     * transformations de coordonnées ou encore parce que l'image (et par conséquence son
-     * {@linkplain #getEnvelope enveloppe}) sera découpée au moment de la lecture.
+     * Returns the geographic bounding box of the {@linkplain #getEnvelope coverage envelope}.
+     * Invoking this method is equivalent to extracting the horizontal component of the envelope
+     * and transform the coordinates if needed.
      */
     GeographicBoundingBox getGeographicBoundingBox();
 
     /**
-     * Retourne des informations sur la géométrie de l'image. Ces informations comprennent notamment
-     * la taille de l'image (en pixels) ainsi que la transformation à utiliser pour passer des
-     * coordonnées pixels vers les coordonnées selon le {@linkplain #getCoordinateReferenceSystem
-     * système de référence de l'image}. Cette transformation sera le plus souvent affine.
+     * For {@link org.geotools.coverage.CoverageStack.Element} implementation only.
+     */
+    NumberRange getZRange();
+
+    /**
+     * Returns the {@linkplain #getCoverage coverage} grid geometry.
      */
     GridGeometry2D getGridGeometry();
 
     /**
-     * Retourne les bandes de l'image. Cette méthode retourne toujours la version geophysique des
-     * bandes (<code>{@linkplain GridSampleDimension#geophysics geophysics}(true)</code>), ce qui
-     * est cohérent avec le type d'image retourné par {@link #getCoverage getCoverage(...)}.
-     *
-     * @return La liste des catégories géophysiques pour chaque bande de l'image.
-     *         La longueur de ce tableau sera égale au nombre de bandes.
+     * Returns the {@linkplain #getCoverage coverage} sample dimensions. This method returns
+     * always the <cite>geophysics</cite> version of sample dimensions
+     * (<code>{@linkplain GridSampleDimension#geophysics geophysics}(true)</code>), which is
+     * consistent with the coverage returned by {@link #getCoverage getCoverage(...)}.
      */
     SampleDimension[] getSampleDimensions();
 
     /**
-     * Retourne l'image correspondant à cette entrée. Cette méthode retourne toujours la version
-     * geophysique de l'image (<code>{@linkplain GridCoverage2D#geophysics geophysics}(true)</code>).
+     * Loads the data if needed and returns the coverage. This method returns always the geophysics
+     * version of data (<code>{@linkplain GridCoverage2D#geophysics geophysics}(true)</code>).
      * <p>
-     * Si l'image avait déjà été lue précédemment et qu'elle n'a pas encore été réclamée par le
-     * ramasse-miette, alors l'image existante sera retournée sans qu'une nouvelle lecture du
-     * fichier ne soit nécessaire. Si au contraire l'image n'était pas déjà en mémoire, alors
-     * un décodage du fichier sera nécessaire.
+     * If the coverage has already been read previously and has not yet been reclaimed by the
+     * garbage collector, then the existing coverage is returned immediately.
      * <p>
-     * Certaines implémentations peuvent utiliser en interne les RMI (<cite>Remote Method Invocation</cite>).
-     * Dans ce dernier cas, cette méthode effectuera le découpage géographique et appliquera d'eventuelles
-     * opérations (par exemple un calcul de gradient) sur le serveur; seul le résultat sera envoyé à travers
-     * le réseau vers le client. Il est toutefois possible que la qualité du résultat soit dégradée pour une
-     * transmission plus compacte sur le réseau.
+     * Some implementation may use RMI (<cite>Remote Method Invocation</cite>). In such cases, this
+     * method will clip the coverage and apply operation (if any) on the remove machine before to
+     * send the results through the network. The image quality may be degraded for more compact
+     * transmission over the network.
      *
-     * @param  listeners Liste des objets à informer des progrès de la lecture ainsi que des
-     *         éventuels avertissements, ou {@code null} s'il n'y en a pas.
-     * @return Image lue, ou {@code null} si l'utilisateur a {@linkplain #abort interrompu la lecture}.
-     * @throws IOException si le fichier n'a pas été trouvé ou si une autre erreur d'entrés/sorties
-     *         est survenue.
-     * @throws IIOException s'il n'y a pas de décodeur approprié pour l'image, ou si l'image n'est
-     *         pas valide.
-     * @throws RemoteException si un problème est survenu lors de la communication avec le serveur.
+     * @param  listeners Objects to inform about progress, or {@code null} if none.
+     * @return The coverage, {@code null} if the user {@linkplain #abort aborted} the process.
+     * @throws IOException if an error occured while reading the image.
+     * @throws IIOException if there is no reader for the coverage, of if the file is not valid
+     *         for the expected format.
+     * @throws RemoteException if an error occured while communicating with a remote server.
+     *
+     * @todo Should probable thrown an exception instead of returning null when the reading is aborted.
      */
     GridCoverage2D getCoverage(IIOListeners listeners) throws IOException;
 
     /**
-     * Annule la lecture de l'image. Cette méthode peut être appelée à partir de n'importe quel
-     * thread.  Si la méthode {@link #getCoverage getCoverage(...)} était en train de lire une
-     * image dans un autre thread, elle s'arrêtera et retournera {@code null}.
+     * Abort the image reading. This method can be invoked from any thread. If {@link #getCoverage
+     * getCoverage(...)} was in progress at the time this method is invoked, then it will stop and
+     * returns {@code null}.
      */
     void abort();
 
 
     /**
-     * Une référence qui délègue son travail à une autre instance de {@link CoverageReference}.
-     * L'implémentation par défaut redirige tous les appels des méthodes vers l'objet {@link
-     * CoverageReference} qui a été spécifié lors de la construction. Les classes dérivées
-     * vont typiquement redéfinir quelques méthodes afin d'ajouter ou de modifier certaines
-     * fonctionalitées.
+     * A coverage reference that delegate its work to an other instance of {@link CoverageReference}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     public static class Proxy extends net.sicade.catalog.Proxy implements CoverageReference {
         /**
-         * Pour compatibilités entre les enregistrements binaires de différentes versions.
+         * For cross-version compatibility.
          */
         private static final long serialVersionUID = 1679051552440633120L;
 
         /**
-         * Référence enveloppée par ce proxy.
+         * The backing reference on which to delegate the work.
          */
         private final CoverageReference ref;
 
         /**
-         * Construit un proxy qui redirigera tous les appels vers la référence spécifiée.
+         * Creates a proxy which will delegates its work to the specified object.
          */
         protected Proxy(final CoverageReference ref) {
             this.ref = ref;

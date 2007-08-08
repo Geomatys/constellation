@@ -312,8 +312,8 @@ public class DescriptorChooser extends JPanel {
         boolean offsetModified    = false;
         for (final Descriptor descriptor : toAdd) {
             if (add(descriptors, descriptor)) {
-                seriesModified    |= add(layers,     descriptor.getPhenomenon());
-                operationModified |= add(operations, descriptor.getProcedure());
+                seriesModified    |= add(layers,     descriptor.getLayer());
+                operationModified |= add(operations, descriptor.getOperation());
                 offsetModified    |= add(offsets,    descriptor.getRegionOfInterest());
             }
         }
@@ -399,8 +399,8 @@ public class DescriptorChooser extends JPanel {
         final Set<Descriptor> confirmed = new HashSet<Descriptor>();
         for (final Map.Entry<Descriptor,Boolean> entry : descriptors.entrySet()) {
             final Descriptor descriptor = entry.getKey();
-            final boolean isSelected = TRUE.equals(layers    .get(descriptor.getPhenomenon      ())) &&
-                                       TRUE.equals(operations.get(descriptor.getProcedure       ())) &&
+            final boolean isSelected = TRUE.equals(layers    .get(descriptor.getLayer      ())) &&
+                                       TRUE.equals(operations.get(descriptor.getOperation       ())) &&
                                        TRUE.equals(offsets   .get(descriptor.getRegionOfInterest()));
             if (isSelected) {
                 if (!selected.add(descriptor)) {
@@ -437,8 +437,8 @@ public class DescriptorChooser extends JPanel {
             final boolean    isSelected = selected.contains(descriptor);
             entry.setValue(isSelected);
             if (isSelected) {
-                if (layers    .put(descriptor.getPhenomenon(),       TRUE) == null ||
-                    operations.put(descriptor.getProcedure(),        TRUE) == null ||
+                if (layers    .put(descriptor.getLayer(),       TRUE) == null ||
+                    operations.put(descriptor.getOperation(),        TRUE) == null ||
                     offsets   .put(descriptor.getRegionOfInterest(), TRUE) == null)
                 {
                     throw new AssertionError(descriptor);

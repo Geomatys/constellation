@@ -16,31 +16,34 @@ package net.sicade.coverage.catalog;
 
 import net.sicade.catalog.Element;
 
+
 /**
- * Un sous-ensemble d'une {@linkplain Layer couche} d'image. Une couche d'images peut être divisée
- * en plusieurs sous-ensembles, où chaque sous-ensemble partage des caractéristiques communes. Par
- * exemple une couche d'images de température de surface de la mer (SST) en provenance du programme
- * <cite>Pathfinder</cite> de la Nasa peut être divisée en deux sous-ensembles:
+ * A series of coverages sharing common characteristics in a {@linkplain Layer layer}. A layer
+ * often regroup all coverages in a single series, but in some cases a layer may contains more
+ * than one series. For example a layer of <cite>Sea Surface Temperature</cite> (SST) from Nasa
+ * <cite>Pathfinder</cite> can be subdivised in two series:
  * <p>
  * <ul>
- *   <li>Les données historiques "définitives" (pour une version donnée de la chaîne de traitement),
- *       souvent vieille d'un moins deux ans à cause de délai nécessaire à leur traitement.</li>
- *   <li>Les données plus récentes mais pas encore définitives, appelée "intérimaires".</li>
+ *   <li>Final release of historical data. Those data are often two years old.</li>
+ *   <li>More recent but not yet definitive data.</li>
  * </ul>
  * <p>
- * Une autre raison de diviser en séries peut être un changement de format ou de chaîne de
- * traitement des données à partir d'une certaine date.
- * <p>
- * Pour la plupart des utilisations, cette distinction n'est pas utile et l'on travaillera uniquement
- * sur des couches d'images. Toutefois pour certaines applications, il peut être nécessaire de faire
- * la distinction entre ces sous-ensembles.
+ * In most cases it is suffisient to work with {@linkplain Layer layer} as a whole without the
+ * need to go down to the {@code Series}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface Series extends Element {
     /**
-     * Retourne le format des images de cette série.
+     * Returns the layer which contains this series.
+     *
+     * @see Layer#getSeries
+     */
+    Layer getLayer();
+
+    /**
+     * Returns the format of all coverages in this series.
      */
     Format getFormat();
 }

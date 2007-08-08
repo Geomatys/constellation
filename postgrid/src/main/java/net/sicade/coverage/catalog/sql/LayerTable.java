@@ -24,7 +24,7 @@ import net.sicade.catalog.CRS;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.BoundedSingletonTable;
 import net.sicade.coverage.catalog.Layer;
-import net.sicade.coverage.catalog.DynamicCoverage;
+import net.sicade.coverage.catalog.GridCoverage;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
 import net.sicade.coverage.catalog.rmi.DataConnection;
@@ -90,7 +90,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
          * {@link LayerTable#postCreateEntry} et que cette dernière n'utilise pas cette
          * méthode. Nous l'implémentons toujours par prudence.
          */
-        public DynamicCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException {
+        public GridCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException {
             return getDatabase().getTable(DescriptorTable.class).getEntryLenient(descriptor).getCoverage();
         }
     }

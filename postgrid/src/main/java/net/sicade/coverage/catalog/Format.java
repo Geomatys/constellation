@@ -17,34 +17,36 @@ package net.sicade.coverage.catalog;
 import java.util.Locale;
 import net.sicade.catalog.Element;
 import org.opengis.coverage.SampleDimension;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.gui.swing.tree.MutableTreeNode;
 
+
 /**
- * Information sur un format d'image. Le {@linkplain #getName nom} d'une entrée devrait être
- * le nom MIME du format d'image.
+ * Information about an image format. The {@linkplain #getName name} should be the MIME type.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface Format extends Element {
     /**
-     * Retourne les listes des bandes qui permettent de décoder les valeurs des paramètres
-     * géophysiques. Cette méthode peut retourner plusieurs objets {@link SampleDimension},
-     * un par bande. Leur type (géophysique ou non) correspond au type des images dans leur
-     * format natif. Par exemple les valeurs des pixels seront des entiers (<code>{@linkplain
-     * org.geotools.coverage.GridSampleDimension#geophysics geophysics}(false)</code>) si l'image
-     * est enregistrée au format PNG, tandis que les plages de valeurs peuvent être des nombres
-     * réels (<code>{@linkplain org.geotools.coverage.GridSampleDimension#geophysics geophysics}(true)</code>)
-     * si l'image est enregistrée dans un format brut ou ASCII.
+     * Returns the list of sample dimensions that should be common to every coverage in that format.
+     * The array length is equals to the expected number of bands.
+     * <p>
+     * The sample dimensions specify how to convert pixel values to geophysics values,
+     * or conversely. Their type (geophysics or not) is format depedent. For example
+     * coverages read from PNG files will typically store their data as integer values
+     * (<code>{@linkplain GridSampleDimension#geophysics geophysics}(false)</code>),
+     * while coverages read from ASCII files will often store their pixel values as real numbers
+     * (<code>{@linkplain GridSampleDimension#geophysics geophysics}(true)</code>).
      */
     SampleDimension[] getSampleDimensions();
 
     /**
-     * Retourne une arborescence qui représentera ce format, ses bandes et les catégories de
-     * chaque bandes.
+     * Returns a tree representation of this format, including {@linkplain SampleDimension
+     * sample dimensions} and {@linkplain org.geotools.coverage.Category categories}.
      *
-     * @param  locale La langue à utiliser pour formatter le contenu textuel de l'arborescence.
-     * @return La racine de l'arborescence.
+     * @param  locale The locale to use for formatting labels in the tree.
+     * @return The tree root.
      */
     MutableTreeNode getTree(Locale locale);
 }

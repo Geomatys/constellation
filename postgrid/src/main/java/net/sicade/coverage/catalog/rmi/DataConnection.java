@@ -187,7 +187,7 @@ public interface DataConnection extends Remote {
      * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
      * @throws IOException      si la lecture d'une image a échoué.
      */
-    List<Coverage> coveragesAt(double t) throws CatalogException, SQLException, IOException;
+    List<Coverage> coveragesAt(DirectPosition position) throws CatalogException, SQLException, IOException;
 
     /**
      * Retourne la liste des images disponibles.

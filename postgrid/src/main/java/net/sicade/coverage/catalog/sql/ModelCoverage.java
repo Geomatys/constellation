@@ -12,15 +12,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.coverage.catalog;
+package net.sicade.coverage.catalog.sql;
 
-// J2SE dependencies
 import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
 import net.sicade.catalog.CatalogException;
+import net.sicade.coverage.catalog.*;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.CannotEvaluateException;
@@ -28,12 +27,11 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-// Geotools dependencies
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.geometry.GeneralEnvelope;
 
-// Sicade dependencies
 import net.sicade.catalog.CRS;
+
 
 /**
  * Une couverture qui délèguera les {@linkplain #evaluate(DirectPosition,double[]) évaluations} à
@@ -42,7 +40,7 @@ import net.sicade.catalog.CRS;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ModelCoverage extends AbstractCoverage {
+final class ModelCoverage extends AbstractCoverage {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */

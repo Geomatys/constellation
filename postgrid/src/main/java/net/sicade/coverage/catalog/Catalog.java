@@ -43,6 +43,7 @@ import net.sicade.coverage.catalog.rmi.DataConnectionFactory;
  * @author Martin Desruisseaux
  * @version $Id$
  */
+@Deprecated
 public class Catalog {
     /**
      * Une instance de {@code Catalog} connectée à la base de données par défaut. Cette
@@ -68,7 +69,7 @@ public class Catalog {
      * L'ensemble des couvertures de données obtenues par {@link #getCoverage}.
      */
     @SuppressWarnings("unchecked")
-    private final Map<String,DynamicCoverage> coverages = new WeakValueHashMap();
+    private final Map<String, GridCoverage> coverages = new WeakValueHashMap();
 
     /**
      * Construit une instance de {@code Catalog} pour la base de données spécifiée.
@@ -227,10 +228,10 @@ public class Catalog {
      * @todo Faire en sorte que le boulot soit entièrement fait du côté du serveur RMI (sans
      *       qu'il ne soit néssaire de faire une connexion à la base de données ici).
      */
-    public synchronized DynamicCoverage getDescriptorCoverage(final String name)
+    public synchronized GridCoverage getDescriptorCoverage(final String name)
             throws CatalogException
     {
-        DynamicCoverage coverage = coverages.get(name);
+        GridCoverage coverage = coverages.get(name);
         if (coverage == null) try {
             final Database database = getDatabase();
             final DataConnectionFactory factory = (DataConnectionFactory)
@@ -267,7 +268,7 @@ public class Catalog {
             layer = getLayer(name);
         } catch (NoSuchRecordException ignore) {
             try {
-                layer = getDescriptorTable().getEntryLenient(name).getPhenomenon();
+                layer = getDescriptorTable().getEntryLenient(name).getLayer();
             } catch (SQLException exception) {
                 throw new ServerException(exception);
             }

@@ -55,6 +55,11 @@ import org.geotools.coverage.grid.GridCoverage2D;
  */
 public class PostGridReader extends AbstractGridCoverage2DReader {
     /**
+     * The logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger("net.sicade.coverage.io");
+
+    /**
      * The layer. Will be instantiated when first needed.
      *
      * @todo Should not be a static constant. Unfortunatly the {@link #getAvailableTimes}
@@ -63,11 +68,6 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      *       renderer run by Geoserver.
      */
     private static Layer layer;
-
-    /**
-     * The entry to log messages during the process.
-     */
-    private static final Logger LOGGER = Logger.getLogger(PostGridReader.class.toString());
 
     /**
      * The format that created this reader.
@@ -201,6 +201,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
         String name = null;
         if (time != null) {
             ref = layer.getCoverageReference(time, elevation);
+            LOGGER.info("time=" + time + ", elevation=" + elevation); // TODO: kick down logging level after debugging.
         } else {
             name = "coriolis";
             final Iterator<CoverageReference> it = layer.getCoverageReferences().iterator();
@@ -209,8 +210,12 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
             } else {
                 throw new CatalogException("Aucune image dans la série.");
             }
+            if (elevation != null) {
+                LOGGER.warning("Profondeur ignorée: " + elevation);
+            }
+            LOGGER.warning("Choix d'une image aléatoire.");
         }
-        System.out.println(ref); // TODO: remove after debugging.
+        LOGGER.info("Image sélectionnée: " + ref);  // TODO: kick down logging level after debugging.
         return trimTo2D(name, ref.getCoverage(null));
     }
 

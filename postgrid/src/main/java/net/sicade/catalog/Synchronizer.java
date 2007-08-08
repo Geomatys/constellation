@@ -15,6 +15,8 @@
 package net.sicade.catalog;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -22,6 +24,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -53,26 +57,28 @@ public class Synchronizer {
     private transient DatabaseMetaData metadata;
 
     /**
-     * Creates a synchronizer reading the configuration from the
-     * {@code "config-source.xml"} and {@code "config-target.xml"} files.
-     * Those files are read from the current directory if present, or from
-     * the user directory as specified in {@link Database} javadoc otherwise.
-     */
-    private Synchronizer() throws IOException {
-        this("config-source.xml", "config-target.xml");
-    }
-
-    /**
      * Creates a synchronizer reading the configuration from the specified files.
      * Those files are read from the current directory if present, or from the user
      * directory as specified in {@link Database} javadoc otherwise.
      *
-     * @param source The source configuration file. Default to {@code "config-source.xml"}.
-     * @param target The target configuration file. Default to {@code "config-target.xml"}.
+     * @param source The source configuration file.
+     * @param target The target configuration file.
      */
     private Synchronizer(final String source, final String target) throws IOException {
         this.source = new Database(null, source);
         this.target = new Database(null, target);
+    }
+
+    /**
+     * Creates a synchronizer using the configuration files specified by
+     * {@code "config-source"} and {@code "config-target"} properties.
+     *
+     * @param properties The properties where to look for {@code "config-source"}
+     *        and {@code "config-target"} filenames.
+     */
+    private Synchronizer(final Properties properties) throws IOException {
+        this(properties.getProperty("config-source", "config-source.xml"),
+             properties.getProperty("config-target", "config-target.xml"));
     }
 
     /**
@@ -166,7 +172,13 @@ public class Synchronizer {
      * @throws SQLException if an error occured while reading or writting in the database.
      */
     private void replace(final String table, final Map<String,String> tables) throws SQLException {
-        final String condition = tables.remove(table);
+        String condition = tables.remove(table);
+        if (condition != null) {
+            condition = condition.trim();
+            if (condition.length() == 0) {
+                condition = null;
+            }
+        }
         delete(table, condition);
         /*
          * Before to insert any new records, check if this table has some foreigner keys
@@ -254,22 +266,44 @@ search: while (!tables.isEmpty()) {
     }
 
     /**
-     * Synchronizes the content of the given table.
+     * Returns a copy of the specified properties as a map. The copy is performed mostly
+     * because {@link Properties} parameterized type is {@code <Object,Object>} instead
+     * of {@code <String,String>}.
+     */
+    private static Map<String,String> asMap(final Properties properties) {
+        final Map<String,String> map = new HashMap<String,String>();
+        for (final Map.Entry<Object,Object> entry : properties.entrySet()) {
+            final String key = (String) entry.getKey();
+            if (!key.equalsIgnoreCase("config-source") && !key.equalsIgnoreCase("config-target")) {
+                map.put(key, (String) entry.getValue());
+            }
+        }
+        return map;
+    }
+
+    /**
+     * Runs from the command line.
      */
     public static void main(String[] args) throws IOException, SQLException {
+        if (true) {
+            throw new RuntimeException("TODO: needs to be run in a debugger at least once before to enable.");
+        }
         final Arguments arguments = new Arguments(args);
-        final String table     = arguments.getRequiredString("-table");
-        final String condition = arguments.getOptionalString("-condition");
+        final String config = arguments.getRequiredString("-config");
         args = arguments.getRemainingArguments(0);
+        final Properties properties = new Properties();
+        final InputStream in = new FileInputStream(config);
+        properties.load(in);
+        in.close();
 
-        final Synchronizer synchronizer = new Synchronizer();
+        final Synchronizer synchronizer = new Synchronizer(properties);
         final Connection source = synchronizer.source.getConnection();
         final Connection target = synchronizer.target.getConnection();
         source.setReadOnly(true);
         target.setAutoCommit(false);
         boolean success = false;
         try {
-//            synchronizer.replace(table, condition);
+            synchronizer.replace(asMap(properties));
             success = true;
         } finally {
             if (success) {

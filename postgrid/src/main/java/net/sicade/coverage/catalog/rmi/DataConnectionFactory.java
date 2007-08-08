@@ -22,7 +22,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
-import net.sicade.coverage.catalog.DynamicCoverage;
+import net.sicade.coverage.catalog.GridCoverage;
 
 
 /**
@@ -61,5 +61,5 @@ public interface DataConnectionFactory extends Remote {
      * @throws SQLException si la connexion à la base de données a échoué.
      * @throws RemoteException si la connexion n'a pas pu être établie.
      */
-    DynamicCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException, RemoteException;
+    GridCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException, RemoteException;
 }

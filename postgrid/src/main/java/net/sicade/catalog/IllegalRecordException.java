@@ -20,21 +20,16 @@ import java.sql.SQLException;
 
 
 /**
- * Indique qu'une incohérence a été détectée dans un enregistrement d'une table de la base
- * de données. Cette exception peut être levée par exemple si une valeur négative a été trouvée
- * dans un champ qui ne devrait contenir que des valeurs positives, ou si une clé étrangère n'a
- * pas été trouvée. Dans plusieurs cas, cette exception ne devrait pas être soulévée si la base
- * de données à bien vérifié toutes les contraintes (par exemple les clés étrangères).
- * <p>
- * Cette exception contient le nom de la table contenant un enregistrement invalide.
- * Ce nom apparaît dans le message formaté par {@link #getLocalizedMessage}.
+ * Thrown when an inconsistency has been found in a record. This exception occurs for example
+ * when a negative value has been found in a database column where only positive values were
+ * expected.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class IllegalRecordException extends CatalogException {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * For cross-version compatibility.
      */
     private static final long serialVersionUID = -8491590864510381052L;
 

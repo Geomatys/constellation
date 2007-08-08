@@ -43,7 +43,7 @@ import org.geotools.resources.Arguments;
 // Sicade dependencies
 import net.sicade.catalog.Database;
 import net.sicade.catalog.ConfigurationKey;
-import net.sicade.coverage.catalog.DynamicCoverage;
+import net.sicade.coverage.catalog.GridCoverage;
 import net.sicade.coverage.catalog.sql.LayerTable;
 import net.sicade.coverage.catalog.sql.DescriptorTable;
 import net.sicade.coverage.catalog.sql.GridCoverageTable;
@@ -163,7 +163,7 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
     /**
      * {@inheritDoc}
      */
-    public DynamicCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException {
+    public GridCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException {
         return database.getTable(DescriptorTable.class).getEntryLenient(descriptor).getCoverage();
     }
 

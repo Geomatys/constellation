@@ -17,38 +17,51 @@ package net.sicade.coverage.catalog.sql;
 import org.geotools.resources.Utilities;
 import net.sicade.catalog.Entry;
 import net.sicade.coverage.catalog.Format;
+import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Series;
 
 
 /**
- * Représentation d'une série. Il n'y a pas d'interface correspondant directement à cette
- * entrée, car la division des couches en séries est habituellement cachée aux yeux de
- * l'utilisateur.
+ * A series entry.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class SeriesEntry extends Entry implements Series {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * For cross-version compatibility.
      */
     private static final long serialVersionUID = -7991804359597967276L;
 
     /**
-     * Le format pour les images de cette série.
+     * The layer which contains this series.
+     */
+    private final Layer layer;
+
+    /**
+     * The format of all coverages in this series.
      */
     private final Format format;
 
     /**
-     * Construit une nouvelle série du nom spécifié.
+     * Creates a new series entry.
      *
-     * @param name    Le nom de la procédure.
-     * @param format  Le format pour les images de cette série.
-     * @param remarks Remarques s'appliquant à cette entrée, ou {@code null}.
+     * @param name    The name for this series.
+     * @param layer   The layer which contains this series.
+     * @param format  The format of all coverages in this series.
+     * @param remarks The remarks, or {@code null} if none.
      */
-    protected SeriesEntry(final String name, final Format format, final String remarks) {
+    protected SeriesEntry(final String name, final Layer layer, final Format format, final String remarks) {
         super(name, remarks);
+        this.layer  = layer;
         this.format = format;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Layer getLayer() {
+        return layer;
     }
 
     /**
@@ -59,7 +72,7 @@ public class SeriesEntry extends Entry implements Series {
     }
 
     /**
-     * Compare cette série avec l'objet spécifié.
+     * Compare this series entry with the specified object for equality.
      */
     @Override
     public boolean equals(final Object object) {
@@ -68,7 +81,8 @@ public class SeriesEntry extends Entry implements Series {
         }
         if (super.equals(object)) {
             final SeriesEntry that = (SeriesEntry) object;
-            return Utilities.equals(this.format, that.format);
+            return Utilities.equals(this.layer,  that.layer ) &&
+                   Utilities.equals(this.format, that.format);
         }
         return false;
     }

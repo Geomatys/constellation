@@ -181,7 +181,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
      * référence directe vers {@link GridCoverageTable} afin de ne pas empêcher le ramasse-miettes
      * de détruire la table et ses connections vers la base de données.
      */
-    private final Parameters parameters;
+    private final GridCoverageSettings parameters;
 
     /**
      * Un décodeur sur lequel déléguer le chargement des images, ou {@code null} pour le lire
@@ -731,7 +731,7 @@ public class GridCoverageEntry extends Entry implements CoverageReference, Cover
              * la source n'est pas conservée si cet objet est susceptible d'être utilisé comme
              * serveur, afin d'éviter de transmettre une copie de GridCoverageEntry via le réseau.
              */
-            final Map properties = (loader==null) ? Collections.singletonMap(SOURCE_KEY, this) : null;
+            final Map properties = (loader==null) ? Collections.singletonMap(REFERENCE_KEY, this) : null;
             coverage = FACTORY.create(filename, image, envelope, bands, null, properties);
             /*
              * Retourne toujours la version "géophysique" de l'image.

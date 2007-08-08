@@ -12,9 +12,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.coverage.catalog;
+package net.sicade.coverage.catalog.sql;
 
-// J2SE dependencies
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -23,26 +22,21 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
-// OpenGIS dependencies
-import org.opengis.coverage.Coverage;
-import org.opengis.coverage.SampleDimension;
-import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.geometry.DirectPosition;
-
-// Geotools dependencies
-import org.geotools.coverage.AbstractCoverage;
-import org.geotools.referencing.crs.DefaultTemporalCRS;
-import static org.geotools.referencing.CRS.getTemporalCRS;
-
-// Sicade dependencies
-import net.sicade.catalog.CRS;
-
-// Static imports
 import static java.lang.Math.*;
 import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 import static java.lang.Double.isInfinite;
+import net.sicade.coverage.catalog.*;
+
+import org.opengis.coverage.Coverage;
+import org.opengis.coverage.SampleDimension;
+import org.opengis.coverage.CannotEvaluateException;
+import org.opengis.geometry.DirectPosition;
+import org.geotools.coverage.AbstractCoverage;
+import org.geotools.referencing.crs.DefaultTemporalCRS;
+import static org.geotools.referencing.CRS.getTemporalCRS;
+
+import net.sicade.catalog.CRS;
 
 
 /**
@@ -56,7 +50,7 @@ import static java.lang.Double.isInfinite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class FunctionalCoverage extends AbstractCoverage implements DynamicCoverage {
+abstract class FunctionalCoverage extends AbstractCoverage implements GridCoverage {
     /**
      * For compatibility during cross-version serialization.
      */
@@ -65,7 +59,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     /**
      * Ensemble des couvertures prédéfinies.
      */
-    private static final Map<String,DynamicCoverage> COVERAGES = new HashMap<String,DynamicCoverage>();
+    private static final Map<String, GridCoverage> COVERAGES = new HashMap<String,GridCoverage>();
 
     /**
      * Ajoute à {@link #COVERAGES} des couvertures pré-définies.
@@ -91,7 +85,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     protected FunctionalCoverage(final String name) throws IllegalArgumentException {
         super(name, CRS.XYT.getCoordinateReferenceSystem(), null, null);
         synchronized (COVERAGES) {
-            final DynamicCoverage old = COVERAGES.put(name, this);
+            final GridCoverage old = COVERAGES.put(name, this);
             if (old != null) {
                 COVERAGES.put(name, old);
                 throw new IllegalArgumentException(name);
@@ -102,7 +96,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     /**
      * Retourne une couverture pour le nom spécifié, ou {@code null} s'il n'y en a pas.
      */
-    public static DynamicCoverage getCoverage(final String name) {
+    public static GridCoverage getCoverage(final String name) {
         synchronized (COVERAGES) {
             return COVERAGES.get(name);
         }
@@ -216,7 +210,7 @@ public abstract class FunctionalCoverage extends AbstractCoverage implements Dyn
     /**
      * Retourne un ensemble toujours vide.
      */
-    public final List<Coverage> coveragesAt(final double t) {
+    public final List<Coverage> coveragesAt(final DirectPosition position) {
         return Collections.emptyList();
     }
 

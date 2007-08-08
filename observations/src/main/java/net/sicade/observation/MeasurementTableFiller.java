@@ -179,11 +179,11 @@ public class MeasurementTableFiller implements Runnable {
          *       peut jouer sur les performances et la consommation de mémoire.
          */
         while (!remaining.isEmpty()) {
-            final Layer layer = remaining.getFirst().getPhenomenon();
+            final Layer layer = remaining.getFirst().getLayer();
             final List<Descriptor> descriptorList = new ArrayList<Descriptor>(remaining.size());
             for (final Iterator<Descriptor> it=remaining.iterator(); it.hasNext();) {
                 final Descriptor descriptor = it.next();
-                if (Utilities.equals(descriptor.getPhenomenon(), layer)) {
+                if (Utilities.equals(descriptor.getLayer(), layer)) {
                     descriptorList.add(descriptor);
                     it.remove();
                 }

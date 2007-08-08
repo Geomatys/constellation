@@ -19,7 +19,7 @@ import org.opengis.coverage.Coverage;
 
 
 /**
- * Une opération à appliquer sur les images d'une même {@linkplain Layer couche}.
+ * An operation applied on coverage from a {@linkplain Layer layer}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -27,18 +27,18 @@ import org.opengis.coverage.Coverage;
  */
 public interface Operation extends Element {
     /**
-     * Retourne le préfix à utiliser dans les noms composites. Les noms composites
-     * seront de la forme "<cite>operation - paramètre - temps</cite>", par exemple
-     * <code>"&nabla;SST<sub>-15</sub>"</code>. Dans l'exemple précédent, le préfix
-     * est <code>"&nabla;"</code>.
+     * Returns the prefix to use in composite names. For example the prefix for the gradient
+     * magnitude is typically <code>"&nabla;"</code>. It can be applied on abbreviation like
+     * {@code "SST"} (<cite>Sea Surface Temperature</cite>) in order to produce a new
+     * abbreviation: <code>"&nabla;SST"</code>.
      */
     String getPrefix();
 
     /**
-     * Applique l'opération sur une image.
+     * Applies the operation on a coverage.
      *
-     * @param  coverage L'image sur laquelle appliquer l'opération.
-     * @return Le résultat de l'opération appliquée sur l'image.
+     * @param  coverage The coverage to apply the operation on.
+     * @return A new coverage resulting from the application of this operation on the specified coverage.
      */
     Coverage doOperation(Coverage coverage);
 
@@ -46,52 +46,50 @@ public interface Operation extends Element {
 
 
     /**
-     * Une opération qui délègue son travail à une autre instance de {@link Operation}. Cette
-     * classe est utile lorsque l'on ne souhaite redéfinir qu'une ou deux méthodes, notamment
-     * {@link #doOperation}.
+     * An operation delegating its work to an other instance of {@link Operation}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     public static class Proxy extends net.sicade.catalog.Proxy implements Operation {
         /**
-         * Pour compatibilités entre les enregistrements binaires de différentes versions.
+         * For cross-version compatibility.
          */
         private static final long serialVersionUID = -2285791043646792332L;
 
         /**
-         * L'opération envelopée.
+         * The wrapped operation.
          */
-        protected final Operation parent;
+        protected final Operation wrapped;
 
         /**
-         * Construit une nouvelle opération enveloppant l'opération spécifiée.
+         * Creates a new operation wrapping the specified one.
          */
-        protected Proxy(final Operation parent) {
-            this.parent = parent;
+        protected Proxy(final Operation wrapped) {
+            this.wrapped = wrapped;
         }
 
         /**
-         * Retourne l'opération envelopée.
+         * Returns the wrapped operation.
          */
         public Operation getBackingElement() {
-            return parent;
+            return wrapped;
         }
 
         /**
-         * Retourne le préfix à utiliser dans les noms composites.
-         * L'implémentation par défaut délègue le travail au {@linkplain #getParent parent}.
+         * Returns the prefix to use in composite names. The default implementation delegates to
+         * the {@linkplain #getBackingElement backing element}.
          */
         public String getPrefix() {
-            return parent.getPrefix();
+            return wrapped.getPrefix();
         }
 
         /**
-         * Applique l'opération sur une image.
-         * L'implémentation par défaut délègue le travail au {@linkplain #getParent parent}.
+         * Applies the operation. The default implementation delegates to
+         * the {@linkplain #getBackingElement backing element}.
          */
         public Coverage doOperation(final Coverage coverage) {
-            return parent.doOperation(coverage);
+            return wrapped.doOperation(coverage);
         }
     }
 }

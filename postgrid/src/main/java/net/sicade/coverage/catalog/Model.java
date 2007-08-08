@@ -14,53 +14,54 @@
  */
 package net.sicade.coverage.catalog;
 
-// J2SE dependencies
 import java.util.List;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Element;
-
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 
+
 /**
- * Interface de base des modèles linéaires ou non-linéaires.
+ * Base interface for numerical models, which may or may not be {@linkplain LinearModel linear}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface Model extends Element {
     /**
-     * Retourne la couche dans laquelle seront stockées les valeurs de la variable dépendante <var>y</var>.
-     * C'est la couche des images qui seront produites à partir de ce modèle.
+     * Returns the layer which represents the results of this numerical model.
      */
     Layer getTarget();
 
     /**
-     * Retourne l'ensemble des descripteurs utilisés comme entrées au modèle. Cet ensemble est
-     * ordonné; à chaque index correspond une valeur réelle qui sera donnée à la méthode
-     * {@link #evaluate}.
+     * Returns all descriptors used as input for this numerical model. The descriptor at
+     * index <var>i</var> in this list determines the value at the same index <var>i</var>
+     * in the {@code values} array given to the {@link #normalize} and {@link #evaluate}
+     * methods, as in the following pseudo-code:
+     *
+     * <blockquote><pre>
+     * values[i] = descriptors.get(i).getCoverage().evaluate(position);
+     * </pre></blockquote>
      */
     List<Descriptor> getDescriptors();
 
     /**
-     * {@linkplain Distribution#normalize Normalise} toutes les données spécifiées. Il est de la
-     * responsabilité de l'utilisateur d'appeller cette méthode exactement une fois avant d'appeller
-     * la méthode {@link #evaluate evaluate}. La normalisation est faite sur place.
+     * {@linkplain Distribution#normalize Normalize} all values in the specified array. It is user
+     * responsability to invoke this method exactly once before invoking {@link #evaluate evaluate}.
+     * The normalization is performed in-place, i.e. the normalized values replace the specified
+     * values.
      */
     void normalize(double[] values);
 
     /**
-     * Calcule la valeur prédite à partir des valeurs données en entrés. Chaque valeur à un index
-     * <var>i</var> doit correspondre au descripteur à ce même index <var>i</var> dans l'ensemble
-     * retournée par {@link #getDescriptors}.
+     * Computes a {@linkplain #getTarget target} value from the given {@linkplain #getDescriptors
+     * descriptor} values.
      */
     double evaluate(double[] values);
 
     /**
-     * Retourne une couverture qui évaluera le modèle aux positions spatio-temporelles qui lui
-     * seront données.
+     * Returns a view of this numerical model as a coverage.
      *
-     * @throws CatalogException si la couverture n'a pas pu être construite.
+     * @throws CatalogException if the coverage can not be created.
      */
     Coverage asCoverage() throws CatalogException;
 }

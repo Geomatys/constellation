@@ -29,6 +29,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.util.NumberRange;
@@ -175,10 +176,10 @@ public class GridCoverageServer extends UnicastRemoteObject implements DataConne
     /**
      * {@inheritDoc}
      */
-    public List<Coverage> coveragesAt(final double t)
+    public List<Coverage> coveragesAt(final DirectPosition position)
             throws CatalogException, SQLException, IOException
     {
-        return table.coveragesAt(t);
+        return table.coveragesAt(position);
     }
 
     /**

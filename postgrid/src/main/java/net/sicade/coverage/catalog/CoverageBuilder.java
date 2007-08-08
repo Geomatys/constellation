@@ -254,7 +254,7 @@ public class CoverageBuilder {
      * Retourne une image pour la couverture spatio-temporelle d'un descripteur, ou {@code null}
      * s'il n'y en a pas.
      */
-    private GridCoverage2D getDescriptorImage(final DynamicCoverage coverage) throws CatalogException {
+    private GridCoverage2D getDescriptorImage(final GridCoverage coverage) throws CatalogException {
         GridCoverage2D coverage2D = null;
         final GeneralDirectPosition source = new GeneralDirectPosition(gridToCRS.getSourceDimensions());
         final GeneralDirectPosition target = new GeneralDirectPosition(gridToCRS.getTargetDimensions());
@@ -268,7 +268,7 @@ public class CoverageBuilder {
             return coverage2D;
         }
         @SuppressWarnings("unchecked")
-        final List<Coverage> coverages = coverage.coveragesAt(position.getOrdinate(position.getDimension()-1));
+        final List<Coverage> coverages = coverage.coveragesAt(position);
         if (!coverages.isEmpty()) {
             final Coverage candidate = coverages.get(coverages.size() / 2);
             if (candidate instanceof GridCoverage2D) {
@@ -284,7 +284,7 @@ public class CoverageBuilder {
      * cette raison, les éventuelles erreurs sont attrapées et écrite dans le fichier de destination
      * plutôt que propagées.
      */
-    private void saveDescriptorImage(final DynamicCoverage coverage) throws CatalogException {
+    private void saveDescriptorImage(final GridCoverage coverage) throws CatalogException {
         if (coverage == null) {
             return;
         }

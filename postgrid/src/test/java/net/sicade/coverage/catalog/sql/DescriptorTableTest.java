@@ -44,7 +44,7 @@ public class DescriptorTableTest extends DatabaseTest {
         final Descriptor      entry = table.getEntry(SAMPLE_NAME);
         assertEquals(SAMPLE_NAME, entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
-        assertEquals(LayerTableTest.SAMPLE_NAME, entry.getPhenomenon().getName());
-        assertEquals(OperationTableTest.SAMPLE_NAME, entry.getProcedure().getName());
+        assertEquals(LayerTableTest.SAMPLE_NAME, entry.getLayer().getName());
+        assertEquals(OperationTableTest.SAMPLE_NAME, entry.getOperation().getName());
     }
 }

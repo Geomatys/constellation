@@ -26,12 +26,14 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import org.opengis.geometry.Envelope;
 import org.opengis.coverage.Coverage;
+import org.opengis.geometry.Envelope;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.util.NumberRange;
 import org.geotools.util.RangeSet;
@@ -166,7 +168,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * retenus afin d'éviter d'avoir à les reconstruires trop souvent
      * si c'est évitable.
      */
-    private transient Parameters parameters;
+    private transient GridCoverageSettings parameters;
 
     /**
      * The set of available dates. Will be computed by
@@ -195,7 +197,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * Une instance d'une coordonnées à utiliser avec {@link #evaluate}.
      */
-    private transient GeneralDirectPosition position;
+    private transient TransformedDirectPosition position;
 
     /**
      * Un buffer pré-alloué à utiliser avec {@link #evaluate}.
@@ -718,25 +720,23 @@ loop:   for (final CoverageReference newReference : entries) {
 
     /**
      * Retourne les paramètres de cette table. Pour des raisons d'économie de mémoire (de très
-     * nombreux objets {@code Parameters} pouvant être créés), cette méthode retourne un exemplaire
+     * nombreux objets {@code GridCoverageSettings} pouvant être créés), cette méthode retourne un exemplaire
      * unique autant que possible. L'objet retourné ne doit donc pas être modifié!
      * <p>
      * Cette méthode est appelée par le constructeur de {@link GridCoverageEntry}.
-     *
-     * @param  seriesID    Nom ID de la couche, pour fin de vérification. Ce nom doit correspondre
+     * 
+     * @param seriesID    Nom ID de la couche, pour fin de vérification. Ce nom doit correspondre
      *                     à celui de la couche examinée par cette table.
-     * @param  formatID    Nom ID du format des images.
-     * @param  coverageCRS Système de référence des coordonnées.
-     * @param  pathname    Chemin relatif des images.
-     * @param  extension   Extension (sans le point) des noms de fichier des images à lire.
-     *
+     * @param formatID    Nom ID du format des images.
+     * @param coverageCRS Système de référence des coordonnées.
+     * @param pathname    Chemin relatif des images.
+     * @param extension   Extension (sans le point) des noms de fichier des images à lire.
      * @return Un objet incluant les paramètres demandées ainsi que ceux de la table.
      * @throws CatalogException si les paramètres n'ont pas pu être obtenus.
      * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
-     *
      * @todo L'implémentation actuelle n'accepte pas d'autres implémentations de Format que FormatEntry.
      */
-    final synchronized Parameters getParameters(final String seriesID,
+    final synchronized GridCoverageSettings getParameters(final String seriesID,
                                                 final String formatID,
                                                 final CoordinateReferenceSystem coverageCRS,
                                                 final String pathname,
@@ -776,7 +776,7 @@ loop:   for (final CoverageReference newReference : entries) {
         if (formatTable == null) {
             formatTable = getDatabase().getTable(FormatTable.class);
         }
-        parameters = new Parameters(layer,
+        parameters = new GridCoverageSettings(layer,
                                     (FormatEntry) formatTable.getEntry(formatID),
                                     pathname.intern(),
                                     extension.intern(),
@@ -796,20 +796,18 @@ loop:   for (final CoverageReference newReference : entries) {
      * Prépare l'évaluation d'un point.
      */
     @SuppressWarnings("fallthrough")
-    private void prepare(final double x, final double y, final double t)
+    private void prepare(final DirectPosition location)
             throws CatalogException, SQLException, IOException
     {
         assert Thread.holdsLock(this);
         if (coverage3D == null) {
             coverage3D = new CoverageStack(getLayer().getName(), getCoordinateReferenceSystem(), getEntries());
-            position   = new GeneralDirectPosition(getCoordinateReferenceSystem());
+            position   = new TransformedDirectPosition(null, getCoordinateReferenceSystem(), null);
         }
-        switch (position.ordinates.length) {
-            default: // Fall through in all cases.
-            case 3:  position.ordinates[2] = t;
-            case 2:  position.ordinates[1] = y;
-            case 1:  position.ordinates[0] = x;
-            case 0:  break;
+        try {
+            position.transform(location);
+        } catch (TransformException e) {
+            throw new CatalogException(e);
         }
     }
 
@@ -819,7 +817,7 @@ loop:   for (final CoverageReference newReference : entries) {
     public synchronized double evaluate(final double x, final double y, final double t, final short band)
             throws CatalogException, SQLException, IOException
     {
-        prepare(x, y, t);
+        //prepare(x, y, t); TODO
         samples = coverage3D.evaluate(position, samples);
         return samples[band];
     }
@@ -830,7 +828,7 @@ loop:   for (final CoverageReference newReference : entries) {
     public synchronized double[] snap(final double x, final double y, final double t)
             throws CatalogException, SQLException, IOException
     {
-        prepare(x, y, t);
+        //prepare(x, y, t); TODO
         coverage3D.snap(position);
         return (double[]) position.ordinates.clone();
     }
@@ -839,11 +837,11 @@ loop:   for (final CoverageReference newReference : entries) {
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public synchronized List<Coverage> coveragesAt(final double t)
+    public synchronized List<Coverage> coveragesAt(final DirectPosition position)
             throws CatalogException, SQLException, IOException
     {
-        prepare(Double.NaN, Double.NaN, t);
-        return coverage3D.coveragesAt(t);
+        prepare(position);
+        return coverage3D.coveragesAt(position.getOrdinate(position.getDimension() - 1));
     }
 
     /**

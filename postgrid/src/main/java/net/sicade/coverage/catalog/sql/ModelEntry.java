@@ -14,23 +14,15 @@
  */
 package net.sicade.coverage.catalog.sql;
 
-// J2SE dependencies
 import java.util.List;
-
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
-
-// Geotoops dependencies
 import org.geotools.resources.Utilities;
-
-// Sicade dependencies
 import net.sicade.catalog.Entry;
 import net.sicade.coverage.catalog.Distribution;
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.Model;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Descriptor;
-import net.sicade.coverage.catalog.ModelCoverage;
 import net.sicade.resources.XArray;
 
 

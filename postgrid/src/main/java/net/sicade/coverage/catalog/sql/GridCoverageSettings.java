@@ -38,11 +38,11 @@ import net.sicade.coverage.catalog.Operation;
  * être immutables. Ce principe d'imutabilité s'applique aussi aux objets référencés par
  * les champs publiques, même si ces objets sont en principe mutables ({@link Rectangle2D},
  * {@link Dimension2D}...).
- *
- * @version $Id$
+ * 
  * @author Martin Desruisseaux
+ * @version $Id$
  */
-final class Parameters implements Serializable {
+final class GridCoverageSettings implements Serializable {
     /**
      * Numéro de série (pour compatibilité avec des versions antérieures).
      */
@@ -159,7 +159,7 @@ final class Parameters implements Serializable {
      * @param encoding Encodage des noms de fichiers, ou {@code null} si aucun encodage ne doit être
      *        effectué.
      */
-    public Parameters(final Layer                     layer,
+    public GridCoverageSettings(final Layer                     layer,
                       final FormatEntry               format,
                       final String                    pathname,
                       final String                    extension,
@@ -193,21 +193,21 @@ final class Parameters implements Serializable {
      */
     @Override
     public boolean equals(final Object o) {
-        if (o instanceof Parameters) {
-            final Parameters that = (Parameters) o;
-            return Utilities.equals(this.layer          , that.layer           ) &&
-                   Utilities.equals(this.format         , that.format          ) &&
-                   Utilities.equals(this.pathname       , that.pathname        ) &&
-                   Utilities.equals(this.extension      , that.extension       ) &&
-                   Utilities.equals(this.operation      , that.operation       ) &&
-                   Utilities.equals(this.tableCRS       , that.tableCRS        ) &&
-                   Utilities.equals(this.coverageCRS    , that.coverageCRS     ) &&
-                   Utilities.equals(this.geographicArea , that.geographicArea  ) &&
-                   Utilities.equals(this.resolution     , that.resolution      ) &&
-                   Utilities.equals(this.dateFormat     , that.dateFormat      ) &&
-                   Utilities.equals(this.rootDirectory  , that.rootDirectory   ) &&
-                   Utilities.equals(this.rootURL        , that.rootURL         ) &&
-                   Utilities.equals(this.encoding       , that.encoding        );
+        if (o instanceof GridCoverageSettings) {
+            final GridCoverageSettings that = (GridCoverageSettings) o;
+            return Utilities.equals(this.layer          , that.layer         ) &&
+                   Utilities.equals(this.format         , that.format        ) &&
+                   Utilities.equals(this.pathname       , that.pathname      ) &&
+                   Utilities.equals(this.extension      , that.extension     ) &&
+                   Utilities.equals(this.operation      , that.operation     ) &&
+                   Utilities.equals(this.tableCRS       , that.tableCRS      ) &&
+                   Utilities.equals(this.coverageCRS    , that.coverageCRS   ) &&
+                   Utilities.equals(this.geographicArea , that.geographicArea) &&
+                   Utilities.equals(this.resolution     , that.resolution    ) &&
+                   Utilities.equals(this.dateFormat     , that.dateFormat    ) &&
+                   Utilities.equals(this.rootDirectory  , that.rootDirectory ) &&
+                   Utilities.equals(this.rootURL        , that.rootURL       ) &&
+                   Utilities.equals(this.encoding       , that.encoding      );
         }
         return false;
     }

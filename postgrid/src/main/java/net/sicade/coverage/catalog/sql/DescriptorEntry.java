@@ -24,8 +24,7 @@ import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.Operation;
 import net.sicade.coverage.catalog.Descriptor;
 import net.sicade.coverage.catalog.RegionOfInterest;
-import net.sicade.coverage.catalog.DynamicCoverage;
-import net.sicade.coverage.catalog.FunctionalCoverage;
+import net.sicade.coverage.catalog.GridCoverage;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Entry;
 import net.sicade.catalog.ServerException;
@@ -80,10 +79,10 @@ public class DescriptorEntry extends Entry implements Descriptor {
     private final short band;
 
     /**
-     * Une vue des données de ce descripteur comme objet {@link DynamicCoverage}.
+     * Une vue des données de ce descripteur comme objet {@link GridCoverage}.
      * Ne sera établie à partir de la couche la première fois où elle sera nécessaire.
      */
-    private transient Reference<DynamicCoverage> coverage;
+    private transient Reference<GridCoverage> coverage;
 
     /**
      * Construit un nouveau descripteur.
@@ -125,14 +124,14 @@ public class DescriptorEntry extends Entry implements Descriptor {
     /**
      * {@inheritDoc}
      */
-    public Layer getPhenomenon() {
+    public Layer getLayer() {
         return phenomenon;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Operation getProcedure() {
+    public Operation getOperation() {
         return procedure;
     }
 
@@ -177,8 +176,8 @@ public class DescriptorEntry extends Entry implements Descriptor {
     /**
      * {@inheritDoc}
      */
-    public synchronized DynamicCoverage getCoverage() throws CatalogException {
-        DynamicCoverage c;
+    public synchronized GridCoverage getCoverage() throws CatalogException {
+        GridCoverage c;
         if (coverage != null) {
             c = coverage.get();
             if (c != null) {
@@ -192,7 +191,7 @@ public class DescriptorEntry extends Entry implements Descriptor {
         } catch (RemoteException exception) {
             throw new ServerException(exception);
         }
-        coverage = new SoftReference<DynamicCoverage>(c);
+        coverage = new SoftReference<GridCoverage>(c);
         return c;
     }
 

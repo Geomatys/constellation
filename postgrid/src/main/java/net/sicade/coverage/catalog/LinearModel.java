@@ -14,89 +14,80 @@
  */
 package net.sicade.coverage.catalog;
 
-// J2SE dependencies
 import java.util.List;
 import java.util.Locale;
 import java.io.Writer;
 import java.io.IOException;
 import net.sicade.catalog.Element;
 
+
 /**
- * Un modèle linéaire.
+ * A linear model.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public interface LinearModel extends Model {
     /**
-     * Retourne les termes d'un modèle linéaire calculant le paramètre. Un paramètre peut être le
-     * résultat d'une combinaison de d'autres paramètres, par exemple sous la forme de l'équation
-     * suivante:
+     * Returns the terms of this linear model. Note that a term may contains a product
+     * of more than one descriptor, like the last one in the example below:
      *
      * <p align="center">{@code PP} = <var>C</var><sub>0</sub> +
      * <var>C</var><sub>1</sub>&times;{@code SST} +
      * <var>C</var><sub>2</sub>&times;{@code SLA} +
      * <var>C</var><sub>3</sub>&times;{@code SST}&times;{@code SLA} + ...</p>
      *
-     * Chacun des termes à droite du signe = est décrit par un objet
-     * {@link net.sicade.observation.coverage.LinearModel.Term}.
-     * Ces descriptions incluent le coefficient <var>C</var><sub>n</sub>,
-     * qui résulte généralement d'une régression linéaire multiple.
+     * Each term on the right side of {@code =} is represented by a
+     * {@link net.sicade.observation.coverage.LinearModel.Term} instance.
+     * The term contains a <var>C</var><sub>n</sub> coefficient, often
+     * computed from a multiple linear regression.
      *
-     * @return La liste de tous les termes composant le modèle linéaire. Cette liste est immutable.
+     * @return An immutable list of all terms in this linear model.
      */
     List<Term> getTerms();
 
     /**
-     * Écrit le modèle linéaire vers le flot de sortie spécifié. Cette méthode utilisera une
-     * ligne par terme du modèle linéaire, et tentera d'aligner les termes comme dans un tableau.
+     * Prints the linear model to the specified writer.
      *
-     * @param  out Le flot de sortie dans lequel écrire.
-     * @param  locale Les conventions locales à utiliser, où {@code null} pour les conventions
-     *         par défaut.
-     * @throws IOException si une erreur est survenue lors de l'écriture.
+     * @param  out The stream where to write.
+     * @param  locale The locale to use for formatting, or {@code null} for the default locale.
+     * @throws IOException if an error occured while writting to the stream.
      */
     void print(final Writer out, final Locale locale) throws IOException;
 
     /**
-     * Un terme dans un modèle linéaire. Un modèle linéaire peut s'écrire de la forme suivante:
+     * A linear model term. A {@linkplain LinearModel linear model} can be represented in the
+     * following form:
      *
      * <p align="center"><var>y</var> = <var>C</var><sub>0</sub> +
      * <var>C</var><sub>1</sub>&times;<var>x</var><sub>1</sub> +
      * <var>C</var><sub>2</sub>&times;<var>x</var><sub>2</sub> +
      * <var>C</var><sub>3</sub>&times;<var>x</var><sub>3</sub> + ...</p>
      *
-     * Dans ce modèle, le terme <var>C</var><sub>0</sub> est représenté par un objet
-     * {@code LinearModel.Term}, le terme <var>C</var><sub>1</sub>&times;<var>x</var><sub>1</sub>
-     * par un autre objet {@code LinearModel.Term}, et ainsi de suite.
+     * where <var>C</var><sub>0</sub> is an instance of {@code LinearModel.Term},
+     * <var>C</var><sub>1</sub>&times;<var>x</var><sub>1</sub> is an other instance of
+     * {@code LinearModel.Term}, <cite>etc.</cite>
      * <p>
-     * Les variables indépendantes <var>x</var><sub>1</sub>, <var>x</var><sub>2</sub>,
-     * <cite>etc.</cite> sont les {@linkplain Descriptor descripteurs du paysage océanique},
-     * eux-mêmes dérivés d'une {@linkplain Layer couche} d'images représentant un paramètre
-     * environnemental.
-     * <p>
-     * La variable dépendante <var>y</var> sera stockée dans un nouveau paramètre 
-     * environnemental (par exemple un paramètre appelé "potentiel de pêche"). 
-     * Elle pourra donc servir d'entrée à un autre modèle linéaire.
+     * The <var>x</var><sub>1</sub>, <var>x</var><sub>2</sub>, <cite>etc.</cite> independant
+     * variables are {@linkplain Descriptor descriptors} derived from {@linkplain Layer layers}.
      *
      * @version $Id$
      * @author Martin Desruisseaux
      */
     public interface Term extends Element {
         /**
-         * Retourne le coefficient <var>C</var> de ce terme. Ce coefficient a 
-         * généralement été obtenu par une régression linéaire multiple.
+         * Returns the coefficient <var>C</var> for this term. This coefficient
+         * is often the result of a multiple linear regression.
          */
         double getCoefficient();
 
         /**
-         * Retourne les descripteurs du paysage océanique composant ce terme. Par exemple, le terme
-         * {@code this} pourrait être <var>C</var>&times;{@code SST}&times;{@code SLA}, où <var>C</var>
-         * est le {@linkplain #getCoefficient coefficient} déterminé par la régression linéaire, tandis
-         * que {@code SST} et {@code SLA} sont les valeurs {@linkplain Distribution#normalize normalisées}
-         * de température de surface et d'anomalie de la hauteur de l'eau respectivement. Pour cet exemple,
-         * {@code getDescriptors()} retournerait dans une liste les deux descripteurs {@code SST} et
-         * {@code SLA}.
+         * Returns the descriptors for this term. In most cases, the list contains exactly one element.
+         * However this interface allows more elements to be returned. For example a term could be
+         * <var>C</var>&times;{@code SST}&times;{@code SLA} where <var>C</var> is the {@linkplain
+         * #getCoefficient coefficient} determined from a linear regression, while {@code SST} and
+         * {@code SLA} are {@linkplain Distribution#normalize normalized values} of <cite>Sea
+         * Surface Temperature</cite> and <cite>Sea Level Anomaly</cite> respectively.
          */
         List<Descriptor> getDescriptors();
     }

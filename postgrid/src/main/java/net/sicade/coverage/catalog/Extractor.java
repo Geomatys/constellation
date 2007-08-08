@@ -14,37 +14,30 @@
  */
 package net.sicade.coverage.catalog;
 
-// Utilitaire
 import java.util.Date;
 import java.util.TimeZone;
 import java.awt.geom.Point2D;
 import java.sql.SQLException;
-
-// Entrés / sorties
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 import java.io.InputStreamReader;
-
-// Formattage
 import java.text.Format;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import net.sicade.catalog.CatalogException;
-import net.sicade.catalog.NoSuchRecordException;
-import org.geotools.io.LineFormat;
 
-// OpenGIS
 import org.opengis.coverage.Coverage;
-
-// Geotools
+import org.geotools.io.LineFormat;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.coverage.OrdinateOutsideCoverageException;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.NoSuchRecordException;
+
 
 /**
  * Utilitaire de lignes de commandes pour extraire des valeurs de la base de données d'images.
@@ -85,6 +78,7 @@ import org.geotools.coverage.OrdinateOutsideCoverageException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
+@Deprecated
 public final class Extractor extends Arguments {
     /**
      * Le nom du fichier en cours de lecture, ou {@code null} pour le périphérique d'entrée standard.
@@ -240,7 +234,7 @@ public final class Extractor extends Arguments {
                     return;
                 }
                 final String n = format.format(values[0]);
-                out.print(Utilities.spaces(precision+6 - n.length()));
+                out.print(Utilities.spaces(precision + 6 - n.length()));
                 out.print(n);
             }
             out.println();
