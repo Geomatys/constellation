@@ -17,8 +17,10 @@ package net.sicade.catalog;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -29,7 +31,10 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import net.sicade.resources.XArray;
+import org.geotools.io.TableWriter;
 import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -57,16 +62,23 @@ public class Synchronizer {
     private transient DatabaseMetaData metadata;
 
     /**
+     * Where to print reports.
+     */
+    private final Writer out;
+
+    /**
      * Creates a synchronizer reading the configuration from the specified files.
      * Those files are read from the current directory if present, or from the user
      * directory as specified in {@link Database} javadoc otherwise.
      *
      * @param source The source configuration file.
      * @param target The target configuration file.
+     * @param out Where to print reports.
      */
-    private Synchronizer(final String source, final String target) throws IOException {
+    private Synchronizer(final String source, final String target, final Writer out) throws IOException {
         this.source = new Database(null, source);
         this.target = new Database(null, target);
+        this.out = out;
     }
 
     /**
@@ -75,10 +87,75 @@ public class Synchronizer {
      *
      * @param properties The properties where to look for {@code "config-source"}
      *        and {@code "config-target"} filenames.
+     * @param out Where to print reports.
      */
-    private Synchronizer(final Properties properties) throws IOException {
+    private Synchronizer(final Properties properties, final Writer out) throws IOException {
         this(properties.getProperty("config-source", "config-source.xml"),
-             properties.getProperty("config-target", "config-target.xml"));
+             properties.getProperty("config-target", "config-target.xml"), out);
+    }
+
+    /**
+     * Returns the primary keys in the target database for the given table. If the primary keys
+     * span over more than one column, then the columns are returned in sequence order. If the
+     * table has no primary key, then this method returns an array of length 0.
+     */
+    private String[] getPrimaryKeys(final String table) throws SQLException {
+        final String catalog = target.catalog;
+        final String schema  = target.schema;
+        final ResultSet results = metadata.getPrimaryKeys(catalog, schema, table);
+        String[] columns = new String[0];
+        while (results.next()) {
+            if (catalog!=null && !catalog.equals(results.getString("TABLE_CAT"))) {
+                continue;
+            }
+            if (schema!=null && !schema.equals(results.getString("TABLE_SCHEM"))) {
+                continue;
+            }
+            if (!table.equals(results.getString("TABLE_NAME"))) {
+                continue;
+            }
+            final String column = results.getString("COLUMN_NAME");
+            final int index = results.getShort("KEY_SEQ");
+            if (index > columns.length) {
+                columns = XArray.resize(columns, index + 1);
+            }
+            columns[index - 1] = column;
+        }
+        results.close();
+        return columns;
+    }
+
+    /**
+     * Returns the index of the specified column, or 0 if not found.
+     *
+     * @param  metadata The metadata to search into.
+     * @param  name The column to search for.
+     * @return The index of the specified column.
+     */
+    private static int getColumnIndex(final ResultSetMetaData metadata, final String column)
+            throws SQLException
+    {
+        final int count = metadata.getColumnCount();
+        for (int i=1; i<=count; i++) {
+            if (column.equals(metadata.getColumnName(i))) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the index of the specified columns. If a column is not found, its corresponding
+     * index will be left to 0.
+     */
+    private static int[] getColumnIndex(final ResultSetMetaData metadata, final String[] columns)
+            throws SQLException
+    {
+        final int[] index = new int[columns.length];
+        for (int i=0; i<columns.length; i++) {
+            index[i] = getColumnIndex(metadata, columns[i]);
+        }
+        return index;
     }
 
     /**
@@ -87,47 +164,106 @@ public class Synchronizer {
      * @param  table The name of the table in which to replace the records.
      * @param  condition A SQL condition (to be put after a {@code WHERE} clause) for
      *         the records to be deleted, or {@code null} for deleting the whole table.
+     *
      * @throws SQLException if a reading or writing operation failed.
      */
     private void delete(final String table, final String condition) throws SQLException {
         final StringBuilder buffer = new StringBuilder();
-        buffer.append("DELETE FROM \"").append(table).append('"');
+        buffer.append("DELETE FROM \"");
+        if (target.schema != null) {
+            buffer.append(target.schema).append("\".\"");
+        }
+        buffer.append(table).append('"');
         if (condition != null) {
             buffer.append(" WHERE ").append(condition);
         }
         final String sql = buffer.toString();
-        final Statement targetStmt = target.getConnection().createStatement();
-        final int count = targetStmt.executeUpdate(sql);
+        final Statement targetStatement = target.getConnection().createStatement();
+        final int count = targetStatement.executeUpdate(sql);
         log(LoggingLevel.DELETE, "delete", sql + '\n' + count + " lignes supprimées.");
-        targetStmt.close();
+        targetStatement.close();
     }
 
     /**
      * Copies the content of the specified table from source to the target database.
+     * If a record already exists for the same primary key, it will not be overwriten.
      *
      * @param  table The name of the table to copy.
      * @param  condition A SQL condition (to be put after a {@code WHERE} clause) for
      *         the records to be copied, or {@code null} for copying the whole table.
+     * @param  checkExisting if {@code true}, checks for existing entries before to write
+     *         new ones, and do not overwrite existing entries.
+     *
      * @throws SQLException if a reading or writing operation failed.
+     * @throws IOException if an error occured while writting reports on this operation.
      */
-    private void insert(final String table, final String condition) throws SQLException {
+    private void insert(final String table, final String condition, final boolean checkExisting)
+            throws SQLException, IOException
+    {
+        /*
+         * Creates the SQL statement for the SELECT query, opens the source ResultSet and
+         * gets the metadata (especially the column names).  We will use the column names
+         * later in order to build the INSERT statement for the target database.
+         */
         final StringBuilder buffer = new StringBuilder();
-        buffer.append("SELECT * FROM \"").append(table).append('"');
+        buffer.append("SELECT * FROM \"");
+        if (source.schema != null) {
+            buffer.append(source.schema).append("\".\"");
+        }
+        buffer.append(table).append('"');
         if (condition != null) {
             buffer.append(" WHERE ").append(condition);
         }
         String sql = buffer.toString();
-        final Statement sourceStmt = source.getConnection().createStatement();
-        final Statement targetStmt = target.getConnection().createStatement();
-        final ResultSet          sources = sourceStmt.executeQuery(sql);
-        final ResultSetMetaData metadata = sources.getMetaData();
-        final String[]           columns = new String[metadata.getColumnCount()];
+        final Statement  sourceStatement = source.getConnection().createStatement();
+        final ResultSet  sourceResultSet = sourceStatement.executeQuery(sql);
+        final ResultSetMetaData metadata = sourceResultSet.getMetaData();
+        final String[] columns = new String[metadata.getColumnCount()];
         for (int i=0; i<columns.length;) {
             columns[i] = metadata.getColumnName(++i);
         }
         log(LoggingLevel.SELECT, "insert", sql);
+        /*
+         * Creates the SQL prepared statement for the SELECT query in the target database.
+         * This is used in order to search for existing entries before to insert a new one.
+         * This operation can be performed only if the target table contains at least one
+         * primary key column. We don't check for primary keys in the source table since it
+         * may be a view.
+         */
+        final PreparedStatement existing;
+        final String[] primaryKeys      = getPrimaryKeys(table);
+        final int[]    primaryKeyIndex  = new int   [primaryKeys.length];
+        final String[] primaryKeyValues = new String[primaryKeys.length];
+        if (primaryKeys.length != 0) {
+            buffer.setLength(0);
+            buffer.append("SELECT * FROM \"");
+            if (target.schema != null) {
+                buffer.append(target.schema).append("\".\"");
+            }
+            buffer.append(table).append("\" WHERE ");
+            for (int i=0; i<primaryKeys.length; i++) {
+                if (i != 0) {
+                    buffer.append(" AND ");
+                }
+                final String name = primaryKeys[i];
+                buffer.append(name).append("=?");
+                primaryKeyIndex[i] = getColumnIndex(metadata, name);
+            }
+            sql = buffer.toString();
+            existing = target.getConnection().prepareStatement(sql);
+        } else {
+            existing = null;
+        }
+        /*
+         * Creates the target prepared statement for the INSERT queries. The parameters will need
+         * to be filled in the same order than the column from the source SELECT query.
+         */
         buffer.setLength(0);
-        buffer.append("INSERT INTO \"").append(table).append("\" (");
+        buffer.append("INSERT INTO \"");
+        if (target.schema != null) {
+            buffer.append(target.schema).append("\".\"");
+        }
+        buffer.append(table).append("\" (");
         for (int i=0; i<columns.length; i++) {
             if (i != 0) {
                 buffer.append(',');
@@ -135,43 +271,129 @@ public class Synchronizer {
             buffer.append('"').append(columns[i]).append('"');
         }
         buffer.append(") VALUES (");
-        final int valuesStart = buffer.length();
-        while (sources.next()) {
-            buffer.setLength(valuesStart);
-            for (int i=0; i<columns.length;) {
-                if (i != 0) {
-                    buffer.append(',');
-                }
-                buffer.append('\'').append(sources.getString(++i)).append('\'');
+        for (int i=0; i<columns.length; i++) {
+            if (i != 0) {
+                buffer.append(',');
             }
-            buffer.append(')');
-            sql = buffer.toString();
-            final int count = targetStmt.executeUpdate(sql);
+            buffer.append('?');
+        }
+        buffer.append(')');
+        sql = buffer.toString();
+        final PreparedStatement targetStatement = target.getConnection().prepareStatement(sql);
+        /*
+         * Read all records from the source table and check if a corresponding records exists
+         * in the target table. If such record exists and have identical content, then nothing
+         * is done. If the content is not identical, then a warning is printed.
+         */
+        int[] sourceToTarget = null;
+        TableWriter mismatchs = null;
+        while (sourceResultSet.next()) {
+            if (existing != null) {
+                for (int i=0; i<primaryKeyIndex.length; i++) {
+                    final String value = sourceResultSet.getString(primaryKeyIndex[i]);
+                    primaryKeyValues[i] = value;
+                    existing.setString(i+1, value);
+                }
+                final ResultSet targetResultSet = existing.executeQuery();
+                if (sourceToTarget == null) {
+                    sourceToTarget = getColumnIndex(targetResultSet.getMetaData(), columns);
+                }
+                int count = 0;
+                while (targetResultSet.next()) {
+                    for (int i=0; i<sourceToTarget.length; i++) {
+                        final int index = sourceToTarget[i];
+                        if (index == 0) {
+                            // Compares only the columns present in both tables.
+                            continue;
+                        }
+                        final String source = sourceResultSet.getString(i+1);
+                        final String target = targetResultSet.getString(index);
+                        if (!Utilities.equals(source, target)) {
+                            if (mismatchs == null) {
+                                final String lineSeparator = System.getProperty("line.separator", "\n");
+                                out.write(lineSeparator);
+                                out.write(table);
+                                out.write(lineSeparator);
+                                mismatchs.nextLine('\u2550');
+                                mismatchs = new TableWriter(out, " \u2502 ");
+                                for (int j=0; j<primaryKeys.length; j++) {
+                                    mismatchs.write(primaryKeys[j]);
+                                    mismatchs.nextColumn();
+                                }
+                                mismatchs.write("Colonne");
+                                mismatchs.nextColumn();
+                                mismatchs.write("Valeur à copier");
+                                mismatchs.nextColumn();
+                                mismatchs.write("Valeur existante");
+                                mismatchs.nextLine('\u2550');
+                            } else {
+                                mismatchs.nextLine();
+                            }
+                            for (int j=0; j<primaryKeys.length; j++) {
+                                mismatchs.write(primaryKeyValues[j]);
+                                mismatchs.nextColumn();
+                            }
+                            mismatchs.write(columns[i]);
+                            mismatchs.nextColumn();
+                            mismatchs.write(source);
+                            mismatchs.nextColumn();
+                            mismatchs.write(target);
+                        }
+                    }
+                    count++;
+                }
+                targetResultSet.close();
+                if (count != 0) {
+                    continue;
+                }
+            }
+            /*
+             * At this point, we know that we have a new element. Now insert the new
+             * record in the target table.
+             */
+            for (int i=1; i<=columns.length; i++) {
+                targetStatement.setString(i, sourceResultSet.getString(i));
+            }
+            final int count = targetStatement.executeUpdate();
             if (count == 1) {
-                log(LoggingLevel.INSERT, "insert", sql);
+                log(LoggingLevel.INSERT, "insert", target.isStatementFormatted ? targetStatement.toString() : sql);
             } else {
                 log(Level.WARNING, "insert", String.valueOf(count) + " enregistrements ajoutés.");
             }
         }
-        sources.close();
-        sourceStmt.close();
-        targetStmt.close();
+        /*
+         * Disposes all resources used by this method.
+         */
+        sourceResultSet.close();
+        sourceStatement.close();
+        targetStatement.close();
+        if (existing != null) {
+            existing.close();
+        }
+        if (mismatchs != null) {
+            mismatchs.nextLine('\u2550');
+            mismatchs.flush();
+        }
     }
 
     /**
-     * Replaces the content of the specified table. The {@linkplain Map#keySet map keys} shall
-     * contains the set of every tables to take in account; table not listed in this set will
-     * be untouched. The associated values are the SLQ conditions to put in the {@code WHERE}
-     * clauses.
+     * Copies or replaces the content of the specified table. The {@linkplain Map#keySet map keys}
+     * shall contains the set of every tables to take in account; table not listed in this set will
+     * be untouched. The associated values are the SLQ conditions to put in the {@code WHERE} clauses.
      * <p>
      * This method process {@code table} as well as dependencies found in {@code tables}.
      * Processed dependencies are removed from the {@code tables} map.
      *
-     * @param table  The table to process.
-     * @param tables The (<var>table</var>, <var>condition</var>) mapping. This map will be modified.
+     * @param table   The table to process.
+     * @param tables  The (<var>table</var>, <var>condition</var>) mapping. This map will be modified.
+     * @param replace if {@code true}, delete the content of the old table before to insert the new records.
+     *
      * @throws SQLException if an error occured while reading or writting in the database.
+     * @throws IOException if an error occured while writting reports on this operation.
      */
-    private void replace(final String table, final Map<String,String> tables) throws SQLException {
+    private void copy(final String table, final Map<String,String> tables, final boolean replace)
+            throws SQLException, IOException
+    {
         String condition = tables.remove(table);
         if (condition != null) {
             condition = condition.trim();
@@ -179,7 +401,9 @@ public class Synchronizer {
                 condition = null;
             }
         }
-        delete(table, condition);
+        if (replace) {
+            delete(table, condition);
+        }
         /*
          * Before to insert any new records, check if this table has some foreigner keys
          * toward other table. If such tables are found, they will be processed them before
@@ -199,23 +423,25 @@ public class Synchronizer {
             }
             dependency = dependencies.getString("PKTABLE_NAME");
             if (tables.containsKey(dependency)) {
-                replace(dependency, tables);
+                copy(dependency, tables, replace);
             }
         }
         dependencies.close();
-        insert(table, condition);
+        insert(table, condition, !replace);
     }
 
     /**
-     * Replaces the content of the specified tables. The {@linkplain Map#keySet map keys} shall
-     * contains the set of every tables to take in account; table not listed in this set will
-     * be untouched. The associated values are the SLQ conditions to put in the {@code WHERE}
-     * clauses.
+     * Copies or replaces the content of the specified tables. The {@linkplain Map#keySet map keys}
+     * shall contains the set of every tables to take in account; table not listed in this set will
+     * be untouched. The associated values are the SLQ conditions to put in the {@code WHERE} clauses.
      *
      * @param tables The (<var>table</var>, <var>condition</var>) mapping. This map will be modified.
      * @throws SQLException if an error occured while reading or writting in the database.
+     * @throws IOException if an error occured while writting reports on this operation.
      */
-    private void replace(final Map<String,String> tables) throws SQLException {
+    private void copy(final Map<String,String> tables, final boolean replace)
+            throws SQLException, IOException
+    {
         final String catalog = target.catalog;
         final String schema  = target.schema;
         metadata = target.getConnection().getMetaData();
@@ -235,13 +461,13 @@ search: while (!tables.isEmpty()) {
                 }
                 dependents.close();
                 // We have found a table which have no dependencies (a leaf).
-                replace(table, tables);
+                copy(table, tables, replace);
                 continue search;
             }
             // We have been unable to find any leaf. Take a chance: process the first table.
             // An exception is likely to be throw, but we will have tried.
             for (final String table : tables.keySet()) {
-                replace(table, tables);
+                copy(table, tables, replace);
                 continue search;
             }
         }
@@ -251,6 +477,7 @@ search: while (!tables.isEmpty()) {
      * Closes the database connections.
      */
     private void close() throws SQLException, IOException {
+        metadata = null;
         target.close();
         source.close();
     }
@@ -290,20 +517,21 @@ search: while (!tables.isEmpty()) {
         }
         final Arguments arguments = new Arguments(args);
         final String config = arguments.getRequiredString("-config");
+        final boolean replace = arguments.getFlag("-replace");
         args = arguments.getRemainingArguments(0);
         final Properties properties = new Properties();
         final InputStream in = new FileInputStream(config);
         properties.load(in);
         in.close();
 
-        final Synchronizer synchronizer = new Synchronizer(properties);
+        final Synchronizer synchronizer = new Synchronizer(properties, arguments.out);
         final Connection source = synchronizer.source.getConnection();
         final Connection target = synchronizer.target.getConnection();
         source.setReadOnly(true);
         target.setAutoCommit(false);
         boolean success = false;
         try {
-            synchronizer.replace(asMap(properties));
+            synchronizer.copy(asMap(properties), replace);
             success = true;
         } finally {
             if (success) {
