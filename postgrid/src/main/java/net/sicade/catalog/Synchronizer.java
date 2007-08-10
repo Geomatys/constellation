@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import net.sicade.resources.XArray;
+import org.geotools.util.Logging;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
@@ -65,6 +66,13 @@ public class Synchronizer {
      * Where to print reports.
      */
     private final Writer out;
+
+    /**
+     * If {@code true}, no changes will be applied to the database. The {@code DELETE} and
+     * {@code INSERT} statements will not be executed. This is useful for testing purpose,
+     * or for getting the reports or log record without performing the action.
+     */
+    private boolean pretend;
 
     /**
      * Creates a synchronizer reading the configuration from the specified files.
@@ -117,7 +125,7 @@ public class Synchronizer {
             final String column = results.getString("COLUMN_NAME");
             final int index = results.getShort("KEY_SEQ");
             if (index > columns.length) {
-                columns = XArray.resize(columns, index + 1);
+                columns = XArray.resize(columns, index);
             }
             columns[index - 1] = column;
         }
@@ -161,7 +169,7 @@ public class Synchronizer {
     /**
      * Deletes the content of the specified table in the target database.
      *
-     * @param  table The name of the table in which to replace the records.
+     * @param  table The name of the table in which to delete the records.
      * @param  condition A SQL condition (to be put after a {@code WHERE} clause) for
      *         the records to be deleted, or {@code null} for deleting the whole table.
      *
@@ -179,7 +187,7 @@ public class Synchronizer {
         }
         final String sql = buffer.toString();
         final Statement targetStatement = target.getConnection().createStatement();
-        final int count = targetStatement.executeUpdate(sql);
+        final int count = pretend ? 0 : targetStatement.executeUpdate(sql);
         log(LoggingLevel.DELETE, "delete", sql + '\n' + count + " lignes supprimées.");
         targetStatement.close();
     }
@@ -231,10 +239,12 @@ public class Synchronizer {
          * may be a view.
          */
         final PreparedStatement existing;
-        final String[] primaryKeys      = getPrimaryKeys(table);
-        final int[]    primaryKeyIndex  = new int   [primaryKeys.length];
-        final String[] primaryKeyValues = new String[primaryKeys.length];
-        if (primaryKeys.length != 0) {
+        final int[]    primaryKeyIndex;
+        final String[] primaryKeyValues;
+        final String[] primaryKeys = (checkExisting) ? getPrimaryKeys(table) : null;
+        if (primaryKeys!=null && primaryKeys.length != 0) {
+            primaryKeyIndex  = new int   [primaryKeys.length];
+            primaryKeyValues = new String[primaryKeys.length];
             buffer.setLength(0);
             buffer.append("SELECT * FROM \"");
             if (target.schema != null) {
@@ -252,7 +262,9 @@ public class Synchronizer {
             sql = buffer.toString();
             existing = target.getConnection().prepareStatement(sql);
         } else {
-            existing = null;
+            existing         = null;
+            primaryKeyIndex  = null;
+            primaryKeyValues = null;
         }
         /*
          * Creates the target prepared statement for the INSERT queries. The parameters will need
@@ -314,8 +326,8 @@ public class Synchronizer {
                                 out.write(lineSeparator);
                                 out.write(table);
                                 out.write(lineSeparator);
-                                mismatchs.nextLine('\u2550');
                                 mismatchs = new TableWriter(out, " \u2502 ");
+                                mismatchs.nextLine('\u2500');
                                 for (int j=0; j<primaryKeys.length; j++) {
                                     mismatchs.write(primaryKeys[j]);
                                     mismatchs.nextColumn();
@@ -325,7 +337,8 @@ public class Synchronizer {
                                 mismatchs.write("Valeur à copier");
                                 mismatchs.nextColumn();
                                 mismatchs.write("Valeur existante");
-                                mismatchs.nextLine('\u2550');
+                                mismatchs.nextLine();
+                                mismatchs.nextLine('\u2500');
                             } else {
                                 mismatchs.nextLine();
                             }
@@ -338,6 +351,7 @@ public class Synchronizer {
                             mismatchs.write(source);
                             mismatchs.nextColumn();
                             mismatchs.write(target);
+                            mismatchs.nextLine();
                         }
                     }
                     count++;
@@ -352,9 +366,9 @@ public class Synchronizer {
              * record in the target table.
              */
             for (int i=1; i<=columns.length; i++) {
-                targetStatement.setString(i, sourceResultSet.getString(i));
+                targetStatement.setObject(i, sourceResultSet.getObject(i));
             }
-            final int count = targetStatement.executeUpdate();
+            final int count = pretend ? 1 : targetStatement.executeUpdate();
             if (count == 1) {
                 log(LoggingLevel.INSERT, "insert", target.isStatementFormatted ? targetStatement.toString() : sql);
             } else {
@@ -371,7 +385,7 @@ public class Synchronizer {
             existing.close();
         }
         if (mismatchs != null) {
-            mismatchs.nextLine('\u2550');
+            mismatchs.nextLine('\u2500');
             mismatchs.flush();
         }
     }
@@ -386,12 +400,13 @@ public class Synchronizer {
      *
      * @param table   The table to process.
      * @param tables  The (<var>table</var>, <var>condition</var>) mapping. This map will be modified.
-     * @param replace if {@code true}, delete the content of the old table before to insert the new records.
+     * @param deleteBeforeInsert If {@code true}, delete the content of the old table before to insert
+     *        the new records.
      *
      * @throws SQLException if an error occured while reading or writting in the database.
      * @throws IOException if an error occured while writting reports on this operation.
      */
-    private void copy(final String table, final Map<String,String> tables, final boolean replace)
+    private void copy(final String table, final Map<String,String> tables, final boolean deleteBeforeInsert)
             throws SQLException, IOException
     {
         String condition = tables.remove(table);
@@ -401,13 +416,13 @@ public class Synchronizer {
                 condition = null;
             }
         }
-        if (replace) {
+        if (deleteBeforeInsert) {
             delete(table, condition);
         }
         /*
          * Before to insert any new records, check if this table has some foreigner keys
-         * toward other table. If such tables are found, they will be processed them before
-         * we add any record to the current table.
+         * toward other table.  If such tables are found, we will process them before to
+         * add any record to the current table.
          */
         final String catalog = target.catalog;
         final String schema  = target.schema;
@@ -423,11 +438,11 @@ public class Synchronizer {
             }
             dependency = dependencies.getString("PKTABLE_NAME");
             if (tables.containsKey(dependency)) {
-                copy(dependency, tables, replace);
+                copy(dependency, tables, deleteBeforeInsert);
             }
         }
         dependencies.close();
-        insert(table, condition, !replace);
+        insert(table, condition, !deleteBeforeInsert);
     }
 
     /**
@@ -439,14 +454,14 @@ public class Synchronizer {
      * @throws SQLException if an error occured while reading or writting in the database.
      * @throws IOException if an error occured while writting reports on this operation.
      */
-    private void copy(final Map<String,String> tables, final boolean replace)
+    private void copy(final Map<String,String> tables, final boolean deleteBeforeInsert)
             throws SQLException, IOException
     {
         final String catalog = target.catalog;
         final String schema  = target.schema;
         metadata = target.getConnection().getMetaData();
 search: while (!tables.isEmpty()) {
-            for (final String table : tables.keySet()) {
+nextTable: for (final String table : tables.keySet()) {
                 // Skips all tables that have dependencies.
                 final ResultSet dependents = metadata.getExportedKeys(catalog, schema, table);
                 while (dependents.next()) {
@@ -455,19 +470,20 @@ search: while (!tables.isEmpty()) {
                     {
                         final String dependent = dependents.getString("FKTABLE_NAME");
                         if (tables.containsKey(dependent)) {
-                            continue;
+                            dependents.close();
+                            continue nextTable;
                         }
                     }
                 }
                 dependents.close();
                 // We have found a table which have no dependencies (a leaf).
-                copy(table, tables, replace);
+                copy(table, tables, deleteBeforeInsert);
                 continue search;
             }
             // We have been unable to find any leaf. Take a chance: process the first table.
             // An exception is likely to be throw, but we will have tried.
             for (final String table : tables.keySet()) {
-                copy(table, tables, replace);
+                copy(table, tables, deleteBeforeInsert);
                 continue search;
             }
         }
@@ -512,12 +528,11 @@ search: while (!tables.isEmpty()) {
      * Runs from the command line.
      */
     public static void main(String[] args) throws IOException, SQLException {
-        if (true) {
-            throw new RuntimeException("TODO: needs to be run in a debugger at least once before to enable.");
-        }
+        Logging.ALL.forceMonolineConsoleOutput(Level.CONFIG);
         final Arguments arguments = new Arguments(args);
         final String config = arguments.getRequiredString("-config");
-        final boolean replace = arguments.getFlag("-replace");
+        final boolean deleteBeforeInsert = arguments.getFlag("-delete-before-insert");
+        final boolean pretend = arguments.getFlag("-pretend");
         args = arguments.getRemainingArguments(0);
         final Properties properties = new Properties();
         final InputStream in = new FileInputStream(config);
@@ -525,13 +540,14 @@ search: while (!tables.isEmpty()) {
         in.close();
 
         final Synchronizer synchronizer = new Synchronizer(properties, arguments.out);
+        synchronizer.pretend = pretend;
         final Connection source = synchronizer.source.getConnection();
         final Connection target = synchronizer.target.getConnection();
         source.setReadOnly(true);
         target.setAutoCommit(false);
         boolean success = false;
         try {
-            synchronizer.copy(asMap(properties), replace);
+            synchronizer.copy(asMap(properties), deleteBeforeInsert);
             success = true;
         } finally {
             if (success) {
@@ -539,7 +555,7 @@ search: while (!tables.isEmpty()) {
             } else {
                 target.rollback();
             }
+            synchronizer.close();
         }
-        synchronizer.close();
     }
 }
