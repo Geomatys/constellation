@@ -21,7 +21,7 @@ import java.lang.ref.SoftReference;
 import org.geotools.resources.Utilities;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.GridCoverage;
-import net.sicade.coverage.catalog.sql.DataCoverage;
+import net.sicade.coverage.catalog.DataCoverage;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Entry;
 import net.sicade.catalog.ServerException;

@@ -42,7 +42,7 @@ import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.catalog.Database;
 import net.sicade.coverage.catalog.Layer;
-import net.sicade.coverage.catalog.sql.LayerTable;
+import net.sicade.coverage.catalog.LayerTable;
 import org.geotools.coverage.grid.GridCoverage2D;
 
 

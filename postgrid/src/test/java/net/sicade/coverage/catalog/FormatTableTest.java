@@ -12,39 +12,41 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.coverage.model;
+package net.sicade.coverage.catalog;
 
+import java.util.Set;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.DatabaseTest;
-import net.sicade.coverage.catalog.LayerTableTest;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 
 /**
- * Tests {@link DescriptorTable}.
+ * Tests {@link FormatTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DescriptorTableTest extends DatabaseTest {
+public class FormatTableTest extends DatabaseTest {
     /**
-     * The name of the descriptor to be tested.
+     * The name of the format to be tested.
      */
-    public static final String SAMPLE_NAME = "∇₃SST";
+    public static final String SAMPLE_NAME = "PNG Température [-3 .. 35,25 °C]";
 
     /**
-     * Tests the {@link DescriptorTable#getEntry} method.
+     * Tests the {@link FormatTable#getEntry} and {@link FormatTable#getEntries} methods.
      */
     @Test
     public void testSelectAndList() throws CatalogException, SQLException {
-        final DescriptorTable table = new DescriptorTable(database);
-        final Descriptor      entry = table.getEntry(SAMPLE_NAME);
+        final FormatTable table = new FormatTable(database);
+        final Format      entry = table.getEntry(SAMPLE_NAME);
         assertEquals(SAMPLE_NAME, entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
-        assertEquals(LayerTableTest.SAMPLE_NAME, entry.getLayer().getName());
-        assertEquals(OperationTableTest.SAMPLE_NAME, entry.getOperation().getName());
+
+        final Set<Format> entries = table.getEntries();
+        assertFalse(entries.isEmpty());
+        assertTrue(entries.contains(entry));
     }
 }

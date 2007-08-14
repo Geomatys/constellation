@@ -157,9 +157,9 @@
         <version>2.4-SNAPSHOT</version>
         <configuration>
           <includes>
-            net.sicade.coverage.catalog.rmi.Server,
-            net.sicade.coverage.catalog.rmi.RemoteLoader,
-            net.sicade.coverage.catalog.rmi.GridCoverageServer
+            net.sicade.coverage.catalog.Server,
+            net.sicade.coverage.catalog.RemoteLoader,
+            net.sicade.coverage.catalog.GridCoverageServer
           </includes>
         </configuration>
         <executions>

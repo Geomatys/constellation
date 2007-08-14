@@ -18,7 +18,6 @@
  */
 package net.sicade.coverage.catalog;
 
-// J2SE dependencies
 import java.util.Date;
 import java.util.Arrays;
 import java.util.Locale;
@@ -30,7 +29,6 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.sql.SQLException;
 
-// Other dependencies
 import junit.framework.TestCase;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import net.sicade.catalog.Database;

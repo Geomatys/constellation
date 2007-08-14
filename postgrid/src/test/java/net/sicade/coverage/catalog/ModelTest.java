@@ -18,7 +18,6 @@
  */
 package net.sicade.coverage.catalog;
 
-// J2SE dependencies
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -28,13 +27,12 @@ import java.text.SimpleDateFormat;
 import java.io.IOException;
 import java.sql.SQLException;
 
-// Geotools dependencies
 import org.geotools.resources.CRSUtilities;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 
-// Sicade dependencies
 import net.sicade.catalog.CRS;
+
 
 /**
  * Evalue les prédictions d'un modèle linéaire.

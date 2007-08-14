@@ -52,7 +52,6 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CannotRedoException;
-import net.sicade.catalog.CatalogException;
 
 import org.geotools.image.io.IIOListeners;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -61,6 +60,8 @@ import net.sicade.util.DateRange;
 import net.sicade.resources.XArray;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
+import net.sicade.catalog.CatalogException;
+
 
 /**
  * Modèle de tableau pour un affichage graphique d'informations sur des images. Ce modèle

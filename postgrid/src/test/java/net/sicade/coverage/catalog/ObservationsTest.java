@@ -18,9 +18,9 @@
  */
 package net.sicade.coverage.catalog;
 
-// JUnit dependencies
 import junit.framework.TestCase;
 import net.sicade.catalog.CatalogException;
+
 
 /**
  * Teste l'utilisation de la classe {@link Catalog}.

@@ -18,30 +18,25 @@
  */
 package net.sicade.coverage.catalog;
 
-// J2SE dependencies
 import java.util.Set;
 import java.util.Locale;
 import java.io.IOException;
 import java.sql.SQLException;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import net.sicade.catalog.CatalogException;
 
-// OpenGIS dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-
-// Geotools dependencies
 import org.geotools.util.Logging;
 import org.geotools.resources.Arguments;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import net.sicade.coverage.catalog.sql.LayerTable;
+
+import net.sicade.catalog.CatalogException;
+import net.sicade.coverage.catalog.LayerTable;
 import net.sicade.coverage.model.OperationTable;
-import net.sicade.coverage.catalog.sql.GridCoverageTable;
+import net.sicade.coverage.catalog.GridCoverageTable;
 
 
 /**

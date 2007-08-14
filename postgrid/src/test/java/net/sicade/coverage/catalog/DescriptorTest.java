@@ -31,7 +31,6 @@ import org.geotools.coverage.SpatioTemporalCoverage3D;
 import net.sicade.coverage.model.DescriptorTable;
 
 
-
 /**
  * Teste le fonctionnement de {@link net.sicade.observation.coverage.sql.GridCoverageTable#evaluate}.
  * Ce test peut fonctionner avec ou sans serveur RMI disponible.

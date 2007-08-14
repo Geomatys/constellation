@@ -34,9 +34,9 @@ import org.geotools.util.WeakValueHashMap;
 import net.sicade.util.DateRange;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.ConfigurationKey;
-import net.sicade.coverage.catalog.sql.LayerTable;
+import net.sicade.coverage.catalog.LayerTable;
 import net.sicade.coverage.model.DescriptorTable;
-import net.sicade.coverage.catalog.rmi.DataConnectionFactory;
+import net.sicade.coverage.catalog.DataConnectionFactory;
 
 
 /**

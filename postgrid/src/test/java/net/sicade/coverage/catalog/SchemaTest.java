@@ -12,39 +12,34 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.coverage.model;
+package net.sicade.coverage.catalog;
 
 import java.sql.SQLException;
-import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.DatabaseTest;
-import net.sicade.coverage.catalog.LayerTableTest;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 
 /**
- * Tests {@link DescriptorTable}.
+ * Tests the SQL queries used by the PostGrid database.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DescriptorTableTest extends DatabaseTest {
+public class SchemaTest extends DatabaseTest {
     /**
-     * The name of the descriptor to be tested.
+     * Creates a new instance.
      */
-    public static final String SAMPLE_NAME = "∇₃SST";
+    public SchemaTest() {
+    }
 
     /**
-     * Tests the {@link DescriptorTable#getEntry} method.
+     * Tests the SQL statements used by the {@link ThematicTable}.
      */
     @Test
-    public void testSelectAndList() throws CatalogException, SQLException {
-        final DescriptorTable table = new DescriptorTable(database);
-        final Descriptor      entry = table.getEntry(SAMPLE_NAME);
-        assertEquals(SAMPLE_NAME, entry.getName());
-        assertSame(entry, table.getEntry(SAMPLE_NAME));
-        assertEquals(LayerTableTest.SAMPLE_NAME, entry.getLayer().getName());
-        assertEquals(OperationTableTest.SAMPLE_NAME, entry.getOperation().getName());
+    public void testThematic() throws SQLException {
+        final ThematicQuery query = new ThematicQuery(database);
+        trySelectAll(query);
     }
 }

@@ -84,7 +84,7 @@ import org.geotools.math.Statistics;
 
 import net.sicade.util.DateRange;
 import net.sicade.image.operation.Equalizer;
-import net.sicade.coverage.catalog.sql.WritableGridCoverageTable;
+import net.sicade.coverage.catalog.WritableGridCoverageTable;
 
 
 /**

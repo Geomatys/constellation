@@ -12,39 +12,37 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.coverage.model;
+package net.sicade.coverage.catalog;
 
 import java.sql.SQLException;
+import org.geotools.coverage.Category;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.DatabaseTest;
-import net.sicade.coverage.catalog.LayerTableTest;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 
 /**
- * Tests {@link DescriptorTable}.
+ * Tests {@link CategoryTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DescriptorTableTest extends DatabaseTest {
+public class CategoryTableTest extends DatabaseTest {
     /**
-     * The name of the descriptor to be tested.
+     * The name of the quantitative category to be tested.
      */
-    public static final String SAMPLE_NAME = "∇₃SST";
+    public static final String SAMPLE_NAME = "Température";
 
     /**
-     * Tests the {@link DescriptorTable#getEntry} method.
+     * Tests the {@link CategoryTable#getCategories} method.
      */
     @Test
-    public void testSelectAndList() throws CatalogException, SQLException {
-        final DescriptorTable table = new DescriptorTable(database);
-        final Descriptor      entry = table.getEntry(SAMPLE_NAME);
-        assertEquals(SAMPLE_NAME, entry.getName());
-        assertSame(entry, table.getEntry(SAMPLE_NAME));
-        assertEquals(LayerTableTest.SAMPLE_NAME, entry.getLayer().getName());
-        assertEquals(OperationTableTest.SAMPLE_NAME, entry.getOperation().getName());
+    public void testSelect() throws CatalogException, SQLException {
+        final CategoryTable table   = new CategoryTable(database);
+        final Category[]    entries = table.getCategories(SampleDimensionTableTest.SAMPLE_NAME);
+        assertEquals(2, entries.length);
+        assertEquals(SAMPLE_NAME, entries[1].getName().toString());
     }
 }

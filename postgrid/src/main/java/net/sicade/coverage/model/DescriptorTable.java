@@ -25,7 +25,7 @@ import net.sicade.catalog.SingletonTable;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.NoSuchRecordException;
 import net.sicade.coverage.catalog.Layer;
-import net.sicade.coverage.catalog.sql.LayerTable;
+import net.sicade.coverage.catalog.LayerTable;
 
 
 /**

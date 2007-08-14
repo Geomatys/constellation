@@ -42,11 +42,11 @@ import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.util.Logging;
 
 import net.sicade.catalog.Database;
-import net.sicade.coverage.catalog.sql.GridCoverageTable;
-import net.sicade.coverage.catalog.sql.FormatTable;
-import net.sicade.coverage.catalog.sql.LayerTable;
-import net.sicade.coverage.catalog.sql.LayerTree;
-import net.sicade.coverage.catalog.sql.TreeDepth;
+import net.sicade.coverage.catalog.GridCoverageTable;
+import net.sicade.coverage.catalog.FormatTable;
+import net.sicade.coverage.catalog.LayerTable;
+import net.sicade.coverage.catalog.LayerTree;
+import net.sicade.coverage.catalog.TreeDepth;
 import net.sicade.resources.i18n.ResourceKeys;
 import net.sicade.resources.i18n.Resources;
 
