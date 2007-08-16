@@ -30,7 +30,7 @@ public class PostGridCoverageReaderTest extends TestCase {
      * the PostGrid DataBase.
      */
     public void testGridCoverage() throws IOException {
-        final PostGridReader obs = new PostGridReader(null, null, null);
+        final PostGridReader obs = new PostGridReader(null, null, null, "SST (Monde - Coriolis)");
         GridCoverage2D gridCoverage2D = (GridCoverage2D) obs.read(null);
         assertNotNull(gridCoverage2D);        
     }

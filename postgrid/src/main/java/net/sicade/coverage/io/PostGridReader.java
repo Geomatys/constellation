@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 import javax.imageio.IIOException;
+import net.sicade.catalog.ServerException;
 import org.geotools.util.NumberRange;
 
 import org.opengis.coverage.grid.Format;
@@ -169,13 +170,11 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      * Returns a Set of all dates available for a request.
      *
      * @return A set of dates available.
-     * @throws SQLException
-     * @throws IOException
-     * @throws CatalogException
+     * @throws CatalogException if a an error occured while reading the catalog.
      *
      * @todo Get the series specified by the user.
      */
-    public static Set<Date> getAvailableTimes() throws SQLException, IOException, CatalogException {
+    public static Set<Date> getAvailableTimes() throws CatalogException {
         return getLayer().getAvailableTimes();
     }
 
@@ -183,44 +182,39 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      * Returns a set of elevations that are commons to every dates present in the database.
      *
      * @return A set of elevations common for all dates.
-     * @throws SQLException
-     * @throws IOException
-     * @throws CatalogException
+     * @throws CatalogException if a an error occured while reading the catalog.
      *
      * @todo Get the series specified by the user.
      */
-    public static SortedSet<Number> getAvailableAltitudes() throws SQLException, IOException, CatalogException {
+    public static SortedSet<Number> getAvailableAltitudes() throws CatalogException {
         return getLayer().getAvailableElevations();
     }
 
     /**
+     * Returns the valid range of values.
      *
-     * @return The valid range for the color pal.
-     * @throws SQLException
-     * @throws IOException
-     * @throws CatalogException
-     *
-     * @todo Get the series specified by the user.
+     * @return The valid range of values.
+     * @throws CatalogException if a an error occured while reading the catalog.
      */
-    public static NumberRange getValidRange() throws SQLException, IOException, CatalogException {
-        //return getLayer().getValidRange();
-        final double MIN = -3.0;
-        final double MAX = 40.0;
-        return new NumberRange(MIN, MAX);
+    public static NumberRange getValidRange() throws CatalogException {
+        // Current implementation retains only the first band.
+        return getLayer().getSampleValueRanges()[0];
     }
 
     /**
      * Returns the layer.
      *
      * @return A set of elevations common for all dates.
-     * @throws SQLException
-     * @throws IOException
-     * @throws CatalogException
+     * @throws CatalogException if a an error occured while reading the catalog.
      */
-    private static synchronized Layer getLayer() throws IOException, SQLException, CatalogException {
-        if (layer == null) {
+    private static synchronized Layer getLayer() throws CatalogException {
+        if (layer == null) try {
             final LayerTable table = new LayerTable(new Database());
             layer = table.getEntry("SST (Monde - Coriolis)"); // TODO
+        } catch (SQLException e) {
+            throw new ServerException(e);
+        } catch (IOException e) {
+            throw new ServerException(e);
         }
         return layer;
 }

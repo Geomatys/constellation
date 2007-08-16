@@ -22,8 +22,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.sql.SQLException;
-import net.sicade.catalog.CatalogException;
+
+import org.geotools.util.NumberRange;
 import net.sicade.catalog.DatabaseTest;
+import net.sicade.catalog.CatalogException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -86,6 +88,12 @@ public class LayerTableTest extends DatabaseTest {
         final CoverageReference reference = entry.getCoverageReference(SAMPLE_TIME, null);
         assertTrue(references.contains(reference));
         assertSame("Should be cached.", availableTimes, entry.getAvailableTimes());
+
+        final NumberRange[] validRanges = entry.getSampleValueRanges();
+        assertNotNull(validRanges);
+        assertEquals(1, validRanges.length);
+        assertEquals(-2.85, validRanges[0].getMinimum(), 1E-8);
+        assertEquals(35.25, validRanges[0].getMaximum(), 1E-8);
     }
 
     /**
@@ -102,5 +110,11 @@ public class LayerTableTest extends DatabaseTest {
         final Layer entry = table.getEntry(NETCDF_NAME);
         final Set<CoverageReference> references = entry.getCoverageReferences();
         assertEquals(3, references.size());
+
+        final NumberRange[] validRanges = entry.getSampleValueRanges();
+        assertNotNull(validRanges);
+        assertEquals(1, validRanges.length);
+        assertEquals(-2.999, validRanges[0].getMinimum(), 1E-8);
+        assertEquals(40.000, validRanges[0].getMaximum(), 1E-8);
     }
 }

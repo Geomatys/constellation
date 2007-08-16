@@ -17,8 +17,11 @@ package net.sicade.coverage.catalog;
 import java.util.Set;
 import java.util.Date;
 import java.util.SortedSet;
+
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.geotools.util.NumberRange;
+
 import net.sicade.util.DateRange;
 import net.sicade.catalog.Element;
 import net.sicade.catalog.CatalogException;
@@ -82,6 +85,12 @@ public interface Layer extends Element {
      * @throws CatalogException if the set can not be obtained.
      */
     SortedSet<Number> getAvailableElevations() throws CatalogException;
+
+    /**
+     * Returns the ranges of valid sample values for each band.
+     * The ranges are always expressed in <cite>geophysics</cite> values.
+     */
+    NumberRange[] getSampleValueRanges();
 
     /**
      * Returns a time range encompassing all coverages in this layer.

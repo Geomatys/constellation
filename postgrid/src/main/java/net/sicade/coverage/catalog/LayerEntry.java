@@ -28,6 +28,7 @@ import java.rmi.RemoteException;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -39,6 +40,7 @@ import net.sicade.catalog.ServerException;
 import net.sicade.coverage.model.Model;
 import net.sicade.coverage.model.Operation;
 import net.sicade.coverage.catalog.DataConnection;
+import net.sicade.resources.XArray;
 
 
 /**
@@ -197,6 +199,36 @@ final class LayerEntry extends Entry implements Layer {
             throw new ServerException(e);
         }
         return null;        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public NumberRange[] getSampleValueRanges() {
+        NumberRange[] ranges = null;
+        for (final Series series : getSeries()) {
+            final Format format = series.getFormat();
+            if (format != null) {
+                final NumberRange[] candidates = format.getSampleValueRanges();
+                if (ranges == null) {
+                    ranges = candidates;
+                } else {
+                    final int length;
+                    if (candidates.length <= ranges.length) {
+                        length = candidates.length;
+                    } else {
+                        length = ranges.length;
+                        ranges = XArray.resize(ranges, candidates.length);
+                        System.arraycopy(candidates, length, ranges, length, candidates.length-length);
+                    }
+                    for (int i=0; i<length; i++) {
+                        ranges[i] = (NumberRange) ranges[i].intersect(candidates[i]);
+                        // TODO: remove cast when Geotools will be allowed to compile for J2SE 1.5.
+                    }
+                }
+            }
+        }
+        return ranges;
     }
 
     /**

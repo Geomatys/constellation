@@ -17,6 +17,7 @@ package net.sicade.coverage.catalog;
 import java.util.Locale;
 import net.sicade.catalog.Element;
 import org.opengis.coverage.SampleDimension;
+import org.geotools.util.NumberRange;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.gui.swing.tree.MutableTreeNode;
 
@@ -28,6 +29,12 @@ import org.geotools.gui.swing.tree.MutableTreeNode;
  * @author Martin Desruisseaux
  */
 public interface Format extends Element {
+    /**
+     * Returns the ranges of valid sample values for each band in this format.
+     * The range are always expressed in <cite>geophysics</cite> values.
+     */
+    NumberRange[] getSampleValueRanges();
+
     /**
      * Returns the list of sample dimensions that should be common to every coverage in that format.
      * The array length is equals to the expected number of bands.
