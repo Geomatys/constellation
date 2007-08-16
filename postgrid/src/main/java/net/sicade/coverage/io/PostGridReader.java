@@ -20,10 +20,12 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 import javax.imageio.IIOException;
+import org.geotools.util.NumberRange;
 
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -81,11 +83,12 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      * @param input  The input file or URL on the local system directory. May be null.
      * @param hints  An optional set of hints, or {@code null} if none.
      */
-    public PostGridReader(final Format format, final Object input, final Hints hints) {
+    public PostGridReader(final Format format, final Object input, final Hints hints, final String series) {
         if (hints != null) {
             this.hints.putAll(hints);
         }
-        if (input != null) {
+        
+        /*if (input != null) {
             this.source = input;
             if (source instanceof File) {
                 this.coverageName = ((File)source).getName();
@@ -102,7 +105,8 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
             if (dotIndex >= 0) {
                 coverageName = coverageName.substring(0, dotIndex);
             }
-        }
+        }*/
+        this.coverageName = series;
         this.format = format;
         this.crs = DefaultGeographicCRS.WGS84;
         this.originalEnvelope = new GeneralEnvelope(crs);
@@ -131,21 +135,29 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
     {
         Date time = null;
         Number elevation = null;
+        NumberRange dimRange = null;
         for (int i=0; i<params.length; i++) {
             final GeneralParameterValue param = params[i];
             if (param instanceof ParameterValue) {
                 final ParameterValue value = (ParameterValue) param;
                 final String name = value.getDescriptor().getName().getCode().trim();
                 if (name.equalsIgnoreCase("TIME")) {
-                    time = (Date) value.getValue();
+                    /* For the moment, we only take the first date in the list, in order to obtain a coverage.
+                     * In the future, it will be replaced by an animation of several rasters which follows the
+                     * period wished by the user.
+                     */
+                    time = (Date) ((List) value.getValue()).get(0);
                 }
                 if (name.equalsIgnoreCase("ELEVATION")) {
                     elevation = (Number) value.getValue();
                 }
+                if (name.equalsIgnoreCase("DIM_RANGE")) {
+                    dimRange = (NumberRange) value.getValue();
+                }
             }
         }
         try {
-            return read(time, elevation);
+            return read(time, elevation, dimRange);
         } catch (SQLException e) {
             throw new IIOException(e.toString(), e);
         } catch (CatalogException e) {
@@ -182,7 +194,28 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
     }
 
     /**
+     *
+     * @return The valid range for the color pal.
+     * @throws SQLException
+     * @throws IOException
+     * @throws CatalogException
+     *
+     * @todo Get the series specified by the user.
+     */
+    public static NumberRange getValidRange() throws SQLException, IOException, CatalogException {
+        //return getLayer().getValidRange();
+        final double MIN = -3.0;
+        final double MAX = 40.0;
+        return new NumberRange(MIN, MAX);
+    }
+
+    /**
      * Returns the layer.
+     *
+     * @return A set of elevations common for all dates.
+     * @throws SQLException
+     * @throws IOException
+     * @throws CatalogException
      */
     private static synchronized Layer getLayer() throws IOException, SQLException, CatalogException {
         if (layer == null) {
@@ -190,20 +223,19 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
             layer = table.getEntry("SST (Monde - Coriolis)"); // TODO
         }
         return layer;
-    }
+}
 
     /**
      * Returns an image for the given layer at the given date.
      */
-    private GridCoverage read(final Date time, final Number elevation) throws SQLException, IOException, CatalogException {
+    private GridCoverage read(final Date time, final Number elevation, final NumberRange dimRange) 
+                throws SQLException, IOException, CatalogException {
         final Layer layer = getLayer();
         final CoverageReference ref;
-        String name = null;
         if (time != null) {
             ref = layer.getCoverageReference(time, elevation);
-            LOGGER.info("time=" + time + ", elevation=" + elevation); // TODO: kick down logging level after debugging.
+            LOGGER.info("time=" + time + ", elevation=" + elevation + ",dim_range=" + dimRange); // TODO: kick down logging level after debugging.
         } else {
-            name = "coriolis";
             final Iterator<CoverageReference> it = layer.getCoverageReferences().iterator();
             if (it.hasNext()) {
                 ref = it.next();
@@ -216,7 +248,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
             LOGGER.warning("Choix d'une image aléatoire.");
         }
         LOGGER.info("Image sélectionnée: " + ref);  // TODO: kick down logging level after debugging.
-        return trimTo2D(name, ref.getCoverage(null));
+        return trimTo2D(coverageName, ref.getCoverage(null));
     }
 
     /**

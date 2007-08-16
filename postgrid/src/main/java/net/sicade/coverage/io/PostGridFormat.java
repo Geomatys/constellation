@@ -20,6 +20,9 @@ package net.sicade.coverage.io;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.geotools.util.NumberRange;
 
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
@@ -44,7 +47,7 @@ public class PostGridFormat extends AbstractGridFormat {
      *
      */
     private static final DefaultParameterDescriptor TIME = new DefaultParameterDescriptor(
-            "TIME", Date.class, null, null);
+            "TIME", List.class, null, null);
 
     /**
      *
@@ -53,10 +56,23 @@ public class PostGridFormat extends AbstractGridFormat {
             "ELEVATION", Integer.TYPE, null, null);
 
     /**
+     *
+     */
+    private static final DefaultParameterDescriptor DIM_RANGE = new DefaultParameterDescriptor(
+            "DIM_RANGE", NumberRange.class, null, null);
+    
+    /**
+     * The series for this coverage.
+     */
+    private final String series;
+    
+    /**
      * Creates a new instance of PostGridFormat.
      * Contains the main information about the PostGrid DataBase format.
+     * 
      */
-    public PostGridFormat() {        
+    public PostGridFormat(final String series) {
+        this.series = series;
         writeParameters = null;
         mInfo = new HashMap();
         mInfo.put("name", "PostGrid");
@@ -66,7 +82,7 @@ public class PostGridFormat extends AbstractGridFormat {
         mInfo.put("version", "1.0");
         readParameters = new ParameterGroup(
                 new DefaultParameterDescriptorGroup(mInfo,
-                new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D, TIME, ELEVATION }));
+                new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D, TIME, ELEVATION, DIM_RANGE}));
     }
 
     /**
@@ -87,7 +103,7 @@ public class PostGridFormat extends AbstractGridFormat {
      * @return A reader on the grid coverage chosen.
      */
     public GridCoverageReader getReader(final Object input, final Hints hints) {
-        return new PostGridReader(this, input, null);
+        return new PostGridReader(this, input, null, series);
     }
 
     /**

@@ -46,7 +46,7 @@ public class PostGridFormatFactorySpi implements GridFormatFactorySpi {
             throw new UnsupportedOperationException(
                     "The PostGrid plugin requires the JAI and JAI ImageI/O libraries.");
         }
-        return new PostGridFormat();
+        return new PostGridFormat("coriolis");
     }
 
     /**
