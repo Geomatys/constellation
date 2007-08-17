@@ -55,11 +55,11 @@ CREATE FUNCTION "ReplaceModelDescriptors"() RETURNS "trigger"
   DECLARE
     name varchar;
   BEGIN
-    SELECT INTO name symbol FROM observations."Descriptors" WHERE identifier=NEW.source1;
+    SELECT INTO name symbol FROM postgrid."Descriptors" WHERE identifier=NEW.source1;
     IF FOUND THEN
       NEW.source1 := name;
     END IF;
-    SELECT INTO name symbol FROM observations."Descriptors" WHERE identifier=NEW.source2;
+    SELECT INTO name symbol FROM postgrid."Descriptors" WHERE identifier=NEW.source2;
     IF FOUND THEN
       NEW.source2 := name;
     END IF;
@@ -80,14 +80,14 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE "Categories" (
-    name character varying(50) NOT NULL,
-    band character varying(20) NOT NULL,
+    name character varying NOT NULL,
+    band character varying NOT NULL,
     lower integer NOT NULL,
     upper integer NOT NULL,
     c0 double precision,
     c1 double precision,
-    "function" character varying(5),
-    colors character varying(40) DEFAULT '#000000'::character varying NOT NULL,
+    "function" character varying,
+    colors character varying DEFAULT '#000000'::character varying NOT NULL,
     CONSTRAINT "Sample_coefficients" CHECK ((((c0 IS NULL) AND (c1 IS NULL)) OR (((c0 IS NOT NULL) AND (c1 IS NOT NULL)) AND (c1 <> (0)::double precision)))),
     CONSTRAINT "Sample_range" CHECK ((lower <= upper))
 );
@@ -170,8 +170,8 @@ COMMENT ON CONSTRAINT "Sample_coefficients" ON "Categories" IS 'Les coefficients
 --
 
 CREATE TABLE "Formats" (
-    name character varying(60) NOT NULL,
-    mime character varying(30) NOT NULL,
+    name character varying NOT NULL,
+    mime character varying NOT NULL,
     "encoding" character varying(10) DEFAULT 'native'::character varying NOT NULL,
     CONSTRAINT "Format_type" CHECK (((("encoding")::text = 'geophysics'::text) OR (("encoding")::text = 'native'::text)))
 );
@@ -219,10 +219,10 @@ COMMENT ON CONSTRAINT "Format_type" ON "Formats" IS 'Enumération des valeurs ac
 --
 
 CREATE TABLE "SampleDimensions" (
-    identifier character varying(20) NOT NULL,
-    format character varying(60) NOT NULL,
+    identifier character varying NOT NULL,
+    format character varying NOT NULL,
     band smallint DEFAULT 1 NOT NULL,
-    units character varying(20) DEFAULT ''::character varying NOT NULL,
+    units character varying DEFAULT ''::character varying NOT NULL,
     CONSTRAINT "Positive_band" CHECK ((band >= 1))
 );
 
@@ -294,12 +294,12 @@ COMMENT ON VIEW "CategoriesDetails" IS 'Liste des catégories et des noms de for
 
 CREATE TABLE "Descriptors" (
     identifier smallint NOT NULL,
-    symbol character varying(12) NOT NULL,
-    layer character varying(60) NOT NULL,
-    operation character varying(50) DEFAULT 'Valeur'::character varying NOT NULL,
-    region character(6) DEFAULT '+00'::bpchar NOT NULL,
+    symbol character varying NOT NULL,
+    layer character varying NOT NULL,
+    operation character varying DEFAULT 'Valeur'::character varying NOT NULL,
+    region character varying DEFAULT '+00'::character varying NOT NULL,
     band smallint DEFAULT 1 NOT NULL,
-    distribution character varying(25) DEFAULT 'normale'::character varying NOT NULL,
+    distribution character varying DEFAULT 'normale'::character varying NOT NULL,
     CONSTRAINT "Band_check" CHECK ((band >= 1))
 );
 
@@ -374,7 +374,7 @@ COMMENT ON CONSTRAINT "Band_check" ON "Descriptors" IS 'Les numéros de bandes d
 --
 
 CREATE TABLE "Distributions" (
-    name character varying(25) NOT NULL,
+    name character varying NOT NULL,
     scale double precision DEFAULT 1 NOT NULL,
     "offset" double precision DEFAULT 0 NOT NULL,
     log boolean DEFAULT false NOT NULL
@@ -423,7 +423,7 @@ COMMENT ON COLUMN "Distributions".log IS 'Indique si les analyses statistiques d
 --
 
 CREATE TABLE "GridGeometries" (
-    identifier character varying(8) NOT NULL,
+    identifier character varying NOT NULL,
     width integer NOT NULL,
     height integer NOT NULL,
     "translateX" double precision DEFAULT 0 NOT NULL,
@@ -601,14 +601,13 @@ COMMENT ON VIEW "GeometriesCheck" IS 'Comparaison entre les enveloppes calculée
 --
 
 CREATE TABLE "GridCoverages" (
-    series character(4) NOT NULL,
-    filename character varying(30) NOT NULL,
+    series character varying NOT NULL,
+    filename character varying NOT NULL,
     "startTime" timestamp without time zone,
     "endTime" timestamp without time zone,
-    extent character varying(8) NOT NULL,
+    extent character varying NOT NULL,
     CONSTRAINT "TemporalExtent_range" CHECK (((("startTime" IS NULL) AND ("endTime" IS NULL)) OR ((("startTime" IS NOT NULL) AND ("endTime" IS NOT NULL)) AND ("startTime" < "endTime"))))
 );
-ALTER TABLE ONLY "GridCoverages" ALTER COLUMN series SET STORAGE PLAIN;
 
 
 ALTER TABLE postgrid."GridCoverages" OWNER TO geoadmin;
@@ -667,10 +666,11 @@ COMMENT ON CONSTRAINT "TemporalExtent_range" ON "GridCoverages" IS 'Les dates de
 --
 
 CREATE TABLE "Layers" (
-    name character varying(60) NOT NULL,
-    thematic character varying(50) NOT NULL,
+    name character varying NOT NULL,
+    thematic character varying NOT NULL,
+    "procedure" character varying NOT NULL,
     period double precision,
-    fallback character varying(60),
+    fallback character varying,
     description text
 );
 
@@ -724,9 +724,9 @@ COMMENT ON COLUMN "Layers".description IS 'Remarques s''appliquant à la couche.
 --
 
 CREATE TABLE "LinearModelTerms" (
-    target character varying(60) NOT NULL,
-    source1 character varying(12) NOT NULL,
-    source2 character varying(12) DEFAULT '①'::character varying NOT NULL,
+    target character varying NOT NULL,
+    source1 character varying NOT NULL,
+    source2 character varying DEFAULT '①'::character varying NOT NULL,
     coefficient double precision NOT NULL
 );
 
@@ -814,13 +814,12 @@ COMMENT ON COLUMN "OperationParameters".value IS 'Valeur du paramètre.';
 --
 
 CREATE TABLE "Operations" (
-    name character varying(50) NOT NULL,
-    prefix character(4) NOT NULL,
-    operation character varying(20),
+    name character varying NOT NULL,
+    prefix character varying NOT NULL,
+    operation character varying,
     "kernelSize" smallint DEFAULT 1,
     description text
 );
-ALTER TABLE ONLY "Operations" ALTER COLUMN prefix SET STORAGE PLAIN;
 
 
 ALTER TABLE postgrid."Operations" OWNER TO geoadmin;
@@ -868,11 +867,44 @@ COMMENT ON COLUMN "Operations".description IS 'Description de l''opération.';
 
 
 --
+-- Name: Procedures; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+--
+
+CREATE TABLE "Procedures" (
+    name character varying NOT NULL,
+    description text
+);
+
+
+ALTER TABLE postgrid."Procedures" OWNER TO geoadmin;
+
+--
+-- Name: TABLE "Procedures"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON TABLE "Procedures" IS 'Procédures utilisées pour effectuer une observation.';
+
+
+--
+-- Name: COLUMN "Procedures".name; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "Procedures".name IS 'Nom unique identifiant cette procédure.';
+
+
+--
+-- Name: COLUMN "Procedures".description; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "Procedures".description IS 'Description de la procédure.';
+
+
+--
 -- Name: RegionOfInterests; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
 --
 
 CREATE TABLE "RegionOfInterests" (
-    name character(6) NOT NULL,
+    name character varying NOT NULL,
     dx double precision NOT NULL,
     dy double precision NOT NULL,
     dz double precision NOT NULL,
@@ -929,16 +961,14 @@ COMMENT ON COLUMN "RegionOfInterests".dt IS 'Décalage temporel, en nombre de jo
 --
 
 CREATE TABLE "Series" (
-    identifier character(4) NOT NULL,
-    layer character varying(60) NOT NULL,
-    pathname character varying(75) NOT NULL,
-    extension character varying(16) NOT NULL,
-    format character varying(60) NOT NULL,
+    identifier character varying NOT NULL,
+    layer character varying NOT NULL,
+    pathname character varying NOT NULL,
+    extension character varying NOT NULL,
+    format character varying NOT NULL,
     visible boolean DEFAULT true NOT NULL,
-    quicklook character(4)
+    quicklook character varying
 );
-ALTER TABLE ONLY "Series" ALTER COLUMN identifier SET STORAGE PLAIN;
-ALTER TABLE ONLY "Series" ALTER COLUMN quicklook SET STORAGE PLAIN;
 
 
 ALTER TABLE postgrid."Series" OWNER TO geoadmin;
@@ -1004,7 +1034,7 @@ COMMENT ON COLUMN "Series".quicklook IS 'Série dont les images sont des aperçu
 --
 
 CREATE TABLE "Thematics" (
-    name character varying(40) NOT NULL,
+    name character varying NOT NULL,
     description text NOT NULL
 );
 
@@ -1164,6 +1194,14 @@ ALTER TABLE ONLY "Operations"
 
 ALTER TABLE ONLY "Operations"
     ADD CONSTRAINT "Prefix_uniqueness" UNIQUE (prefix);
+
+
+--
+-- Name: Procedures_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+--
+
+ALTER TABLE ONLY "Procedures"
+    ADD CONSTRAINT "Procedures_pkey" PRIMARY KEY (name);
 
 
 --
@@ -1582,18 +1620,11 @@ COMMENT ON CONSTRAINT "Operation_reference" ON "Descriptors" IS 'Chaque descript
 
 
 --
--- Name: Phenomenon_reference; Type: FK CONSTRAINT; Schema: postgrid; Owner: geoadmin
+-- Name: Procedure_reference; Type: FK CONSTRAINT; Schema: postgrid; Owner: geoadmin
 --
 
 ALTER TABLE ONLY "Layers"
-    ADD CONSTRAINT "Phenomenon_reference" FOREIGN KEY (thematic) REFERENCES "Thematics"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
---
--- Name: CONSTRAINT "Phenomenon_reference" ON "Layers"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON CONSTRAINT "Phenomenon_reference" ON "Layers" IS 'Chaque couche représente les données observées pour un phénomène (ou thème).';
+    ADD CONSTRAINT "Procedure_reference" FOREIGN KEY ("procedure") REFERENCES "Procedures"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -1645,6 +1676,21 @@ COMMENT ON CONSTRAINT "SampleDimension_reference" ON "Categories" IS 'Chaque cat
 -- Name: Series_reference; Type: FK CONSTRAINT; Schema: postgrid; Owner: geoadmin
 --
 
+ALTER TABLE ONLY "GridCoverages"
+    ADD CONSTRAINT "Series_reference" FOREIGN KEY (series) REFERENCES "Series"(identifier) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: CONSTRAINT "Series_reference" ON "GridCoverages"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON CONSTRAINT "Series_reference" ON "GridCoverages" IS 'Chaque image appartient à une série.';
+
+
+--
+-- Name: Series_reference; Type: FK CONSTRAINT; Schema: postgrid; Owner: geoadmin
+--
+
 ALTER TABLE ONLY "Series"
     ADD CONSTRAINT "Series_reference" FOREIGN KEY (layer) REFERENCES "Layers"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
 
@@ -1657,18 +1703,18 @@ COMMENT ON CONSTRAINT "Series_reference" ON "Series" IS 'Chaque série appartien
 
 
 --
--- Name: Series_reference; Type: FK CONSTRAINT; Schema: postgrid; Owner: geoadmin
+-- Name: Thematic_reference; Type: FK CONSTRAINT; Schema: postgrid; Owner: geoadmin
 --
 
-ALTER TABLE ONLY "GridCoverages"
-    ADD CONSTRAINT "Series_reference" FOREIGN KEY (series) REFERENCES "Series"(identifier) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE ONLY "Layers"
+    ADD CONSTRAINT "Thematic_reference" FOREIGN KEY (thematic) REFERENCES "Thematics"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
--- Name: CONSTRAINT "Series_reference" ON "GridCoverages"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+-- Name: CONSTRAINT "Thematic_reference" ON "Layers"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
 --
 
-COMMENT ON CONSTRAINT "Series_reference" ON "GridCoverages" IS 'Chaque image appartient à une série.';
+COMMENT ON CONSTRAINT "Thematic_reference" ON "Layers" IS 'Chaque couche représente les données observées pour une thématique.';
 
 
 --
