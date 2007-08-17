@@ -174,7 +174,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      *
      * @todo Get the series specified by the user.
      */
-    public static Set<Date> getAvailableTimes() throws CatalogException {
+    public static Set<Date> getAvailableTimes(final String series) throws CatalogException {
         return getLayer().getAvailableTimes();
     }
 
@@ -186,7 +186,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      *
      * @todo Get the series specified by the user.
      */
-    public static SortedSet<Number> getAvailableAltitudes() throws CatalogException {
+    public static SortedSet<Number> getAvailableAltitudes(final String series) throws CatalogException {
         return getLayer().getAvailableElevations();
     }
 
@@ -196,7 +196,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      * @return The valid range of values.
      * @throws CatalogException if a an error occured while reading the catalog.
      */
-    public static NumberRange getValidRange() throws CatalogException {
+    public static NumberRange getValidRange(final String series) throws CatalogException {
         // Current implementation retains only the first band.
         return getLayer().getSampleValueRanges()[0];
     }
