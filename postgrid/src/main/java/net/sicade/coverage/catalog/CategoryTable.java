@@ -33,8 +33,8 @@ import org.geotools.util.NumberRange;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.image.io.PaletteFactory;
 
-import net.sicade.image.Utilities;
 import net.sicade.catalog.Element;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
@@ -189,6 +189,6 @@ public class CategoryTable extends Table {
              */
         }
         final URL url = new URL(colors);
-        return Utilities.getPaletteFactory(null).getColors(url.getPath());
+        return PaletteFactory.getDefault(null).getColors(url.getPath());
     }
 }

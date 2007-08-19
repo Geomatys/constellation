@@ -26,6 +26,9 @@ import java.util.SortedSet;
 import java.util.logging.Logger;
 import javax.imageio.IIOException;
 import net.sicade.catalog.ServerException;
+import org.geotools.coverage.processing.ColorMap;
+import org.geotools.coverage.processing.Operations;
+import org.geotools.util.MeasurementRange;
 import org.geotools.util.NumberRange;
 
 import org.opengis.coverage.grid.Format;
@@ -174,8 +177,8 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      *
      * @todo Get the series specified by the user.
      */
-    public static Set<Date> getAvailableTimes(final String series) throws CatalogException {
-        return getLayer().getAvailableTimes();
+    public static Set<Date> getAvailableTimes(final String layer) throws CatalogException {
+        return getLayer(layer).getAvailableTimes();
     }
 
     /**
@@ -186,8 +189,8 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      *
      * @todo Get the series specified by the user.
      */
-    public static SortedSet<Number> getAvailableAltitudes(final String series) throws CatalogException {
-        return getLayer().getAvailableElevations();
+    public static SortedSet<Number> getAvailableAltitudes(final String layer) throws CatalogException {
+        return getLayer(layer).getAvailableElevations();
     }
 
     /**
@@ -196,9 +199,9 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      * @return The valid range of values.
      * @throws CatalogException if a an error occured while reading the catalog.
      */
-    public static NumberRange getValidRange(final String series) throws CatalogException {
+    public static NumberRange getValidRange(final String layer) throws CatalogException {
         // Current implementation retains only the first band.
-        return getLayer().getSampleValueRanges()[0];
+        return getLayer(layer).getSampleValueRanges()[0];
     }
 
     /**
@@ -207,7 +210,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      * @return A set of elevations common for all dates.
      * @throws CatalogException if a an error occured while reading the catalog.
      */
-    private static synchronized Layer getLayer() throws CatalogException {
+    private static synchronized Layer getLayer(final String layerName) throws CatalogException {
         if (layer == null) try {
             final LayerTable table = new LayerTable(new Database());
             layer = table.getEntry("SST (Monde - Coriolis)"); // TODO
@@ -217,18 +220,19 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
             throw new ServerException(e);
         }
         return layer;
-}
+    }
 
     /**
      * Returns an image for the given layer at the given date.
      */
     private GridCoverage read(final Date time, final Number elevation, final NumberRange dimRange) 
                 throws SQLException, IOException, CatalogException {
-        final Layer layer = getLayer();
+        final Layer layer = getLayer(null);
         final CoverageReference ref;
         if (time != null) {
             ref = layer.getCoverageReference(time, elevation);
-            LOGGER.info("time=" + time + ", elevation=" + elevation + ",dim_range=" + dimRange); // TODO: kick down logging level after debugging.
+            LOGGER.info("time=" + time + ", elevation=" + elevation + ",dim_range=" + dimRange);
+            // TODO: kick down logging level after debugging.
         } else {
             final Iterator<CoverageReference> it = layer.getCoverageReferences().iterator();
             if (it.hasNext()) {
@@ -242,7 +246,13 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
             LOGGER.warning("Choix d'une image aléatoire.");
         }
         LOGGER.info("Image sélectionnée: " + ref);  // TODO: kick down logging level after debugging.
-        return trimTo2D(coverageName, ref.getCoverage(null));
+        GridCoverage coverage = trimTo2D(coverageName, ref.getCoverage(null));
+        if (dimRange != null) {
+            final ColorMap colorMap = new ColorMap();
+            colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange(dimRange, null));
+            coverage = Operations.DEFAULT.recolor(coverage, new ColorMap[] {colorMap});
+        }
+        return coverage;
     }
 
     /**

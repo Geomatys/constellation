@@ -14,13 +14,8 @@
  */
 package net.sicade.image;
 
-import java.util.Locale;
-import java.io.File;
-import java.nio.charset.Charset;
 import java.awt.image.RenderedImage;
 import javax.swing.JFrame;
-
-import org.geotools.image.io.PaletteFactory;
 
 
 /**
@@ -31,31 +26,9 @@ import org.geotools.image.io.PaletteFactory;
  */
 public final class Utilities {
     /**
-     * The palette factory.
-     */
-    private static PaletteFactory factory;
-
-    /**
      * Do not allows instantiation of this class.
      */
     private Utilities() {
-    }
-
-    /**
-     * Gets the default palette factory.
-     */
-    public static synchronized PaletteFactory getPaletteFactory(final Locale locale) {
-        if (factory == null) {
-            factory = new PaletteFactory(
-            /* parent factory */ PaletteFactory.getDefault(locale),
-            /* class loader   */ Utilities.class,
-            /* root directory */ new File("colors"),
-            /* extension      */ ".pal",
-            /* character set  */ Charset.forName("ISO-8859-1"),
-            /* locale         */ Locale.US,
-            /* warning locale */ locale);
-        }
-        return factory;
     }
 
     /**

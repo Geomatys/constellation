@@ -322,7 +322,7 @@ final class FormatEntry extends Entry implements Format {
                              final ImageReadParam param,
                              final IIOListeners   listeners,
                              final Dimension      expected,
-                             final CoverageReference  source) throws IOException
+                             final CoverageReference source) throws IOException
     {
         assert Thread.holdsLock(this);
         RenderedImage    image       = null;
