@@ -28,6 +28,7 @@ import javax.imageio.IIOException;
 import net.sicade.catalog.ServerException;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.Operations;
+import org.geotools.referencing.CRS;
 import org.geotools.util.MeasurementRange;
 import org.geotools.util.NumberRange;
 
@@ -50,6 +51,8 @@ import net.sicade.catalog.Database;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.LayerTable;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 
 /**
@@ -112,10 +115,21 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
         }*/
         this.coverageName = series;
         this.format = format;
-        this.crs = DefaultGeographicCRS.WGS84;
+        try {
+            this.crs = CRS.decode("EPSG:3395");
+        } catch (NoSuchAuthorityCodeException ex) {
+            this.crs = DefaultGeographicCRS.WGS84;
+        } catch (FactoryException ex) {
+            this.crs = DefaultGeographicCRS.WGS84;
+        }
         this.originalEnvelope = new GeneralEnvelope(crs);
-        this.originalEnvelope.setRange(0, -180, +180);
-        this.originalEnvelope.setRange(1, -90, +90);
+        if (crs == DefaultGeographicCRS.WGS84) {
+            this.originalEnvelope.setRange(0, -180, +180);
+            this.originalEnvelope.setRange(1, -77.0104827880859, 77.0104827880859);
+        } else {
+            this.originalEnvelope.setRange(0, -20037510, 20037510);
+            this.originalEnvelope.setRange(1, -13817586, 13817586);
+        }
         this.originalGridRange = new GeneralGridRange(originalEnvelope); 
     }
 
@@ -231,7 +245,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
         final CoverageReference ref;
         if (time != null) {
             ref = layer.getCoverageReference(time, elevation);
-            LOGGER.info("time=" + time + ", elevation=" + elevation + ",dim_range=" + dimRange);
+            LOGGER.info("time=" + time + ", elevation=" + elevation + ", dim_range=" + dimRange);
             // TODO: kick down logging level after debugging.
         } else {
             final Iterator<CoverageReference> it = layer.getCoverageReferences().iterator();
