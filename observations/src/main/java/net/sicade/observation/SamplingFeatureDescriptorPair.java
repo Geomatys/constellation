@@ -32,11 +32,11 @@ import org.geotools.coverage.SpatioTemporalCoverage3D;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
+final class SamplingFeatureDescriptorPair implements Comparable<SamplingFeatureDescriptorPair> {
     /**
      * La station.
      */
-    final SamplingFeature station;
+    final SamplingFeature samplingFeature;
 
     /**
      * Le descripteur du paysage océanique.
@@ -51,8 +51,8 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
     /**
      * Construit une nouvelle paire pour la station et le descripteur spécifié.
      */
-    public StationDescriptorPair(final SamplingFeature station, final Descriptor descriptor) {
-        this.station    = station;
+    public SamplingFeatureDescriptorPair(final SamplingFeature samplingFeature, final Descriptor descriptor) {
+        this.samplingFeature    = samplingFeature;
         this.descriptor = descriptor;
     }
 
@@ -60,7 +60,7 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
      * Retourne la date à laquelle le descripteur sera évalué.
      */
     private long getTime() throws CatalogException {
-        final Date time = station.getTime();
+        final Date time = samplingFeature.getTime();
         if (time == null) {
             /*
              * Place les stations dont la date est indéterminée à la fin. C'est cohérent
@@ -74,7 +74,7 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
     /**
      * Compare cette paire avec la paire spécifiée.
      */
-    public int compareTo(final StationDescriptorPair that) {
+    public int compareTo(final SamplingFeatureDescriptorPair that) {
         final long t1, t2;
         try {
             t1 = this.getTime();
@@ -93,6 +93,6 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
      */
     @Override
     public String toString() {
-        return '(' + station.getName() + ", " + descriptor.getName() + ')';
+        return '(' + samplingFeature.getName() + ", " + descriptor.getName() + ')';
     }
 }

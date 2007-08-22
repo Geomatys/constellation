@@ -41,12 +41,12 @@ final class MeasurementInserts extends Thread {
     /**
      * Liste des stations à insérer.
      */
-    private final BlockingQueue<StationDescriptorPair> values = new LinkedBlockingQueue<StationDescriptorPair>();
+    private final BlockingQueue<SamplingFeatureDescriptorPair> values = new LinkedBlockingQueue<SamplingFeatureDescriptorPair>();
     
     /**
      * Valeur sentinelle indiquant que les insertions sont terminées.
      */
-    private final StationDescriptorPair finish = new StationDescriptorPair(null, null);
+    private final SamplingFeatureDescriptorPair finish = new SamplingFeatureDescriptorPair(null, null);
 
     /**
      * Si non-null, alors l'erreur qui vient de se produire.
@@ -63,7 +63,7 @@ final class MeasurementInserts extends Thread {
     /**
      * Ajoute la valeur spécifiée à la liste des valeurs à insérer.
      */
-    public void add(final StationDescriptorPair value) throws CatalogException {
+    public void add(final SamplingFeatureDescriptorPair value) throws CatalogException {
         assert isAlive();
         final CatalogException e = exception;
         if (e != null) {
@@ -97,7 +97,7 @@ final class MeasurementInserts extends Thread {
     @Override
     public void run() {
         do {
-            final StationDescriptorPair pair;
+            final SamplingFeatureDescriptorPair pair;
             try {
                 pair = values.take();
             } catch (InterruptedException cause) {
@@ -108,7 +108,7 @@ final class MeasurementInserts extends Thread {
                 break;
             }
             //measures.setObservable(pair.descriptor);  // TODO
-            measures.setStation   (pair.station);
+            measures.setStation   (pair.samplingFeature);
             try {
                 measures.setValue(pair.value, Float.NaN);
             } catch (CatalogException cause) {
