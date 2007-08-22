@@ -33,7 +33,7 @@ public interface Category extends Observable {
     /**
      * Retourne l'espèce observée.
      */
-    Species getPhenomenon();
+    Species getPropertyType();
     
     /**
      * Retourne le stade de développement de l'espèce observé.
@@ -43,5 +43,5 @@ public interface Category extends Observable {
     /**
      * Retourne la méthode par laquelle les individus sont capturés.
      */
-    FisheryType getProcedure();
+    FisheryType getProcess();
 }

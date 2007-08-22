@@ -150,10 +150,10 @@ public class MergedMeasurementTable extends Table {
         }
         int count = 0;
         for (final Observable observable : observables.keySet()) {
-            if (phenomenon != null && !phenomenon.equals(observable.getPhenomenon())) {
+            if (phenomenon != null && !phenomenon.equals(observable.getPropertyType())) {
                 continue;
             }
-            if (procedure != null && !procedure.equals(observable.getProcedure())) {
+            if (procedure != null && !procedure.equals(observable.getProcess())) {
                 continue;
             }
             if (offset != null && !(observable instanceof Descriptor &&

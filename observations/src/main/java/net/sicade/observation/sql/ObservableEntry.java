@@ -88,14 +88,14 @@ public class ObservableEntry extends Entry implements Observable {
     /**
      * {@inheritDoc}
      */
-    public PropertyType getPhenomenon() {
+    public PropertyType getPropertyType() {
         return phenomenon;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Process getProcedure() {
+    public Process getProcess() {
         return procedure;
     }
 

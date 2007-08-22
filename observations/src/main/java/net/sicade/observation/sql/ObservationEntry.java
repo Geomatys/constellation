@@ -69,7 +69,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public SamplingFeature getStation() {
+    public SamplingFeature getSamplingFeature() {
         return station;
     }
 
