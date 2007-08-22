@@ -39,7 +39,7 @@ import net.sicade.catalog.Table;
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.sicade.observation.Procedure;
+import net.sicade.observation.Process;
 import net.sicade.observation.PropertyType;
 import net.sicade.observation.Observable;
 import net.sicade.coverage.model.Descriptor;
