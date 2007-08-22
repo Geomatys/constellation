@@ -24,7 +24,7 @@ import net.sicade.catalog.Entry;
  * @version $Id$
  * @author Antoine Hnawia
  */
-public class ProcedureEntry extends Entry implements Process {
+public class ProcessEntry extends Entry implements Process {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -35,7 +35,7 @@ public class ProcedureEntry extends Entry implements Process {
      *
      * @param name Le nom de la procédure.
      */
-    protected ProcedureEntry(final String name) {
+    protected ProcessEntry(final String name) {
         super(name);
     }
 
@@ -45,7 +45,7 @@ public class ProcedureEntry extends Entry implements Process {
      * @param name    Le nom de la procédure.
      * @param remarks Remarques s'appliquant à cette procédure, ou {@code null}.
      */
-    protected ProcedureEntry(final String name, final String remarks) {
+    protected ProcessEntry(final String name, final String remarks) {
         super(name, remarks);
     }
 }

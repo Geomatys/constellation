@@ -19,7 +19,7 @@
 package net.sicade.observation.fishery.sql;
 
 // Sicade dependencies
-import net.sicade.observation.sql.ProcedureEntry;
+import net.sicade.observation.sql.ProcessEntry;
 import net.sicade.observation.fishery.FisheryType;
 
 
@@ -29,7 +29,7 @@ import net.sicade.observation.fishery.FisheryType;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class FisheryTypeEntry extends ProcedureEntry implements FisheryType {
+public class FisheryTypeEntry extends ProcessEntry implements FisheryType {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */

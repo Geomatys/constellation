@@ -31,7 +31,7 @@ import net.sicade.catalog.SingletonTable;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class ProcedureTable extends SingletonTable<Process> {
+public class ProcessTable extends SingletonTable<Process> {
     /**
      * Requête SQL pour obtenir une procédure.
      */
@@ -48,7 +48,7 @@ public class ProcedureTable extends SingletonTable<Process> {
      * 
      * @param  database Connexion vers la base de données.
      */
-    public ProcedureTable(final Database database) {
+    public ProcessTable(final Database database) {
         super(new Query(database)); // TODO
     }
 
@@ -56,7 +56,7 @@ public class ProcedureTable extends SingletonTable<Process> {
      * Construit une procédure pour l'enregistrement courant.
      */
     protected Process createEntry(final ResultSet results) throws SQLException {
-        return new ProcedureEntry(results.getString(NAME),
+        return new ProcessEntry(results.getString(NAME),
                                   results.getString(DESCRIPTION));
     }
 }

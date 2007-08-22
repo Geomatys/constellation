@@ -68,7 +68,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * des verrous devrait toujours être {@code ObservationTable} d'abord, et {@code StationTable}
      * ensuite.
      */
-    private StationTable stations;
+    private SamplingFeatureTable stations;
 
     /**
      * Connexion vers la table des {@linkplain Observable observables}.
@@ -80,7 +80,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * La station pour laquelle on veut des observations, ou {@code null} pour récupérer les
      * observations de toutes les stations.
      */
-    private SamplingFeature station;
+    private SamplingFeature samplingFeature;
 
     /**
      * L'observable pour lequel on veut des observations, ou {@code null} pour récupérer les
@@ -113,7 +113,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * @param  stations La table des stations à utiliser.
      * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
      */
-    protected ObservationTable(final StationTable   stations,
+    protected ObservationTable(final SamplingFeatureTable   stations,
                                final ConfigurationKey select)
     {
         this(stations.getDatabase(), select);
@@ -127,7 +127,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * @param  stations Table des stations à utiliser.
      * @throws IllegalStateException si cette instance utilise déjà une autre table des stations.
      */
-    protected synchronized void setStationTable(final StationTable stations)
+    protected synchronized void setStationTable(final SamplingFeatureTable stations)
             throws IllegalStateException
     {
         if (this.stations != stations) {
@@ -142,9 +142,9 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     /**
      * Retourne la table des stations, en la créant si nécessaire.
      */
-    private synchronized StationTable getStationTable() {
+    private synchronized SamplingFeatureTable getStationTable() {
         if (stations == null) {
-            setStationTable(getDatabase().getTable(StationTable.class));
+            setStationTable(getDatabase().getTable(SamplingFeatureTable.class));
         }
         return stations;
     }
@@ -165,7 +165,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * Retourne la station pour laquelle on recherche des observations.
      */
     public final SamplingFeature getStation() {
-        return station;
+        return samplingFeature;
     }
 
     /**
@@ -173,8 +173,8 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * La valeur {@code null} recherche toutes les stations.
      */
     public synchronized void setStation(final SamplingFeature station) {
-        if (!Utilities.equals(station, this.station)) {
-            this.station = station;
+        if (!Utilities.equals(station, this.samplingFeature)) {
+            this.samplingFeature = station;
             fireStateChanged("Station");
         }
     }
@@ -205,8 +205,8 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        if (station != null) {
-            statement.setInt(STATION, station.getNumericIdentifier());
+        if (samplingFeature != null) {
+            statement.setInt(STATION, samplingFeature.getNumericIdentifier());
         } else {
             throw new UnsupportedOperationException("La recherche sur toutes les stations n'est pas encore impléméntée.");
         }
@@ -277,7 +277,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * Construit une observation pour l'enregistrement courant.
      */
     private EntryType createEntry(final ResultSet result) throws CatalogException, SQLException {
-        SamplingFeature station = this.station;
+        SamplingFeature station = this.samplingFeature;
         if (station == null) {
             assert !Thread.holdsLock(getStationTable()); // Voir le commentaire de 'stations'.
             station = getStationTable().getEntry(result.getString(STATION));

@@ -25,7 +25,7 @@ import net.sicade.catalog.Entry;
  * @version $Id$
  * @author Antoine Hnawia
  */
-public class PhenomenonEntry extends Entry implements PropertyType {
+public class PropertyTypeEntry extends Entry implements PropertyType {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -36,7 +36,7 @@ public class PhenomenonEntry extends Entry implements PropertyType {
      *
      * @param name Le nom du phénomène.
      */
-    protected PhenomenonEntry(final String name) {
+    protected PropertyTypeEntry(final String name) {
         super(name);
     }
 
@@ -46,7 +46,7 @@ public class PhenomenonEntry extends Entry implements PropertyType {
      * @param name    Le nom du phénomène.
      * @param remarks Remarques s'appliquant à ce phénomène, ou {@code null}.
      */
-    protected PhenomenonEntry(final String name, final String remarks) {
+    protected PropertyTypeEntry(final String name, final String remarks) {
         super(name, remarks);
     }
 }

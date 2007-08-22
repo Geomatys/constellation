@@ -89,7 +89,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
      * la table des stations doit se synchroniser sur {@code stations} <em>avant</em> de se
      * synchroniser sur {@code this}, afin d'éviter des situations de <cite>thread lock</cite>.
      */
-    private StationTable stations;
+    private SamplingFeatureTable stations;
 
     /**
      * Le fournisseur des stations recherchées, ou {@code null} si on accepte tous les fournisseurs.
@@ -111,7 +111,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
      * @param  stations Table des stations à utiliser.
      * @throws IllegalStateException si cette instance utilise déjà une autre table des stations.
      */
-    protected synchronized void setStationTable(final StationTable stations)
+    protected synchronized void setStationTable(final SamplingFeatureTable stations)
             throws IllegalStateException
     {
         if (this.stations != stations) {
@@ -126,10 +126,10 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
     /**
      * Retourne la table des stations à utiliser pour la création des objets {@link StationEntry}.
      */
-    final StationTable getStationTable() {
+    final SamplingFeatureTable getStationTable() {
         assert Thread.holdsLock(this);
         if (stations == null) {
-            setStationTable(getDatabase().getTable(StationTable.class));
+            setStationTable(getDatabase().getTable(SamplingFeatureTable.class));
         }
         return stations;
     }

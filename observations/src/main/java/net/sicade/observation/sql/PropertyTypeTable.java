@@ -31,7 +31,7 @@ import net.sicade.catalog.SingletonTable;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class PhenomenonTable extends SingletonTable<PropertyType> {
+public class PropertyTypeTable extends SingletonTable<PropertyType> {
     /**
      * Requête SQL pour obtenir un phénomène.
      */
@@ -48,7 +48,7 @@ public class PhenomenonTable extends SingletonTable<PropertyType> {
      * 
      * @param  database Connexion vers la base de données.
      */
-    public PhenomenonTable(final Database database) {
+    public PropertyTypeTable(final Database database) {
         super(new Query(database)); // TODO
     }
 
@@ -56,6 +56,6 @@ public class PhenomenonTable extends SingletonTable<PropertyType> {
      * Construit un phénomène pour l'enregistrement courant.
      */
     protected PropertyType createEntry(final ResultSet results) throws SQLException {
-        return new PhenomenonEntry(results.getString(NAME), results.getString(REMARKS));
+        return new PropertyTypeEntry(results.getString(NAME), results.getString(REMARKS));
     }
 }

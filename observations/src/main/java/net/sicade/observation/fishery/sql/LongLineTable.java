@@ -34,7 +34,7 @@ import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Platform;
-import net.sicade.observation.sql.StationTable;
+import net.sicade.observation.sql.SamplingFeatureTable;
 
 
 /**
@@ -44,7 +44,7 @@ import net.sicade.observation.sql.StationTable;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class LongLineTable extends StationTable {
+public class LongLineTable extends SamplingFeatureTable {
     /**
      * Requête SQL pour obtenir une station à partir de son identifiant.
      */

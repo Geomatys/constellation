@@ -98,7 +98,7 @@ public class MeasurementTable extends ObservationTable<Measurement> {
      * @param  insert   Clé de la requête SQL à utiliser pour ajouter des valeurs,
      *                  ou {@code null} si les insertions ne sont pas supportées.
      */
-    protected MeasurementTable(final StationTable   stations,
+    protected MeasurementTable(final SamplingFeatureTable   stations,
                                final ConfigurationKey select,
                                final ConfigurationKey insert)
     {

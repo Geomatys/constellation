@@ -57,13 +57,13 @@ public class ObservableTable extends SingletonTable<Observable> {
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private PhenomenonTable phenomenons;
+    private PropertyTypeTable phenomenons;
 
     /**
      * Connexion vers la table des {@linkplain Procedure procedures}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private ProcedureTable procedures;
+    private ProcessTable procedures;
 
     /**
      * Connexion vers la table des {@linkplain Distribution distributions}.
@@ -91,11 +91,11 @@ public class ObservableTable extends SingletonTable<Observable> {
         final String distributionID = result.getString(DISTRIBUTION);
         final String remarks        = result.getString(REMARKS);
         if (phenomenons == null) {
-            phenomenons = getDatabase().getTable(PhenomenonTable.class);
+            phenomenons = getDatabase().getTable(PropertyTypeTable.class);
         }
         final PropertyType phenomenon = phenomenons.getEntry(phenomenonID);
         if (procedures == null) {
-            procedures = getDatabase().getTable(ProcedureTable.class);
+            procedures = getDatabase().getTable(ProcessTable.class);
         }
         final Process procedure = procedures.getEntry(procedureID);
         if (distributions == null) {

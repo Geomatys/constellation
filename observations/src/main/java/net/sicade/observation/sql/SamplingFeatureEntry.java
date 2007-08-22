@@ -45,7 +45,7 @@ import net.sicade.catalog.CatalogException;
  *       une connexion à la base de données. Une version future devrait rétablir la connexion au
  *       moment de la <cite>deserialization</cite>.
  */
-public class StationEntry extends LocatedEntry implements SamplingFeature {
+public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeature {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -94,7 +94,7 @@ public class StationEntry extends LocatedEntry implements SamplingFeature {
      * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
      * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
      */
-    protected StationEntry(final StationTable table,
+    protected SamplingFeatureEntry(final SamplingFeatureTable table,
                            final int          identifier,
                            final String       name,
                            final Point2D      coordinate,
@@ -187,7 +187,7 @@ public class StationEntry extends LocatedEntry implements SamplingFeature {
             return true;
         }
         if (super.equals(object)) {
-            final StationEntry that = (StationEntry) object;
+            final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
             return                 (this.identifier == that.identifier) &&
                    Utilities.equals(this.platform,     that.platform)   &&
                    Utilities.equals(this.quality,      that.quality)    &&

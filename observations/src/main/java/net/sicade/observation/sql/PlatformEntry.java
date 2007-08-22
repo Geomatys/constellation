@@ -49,7 +49,7 @@ public class PlatformEntry extends LocatedEntry implements Platform {
      * Connexion vers la table des stations.
      * Sera mis à {@code null} lorsqu'elle ne sera plus nécessaire.
      */
-    private transient StationTable stations;
+    private transient SamplingFeatureTable stations;
 
     /**
      * Construit une entrée pour l'identifiant de plateforme spécifié.

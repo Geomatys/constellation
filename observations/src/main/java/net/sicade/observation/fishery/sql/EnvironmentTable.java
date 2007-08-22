@@ -21,7 +21,7 @@ package net.sicade.observation.fishery.sql;
 // Sicade dependencies
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
-import net.sicade.observation.sql.StationTable;
+import net.sicade.observation.sql.SamplingFeatureTable;
 import net.sicade.observation.sql.MeasurementTable;
 
 
@@ -62,7 +62,7 @@ public class EnvironmentTable extends MeasurementTable {
      * 
      * @param  stations La table des stations à utiliser.
      */
-    public EnvironmentTable(final StationTable stations) {
+    public EnvironmentTable(final SamplingFeatureTable stations) {
         super(stations, SELECT, INSERT);
     }
 
@@ -77,11 +77,11 @@ public class EnvironmentTable extends MeasurementTable {
      *         liste de ces fournisseurs.
      */
     public EnvironmentTable(final Database                  database,
-                            final Class<? extends StationTable> type,
+                            final Class<? extends SamplingFeatureTable> type,
                             final String...                providers)
     {
         this(database);
-        final StationTable stations = database.getTable(type);
+        final SamplingFeatureTable stations = database.getTable(type);
         for (String provider : providers) {
             stations.acceptableProvider(provider);
         }

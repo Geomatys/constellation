@@ -55,7 +55,7 @@ import net.sicade.catalog.CatalogException;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class StationTable extends SingletonTable<SamplingFeature> {
+public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
     /**
      * Requête SQL pour obtenir une station à partir de son identifiant.
      *
@@ -127,7 +127,7 @@ public class StationTable extends SingletonTable<SamplingFeature> {
     /** 
      * Construit une nouvelle connexion vers la table des stations.
      */
-    public StationTable(final Database database) {
+    public SamplingFeatureTable(final Database database) {
         super(new Query(database)); // TODO
     }
 
@@ -363,7 +363,7 @@ public class StationTable extends SingletonTable<SamplingFeature> {
                                   final ResultSet    result)
             throws SQLException
     {
-        return new StationEntry(this, identifier, name, coordinate, timeRange, platform, quality, provider);
+        return new SamplingFeatureEntry(this, identifier, name, coordinate, timeRange, platform, quality, provider);
     }
 
     /**
