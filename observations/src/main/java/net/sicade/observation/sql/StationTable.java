@@ -40,7 +40,7 @@ import org.geotools.metadata.iso.citation.CitationImpl;
 
 // Sicade dependencies
 import net.sicade.util.DateRange;
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Platform;
 import net.sicade.observation.Observation;
 import net.sicade.catalog.ConfigurationKey;
@@ -55,7 +55,7 @@ import net.sicade.catalog.CatalogException;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class StationTable extends SingletonTable<Station> {
+public class StationTable extends SingletonTable<SamplingFeature> {
     /**
      * Requête SQL pour obtenir une station à partir de son identifiant.
      *
@@ -298,7 +298,7 @@ public class StationTable extends SingletonTable<Station> {
      * <code>{@linkplain #createEntry(int,String,Platform,DataQuality,Citation,ResultSet)
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
-    protected Station createEntry(final ResultSet result) throws CatalogException, SQLException {
+    protected SamplingFeature createEntry(final ResultSet result) throws CatalogException, SQLException {
         final String name    = result.getString(NAME);
         final int identifier = result.getInt(IDENTIFIER);
         final Platform owner;
@@ -353,7 +353,7 @@ public class StationTable extends SingletonTable<Station> {
      *
      * @throws SQLException si un accès à la base de données était nécessaire et a échoué.
      */
-    protected Station createEntry(final int          identifier,
+    protected SamplingFeature createEntry(final int          identifier,
                                   final String       name,
                                   final Point2D      coordinate,
                                   final DateRange    timeRange,
@@ -374,7 +374,7 @@ public class StationTable extends SingletonTable<Station> {
      * cette méthode va l'accepter comme approche conservative.
      */
     @Override
-    protected boolean accept(final Station entry) throws CatalogException, SQLException {
+    protected boolean accept(final SamplingFeature entry) throws CatalogException, SQLException {
         if (providers != null) {
             final Citation provider = entry.getProvider();
             if (provider != null) {

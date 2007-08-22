@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
 import org.geotools.resources.Utilities;
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
 import net.sicade.catalog.CatalogException;
@@ -80,7 +80,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * La station pour laquelle on veut des observations, ou {@code null} pour récupérer les
      * observations de toutes les stations.
      */
-    private Station station;
+    private SamplingFeature station;
 
     /**
      * L'observable pour lequel on veut des observations, ou {@code null} pour récupérer les
@@ -152,7 +152,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     /**
      * Retourne la liste des stations qui pourrait avoir des données dans cette table.
      */
-    public Set<Station> getStations() throws CatalogException, SQLException {
+    public Set<SamplingFeature> getStations() throws CatalogException, SQLException {
         /*
          * Ne PAS synchroniser cette méthode. StationTable est déjà synchronisée, et on veut
          * éviter de garder un vérou à la fois sur ObservationTable et StationTable à cause
@@ -164,7 +164,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     /**
      * Retourne la station pour laquelle on recherche des observations.
      */
-    public final Station getStation() {
+    public final SamplingFeature getStation() {
         return station;
     }
 
@@ -172,7 +172,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * Définit la station pour laquelle on recherche des observations.
      * La valeur {@code null} recherche toutes les stations.
      */
-    public synchronized void setStation(final Station station) {
+    public synchronized void setStation(final SamplingFeature station) {
         if (!Utilities.equals(station, this.station)) {
             this.station = station;
             fireStateChanged("Station");
@@ -277,7 +277,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * Construit une observation pour l'enregistrement courant.
      */
     private EntryType createEntry(final ResultSet result) throws CatalogException, SQLException {
-        Station station = this.station;
+        SamplingFeature station = this.station;
         if (station == null) {
             assert !Thread.holdsLock(getStationTable()); // Voir le commentaire de 'stations'.
             station = getStationTable().getEntry(result.getString(STATION));
@@ -300,7 +300,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * 
      * @throws SQLException si une erreur est survenu lors de l'accès à la base de données.
      */
-    protected abstract EntryType createEntry(final Station    station,
+    protected abstract EntryType createEntry(final SamplingFeature    station,
                                              final Observable observable,
                                              final ResultSet  result) throws SQLException;
 }

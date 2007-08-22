@@ -17,7 +17,7 @@ package net.sicade.observation.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.sicade.observation.Phenomenon;
+import net.sicade.observation.PropertyType;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Query;
@@ -31,7 +31,7 @@ import net.sicade.catalog.SingletonTable;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class PhenomenonTable extends SingletonTable<Phenomenon> {
+public class PhenomenonTable extends SingletonTable<PropertyType> {
     /**
      * Requête SQL pour obtenir un phénomène.
      */
@@ -55,7 +55,7 @@ public class PhenomenonTable extends SingletonTable<Phenomenon> {
     /**
      * Construit un phénomène pour l'enregistrement courant.
      */
-    protected Phenomenon createEntry(final ResultSet results) throws SQLException {
+    protected PropertyType createEntry(final ResultSet results) throws SQLException {
         return new PhenomenonEntry(results.getString(NAME), results.getString(REMARKS));
     }
 }

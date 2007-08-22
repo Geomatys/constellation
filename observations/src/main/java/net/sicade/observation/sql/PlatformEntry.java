@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.Collections;
 import java.sql.SQLException;
 
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Platform;
 import net.sicade.catalog.ServerException;
 import net.sicade.catalog.CatalogException;
@@ -43,7 +43,7 @@ public class PlatformEntry extends LocatedEntry implements Platform {
     /**
      * L'ensemble des stations. Ne sera construit que la première fois où il sera nécessaire.
      */
-    private Set<? extends Station> elements;
+    private Set<? extends SamplingFeature> elements;
 
     /**
      * Connexion vers la table des stations.
@@ -67,10 +67,10 @@ public class PlatformEntry extends LocatedEntry implements Platform {
     /**
      * {@inheritDoc}
      */
-    public synchronized Set<? extends Station> getStations() throws CatalogException {
+    public synchronized Set<? extends SamplingFeature> getStations() throws CatalogException {
         if (elements == null) try {
             if (stations != null) {
-                final Set<Station> set;
+                final Set<SamplingFeature> set;
                 synchronized (stations) {
                     assert equals(stations.getPlatform()) : this;
                     stations.setPlatform(this);

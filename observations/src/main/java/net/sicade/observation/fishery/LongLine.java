@@ -19,7 +19,7 @@
 package net.sicade.observation.fishery;
 
 // Sicade dependencies
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 
 
 /**
@@ -29,7 +29,7 @@ import net.sicade.observation.Station;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public interface LongLine extends Station {
+public interface LongLine extends SamplingFeature {
     /**
      * Retourne le nombre d'hameçons.
      */

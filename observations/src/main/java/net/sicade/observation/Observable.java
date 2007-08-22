@@ -55,7 +55,7 @@ public interface Observable extends Element {
      * représente une quantité de poisson pêchée, alors la procédure retournée sera typiquement un
      * {@linkplain net.sicade.observation.fishery.FisheryType type de pêche}.
      */
-    Procedure getProcedure();
+    Process getProcedure();
 
     /**
      * Retourne la distribution statistique approximative des valeurs attendues. Cette distribution

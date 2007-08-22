@@ -19,7 +19,7 @@
 package net.sicade.observation.fishery;
 
 // Sicade dependencies
-import net.sicade.observation.Procedure;
+import net.sicade.observation.Process;
 
 
 /**
@@ -28,5 +28,5 @@ import net.sicade.observation.Procedure;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public interface FisheryType extends Procedure {
+public interface FisheryType extends Process {
 }

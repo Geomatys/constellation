@@ -15,7 +15,7 @@
 package net.sicade.observation.sql;
 
 import net.sicade.catalog.Entry;
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
 import org.geotools.resources.Utilities;
@@ -37,7 +37,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * La station à laquelle a été pris cet échantillon.
      */
-    private final Station station;
+    private final SamplingFeature station;
 
     /**
      * Ce que l'on observe
@@ -50,7 +50,7 @@ public class ObservationEntry extends Entry implements Observation {
      * @param station     La station d'observation (par exemple une position de pêche).
      * @param observable  Ce que l'on observe (température, quantité pêchée, <cite>etc.</cite>).
      */
-    protected ObservationEntry(final Station    station, 
+    protected ObservationEntry(final SamplingFeature    station, 
                                final Observable observable) 
     {
         super(null);
@@ -69,7 +69,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public Station getStation() {
+    public SamplingFeature getStation() {
         return station;
     }
 

@@ -15,7 +15,7 @@
 package net.sicade.observation.sql;
 
 // Sicade dependencies
-import net.sicade.observation.Phenomenon;
+import net.sicade.observation.PropertyType;
 import net.sicade.catalog.Entry;
 
 
@@ -25,7 +25,7 @@ import net.sicade.catalog.Entry;
  * @version $Id$
  * @author Antoine Hnawia
  */
-public class PhenomenonEntry extends Entry implements Phenomenon {
+public class PhenomenonEntry extends Entry implements PropertyType {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */

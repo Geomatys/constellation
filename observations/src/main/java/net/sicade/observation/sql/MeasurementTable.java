@@ -27,7 +27,7 @@ import org.geotools.resources.Utilities;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.CatalogException;
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Measurement;
 
@@ -110,13 +110,13 @@ public class MeasurementTable extends ObservationTable<Measurement> {
      * Construit une mesure pour l'enregistrement couran
      */
     @Override
-    protected Measurement createEntry(final Station    station,
-                                      final Observable observable,
-                                      final ResultSet  result) throws SQLException
+    protected Measurement createEntry(final SamplingFeature samplingFeature,
+                                      final Observable      observable,
+                                      final ResultSet       result) throws SQLException
     {
         float value = result.getFloat(VALUE); if (result.wasNull()) value=Float.NaN;
         float error = result.getFloat(ERROR); if (result.wasNull()) error=Float.NaN;
-        return new MeasurementEntry(station, observable, value, error);
+        return new MeasurementEntry(samplingFeature, observable, value, error);
     }
 
     /**
@@ -132,7 +132,7 @@ public class MeasurementTable extends ObservationTable<Measurement> {
             throw new CatalogException("La table \"" + Utilities.getShortClassName(this) +
                                        "\" n'est pas modifiable.");
         }
-        final Station station = getStation();
+        final SamplingFeature station = getStation();
         if (station == null) {
             throw new CatalogException("La station doit être définie.");
         }

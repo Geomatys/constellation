@@ -28,7 +28,7 @@ import net.sicade.catalog.QueryType;
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Platform;
 import net.sicade.catalog.ConfigurationKey;
 

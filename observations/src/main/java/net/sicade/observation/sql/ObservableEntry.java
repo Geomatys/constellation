@@ -16,8 +16,8 @@ package net.sicade.observation.sql;
 
 import net.sicade.catalog.Entry;
 import net.sicade.observation.Observable;
-import net.sicade.observation.Phenomenon;
-import net.sicade.observation.Procedure;
+import net.sicade.observation.PropertyType;
+import net.sicade.observation.Process;
 import net.sicade.coverage.model.Distribution;
 import org.geotools.resources.Utilities;
 
@@ -43,12 +43,12 @@ public class ObservableEntry extends Entry implements Observable {
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
      */
-    private final Phenomenon phenomenon;
+    private final PropertyType phenomenon;
 
     /**
      * Référence vers la {@linkplain Procedure procédure} associée à cet observable.
      */
-    private final Procedure procedure;
+    private final Process procedure;
 
     /**
      * Référence vers la {@linkplain Distribution distribution} associée à cet observable.
@@ -66,8 +66,8 @@ public class ObservableEntry extends Entry implements Observable {
      */
     protected ObservableEntry(final int          identifier,
                               final String       symbol,
-                              final Phenomenon   phenomenon,
-                              final Procedure    procedure,
+                              final PropertyType   phenomenon,
+                              final Process    procedure,
                               final Distribution distribution,
                               final String       remarks)
     {
@@ -88,14 +88,14 @@ public class ObservableEntry extends Entry implements Observable {
     /**
      * {@inheritDoc}
      */
-    public Phenomenon getPhenomenon() {
+    public PropertyType getPhenomenon() {
         return phenomenon;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Procedure getProcedure() {
+    public Process getProcedure() {
         return procedure;
     }
 

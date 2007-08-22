@@ -26,7 +26,7 @@ import org.opengis.metadata.quality.DataQuality;
 
 // Sicade dependencies
 import net.sicade.util.DateRange;
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Platform;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
@@ -45,7 +45,7 @@ import net.sicade.catalog.CatalogException;
  *       une connexion à la base de données. Une version future devrait rétablir la connexion au
  *       moment de la <cite>deserialization</cite>.
  */
-public class StationEntry extends LocatedEntry implements Station {
+public class StationEntry extends LocatedEntry implements SamplingFeature {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */

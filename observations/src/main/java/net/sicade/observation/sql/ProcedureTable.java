@@ -17,7 +17,7 @@ package net.sicade.observation.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.sicade.observation.Procedure;
+import net.sicade.observation.Process;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Query;
@@ -31,7 +31,7 @@ import net.sicade.catalog.SingletonTable;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class ProcedureTable extends SingletonTable<Procedure> {
+public class ProcedureTable extends SingletonTable<Process> {
     /**
      * Requête SQL pour obtenir une procédure.
      */
@@ -55,7 +55,7 @@ public class ProcedureTable extends SingletonTable<Procedure> {
     /**
      * Construit une procédure pour l'enregistrement courant.
      */
-    protected Procedure createEntry(final ResultSet results) throws SQLException {
+    protected Process createEntry(final ResultSet results) throws SQLException {
         return new ProcedureEntry(results.getString(NAME),
                                   results.getString(DESCRIPTION));
     }

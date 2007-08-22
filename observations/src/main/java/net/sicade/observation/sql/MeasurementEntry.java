@@ -15,7 +15,7 @@
 package net.sicade.observation.sql;
 
 import javax.units.Unit;
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Measurement;
 
@@ -53,7 +53,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      * @param error       Estimation de l'erreur sur la valeur mesurée, ou {@link Float#NaN NaN}
      *                    si l'erreur est inconnue ou ne s'applique pas.
      */
-    protected MeasurementEntry(final Station    station, 
+    protected MeasurementEntry(final SamplingFeature    station, 
                                final Observable observable, 
                                final float      value, 
                                final float      error) 

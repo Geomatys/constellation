@@ -60,7 +60,7 @@ public class MeasurementTableFiller implements Runnable {
     /**
      * Ensemble des stations concernées.
      */
-    private final Set<Station> stations = new LinkedHashSet<Station>();
+    private final Set<SamplingFeature> stations = new LinkedHashSet<SamplingFeature>();
 
     /**
      * Ensemble des descripteurs à utiliser pour remplir la table des mesures.
@@ -90,7 +90,7 @@ public class MeasurementTableFiller implements Runnable {
      * paysage océanique. L'ensemble retourné est modifiable; il est possible d'ajouter ou de
      * retirer des stations à prendre en compte en appelant {@link Set#add} ou {@link Set#remove}.
      */
-    public Set<Station> stations() {
+    public Set<SamplingFeature> stations() {
         return stations;
     }
 
@@ -154,7 +154,7 @@ public class MeasurementTableFiller implements Runnable {
      * @throws CatalogException si un problème est survenu lors des accès au catalogue.
      */
     public synchronized void execute() throws CatalogException {
-        final Set<Station>    stations    = stations();
+        final Set<SamplingFeature>    stations    = stations();
         final Set<Descriptor> descriptors = descriptors();
         if (descriptors.isEmpty()) {
             Descriptor.LOGGER.warning("L'ensemble des descripteurs est vide.");
@@ -213,7 +213,7 @@ public class MeasurementTableFiller implements Runnable {
                     throw new AssertionError(descriptor);
                 }
                 //measures.setObservable(descriptor);  // TODO
-                for (final Station station : stations) {
+                for (final SamplingFeature station : stations) {
                     measures.setStation(station);
                     try {
                         if (measures.exists()) {
@@ -236,7 +236,7 @@ public class MeasurementTableFiller implements Runnable {
             float[] values = null;
             for (index=0; index<pairs.length; index++) {
                 final StationDescriptorPair    pair       = pairs[index];
-                final Station                  station    = pair.station;
+                final SamplingFeature          station    = pair.station;
                 final Descriptor               descriptor = pair.descriptor;
                 final SpatioTemporalCoverage3D coverage   = coverages.get(descriptor);
                 final Point2D                  coord      = station.getCoordinate();

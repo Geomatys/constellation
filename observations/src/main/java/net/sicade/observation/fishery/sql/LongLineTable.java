@@ -32,7 +32,7 @@ import net.sicade.util.DateRange;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
-import net.sicade.observation.Station;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Platform;
 import net.sicade.observation.sql.StationTable;
 
@@ -67,7 +67,7 @@ public class LongLineTable extends StationTable {
      * @todo A mettre à jour lorsque l'on aura implémenté une classe {@code LongLineEntry}.
      */
     @Override
-    protected Station createEntry(final int          identifier,
+    protected SamplingFeature createEntry(final int          identifier,
                                   final String       name,
                                   final Point2D      coordinate,
                                   final DateRange    timeRange,

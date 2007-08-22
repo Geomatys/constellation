@@ -36,7 +36,7 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
     /**
      * La station.
      */
-    final Station station;
+    final SamplingFeature station;
 
     /**
      * Le descripteur du paysage océanique.
@@ -51,7 +51,7 @@ final class StationDescriptorPair implements Comparable<StationDescriptorPair> {
     /**
      * Construit une nouvelle paire pour la station et le descripteur spécifié.
      */
-    public StationDescriptorPair(final Station station, final Descriptor descriptor) {
+    public StationDescriptorPair(final SamplingFeature station, final Descriptor descriptor) {
         this.station    = station;
         this.descriptor = descriptor;
     }

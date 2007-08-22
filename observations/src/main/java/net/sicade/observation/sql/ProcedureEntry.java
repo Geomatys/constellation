@@ -14,7 +14,7 @@
  */
 package net.sicade.observation.sql;
 
-import net.sicade.observation.Procedure;
+import net.sicade.observation.Process;
 import net.sicade.catalog.Entry;
 
 
@@ -24,7 +24,7 @@ import net.sicade.catalog.Entry;
  * @version $Id$
  * @author Antoine Hnawia
  */
-public class ProcedureEntry extends Entry implements Procedure {
+public class ProcedureEntry extends Entry implements Process {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
