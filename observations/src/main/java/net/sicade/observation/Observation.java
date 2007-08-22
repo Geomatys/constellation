@@ -33,7 +33,7 @@ public interface Observation extends Element {
     /**
      * Retourne la station à laquelle a été effectuée cette observation.
      */
-    SamplingFeature getStation();
+    SamplingFeature getSamplingFeature();
 
     /**
      * Retourne le phénomène observé.

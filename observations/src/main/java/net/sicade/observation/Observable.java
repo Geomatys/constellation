@@ -46,7 +46,7 @@ public interface Observable extends Element {
      * alors le phénomène retourné sera typiquement une
      * {@linkplain net.sicade.observation.fishery.Species espèce}.
      */
-    PropertyType getPhenomenon();
+    PropertyType getPropertyType();
 
     /**
      * Retourne la procedure utilisée. Si cet observable représente un paramètre physique tel que
@@ -55,7 +55,7 @@ public interface Observable extends Element {
      * représente une quantité de poisson pêchée, alors la procédure retournée sera typiquement un
      * {@linkplain net.sicade.observation.fishery.FisheryType type de pêche}.
      */
-    Process getProcedure();
+    Process getProcess();
 
     /**
      * Retourne la distribution statistique approximative des valeurs attendues. Cette distribution
