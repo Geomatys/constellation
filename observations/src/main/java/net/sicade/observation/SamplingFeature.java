@@ -15,7 +15,6 @@
 package net.sicade.observation;
 
 import java.util.Collection;
-import net.sicade.catalog.CatalogException;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.DataQuality;
 
@@ -32,7 +31,7 @@ import org.opengis.metadata.quality.DataQuality;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public interface Station extends LocatedElement {
+public interface SamplingFeature extends LocatedElement{
     /**
      * Retourne un numéro unique identifiant cette station. Ce numéro est complémentaire (et dans
      * une certaine mesure redondant) avec {@linkplain #getName le nom} de la station. Il existe

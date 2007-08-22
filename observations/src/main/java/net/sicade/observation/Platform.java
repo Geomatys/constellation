@@ -36,5 +36,5 @@ public interface Platform extends LocatedElement {
      *
      * @throws CatalogException si l'interrogation du catalogue a échoué.
      */
-    Set<? extends Station> getStations() throws CatalogException;
+    Set<? extends SamplingFeature> getStations() throws CatalogException;
 }

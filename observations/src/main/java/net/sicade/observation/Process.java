@@ -14,19 +14,20 @@
  */
 package net.sicade.observation;
 
-import net.sicade.catalog.Element;
-
 
 /**
- * Représentation d'un phénomène observé. Cette interface est étendue dans des paquets
- * spécialisés.
+ * Représentation d'une procédure utilisée pour observer un {@linkplain Phenomenon phénomène}.
+ * Cette interface est étendue dans des paquets spécialisés. Par exemple pour les images, les
+ * procédures utilisées sont des {@linkplain net.sicade.observation.coverage.Operation opérations}.
+ * Pour les données de pêches, les procédures utilisées sont des
+ * {@linkplain net.sicade.observation.fishery.FisheryType types de pêche}.
  * <p>
- * La combinaison d'un phénomène avec une {@linkplain Procedure procedure} donne un
+ * La combinaison d'un {@linkplain Phenomenon phénomène} avec une procedure donne un
  * {@linkplain Observable observable}.
- * 
+ *
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public interface Phenomenon extends Element {    
+public interface Process extends Element {
 }
