@@ -139,7 +139,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
     public Format getFormat() {
         return format;
     }
-
+    
     /**
      * Read the coverage and generate the Grid Coverage associated.
      *
@@ -171,6 +171,32 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
                 }
                 if (name.equalsIgnoreCase("DIM_RANGE")) {
                     dimRange = (NumberRange) value.getValue();
+                }
+                
+                /*
+                 * Because WCS does not use the StreamingRenderer class to handle parameters (contrary to WMS),
+                 * "Z" and "DATE" parameters are created for WCS, in order to get these values given by user in a
+                 * WCS GetCoverage request. 
+                 * TODO: modify WCS Geoserver to handle parameters correctly.
+                 */
+                if (name.equalsIgnoreCase("Z")) {
+                    if (value.getValue() instanceof Double) {
+                        elevation = (Number) value.getValue();
+                    } else {
+                        if (value.getValue() instanceof String) {
+                            elevation = Double.parseDouble((String) value.getValue());
+                        } else {
+                            throw new IllegalArgumentException("The Z parameter value is not a string or a double.");
+                        }
+                    }
+                }
+                if (name.equalsIgnoreCase("DATE")) {
+                    if (value.getValue() instanceof Date) {
+                        time = (Date) value.getValue();
+                    } else {
+                        throw new IllegalArgumentException("The DATE parameter value for wcs should be a date, but " 
+                                + time.getClass() + " found.");
+                    }
                 }
             }
         }
