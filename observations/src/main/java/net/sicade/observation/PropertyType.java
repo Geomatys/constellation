@@ -14,6 +14,8 @@
  */
 package net.sicade.observation;
 
+import net.sicade.catalog.Element;
+
 
 /**
  * Représentation d'un phénomène observé. Cette interface est étendue dans des paquets
