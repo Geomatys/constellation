@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.sql.SQLException;
 
 import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Platform;
+import net.sicade.observation.SamplingFeatureCollection;
 import net.sicade.catalog.ServerException;
 import net.sicade.catalog.CatalogException;
 
@@ -34,7 +34,7 @@ import net.sicade.catalog.CatalogException;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class PlatformEntry extends LocatedEntry implements Platform {
+public class PlatformEntry extends LocatedEntry implements SamplingFeatureCollection {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -67,7 +67,7 @@ public class PlatformEntry extends LocatedEntry implements Platform {
     /**
      * {@inheritDoc}
      */
-    public synchronized Set<? extends SamplingFeature> getStations() throws CatalogException {
+    public synchronized Set<? extends SamplingFeature> getMember() throws CatalogException {
         if (elements == null) try {
             if (stations != null) {
                 final Set<SamplingFeature> set;
@@ -93,7 +93,7 @@ public class PlatformEntry extends LocatedEntry implements Platform {
     @Override
     protected synchronized void writeObject(final ObjectOutputStream out) throws IOException {
         if (elements == null) try {
-            elements = getStations();
+            elements = getMember();
         } catch (CatalogException exception) {
             final InvalidObjectException e = new InvalidObjectException(exception.toString());
             e.initCause(exception);

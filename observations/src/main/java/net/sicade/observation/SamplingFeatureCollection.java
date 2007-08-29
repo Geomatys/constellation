@@ -30,11 +30,11 @@ import net.sicade.catalog.CatalogException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public interface Platform extends LocatedElement {
+public interface SamplingFeatureCollection extends LocatedElement {
     /**
      * Retourne toutes les stations visitées par cette plateforme, en ordre chronologique.
      *
      * @throws CatalogException si l'interrogation du catalogue a échoué.
      */
-    Set<? extends SamplingFeature> getStations() throws CatalogException;
+    Set<? extends SamplingFeature> getMember() throws CatalogException;
 }

@@ -33,7 +33,7 @@ import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Platform;
+import net.sicade.observation.SamplingFeatureCollection;
 import net.sicade.observation.sql.SamplingFeatureTable;
 
 
@@ -71,7 +71,7 @@ public class LongLineTable extends SamplingFeatureTable {
                                   final String       name,
                                   final Point2D      coordinate,
                                   final DateRange    timeRange,
-                                  final Platform     platform,
+                                  final SamplingFeatureCollection     platform,
                                   final DataQuality  quality,
                                   final Citation     provider,
                                   final ResultSet    result)

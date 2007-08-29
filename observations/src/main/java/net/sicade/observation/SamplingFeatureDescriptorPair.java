@@ -25,7 +25,7 @@ import net.sicade.coverage.model.Descriptor;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 
 /**
- * Une paire {@linkplain Station station} - {@linkplain Descriptor descripteur}.
+ * Une paire {@linkplain SamplingFeature station} - {@linkplain Descriptor descripteur}.
  * Utilisée par {@link MeasurementTableFiller} pour déterminer un ordre optimal
  * dans lequel ces éléments devraient être évalués.
  *

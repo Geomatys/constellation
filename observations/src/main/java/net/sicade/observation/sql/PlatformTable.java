@@ -29,7 +29,7 @@ import org.geotools.resources.Utilities;
 
 // Sicade dependencies
 import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Platform;
+import net.sicade.observation.SamplingFeatureCollection;
 import net.sicade.catalog.ConfigurationKey;
 
 
@@ -41,7 +41,7 @@ import net.sicade.catalog.ConfigurationKey;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class PlatformTable extends BoundedSingletonTable<Platform> {
+public class PlatformTable extends BoundedSingletonTable<SamplingFeatureCollection> {
     /**
      * Requête SQL pour obtenir les limites géographiques des plateformes dans une région.
      */
@@ -185,7 +185,7 @@ public class PlatformTable extends BoundedSingletonTable<Platform> {
     /**
      * Construit une plateforme pour l'enregistrement courant.
      */
-    protected Platform createEntry(final ResultSet results) throws SQLException {
+    protected SamplingFeatureCollection createEntry(final ResultSet results) throws SQLException {
         final String name = results.getString(NAME);
         return new PlatformEntry(this, name);
     }

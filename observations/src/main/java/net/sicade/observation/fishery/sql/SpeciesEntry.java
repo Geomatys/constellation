@@ -24,7 +24,7 @@ import static java.util.Locale.*;
 
 // Sicade dependencies
 import net.sicade.observation.fishery.Species;
-import net.sicade.observation.sql.PropertyTypeEntry;
+import net.sicade.observation.sql.PhenomenonEntry;
 
 
 /**
@@ -33,7 +33,7 @@ import net.sicade.observation.sql.PropertyTypeEntry;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SpeciesEntry extends PropertyTypeEntry implements Species {
+public class SpeciesEntry extends PhenomenonEntry implements Species {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */

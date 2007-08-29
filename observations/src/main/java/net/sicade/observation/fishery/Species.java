@@ -23,7 +23,7 @@ import java.awt.Color;
 import java.util.Locale;
 
 // Sicade dependencies
-import net.sicade.observation.PropertyType;
+import net.sicade.observation.Phenomenon;
 
 
 /**
@@ -33,7 +33,7 @@ import net.sicade.observation.PropertyType;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public interface Species extends PropertyType {
+public interface Species extends Phenomenon {
     /**
      * Constante désignant la langue "Latin".
      * Souvent utilisée pour nommer les espèces.

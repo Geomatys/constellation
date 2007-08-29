@@ -51,8 +51,9 @@ public interface SamplingFeature extends LocatedElement{
      * Retourne la plateforme transportant la station. Il s'agit par exemple d'un identifiant
      * d'un bateau ou un numéro de croisière. Peut être {@code null} si cette information n'est
      * pas disponible.
+     
+      SamplingFeatureCollection getPlatform();
      */
-    Platform getPlatform();
 
     /**
      * Retourne une indication de la qualité de la donnée. Peut être {@code null} si cette
@@ -65,9 +66,10 @@ public interface SamplingFeature extends LocatedElement{
      * été effectuée pour cet observable, retourne {@code null}.
      *
      * @throws CatalogException si l'interrogation du catalogue a échoué.
-     */
+     
     Observation getObservation(Observable observable) throws CatalogException;
-
+     */
+    
     /**
      * Retourne l'ensemble des observations qui ont été effectuées à cette station. Une même station
      * peut contenir plusieurs {@linkplain Observation observations}, à la condition que chaque
@@ -75,5 +77,5 @@ public interface SamplingFeature extends LocatedElement{
      *
      * @throws CatalogException si l'interrogation du catalogue a échoué.
      */
-    Collection<? extends Observation> getObservations() throws CatalogException;
+    Collection<? extends Observation> getRelatedObservations() throws CatalogException;
 }

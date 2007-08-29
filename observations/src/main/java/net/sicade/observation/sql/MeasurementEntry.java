@@ -15,9 +15,11 @@
 package net.sicade.observation.sql;
 
 import javax.units.Unit;
+import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Observable;
 import net.sicade.observation.Measurement;
+import net.sicade.observation.Phenomenon;
+import net.sicade.observation.Process;
 
 
 /**
@@ -53,12 +55,14 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      * @param error       Estimation de l'erreur sur la valeur mesurée, ou {@link Float#NaN NaN}
      *                    si l'erreur est inconnue ou ne s'applique pas.
      */
-    protected MeasurementEntry(final SamplingFeature    station, 
-                               final Observable observable, 
+    protected MeasurementEntry(final SamplingFeature station, 
+                               final Phenomenon      observedProperty,
+                               final Process         procedure,
+                               final Distribution    distribution, 
                                final float      value, 
                                final float      error) 
     {
-        super(station, observable);
+        super(station, observedProperty, procedure, distribution);
         this.value = value;
         this.error = error;
     }

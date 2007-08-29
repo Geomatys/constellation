@@ -27,9 +27,12 @@ import org.geotools.resources.Utilities;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.CatalogException;
+import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Measurement;
+import net.sicade.observation.Phenomenon;
+import net.sicade.observation.Process;
 
 
 /**
@@ -110,13 +113,15 @@ public class MeasurementTable extends ObservationTable<Measurement> {
      * Construit une mesure pour l'enregistrement couran
      */
     @Override
-    protected Measurement createEntry(final SamplingFeature samplingFeature,
-                                      final Observable      observable,
+    protected Measurement createEntry(final SamplingFeature featureOfInterest,
+                                      final Phenomenon      observedProperty,
+                                      final Process         procedure,
+                                      final Distribution    distribution,
                                       final ResultSet       result) throws SQLException
     {
         float value = result.getFloat(VALUE); if (result.wasNull()) value=Float.NaN;
         float error = result.getFloat(ERROR); if (result.wasNull()) error=Float.NaN;
-        return new MeasurementEntry(samplingFeature, observable, value, error);
+        return new MeasurementEntry(featureOfInterest, observedProperty, procedure, distribution, value, error);
     }
 
     /**
@@ -132,7 +137,7 @@ public class MeasurementTable extends ObservationTable<Measurement> {
             throw new CatalogException("La table \"" + Utilities.getShortClassName(this) +
                                        "\" n'est pas modifiable.");
         }
-        final SamplingFeature station = getStation();
+        final SamplingFeature station = getFeatureOfInterest();
         if (station == null) {
             throw new CatalogException("La station doit être définie.");
         }

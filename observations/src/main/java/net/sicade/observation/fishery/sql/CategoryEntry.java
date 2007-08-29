@@ -72,8 +72,8 @@ public class CategoryEntry extends ObservableEntry implements Category {
      * {@inheritDoc}
      */
     @Override
-    public Species getPropertyType() {
-        return (Species) super.getPropertyType();
+    public Species getPhenomenon() {
+        return (Species) super.getPhenomenon();
     }
     
     /**

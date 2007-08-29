@@ -15,7 +15,7 @@
 package net.sicade.observation.sql;
 
 // Sicade dependencies
-import net.sicade.observation.PropertyType;
+import net.sicade.observation.Phenomenon;
 import net.sicade.catalog.Entry;
 
 
@@ -25,7 +25,7 @@ import net.sicade.catalog.Entry;
  * @version $Id$
  * @author Antoine Hnawia
  */
-public class PropertyTypeEntry extends Entry implements PropertyType {
+public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -36,7 +36,7 @@ public class PropertyTypeEntry extends Entry implements PropertyType {
      *
      * @param name Le nom du phénomène.
      */
-    protected PropertyTypeEntry(final String name) {
+    protected PhenomenonEntry(final String name) {
         super(name);
     }
 
@@ -46,7 +46,7 @@ public class PropertyTypeEntry extends Entry implements PropertyType {
      * @param name    Le nom du phénomène.
      * @param remarks Remarques s'appliquant à ce phénomène, ou {@code null}.
      */
-    protected PropertyTypeEntry(final String name, final String remarks) {
+    protected PhenomenonEntry(final String name, final String remarks) {
         super(name, remarks);
     }
 }

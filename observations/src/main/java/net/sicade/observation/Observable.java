@@ -46,7 +46,7 @@ public interface Observable extends Element {
      * alors le phénomène retourné sera typiquement une
      * {@linkplain net.sicade.observation.fishery.Species espèce}.
      */
-    PropertyType getPropertyType();
+    Phenomenon getPhenomenon();
 
     /**
      * Retourne la procedure utilisée. Si cet observable représente un paramètre physique tel que

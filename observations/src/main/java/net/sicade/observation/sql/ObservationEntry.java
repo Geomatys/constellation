@@ -15,9 +15,11 @@
 package net.sicade.observation.sql;
 
 import net.sicade.catalog.Entry;
+import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
+import net.sicade.observation.Phenomenon;
+import net.sicade.observation.Process;
 import org.geotools.resources.Utilities;
 
 
@@ -37,25 +39,40 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * La station à laquelle a été pris cet échantillon.
      */
-    private final SamplingFeature station;
+    private final SamplingFeature featureOfInterest;
+    
+    /**
+     * Référence vers le {@linkplain Phenomenon phénomène} observé.
+     */
+    private final Phenomenon observedProperty;
 
     /**
-     * Ce que l'on observe
+     * Référence vers la {@linkplain Procedure procédure} associée à cet observable.
      */
-    private final Observable observable;
+    private final Process procedure;
+    
+     /**
+     * Référence vers la {@linkplain Distribution distribution} associée à cet observable.
+     */
+    private final Distribution distribution;
 
     /**
      * Construit une observation.
      * 
-     * @param station     La station d'observation (par exemple une position de pêche).
-     * @param observable  Ce que l'on observe (température, quantité pêchée, <cite>etc.</cite>).
+     * @param featureOfInterest La station d'observation (par exemple une position de pêche).
+     * @param observedProperty  Le phénomène observé.
+     * @param procedure         La procédure associée.
      */
-    protected ObservationEntry(final SamplingFeature    station, 
-                               final Observable observable) 
+    protected ObservationEntry(final SamplingFeature featureOfInterest, 
+                               final Phenomenon      observedProperty,
+                               final Process         procedure,
+                               final Distribution    distribution) 
     {
         super(null);
-        this.station    = station;
-        this.observable = observable;
+        this.featureOfInterest = featureOfInterest;
+        this.observedProperty  = observedProperty;
+        this.procedure         = procedure;
+        this.distribution      = distribution;
     }
 
     /**
@@ -63,21 +80,35 @@ public class ObservationEntry extends Entry implements Observation {
      */
     @Override
     protected String createName() {
-        return observable.getName() + '(' + station.getName() + ')';
+        return observedProperty.getName() + '(' + featureOfInterest.getName() + ')';
     }
 
     /**
      * {@inheritDoc}
      */
-    public SamplingFeature getSamplingFeature() {
-        return station;
+    public SamplingFeature getFeatureOfInterest() {
+        return featureOfInterest;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Observable getObservable() {
-        return observable;
+    public Phenomenon getObservedProperty() {
+        return observedProperty;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Process getProcess() {
+        return procedure;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Distribution getDistribution() {
+        return distribution;
     }
 
     /**
@@ -85,7 +116,7 @@ public class ObservationEntry extends Entry implements Observation {
      */
     @Override
     public final int hashCode() {
-        return station.hashCode() ^ observable.hashCode();
+        return featureOfInterest.hashCode() ^ observedProperty.hashCode();
     }
 
     /**
@@ -98,8 +129,10 @@ public class ObservationEntry extends Entry implements Observation {
         }
         if (super.equals(object)) {
             final ObservationEntry that = (ObservationEntry) object;
-            return Utilities.equals(this.observable, that.observable) && 
-                   Utilities.equals(this.station,    that.station);
+            return Utilities.equals(this.featureOfInterest,    that.featureOfInterest) &&
+                   Utilities.equals(this.observedProperty,   that.observedProperty) &&
+                   Utilities.equals(this.procedure,    that.procedure)  &&
+                   Utilities.equals(this.distribution, that.distribution);
         }
         return false;
     }

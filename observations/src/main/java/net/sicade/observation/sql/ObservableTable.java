@@ -18,7 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.sicade.observation.Observable;
-import net.sicade.observation.PropertyType;
+import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Process;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.catalog.CatalogException;
@@ -57,7 +57,7 @@ public class ObservableTable extends SingletonTable<Observable> {
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private PropertyTypeTable phenomenons;
+    private PhenomenonTable phenomenons;
 
     /**
      * Connexion vers la table des {@linkplain Procedure procedures}.
@@ -91,9 +91,9 @@ public class ObservableTable extends SingletonTable<Observable> {
         final String distributionID = result.getString(DISTRIBUTION);
         final String remarks        = result.getString(REMARKS);
         if (phenomenons == null) {
-            phenomenons = getDatabase().getTable(PropertyTypeTable.class);
+            phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
-        final PropertyType phenomenon = phenomenons.getEntry(phenomenonID);
+        final Phenomenon phenomenon = phenomenons.getEntry(phenomenonID);
         if (procedures == null) {
             procedures = getDatabase().getTable(ProcessTable.class);
         }

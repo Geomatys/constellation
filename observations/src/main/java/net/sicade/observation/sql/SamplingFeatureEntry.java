@@ -27,7 +27,7 @@ import org.opengis.metadata.quality.DataQuality;
 // Sicade dependencies
 import net.sicade.util.DateRange;
 import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Platform;
+import net.sicade.observation.SamplingFeatureCollection;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
 import net.sicade.catalog.ServerException;
@@ -60,7 +60,7 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
      * La plateforme (par exemple un bateau) sur laquelle a été prise cette station.
      * Peut être nul si cette information n'est pas disponible.
      */
-    private final Platform platform;
+    private final SamplingFeatureCollection platform;
 
     /**
      * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
@@ -99,7 +99,7 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
                            final String       name,
                            final Point2D      coordinate,
                            final DateRange    timeRange,
-                           final Platform     platform,
+                           final SamplingFeatureCollection     platform,
                            final DataQuality  quality,
                            final Citation     provider)
     {
@@ -129,7 +129,7 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
     /**
      * {@inheritDoc}
      */
-    public Platform getPlatform() {
+    public SamplingFeatureCollection getPlatform() {
         return platform;
     }
 
@@ -142,8 +142,8 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
 
     /**
      * {@inheritDoc}
-     */
-    public Observation getObservation(final Observable observable) throws CatalogException {
+     
+    public Observation getObservation(final Observable observable) getRelatedObservationException {
         try {
             synchronized (table) {
                 table.setStation(this);
@@ -154,11 +154,12 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
             throw new ServerException(exception);
         }
     }
+    */
 
     /**
      * {@inheritDoc}
      */
-    public Collection<? extends Observation> getObservations() throws CatalogException {
+    public Collection<? extends Observation> getRelatedObservations() throws CatalogException {
         try {
             synchronized (table) {
                 table.setStation   (this);

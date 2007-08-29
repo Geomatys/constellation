@@ -41,7 +41,7 @@ import org.geotools.metadata.iso.citation.CitationImpl;
 // Sicade dependencies
 import net.sicade.util.DateRange;
 import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Platform;
+import net.sicade.observation.SamplingFeatureCollection;
 import net.sicade.observation.Observation;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.CatalogException;
@@ -109,7 +109,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * La plateforme recherchée, ou {@code null} pour rechercher les stations de toutes les
      * plateformes.
      */
-    private Platform platform;
+    private SamplingFeatureCollection platform;
 
     /**
      * Ensemble des fournisseur pour lesquels on accepte des stations, ou {@code null}
@@ -195,7 +195,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * Retourne la {@linkplain Platform platforme} des stations désirées. La valeur {@code null}
      * signifie que cette table recherche les stations de toutes les plateformes.
      */
-    public final Platform getPlatform() {
+    public final SamplingFeatureCollection getPlatform() {
         return platform;
     }
 
@@ -205,7 +205,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * La valeur {@code null} retire la contrainte des plateformes (c'est-à-dire que cette table
      * recherchera les stations de toutes les plateformes).
      */
-    public synchronized void setPlatform(final Platform platform) {
+    public synchronized void setPlatform(final SamplingFeatureCollection platform) {
         if (!Utilities.equals(platform, this.platform)) {
             this.platform = platform;
             fireStateChanged("Platform");
@@ -301,7 +301,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
     protected SamplingFeature createEntry(final ResultSet result) throws CatalogException, SQLException {
         final String name    = result.getString(NAME);
         final int identifier = result.getInt(IDENTIFIER);
-        final Platform owner;
+        final SamplingFeatureCollection owner;
         if (platform == null && !abridged) {
             if (platforms == null) {
                 setPlatformTable(getDatabase().getTable(PlatformTable.class));
@@ -357,7 +357,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
                                   final String       name,
                                   final Point2D      coordinate,
                                   final DateRange    timeRange,
-                                  final Platform     platform,
+                                  final SamplingFeatureCollection     platform,
                                   final DataQuality  quality,
                                   final Citation     provider,
                                   final ResultSet    result)

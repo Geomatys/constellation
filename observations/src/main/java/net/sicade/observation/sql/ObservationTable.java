@@ -26,6 +26,7 @@ import org.geotools.resources.Utilities;
 import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
+import net.sicade.observation.Process;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.DuplicatedRecordException;
 import net.sicade.catalog.ConfigurationKey;
@@ -33,6 +34,9 @@ import net.sicade.catalog.Database;
 import net.sicade.catalog.Query;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.Table;
+import net.sicade.coverage.model.Distribution;
+import net.sicade.coverage.model.DistributionTable;
+import net.sicade.observation.Phenomenon;
 
 
 /**
@@ -57,8 +61,10 @@ import net.sicade.catalog.Table;
  * @author Antoine Hnawia
  */
 public abstract class ObservationTable<EntryType extends Observation> extends Table {
-    /** Numéro de colonne et d'argument. */ static final int STATION    = 1;
-    /** Numéro de colonne et d'argument. */ static final int OBSERVABLE = 2;
+    /** Numéro de colonne et d'argument. */ static final int STATION      = 1;
+    /** Numéro de colonne. */               static final int PHENOMENON   = 2;
+    /** Numéro de colonne. */               static final int PROCEDURE    = 3;
+    /** Numéro de colonne. */               static final int DISTRIBUTION = 4;
 
     /**
      * Connexion vers la table des stations.
@@ -70,23 +76,32 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      */
     private SamplingFeatureTable stations;
 
-    /**
-     * Connexion vers la table des {@linkplain Observable observables}.
+   /**
+     * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private ObservableTable observables;
+    private PhenomenonTable phenomenons;
+
+    /**
+     * Connexion vers la table des {@linkplain Procedure procedures}.
+     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     */
+    private ProcessTable procedures;
+
+    /**
+     * Connexion vers la table des {@linkplain Distribution distributions}.
+     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     */
+    private DistributionTable distributions;
+    
 
     /**
      * La station pour laquelle on veut des observations, ou {@code null} pour récupérer les
      * observations de toutes les stations.
      */
-    private SamplingFeature samplingFeature;
+    private SamplingFeature featureOfInterest;
 
-    /**
-     * L'observable pour lequel on veut des observations, ou {@code null} pour récupérer les
-     * observations correspondant à tous les observables.
-     */
-    private Observable observable;
+    
 
     /**
      * La clé désignant la requête à utiliser pour obtenir des valeurs.
@@ -164,8 +179,8 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     /**
      * Retourne la station pour laquelle on recherche des observations.
      */
-    public final SamplingFeature getStation() {
-        return samplingFeature;
+    public final SamplingFeature getFeatureOfInterest() {
+        return featureOfInterest;
     }
 
     /**
@@ -173,27 +188,9 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * La valeur {@code null} recherche toutes les stations.
      */
     public synchronized void setStation(final SamplingFeature station) {
-        if (!Utilities.equals(station, this.samplingFeature)) {
-            this.samplingFeature = station;
+        if (!Utilities.equals(station, this.featureOfInterest)) {
+            this.featureOfInterest = station;
             fireStateChanged("Station");
-        }
-    }
-
-    /**
-     * Retourne l'observable pour lequel on recherche des observations.
-     */
-    public final Observable getObservable() {
-        return observable;
-    }
-
-    /**
-     * Définit l'observable pour lequel on recherche des observations.
-     * La valeur {@code null} retient tous les observables.
-     */
-    public synchronized void setObservable(final Observable observable) {
-        if (!Utilities.equals(observable, this.observable)) {
-            this.observable = observable;
-            fireStateChanged("Observable");
         }
     }
 
@@ -205,8 +202,8 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        if (samplingFeature != null) {
-            statement.setInt(STATION, samplingFeature.getNumericIdentifier());
+        if (featureOfInterest != null) {
+            statement.setInt(STATION, featureOfInterest.getNumericIdentifier());
         } else {
             throw new UnsupportedOperationException("La recherche sur toutes les stations n'est pas encore impléméntée.");
         }
@@ -277,19 +274,29 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * Construit une observation pour l'enregistrement courant.
      */
     private EntryType createEntry(final ResultSet result) throws CatalogException, SQLException {
-        SamplingFeature station = this.samplingFeature;
+       final String phenomenonID   = result.getString(PHENOMENON);
+       final String procedureID    = result.getString(PROCEDURE);
+       final String distributionID = result.getString(DISTRIBUTION);
+        
+        SamplingFeature station = this.featureOfInterest;
         if (station == null) {
             assert !Thread.holdsLock(getStationTable()); // Voir le commentaire de 'stations'.
             station = getStationTable().getEntry(result.getString(STATION));
         }
-        Observable observable = this.observable;
-        if (observable == null) {
-            if (observables == null) {
-                observables = getDatabase().getTable(ObservableTable.class);
-            }
-            observable = observables.getEntry(result.getString(OBSERVABLE));
+       if (phenomenons == null) {
+            phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
-        return createEntry(station, observable, result);
+        final Phenomenon phenomenon = phenomenons.getEntry(phenomenonID);
+        if (procedures == null) {
+            procedures = getDatabase().getTable(ProcessTable.class);
+        }
+        final Process procedure = procedures.getEntry(procedureID);
+        if (distributions == null) {
+            distributions = getDatabase().getTable(DistributionTable.class);
+        }
+        final Distribution distribution = distributions.getEntry(distributionID);
+        
+        return createEntry(station,  phenomenon, procedure, distribution, result);
     }
 
     /**
@@ -301,6 +308,8 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * @throws SQLException si une erreur est survenu lors de l'accès à la base de données.
      */
     protected abstract EntryType createEntry(final SamplingFeature    station,
-                                             final Observable observable,
+                                             final Phenomenon phenomenon, 
+                                             final Process procedure, 
+                                             final Distribution distribution,
                                              final ResultSet  result) throws SQLException;
 }

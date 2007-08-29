@@ -40,7 +40,7 @@ import org.geotools.resources.Utilities;
 
 // Sicade dependencies
 import net.sicade.observation.Process;
-import net.sicade.observation.PropertyType;
+import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Observable;
 import net.sicade.coverage.model.Descriptor;
 import net.sicade.coverage.model.RegionOfInterest;
@@ -141,7 +141,7 @@ public class MergedMeasurementTable extends Table {
      * @param  offset Si non-nul, alors seul les observables à cette position relative seront
      *         pris en compte.
      */
-    public synchronized int count(final PropertyType phenomenon,
+    public synchronized int count(final Phenomenon phenomenon,
                                   final Process   procedure,
                                   final RegionOfInterest offset)
     {
@@ -150,7 +150,7 @@ public class MergedMeasurementTable extends Table {
         }
         int count = 0;
         for (final Observable observable : observables.keySet()) {
-            if (phenomenon != null && !phenomenon.equals(observable.getPropertyType())) {
+            if (phenomenon != null && !phenomenon.equals(observable.getPhenomenon())) {
                 continue;
             }
             if (procedure != null && !procedure.equals(observable.getProcess())) {
