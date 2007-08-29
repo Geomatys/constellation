@@ -15,14 +15,17 @@
 package net.sicade.observation.sql;
 
 import javax.units.Unit;
+
+// Sicade dependencies
 import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Measurement;
 
+
 // GeoAPI dependencies
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
-
+import org.opengis.metadata.quality.DataQuality;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Measurement mesure}.
@@ -60,11 +63,12 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     protected MeasurementEntry(final SamplingFeature station, 
                                final Phenomenon      observedProperty,
                                final Process         procedure,
-                               final Distribution    distribution, 
+                               final Distribution    distribution,
+                               final DataQuality  quality,
                                final float      value, 
                                final float      error) 
     {
-        super(station, observedProperty, procedure, distribution);
+        super(station, observedProperty, procedure, distribution, quality);
         this.value = value;
         this.error = error;
     }
@@ -86,7 +90,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      *
      * @todo Implémenter le retour des unités.
      */
-    public Unit getUnit() {
+    public Unit getUom() {
         return null;
     }
 

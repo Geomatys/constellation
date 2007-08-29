@@ -40,5 +40,5 @@ public interface Measurement extends Observation {
      * ou des tonnes de poissons pêchés, ou plus simplement un comptage du nombre
      * d'individus. Dans ce dernier cas, l'unité retournée sera sans dimension.
      */
-    Unit getUnit();
+    Unit getUom();
 }

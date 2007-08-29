@@ -19,6 +19,7 @@ import java.sql.Types;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.util.Observable;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -29,8 +30,8 @@ import net.sicade.catalog.Database;
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Observable;
 import net.sicade.observation.Measurement;
+import org.opengis.metadata.quality.DataQuality;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
 
@@ -63,8 +64,8 @@ public class MeasurementTable extends ObservationTable<Measurement> {
 //            "INSERT INTO \"Measurements\" (station, observable, value, error)\n"  +
 //            "VALUES (?, ?, ?, ?)");
 
-    /** Numéro de colonne. */ private static final int VALUE = 3;
-    /** Numéro de colonne. */ private static final int ERROR = 4;
+    /** Numéro de colonne. */ private static final int VALUE = 6;
+    /** Numéro de colonne. */ private static final int ERROR = 7;
 
     /**
      * La clé désignant la requête à utiliser pour ajouter des valeurs.
@@ -118,11 +119,12 @@ public class MeasurementTable extends ObservationTable<Measurement> {
                                       final Phenomenon      observedProperty,
                                       final Process         procedure,
                                       final Distribution    distribution,
+                                      final DataQuality  quality,
                                       final ResultSet       result) throws SQLException
     {
         float value = result.getFloat(VALUE); if (result.wasNull()) value=Float.NaN;
         float error = result.getFloat(ERROR); if (result.wasNull()) error=Float.NaN;
-        return new MeasurementEntry(featureOfInterest, observedProperty, procedure, distribution, value, error);
+        return new MeasurementEntry(featureOfInterest, observedProperty, procedure, distribution, quality, value, error);
     }
 
     /**
@@ -142,16 +144,13 @@ public class MeasurementTable extends ObservationTable<Measurement> {
         if (station == null) {
             throw new CatalogException("La station doit être définie.");
         }
-        final Observable observable = getObservable();
-        if (observable == null) {
-            throw new CatalogException("L'observable doit être défini.");
-        }
+        
         if (Float.isNaN(value)) {
             return;
         }
         final PreparedStatement statement = getStatement(getProperty(insert));
-        statement.setInt  (STATION,    station   .getNumericIdentifier());
-        statement.setInt  (OBSERVABLE, observable.getNumericIdentifier());
+        statement.setInt  (STATION,    station.getNumericIdentifier());
+        
         statement.setFloat(VALUE, value);
         if (!Float.isNaN(error)) {
             statement.setFloat(ERROR, error);
@@ -160,7 +159,7 @@ public class MeasurementTable extends ObservationTable<Measurement> {
         }
         final int count = statement.executeUpdate();
         if (count != 1) {
-            Measurement.LOGGER.warning(count + " valeurs ajoutées pour \"" + observable + "\" à la station " + station);
+            Measurement.LOGGER.warning(count + " valeurs ajoutées pour \" \" à la station " + station);
         }
     }
 }

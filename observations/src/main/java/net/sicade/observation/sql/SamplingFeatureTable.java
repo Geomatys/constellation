@@ -74,7 +74,6 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
     /** Numéro de colonne. */ private static final int  NAME       = 1;
     /** Numéro de colonne. */ private static final int  IDENTIFIER = 2;
     /** Numéro de colonne. */ private static final int  PLATFORM   = 3;
-    /** Numéro de colonne. */ private static final int  QUALITY    = 4;
     /** Numéro de colonne. */ private static final int  PROVIDER   = 5;
     /** Numéro de colonne. */ private static final int  START_TIME = 6;
     /** Numéro de colonne. */ private static final int  END_TIME   = 7;
@@ -91,14 +90,8 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * Connexion vers la table des plateformes. Une table par défaut sera construite la première
      * fois où elle sera nécessaire.
      */
-    private PlatformTable platforms;
-
-    /**
-     * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
-     * sera construite la première fois où elle sera nécessaire.
-     */
-    private MetadataTable metadata;
-
+    private SamplingFeatureCollectionTable platforms;
+    
     /**
      * Connexion vers la table des observations.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
@@ -138,7 +131,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * @param  platforms Table des plateformes à utiliser.
      * @throws IllegalStateException si cette instance utilise déjà une autre table des plateformes.
      */
-    protected synchronized void setPlatformTable(final PlatformTable platforms)
+    protected synchronized void setPlatformTable(final SamplingFeatureCollectionTable platforms)
             throws IllegalStateException
     {
         if (this.platforms != platforms) {
@@ -304,16 +297,13 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
         final SamplingFeatureCollection owner;
         if (platform == null && !abridged) {
             if (platforms == null) {
-                setPlatformTable(getDatabase().getTable(PlatformTable.class));
+                setPlatformTable(getDatabase().getTable(SamplingFeatureCollectionTable.class));
             }
             owner = platforms.getEntry(result.getString(PLATFORM));
         } else {
             owner = platform;
         }
-        if (metadata == null) {
-            metadata = getDatabase().getTable(MetadataTable.class);
-        }
-        final DataQuality quality = metadata.getEntry(DataQuality.class, result.getString(QUALITY ));
+       
         final Citation   provider = metadata.getEntry(Citation.class,    result.getString(PROVIDER));
         final Calendar   calendar = getCalendar();
         Date startTime = result.getTimestamp(START_TIME, calendar);
@@ -326,7 +316,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
         return createEntry(identifier, name,
                 (!Double.isNaN(x) || !Double.isNaN(y)) ? new Point2D.Double(x,y)           : null,
                 ( startTime!=null ||  endTime!=null)   ? new DateRange(startTime, endTime) : null,
-                owner, quality, provider, result);
+                owner, provider, result);
     }
 
     /**
@@ -358,12 +348,11 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
                                   final Point2D      coordinate,
                                   final DateRange    timeRange,
                                   final SamplingFeatureCollection     platform,
-                                  final DataQuality  quality,
                                   final Citation     provider,
                                   final ResultSet    result)
             throws SQLException
     {
-        return new SamplingFeatureEntry(this, identifier, name, coordinate, timeRange, platform, quality, provider);
+        return new SamplingFeatureEntry(this, identifier, name, coordinate, timeRange, platform, provider);
     }
 
     /**

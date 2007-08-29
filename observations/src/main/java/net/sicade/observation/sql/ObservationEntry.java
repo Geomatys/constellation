@@ -20,6 +20,7 @@ import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Observation;
 import org.opengis.observation.Process;
 import org.geotools.resources.Utilities;
+import org.opengis.metadata.quality.DataQuality;
 import org.opengis.observation.Phenomenon;
 
 
@@ -55,6 +56,11 @@ public class ObservationEntry extends Entry implements Observation {
      * Référence vers la {@linkplain Distribution distribution} associée à cet observable.
      */
     private final Distribution distribution;
+    
+    /**
+     * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
+     */
+    private final DataQuality quality;
 
     /**
      * Construit une observation.
@@ -62,17 +68,20 @@ public class ObservationEntry extends Entry implements Observation {
      * @param featureOfInterest La station d'observation (par exemple une position de pêche).
      * @param observedProperty  Le phénomène observé.
      * @param procedure         La procédure associée.
+     * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
      */
     protected ObservationEntry(final SamplingFeature featureOfInterest, 
                                final Phenomenon      observedProperty,
                                final Process         procedure,
-                               final Distribution    distribution) 
+                               final Distribution    distribution,
+                               final DataQuality  quality) 
     {
         super(null);
         this.featureOfInterest = featureOfInterest;
         this.observedProperty  = observedProperty;
         this.procedure         = procedure;
         this.distribution      = distribution;
+        this.quality           = quality;
     }
 
     /**
@@ -100,7 +109,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public Process getProcess() {
+    public Process getProcedure() {
         return procedure;
     }
 
@@ -110,6 +119,14 @@ public class ObservationEntry extends Entry implements Observation {
     public Distribution getDistribution() {
         return distribution;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public DataQuality getQuality() {
+        return quality;
+    }
+
 
     /**
      * Retourne un code représentant cette observation.
@@ -132,6 +149,7 @@ public class ObservationEntry extends Entry implements Observation {
             return Utilities.equals(this.featureOfInterest,    that.featureOfInterest) &&
                    Utilities.equals(this.observedProperty,   that.observedProperty) &&
                    Utilities.equals(this.procedure,    that.procedure)  &&
+                   Utilities.equals(this.quality,      that.quality)    && 
                    Utilities.equals(this.distribution, that.distribution);
         }
         return false;

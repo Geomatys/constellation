@@ -17,8 +17,6 @@ package net.sicade.observation;
 import java.util.Collection;
 import net.sicade.catalog.CatalogException;
 import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.quality.DataQuality;
-
 
 /**
  * Représentation d'une station à laquelle ont été effectuées des {@linkplain Observation observations}.
@@ -54,13 +52,7 @@ public interface SamplingFeature extends LocatedElement{
      
       SamplingFeatureCollection getPlatform();
      */
-
-    /**
-     * Retourne une indication de la qualité de la donnée. Peut être {@code null} si cette
-     * information n'est pas disponible.
-     */
-    DataQuality getQuality();
-
+   
     /**
      * Retourne l'observation correspondant à l'observable spécifié. Si aucune observation n'a
      * été effectuée pour cet observable, retourne {@code null}.

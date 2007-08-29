@@ -18,7 +18,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 // sicade dependencies
-import net.sicade.observation.Observable;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.model.DistributionTable;

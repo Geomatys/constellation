@@ -72,11 +72,10 @@ public class LongLineTable extends SamplingFeatureTable {
                                   final Point2D      coordinate,
                                   final DateRange    timeRange,
                                   final SamplingFeatureCollection     platform,
-                                  final DataQuality  quality,
                                   final Citation     provider,
                                   final ResultSet    result)
             throws SQLException
     {
-        return super.createEntry(identifier, name, coordinate, timeRange, platform, quality, provider, result);
+        return super.createEntry(identifier, name, coordinate, timeRange, platform, provider, result);
     }
 }

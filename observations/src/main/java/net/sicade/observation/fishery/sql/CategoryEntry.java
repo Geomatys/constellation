@@ -23,11 +23,13 @@ import org.geotools.resources.Utilities;
 
 // Sicade dependencies
 import net.sicade.coverage.model.Distribution;
+import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.fishery.Stage;
 import net.sicade.observation.fishery.Species;
 import net.sicade.observation.fishery.Category;
 import net.sicade.observation.fishery.FisheryType;
-import net.sicade.observation.sql.ObservableEntry;
+import net.sicade.observation.sql.ObservationEntry;
+import org.opengis.metadata.quality.DataQuality;
 
 
 /**
@@ -36,7 +38,7 @@ import net.sicade.observation.sql.ObservableEntry;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CategoryEntry extends ObservableEntry implements Category {
+public class CategoryEntry extends ObservationEntry implements Category {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -50,21 +52,19 @@ public class CategoryEntry extends ObservableEntry implements Category {
     /**
      * Construit une nouvelle catégorie.
      *
-     * @param identifier  L'identifiant de la catégorie.
      * @param symbol      Le symbole de la catégorie.
      * @param species     L'espèce observée.
      * @param stage       Le stade de développement.
      * @param procedure   La procédure associée.
      * @param remarks     Remarques s'appliquant à cette entrée, ou {@code null}.
      */
-    protected CategoryEntry(final int          identifier,
-                            final String       symbol,
-                            final Species      species,
-                            final Stage        stage,
-                            final FisheryType  procedure,
-                            final String       remarks)
+    protected CategoryEntry(final SamplingFeature featureOfInterest,
+                            final Species         species,
+                            final Stage           stage,
+                            final FisheryType     procedure,
+                            final DataQuality     quality)
     {
-        super(identifier, symbol, species, procedure, Distribution.NORMAL, remarks);
+        super(featureOfInterest, species, procedure, Distribution.NORMAL, quality);
         this.stage = stage;
     }
 
@@ -72,8 +72,8 @@ public class CategoryEntry extends ObservableEntry implements Category {
      * {@inheritDoc}
      */
     @Override
-    public Species getPhenomenon() {
-        return (Species) super.getPhenomenon();
+    public Species getObservedProperty() {
+        return (Species) super.getObservedProperty();
     }
     
     /**
@@ -87,8 +87,8 @@ public class CategoryEntry extends ObservableEntry implements Category {
      * {@inheritDoc}
      */
     @Override
-    public FisheryType getProcess() {
-        return (FisheryType) super.getProcess();
+    public FisheryType getProcedure() {
+        return (FisheryType) super.getProcedure();
     }
 
     /**

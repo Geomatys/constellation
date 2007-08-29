@@ -30,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Observable;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.LoggingLevel;
 import net.sicade.catalog.Query;
@@ -39,9 +40,9 @@ import net.sicade.catalog.Table;
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.sicade.observation.Observable;
 import net.sicade.coverage.model.Descriptor;
 import net.sicade.coverage.model.RegionOfInterest;
+import net.sicade.observation.Observation;
 
 // GeoAPI dependencies
 import org.opengis.observation.Phenomenon;
@@ -72,7 +73,7 @@ public class MergedMeasurementTable extends Table {
     /**
      * Les descripteurs que l'on voudra inclure dans cette table.
      */
-    private final Map<Observable,Boolean> observables = new LinkedHashMap<Observable,Boolean>();
+    private final Map<Observation,Boolean> observations = new LinkedHashMap<Observation,Boolean>();
 
     /**
      * Construit une nouvelle table.
@@ -84,63 +85,63 @@ public class MergedMeasurementTable extends Table {
     }
 
     /**
-     * Ajoute un observable à faire apparaître comme une colonne. Chaque objet {@code MergedMeasurementTable}
+     * Ajoute une observation à faire apparaître comme une colonne. Chaque objet {@code MergedMeasurementTable}
      * nouvellement créé ne contient initialement qu'une seule colonne: le numéro ID des stations. Chaque appel
      * à {@code add} ajoute une colonne. Cette colonne sera prise en compte lors du prochain appel de
      * la méthode {@link #getResultSet}.
      *
      * @param  observable pour la colonne à ajouter.
      */
-    public final void add(final Observable observable) {
-        add(observable, false);
+    public final void add(final Observation observation) {
+        add(observation, false);
     }
 
     /**
-     * Ajoute un observable à faire apparaître comme une colonne, en spécifiant si les valeurs
+     * Ajoute une obsertion à faire apparaître comme une colonne, en spécifiant si les valeurs
      * nulles sont autorisées.
      *
-     * @param  observable pour la colonne à ajouter.
+     * @param  observation pour la colonne à ajouter.
      * @param  nullIncluded Indique si {@link #getResultSet} est autorisé à retourner des valeurs
      *         nulles. La valeur par défaut est {@code false}, ce qui indique que tous les
      *         enregistrements pour lesquels au moins un paramètre environnemental est manquant
      *         seront omis.
      */
-    public synchronized void add(final Observable observable, final boolean nullIncluded) {
-        observables.put(observable, Boolean.valueOf(nullIncluded));
+    public synchronized void add(final Observation observation, final boolean nullIncluded) {
+        observations.put(observation, Boolean.valueOf(nullIncluded));
     }
 
     /**
-     * Retire un observable qui apparaissait comme une des colonnes. Cette méthode
+     * Retire une observation qui apparaissait comme une des colonnes. Cette méthode
      * permet de retirer une colonne qui aurait été ajoutée précédement par un appel
-     * à <code>{@linkplain #add(Observable) add}(observable)</code>. Cette méthode
-     * ne fait rien si aucune colonne ne correspond à l'observable spécifié.
+     * à <code>{@linkplain #add(Observation) add}(observation)</code>. Cette méthode
+     * ne fait rien si aucune colonne ne correspond à l'observation spécifiée.
      *
-     * @param  observable pour la colonne à retirer.
+     * @param  observation pour la colonne à retirer.
      */
-    public synchronized void remove(final Observable observable) {
-        observables.remove(observable);
+    public synchronized void remove(final Observation observation) {
+        observations.remove(observation);
     }
 
     /**
-     * Oublie tous les {@linkplain Observable observables} qui ont été déclarés avec
-     * la méthode {@link #add(Observable) add}.
+     * Oublie tous les {@linkplain Observation observations} qui ont été déclarés avec
+     * la méthode {@link #add(Observation) add}.
      */
     public synchronized void clear() {
-        observables.clear();
+        observations.clear();
     }
 
     /**
-     * Retourne le nombre d'{@linkplain Observable observables} dans cette table correspondant aux
+     * Retourne le nombre d'{@linkplain Observation observations} dans cette table correspondant aux
      * critères spécifiés. Si un ou plusieurs des arguments {@code phenomenon}, {@code procedure}
-     * ou {@code offset} est non-nul, alors cette méthode filtre les observables en ne comptant que
+     * ou {@code offset} est non-nul, alors cette méthode filtre les observations en ne comptant que
      * ceux qui correspondent aux arguments non-nuls. Par exemple {@code count(null,null,offset)}
-     * comptera tous les observables dont la position spatio-temporelle relative est égale à
+     * comptera tous les observations dont la position spatio-temporelle relative est égale à
      * {@code offset}.
      *
      * @param  phenomenon Phénomène à compter, ou {@code null} pour les compter tous.
-     * @param  procedure Si non-nul, alors seul les observables sur lesquelles on applique
+     * @param  procedure Si non-nul, alors seul les observationes sur lesquelles on applique
      *         cette procédure seront pris en compte.
-     * @param  offset Si non-nul, alors seul les observables à cette position relative seront
+     * @param  offset Si non-nul, alors seul les observations à cette position relative seront
      *         pris en compte.
      */
     public synchronized int count(final Phenomenon phenomenon,
@@ -148,18 +149,18 @@ public class MergedMeasurementTable extends Table {
                                   final RegionOfInterest offset)
     {
         if (phenomenon == null && procedure == null && offset == null) {
-            return observables.size();
+            return observations.size();
         }
         int count = 0;
-        for (final Observable observable : observables.keySet()) {
-            if (phenomenon != null && !phenomenon.equals(observable.getPhenomenon())) {
+        for (final Observation observation : observations.keySet()) {
+            if (phenomenon != null && !phenomenon.equals(observation.getObservedProperty())) {
                 continue;
             }
-            if (procedure != null && !procedure.equals(observable.getProcess())) {
+            if (procedure != null && !procedure.equals(observation.getProcedure())) {
                 continue;
             }
-            if (offset != null && !(observable instanceof Descriptor &&
-                offset.equals(((Descriptor) observable).getRegionOfInterest())))
+            if (offset != null && !(observation instanceof Descriptor &&
+                offset.equals(((Descriptor) observation).getRegionOfInterest())))
             {
                 continue;
             }
@@ -354,7 +355,7 @@ public class MergedMeasurementTable extends Table {
                 final LogRecord record = new LogRecord(LoggingLevel.CREATE, sqlCreate);
                 record.setSourceClassName ("MergedMeasurementTable");
                 record.setSourceMethodName("copyToTable");
-                Observable.LOGGER.log(record);
+                Observation.LOGGER.log(record);
             }
         }
         /*

@@ -19,7 +19,7 @@
 package net.sicade.observation.fishery;
 
 // Sicade dependencies
-import net.sicade.observation.Observable;
+import net.sicade.observation.Observation;
 
 
 /**
@@ -29,11 +29,11 @@ import net.sicade.observation.Observable;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
-public interface Category extends Observable {
+public interface Category extends Observation {
     /**
      * Retourne l'espèce observée.
      */
-    Species getPhenomenon();
+    Species getObservedProperty();
     /**
      * Retourne le stade de développement de l'espèce observé.
      */
@@ -42,5 +42,5 @@ public interface Category extends Observable {
     /**
      * Retourne la méthode par laquelle les individus sont capturés.
      */
-    FisheryType getProcess();
+    FisheryType getProcedure();
 }

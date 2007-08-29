@@ -28,7 +28,6 @@ import org.opengis.metadata.quality.DataQuality;
 import net.sicade.util.DateRange;
 import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.SamplingFeatureCollection;
-import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
 import net.sicade.catalog.ServerException;
 import net.sicade.catalog.CatalogException;
@@ -61,12 +60,7 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
      * Peut être nul si cette information n'est pas disponible.
      */
     private final SamplingFeatureCollection platform;
-
-    /**
-     * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
-     */
-    private final DataQuality quality;
-
+   
     /**
      * La provenance de la donnée. Peut être nul si cette information n'est pas disponible.
      */
@@ -91,7 +85,6 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
      * @param timeRange  Plage de temps de cet élément, ou {@code null} si inconue.
      * @param platform   La plateforme (par exemple un bateau) sur laquelle a été prise cette
      *                   station, ou {@code null} si inconnue.
-     * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
      * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
      */
     protected SamplingFeatureEntry(final SamplingFeatureTable table,
@@ -100,14 +93,12 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
                            final Point2D      coordinate,
                            final DateRange    timeRange,
                            final SamplingFeatureCollection     platform,
-                           final DataQuality  quality,
                            final Citation     provider)
     {
         super((table.isAbridged() && coordinate!=null && timeRange!=null) ? null :
                table.getLocationTable(), name, coordinate, timeRange);
         this.identifier = identifier;
         this.platform   = platform;
-        this.quality    = quality;
         this.provider   = provider;
         this.table      = table.getObservationTable();
     }
@@ -133,12 +124,7 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
         return platform;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public DataQuality getQuality() {
-        return quality;
-    }
+    
 
     /**
      * {@inheritDoc}
@@ -191,7 +177,6 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
             final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
             return                 (this.identifier == that.identifier) &&
                    Utilities.equals(this.platform,     that.platform)   &&
-                   Utilities.equals(this.quality,      that.quality)    &&
                    Utilities.equals(this.provider,     that.provider);
         }
         return false;

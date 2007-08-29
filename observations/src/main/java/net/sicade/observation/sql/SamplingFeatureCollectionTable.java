@@ -41,7 +41,7 @@ import net.sicade.catalog.ConfigurationKey;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class PlatformTable extends BoundedSingletonTable<SamplingFeatureCollection> {
+public class SamplingFeatureCollectionTable extends BoundedSingletonTable<SamplingFeatureCollection> {
     /**
      * Requête SQL pour obtenir les limites géographiques des plateformes dans une région.
      */
@@ -100,7 +100,7 @@ public class PlatformTable extends BoundedSingletonTable<SamplingFeatureCollecti
      * Construit une connexion vers la table des plateformes qui utilisera la base de données
      * spécifiée.
      */
-    public PlatformTable(final Database database) {
+    public SamplingFeatureCollectionTable(final Database database) {
         super(new Query(database), CRS.XYZT); // TODO
     }
 
@@ -187,6 +187,6 @@ public class PlatformTable extends BoundedSingletonTable<SamplingFeatureCollecti
      */
     protected SamplingFeatureCollection createEntry(final ResultSet results) throws SQLException {
         final String name = results.getString(NAME);
-        return new PlatformEntry(this, name);
+        return new SamplingFeatureCollectionEntry(this, name);
     }
 }

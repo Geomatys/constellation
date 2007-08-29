@@ -22,7 +22,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
-import org.geotools.resources.Utilities;
+
+// Sicade dependencies
 import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Observation;
 import net.sicade.catalog.CatalogException;
@@ -34,9 +35,14 @@ import net.sicade.catalog.QueryType;
 import net.sicade.catalog.Table;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.coverage.model.DistributionTable;
+
+// geoAPI dependencies
+import org.opengis.metadata.quality.DataQuality;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
 
+// geotolls dependencies
+import org.geotools.resources.Utilities;
 
 /**
  * Classe de base des connections vers la table des {@linkplain Observation observation}.
@@ -64,6 +70,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     /** Numéro de colonne. */               static final int PHENOMENON   = 2;
     /** Numéro de colonne. */               static final int PROCEDURE    = 3;
     /** Numéro de colonne. */               static final int DISTRIBUTION = 4;
+    /** Numéro de colonne. */               static final int QUALITY      = 5;
 
     /**
      * Connexion vers la table des stations.
@@ -93,7 +100,12 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      */
     private DistributionTable distributions;
     
-
+    /**
+     * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
+     * sera construite la première fois où elle sera nécessaire.
+     */
+    private MetadataTable metadata;
+    
     /**
      * La station pour laquelle on veut des observations, ou {@code null} pour récupérer les
      * observations de toutes les stations.
@@ -206,11 +218,11 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
         } else {
             throw new UnsupportedOperationException("La recherche sur toutes les stations n'est pas encore impléméntée.");
         }
-        if (observable != null) {
+       /* if (observable != null) {
             statement.setInt(OBSERVABLE, observable.getNumericIdentifier());
         } else {
             throw new UnsupportedOperationException("La recherche sur tous les observables n'est pas encore impléméntée.");
-        }
+        }*/
     }
 
     /**
@@ -262,7 +274,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
             if (observation == null) {
                 observation = candidate;
             } else if (!observation.equals(candidate)) {
-                throw new DuplicatedRecordException(results, 1, String.valueOf(observable));
+                throw new DuplicatedRecordException(results, 1, String.valueOf(observation));
             }
         }
         results.close();
@@ -295,7 +307,12 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
         }
         final Distribution distribution = distributions.getEntry(distributionID);
         
-        return createEntry(station,  phenomenon, procedure, distribution, result);
+        if (metadata == null) {
+            metadata = getDatabase().getTable(MetadataTable.class);
+        }
+        final DataQuality quality = metadata.getEntry(DataQuality.class, result.getString(QUALITY ));
+        
+        return createEntry(station,  phenomenon, procedure, distribution, quality, result);
     }
 
     /**
@@ -310,5 +327,6 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
                                              final Phenomenon phenomenon, 
                                              final Process procedure, 
                                              final Distribution distribution,
+                                             final DataQuality  quality,
                                              final ResultSet  result) throws SQLException;
 }

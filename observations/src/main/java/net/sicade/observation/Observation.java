@@ -14,9 +14,12 @@
  */
 package net.sicade.observation;
 
-// Sicade
+// Sicade dependencies
 import net.sicade.catalog.Element;
 import net.sicade.coverage.model.Distribution;
+
+// GeoAPI dependencies 
+import org.opengis.metadata.quality.DataQuality;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
 
@@ -52,7 +55,7 @@ public interface Observation extends Element {
      * représente une quantité de poisson pêchée, alors la procédure retournée sera typiquement un
      * {@linkplain net.sicade.observation.fishery.FisheryType type de pêche}.
      */
-    Process getProcess();
+    Process getProcedure();
 
     /**
      * Retourne la distribution statistique approximative des valeurs attendues. Cette distribution
@@ -69,5 +72,11 @@ public interface Observation extends Element {
      * Retourne la station à laquelle a été effectuée cette observation.
      */
     SamplingFeature getFeatureOfInterest();
+    
+     /**
+     * Retourne une indication de la qualité de la donnée. Peut être {@code null} si cette
+     * information n'est pas disponible.
+     */
+    DataQuality getQuality();
     
 }

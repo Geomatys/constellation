@@ -34,7 +34,7 @@ import net.sicade.catalog.CatalogException;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class PlatformEntry extends LocatedEntry implements SamplingFeatureCollection {
+public class SamplingFeatureCollectionEntry extends LocatedEntry implements SamplingFeatureCollection {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -57,7 +57,7 @@ public class PlatformEntry extends LocatedEntry implements SamplingFeatureCollec
      * @param table La table qui a produit cette entrée.
      * @param name  Le nom de la plateforme (parfois assimilé à une campagne d'échantillonage).
      */
-    protected PlatformEntry(final PlatformTable table,
+    protected SamplingFeatureCollectionEntry(final SamplingFeatureCollectionTable table,
                             final String        name)
     {
         super(table.getLocationTable(), name, null, null);
@@ -67,7 +67,7 @@ public class PlatformEntry extends LocatedEntry implements SamplingFeatureCollec
     /**
      * {@inheritDoc}
      */
-    public synchronized Set<? extends SamplingFeature> getMember() throws CatalogException {
+    public synchronized Set<? extends SamplingFeature> getMembers() throws CatalogException {
         if (elements == null) try {
             if (stations != null) {
                 final Set<SamplingFeature> set;
@@ -93,7 +93,7 @@ public class PlatformEntry extends LocatedEntry implements SamplingFeatureCollec
     @Override
     protected synchronized void writeObject(final ObjectOutputStream out) throws IOException {
         if (elements == null) try {
-            elements = getMember();
+            elements = getMembers();
         } catch (CatalogException exception) {
             final InvalidObjectException e = new InvalidObjectException(exception.toString());
             e.initCause(exception);
