@@ -22,15 +22,17 @@ import java.sql.SQLException;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.quality.DataQuality;
 
 // Sicade dependencies
 import net.sicade.util.DateRange;
-import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.SamplingFeatureCollection;
-import net.sicade.observation.Observation;
 import net.sicade.catalog.ServerException;
 import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.Entry;
+
+// openGis dependencies
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.sampling.SamplingFeatureCollection;
+import org.opengis.observation.Observation;
 
 
 /**
@@ -44,7 +46,7 @@ import net.sicade.catalog.CatalogException;
  *       une connexion à la base de données. Une version future devrait rétablir la connexion au
  *       moment de la <cite>deserialization</cite>.
  */
-public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeature {
+public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -95,8 +97,7 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
                            final SamplingFeatureCollection     platform,
                            final Citation     provider)
     {
-        super((table.isAbridged() && coordinate!=null && timeRange!=null) ? null :
-               table.getLocationTable(), name, coordinate, timeRange);
+        super(name);
         this.identifier = identifier;
         this.platform   = platform;
         this.provider   = provider;
@@ -116,15 +117,7 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
     public Citation getProvider() {
         return provider;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public SamplingFeatureCollection getPlatform() {
-        return platform;
-    }
-
-    
+       
 
     /**
      * {@inheritDoc}

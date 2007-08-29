@@ -24,8 +24,6 @@ import java.sql.PreparedStatement;
 
 
 // Sicade dependencies
-import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Observation;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.DuplicatedRecordException;
 import net.sicade.catalog.ConfigurationKey;
@@ -40,9 +38,13 @@ import net.sicade.coverage.model.DistributionTable;
 import org.opengis.metadata.quality.DataQuality;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.Observation;
 
 // geotolls dependencies
 import org.geotools.resources.Utilities;
+
+
 
 /**
  * Classe de base des connections vers la table des {@linkplain Observation observation}.

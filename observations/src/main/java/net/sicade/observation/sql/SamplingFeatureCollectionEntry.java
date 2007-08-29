@@ -20,11 +20,16 @@ import java.io.ObjectOutputStream;
 import java.util.Set;
 import java.util.Collections;
 import java.sql.SQLException;
+import java.util.List;
 
-import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.SamplingFeatureCollection;
+// Sicade dependencies
 import net.sicade.catalog.ServerException;
 import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.Entry;
+
+// GeoAPI dependencies
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.sampling.SamplingFeatureCollection;
 
 
 /**
@@ -34,7 +39,7 @@ import net.sicade.catalog.CatalogException;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class SamplingFeatureCollectionEntry extends LocatedEntry implements SamplingFeatureCollection {
+public class SamplingFeatureCollectionEntry extends Entry implements SamplingFeatureCollection {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -58,16 +63,16 @@ public class SamplingFeatureCollectionEntry extends LocatedEntry implements Samp
      * @param name  Le nom de la plateforme (parfois assimilé à une campagne d'échantillonage).
      */
     protected SamplingFeatureCollectionEntry(final SamplingFeatureCollectionTable table,
-                            final String        name)
+                                             final String name)
     {
-        super(table.getLocationTable(), name, null, null);
+        super(name);
         stations = table.getStationTable();
     }
 
     /**
      * {@inheritDoc}
      */
-    public synchronized Set<? extends SamplingFeature> getMembers() throws CatalogException {
+    public synchronized Set<SamplingFeature> getMembers() {
         if (elements == null) try {
             if (stations != null) {
                 final Set<SamplingFeature> set;
@@ -90,7 +95,6 @@ public class SamplingFeatureCollectionEntry extends LocatedEntry implements Samp
      * @param  out The output stream where to serialize this object.
      * @throws IOException if the serialization failed.
      */
-    @Override
     protected synchronized void writeObject(final ObjectOutputStream out) throws IOException {
         if (elements == null) try {
             elements = getMembers();
@@ -99,6 +103,6 @@ public class SamplingFeatureCollectionEntry extends LocatedEntry implements Samp
             e.initCause(exception);
             throw e;
         }
-        super.writeObject(out);
+       out.defaultWriteObject();
     }
 }

@@ -14,14 +14,22 @@
  */
 package net.sicade.observation.sql;
 
+// Sicade dependencies 
 import net.sicade.catalog.Entry;
 import net.sicade.coverage.model.Distribution;
-import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Observation;
+
+// openGis dependencies
 import org.opengis.observation.Process;
-import org.geotools.resources.Utilities;
 import org.opengis.metadata.quality.DataQuality;
 import org.opengis.observation.Phenomenon;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.Observation;
+import org.opengis.metadata.quality.Element;
+
+// geotools dependencies
+import org.geotools.resources.Utilities;
+
+
 
 
 /**
@@ -60,7 +68,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
      */
-    private final DataQuality quality;
+    private final Element quality;
 
     /**
      * Construit une observation.
@@ -74,7 +82,7 @@ public class ObservationEntry extends Entry implements Observation {
                                final Phenomenon      observedProperty,
                                final Process         procedure,
                                final Distribution    distribution,
-                               final DataQuality  quality) 
+                               final Element  quality) 
     {
         super(null);
         this.featureOfInterest = featureOfInterest;
@@ -123,7 +131,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public DataQuality getQuality() {
+    public Element getQuality() {
         return quality;
     }
 

@@ -19,7 +19,6 @@ import java.sql.Types;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
-import java.util.Observable;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -29,11 +28,13 @@ import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.model.Distribution;
-import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Measurement;
+
+// GeoAPI dependencies
 import org.opengis.metadata.quality.DataQuality;
+import org.opengis.observation.Measurement;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
+import org.opengis.observation.sampling.SamplingFeature;
 
 
 

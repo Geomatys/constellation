@@ -30,7 +30,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Observable;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.LoggingLevel;
 import net.sicade.catalog.Query;
@@ -42,12 +41,11 @@ import org.geotools.resources.Utilities;
 // Sicade dependencies
 import net.sicade.coverage.model.Descriptor;
 import net.sicade.coverage.model.RegionOfInterest;
-import net.sicade.observation.Observation;
 
 // GeoAPI dependencies
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
-
+import org.opengis.observation.Observation;
 
 /**
  * Juxtapose des observations de différents types sur une même ligne. La première colonne pourrait

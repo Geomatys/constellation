@@ -23,15 +23,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.awt.geom.Point2D;
-import net.sicade.catalog.Database;
-import net.sicade.catalog.Query;
-import net.sicade.catalog.QueryType;
-import net.sicade.catalog.SingletonTable;
-import net.sicade.observation.sql.MetadataTable;
+
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.quality.DataQuality;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.sampling.SamplingFeatureCollection;
+import org.opengis.observation.Observation;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -40,11 +38,13 @@ import org.geotools.metadata.iso.citation.CitationImpl;
 
 // Sicade dependencies
 import net.sicade.util.DateRange;
-import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.SamplingFeatureCollection;
-import net.sicade.observation.Observation;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.Query;
+import net.sicade.catalog.QueryType;
+import net.sicade.catalog.SingletonTable;
+
 
 
 /**

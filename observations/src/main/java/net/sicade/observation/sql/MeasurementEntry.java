@@ -18,14 +18,13 @@ import javax.units.Unit;
 
 // Sicade dependencies
 import net.sicade.coverage.model.Distribution;
-import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Measurement;
 
-
-// GeoAPI dependencies
+// openGis dependencies
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
-import org.opengis.metadata.quality.DataQuality;
+import org.opengis.observation.Measurement;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.metadata.quality.Element;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Measurement mesure}.
@@ -64,7 +63,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
                                final Phenomenon      observedProperty,
                                final Process         procedure,
                                final Distribution    distribution,
-                               final DataQuality  quality,
+                               final Element  quality,
                                final float      value, 
                                final float      error) 
     {

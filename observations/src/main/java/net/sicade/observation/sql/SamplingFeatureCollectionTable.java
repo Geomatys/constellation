@@ -28,9 +28,10 @@ import net.sicade.catalog.QueryType;
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.SamplingFeatureCollection;
 import net.sicade.catalog.ConfigurationKey;
+
+// openGis dependencies
+import org.opengis.observation.sampling.SamplingFeatureCollection;
 
 
 /**
