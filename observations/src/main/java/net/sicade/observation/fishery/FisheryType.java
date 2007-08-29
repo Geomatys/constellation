@@ -18,8 +18,7 @@
  */
 package net.sicade.observation.fishery;
 
-// Sicade dependencies
-import net.sicade.observation.Process;
+import org.opengis.observation.Process;
 
 
 /**

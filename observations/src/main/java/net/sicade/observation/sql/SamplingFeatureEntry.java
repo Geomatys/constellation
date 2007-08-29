@@ -163,7 +163,7 @@ public class SamplingFeatureEntry extends LocatedEntry implements SamplingFeatur
         try {
             synchronized (table) {
                 table.setStation   (this);
-                table.setObservable(null);
+                //table.setObservable(null);
                 return table.getEntries();
             }
         } catch (SQLException exception) {

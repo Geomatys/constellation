@@ -31,8 +31,9 @@ import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Observable;
 import net.sicade.observation.Measurement;
-import net.sicade.observation.Phenomenon;
-import net.sicade.observation.Process;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.Process;
+
 
 
 /**

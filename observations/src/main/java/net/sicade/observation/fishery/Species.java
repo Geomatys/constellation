@@ -21,9 +21,7 @@ package net.sicade.observation.fishery;
 // J2SE dependencies
 import java.awt.Color;
 import java.util.Locale;
-
-// Sicade dependencies
-import net.sicade.observation.Phenomenon;
+import org.opengis.observation.Phenomenon;
 
 
 /**

@@ -17,9 +17,8 @@ package net.sicade.observation.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+// sicade dependencies
 import net.sicade.observation.Observable;
-import net.sicade.observation.Phenomenon;
-import net.sicade.observation.Process;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.model.DistributionTable;
@@ -28,6 +27,10 @@ import net.sicade.catalog.Database;
 import net.sicade.catalog.Query;
 import net.sicade.catalog.SingletonTable;
 
+
+// GeoAPI dependencies
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.Process;
 
 /**
  * Connexion vers la table des {@linkplain Observable observables}.

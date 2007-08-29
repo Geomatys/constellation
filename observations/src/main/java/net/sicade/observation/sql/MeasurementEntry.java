@@ -18,8 +18,10 @@ import javax.units.Unit;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.Measurement;
-import net.sicade.observation.Phenomenon;
-import net.sicade.observation.Process;
+
+// GeoAPI dependencies
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.Process;
 
 
 /**

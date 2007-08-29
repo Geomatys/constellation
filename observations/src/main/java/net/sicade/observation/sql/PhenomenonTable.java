@@ -17,11 +17,11 @@ package net.sicade.observation.sql;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.sicade.observation.Phenomenon;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Query;
 import net.sicade.catalog.SingletonTable;
+import org.opengis.observation.Phenomenon;
 
 
 /**

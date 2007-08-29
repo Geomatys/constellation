@@ -14,8 +14,13 @@
  */
 package net.sicade.observation;
 
+// sicade dependencies
 import net.sicade.coverage.model.Distribution;
 import net.sicade.catalog.Element;
+
+// GeoAPI dependencies
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.Process;
 
 
 /**

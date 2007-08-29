@@ -17,6 +17,8 @@ package net.sicade.observation;
 // Sicade
 import net.sicade.catalog.Element;
 import net.sicade.coverage.model.Distribution;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.Process;
 
 
 /**

@@ -24,9 +24,7 @@ import java.sql.PreparedStatement;
 
 import org.geotools.resources.Utilities;
 import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.Observable;
 import net.sicade.observation.Observation;
-import net.sicade.observation.Process;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.DuplicatedRecordException;
 import net.sicade.catalog.ConfigurationKey;
@@ -36,7 +34,8 @@ import net.sicade.catalog.QueryType;
 import net.sicade.catalog.Table;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.coverage.model.DistributionTable;
-import net.sicade.observation.Phenomenon;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.Process;
 
 
 /**

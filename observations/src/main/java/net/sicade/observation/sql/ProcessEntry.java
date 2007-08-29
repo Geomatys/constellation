@@ -14,7 +14,7 @@
  */
 package net.sicade.observation.sql;
 
-import net.sicade.observation.Process;
+import org.opengis.observation.Process;
 import net.sicade.catalog.Entry;
 
 

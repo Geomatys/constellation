@@ -14,13 +14,17 @@
  */
 package net.sicade.observation.sql;
 
+// sicade dependencies
 import net.sicade.catalog.Entry;
 import net.sicade.observation.Observable;
-import net.sicade.observation.Phenomenon;
-import net.sicade.observation.Process;
 import net.sicade.coverage.model.Distribution;
+
+// geotools dependencies
 import org.geotools.resources.Utilities;
 
+// geoAPI dependencies
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.Process;
 
 /**
  * Implémentation d'une entrée représentant un {@linkplain Observable observable}.

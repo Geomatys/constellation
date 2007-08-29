@@ -39,11 +39,13 @@ import net.sicade.catalog.Table;
 import org.geotools.resources.Utilities;
 
 // Sicade dependencies
-import net.sicade.observation.Process;
-import net.sicade.observation.Phenomenon;
 import net.sicade.observation.Observable;
 import net.sicade.coverage.model.Descriptor;
 import net.sicade.coverage.model.RegionOfInterest;
+
+// GeoAPI dependencies
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.Process;
 
 
 /**
