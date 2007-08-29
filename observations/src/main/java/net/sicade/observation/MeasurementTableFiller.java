@@ -29,15 +29,19 @@ import net.sicade.coverage.model.Descriptor;
 
 // OpenGIS dependencies
 import org.opengis.coverage.PointOutsideCoverageException;
+import org.opengis.observation.sampling.SamplingFeature;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.gui.swing.ExceptionMonitor;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
+
+// Sicade dependencies
 import net.sicade.observation.sql.MeasurementTable;
 import net.sicade.coverage.model.DescriptorTable;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.XArray;
+
 
 
 /**

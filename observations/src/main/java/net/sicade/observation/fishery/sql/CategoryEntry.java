@@ -23,13 +23,15 @@ import org.geotools.resources.Utilities;
 
 // Sicade dependencies
 import net.sicade.coverage.model.Distribution;
-import net.sicade.observation.SamplingFeature;
 import net.sicade.observation.fishery.Stage;
 import net.sicade.observation.fishery.Species;
 import net.sicade.observation.fishery.Category;
 import net.sicade.observation.fishery.FisheryType;
 import net.sicade.observation.sql.ObservationEntry;
-import org.opengis.metadata.quality.DataQuality;
+
+// openGis dependencies
+import org.opengis.metadata.quality.Element;
+import org.opengis.observation.sampling.SamplingFeature;
 
 
 /**
@@ -62,7 +64,7 @@ public class CategoryEntry extends ObservationEntry implements Category {
                             final Species         species,
                             final Stage           stage,
                             final FisheryType     procedure,
-                            final DataQuality     quality)
+                            final Element         quality)
     {
         super(featureOfInterest, species, procedure, Distribution.NORMAL, quality);
         this.stage = stage;

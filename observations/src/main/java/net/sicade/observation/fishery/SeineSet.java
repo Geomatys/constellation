@@ -18,8 +18,8 @@
  */
 package net.sicade.observation.fishery;
 
-// Sicade dependencies
-import net.sicade.observation.SamplingFeature;
+// OpenGis dependencies
+import org.opengis.observation.sampling.SamplingFeature;
 
 
 /**

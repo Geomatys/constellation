@@ -17,12 +17,13 @@ package net.sicade.observation;
 // J2SE dependencies
 import java.util.Date;
 import java.lang.reflect.UndeclaredThrowableException;
-import net.sicade.catalog.CatalogException;
-import net.sicade.coverage.catalog.*;
-import net.sicade.coverage.model.Descriptor;
 
-// Geotools dependencies
-import org.geotools.coverage.SpatioTemporalCoverage3D;
+// Sicade dependencies
+import net.sicade.catalog.CatalogException;
+import net.sicade.coverage.model.Descriptor;
+import org.opengis.observation.sampling.SamplingFeature;
+
+
 
 /**
  * Une paire {@linkplain SamplingFeature station} - {@linkplain Descriptor descripteur}.

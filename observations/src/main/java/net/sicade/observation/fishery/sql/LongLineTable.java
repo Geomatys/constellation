@@ -25,16 +25,15 @@ import java.awt.geom.Point2D;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
-import org.opengis.metadata.quality.DataQuality;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.sampling.SamplingFeatureCollection;
 
 // Sicade dependencies
 import net.sicade.util.DateRange;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
-import net.sicade.catalog.QueryType;
-import net.sicade.observation.SamplingFeature;
-import net.sicade.observation.SamplingFeatureCollection;
 import net.sicade.observation.sql.SamplingFeatureTable;
+
 
 
 /**

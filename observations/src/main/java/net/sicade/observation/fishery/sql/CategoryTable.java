@@ -25,10 +25,10 @@ import java.sql.SQLException;
 // Sicade dependencies
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
-import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.catalog.CatalogException;
 import net.sicade.observation.fishery.Category;
+import net.sicade.observation.sql.SamplingFeatureTable;
 
 
 /**
@@ -50,13 +50,18 @@ public class CategoryTable extends SingletonTable<Category> {
 //            "   AND selected=TRUE\n"                                                     +
 //            " ORDER BY identifier");
 
-    /** Numéro de colonne. */ private static final int  SYMBOL     = 1;
-    /** Numéro de colonne. */ private static final int  IDENTIFIER = 2;
-    /** Numéro de colonne. */ private static final int  PHENOMENON = 3;
-    /** Numéro de colonne. */ private static final int  PROCEDURE  = 4;
-    /** Numéro de colonne. */ private static final int  STAGE      = 5;
-    /** Numéro de colonne. */ private static final int  REMARKS    = 6;
+    /** Numéro de colonne. */ private static final int  FEATUREOFINTEREST= 1;
+    /** Numéro de colonne. */ private static final int  PHENOMENON = 2;
+    /** Numéro de colonne. */ private static final int  PROCEDURE  = 3;
+    /** Numéro de colonne. */ private static final int  STAGE      = 4;
+    /** Numéro de colonne. */ private static final int  REMARKS    = 5;
 
+    /**
+     * Table des stationss.
+     * Ne sera construite que la première fois où elle sera nécessaire/
+     */
+    private transient SamplingFeatureTable stations;
+    
     /**
      * Table des espèces.
      * Ne sera construite que la première fois où elle sera nécessaire/
@@ -89,19 +94,25 @@ public class CategoryTable extends SingletonTable<Category> {
      * Construit une catégorie pour l'enregistrement courant.
      */
     protected Category createEntry(final ResultSet result) throws SQLException, CatalogException {
-        final String symbol     = result.getString(SYMBOL);
-        final int    identifier = result.getInt   (IDENTIFIER);
+        final String station     = result.getString(FEATUREOFINTEREST);
         final String phenomenon = result.getString(PHENOMENON);
         final String procedure  = result.getString(PROCEDURE);
         final String stage      = result.getString(STAGE);
         final String remarks    = result.getString(REMARKS);
+        
+        if (stations == null) {
+            stations = getDatabase().getTable(SamplingFeatureTable.class);
+        }
         if (species == null) {
             species = getDatabase().getTable(SpeciesTable.class);
         }
         if (stages == null) {
             stages = getDatabase().getTable(StageTable.class);
         }
-        return new CategoryEntry(identifier, symbol, species.getEntry(phenomenon),
-                                 stages.getEntry(stage), fisheryType, remarks);
+        return new CategoryEntry(stations.getEntry(stations), 
+                                 species.getEntry(phenomenon),
+                                 stages.getEntry(stage),
+                                 fisheryType, 
+                                 remarks);
     }
 }
