@@ -30,7 +30,9 @@ import net.sicade.catalog.Entry;
 // GeoAPI dependencies
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.sampling.SamplingFeatureCollection;
-
+import org.opengis.observation.Observation;
+import org.opengis.observation.AnyFeature;
+import org.opengis.observation.sampling.SurveyProcedure;
 
 /**
  * Implémentation d'une entrée représentant une {@link Platform plateforme}.
@@ -39,17 +41,17 @@ import org.opengis.observation.sampling.SamplingFeatureCollection;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class SamplingFeatureCollectionEntry extends Entry implements SamplingFeatureCollection {
+public class SamplingFeatureCollectionEntry extends SamplingFeatureEntry implements SamplingFeatureCollection {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = 791454287176154131L;
-
+   
     /**
-     * L'ensemble des stations. Ne sera construit que la première fois où il sera nécessaire.
+     * L'ensemble des stations de cette platform . Ne sera construit que la première fois où il sera nécessaire.
      */
-    private Set<? extends SamplingFeature> elements;
-
+    private Set<SamplingFeature> member;
+    
     /**
      * Connexion vers la table des stations.
      * Sera mis à {@code null} lorsqu'elle ne sera plus nécessaire.
@@ -62,18 +64,20 @@ public class SamplingFeatureCollectionEntry extends Entry implements SamplingFea
      * @param table La table qui a produit cette entrée.
      * @param name  Le nom de la plateforme (parfois assimilé à une campagne d'échantillonage).
      */
-    protected SamplingFeatureCollectionEntry(final SamplingFeatureCollectionTable table,
-                                             final String name)
+    protected SamplingFeatureCollectionEntry(SamplingFeatureTable stations,
+                                             final String name,
+                                             final SurveyProcedure surveyDetail)
     {
-        super(name);
-        stations = table.getStationTable();
+        super(stations, name, surveyDetail);
+        stations = stations;
     }
 
+  
     /**
      * {@inheritDoc}
      */
     public synchronized Set<SamplingFeature> getMembers() {
-        if (elements == null) try {
+        if (member == null) try {
             if (stations != null) {
                 final Set<SamplingFeature> set;
                 synchronized (stations) {
@@ -81,13 +85,15 @@ public class SamplingFeatureCollectionEntry extends Entry implements SamplingFea
                     stations.setPlatform(this);
                     set = stations.getEntries();
                 }
-                elements = Collections.unmodifiableSet(set);
+                member = Collections.unmodifiableSet(set);
             }
         } catch (SQLException exception) {
             throw new ServerException(exception);
         }
-        return elements;
+        return member;
     }
+    
+   
 
     /**
      * Complete the station informations before serialization.
@@ -96,8 +102,8 @@ public class SamplingFeatureCollectionEntry extends Entry implements SamplingFea
      * @throws IOException if the serialization failed.
      */
     protected synchronized void writeObject(final ObjectOutputStream out) throws IOException {
-        if (elements == null) try {
-            elements = getMembers();
+        if (member == null) try {
+            member = getMembers();
         } catch (CatalogException exception) {
             final InvalidObjectException e = new InvalidObjectException(exception.toString());
             e.initCause(exception);

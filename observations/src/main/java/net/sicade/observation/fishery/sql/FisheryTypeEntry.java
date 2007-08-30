@@ -19,7 +19,7 @@
 package net.sicade.observation.fishery.sql;
 
 // Sicade dependencies
-import net.sicade.observation.sql.ProcessEntry;
+import net.sicade.observation.ProcessEntry;
 import net.sicade.observation.fishery.FisheryType;
 
 

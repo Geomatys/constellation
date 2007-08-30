@@ -248,7 +248,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * @throws CatalogException si un enregistrement est invalide.
      * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
      */
-    public synchronized Collection<EntryType> getEntries() throws CatalogException, SQLException {
+    public synchronized List<EntryType> getEntries() throws CatalogException, SQLException {
         final List<EntryType> list = new ArrayList<EntryType>();
         final PreparedStatement statement = getStatement(getProperty(select));
         final ResultSet result = statement.executeQuery();

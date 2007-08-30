@@ -16,6 +16,7 @@ package net.sicade.observation.sql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import net.sicade.observation.ProcessEntry;
 
 import org.opengis.observation.Process;
 import net.sicade.catalog.ConfigurationKey;

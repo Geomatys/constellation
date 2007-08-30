@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation.sql;
+package net.sicade.observation;
 
 import org.opengis.observation.Process;
 import net.sicade.catalog.Entry;

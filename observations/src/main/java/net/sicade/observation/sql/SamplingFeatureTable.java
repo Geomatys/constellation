@@ -96,7 +96,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * Connexion vers la table des observations.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private ObservationTable<? extends Observation> observations;
+    private ObservationTable<Observation> observations;
 
     /**
      * La plateforme recherchée, ou {@code null} pour rechercher les stations de toutes les
@@ -176,7 +176,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
     /**
      * Retourne la table des observations à utiliser pour la création des objets {@link StationEntry}.
      */
-    final ObservationTable<? extends Observation> getObservationTable() {
+    final ObservationTable<Observation> getObservationTable() {
         assert Thread.holdsLock(this);
         if (observations == null) {
             setObservationTable(getDatabase().getTable(MeasurementTable.class));

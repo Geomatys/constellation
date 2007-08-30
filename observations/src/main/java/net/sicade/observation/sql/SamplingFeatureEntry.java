@@ -14,26 +14,22 @@
  */
 package net.sicade.observation.sql;
 
-// J2SE dependencies
-import java.util.Collection;
-import java.awt.geom.Point2D;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import org.opengis.metadata.citation.Citation;
-
-// Sicade dependencies
-import net.sicade.util.DateRange;
 import net.sicade.catalog.ServerException;
-import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Entry;
 
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.observation.sampling.SamplingFeatureCollection;
 import org.opengis.observation.Observation;
-
+import org.opengis.observation.AnyFeature;
+import org.opengis.observation.sampling.SamplingFeatureRelation;
+import org.opengis.observation.sampling.SurveyProcedure;
 
 /**
  * Implémentation d'une entrée représentant une {@link Station station}.
@@ -56,17 +52,33 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * L'identifiant numérique de la station.
      */
     private final int identifier;
-
+    
     /**
-     * La plateforme (par exemple un bateau) sur laquelle a été prise cette station.
-     * Peut être nul si cette information n'est pas disponible.
+     * L'ensemble des stations. Ne sera construit que la première fois où il sera nécessaire.
      */
-    private final SamplingFeatureCollection platform;
-   
+    private List<SamplingFeatureRelation> relatedSamplingFeature;
+    
     /**
-     * La provenance de la donnée. Peut être nul si cette information n'est pas disponible.
+     * Les Observations
      */
-    private final Citation provider;
+    private List<Observation> relatedObservation;
+    
+    /**
+     * Les features designé
+     */
+    private List<AnyFeature> sampledFeature; 
+    
+    /**
+     * Connexion vers la table des stations.
+     * Sera mis à {@code null} lorsqu'elle ne sera plus nécessaire.
+     */
+    private transient SamplingFeatureTable stations;
+    
+    /**
+     * Connexion vers la table des "survey details"
+     * Optionnel peut etre {@code null}
+     */
+    private SurveyProcedure surveyDetail;
 
     /**
      * Connexion vers la table des observations. Contrairement à la plupart des autres
@@ -74,7 +86,8 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * conservées dans une cache car elle sont potentiellement très nombreuses. Il nous
      * faudra donc conserver la connexion en permanence.
      */
-    private final ObservationTable<? extends Observation> table;
+    private final ObservationTable<Observation> observations;
+    
 
     /** 
      * Construit une entrée pour l'identifiant de station spécifié.
@@ -82,26 +95,18 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * @param table      La table qui a produit cette entrée.
      * @param identifier L'identifiant numérique de la station.
      * @param name       Le nom de la station.
-     * @param coordinate Une coordonnée représentative en degrés de longitude et de latitude,
-     *                   ou {@code null} si inconue.
-     * @param timeRange  Plage de temps de cet élément, ou {@code null} si inconue.
-     * @param platform   La plateforme (par exemple un bateau) sur laquelle a été prise cette
-     *                   station, ou {@code null} si inconnue.
      * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
      */
-    protected SamplingFeatureEntry(final SamplingFeatureTable table,
-                           final int          identifier,
-                           final String       name,
-                           final Point2D      coordinate,
-                           final DateRange    timeRange,
-                           final SamplingFeatureCollection     platform,
-                           final Citation     provider)
+    protected SamplingFeatureEntry(final SamplingFeatureTable stations,
+                                   final String       name,
+                                   final SurveyProcedure surveyDetail,
+                                   final int identifier)
     {
         super(name);
+        this.surveyDetail = surveyDetail;
+        this.stations   = stations;
+        this.observations   = stations.getObservationTable();
         this.identifier = identifier;
-        this.platform   = platform;
-        this.provider   = provider;
-        this.table      = table.getObservationTable();
     }
 
     /**
@@ -110,45 +115,75 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     public int getNumericIdentifier() {
         return identifier;
     }
-
+    
     /**
      * {@inheritDoc}
      */
-    public Citation getProvider() {
-        return provider;
-    }
-       
-
-    /**
-     * {@inheritDoc}
-     
-    public Observation getObservation(final Observable observable) getRelatedObservationException {
-        try {
-            synchronized (table) {
-                table.setStation(this);
-                table.setObservable(observable);
-                return table.getEntry();
+    public synchronized List<SamplingFeatureRelation> getRelatedSamplingFeatures() {
+        if (relatedSamplingFeature == null) try {
+            if (stations != null) {
+                final List<SamplingFeatureRelation> list = null;
+               
+                /*synchronized (stations) {
+                    assert equals(stations.getPlatform()) : this;
+                    stations.setPlatform(this);
+                    set = stations.getEntries();
+                }*/
+                relatedSamplingFeature = Collections.unmodifiableList(list);
             }
         } catch (SQLException exception) {
             throw new ServerException(exception);
         }
+        return relatedSamplingFeature;
     }
-    */
-
+  
+    
     /**
      * {@inheritDoc}
      */
-    public Collection<? extends Observation> getRelatedObservations() throws CatalogException {
-        try {
-            synchronized (table) {
-                table.setStation   (this);
-                //table.setObservable(null);
-                return table.getEntries();
+    public synchronized List<Observation> getRelatedObservations() {
+        
+        if (relatedObservation == null) try {
+            if (observations != null) {
+                List<Observation> list = null;
+                synchronized (observations) {
+                    /*assert equals(observations.) : this;
+                    observations.setPlatform(this);*/
+                    list = observations.getEntries();
+                }
+                relatedObservation = Collections.unmodifiableList(list);
             }
         } catch (SQLException exception) {
             throw new ServerException(exception);
         }
+        return relatedObservation;
     }
+    
+     /**
+     * {@inheritDoc}
+     */
+    public synchronized List<AnyFeature> getSampledFeatures() {
+        if (sampledFeature == null) try {
+            if (stations != null) {
+                final List<AnyFeature> list = null;
+               /* synchronized (stations) {
+                    assert equals(stations.getPlatform()) : this;
+                    stations.setPlatform(this);
+                    set = stations.getEntries();
+                }*/
+                sampledFeature = Collections.unmodifiableList(list);
+            }
+        } catch (SQLException exception) {
+            throw new ServerException(exception);
+        }
+        return sampledFeature;
+    }
+
+    public SurveyProcedure getSurveyDetail() {
+        return this.surveyDetail;
+    }
+    
+    
 
     /**
      * Retourne le code numérique identifiant cette entrée.
@@ -168,9 +203,11 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         }
         if (super.equals(object)) {
             final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
-            return                 (this.identifier == that.identifier) &&
-                   Utilities.equals(this.platform,     that.platform)   &&
-                   Utilities.equals(this.provider,     that.provider);
+            return                 (this.identifier       ==     that.identifier) &&
+                   Utilities.equals(this.surveyDetail,           that.surveyDetail)   &&
+                   Utilities.equals(this.relatedObservation,     that.relatedObservation) &&
+                   Utilities.equals(this.relatedSamplingFeature, that.relatedSamplingFeature) &&
+                   Utilities.equals(this.sampledFeature,         that.sampledFeature);
         }
         return false;
     }

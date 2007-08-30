@@ -69,7 +69,16 @@ public class ObservationEntry extends Entry implements Observation {
      * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
      */
     private final Element quality;
-
+    
+    /**
+     * le resultat de l'observation de n'importe quel type 
+     */
+    private Object Result;
+    
+    /**
+     * 
+     */
+    
     /**
      * Construit une observation.
      * 
@@ -82,7 +91,8 @@ public class ObservationEntry extends Entry implements Observation {
                                final Phenomenon      observedProperty,
                                final Process         procedure,
                                final Distribution    distribution,
-                               final Element  quality) 
+                               final Element         quality,
+                               final Object          result ) 
     {
         super(null);
         this.featureOfInterest = featureOfInterest;
@@ -90,6 +100,7 @@ public class ObservationEntry extends Entry implements Observation {
         this.procedure         = procedure;
         this.distribution      = distribution;
         this.quality           = quality;
+        this.Result            = result;
     }
 
     /**
@@ -103,7 +114,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public SamplingFeature getFeatureOfInterest() {
+    public AnyFeature getFeatureOfInterest() {
         return featureOfInterest;
     }
 
@@ -135,6 +146,12 @@ public class ObservationEntry extends Entry implements Observation {
         return quality;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Object getResult() {
+        return Result;
+    }
 
     /**
      * Retourne un code représentant cette observation.

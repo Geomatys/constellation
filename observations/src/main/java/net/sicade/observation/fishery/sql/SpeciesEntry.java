@@ -24,7 +24,7 @@ import static java.util.Locale.*;
 
 // Sicade dependencies
 import net.sicade.observation.fishery.Species;
-import net.sicade.observation.sql.PhenomenonEntry;
+import net.sicade.observation.PhenomenonEntry;
 
 
 /**

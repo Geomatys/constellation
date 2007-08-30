@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation.sql;
+package net.sicade.observation;
 
 // Sicade dependencies
 import net.sicade.catalog.Entry;
@@ -38,7 +38,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      *
      * @param name Le nom du phénomène.
      */
-    protected PhenomenonEntry(final String name) {
+    public PhenomenonEntry(final String name) {
         super(name);
     }
 
@@ -48,7 +48,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      * @param name    Le nom du phénomène.
      * @param remarks Remarques s'appliquant à ce phénomène, ou {@code null}.
      */
-    protected PhenomenonEntry(final String name, final String remarks) {
+    public PhenomenonEntry(final String name, final String remarks) {
         super(name, remarks);
     }
 }
