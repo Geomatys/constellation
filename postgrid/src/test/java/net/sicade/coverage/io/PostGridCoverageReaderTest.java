@@ -55,12 +55,22 @@ public class PostGridCoverageReaderTest extends TestCase {
         coverage.show("Original");
 
         final ColorMap colorMap = new ColorMap();
-        colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange(3, 20, SI.CELSIUS));
-        final GridCoverage recolored = Operations.DEFAULT.recolor(original, new ColorMap[] {colorMap});
+        colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange(-3, 40, SI.CELSIUS));
+        GridCoverage recolored = Operations.DEFAULT.recolor(original, new ColorMap[] {colorMap});
+        assertSame(original, recolored);
+
+        colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange(10, 40, SI.CELSIUS));
+        recolored = Operations.DEFAULT.recolor(original, new ColorMap[] {colorMap});
         assertNotSame(original, recolored);
         assertTrue(recolored instanceof GridCoverage2D);
-        ((GridCoverage2D) recolored).show("Recolor");
+        ((GridCoverage2D) recolored).show("Recolor [10..40°C]");
 
-        Thread.sleep(10000);
+        colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange(3, 20, SI.CELSIUS));
+        recolored = Operations.DEFAULT.recolor(original, new ColorMap[] {colorMap});
+        assertNotSame(original, recolored);
+        assertTrue(recolored instanceof GridCoverage2D);
+        ((GridCoverage2D) recolored).show("Recolor [3..20°C]");
+
+        Thread.sleep(15000);
     }
 }

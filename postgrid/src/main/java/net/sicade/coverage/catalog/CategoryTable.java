@@ -78,6 +78,9 @@ public class CategoryTable extends Table {
      * @throws SQLException if an error occured while reading the database.
      */
     public synchronized Category[] getCategories(final String band) throws CatalogException, SQLException {
+        final PaletteFactory palettes = PaletteFactory.getDefault();
+        palettes.setWarningLocale(getDatabase().getLocale());
+
         final CategoryQuery query = (CategoryQuery) this.query;
         final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
         statement.setString(indexOf(query.byBand), band);
@@ -106,7 +109,7 @@ public class CategoryTable extends Table {
              */
             Color[] colors = null;
             if (colorID != null) try {
-                colors = decode(colorID);
+                colors = decode(palettes, colorID);
             } catch (Exception exception) { // Includes IOException and ParseException
                 throw new IllegalRecordException(exception, results, colorsIndex, name);
             }
@@ -160,7 +163,9 @@ public class CategoryTable extends Table {
      * @throws ParseException si le fichier de la palette de couleurs a été ouvert,
      *         mais qu'elle contient des caractères qui n'ont pas pus être interprétés.
      */
-    private static Color[] decode(String colors) throws IOException, ParseException {
+    private static Color[] decode(final PaletteFactory palettes, String colors)
+            throws IOException, ParseException
+    {
         /*
          * Retire les guillements au début et à la fin de la chaîne, s'il y en a.
          * Cette opération vise à éviter des problèmes de compatibilités lorsque
@@ -188,7 +193,6 @@ public class CategoryTable extends Table {
              * l'erreur et on continue en essayant de décoder l'URL.
              */
         }
-        final URL url = new URL(colors);
-        return PaletteFactory.getDefault(null).getColors(url.getPath());
+        return palettes.getColors(new URL(colors).getPath());
     }
 }
