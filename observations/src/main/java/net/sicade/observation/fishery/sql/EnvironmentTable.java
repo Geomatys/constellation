@@ -82,9 +82,6 @@ public class EnvironmentTable extends MeasurementTable {
     {
         this(database);
         final SamplingFeatureTable stations = database.getTable(type);
-        for (String provider : providers) {
-            stations.acceptableProvider(provider);
-        }
         stations.setAbridged(true);
         setStationTable(stations);
     }

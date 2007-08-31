@@ -18,20 +18,21 @@ import javax.units.Unit;
 
 // Sicade dependencies
 import net.sicade.coverage.model.Distribution;
-import org.opengis.metadata.MetaData;
+
 
 // openGis dependencies
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
 import org.opengis.observation.Measurement;
-import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.metadata.quality.Element;
 import org.opengis.observation.Measure;
 import org.opengis.temporal.TemporalObject;
+import org.opengis.metadata.MetaData;
+import org.opengis.observation.sampling.SamplingFeature;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Measurement mesure}.
- * 
+ *
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
@@ -41,7 +42,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = 6700527485309897974L;
-
+    
     
     /**
      * le resultat de la mesure
@@ -49,7 +50,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     private Measure result;
     
     
-    /** 
+    /**
      * Crée une nouvelle mesure.
      *
      * @param station     La station d'observation (par exemple une position de pêche).
@@ -58,34 +59,33 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      * @param error       Estimation de l'erreur sur la valeur mesurée, ou {@link Float#NaN NaN}
      *                    si l'erreur est inconnue ou ne s'applique pas.
      */
-    protected MeasurementEntry(final SamplingFeature station, 
-                               final Phenomenon      observedProperty,
-                               final Process         procedure,
-                               final Distribution    distribution,
-                               final Element         quality,
-                               final Measure         result,
-                               final TemporalObject  samplingTime,
-                               final MetaData        observationMetadata,
-                               final String          resultDefinition,
-                               final TemporalObject  procedureTime,
-                               final Object          procedureParameter) 
-    {
+    protected MeasurementEntry(final SamplingFeature station,
+            final Phenomenon      observedProperty,
+            final Process         procedure,
+            final Distribution    distribution,
+            final Element         quality,
+            final Measure         result,
+            final TemporalObject  samplingTime,
+            final MetaData        observationMetadata,
+            final String          resultDefinition,
+            final TemporalObject  procedureTime,
+            final Object          procedureParameter) {
         super(station, observedProperty, procedure, distribution, quality, result,
                 samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
     protected String createName() {
-        final StringBuilder name = new StringBuilder(super.createName()).append(" = ").append(value);
-       
+        final StringBuilder name = new StringBuilder(super.createName()).append(" = ");
+        
         return name.toString();
     }
-
     
-
+    
+    
     
     /**
      * Vérifie si cette entré est identique à l'objet spécifié.
@@ -98,7 +98,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         }
         return false;
     }
-
+    
     public Measure getResult() {
         return result;
     }

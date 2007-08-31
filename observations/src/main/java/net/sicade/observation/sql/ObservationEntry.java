@@ -25,7 +25,6 @@ import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
 import org.opengis.metadata.quality.Element;
 import org.opengis.metadata.MetaData;
-import org.opengis.observation.AnyFeature;
 import org.opengis.temporal.TemporalObject;
 
 // geotools dependencies
@@ -51,7 +50,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * La station à laquelle a été pris cet échantillon.
      */
-    private final AnyFeature featureOfInterest;
+    private final SamplingFeature featureOfInterest;
     
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
@@ -111,17 +110,17 @@ public class ObservationEntry extends Entry implements Observation {
      * @param procedure         La procédure associée.
      * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
      */
-    protected ObservationEntry(final AnyFeature featureOfInterest, 
+    protected ObservationEntry(final SamplingFeature featureOfInterest, 
                                final Phenomenon      observedProperty,
                                final Process         procedure,
                                final Distribution    distribution,
                                final Element         quality,
                                final Object          result,
-                               final TemporalObject samplingTime,
-                               final MetaData observationMetadata,
-                               final String resultDefinition,
-                               final TemporalObject procedureTime,
-                               final Object procedureParameter) 
+                               final TemporalObject  samplingTime,
+                               final MetaData        observationMetadata,
+                               final String          resultDefinition,
+                               final TemporalObject  procedureTime,
+                               final Object          procedureParameter) 
     {
         super(null);
         this.featureOfInterest   = featureOfInterest;
@@ -142,13 +141,13 @@ public class ObservationEntry extends Entry implements Observation {
      */
     @Override
     protected String createName() {
-        return observedProperty.getName() + '(' + featureOfInterest.getName() + ')';
+        return "";
     }
 
     /**
      * {@inheritDoc}
      */
-    public AnyFeature getFeatureOfInterest() {
+    public SamplingFeature getFeatureOfInterest() {
         return featureOfInterest;
     }
 

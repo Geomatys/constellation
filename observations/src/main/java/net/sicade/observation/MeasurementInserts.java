@@ -18,6 +18,8 @@ package net.sicade.observation;
 import java.sql.SQLException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+// Sicade dependencies
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
 import net.sicade.coverage.catalog.*;

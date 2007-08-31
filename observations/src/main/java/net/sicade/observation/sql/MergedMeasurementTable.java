@@ -353,7 +353,7 @@ public class MergedMeasurementTable extends Table {
                 final LogRecord record = new LogRecord(LoggingLevel.CREATE, sqlCreate);
                 record.setSourceClassName ("MergedMeasurementTable");
                 record.setSourceMethodName("copyToTable");
-                Observation.LOGGER.log(record);
+                //Observation.LOGGER.log(record);
             }
         }
         /*

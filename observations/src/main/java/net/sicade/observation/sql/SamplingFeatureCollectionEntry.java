@@ -31,7 +31,6 @@ import net.sicade.catalog.Entry;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.sampling.SamplingFeatureCollection;
 import org.opengis.observation.Observation;
-import org.opengis.observation.AnyFeature;
 import org.opengis.observation.sampling.SurveyProcedure;
 
 /**
@@ -65,10 +64,11 @@ public class SamplingFeatureCollectionEntry extends SamplingFeatureEntry impleme
      * @param name  Le nom de la plateforme (parfois assimilé à une campagne d'échantillonage).
      */
     protected SamplingFeatureCollectionEntry(SamplingFeatureTable stations,
+                                             final int identifier,
                                              final String name,
                                              final SurveyProcedure surveyDetail)
     {
-        super(stations, name, surveyDetail);
+        super(stations, identifier, name, surveyDetail);
         stations = stations;
     }
 

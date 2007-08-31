@@ -215,12 +215,12 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        if (featureOfInterest != null) {
+       /* if (featureOfInterest != null) {
             statement.setInt(STATION, featureOfInterest.getNumericIdentifier());
         } else {
             throw new UnsupportedOperationException("La recherche sur toutes les stations n'est pas encore impléméntée.");
         }
-       /* if (observable != null) {
+        if (observable != null) {
             statement.setInt(OBSERVABLE, observable.getNumericIdentifier());
         } else {
             throw new UnsupportedOperationException("La recherche sur tous les observables n'est pas encore impléméntée.");

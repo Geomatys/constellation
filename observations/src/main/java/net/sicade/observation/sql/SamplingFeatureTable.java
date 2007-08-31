@@ -34,7 +34,6 @@ import org.opengis.observation.Observation;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.metadata.iso.citation.CitationImpl;
 
 // Sicade dependencies
 import net.sicade.util.DateRange;
@@ -44,6 +43,7 @@ import net.sicade.catalog.Database;
 import net.sicade.catalog.Query;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
+import org.opengis.observation.sampling.SurveyProcedure;
 
 
 
@@ -79,12 +79,6 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
     /** Numéro de colonne. */ private static final int  END_TIME   = 7;
     /** Numéro de colonne. */ private static final int  LONGITUDE  = 8;
     /** Numéro de colonne. */ private static final int  LATITUDE   = 9;
-
-    /**
-     * Connexion vers la table permettant d'obtenir les trajectoires des stations. Une table par
-     * défaut sera construite la première fois où elle sera nécessaire.
-     */
-    private LocationTable locations;
 
     /**
      * Connexion vers la table des plateformes. Une table par défaut sera construite la première
@@ -150,7 +144,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * @param  platforms Table des observations à utiliser.
      * @throws IllegalStateException si cette instance utilise déjà une autre table des observations.
      */
-    protected synchronized void setObservationTable(final ObservationTable<? extends Observation> observations)
+    protected synchronized void setObservationTable(final ObservationTable<Observation> observations)
             throws IllegalStateException
     {
         if (this.observations != observations) {
@@ -162,17 +156,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
         }
     }
 
-    /**
-     * Retourne la table des positions à utiliser pour la création des objets {@link StationEntry}.
-     */
-    final LocationTable getLocationTable() {
-        assert Thread.holdsLock(this);
-        if (locations == null) {
-            locations = getDatabase().getTable(LocationTable.Station.class);
-        }
-        return locations;
-    }
-
+   
     /**
      * Retourne la table des observations à utiliser pour la création des objets {@link StationEntry}.
      */
@@ -220,24 +204,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
         }
     }
 
-    /**
-     * Indique que les stations en provenance du fournisseur de données spécifié sont acceptables.
-     * Cette méthode est similaire à celle du même nom qui attend un objet {@link Citation} en
-     * argument, excepté qu'elle tentera de déterminer le fournisseur à partir d'une chaîne de
-     * caractères qui peut être une clé primaire dans la base de données.
-     */
-    public synchronized void acceptableProvider(final String provider) {
-        if (metadata == null) {
-            metadata = getDatabase().getTable(MetadataTable.class);
-        }
-        Citation citation;
-        try {
-            citation = metadata.getEntry(Citation.class, provider);
-        } catch (SQLException e) {
-            citation = new CitationImpl(provider);
-        }
-        acceptableProvider(citation);
-    }
+    
 
     /**
      * Indique si cette table est autorisée à construire des objets {@link Station}
@@ -304,7 +271,6 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
             owner = platform;
         }
        
-        final Citation   provider = metadata.getEntry(Citation.class,    result.getString(PROVIDER));
         final Calendar   calendar = getCalendar();
         Date startTime = result.getTimestamp(START_TIME, calendar);
         Date   endTime = result.getTimestamp(  END_TIME, calendar);
@@ -344,15 +310,11 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * @throws SQLException si un accès à la base de données était nécessaire et a échoué.
      */
     protected SamplingFeature createEntry(final int          identifier,
-                                  final String       name,
-                                  final Point2D      coordinate,
-                                  final DateRange    timeRange,
-                                  final SamplingFeatureCollection     platform,
-                                  final Citation     provider,
-                                  final ResultSet    result)
+                                          final String       name,
+                                          final SurveyProcedure surveyDetail)
             throws SQLException
     {
-        return new SamplingFeatureEntry(this, identifier, name, coordinate, timeRange, platform, provider);
+        return new SamplingFeatureEntry(this, identifier, name, surveyDetail);
     }
 
     /**

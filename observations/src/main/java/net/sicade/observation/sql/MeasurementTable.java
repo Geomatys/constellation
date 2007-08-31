@@ -14,28 +14,22 @@
  */
 package net.sicade.observation.sql;
 
-// J2SE dependencies
-import java.sql.Types;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
 
 // Sicade dependencies
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
-import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.model.Distribution;
 
-// GeoAPI dependencies
-import org.opengis.metadata.quality.DataQuality;
+// OpenGis dependencies
+import org.opengis.observation.Measure;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
 import org.opengis.observation.sampling.SamplingFeature;
-
+import org.opengis.temporal.TemporalObject;
+import org.opengis.metadata.MetaData;
+import org.opengis.metadata.quality.Element;
 
 
 /**
@@ -113,54 +107,22 @@ public class MeasurementTable extends ObservationTable<Measurement> {
     }
 
     /**
-     * Construit une mesure pour l'enregistrement couran
+     * Construit une mesure pour l'enregistrement courant
      */
-    @Override
     protected Measurement createEntry(final SamplingFeature featureOfInterest,
                                       final Phenomenon      observedProperty,
                                       final Process         procedure,
                                       final Distribution    distribution,
-                                      final DataQuality  quality,
-                                      final ResultSet       result) throws SQLException
+                                      final Element         quality,
+                                      final Measure         result,
+                                      final TemporalObject  samplingTime,
+                                      final MetaData        observationMetadata,
+                                      final String          resultDefinition,
+                                      final TemporalObject  procedureTime,
+                                      final Object          procedureParameter) throws SQLException
     {
-        float value = result.getFloat(VALUE); if (result.wasNull()) value=Float.NaN;
-        float error = result.getFloat(ERROR); if (result.wasNull()) error=Float.NaN;
-        return new MeasurementEntry(featureOfInterest, observedProperty, procedure, distribution, quality, value, error);
+        return new MeasurementEntry(featureOfInterest, observedProperty, procedure, distribution, quality,
+                result, samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
     }
 
-    /**
-     * Définie une valeur réelle pour la station et l'observable courant.
-     *
-     * @param  value Valeur à inscrire dans la base de données.
-     * @param  error Une estimation de l'erreur, ou {@link Float#NaN} s'il n'y en a pas.
-     * @throws CatalogException si la station ou le descripteur spécifié n'existe pas.
-     * @throws SQLException si la mise à jour de la base de données a échoué pour une autre raison.
-     */
-    public synchronized void setValue(final float value, final float error) throws CatalogException, SQLException {
-        if (insert == null) {
-            throw new CatalogException("La table \"" + Utilities.getShortClassName(this) +
-                                       "\" n'est pas modifiable.");
-        }
-        final SamplingFeature station = getFeatureOfInterest();
-        if (station == null) {
-            throw new CatalogException("La station doit être définie.");
-        }
-        
-        if (Float.isNaN(value)) {
-            return;
-        }
-        final PreparedStatement statement = getStatement(getProperty(insert));
-        statement.setInt  (STATION,    station.getNumericIdentifier());
-        
-        statement.setFloat(VALUE, value);
-        if (!Float.isNaN(error)) {
-            statement.setFloat(ERROR, error);
-        } else {
-            statement.setNull(ERROR, Types.FLOAT);
-        }
-        final int count = statement.executeUpdate();
-        if (count != 1) {
-            Measurement.LOGGER.warning(count + " valeurs ajoutées pour \" \" à la station " + station);
-        }
-    }
 }

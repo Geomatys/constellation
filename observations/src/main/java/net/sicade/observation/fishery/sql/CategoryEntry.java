@@ -29,10 +29,12 @@ import net.sicade.observation.fishery.Category;
 import net.sicade.observation.fishery.FisheryType;
 import net.sicade.observation.sql.ObservationEntry;
 
+
 // openGis dependencies
 import org.opengis.metadata.quality.Element;
 import org.opengis.observation.sampling.SamplingFeature;
-
+import org.opengis.temporal.TemporalObject;
+import org.opengis.metadata.MetaData;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Category catégorie}.
@@ -64,9 +66,16 @@ public class CategoryEntry extends ObservationEntry implements Category {
                             final Species         species,
                             final Stage           stage,
                             final FisheryType     procedure,
-                            final Element         quality)
+                            final Element         quality,
+                            final Object          result,
+                            final TemporalObject  samplingTime,
+                            final MetaData        observationMetadata,
+                            final String          resultDefinition,
+                            final TemporalObject  procedureTime,
+                            final Object          procedureParameter)
     {
-        super(featureOfInterest, species, procedure, Distribution.NORMAL, quality);
+        super(featureOfInterest, species, procedure, Distribution.NORMAL, quality, result, samplingTime,
+                observationMetadata, resultDefinition, procedureTime, procedureParameter);
         this.stage = stage;
     }
 

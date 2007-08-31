@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import net.sicade.catalog.CatalogException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -27,7 +28,6 @@ import net.sicade.catalog.Entry;
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
-import org.opengis.observation.AnyFeature;
 import org.opengis.observation.sampling.SamplingFeatureRelation;
 import org.opengis.observation.sampling.SurveyProcedure;
 
@@ -66,7 +66,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * Les features designé
      */
-    private List<AnyFeature> sampledFeature; 
+    private List<Object> sampledFeature; 
     
     /**
      * Connexion vers la table des stations.
@@ -98,9 +98,9 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
      */
     protected SamplingFeatureEntry(final SamplingFeatureTable stations,
+                                   final int identifier,
                                    final String       name,
-                                   final SurveyProcedure surveyDetail,
-                                   final int identifier)
+                                   final SurveyProcedure surveyDetail)
     {
         super(name);
         this.surveyDetail = surveyDetail;
@@ -131,8 +131,8 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
                 }*/
                 relatedSamplingFeature = Collections.unmodifiableList(list);
             }
-        } catch (SQLException exception) {
-            throw new ServerException(exception);
+        } catch (Exception exception) {
+            //throw new ServerException(exception);
         }
         return relatedSamplingFeature;
     }
@@ -154,7 +154,12 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
                 relatedObservation = Collections.unmodifiableList(list);
             }
         } catch (SQLException exception) {
-            throw new ServerException(exception);
+            System.out.print("SQL EXCEPTION DANS getRelatedObservation()");
+            //throw new ServerException(exception);
+        }
+        catch (CatalogException exception) {
+             System.out.print("Catalog EXCEPTION DANS getRelatedObservation()");
+            //throw new ServerException(exception);
         }
         return relatedObservation;
     }
@@ -162,19 +167,20 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      /**
      * {@inheritDoc}
      */
-    public synchronized List<AnyFeature> getSampledFeatures() {
+    public synchronized List<Object> getSampledFeatures() {
         if (sampledFeature == null) try {
             if (stations != null) {
-                Set<AnyFeature> list = null;
+                Set<Object> list = null;
                 synchronized (stations) {
                     assert equals(stations.getPlatform()) : this;
                    // stations.setPlatform(this);
-                    list = stations.getEntries();
+                    //list = stations.getEntries();
                 }
-                sampledFeature = Collections.unmodifiableList(list);
+               // sampledFeature = Collections.unmodifiableSet(list);
             }
-        } catch (SQLException exception) {
-            throw new ServerException(exception);
+        } catch (Exception exception) {
+            System.out.println("EXCEPTION DANS getSampledFeature");
+            //throw new ServerException(exception);
         }
         return sampledFeature;
     }

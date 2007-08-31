@@ -75,12 +75,7 @@ public class SamplingFeatureCollectionTable extends BoundedSingletonTable<Sampli
     /** Numéro d'argument. */ private static final int ARGUMENT_PROVIDER = 7;
     /** Numéro de colonne. */ private static final int NAME              = 1;
 
-    /**
-     * Connexion vers la table permettant d'obtenir les trajectoires des plateformes. Une table
-     * par défaut sera construite la première fois où elle sera nécessaire.
-     */
-    private LocationTable locations;
-
+    
     /**
      * Connexion vers la table des {@linkplain Station stations}. Une table par défaut sera
      * construite la première fois où elle sera nécessaire.
@@ -135,17 +130,7 @@ public class SamplingFeatureCollectionTable extends BoundedSingletonTable<Sampli
         return stations;
     }
 
-    /**
-     * Retourne la table des positions à utiliser pour la création des objets {@link StationEntry}.
-     */
-    final LocationTable getLocationTable() {
-        assert Thread.holdsLock(this);
-        if (locations == null) {
-            locations = getDatabase().getTable(LocationTable.Platform.class);
-        }
-        return locations;
-    }
-
+    
     /**
      * Retourne le fournisseur des plateformes désirées, ou {@code null} pour obtenir toutes
      * les plateformes.
