@@ -165,12 +165,12 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     public synchronized List<AnyFeature> getSampledFeatures() {
         if (sampledFeature == null) try {
             if (stations != null) {
-                final List<AnyFeature> list = null;
-               /* synchronized (stations) {
+                Set<AnyFeature> list = null;
+                synchronized (stations) {
                     assert equals(stations.getPlatform()) : this;
-                    stations.setPlatform(this);
-                    set = stations.getEntries();
-                }*/
+                   // stations.setPlatform(this);
+                    list = stations.getEntries();
+                }
                 sampledFeature = Collections.unmodifiableList(list);
             }
         } catch (SQLException exception) {

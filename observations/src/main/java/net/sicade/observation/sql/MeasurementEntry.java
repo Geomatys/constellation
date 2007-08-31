@@ -18,6 +18,7 @@ import javax.units.Unit;
 
 // Sicade dependencies
 import net.sicade.coverage.model.Distribution;
+import org.opengis.metadata.MetaData;
 
 // openGis dependencies
 import org.opengis.observation.Phenomenon;
@@ -25,6 +26,8 @@ import org.opengis.observation.Process;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.metadata.quality.Element;
+import org.opengis.observation.Measure;
+import org.opengis.temporal.TemporalObject;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Measurement mesure}.
@@ -39,16 +42,12 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      */
     private static final long serialVersionUID = 6700527485309897974L;
 
+    
     /**
-     * La valeur mesurée.
+     * le resultat de la mesure
      */
-    private final float value;
-
-    /**
-     * Estimation de l'erreur sur la valeur mesurée, ou {@link Double#NaN NaN} si l'erreur
-     * est inconnue ou ne s'applique pas.
-     */
-    private final float error;
+    private Measure result;
+    
     
     /** 
      * Crée une nouvelle mesure.
@@ -63,13 +62,16 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
                                final Phenomenon      observedProperty,
                                final Process         procedure,
                                final Distribution    distribution,
-                               final Element  quality,
-                               final float      value, 
-                               final float      error) 
+                               final Element         quality,
+                               final Measure         result,
+                               final TemporalObject  samplingTime,
+                               final MetaData        observationMetadata,
+                               final String          resultDefinition,
+                               final TemporalObject  procedureTime,
+                               final Object          procedureParameter) 
     {
-        super(station, observedProperty, procedure, distribution, quality);
-        this.value = value;
-        this.error = error;
+        super(station, observedProperty, procedure, distribution, quality, result,
+                samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
     }
 
     /**
@@ -78,35 +80,13 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     @Override
     protected String createName() {
         final StringBuilder name = new StringBuilder(super.createName()).append(" = ").append(value);
-        if (!Float.isNaN(error)) {
-            name.append(" \u00B1 ").append(error);
-        }
+       
         return name.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @todo Implémenter le retour des unités.
-     */
-    public Unit getUom() {
-        return null;
-    }
+    
 
-    /**
-     * {@inheritDoc}
-     */
-    public float getValue() {
-        return value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public float getError() {
-        return error;
-    }
-
+    
     /**
      * Vérifie si cette entré est identique à l'objet spécifié.
      */
@@ -114,9 +94,12 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     public boolean equals(final Object object) {
         if (super.equals(object)) {
             final MeasurementEntry that = (MeasurementEntry) object;
-            return Float.floatToIntBits(this.value) == Float.floatToIntBits(that.value) &&
-                   Float.floatToIntBits(this.error) == Float.floatToIntBits(that.error);
+            return this.getResult().equals(that.getResult());
         }
         return false;
+    }
+
+    public Measure getResult() {
+        return result;
     }
 }

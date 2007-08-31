@@ -20,14 +20,17 @@ import net.sicade.coverage.model.Distribution;
 
 // openGis dependencies
 import org.opengis.observation.Process;
-import org.opengis.metadata.quality.DataQuality;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
 import org.opengis.metadata.quality.Element;
+import org.opengis.metadata.MetaData;
+import org.opengis.observation.AnyFeature;
+import org.opengis.temporal.TemporalObject;
 
 // geotools dependencies
 import org.geotools.resources.Utilities;
+
 
 
 
@@ -48,7 +51,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * La station à laquelle a été pris cet échantillon.
      */
-    private final SamplingFeature featureOfInterest;
+    private final AnyFeature featureOfInterest;
     
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
@@ -73,11 +76,32 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * le resultat de l'observation de n'importe quel type 
      */
-    private Object Result;
+    private Object result;
+    
+    /**
+     *  
+     */
+     private TemporalObject samplingTime;
+     
+     /**
+      *
+      */
+     private MetaData observationMetadata;
+     
+    /**
+     * Definition du resultat. 
+     */
+    private String resultDefinition;
     
     /**
      * 
      */
+    private TemporalObject procedureTime;
+    
+    /**
+     *
+     */
+    private Object procedureParameter;
     
     /**
      * Construit une observation.
@@ -87,20 +111,30 @@ public class ObservationEntry extends Entry implements Observation {
      * @param procedure         La procédure associée.
      * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
      */
-    protected ObservationEntry(final SamplingFeature featureOfInterest, 
+    protected ObservationEntry(final AnyFeature featureOfInterest, 
                                final Phenomenon      observedProperty,
                                final Process         procedure,
                                final Distribution    distribution,
                                final Element         quality,
-                               final Object          result ) 
+                               final Object          result,
+                               final TemporalObject samplingTime,
+                               final MetaData observationMetadata,
+                               final String resultDefinition,
+                               final TemporalObject procedureTime,
+                               final Object procedureParameter) 
     {
         super(null);
-        this.featureOfInterest = featureOfInterest;
-        this.observedProperty  = observedProperty;
-        this.procedure         = procedure;
-        this.distribution      = distribution;
-        this.quality           = quality;
-        this.Result            = result;
+        this.featureOfInterest   = featureOfInterest;
+        this.observedProperty    = observedProperty;
+        this.procedure           = procedure;
+        this.distribution        = distribution;
+        this.quality             = quality;
+        this.result              = result;
+        this.samplingTime        = samplingTime;
+        this.observationMetadata = observationMetadata;
+        this.resultDefinition    = resultDefinition;
+        this.procedureTime       = procedureTime;
+        this.procedureParameter  = procedureParameter; 
     }
 
     /**
@@ -150,9 +184,43 @@ public class ObservationEntry extends Entry implements Observation {
      * {@inheritDoc}
      */
     public Object getResult() {
-        return Result;
+        return result;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String getResultDefinition() {
+        return resultDefinition;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public TemporalObject getSamplingTime() {
+        return samplingTime;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public MetaData getObservationMetadata() {
+        return observationMetadata;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+     public TemporalObject getProcedureTime() {
+        return procedureTime;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */ 
+    public Object getProcedureParameter() {
+        return procedureParameter;
+    }
     /**
      * Retourne un code représentant cette observation.
      */
@@ -172,11 +240,18 @@ public class ObservationEntry extends Entry implements Observation {
         if (super.equals(object)) {
             final ObservationEntry that = (ObservationEntry) object;
             return Utilities.equals(this.featureOfInterest,    that.featureOfInterest) &&
-                   Utilities.equals(this.observedProperty,   that.observedProperty) &&
-                   Utilities.equals(this.procedure,    that.procedure)  &&
-                   Utilities.equals(this.quality,      that.quality)    && 
-                   Utilities.equals(this.distribution, that.distribution);
+                   Utilities.equals(this.observedProperty,    that.observedProperty) &&
+                   Utilities.equals(this.procedure,           that.procedure)  &&
+                   Utilities.equals(this.quality,             that.quality)    && 
+                   Utilities.equals(this.distribution,        that.distribution) &&
+                   Utilities.equals(this.result,              that.result) &&
+                   Utilities.equals(this.samplingTime,        that.samplingTime) &&
+                   Utilities.equals(this.observationMetadata, that.observationMetadata) &&
+                   Utilities.equals(this.resultDefinition,    that.resultDefinition) &&
+                   Utilities.equals(this.procedureTime,       that.procedureTime) &&
+                   Utilities.equals(this.procedureParameter,  that.procedureParameter);
         }
         return false;
     }
+
 }
