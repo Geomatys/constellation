@@ -12,11 +12,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation.sql;
+package net.sicade.observation;
 
 // Sicade dependencies 
 import net.sicade.catalog.Entry;
 import net.sicade.coverage.model.Distribution;
+import net.sicade.observation.sql.*;
 
 // openGis dependencies
 import org.opengis.observation.Process;
@@ -46,7 +47,12 @@ public class ObservationEntry extends Entry implements Observation {
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = 3269639171560208276L;
-
+    
+    /**
+     * La descritpion de l'observation
+     */
+    private final String definition;
+    
     /**
      * La station à laquelle a été pris cet échantillon.
      */
@@ -110,7 +116,8 @@ public class ObservationEntry extends Entry implements Observation {
      * @param procedure         La procédure associée.
      * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
      */
-    protected ObservationEntry(final SamplingFeature featureOfInterest, 
+    public ObservationEntry(final String definition,
+                               final SamplingFeature featureOfInterest, 
                                final Phenomenon      observedProperty,
                                final Process         procedure,
                                final Distribution    distribution,
@@ -123,6 +130,7 @@ public class ObservationEntry extends Entry implements Observation {
                                final Object          procedureParameter) 
     {
         super(null);
+        this.definition          = definition;
         this.featureOfInterest   = featureOfInterest;
         this.observedProperty    = observedProperty;
         this.procedure           = procedure;
@@ -220,6 +228,15 @@ public class ObservationEntry extends Entry implements Observation {
     public Object getProcedureParameter() {
         return procedureParameter;
     }
+    
+   
+    /**
+     * {@inheritDoc}
+     */ 
+    public String getDefinition() {
+        return definition;
+    }
+    
     /**
      * Retourne un code représentant cette observation.
      */
@@ -252,5 +269,7 @@ public class ObservationEntry extends Entry implements Observation {
         }
         return false;
     }
+
+    
 
 }

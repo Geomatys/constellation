@@ -23,15 +23,14 @@ import net.sicade.catalog.CRS;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Query;
 import net.sicade.catalog.QueryType;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
+import net.sicade.observation.SamplingFeatureCollectionEntry;
 
 // Sicade dependencies
 import net.sicade.catalog.ConfigurationKey;
 
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeatureCollection;
+import org.opengis.observation.sampling.SurveyProcedure;
 
 
 /**
@@ -74,6 +73,8 @@ public class SamplingFeatureCollectionTable extends BoundedSingletonTable<Sampli
 
     /** Numéro d'argument. */ private static final int ARGUMENT_PROVIDER = 7;
     /** Numéro de colonne. */ private static final int NAME              = 1;
+    /** Numéro de colonne. */ private static final int IDENTIFIER        = 2;
+
 
     
     /**
@@ -86,11 +87,6 @@ public class SamplingFeatureCollectionTable extends BoundedSingletonTable<Sampli
      * synchroniser sur {@code this}, afin d'éviter des situations de <cite>thread lock</cite>.
      */
     private SamplingFeatureTable stations;
-
-    /**
-     * Le fournisseur des stations recherchées, ou {@code null} si on accepte tous les fournisseurs.
-     */
-    private String provider;
 
     /**
      * Construit une connexion vers la table des plateformes qui utilisera la base de données
@@ -130,27 +126,6 @@ public class SamplingFeatureCollectionTable extends BoundedSingletonTable<Sampli
         return stations;
     }
 
-    
-    /**
-     * Retourne le fournisseur des plateformes désirées, ou {@code null} pour obtenir toutes
-     * les plateformes.
-     */
-    public final String getProvider() {
-        return provider;
-    }
-
-    /**
-     * Définit le fournisseur des plateformes désirées. Les prochains appels à la méthode
-     * {@link #getEntries() getEntries()} ne retourneront que les plateformes de ce fournisseur.
-     * La valeur {@code null} sélectionne toutes les plateformes.
-     */
-    public synchronized void setProvider(final String provider) {
-        if (!Utilities.equals(provider, this.provider)) {
-            this.provider = provider;
-            fireStateChanged("Provider");
-        }
-    }
-
     /**
      * Configure la requête SQL spécifiée en fonction du {@linkplain #getProvider provider}
      * des données de cette table. Cette méthode est appelée automatiquement lorsque cette
@@ -162,7 +137,7 @@ public class SamplingFeatureCollectionTable extends BoundedSingletonTable<Sampli
         switch (type) {
             case LIST: // Fall through
             case BOUNDING_BOX: {
-                statement.setString(ARGUMENT_PROVIDER, provider);
+                //statement.setString(ARGUMENT_PROVIDER, provider);
                 break;
             }
         }
@@ -172,7 +147,9 @@ public class SamplingFeatureCollectionTable extends BoundedSingletonTable<Sampli
      * Construit une plateforme pour l'enregistrement courant.
      */
     protected SamplingFeatureCollection createEntry(final ResultSet results) throws SQLException {
-        final String name = results.getString(NAME);
-        return new SamplingFeatureCollectionEntry(this, name);
+        final String name    = results.getString(NAME);
+        final int identifier = results.getInt(IDENTIFIER);
+        final SurveyProcedure surveyDetail = null;
+        return new SamplingFeatureCollectionEntry(stations, identifier, name, surveyDetail);
     }
 }

@@ -35,7 +35,7 @@ public class ProcessEntry extends Entry implements Process {
      *
      * @param name Le nom de la procédure.
      */
-    protected ProcessEntry(final String name) {
+    public ProcessEntry(final String name) {
         super(name);
     }
 
@@ -45,7 +45,7 @@ public class ProcessEntry extends Entry implements Process {
      * @param name    Le nom de la procédure.
      * @param remarks Remarques s'appliquant à cette procédure, ou {@code null}.
      */
-    protected ProcessEntry(final String name, final String remarks) {
+    public ProcessEntry(final String name, final String remarks) {
         super(name, remarks);
     }
 }

@@ -1,6 +1,6 @@
 /* Created on 31 aout 2007, 12:02 */
 
-package net.sicade.observation.sql;
+package net.sicade.observation;
 
 // Sicade dependencies
 import net.sicade.catalog.Entry;

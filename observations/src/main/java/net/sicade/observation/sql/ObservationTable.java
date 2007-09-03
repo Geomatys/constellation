@@ -17,7 +17,6 @@ package net.sicade.observation.sql;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -43,6 +42,7 @@ import org.opengis.observation.Observation;
 
 // geotolls dependencies
 import org.geotools.resources.Utilities;
+import org.opengis.metadata.quality.Element;
 
 
 
@@ -68,11 +68,18 @@ import org.geotools.resources.Utilities;
  * @author Antoine Hnawia
  */
 public abstract class ObservationTable<EntryType extends Observation> extends Table {
-    /** Numéro de colonne et d'argument. */ static final int STATION      = 1;
-    /** Numéro de colonne. */               static final int PHENOMENON   = 2;
-    /** Numéro de colonne. */               static final int PROCEDURE    = 3;
-    /** Numéro de colonne. */               static final int DISTRIBUTION = 4;
-    /** Numéro de colonne. */               static final int QUALITY      = 5;
+    /** Numéro de colonne et d'argument. */ static final int STATION            = 1;
+    /** Numéro de colonne. */               static final int PHENOMENON         = 2;
+    /** Numéro de colonne. */               static final int PROCEDURE          = 3;
+    /** Numéro de colonne. */               static final int DISTRIBUTION       = 4;
+    /** Numéro de colonne. */               static final int QUALITY            = 5;
+    /** Numéro de colonne. */               static final int RESULT             = 6;
+    /** Numéro de colonne. */               static final int SAMPLINGTIME       = 7;
+    /** Numéro de colonne. */               static final int METADATA           = 8;
+    /** Numéro de colonne. */               static final int RESULTDEFINITION   = 9;
+    /** Numéro de colonne. */               static final int PROCEDURETIME      = 10;
+    /** Numéro de colonne. */               static final int PROCEDUREPARAMETER = 11;  
+    
 
     /**
      * Connexion vers la table des stations.
@@ -128,7 +135,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * @param  database Connexion vers la base de données des observations.
      * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
      */
-    protected ObservationTable(final Database       database,
+    public ObservationTable(final Database       database,
                                final ConfigurationKey select)
     {
         super(new Query(database)); // TODO
@@ -141,7 +148,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * @param  stations La table des stations à utiliser.
      * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
      */
-    protected ObservationTable(final SamplingFeatureTable   stations,
+    public ObservationTable(final SamplingFeatureTable   stations,
                                final ConfigurationKey select)
     {
         this(stations.getDatabase(), select);
@@ -296,14 +303,17 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
             assert !Thread.holdsLock(getStationTable()); // Voir le commentaire de 'stations'.
             station = getStationTable().getEntry(result.getString(STATION));
         }
-       if (phenomenons == null) {
+        
+        if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
         final Phenomenon phenomenon = phenomenons.getEntry(phenomenonID);
+        
         if (procedures == null) {
             procedures = getDatabase().getTable(ProcessTable.class);
         }
         final Process procedure = procedures.getEntry(procedureID);
+        
         if (distributions == null) {
             distributions = getDatabase().getTable(DistributionTable.class);
         }
@@ -312,23 +322,9 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
         if (metadata == null) {
             metadata = getDatabase().getTable(MetadataTable.class);
         }
-        final DataQuality quality = metadata.getEntry(DataQuality.class, result.getString(QUALITY ));
+        final Element quality = metadata.getEntry(Element.class, result.getString(QUALITY ));
         
         return createEntry(station,  phenomenon, procedure, distribution, quality, result);
     }
 
-    /**
-     * Construit une observation pour l'enregistrement courant. Les deux premières colonnes
-     * de l'enregistrement ont déjà été extraits et donnés en argument ({@code station} et
-     * {@code observable}). Les classes dérivées doivent extraires les colonnes restantes
-     * et construire l'entrée appropriée.
-     * 
-     * @throws SQLException si une erreur est survenu lors de l'accès à la base de données.
-     */
-    protected abstract EntryType createEntry(final SamplingFeature    station,
-                                             final Phenomenon phenomenon, 
-                                             final Process procedure, 
-                                             final Distribution distribution,
-                                             final DataQuality  quality,
-                                             final ResultSet  result) throws SQLException;
 }

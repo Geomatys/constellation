@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation.sql;
+package net.sicade.observation;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -22,8 +22,9 @@ import net.sicade.catalog.CatalogException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import net.sicade.catalog.ServerException;
 import net.sicade.catalog.Entry;
+import net.sicade.observation.sql.ObservationTable;
+import net.sicade.observation.sql.SamplingFeatureTable;
 
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;
@@ -54,6 +55,10 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     private final int identifier;
     
     /**
+     * Une definition de la station
+     */
+    private final String definition;
+    /**
      * L'ensemble des stations. Ne sera construit que la première fois où il sera nécessaire.
      */
     private List<SamplingFeatureRelation> relatedSamplingFeature;
@@ -79,6 +84,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * Optionnel peut etre {@code null}
      */
     private SurveyProcedure surveyDetail;
+    
 
     /**
      * Connexion vers la table des observations. Contrairement à la plupart des autres
@@ -86,7 +92,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * conservées dans une cache car elle sont potentiellement très nombreuses. Il nous
      * faudra donc conserver la connexion en permanence.
      */
-    private final ObservationTable<Observation> observations;
+    private final ObservationTable<? extends Observation> observations;
     
 
     /** 
@@ -97,7 +103,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * @param name       Le nom de la station.
      * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
      */
-    protected SamplingFeatureEntry(final SamplingFeatureTable stations,
+    public SamplingFeatureEntry(final SamplingFeatureTable stations,
                                    final int identifier,
                                    final String       name,
                                    final SurveyProcedure surveyDetail)
@@ -149,7 +155,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
                 synchronized (observations) {
                     /*assert equals(observations.) : this;
                     observations.setPlatform(this);*/
-                    list = observations.getEntries();
+                    list = (List<Observation>)observations.getEntries();
                 }
                 relatedObservation = Collections.unmodifiableList(list);
             }
@@ -168,20 +174,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * {@inheritDoc}
      */
     public synchronized List<Object> getSampledFeatures() {
-        if (sampledFeature == null) try {
-            if (stations != null) {
-                Set<Object> list = null;
-                synchronized (stations) {
-                    assert equals(stations.getPlatform()) : this;
-                   // stations.setPlatform(this);
-                    //list = stations.getEntries();
-                }
-               // sampledFeature = Collections.unmodifiableSet(list);
-            }
-        } catch (Exception exception) {
-            System.out.println("EXCEPTION DANS getSampledFeature");
-            //throw new ServerException(exception);
-        }
+        
         return sampledFeature;
     }
 
@@ -189,7 +182,9 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         return this.surveyDetail;
     }
     
-    
+     public String getDefinition() {
+        return definition;
+    }
 
     /**
      * Retourne le code numérique identifiant cette entrée.
@@ -217,4 +212,6 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         }
         return false;
     }
+
+   
 }

@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation.sql;
+package net.sicade.observation;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -26,6 +26,7 @@ import java.util.List;
 import net.sicade.catalog.ServerException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Entry;
+import net.sicade.observation.sql.*;
 
 // GeoAPI dependencies
 import org.opengis.observation.sampling.SamplingFeature;
@@ -63,7 +64,7 @@ public class SamplingFeatureCollectionEntry extends SamplingFeatureEntry impleme
      * @param table La table qui a produit cette entrée.
      * @param name  Le nom de la plateforme (parfois assimilé à une campagne d'échantillonage).
      */
-    protected SamplingFeatureCollectionEntry(SamplingFeatureTable stations,
+    public SamplingFeatureCollectionEntry(SamplingFeatureTable stations,
                                              final int identifier,
                                              final String name,
                                              final SurveyProcedure surveyDetail)
@@ -81,8 +82,6 @@ public class SamplingFeatureCollectionEntry extends SamplingFeatureEntry impleme
             if (stations != null) {
                 final Set<SamplingFeature> set;
                 synchronized (stations) {
-                    assert equals(stations.getPlatform()) : this;
-                    stations.setPlatform(this);
                     set = stations.getEntries();
                 }
                 member = Collections.unmodifiableSet(set);

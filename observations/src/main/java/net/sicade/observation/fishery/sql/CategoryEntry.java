@@ -27,7 +27,7 @@ import net.sicade.observation.fishery.Stage;
 import net.sicade.observation.fishery.Species;
 import net.sicade.observation.fishery.Category;
 import net.sicade.observation.fishery.FisheryType;
-import net.sicade.observation.sql.ObservationEntry;
+import net.sicade.observation.ObservationEntry;
 
 
 // openGis dependencies
@@ -62,7 +62,7 @@ public class CategoryEntry extends ObservationEntry implements Category {
      * @param procedure   La procédure associée.
      * @param remarks     Remarques s'appliquant à cette entrée, ou {@code null}.
      */
-    protected CategoryEntry(final SamplingFeature featureOfInterest,
+    public CategoryEntry(final SamplingFeature featureOfInterest,
                             final Species         species,
                             final Stage           stage,
                             final FisheryType     procedure,

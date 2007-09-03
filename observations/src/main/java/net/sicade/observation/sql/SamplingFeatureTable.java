@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.awt.geom.Point2D;
+import net.sicade.observation.SamplingFeatureEntry;
 
 
 // OpenGIS dependencies
@@ -73,12 +74,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
 
     /** Numéro de colonne. */ private static final int  NAME       = 1;
     /** Numéro de colonne. */ private static final int  IDENTIFIER = 2;
-    /** Numéro de colonne. */ private static final int  PLATFORM   = 3;
-    /** Numéro de colonne. */ private static final int  PROVIDER   = 5;
-    /** Numéro de colonne. */ private static final int  START_TIME = 6;
-    /** Numéro de colonne. */ private static final int  END_TIME   = 7;
-    /** Numéro de colonne. */ private static final int  LONGITUDE  = 8;
-    /** Numéro de colonne. */ private static final int  LATITUDE   = 9;
+    
 
     /**
      * Connexion vers la table des plateformes. Une table par défaut sera construite la première
@@ -90,19 +86,14 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * Connexion vers la table des observations.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private ObservationTable<Observation> observations;
+    private ObservationTable<? extends Observation> observations;
 
     /**
      * La plateforme recherchée, ou {@code null} pour rechercher les stations de toutes les
      * plateformes.
      */
     private SamplingFeatureCollection platform;
-
-    /**
-     * Ensemble des fournisseur pour lesquels on accepte des stations, ou {@code null}
-     * pour les accepter tous.
-     */
-    private Set<Citation> providers;
+ 
 
     /**
      * {@code true} si l'on autorise cette classe à construire des objets {@link StationEntry}
@@ -144,7 +135,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * @param  platforms Table des observations à utiliser.
      * @throws IllegalStateException si cette instance utilise déjà une autre table des observations.
      */
-    protected synchronized void setObservationTable(final ObservationTable<Observation> observations)
+    protected synchronized void setObservationTable(final ObservationTable<? extends Observation> observations)
             throws IllegalStateException
     {
         if (this.observations != observations) {
@@ -160,52 +151,14 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
     /**
      * Retourne la table des observations à utiliser pour la création des objets {@link StationEntry}.
      */
-    final ObservationTable<Observation> getObservationTable() {
+    public ObservationTable<? extends Observation> getObservationTable() {
         assert Thread.holdsLock(this);
         if (observations == null) {
             setObservationTable(getDatabase().getTable(MeasurementTable.class));
         }
         return observations;
     }
-
-    /**
-     * Retourne la {@linkplain Platform platforme} des stations désirées. La valeur {@code null}
-     * signifie que cette table recherche les stations de toutes les plateformes.
-     */
-    public final SamplingFeatureCollection getPlatform() {
-        return platform;
-    }
-
-    /**
-     * Définit la {@linkplain Platform platforme} des stations désirées. Les prochains appels à la
-     * méthode {@link #getEntries() getEntries()} ne retourneront que les stations de cette plateforme.
-     * La valeur {@code null} retire la contrainte des plateformes (c'est-à-dire que cette table
-     * recherchera les stations de toutes les plateformes).
-     */
-    public synchronized void setPlatform(final SamplingFeatureCollection platform) {
-        if (!Utilities.equals(platform, this.platform)) {
-            this.platform = platform;
-            fireStateChanged("Platform");
-        }
-    }
-
-    /**
-     * Indique que les stations en provenance du fournisseur de données spécifié sont acceptables.
-     * Toutes les stations qui ne proviennent pas de ce fournisseur ou d'un fournisseur spécifié
-     * lors d'un appel précédent de cette méthode ne seront pas retenues par la méthode
-     * {@link #getEntries}.
-     */
-    public synchronized void acceptableProvider(final Citation provider) {
-        if (providers == null) {
-            providers = new HashSet<Citation>();
-        }
-        if (providers.add(provider)) {
-            fireStateChanged("Providers");
-        }
-    }
-
-    
-
+   
     /**
      * Indique si cette table est autorisée à construire des objets {@link Station}
      * qui contiennent moins d'informations. Cet allègement permet de réduire le nombre de
@@ -261,28 +214,9 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
     protected SamplingFeature createEntry(final ResultSet result) throws CatalogException, SQLException {
         final String name    = result.getString(NAME);
         final int identifier = result.getInt(IDENTIFIER);
-        final SamplingFeatureCollection owner;
-        if (platform == null && !abridged) {
-            if (platforms == null) {
-                setPlatformTable(getDatabase().getTable(SamplingFeatureCollectionTable.class));
-            }
-            owner = platforms.getEntry(result.getString(PLATFORM));
-        } else {
-            owner = platform;
-        }
-       
-        final Calendar   calendar = getCalendar();
-        Date startTime = result.getTimestamp(START_TIME, calendar);
-        Date   endTime = result.getTimestamp(  END_TIME, calendar);
-        double       x = result.getDouble(LONGITUDE); if (result.wasNull()) x=Double.NaN;
-        double       y = result.getDouble( LATITUDE); if (result.wasNull()) y=Double.NaN;
-        // Remplace le type Timestamp par Date, car DateRange exigera ce type exact.
-        if (startTime != null) startTime = new Date(startTime.getTime());
-        if (  endTime != null)   endTime = new Date(  endTime.getTime());
-        return createEntry(identifier, name,
-                (!Double.isNaN(x) || !Double.isNaN(y)) ? new Point2D.Double(x,y)           : null,
-                ( startTime!=null ||  endTime!=null)   ? new DateRange(startTime, endTime) : null,
-                owner, provider, result);
+        final SurveyProcedure surveyDetail = null;
+        
+        return createEntry(identifier, name,  result, surveyDetail);
     }
 
     /**
@@ -326,17 +260,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      */
     @Override
     protected boolean accept(final SamplingFeature entry) throws CatalogException, SQLException {
-        if (providers != null) {
-            final Citation provider = entry.getProvider();
-            if (provider != null) {
-                for (final Citation acceptable : providers) {
-                    if (Citations.identifierMatches(provider, acceptable)) {
-                        return super.accept(entry);
-                    }
-                }
-                return false;
-            }
-        }
+        
         return super.accept(entry);
     }
 }

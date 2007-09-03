@@ -12,12 +12,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation.sql;
+package net.sicade.observation;
 
 import javax.units.Unit;
 
 // Sicade dependencies
 import net.sicade.coverage.model.Distribution;
+import net.sicade.observation.sql.*;
 
 
 // openGis dependencies
@@ -59,7 +60,8 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      * @param error       Estimation de l'erreur sur la valeur mesurée, ou {@link Float#NaN NaN}
      *                    si l'erreur est inconnue ou ne s'applique pas.
      */
-    protected MeasurementEntry(final SamplingFeature station,
+    public MeasurementEntry(final String definition,
+            final SamplingFeature station,
             final Phenomenon      observedProperty,
             final Process         procedure,
             final Distribution    distribution,
@@ -70,7 +72,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final String          resultDefinition,
             final TemporalObject  procedureTime,
             final Object          procedureParameter) {
-        super(station, observedProperty, procedure, distribution, quality, result,
+        super(definition, station, observedProperty, procedure, distribution, quality, result,
                 samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
     }
     

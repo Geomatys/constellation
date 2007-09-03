@@ -14,12 +14,14 @@
  */
 package net.sicade.observation.sql;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 // Sicade dependencies
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.coverage.model.Distribution;
+import net.sicade.observation.MeasurementEntry;
 
 // OpenGis dependencies
 import org.opengis.observation.Measure;
@@ -51,78 +53,78 @@ public class MeasurementTable extends ObservationTable<Measurement> {
 //            "SELECT station, observable, value, error\n"  +
 //            "  FROM \"Measurements\"\n"                   +
 //            " WHERE (station = ?) AND (observable = ?)");
-
+    
     /**
      * Requête SQL pour insérer les mesures pour une station et un observable donnés.
      */
     private static final ConfigurationKey INSERT = null; // new ConfigurationKey("Measurements:INSERT",
 //            "INSERT INTO \"Measurements\" (station, observable, value, error)\n"  +
 //            "VALUES (?, ?, ?, ?)");
-
+    
     /** Numéro de colonne. */ private static final int VALUE = 6;
     /** Numéro de colonne. */ private static final int ERROR = 7;
-
+    
     /**
      * La clé désignant la requête à utiliser pour ajouter des valeurs.
      */
     private final ConfigurationKey insert;
-
+    
     /**
      * Construit une nouvelle connexion vers la table des mesures.
      */
     public MeasurementTable(final Database database) {
         this(database, SELECT, INSERT);
     }
-
-    /** 
+    
+    /**
      * Construit une nouvelle connexion vers la table des mesures.
-     * 
+     *
      * @param  database Connexion vers la base de données des observations.
      * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
      * @param  insert   Clé de la requête SQL à utiliser pour ajouter des valeurs,
      *                  ou {@code null} si les insertions ne sont pas supportées.
      */
     protected MeasurementTable(final Database       database,
-                               final ConfigurationKey select,
-                               final ConfigurationKey insert)
-    {
+            final ConfigurationKey select,
+            final ConfigurationKey insert) {
         super(database, select);
         this.insert = insert;
     }
-
-    /** 
+    
+    /**
      * Construit une nouvelle connexion vers la table des mesures pour les stations spécifiées.
-     * 
+     *
      * @param  stations La table des stations à utiliser.
      * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
      * @param  insert   Clé de la requête SQL à utiliser pour ajouter des valeurs,
      *                  ou {@code null} si les insertions ne sont pas supportées.
      */
     protected MeasurementTable(final SamplingFeatureTable   stations,
-                               final ConfigurationKey select,
-                               final ConfigurationKey insert)
-    {
+            final ConfigurationKey select,
+            final ConfigurationKey insert) {
         super(stations, select);
         this.insert = insert;
     }
-
+    
     /**
      * Construit une mesure pour l'enregistrement courant
      */
-    protected Measurement createEntry(final SamplingFeature featureOfInterest,
-                                      final Phenomenon      observedProperty,
-                                      final Process         procedure,
-                                      final Distribution    distribution,
-                                      final Element         quality,
-                                      final Measure         result,
-                                      final TemporalObject  samplingTime,
-                                      final MetaData        observationMetadata,
-                                      final String          resultDefinition,
-                                      final TemporalObject  procedureTime,
-                                      final Object          procedureParameter) throws SQLException
-    {
-        return new MeasurementEntry(featureOfInterest, observedProperty, procedure, distribution, quality,
+    protected Measurement createEntry(final SamplingFeature station,
+            final Phenomenon      phenomenon,
+            final Process         procedure,
+            final Distribution    distribution,
+            final Element         quality,
+            final ResultSet       result) throws SQLException {
+        
+                final Measure         result;
+                final TemporalObject  samplingTime;
+                final MetaData        observationMetadata;
+                final String          resultDefinition;
+                final TemporalObject  procedureTime;
+                final Object          procedureParameter;
+                
+                return new MeasurementEntry(definition, featureOfInterest, observedProperty, procedure, distribution, quality,
                 result, samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
     }
-
+    
 }
