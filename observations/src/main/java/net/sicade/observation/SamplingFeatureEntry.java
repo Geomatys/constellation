@@ -55,10 +55,6 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     private final int identifier;
     
     /**
-     * Une definition de la station
-     */
-    private final String definition;
-    /**
      * L'ensemble des stations. Ne sera construit que la première fois où il sera nécessaire.
      */
     private List<SamplingFeatureRelation> relatedSamplingFeature;
@@ -72,12 +68,6 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * Les features designé
      */
     private List<Object> sampledFeature; 
-    
-    /**
-     * Connexion vers la table des stations.
-     * Sera mis à {@code null} lorsqu'elle ne sera plus nécessaire.
-     */
-    private transient SamplingFeatureTable stations;
     
     /**
      * Connexion vers la table des "survey details"
@@ -103,16 +93,20 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * @param name       Le nom de la station.
      * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
      */
-    public SamplingFeatureEntry(final SamplingFeatureTable stations,
-                                   final int identifier,
-                                   final String       name,
-                                   final SurveyProcedure surveyDetail)
+    public SamplingFeatureEntry(   final int               identifier,
+                                   final String            name,
+                                   final String            remarks,
+                                   final List<SamplingFeatureRelation> relatedSamplingFeature,
+                                   final List<Observation> relatedObservation,
+                                   final List<Object>      sampledFeature,
+                                   final SurveyProcedure   surveyDetail)
     {
-        super(name);
+        super(name, remarks);
         this.surveyDetail = surveyDetail;
-        this.stations   = stations;
-        this.observations   = stations.getObservationTable();
         this.identifier = identifier;
+        this.relatedSamplingFeature = relatedSamplingFeature;
+        this.relatedObservation = relatedObservation;
+        this.sampledFeature = sampledFeature;
     }
 
     /**
@@ -127,17 +121,17 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      */
     public synchronized List<SamplingFeatureRelation> getRelatedSamplingFeatures() {
         if (relatedSamplingFeature == null) try {
-            if (stations != null) {
+          /*  if (stations != null) {
                 final List<SamplingFeatureRelation> list = null;
                
-                /*synchronized (stations) {
+                synchronized (stations) {
                     assert equals(stations.getPlatform()) : this;
                     stations.setPlatform(this);
                     set = stations.getEntries();
                 }*/
-                relatedSamplingFeature = Collections.unmodifiableList(list);
+                //relatedSamplingFeature = Collections.unmodifiableList(list);
             }
-        } catch (Exception exception) {
+         catch (Exception exception) {
             //throw new ServerException(exception);
         }
         return relatedSamplingFeature;
@@ -182,9 +176,6 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         return this.surveyDetail;
     }
     
-     public String getDefinition() {
-        return definition;
-    }
 
     /**
      * Retourne le code numérique identifiant cette entrée.

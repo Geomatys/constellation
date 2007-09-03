@@ -42,40 +42,6 @@ import org.opengis.observation.sampling.SurveyProcedure;
  */
 @Deprecated
 public class SamplingFeatureCollectionTable extends BoundedSingletonTable<SamplingFeatureCollection> {
-    /**
-     * Requête SQL pour obtenir les limites géographiques des plateformes dans une région.
-     */
-    private static final ConfigurationKey BOUNDING_BOX = null; // new ConfigurationKey("Platforms:BBOX",
-//            "SELECT MIN(date), MAX(date), MIN(x), MAX(x), MIN(y), MAX(y)\n"          +
-//            "  FROM \"Locations\"\n"                                                 +
-//            "  JOIN \"Stations\" ON station=identifier\n"                            +
-//            " WHERE (date>=? AND date<=?) AND (x>=? AND x<=?) AND (y>=? AND y<=?)\n" +
-//            "   AND (provider LIKE ?)");
-
-    /**
-     * Requête SQL pour obtenir la liste des plateformes dans une région.
-     */
-    private static final ConfigurationKey LIST = null; // new ConfigurationKey("Platforms:LIST",
-//            "SELECT DISTINCT platform\n"                                             +
-//            "  FROM \"Stations\"\n"                                                  +
-//            "  JOIN \"Locations\" ON station=identifier\n"                           +
-//            " WHERE (date>=? AND date<=?) AND (x>=? AND x<=?) AND (y>=? AND y<=?)\n" +
-//            "   AND (provider LIKE ?)\n" +
-//            " ORDER BY date");
-
-    /**
-     * Requête SQL pour obtenir des informations sur une plateforme.
-     */
-    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Platforms:SELECT",
-//            "SELECT DISTINCT platform\n" +
-//            "  FROM \"Stations\"\n"      +
-//            " WHERE platform=?");
-
-    /** Numéro d'argument. */ private static final int ARGUMENT_PROVIDER = 7;
-    /** Numéro de colonne. */ private static final int NAME              = 1;
-    /** Numéro de colonne. */ private static final int IDENTIFIER        = 2;
-
-
     
     /**
      * Connexion vers la table des {@linkplain Station stations}. Une table par défaut sera
@@ -130,7 +96,7 @@ public class SamplingFeatureCollectionTable extends BoundedSingletonTable<Sampli
      * Configure la requête SQL spécifiée en fonction du {@linkplain #getProvider provider}
      * des données de cette table. Cette méthode est appelée automatiquement lorsque cette
      * table a {@linkplain #fireStateChanged changé d'état}.
-     */
+     
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
@@ -142,7 +108,8 @@ public class SamplingFeatureCollectionTable extends BoundedSingletonTable<Sampli
             }
         }
     }
-
+    */
+    
     /**
      * Construit une plateforme pour l'enregistrement courant.
      */

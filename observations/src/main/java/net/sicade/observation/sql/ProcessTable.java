@@ -33,16 +33,6 @@ import net.sicade.catalog.SingletonTable;
  */
 @Deprecated
 public class ProcessTable extends SingletonTable<Process> {
-    /**
-     * Requête SQL pour obtenir une procédure.
-     */
-    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Procedures:SELECT",
-//            "SELECT name, description\n" +
-//            "  FROM \"Procedures\"\n" +
-//            " WHERE name=?");
-
-    /** Numéro de colonne. */ private static final int NAME        = 1;
-    /** Numéro de colonne. */ private static final int DESCRIPTION = 2;
 
     /**
      * Construit une table des procédures.
@@ -50,14 +40,15 @@ public class ProcessTable extends SingletonTable<Process> {
      * @param  database Connexion vers la base de données.
      */
     public ProcessTable(final Database database) {
-        super(new Query(database)); // TODO
+        super(new ProcessQuery(database)); 
     }
 
     /**
      * Construit une procédure pour l'enregistrement courant.
      */
     protected Process createEntry(final ResultSet results) throws SQLException {
-        return new ProcessEntry(results.getString(NAME),
-                                  results.getString(DESCRIPTION));
+        final ProcessQuery query = (ProcessQuery) super.query;
+        return new ProcessEntry(results.getString(indexOf(query.name   )),
+                                results.getString(indexOf(query.remarks)));
     }
 }

@@ -37,29 +37,20 @@ import org.opengis.observation.Phenomenon;
 @Deprecated
 public class PhenomenonTable extends SingletonTable<Phenomenon> {
     /**
-     * Requête SQL pour obtenir un phénomène.
-     */
-    private static final ConfigurationKey SELECT = null; // new ConfigurationKey("Phenomenons:SELECT",
-//            "SELECT name, NULL as description\n" +
-//            "  FROM \"Phenomenons\"\n"           +
-//            " WHERE name=?");
-
-    /** Numéro de colonne. */ private static final int NAME    = 1;
-    /** Numéro de colonne. */ private static final int REMARKS = 2;
-
-    /**
      * Construit une table des phénomènes.
      * 
      * @param  database Connexion vers la base de données.
      */
     public PhenomenonTable(final Database database) {
-        super(new Query(database)); // TODO
+        super(new PhenomenonQuery(database));
     }
 
     /**
      * Construit un phénomène pour l'enregistrement courant.
      */
     protected Phenomenon createEntry(final ResultSet results) throws SQLException {
-        return new PhenomenonEntry(results.getString(NAME), results.getString(REMARKS));
+        final PhenomenonQuery query = (PhenomenonQuery) super.query;
+        return new PhenomenonEntry(results.getString(indexOf(query.name   )),
+                                   results.getString(indexOf(query.remarks)));
     }
 }

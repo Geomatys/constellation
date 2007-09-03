@@ -32,17 +32,21 @@ import net.sicade.catalog.QueryType;
 import net.sicade.catalog.Table;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.coverage.model.DistributionTable;
+import net.sicade.observation.ObservationEntry;
+import net.sicade.observation.TemporalObjectEntry;
 
-// geoAPI dependencies
-import org.opengis.metadata.quality.DataQuality;
+// OpenGis dependencies
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.Process;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
-
-// geotolls dependencies
-import org.geotools.resources.Utilities;
 import org.opengis.metadata.quality.Element;
+import org.opengis.temporal.TemporalObject;
+
+// geotools dependencies
+import org.geotools.resources.Utilities;
+import org.opengis.metadata.MetaData;
+
 
 
 
@@ -68,18 +72,6 @@ import org.opengis.metadata.quality.Element;
  * @author Antoine Hnawia
  */
 public abstract class ObservationTable<EntryType extends Observation> extends Table {
-    /** Numéro de colonne et d'argument. */ static final int STATION            = 1;
-    /** Numéro de colonne. */               static final int PHENOMENON         = 2;
-    /** Numéro de colonne. */               static final int PROCEDURE          = 3;
-    /** Numéro de colonne. */               static final int DISTRIBUTION       = 4;
-    /** Numéro de colonne. */               static final int QUALITY            = 5;
-    /** Numéro de colonne. */               static final int RESULT             = 6;
-    /** Numéro de colonne. */               static final int SAMPLINGTIME       = 7;
-    /** Numéro de colonne. */               static final int METADATA           = 8;
-    /** Numéro de colonne. */               static final int RESULTDEFINITION   = 9;
-    /** Numéro de colonne. */               static final int PROCEDURETIME      = 10;
-    /** Numéro de colonne. */               static final int PROCEDUREPARAMETER = 11;  
-    
 
     /**
      * Connexion vers la table des stations.
@@ -294,9 +286,10 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * Construit une observation pour l'enregistrement courant.
      */
     private EntryType createEntry(final ResultSet result) throws CatalogException, SQLException {
-       final String phenomenonID   = result.getString(PHENOMENON);
-       final String procedureID    = result.getString(PROCEDURE);
-       final String distributionID = result.getString(DISTRIBUTION);
+       final String phenomenonID     = result.getString(PHENOMENON);
+       final String procedureID      = result.getString(PROCEDURE);
+       final String distributionID   = result.getString(DISTRIBUTION);
+       final String resultDefinition = result.getString(RESULTDEFINITION);
         
         SamplingFeature station = this.featureOfInterest;
         if (station == null) {
@@ -323,8 +316,15 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
             metadata = getDatabase().getTable(MetadataTable.class);
         }
         final Element quality = metadata.getEntry(Element.class, result.getString(QUALITY ));
+        final MetaData observationMetadata =  metadata.getEntry(MetaData.class, result.getString(METADATA ));
         
-        return createEntry(station,  phenomenon, procedure, distribution, quality, result);
+        final TemporalObject samplingTime  = new TemporalObjectEntry(result.getDate(SAMPLINGTIME));
+        final TemporalObject procedureTime = new TemporalObjectEntry(result.getDate(PROCEDURETIME));
+        
+        final int procedureParameter       = result.getInt(PROCEDUREPARAMETER);
+        
+        return new ObservationEntry(station,  phenomenon, procedure, distribution, quality, result, 
+                samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
     }
 
 }

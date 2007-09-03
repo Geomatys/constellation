@@ -255,7 +255,7 @@ public class ObservationEntry extends Entry implements Observation {
         }
         if (super.equals(object)) {
             final ObservationEntry that = (ObservationEntry) object;
-            return Utilities.equals(this.featureOfInterest,    that.featureOfInterest) &&
+            return Utilities.equals(this.featureOfInterest,   that.featureOfInterest) &&
                    Utilities.equals(this.observedProperty,    that.observedProperty) &&
                    Utilities.equals(this.procedure,           that.procedure)  &&
                    Utilities.equals(this.quality,             that.quality)    && 

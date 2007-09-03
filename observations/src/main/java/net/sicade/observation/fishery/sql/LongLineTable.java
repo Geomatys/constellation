@@ -65,7 +65,6 @@ public class LongLineTable extends SamplingFeatureTable {
      *
      * @todo A mettre à jour lorsque l'on aura implémenté une classe {@code LongLineEntry}.
      */
-    @Override
     protected SamplingFeature createEntry(final int          identifier,
                                   final String       name,
                                   final Point2D      coordinate,

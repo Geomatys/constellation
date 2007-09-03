@@ -14,35 +14,13 @@
  */
 package net.sicade.observation.sql;
 
-// J2SE dependencies
-import java.util.Set;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Calendar;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.awt.geom.Point2D;
 import net.sicade.observation.SamplingFeatureEntry;
-
-
-// OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
 import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.observation.sampling.SamplingFeatureCollection;
 import org.opengis.observation.Observation;
-
-// Geotools dependencies
-import org.geotools.resources.Utilities;
-import org.geotools.metadata.iso.citation.Citations;
-
-// Sicade dependencies
-import net.sicade.util.DateRange;
-import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
-import net.sicade.catalog.Query;
-import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 import org.opengis.observation.sampling.SurveyProcedure;
 
@@ -57,43 +35,15 @@ import org.opengis.observation.sampling.SurveyProcedure;
  */
 @Deprecated
 public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
-    /**
-     * Requête SQL pour obtenir une station à partir de son identifiant.
-     *
-     * @todo L'utilisation d'une clause {@code LIKE %} ne retourne pas les lignes dont la valeur est
-     *       nulle. C'est embêtant lorsque la recherche est faite sur la colonne {@code platform},
-     *       ce qui ce produit dans le cas {@code LIST} de la méthode {@link #getQuery}.
-     */
-    private static final ConfigurationKey SELECT = null; //new ConfigurationKey("Stations:SELECT",
-//            "SELECT identifier AS name, identifier, platform, quality, provider, \"startTime\", \"endTime\", x, y\n" +
-//            "  FROM \"StationsLocations\"\n" +
-//            " WHERE name LIKE ?\n"           +
-//            " ORDER BY identifier");
-
-    /** Numéro d'argument. */ private static final int  ARGUMENT_PLATFORM = 1;
-
-    /** Numéro de colonne. */ private static final int  NAME       = 1;
-    /** Numéro de colonne. */ private static final int  IDENTIFIER = 2;
-    
-
-    /**
-     * Connexion vers la table des plateformes. Une table par défaut sera construite la première
-     * fois où elle sera nécessaire.
-     */
-    private SamplingFeatureCollectionTable platforms;
-    
+   
+       
     /**
      * Connexion vers la table des observations.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     private ObservationTable<? extends Observation> observations;
 
-    /**
-     * La plateforme recherchée, ou {@code null} pour rechercher les stations de toutes les
-     * plateformes.
-     */
-    private SamplingFeatureCollection platform;
- 
+     
 
     /**
      * {@code true} si l'on autorise cette classe à construire des objets {@link StationEntry}
@@ -106,28 +56,10 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * Construit une nouvelle connexion vers la table des stations.
      */
     public SamplingFeatureTable(final Database database) {
-        super(new Query(database)); // TODO
+        super(new SamplingFeatureQuery(database));
     }
 
-    /**
-     * Définie la table des plateformes à utiliser. Cette méthode peut être appelée par {@link PlatformTable}
-     * immédiatement après la construction de {@code StationTable} et avant toute première utilisation.
-     *
-     * @param  platforms Table des plateformes à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des plateformes.
-     */
-    protected synchronized void setPlatformTable(final SamplingFeatureCollectionTable platforms)
-            throws IllegalStateException
-    {
-        if (this.platforms != platforms) {
-            if (this.platforms != null) {
-                throw new IllegalStateException();
-            }
-            this.platforms = platforms; // Doit être avant tout appel de setTable(this).
-            platforms.setStationTable(this);
-        }
-    }
-
+   
     /**
      * Définie la table des observations à utiliser. Cette méthode peut être appelée par
      * {@link ObservationTable} avant toute première utilisation de {@code StationTable}.
@@ -191,7 +123,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * Configure la requête SQL spécifiée en fonction de la {@linkplain #getPlatform plateforme
      * courante} de cette table. Cette méthode est appelée automatiquement lorsque cette table a
      * {@linkplain #fireStateChanged changé d'état}.
-     */
+     
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
@@ -203,7 +135,8 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
             }
         }
     }
-
+    */
+    
     /**
      * Construit une station pour l'enregistrement courant. L'implémentation par défaut extrait une
      * première série d'informations telles que le {@linkplain Station#getName nom de la station},
@@ -212,11 +145,10 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
     protected SamplingFeature createEntry(final ResultSet result) throws CatalogException, SQLException {
-        final String name    = result.getString(NAME);
-        final int identifier = result.getInt(IDENTIFIER);
-        final SurveyProcedure surveyDetail = null;
+        final SamplingFeatureQuery query = (SamplingFeatureQuery) super.query;
+        return new SamplingFeatureEntry(results.getString(indexOf(query.name   )),
+                                       results.getString(indexOf(query.remarks)));
         
-        return createEntry(identifier, name,  result, surveyDetail);
     }
 
     /**
