@@ -193,6 +193,6 @@ public class CategoryTable extends Table {
              * l'erreur et on continue en essayant de décoder l'URL.
              */
         }
-        return palettes.getColors(new URL(colors).getPath());
+        return palettes.getColors(colors);
     }
 }
