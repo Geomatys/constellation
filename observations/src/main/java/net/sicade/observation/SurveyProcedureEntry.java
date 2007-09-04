@@ -1,4 +1,17 @@
-/* Created on 3 septembre 2007, 12:33 */
+/*
+ * Sicade - Systemes integrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le D�veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 
 package net.sicade.observation;
 
@@ -11,8 +24,9 @@ import org.opengis.temporal.TemporalObject;
 import org.opengis.util.GenericName;
 
 /**
- *SurveyProcedureEntry.java
+ *Impl�mentation d'une entr�e repr�sentant une {@linkplain SurveyProcedure SurveyProcedure}.
  *
+ * @version $Id:
  * @author Guilhem Legal
  */
 public class SurveyProcedureEntry extends Entry implements SurveyProcedure {

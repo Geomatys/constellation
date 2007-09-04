@@ -1,4 +1,17 @@
-/* Created on 3 septembre 2007, 12:32 */
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 
 package net.sicade.observation.sql;
 
@@ -41,7 +54,6 @@ public class SamplingFeatureQuery extends Query {
         relatedObservation      = addColumn   ("samplingFeatures", "relatedObservation", usage);
         sampledFeature          = addColumn   ("samplingFeatures", "sampledFeature", usage);
         surveyDetail            = addColumn   ("samplingFeatures", "surveyDetail", usage);
-        
         
         byIdentifier  = addParameter(identifier, SELECT);
         name.setOrdering("ASC");
