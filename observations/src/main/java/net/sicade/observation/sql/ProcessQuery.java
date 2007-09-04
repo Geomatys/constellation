@@ -32,7 +32,7 @@ public class ProcessQuery extends Query{
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, remarks;
+    protected final Column name, remarks, href;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -49,8 +49,9 @@ public class ProcessQuery extends Query{
         final QueryType[] usage = {SELECT, LIST};
         name    = addColumn   ("Process", "name",        usage);
         remarks = addColumn   ("Process", "description", usage);
+        href    = addColumn   ("Process", "href", usage);
+
         byName  = addParameter(name, SELECT);
-        name.setOrdering("ASC");
     }
     
 }

@@ -32,8 +32,7 @@ public class SamplingFeatureQuery extends Query {
      /** 
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column identifier, name, remarks, relatedSamplingFeature, 
-            relatedObservation, sampledFeature, surveyDetail;
+    protected final Column identifier, name, description, sampledFeature;
      /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
@@ -47,16 +46,12 @@ public class SamplingFeatureQuery extends Query {
     public SamplingFeatureQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT, LIST};
-        name                    = addColumn   ("samplingFeatures", "name",        usage);
-        remarks                 = addColumn   ("samplingFeatures", "description", usage);
-        identifier              = addColumn   ("samplingFeatures", "identifier", usage);
-        relatedSamplingFeature  = addColumn   ("samplingFeatures", "relatedSamplingFeature", usage);
-        relatedObservation      = addColumn   ("samplingFeatures", "relatedObservation", usage);
-        sampledFeature          = addColumn   ("samplingFeatures", "sampledFeature", usage);
-        surveyDetail            = addColumn   ("samplingFeatures", "surveyDetail", usage);
+        identifier              = addColumn   ("sampling_features", "id", usage);
+        name                    = addColumn   ("sampling_features", "name",        usage);
+        description             = addColumn   ("sampling_features", "description", usage);
+        sampledFeature          = addColumn   ("sampling_features", "sampled_feature", usage);
         
         byIdentifier  = addParameter(identifier, SELECT);
-        name.setOrdering("ASC");
     }
     
 }

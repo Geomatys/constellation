@@ -33,7 +33,7 @@ import org.opengis.observation.sampling.SamplingFeatureRelation;
 import org.opengis.observation.sampling.SurveyProcedure;
 
 /**
- * Implémentation d'une entrée représentant une {@link Station station}.
+ * Implémentation d'une entrée représentant une {@link SamplingFeature station}.
  *
  * @version $Id$
  * @author Antoine Hnawia
@@ -50,12 +50,13 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     private static final long serialVersionUID = 8822736167506306189L;
 
     /**
-     * L'identifiant numérique de la station.
+     * L'identifiant alphanumérique de la station.
      */
-    private final int identifier;
+    private final String identifier;
+    
     
     /**
-     * L'ensemble des stations. Ne sera construit que la première fois où il sera nécessaire.
+     * 
      */
     private List<SamplingFeatureRelation> relatedSamplingFeature;
     
@@ -82,18 +83,33 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * conservées dans une cache car elle sont potentiellement très nombreuses. Il nous
      * faudra donc conserver la connexion en permanence.
      */
-    private final ObservationTable<? extends Observation> observations;
+    private final ObservationTable<? extends Observation> observations = null;
     
 
     /** 
      * Construit une entrée pour l'identifiant de station spécifié.
+     * adapté au modele de BRGM.
      *
-     * @param table      La table qui a produit cette entrée.
-     * @param identifier L'identifiant numérique de la station.
-     * @param name       Le nom de la station.
-     * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
+     * @param identifier  L'identifiant numérique de la station.
+     * @param name        Le nom de la station.
+     * @param description Une description de la station.
+     * @param le 
      */
-    public SamplingFeatureEntry(   final int               identifier,
+    public SamplingFeatureEntry(   final String            identifier,
+                                   final String            name,
+                                   final String            description,
+                                   final String            sampledFeature)
+    {
+        super(name, description);
+        this.identifier             = identifier;
+        this.sampledFeature.add(sampledFeature);
+        this.surveyDetail           = null;
+        this.relatedSamplingFeature = null;
+        this.relatedObservation     = null;
+        this.sampledFeature         = null;
+    }
+    
+    public SamplingFeatureEntry(   final String            identifier,
                                    final String            name,
                                    final String            remarks,
                                    final List<SamplingFeatureRelation> relatedSamplingFeature,
@@ -102,8 +118,8 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
                                    final SurveyProcedure   surveyDetail)
     {
         super(name, remarks);
-        this.surveyDetail = surveyDetail;
         this.identifier = identifier;
+        this.surveyDetail = surveyDetail;
         this.relatedSamplingFeature = relatedSamplingFeature;
         this.relatedObservation = relatedObservation;
         this.sampledFeature = sampledFeature;
@@ -112,7 +128,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * {@inheritDoc}
      */
-    public int getNumericIdentifier() {
+    public String getdentifier() {
         return identifier;
     }
     
@@ -120,20 +136,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * {@inheritDoc}
      */
     public synchronized List<SamplingFeatureRelation> getRelatedSamplingFeatures() {
-        if (relatedSamplingFeature == null) try {
-          /*  if (stations != null) {
-                final List<SamplingFeatureRelation> list = null;
-               
-                synchronized (stations) {
-                    assert equals(stations.getPlatform()) : this;
-                    stations.setPlatform(this);
-                    set = stations.getEntries();
-                }*/
-                //relatedSamplingFeature = Collections.unmodifiableList(list);
-            }
-         catch (Exception exception) {
-            //throw new ServerException(exception);
-        }
+    
         return relatedSamplingFeature;
     }
   
@@ -142,25 +145,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      * {@inheritDoc}
      */
     public synchronized List<Observation> getRelatedObservations() {
-        
-        if (relatedObservation == null) try {
-            if (observations != null) {
-                List<Observation> list = null;
-                synchronized (observations) {
-                    /*assert equals(observations.) : this;
-                    observations.setPlatform(this);*/
-                    list = (List<Observation>)observations.getEntries();
-                }
-                relatedObservation = Collections.unmodifiableList(list);
-            }
-        } catch (SQLException exception) {
-            System.out.print("SQL EXCEPTION DANS getRelatedObservation()");
-            //throw new ServerException(exception);
-        }
-        catch (CatalogException exception) {
-             System.out.print("Catalog EXCEPTION DANS getRelatedObservation()");
-            //throw new ServerException(exception);
-        }
+       
         return relatedObservation;
     }
     
@@ -182,7 +167,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      */
     @Override
     public int hashCode() {
-        return identifier;
+        return identifier.hashCode();
     }
 
     /**

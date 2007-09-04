@@ -51,6 +51,7 @@ public class PhenomenonTable extends SingletonTable<Phenomenon> {
     protected Phenomenon createEntry(final ResultSet results) throws SQLException {
         final PhenomenonQuery query = (PhenomenonQuery) super.query;
         return new PhenomenonEntry(results.getString(indexOf(query.name   )),
-                                   results.getString(indexOf(query.remarks)));
+                                   results.getString(indexOf(query.remarks)),
+                                   results.getString(indexOf(query.identifier)));
     }
 }

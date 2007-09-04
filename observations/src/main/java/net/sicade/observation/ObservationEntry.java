@@ -56,7 +56,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * La station à laquelle a été pris cet échantillon.
      */
-    private final SamplingFeature featureOfInterest;
+    private final String featureOfInterest;
     
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
@@ -116,20 +116,21 @@ public class ObservationEntry extends Entry implements Observation {
      * @param procedure         La procédure associée.
      * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
      */
-    public ObservationEntry(final String definition,
-                               final SamplingFeature featureOfInterest, 
-                               final Phenomenon      observedProperty,
-                               final Process         procedure,
-                               final Distribution    distribution,
-                               final Element         quality,
-                               final Object          result,
-                               final TemporalObject  samplingTime,
-                               final MetaData        observationMetadata,
-                               final String          resultDefinition,
-                               final TemporalObject  procedureTime,
-                               final Object          procedureParameter) 
+    public ObservationEntry(final String name,
+                            final String          definition,
+                            final String          featureOfInterest, 
+                            final Phenomenon      observedProperty,
+                            final Process         procedure,
+                            final Distribution    distribution,
+                            final Element         quality,
+                            final Object          result,
+                            final TemporalObject  samplingTime,
+                            final MetaData        observationMetadata,
+                            final String          resultDefinition,
+                            final TemporalObject  procedureTime,
+                            final Object          procedureParameter) 
     {
-        super(null);
+        super(name);
         this.definition          = definition;
         this.featureOfInterest   = featureOfInterest;
         this.observedProperty    = observedProperty;
@@ -143,6 +144,40 @@ public class ObservationEntry extends Entry implements Observation {
         this.procedureTime       = procedureTime;
         this.procedureParameter  = procedureParameter; 
     }
+    
+    /**
+     * Construit une observation reduite adapté a brgm.
+     * 
+     * @param featureOfInterest La station d'observation (par exemple une position de pêche).
+     * @param observedProperty  Le phénomène observé.
+     * @param procedure         La procédure associée.
+     * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
+     */
+    public ObservationEntry(final String         name,
+                            final String         definition,
+                            final String         featureOfInterest, 
+                            final Phenomenon     observedProperty,
+                            final Process        procedure,
+                            final Distribution   distribution,
+                            final Element        quality,
+                            final Object         result,
+                            final TemporalObject samplingTime,
+                            final String         resultDefinition)
+    {
+        super(name);
+        this.definition          = definition;
+        this.featureOfInterest   = featureOfInterest;
+        this.observedProperty    = observedProperty;
+        this.procedure           = procedure;
+        this.distribution        = distribution;
+        this.quality             = quality;
+        this.result              = result;
+        this.samplingTime        = samplingTime;
+        this.observationMetadata = null;
+        this.resultDefinition    = resultDefinition;
+        this.procedureTime       = null;
+        this.procedureParameter  = null; 
+    }
 
     /**
      * Construit un nom à partir des autres informations disponibles.
@@ -155,7 +190,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public SamplingFeature getFeatureOfInterest() {
+    public String getFeatureOfInterest() {
         return featureOfInterest;
     }
 

@@ -34,12 +34,18 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     private static final long serialVersionUID = 5140595674231914861L;
 
     /**
+     * L'identifiant du phenomene.
+     */
+    private String id;
+    
+    /**
      * Construit un nouveau phénomène du nom spécifié.
      *
      * @param name Le nom du phénomène.
      */
-    public PhenomenonEntry(final String name) {
+    public PhenomenonEntry(final String id, final String name) {
         super(name);
+        this.id = id;
     }
 
     /** 
@@ -48,7 +54,8 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      * @param name    Le nom du phénomène.
      * @param remarks Remarques s'appliquant à ce phénomène, ou {@code null}.
      */
-    public PhenomenonEntry(final String name, final String remarks) {
-        super(name, remarks);
+    public PhenomenonEntry(final String id, final String name, final String description ) {
+        super(name, description);
+        this.id = id;
     }
 }

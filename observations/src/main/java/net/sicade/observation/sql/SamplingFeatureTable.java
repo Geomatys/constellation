@@ -146,42 +146,14 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      */
     protected SamplingFeature createEntry(final ResultSet result) throws CatalogException, SQLException {
         final SamplingFeatureQuery query = (SamplingFeatureQuery) super.query;
-        return new SamplingFeatureEntry(results.getString(indexOf(query.name   )),
-                                       results.getString(indexOf(query.remarks)));
+        return new SamplingFeatureEntry(result.getString(indexOf(query.identifier)),
+                                        result.getString(indexOf(query.name)),
+                                        result.getString(indexOf(query.description)),
+                                        result.getString(indexOf(query.sampledFeature)));
         
     }
 
-    /**
-     * Construit une station à partir des informations spécifiées. Cette méthode est appelée
-     * automatiquement par {@link #createEntry(ResultSet)} après avoir extrait les informations
-     * communes à tous les types de stations. L'implémentation par défaut ne fait que construire
-     * un objet {@link StationEntry} sans extraire davantage d'informations. Les classes dérivées
-     * devraient redéfinir cette méthode si elles souhaitent construire un type de station plus
-     * élaboré.
-     *
-     * @param table      La table qui a produit cette entrée.
-     * @param identifier L'identifiant numérique de la station.
-     * @param name       Le nom de la station.
-     * @param coordinate Une coordonnée représentative en degrés de longitude et de latitude,
-     *                   ou {@code null} si inconue.
-     * @param timeRange  Plage de temps de cet élément, ou {@code null} si inconue.
-     * @param platform   La plateforme (par exemple un bateau) sur laquelle a été prise cette
-     *                   station, ou {@code null} si inconnue.
-     * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
-     * @param provider   La provenance de la donnée, ou {@code null} si inconnue.
-     * @param result     La ligne courante de la requête SQL. A utiliser seulement si les sous-classes
-     *                   ont besoin d'extraire davantage d'informations que celles qui ont été fournies
-     *                   par les arguments précédents.
-     *
-     * @throws SQLException si un accès à la base de données était nécessaire et a échoué.
-     */
-    protected SamplingFeature createEntry(final int          identifier,
-                                          final String       name,
-                                          final SurveyProcedure surveyDetail)
-            throws SQLException
-    {
-        return new SamplingFeatureEntry(this, identifier, name, surveyDetail);
-    }
+   
 
     /**
      * Indique si la méthode {@link #getEntries} devrait accepter la station spécifiée.

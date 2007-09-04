@@ -210,11 +210,11 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * Configure la requête SQL spécifiée en fonction de la station et de l'observable recherchés
      * par cette table. Cette méthode est appelée automatiquement lorsque cette table a
      * {@linkplain #fireStateChanged changé d'état}.
-     */
+     
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-       /* if (featureOfInterest != null) {
+        if (featureOfInterest != null) {
             statement.setInt(STATION, featureOfInterest.getNumericIdentifier());
         } else {
             throw new UnsupportedOperationException("La recherche sur toutes les stations n'est pas encore impléméntée.");
@@ -223,9 +223,10 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
             statement.setInt(OBSERVABLE, observable.getNumericIdentifier());
         } else {
             throw new UnsupportedOperationException("La recherche sur tous les observables n'est pas encore impléméntée.");
-        }*/
+        }
     }
-
+     */
+    
     /**
      * Retourne {@code true} s'il existe au moins une entrée pour la station et l'observable
      * courant.
@@ -286,45 +287,19 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * Construit une observation pour l'enregistrement courant.
      */
     private EntryType createEntry(final ResultSet result) throws CatalogException, SQLException {
-       final String phenomenonID     = result.getString(PHENOMENON);
-       final String procedureID      = result.getString(PROCEDURE);
-       final String distributionID   = result.getString(DISTRIBUTION);
-       final String resultDefinition = result.getString(RESULTDEFINITION);
+      final ObservationQuery query = (ObservationQuery) super.query;
+        return new ObservationEntry(result.getString(indexOf(query.name   )),
+                                    result.getString(indexOf(query.description)),
+                                    result.getString(indexOf(query.featureOfInterest)),
+                                    phenomenons.getEntry(result.getString(indexOf(query.observedProperty))), 
+                                    procedures.getEntry(result.getString(indexOf(query.procedure))),
+                                    distributions.getEntry(result.getString(indexOf(query.distribution))),
+                                    //manque quality
+                                    //manque result
+                                    result.getDate(indexOf(query.samplingTime)),
+                                    result.getString(indexOf(query.resultDefinition)));
         
-        SamplingFeature station = this.featureOfInterest;
-        if (station == null) {
-            assert !Thread.holdsLock(getStationTable()); // Voir le commentaire de 'stations'.
-            station = getStationTable().getEntry(result.getString(STATION));
-        }
         
-        if (phenomenons == null) {
-            phenomenons = getDatabase().getTable(PhenomenonTable.class);
-        }
-        final Phenomenon phenomenon = phenomenons.getEntry(phenomenonID);
-        
-        if (procedures == null) {
-            procedures = getDatabase().getTable(ProcessTable.class);
-        }
-        final Process procedure = procedures.getEntry(procedureID);
-        
-        if (distributions == null) {
-            distributions = getDatabase().getTable(DistributionTable.class);
-        }
-        final Distribution distribution = distributions.getEntry(distributionID);
-        
-        if (metadata == null) {
-            metadata = getDatabase().getTable(MetadataTable.class);
-        }
-        final Element quality = metadata.getEntry(Element.class, result.getString(QUALITY ));
-        final MetaData observationMetadata =  metadata.getEntry(MetaData.class, result.getString(METADATA ));
-        
-        final TemporalObject samplingTime  = new TemporalObjectEntry(result.getDate(SAMPLINGTIME));
-        final TemporalObject procedureTime = new TemporalObjectEntry(result.getDate(PROCEDURETIME));
-        
-        final int procedureParameter       = result.getInt(PROCEDUREPARAMETER);
-        
-        return new ObservationEntry(station,  phenomenon, procedure, distribution, quality, result, 
-                samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
     }
 
 }

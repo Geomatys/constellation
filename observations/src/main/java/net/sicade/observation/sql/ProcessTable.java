@@ -49,6 +49,7 @@ public class ProcessTable extends SingletonTable<Process> {
     protected Process createEntry(final ResultSet results) throws SQLException {
         final ProcessQuery query = (ProcessQuery) super.query;
         return new ProcessEntry(results.getString(indexOf(query.name   )),
-                                results.getString(indexOf(query.remarks)));
+                                results.getString(indexOf(query.remarks)),
+                                results.getString(indexOf(query.href)));
     }
 }
