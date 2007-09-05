@@ -31,18 +31,12 @@ public class ProcessEntry extends Entry implements Process {
     private static final long serialVersionUID = -1370011712794916454L;
     
     /**
-     * un lien vers un fichier SensorML.
-     */
-    private String href;
-
-    /**
      * Construit une nouvelle procédure du nom spécifié.
      *
      * @param name Le nom de la procédure.
      */
-    public ProcessEntry(final String name, final String href) {
+    public ProcessEntry(final String name) {
         super(name);
-        this.href = href;
     }
 
     /** 
@@ -51,8 +45,7 @@ public class ProcessEntry extends Entry implements Process {
      * @param name    Le nom de la procédure.
      * @param remarks Remarques s'appliquant à cette procédure, ou {@code null}.
      */
-    public ProcessEntry(final String name, final String remarks , final String href) {
+    public ProcessEntry(final String name, final String remarks) {
         super(name, remarks);
-        this.href = href;
     }
 }

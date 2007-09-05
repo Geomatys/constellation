@@ -60,15 +60,18 @@ public class MeasurementTable extends ObservationTable<Measurement> {
      */
     protected Measurement createEntry(final ResultSet result) throws SQLException {
         
-                final Measure         result;
-                final TemporalObject  samplingTime;
-                final MetaData        observationMetadata;
-                final String          resultDefinition;
-                final TemporalObject  procedureTime;
-                final Object          procedureParameter;
+                 final MeasurementQuery query = (MeasurementQuery) super.query;
                 
-                return new MeasurementEntry(definition, featureOfInterest, observedProperty, procedure, distribution, quality,
-                result, samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
+                return new MeasurementEntry(result.getString(indexOf(query.name   )),
+                                            result.getString(indexOf(query.description)),
+                                            result.getString(indexOf(query.featureOfInterest)),
+                                            phenomenons.getEntry(result.getString(indexOf(query.observedProperty))), 
+                                            procedures.getEntry(result.getString(indexOf(query.procedure))),
+                                            distributions.getEntry(result.getString(indexOf(query.distribution))),
+                                            //manque quality
+                                            //manque result
+                                            result.getDate(indexOf(query.samplingTime)),
+                                            result.getString(indexOf(query.resultDefinition)));;
     }
     
 }

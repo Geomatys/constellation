@@ -70,6 +70,7 @@ import org.opengis.metadata.MetaData;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
+ * @author Guilhem Legal
  */
 public abstract class ObservationTable<EntryType extends Observation> extends Table {
 
@@ -81,72 +82,50 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * des verrous devrait toujours être {@code ObservationTable} d'abord, et {@code StationTable}
      * ensuite.
      */
-    private SamplingFeatureTable stations;
+    protected SamplingFeatureTable stations;
 
    /**
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private PhenomenonTable phenomenons;
+    protected PhenomenonTable phenomenons;
 
     /**
      * Connexion vers la table des {@linkplain Procedure procedures}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private ProcessTable procedures;
+    protected ProcessTable procedures;
 
     /**
      * Connexion vers la table des {@linkplain Distribution distributions}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private DistributionTable distributions;
+    protected DistributionTable distributions;
     
     /**
      * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
      * sera construite la première fois où elle sera nécessaire.
      */
-    private MetadataTable metadata;
+    protected MetadataTable metadata;
     
     /**
      * La station pour laquelle on veut des observations, ou {@code null} pour récupérer les
      * observations de toutes les stations.
      */
-    private SamplingFeature featureOfInterest;
-
-    
-
-    /**
-     * La clé désignant la requête à utiliser pour obtenir des valeurs.
-     */
-    private final ConfigurationKey select;
+    protected SamplingFeature featureOfInterest;
+  
 
     /** 
      * Construit une nouvelle connexion vers la table des observations. Voyez la javadoc de
      * cette classe pour les conditions que doivent remplir la requête donnée en argument.
      * 
      * @param  database Connexion vers la base de données des observations.
-     * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
      */
-    public ObservationTable(final Database       database,
-                               final ConfigurationKey select)
-    {
-        super(new Query(database)); // TODO
-        this.select = select;
+    public ObservationTable(final Database database) {
+        super(new ObservationQuery(database)); 
     }
 
-    /** 
-     * Construit une nouvelle connexion vers la table des observations pour les stations spécifiées.
-     * 
-     * @param  stations La table des stations à utiliser.
-     * @param  select   Clé de la requête SQL à utiliser pour obtenir des valeurs.
-     */
-    public ObservationTable(final SamplingFeatureTable   stations,
-                               final ConfigurationKey select)
-    {
-        this(stations.getDatabase(), select);
-        setStationTable(stations);
-    }
-
+    
     /**
      * Définie la table des stations à utiliser. Cette méthode peut être appelée par
      * {@link StationTable} avant toute première utilisation de {@code ObservationTable}.
@@ -230,7 +209,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     /**
      * Retourne {@code true} s'il existe au moins une entrée pour la station et l'observable
      * courant.
-     */
+     
     public synchronized boolean exists() throws SQLException {
         final PreparedStatement statement = getStatement(getProperty(select));
         final ResultSet result = statement.executeQuery();
@@ -238,6 +217,8 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
         result.close();
         return exists;
     }
+     
+     */
 
     /**
      * Retourne les observations pour la station et l'observable courants. Cette méthode
@@ -247,7 +228,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * 
      * @throws CatalogException si un enregistrement est invalide.
      * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
-     */
+     
     public synchronized List<EntryType> getEntries() throws CatalogException, SQLException {
         final List<EntryType> list = new ArrayList<EntryType>();
         final PreparedStatement statement = getStatement(getProperty(select));
@@ -257,7 +238,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
         }
         result.close();
         return list;
-    }
+    }*/
 
     /**
      * Retourne une seule observation pour la station et l'observable courants, ou {@code null}
@@ -266,7 +247,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * 
      * @throws CatalogException si un enregistrement est invalide.
      * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
-     */
+     
     public synchronized EntryType getEntry() throws CatalogException, SQLException {
         final PreparedStatement statement = getStatement(getProperty(select));
         final ResultSet results = statement.executeQuery();
@@ -282,7 +263,8 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
         results.close();
         return observation;
     }
-
+   */
+     
     /**
      * Construit une observation pour l'enregistrement courant.
      */

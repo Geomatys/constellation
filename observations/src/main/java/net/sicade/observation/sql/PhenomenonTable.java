@@ -36,6 +36,7 @@ import org.opengis.observation.Phenomenon;
  */
 @Deprecated
 public class PhenomenonTable extends SingletonTable<Phenomenon> {
+   
     /**
      * Construit une table des phénomènes.
      * 

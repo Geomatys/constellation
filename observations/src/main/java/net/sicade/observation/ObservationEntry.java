@@ -146,7 +146,7 @@ public class ObservationEntry extends Entry implements Observation {
     }
     
     /**
-     * Construit une observation reduite adapté a brgm.
+     * Construit une observation reduite adapté a BRGM.
      * 
      * @param featureOfInterest La station d'observation (par exemple une position de pêche).
      * @param observedProperty  Le phénomène observé.

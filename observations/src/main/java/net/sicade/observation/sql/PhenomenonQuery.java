@@ -23,8 +23,9 @@ import net.sicade.catalog.QueryType;
 import static net.sicade.catalog.QueryType.*;
 
 /**
- * The query to execute for a {@link ThematicTable}.
+ * The query to execute for a {@link PhenomenonTable}.
  *
+ * @version $Id:
  * @author Guilhem Legal
  */
 public class PhenomenonQuery extends Query{

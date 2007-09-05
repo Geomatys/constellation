@@ -20,11 +20,11 @@ import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
 
 /**
- *CompositePhenomenonEntry.java
- *
- * @author Guilhem Legal
- * @author Mehdi Sidhoum
- */
+  * Une propriété complexe composée de plusieur {@linkPlain Phenomenon phenomenon}
+  *
+  * @version $Id:
+  * @author Guilhem Legal
+  */
 public class CompositePhenomenonEntry extends PhenomenonEntry implements CompositePhenomenon{
     
     /**
@@ -46,9 +46,11 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
      * Crée un nouveau phenomene composé
      */
     public CompositePhenomenonEntry(final String id, final String name, final String description
-            ,final List<Phenomenon> component) {
+            ,final Phenomenon base, final List<Phenomenon> component) {
         super(id, name, description);
+        this.base = base;
         this.component = component;
+        this.dimension = component.size();
         
     }
     
@@ -57,6 +59,13 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
      */
     public Phenomenon getBase(){
         return base;
+    }
+    
+    /**
+     * Ajoute un composant a la liste 
+     */
+    public void addComponent(Phenomenon phenomenon) {
+        component.add(phenomenon);
     }
     
     /**
