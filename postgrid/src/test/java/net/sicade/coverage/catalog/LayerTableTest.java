@@ -46,7 +46,7 @@ public class LayerTableTest extends DatabaseTest {
     /**
      * The name of the NetCDF layer to be tested.
      */
-    public static final String NETCDF_NAME = "SST (Monde - Coriolis)";
+    public static final String NETCDF_NAME = "coriolis";
 
     /**
      * The start time, end time, and a sample time between them.
