@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ public class PostGridCoverageReaderTest extends TestCase {
      * the PostGrid DataBase.
      */
     public void testCoriolis() throws Exception {
-        final PostGridReader obs = new PostGridReader(null, null, null, "SST (Monde - Coriolis)");
+        final PostGridReader obs = new PostGridReader(null, "coriolis");
         final GridCoverage original = obs.read(new GeneralParameterValue[0]);
         assertTrue(original instanceof GridCoverage2D);
 

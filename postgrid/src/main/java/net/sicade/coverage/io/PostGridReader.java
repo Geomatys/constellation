@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,51 +14,43 @@
  */
 package net.sicade.coverage.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.logging.Logger;
+import java.io.IOException;
+import java.sql.SQLException;
 import javax.imageio.IIOException;
-import net.sicade.catalog.ServerException;
-import org.geotools.coverage.processing.ColorMap;
-import org.geotools.coverage.processing.Operations;
-import org.geotools.referencing.CRS;
-import org.geotools.util.MeasurementRange;
-import org.geotools.util.NumberRange;
 
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.referencing.FactoryException;
 
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
-import org.geotools.factory.Hints;
+import org.geotools.coverage.processing.ColorMap;
+import org.geotools.coverage.processing.Operations;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.util.MeasurementRange;
+import org.geotools.util.NumberRange;
 
-import net.sicade.catalog.CatalogException;
-import net.sicade.coverage.catalog.CoverageReference;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.ServerException;
 import net.sicade.coverage.catalog.Layer;
 import net.sicade.coverage.catalog.LayerTable;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
+import net.sicade.coverage.catalog.CoverageReference;
 
 
 /**
  * An implementation of {@link org.opengis.coverage.grid.GridCoverageReader} backed by the
  * PostGrid database.
- * 
+ *
  * @version $Id$
  * @author Cédric Briançon
  */
@@ -69,14 +61,20 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
     private static final Logger LOGGER = Logger.getLogger("net.sicade.coverage.io");
 
     /**
-     * The layer. Will be instantiated when first needed.
+     * The table or layers used for creating values in {@link #layers}.
+     * Will be created only when first needed.
+     */
+    private static LayerTable layerTable;
+
+    /**
+     * The layers. Values will be instantiated when first needed.
      *
      * @todo Should not be a static constant. Unfortunatly the {@link #getAvailableTimes}
      *       and {@link #getAvailableAltitudes} methods must be static for now, until we
      *       figure out how to pass a {@code PostGridReader} instance to the streaming
      *       renderer run by Geoserver.
      */
-    private static Layer layer;
+    private static final Map<String,Layer> layers = new HashMap<String,Layer>();
 
     /**
      * The format that created this reader.
@@ -87,50 +85,29 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      * Constructs a reader for the specified layer.
      *
      * @param format The default format.
-     * @param input  The input file or URL on the local system directory. May be null.
-     * @param hints  An optional set of hints, or {@code null} if none.
      */
-    public PostGridReader(final Format format, final Object input, final Hints hints, final String series) {
+    public PostGridReader(final Format format, final String layerName) {
         if (hints != null) {
             this.hints.putAll(hints);
         }
-        
-        /*if (input != null) {
-            this.source = input;
-            if (source instanceof File) {
-                this.coverageName = ((File)source).getName();
-            } else {
-                if (source instanceof URL) {
-                    this.coverageName = ((URL) source).getFile();
-                } else {
-                    this.coverageName = "postgrid_coverage";
-                }
-            }
 
-            // gets the coverage name without the extension and the dot
-            final int dotIndex = coverageName.lastIndexOf('.');
-            if (dotIndex >= 0) {
-                coverageName = coverageName.substring(0, dotIndex);
-            }
-        }*/
-        this.coverageName = series;
+        this.coverageName = layerName;
         this.format = format;
         try {
             this.crs = CRS.decode("EPSG:3395");
-        } catch (NoSuchAuthorityCodeException ex) {
-            this.crs = DefaultGeographicCRS.WGS84;
         } catch (FactoryException ex) {
+            LOGGER.warning(ex.toString());
             this.crs = DefaultGeographicCRS.WGS84;
         }
         this.originalEnvelope = new GeneralEnvelope(crs);
-        if (crs == DefaultGeographicCRS.WGS84) {
+        if (CRS.equalsIgnoreMetadata(crs, DefaultGeographicCRS.WGS84)) {
             this.originalEnvelope.setRange(0, -180, +180);
             this.originalEnvelope.setRange(1, -77.0104827880859, 77.0104827880859);
         } else {
             this.originalEnvelope.setRange(0, -20037510, 20037510);
             this.originalEnvelope.setRange(1, -13817586, 13817586);
         }
-        this.originalGridRange = new GeneralGridRange(originalEnvelope); 
+        this.originalGridRange = new GeneralGridRange(originalEnvelope);
     }
 
     /**
@@ -139,9 +116,9 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
     public Format getFormat() {
         return format;
     }
-    
+
     /**
-     * Read the coverage and generate the Grid Coverage associated.
+     * Reads the coverage and generate the Grid Coverage associated.
      *
      * @param params Contains the parameters values for this coverage.
      * @return The grid coverage generated from the reading of the netcdf file.
@@ -160,7 +137,8 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
                 final ParameterValue value = (ParameterValue) param;
                 final String name = value.getDescriptor().getName().getCode().trim();
                 if (name.equalsIgnoreCase("TIME")) {
-                    /* For the moment, we only take the first date in the list, in order to obtain a coverage.
+                    /*
+                     * For the moment, we only take the first date in the list, in order to obtain a coverage.
                      * In the future, it will be replaced by an animation of several rasters which follows the
                      * period wished by the user.
                      */
@@ -172,11 +150,11 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
                 if (name.equalsIgnoreCase("DIM_RANGE")) {
                     dimRange = (NumberRange) value.getValue();
                 }
-                
+
                 /*
                  * Because WCS does not use the StreamingRenderer class to handle parameters (contrary to WMS),
                  * "Z" and "DATE" parameters are created for WCS, in order to get these values given by user in a
-                 * WCS GetCoverage request. 
+                 * WCS GetCoverage request.
                  * TODO: modify WCS Geoserver to handle parameters correctly.
                  */
                 if (name.equalsIgnoreCase("Z")) {
@@ -194,7 +172,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
                     if (value.getValue() instanceof Date) {
                         time = (Date) value.getValue();
                     } else {
-                        throw new IllegalArgumentException("The DATE parameter value for wcs should be a date, but " 
+                        throw new IllegalArgumentException("The DATE parameter value for wcs should be a date, but "
                                 + time.getClass() + " found.");
                     }
                 }
@@ -251,9 +229,13 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
      * @throws CatalogException if a an error occured while reading the catalog.
      */
     private static synchronized Layer getLayer(final String layerName) throws CatalogException {
+        Layer layer = layers.get(layerName);
         if (layer == null) try {
-            final LayerTable table = new LayerTable(new Database());
-            layer = table.getEntry("SST (Monde - Coriolis)"); // TODO
+            if (layerTable == null) {
+                layerTable = new LayerTable(new Database());
+            }
+            layer = layerTable.getEntry(layerName);
+            layers.put(layerName, layer);
         } catch (SQLException e) {
             throw new ServerException(e);
         } catch (IOException e) {
@@ -265,7 +247,7 @@ public class PostGridReader extends AbstractGridCoverage2DReader {
     /**
      * Returns an image for the given layer at the given date.
      */
-    private GridCoverage read(final Date time, final Number elevation, final NumberRange dimRange) 
+    private GridCoverage read(final Date time, final Number elevation, final NumberRange dimRange)
                 throws SQLException, IOException, CatalogException {
         final Layer layer = getLayer(null);
         final CoverageReference ref;

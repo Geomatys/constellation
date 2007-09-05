@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2006, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -11,10 +11,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package net.sicade.coverage.io;
 
@@ -42,7 +38,7 @@ import org.geotools.parameter.ParameterGroup;
  * @version $Id$
  * @author Cédric Briançon
  */
-public class PostGridFormat extends AbstractGridFormat {    
+public class PostGridFormat extends AbstractGridFormat {
     /**
      *
      */
@@ -60,23 +56,23 @@ public class PostGridFormat extends AbstractGridFormat {
      */
     private static final DefaultParameterDescriptor DIM_RANGE = new DefaultParameterDescriptor(
             "DIM_RANGE", NumberRange.class, null, null);
-    
+
     /**
      * The series for this coverage.
      */
-    private final String series;
-    
+    private final String layerName;
+
     /**
      * Creates a new instance of PostGridFormat.
      * Contains the main information about the PostGrid DataBase format.
-     * 
+     *
      */
-    public PostGridFormat(final String series) {
-        this.series = series;
+    public PostGridFormat(final String layerName) {
+        this.layerName = layerName;
         writeParameters = null;
         mInfo = new HashMap();
         mInfo.put("name", "PostGrid");
-        mInfo.put("description", "PostGrid"); 
+        mInfo.put("description", "PostGrid");
         mInfo.put("vendor", "Geomatys");
         mInfo.put("docURL", "http://www.geomatys.fr/");
         mInfo.put("version", "1.0");
@@ -87,7 +83,7 @@ public class PostGridFormat extends AbstractGridFormat {
 
     /**
      * Gets a reader for the raster chosen in the DataBase.
-     * 
+     *
      * @param input The input object.
      * @return A reader on the grid coverage chosen.
      */
@@ -97,13 +93,13 @@ public class PostGridFormat extends AbstractGridFormat {
 
     /**
      * Gets a reader for the raster, specifying some {@code hints}.
-     * 
+     *
      * @param input The input object.
      * @param hints Hints value for the data.
      * @return A reader on the grid coverage chosen.
      */
     public GridCoverageReader getReader(final Object input, final Hints hints) {
-        return new PostGridReader(this, input, null, series);
+        return new PostGridReader(this, layerName);
     }
 
     /**
