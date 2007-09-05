@@ -58,7 +58,7 @@ public class MetadataTable extends Table {
      * @param  database Connexion vers la table des plateformes qui utilisera cette table des stations.
      */
     public MetadataTable(final Database database) {
-        super(new MetadataQuery(database));
+        super(new Query(database));
     }
 
     /**

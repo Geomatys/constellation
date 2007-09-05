@@ -159,7 +159,7 @@ public class ObservationEntry extends Entry implements Observation {
                             final Phenomenon     observedProperty,
                             final Process        procedure,
                             final Distribution   distribution,
-                            final Element        quality,
+                           // final Element        quality,
                             final Object         result,
                             final TemporalObject samplingTime,
                             final String         resultDefinition)
@@ -170,7 +170,7 @@ public class ObservationEntry extends Entry implements Observation {
         this.observedProperty    = observedProperty;
         this.procedure           = procedure;
         this.distribution        = distribution;
-        this.quality             = quality;
+        this.quality             = null;       //= quality;
         this.result              = result;
         this.samplingTime        = samplingTime;
         this.observationMetadata = null;

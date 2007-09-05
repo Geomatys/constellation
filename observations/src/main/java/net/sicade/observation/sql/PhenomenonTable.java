@@ -33,6 +33,7 @@ import org.opengis.observation.Phenomenon;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Guilhem Legal
  */
 @Deprecated
 public class PhenomenonTable extends SingletonTable<Phenomenon> {

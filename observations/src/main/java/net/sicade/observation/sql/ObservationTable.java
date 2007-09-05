@@ -15,40 +15,21 @@
 package net.sicade.observation.sql;
 
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
 
 
 // Sicade dependencies
 import net.sicade.catalog.CatalogException;
-import net.sicade.catalog.DuplicatedRecordException;
-import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
-import net.sicade.catalog.Query;
-import net.sicade.catalog.QueryType;
 import net.sicade.catalog.Table;
-import net.sicade.coverage.model.Distribution;
 import net.sicade.coverage.model.DistributionTable;
 import net.sicade.observation.ObservationEntry;
-import net.sicade.observation.TemporalObjectEntry;
-
-// OpenGis dependencies
-import org.opengis.observation.Phenomenon;
-import org.opengis.observation.Process;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
-import org.opengis.metadata.quality.Element;
-import org.opengis.temporal.TemporalObject;
 
 // geotools dependencies
 import org.geotools.resources.Utilities;
-import org.opengis.metadata.MetaData;
-
-
-
 
 /**
  * Classe de base des connections vers la table des {@linkplain Observation observation}.
@@ -270,14 +251,15 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      */
     private EntryType createEntry(final ResultSet result) throws CatalogException, SQLException {
       final ObservationQuery query = (ObservationQuery) super.query;
-        return new ObservationEntry(result.getString(indexOf(query.name   )),
+      
+      return new ObservationEntry(result.getString(indexOf(query.name)),
                                     result.getString(indexOf(query.description)),
                                     result.getString(indexOf(query.featureOfInterest)),
                                     phenomenons.getEntry(result.getString(indexOf(query.observedProperty))), 
                                     procedures.getEntry(result.getString(indexOf(query.procedure))),
                                     distributions.getEntry(result.getString(indexOf(query.distribution))),
                                     //manque quality
-                                    //manque result
+                                    result.getString(indexOf(query.result)),
                                     result.getDate(indexOf(query.samplingTime)),
                                     result.getString(indexOf(query.resultDefinition)));
         

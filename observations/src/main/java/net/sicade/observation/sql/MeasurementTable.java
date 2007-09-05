@@ -16,23 +16,9 @@ package net.sicade.observation.sql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-// Sicade dependencies
-import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
-import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.MeasurementEntry;
-
-// OpenGis dependencies
-import org.opengis.observation.Measure;
 import org.opengis.observation.Measurement;
-import org.opengis.observation.Phenomenon;
-import org.opengis.observation.Process;
-import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.temporal.TemporalObject;
-import org.opengis.metadata.MetaData;
-import org.opengis.metadata.quality.Element;
-
 
 /**
  * Connexion vers la table des {@linkplain Measurement mesures}.
@@ -40,12 +26,15 @@ import org.opengis.metadata.quality.Element;
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
+ * @author Guilhem Legal
  *
  * @see MergedMeasurementTable
  * @see net.sicade.observation.coverage.MeasurementTableFiller
  */
 @Deprecated
 public class MeasurementTable extends ObservationTable<Measurement> {
+    
+    protected MeasureTable measures;
     
     /**
      * Construit une nouvelle connexion vers la table des mesures.
