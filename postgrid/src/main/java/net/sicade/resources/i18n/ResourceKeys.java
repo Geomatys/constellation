@@ -126,79 +126,85 @@ public final class ResourceKeys {
     public static final int COLOR = 43;
 
     /**
+     * Aucune colonne "{0}" n''a été trouvée dans la table "{1}". La valeur "{2}" sera utilisée à
+     * la place.
+     */
+    public static final int COLUMN_NOT_FOUND_$3 = 44;
+
+    /**
      * {0} composantes
      */
-    public static final int COMPONENT_COUNT_$1 = 44;
+    public static final int COMPONENT_COUNT_$1 = 45;
 
     /**
      * Fenêtre du {0} au {1} calculée.
      */
-    public static final int COMPUTATION_DONE_$2 = 45;
+    public static final int COMPUTATION_DONE_$2 = 46;
 
     /**
      * Calcul des statistiques...
      */
-    public static final int COMPUTING_STATISTICS = 46;
+    public static final int COMPUTING_STATISTICS = 47;
 
     /**
      * Confirmer le remplacement
      */
-    public static final int CONFIRM_OVERWRITE = 47;
+    public static final int CONFIRM_OVERWRITE = 48;
 
     /**
      * Sur les {1} fichiers à écrire, {0} existent déjà. Voulez-vous les écraser tous?
      */
-    public static final int CONFIRM_OVERWRITE_ALL_$2 = 48;
+    public static final int CONFIRM_OVERWRITE_ALL_$2 = 49;
 
     /**
      * Décimer par un facteur fixe
      */
-    public static final int CONSTANT_DECIMATION = 49;
+    public static final int CONSTANT_DECIMATION = 50;
 
     /**
      * Construit un décodeur pour le format "{0}".
      */
-    public static final int CONSTRUCT_DECODER_$1 = 50;
+    public static final int CONSTRUCT_DECODER_$1 = 51;
 
     /**
      * Copier
      */
-    public static final int COPY = 51;
+    public static final int COPY = 52;
 
     /**
      * Couplage pêche/environnement
      */
-    public static final int COUPLING = 52;
+    public static final int COUPLING = 53;
 
     /**
      * Images
      */
-    public static final int COVERAGES = 53;
+    public static final int COVERAGES = 54;
 
     /**
      * Il y a {0} images à exporter.
      */
-    public static final int COVERAGES_TO_EXPORT_COUNT_$1 = 54;
+    public static final int COVERAGES_TO_EXPORT_COUNT_$1 = 55;
 
     /**
      * Base de données
      */
-    public static final int DATABASE = 55;
+    public static final int DATABASE = 56;
 
     /**
      * Bases de données
      */
-    public static final int DATABASES = 56;
+    public static final int DATABASES = 57;
 
     /**
      * jour
      */
-    public static final int DAY = 57;
+    public static final int DAY = 58;
 
     /**
      * jours
      */
-    public static final int DAYS = 58;
+    public static final int DAYS = 59;
 
     /**
      * Débug
@@ -208,49 +214,49 @@ public final class ResourceKeys {
     /**
      * Décimation
      */
-    public static final int DECIMATION = 59;
+    public static final int DECIMATION = 60;
 
     /**
      * Définir
      */
-    public static final int DEFINE = 60;
+    public static final int DEFINE = 61;
 
     /**
      * Redéfinit la requête SQL pour "{0}".
      */
-    public static final int DEFINE_QUERY_$1 = 61;
+    public static final int DEFINE_QUERY_$1 = 62;
 
     /**
      * Supprimer
      */
-    public static final int DELETE = 62;
+    public static final int DELETE = 63;
 
     /**
      * Profondeur
      */
-    public static final int DEPTH = 63;
+    public static final int DEPTH = 64;
 
     /**
      * Fichiers de bureau (*.{0})
      */
-    public static final int DESKTOP_FILES_TYPE_$1 = 64;
+    public static final int DESKTOP_FILES_TYPE_$1 = 65;
 
     /**
      * Durée
      */
-    public static final int DURATION = 65;
+    public static final int DURATION = 66;
 
     /**
      * Édition
      */
-    public static final int EDIT = 66;
+    public static final int EDIT = 67;
 
     /**
      * Cette fenêtre vous permet de modifier les paramètres des bases de données d'images et
      * d'échantillons. Modifiez ces paramètres avec prudence, car de mauvaises valeurs peuvent
      * empêcher l'application de fonctionner, ou produire des résultats erronés.
      */
-    public static final int EDIT_DATABASES_CONFIGURATION = 67;
+    public static final int EDIT_DATABASES_CONFIGURATION = 68;
 
     /**
      * Cette fenêtre affiche les instructions SQL utilisées pour interroger la base de données
@@ -258,12 +264,12 @@ public final class ResourceKeys {
      * les adapter à la structure de votre base de données, mais vous devez veiller à ce que les
      * colonnes apparaissent dans le même ordre, sans ajout ni omission.
      */
-    public static final int EDIT_SQL_COVERAGES_OR_SAMPLES_$1 = 68;
+    public static final int EDIT_SQL_COVERAGES_OR_SAMPLES_$1 = 69;
 
     /**
      * Termine l'application.
      */
-    public static final int END_APPLICATION = 69;
+    public static final int END_APPLICATION = 70;
 
     /**
      * Date de fin
@@ -273,27 +279,27 @@ public final class ResourceKeys {
     /**
      * Argument illegal: {0}={1}
      */
-    public static final int ERROR_BAD_ARGUMENT_$2 = 70;
+    public static final int ERROR_BAD_ARGUMENT_$2 = 71;
 
     /**
      * Système de coordonnées illegal.
      */
-    public static final int ERROR_BAD_COORDINATE_SYSTEM = 71;
+    public static final int ERROR_BAD_COORDINATE_SYSTEM = 72;
 
     /**
      * Le répertoire spécifié n'est pas valide.
      */
-    public static final int ERROR_BAD_DIRECTORY = 72;
+    public static final int ERROR_BAD_DIRECTORY = 73;
 
     /**
      * Saisie invalide
      */
-    public static final int ERROR_BAD_ENTRY = 73;
+    public static final int ERROR_BAD_ENTRY = 74;
 
     /**
      * Le fichier "{0}" n''est pas valide.
      */
-    public static final int ERROR_BAD_FILE_$1 = 74;
+    public static final int ERROR_BAD_FILE_$1 = 75;
 
     /**
      * Le fichier "{0}" n''est pas du format attendu.
@@ -303,82 +309,82 @@ public final class ResourceKeys {
     /**
      * La plage [{0}..{1}] n''est pas valide.
      */
-    public static final int ERROR_BAD_RANGE_$2 = 75;
+    public static final int ERROR_BAD_RANGE_$2 = 76;
 
     /**
      * Une passe ne peut pas contenir {0} enregistrements.
      */
-    public static final int ERROR_BAD_RECORD_COUNT_$1 = 76;
+    public static final int ERROR_BAD_RECORD_COUNT_$1 = 77;
 
     /**
      * La lecture de la table "{0}" pour l''enregistrement "{1}" a échoué.
      */
-    public static final int ERROR_CATALOG_$2 = 77;
+    public static final int ERROR_CATALOG_$2 = 78;
 
     /**
      * La lecture de la colonne "{1}" de la table "{0}" pour l''enregistrement "{2}" a échoué.
      */
-    public static final int ERROR_CATALOG_$3 = 78;
+    public static final int ERROR_CATALOG_$3 = 79;
 
     /**
      * La lecture de la table "{0}" a échoué.
      */
-    public static final int ERROR_CATALOG_NOKEY_$1 = 79;
+    public static final int ERROR_CATALOG_NOKEY_$1 = 80;
 
     /**
      * La lecture de la colonne "{1}" de la table "{0}" a échoué.
      */
-    public static final int ERROR_CATALOG_NOKEY_$2 = 80;
+    public static final int ERROR_CATALOG_NOKEY_$2 = 81;
 
     /**
      * Les pixels des images ne sont pas classés selon les mêmes catégories.
      */
-    public static final int ERROR_CATEGORIES_MITMATCH = 81;
+    public static final int ERROR_CATEGORIES_MITMATCH = 82;
 
     /**
      * Une image nommée "{0}" existe déjà.
      */
-    public static final int ERROR_COVERAGE_ALREADY_EXIST_$1 = 82;
+    public static final int ERROR_COVERAGE_ALREADY_EXIST_$1 = 83;
 
     /**
      * Les dates doivent être en ordre croissant.
      */
-    public static final int ERROR_DATES_NOT_INCREASING = 83;
+    public static final int ERROR_DATES_NOT_INCREASING = 84;
 
     /**
      * Les dates des fichiers "{0}" et "{1}" se chevauchent autour du {2}.
      */
-    public static final int ERROR_DATES_OVERLAP_$3 = 84;
+    public static final int ERROR_DATES_OVERLAP_$3 = 85;
 
     /**
      * La date {0} est en dehors de la plage de temps des données disponibles.
      */
-    public static final int ERROR_DATE_OUTSIDE_COVERAGE_$1 = 85;
+    public static final int ERROR_DATE_OUTSIDE_COVERAGE_$1 = 86;
 
     /**
      * La date "{1}" est trop tard. Les enregistrements du fichier "{0}" se terminent le {2}.
      */
-    public static final int ERROR_DATE_TOO_LATE_$3 = 86;
+    public static final int ERROR_DATE_TOO_LATE_$3 = 87;
 
     /**
      * Le répertoire "{0}" n''a pas été trouvé.
      */
-    public static final int ERROR_DIRECTORY_NOT_FOUND_$1 = 87;
+    public static final int ERROR_DIRECTORY_NOT_FOUND_$1 = 88;
 
     /**
      * L''image #{0} est un doublon.
      */
-    public static final int ERROR_DUPLICATED_COVERAGE_$1 = 88;
+    public static final int ERROR_DUPLICATED_COVERAGE_$1 = 89;
 
     /**
      * Les images "{0}" et "{1}" ont le même numéro ID.
      */
-    public static final int ERROR_DUPLICATED_COVERAGE_$2 = 89;
+    public static final int ERROR_DUPLICATED_COVERAGE_$2 = 90;
 
     /**
      * Le région géographique #{0} est un doublon.
      */
-    public static final int ERROR_DUPLICATED_GEOMETRY_$1 = 90;
+    public static final int ERROR_DUPLICATED_GEOMETRY_$1 = 91;
 
     /**
      * Isoligne dupliquée pour la valeur {0}.
@@ -388,28 +394,28 @@ public final class ResourceKeys {
     /**
      * Doublon: {0}
      */
-    public static final int ERROR_DUPLICATED_RECORD_$1 = 91;
+    public static final int ERROR_DUPLICATED_RECORD_$1 = 92;
 
     /**
      * La série "{0}" est définie deux fois.
      */
-    public static final int ERROR_DUPLICATED_SERIES_$1 = 92;
+    public static final int ERROR_DUPLICATED_SERIES_$1 = 93;
 
     /**
      * Le fichier "{0}" n''a pas été trouvé.
      */
-    public static final int ERROR_FILE_NOT_FOUND_$1 = 93;
+    public static final int ERROR_FILE_NOT_FOUND_$1 = 94;
 
     /**
      * L''image "{0}" est de dimension ({1}×{2}) pixels, alors qu''elle devrait être de ({3}×{4})
      * pixels.
      */
-    public static final int ERROR_IMAGE_SIZE_MISMATCH_$5 = 94;
+    public static final int ERROR_IMAGE_SIZE_MISMATCH_$5 = 95;
 
     /**
      * L''index {0} est en dehors des limites permises.
      */
-    public static final int ERROR_INDEX_OUT_OF_BOUNDS_$1 = 95;
+    public static final int ERROR_INDEX_OUT_OF_BOUNDS_$1 = 96;
 
     /**
      * Le tableau des valeurs d'entrés n'a pas la longueur attendue.
@@ -419,12 +425,12 @@ public final class ResourceKeys {
     /**
      * Aucun enregistrement pour "{1}" n''a été trouvé dans la table "{0}".
      */
-    public static final int ERROR_KEY_NOT_FOUND_$2 = 96;
+    public static final int ERROR_KEY_NOT_FOUND_$2 = 97;
 
     /**
      * Un enregistrement du fichier "{0}" est incomplet.
      */
-    public static final int ERROR_MISSING_FIELDS_$1 = 97;
+    public static final int ERROR_MISSING_FIELDS_$1 = 98;
 
     /**
      * Isoligne manquante pour la valeur {0}.
@@ -439,12 +445,12 @@ public final class ResourceKeys {
     /**
      * Des enregistrements qui étaient prévus n''ont pas été trouvés dans le fichier "{0}".
      */
-    public static final int ERROR_MISSING_RECORDS_$1 = 98;
+    public static final int ERROR_MISSING_RECORDS_$1 = 99;
 
     /**
      * Les bandes #{0} et {1} ne sont pas consécutives.
      */
-    public static final int ERROR_NON_CONSECUTIVE_BANDS_$2 = 99;
+    public static final int ERROR_NON_CONSECUTIVE_BANDS_$2 = 100;
 
     /**
      * Le nombre {0} n''est pas un entier.
@@ -454,22 +460,22 @@ public final class ResourceKeys {
     /**
      * Il n''y a aucune donnée après la date {0}.
      */
-    public static final int ERROR_NO_DATA_AFTER_DATE_$1 = 100;
+    public static final int ERROR_NO_DATA_AFTER_DATE_$1 = 101;
 
     /**
      * Aucune donnée entre le {0} et le {1}.
      */
-    public static final int ERROR_NO_DATA_BETWEEN_$2 = 101;
+    public static final int ERROR_NO_DATA_BETWEEN_$2 = 102;
 
     /**
      * Il n''y a pas de décodeur pour les images "{0}".
      */
-    public static final int ERROR_NO_IMAGE_DECODER_$1 = 102;
+    public static final int ERROR_NO_IMAGE_DECODER_$1 = 103;
 
     /**
      * Le format #{0} n''a pas été trouvé.
      */
-    public static final int ERROR_NO_IMAGE_FORMAT_$1 = 103;
+    public static final int ERROR_NO_IMAGE_FORMAT_$1 = 104;
 
     /**
      * Aucune entrée n'a été spécifiée.
@@ -479,17 +485,17 @@ public final class ResourceKeys {
     /**
      * Paramètre inconnu: "{0}".
      */
-    public static final int ERROR_NO_PARAMETER_$1 = 104;
+    public static final int ERROR_NO_PARAMETER_$1 = 105;
 
     /**
      * La table ne contient pas de série.
      */
-    public static final int ERROR_NO_SERIES = 105;
+    public static final int ERROR_NO_SERIES = 106;
 
     /**
      * Aucune série n'a été sélectionnée.
      */
-    public static final int ERROR_NO_SERIES_SELECTION = 106;
+    public static final int ERROR_NO_SERIES_SELECTION = 107;
 
     /**
      * Le tableau des valeurs de sorties n'a pas la longueur attendue.
@@ -499,42 +505,42 @@ public final class ResourceKeys {
     /**
      * Débordement de capacité.
      */
-    public static final int ERROR_OVERFLOW = 107;
+    public static final int ERROR_OVERFLOW = 108;
 
     /**
      * L''échantillon "{0}" n''a pas été trouvé.
      */
-    public static final int ERROR_SAMPLE_NOT_FOUND_$1 = 108;
+    public static final int ERROR_SAMPLE_NOT_FOUND_$1 = 109;
 
     /**
      * La série "{0}" n''a pas été trouvée.
      */
-    public static final int ERROR_SERIES_NOT_FOUND_$1 = 109;
+    public static final int ERROR_SERIES_NOT_FOUND_$1 = 110;
 
     /**
      * Le format #{0} est définit plusieurs fois.
      */
-    public static final int ERROR_TOO_MANY_IMAGE_FORMATS_$1 = 110;
+    public static final int ERROR_TOO_MANY_IMAGE_FORMATS_$1 = 111;
 
     /**
      * Un seul enregistrement devait être ajouté ou mis à jour, mais {0} l''ont étés.
      */
-    public static final int ERROR_UNEXPECTED_UPDATE_$1 = 111;
+    public static final int ERROR_UNEXPECTED_UPDATE_$1 = 112;
 
     /**
      * Type de données inconnu.
      */
-    public static final int ERROR_UNKNOW_DATATYPE = 112;
+    public static final int ERROR_UNKNOW_DATATYPE = 113;
 
     /**
      * Le type de données "{0}" n''est pas supporté.
      */
-    public static final int ERROR_UNSUPPORTED_DATATYPE_$1 = 113;
+    public static final int ERROR_UNSUPPORTED_DATATYPE_$1 = 114;
 
     /**
      * L''image demandée n''appartient pas à la série "{0}".
      */
-    public static final int ERROR_WRONG_SERIES_$1 = 114;
+    public static final int ERROR_WRONG_SERIES_$1 = 115;
 
     /**
      * Exception
@@ -544,62 +550,62 @@ public final class ResourceKeys {
     /**
      * Quitter
      */
-    public static final int EXIT = 115;
+    public static final int EXIT = 116;
 
     /**
      * Exporter
      */
-    public static final int EXPORT = 116;
+    public static final int EXPORT = 117;
 
     /**
      * Exportation de {0}...
      */
-    public static final int EXPORTING_$1 = 117;
+    public static final int EXPORTING_$1 = 118;
 
     /**
      * Extractions de la table d'environnement
      */
-    public static final int EXTRACT_ENVIRONMENT = 118;
+    public static final int EXTRACT_ENVIRONMENT = 119;
 
     /**
      * Code de la FAO
      */
-    public static final int FAO_CODE = 119;
+    public static final int FAO_CODE = 120;
 
     /**
      * Fichier
      */
-    public static final int FILE = 120;
+    public static final int FILE = 121;
 
     /**
      * Le fichier "{0}" existe déjà. Voulez-vous l''écraser?
      */
-    public static final int FILE_ALREADY_EXIST_$1 = 121;
+    public static final int FILE_ALREADY_EXIST_$1 = 122;
 
     /**
      * Environnements des pêches
      */
-    public static final int FISHERIES_ENVIRONMENT = 122;
+    public static final int FISHERIES_ENVIRONMENT = 123;
 
     /**
      * Formats
      */
-    public static final int FORMATS = 123;
+    public static final int FORMATS = 124;
 
     /**
      * {0} images trouvées.
      */
-    public static final int FOUND_COVERAGES_$1 = 124;
+    public static final int FOUND_COVERAGES_$1 = 125;
 
     /**
      * Gradient spatial (Sobel)
      */
-    public static final int GRADIENT_SOBEL = 125;
+    public static final int GRADIENT_SOBEL = 126;
 
     /**
      * Tons de gris
      */
-    public static final int GRAY_SCALE = 126;
+    public static final int GRAY_SCALE = 127;
 
     /**
      * Images
@@ -609,22 +615,22 @@ public final class ResourceKeys {
     /**
      * Sommaires des plages de temps
      */
-    public static final int IMAGES_CATALOG = 127;
+    public static final int IMAGES_CATALOG = 128;
 
     /**
      * {0} images ({1} sélectionnées)
      */
-    public static final int IMAGES_COUNT_$2 = 128;
+    public static final int IMAGES_COUNT_$2 = 129;
 
     /**
      * Liste d'images
      */
-    public static final int IMAGES_LIST = 129;
+    public static final int IMAGES_LIST = 130;
 
     /**
      * Séries d'images
      */
-    public static final int IMAGES_SERIES = 130;
+    public static final int IMAGES_SERIES = 131;
 
     /**
      * Sélectionnez des images dans la table de gauche.
@@ -636,12 +642,12 @@ Les lignes bleues représentent
      * les images déjà vues.
 Les lignes rouges représentent les images manquantes.
      */
-    public static final int IMAGES_TABLE_INSTRUCTIONS = 131;
+    public static final int IMAGES_TABLE_INSTRUCTIONS = 132;
 
     /**
      * Inverser la sélection
      */
-    public static final int INVERT_SELECTION = 132;
+    public static final int INVERT_SELECTION = 133;
 
     /**
      * Isolignes compressées de {1,number,percent}. Résolution avant compression:
@@ -652,52 +658,52 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Pilote JDBC
      */
-    public static final int JDBC_DRIVER = 133;
+    public static final int JDBC_DRIVER = 134;
 
     /**
      * Joint la table "{0}".
      */
-    public static final int JOIN_TABLE_$1 = 134;
+    public static final int JOIN_TABLE_$1 = 135;
 
     /**
      * Conserve les données du {0} au {1} ({2,number,percent})
      */
-    public static final int KEEP_DATA_$3 = 135;
+    public static final int KEEP_DATA_$3 = 136;
 
     /**
      * Langue
      */
-    public static final int LANGUAGE = 136;
+    public static final int LANGUAGE = 137;
 
     /**
      * Défilement continu
      */
-    public static final int LIVE_SCROLLING = 137;
+    public static final int LIVE_SCROLLING = 138;
 
     /**
      * Pilote JDBC "{0}" version {1}.{2} chargé.
      */
-    public static final int LOADED_JDBC_DRIVER_$3 = 138;
+    public static final int LOADED_JDBC_DRIVER_$3 = 139;
 
     /**
      * Chargement de {0}...
      */
-    public static final int LOADING_$1 = 139;
+    public static final int LOADING_$1 = 140;
 
     /**
      * Chargement du {0} au {1}
      */
-    public static final int LOADING_$2 = 140;
+    public static final int LOADING_$2 = 141;
 
     /**
      * Chargement des images {0} et {1}
      */
-    public static final int LOADING_IMAGES_$2 = 141;
+    public static final int LOADING_IMAGES_$2 = 142;
 
     /**
      * Chargement de l''image {0}
      */
-    public static final int LOADING_IMAGE_$1 = 142;
+    public static final int LOADING_IMAGE_$1 = 143;
 
     /**
      * Chargement de l''isoligne {0}.
@@ -707,7 +713,7 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Examen de la base de données
      */
-    public static final int LOOKING_INTO_DATABASE = 143;
+    public static final int LOOKING_INTO_DATABASE = 144;
 
     /**
      * Apparence
@@ -717,7 +723,7 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Mosaïque multi-paramètres
      */
-    public static final int MOSAIC = 144;
+    public static final int MOSAIC = 145;
 
     /**
      * Nom
@@ -732,17 +738,17 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Nouveau
      */
-    public static final int NEW = 145;
+    public static final int NEW = 146;
 
     /**
      * Nouvelles series d'images
      */
-    public static final int NEW_IMAGES_SERIES = 146;
+    public static final int NEW_IMAGES_SERIES = 147;
 
     /**
      * (non disponible)
      */
-    public static final int NOT_AVAILABLE = 147;
+    public static final int NOT_AVAILABLE = 148;
 
     /**
      * Aucune données à afficher
@@ -752,47 +758,47 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Image originale
      */
-    public static final int NO_OPERATION = 148;
+    public static final int NO_OPERATION = 149;
 
     /**
      * Ouvrir
      */
-    public static final int OPEN = 149;
+    public static final int OPEN = 150;
 
     /**
      * Ouvre "{0}"
      */
-    public static final int OPEN_$1 = 150;
+    public static final int OPEN_$1 = 151;
 
     /**
      * Ouvrir un bureau
      */
-    public static final int OPEN_DESKTOP = 151;
+    public static final int OPEN_DESKTOP = 152;
 
     /**
      * Options
      */
-    public static final int OPTIONS = 152;
+    public static final int OPTIONS = 153;
 
     /**
      * Répertoire de destination
      */
-    public static final int OUT_DIRECTORY = 153;
+    public static final int OUT_DIRECTORY = 154;
 
     /**
      * Il y a {0} positions à évaluer.
      */
-    public static final int POSITIONS_TO_EVALUATE_$1 = 154;
+    public static final int POSITIONS_TO_EVALUATE_$1 = 155;
 
     /**
      * Potentiel
      */
-    public static final int POTENTIAL = 155;
+    public static final int POTENTIAL = 156;
 
     /**
      * Préférences
      */
-    public static final int PREFERENCES = 156;
+    public static final int PREFERENCES = 157;
 
     /**
      * État d'avancement
@@ -802,17 +808,17 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Propriétés
      */
-    public static final int PROPERTIES = 157;
+    public static final int PROPERTIES = 158;
 
     /**
      * Refaire
      */
-    public static final int REDO = 158;
+    public static final int REDO = 159;
 
     /**
      * Rétablit la requête SQL par défaut pour "{0}".
      */
-    public static final int REMOVE_QUERY_$1 = 159;
+    public static final int REMOVE_QUERY_$1 = 160;
 
     /**
      * Rétablir
@@ -822,12 +828,12 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Rétablir l'affichage
      */
-    public static final int RESET_VIEW = 160;
+    public static final int RESET_VIEW = 161;
 
     /**
      * Change la capacité de {0} à {1} ko.
      */
-    public static final int RESIZE_$2 = 161;
+    public static final int RESIZE_$2 = 162;
 
     /**
      * Droite
@@ -837,87 +843,87 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Répertoire racine
      */
-    public static final int ROOT_DIRECTORY = 162;
+    public static final int ROOT_DIRECTORY = 163;
 
     /**
      * Échantillons
      */
-    public static final int SAMPLES = 163;
+    public static final int SAMPLES = 164;
 
     /**
      * Enregistrer
      */
-    public static final int SAVE = 164;
+    public static final int SAVE = 165;
 
     /**
      * Enregistrer sous
      */
-    public static final int SAVE_AS = 165;
+    public static final int SAVE_AS = 166;
 
     /**
      * Enregistrer le bureau
      */
-    public static final int SAVE_DESKTOP = 166;
+    public static final int SAVE_DESKTOP = 167;
 
     /**
      * Positionne "{0}" à la date {1}.
      */
-    public static final int SEEK_TO_DATE_$2 = 167;
+    public static final int SEEK_TO_DATE_$2 = 168;
 
     /**
      * Sélectionner tout
      */
-    public static final int SELECT_ALL = 168;
+    public static final int SELECT_ALL = 169;
 
     /**
      * Séries
      */
-    public static final int SERIES = 169;
+    public static final int SERIES = 170;
 
     /**
      * Sélectionne la région {0} pour la série "{1}".
      */
-    public static final int SET_GEOGRAPHIC_AREA_$2 = 170;
+    public static final int SET_GEOGRAPHIC_AREA_$2 = 171;
 
     /**
      * Sélectionne l''opération "{0}" pour la série "{1}".
      */
-    public static final int SET_OPERATION_$2 = 171;
+    public static final int SET_OPERATION_$2 = 172;
 
     /**
      * Sélectionne la résolution {0}×{1} pour la série "{2}".
      */
-    public static final int SET_RESOLUTION_$3 = 172;
+    public static final int SET_RESOLUTION_$3 = 173;
 
     /**
      * Sélectionne la série "{0}".
      */
-    public static final int SET_SERIES_$1 = 173;
+    public static final int SET_SERIES_$1 = 174;
 
     /**
      * Sélectionne la plage de temps du {0} au {1} pour la série "{2}".
      */
-    public static final int SET_TIME_RANGE_$3 = 174;
+    public static final int SET_TIME_RANGE_$3 = 175;
 
     /**
      * Afficher les quantités pêchées par espèces
      */
-    public static final int SHOW_CATCH_AMOUNT = 175;
+    public static final int SHOW_CATCH_AMOUNT = 176;
 
     /**
      * Afficher les positions seulement
      */
-    public static final int SHOW_POSITION_ONLY = 176;
+    public static final int SHOW_POSITION_ONLY = 177;
 
     /**
      * Espèces
      */
-    public static final int SPECIES = 177;
+    public static final int SPECIES = 178;
 
     /**
      * Sélection des espèces
      */
-    public static final int SPECIES_SELECTION = 178;
+    public static final int SPECIES_SELECTION = 179;
 
     /**
      * Date de début
@@ -927,19 +933,19 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Images synchronisées
      */
-    public static final int SYNCHRONIZED_IMAGES = 179;
+    public static final int SYNCHRONIZED_IMAGES = 180;
 
     /**
      * Fuseau horaire
      */
-    public static final int TIMEZONE = 180;
+    public static final int TIMEZONE = 181;
 
     /**
      * Sélectionnez le fuseau horaire à utiliser pour l'affichage et la saisie des dates dans cette
      * application. Ce changement n'aura aucun impact sur le fuseau horaire du système ou des bases
      * de données utilisées.
      */
-    public static final int TIMEZONE_SELECTION_MESSAGE = 181;
+    public static final int TIMEZONE_SELECTION_MESSAGE = 182;
 
     /**
      * Plage de temps
@@ -951,22 +957,22 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Annuler
      */
-    public static final int UNDO = 182;
+    public static final int UNDO = 183;
 
     /**
      * (sans nom)
      */
-    public static final int UNNAMED = 183;
+    public static final int UNNAMED = 184;
 
     /**
      * Annule l''application d''opérations pour la série "{0}".
      */
-    public static final int UNSET_OPERATION_$1 = 184;
+    public static final int UNSET_OPERATION_$1 = 185;
 
     /**
      * Sélectionne la résolution maximale pour la série "{0}".
      */
-    public static final int UNSET_RESOLUTION_$1 = 185;
+    public static final int UNSET_RESOLUTION_$1 = 186;
 
     /**
      * (sans titre)
@@ -976,7 +982,7 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Visible
      */
-    public static final int VISIBLE = 186;
+    public static final int VISIBLE = 187;
 
     /**
      * Avertissement
@@ -988,12 +994,12 @@ Les lignes rouges représentent les images manquantes.
      * résultats erronés ou empêcher l'application de fonctionner. Êtes-vous certain de vouloir
      * continuer?
      */
-    public static final int WARNING_ADVANCED_USER = 187;
+    public static final int WARNING_ADVANCED_USER = 188;
 
     /**
      * "Enregistrer sous" vous permet de suspendre votre travail pour le reprendre un peu plus
      * tard. N'utilisez PAS cette option pour des enregistrements importants, car il n'est pas
      * garantit que les fichiers binaires produits seront compatibles avec les versions futures.
      */
-    public static final int WARNING_SERIALIZATION = 188;
+    public static final int WARNING_SERIALIZATION = 189;
 }

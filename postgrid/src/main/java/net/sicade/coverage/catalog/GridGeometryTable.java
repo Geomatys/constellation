@@ -19,6 +19,11 @@ import java.util.*;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.awt.Dimension;
+import java.awt.geom.AffineTransform;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import static java.lang.reflect.Array.getLength;
 import static java.lang.reflect.Array.getDouble;
 
@@ -43,6 +48,9 @@ import net.sicade.catalog.IllegalRecordException;
 import net.sicade.catalog.SpatialFunctions;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**
@@ -81,20 +89,20 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      */
     @SuppressWarnings("fallthrough")
     protected GridGeometryEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final GridGeometryQuery query = (GridGeometryQuery) super.query;
-        final String identifier       = results.getString(indexOf(query.identifier));
-        final int    width            = results.getInt   (indexOf(query.width));
-        final int    height           = results.getInt   (indexOf(query.height));
-        final double scaleX           = results.getDouble(indexOf(query.scaleX));
-        final double scaleY           = results.getDouble(indexOf(query.scaleY));
-        final double translateX       = results.getDouble(indexOf(query.translateX));
-        final double translateY       = results.getDouble(indexOf(query.translateY));
-        final double shearX           = results.getDouble(indexOf(query.shearX));
-        final double shearY           = results.getDouble(indexOf(query.shearY));
-        final int    horizontalSRID   = results.getInt   (indexOf(query.horizontalSRID));
-        final String horizontalExtent = results.getString(indexOf(query.horizontalExtent));
-        final int    verticalSRID     = results.getInt   (indexOf(query.verticalSRID));
-        final Array  vertical         = results.getArray (indexOf(query.verticalOrdinates));
+        final GridGeometryQuery query  = (GridGeometryQuery) super.query;
+        final String identifier        = results.getString(indexOf(query.identifier));
+        final int    width             = results.getInt   (indexOf(query.width));
+        final int    height            = results.getInt   (indexOf(query.height));
+        final double scaleX            = results.getDouble(indexOf(query.scaleX));
+        final double scaleY            = results.getDouble(indexOf(query.scaleY));
+        final double translateX        = results.getDouble(indexOf(query.translateX));
+        final double translateY        = results.getDouble(indexOf(query.translateY));
+        final double shearX            = results.getDouble(indexOf(query.shearX));
+        final double shearY            = results.getDouble(indexOf(query.shearY));
+        final int    horizontalSRID    = results.getInt   (indexOf(query.horizontalSRID));
+        final String horizontalExtent  = results.getString(indexOf(query.horizontalExtent));
+        final int    verticalSRID      = results.getInt   (indexOf(query.verticalSRID));
+        final Array  verticalOrdinates = results.getArray (indexOf(query.verticalOrdinates));
         /*
          * Creates the horizontal CRS. We will append a vertical CRS later if
          * the vertical, ordinates array is non-null, and a temporal CRS last.
@@ -112,25 +120,17 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         CoordinateReferenceSystem verticalCRS = null;
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
-        final double[] altitudes;
-        if (vertical != null) {
-            final Object data = vertical.getArray();
-            final int length = getLength(data);
-            altitudes = new double[length];
-            for (int i=0; i<length; i++) {
-                final double z = getDouble(data, i);
-                altitudes[i] = z;
+        final double[] altitudes = asDoubleArray(verticalOrdinates);
+        if (altitudes != null) {
+            for (double z : altitudes) {
                 if (z < min) min = z;
                 if (z > max) max = z;
             }
-//          altitudes.free(); // TODO: uncomment when we will be allowed to use Java 6.
             try {
                 verticalCRS = CRS.decode(CRS_AUTHORITY + verticalSRID);
             } catch (FactoryException exception) {
                 throw new IllegalRecordException(exception, results, indexOf(query.verticalSRID), identifier);
             }
-        } else {
-            altitudes = null;
         }
         /*
          * Adds the temporal axis. TODO: HARD CODED FOR NOW. We need to do something better.
@@ -200,6 +200,27 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     }
 
     /**
+     * Returns the specified SQL array as an array of type {@code double[]}, or {@code null}
+     * if the SQL array is null. The array if {@linkplain Array#free freeded} by this method.
+     */
+    private static double[] asDoubleArray(final Array verticalOrdinates) throws SQLException {
+        final double[] altitudes;
+        if (verticalOrdinates != null) {
+            final Object data = verticalOrdinates.getArray();
+            final int length = getLength(data);
+            altitudes = new double[length];
+            for (int i=0; i<length; i++) {
+                final double z = getDouble(data, i);
+                altitudes[i] = z;
+            }
+//          altitudes.free(); // TODO: uncomment when we will be allowed to use Java 6.
+        } else {
+            altitudes = null;
+        }
+        return altitudes;
+    }
+
+    /**
      * For every values in the specified map, replace the collection of identifiers by a set of
      * altitudes. On input, the values are usually {@code List<String>}. On output, all values
      * will be {@code SortedSet<Number>}.
@@ -252,7 +273,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     }
 
     /**
-     * Unsafe setting on a map entry. Used because we changing the map type in-place.
+     * Unsafe setting on a map entry. Used because we are changing the map type in-place.
      */
     @SuppressWarnings("unchecked")
     private static void unsafe(final Map.Entry entry, final SortedSet<Number> altitudes) {
@@ -271,43 +292,61 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * Returns the identifier for the specified grid geometry.
      * If no matching record is found, then this method returns {@code null}.
      *
-     * @param  spatialExtent The three-dimensional envelope.
-     * @param  size The image width, height and depth (in pixels) as an array of length 3.
+     * @param  size              The image width and height in pixels.
+     * @param  gridToCRS         The transform from grid coordinates to "real world" coordinates.
+     * @param  horizontalSRID    The "real world" horizontal coordinate reference system.
+     * @param  verticalSRID      The "real world" vertical coordinate reference system.
+     * @param  verticalOrdinates The vertical coordinates, or {@code null}.
+     * @return The identifier of a matching entry, or {@code null} if none.
      * @throws SQLException if the operation failed.
      */
-//    public synchronized String getIdentifier(final Envelope spatialExtent, final int[] size)
-//            throws SQLException
-//    {
-//        final GridGeometryQuery query = (GridGeometryQuery) super.query;
-//        final PreparedStatement statement = getStatement(QueryType.SELECT);
-//        query.byExtent.setEnvelope(statement, QueryType.SELECT, spatialExtent);
-//        for (int i=0; i<3; i++) {
-//            final Parameter p;
-//            switch (i) {
-//                case 0: p = query.byWidth;  break;
-//                case 1: p = query.byHeight; break;
-//                case 2: p = query.byDepth;  break;
-//                default: throw new AssertionError(i);
-//            }
-//            statement.setInt(indexOf(p), i < size.length ? size[i] : 1);
-//        }
-//        String ID = null;
-//        final ResultSet result = statement.executeQuery();
-//        while (result.next()) {
-//            final String nextID = result.getString(1);
-//            if (ID!=null && !ID.equals(nextID)) {
-//                final LogRecord record = Resources.getResources(getDatabase().getLocale()).
-//                        getLogRecord(Level.WARNING, ResourceKeys.ERROR_DUPLICATED_GEOMETRY_$1, nextID);
-//                record.setSourceClassName("GridGeometryTable");
-//                record.setSourceMethodName("getIdentifier");
-//                Element.LOGGER.log(record);
-//            } else {
-//                ID = nextID;
-//            }
-//        }
-//        result.close();
-//        return ID;
-//    }
+    public synchronized String getIdentifier(final Dimension size, final AffineTransform gridToCRS,
+                                             final String horizontalSRID, final String verticalSRID,
+                                             final double[] verticalOrdinates)
+            throws SQLException
+    {
+        final GridGeometryQuery query = (GridGeometryQuery) super.query;
+        final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+        statement.setInt   (indexOf(query.byWidth),          size.width );
+        statement.setInt   (indexOf(query.byHeight),         size.height);
+        statement.setDouble(indexOf(query.byScaleX),         gridToCRS.getScaleX());
+        statement.setDouble(indexOf(query.byScaleY),         gridToCRS.getScaleY());
+        statement.setDouble(indexOf(query.byTranslateX),     gridToCRS.getTranslateX());
+        statement.setDouble(indexOf(query.byTranslateY),     gridToCRS.getTranslateY());
+        statement.setDouble(indexOf(query.byShearX),         gridToCRS.getShearX());
+        statement.setDouble(indexOf(query.byShearY),         gridToCRS.getShearY());
+        statement.setString(indexOf(query.byHorizontalSRID), horizontalSRID);
+        statement.setString(indexOf(query.byVerticalSRID),   verticalSRID);
+
+        String ID = null;
+        final int idIndex = indexOf(query.identifier);
+        final int voIndex = indexOf(query.verticalOrdinates);
+        final ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            final String nextID = results.getString(idIndex);
+            final double[] altitudes = asDoubleArray(results.getArray(voIndex));
+            if (!Arrays.equals(altitudes, verticalOrdinates)) {
+                /*
+                 * NOTE:  we compare the array in this Java code rather than inserting it as a
+                 * parameter in the WHERE clause in order to make sure that we are insensitive
+                 * to the array type, since we convert to double[] in all cases.
+                 */
+                continue;
+            }
+            if (ID!=null && !ID.equals(nextID)) {
+                // Could happen if there is insuffisient conditions in the WHERE clause.
+                final LogRecord record = Resources.getResources(getDatabase().getLocale()).
+                        getLogRecord(Level.WARNING, ResourceKeys.ERROR_DUPLICATED_GEOMETRY_$1, nextID);
+                record.setSourceClassName("GridGeometryTable");
+                record.setSourceMethodName("getIdentifier");
+                LOGGER.log(record);
+            } else {
+                ID = nextID;
+            }
+        }
+        results.close();
+        return ID;
+    }
 
     /**
      * Ajoute une entrée pour l'étendue géographique et la dimension d'image spécifiée.

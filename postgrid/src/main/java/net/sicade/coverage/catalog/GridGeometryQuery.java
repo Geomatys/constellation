@@ -44,7 +44,8 @@ final class GridGeometryQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-//    protected final Parameter byWidth, byHeight, byDepth, byExtent;
+    protected final Parameter byWidth, byHeight, byScaleX, byScaleY, byTranslateX, byTranslateY,
+            byShearX, byShearY, byHorizontalSRID, byVerticalSRID;
 
     /**
      * The SQL instruction for inserting a new geographic bounding box.
@@ -76,27 +77,35 @@ final class GridGeometryQuery extends Query {
      */
     public GridGeometryQuery(final Database database) {
         super(database);
-        final QueryType[] LS = {LIST, SELECT};
-        identifier        = addColumn("GridGeometries", "identifier",        LS);
-        width             = addColumn("GridGeometries", "width",             LS);
-        height            = addColumn("GridGeometries", "height",            LS);
-        scaleX            = addColumn("GridGeometries", "scaleX",            LS);
-        scaleY            = addColumn("GridGeometries", "scaleY",            LS);
-        translateX        = addColumn("GridGeometries", "translateX",        LS);
-        translateY        = addColumn("GridGeometries", "translateY",        LS);
-        shearX            = addColumn("GridGeometries", "shearX",            LS);
-        shearY            = addColumn("GridGeometries", "shearY",            LS);
-        horizontalSRID    = addColumn("GridGeometries", "horizontalSRID",    LS);
-        horizontalExtent  = addColumn("GridGeometries", "horizontalExtent",  LS);
-        verticalSRID      = addColumn("GridGeometries", "verticalSRID",      LS);
-        verticalOrdinates = addColumn("GridGeometries", "verticalOrdinates", LS);
+        final QueryType[] FLS = {FILTERED_LIST, LIST, SELECT};
+        final QueryType[] LS =  {               LIST, SELECT};
+        final QueryType[] F  =  {FILTERED_LIST              };
+        identifier        = addColumn("GridGeometries", "identifier",              FLS);
+        width             = addColumn("GridGeometries", "width",                    LS);
+        height            = addColumn("GridGeometries", "height",                   LS);
+        scaleX            = addColumn("GridGeometries", "scaleX",                   LS);
+        scaleY            = addColumn("GridGeometries", "scaleY",                   LS);
+        translateX        = addColumn("GridGeometries", "translateX",               LS);
+        translateY        = addColumn("GridGeometries", "translateY",               LS);
+        shearX            = addColumn("GridGeometries", "shearX",               0,  LS);
+        shearY            = addColumn("GridGeometries", "shearY",               0,  LS);
+        horizontalSRID    = addColumn("GridGeometries", "horizontalSRID",           LS);
+        horizontalExtent  = addColumn("GridGeometries", "horizontalExtent",         LS);
+        verticalSRID      = addColumn("GridGeometries", "verticalSRID",      null,  LS);
+        verticalOrdinates = addColumn("GridGeometries", "verticalOrdinates", null, FLS);
         if (database.isSpatialEnabled()) {
             horizontalExtent.setFunction("Box2D", LS);
         }
-        byIdentifier = addParameter(identifier, SELECT);
-//        byWidth      = addParameter(width,            SI);
-//        byHeight     = addParameter(height,           SI);
-//        byDepth      = addParameter(depth,            SI);
-//        byExtent     = addParameter(horizontalExtent, SI);
+        byIdentifier        = addParameter(identifier, SELECT);
+        byWidth             = addParameter(width,          F);
+        byHeight            = addParameter(height,         F);
+        byScaleX            = addParameter(scaleX,         F);
+        byScaleY            = addParameter(scaleY,         F);
+        byTranslateX        = addParameter(translateX,     F);
+        byTranslateY        = addParameter(translateY,     F);
+        byShearX            = addParameter(shearX,         F);
+        byShearY            = addParameter(shearY,         F);
+        byHorizontalSRID    = addParameter(horizontalSRID, F);
+        byVerticalSRID      = addParameter(verticalSRID,   F);
     }
 }

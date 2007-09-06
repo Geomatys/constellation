@@ -59,6 +59,12 @@ public class QueryTest extends DatabaseTest {
         assertSame (name, iterator.previous());
         assertFalse(iterator.hasPrevious());
         assertEquals(-1, iterator.previousIndex());
+
+        // Tests a non-existant column
+        final Column dummy = new Column(query, "Formats", "dummy", "dummy", 10,  (QueryType[]) null);
+        final String SQL2 = query.select(SELECT);
+        assertEquals("SELECT \"name\", \"mime\", \"encoding\", 10 AS \"dummy\" FROM \"Formats\"", SQL2);
+        tryStatement(SQL);
     }
 
     /**
@@ -71,8 +77,8 @@ public class QueryTest extends DatabaseTest {
         final Column layer     = new Column(query, "Series",         "layer");
         final Column pathname  = new Column(query, "Series",         "pathname");
         final Column filename  = new Column(query, "GridCoverages",  "filename");
-        final Column startTime = new Column(query, "GridCoverages",  "startTime", "tmin", (QueryType[]) null);
-        final Column endTime   = new Column(query, "GridCoverages",  "endTime",   "tmax", (QueryType[]) null);
+        final Column startTime = new Column(query, "GridCoverages",  "startTime", "tmin", null, (QueryType[]) null);
+        final Column endTime   = new Column(query, "GridCoverages",  "endTime",   "tmax", null, (QueryType[]) null);
         final Column width     = new Column(query, "GridGeometries", "width");
         final Column height    = new Column(query, "GridGeometries", "height");
         final Column format    = new Column(query, "Series",         "format");
@@ -102,7 +108,7 @@ public class QueryTest extends DatabaseTest {
     public void testParameters() throws SQLException {
         final Query     query      = new Query(database);
         final Column    name       = new Column   (query, "Categories", "name");
-        final Column    identifier = new Column   (query, "Categories", "lower", "identifier", (QueryType[]) null);
+        final Column    identifier = new Column   (query, "Categories", "lower", "identifier", null, (QueryType[]) null);
         final Column    colors     = new Column   (query, "Categories", "colors");
         final Parameter byName     = new Parameter(query, name,       SELECT);
         final Parameter byId       = new Parameter(query, identifier, SELECT_BY_IDENTIFIER);

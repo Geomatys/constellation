@@ -18,11 +18,18 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import org.geotools.resources.Utilities;
 import net.sicade.resources.XArray;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**
@@ -99,6 +106,7 @@ public class Query {
      * This is used by the {@link IndexedSqlElement} constructor only.
      */
     final IndexedSqlElement[] add(final IndexedSqlElement element) {
+        cachedSQL.clear();
         final IndexedSqlElement[] old;
         if (element instanceof Column) {
             old = columns;
@@ -117,7 +125,7 @@ public class Query {
     }
 
     /**
-     * Creates a new column from the specified table with the specified name but no alias.
+     * Creates a new mandatory column from the specified table with the specified name.
      *
      * @param table The name of the table that contains the column.
      * @param name  The column name.
@@ -126,21 +134,23 @@ public class Query {
      * @return The newly added column.
      */
     protected Column addColumn(final String table, final String name, final QueryType... types) {
-        return addColumn(table, name, name, types);
+        return addColumn(table, name, Column.MANDATORY, types);
     }
 
     /**
-     * Adds a new column from the specified table with the specified name and alias.
+     * Creates a new optional column from the specified table with the specified name and default
+     * value.
      *
      * @param table The name of the table that contains the column.
      * @param name  The column name.
-     * @param alias An alias for the column.
+     * @param defaultValue The default value if the column is not present in the database.
+     *              Should be a {@link Number}, a {@link String} or {@code null}.
      * @param types Types of the queries where the column shall appears, or {@code null}
      *              if the column is applicable to any kind of queries.
      * @return The newly added column.
      */
-    protected Column addColumn(final String table, final String name, final String alias, final QueryType... types) {
-        return new Column(this, table, name, alias, types);
+    protected Column addColumn(final String table, final String name, final Object defaultValue, final QueryType... types) {
+        return new Column(this, table, name, name, defaultValue, types);
         // The addition into this query is performed by the Column constructor.
     }
 
@@ -197,30 +207,84 @@ public class Query {
             throws SQLException
     {
         /*
-         * List all columns after the "SELECT" clause.
+         * Lists all columns after the "SELECT" clause.
          * Keep trace of all involved tables in the process.
          */
         final String quote = metadata.getIdentifierQuoteString().trim();
         Map<String,CrossReference> tables = new LinkedHashMap<String,CrossReference>();
+        Map<String,Set<String>> columnNames = null;
         String separator = "SELECT ";
         for (final Column column : columns) {
             if (column.indexOf(type) == 0) {
-                continue; // Column not to be included for the requested query type.
+                // Column not to be included for the requested query type.
+                continue;
             }
+            final String table = column.table; // Because often requested.
+            /*
+             * Checks if the column exists in the table. This check is performed only if the column
+             * is optional. For mandatory columns, we will inconditionnaly insert the column in the
+             * SELECT clause and lets the SQL driver throws the appropriate exception later.
+             */
+            final boolean columnExists;
+            if (column.defaultValue == Column.MANDATORY) {
+                columnExists = true;
+            } else {
+                if (columnNames == null) {
+                    columnNames = new HashMap<String,Set<String>>();
+                }
+                Set<String> columns = columnNames.get(table);
+                if (columns == null) {
+                    columns = new HashSet<String>();
+                    ResultSet results = metadata.getColumns(database.catalog, database.schema, table, null);
+                    while (results.next()) {
+                        columns.add(results.getString("COLUMN_NAME"));
+                    }
+                    results.close();
+                    columnNames.put(table, columns);
+                }
+                columnExists = columns.contains(column.name);
+                if (!columnExists) {
+                    final LogRecord record = new LogRecord(Level.CONFIG, Resources.format(
+                            ResourceKeys.COLUMN_NOT_FOUND_$3, column.name, table, column.defaultValue));
+                    record.setSourceClassName(Utilities.getShortClassName(this));
+                    record.setSourceMethodName("select");
+                    Element.LOGGER.log(record);
+                }
+            }
+            /*
+             * Appends the column name in the SELECT clause, or the default value if the column
+             * doesn't exist in the current database.
+             */
             buffer.append(separator);
-            final String function = column.getFunction(type);
-            if (function != null) {
-                buffer.append(function).append('(');
+            if (columnExists) {
+                final String function = column.getFunction(type);
+                if (function != null) {
+                    buffer.append(function).append('(');
+                }
+                buffer.append(quote).append(column.name).append(quote);
+                if (function != null) {
+                    buffer.append(')');
+                }
+            } else {
+                // Don't put quote for numbers and NULL values.
+                final boolean needQuotes = !(column.defaultValue instanceof Number);
+                if (needQuotes) {
+                    buffer.append(quote);
+                }
+                buffer.append(column.defaultValue); // May be null.
+                if (needQuotes) {
+                    buffer.append(quote);
+                }
             }
-            buffer.append(quote).append(column.name).append(quote);
-            if (function != null) {
-                buffer.append(')');
-            }
-            if (!column.alias.equals(column.name)) {
+            /*
+             * Declares the alias if needed. This part is mandatory if the
+             * column doesn't exist and has been replaced by a default value.
+             */
+            if (!columnExists || !column.alias.equals(column.name)) {
                 buffer.append(" AS ").append(quote).append(column.alias).append(quote);
             }
             separator = ", ";
-            tables.put(column.table, null); // ForeignerKeys will be determined later.
+            tables.put(table, null); // ForeignerKeys will be determined later.
         }
         if (joinParameters) {
             for (final Parameter parameter : parameters) {

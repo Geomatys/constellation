@@ -27,6 +27,11 @@ import org.geotools.resources.Utilities;
  */
 public final class Column extends IndexedSqlElement {
     /**
+     * A flag for column without {@linkplain #defaultValue default value}.
+     */
+    static final Object MANDATORY = new Object();
+
+    /**
      * The table name in which this column appears.
      */
     final String table;
@@ -42,6 +47,12 @@ public final class Column extends IndexedSqlElement {
     final String alias;
 
     /**
+     * The default value, or {@link #MANDATORY} if the value is mandatory.
+     * Should be a {@link Number}, a {@link String} or {@code null}.
+     */
+    final Object defaultValue;
+
+    /**
      * The ordering: {@code "ASC"}, {@code "DESC"} or {@code null} if none.
      */
     private String ordering;
@@ -54,7 +65,7 @@ public final class Column extends IndexedSqlElement {
      * @param name  The column name.
      */
     Column(final Query query, final String table, final String name) {
-        this(query, table, name, name, (QueryType[]) null);
+        this(query, table, name, name, MANDATORY, (QueryType[]) null);
     }
 
     /**
@@ -65,14 +76,19 @@ public final class Column extends IndexedSqlElement {
      * @param table The name of the table that contains the column.
      * @param name  The column name.
      * @param alias An alias for the column.
+     * @param defaultValue The default value if the column is not present in the database.
+     *              Should be a {@link Number}, a {@link String} or {@code null}.
      * @param types Types of the queries where the column shall appears, or {@code null}
      *              if the column is applicable to any kind of queries.
      */
-    Column(final Query query, final String table, final String name, final String alias, final QueryType... types) {
+    Column(final Query query, final String table, final String name, final String alias,
+           final Object defaultValue, final QueryType... types)
+    {
         super(query, types);
         this.table = table.trim();
         this.name  = name .trim();
         this.alias = alias.trim();
+        this.defaultValue = defaultValue;
     }
 
     /**
@@ -151,10 +167,11 @@ public final class Column extends IndexedSqlElement {
     public boolean equals(final Object object) {
         if (super.equals(object)) {
             final Column that = (Column) object;
-            return Utilities.equals(this.table, that.table) &&
-                   Utilities.equals(this.name,  that.name ) &&
-                   Utilities.equals(this.alias, that.alias) &&
-                   Utilities.equals(this.ordering, that.ordering);
+            return Utilities.equals(this.table,        that.table) &&
+                   Utilities.equals(this.name,         that.name ) &&
+                   Utilities.equals(this.alias,        that.alias) &&
+                   Utilities.equals(this.defaultValue, that.defaultValue) &&
+                   Utilities.equals(this.ordering,     that.ordering);
         }
         return false;
     }
