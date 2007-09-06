@@ -118,7 +118,17 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         return name.toString();
     }
     
+     public Measure getResult() {
+        return result;
+    }
     
+    /**
+     * Retourne un code représentant cette mesure.
+     */
+    @Override
+    public final int hashCode() {
+        return featureOfInterest.hashCode() ^ observedProperty.hashCode() ^ result.hashCode();
+    }
     
     
     /**
@@ -126,6 +136,9 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      */
     @Override
     public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
         if (super.equals(object)) {
             final MeasurementEntry that = (MeasurementEntry) object;
             return this.getResult().equals(that.getResult());
@@ -133,7 +146,5 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         return false;
     }
     
-    public Measure getResult() {
-        return result;
-    }
+   
 }

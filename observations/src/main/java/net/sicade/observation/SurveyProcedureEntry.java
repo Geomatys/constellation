@@ -33,6 +33,10 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     
     /**
      */
+    private String name;
+    
+    /**
+     */
     private ResponsibleParty operator;
     
     /**
@@ -112,6 +116,33 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     
     public TemporalObject getSurveyTime() {
         return surveyTime;
+    }
+    
+     /**
+     * Retourne le code numérique identifiant cette entrée.
+     */
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+    
+    /**
+     * Vérifie que cette station est identique à l'objet spécifié
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final SurveyProcedureEntry that = (SurveyProcedureEntry) object;
+            return Utilities.equals(this.id,         that.id) &&
+                   Utilities.equals(this.blockId,    that.blockId)   &&
+                   Utilities.equals(this.definition, that.definition)   && 
+                   Utilities.equals(this.fields,     that.fields) &&
+                   Utilities.equals(this.fixed,      that.fixed);
+        }
+        return false;
     }
     
 }

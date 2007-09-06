@@ -15,6 +15,7 @@
 package net.sicade.observation;
 
 import net.sicade.catalog.Entry;
+import org.geotools.resources.Utilities;
 
 /**
  * Valeur d'un champ de dataRecord scalaire ou textuelle. 
@@ -69,6 +70,31 @@ public class DataRecordFieldEntry extends Entry{
      */
     public Object getValue() {
         return value;
+    }
+    
+    /**
+     * Retourne un code représentant ce champ de dataRecord.
+     */
+    @Override
+    public final int hashCode() {
+        return idField + 13 * idDataRecord.hashCode();
+    }
+
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final DataRecordFieldEntry that = (DataRecordFieldEntry) object;
+            return Utilities.equals(this.idField,         that.idField) &&
+                   Utilities.equals(this.idDataRecord, that.idDataRecord) &&
+                   Utilities.equals(this.value,   that.value) ;
+        }
+        return false;
     }
     
 }

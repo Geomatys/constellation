@@ -16,6 +16,7 @@ package net.sicade.observation;
 
 import java.util.List;
 import net.sicade.catalog.Entry;
+import org.geotools.resources.Utilities;
 
 /**
  * Resultat d'une observation de type DataBlockDefinition.
@@ -76,6 +77,31 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
      */
     public AbstractEncoding getEncoding() {
         return encoding;
+    }
+    
+    /**
+     * Retourne un code représentant ce dataBlock.
+     */
+    @Override
+    public final int hashCode() {
+        return id.hashCode();
+    }
+
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final DataBlockDefinitionEntry that = (DataBlockDefinitionEntry) object;
+            return Utilities.equals(this.id,         that.id) &&
+                   Utilities.equals(this.components, that.components) &&
+                   Utilities.equals(this.encoding,   that.encoding) ;
+        }
+        return false;
     }
     
 }

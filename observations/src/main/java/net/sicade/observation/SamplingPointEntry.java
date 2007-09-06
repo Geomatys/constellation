@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le D�veloppement
+ * (C) 2005, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,6 +15,7 @@
 package net.sicade.observation;
 
 import java.util.List;
+import org.geotools.resources.Utilities;
 import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeatureRelation;
 import org.opengis.observation.sampling.SamplingPoint;
@@ -27,9 +28,14 @@ import org.opengis.observation.sampling.SurveyProcedure;
  */
 public class SamplingPointEntry extends SamplingFeatureEntry implements SamplingPoint{
    
+    /**
+     * La position de la station.
+     */
     private Point position;
     
-    /** Creates a new instance of SamplingPointEntry */
+    /** 
+     * Créé une nouvelle station localisé.
+     */
     public SamplingPointEntry(final String            identifier,
                               final String            name,
                               final String            remarks,
@@ -58,7 +64,25 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
         this.position = position;
     }
     
+    /**
+     * Retourne la position de la station.
+     */
     public Point getPosition(){
         return position;
+    }
+    
+    /**
+     * Vérifie que cette station est identique à l'objet spécifié
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final SamplingPointEntry that = (SamplingPointEntry) object;
+            return  Utilities.equals(this.position, that.position);
+        }
+        return false;
     }
 }

@@ -111,15 +111,15 @@ final class MeasurementInserts extends Thread {
             }
             //measures.setObservable(pair.descriptor);  // TODO
             measures.setStation   (pair.samplingFeature);
-            try {
-                //measures.setValue(pair.value, Float.NaN); //TODO
+            /*try {
+                measures.setValue(pair.value, Float.NaN); //TODO
             } catch (CatalogException cause) {
                 exception = cause;
                 break;
             } catch (SQLException cause) {
                 exception = new ServerException(cause);
                 break;
-            }
+            }*/
         } while (exception == null);
     }
 }

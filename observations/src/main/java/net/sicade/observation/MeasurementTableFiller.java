@@ -219,13 +219,13 @@ public class MeasurementTableFiller implements Runnable {
                 //measures.setObservable(descriptor);  // TODO
                 for (final SamplingFeature samplingFeature : samplingFeatures) {
                     measures.setStation(samplingFeature);
-                    try {
+                    /*try {
                         if (measures.exists()) {
                             continue;
                         }
                     } catch (SQLException exception) {
                         throw new ServerException(exception);
-                    }
+                    }*/
                     pairs[index++] = new SamplingFeatureDescriptorPair(samplingFeature, descriptor);
                 }
             }
@@ -243,7 +243,7 @@ public class MeasurementTableFiller implements Runnable {
                 final SamplingFeature          station    = pair.samplingFeature;
                 final Descriptor               descriptor = pair.descriptor;
                 final SpatioTemporalCoverage3D coverage   = coverages.get(descriptor);
-                final Point2D                  coord      = station.getCoordinate();
+               /* final Point2D                  coord      = station.getCoordinate();
                 final Date                     time       = station.getTime();
                 pairs[index] = null;
                 if (coord==null || time==null) {
@@ -255,7 +255,7 @@ public class MeasurementTableFiller implements Runnable {
                 } catch (PointOutsideCoverageException exception) {
                     warning(coverage, exception);
                     continue;
-                }
+                }*/
                 pair.value = values[0];
                 updater.add(pair);
                 if (cancel) {

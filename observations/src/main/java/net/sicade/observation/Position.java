@@ -14,6 +14,8 @@
  */
 package net.sicade.observation;
 
+import org.geotools.resources.Utilities;
+
 /**
  * decrit une position.
  *
@@ -42,6 +44,31 @@ public class Position {
 
     public int getValue() {
         return value;
+    }
+    
+    /**
+     * Retourne un code représentant ce phenomene composé.
+     */
+    @Override
+    public final int hashCode() {
+        return srsName.hashCode();
+    }
+
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final Position that = (Position) object;
+            return Utilities.equals(this.srsName,      that.srsName) &&
+                   Utilities.equals(this.srsDimension, that.srsDimension) &&
+                   Utilities.equals(this.value,        that.value) ;
+        }
+        return false;
     }
     
 }

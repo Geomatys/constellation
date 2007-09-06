@@ -61,7 +61,7 @@ final class SamplingFeatureDescriptorPair implements Comparable<SamplingFeatureD
      * Retourne la date à laquelle le descripteur sera évalué.
      */
     private long getTime() throws CatalogException {
-        final Date time = samplingFeature.getTime();
+        final Date time = null; //samplingFeature.getTime();
         if (time == null) {
             /*
              * Place les stations dont la date est indéterminée à la fin. C'est cohérent
@@ -94,6 +94,6 @@ final class SamplingFeatureDescriptorPair implements Comparable<SamplingFeatureD
      */
     @Override
     public String toString() {
-        return '(' + samplingFeature.getName() + ", " + descriptor.getName() + ')';
+        return ""; //'(' + samplingFeature.getName() + ", " + descriptor.getName() + ')';
     }
 }

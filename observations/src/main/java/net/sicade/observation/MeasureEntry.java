@@ -17,6 +17,7 @@ package net.sicade.observation;
 
 // Sicade dependencies
 import net.sicade.catalog.Entry;
+import org.geotools.resources.Utilities;
 
 // OpenGis dependencies
 import org.opengis.observation.Measure;
@@ -29,6 +30,11 @@ import org.opengis.observation.Measure;
  */
 public class MeasureEntry extends Entry implements Measure{
     
+    /**
+     * Le non de l'unité de mesure.
+     */
+    private String name;
+
     /**
      * L'unite de la mesure
      */
@@ -51,6 +57,7 @@ public class MeasureEntry extends Entry implements Measure{
                         final float value)
     {
         super(name);
+        this.name = name;
         this.uom   = uom;
         this.value = value;        
     }
@@ -69,6 +76,31 @@ public class MeasureEntry extends Entry implements Measure{
      */
     public float getValue() {
         return value;
+    }
+    
+     /**
+     * Retourne un code représentant ce resultat de mesure.
+     */
+    @Override
+    public final int hashCode() {
+        return name.hashCode();
+    }
+
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final MeasureEntry that = (MeasureEntry) object;
+            return Utilities.equals(this.name,  that.name) &&
+                   Utilities.equals(this.uom,   that.uom) &&
+                   Utilities.equals(this.value, that.value) ;
+        }
+        return false;
     }
     
 }

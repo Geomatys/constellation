@@ -14,17 +14,13 @@
  */
 package net.sicade.observation;
 
-import java.sql.SQLException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import net.sicade.catalog.CatalogException;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import net.sicade.catalog.Entry;
 import net.sicade.observation.sql.ObservationTable;
-import net.sicade.observation.sql.SamplingFeatureTable;
 
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;
@@ -54,6 +50,11 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      */
     private final String identifier;
     
+    
+    /**
+     * La description de la station.
+     */
+    private final String description;
     
     /**
      * 
@@ -102,6 +103,8 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     {
         super(name, description);
         this.identifier             = identifier;
+        this.description            = description;
+        this.sampledFeature = new ArrayList<Object>();
         this.sampledFeature.add(sampledFeature);
         this.surveyDetail           = null;
         this.relatedSamplingFeature = null;
@@ -111,25 +114,33 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     
     public SamplingFeatureEntry(   final String            identifier,
                                    final String            name,
-                                   final String            remarks,
+                                   final String            description,
                                    final List<SamplingFeatureRelation> relatedSamplingFeature,
                                    final List<Observation> relatedObservation,
                                    final List<Object>      sampledFeature,
                                    final SurveyProcedure   surveyDetail)
     {
-        super(name, remarks);
-        this.identifier = identifier;
-        this.surveyDetail = surveyDetail;
+        super(name, description);
+        this.identifier             = identifier;
+        this.description            = description;
+        this.surveyDetail           = surveyDetail;
         this.relatedSamplingFeature = relatedSamplingFeature;
-        this.relatedObservation = relatedObservation;
-        this.sampledFeature = sampledFeature;
+        this.relatedObservation     = relatedObservation;
+        this.sampledFeature         = sampledFeature;
     }
 
     /**
-     * {@inheritDoc}
+     * retourne l'identifiant de la station.
      */
-    public String getdentifier() {
+    public String getIdentifier() {
         return identifier;
+    }
+    
+    /**
+     * retourne la description de la station.
+     */
+    public String getDescription() {
+        return description;
     }
     
     /**
@@ -182,12 +193,15 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
             final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
             return                 (this.identifier       ==     that.identifier) &&
                    Utilities.equals(this.surveyDetail,           that.surveyDetail)   &&
+                   Utilities.equals(this.description,            that.description)   && 
                    Utilities.equals(this.relatedObservation,     that.relatedObservation) &&
                    Utilities.equals(this.relatedSamplingFeature, that.relatedSamplingFeature) &&
                    Utilities.equals(this.sampledFeature,         that.sampledFeature);
         }
         return false;
     }
+
+  
 
    
 }

@@ -19,6 +19,9 @@ import java.util.List;
 import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
 
+// geotools dependencies
+import org.geotools.resources.Utilities;
+
 /**
   * Une propriété complexe composée de plusieur {@linkPlain Phenomenon phenomenon}
   *
@@ -80,6 +83,31 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
      */
     public int getDimension() {
         return dimension;
+    }
+    
+    /**
+     * Retourne un code représentant ce phenomene composé.
+     */
+    @Override
+    public final int hashCode() {
+        return base.hashCode() ^ component.hashCode();
+    }
+
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final CompositePhenomenonEntry that = (CompositePhenomenonEntry) object;
+            return Utilities.equals(this.base,         that.base) &&
+                   Utilities.equals(this.component,    that.component) &&
+                   Utilities.equals(this.dimension,    that.dimension) ;
+        }
+        return false;
     }
         
     

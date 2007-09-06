@@ -276,7 +276,7 @@ public class ObservationEntry extends Entry implements Observation {
      */
     @Override
     public final int hashCode() {
-        return featureOfInterest.hashCode() ^ observedProperty.hashCode();
+        return featureOfInterest.hashCode() ^ observedProperty.hashCode() ^ result.hashCode();
     }
 
     /**

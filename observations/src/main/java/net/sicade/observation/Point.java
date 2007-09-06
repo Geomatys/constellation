@@ -15,6 +15,8 @@
 
 package net.sicade.observation;
 
+import org.geotools.resources.Utilities;
+
 
 
 /**
@@ -45,5 +47,36 @@ public class Point {
     
     public Position getPosition(){
         return position;
+    }
+
+    /**
+     * Retourne l'identifiant du point.
+     */
+    public String getId() {
+        return id;
+    }
+    
+    /**
+     * Retourne un code représentant ce point.
+     */
+    @Override
+    public final int hashCode() {
+        return id.hashCode();
+    }
+
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final Point that = (Point) object;
+            return Utilities.equals(this.id,       that.id) &&
+                   Utilities.equals(this.position, that.position) ;
+        }
+        return false;
     }
 }

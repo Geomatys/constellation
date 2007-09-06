@@ -16,6 +16,7 @@ package net.sicade.observation;
 
 // Sicade dependencies
 import net.sicade.catalog.Entry;
+import org.geotools.resources.Utilities;
 
 // GeoAPI dependencies 
 import org.opengis.observation.Phenomenon;
@@ -38,6 +39,12 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      */
     private String id;
     
+      
+    /**
+     * La description du phenomene.
+     */
+    private String description;
+    
     /**
      * Construit un nouveau phénomène du nom spécifié.
      *
@@ -46,6 +53,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     public PhenomenonEntry(final String id, final String name) {
         super(name);
         this.id = id;
+        this.description = null;
     }
 
     /** 
@@ -57,5 +65,38 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     public PhenomenonEntry(final String id, final String name, final String description ) {
         super(name, description);
         this.id = id;
+        this.description = description;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+    
+    /**
+     * Retourne un code représentant ce phenomene.
+     */
+    @Override
+    public final int hashCode() {
+        return id.hashCode();
+    }
+
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final PhenomenonEntry that = (PhenomenonEntry) object;
+            return Utilities.equals(this.id,          that.id) &&
+                   Utilities.equals(this.description, that.description);
+        }
+        return false;
     }
 }
