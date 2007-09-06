@@ -24,7 +24,7 @@ import net.sicade.catalog.SingletonTable;
 
 /**
  * Connection to a table of {@linkplain Thematic thematic} represented by {@linkplain Layer layers}.
- * 
+ *
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
@@ -32,7 +32,7 @@ import net.sicade.catalog.SingletonTable;
 public class ThematicTable extends SingletonTable<Thematic> {
     /**
      * Creates a thematic table.
-     * 
+     *
      * @param database Connection to the database.
      */
     public ThematicTable(final Database database) {

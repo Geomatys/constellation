@@ -41,7 +41,7 @@ public class FormatTable extends SingletonTable<Format> {
 
     /**
      * Creates a format table.
-     * 
+     *
      * @param database Connection to the database.
      */
     public FormatTable(final Database database) {

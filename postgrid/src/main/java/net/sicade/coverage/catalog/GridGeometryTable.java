@@ -79,6 +79,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * @throws CatalogException if an inconsistent record is found in the database.
      * @throws SQLException if an error occured while reading the database.
      */
+    @SuppressWarnings("fallthrough")
     protected GridGeometryEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final GridGeometryQuery query = (GridGeometryQuery) super.query;
         final String identifier       = results.getString(indexOf(query.identifier));

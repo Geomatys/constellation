@@ -42,7 +42,6 @@ import org.geotools.resources.geometry.XRectangle2D;
 
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.model.Operation;
-import net.sicade.coverage.catalog.DataConnection;
 import net.sicade.catalog.BoundedSingletonTable;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
@@ -727,7 +726,7 @@ loop:   for (final CoverageReference newReference : entries) {
      * unique autant que possible. L'objet retourné ne doit donc pas être modifié!
      * <p>
      * Cette méthode est appelée par le constructeur de {@link GridCoverageEntry}.
-     * 
+     *
      * @param seriesID    Nom ID de la couche, pour fin de vérification. Ce nom doit correspondre
      *                     à celui de la couche examinée par cette table.
      * @param formatID    Nom ID du format des images.
@@ -833,7 +832,7 @@ loop:   for (final CoverageReference newReference : entries) {
     {
         //prepare(x, y, t); TODO
         coverage3D.snap(position);
-        return (double[]) position.ordinates.clone();
+        return position.ordinates.clone();
     }
 
     /**

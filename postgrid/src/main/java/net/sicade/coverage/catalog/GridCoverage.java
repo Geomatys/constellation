@@ -25,7 +25,7 @@ import org.opengis.geometry.DirectPosition;
 /**
  * A coverage in which values are located on a grid. This interface provides a {@link #snap}
  * method returning the location of the nearest point on the grid.
- * 
+ *
  * @author Martin Desruisseaux
  * @version $Id$
  */

@@ -36,7 +36,7 @@ import net.sicade.coverage.model.Operation;
  * être immutables. Ce principe d'imutabilité s'applique aussi aux objets référencés par
  * les champs publiques, même si ces objets sont en principe mutables ({@link Rectangle2D},
  * {@link Dimension2D}...).
- * 
+ *
  * @author Martin Desruisseaux
  * @version $Id$
  */

@@ -197,7 +197,7 @@ public class CombinaisonSet extends AbstractSet<String> {
         }
         this.separator = separator;
     }
-    
+
     /**
      * Affiche toutes les combinaisons des éléments spécifiés. Les arguments suivants peuvent
      * être spécifiés sur la ligne de commande:

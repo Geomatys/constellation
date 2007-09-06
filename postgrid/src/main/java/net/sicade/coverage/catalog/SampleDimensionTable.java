@@ -51,7 +51,7 @@ public class SampleDimensionTable extends Table {
 
     /**
      * Creates a sample dimension table.
-     * 
+     *
      * @param database Connection to the database.
      */
     public SampleDimensionTable(final Database database) {

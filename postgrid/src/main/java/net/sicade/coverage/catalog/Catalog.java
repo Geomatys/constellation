@@ -33,10 +33,7 @@ import org.geotools.util.WeakValueHashMap;
 
 import net.sicade.util.DateRange;
 import net.sicade.catalog.Database;
-import net.sicade.catalog.ConfigurationKey;
-import net.sicade.coverage.catalog.LayerTable;
 import net.sicade.coverage.model.DescriptorTable;
-import net.sicade.coverage.catalog.DataConnectionFactory;
 
 
 /**
@@ -75,8 +72,8 @@ public class Catalog {
 
     /**
      * Construit une instance de {@code Catalog} pour la base de données spécifiée.
-     * 
-     * 
+     *
+     *
      * @param database Connexion à la base de données, ou {@code null} pour utiliser la
      *        base de données par défaut.
      */
@@ -296,8 +293,8 @@ public class Catalog {
      * Une enveloppe représentée par une {@linkplain GeographicBoundingBox région géographique} et
      * une {@linkplain DateRange plage de temps}. Cette classe sert uniquement de clés pour la cache
      * des {@linkplain LayerTable tables des couches}.
-     * 
-     * 
+     *
+     *
      * @author Martin Desruisseaux
      * @version $Id$
      */

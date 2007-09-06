@@ -25,8 +25,6 @@ import net.sicade.catalog.Database;
 import net.sicade.catalog.BoundedSingletonTable;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
-import net.sicade.coverage.catalog.DataConnection;
-import net.sicade.coverage.catalog.DataConnectionFactory;
 import net.sicade.coverage.model.DescriptorTable;
 import net.sicade.coverage.model.LinearModelTable;
 
@@ -97,7 +95,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
 
     /**
      * Creates a layer table.
-     * 
+     *
      * @param database Connection to the database.
      */
     public LayerTable(final Database database) {

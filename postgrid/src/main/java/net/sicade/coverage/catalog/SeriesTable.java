@@ -48,7 +48,7 @@ public class SeriesTable extends SingletonTable<Series> {
 
     /**
      * Creates a series table.
-     * 
+     *
      * @param database Connection to the database.
      */
     public SeriesTable(final Database database) {
@@ -105,6 +105,7 @@ public class SeriesTable extends SingletonTable<Series> {
      * @throws CatalogException if a series contains invalid data.
      * @throws SQLException if an error occured will reading from the database.
      */
+    @Override
     public synchronized Set<Series> getEntries() throws CatalogException, SQLException {
         return getEntries(layer==null ? QueryType.LIST : QueryType.FILTERED_LIST);
     }

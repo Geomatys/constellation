@@ -15,7 +15,6 @@
  */
 package net.sicade.coverage.catalog;
 
-import java.net.URL;
 import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ public class CategoryTable extends Table {
 
     /**
      * Creates a category table.
-     * 
+     *
      * @param database Connection to the database.
      */
     public CategoryTable(final Database database) {

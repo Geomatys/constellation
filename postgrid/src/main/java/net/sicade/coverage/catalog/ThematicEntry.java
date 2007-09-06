@@ -38,7 +38,7 @@ final class ThematicEntry extends Entry implements Thematic {
         super(name);
     }
 
-    /** 
+    /**
      * Construit un nouveau thème du nom spécifié.
      *
      * @param name    Le nom du phénomène.

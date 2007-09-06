@@ -21,7 +21,6 @@ import java.sql.PreparedStatement;
 import java.awt.Dimension;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.IllegalFormatException;
 import java.util.Set;
 import java.util.logging.LogRecord;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
@@ -82,8 +81,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
 
     /**
      * Retourne la séries à utiliser.
-     * 
-     * @throws CatalogException si aucune couche n'a été spécifiée, ou si la couche ne contient pas 
+     *
+     * @throws CatalogException si aucune couche n'a été spécifiée, ou si la couche ne contient pas
      *                          exactement une série.
      */
     private Series getSeries() throws CatalogException {
@@ -134,11 +133,11 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         buffer.append(query.substring(last));
         log(new LogRecord(LoggingLevel.UPDATE, buffer.toString()));
     }
-    
+
     /**
      * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setLayer}
      * doit d'abord avoir été appelée au moins une fois.
-     * 
+     *
      * @param   file        Le fichier image avec son chemin complet.
      * @param   envelope    L'enveloppe géographique pour cette image.
      * @param   size        La dimension de l'image, en nombre de pixels.
@@ -148,7 +147,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      */
     public synchronized void addEntry(final File      file,
                                       final Envelope  envelope,
-                                      final Dimension size) 
+                                      final Dimension size)
             throws CatalogException, FactoryException, SQLException
     {
         GeographicBoundingBox geoBBox = null;
@@ -156,7 +155,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             geoBBox = new GeographicBoundingBoxImpl(envelope);
         } catch (TransformException ex) {
             log(new LogRecord(LoggingLevel.SEVERE, ex.getMessage()));
-        }        
+        }
         TemporalCRS temporalCRS = CRS.getTemporalCRS(envelope.getCoordinateReferenceSystem());
         if (temporalCRS == null) {
             throw new FactoryException("Le CRS spécifié n'est pas de type \"Temporel\".");
@@ -168,11 +167,11 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         final String fileName = fileNameWithExt.substring(0, fileNameWithExt.indexOf("."));
         addEntry(fileName, startTime, endTime, geoBBox, size);
     }
-    
+
     /**
      * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setLayer}
      * doit d'abord avoir été appelée au moins une fois.
-     * 
+     *
      * @param   filename    Le nom de l'image, sans son chemin ni son extension.
      * @param   startTime   La date de début de la plage de temps concernée par l'image.
      * @param   endTime     La date de fin de la plage de temps concernée par l'image.
@@ -183,10 +182,10 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      */
     public synchronized void addEntry(final String            filename,
                                       final Date             startTime,
-                                      final Date               endTime, 
+                                      final Date               endTime,
                                       final GeographicBoundingBox bbox,
                                       final Dimension             size)
-            throws CatalogException, SQLException 
+            throws CatalogException, SQLException
     {
         if (gridGeometries == null) {
             gridGeometries = getDatabase().getTable(GridGeometryTable.class);

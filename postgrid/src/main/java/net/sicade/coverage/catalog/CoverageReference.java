@@ -14,7 +14,6 @@
  */
 package net.sicade.coverage.catalog;
 
-import java.util.Date;
 import java.net.URL;
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +51,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     /**
      * Key to use for storing a {@code CoverageReference} as {@link GridCoverage2D} property.
      * Users can obtain a {@code CoverageReference} from a {@code GridCoverage2D} as below:
-     * 
+     *
      * <blockquote><pre>
      * CoverageReference reference = ...
      * GridCoverage2D    coverage  = reference.{@linkplain #getCoverage getCoverage}(null);

@@ -147,7 +147,7 @@ final class GridGeometryEntry extends Entry {
      * Returns the vertical ordinate values, or {@code null} if none.
      */
     public double[] getVerticalOrdinates() {
-        return (verticalOrdinates != null) ? (double[]) verticalOrdinates.clone() : null;
+        return (verticalOrdinates != null) ? verticalOrdinates.clone() : null;
     }
 
     /**

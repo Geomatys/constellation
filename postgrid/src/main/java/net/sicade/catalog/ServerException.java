@@ -29,7 +29,7 @@ public class ServerException extends CatalogException {
      */
     private static final long serialVersionUID = -6413382346019648505L;
 
-    /** 
+    /**
      * Creates an exception with the specified cause and no details message.
      *
      * @param cause The cause for this exception.

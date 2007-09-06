@@ -39,7 +39,6 @@ import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
 import net.sicade.coverage.model.Model;
 import net.sicade.coverage.model.Operation;
-import net.sicade.coverage.catalog.DataConnection;
 import net.sicade.resources.XArray;
 
 
@@ -198,7 +197,7 @@ final class LayerEntry extends Entry implements Layer {
         } catch (RemoteException e) {
             throw new ServerException(e);
         }
-        return null;        
+        return null;
     }
 
     /**

@@ -55,12 +55,12 @@ public enum CRS {
      * A (<var>x</var>, <var>y</var>, <var>t</var>) coordinate system.
      */
     XYT(-1, 2),
-    
+
     /**
      * A (<var>x</var>, <var>y</var>, <var>z</var>) coordinate system.
      */
     XYZ(2, -1),
-    
+
     /**
      * A (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>) coordinate system.
      */

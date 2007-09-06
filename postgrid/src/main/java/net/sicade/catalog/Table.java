@@ -325,7 +325,7 @@ public class Table {
      * <blockquote><pre>
      * Calendar   calendar = getCalendar();
      * Timestamp startTime = resultSet.getTimestamp(1, calendar);
-     * Timestamp   endTime = resultSet.getTimestamp(2, calendar); 
+     * Timestamp   endTime = resultSet.getTimestamp(2, calendar);
      * </pre></blockquote>
      *
      * This calendar should be used for storing dates as well. The caller must holds the lock

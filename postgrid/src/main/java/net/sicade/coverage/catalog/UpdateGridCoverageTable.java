@@ -31,9 +31,9 @@ import net.sicade.catalog.CatalogException;
 
 /**
  * Ajoute des entrées dans une table {@link WritableGridCoverageTable}.
- * Elle peut être appelée par un script shell pour automatiser l'ajout d'image dans la table 
+ * Elle peut être appelée par un script shell pour automatiser l'ajout d'image dans la table
  * {@link GridCoverageTable GridCoverage}.
- * 
+ *
  * @version $Id$
  * @author Antoine Hnawia
  *
@@ -46,11 +46,11 @@ public class UpdateGridCoverageTable {
      */
     private UpdateGridCoverageTable() {
     }
-    
+
     /**
-     * Retourne un objet {@link Date} correspondant a la chaîne de caractère {@code date} fournie 
+     * Retourne un objet {@link Date} correspondant a la chaîne de caractère {@code date} fournie
      * en paramètre.
-     * 
+     *
      * @param   date    La chaîne de caractère à "traduire" en objet {@link Date}.
      */
     private static Date getDate(String date) {
@@ -81,17 +81,17 @@ public class UpdateGridCoverageTable {
         calendar.set(an, mois, jour);
         return calendar.getTime();
     }
-    
+
     /**
-     * La méthode principale attend comme argument sur la ligne de commande : 
-     *  - la couche pour laquelle rajouter une image, 
-     *  - le nom de l'image à rajouter (sans son chemin ni son extension), 
-     *  - la date de début, 
-     *  - la date de fin, 
-     *  - xmin, ymin, xmax, ymax coordonnées géographiques, 
+     * La méthode principale attend comme argument sur la ligne de commande :
+     *  - la couche pour laquelle rajouter une image,
+     *  - le nom de l'image à rajouter (sans son chemin ni son extension),
+     *  - la date de début,
+     *  - la date de fin,
+     *  - xmin, ymin, xmax, ymax coordonnées géographiques,
      *  - largeur et hauteur de l'image.
      * Les dates peuvent être au format : aaaammjj ou aaaajjj.
-     * 
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) throws CatalogException, SQLException {
@@ -110,13 +110,13 @@ public class UpdateGridCoverageTable {
         final Double        ymin         = arguments.getRequiredDouble ("-ymin" );
         final Double        ymax         = arguments.getRequiredDouble ("-ymax" );
         final Rectangle2D   bbox         = new Rectangle2D.Double(xmin, ymin, (xmax-xmin), (ymax-ymin));
-        final Dimension     size         = new Dimension(arguments.getRequiredInteger("-width"), 
+        final Dimension     size         = new Dimension(arguments.getRequiredInteger("-width"),
                                                          arguments.getRequiredInteger("-height"));
         final WritableGridCoverageTable wgt = observations.getDatabase().getTable(WritableGridCoverageTable.class);
         wgt.setLayer(layer);
         wgt.addEntry(filename, startTime, endTime, new GeographicBoundingBoxImpl(bbox), size);
     }
-    
+
     /**
      * Affiche l'aide.
      */

@@ -33,7 +33,6 @@ import java.util.Locale;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Collections;
-import java.util.EventListener;
 import java.util.IdentityHashMap;
 import java.util.logging.LogRecord;
 import java.util.logging.Level;
@@ -59,10 +58,8 @@ import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.image.io.RawBinaryImageReadParam;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.XArray;
 
 import net.sicade.catalog.Entry;
-import net.sicade.catalog.Database;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
 

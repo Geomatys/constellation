@@ -73,8 +73,6 @@ import org.geotools.resources.geometry.XRectangle2D;
 import net.sicade.util.DateRange;
 import net.sicade.catalog.Entry;
 import net.sicade.coverage.model.Operation;
-import net.sicade.coverage.catalog.RemoteLoader;
-import net.sicade.coverage.catalog.CoverageLoader;
 import net.sicade.catalog.IllegalRecordException;
 import net.sicade.catalog.CatalogException;
 
@@ -433,6 +431,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *
      * @todo Should compute the geometry by {@link GridGeometryEntry} instead.
      */
+    @SuppressWarnings("fallthrough")
     public GridGeometry2D getGridGeometry() {
         final Rectangle clipPixels = new Rectangle();
         final Envelope envelope;
@@ -484,6 +483,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * @return Les coordonnées logiques de l'image à lire, où {@code null} si l'image ne doit pas
      *         être lue (par exemple parce que l'envelope est vide).
      */
+    @SuppressWarnings("fallthrough")
     private GeneralEnvelope computeBounds(final Rectangle clipPixel, final Point subsampling)
             throws TransformException
     {

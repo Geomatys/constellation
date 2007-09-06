@@ -15,7 +15,6 @@
  */
 package net.sicade.coverage.catalog;
 
-import org.geotools.coverage.Category;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Column;
 import net.sicade.catalog.Parameter;

@@ -15,7 +15,6 @@
 package net.sicade.catalog;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 

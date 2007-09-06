@@ -71,7 +71,7 @@ final class GridCoverageServer extends UnicastRemoteObject implements DataConnec
      * La table d'images locale.
      */
     protected final DataConnection table;
-    
+
     /**
      * Construit une table d'image à exécuter sur un serveur distant.
      * <p>

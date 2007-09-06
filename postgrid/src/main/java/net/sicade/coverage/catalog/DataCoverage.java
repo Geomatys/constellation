@@ -33,7 +33,6 @@ import org.geotools.geometry.GeneralDirectPosition;
 import net.sicade.coverage.model.Operation;
 import net.sicade.coverage.model.Descriptor;
 import net.sicade.coverage.model.RegionOfInterest;
-import net.sicade.coverage.catalog.DataConnection;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
 
@@ -58,7 +57,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     /**
      * Connexion vers la source de données.
      */
-    protected final DataConnection data;
+    private final DataConnection data;
 
     /**
      * Sources de données de second recours, ou un tableau de longeur 0 si aucune.
