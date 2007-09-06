@@ -35,6 +35,6 @@ public interface TextBlock extends AbstractEncoding {
     /**
      * One character to use as a decimal separator
      */
-     char   getDecimalSeparator();
+     char getDecimalSeparator();
     
 }

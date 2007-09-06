@@ -29,7 +29,9 @@ import net.sicade.catalog.SingletonTable;
  * Connexion vers la table des {@linkplain Procedure procédures}.
  *
  * @version $Id$
+ *
  * @author Martin Desruisseaux
+ * @author Guilhem Legal
  */
 @Deprecated
 public class ProcessTable extends SingletonTable<Process> {

@@ -26,17 +26,35 @@ import org.opengis.annotation.UML;
  */
 public class SimpleDataRecordEntry extends Entry implements SimpleDataRecord {
     
+    /**
+     * L'identifiant du dataBlock qui contient ce data record.
+     */
+    private String BlockId;
+    
+    /**
+     * L'identifiant du dataRecord
+     */
+    private String id;
+    
     private boolean fixed;
     
+    /**
+     * definition du record.
+     */
     private String definition;
     
+    /**
+     * List de valeur textuelle ou scalaire.
+     */
     private List<Object> fields;
     /** 
      * Créé une nouvelle Liste de valeur textuelle ou scalaire.
      */
-    public SimpleDataRecordEntry(final String definition, final boolean fixed,
+    public SimpleDataRecordEntry(final String blockId, final String id, final String definition, final boolean fixed,
             final List<Object> fields) {
-        super(null);
+        super(id);
+        this.id = id;
+        this.BlockId = blockId;
         this.definition = definition;
         this.fixed      = fixed;
         this.fields = fields;
@@ -61,6 +79,20 @@ public class SimpleDataRecordEntry extends Entry implements SimpleDataRecord {
      */
     public boolean isFixed() {
         return fixed;
+    }
+
+    /**
+     * Retourne l'identifiant du block qui contient ce data record.
+     */
+    public String getBlockId() {
+        return BlockId;
+    }
+
+     /**
+     * Retourne l'identifiant de ce data record.
+     */
+    public String getId() {
+        return id;
     }
     
 }
