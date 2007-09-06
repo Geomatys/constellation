@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,30 +23,38 @@ import net.sicade.observation.CompositePhenomenonEntry;
 import org.opengis.observation.CompositePhenomenon;
 
 /**
- * Connexion vers la table des {@linkplain CompositePhenomenon phénomènes composé}.
+ * Connexion vers la table des {@linkplain CompositePhenomenon phï¿½nomï¿½nes composï¿½}.
  *
  * @version $Id:
  * @author Guilhem Legal
  */
 public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon>{
     
+    /**
+     * Connexion vers la table des {@linkplain Phenomenon phÃ©nomÃ¨nes}.
+     * Une connexion (potentiellement partagÃ©e) sera Ã©tablie la premiÃ¨re fois oÃ¹ elle sera nÃ©cessaire.
+     */
+    protected PhenomenonTable phenomenons;
+    
    /**
-     * Construit une table des phénomènes composé.
+     * Construit une table des phï¿½nomï¿½nes composï¿½.
      * 
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion vers la base de donnï¿½es.
      */
     public CompositePhenomenonTable(final Database database) {
         super(new CompositePhenomenonQuery(database));
     }
     
     /**
-     * Construit un phénomène pour l'enregistrement courant.
+     * Construit un phï¿½nomï¿½ne pour l'enregistrement courant.
      */
     protected CompositePhenomenon createEntry(final ResultSet results) throws SQLException {
         final CompositePhenomenonQuery query = (CompositePhenomenonQuery) super.query;
         return new CompositePhenomenonEntry(results.getString(indexOf(query.name   )),
                                    results.getString(indexOf(query.remarks)),
-                                   results.getString(indexOf(query.identifier)));
+                                   results.getString(indexOf(query.identifier)),
+                                   phenomenons.getEntry(results.getString(indexOf(query.base))),
+                                   phenomenons.getEntries(results.getString(indexOf(query.component))));
     }
     
 }

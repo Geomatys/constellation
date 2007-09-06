@@ -17,7 +17,6 @@ package net.sicade.observation;
 // Sicade dependencies 
 import net.sicade.catalog.Entry;
 import net.sicade.coverage.model.Distribution;
-import net.sicade.observation.sql.*;
 
 // openGis dependencies
 import org.opengis.observation.Process;
@@ -56,7 +55,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * La station à laquelle a été pris cet échantillon.
      */
-    private final String featureOfInterest;
+    private final SamplingFeature featureOfInterest;
     
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
@@ -118,7 +117,7 @@ public class ObservationEntry extends Entry implements Observation {
      */
     public ObservationEntry(final String name,
                             final String          definition,
-                            final String          featureOfInterest, 
+                            final SamplingFeature featureOfInterest, 
                             final Phenomenon      observedProperty,
                             final Process         procedure,
                             final Distribution    distribution,
@@ -153,16 +152,16 @@ public class ObservationEntry extends Entry implements Observation {
      * @param procedure         La procédure associée.
      * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
      */
-    public ObservationEntry(final String         name,
-                            final String         definition,
-                            final String         featureOfInterest, 
-                            final Phenomenon     observedProperty,
-                            final Process        procedure,
-                            final Distribution   distribution,
-                           // final Element        quality,
-                            final Object         result,
-                            final TemporalObject samplingTime,
-                            final String         resultDefinition)
+    public ObservationEntry(final String          name,
+                            final String          definition,
+                            final SamplingFeature featureOfInterest, 
+                            final Phenomenon      observedProperty,
+                            final Process         procedure,
+                            final Distribution    distribution,
+                         // final Element         quality,
+                            final Object          result,
+                            final TemporalObject  samplingTime,
+                            final String          resultDefinition)
     {
         super(name);
         this.definition          = definition;
@@ -190,7 +189,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public String getFeatureOfInterest() {
+    public SamplingFeature getFeatureOfInterest() {
         return featureOfInterest;
     }
 

@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ public class SurveyProcedureTable extends SingletonTable<SurveyProcedure>{
    /**
     * Construit une table des survey procedures.
     * 
-    * @param  database Connexion vers la base de données.
+    * @param  database Connexion vers la base de donnï¿½es.
     */
     public SurveyProcedureTable(final Database database) {
          super(new SurveyProcedureQuery(database)); 
@@ -47,7 +47,7 @@ public class SurveyProcedureTable extends SingletonTable<SurveyProcedure>{
      */
     protected SurveyProcedure createEntry(final ResultSet results) throws CatalogException, SQLException {
          final SurveyProcedureQuery query = (SurveyProcedureQuery) super.query;
-         return new SurveyProcedureEntry(results.getString(indexOf(query.name   )),
+         return null;/* new SurveyProcedureEntry(results.getString(indexOf(query.name   )),
                                          results.getString(indexOf(query.operator)),
                                          results.getString(indexOf(query.elevationAccuracy)),
                                          results.getString(indexOf(query.elevationDatum)),
@@ -56,7 +56,7 @@ public class SurveyProcedureTable extends SingletonTable<SurveyProcedure>{
                                          results.getString(indexOf(query.positionMethod)),
                                          results.getString(indexOf(query.positionAccuracy)),
                                          results.getString(indexOf(query.projection)),
-                                         results.getString(indexOf(query.surveyTime)));
+                                         results.getString(indexOf(query.surveyTime)));*/
     }
     
 }

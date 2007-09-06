@@ -25,6 +25,7 @@ import net.sicade.catalog.Database;
 import net.sicade.catalog.Table;
 import net.sicade.coverage.model.DistributionTable;
 import net.sicade.observation.ObservationEntry;
+import net.sicade.observation.TemporalObjectEntry;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
 
@@ -104,6 +105,15 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      */
     public ObservationTable(final Database database) {
         super(new ObservationQuery(database)); 
+    }
+    
+    /** 
+     * Super constructeur qui est appelé par les classe specialisant ObservationTable.
+     * 
+     * @param  database Connexion vers la base de données des observations.
+     */
+    protected ObservationTable(ObservationQuery query) {
+        super(query); 
     }
 
     
@@ -249,18 +259,19 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     /**
      * Construit une observation pour l'enregistrement courant.
      */
-    private EntryType createEntry(final ResultSet result) throws CatalogException, SQLException {
+    private Observation createEntry(final ResultSet result) throws CatalogException, SQLException {
       final ObservationQuery query = (ObservationQuery) super.query;
       
       return new ObservationEntry(result.getString(indexOf(query.name)),
                                     result.getString(indexOf(query.description)),
-                                    result.getString(indexOf(query.featureOfInterest)),
+                                    stations.getEntry(result.getString(indexOf(query.featureOfInterest))),
                                     phenomenons.getEntry(result.getString(indexOf(query.observedProperty))), 
                                     procedures.getEntry(result.getString(indexOf(query.procedure))),
                                     distributions.getEntry(result.getString(indexOf(query.distribution))),
                                     //manque quality
                                     result.getString(indexOf(query.result)),
-                                    result.getDate(indexOf(query.samplingTime)),
+                                    new TemporalObjectEntry(result.getDate(indexOf(query.samplingTimeBegin)),
+                                                            result.getDate(indexOf(query.samplingTimeEnd))),
                                     result.getString(indexOf(query.resultDefinition)));
         
         

@@ -12,63 +12,55 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package net.sicade.observation;
 
-// Sicade dependencies
+import java.util.List;
 import net.sicade.catalog.Entry;
-
-// OpenGis dependencies
-import org.opengis.observation.Measure;
+import org.opengis.annotation.UML;
 
 /**
- * Resultat d'une observation de type {linkplain Measurement measurement}.
- *
+ * Liste de valeur scalaire ou textuelle utilisé dans le resultat d'une observation.
+ * 
  * @version $Id:
  * @author Guilhem Legal
  */
-public class MeasureEntry extends Entry implements Measure{
+public class SimpleDataRecordEntry extends Entry implements SimpleDataRecord {
     
-    /**
-     * L'unite de la mesure
-     */
-    private String uom;
+    private boolean fixed;
     
-    /**
-     * La valeur de la mesure
-     */
-    private float value;
+    private String definition;
     
+    private List<Object> fields;
     /** 
-     * crée un nouveau resultat de mesure.
-     *
-     * @param name  Le nom/identifiant du resultat.
-     * @param uom   L'unité de mesure.
-     * @param value La valeur mesurée.
+     * Créé une nouvelle Liste de valeur textuelle ou scalaire.
      */
-    public MeasureEntry(final String name,
-                        final String uom,
-                        final float value)
-    {
-        super(name);
-        this.uom   = uom;
-        this.value = value;        
-    }
-    
-    /**
-     * {@inheritDoc}
-     *
-     * @todo Implementer le retour des unites.
-     */
-    public String getUom() {
-        return null;
+    public SimpleDataRecordEntry(final String definition, final boolean fixed,
+            final List<Object> fields) {
+        super(null);
+        this.definition = definition;
+        this.fixed      = fixed;
+        this.fields = fields;
     }
 
     /**
      * {@inheritDoc}
      */
-    public float getValue() {
-        return value;
+    public List<Object> getFields() {
+        return fields;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getDefinition() {
+        return definition;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isFixed() {
+        return fixed;
     }
     
 }

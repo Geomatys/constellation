@@ -54,13 +54,20 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     /**
      * Crée une nouvelle mesure.
      *
-     * @param station     La station d'observation (par exemple une position de pêche).
-     * @param observable  Ce que l'on observe (température, quantité pêchée, <cite>etc.</cite>).
-     * @param value       La valeur mesurée.
-     * @param error       Estimation de l'erreur sur la valeur mesurée, ou {@link Float#NaN NaN}
-     *                    si l'erreur est inconnue ou ne s'applique pas.
+     * @param station           La station d'observation (par exemple une position de pêche).
+     * @param observedProperty  Ce que l'on observe (température, quantité pêchée, <cite>etc.</cite>).
+     * @param process           La procedure effectuée sur cette operation.
+     * @param distribution
+     * @param quality
+     * @param result            Le resultat de l'observation, ici une measure.
+     * @param samplingTime
+     * @param observationMetadata
+     * @param resultDefinition
+     * @param procedureTime
+     * @param procedureParameter
      */
-    public MeasurementEntry(final String definition,
+    public MeasurementEntry(final String name,
+            final String definition,
             final SamplingFeature station,
             final Phenomenon      observedProperty,
             final Process         procedure,
@@ -72,8 +79,33 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final String          resultDefinition,
             final TemporalObject  procedureTime,
             final Object          procedureParameter) {
-        super(definition, station, observedProperty, procedure, distribution, quality, result,
+        super(name, definition, station, observedProperty, procedure, distribution, quality, result,
                 samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
+    }
+    
+    /**
+     * Crée une nouvelle mesure  reduite adapté a BRGM.
+     *
+     * @param station     La station d'observation (par exemple une position de pêche).
+     * @param observable  Ce que l'on observe (température, quantité pêchée, <cite>etc.</cite>).
+     * @param value       La valeur mesurée.
+     * @param error       Estimation de l'erreur sur la valeur mesurée, ou {@link Float#NaN NaN}
+     *                    si l'erreur est inconnue ou ne s'applique pas.
+     */
+    public MeasurementEntry(final String name,
+            final String definition,
+            final SamplingFeature station,
+            final Phenomenon      observedProperty,
+            final Process         procedure,
+            final Distribution    distribution,
+          //final Element         quality,
+            final Measure         result,
+            final TemporalObject  samplingTime,
+            final String          resultDefinition) {
+        super(name, definition, station, observedProperty, procedure, distribution, result,
+                samplingTime, resultDefinition);
+        
+        
     }
     
     /**

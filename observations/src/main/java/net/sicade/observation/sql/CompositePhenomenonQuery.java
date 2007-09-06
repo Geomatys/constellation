@@ -1,6 +1,6 @@
 /*
- * Sicade - SystËmes intÈgrÈs de connaissances pour l'aide ‡ la d?cision en environnement
- * (C) 2005, Institut de Recherche pour le DÈveloppement
+ * Sicade - Syst√®mes int√©gr√©s de connaissances pour l'aide √† la d√©cision en environnement
+ * (C) 2005, Institut de Recherche pour le D√©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public

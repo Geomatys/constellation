@@ -15,6 +15,7 @@
 
 package net.sicade.observation;
 
+import java.util.List;
 import org.opengis.annotation.UML;
 import static org.opengis.annotation.Specification.*;
 import static org.opengis.annotation.Obligation.*;
@@ -22,6 +23,7 @@ import static org.opengis.annotation.Obligation.*;
 /**
  * Schema allowing definition of structure and encoding of sensor data.
  * 
+ * @version $Id:
  * @author legal
  */
 @UML(identifier="DataBlockDefinition", specification=UNSPECIFIED)
@@ -31,9 +33,9 @@ public interface DataBlockDefinition {
     String getId();
     
     @UML(identifier="components", obligation=MANDATORY, specification=UNSPECIFIED)
-    AbstractDataComponent getComponents();
+    List<AbstractDataComponent> getComponents();
     
-    AbstractEncoding getencoding();
+    AbstractEncoding getEncoding();
     
     
     

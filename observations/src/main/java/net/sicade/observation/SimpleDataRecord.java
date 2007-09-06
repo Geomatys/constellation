@@ -24,6 +24,7 @@ import static org.opengis.annotation.Obligation.*;
  * Implementation of ISO-11404 Record datatype that takes only simple scalars (i.e. no data aggregates).
  * SimpleDataRecord is a data-type so usually appears "by value" rather than by reference.
  *
+ * @version $Id:
  * @author legal
  */
 @UML(identifier="SimpleDataRecord", specification=UNSPECIFIED)

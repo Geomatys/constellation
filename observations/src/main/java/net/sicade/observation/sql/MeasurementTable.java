@@ -16,8 +16,10 @@ package net.sicade.observation.sql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.observation.MeasurementEntry;
+import net.sicade.observation.TemporalObjectEntry;
 import org.opengis.observation.Measurement;
 
 /**
@@ -34,6 +36,10 @@ import org.opengis.observation.Measurement;
 @Deprecated
 public class MeasurementTable extends ObservationTable<Measurement> {
     
+    /**
+     * Connexion vers la table des {@linkplain Measure measure}.
+     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     */
     protected MeasureTable measures;
     
     /**
@@ -47,20 +53,21 @@ public class MeasurementTable extends ObservationTable<Measurement> {
     /**
      * Construit une mesure pour l'enregistrement courant
      */
-    protected Measurement createEntry(final ResultSet result) throws SQLException {
+    protected Measurement createEntry(final ResultSet result) throws SQLException, CatalogException {
         
                  final MeasurementQuery query = (MeasurementQuery) super.query;
                 
                 return new MeasurementEntry(result.getString(indexOf(query.name   )),
                                             result.getString(indexOf(query.description)),
-                                            result.getString(indexOf(query.featureOfInterest)),
+                                            stations.getEntry(result.getString(indexOf(query.featureOfInterest))),
                                             phenomenons.getEntry(result.getString(indexOf(query.observedProperty))), 
                                             procedures.getEntry(result.getString(indexOf(query.procedure))),
                                             distributions.getEntry(result.getString(indexOf(query.distribution))),
                                             //manque quality
-                                            //manque result
-                                            result.getDate(indexOf(query.samplingTime)),
-                                            result.getString(indexOf(query.resultDefinition)));;
+                                            measures.getEntry(result.getString(indexOf(query.result))),
+                                            new TemporalObjectEntry(result.getDate(indexOf(query.samplingTimeBegin)),
+                                                                    result.getDate(indexOf(query.samplingTimeEnd))),
+                                            result.getString(indexOf(query.resultDefinition)));
     }
     
 }
