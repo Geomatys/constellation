@@ -16,6 +16,7 @@
 package net.sicade.observation;
 
 import net.sicade.catalog.Entry;
+import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.observation.Measure;
 import org.opengis.observation.sampling.SurveyProcedure;
@@ -127,7 +128,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     }
     
     /**
-     * Vérifie que cette station est identique à l'objet spécifié
+     * Vérifie que cette procedure est identique à l'objet spécifié
      */
     @Override
     public boolean equals(final Object object) {
@@ -136,11 +137,15 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
         }
         if (super.equals(object)) {
             final SurveyProcedureEntry that = (SurveyProcedureEntry) object;
-            return Utilities.equals(this.id,         that.id) &&
-                   Utilities.equals(this.blockId,    that.blockId)   &&
-                   Utilities.equals(this.definition, that.definition)   && 
-                   Utilities.equals(this.fields,     that.fields) &&
-                   Utilities.equals(this.fixed,      that.fixed);
+            return Utilities.equals(this.name,              that.name) &&
+                   Utilities.equals(this.operator,          that.operator)   &&
+                   Utilities.equals(this.elevationDatum,    that.elevationDatum)   && 
+                   Utilities.equals(this.elevationMethod,   that.elevationMethod) &&
+                   Utilities.equals(this.elevationAccuracy, that.elevationAccuracy) &&
+                   Utilities.equals(this.positionAccuracy,  that.positionAccuracy) &&
+                   Utilities.equals(this.positionMethod,    that.positionMethod) &&
+                   Utilities.equals(this.projection,        that.projection) &&
+                   Utilities.equals(this.surveyTime,        that.surveyTime);
         }
         return false;
     }

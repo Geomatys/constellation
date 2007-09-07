@@ -122,14 +122,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         return result;
     }
     
-    /**
-     * Retourne un code représentant cette mesure.
-     */
-    @Override
-    public final int hashCode() {
-        return featureOfInterest.hashCode() ^ observedProperty.hashCode() ^ result.hashCode();
-    }
-    
+       
     
     /**
      * Vérifie si cette entré est identique à l'objet spécifié.

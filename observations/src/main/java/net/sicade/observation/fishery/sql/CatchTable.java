@@ -21,7 +21,7 @@ package net.sicade.observation.fishery.sql;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.observation.fishery.Catch;
-import net.sicade.observation.sql.MeasurementTable;
+import net.sicade.observation.MeasurementTable;
 
 
 /**

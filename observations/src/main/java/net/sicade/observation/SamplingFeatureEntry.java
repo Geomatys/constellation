@@ -20,7 +20,7 @@ import java.util.List;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import net.sicade.catalog.Entry;
-import net.sicade.observation.sql.ObservationTable;
+import net.sicade.observation.ObservationTable;
 
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;

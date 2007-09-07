@@ -23,7 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.ServerException;
 import net.sicade.coverage.catalog.*;
-import net.sicade.observation.sql.MeasurementTable;
+import net.sicade.observation.MeasurementTable;
 
 
 /**

@@ -21,8 +21,8 @@ package net.sicade.observation.fishery.sql;
 // Sicade dependencies
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
-import net.sicade.observation.sql.SamplingFeatureTable;
-import net.sicade.observation.sql.MeasurementTable;
+import net.sicade.observation.SamplingFeatureTable;
+import net.sicade.observation.MeasurementTable;
 
 
 /**

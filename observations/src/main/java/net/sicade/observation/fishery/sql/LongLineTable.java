@@ -32,7 +32,7 @@ import org.opengis.observation.sampling.SamplingFeatureCollection;
 import net.sicade.util.DateRange;
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
-import net.sicade.observation.sql.SamplingFeatureTable;
+import net.sicade.observation.SamplingFeatureTable;
 
 
 

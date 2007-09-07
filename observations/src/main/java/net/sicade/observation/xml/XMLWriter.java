@@ -22,10 +22,12 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Set;
 import net.sicade.catalog.CatalogException;
+import net.sicade.swe.BaseUnit;
 import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.SamplingPointEntry;
-import net.sicade.observation.sql.PhenomenonTable;
-import net.sicade.observation.sql.SamplingPointTable;
+import net.sicade.observation.PhenomenonTable;
+import net.sicade.observation.SamplingPointTable;
+import net.sicade.swe.UnitOfMeasureTable;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingPoint;
 
@@ -126,21 +128,21 @@ public class XMLWriter {
     /**
      * Ecris le fichier dictionnaire des unites de mesure.
      */
-    public void WriteUOMDictionary(String urlFile, UnitOfMeasureTable units){
-        Set<Phenomenon> list = phenomenons.getEntries();
+    public void WriteUOMDictionary(String urlFile, UnitOfMeasureTable units) throws CatalogException, SQLException, IOException{
+        Set<BaseUnit> list = units.getEntries();
         String codeSpace = "urn:x-ogc:tc:arch:doc-rp(05-010)";
         
         write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n', urlFile);
         write("<gml:Dictionnary xmlns:gml=\"http://www.opengis.net/gml\" xmlns:swe=\"http://www.opengis.net/swe/1.0\" " +
                 "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"   xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.opengis.net/swe/1.0 ./sweCommon/1.0.0/swe.xsd\" " +
                 "gml:id=\"phenomene_swe\">" + '\n', urlFile);
-        write( '\t' + "<gml:description>description des phénomène</gml:description>" + '\n', urlFile);
-        write( '\t' +"<gml:name>Liste des phénomène</gml:name>" + '\n', urlFile);
+        write( '\t' + "<gml:description>description des unités de mesure</gml:description>" + '\n', urlFile);
+        write( '\t' +"<gml:name>Liste des unité de mesure</gml:name>" + '\n', urlFile);
         
         String decalage = '\t' + "";
         Iterator i = list.iterator();
         while(i.hasNext()){
-            PhenomenonEntry p = (PhenomenonEntry)i.next();
+            UnitOfMeasureEntry p = (UnitOfMeasureEntry)i.next();
             write(decalage + "<gml:dictionaryEntry>" + '\n', urlFile);
             decalage += '\t';
             write(decalage + "<swe:Phenomenon gml:id=\"" + p.getId() + "\">" + '\n', urlFile);

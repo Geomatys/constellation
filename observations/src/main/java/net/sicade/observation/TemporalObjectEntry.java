@@ -3,6 +3,7 @@ package net.sicade.observation;
 
 import java.sql.Date;
 import net.sicade.catalog.Entry;
+import org.geotools.resources.Utilities;
 import org.opengis.temporal.TemporalObject;
 
 /**
@@ -43,6 +44,25 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
     public Date getEndTime() {
         return endTime;
     }
+    
+   
+    
+    /**
+     * Vérifie que cette station est identique à l'objet spécifié
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final TemporalObjectEntry that = (TemporalObjectEntry) object;
+            return Utilities.equals(this.beginTime, that.beginTime) &&
+                   Utilities.equals(this.endTime,   that.endTime);
+        }
+        return false;
+    }
+    
 
    
     

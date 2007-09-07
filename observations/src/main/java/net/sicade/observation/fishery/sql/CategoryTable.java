@@ -28,7 +28,7 @@ import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.catalog.CatalogException;
 import net.sicade.observation.fishery.Category;
-import net.sicade.observation.sql.SamplingFeatureTable;
+import net.sicade.observation.SamplingFeatureTable;
 
 
 /**

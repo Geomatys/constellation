@@ -15,6 +15,7 @@
 package net.sicade.observation;
 
 import java.util.List;
+import net.sicade.swe.Point;
 import org.geotools.resources.Utilities;
 import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeatureRelation;
