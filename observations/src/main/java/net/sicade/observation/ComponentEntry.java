@@ -12,27 +12,36 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.swe;
+package net.sicade.observation;
 
-import java.util.Collection;
-import org.opengis.annotation.UML;
-import static org.opengis.annotation.Specification.*;
-import static org.opengis.annotation.Obligation.*;
-
+import net.sicade.catalog.Entry;
+import org.opengis.observation.Phenomenon;
 
 /**
- * Implementation of ISO-11404 Record datatype that takes only simple scalars (i.e. no data aggregates).
- * SimpleDataRecord is a data-type so usually appears "by value" rather than by reference.
+ * Une liste de phénomèmene pour un phenoméne composé.
  *
  * @version $Id:
- * @author legal
+ * @author Guilhem Legal
  */
-@UML(identifier="SimpleDataRecord", specification=UNSPECIFIED)
-public interface SimpleDataRecord extends AbstractDataRecord {
+public class ComponentEntry extends Entry {
     
     /**
-     * this field is restricted to AnyScalar value.
+     * L'identifiant du phénomène composé.
      */
-    Collection<DataRecordFieldEntry> getFields();
+    private String idCompositePhenomenon;
+    
+    /**
+     * 
+     */
+    private Phenomenon component;
+    
+    /**
+     * Crée une nouvelle liste de phénomene. 
+     */
+    public ComponentEntry(String idCompositePhenomenon, Phenomenon component) {
+        super(idCompositePhenomenon);
+        this.idCompositePhenomenon = idCompositePhenomenon;
+        this.component             = component;
+    }
     
 }

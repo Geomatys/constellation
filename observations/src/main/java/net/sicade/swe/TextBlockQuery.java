@@ -45,7 +45,7 @@ public class TextBlockQuery extends Query{
      */
     public TextBlockQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT, LIST};
+        final QueryType[] usage = {SELECT};
         id               = addColumn("text_block_encodings", "id",                usage);
         tokenSeparator   = addColumn("text_block_encodings", "token_separator",   usage);
         blockSeparator   = addColumn("text_block_encodings", "block_separator",   usage);

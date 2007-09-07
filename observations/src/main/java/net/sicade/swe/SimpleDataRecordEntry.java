@@ -12,11 +12,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation;
+package net.sicade.swe;
 
+import java.util.Collection;
 import java.util.List;
 import net.sicade.catalog.Entry;
-import net.sicade.swe.SimpleDataRecord;
 import org.geotools.resources.Utilities;
 
 /**
@@ -47,12 +47,12 @@ public class SimpleDataRecordEntry extends Entry implements SimpleDataRecord {
     /**
      * List de valeur textuelle ou scalaire.
      */
-    private List<Object> fields;
+    private Collection<DataRecordFieldEntry> fields;
     /** 
      * Créé une nouvelle Liste de valeur textuelle ou scalaire.
      */
     public SimpleDataRecordEntry(final String blockId, final String id, final String definition, final boolean fixed,
-            final List<Object> fields) {
+            final Collection<DataRecordFieldEntry> fields) {
         super(id);
         this.id = id;
         this.blockId = blockId;
@@ -64,7 +64,7 @@ public class SimpleDataRecordEntry extends Entry implements SimpleDataRecord {
     /**
      * {@inheritDoc}
      */
-    public List<Object> getFields() {
+    public Collection<DataRecordFieldEntry> getFields() {
         return fields;
     }
 

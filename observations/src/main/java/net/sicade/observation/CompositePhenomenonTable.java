@@ -19,11 +19,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.observation.sql.*;
 import org.opengis.observation.CompositePhenomenon;
+import org.opengis.observation.Phenomenon;
 
 /**
- * Connexion vers la table des {@linkplain CompositePhenomenon ph�nom�nes compos�}.
+ * Connexion vers la table des {@linkplain CompositePhenomenon phénoménes composé}.
  *
  * @version $Id:
  * @author Guilhem Legal
@@ -36,25 +36,54 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
      */
     protected PhenomenonTable phenomenons;
     
+    /**
+     * Connexion vers la table des {@linkplain ComponentTable composants}.
+     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     */
+    protected ComponentTable components;
+    
+    
    /**
-     * Construit une table des ph�nom�nes compos�.
+     * Construit une table des phénoménes composé.
      * 
-     * @param  database Connexion vers la base de donn�es.
+     * @param  database Connexion vers la base de données.
      */
     public CompositePhenomenonTable(final Database database) {
         super(new CompositePhenomenonQuery(database));
     }
     
     /**
-     * Construit un ph�nom�ne pour l'enregistrement courant.
+     * Initialise l'identifiant de la table.
+     */
+    private CompositePhenomenonTable(final CompositePhenomenonQuery query) {
+        super(query);
+        setIdentifierParameters(query.byIdentifier, null);
+    }
+    
+    /**
+     * Construit un phénoméne pour l'enregistrement courant.
      */
     protected CompositePhenomenon createEntry(final ResultSet results) throws SQLException {
         final CompositePhenomenonQuery query = (CompositePhenomenonQuery) super.query;
+        
+        String idCompositePhenomenon = results.getString(indexOf(query.identifier));
+        
+        if (phenomenons == null) {
+            phenomenons = getDatabase().getTable(PhenomenonTable.class);
+        }
+        Phenomenon base = phenomenons.getEntry(results.getString(indexOf(query.base)));
+        
+        if (components == null) {
+            components =  getDatabase().getTable(ComponentTable.class);
+        }
+        components.setIdCompositePhenomenons(idCompositePhenomenon);
+        Collection<Phenomenon> entries = components.getEntries();
+                
         return new CompositePhenomenonEntry(results.getString(indexOf(query.name   )),
                                    results.getString(indexOf(query.remarks)),
-                                   results.getString(indexOf(query.identifier)),
-                                   phenomenons.getEntry(results.getString(indexOf(query.base))),
-                                   phenomenons.getEntries(results.getString(indexOf(query.component))));
+                                   idCompositePhenomenon,
+                                   base,
+                                   entries);
     }
     
 }

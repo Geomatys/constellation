@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.observation.sql;
+package net.sicade.observation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,7 +36,6 @@ import org.opengis.observation.Phenomenon;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-@Deprecated
 public class PhenomenonTable extends SingletonTable<Phenomenon> {
    
     /**
@@ -47,13 +46,21 @@ public class PhenomenonTable extends SingletonTable<Phenomenon> {
     public PhenomenonTable(final Database database) {
         super(new PhenomenonQuery(database));
     }
+    
+    /**
+     * Initialise l'identifiant de la table.
+     */
+    private PhenomenonTable(final PhenomenonQuery query) {
+        super(query);
+        setIdentifierParameters(query.byIdentifier, null);
+    }
 
     /**
      * Construit un phénomène pour l'enregistrement courant.
      */
     protected Phenomenon createEntry(final ResultSet results) throws SQLException {
         final PhenomenonQuery query = (PhenomenonQuery) super.query;
-        return new PhenomenonEntry(results.getString(indexOf(query.name   )),
+        return new PhenomenonEntry(results.getString(indexOf(query.name)),
                                    results.getString(indexOf(query.remarks)),
                                    results.getString(indexOf(query.identifier)));
     }

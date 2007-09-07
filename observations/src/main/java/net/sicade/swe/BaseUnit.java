@@ -35,7 +35,7 @@ public interface BaseUnit {
     /**
      * The quantity type.
      */
-    String quantityType();
+    String getQuantityType();
     
     /**
      * The system defining this unit f measure.

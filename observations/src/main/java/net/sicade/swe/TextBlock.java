@@ -18,7 +18,7 @@ package net.sicade.swe;
 import net.sicade.observation.*;
 
 /**
- *TextBlock.java
+ * Textual encoding of data.
  *
  * @author Guilhem Legal
  */
@@ -37,6 +37,6 @@ public interface TextBlock extends AbstractEncoding {
     /**
      * One character to use as a decimal separator
      */
-     char getDecimalSeparator();
+    char getDecimalSeparator();
     
 }

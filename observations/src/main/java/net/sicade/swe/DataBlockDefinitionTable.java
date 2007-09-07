@@ -17,9 +17,9 @@ package net.sicade.swe;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.observation.sql.*;
 
 /**
  * Connexion vers la table des {@linkplain DataBlockDefinition dataBlockDefintion}.
@@ -48,19 +48,37 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
      * @param  database Connexion vers la base de données.
      */
     public DataBlockDefinitionTable(final Database database) {
-           super(new DataBlockDefinitionQuery(database)); 
+          this(new DataBlockDefinitionQuery(database)); 
     }
     
-    
+    /**
+     * Initialise l'identifiant de la table.
+     */
+    private DataBlockDefinitionTable(final DataBlockDefinitionQuery query) {
+        super(query);
+        setIdentifierParameters(query.byId, null);
+    }
 
     /**
      * Construit un data block pour l'enregistrement courant.
      */
     protected DataBlockDefinition createEntry(final ResultSet results) throws SQLException {
         final DataBlockDefinitionQuery query = (DataBlockDefinitionQuery) super.query;
-        return new DataBlockDefinitionEntry(results.getString(indexOf(query.id   )),
-                                            dataRecords.getEntries(results.getString(indexOf(query.id ))),
-                                            textBlockEncodings.getEntry(results.getString(indexOf(query.encoding))));
+        String idDataBlock = results.getString(indexOf(query.id));
+        
+        if (dataRecords == null) {
+            dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
+        }
+        dataRecords.setIdDataBlock(idDataBlock);
+        Collection<SimpleDataRecord> entries = dataRecords.getEntries();
+        
+        if (textBlockEncodings == null) {
+            textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
+        }
+        
+        TextBlock encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
+        
+        return new DataBlockDefinitionEntry(idDataBlock, entries, encoding);
     }
     
 }

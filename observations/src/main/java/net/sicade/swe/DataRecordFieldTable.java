@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.observation.DataRecordFieldQuery;
+import net.sicade.swe.DataRecordFieldQuery;
 import org.geotools.resources.Utilities;
 
 /**

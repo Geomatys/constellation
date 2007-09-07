@@ -14,6 +14,7 @@
  */
 package net.sicade.swe;
 
+import java.util.Collection;
 import java.util.List;
 import net.sicade.catalog.Entry;
 import org.geotools.resources.Utilities;
@@ -34,7 +35,7 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
     /**
      * Liste de composant Data record.
      */
-     private List<AbstractDataComponent> components;
+     private Collection<AbstractDataComponent> components;
      
     /**
      * Decrit l'encodage des données.
@@ -50,7 +51,7 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
      * @param components liste de composant data record.
      * @param encoding encodage des données.
      */
-    public DataBlockDefinitionEntry(final String id, final List<AbstractDataComponent> components,
+    public DataBlockDefinitionEntry(final String id, final Collection<AbstractDataComponent> components,
             final AbstractEncoding encoding) {
         super(null);
         this.id         = id;
@@ -68,7 +69,7 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
     /**
      * {@inheritDoc}
      */
-    public List<AbstractDataComponent> getComponents() {
+    public Collection<AbstractDataComponent> getComponents() {
         return components;
     }
 

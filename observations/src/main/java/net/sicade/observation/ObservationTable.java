@@ -24,7 +24,6 @@ import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Table;
 import net.sicade.coverage.model.DistributionTable;
-import net.sicade.observation.sql.*;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
 

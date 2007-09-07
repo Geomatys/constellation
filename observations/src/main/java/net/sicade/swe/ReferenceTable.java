@@ -19,39 +19,38 @@ import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.TextBlockEntry;
+import net.sicade.swe.ReferenceQuery;
 
 /**
- *  Connexion vers la table des {@linkplain TextBlock textBlock}.
  *
  * @version $Id:
  * @author Guilhem Legal
  */
-public class TextBlockTable extends SingletonTable<TextBlock>{
+public class ReferenceTable extends SingletonTable<Reference>{
     
     /**
-     * Construit une table des text Block encodage.
+     * Construit une table des reference.
      *
      * @param  database Connexion vers la base de données.
      */
-    public TextBlockTable(final Database database) {
-           this(new TextBlockQuery(database)); 
+    public ReferenceTable(final Database database) {
+        this(new ReferenceQuery(database));
     }
-    
+
     /**
      * Initialise l'identifiant de la table.
      */
-    private TextBlockTable(final TextBlockQuery query) {
+    private ReferenceTable(final ReferenceQuery query) {
         super(query);
-        setIdentifierParameters(query.byId, null);
+        setIdentifierParameters(query.byIdReference, null);
     }
 
-    protected TextBlock createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final TextBlockQuery query = (TextBlockQuery) super.query;
-        return new TextBlockEntry(results.getString(indexOf(query.id )),
-                                  results.getString(indexOf(query.tokenSeparator )),
-                                  results.getString(indexOf(query.blockSeparator )),
-                                  results.getString(indexOf(query.decimalSeparator)).charAt(0));
+    /**
+     * Construit une reference pour l'enregistrement courant.
+     */
+    protected Reference createEntry(final ResultSet results) throws CatalogException, SQLException {
+         final ReferenceQuery query = (ReferenceQuery) super.query;
+         return new ReferenceEntry(results.getString(indexOf(query.idReference)));
     }
     
 }

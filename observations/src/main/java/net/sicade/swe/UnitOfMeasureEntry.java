@@ -64,7 +64,7 @@ public class UnitOfMeasureEntry extends Entry implements BaseUnit {
     /**
      * retourne le type de l'unité de mesure.
      */
-    public String quantityType() {
+    public String getQuantityType() {
         return quantityType;
     }
     

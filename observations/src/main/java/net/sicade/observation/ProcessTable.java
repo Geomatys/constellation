@@ -41,7 +41,15 @@ public class ProcessTable extends SingletonTable<Process> {
      * @param  database Connexion vers la base de données.
      */
     public ProcessTable(final Database database) {
-        super(new ProcessQuery(database)); 
+        this(new ProcessQuery(database)); 
+    }
+    
+    /**
+     * Initialise l'identifiant de la table.
+     */
+    private ProcessTable(final ProcessQuery query) {
+        super(query);
+        setIdentifierParameters(query.byName, null);
     }
 
     /**

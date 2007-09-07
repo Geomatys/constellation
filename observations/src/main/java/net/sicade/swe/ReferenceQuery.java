@@ -12,45 +12,43 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-package net.sicade.observation;
+package net.sicade.swe;
 
 import net.sicade.catalog.Column;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Parameter;
 import net.sicade.catalog.Query;
-import net.sicade.catalog.QueryType;
 import static net.sicade.catalog.QueryType.*;
+import net.sicade.catalog.QueryType;
 
 /**
- * The query to execute for a {@link ProcessTable}.
  *
+ * @version $Id:
  * @author Guilhem Legal
  */
-public class ProcessQuery extends Query{
+public class ReferenceQuery extends Query {
     
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, remarks;
+    protected final Column idReference;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName;
+    protected final Parameter byIdReference;
     
     /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
-    public ProcessQuery(final Database database) {
+    public ReferenceQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT};
-        name    = addColumn   ("Process", "name",        usage);
-        remarks = addColumn   ("Process", "description", usage);
-
-        byName  = addParameter(name, SELECT);
+        idReference = addColumn("reference", "id_reference", usage);
+        
+        byIdReference          = addParameter(idReference, SELECT);
     }
     
 }

@@ -15,12 +15,12 @@
 package net.sicade.observation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
 import net.sicade.catalog.Entry;
-import net.sicade.observation.ObservationTable;
 
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;
@@ -59,17 +59,17 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * 
      */
-    private List<SamplingFeatureRelation> relatedSamplingFeature;
+    private Collection<SamplingFeatureRelation> relatedSamplingFeature;
     
     /**
      * Les Observations
      */
-    private List<Observation> relatedObservation;
+    private Collection<Observation> relatedObservation;
     
     /**
      * Les features designé
      */
-    private List<Object> sampledFeature; 
+    private Collection<Object> sampledFeature; 
     
     /**
      * Connexion vers la table des "survey details"
@@ -146,7 +146,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * {@inheritDoc}
      */
-    public synchronized List<SamplingFeatureRelation> getRelatedSamplingFeatures() {
+    public synchronized Collection<SamplingFeatureRelation> getRelatedSamplingFeatures() {
     
         return relatedSamplingFeature;
     }
@@ -155,7 +155,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * {@inheritDoc}
      */
-    public synchronized List<Observation> getRelatedObservations() {
+    public synchronized Collection<Observation> getRelatedObservations() {
        
         return relatedObservation;
     }
@@ -163,7 +163,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      /**
      * {@inheritDoc}
      */
-    public synchronized List<Object> getSampledFeatures() {
+    public synchronized Collection<Object> getSampledFeatures() {
         
         return sampledFeature;
     }
@@ -191,7 +191,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         }
         if (super.equals(object)) {
             final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
-            return                 (this.identifier       ==     that.identifier) &&
+            return Utilities.equals(this.identifier,             that.identifier) &&
                    Utilities.equals(this.surveyDetail,           that.surveyDetail)   &&
                    Utilities.equals(this.description,            that.description)   && 
                    Utilities.equals(this.relatedObservation,     that.relatedObservation) &&

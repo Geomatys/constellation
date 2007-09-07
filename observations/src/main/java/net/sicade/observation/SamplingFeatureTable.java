@@ -37,14 +37,6 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
    
        
     /**
-     * Connexion vers la table des observations.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
-     */
-    private ObservationTable<? extends Observation> observations;
-
-     
-
-    /**
      * {@code true} si l'on autorise cette classe à construire des objets {@link StationEntry}
      * qui contiennent moins d'informations, afin de réduire le nombre de requêtes SQL. Utile
      * si l'on souhaite obtenir une {@linkplain #getEntries liste de nombreuses stations}.
@@ -57,37 +49,13 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
     public SamplingFeatureTable(final Database database) {
         super(new SamplingFeatureQuery(database));
     }
-
-   
+    
     /**
-     * Définie la table des observations à utiliser. Cette méthode peut être appelée par
-     * {@link ObservationTable} avant toute première utilisation de {@code StationTable}.
-     *
-     * @param  platforms Table des observations à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des observations.
+     * Initialise l'identifiant de la table.
      */
-    protected synchronized void setObservationTable(final ObservationTable<? extends Observation> observations)
-            throws IllegalStateException
-    {
-        if (this.observations != observations) {
-            if (this.observations != null) {
-                throw new IllegalStateException();
-            }
-            this.observations = observations; // Doit être avant tout appel de setTable(this).
-            observations.setStationTable(this);
-        }
-    }
-
-   
-    /**
-     * Retourne la table des observations à utiliser pour la création des objets {@link StationEntry}.
-     */
-    public ObservationTable<? extends Observation> getObservationTable() {
-        assert Thread.holdsLock(this);
-        if (observations == null) {
-            setObservationTable(getDatabase().getTable(MeasurementTable.class));
-        }
-        return observations;
+    private SamplingFeatureTable(final SamplingFeatureQuery query) {
+        super(query);
+        setIdentifierParameters(query.byIdentifier, null);
     }
    
     /**
@@ -118,24 +86,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
         }
     }
 
-    /**
-     * Configure la requête SQL spécifiée en fonction de la {@linkplain #getPlatform plateforme
-     * courante} de cette table. Cette méthode est appelée automatiquement lorsque cette table a
-     * {@linkplain #fireStateChanged changé d'état}.
-     
-    @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
-        super.configure(type, statement);
-        switch (type) {
-            case LIST: {
-                final String name = (platform != null) ? platform.getName() : null;
-                statement.setString(ARGUMENT_PLATFORM, name);
-                break;
-            }
-        }
-    }
-    */
-    
+      
     /**
      * Construit une station pour l'enregistrement courant. L'implémentation par défaut extrait une
      * première série d'informations telles que le {@linkplain Station#getName nom de la station},

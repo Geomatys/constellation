@@ -18,7 +18,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
-import net.sicade.observation.sql.*;
 import org.opengis.observation.Measurement;
 
 /**

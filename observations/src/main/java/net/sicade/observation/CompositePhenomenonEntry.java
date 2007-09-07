@@ -15,6 +15,7 @@
 
 package net.sicade.observation;
 
+import java.util.Collection;
 import java.util.List;
 import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
@@ -43,13 +44,13 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Les composants.
      */
-    private List<Phenomenon> component;
+    private Collection<Phenomenon> component;
    
     /** 
      * Crée un nouveau phenomene composé
      */
     public CompositePhenomenonEntry(final String id, final String name, final String description
-            ,final Phenomenon base, final List<Phenomenon> component) {
+            ,final Phenomenon base, final Collection<Phenomenon> component) {
         super(id, name, description);
         this.base = base;
         this.component = component;
@@ -74,7 +75,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Retourne les composants.
      */
-    public List<Phenomenon> getComponent() {
+    public Collection<Phenomenon> getComponent() {
         return component;
     }
 

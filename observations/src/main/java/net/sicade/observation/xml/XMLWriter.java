@@ -27,6 +27,7 @@ import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.SamplingPointEntry;
 import net.sicade.observation.PhenomenonTable;
 import net.sicade.observation.SamplingPointTable;
+import net.sicade.swe.UnitOfMeasureEntry;
 import net.sicade.swe.UnitOfMeasureTable;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingPoint;
@@ -103,7 +104,7 @@ public class XMLWriter {
             decalage += '\t';
             write(decalage + "<gml:description>\"" + sp.getDescription() + "</gml:description>" + '\n', urlFile);
             write(decalage + "<gml:name codeSpace=\"" + codeSpace + "\">" + sp.getName() + "</gml:name>" + '\n', urlFile);
-            write(decalage + "<gml:sampledFeature xlink:href=\"" + sp.getSampledFeatures().get(0) + "\"/>" + '\n', urlFile);
+            write(decalage + "<gml:sampledFeature xlink:href=\"" + sp.getSampledFeatures().iterator().next() + "\"/>" + '\n', urlFile);
             write(decalage + "<sa:position>" + '\n', urlFile);
             decalage += '\t';
             write(decalage + "<gml:Point gml:id=\"" + sp.getPosition().getId() + "\">" + '\n', urlFile);
@@ -142,15 +143,16 @@ public class XMLWriter {
         String decalage = '\t' + "";
         Iterator i = list.iterator();
         while(i.hasNext()){
-            UnitOfMeasureEntry p = (UnitOfMeasureEntry)i.next();
+            UnitOfMeasureEntry uom = (UnitOfMeasureEntry)i.next();
             write(decalage + "<gml:dictionaryEntry>" + '\n', urlFile);
             decalage += '\t';
-            write(decalage + "<swe:Phenomenon gml:id=\"" + p.getId() + "\">" + '\n', urlFile);
+            write(decalage + "<gml:BaseUnit gml:id=\"" + uom.getId() + "\">" + '\n', urlFile);
             decalage += '\t';
-            write(decalage + "<gml:description>\"" + p.getDescription() + "</gml:description>" + '\n', urlFile);
-            write(decalage + "<gml:name codeSpace=\"" + codeSpace + "\">" + p.getName() + "</gml:name>" + '\n', urlFile);
+            write(decalage + "<gml:name codeSpace=\"" + codeSpace + "\">" + uom.getName() + "</gml:name>" + '\n', urlFile);
+            write(decalage + "<gml:quantityType\">" + uom.getQuantityType() + "</gml:quantity>" + '\n', urlFile);
+            write(decalage + "<gml:unitsSystem\">" + uom.getUnitsSystem() + "</gml:unitsSystem>" + '\n', urlFile);
             decalage = decalage.substring(0, decalage.length()-1);
-            write(decalage + "</swe:Phenomenon>" + '\n', urlFile);
+            write(decalage + "</gml:BaseUnit>" + '\n', urlFile);
             decalage = decalage.substring(0, decalage.length()-1);
             write(decalage + "</gml:dictionaryEntry>" + '\n', urlFile);
         }

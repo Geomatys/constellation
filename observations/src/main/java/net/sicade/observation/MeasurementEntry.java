@@ -18,7 +18,6 @@ import javax.units.Unit;
 
 // Sicade dependencies
 import net.sicade.coverage.model.Distribution;
-import net.sicade.observation.sql.*;
 
 
 // openGis dependencies

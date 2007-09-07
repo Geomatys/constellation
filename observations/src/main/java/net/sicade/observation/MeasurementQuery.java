@@ -2,7 +2,6 @@
 package net.sicade.observation;
 
 import net.sicade.catalog.Database;
-import net.sicade.observation.sql.*;
 
 /**
  * The query to execute for a {@link MeasurementTable}.

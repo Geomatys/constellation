@@ -14,16 +14,16 @@
  */
 package net.sicade.swe;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
+import java.util.Collection;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.DataRecordFieldTable;
-import net.sicade.swe.SimpleDataRecordEntry;
 import static net.sicade.catalog.QueryType.*;
-import net.sicade.swe.DataRecordFieldEntry;
+import net.sicade.catalog.QueryType;
+import org.geotools.resources.Utilities;
 
 /**
  *  Connexion vers la table des {@linkplain SimpleDataRecord simpleDataRecord}.
@@ -32,6 +32,13 @@ import net.sicade.swe.DataRecordFieldEntry;
  * @author Guilhem Legal
  */
 public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecord>{
+    
+    /**
+     * identifiant secondaire de la table
+     * (identifiant du DataBlock contenant le dataRecord qui possede ce champ).
+     */
+    private String idDataBlock;
+    
     
     /**
      * Connexion vers la table des {@linkplain DataRecordField dataRecord field}.
@@ -45,7 +52,34 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecord>{
      * @param  database Connexion vers la base de données.
      */
     public SimpleDataRecordTable(final Database database) {
-        super(new SimpleDataRecordQuery(database));
+        this(new SimpleDataRecordQuery(database));
+    }
+    
+    /**
+     * Initialise l'identifiant de la table.
+     */
+    private SimpleDataRecordTable(final SimpleDataRecordQuery query) {
+        super(query);
+        setIdentifierParameters(query.byIdDataRecord, null);
+    }
+    
+    /**
+     * retourne l'identifiant du DataBlock contenant le dataRecord qui possede ce champ.
+     */
+    public String getIdDataBlock() {
+        return idDataBlock;
+    }
+    
+    /**
+     * Modifie l'identifiant du dataBlock si il est different de l'actuel.
+     *
+     * @param idDataBlock le nouvel identifiant du dataBlock.
+     */
+    public void setIdDataBlock(final String idDataBlock) {
+        if (!Utilities.equals(this.idDataBlock, idDataBlock)) {
+            this.idDataBlock = idDataBlock;
+            fireStateChanged("idDataBlock");
+        }
     }
     
     /**
@@ -62,11 +96,22 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecord>{
        
         fields.setIdDataBlock(idDataBlock);
         fields.setIdDataRecord(idDataRecord);
-        Set<DataRecordFieldEntry> entries = fields.getEntries();
+        Collection<DataRecordFieldEntry> entries = fields.getEntries();
         
         return new SimpleDataRecordEntry(idDataBlock, idDataRecord,
                 results.getString(indexOf(query.definition)),
-                results.getBoolean(indexOf(query.fixed)), entries);
+                results.getBoolean(indexOf(query.fixed)),entries);
+        
+    }
+    
+    /**
+     * Specifie les parametres a utiliser dans la requetes de type "type".
+     */
+    @Override
+    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
+        super.configure(type, statement);
+        final DataRecordFieldQuery query = (DataRecordFieldQuery) super.query;
+        statement.setString(indexOf(query.byIdDataBlock), idDataBlock);
         
     }
     

@@ -1,6 +1,6 @@
 /*
- * Sicade - Syst�mes int�gr�s de connaissances pour l'aide � la d�cision en environnement
- * (C) 2005, Institut de Recherche pour le D�veloppement
+ * Sicade - Systémes intégrés de connaissances pour l'aide é la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -33,13 +33,21 @@ public class SamplingPointTable extends SingletonTable<SamplingPoint> {
     
     /** Creates a new instance of SamplingPointTable */
     public SamplingPointTable(final Database database) {
-        super(new SamplingPointQuery(database));
+        this(new SamplingPointQuery(database));
+    }
+    
+     /**
+     * Initialise l'identifiant de la table.
+     */
+    private SamplingPointTable(final SamplingPointQuery query) {
+        super(query);
+        setIdentifierParameters(query.byIdentifier, null);
     }
     
     /**
-     * Construit une station pour l'enregistrement courant. L'impl�mentation par d�faut extrait une
-     * premi�re s�rie d'informations telles que le {@linkplain Station#getName nom de la station},
-     * {@linkplain Station#getProvider son fournisseur}, <cite>etc.</cite> et appele la m�thode
+     * Construit une station pour l'enregistrement courant. L'implémentation par défaut extrait une
+     * premiére série d'informations telles que le {@linkplain Station#getName nom de la station},
+     * {@linkplain Station#getProvider son fournisseur}, <cite>etc.</cite> et appele la méthode
      * <code>{@linkplain #createEntry(int,String,Platform,DataQuality,Citation,ResultSet)
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */

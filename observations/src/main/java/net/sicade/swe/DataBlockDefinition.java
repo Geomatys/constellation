@@ -15,8 +15,7 @@
 
 package net.sicade.swe;
 
-import java.util.List;
-import net.sicade.observation.*;
+import java.util.Collection;
 import org.opengis.annotation.UML;
 import static org.opengis.annotation.Specification.*;
 import static org.opengis.annotation.Obligation.*;
@@ -34,7 +33,7 @@ public interface DataBlockDefinition {
     String getId();
     
     @UML(identifier="components", obligation=MANDATORY, specification=UNSPECIFIED)
-    List<AbstractDataComponent> getComponents();
+    Collection<AbstractDataComponent> getComponents();
     
     AbstractEncoding getEncoding();
     

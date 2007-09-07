@@ -12,27 +12,19 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.swe;
-
-import java.util.Collection;
-import org.opengis.annotation.UML;
-import static org.opengis.annotation.Specification.*;
-import static org.opengis.annotation.Obligation.*;
-
+package net.sicade.observation;
 
 /**
- * Implementation of ISO-11404 Record datatype that takes only simple scalars (i.e. no data aggregates).
- * SimpleDataRecord is a data-type so usually appears "by value" rather than by reference.
  *
  * @version $Id:
- * @author legal
+ * @author Guilhem Legal
  */
-@UML(identifier="SimpleDataRecord", specification=UNSPECIFIED)
-public interface SimpleDataRecord extends AbstractDataRecord {
+public class ComponentQuery {
     
     /**
-     * this field is restricted to AnyScalar value.
+     *
      */
-    Collection<DataRecordFieldEntry> getFields();
+    public ComponentQuery() {
+    }
     
 }

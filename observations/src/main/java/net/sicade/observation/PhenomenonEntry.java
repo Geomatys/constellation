@@ -38,8 +38,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      * L'identifiant du phenomene.
      */
     private String id;
-    
-      
+       
     /**
      * La description du phenomene.
      */
@@ -48,6 +47,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
      * Construit un nouveau phénomène du nom spécifié.
      *
+     * @param id L'identifiant de ce phenomene.
      * @param name Le nom du phénomène.
      */
     public PhenomenonEntry(final String id, final String name) {
@@ -59,8 +59,9 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     /** 
      * Construit un nouveau phénomène du nom spécifié.
      *
+     * @param id L'identifiant de ce phenomene.
      * @param name    Le nom du phénomène.
-     * @param remarks Remarques s'appliquant à ce phénomène, ou {@code null}.
+     * @param description La description de ce phénomène, ou {@code null}.
      */
     public PhenomenonEntry(final String id, final String name, final String description ) {
         super(name, description);
@@ -68,10 +69,16 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
         this.description = description;
     }
 
+    /**
+     * Retourne l'identifiant du phénomène.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Retoune la description du phénomène.
+     */
     public String getDescription() {
         return description;
     }
@@ -80,7 +87,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      * Retourne un code représentant ce phenomene.
      */
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return id.hashCode();
     }
 

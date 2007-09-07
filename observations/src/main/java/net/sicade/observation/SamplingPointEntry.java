@@ -23,7 +23,7 @@ import org.opengis.observation.sampling.SamplingPoint;
 import org.opengis.observation.sampling.SurveyProcedure;
 
 /**
- * Description d'une station
+ * Description d'une station localisé.
  *
  * @author Guilhem Legal
  */
@@ -51,8 +51,8 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
     }
     
      /** 
-      * Construit une entr�e pour l'identifiant de station sp�cifi�.
-      * adapt� au modele de BRGM.
+      * Construit une entrée pour l'identifiant de station spécifié.
+      * adapté au modele de BRGM.
       * 
       */
     public SamplingPointEntry(final String            identifier,
