@@ -18,7 +18,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.coverage.model.Distribution;
+import net.sicade.coverage.model.DistributionTable;
+import org.opengis.observation.Measure;
 import org.opengis.observation.Measurement;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.sampling.SamplingFeature;
 
 /**
  * Connexion vers la table des {@linkplain Measurement mesures}.
@@ -44,28 +49,48 @@ public class MeasurementTable extends ObservationTable<Measurement> {
      * Construit une nouvelle connexion vers la table des mesures.
      */
     public MeasurementTable(final Database database) {
-         super(new MeasurementQuery(database));
+        super(new MeasurementQuery(database));
     }
-        
+    
     
     /**
      * Construit une mesure pour l'enregistrement courant
      */
-    protected Measurement createEntry(final ResultSet result) throws SQLException, CatalogException {
+    public Measurement createEntry(final ResultSet result) throws SQLException, CatalogException {
+        final MeasurementQuery query = (MeasurementQuery) super.query;
+        if (distributions == null) {
+            distributions = getDatabase().getTable(DistributionTable.class);
+        }
+        Distribution distrib = distributions.getEntry(result.getString(indexOf(query.distribution)));
+        if (phenomenons == null) {
+            phenomenons = getDatabase().getTable(PhenomenonTable.class);
+        }
+        Phenomenon pheno = phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
+        if (stations == null) {
+            stations = getDatabase().getTable(SamplingFeatureTable.class);
+        }
+        SamplingFeature station = stations.getEntry(result.getString(indexOf(query.featureOfInterest)));
+        if (procedures == null) {
+            procedures = getDatabase().getTable(ProcessTable.class);
+        }
+        org.opengis.observation.Process procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
+        if (measures == null) {
+            measures = getDatabase().getTable(MeasureTable.class);
+        }
+        Measure resultat = measures.getEntry(result.getString(indexOf(query.result)));
         
-                 final MeasurementQuery query = (MeasurementQuery) super.query;
-                
-                return new MeasurementEntry(result.getString(indexOf(query.name   )),
-                                            result.getString(indexOf(query.description)),
-                                            stations.getEntry(result.getString(indexOf(query.featureOfInterest))),
-                                            phenomenons.getEntry(result.getString(indexOf(query.observedProperty))), 
-                                            procedures.getEntry(result.getString(indexOf(query.procedure))),
-                                            distributions.getEntry(result.getString(indexOf(query.distribution))),
-                                            //manque quality
-                                            measures.getEntry(result.getString(indexOf(query.result))),
-                                            new TemporalObjectEntry(result.getDate(indexOf(query.samplingTimeBegin)),
-                                                                    result.getDate(indexOf(query.samplingTimeEnd))),
-                                            result.getString(indexOf(query.resultDefinition)));
+        
+        return new MeasurementEntry(result.getString(indexOf(query.name   )),
+                                    result.getString(indexOf(query.description)),
+                                    station,
+                                    pheno,
+                                    procedure,
+                                    distrib,
+                                    //manque quality
+                                    resultat,
+                                    new TemporalObjectEntry(result.getDate(indexOf(query.samplingTimeBegin)),
+                                                            result.getDate(indexOf(query.samplingTimeEnd))),
+                                    result.getString(indexOf(query.resultDefinition)));
     }
     
 }

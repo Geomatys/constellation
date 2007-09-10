@@ -37,6 +37,10 @@ public class ObservationQuery extends Query {
              samplingTimeBegin, samplingTimeEnd, result, resultDefinition, description;
  // quality, , observationMetadata, procedureTime, procedureParameter,
  
+    /**
+     * Parameter to appear after the {@code "FROM"} clause.
+     */
+    protected final Parameter byName;
     
     /**
      * Creates a new query for the specified database.
@@ -45,7 +49,7 @@ public class ObservationQuery extends Query {
      */
     public ObservationQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT, LIST};
+        final QueryType[] usage = {SELECT};
         name                = addColumn("observations", "name",                usage);
         description         = addColumn("observations", "description",         usage);
         featureOfInterest   = addColumn("observations", "feature_of_interest", usage);
@@ -62,8 +66,9 @@ public class ObservationQuery extends Query {
         result              = addColumn("observations", "result",              usage);
         procedureTime       = addColumn("observations", "procedureTime",       usage);
         procedureParameter  = addColumn("observations", "procedureParameter",  usage);*/
+                
         
-        
+        byName = addParameter(name, SELECT);
     }
     
 }

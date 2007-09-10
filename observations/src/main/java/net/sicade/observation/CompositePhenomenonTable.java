@@ -17,6 +17,9 @@ package net.sicade.observation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
 import org.opengis.observation.CompositePhenomenon;
@@ -76,14 +79,22 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
         if (components == null) {
             components =  getDatabase().getTable(ComponentTable.class);
         }
-        components.setIdCompositePhenomenons(idCompositePhenomenon);
-        Collection<Phenomenon> entries = components.getEntries();
-                
+        components.setIdCompositePhenomenon(idCompositePhenomenon);
+        Collection<ComponentEntry> entries = components.getEntries();
+        
+        Collection<Phenomenon> components = new HashSet<Phenomenon>();
+        
+        Iterator i = entries.iterator();
+        while(i.hasNext()) {
+            ComponentEntry c =(ComponentEntry) i.next();
+            components.add(c.getComponent());
+        }
+        
         return new CompositePhenomenonEntry(results.getString(indexOf(query.name   )),
                                    results.getString(indexOf(query.remarks)),
                                    idCompositePhenomenon,
                                    base,
-                                   entries);
+                                   components);
     }
     
 }

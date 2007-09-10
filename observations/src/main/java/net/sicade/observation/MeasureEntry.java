@@ -17,11 +17,13 @@ package net.sicade.observation;
 
 // Sicade dependencies
 import net.sicade.catalog.Entry;
+
+// GeoTools dependencies
 import org.geotools.resources.Utilities;
 
 // OpenGis dependencies
 import org.opengis.observation.Measure;
-
+import org.opengis.observation.BaseUnit;
 /**
  * Resultat d'une observation de type {linkplain Measurement measurement}.
  *
@@ -38,7 +40,7 @@ public class MeasureEntry extends Entry implements Measure{
     /**
      * L'unite de la mesure
      */
-    private String uom;
+    private BaseUnit uom;
     
     /**
      * La valeur de la mesure
@@ -52,9 +54,9 @@ public class MeasureEntry extends Entry implements Measure{
      * @param uom   L'unité de mesure.
      * @param value La valeur mesurée.
      */
-    public MeasureEntry(final String name,
-                        final String uom,
-                        final float value)
+    public MeasureEntry(final String   name,
+                        final BaseUnit uom,
+                        final float    value)
     {
         super(name);
         this.name = name;
@@ -67,8 +69,8 @@ public class MeasureEntry extends Entry implements Measure{
      *
      * @todo Implementer le retour des unites.
      */
-    public String getUom() {
-        return null;
+    public BaseUnit getUom() {
+        return uom;
     }
 
     /**

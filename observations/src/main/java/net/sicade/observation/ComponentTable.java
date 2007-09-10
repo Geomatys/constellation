@@ -17,8 +17,10 @@ package net.sicade.observation;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
 import org.geotools.resources.Utilities;
+import org.opengis.observation.Phenomenon;
 
 /**
  *
@@ -30,25 +32,50 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
     /**
      * identifiant secondaire de la table.
      */
-    private String idCompositePhenomenons;
+    private String idCompositePhenomenon;
     
     /**
-     *
+     * un lien vers la table des phénomènes.
      */
-    public ComponentTable() {
+    private PhenomenonTable phenomenons;
+    
+    /**
+     * Construit une table des phenomene composé.
+     *
+     * @param  database Connexion vers la base de données.
+     */
+    public ComponentTable(final Database database) {
+        this(new ComponentQuery(database));
     }
+    
+    /**
+     * Initialise l'identifiant de la table.
+     */
+    private ComponentTable(final ComponentQuery query) {
+        super(query);
+        setIdentifierParameters(query.byComponent, null);
+    }
+    
     
     protected ComponentEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
+        final ComponentQuery query = (ComponentQuery) super.query;
+                
+        if (phenomenons == null) {
+            phenomenons = getDatabase().getTable(PhenomenonTable.class);
+        }
+        Phenomenon component = phenomenons.getEntry(results.getString(indexOf(query.idComponent)));
+        
+        return new ComponentEntry(results.getString(indexOf(query.idCompositePhenomenon)), component);
     }
     
-    public String getIdCompositePhenomenons() {
-        return idCompositePhenomenons;
+    public String getIdCompositePhenomenon() {
+        return idCompositePhenomenon;
     }
     
-    public void setIdCompositePhenomenons(String idCompositePhenomenons) {
-        if (!Utilities.equals(this.idCompositePhenomenons, idCompositePhenomenons)) {
-            this.idCompositePhenomenons = idCompositePhenomenons;
-            fireStateChanged("idDataBlock");
+    public void setIdCompositePhenomenon(String idCompositPhenomenon) {
+        if (!Utilities.equals(this.idCompositePhenomenon, idCompositePhenomenon)) {
+            this.idCompositePhenomenon = idCompositePhenomenon;
+            fireStateChanged("idCompositePhenomenon");
         }
         
     }

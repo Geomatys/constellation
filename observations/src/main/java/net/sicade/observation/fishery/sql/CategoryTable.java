@@ -55,6 +55,7 @@ public class CategoryTable extends SingletonTable<Category> {
     /** Numéro de colonne. */ private static final int  PROCEDURE  = 3;
     /** Numéro de colonne. */ private static final int  STAGE      = 4;
     /** Numéro de colonne. */ private static final int  REMARKS    = 5;
+     /** Numéro de colonne. */ private static final int  NAME      = 6;
 
     /**
      * Table des stationss.
@@ -109,10 +110,11 @@ public class CategoryTable extends SingletonTable<Category> {
         if (stages == null) {
             stages = getDatabase().getTable(StageTable.class);
         }
-        return new CategoryEntry(stations.getEntry(stations), 
+        return new CategoryEntry(result.getString(NAME),
+                                 remarks,
+                                 stations.getEntry(station), 
                                  species.getEntry(phenomenon),
                                  stages.getEntry(stage),
-                                 fisheryType, 
-                                 remarks);
+                                 fisheryType,null,null,null,null,null,null,null);
     }
 }

@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Set;
 import net.sicade.catalog.CatalogException;
-import net.sicade.swe.BaseUnit;
+import org.opengis.observation.BaseUnit;
 import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.SamplingPointEntry;
 import net.sicade.observation.PhenomenonTable;

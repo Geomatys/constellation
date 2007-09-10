@@ -62,19 +62,21 @@ public class CategoryEntry extends ObservationEntry implements Category {
      * @param procedure   La procédure associée.
      * @param remarks     Remarques s'appliquant à cette entrée, ou {@code null}.
      */
-    public CategoryEntry(final SamplingFeature featureOfInterest,
-                            final Species         species,
-                            final Stage           stage,
-                            final FisheryType     procedure,
-                            final Element         quality,
-                            final Object          result,
-                            final TemporalObject  samplingTime,
-                            final MetaData        observationMetadata,
-                            final String          resultDefinition,
-                            final TemporalObject  procedureTime,
-                            final Object          procedureParameter)
+    public CategoryEntry(final String          name,
+                         final String          definition,
+                         final SamplingFeature featureOfInterest,
+                         final Species         species,
+                         final Stage           stage,
+                         final FisheryType     procedure,
+                         final Element         quality,
+                         final Object          result,
+                         final TemporalObject  samplingTime,
+                         final MetaData        observationMetadata,
+                         final String          resultDefinition,
+                         final TemporalObject  procedureTime,
+                         final Object          procedureParameter)
     {
-        super(featureOfInterest, species, procedure, Distribution.NORMAL, quality, result, samplingTime,
+        super(name, definition, featureOfInterest, species, procedure, Distribution.NORMAL, quality, result, samplingTime,
                 observationMetadata, resultDefinition, procedureTime, procedureParameter);
         this.stage = stage;
     }

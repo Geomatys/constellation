@@ -116,11 +116,11 @@ public class MeasurementTableFiller implements Runnable {
      */
     public synchronized void addDefaultStations() throws CatalogException {
         Descriptor.LOGGER.info("Obtient l'ensemble des stations.");
-        try {
+        /*try {
             samplingFeatures.addAll(measures.getStations());
         } catch (SQLException exception) {
             throw new ServerException(exception);
-        }
+        }*/
     }
 
     /**

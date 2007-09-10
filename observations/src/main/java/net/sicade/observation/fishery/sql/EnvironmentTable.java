@@ -54,7 +54,7 @@ public class EnvironmentTable extends MeasurementTable {
      * @param  database Connexion vers la base de données des observations.
      */
     public EnvironmentTable(final Database database) {
-        super(database, SELECT, INSERT);
+        super(database);
     }
 
     /** 
@@ -63,7 +63,7 @@ public class EnvironmentTable extends MeasurementTable {
      * @param  stations La table des stations à utiliser.
      */
     public EnvironmentTable(final SamplingFeatureTable stations) {
-        super(stations, SELECT, INSERT);
+        super(null);//stations);
     }
 
     /**
@@ -83,6 +83,6 @@ public class EnvironmentTable extends MeasurementTable {
         this(database);
         final SamplingFeatureTable stations = database.getTable(type);
         stations.setAbridged(true);
-        setStationTable(stations);
+       // setStationTable(stations);
     }
 }

@@ -14,7 +14,6 @@
  */
 package net.sicade.observation;
 
-import java.util.Set;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -22,13 +21,20 @@ import java.sql.SQLException;
 // Sicade dependencies
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
-import net.sicade.catalog.Table;
+import net.sicade.catalog.SingletonTable;
+import net.sicade.coverage.model.Distribution;
 import net.sicade.coverage.model.DistributionTable;
+import net.sicade.swe.AnyResultEntry;
+import net.sicade.swe.AnyResultTable;
+
+// OpenGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
+import org.opengis.observation.Phenomenon;
 
 // geotools dependencies
 import org.geotools.resources.Utilities;
+
 
 /**
  * Classe de base des connections vers la table des {@linkplain Observation observation}.
@@ -52,7 +58,7 @@ import org.geotools.resources.Utilities;
  * @author Antoine Hnawia
  * @author Guilhem Legal
  */
-public abstract class ObservationTable<EntryType extends Observation> extends Table {
+public abstract class ObservationTable<EntryType extends Observation> extends SingletonTable<Observation> {
 
     /**
      * Connexion vers la table des stations.
@@ -83,6 +89,12 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     protected DistributionTable distributions;
     
     /**
+     * Connexion vers la table des {@linkplain AnyResult result}.
+     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     */
+    protected AnyResultTable results;
+    
+    /**
      * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
      * sera construite la première fois où elle sera nécessaire.
      */
@@ -102,7 +114,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      * @param  database Connexion vers la base de données des observations.
      */
     public ObservationTable(final Database database) {
-        super(new ObservationQuery(database)); 
+        this(new ObservationQuery(database)); 
     }
     
     /** 
@@ -112,48 +124,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
      */
     protected ObservationTable(ObservationQuery query) {
         super(query); 
-    }
-
-    
-    /**
-     * Définie la table des stations à utiliser. Cette méthode peut être appelée par
-     * {@link StationTable} avant toute première utilisation de {@code ObservationTable}.
-     *
-     * @param  stations Table des stations à utiliser.
-     * @throws IllegalStateException si cette instance utilise déjà une autre table des stations.
-     */
-    protected synchronized void setStationTable(final SamplingFeatureTable stations)
-            throws IllegalStateException
-    {
-        if (this.stations != stations) {
-            if (this.stations != null) {
-                throw new IllegalStateException();
-            }
-            this.stations = stations; // Doit être avant tout appel de setTable(this).
-            stations.setObservationTable(this);
-        }
-    }
-
-    /**
-     * Retourne la table des stations, en la créant si nécessaire.
-     */
-    private synchronized SamplingFeatureTable getStationTable() {
-        if (stations == null) {
-            setStationTable(getDatabase().getTable(SamplingFeatureTable.class));
-        }
-        return stations;
-    }
-
-    /**
-     * Retourne la liste des stations qui pourrait avoir des données dans cette table.
-     */
-    public Set<SamplingFeature> getStations() throws CatalogException, SQLException {
-        /*
-         * Ne PAS synchroniser cette méthode. StationTable est déjà synchronisée, et on veut
-         * éviter de garder un vérou à la fois sur ObservationTable et StationTable à cause
-         * du risque de "thread lock" que cela pourrait poser.
-         */
-        return getStationTable().getEntries();
+        setIdentifierParameters(query.byName, null);
     }
 
     /**
@@ -257,20 +228,48 @@ public abstract class ObservationTable<EntryType extends Observation> extends Ta
     /**
      * Construit une observation pour l'enregistrement courant.
      */
-    private Observation createEntry(final ResultSet result) throws CatalogException, SQLException {
+    public Observation createEntry(final ResultSet result) throws CatalogException, SQLException {
       final ObservationQuery query = (ObservationQuery) super.query;
       
+      if (distributions == null) {
+          distributions = getDatabase().getTable(DistributionTable.class);
+      }
+      Distribution distrib = distributions.getEntry(result.getString(indexOf(query.distribution)));
+      if (phenomenons == null) {
+          phenomenons = getDatabase().getTable(PhenomenonTable.class);
+      }
+      Phenomenon pheno = phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
+      if (stations == null) {
+          stations = getDatabase().getTable(SamplingFeatureTable.class);
+      }
+      SamplingFeature station = stations.getEntry(result.getString(indexOf(query.featureOfInterest)));
+      if (procedures == null) {
+          procedures = getDatabase().getTable(ProcessTable.class);
+      }
+      org.opengis.observation.Process procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
+      if (results == null) {
+          results = getDatabase().getTable(AnyResultTable.class);
+      }
+      AnyResultEntry any = results.getEntry(result.getString(indexOf(query.result)));
+      Object resultat;
+      if(any.getReference() == null && any.getDataBlockDefinition() != null) {
+          resultat = any.getDataBlockDefinition();
+      } else if(any.getReference() != null && any.getDataBlockDefinition() == null)  {
+          resultat = any.getReference();
+      }
+        
+      
       return new ObservationEntry(result.getString(indexOf(query.name)),
-                                    result.getString(indexOf(query.description)),
-                                    stations.getEntry(result.getString(indexOf(query.featureOfInterest))),
-                                    phenomenons.getEntry(result.getString(indexOf(query.observedProperty))), 
-                                    procedures.getEntry(result.getString(indexOf(query.procedure))),
-                                    distributions.getEntry(result.getString(indexOf(query.distribution))),
-                                    //manque quality
-                                    result.getString(indexOf(query.result)),
-                                    new TemporalObjectEntry(result.getDate(indexOf(query.samplingTimeBegin)),
-                                                            result.getDate(indexOf(query.samplingTimeEnd))),
-                                    result.getString(indexOf(query.resultDefinition)));
+                                  result.getString(indexOf(query.description)),
+                                  station,
+                                  pheno, 
+                                  procedure,
+                                  distrib,
+                                  //manque quality
+                                  resultat,
+                                  new TemporalObjectEntry(result.getDate(indexOf(query.samplingTimeBegin)),
+                                                          result.getDate(indexOf(query.samplingTimeEnd))),
+                                  result.getString(indexOf(query.resultDefinition)));
         
         
     }

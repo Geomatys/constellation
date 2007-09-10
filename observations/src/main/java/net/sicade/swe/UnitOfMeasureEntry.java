@@ -15,6 +15,7 @@
 package net.sicade.swe;
 
 import net.sicade.catalog.Entry;
+import org.opengis.observation.BaseUnit;
 
 /**
  * Unité de mesure.

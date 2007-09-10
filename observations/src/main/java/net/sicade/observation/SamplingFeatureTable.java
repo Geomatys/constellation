@@ -31,8 +31,8 @@ import org.opengis.observation.sampling.SurveyProcedure;
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
+ * @author Guilhem Legal
  */
-@Deprecated
 public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
    
        

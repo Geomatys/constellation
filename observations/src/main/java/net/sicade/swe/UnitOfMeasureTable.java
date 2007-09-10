@@ -20,6 +20,7 @@ import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.swe.UnitOfMeasureEntry;
+import org.opengis.observation.BaseUnit;
 
 /**
  * Connexion vers la table des {@linkplain UnitOfMeasure unit of measure}.
@@ -37,7 +38,18 @@ public class UnitOfMeasureTable extends SingletonTable<BaseUnit>{
     public UnitOfMeasureTable(final Database database) {
         super(new UnitOfMeasureQuery(database)); 
     }
+    
+    /**
+     * Initialise l'identifiant de la table.
+     */
+    private UnitOfMeasureTable(final UnitOfMeasureQuery query) {
+        super(query);
+        setIdentifierParameters(query.byId, null);
+    }
 
+    /**
+     * Crée une entrée pour l'untié de mesure courante.
+     */
     protected BaseUnit createEntry(final ResultSet results) throws CatalogException, SQLException {
           final UnitOfMeasureQuery query = (UnitOfMeasureQuery) super.query;
           return new UnitOfMeasureEntry(results.getString(indexOf(query.id )),

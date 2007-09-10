@@ -18,6 +18,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
+import net.sicade.swe.UnitOfMeasureTable;
+import org.opengis.observation.BaseUnit;
 import org.opengis.observation.Measure;
 
 /**
@@ -28,6 +30,12 @@ import org.opengis.observation.Measure;
 public class MeasureTable extends SingletonTable<Measure> {
     
     /**
+     * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
+     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     */
+    private UnitOfMeasureTable uoms;
+    
+    /**
      * Construit une table des resultats de mesure.
      * 
      * @param  database Connexion vers la base de données.
@@ -35,15 +43,28 @@ public class MeasureTable extends SingletonTable<Measure> {
     public MeasureTable(final Database database) {
          super(new MeasureQuery(database));
     }
+    
+    /**
+     * Initialise l'identifiant de la table.
+     */
+    private MeasureTable(final MeasureQuery query) {
+        super(query);
+        setIdentifierParameters(query.byName, null);
+    }
+    
 
     /**
      * Construit un resultat de mesure pour l'enregistrement courant.
      */
     protected Measure createEntry(final ResultSet results) throws SQLException {
         final MeasureQuery query = (MeasureQuery) super.query;
+        if(uoms == null) {
+            uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
+        }
+        BaseUnit uom = uoms.getEntry(results.getString(indexOf(query.uom)));
         return new MeasureEntry(results.getString(indexOf(query.name   )),
-                                   results.getString(indexOf(query.uom)),
-                                   results.getFloat(indexOf(query.value)));
+                                uom,
+                                results.getFloat(indexOf(query.value)));
     }
     
 }

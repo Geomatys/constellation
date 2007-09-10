@@ -54,5 +54,26 @@ public class AnyResultEntry extends Entry {
         this.reference = reference;
         this.dataBlockDefinition = dataBlockDefinition;
     }
+
+    /**
+     * Retourne l'identifiant du resultat
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * retourne un resultat de type reference si s'en est un, {@code null} sinon.
+     */
+    public Reference getReference() {
+        return reference;
+    }
+
+    /**
+     * retourne un resultat de type dataBlockDefinition si s'en est un, {@code null} sinon.
+     */
+    public DataBlockDefinition getDataBlockDefinition() {
+        return dataBlockDefinition;
+    }
     
 }

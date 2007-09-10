@@ -74,6 +74,6 @@ public class LongLineTable extends SamplingFeatureTable {
                                   final ResultSet    result)
             throws SQLException
     {
-        return super.createEntry(identifier, name, coordinate, timeRange, platform, provider, result);
+        return null;//super.createEntry(identifier, name, coordinate, timeRange, platform, provider, result);
     }
 }

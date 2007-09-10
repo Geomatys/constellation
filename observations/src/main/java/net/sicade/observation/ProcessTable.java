@@ -32,7 +32,6 @@ import net.sicade.catalog.SingletonTable;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-@Deprecated
 public class ProcessTable extends SingletonTable<Process> {
 
     /**
