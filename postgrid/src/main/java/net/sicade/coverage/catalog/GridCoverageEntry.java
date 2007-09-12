@@ -75,6 +75,7 @@ import net.sicade.catalog.Entry;
 import net.sicade.coverage.model.Operation;
 import net.sicade.catalog.IllegalRecordException;
 import net.sicade.catalog.CatalogException;
+import org.opengis.coverage.grid.GridRange;
 
 
 /**
@@ -487,8 +488,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     private GeneralEnvelope computeBounds(final Rectangle clipPixel, final Point subsampling)
             throws TransformException
     {
-        final int width  = geometry.gridRange.getLength(0);
-        final int height = geometry.gridRange.getLength(1);
+        final GridRange gridRange = geometry.getGridRange();
+        final int width  = gridRange.getLength(0);
+        final int height = gridRange.getLength(1);
         final XRectangle2D boundingBox = geometry.geographicEnvelope;
         /*
          * Obtient les coordonnées géographiques et la résolution désirées. Notez que ces
@@ -700,9 +702,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
                         param.setSourceBands(new int[] {band});
                     }
                     if (image == null) {
-                        image = format.read(getInput(true), imageIndex, param, listeners,
-                                new Dimension(geometry.gridRange.getLength(0),
-                                              geometry.gridRange.getLength(1)), this);
+                        final Dimension size = geometry.getSize();
+                        image = format.read(getInput(true), imageIndex, param, listeners, size, this);
                         if (image == null) {
                             return null;
                         }
@@ -816,8 +817,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *         demandée. Cette méthode retourne {@code false} si {@code resolution} était nul.
      */
     final boolean hasEnoughResolution(final Dimension2D resolution) {
-        final int width  = geometry.gridRange.getLength(0);
-        final int height = geometry.gridRange.getLength(1);
+        final GridRange gridRange = geometry.getGridRange();
+        final int width  = gridRange.getLength(0);
+        final int height = gridRange.getLength(1);
         final XRectangle2D boundingBox = geometry.geographicEnvelope;
         return (resolution != null) &&
                (1+EPS)*resolution.getWidth()  >= boundingBox.getWidth() /width &&
@@ -830,10 +832,12 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * leurs résolutions sont incompatibles, alors cette méthode retourne {@code null}.
      */
     final GridCoverageEntry getLowestResolution(final GridCoverageEntry that) {
-        final int width   = this.geometry.gridRange.getLength(0);
-        final int height  = this.geometry.gridRange.getLength(1);
-        final int width2  = that.geometry.gridRange.getLength(0);
-        final int height2 = that.geometry.gridRange.getLength(1);
+        final GridRange gridRange  = this.geometry.getGridRange();
+        final GridRange gridRange2 = that.geometry.getGridRange();
+        final int width   = gridRange .getLength(0);
+        final int height  = gridRange .getLength(1);
+        final int width2  = gridRange2.getLength(0);
+        final int height2 = gridRange2.getLength(1);
         if (Utilities.equals(this.parameters.layer, that.parameters.layer) && sameEnvelope(that)) {
             if (width <= width2 && height <= height2) return this;
             if (width >= width2 && height >= height2) return that;

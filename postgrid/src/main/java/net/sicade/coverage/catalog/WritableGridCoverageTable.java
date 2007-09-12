@@ -14,62 +14,41 @@
  */
 package net.sicade.coverage.catalog;
 
-import java.io.File;
 import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.awt.Dimension;
+import java.net.URL;
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Set;
-import java.util.logging.LogRecord;
-import org.geotools.referencing.crs.DefaultTemporalCRS;
+import java.util.Iterator;
+import javax.imageio.ImageReader;
 
-import net.sicade.catalog.ConfigurationKey;
-import net.sicade.catalog.LoggingLevel;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+
+import org.geotools.image.io.metadata.GeographicMetadata;
+import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
-import net.sicade.catalog.Element;
 import net.sicade.catalog.CatalogException;
-
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.referencing.CRS;
-
-import org.opengis.geometry.Envelope;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.TemporalCRS;
-import org.opengis.referencing.operation.TransformException;
 
 
 /**
- * Insère de nouvelles entrées dans la base de données d'images. Par exemple, cette classe peut
- * être utilisée pour ajouter de nouvelles entrées dans la table {@code "GridCoverages"}, ce qui
- * peut impliquer l'ajout d'entrés dans la table {@code "GeographicBoundingBoxes"} en même temps.
- * Cette classe peut ajouter de nouvelles lignes aux tables existantes, mais ne modifie jamais les
- * lignes existantes.
+ * A grid coverage table with write capabilities. This class can be used in order to insert new
+ * image in the database. Note that adding new records in the {@code "GridCoverages"} table may
+ * imply adding new records in dependent tables like {@code "GridGeometries"}. This class may
+ * add new records, but will never modify existing records.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
- *
- * @todo Beaucoup de parties de cette classe ne sont pas encore fonctionnelles.
  */
-@Deprecated
-public class WritableGridCoverageTable extends GridCoverageTable {
-    /**
-     * The SQL instruction for inserting a new grid coverage.
-     */
-    private static final ConfigurationKey INSERT = null; // new ConfigurationKey("GridCoverage:INSERT",
-//            "INSERT INTO coverages.\"GridCoverages\" " +
-//                "(series, filename, \"startTime\", \"endTime\", extent)\n" +
-//                "VALUES (?, ?, ?, ?, ?)");
-
-    /**
-     * Connexion vers la table des étendues géographiques.
-     */
-    private GridGeometryTable gridGeometries;
-
+public abstract class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Constructs a new {@code WritableGridCoverageTable}.
      *
@@ -80,92 +59,100 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Retourne la séries à utiliser.
+     * Returns the series in which to insert the coverages.
      *
-     * @throws CatalogException si aucune couche n'a été spécifiée, ou si la couche ne contient pas
-     *                          exactement une série.
+     * @throws CatalogException if no series has been specified, or if the layer contains
+     *         zero or more than one series.
      */
     private Series getSeries() throws CatalogException {
         final Layer layer = getLayer();
         if (layer == null) {
-            throw new CatalogException("Aucune couche n'a été spécifiée.");
+            throw new CatalogException("Aucune couche n'a été spécifiée."); // TODO: localize
         }
-        final Set<Series> series = layer.getSeries();
-        if (series.size() != 1) {
-            throw new CatalogException("La couche devrait contenir exactement une série.");
-        }
-        return series.iterator().next();
-    }
-
-    /**
-     * Log a record. This is used for logging warning or information messages when the database
-     * is updated. Since this class is used by {@link CoverageTable#addGridCoverage} only, we will
-     * set source class and method name according.
-     */
-    private static void log(final LogRecord record) {
-        record.setSourceClassName("WritableGridCoverageTable");
-        record.setSourceMethodName("addEntry");
-        Element.LOGGER.log(record);
-    }
-
-    /**
-     * Log an "SQL_UPDATE" record with the specified query as the message.
-     * This method replaces all question marks found in the query by the
-     * specified argument values.
-     */
-    private static void logUpdate(final String query, final Object... values) {
-        final StringBuilder buffer = new StringBuilder();
-        int last = 0;
-        for (int i=0; i<values.length; i++) {
-            final int stop = query.indexOf('?', last);
-            if (stop < 0) {
-                // Missing arguments in the query. Since this method is used for logging
-                // purpose only, we will not stop the normal execution flow for that.
-                break;
+        final Iterator<Series> it = layer.getSeries().iterator();
+        if (it.hasNext()) {
+            final Series series = it.next();
+            if (!it.hasNext()) {
+                return series;
             }
-            final boolean isChar = (values[i] instanceof CharSequence);
-            buffer.append(query.substring(last, stop));
-            if (isChar) buffer.append('\'');
-            buffer.append(values[i].toString());
-            if (isChar) buffer.append('\'');
-            last = stop+1;
         }
-        buffer.append(query.substring(last));
-        log(new LogRecord(LoggingLevel.UPDATE, buffer.toString()));
+        throw new CatalogException("La couche devrait contenir exactement une série."); // TODO: localize
     }
 
     /**
-     * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setLayer}
-     * doit d'abord avoir été appelée au moins une fois.
-     *
-     * @param   file        Le fichier image avec son chemin complet.
-     * @param   envelope    L'enveloppe géographique pour cette image.
-     * @param   size        La dimension de l'image, en nombre de pixels.
-     * @throws  SQLException     Si l'exécution d'une requête SQL a échouée.
-     * @throws  FactoryException Si le Coordinate Reference System n'est pas de type "Temporel".
-     * @throws  CatalogException Si l'exécution a échouée pour une autre raison.
+     * Returns the path for the specified input. The returned file should not be opened
+     * since it may be invalid (especially if built from a URL input). Its only purpose
+     * is to split the name part and the path part.
+     * 
+     * @param  input The input.
+     * @return The input as a file.
+     * @throws CatalogException if the input is not recognized.
      */
-    public synchronized void addEntry(final File      file,
-                                      final Envelope  envelope,
-                                      final Dimension size)
-            throws CatalogException, FactoryException, SQLException
+    private static File path(final Object input) throws CatalogException {
+        if (input instanceof File) {
+            return (File) input;
+        }
+        if (input instanceof URL) {
+            return new File(((URL) input).getPath());
+        }
+        if (input instanceof CharSequence) {
+            return new File(input.toString());
+        }
+        throw new CatalogException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, Utilities.getShortClassName(input)));
+    }
+
+    /**
+     * Returns the grid geometry identifier for the given image metadata.
+     * 
+     * @param  metadata The {@linkplain ImageReader#getImageMetadata metadata}.
+     * @param  width    The image width.
+     * @param  height   The image height.
+     * @return The identifier of a grid geometry suitable to the specified metadata.
+     *         It shall be the primary key of an entry in {@link GridGeometryTable}.
+     */
+    protected abstract String getGridGeometry(GeographicMetadata metadata, int width, int height)
+            throws CatalogException, SQLException, IOException;
+
+    /**
+     * Adds an entry infered from the specified image reader. The {@linkplain ImageReader#getInput
+     * reader input} must be set, and its {@linkplain ImageReader#getImageMetadata metadata} shall
+     * conform to the Geotools {@linkplain GeographicMetadata geographic metadata}.
+     * <p>
+     * This method will typically not read the full image, but only the metadata required.
+     *
+     * @param reader     The image reader.
+     * @param imageIndex The index of the image to insert in the database.
+     */
+    public synchronized void addEntry(final ImageReader reader, final int imageIndex)
+            throws CatalogException, SQLException, IOException
     {
-        GeographicBoundingBox geoBBox = null;
-        try {
-            geoBBox = new GeographicBoundingBoxImpl(envelope);
-        } catch (TransformException ex) {
-            log(new LogRecord(LoggingLevel.SEVERE, ex.getMessage()));
+        /*
+         * Splits the filename, path and extension from the reader input.
+         */
+        final File  input = path(reader.getInput());
+        final String path = input.getParent();
+        final String filename, extension;
+        if (true) {
+            final String name = input.getName();
+            final int split = name.lastIndexOf('.');
+            if (split >= 0) {
+                filename  = name.substring(0, split);
+                extension = name.substring(split + 1);
+            } else {
+                filename  = name;
+                extension = "";
+            }
         }
-        TemporalCRS temporalCRS = CRS.getTemporalCRS(envelope.getCoordinateReferenceSystem());
-        if (temporalCRS == null) {
-            throw new FactoryException("Le CRS spécifié n'est pas de type \"Temporel\".");
-        }
-        DefaultTemporalCRS defaultTempCRS = DefaultTemporalCRS.wrap(temporalCRS);
-        final Date startTime = defaultTempCRS.toDate(envelope.getMinimum(0));
-        final Date endTime   = defaultTempCRS.toDate(envelope.getMaximum(0));
-        String fileNameWithExt = file.getName();
-        final String fileName = fileNameWithExt.substring(0, fileNameWithExt.indexOf("."));
-        addEntry(fileName, startTime, endTime, geoBBox, size);
+        /*
+         * Gets the metadata of interest.
+         */
+//        final GeographicMetadata metadata = getMetadata(reader, imageIndex);
+//        final int width  = reader.getWidth (imageIndex);
+//        final int height = reader.getHeight(imageIndex);
+//        final String geometry = getGridGeometry(metadata, width, height);
+        /*
+         */
+        
     }
 
     /**
@@ -187,9 +174,6 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                                       final Dimension             size)
             throws CatalogException, SQLException
     {
-        if (gridGeometries == null) {
-            gridGeometries = getDatabase().getTable(GridGeometryTable.class);
-        }
         final String bboxID = null; // TODO gridGeometries.getIdentifier(bbox, size);
         if (bboxID == null) {
             throw new CatalogException("L'étendue géographique n'est pas déclarée dans la base de données.");
@@ -205,6 +189,5 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         if (statement.executeUpdate() != 1) {
             throw new CatalogException("L'image n'a pas été ajoutée.");
         }
-        logUpdate(getProperty(INSERT), series.getName(), filename, startTime, endTime, bbox);
     }
 }

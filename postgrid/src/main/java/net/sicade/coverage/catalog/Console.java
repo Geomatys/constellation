@@ -14,6 +14,7 @@
  */
 package net.sicade.coverage.catalog;
 
+import net.sicade.coverage.catalog.gui.CoverageTableModel;
 import java.util.Date;
 import java.io.File;
 import java.io.IOException;

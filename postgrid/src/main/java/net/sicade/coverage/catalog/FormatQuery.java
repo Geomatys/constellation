@@ -52,6 +52,6 @@ final class FormatQuery extends Query {
         mimeType = addColumn("Formats", "mime",     usage);
         encoding = addColumn("Formats", "encoding", usage);
         byName   = addParameter(name, SELECT);
-        name.setOrdering("ASC");
+        name.setOrdering("ASC", LIST);
     }
 }

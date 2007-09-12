@@ -59,6 +59,6 @@ final class SeriesQuery extends Query {
         format  = addColumn("Series", "format",     usage);
         byName  = addParameter(name,  SELECT);
         byLayer = addParameter(layer, FILTERED_LIST);
-        name.setOrdering("ASC");
+        name.setOrdering("ASC", LIST, FILTERED_LIST);
     }
 }

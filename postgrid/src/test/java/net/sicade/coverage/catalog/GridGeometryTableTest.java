@@ -16,7 +16,11 @@ package net.sicade.coverage.catalog;
 
 import java.util.Set;
 import java.sql.SQLException;
+import java.awt.Dimension;
+import java.awt.geom.AffineTransform;
 import org.opengis.geometry.Envelope;
+import org.opengis.coverage.grid.GridRange;
+
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.DatabaseTest;
 import net.sicade.catalog.CRS;
@@ -54,9 +58,10 @@ public class GridGeometryTableTest extends DatabaseTest {
     public void testSelectAndList() throws CatalogException, SQLException {
         final GridGeometryTable table = new GridGeometryTable(database);
         final GridGeometryEntry entry = table.getEntry(SAMPLE_NAME);
-        assertEquals( 720, entry.gridRange.getLength(0));
-        assertEquals( 499, entry.gridRange.getLength(1));
-        assertEquals(  59, entry.gridRange.getLength(2));
+        final GridRange gridRange = entry.getGridRange();
+        assertEquals( 720, gridRange.getLength(0));
+        assertEquals( 499, gridRange.getLength(1));
+        assertEquals(  59, gridRange.getLength(2));
         assertEquals(-180, entry.geographicEnvelope.getMinX(), 0.0);
         assertEquals(+180, entry.geographicEnvelope.getMaxX(), 0.0);
         assertEquals( -77, entry.geographicEnvelope.getMinY(), 0.5);
@@ -76,5 +81,18 @@ public class GridGeometryTableTest extends DatabaseTest {
         assertSame(entry, table.getEntry(SAMPLE_NAME));
         final Set<GridGeometryEntry> entries = table.getEntries();
         assertTrue(entries.contains(entry));
+
+        final String horizontalSRID     = "3395";
+        final String verticalSRID       = "5714";
+        final String name               = entry.getName();
+        final Dimension size            = entry.getSize();
+        final AffineTransform gridToCRS = entry.getGridToCRS2D();
+        assertFalse(gridToCRS.isIdentity());
+        assertFalse(gridToCRS.getDeterminant() == 0);
+        assertEquals(name, table.getIdentifier(size, gridToCRS, horizontalSRID, verticalSRID, altitudes));
+        assertNull(table.getIdentifier(size, gridToCRS, "4326", verticalSRID, altitudes));
+
+        altitudes[1] = 12.8; // Tries a non-existant altitude.
+        assertNull(table.getIdentifier(size, gridToCRS, horizontalSRID, verticalSRID, altitudes));
     }
 }

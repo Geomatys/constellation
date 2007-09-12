@@ -48,9 +48,9 @@ final class ThematicQuery extends Query {
     public ThematicQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT, LIST};
-        name    = addColumn   ("Thematics", "name",        usage);
-        remarks = addColumn   ("Thematics", "description", usage);
+        name    = addColumn   ("Thematics", "name",              usage);
+        remarks = addColumn   ("Thematics", "description", null, usage);
         byName  = addParameter(name, SELECT);
-        name.setOrdering("ASC");
+        name.setOrdering("ASC", LIST);
     }
 }

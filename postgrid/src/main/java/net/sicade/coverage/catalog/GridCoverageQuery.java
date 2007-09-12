@@ -49,34 +49,40 @@ final class GridCoverageQuery extends Query {
     public GridCoverageQuery(final Database database) {
         super(database);
         final Column horizontalExtent, visibility;
-        final QueryType[] hiden = {                            };
-        final QueryType[] SL    = {SELECT, LIST                };
-        final QueryType[] SLA   = {SELECT, LIST, AVAILABLE_DATA};
-        final QueryType[]   A   = {              AVAILABLE_DATA};
+        final QueryType[] hiden = {                                          };
+        final QueryType[] SL    = {SELECT, LIST                              };
+        final QueryType[] SLA   = {SELECT, LIST, AVAILABLE_DATA              };
+        final QueryType[] SLAB  = {SELECT, LIST, AVAILABLE_DATA, BOUNDING_BOX};
+        final QueryType[]    B  = {                              BOUNDING_BOX};
         layer            = addColumn("Series",         "layer",            SL   );
         series           = addColumn("GridCoverages",  "series",           SL   );
         pathname         = addColumn("Series",         "pathname",         SL   );
         filename         = addColumn("GridCoverages",  "filename",         SL   );
         extension        = addColumn("Series",         "extension",        SL   );
-        startTime        = addColumn("GridCoverages",  "startTime",        SLA  );
-        endTime          = addColumn("GridCoverages",  "endTime",          SLA  );
+        startTime        = addColumn("GridCoverages",  "startTime",        SLAB );
+        endTime          = addColumn("GridCoverages",  "endTime",          SLAB );
         spatialExtent    = addColumn("GridCoverages",  "extent",           SLA  );
-        horizontalExtent = addColumn("GridGeometries", "horizontalExtent", hiden);
+        horizontalExtent = addColumn("GridGeometries", "horizontalExtent",    B );
         format           = addColumn("Series",         "format",           SL   );
-        visibility       = addColumn("Series",         "visible",          hiden);
+        visibility       = addColumn("Series",         "visible", true,    hiden);
 
-        endTime         .setOrdering("ASC");
-//      series          .setOrdering("ASC"); // TODO: enable once declaration order is taken in account.
-        byFilename         = addParameter(filename,      SELECT);
-        byLayer            = addParameter(layer,            SLA);
-        byStartTime        = addParameter(startTime,        SLA);
-        byEndTime          = addParameter(endTime,          SLA);
-        byHorizontalExtent = addParameter(horizontalExtent, SLA);
-        byVisibility       = addParameter(visibility,       SLA);
+        startTime.setFunction("MIN", B);
+        endTime  .setFunction("MAX", B);
+        endTime  .setOrdering("DESC", SL);
+        series   .setOrdering("ASC",  SL);
+
+        byFilename         = addParameter(filename,       SELECT);
+        byLayer            = addParameter(layer,            SLAB);
+        byStartTime        = addParameter(startTime,        SLAB);
+        byEndTime          = addParameter(endTime,          SLAB);
+        byHorizontalExtent = addParameter(horizontalExtent, SLAB);
+        byVisibility       = addParameter(visibility,       SLAB);
         if (database.isSpatialEnabled()) {
             byHorizontalExtent.setComparator("&&");
-            byHorizontalExtent.setFunction("GeometryFromText(?,4326)", SLA);
+            byHorizontalExtent.setFunction("GeometryFromText(?,4326)", SLAB);
+            horizontalExtent  .setFunction("EXTENT", B);
         } else {
+            throw new UnsupportedOperationException();
             // TODO: revisit.
         }
         byStartTime.setComparator("IS NULL OR <=");

@@ -516,7 +516,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      */
     private void ensureTrimmed(final QueryType type) throws IllegalRecordException, SQLException {
         assert Thread.holdsLock(this);
-        if (trimRequested && !trimmed && false) { // TODO: Disabled for now
+        if (trimRequested && !trimmed) {
             final PreparedStatement statement = getStatement(type);
             if (statement != null) {
                 final int timeColumn = (byTimeRange     != null) ? byTimeRange    .column.indexOf(type) : 0;

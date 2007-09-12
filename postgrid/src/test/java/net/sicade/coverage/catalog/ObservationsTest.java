@@ -18,6 +18,7 @@
  */
 package net.sicade.coverage.catalog;
 
+import net.sicade.coverage.catalog.gui.CoverageTableModel;
 import junit.framework.TestCase;
 import net.sicade.catalog.CatalogException;
 

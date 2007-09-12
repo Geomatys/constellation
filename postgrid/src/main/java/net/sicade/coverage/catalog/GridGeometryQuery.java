@@ -48,29 +48,6 @@ final class GridGeometryQuery extends Query {
             byShearX, byShearY, byHorizontalSRID, byVerticalSRID;
 
     /**
-     * The SQL instruction for inserting a new geographic bounding box.
-     *
-     * @todo Choose the CRS.
-     */
-//    private static final SpatialConfigurationKey INSERT = new SpatialConfigurationKey("GridGeometryes:INSERT",
-//            "INSERT INTO \"GridGeometries\"\n" +
-//            "  (id, \"westBoundLongitude\",\n" +
-//            "       \"eastBoundLongitude\",\n" +
-//            "       \"southBoundLatitude\",\n" +
-//            "       \"northBoundLatitude\",\n" +
-//            "       \"altitudeMin\",\n"        +
-//            "       \"altitudeMax\",\n"        +
-//            "       \"CRS\",\n"                +
-//            "       width, height, depth)\n"   +
-//            "  VALUES (?, ?, ?, ?, ?, ?, ?, 'IRD:WGS84(xyt)', ?, ?, ?)",
-//
-//            "INSERT INTO coverages.\"GridGeometries\"\n"+
-//            "  (id, \"spatialExtent\",\n"               +
-//            "       \"CRS\",\n"                         +
-//            "       width, height, depth)\n"            +
-//            "  VALUES (?, ?, 'IRD:WGS84(xyt)', ?, ?, ?)");
-
-    /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.

@@ -62,39 +62,6 @@ import static net.sicade.catalog.QueryType.*;
  */
 public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> implements DataConnection {
     /**
-     * Requête SQL utilisée pour obtenir l'enveloppe spatio-temporelle couverte
-     * par toutes les images d'une couche (ou de l'ensemble des couches).
-     */
-//     static final SpatialConfigurationKey BOUNDING_BOX = new SpatialConfigurationKey("GridCoverages:BOX",
-//            "SELECT MIN(\"startTime\") "           + "AS \"tmin\", "  +
-//                   "MAX(\"endTime\") "             + "AS \"tmax\", "  +
-//                   "MIN(\"westBoundLongitude\") "  + "AS \"xmin\", "  +
-//                   "MAX(\"eastBoundLongitude\") "  + "AS \"xmax\", "  +
-//                   "MIN(\"southBoundLatitude\") "  + "AS \"ymin\", "  +
-//                   "MAX(\"northBoundLatitude\") "  + "AS \"ymax\"\n"  +
-//                   "MIN(\"altitudeMin\") "         + "AS \"zmin\"\n"  +
-//                   "MAX(\"altitudeMax\") "         + "AS \"zmax\"\n"  +
-//             "  FROM \"GridCoverages\"\n"          +
-//             "  JOIN \"GridGeometries\" ON extent=\"GridGeometries\".id\n"        +
-//             "  JOIN \"Series\" ON layer=\"Series\".identifier\n"                 +
-//             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"             +
-//             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"             +
-//             "   AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n" +
-//             "   AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n" +
-//             "   AND (series LIKE ?) AND visible=TRUE\n",
-//
-//            "SELECT MIN(\"startTime\") AS \"tmin\", " +
-//                   "MAX(\"endTime\") AS \"tmax\", " +
-//                   "\"spatialExtent\"\n"  +
-//             "  FROM \"GridCoverages\"\n" +
-//             "  JOIN \"GridGeometries\" ON extent=\"GridGeometries\".id\n" +
-//             "  JOIN \"Series\" ON layer=\"Series\".identifier\n"          +
-//             " WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"      +
-//             "   AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"      +
-//             "   AND (\"spatialExtent\" && ?)\n"                           +
-//             "   AND (series LIKE ?) AND visible=TRUE\n");
-
-    /**
      * Le modèle à utiliser pour formatter des angles.
      */
     static final String ANGLE_PATTERN = "D°MM.m'";
@@ -212,17 +179,23 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * @param connection The connection to the database.
      */
     public GridCoverageTable(final Database database) {
-        super(new GridCoverageQuery(database), net.sicade.catalog.CRS.XYT);
-        final GridCoverageQuery query = (GridCoverageQuery) super.query;
-        setIdentifierParameters(query.byFilename, null);
-        setExtentParameters(query.byStartTime, query.byHorizontalExtent);
-        this.dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
-        this.dateFormat.setTimeZone(database.getTimeZone());
+        this(new GridCoverageQuery(database));
     }
 
     /**
-     * Construit une nouvelle table avec la même configuration initiale que celle de la table
-     * spécifiée.
+     * Constructs a new {@code GridCoverageTable} from the specified query.
+     */
+    private GridCoverageTable(final GridCoverageQuery query) {
+        super(query, net.sicade.catalog.CRS.XYT);
+        setIdentifierParameters(query.byFilename, null);
+        setExtentParameters(query.byStartTime, query.byHorizontalExtent);
+        this.dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
+        this.dateFormat.setTimeZone(getDatabase().getTimeZone());
+    }
+
+    /**
+     * Constructs a new {@code GridCoverageTable} with the same initial configuration
+     * than the specified table.
      */
     public GridCoverageTable(final GridCoverageTable table) {
         super(table);
@@ -247,16 +220,14 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Retourne la référence vers la couche d'images.
+     * Returns the layer for the coverages in this table.
      */
     public Layer getLayer() {
         return layer;
     }
 
     /**
-     * Définit la couche dont on veut les images.
-     *
-     * @param  layer Réference vers la couche d'images.
+     * Sets the layer for the coverages in this table.
      */
     public synchronized void setLayer(final Layer layer) {
         if (!layer.equals(this.layer)) {
@@ -421,7 +392,7 @@ loop:   for (final CoverageReference newReference : entries) {
                     if (oldReference instanceof GridCoverageEntry) {
                         final GridCoverageEntry oldEntry = (GridCoverageEntry) oldReference;
                         if (!oldEntry.compare(newEntry)) {
-                            // Entries not equals according the "ORDER BY" clause.
+                            // Entries not equal according the "ORDER BY" clause.
                             break;
                         }
                         final GridCoverageEntry lowestResolution = oldEntry.getLowestResolution(newEntry);

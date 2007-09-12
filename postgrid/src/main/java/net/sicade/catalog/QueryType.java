@@ -55,7 +55,7 @@ public enum QueryType {
     BOUNDING_BOX(),
 
     /**
-     * Selects a list of available date or depth.
+     * Selects a list of available dates or depths.
      */
     AVAILABLE_DATA(),
 

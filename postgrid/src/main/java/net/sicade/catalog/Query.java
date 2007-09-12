@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -74,6 +75,14 @@ public class Query {
      * The parameters in this query.
      */
     private Parameter[] parameters = EMPTY_PARAMETERS;
+
+    /**
+     * The ordering for each column. We stores this information in the query rather than
+     * in the column because the column order is significant.
+     * <p>
+     * Values shall be {@code "ASC"} or {@code "DESC"}.
+     */
+    final Map<Column,String> ordering = new LinkedHashMap<Column,String>();
 
     /**
      * SQL queries cached up to date.
@@ -266,12 +275,15 @@ public class Query {
                     buffer.append(')');
                 }
             } else {
-                // Don't put quote for numbers and NULL values.
-                final boolean needQuotes = !(column.defaultValue instanceof Number);
+                // Don't put quote for number, boolean and null values.
+                final boolean needQuotes = (column.defaultValue instanceof CharSequence);
+                String defaultValue = String.valueOf(column.defaultValue); // May be "null"
                 if (needQuotes) {
                     buffer.append(quote);
+                } else {
+                    defaultValue = defaultValue.toUpperCase(Locale.ENGLISH);
                 }
-                buffer.append(column.defaultValue); // May be null.
+                buffer.append(defaultValue);
                 if (needQuotes) {
                     buffer.append(quote);
                 }
@@ -410,7 +422,6 @@ scan:       while (!tables.isEmpty()) {
             if (p.indexOf(type) != 0) {
                 buffer.append(separator).append('(');
                 final String variable   = p.column.alias;
-                final String function   = p.getColumnFunction(type);
                 final String comparator = p.getComparator();
                 final String[] comparators;
                 if (comparator.startsWith(SPECIAL_CONDITION)) {
@@ -424,18 +435,13 @@ scan:       while (!tables.isEmpty()) {
                     };
                 }
                 for (int i=0; i<comparators.length; i++) {
-                    if (function != null) {
-                        buffer.append(function).append('(');
-                    }
-                    buffer.append(quote).append(variable).append(quote);
-                    if (function != null) {
-                        buffer.append(')');
-                    }
-                    buffer.append(' ').append(comparators[i]).append(' ');
+                    // Reminder: aggregate functions are not allowed in a WHERE clause.
+                    buffer.append(quote).append(variable).append(quote)
+                          .append(' ').append(comparators[i]).append(' ');
                 }
-                final String f = p.getFunction(type);
-                if (f != null) {
-                    buffer.append(f);
+                final String function = p.getFunction(type);
+                if (function != null) {
+                    buffer.append(function);
                 } else {
                     buffer.append('?');
                 }
@@ -458,16 +464,14 @@ scan:       while (!tables.isEmpty()) {
     {
         final String quote = metadata.getIdentifierQuoteString().trim();
         String separator = " ORDER BY ";
-        for (final Column c : columns) {
-            if (c.indexOf(type) != 0) {
-                String ordering = c.getOrdering();
-                if (ordering != null) {
-                    buffer.append(separator).append(quote).append(c.name).append(quote);
-                    if (!ordering.equals("ASC")) {
-                        buffer.append(' ').append(ordering);
-                    }
-                    separator = ", ";
+        for (final Column c : ordering.keySet()) {
+            String ordering = c.getOrdering(type);
+            if (ordering != null) {
+                buffer.append(separator).append(quote).append(c.name).append(quote);
+                if (!ordering.equals("ASC")) {
+                    buffer.append(' ').append(ordering);
                 }
+                separator = ", ";
             }
         }
     }

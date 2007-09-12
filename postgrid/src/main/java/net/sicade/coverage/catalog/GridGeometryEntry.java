@@ -14,6 +14,9 @@
  */
 package net.sicade.coverage.catalog;
 
+import java.awt.Dimension;
+import java.awt.geom.AffineTransform;
+
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -47,14 +50,14 @@ final class GridGeometryEntry extends Entry {
     /**
      * The immutable grid range, which may be 2D, 3D or 4D.
      */
-    final GridRange gridRange;
+    private final GridRange gridRange;
 
     /**
      * The "grid to CRS" affine transform for the horizontal part. The vertical
      * transform is not included because the {@link #verticalOrdinates} may not
      * be regular.
      */
-//    private final AffineTransform gridToCRS;
+    private final AffineTransform gridToCRS;
 
     /**
      * The full envelope, including the vertical and temporal extent if any.
@@ -77,16 +80,19 @@ final class GridGeometryEntry extends Entry {
      * <strong>Note:</strong> This constructor do not clone any of its arguments.
      * Do not modify the arguments after construction.
      *
-     * @param name The identifier of this grid geometry.
+     * @param name      The identifier of this grid geometry.
+     * @param gridToCRS The grid to CRS affine transform.
      * @param gridRange The image dimension. May be 2D or 3D.
-     * @param envelope The spatio-temporal envelope.
-     * @param bbox Same as the envelope, but as a  geographic bounding box.
+     * @param envelope  The spatio-temporal envelope.
+     * @param bbox      Same as the envelope, but as a geographic bounding box.
      * @param verticalOrdinates The vertical ordinate values, or {@code null} if none.
      */
-    GridGeometryEntry(final String name, final GridRange gridRange, final GeneralEnvelope envelope,
-            final GeographicBoundingBox bbox, final double[] verticalOrdinates)
+    GridGeometryEntry(final String name, final AffineTransform gridToCRS,
+                      final GridRange gridRange, final GeneralEnvelope envelope,
+                      final GeographicBoundingBox bbox, final double[] verticalOrdinates)
     {
         super(name);
+        this.gridToCRS         = gridToCRS;
         this.gridRange         = gridRange;
         this.envelope          = envelope;
         this.verticalOrdinates = verticalOrdinates;
@@ -110,6 +116,29 @@ final class GridGeometryEntry extends Entry {
         geographicEnvelope = XRectangle2D.createFromExtremums(
                 bbox.getWestBoundLongitude(), bbox.getSouthBoundLatitude(),
                 bbox.getEastBoundLongitude(), bbox.getNorthBoundLatitude());
+    }
+
+    /**
+     * Returns the affine transform from grid to
+     * {@linkplain #getCoordinateReferenceSystem coordinate reference system}.
+     */
+    public AffineTransform getGridToCRS2D() {
+        return (AffineTransform) gridToCRS.clone();
+    }
+
+    /**
+     * Convenience method returning the two first dimension of the
+     * {@linkplain #getGridRange grid range}.
+     */
+    public Dimension getSize() {
+        return new Dimension(gridRange.getLength(0), gridRange.getLength(1));
+    }
+
+    /**
+     * Returns the grid range.
+     */
+    public GridRange getGridRange() {
+        return gridRange;
     }
 
     /**
@@ -190,8 +219,9 @@ final class GridGeometryEntry extends Entry {
         }
         if (super.equals(object)) {
             final GridGeometryEntry that = (GridGeometryEntry) object;
-            return Utilities.equals(this.gridRange,         that.gridRange) &&
-                   Utilities.equals(this.envelope,          that.envelope) &&
+            return Utilities.equals(this.gridToCRS,         that.gridToCRS) &&
+                   Utilities.equals(this.gridRange,         that.gridRange) &&
+                   Utilities.equals(this.envelope,          that.envelope)  &&
                    Utilities.equals(this.verticalOrdinates, that.verticalOrdinates);
         }
         return false;

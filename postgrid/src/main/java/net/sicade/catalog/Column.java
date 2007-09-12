@@ -14,7 +14,11 @@
  */
 package net.sicade.catalog;
 
+import java.util.Map;
 import java.util.Locale;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
 import org.geotools.resources.Utilities;
 
 
@@ -53,9 +57,19 @@ public final class Column extends IndexedSqlElement {
     final Object defaultValue;
 
     /**
-     * The ordering: {@code "ASC"}, {@code "DESC"} or {@code null} if none.
+     * The ordering for each column. This field is the same reference than {@link Query#ordering}
+     * and must be shared by every columns in the same query. We retain the map instead of the
+     * whole {@link Query} object in order to avoid the retention of more objects than needed by
+     * the garbage collector.
+     * <p>
+     * Values shall be {@code "ASC"} or {@code "DESC"}.
      */
-    private String ordering;
+    private final Map<Column,String> ordering;
+
+    /**
+     * The types for which the ordering is applicable. Will be created only when first needed.
+     */
+    private EnumSet<QueryType> orderUsage;
 
     /**
      * Creates a column from the specified table with the specified name but no alias.
@@ -85,9 +99,10 @@ public final class Column extends IndexedSqlElement {
            final Object defaultValue, final QueryType... types)
     {
         super(query, types);
-        this.table = table.trim();
-        this.name  = name .trim();
-        this.alias = alias.trim();
+        this.ordering     = (query != null) ? query.ordering : new HashMap<Column,String>();
+        this.table        = table.trim();
+        this.name         = name .trim();
+        this.alias        = alias.trim();
         this.defaultValue = defaultValue;
     }
 
@@ -107,6 +122,9 @@ public final class Column extends IndexedSqlElement {
     /**
      * Returns the function for this column when used in a query of the given type,
      * or {@code null} if none.
+     * <p>
+     * In current implementation, the functions are assumed <cite>aggregate functions</cite>,
+     * i.e. they will not be used in the {@code WHERE} part of the SQL statement.
      */
     @Override
     public String getFunction(final QueryType type) {
@@ -116,6 +134,9 @@ public final class Column extends IndexedSqlElement {
     /**
      * Sets a function for this column when used in a query of the given type.
      * They are typically aggregate functions like {@code "MIN"} or {@code "MAX"}.
+     * <p>
+     * In current implementation, the functions are assumed <cite>aggregate functions</cite>
+     * in all cases, i.e. they will never be used in the {@code WHERE} part of the SQL statement.
      */
     @Override
     public void setFunction(final String function, final QueryType... types) {
@@ -125,20 +146,27 @@ public final class Column extends IndexedSqlElement {
     /**
      * Returns the ordering: {@code "ASC"}, {@code "DESC"} or {@code null} if none.
      */
-    public String getOrdering() {
-        return ordering;
+    public String getOrdering(final QueryType type) {
+        if (orderUsage != null && orderUsage.contains(type)) {
+            return ordering.get(this);
+        } else {
+            return null;
+        }
     }
 
     /**
      * Sets the ordering to the specified value.
-     *
-     * @todo Need to preserve the order in which this method has been invoked.
      */
-    public void setOrdering(String ordering) {
+    public void setOrdering(String ordering, final QueryType... types) {
         if (ordering != null) {
             ordering = ordering.trim().toUpperCase(Locale.ENGLISH);
         }
-        this.ordering = ordering;
+        if (orderUsage == null) {
+            orderUsage = EnumSet.noneOf(QueryType.class);
+        }
+        orderUsage.clear();
+        orderUsage.addAll(Arrays.asList(types));
+        this.ordering.put(this, ordering);
     }
 
     /**

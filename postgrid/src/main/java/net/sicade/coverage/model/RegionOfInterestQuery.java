@@ -48,15 +48,16 @@ final class RegionOfInterestQuery extends Query {
     public RegionOfInterestQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT, LIST};
+        final QueryType[] list  = {        LIST};
         name   = addColumn("RegionOfInterests", "name", usage);
         dx     = addColumn("RegionOfInterests", "dx",   usage);
         dy     = addColumn("RegionOfInterests", "dy",   usage);
         dz     = addColumn("RegionOfInterests", "dz",   usage);
         dt     = addColumn("RegionOfInterests", "dt",   usage);
-        byName = addParameter(name,  SELECT);
-        dt.setOrdering("DESC");
-        dz.setOrdering("DESC");
-        dy.setOrdering("DESC");
-        dx.setOrdering("DESC");
+        byName = addParameter(name, SELECT);
+        dt.setOrdering("DESC", list);
+        dz.setOrdering("DESC", list);
+        dy.setOrdering("DESC", list);
+        dx.setOrdering("DESC", list);
     }
 }

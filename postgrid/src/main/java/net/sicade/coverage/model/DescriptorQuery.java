@@ -57,6 +57,6 @@ final class DescriptorQuery extends Query {
         distribution = addColumn   ("Descriptors", "distribution", usage);
         bySymbol     = addParameter(symbol,     SELECT);
         byIdentifier = addParameter(identifier, SELECT_BY_IDENTIFIER);
-        identifier.setOrdering("ASC");
+        identifier.setOrdering("ASC", LIST);
     }
 }

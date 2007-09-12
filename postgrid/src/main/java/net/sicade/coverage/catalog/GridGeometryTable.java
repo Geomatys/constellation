@@ -75,8 +75,15 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * @param connection The connection to the database.
      */
     public GridGeometryTable(final Database database) {
-        super(new GridGeometryQuery(database));
-        setIdentifierParameters(((GridGeometryQuery) query).byIdentifier, null);
+        this(new GridGeometryQuery(database));
+    }
+
+    /**
+     * Constructs a new {@code GridGeometryTable} from the specified query.
+     */
+    private GridGeometryTable(final GridGeometryQuery query) {
+        super(query);
+        setIdentifierParameters(query.byIdentifier, null);
     }
 
     /**
@@ -191,7 +198,8 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         /*
          * Creates the entry and performs some final checks.
          */
-        final GridGeometryEntry entry = new GridGeometryEntry(identifier, gridRange, envelope, bbox, altitudes);
+        final AffineTransform at = new AffineTransform(scaleX, shearY, shearX, scaleY, translateX, translateY);
+        final GridGeometryEntry entry = new GridGeometryEntry(identifier, at, gridRange, envelope, bbox, altitudes);
         if (entry.geographicEnvelope.isEmpty()) {
             throw new IllegalRecordException("L'enveloppe géographique est vide. Elle a été calculée à partir de \"" +
                     horizontalExtent + "\".", results, indexOf(query.horizontalExtent), identifier);

@@ -20,10 +20,13 @@ import java.util.Date;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.geotools.geometry.GeneralEnvelope;
+
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.DatabaseTest;
 
@@ -55,31 +58,41 @@ public class GridCoverageTableTest extends DatabaseTest {
         final CoverageReference entry = table.getEntry(SAMPLE_NAME);
         assertEquals(SeriesTableTest.SAMPLE_NAME + ':' + SAMPLE_NAME, entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
-
+        /*
+         * Tests the envelope of a single entry.
+         */
         final Envelope envelope = entry.getEnvelope();
         assertTrue(getHorizontalCRS(envelope.getCoordinateReferenceSystem()) instanceof GeographicCRS);
         assertEquals(-180, envelope.getMinimum(0), 0.0);
         assertEquals(+180, envelope.getMaximum(0), 0.0);
         assertEquals( -90, envelope.getMinimum(1), 0.0);
         assertEquals( +90, envelope.getMaximum(1), 0.0);
-
+        /*
+         * Gets the set of entries in the layer.
+         */
         table.setTimeRange(LayerTableTest.START_TIME, LayerTableTest.END_TIME);
         final Set<CoverageReference> entries = table.getEntries();
         assertEquals(3, entries.size());
         assertTrue(entries.contains(entry));
         assertSame(entry, table.getEntry());
-
+        /*
+         * Tests available centroids.
+         */
         final SortedMap<Date, SortedSet<Number>> centroids = table.getAvailableCentroids();
         assertEquals(entries.size(), centroids.size());
         final Set<Number> depths = centroids.get(LayerTableTest.SAMPLE_TIME);
         assertNotNull(depths);
         assertTrue(depths.isEmpty());
-
+        /*
+         * Tests available times.
+         */
         final Set<Date> availableTimes = table.getAvailableTimes();
         assertEquals(centroids.keySet(), availableTimes);
         assertTrue(allTimes.containsAll(availableTimes));
         assertFalse(availableTimes.containsAll(allTimes));
-
+        /*
+         * Tests available elevations.
+         */
         final Set<Number> elevations = table.getAvailableElevations();
         assertTrue(elevations.isEmpty());
     }
@@ -93,7 +106,9 @@ public class GridCoverageTableTest extends DatabaseTest {
         table.setLayer(LayerTableTest.NETCDF_NAME);
         final Set<Date> availableTimes = table.getAvailableTimes();
         assertEquals(3, availableTimes.size());
-
+        /*
+         * Tests the envelope of a single entry.
+         */
         final CoverageReference entry = table.getEntry();
         final Envelope envelope = entry.getEnvelope();
         assertTrue(getHorizontalCRS(envelope.getCoordinateReferenceSystem()) instanceof ProjectedCRS);
@@ -101,11 +116,40 @@ public class GridCoverageTableTest extends DatabaseTest {
         assertEquals( 2.00375E7, envelope.getMaximum(0), 100.0);
         assertEquals(-1.38176E7, envelope.getMinimum(1), 100.0);
         assertEquals( 1.38176E7, envelope.getMaximum(1), 100.0);
-
+        /*
+         * Tests the geographic envelope, which should have been projected.
+         */
         final GeographicBoundingBox bbox = entry.getGeographicBoundingBox();
         assertEquals(-180, bbox.getWestBoundLongitude(), 0.0);
         assertEquals(+180, bbox.getEastBoundLongitude(), 0.0);
         assertEquals( -77, bbox.getSouthBoundLatitude(), 0.1);
         assertEquals( +77, bbox.getNorthBoundLatitude(), 0.1);
+    }
+
+    /**
+     * Tests the request for the bounding box.
+     */
+    @Test
+    public void testBoundingBox() throws CatalogException, SQLException {
+        final GridCoverageTable table = new GridCoverageTable(database);
+        table.setLayer(LayerTableTest.SAMPLE_NAME);
+        final GeneralEnvelope search = new GeneralEnvelope(table.getCoordinateReferenceSystem());
+        search.setRange(0, -200, 200);
+        search.setRange(1, -100, 100);
+        search.setRange(2, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        table.setEnvelope(search);
+
+        Envelope envelope = table.getEnvelope();
+        assertEquals(-200, envelope.getMinimum(0), 0.0);
+        assertEquals(+200, envelope.getMaximum(0), 0.0);
+        assertEquals(-100, envelope.getMinimum(1), 0.0);
+        assertEquals(+100, envelope.getMaximum(1), 0.0);
+        
+        table.trimEnvelope();
+        envelope = table.getEnvelope();
+        assertEquals(-180, envelope.getMinimum(0), 0.0);
+        assertEquals(+180, envelope.getMaximum(0), 0.0);
+        assertEquals( -90, envelope.getMinimum(1), 0.0);
+        assertEquals( +90, envelope.getMaximum(1), 0.0);
     }
 }

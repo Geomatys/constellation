@@ -54,7 +54,7 @@ final class LinearModelQuery extends Query {
         source2     = addColumn   ("LinearModelTerms", "source2",     usage);
         coefficient = addColumn   ("LinearModelTerms", "coefficient", usage);
         byTarget    = addParameter(target, usage);
-        source1.setOrdering("ASC");
-        source2.setOrdering("ASC");
+        source1.setOrdering("ASC", usage);
+        source2.setOrdering("ASC", usage);
     }
 }

@@ -16,51 +16,103 @@ package net.sicade.util;
 
 import java.util.Date;
 import javax.media.jai.util.Range;
+import javax.units.SI;
+import javax.units.Unit;
+import javax.units.Converter;
+import javax.units.ConversionException;
+
+import org.geotools.util.MeasurementRange;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
- * Une plage de dates. Dans la version actuelle, cette implémentation ne clone pas les dates
- * données en argument ou retournées. Cette classe devrait donc être considérée comme mutable.
+ * A range of dates.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class DateRange extends Range {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * For cross-version compatibility.
      */
     private static final long serialVersionUID = -6400011350250757942L;
 
     /**
-     * Construit une nouvelle plage pour les dates spécifiées.
-     * Les dates de départ et de fins sont considérées inclusives.
+     * The unit used for time representation in a date.
+     */
+    private static final Unit MILLISECOND = SI.MILLI(SI.SECOND);
+
+    /**
+     * Creates a new date range for the given dates. Start time and end time are inclusive.
      */
     public DateRange(final Date startTime, final Date endTime) {
-        super(Date.class, startTime, endTime);
+        super(Date.class, clone(startTime), clone(endTime));
     }
 
     /**
-     * Construit une nouvelle plage pour les dates spécifiées.
+     * Creates a new date range for the given dates.
      */
     public DateRange(final Date startTime, boolean isMinIncluded,
                      final Date   endTime, boolean isMaxIncluded)
     {
-        super(Date.class, startTime, isMinIncluded, endTime, isMaxIncluded);
+        super(Date.class, clone(startTime), isMinIncluded,
+                          clone(  endTime), isMaxIncluded);
     }
 
     /**
-     * Retourne la date de départ.
+     * Creates a date range from the specified measurement range. Units are converted as needed.
+     * 
+     * @throws ConversionException if the given range doesn't have a
+     *         {@linkplain MeasurementRange#getUnits unit} compatible with milliseconds.
+     */
+    public DateRange(final MeasurementRange range, final Date origin) throws ConversionException {
+        this(range, getConverter(range.getUnits()), origin.getTime());
+    }
+
+    /**
+     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
+     * call in constructors").
+     */
+    private DateRange(final MeasurementRange range, final Converter converter, final long origin)
+            throws ConversionException
+    {
+        super(Date.class,
+              new Date(origin + Math.round(converter.convert(range.getMinimum()))), range.isMinIncluded(),
+              new Date(origin + Math.round(converter.convert(range.getMinimum()))), range.isMaxIncluded());
+    }
+
+    /**
+     * Returns a clone of the specified date.
+     */
+    private static Date clone(final Date date) {
+        return (date != null) ? (Date) date.clone() : null;
+    }
+
+    /**
+     * Workaround for RFE #4093999 ("Relax constraint on placement of this()/super()
+     * call in constructors").
+     */
+    private static Converter getConverter(final Unit source) throws ConversionException {
+        if (source == null) {
+            throw new ConversionException(Errors.format(ErrorKeys.NO_UNIT));
+        }
+        return source.getConverterTo(MILLISECOND);
+    }
+
+    /**
+     * Returns the start time.
      */
     @Override
     public Date getMinValue() {
-        return (Date) super.getMinValue();
+        return clone((Date) super.getMinValue());
     }
 
     /**
-     * Retourne la date de fin.
+     * Returns the end time.
      */
     @Override
     public Date getMaxValue() {
-        return (Date) super.getMaxValue();
+        return clone((Date) super.getMaxValue());
     }
 }

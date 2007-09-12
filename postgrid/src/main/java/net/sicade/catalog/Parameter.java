@@ -46,16 +46,6 @@ public final class Parameter extends IndexedSqlElement {
     }
 
     /**
-     * Returns the function applied on the column, or {@code null} if none.
-     */
-    final String getColumnFunction(final QueryType type) {
-        if (column.name.equals(column.alias)) {
-            return column.getFunction(type);
-        }
-        return null;
-    }
-
-    /**
      * Returns the parameter index when used in a query of the given type. Valid index numbers
      * start at 1. This method returns 0 if this parameter is not applicable to a query of the
      * specified type.

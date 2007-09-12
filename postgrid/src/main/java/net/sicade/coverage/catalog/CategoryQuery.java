@@ -49,15 +49,15 @@ final class CategoryQuery extends Query {
         super(database);
         final Column band;
         final QueryType[] usage = {LIST, FILTERED_LIST};
-        name     = addColumn("Categories", "name",     usage);
-        band     = addColumn("Categories", "band",     LIST );
-        lower    = addColumn("Categories", "lower",    usage);
-        upper    = addColumn("Categories", "upper",    usage);
-        c0       = addColumn("Categories", "c0",       usage);
-        c1       = addColumn("Categories", "c1",       usage);
-        function = addColumn("Categories", "function", usage);
-        colors   = addColumn("Categories", "colors",   usage);
+        name     = addColumn("Categories", "name",           usage);
+        band     = addColumn("Categories", "band",           LIST );
+        lower    = addColumn("Categories", "lower",          usage);
+        upper    = addColumn("Categories", "upper",          usage);
+        c0       = addColumn("Categories", "c0",             usage);
+        c1       = addColumn("Categories", "c1",             usage);
+        function = addColumn("Categories", "function", null, usage);
+        colors   = addColumn("Categories", "colors",         usage);
         byBand   = addParameter(band, FILTERED_LIST);
-        lower.setOrdering("ASC");
+        lower.setOrdering("ASC", usage);
     }
 }

@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.coverage.catalog;
+package net.sicade.coverage.catalog.gui;
 
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +61,8 @@ import net.sicade.resources.XArray;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
 import net.sicade.catalog.CatalogException;
+import net.sicade.coverage.catalog.Layer;
+import net.sicade.coverage.catalog.CoverageReference;
 
 
 /**

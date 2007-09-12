@@ -528,7 +528,6 @@ nextTable: for (final String table : tables.keySet()) {
      * Runs from the command line.
      */
     public static void main(String[] args) throws IOException, SQLException {
-        Logging.ALL.forceMonolineConsoleOutput(Level.CONFIG);
         final Arguments arguments = new Arguments(args);
         final String config = arguments.getRequiredString("-config");
         final boolean deleteBeforeInsert = arguments.getFlag("-delete-before-insert");

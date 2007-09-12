@@ -51,9 +51,9 @@ final class SampleDimensionQuery extends Query {
         final QueryType[] usage = {LIST, FILTERED_LIST};
         identifier = addColumn("SampleDimensions", "identifier", usage);
         format     = addColumn("SampleDimensions", "format",     LIST );
-        band       = addColumn("SampleDimensions", "band",       usage);
+        band       = addColumn("SampleDimensions", "band", 1,    usage);
         units      = addColumn("SampleDimensions", "units",      usage);
         byFormat   = addParameter(format, FILTERED_LIST);
-        band.setOrdering("ASC");
+        band.setOrdering("ASC", usage);
     }
 }
