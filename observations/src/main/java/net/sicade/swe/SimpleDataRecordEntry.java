@@ -48,6 +48,7 @@ public class SimpleDataRecordEntry extends Entry implements SimpleDataRecord {
      * List de valeur textuelle ou scalaire.
      */
     private Collection<DataRecordFieldEntry> fields;
+   
     /** 
      * Créé une nouvelle Liste de valeur textuelle ou scalaire.
      */

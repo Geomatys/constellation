@@ -26,6 +26,8 @@ import net.sicade.coverage.model.Distribution;
 import net.sicade.coverage.model.DistributionTable;
 import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.AnyResultTable;
+import net.sicade.swe.DataBlockDefinition;
+import net.sicade.swe.DataBlockDefinitionTable;
 
 // OpenGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;
@@ -93,6 +95,12 @@ public abstract class ObservationTable<EntryType extends Observation> extends Si
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected AnyResultTable results;
+    
+    /**
+     * Connexion vers la table des {@linkplain DataBlockDefinition dataBlockdDefinition}.
+     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     */
+    protected DataBlockDefinitionTable dataBlockDefinitions;
     
     /**
      * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
@@ -252,12 +260,17 @@ public abstract class ObservationTable<EntryType extends Observation> extends Si
       }
       AnyResultEntry any = results.getEntry(result.getString(indexOf(query.result)));
       Object resultat;
-      if(any.getReference() == null && any.getDataBlockDefinition() != null) {
-          resultat = any.getDataBlockDefinition();
-      } else if(any.getReference() != null && any.getDataBlockDefinition() == null)  {
+      if(any.getReference() == null && any.getDataBlock() != null) {
+          resultat = any.getDataBlock();
+      } else if(any.getReference() != null && any.getDataBlock() == null)  {
           resultat = any.getReference();
       }
-        
+      
+      if (dataBlockDefinitions == null) {
+          dataBlockDefinitions = getDatabase().getTable(DataBlockDefinitionTable.class);
+      }
+      DataBlockDefinition dataBlockDef = dataBlockDefinitions.getEntry(result.getString(indexOf(query.resultDefinition)));
+      
       
       return new ObservationEntry(result.getString(indexOf(query.name)),
                                   result.getString(indexOf(query.description)),
@@ -269,7 +282,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Si
                                   resultat,
                                   new TemporalObjectEntry(result.getDate(indexOf(query.samplingTimeBegin)),
                                                           result.getDate(indexOf(query.samplingTimeEnd))),
-                                  result.getString(indexOf(query.resultDefinition)));
+                                  dataBlockDef.getId());
         
         
     }

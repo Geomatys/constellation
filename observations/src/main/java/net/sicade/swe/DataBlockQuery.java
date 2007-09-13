@@ -22,36 +22,35 @@ import net.sicade.catalog.QueryType;
 import static net.sicade.catalog.QueryType.*;
 
 /**
- * The query to execute for a {@link AnyResultTable}.
+ * The query to execute for a {@link DataBlockTable}.
  *
  * @version $Id:
  * @author Guilhem Legal
  */
-public class AnyResultQuery extends Query {
+public class DataBlockQuery extends Query{
     
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column idResult, reference, dataBlock;
+    protected final Column idBlock, data;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byIdResult;
+    protected final Parameter byIdBlock;
     
     /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
-    public AnyResultQuery(final Database database) {
+    public DataBlockQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT};
-        idResult   = addColumn("any_results", "id_result",  usage);
-        reference  = addColumn("any_results", "reference",  usage);
-        dataBlock  = addColumn("any_results", "data_block", usage);
+        idBlock       = addColumn("data_block", "id_datablock",  usage);
+        data          = addColumn("data_block", "fixed",         usage);
         
-        byIdResult = addParameter(idResult, SELECT);
+        byIdBlock       = addParameter(idBlock, SELECT);
     }
     
 }

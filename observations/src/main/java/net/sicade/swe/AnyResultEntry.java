@@ -39,7 +39,7 @@ public class AnyResultEntry extends Entry {
     /**
      * Le resultat peut être de type DataBlockDefinition.
      */
-    private DataBlockDefinition dataBlockDefinition;
+    private DataBlockEntry dataBlock;
     
     /**
      * créé un nouveau resultat en specifiant son type.
@@ -48,11 +48,11 @@ public class AnyResultEntry extends Entry {
      * @param reference l'identifiant de la reference si le resultat en est une, {@code null} sinon.
      * @param dataBlockDefinition l'identifiant du dataBlock si le resultat en est un, {@code null} sinon.
      */
-    public AnyResultEntry(int id, Reference reference, DataBlockDefinition dataBlockDefinition) {
+    public AnyResultEntry(int id, Reference reference, DataBlockEntry dataBlock) {
         super(null);
         this.id = id;
         this.reference = reference;
-        this.dataBlockDefinition = dataBlockDefinition;
+        this.dataBlock = dataBlock;
     }
 
     /**
@@ -72,8 +72,8 @@ public class AnyResultEntry extends Entry {
     /**
      * retourne un resultat de type dataBlockDefinition si s'en est un, {@code null} sinon.
      */
-    public DataBlockDefinition getDataBlockDefinition() {
-        return dataBlockDefinition;
+    public DataBlockEntry getDataBlock() {
+        return dataBlock;
     }
     
 }
