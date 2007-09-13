@@ -46,7 +46,7 @@ public class LayerTableTest extends DatabaseTest {
     /**
      * The name of the NetCDF layer to be tested.
      */
-    public static final String NETCDF_NAME = "coriolis";
+    public static final String NETCDF_NAME = "AO_Coriolis_(Temp)";
 
     /**
      * The start time, end time, and a sample time between them.
@@ -92,8 +92,8 @@ public class LayerTableTest extends DatabaseTest {
         final NumberRange[] validRanges = entry.getSampleValueRanges();
         assertNotNull(validRanges);
         assertEquals(1, validRanges.length);
-        assertEquals(-2.85, validRanges[0].getMinimum(), 1E-8);
-        assertEquals(35.25, validRanges[0].getMaximum(), 1E-8);
+        assertEquals(-2.85, validRanges[0].getMinimum(true), 1E-8);
+        assertEquals(35.25, validRanges[0].getMaximum(true), 1E-8);
     }
 
     /**
@@ -114,7 +114,7 @@ public class LayerTableTest extends DatabaseTest {
         final NumberRange[] validRanges = entry.getSampleValueRanges();
         assertNotNull(validRanges);
         assertEquals(1, validRanges.length);
-        assertEquals(-2.999, validRanges[0].getMinimum(), 1E-8);
-        assertEquals(40.000, validRanges[0].getMaximum(), 1E-8);
+        assertEquals(-3.0, validRanges[0].getMinimum(true), 1E-8);
+        assertEquals(40.0, validRanges[0].getMaximum(true), 1E-8);
     }
 }

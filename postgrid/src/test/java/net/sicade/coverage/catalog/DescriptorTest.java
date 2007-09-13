@@ -23,11 +23,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import net.sicade.catalog.CatalogException;
 
 import org.geotools.resources.Arguments;
-import org.geotools.util.MonolineFormatter;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
+
+import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.model.DescriptorTable;
 
 
@@ -65,8 +65,6 @@ public class DescriptorTest extends AbstractTest {
      * Exécute la suite de tests à partir de la ligne de commande.
      */
     public static void main(final String[] args) {
-        MonolineFormatter.init("org.geotools");
-        MonolineFormatter.init("net.sicade");
         final Arguments arguments = new Arguments(args);
         Locale.setDefault(arguments.locale);
         junit.textui.TestRunner.run(suite());

@@ -580,20 +580,20 @@ COMMENT ON CONSTRAINT "enforce_srid_verticalOrdinates" ON "GridGeometries" IS 'L
 
 
 --
--- Name: GeometriesCheck; Type: VIEW; Schema: postgrid; Owner: geoadmin
+-- Name: BoundingBoxes; Type: VIEW; Schema: postgrid; Owner: geoadmin
 --
 
-CREATE VIEW "GeometriesCheck" AS
-    SELECT "GridGeometries".identifier, postgis.box2d(postgis.transform(postgis.affine(postgis.geometryfromtext((((((((('POLYGON((0 0,0 '::text || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' '::text) || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' 0,0 0))'::text), "GridGeometries"."horizontalSRID"), "GridGeometries"."scaleX", "GridGeometries"."shearX", "GridGeometries"."shearY", "GridGeometries"."scaleY", "GridGeometries"."translateX", "GridGeometries"."translateY"), 4326)) AS "computedBox", postgis.box2d("GridGeometries"."horizontalExtent") AS "declaredBox", postgis.astext("GridGeometries"."horizontalExtent") AS "declaredPolygon" FROM "GridGeometries";
+CREATE VIEW "BoundingBoxes" AS
+    SELECT "GeometryDetails".identifier, "GeometryDetails".width, "GeometryDetails".height, "GeometryDetails".crs, postgis.xmin(("GeometryDetails"."nativeBox")::postgis.box3d) AS "minX", postgis.xmax(("GeometryDetails"."nativeBox")::postgis.box3d) AS "maxX", postgis.ymin(("GeometryDetails"."nativeBox")::postgis.box3d) AS "minY", postgis.ymax(("GeometryDetails"."nativeBox")::postgis.box3d) AS "maxY", postgis.xmin(("GeometryDetails"."geographicBox")::postgis.box3d) AS "westBoundLongitude", postgis.xmax(("GeometryDetails"."geographicBox")::postgis.box3d) AS "eastBoundLongitude", postgis.ymin(("GeometryDetails"."geographicBox")::postgis.box3d) AS "southBoundLatitude", postgis.ymax(("GeometryDetails"."geographicBox")::postgis.box3d) AS "northBoundLatitude" FROM (SELECT "TransformedGeometries".identifier, "TransformedGeometries".width, "TransformedGeometries".height, postgis.srid("TransformedGeometries".envelope) AS crs, postgis.box2d("TransformedGeometries".envelope) AS "nativeBox", postgis.box2d(postgis.transform("TransformedGeometries".envelope, 4326)) AS "geographicBox" FROM (SELECT "GridGeometries".identifier, "GridGeometries".width, "GridGeometries".height, postgis.affine(postgis.geometryfromtext((((((((('POLYGON((0 0,0 '::text || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' '::text) || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' 0,0 0))'::text), "GridGeometries"."horizontalSRID"), "GridGeometries"."scaleX", "GridGeometries"."shearX", "GridGeometries"."shearY", "GridGeometries"."scaleY", "GridGeometries"."translateX", "GridGeometries"."translateY") AS envelope FROM "GridGeometries") "TransformedGeometries") "GeometryDetails";
 
 
-ALTER TABLE postgrid."GeometriesCheck" OWNER TO geoadmin;
+ALTER TABLE postgrid."BoundingBoxes" OWNER TO geoadmin;
 
 --
--- Name: VIEW "GeometriesCheck"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+-- Name: VIEW "BoundingBoxes"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
 --
 
-COMMENT ON VIEW "GeometriesCheck" IS 'Comparaison entre les enveloppes calculées et les enveloppes déclarées.';
+COMMENT ON VIEW "BoundingBoxes" IS 'Comparaison entre les enveloppes calculées et les enveloppes déclarées.';
 
 
 --
@@ -1511,7 +1511,7 @@ COMMENT ON CONSTRAINT "Distribution_reference" ON "Descriptors" IS 'Chaque descr
 --
 
 ALTER TABLE ONLY "LinearModelTerms"
-    ADD CONSTRAINT "ExplainedVariable_reference" FOREIGN KEY (target) REFERENCES "Layers"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "ExplainedVariable_reference" FOREIGN KEY (target) REFERENCES "Layers"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1541,7 +1541,7 @@ COMMENT ON CONSTRAINT "Fallback_reference" ON "Layers" IS 'Chaque couche de seco
 --
 
 ALTER TABLE ONLY "SampleDimensions"
-    ADD CONSTRAINT "Format_reference" FOREIGN KEY (format) REFERENCES "Formats"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "Format_reference" FOREIGN KEY (format) REFERENCES "Formats"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1586,7 +1586,7 @@ COMMENT ON CONSTRAINT "GridGeometry_reference" ON "GridCoverages" IS 'Chaque ima
 --
 
 ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "Layer_reference" FOREIGN KEY (layer) REFERENCES "Layers"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "Layer_reference" FOREIGN KEY (layer) REFERENCES "Layers"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1601,7 +1601,7 @@ COMMENT ON CONSTRAINT "Layer_reference" ON "Descriptors" IS 'Chaque descripteur 
 --
 
 ALTER TABLE ONLY "OperationParameters"
-    ADD CONSTRAINT "Operation_reference" FOREIGN KEY (operation) REFERENCES "Operations"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "Operation_reference" FOREIGN KEY (operation) REFERENCES "Operations"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1609,7 +1609,7 @@ ALTER TABLE ONLY "OperationParameters"
 --
 
 ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "Operation_reference" FOREIGN KEY (operation) REFERENCES "Operations"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "Operation_reference" FOREIGN KEY (operation) REFERENCES "Operations"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1624,7 +1624,7 @@ COMMENT ON CONSTRAINT "Operation_reference" ON "Descriptors" IS 'Chaque descript
 --
 
 ALTER TABLE ONLY "Layers"
-    ADD CONSTRAINT "Procedure_reference" FOREIGN KEY ("procedure") REFERENCES "Procedures"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "Procedure_reference" FOREIGN KEY ("procedure") REFERENCES "Procedures"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1647,7 +1647,7 @@ COMMENT ON CONSTRAINT "Quicklook_reference" ON "Series" IS 'Les aperçus s''appl
 --
 
 ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "ROI_reference" FOREIGN KEY (region) REFERENCES "RegionOfInterests"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "ROI_reference" FOREIGN KEY (region) REFERENCES "RegionOfInterests"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1662,7 +1662,7 @@ COMMENT ON CONSTRAINT "ROI_reference" ON "Descriptors" IS 'Chaque descripteur pe
 --
 
 ALTER TABLE ONLY "Categories"
-    ADD CONSTRAINT "SampleDimension_reference" FOREIGN KEY (band) REFERENCES "SampleDimensions"(identifier) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "SampleDimension_reference" FOREIGN KEY (band) REFERENCES "SampleDimensions"(identifier) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1677,7 +1677,7 @@ COMMENT ON CONSTRAINT "SampleDimension_reference" ON "Categories" IS 'Chaque cat
 --
 
 ALTER TABLE ONLY "GridCoverages"
-    ADD CONSTRAINT "Series_reference" FOREIGN KEY (series) REFERENCES "Series"(identifier) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "Series_reference" FOREIGN KEY (series) REFERENCES "Series"(identifier) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1692,7 +1692,7 @@ COMMENT ON CONSTRAINT "Series_reference" ON "GridCoverages" IS 'Chaque image app
 --
 
 ALTER TABLE ONLY "Series"
-    ADD CONSTRAINT "Series_reference" FOREIGN KEY (layer) REFERENCES "Layers"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "Series_reference" FOREIGN KEY (layer) REFERENCES "Layers"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1707,7 +1707,7 @@ COMMENT ON CONSTRAINT "Series_reference" ON "Series" IS 'Chaque série appartien
 --
 
 ALTER TABLE ONLY "Layers"
-    ADD CONSTRAINT "Thematic_reference" FOREIGN KEY (thematic) REFERENCES "Thematics"(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT "Thematic_reference" FOREIGN KEY (thematic) REFERENCES "Thematics"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1834,13 +1834,13 @@ GRANT SELECT ON TABLE "GridGeometries" TO PUBLIC;
 
 
 --
--- Name: GeometriesCheck; Type: ACL; Schema: postgrid; Owner: geoadmin
+-- Name: BoundingBoxes; Type: ACL; Schema: postgrid; Owner: geoadmin
 --
 
-REVOKE ALL ON TABLE "GeometriesCheck" FROM PUBLIC;
-REVOKE ALL ON TABLE "GeometriesCheck" FROM geoadmin;
-GRANT ALL ON TABLE "GeometriesCheck" TO geoadmin;
-GRANT SELECT ON TABLE "GeometriesCheck" TO PUBLIC;
+REVOKE ALL ON TABLE "BoundingBoxes" FROM PUBLIC;
+REVOKE ALL ON TABLE "BoundingBoxes" FROM geoadmin;
+GRANT ALL ON TABLE "BoundingBoxes" TO geoadmin;
+GRANT SELECT ON TABLE "BoundingBoxes" TO PUBLIC;
 
 
 --
