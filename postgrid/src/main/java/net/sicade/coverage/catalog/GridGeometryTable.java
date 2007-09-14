@@ -308,9 +308,9 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * @return The identifier of a matching entry, or {@code null} if none.
      * @throws SQLException if the operation failed.
      */
-    public synchronized String getIdentifier(final Dimension size, final AffineTransform gridToCRS,
-                                             final String horizontalSRID, final String verticalSRID,
-                                             final double[] verticalOrdinates)
+    final synchronized String getIdentifier(final Dimension size, final AffineTransform gridToCRS,
+                                            final String horizontalSRID, final String verticalSRID,
+                                            final double[] verticalOrdinates)
             throws SQLException
     {
         final GridGeometryQuery query = (GridGeometryQuery) super.query;

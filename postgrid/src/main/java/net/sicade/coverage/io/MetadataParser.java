@@ -14,6 +14,8 @@
  */
 package net.sicade.coverage.io;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.Date;
 import java.io.IOException;
 import javax.imageio.IIOException;
@@ -31,6 +33,10 @@ import org.geotools.util.NumberRange;
 
 import net.sicade.util.Ranks;
 import net.sicade.util.DateRange;
+import org.geotools.coverage.grid.GeneralGridGeometry;
+import org.geotools.coverage.grid.GridGeometry2D;
+import org.opengis.metadata.spatial.PixelOrientation;
+import org.opengis.util.CodeList;
 
 
 /**
@@ -72,6 +78,23 @@ public class MetadataParser {
                 throw new IIOException("Aucune métadonnée n'a été trouvée"); // TODO: localize
             }
         }
+    }
+
+    /**
+     * Returns the code list of the given name, or {@code null} if none.
+     * 
+     * @todo Weshould log a warning if a name has been specified but no matching code was found.
+     */
+    private static <E extends CodeList> E getCode(final E[] values, String name) {
+        if (name != null) {
+            name = name.trim();
+            for (final E code : values) {
+                if (name.equals(code.name())) {
+                    return code;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -180,5 +203,90 @@ public class MetadataParser {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the <cite>grid to CRS</cite> transform for the specified axis. The returned
+     * transform maps always the {@linkplain PixelOrientation#UPPER_LEFT upper left} corner.
+     * 
+     * @param  xAxis The <var>x</var> axis (usually 0).
+     * @param  yAxis The <var>y</var> axis (usually 1).
+     * @return The affine transform from grid to CRS.
+     */
+    public AffineTransform getGridToCRS(final int xAxis, final int yAxis) {
+        final double[] flatmatrix = new double[6];
+        final ImageGeometry geometry = metadata.getGeometry();
+        computeAffineCoefficients(geometry, xAxis, xAxis, flatmatrix, false);
+        computeAffineCoefficients(geometry, yAxis, yAxis, flatmatrix, true );
+        final AffineTransform at = new AffineTransform(flatmatrix);
+        final PixelOrientation p = getCode(PixelOrientation.values(), geometry.getPixelOrientation());
+        if (p != null) {
+            final Point2D offset = GridGeometry2D.getPixelTranslation(p);
+            at.translate(0.5 + offset.getX(), 0.5 + offset.getY());
+        }
+        return at;
+    }
+
+    /**
+     * Computes the affine transform cooefficients for the specified dimension.
+     * 
+     * @param geometry   The geometry where to fetch information from.
+     * @param sourceDim  The source dimension in the grid geometry.
+     * @param targetDim  The target dimension in the envelope. Usually identical to {@code sourceDim}.
+     * @param flatmatrix The flat matrix to setup. Coefficients will be written in this array on output.
+     * @param asY        {@code false} for setting <var>x</var> coefficients,
+     *                   {@code true} for setting <var>y</var>.
+     */
+    private static boolean computeAffineCoefficients(final ImageGeometry geometry,
+            final int sourceDim, final int targetDim, final double[] flatmatrix, final boolean asY)
+    {
+        final NumberRange sourceRange = geometry.getGridRange(sourceDim);
+        if (sourceRange == null) {
+            return false;
+        }
+        final NumberRange targetRange = geometry.getCoordinateRange(targetDim);
+        if (targetRange == null) {
+            return false;
+        }
+        /*
+         * The 'isMin/MaxIncluded' flags are determined from the target ranges because they are
+         * typically floating point values, while source ranges are typically integer values. It
+         * is easier and more accurate to keep floating point values "as is" and adjust integer
+         * values than the converse.
+         */
+        final boolean isMinIncluded = targetRange.isMinIncluded();
+        final boolean isMaxIncluded = targetRange.isMaxIncluded();
+        final double  minimum = targetRange.getMinimum();
+        final double  maximum = targetRange.getMaximum();
+        final double  lower   = sourceRange.getMinimum(isMinIncluded);
+        final double  upper   = sourceRange.getMaximum(isMaxIncluded);
+        double scale  = (maximum - minimum) / (upper - lower);
+        if (Double.isNaN(scale)) {
+            /*
+             * We probably have a single value (minimum == maximum && lower == upper). Set the
+             * scale to 0. This is not equivalent to NaN, but is not completly unsafe since it
+             * will cause the transform to be non-invertible. Users who attempt to invert this
+             * transform will be clearly notified by a NonInvertibleTransformException.
+             * 
+             * Setting the scale to 0 allows the transform to produce 'minimum' on very attempt
+             * to transform a coordinates, which is probably the expected value. Note that both
+             * 'isMin/MaxIncluded' flags are expected to be true, otherwise we probably have an
+             * invalid range. Note also that we accept infinite values; they are mathematically
+             * okay.
+             */
+            if (!isMinIncluded || !isMaxIncluded) {
+                return false;
+            }
+            scale = 0;
+        }
+        final double offset = minimum - scale * lower;
+        if (asY) {
+            flatmatrix[3] = scale;
+            flatmatrix[5] = offset;
+        } else {
+            flatmatrix[0] = scale;
+            flatmatrix[4] = offset;
+        }
+        return true;
     }
 }

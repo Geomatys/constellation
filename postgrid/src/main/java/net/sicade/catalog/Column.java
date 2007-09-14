@@ -72,6 +72,12 @@ public final class Column extends IndexedSqlElement {
     private EnumSet<QueryType> orderUsage;
 
     /**
+     * The parameter index in {@code INSERT} statements. Will be calculated only the
+     * first time {@link Query#insert} will be invoked for this column {@link #table}.
+     */
+    private short insertIndex;
+
+    /**
      * Creates a column from the specified table with the specified name but no alias.
      *
      * @param query The query for which the column is created.
@@ -107,6 +113,18 @@ public final class Column extends IndexedSqlElement {
     }
 
     /**
+     * Sets the parameter index in {@code INSERT} statement.
+     */
+    final void setInsertIndex(final short index) {
+        if (insertIndex != index) {
+            if (insertIndex != 0) {
+                throw new IllegalStateException(String.valueOf(insertIndex));
+            }
+            insertIndex = index;
+        }
+    }
+
+    /**
      * Returns the column index when used in a query of the given type. Valid index numbers
      * start at 1. This method returns 0 if this column is not applicable to a query of the
      * specified type.
@@ -116,6 +134,9 @@ public final class Column extends IndexedSqlElement {
      */
     @Override
     public int indexOf(final QueryType type) {
+        if (QueryType.INSERT.equals(type)) {
+            return insertIndex;
+        }
         return super.indexOf(type);
     }
 

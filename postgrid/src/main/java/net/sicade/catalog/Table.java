@@ -61,6 +61,12 @@ public class Table {
     protected final Query query;
 
     /**
+     * The name of what looks like tha "main" table. In the simpliest case, all columns in
+     * the {@link #query} come from the same table and this field is the name of this table.
+     */
+    private String name;
+
+    /**
      * The query type for current {@linkplain #statement}, or {@code null} if none.
      */
     private QueryType queryType;
@@ -170,6 +176,16 @@ public class Table {
     }
 
     /**
+     * Returns the table name. If the {@linkplain #query} mix columns from different tables,
+     * then the value returned by this method is implementation-dependant. It may be the name
+     * of the table which contain the entry identifiers, or simply the name of the table that
+     * occurs most frequently.
+     */
+    public String getName() {
+        return query.getTableName();
+    }
+
+    /**
      * Returns a property for the given key. This method tries to {@linkplain Database#getProperty
      * get the property} from the {@linkplain #getDatabase database} if available, or return the
      * {@linkplain ConfigurationKey#getDefaultValue default value} otherwise.
@@ -258,7 +274,16 @@ public class Table {
      * @throws SQLException if the statement can not be created.
      */
     protected final PreparedStatement getStatement(final QueryType type) throws SQLException {
-        final String sql = (type != null) ? query.select(type) : null;
+        final String sql;
+        if (type != null) {
+            if (type.equals(QueryType.INSERT)) {
+                sql = query.insert(getName());
+            } else {
+                sql = query.select(type);
+            }
+        } else {
+            sql = null;
+        }
         queryType = type;
         return getStatement(sql);
     }
@@ -294,7 +319,7 @@ public class Table {
         if (index > 0) {
             return index;
         } else {
-            throw new SQLException("La colonne " + column + " ne s'applique pas au type " + queryType);
+            throw new SQLException("La colonne \"" + column + "\" ne s'applique pas au type " + queryType);
         }
     }
 

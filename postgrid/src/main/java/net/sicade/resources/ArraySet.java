@@ -69,7 +69,7 @@ public class ArraySet<Element> extends AbstractSet<Element> implements Serializa
      * Returns {@code true} if the specified array contains duplicated elements.
      * If the array contains one or more {@code null} elements, then this method
      * conservatively returns {@code false}  since the creation of null elements
-     * may be differed at a later time with the {@link #create} method.   This method
+     * may be differed at a later time with the {@link #create} method. This method
      * is used for assertions only.
      */
     private boolean hasDuplicated(final Element[] elements) {

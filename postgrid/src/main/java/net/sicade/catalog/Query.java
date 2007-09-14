@@ -24,13 +24,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
 import org.geotools.resources.Utilities;
+
 import net.sicade.resources.XArray;
 import net.sicade.resources.i18n.Resources;
 import net.sicade.resources.i18n.ResourceKeys;
+import net.sicade.util.FrequencySortedSet;
 
 
 /**
@@ -107,6 +111,20 @@ public class Query {
      */
     private Query(final Database database, final String catalog, final String schema) {
         this.database = database;
+    }
+
+    /**
+     * If every columns come from the same table (the usual case), returns their table name.
+     * Otherwise returns the table name that occurs most frequently.
+     *
+     * @throws NoSuchElementException if this query do not contains any column.
+     */
+    final String getTableName() throws NoSuchElementException {
+        final FrequencySortedSet<String> names = new FrequencySortedSet<String>(true);
+        for (int i=0; i<columns.length; i++) {
+            names.add(columns[i].table);
+        }
+        return names.first();
     }
 
     /**
@@ -201,6 +219,26 @@ public class Query {
     }
 
     /**
+     * Returns the column names for the specified table.
+     *
+     * @param  metadata The database metadata.
+     * @param  table The table name.
+     * @return The columns in the specified table.
+     * @throws SQLException if an error occured while reading the database.
+     */
+    private Set<String> getColumnNames(final DatabaseMetaData metadata, final String table)
+            throws SQLException
+    {
+        final Set<String> columns = new HashSet<String>();
+        ResultSet results = metadata.getColumns(database.catalog, database.schema, table, null);
+        while (results.next()) {
+            columns.add(results.getString("COLUMN_NAME"));
+        }
+        results.close();
+        return columns;
+    }
+
+    /**
      * Creates the SQL statement for selecting all records.
      * No SQL parameters are expected for this statement.
      *
@@ -243,12 +281,7 @@ public class Query {
                 }
                 Set<String> columns = columnNames.get(table);
                 if (columns == null) {
-                    columns = new HashSet<String>();
-                    ResultSet results = metadata.getColumns(database.catalog, database.schema, table, null);
-                    while (results.next()) {
-                        columns.add(results.getString("COLUMN_NAME"));
-                    }
-                    results.close();
+                    columns = getColumnNames(metadata, table);
                     columnNames.put(table, columns);
                 }
                 columnExists = columns.contains(column.name);
@@ -513,6 +546,49 @@ scan:       while (!tables.isEmpty()) {
             }
         }
         return sql;
+    }
+
+    /**
+     * Creates the SQL statement for inserting elements in the table that contains the given
+     * column.
+     *
+     * @param  table The name of the table in which to insert a statement.
+     * @return The SQL statement, or {@code null} if there is no column in the query.
+     * @throws SQLException if an error occured while reading the database.
+     */
+    final String insert(final String table) throws SQLException {
+        final DatabaseMetaData metadata = database.getConnection().getMetaData();
+        final String quote = metadata.getIdentifierQuoteString().trim();
+        final Set<String> columnNames = getColumnNames(metadata, table);
+        final StringBuilder buffer = new StringBuilder("INSERT INTO ");
+        if (database.catalog != null) {
+            buffer.append(quote).append(database.catalog).append(quote).append('.');
+        }
+        if (database.schema != null) {
+            buffer.append(quote).append(database.schema).append(quote).append('.');
+        }
+        buffer.append(quote).append(table).append(quote);
+        String separator = " (";
+        short count = 0;
+        for (final Column column : columns) {
+            if (!table.equals(column.table) || !columnNames.contains(column.name)) {
+                // Column not to be included for an insert statement.
+                continue;
+            }
+            buffer.append(separator).append(quote).append(column.name).append(quote);
+            separator = ", ";
+            column.setInsertIndex(++count);
+        }
+        if (count == 0) {
+            return null;
+        }
+        buffer.append(") VALUES");
+        separator = " (";
+        while (--count >= 0) {
+            buffer.append(separator).append('?');
+            separator = ", ";
+        }
+        return buffer.append(')').toString();
     }
 
     /**

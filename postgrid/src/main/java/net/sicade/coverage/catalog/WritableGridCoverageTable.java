@@ -18,12 +18,15 @@ import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.awt.Dimension;
+import java.awt.geom.AffineTransform;
 import java.net.URL;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
 
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -33,9 +36,11 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
+import net.sicade.util.DateRange;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.CatalogException;
+import net.sicade.coverage.io.MetadataParser;
 
 
 /**
@@ -102,57 +107,87 @@ public abstract class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Returns the grid geometry identifier for the given image metadata.
-     * 
-     * @param  metadata The {@linkplain ImageReader#getImageMetadata metadata}.
-     * @param  width    The image width.
-     * @param  height   The image height.
-     * @return The identifier of a grid geometry suitable to the specified metadata.
-     *         It shall be the primary key of an entry in {@link GridGeometryTable}.
-     */
-    protected abstract String getGridGeometry(GeographicMetadata metadata, int width, int height)
-            throws CatalogException, SQLException, IOException;
-
-    /**
-     * Adds an entry infered from the specified image reader. The {@linkplain ImageReader#getInput
+     * Adds entries inferred from the specified image readers. The {@linkplain ImageReader#getInput
      * reader input} must be set, and its {@linkplain ImageReader#getImageMetadata metadata} shall
-     * conform to the Geotools {@linkplain GeographicMetadata geographic metadata}.
+     * conforms to the Geotools {@linkplain GeographicMetadata geographic metadata}.
      * <p>
      * This method will typically not read the full image, but only the metadata required.
      *
-     * @param reader     The image reader.
+     * @param readers    The image reader. The iterator may recycle the same reader with different
+     *                   {@linkplain ImageReader#getInput input} on each call to {@link Iterator#next}.
      * @param imageIndex The index of the image to insert in the database.
      */
-    public synchronized void addEntry(final ImageReader reader, final int imageIndex)
+    public synchronized void addEntry(final Iterator<ImageReader> readers, final int imageIndex)
             throws CatalogException, SQLException, IOException
     {
-        /*
-         * Splits the filename, path and extension from the reader input.
-         */
-        final File  input = path(reader.getInput());
-        final String path = input.getParent();
-        final String filename, extension;
-        if (true) {
-            final String name = input.getName();
-            final int split = name.lastIndexOf('.');
-            if (split >= 0) {
-                filename  = name.substring(0, split);
-                extension = name.substring(split + 1);
-            } else {
-                filename  = name;
-                extension = "";
+        final GridCoverageQuery query     = (GridCoverageQuery) this.query;
+        final PreparedStatement statement = getStatement(QueryType.INSERT);
+        final Calendar          calendar  = getCalendar();
+        final Series            series    = getSeries();
+        final GridGeometryTable gridTable = getDatabase().getTable(GridGeometryTable.class);
+        final int bySeries    = indexOf(query.series);
+        final int byFilename  = indexOf(query.filename);
+        final int byStartTime = indexOf(query.startTime);
+        final int byEndTime   = indexOf(query.endTime);
+        final int byExtent    = indexOf(query.spatialExtent);
+        statement.setString(bySeries, series.getName());
+        while (readers.hasNext()) {
+            final ImageReader reader = readers.next();
+            final File  input = path(reader.getInput());
+            final String path = input.getParent();
+            final String filename, extension;
+            if (true) {
+                final String name = input.getName();
+                final int split = name.lastIndexOf('.');
+                if (split >= 0) {
+                    filename  = name.substring(0, split);
+                    extension = name.substring(split + 1);
+                } else {
+                    filename  = name;
+                    extension = "";
+                }
+            }
+            /*
+             * Gets the metadata of interest.
+             */
+            final MetadataParser metadata = new MetadataParser(reader, imageIndex);
+            final DateRange[] dates = metadata.getDateRanges();
+            if (dates == null) {
+                warning("Aucune méta-donnée pour le fichier \"" + filename + "\"."); // TODO: localize
+                continue;
+            }
+            final int width  = reader.getWidth (imageIndex);
+            final int height = reader.getHeight(imageIndex);
+            final AffineTransform gridToCRS = metadata.getGridToCRS(0, 1);
+            final String horizontalSRID = null; // TODO
+            final String verticalSRID = null; // TODO
+            final double[] verticalOrdinates = null; // TODO
+            final String extent = gridTable.getIdentifier(new Dimension(width, height), gridToCRS,
+                    horizontalSRID, verticalSRID, verticalOrdinates);
+            /*
+             * Adds the entries for each image found in the file.
+             * There is often only one image per file, but not always.
+             */
+            statement.setString(byFilename, filename);
+            statement.setString(byExtent, extent);
+            for (int i=0; i<dates.length; i++) {
+                final Date startTime = dates[i].getMinValue();
+                final Date   endTime = dates[i].getMaxValue();
+                statement.setTimestamp(byStartTime, new Timestamp(startTime.getTime()), calendar);
+                statement.setTimestamp(byEndTime,   new Timestamp(endTime.getTime())  , calendar);
+                // TODO.
             }
         }
-        /*
-         * Gets the metadata of interest.
-         */
-//        final GeographicMetadata metadata = getMetadata(reader, imageIndex);
-//        final int width  = reader.getWidth (imageIndex);
-//        final int height = reader.getHeight(imageIndex);
-//        final String geometry = getGridGeometry(metadata, width, height);
-        /*
-         */
-        
+    }
+
+    /**
+     * Logs a warning.
+     */
+    private static final void warning(final String message) {
+        final LogRecord record = new LogRecord(Level.WARNING, message);
+        record.setSourceClassName(WritableGridCoverageTable.class.getName());
+        record.setSourceMethodName("addEntry");
+        LOGGER.log(record);
     }
 
     /**

@@ -60,6 +60,11 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * The query to use for selecting a record by its number.
      */
     private static final QueryType SELECT_BY_NUMBER = QueryType.SELECT_BY_IDENTIFIER;
+    
+    /**
+     * The table name for insert statements, or {@code null} if not yet computed.
+     */
+    private String tableName;
 
     /**
      * The parameter to use for looking an element by name, or {@code 0} if unset.
@@ -104,6 +109,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
      */
     protected SingletonTable(final SingletonTable<E> table) {
         super(table);
+        tableName     = table.tableName;
         indexByName   = table.indexByName;
         indexByNumber = table.indexByNumber;
     }
@@ -153,16 +159,28 @@ public abstract class SingletonTable<E extends Element> extends Table {
                 }
             }
         }
-        if (success) {
-            if ((newByName != indexByName) || (newByNumber != indexByNumber)) {
-                indexByName   = newByName;
-                indexByNumber = newByNumber;
-                clearCache();
-                fireStateChanged("identifierParameters");
-            }
-            return;
+        if (!success) {
+            throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_ARGUMENT_$2, name, param));
         }
-        throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_ARGUMENT_$2, name, param));
+        if ((newByName != indexByName) || (newByNumber != indexByNumber)) {
+            indexByName   = newByName;
+            indexByNumber = newByNumber;
+            param = (byName != null) ? byName : byNumber;
+            tableName = (param != null) ? param.column.table : null;
+            clearCache();
+            fireStateChanged("identifierParameters");
+        }
+    }
+
+    /**
+     * Returns the name of the table that contains the entry identifiers.
+     */
+    @Override
+    public String getName() {
+        if (tableName == null) {
+            tableName = super.getName();
+        }
+        return tableName;
     }
 
     /**
