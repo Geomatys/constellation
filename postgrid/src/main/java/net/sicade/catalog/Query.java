@@ -550,7 +550,7 @@ scan:       while (!tables.isEmpty()) {
 
     /**
      * Creates the SQL statement for inserting elements in the table that contains the given
-     * column.
+     * column. This method should be invoked only for queries of type {@link QueryType#INSERT}.
      *
      * @param  table The name of the table in which to insert a statement.
      * @return The SQL statement, or {@code null} if there is no column in the query.
@@ -569,15 +569,28 @@ scan:       while (!tables.isEmpty()) {
         }
         buffer.append(quote).append(table).append(quote);
         String separator = " (";
-        short count = 0;
+        int count = 0;
         for (final Column column : columns) {
             if (!table.equals(column.table) || !columnNames.contains(column.name)) {
                 // Column not to be included for an insert statement.
                 continue;
             }
+            final int index = column.indexOf(QueryType.INSERT);
+            if (index == 0) {
+                /*
+                 * We require the column to be explicitly declared as to be included in an INSERT
+                 * statement. This is in order to reduce the risk of unintentional write into the
+                 * database, and also because some columns are expected to be left to their default
+                 * value (sometime computed by trigger, e.g. GridGeometries.horizontalExtent).
+                 */
+                continue;
+            }
+            if (++count != index) {
+                // Safety check.
+                throw new IllegalStateException(String.valueOf(column));
+            }
             buffer.append(separator).append(quote).append(column.name).append(quote);
             separator = ", ";
-            column.setInsertIndex(++count);
         }
         if (count == 0) {
             return null;
@@ -599,11 +612,11 @@ scan:       while (!tables.isEmpty()) {
         for (final QueryType type : QueryType.values()) {
             final String sql;
             try {
-                sql = select(QueryType.SELECT);
+                sql = select(type);
             } catch (SQLException e) {
                 return e.toString();
             }
-            if (sql.length() != 0) {
+            if (sql!=null && sql.length() != 0) {
                 return sql;
             }
         }

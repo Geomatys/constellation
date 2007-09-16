@@ -22,21 +22,22 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.units.Unit;
+import javax.units.NonSI;
+import javax.units.Converter;
+
 
 import org.geotools.image.io.GeographicImageReader;
 import org.geotools.image.io.metadata.Axis;
 import org.geotools.image.io.metadata.ImageGeometry;
 import org.geotools.image.io.metadata.ImageReferencing;
 import org.geotools.image.io.metadata.GeographicMetadata;
+import org.geotools.image.io.metadata.GeographicMetadataFormat;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.util.MeasurementRange;
 import org.geotools.util.NumberRange;
 
 import net.sicade.util.Ranks;
 import net.sicade.util.DateRange;
-import org.geotools.coverage.grid.GeneralGridGeometry;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.opengis.metadata.spatial.PixelOrientation;
-import org.opengis.util.CodeList;
 
 
 /**
@@ -81,28 +82,17 @@ public class MetadataParser {
     }
 
     /**
-     * Returns the code list of the given name, or {@code null} if none.
-     * 
-     * @todo Weshould log a warning if a name has been specified but no matching code was found.
+     * Returns the units for the specified axis, or {@code null} if none.
      */
-    private static <E extends CodeList> E getCode(final E[] values, String name) {
-        if (name != null) {
-            name = name.trim();
-            for (final E code : values) {
-                if (name.equals(code.name())) {
-                    return code;
-                }
-            }
+    private static Unit getUnits(final Axis axis) {
+        final String symbol = axis.getUnits();
+        if (symbol == null) {
+            return null;
         }
-        return null;
-    }
-
-    /**
-     * Returns the units of the specified axis, or {@code null} if none.
-     */
-    private Unit getUnits(final int dimension) {
-        final String units = metadata.getReferencing().getAxis(dimension).getUnits();
-        return (units != null) ? Unit.valueOf(units) : null;
+        if (symbol.equalsIgnoreCase("days")) {
+            return NonSI.DAY;
+        }
+        return Unit.valueOf(symbol);
     }
 
     /**
@@ -121,18 +111,25 @@ public class MetadataParser {
             if (range != null) {
                 final NumberRange gridRange = geometry.getGridRange(dimension);
                 if (gridRange != null) {
-                    final double  minimum       = range.getMinimum();
-                    final double  maximum       = range.getMaximum();
+                    final double  minimum       = range.getMinimum(); // May be negative infinity.
+                    final double  maximum       = range.getMaximum(); // May be positive infinity.
                     final boolean isMinIncluded = range.isMinIncluded();
                     final boolean isMaxIncluded = range.isMaxIncluded();
                     final double  numCells = gridRange.getMaximum(isMaxIncluded) -
                                              gridRange.getMinimum(isMinIncluded);
-                    final double step = (maximum - minimum) / numCells;
-                    final int lower  = isMinIncluded ? 0 : 1;
-                    final int length = (int) Math.round(numCells) + (isMaxIncluded ? 1 : 0) - lower;
-                    values = new double[length];
-                    for (int i=0; i<length; i++) {
-                        values[i] = minimum + step * (lower + i);
+                    final double step;
+                    if (numCells == 0 && minimum == maximum && isMinIncluded && isMaxIncluded) {
+                        step = 0; // We have a single value.
+                    } else {
+                        step = (maximum - minimum) / numCells;
+                    }
+                    if (!Double.isInfinite(step) && !Double.isNaN(step)) {
+                        final int lower  = isMinIncluded ? 0 : 1;
+                        final int length = (int) Math.round(numCells) + (isMaxIncluded ? 1 : 0) - lower;
+                        values = new double[length];
+                        for (int i=0; i<length; i++) {
+                            values[i] = minimum + step * (lower + i);
+                        }
                     }
                 }
             }
@@ -153,7 +150,7 @@ public class MetadataParser {
         if (values == null) {
             return null;
         }
-        final Unit units = getUnits(dimension);
+        final Unit units = getUnits(metadata.getReferencing().getAxis(dimension));
         final MeasurementRange[] ranges = new MeasurementRange[values.length];
         switch (ranges.length) {
             case 0: {
@@ -183,7 +180,7 @@ public class MetadataParser {
     /**
      * Returns the date range for the given image metadata. This method usually returns a singleton,
      * but more than one time range could be returned if the image reader contains data at many times.
-     * 
+     *
      * @return The date range for the given metadata, or {@code null} if none.
      */
     public DateRange[] getDateRanges() {
@@ -196,7 +193,7 @@ public class MetadataParser {
                 if (ranges != null) {
                     final DateRange[] dates = new DateRange[ranges.length];
                     for (int j=0; j<dates.length; j++) {
-                        dates[j] = new DateRange(ranges[i], origin);
+                        dates[j] = new DateRange(ranges[j], origin);
                     }
                     return dates;
                 }
@@ -208,28 +205,31 @@ public class MetadataParser {
     /**
      * Returns the <cite>grid to CRS</cite> transform for the specified axis. The returned
      * transform maps always the {@linkplain PixelOrientation#UPPER_LEFT upper left} corner.
-     * 
+     *
      * @param  xAxis The <var>x</var> axis (usually 0).
      * @param  yAxis The <var>y</var> axis (usually 1).
-     * @return The affine transform from grid to CRS.
+     * @return The affine transform from grid to CRS, or {@code null} if it can't be computed.
      */
     public AffineTransform getGridToCRS(final int xAxis, final int yAxis) {
         final double[] flatmatrix = new double[6];
         final ImageGeometry geometry = metadata.getGeometry();
-        computeAffineCoefficients(geometry, xAxis, xAxis, flatmatrix, false);
-        computeAffineCoefficients(geometry, yAxis, yAxis, flatmatrix, true );
+        if (!computeAffineCoefficients(geometry, xAxis, xAxis, flatmatrix, false) ||
+            !computeAffineCoefficients(geometry, yAxis, yAxis, flatmatrix, true ))
+        {
+            return null;
+        }
         final AffineTransform at = new AffineTransform(flatmatrix);
-        final PixelOrientation p = getCode(PixelOrientation.values(), geometry.getPixelOrientation());
+        final String p = geometry.getPixelOrientation();
         if (p != null) {
             final Point2D offset = GridGeometry2D.getPixelTranslation(p);
-            at.translate(0.5 + offset.getX(), 0.5 + offset.getY());
+            at.translate(-0.5 - offset.getX(), -0.5 - offset.getY());
         }
         return at;
     }
 
     /**
      * Computes the affine transform cooefficients for the specified dimension.
-     * 
+     *
      * @param geometry   The geometry where to fetch information from.
      * @param sourceDim  The source dimension in the grid geometry.
      * @param targetDim  The target dimension in the envelope. Usually identical to {@code sourceDim}.
@@ -267,7 +267,7 @@ public class MetadataParser {
              * scale to 0. This is not equivalent to NaN, but is not completly unsafe since it
              * will cause the transform to be non-invertible. Users who attempt to invert this
              * transform will be clearly notified by a NonInvertibleTransformException.
-             * 
+             *
              * Setting the scale to 0 allows the transform to produce 'minimum' on very attempt
              * to transform a coordinates, which is probably the expected value. Note that both
              * 'isMin/MaxIncluded' flags are expected to be true, otherwise we probably have an
@@ -279,6 +279,7 @@ public class MetadataParser {
             }
             scale = 0;
         }
+        // Note: No need for a special processing of "excluded" case in formula below.
         final double offset = minimum - scale * lower;
         if (asY) {
             flatmatrix[3] = scale;
@@ -288,5 +289,107 @@ public class MetadataParser {
             flatmatrix[4] = offset;
         }
         return true;
+    }
+
+    /**
+     * Returns the CRS identifier, or {@code 0} if unknown.
+     *
+     * @todo Current implementation uses hard-coded values from EPSG code space.
+     *       We need to do something more generic.
+     */
+    public int getSRID() {
+        final ImageReferencing referencing = metadata.getReferencing();
+        String type = referencing.getCoordinateReferenceSystem().type;
+        if (GeographicMetadataFormat.PROJECTED.equalsIgnoreCase(type)) {
+            return 3395; // World Mercator
+        }
+        if (GeographicMetadataFormat.GEOGRAPHIC.equalsIgnoreCase(type)) {
+            return 4326; // WGS 84
+        }
+        if (GeographicMetadataFormat.GEOGRAPHIC_3D.equalsIgnoreCase(type)) {
+            return 4327; // WGS 84
+        }
+        type = referencing.getCoordinateSystem().type;
+        if (GeographicMetadataFormat.CARTESIAN.equalsIgnoreCase(type)) {
+            return 3395; // World Mercator
+        }
+        if (GeographicMetadataFormat.ELLIPSOIDAL.equalsIgnoreCase(type)) {
+            return referencing.getDimension() <= 2 ? 4326 : 4327; // WGS 84
+        }
+        return 0;
+    }
+
+    /**
+     * Returns the horizontal CRS identifier, or {@code 0} if unknown.
+     *
+     * @todo Current implementation uses hard-coded values from EPSG code space.
+     *       We need to do something more generic.
+     */
+    public int getHorizontalSRID() {
+        int id = getSRID();
+        switch (id) {
+            case 4327: id = 4326; break;
+        }
+        return id;
+    }
+
+    /**
+     * Returns the vertical CRS identifier, or {@code 0} if unknown.
+     *
+     * @todo Current implementation uses hard-coded values from EPSG code space.
+     *       We need to do something more generic.
+     */
+    public int getVerticalSRID() {
+        // Following rule is not exact since the third dimension could be time. This is okay as a
+        // patch for now since this vertical SRID will be ignored by WritableGridCoverageTable if
+        // getVerticalValues(SI.METER) returns null.
+        return metadata.getReferencing().getDimension() > 2 ? 5714 : 0;
+    }
+
+    /**
+     * Returns the vertical coordinate values in the specified units, or {@code null} if none.
+     *
+     * @todo Current implementation uses hard-coded values.
+     *       We need to do something more generic.
+     */
+    public double[] getVerticalValues(final Unit units) {
+        final ImageReferencing referencing = metadata.getReferencing();
+        for (int i=referencing.getDimension(); --i>=0;) {
+            final Axis axis = referencing.getAxis(i);
+            final String direction = axis.getDirection();
+            if (direction != null) {
+                final int sign;
+                if (direction.equalsIgnoreCase("up")) {
+                    sign = +1;
+                } else if (direction.equalsIgnoreCase("down")) {
+                    sign = -1;
+                } else {
+                    continue;
+                }
+                final Unit axisUnits = getUnits(axis);
+                final boolean convert = (units != null && axisUnits != null);
+                if (convert && !units.isCompatible(axisUnits)) {
+                    continue;
+                }
+                final double values[] = getCoordinateValues(i);
+                if (values == null) {
+                    continue;
+                }
+                if (sign != 1) {
+                    for (int j=0; j<values.length; j++) {
+                        values[j] *= sign;
+                    }
+                }
+                if (convert) {
+                    // TODO: Should convert the whole array in one method call (JSR-275)
+                    final Converter converter = axisUnits.getConverterTo(units);
+                    for (int j=0; j<values.length; j++) {
+                        values[j] = converter.convert(values[j]);
+                    }
+                }
+                return values;
+            }
+        }
+        return null;
     }
 }

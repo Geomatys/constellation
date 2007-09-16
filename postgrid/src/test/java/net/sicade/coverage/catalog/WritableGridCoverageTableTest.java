@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,65 +16,68 @@
 package net.sicade.coverage.catalog;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.Set;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import org.junit.Test;
 
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.coverage.CoverageStack;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import net.sicade.catalog.Element;
 import net.sicade.catalog.DatabaseTest;
+import net.sicade.catalog.ConfigurationKey;
+import net.sicade.catalog.CatalogException;
 
 
 /**
- * Teste le fonctionnement de {@link CoverageStack#evaluate} avec des {@link Layer}.
- * Ce test est un peu plus direct que {@link DescriptorTest} du fait qu'il construit
- * lui même le {@link CoverageStack} dans plusieurs cas.
+ * Tests the addition of new entries in the database.
  *
- * @author Cédric Briançon
  * @version $Id$
+ * @author Cédric Briançon
+ * @author Martin Desruisseaux
  */
-@Deprecated
 public class WritableGridCoverageTableTest extends DatabaseTest {
     /**
-     * {@code true} pour désactiver tous les tests (sauf typiquement un test en particulier que l'on
-     * souhaite suivre pas à pas). La valeur de ce champ devrait être toujours {@code false} sauf en
-     * cas de déboguage d'une méthode bien spécifique.
+     * The file to test for inclusion, relative to the data root directory.
      */
-    private static final boolean DISABLED = true;
+    private static final String TEST_FILE = "Monde/SST/Coriolis/OA_RTQCGL01_20070606_FLD_TEMP.nc";
 
     /**
-     * Etablit la connexion avec la base de données. Cette connexion ne sera établie que la
-     * première fois où un test sera exécuté. Pour la fermeture des connections, on se fiera
-     * au rammase-miettes et aux "shutdown hooks" mis en place par {@code Database}.
+     * Tests a {@code INSERT} statement (but do not really performs the insert).
      */
-//    @Override
-//    protected void setUp() throws SQLException, IOException {
-//        super.setUp();
-//        if (layers == null) {
-//            layers = database.getTable(LayerTable.class);
-//        }
-//    }
+    @Test
+    public void testPseudoInserts() throws Exception {
+        final String root = database.getProperty(ConfigurationKey.ROOT_DIRECTORY);
+        assertNotNull("The ROOT_DIRECTORY property must be defined.", root);
+        final File file = new File(root, TEST_FILE);
+        if (!file.isFile()) {
+            Element.LOGGER.warning("Test file \"" + file + "\" not found.");
+            return;
+        }
+        final LayerTable layers = database.getTable(LayerTable.class);
+        final Layer layer = layers.getEntry(LayerTableTest.NETCDF_NAME);
+        final Set<Series> series = layer.getSeries();
+        assertEquals("Expected only one series in the layer.", 1, series.size());
+        final Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("NetCDF");
+        assertTrue("A NetCDF reader must be available.", readers.hasNext());
+        final ImageReader reader = readers.next();
+        reader.setInput(file);
 
-    /**
-     * Teste l'obtention de la liste des couches, incluant un filtrage par région géographique.
-     */
-    public void testWritableGCT() throws Exception {
-        if (DISABLED) return;
-        final LayerTable table = database.getTable(LayerTable.class);
-        final Set<Layer> all = table.getEntries();
-        final File file = new File("C:\\images\\Contrôles\\Afrique.png");
-        final String fileNameWithExt = file.getName();
-        final String fileName = fileNameWithExt.substring(0, fileNameWithExt.indexOf("."));
-        assertFalse(all.isEmpty());
-        final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(-180.0, 180.0, -90.0, 90.0);
-        table.setGeographicBoundingBox(bbox);
-        assertEquals(bbox, table.getGeographicBoundingBox());
-//        table.trimEnvelope(); // Devrait n'avoir aucun effet lorsque la sélection contient des image mondiales.
-//        assertEquals(bbox, table.getGeographicBoundingBox());
-//        final Layer selected = table.getEntry("Images de tests");
-//        System.out.println(selected.getSeries());
-//        WritableGridCoverageTable writableGCT = new WritableGridCoverageTable(database);
-//        writableGCT.setLayer(selected);
-//        writableGCT.addEntry(fileName, dateFormat.parse("17/06/2007"), 
-//                dateFormat.parse("18/06/2007"), bbox, new Dimension(1024, 768));
+        WritableGridCoverageTable table = database.getTable(WritableGridCoverageTable.class);
+        try {
+            table.addEntry(reader);
+            fail("Should not accept to add an entry without layer.");
+        } catch (CatalogException exception) {
+            // This is the expected exception since no layer has been specified.
+        }
+        try {
+            table.setLayer(layer);
+            fail("Should not accept to modify a shared table.");
+        } catch (IllegalStateException exception) {
+            // This is the expected exception since the table has not been cloned.
+        }
+        table = new WritableGridCoverageTable(table);
+        table.setLayer(layer);
+        table.addEntry(reader);
+        reader.dispose();
     }
 }

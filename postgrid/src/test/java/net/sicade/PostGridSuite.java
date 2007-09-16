@@ -29,6 +29,9 @@ public class PostGridSuite extends TestSuite {
      * Creates the test suite. The tests are added in an approximative dependency order.
      */
     public PostGridSuite() {
+        // No need for database connection for those first few tests.
+        addTestSuite(net.sicade.coverage.io.MetadataParserTest.class);
+
         addTestSuite(net.sicade.catalog.DatabaseTest.Open.class); // Must be first
         addTestSuite(net.sicade.catalog.         SpatialFunctionsTest         .class);
         addTestSuite(net.sicade.catalog.         TimeStampTest                .class);

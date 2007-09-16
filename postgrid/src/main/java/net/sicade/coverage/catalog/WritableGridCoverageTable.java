@@ -23,15 +23,16 @@ import java.net.URL;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
+import javax.units.SI;
 
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
-import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -53,7 +54,7 @@ import net.sicade.coverage.io.MetadataParser;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public abstract class WritableGridCoverageTable extends GridCoverageTable {
+public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Constructs a new {@code WritableGridCoverageTable}.
      *
@@ -61,6 +62,14 @@ public abstract class WritableGridCoverageTable extends GridCoverageTable {
      */
     public WritableGridCoverageTable(final Database database) {
         super(database);
+    }
+
+    /**
+     * Constructs a new {@code WritableGridCoverageTable} with the same initial configuration
+     * than the specified table.
+     */
+    public WritableGridCoverageTable(final WritableGridCoverageTable table) {
+        super(table);
     }
 
     /**
@@ -88,7 +97,7 @@ public abstract class WritableGridCoverageTable extends GridCoverageTable {
      * Returns the path for the specified input. The returned file should not be opened
      * since it may be invalid (especially if built from a URL input). Its only purpose
      * is to split the name part and the path part.
-     * 
+     *
      * @param  input The input.
      * @return The input as a file.
      * @throws CatalogException if the input is not recognized.
@@ -107,13 +116,27 @@ public abstract class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
+     * Adds entries (usually only one) inferred from the specified image reader.
+     * The {@linkplain ImageReader#getInput reader input} must be set, and its
+     * {@linkplain ImageReader#getImageMetadata metadata} shall conforms to the
+     * Geotools {@linkplain GeographicMetadata geographic metadata}.
+     * <p>
+     * This method will typically not read the full image, but only the metadata required.
+     *
+     * @param readers The image reader.
+     */
+    public void addEntry(final ImageReader reader) throws CatalogException, SQLException, IOException {
+        addEntry(Collections.singleton(reader).iterator(), 0);
+    }
+
+    /**
      * Adds entries inferred from the specified image readers. The {@linkplain ImageReader#getInput
      * reader input} must be set, and its {@linkplain ImageReader#getImageMetadata metadata} shall
      * conforms to the Geotools {@linkplain GeographicMetadata geographic metadata}.
      * <p>
      * This method will typically not read the full image, but only the metadata required.
      *
-     * @param readers    The image reader. The iterator may recycle the same reader with different
+     * @param readers    The image readers. The iterator may recycle the same reader with different
      *                   {@linkplain ImageReader#getInput input} on each call to {@link Iterator#next}.
      * @param imageIndex The index of the image to insert in the database.
      */
@@ -121,9 +144,9 @@ public abstract class WritableGridCoverageTable extends GridCoverageTable {
             throws CatalogException, SQLException, IOException
     {
         final GridCoverageQuery query     = (GridCoverageQuery) this.query;
-        final PreparedStatement statement = getStatement(QueryType.INSERT);
-        final Calendar          calendar  = getCalendar();
         final Series            series    = getSeries();
+        final Calendar          calendar  = getCalendar();
+        final PreparedStatement statement = getStatement(QueryType.INSERT);
         final GridGeometryTable gridTable = getDatabase().getTable(GridGeometryTable.class);
         final int bySeries    = indexOf(query.series);
         final int byFilename  = indexOf(query.filename);
@@ -159,11 +182,11 @@ public abstract class WritableGridCoverageTable extends GridCoverageTable {
             final int width  = reader.getWidth (imageIndex);
             final int height = reader.getHeight(imageIndex);
             final AffineTransform gridToCRS = metadata.getGridToCRS(0, 1);
-            final String horizontalSRID = null; // TODO
-            final String verticalSRID = null; // TODO
-            final double[] verticalOrdinates = null; // TODO
+            final int horizontalSRID = metadata.getHorizontalSRID();
+            final int verticalSRID = metadata.getVerticalSRID();
+            final double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
             final String extent = gridTable.getIdentifier(new Dimension(width, height), gridToCRS,
-                    horizontalSRID, verticalSRID, verticalOrdinates);
+                                            horizontalSRID, verticalOrdinates, verticalSRID, true);
             /*
              * Adds the entries for each image found in the file.
              * There is often only one image per file, but not always.

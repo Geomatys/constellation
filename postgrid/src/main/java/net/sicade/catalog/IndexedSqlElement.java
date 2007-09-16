@@ -14,8 +14,8 @@
  */
 package net.sicade.catalog;
 
-import java.sql.ResultSet;
-import java.sql.PreparedStatement;
+import java.sql.ResultSet;          // For javadoc
+import java.sql.PreparedStatement;  // For javadoc
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -52,10 +52,10 @@ abstract class IndexedSqlElement {
      * Creates a new language element for the specified query.
      *
      * @param query  The query for which the element is created.
-     * @param types  The query types for which the element applies, or {@code null} for all.
+     * @param types  The query types for which the element applies, or {@code null} for all
+     *               {@code SELECT} queries (i.e. excluding {@link QueryType#INSERT INSERT}).
      */
     protected IndexedSqlElement(final Query query, final QueryType[] types) {
-        int length = 0;
         /*
          * Creates the enum set from the 'types' array, and
          * computes the index array length in the same occasion.
@@ -63,15 +63,18 @@ abstract class IndexedSqlElement {
         final EnumSet<QueryType> typeSet;
         if (types == null) {
             typeSet = EnumSet.allOf(QueryType.class);
-            length  = typeSet.size();
+            typeSet.remove(QueryType.INSERT);
         } else {
             typeSet = EnumSet.noneOf(QueryType.class);
             for (final QueryType type : types) {
-                final int ordinal = type.ordinal();
-                if (ordinal >= length) {
-                    length = ordinal + 1;
-                }
                 typeSet.add(type);
+            }
+        }
+        int length = 0;
+        for (final QueryType type : typeSet) {
+            final int ordinal = type.ordinal();
+            if (ordinal >= length) {
+                length = ordinal + 1;
             }
         }
         /*

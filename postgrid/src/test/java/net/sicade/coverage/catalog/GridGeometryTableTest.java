@@ -82,17 +82,17 @@ public class GridGeometryTableTest extends DatabaseTest {
         final Set<GridGeometryEntry> entries = table.getEntries();
         assertTrue(entries.contains(entry));
 
-        final String horizontalSRID     = "3395";
-        final String verticalSRID       = "5714";
+        final int    horizontalSRID     = 3395;
+        final int    verticalSRID       = 5714;
         final String name               = entry.getName();
         final Dimension size            = entry.getSize();
         final AffineTransform gridToCRS = entry.getGridToCRS2D();
         assertFalse(gridToCRS.isIdentity());
         assertFalse(gridToCRS.getDeterminant() == 0);
-        assertEquals(name, table.getIdentifier(size, gridToCRS, horizontalSRID, verticalSRID, altitudes));
-        assertNull(table.getIdentifier(size, gridToCRS, "4326", verticalSRID, altitudes));
+        assertEquals(name, table.getIdentifier(size, gridToCRS, horizontalSRID, altitudes, verticalSRID, false));
+        assertNull(table.getIdentifier(size, gridToCRS, 4326, altitudes, verticalSRID, false));
 
         altitudes[1] = 12.8; // Tries a non-existant altitude.
-        assertNull(table.getIdentifier(size, gridToCRS, horizontalSRID, verticalSRID, altitudes));
+        assertNull(table.getIdentifier(size, gridToCRS, horizontalSRID, altitudes, verticalSRID, false));
     }
 }

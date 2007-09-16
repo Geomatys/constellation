@@ -16,6 +16,7 @@
 package net.sicade.coverage.catalog;
 
 import java.util.*;
+import java.sql.Types;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -297,24 +298,29 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     }
 
     /**
-     * Returns the identifier for the specified grid geometry.
-     * If no matching record is found, then this method returns {@code null}.
+     * Returns the identifier for the specified grid geometry. If no matching record is found and
+     * {@code allowCreate} is {@code true}, then a new one is created and added to the database.
      *
      * @param  size              The image width and height in pixels.
      * @param  gridToCRS         The transform from grid coordinates to "real world" coordinates.
      * @param  horizontalSRID    The "real world" horizontal coordinate reference system.
-     * @param  verticalSRID      The "real world" vertical coordinate reference system.
      * @param  verticalOrdinates The vertical coordinates, or {@code null}.
-     * @return The identifier of a matching entry, or {@code null} if none.
+     * @param  verticalSRID      The "real world" vertical coordinate reference system.
+     *                           Ignored if {@code verticalOrdinates} is {@code null}.
+     * @param  allowCreate       {@code true} if this method is allowed to create a new entry if
+     *                           none were found, {@code false} otherwise.
+     * @return The identifier of a matching entry, or {@code null} if none if none was found and
+     *         {@code allowCreate} is {@code false}.
      * @throws SQLException if the operation failed.
      */
-    final synchronized String getIdentifier(final Dimension size, final AffineTransform gridToCRS,
-                                            final String horizontalSRID, final String verticalSRID,
-                                            final double[] verticalOrdinates)
-            throws SQLException
+    final synchronized String getIdentifier(final Dimension size,
+                                            final AffineTransform  gridToCRS, final int horizontalSRID,
+                                            final double[] verticalOrdinates, final int verticalSRID,
+                                            final boolean allowCreate)
+            throws SQLException, CatalogException
     {
         final GridGeometryQuery query = (GridGeometryQuery) super.query;
-        final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+        PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
         statement.setInt   (indexOf(query.byWidth),          size.width );
         statement.setInt   (indexOf(query.byHeight),         size.height);
         statement.setDouble(indexOf(query.byScaleX),         gridToCRS.getScaleX());
@@ -323,8 +329,13 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         statement.setDouble(indexOf(query.byTranslateY),     gridToCRS.getTranslateY());
         statement.setDouble(indexOf(query.byShearX),         gridToCRS.getShearX());
         statement.setDouble(indexOf(query.byShearY),         gridToCRS.getShearY());
-        statement.setString(indexOf(query.byHorizontalSRID), horizontalSRID);
-        statement.setString(indexOf(query.byVerticalSRID),   verticalSRID);
+        statement.setInt   (indexOf(query.byHorizontalSRID), horizontalSRID);
+        int byVerticalSRID = indexOf(query.byVerticalSRID);
+        if (verticalOrdinates != null) {
+            statement.setInt(byVerticalSRID, verticalSRID);
+        } else {
+            statement.setNull(byVerticalSRID, Types.INTEGER);
+        }
 
         String ID = null;
         final int idIndex = indexOf(query.identifier);
@@ -353,25 +364,37 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
             }
         }
         results.close();
+        if (ID != null || !allowCreate) {
+            return ID;
+        }
+        /*
+         * No match found. Adds a new record in the database.
+         * 
+         * TODO: need to compute an ID.
+         */
+        statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.identifier),     ID);
+        statement.setInt   (indexOf(query.width),          size.width );
+        statement.setInt   (indexOf(query.height),         size.height);
+        statement.setDouble(indexOf(query.scaleX),         gridToCRS.getScaleX());
+        statement.setDouble(indexOf(query.scaleY),         gridToCRS.getScaleY());
+        statement.setDouble(indexOf(query.translateX),     gridToCRS.getTranslateX());
+        statement.setDouble(indexOf(query.translateY),     gridToCRS.getTranslateY());
+        statement.setDouble(indexOf(query.shearX),         gridToCRS.getShearX());
+        statement.setDouble(indexOf(query.shearY),         gridToCRS.getShearY());
+        statement.setInt   (indexOf(query.horizontalSRID), horizontalSRID);
+        byVerticalSRID = indexOf(query.verticalSRID);
+        if (verticalOrdinates != null) {
+            statement.setInt(byVerticalSRID, verticalSRID);
+        } else {
+            statement.setNull(byVerticalSRID, Types.INTEGER);
+        }
+        if (false) {
+            // TODO: code disabled for now until we tested it.
+            if (statement.executeUpdate() != 1) {
+                throw new CatalogException("L'étendue géographique n'a pas été ajoutée.");
+            }
+        }
         return ID;
     }
-
-    /**
-     * Ajoute une entrée pour l'étendue géographique et la dimension d'image spécifiée.
-     */
-//    public synchronized void addEntry(final String          identifier,
-//                                      final GeographicBoundingBox bbox,
-//                                      final Dimension             size)
-//            throws CatalogException, SQLException
-//    {
-//        if (true) {
-//            throw new CatalogException("Not yet implemented.");
-//        }
-//        final PreparedStatement statement = getStatement(QueryType.INSERT);
-//        statement.setString(1, identifier);
-//        setBoundingBox(statement, 1, bbox, size);
-//        if (statement.executeUpdate() != 1) {
-//            throw new CatalogException("L'étendue géographique n'a pas été ajoutée.");
-//        }
-//    }
 }
