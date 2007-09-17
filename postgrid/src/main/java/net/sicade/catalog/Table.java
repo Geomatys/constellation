@@ -15,6 +15,7 @@
  */
 package net.sicade.catalog;
 
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.util.Timer;
@@ -25,6 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.geotools.resources.Utilities;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**
@@ -116,7 +119,7 @@ public class Table {
      * The timer in charge of closing the {@linkplain #statement} after some idle time.
      */
     private final class Disposer extends TimerTask {
-        public void run() {
+        @Override public void run() {
             synchronized (Table.this) {
                 if (System.currentTimeMillis() - lastAccess >= DELAY) try {
                     if (statement != null) {
@@ -286,6 +289,30 @@ public class Table {
         }
         queryType = type;
         return getStatement(sql);
+    }
+
+    /**
+     * Executes the specified SQL {@code INSERT} statement, which is expected to insert exactly
+     * one record. As a special case, this method do not execute the statement during testing
+     * and debugging phases. In the later case, this method rather prints the statement to the
+     * stream specified to {@link Database#setInsertSimulator}.
+     *
+     * @param  statement The statement to execute.
+     * @throws CatalogException if the number of records added is not exactly one.
+     * @throws SQLException if an other error occured.
+     */
+    protected final void insertSingleton(final PreparedStatement statement)
+            throws CatalogException, SQLException
+    {
+        final PrintWriter out = getDatabase().getInsertSimulator();
+        if (out != null) {
+            out.println(statement);
+        } else {
+            final int count = 1; // TODO statement.executeUpdate();
+            if (count != 1) {
+                throw new CatalogException(Resources.format(ResourceKeys.ERROR_UNEXPECTED_UPDATE_$1, count));
+            }
+        }
     }
 
     /**

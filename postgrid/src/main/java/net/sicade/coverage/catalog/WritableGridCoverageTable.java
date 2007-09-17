@@ -198,9 +198,17 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 final Date   endTime = dates[i].getMaxValue();
                 statement.setTimestamp(byStartTime, new Timestamp(startTime.getTime()), calendar);
                 statement.setTimestamp(byEndTime,   new Timestamp(endTime.getTime())  , calendar);
-                // TODO.
+//                insertSingleton(statement);
             }
         }
+    }
+
+    /**
+     * Returns a suggested ID for records to be added in the given table. The default
+     * implementation returns the layer name.
+     */
+    protected String getSuggestedID(final String table) {
+        return getLayer().getName();
     }
 
     /**
@@ -211,41 +219,5 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         record.setSourceClassName(WritableGridCoverageTable.class.getName());
         record.setSourceMethodName("addEntry");
         LOGGER.log(record);
-    }
-
-    /**
-     * Ajoute une entrée dans la table "{@code GridCoverages}". La méthode {@link #setLayer}
-     * doit d'abord avoir été appelée au moins une fois.
-     *
-     * @param   filename    Le nom de l'image, sans son chemin ni son extension.
-     * @param   startTime   La date de début de la plage de temps concernée par l'image.
-     * @param   endTime     La date de fin de la plage de temps concernée par l'image.
-     * @param   bbox        La région géographique de l'image.
-     * @param   size        La dimension de l'image, en nombre de pixels.
-     * @throws  SQLException     Si l'exécution d'une requête SQL a échouée.
-     * @throws  CatalogException Si l'exécution a échouée pour une autre raison.
-     */
-    public synchronized void addEntry(final String            filename,
-                                      final Date             startTime,
-                                      final Date               endTime,
-                                      final GeographicBoundingBox bbox,
-                                      final Dimension             size)
-            throws CatalogException, SQLException
-    {
-        final String bboxID = null; // TODO gridGeometries.getIdentifier(bbox, size);
-        if (bboxID == null) {
-            throw new CatalogException("L'étendue géographique n'est pas déclarée dans la base de données.");
-        }
-        final Calendar          calendar  = getCalendar();
-        final Series            series    = getSeries();
-        final PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString   (1, series.getName());
-        statement.setString   (2, filename);
-        statement.setTimestamp(3, new Timestamp(startTime.getTime()), calendar);
-        statement.setTimestamp(4, new Timestamp(endTime.getTime())  , calendar);
-        statement.setString   (5, bboxID);
-        if (statement.executeUpdate() != 1) {
-            throw new CatalogException("L'image n'a pas été ajoutée.");
-        }
     }
 }

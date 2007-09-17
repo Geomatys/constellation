@@ -22,6 +22,7 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.units.Unit;
+import javax.units.SI;
 import javax.units.NonSI;
 import javax.units.Converter;
 
@@ -91,6 +92,9 @@ public class MetadataParser {
         }
         if (symbol.equalsIgnoreCase("days")) {
             return NonSI.DAY;
+        }
+        if (symbol.equalsIgnoreCase("seconds")) {
+            return SI.SECOND;
         }
         return Unit.valueOf(symbol);
     }
@@ -204,7 +208,8 @@ public class MetadataParser {
 
     /**
      * Returns the <cite>grid to CRS</cite> transform for the specified axis. The returned
-     * transform maps always the {@linkplain PixelOrientation#UPPER_LEFT upper left} corner.
+     * transform maps always the pixel {@linkplain PixelOrientation#UPPER_LEFT upper left}
+     * corner.
      *
      * @param  xAxis The <var>x</var> axis (usually 0).
      * @param  yAxis The <var>y</var> axis (usually 1).
@@ -213,8 +218,8 @@ public class MetadataParser {
     public AffineTransform getGridToCRS(final int xAxis, final int yAxis) {
         final double[] flatmatrix = new double[6];
         final ImageGeometry geometry = metadata.getGeometry();
-        if (!computeAffineCoefficients(geometry, xAxis, xAxis, flatmatrix, false) ||
-            !computeAffineCoefficients(geometry, yAxis, yAxis, flatmatrix, true ))
+        if (!computeAffineCoefficients(geometry, xAxis, xAxis, flatmatrix, false, false) ||
+            !computeAffineCoefficients(geometry, yAxis, yAxis, flatmatrix, true,  true))
         {
             return null;
         }
@@ -234,11 +239,12 @@ public class MetadataParser {
      * @param sourceDim  The source dimension in the grid geometry.
      * @param targetDim  The target dimension in the envelope. Usually identical to {@code sourceDim}.
      * @param flatmatrix The flat matrix to setup. Coefficients will be written in this array on output.
-     * @param asY        {@code false} for setting <var>x</var> coefficients,
-     *                   {@code true} for setting <var>y</var>.
+     * @param asY        {@code false} for setting <var>x</var> coefficients, {@code true} for setting <var>y</var>.
+     * @param reverse    {@code true} for reversing the axis (this is usually the case of <var>y</var> axis).
      */
     private static boolean computeAffineCoefficients(final ImageGeometry geometry,
-            final int sourceDim, final int targetDim, final double[] flatmatrix, final boolean asY)
+            final int sourceDim, final int targetDim, final double[] flatmatrix,
+            final boolean asY, final boolean reverse)
     {
         final NumberRange sourceRange = geometry.getGridRange(sourceDim);
         if (sourceRange == null) {
@@ -279,8 +285,14 @@ public class MetadataParser {
             }
             scale = 0;
         }
+        final double offset;
         // Note: No need for a special processing of "excluded" case in formula below.
-        final double offset = minimum - scale * lower;
+        if (reverse) {
+            offset = maximum - scale * lower;
+            scale = -scale;
+        } else {
+            offset = minimum - scale * lower;
+        }
         if (asY) {
             flatmatrix[3] = scale;
             flatmatrix[5] = offset;

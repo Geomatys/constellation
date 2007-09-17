@@ -509,7 +509,7 @@ public class CoverageBuilder {
         wgt.setLayer(layer);
         final CoverageReference entry;
         try {
-            wgt.addEntry(filename, startTime, endTime, bbox, size);
+// TODO            wgt.addEntry(filename, startTime, endTime, bbox, size);
             entry = wgt.getEntry(filename);
         } catch (SQLException exception) {
             throw new ServerException(exception);

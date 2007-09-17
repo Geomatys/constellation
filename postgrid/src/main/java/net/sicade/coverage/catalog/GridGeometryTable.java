@@ -338,9 +338,9 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         }
 
         String ID = null;
-        final int idIndex = indexOf(query.identifier);
-        final int voIndex = indexOf(query.verticalOrdinates);
-        final ResultSet results = statement.executeQuery();
+        int idIndex = indexOf(query.identifier);
+        int voIndex = indexOf(query.verticalOrdinates);
+        ResultSet results = statement.executeQuery();
         while (results.next()) {
             final String nextID = results.getString(idIndex);
             final double[] altitudes = asDoubleArray(results.getArray(voIndex));
@@ -384,17 +384,33 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         statement.setDouble(indexOf(query.shearY),         gridToCRS.getShearY());
         statement.setInt   (indexOf(query.horizontalSRID), horizontalSRID);
         byVerticalSRID = indexOf(query.verticalSRID);
-        if (verticalOrdinates != null) {
-            statement.setInt(byVerticalSRID, verticalSRID);
-        } else {
+        voIndex = indexOf(query.verticalOrdinates);
+        if (verticalOrdinates == null || verticalOrdinates.length != 0) {
             statement.setNull(byVerticalSRID, Types.INTEGER);
-        }
-        if (false) {
-            // TODO: code disabled for now until we tested it.
-            if (statement.executeUpdate() != 1) {
-                throw new CatalogException("L'étendue géographique n'a pas été ajoutée.");
+            statement.setNull(voIndex, Types.ARRAY);
+        } else {
+            statement.setInt(byVerticalSRID, verticalSRID);
+            if (false) {
+                // TODO: Enable this bloc when we will be allowed to compile for J2SE 1.6, and
+                //       if the PostgreSQL JDBC driver implements the createArrayOf(...) method.
+                final Double[] numbers = new Double[verticalOrdinates.length];
+                for (int i=0; i<numbers.length; i++) {
+                    numbers[i] = verticalOrdinates[i];
+                }
+                final Array array = null;//statement.getConnection().createArrayOf("float8", numbers);
+                statement.setArray(voIndex, array);
+            } else {
+                final StringBuilder buffer = new StringBuilder();
+                char separator = '{';
+                for (int i=0; i<verticalOrdinates.length; i++) {
+                    buffer.append(separator).append(verticalOrdinates[i]);
+                    separator = ',';
+                }
+                final String array = buffer.append('}').toString();
+                statement.setString(voIndex, array);
             }
         }
+        insertSingleton(statement);
         return ID;
     }
 }

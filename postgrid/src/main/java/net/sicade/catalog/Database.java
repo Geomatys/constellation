@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -127,6 +128,12 @@ public class Database {
      * JDBC driver.
      */
     final boolean isStatementFormatted;
+
+    /**
+     * If non-null, SQL {@code INSERT} statements will not be executed but will rather
+     * be printed to this stream. This is used for testing and debugging purpose only.
+     */
+    private PrintWriter insertSimulator;
 
     /**
      * The tables created up to date.
@@ -511,6 +518,22 @@ public class Database {
      */
     public boolean isSpatialEnabled() {
         return isSpatialEnabled;
+    }
+
+    /**
+     * If non-null, SQL {@code INSERT} statements will not be executed but will rather
+     * be printed to this stream. This is used for testing and debugging purpose only.
+     */
+    public void setInsertSimulator(final PrintWriter out) {
+        insertSimulator = out;
+    }
+
+    /**
+     * Returns the value set by the last call to {@link #setInsertSimulator},
+     * or {@code null} if none.
+     */
+    final PrintWriter getInsertSimulator() {
+        return insertSimulator;
     }
 
     /**

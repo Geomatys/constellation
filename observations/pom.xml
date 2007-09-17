@@ -22,7 +22,7 @@
   <artifactId>observations</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Observations et mesures</name>
+  <name>SeaGIS - Observations & measurements</name>
   <description>
     Utilitaires dédiés à l'exploitation d'une base de données PostgreSQL contenant un ensemble de mesures.
   </description>

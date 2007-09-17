@@ -22,7 +22,7 @@
   <artifactId>numeric</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Algorithmes numériques</name>
+  <name>SeaGIS - Algorithmes numériques</name>
   <description>
     Algorithmes de calculs numériques.
   </description>

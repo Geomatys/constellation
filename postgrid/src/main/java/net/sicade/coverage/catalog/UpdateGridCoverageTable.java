@@ -114,7 +114,7 @@ public class UpdateGridCoverageTable {
                                                          arguments.getRequiredInteger("-height"));
         final WritableGridCoverageTable wgt = observations.getDatabase().getTable(WritableGridCoverageTable.class);
         wgt.setLayer(layer);
-        wgt.addEntry(filename, startTime, endTime, new GeographicBoundingBoxImpl(bbox), size);
+// TODO        wgt.addEntry(filename, startTime, endTime, new GeographicBoundingBoxImpl(bbox), size);
     }
 
     /**

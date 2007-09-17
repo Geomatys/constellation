@@ -22,7 +22,7 @@
   <artifactId>openoffice</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Addin OpenOffice</name>
+  <name>SeaGIS - Addin OpenOffice</name>
   <description>
     Connexion aux méthodes du module "Observations et mesures" à partir d'OpenOffice.
   </description>
