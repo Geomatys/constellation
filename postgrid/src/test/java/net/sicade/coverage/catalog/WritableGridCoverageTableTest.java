@@ -16,6 +16,8 @@
 package net.sicade.coverage.catalog;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Set;
 import javax.imageio.ImageIO;
@@ -46,6 +48,9 @@ public class WritableGridCoverageTableTest extends DatabaseTest {
      */
     @Test
     public void testPseudoInserts() throws Exception {
+        final StringWriter insertStatements = new StringWriter();
+        database.setInsertSimulator(new PrintWriter(insertStatements));
+
         final String root = database.getProperty(ConfigurationKey.ROOT_DIRECTORY);
         assertNotNull("The ROOT_DIRECTORY property must be defined.", root);
         final File file = new File(root, TEST_FILE);
