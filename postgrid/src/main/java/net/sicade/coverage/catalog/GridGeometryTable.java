@@ -307,16 +307,21 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * @param  verticalOrdinates The vertical coordinates, or {@code null}.
      * @param  verticalSRID      The "real world" vertical coordinate reference system.
      *                           Ignored if {@code verticalOrdinates} is {@code null}.
-     * @param  allowCreate       {@code true} if this method is allowed to create a new entry if
-     *                           none were found, {@code false} otherwise.
-     * @return The identifier of a matching entry, or {@code null} if none if none was found and
-     *         {@code allowCreate} is {@code false}.
-     * @throws SQLException if the operation failed.
+     * @param  newIdentifier
+     *              If non-null, then this method is allowed to create a new entry if none was
+     *              found and will use the specified identifier expanded with suffix if needed
+     *              ({@code "-001"}, {@code "-002"}, <cite>etc.</cite>). If {@code null}, then
+     *              this method will not create any new entry if none was found.
+     * @return
+     *              The identifier of a matching entry, or {@code null} if none if none was
+     *              found and {@code newIdentifier} is {@code null}.
+     * @throws SQLException
+     *              If the operation failed.
      */
     final synchronized String getIdentifier(final Dimension size,
                                             final AffineTransform  gridToCRS, final int horizontalSRID,
                                             final double[] verticalOrdinates, final int verticalSRID,
-                                            final boolean allowCreate)
+                                            final String newIdentifier)
             throws SQLException, CatalogException
     {
         final GridGeometryQuery query = (GridGeometryQuery) super.query;
@@ -330,19 +335,26 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         statement.setDouble(indexOf(query.byShearX),         gridToCRS.getShearX());
         statement.setDouble(indexOf(query.byShearY),         gridToCRS.getShearY());
         statement.setInt   (indexOf(query.byHorizontalSRID), horizontalSRID);
-        int byVerticalSRID = indexOf(query.byVerticalSRID);
-        if (verticalOrdinates != null) {
-            statement.setInt(byVerticalSRID, verticalSRID);
-        } else {
-            statement.setNull(byVerticalSRID, Types.INTEGER);
-        }
 
         String ID = null;
         int idIndex = indexOf(query.identifier);
+        int vsIndex = indexOf(query.verticalSRID);
         int voIndex = indexOf(query.verticalOrdinates);
         ResultSet results = statement.executeQuery();
         while (results.next()) {
             final String nextID = results.getString(idIndex);
+            final int  nextSRID = results.getInt   (vsIndex);
+            if (results.wasNull() != (verticalOrdinates == null) ||
+                (verticalOrdinates != null && nextSRID != verticalSRID))
+            {
+                /*
+                 * NOTE: we check for vertical SRID in Java code rather than in the SQL statement
+                 * because it is uneasy to write a statement that work for both non-null and null
+                 * values (the former requires "? IS NULL" since the "? = NULL" statement doesn't
+                 * work with PostgreSQL 8.2.
+                 */
+                continue;
+            }
             final double[] altitudes = asDoubleArray(results.getArray(voIndex));
             if (!Arrays.equals(altitudes, verticalOrdinates)) {
                 /*
@@ -364,14 +376,13 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
             }
         }
         results.close();
-        if (ID != null || !allowCreate) {
+        if (ID != null || newIdentifier == null) {
             return ID;
         }
         /*
          * No match found. Adds a new record in the database.
-         * 
-         * TODO: need to compute an ID.
          */
+        ID = searchFreeIdentifier(newIdentifier);
         statement = getStatement(QueryType.INSERT);
         statement.setString(indexOf(query.identifier),     ID);
         statement.setInt   (indexOf(query.width),          size.width );
@@ -383,13 +394,13 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         statement.setDouble(indexOf(query.shearX),         gridToCRS.getShearX());
         statement.setDouble(indexOf(query.shearY),         gridToCRS.getShearY());
         statement.setInt   (indexOf(query.horizontalSRID), horizontalSRID);
-        byVerticalSRID = indexOf(query.verticalSRID);
+        vsIndex = indexOf(query.verticalSRID);
         voIndex = indexOf(query.verticalOrdinates);
         if (verticalOrdinates == null || verticalOrdinates.length != 0) {
-            statement.setNull(byVerticalSRID, Types.INTEGER);
+            statement.setNull(vsIndex, Types.INTEGER);
             statement.setNull(voIndex, Types.ARRAY);
         } else {
-            statement.setInt(byVerticalSRID, verticalSRID);
+            statement.setInt(vsIndex, verticalSRID);
             if (false) {
                 // TODO: Enable this bloc when we will be allowed to compile for J2SE 1.6, and
                 //       if the PostgreSQL JDBC driver implements the createArrayOf(...) method.

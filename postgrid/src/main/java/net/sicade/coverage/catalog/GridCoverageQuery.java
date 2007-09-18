@@ -34,7 +34,7 @@ final class GridCoverageQuery extends Query {
      * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column layer, series, pathname, filename, extension,
-            startTime, endTime, spatialExtent, format;
+            index, startTime, endTime, spatialExtent, format;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -61,6 +61,7 @@ final class GridCoverageQuery extends Query {
         pathname         = addColumn("Series",         "pathname",         SL   );
         filename         = addColumn("GridCoverages",  "filename",         SLI  );
         extension        = addColumn("Series",         "extension",        SL   );
+        index            = addColumn("GridCoverages",  "index", 1,         SLI  );
         startTime        = addColumn("GridCoverages",  "startTime",        SLABI);
         endTime          = addColumn("GridCoverages",  "endTime",          SLABI);
         spatialExtent    = addColumn("GridCoverages",  "extent",           SLAI );

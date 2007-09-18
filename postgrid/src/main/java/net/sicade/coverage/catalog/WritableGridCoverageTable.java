@@ -22,6 +22,7 @@ import java.awt.geom.AffineTransform;
 import java.net.URL;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -30,8 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
 import javax.units.SI;
-
-import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -126,7 +125,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * @param readers The image reader.
      */
     public void addEntry(final ImageReader reader) throws CatalogException, SQLException, IOException {
-        addEntry(Collections.singleton(reader).iterator(), 0);
+        addEntries(Collections.singleton(reader).iterator(), 0);
     }
 
     /**
@@ -140,7 +139,30 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      *                   {@linkplain ImageReader#getInput input} on each call to {@link Iterator#next}.
      * @param imageIndex The index of the image to insert in the database.
      */
-    public synchronized void addEntry(final Iterator<ImageReader> readers, final int imageIndex)
+    public synchronized void addEntries(final Iterator<ImageReader> readers, final int imageIndex)
+            throws CatalogException, SQLException, IOException
+    {
+        final Connection connection = getDatabase().getConnection();
+        final boolean autoCommit = connection.getAutoCommit();
+        boolean success = false;
+        try {
+            connection.setAutoCommit(false);
+            insertEntries(readers, imageIndex);
+            connection.commit();
+            success = true;
+        } finally {
+            if (!success) {
+                connection.rollback();
+            }
+            connection.setAutoCommit(autoCommit);
+        }
+    }
+
+    /**
+     * Adds entries without the protection provided by the database rollback mechanism.
+     * The commit or rollback must be performed by the caller.
+     */
+    private void insertEntries(final Iterator<ImageReader> readers, final int imageIndex)
             throws CatalogException, SQLException, IOException
     {
         final GridCoverageQuery query     = (GridCoverageQuery) this.query;
@@ -150,6 +172,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         final GridGeometryTable gridTable = getDatabase().getTable(GridGeometryTable.class);
         final int bySeries    = indexOf(query.series);
         final int byFilename  = indexOf(query.filename);
+        final int byIndex     = indexOf(query.index);
         final int byStartTime = indexOf(query.startTime);
         final int byEndTime   = indexOf(query.endTime);
         final int byExtent    = indexOf(query.spatialExtent);
@@ -186,29 +209,30 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             final int verticalSRID = metadata.getVerticalSRID();
             final double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
             final String extent = gridTable.getIdentifier(new Dimension(width, height), gridToCRS,
-                                            horizontalSRID, verticalOrdinates, verticalSRID, true);
+                    horizontalSRID, verticalOrdinates, verticalSRID, getSuggestedID(gridTable.getName()));
             /*
              * Adds the entries for each image found in the file.
              * There is often only one image per file, but not always.
              */
             statement.setString(byFilename, filename);
-            statement.setString(byExtent, extent);
+            statement.setString(byExtent,   extent);
             for (int i=0; i<dates.length; i++) {
                 final Date startTime = dates[i].getMinValue();
                 final Date   endTime = dates[i].getMaxValue();
+                statement.setInt      (byIndex,     i + 1);
                 statement.setTimestamp(byStartTime, new Timestamp(startTime.getTime()), calendar);
-                statement.setTimestamp(byEndTime,   new Timestamp(endTime.getTime())  , calendar);
-//                insertSingleton(statement);
+                statement.setTimestamp(byEndTime,   new Timestamp(endTime  .getTime()), calendar);
+                insertSingleton(statement);
             }
         }
     }
 
     /**
      * Returns a suggested ID for records to be added in the given table. The default
-     * implementation returns the layer name.
+     * implementation returns the series name in all cases.
      */
-    protected String getSuggestedID(final String table) {
-        return getLayer().getName();
+    protected String getSuggestedID(final String table) throws CatalogException {
+        return getSeries().getName();
     }
 
     /**

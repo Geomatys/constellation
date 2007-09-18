@@ -45,7 +45,7 @@ final class GridGeometryQuery extends Query {
      * Parameter to appear after the {@code "FROM"} clause.
      */
     protected final Parameter byWidth, byHeight, byScaleX, byScaleY, byTranslateX, byTranslateY,
-            byShearX, byShearY, byHorizontalSRID, byVerticalSRID;
+            byShearX, byShearY, byHorizontalSRID;
 
     /**
      * Creates a new query for the specified database.
@@ -54,11 +54,11 @@ final class GridGeometryQuery extends Query {
      */
     public GridGeometryQuery(final Database database) {
         super(database);
-        final QueryType[] FLSI = {FILTERED_LIST, LIST, SELECT, INSERT};
-        final QueryType[] LSI  = {               LIST, SELECT, INSERT};
-        final QueryType[] LS   = {               LIST, SELECT        };
-        final QueryType[] F    = {FILTERED_LIST              };
-        identifier        = addColumn("GridGeometries", "identifier",              FLSI);
+        final QueryType[] LFSEI = {LIST, FILTERED_LIST, SELECT, EXISTS, INSERT};
+        final QueryType[] LFSI  = {LIST, FILTERED_LIST, SELECT,         INSERT};
+        final QueryType[] LSI   = {LIST,                SELECT,         INSERT};
+        final QueryType[] LS    = {LIST,                SELECT                };
+        identifier        = addColumn("GridGeometries", "identifier",             LFSEI);
         width             = addColumn("GridGeometries", "width",                    LSI);
         height            = addColumn("GridGeometries", "height",                   LSI);
         scaleX            = addColumn("GridGeometries", "scaleX",                   LSI);
@@ -69,12 +69,13 @@ final class GridGeometryQuery extends Query {
         shearY            = addColumn("GridGeometries", "shearY",               0,  LSI);
         horizontalSRID    = addColumn("GridGeometries", "horizontalSRID",           LSI);
         horizontalExtent  = addColumn("GridGeometries", "horizontalExtent",         LS ); // Will rely on trigger for insertion.
-        verticalSRID      = addColumn("GridGeometries", "verticalSRID",      null,  LSI);
-        verticalOrdinates = addColumn("GridGeometries", "verticalOrdinates", null, FLSI);
+        verticalSRID      = addColumn("GridGeometries", "verticalSRID",      null, LFSI);
+        verticalOrdinates = addColumn("GridGeometries", "verticalOrdinates", null, LFSI);
         if (database.isSpatialEnabled()) {
             horizontalExtent.setFunction("Box2D", LS);
         }
-        byIdentifier        = addParameter(identifier, SELECT);
+        final QueryType[] F = {FILTERED_LIST};
+        byIdentifier        = addParameter(identifier, SELECT, EXISTS);
         byWidth             = addParameter(width,          F);
         byHeight            = addParameter(height,         F);
         byScaleX            = addParameter(scaleX,         F);
@@ -84,6 +85,5 @@ final class GridGeometryQuery extends Query {
         byShearX            = addParameter(shearX,         F);
         byShearY            = addParameter(shearY,         F);
         byHorizontalSRID    = addParameter(horizontalSRID, F);
-        byVerticalSRID      = addParameter(verticalSRID,   F);
     }
 }

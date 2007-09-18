@@ -62,7 +62,7 @@ public class DateRange extends Range {
 
     /**
      * Creates a date range from the specified measurement range. Units are converted as needed.
-     * 
+     *
      * @throws ConversionException if the given range doesn't have a
      *         {@linkplain MeasurementRange#getUnits unit} compatible with milliseconds.
      */
@@ -79,7 +79,7 @@ public class DateRange extends Range {
     {
         super(Date.class,
               new Date(origin + Math.round(converter.convert(range.getMinimum()))), range.isMinIncluded(),
-              new Date(origin + Math.round(converter.convert(range.getMinimum()))), range.isMaxIncluded());
+              new Date(origin + Math.round(converter.convert(range.getMaximum()))), range.isMaxIncluded());
     }
 
     /**

@@ -60,11 +60,28 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * The query to use for selecting a record by its number.
      */
     private static final QueryType SELECT_BY_NUMBER = QueryType.SELECT_BY_IDENTIFIER;
-    
+
+    /**
+     * The maximal value (inclusive) for auto-increment. Used in order to avoid long
+     * iteration over too big tables (in which case we need to find a better algorithm).
+     * <p>
+     * If this number is modified, consider changing the number of leading zeros as well
+     * if the formatting code.
+     *
+     * @see #searchFreeIdentifier
+     */
+    private static final int MAXIMUM_AUTO_INCREMENT = 999;
+
     /**
      * The table name for insert statements, or {@code null} if not yet computed.
      */
     private String tableName;
+
+    /**
+     * The main parameter to use for the identification of a record, or {@code null}
+     * if unknown.
+     */
+    private Parameter primaryKey;
 
     /**
      * The parameter to use for looking an element by name, or {@code 0} if unset.
@@ -133,12 +150,15 @@ public abstract class SingletonTable<E extends Element> extends Table {
         boolean success = true;
         String    name = "byName";
         Parameter param = byName;
+        final Parameter newPK;
         if (byName == null) {
+            newPK = byNumber;
             if (byNumber != null) {
                 newByName = byNumber.indexOf(SELECT_BY_NAME);
                 // Optional, so don't test for success.
             }
         } else {
+            newPK = byName;
             if (success = query.getParameters(SELECT_BY_NAME).contains(byName)) {
                 newByName = byName.indexOf(SELECT_BY_NAME);
                 success = (newByName != 0);
@@ -162,11 +182,11 @@ public abstract class SingletonTable<E extends Element> extends Table {
         if (!success) {
             throw new IllegalArgumentException(Resources.format(ResourceKeys.ERROR_BAD_ARGUMENT_$2, name, param));
         }
-        if ((newByName != indexByName) || (newByNumber != indexByNumber)) {
+        if ((newByName != indexByName) || (newByNumber != indexByNumber) || (newPK != primaryKey)) {
+            primaryKey    = newPK;
             indexByName   = newByName;
             indexByNumber = newByNumber;
-            param = (byName != null) ? byName : byNumber;
-            tableName = (param != null) ? param.column.table : null;
+            tableName     = (newPK != null) ? newPK.column.table : null;
             clearCache();
             fireStateChanged("identifierParameters");
         }
@@ -471,6 +491,54 @@ public abstract class SingletonTable<E extends Element> extends Table {
                 pool.remove(entry.getKey().getName());
             }
         }
+    }
+
+    /**
+     * Searchs for an identifier not already in use. This method appends a decimal number to the
+     * specified base and check if the resulting identifier is not in use. If it is, then the
+     * decimal number is incremented until a unused identifier is found.
+     *
+     * @param  base The base for the identifier.
+     * @return A unused identifier.
+     * @throws CatalogException if the maximal amount of identifiers has been reached.
+     * @throws SQLException if an error occured while reading the database.
+     */
+    protected String searchFreeIdentifier(final String base) throws CatalogException, SQLException {
+        final PreparedStatement statement    = getStatement(QueryType.EXISTS);
+        final int               byPrimaryKey = indexOf(primaryKey);
+        final int               indexPK      = primaryKey.column.indexOf(QueryType.EXISTS);
+        final StringBuilder     buffer       = new StringBuilder(base).append('-');
+        final int               offset       = buffer.length();
+scan:   for (int n=1; n<=MAXIMUM_AUTO_INCREMENT; n++) {
+            buffer.setLength(offset);
+            if (n < 100) buffer.append('0');
+            if (n <  10) buffer.append('0');
+            buffer.append(n);
+            final String ID = buffer.toString().trim();
+            statement.setString(byPrimaryKey, ID);
+            final ResultSet results = statement.executeQuery();
+            while (results.next()) {
+                if (indexPK != 0) {
+                    /*
+                     * Below is a paranoiac check that should never be needed when the SQL
+                     * statement is something like "WHERE name='foo'".  However we perform
+                     * this check as an anticipation for a future version that may implement
+                     * a more elaborated mechanism on top of regular expressions.
+                     */
+                    final String existing = results.getString(indexPK).trim();
+                    if (!ID.equals(existing)) {
+                        continue;
+                    }
+                }
+                // A match has been found. Increment the counter and try an other identifier.
+                results.close();
+                continue scan;
+            }
+            // No match found. We can use this identifier.
+            results.close();
+            return ID;
+        }
+        throw new CatalogException("Trop d'itérations.");
     }
 
     /**

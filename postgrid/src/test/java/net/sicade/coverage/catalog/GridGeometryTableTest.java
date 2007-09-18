@@ -89,10 +89,10 @@ public class GridGeometryTableTest extends DatabaseTest {
         final AffineTransform gridToCRS = entry.getGridToCRS2D();
         assertFalse(gridToCRS.isIdentity());
         assertFalse(gridToCRS.getDeterminant() == 0);
-        assertEquals(name, table.getIdentifier(size, gridToCRS, horizontalSRID, altitudes, verticalSRID, false));
-        assertNull(table.getIdentifier(size, gridToCRS, 4326, altitudes, verticalSRID, false));
+        assertEquals(name, table.getIdentifier(size, gridToCRS, horizontalSRID, altitudes, verticalSRID, null));
+        assertNull(table.getIdentifier(size, gridToCRS, 4326, altitudes, verticalSRID, null));
 
         altitudes[1] = 12.8; // Tries a non-existant altitude.
-        assertNull(table.getIdentifier(size, gridToCRS, horizontalSRID, altitudes, verticalSRID, false));
+        assertNull(table.getIdentifier(size, gridToCRS, horizontalSRID, altitudes, verticalSRID, null));
     }
 }

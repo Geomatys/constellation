@@ -450,7 +450,7 @@ ALTER TABLE postgrid."GridGeometries" OWNER TO geoadmin;
 -- Name: TABLE "GridGeometries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
 --
 
-COMMENT ON TABLE "GridGeometries" IS 'Envelope spatiales des images ainsi que la dimension de leurs grilles.';
+COMMENT ON TABLE "GridGeometries" IS 'Envelope spatiales des images ainsi que la dimension de leurs grilles. La transformation affine doit représenter le coin supérieur gauche des pixels.';
 
 
 --
@@ -584,7 +584,7 @@ COMMENT ON CONSTRAINT "enforce_srid_verticalOrdinates" ON "GridGeometries" IS 'L
 --
 
 CREATE VIEW "BoundingBoxes" AS
-    SELECT "GeometryDetails".identifier, "GeometryDetails".width, "GeometryDetails".height, "GeometryDetails".crs, postgis.xmin(("GeometryDetails"."nativeBox")::postgis.box3d) AS "minX", postgis.xmax(("GeometryDetails"."nativeBox")::postgis.box3d) AS "maxX", postgis.ymin(("GeometryDetails"."nativeBox")::postgis.box3d) AS "minY", postgis.ymax(("GeometryDetails"."nativeBox")::postgis.box3d) AS "maxY", postgis.xmin(("GeometryDetails"."geographicBox")::postgis.box3d) AS "westBoundLongitude", postgis.xmax(("GeometryDetails"."geographicBox")::postgis.box3d) AS "eastBoundLongitude", postgis.ymin(("GeometryDetails"."geographicBox")::postgis.box3d) AS "southBoundLatitude", postgis.ymax(("GeometryDetails"."geographicBox")::postgis.box3d) AS "northBoundLatitude" FROM (SELECT "TransformedGeometries".identifier, "TransformedGeometries".width, "TransformedGeometries".height, postgis.srid("TransformedGeometries".envelope) AS crs, postgis.box2d("TransformedGeometries".envelope) AS "nativeBox", postgis.box2d(postgis.transform("TransformedGeometries".envelope, 4326)) AS "geographicBox" FROM (SELECT "GridGeometries".identifier, "GridGeometries".width, "GridGeometries".height, postgis.affine(postgis.geometryfromtext((((((((('POLYGON((0 0,0 '::text || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' '::text) || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' 0,0 0))'::text), "GridGeometries"."horizontalSRID"), "GridGeometries"."scaleX", "GridGeometries"."shearX", "GridGeometries"."shearY", "GridGeometries"."scaleY", "GridGeometries"."translateX", "GridGeometries"."translateY") AS envelope FROM "GridGeometries") "TransformedGeometries") "GeometryDetails";
+    SELECT "GeometryDetails".identifier, "GeometryDetails".width, "GeometryDetails".height, "GeometryDetails".crs, postgis.xmin(("GeometryDetails"."nativeBox")::postgis.box3d) AS "minX", postgis.xmax(("GeometryDetails"."nativeBox")::postgis.box3d) AS "maxX", postgis.ymin(("GeometryDetails"."nativeBox")::postgis.box3d) AS "minY", postgis.ymax(("GeometryDetails"."nativeBox")::postgis.box3d) AS "maxY", postgis.xmin(("GeometryDetails"."geographicBox")::postgis.box3d) AS west, postgis.xmax(("GeometryDetails"."geographicBox")::postgis.box3d) AS east, postgis.ymin(("GeometryDetails"."geographicBox")::postgis.box3d) AS south, postgis.ymax(("GeometryDetails"."geographicBox")::postgis.box3d) AS north FROM (SELECT "TransformedGeometries".identifier, "TransformedGeometries".width, "TransformedGeometries".height, postgis.srid("TransformedGeometries".envelope) AS crs, postgis.box2d("TransformedGeometries".envelope) AS "nativeBox", postgis.box2d(postgis.transform("TransformedGeometries".envelope, 4326)) AS "geographicBox" FROM (SELECT "GridGeometries".identifier, "GridGeometries".width, "GridGeometries".height, postgis.affine(postgis.geometryfromtext((((((((('POLYGON((0 0,0 '::text || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' '::text) || ("GridGeometries".height)::text) || ','::text) || ("GridGeometries".width)::text) || ' 0,0 0))'::text), "GridGeometries"."horizontalSRID"), "GridGeometries"."scaleX", "GridGeometries"."shearX", "GridGeometries"."shearY", "GridGeometries"."scaleY", "GridGeometries"."translateX", "GridGeometries"."translateY") AS envelope FROM "GridGeometries") "TransformedGeometries") "GeometryDetails";
 
 
 ALTER TABLE postgrid."BoundingBoxes" OWNER TO geoadmin;
@@ -603,9 +603,11 @@ COMMENT ON VIEW "BoundingBoxes" IS 'Comparaison entre les enveloppes calculées 
 CREATE TABLE "GridCoverages" (
     series character varying NOT NULL,
     filename character varying NOT NULL,
+    "index" smallint DEFAULT 1 NOT NULL,
     "startTime" timestamp without time zone,
     "endTime" timestamp without time zone,
     extent character varying NOT NULL,
+    CONSTRAINT "ImageIndex_check" CHECK (("index" >= 1)),
     CONSTRAINT "TemporalExtent_range" CHECK (((("startTime" IS NULL) AND ("endTime" IS NULL)) OR ((("startTime" IS NOT NULL) AND ("endTime" IS NOT NULL)) AND ("startTime" < "endTime"))))
 );
 
@@ -634,6 +636,13 @@ COMMENT ON COLUMN "GridCoverages".filename IS 'Nom du fichier contenant l''image
 
 
 --
+-- Name: COLUMN "GridCoverages"."index"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON COLUMN "GridCoverages"."index" IS 'Index de l''image dans les fichiers contenant plusieurs images. Numérotées à partir de 1.';
+
+
+--
 -- Name: COLUMN "GridCoverages"."startTime"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
 --
 
@@ -659,6 +668,13 @@ COMMENT ON COLUMN "GridCoverages".extent IS 'Coordonnées de la région géograp
 --
 
 COMMENT ON CONSTRAINT "TemporalExtent_range" ON "GridCoverages" IS 'Les dates de début et de fin doivent être nulles ou non-nulles en même temps, et la date de début doit être inférieure à la date de fin.';
+
+
+--
+-- Name: CONSTRAINT "ImageIndex_check" ON "GridCoverages"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON CONSTRAINT "ImageIndex_check" ON "GridCoverages" IS 'L''index de l''image doit être strictement positif.';
 
 
 --
@@ -1030,6 +1046,40 @@ COMMENT ON COLUMN "Series".quicklook IS 'Série dont les images sont des aperçu
 
 
 --
+-- Name: RangeOfLayers; Type: VIEW; Schema: postgrid; Owner: geoadmin
+--
+
+CREATE VIEW "RangeOfLayers" AS
+    SELECT "GridCoveragesDetails".layer, count("GridCoveragesDetails".layer) AS count, min("GridCoveragesDetails"."startTime") AS "startTime", max("GridCoveragesDetails"."endTime") AS "endTime", min("GridCoveragesDetails".west) AS west, max("GridCoveragesDetails".east) AS east, min("GridCoveragesDetails".south) AS south, max("GridCoveragesDetails".north) AS north FROM (SELECT "Series".layer, "GridCoverages".filename, "GridCoverages"."startTime", "GridCoverages"."endTime", "BoundingBoxes".west, "BoundingBoxes".east, "BoundingBoxes".south, "BoundingBoxes".north FROM (("GridCoverages" JOIN "BoundingBoxes" ON ((("GridCoverages".extent)::text = ("BoundingBoxes".identifier)::text))) JOIN "Series" ON ((("GridCoverages".series)::text = ("Series".identifier)::text)))) "GridCoveragesDetails" GROUP BY "GridCoveragesDetails".layer ORDER BY "GridCoveragesDetails".layer;
+
+
+ALTER TABLE postgrid."RangeOfLayers" OWNER TO geoadmin;
+
+--
+-- Name: VIEW "RangeOfLayers"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON VIEW "RangeOfLayers" IS 'Nombre d''images pour chacune des couches utilisées.';
+
+
+--
+-- Name: RangeOfSeries; Type: VIEW; Schema: postgrid; Owner: geoadmin
+--
+
+CREATE VIEW "RangeOfSeries" AS
+    SELECT "Series".layer, "GridCoverages".series, count("GridCoverages".extent) AS count, min("GridCoverages"."startTime") AS "startTime", max("GridCoverages"."endTime") AS "endTime", min("BoundingBoxes".west) AS west, max("BoundingBoxes".east) AS east, min("BoundingBoxes".south) AS south, max("BoundingBoxes".north) AS north FROM (("GridCoverages" JOIN "Series" ON ((("GridCoverages".series)::text = ("Series".identifier)::text))) JOIN "BoundingBoxes" ON ((("GridCoverages".extent)::text = ("BoundingBoxes".identifier)::text))) GROUP BY "Series".layer, "GridCoverages".series, "GridCoverages".extent ORDER BY "Series".layer, "GridCoverages".series, count("GridCoverages".extent);
+
+
+ALTER TABLE postgrid."RangeOfSeries" OWNER TO geoadmin;
+
+--
+-- Name: VIEW "RangeOfSeries"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
+--
+
+COMMENT ON VIEW "RangeOfSeries" IS 'Liste des régions géographiques utilisées par chaque sous-série.';
+
+
+--
 -- Name: Thematics; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
 --
 
@@ -1122,22 +1172,7 @@ COMMENT ON CONSTRAINT "GridCoverages_extent" ON "GridCoverages" IS 'L''envelope 
 --
 
 ALTER TABLE ONLY "GridCoverages"
-    ADD CONSTRAINT "GridCoverages_pkey" PRIMARY KEY (series, filename);
-
-
---
--- Name: GridCoverages_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
---
-
-ALTER TABLE ONLY "GridCoverages"
-    ADD CONSTRAINT "GridCoverages_uniqueness" UNIQUE (series, filename);
-
-
---
--- Name: CONSTRAINT "GridCoverages_uniqueness" ON "GridCoverages"; Type: COMMENT; Schema: postgrid; Owner: geoadmin
---
-
-COMMENT ON CONSTRAINT "GridCoverages_uniqueness" ON "GridCoverages" IS 'Le nom du fichier doit être unique pour chaque série.';
+    ADD CONSTRAINT "GridCoverages_pkey" PRIMARY KEY (series, filename, "index");
 
 
 --
@@ -1911,6 +1946,26 @@ REVOKE ALL ON TABLE "Series" FROM PUBLIC;
 REVOKE ALL ON TABLE "Series" FROM geoadmin;
 GRANT ALL ON TABLE "Series" TO geoadmin;
 GRANT SELECT ON TABLE "Series" TO PUBLIC;
+
+
+--
+-- Name: RangeOfLayers; Type: ACL; Schema: postgrid; Owner: geoadmin
+--
+
+REVOKE ALL ON TABLE "RangeOfLayers" FROM PUBLIC;
+REVOKE ALL ON TABLE "RangeOfLayers" FROM geoadmin;
+GRANT ALL ON TABLE "RangeOfLayers" TO geoadmin;
+GRANT SELECT ON TABLE "RangeOfLayers" TO PUBLIC;
+
+
+--
+-- Name: RangeOfSeries; Type: ACL; Schema: postgrid; Owner: geoadmin
+--
+
+REVOKE ALL ON TABLE "RangeOfSeries" FROM PUBLIC;
+REVOKE ALL ON TABLE "RangeOfSeries" FROM geoadmin;
+GRANT ALL ON TABLE "RangeOfSeries" TO geoadmin;
+GRANT SELECT ON TABLE "RangeOfSeries" TO PUBLIC;
 
 
 --

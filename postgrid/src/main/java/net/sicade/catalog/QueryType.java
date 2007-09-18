@@ -60,6 +60,11 @@ public enum QueryType {
     AVAILABLE_DATA(),
 
     /**
+     * Checks if a record exists. This query usually don't fetch values.
+     */
+    EXISTS(),
+
+    /**
      * A record to be added in a table.
      */
     INSERT(LoggingLevel.INSERT);

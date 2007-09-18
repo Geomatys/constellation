@@ -308,7 +308,7 @@ public class Table {
         if (out != null) {
             out.println(statement);
         } else {
-            final int count = 1; // TODO statement.executeUpdate();
+            final int count = statement.executeUpdate();
             if (count != 1) {
                 throw new CatalogException(Resources.format(ResourceKeys.ERROR_UNEXPECTED_UPDATE_$1, count));
             }
