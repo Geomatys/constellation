@@ -26,6 +26,8 @@ import javax.units.SI;
 import javax.units.NonSI;
 import javax.units.Converter;
 
+import org.opengis.util.CodeList;
+import org.opengis.metadata.spatial.PixelOrientation;
 
 import org.geotools.image.io.GeographicImageReader;
 import org.geotools.image.io.metadata.Axis;
@@ -97,6 +99,21 @@ public class MetadataParser {
             return SI.SECOND;
         }
         return Unit.valueOf(symbol);
+    }
+
+    /**
+     * Returns the code matching the specified name, or {@code null} if none.
+     */
+    private static <E extends CodeList> E getCode(final E[] values, String name) {
+        if (name != null) {
+            name = name.trim();
+            for (final E code : values) {
+                if (name.equalsIgnoreCase(code.name())) {
+                    return code;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -224,7 +241,7 @@ public class MetadataParser {
             return null;
         }
         final AffineTransform at = new AffineTransform(flatmatrix);
-        final String p = geometry.getPixelOrientation();
+        final PixelOrientation p = getCode(PixelOrientation.values(), geometry.getPixelOrientation());
         if (p != null) {
             final Point2D offset = GridGeometry2D.getPixelTranslation(p);
             at.translate(-0.5 - offset.getX(), -0.5 - offset.getY());

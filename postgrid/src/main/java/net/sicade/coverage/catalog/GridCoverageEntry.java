@@ -45,12 +45,14 @@ import java.util.Collections;
 import static java.lang.Math.*;
 
 import org.opengis.coverage.SampleDimension;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.geotools.image.io.IIOListeners;
+import org.geotools.image.io.netcdf.NetcdfReadParam;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
@@ -75,7 +77,8 @@ import net.sicade.catalog.Entry;
 import net.sicade.coverage.model.Operation;
 import net.sicade.catalog.IllegalRecordException;
 import net.sicade.catalog.CatalogException;
-import org.opengis.coverage.grid.GridRange;
+
+import ucar.nc2.dataset.AxisType;
 
 
 /**
@@ -154,6 +157,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /** The file name.               */ private final String filename;
     /** Image start time, inclusive. */ private final long   startTime;
     /** Image end time, exclusive.   */ private final long   endTime;
+    /** Index in the time dimension. */ private final short  timeIndex;
     /** The band to read, or 0.      */ private final short  band;
 
     /**
@@ -219,6 +223,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
                                 final String            extension,
                                 final Date              startTime,
                                 final Date              endTime,
+                                final short             timeIndex,
                                 final GridGeometryEntry geometry,
                                 final short             band,
                                 final String            format,
@@ -234,6 +239,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
         this.parameters = table.getParameters(layer, format, crs, pathname, extension);
         this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
+        this.timeIndex  = timeIndex;
         if (geometry.geographicEnvelope.isEmpty() || this.startTime >= this.endTime) {
             // TODO: localize
             throw new IllegalRecordException("L'enveloppe spatio-temporelle est vide.");
@@ -471,6 +477,17 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     }
 
     /**
+     * Handle special cases for some specific image formats.
+     */
+    private void handleSpecialCases(final ImageReadParam param) {
+        if (param instanceof NetcdfReadParam) {
+            final NetcdfReadParam p = (NetcdfReadParam) param;
+            p.setBandDimensionTypes(new AxisType[] {AxisType.Height, AxisType.Pressure});
+            p.setSliceIndice(AxisType.Time, timeIndex - 1);
+        }
+    }
+
+    /**
      * Calcule les limites des pixels à lire, en coordonnées logiques et en coordonnées pixels.
      * Cette méthode est appelée avant la lecture d'une image, mais peut aussi être appelée par
      * des methodes telles que {@link #getEnvelope} et {@link #getGridGeometry}. Tous les arguments
@@ -701,6 +718,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
                     if (band != 0) {
                         param.setSourceBands(new int[] {band});
                     }
+                    handleSpecialCases(param);
                     if (image == null) {
                         final Dimension size = geometry.getSize();
                         image = format.read(getInput(true), imageIndex, param, listeners, size, this);
@@ -877,6 +895,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
             return this.band      == that.band      &&
                    this.startTime == that.startTime &&
                    this.endTime   == that.endTime   &&
+                   this.timeIndex == that.timeIndex &&
                    Utilities.equals(this.filename,   that.filename  ) &&
                    Utilities.equals(this.geometry,   that.geometry  ) &&
                    Utilities.equals(this.parameters, that.parameters);

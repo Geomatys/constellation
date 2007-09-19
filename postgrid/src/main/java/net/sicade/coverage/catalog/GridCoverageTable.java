@@ -679,6 +679,7 @@ loop:   for (final CoverageReference newReference : entries) {
         final String extension = result.getString   (indexOf(query.extension));
         final Date   startTime = result.getTimestamp(indexOf(query.startTime), calendar);
         final Date   endTime   = result.getTimestamp(indexOf(query.endTime),   calendar);
+        final short  timeIndex = result.getShort    (indexOf(query.index));
         final String extent    = result.getString   (indexOf(query.spatialExtent));
         final String format    = result.getString   (indexOf(query.format));
         if (gridGeometryTable == null) {
@@ -688,7 +689,7 @@ loop:   for (final CoverageReference newReference : entries) {
         final NumberRange  verticalRange = getVerticalRange();
         final short band = geometry.indexOf(0.5*(verticalRange.getMinimum() + verticalRange.getMaximum()));
         return new GridCoverageEntry(this, layer, series, pathname, filename, extension, startTime,
-                    endTime, geometry, band, format, null).canonicalize();
+                    endTime, timeIndex, geometry, band, format, null).canonicalize();
     }
 
     /**

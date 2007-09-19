@@ -235,8 +235,8 @@ final class FormatEntry extends Entry implements Format {
      * Indique si le tableau {@code array} contient au moins un
      * exemplaire de la classe {@code item} ou d'une super-classe.
      */
-    private static <T> boolean contains(final Class<Object>[] array, final Class<T> item) {
-        for (final Class<Object> c : array) {
+    private static <T> boolean contains(final Class<?>[] array, final Class<T> item) {
+        for (final Class<?> c : array) {
             if (c.isAssignableFrom(item)) {
                 return true;
             }
@@ -249,7 +249,7 @@ final class FormatEntry extends Entry implements Format {
      * tableau {@code inputTypes}. Si la conversion ne peut pas être effectuée,
      * alors cette méthode retourne {@code null}.
      */
-    private static Object getInput(final Object file, final Class<Object>[] inputTypes) {
+    private static Object getInput(final Object file, final Class<?>[] inputTypes) {
         if (contains(inputTypes, file.getClass())) {
             return file;
         }
@@ -297,7 +297,6 @@ final class FormatEntry extends Entry implements Format {
      * Note 2: La méthode {@link #setReading} <strong>doit</strong> être appelée
      *         avant et après cette méthode dans un bloc {@code try...finally}.
      *
-     *
      * @param  file Fichier à lire. Habituellement un objet {@link File}, {@link URL} ou {@link URI}.
      * @param  imageIndex Index (à partir de 0) de l'image à lire.
      * @param  param Bloc de paramètre à utiliser pour la lecture.
@@ -313,7 +312,6 @@ final class FormatEntry extends Entry implements Format {
      * @return Image lue, ou {@code null} si la lecture de l'image a été annulée.
      * @throws IOException si une erreur est survenue lors de la lecture.
      */
-    @SuppressWarnings("unchecked")
     final RenderedImage read(final Object         file,
                              final int            imageIndex,
                              final ImageReadParam param,
@@ -332,7 +330,7 @@ final class FormatEntry extends Entry implements Format {
          */
         final ImageReader reader = getImageReader();
         final ImageReaderSpi spi = reader.getOriginatingProvider();
-        final Class<Object>[] inputTypes = (spi!=null) ? spi.getInputTypes() : ImageReaderSpi.STANDARD_INPUT_TYPE;
+        final Class<?>[] inputTypes = (spi!=null) ? spi.getInputTypes() : ImageReaderSpi.STANDARD_INPUT_TYPE;
         inputObject = getInput(file, inputTypes);
         if (inputObject == null) {
             inputObject = inputStream = ImageIO.createImageInputStream(file);
