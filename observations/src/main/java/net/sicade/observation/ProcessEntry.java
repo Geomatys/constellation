@@ -14,6 +14,10 @@
  */
 package net.sicade.observation;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.observation.Process;
 import net.sicade.catalog.Entry;
 
@@ -24,11 +28,24 @@ import net.sicade.catalog.Entry;
  * @version $Id$
  * @author Antoine Hnawia
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "ProcessEntry", propOrder = {"href"})
 public class ProcessEntry extends Entry implements Process {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = -1370011712794916454L;
+    
+    /**
+     * Le nom/identifiant du capteur.
+     */
+    @XmlElement(required = true)
+    private String href;
+    
+     /**
+     * Constructeur vide utilisé par JAXB.
+     */
+    private ProcessEntry(){}
     
     /**
      * Construit une nouvelle procédure du nom spécifié.
@@ -37,6 +54,7 @@ public class ProcessEntry extends Entry implements Process {
      */
     public ProcessEntry(final String name) {
         super(name);
+        this.href = name;
     }
 
     /** 
@@ -47,5 +65,6 @@ public class ProcessEntry extends Entry implements Process {
      */
     public ProcessEntry(final String name, final String remarks) {
         super(name, remarks);
+        this.href = name;
     }
 }

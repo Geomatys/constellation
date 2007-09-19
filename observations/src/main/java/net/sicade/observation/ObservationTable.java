@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.coverage.model.Distribution;
+import net.sicade.coverage.model.DistributionEntry;
 import net.sicade.coverage.model.DistributionTable;
 import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.AnyResultTable;
@@ -32,7 +32,6 @@ import net.sicade.swe.DataBlockDefinitionTable;
 // OpenGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
-import org.opengis.observation.Phenomenon;
 
 // geotools dependencies
 import org.geotools.resources.Utilities;
@@ -242,19 +241,19 @@ public abstract class ObservationTable<EntryType extends Observation> extends Si
       if (distributions == null) {
           distributions = getDatabase().getTable(DistributionTable.class);
       }
-      Distribution distrib = distributions.getEntry(result.getString(indexOf(query.distribution)));
+      DistributionEntry distrib = distributions.getEntry(result.getString(indexOf(query.distribution)));
       if (phenomenons == null) {
           phenomenons = getDatabase().getTable(PhenomenonTable.class);
       }
-      Phenomenon pheno = phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
+      PhenomenonEntry pheno = phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
       if (stations == null) {
           stations = getDatabase().getTable(SamplingFeatureTable.class);
       }
-      SamplingFeature station = stations.getEntry(result.getString(indexOf(query.featureOfInterest)));
+      SamplingFeatureEntry station = stations.getEntry(result.getString(indexOf(query.featureOfInterest)));
       if (procedures == null) {
           procedures = getDatabase().getTable(ProcessTable.class);
       }
-      org.opengis.observation.Process procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
+      ProcessEntry procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
       if (results == null) {
           results = getDatabase().getTable(AnyResultTable.class);
       }

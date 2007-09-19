@@ -15,20 +15,9 @@
 package net.sicade.observation;
 
 import javax.units.Unit;
-
-// Sicade dependencies
-import net.sicade.coverage.model.Distribution;
-
-
-// openGis dependencies
-import org.opengis.observation.Phenomenon;
-import org.opengis.observation.Process;
+import net.sicade.coverage.model.DistributionEntry;
 import org.opengis.observation.Measurement;
-import org.opengis.metadata.quality.Element;
 import org.opengis.observation.Measure;
-import org.opengis.temporal.TemporalObject;
-import org.opengis.metadata.MetaData;
-import org.opengis.observation.sampling.SamplingFeature;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Measurement mesure}.
@@ -47,7 +36,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     /**
      * le resultat de la mesure
      */
-    private Measure result;
+    private MeasureEntry result;
     
     
     /**
@@ -67,17 +56,17 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      */
     public MeasurementEntry(final String name,
             final String definition,
-            final SamplingFeature station,
-            final Phenomenon      observedProperty,
-            final Process         procedure,
-            final Distribution    distribution,
-            final Element         quality,
-            final Measure         result,
-            final TemporalObject  samplingTime,
-            final MetaData        observationMetadata,
-            final String          resultDefinition,
-            final TemporalObject  procedureTime,
-            final Object          procedureParameter) {
+            final SamplingFeatureEntry station,
+            final PhenomenonEntry      observedProperty,
+            final ProcessEntry         procedure,
+            final DistributionEntry    distribution,
+            final ElementEntry         quality,
+            final MeasureEntry         result,
+            final TemporalObjectEntry  samplingTime,
+            final MetaDataEntry        observationMetadata,
+            final String               resultDefinition,
+            final TemporalObjectEntry  procedureTime,
+            final Object               procedureParameter) {
         super(name, definition, station, observedProperty, procedure, distribution, quality, result,
                 samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
     }
@@ -93,14 +82,14 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      */
     public MeasurementEntry(final String name,
             final String definition,
-            final SamplingFeature station,
-            final Phenomenon      observedProperty,
-            final Process         procedure,
-            final Distribution    distribution,
-          //final Element         quality,
-            final Measure         result,
-            final TemporalObject  samplingTime,
-            final String          resultDefinition) {
+            final SamplingFeatureEntry station,
+            final PhenomenonEntry      observedProperty,
+            final ProcessEntry         procedure,
+            final DistributionEntry    distribution,
+            //final ElementEntry         quality,
+            final MeasureEntry         result,
+            final TemporalObjectEntry  samplingTime,
+            final String               resultDefinition) {
         super(name, definition, station, observedProperty, procedure, distribution, result,
                 samplingTime, resultDefinition);
         
@@ -117,11 +106,11 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         return name.toString();
     }
     
-     public Measure getResult() {
+    public Measure getResult() {
         return result;
     }
     
-       
+    
     
     /**
      * Vérifie si cette entré est identique à l'objet spécifié.
@@ -138,5 +127,5 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         return false;
     }
     
-   
+    
 }

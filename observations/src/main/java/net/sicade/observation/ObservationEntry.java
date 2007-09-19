@@ -14,9 +14,16 @@
  */
 package net.sicade.observation;
 
+// jaxb import
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
 // Sicade dependencies 
 import net.sicade.catalog.Entry;
-import net.sicade.coverage.model.Distribution;
+import net.sicade.coverage.model.DistributionEntry;
 
 // openGis dependencies
 import org.opengis.observation.Process;
@@ -40,7 +47,24 @@ import org.geotools.resources.Utilities;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
+ * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "ObservationEntry", propOrder = {
+    "definition",
+    "observationMetadata",
+    "samplingTime",
+    "distribution",
+    "procedure",
+    "procedureParameter",
+    "procedureTime",
+    "resultQuality",
+    "resultDefinition",
+    "observedProperty",
+    "featureOfInterest",
+    "result"
+})
+@XmlRootElement
 public class ObservationEntry extends Entry implements Observation {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
@@ -48,49 +72,54 @@ public class ObservationEntry extends Entry implements Observation {
     private static final long serialVersionUID = 3269639171560208276L;
     
     /**
-     * La descritpion de l'observation
+     * La description de l'observation
      */
-    private final String definition;
+    private String definition;
     
     /**
      * La station à laquelle a été pris cet échantillon.
      */
-    private final SamplingFeature featureOfInterest;
+     @XmlElement(required = true)
+    private SamplingFeatureEntry featureOfInterest;
     
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
      */
-    private final Phenomenon observedProperty;
+    @XmlElement(required = true)
+    private PhenomenonEntry observedProperty;
 
     /**
      * Référence vers la {@linkplain Procedure procédure} associée à cet observable.
      */
-    private final Process procedure;
+    @XmlElement(required = true)
+    private ProcessEntry procedure;
     
      /**
      * Référence vers la {@linkplain Distribution distribution} associée à cet observable.
      */
-    private final Distribution distribution;
+    private DistributionEntry distribution;
     
     /**
      * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
      */
-    private final Element quality;
+    private ElementEntry resultQuality;
     
     /**
      * le resultat de l'observation de n'importe quel type 
      */
+    @XmlElement(required = true)
     private Object result;
     
     /**
      *  
      */
-     private TemporalObject samplingTime;
+     @XmlElement(required = true)
+     private TemporalObjectEntry samplingTime;
      
      /**
       *
       */
-     private MetaData observationMetadata;
+     private MetaDataEntry observationMetadata;
      
     /**
      * Definition du resultat. 
@@ -100,7 +129,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * 
      */
-    private TemporalObject procedureTime;
+    private TemporalObjectEntry procedureTime;
     
     /**
      *
@@ -108,26 +137,32 @@ public class ObservationEntry extends Entry implements Observation {
     private Object procedureParameter;
     
     /**
+     * Construit une observation vide (utilisé pour la serialisation par JAXB)
+     */
+    protected ObservationEntry() {}
+    
+    /**
      * Construit une observation.
+     * 
      * 
      * @param featureOfInterest La station d'observation (par exemple une position de pêche).
      * @param observedProperty  Le phénomène observé.
      * @param procedure         La procédure associée.
-     * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
+     * @param resultQuality    La qualité de la donnée, ou {@code null} si inconnue.
      */
-    public ObservationEntry(final String name,
-                            final String          definition,
-                            final SamplingFeature featureOfInterest, 
-                            final Phenomenon      observedProperty,
-                            final Process         procedure,
-                            final Distribution    distribution,
-                            final Element         quality,
-                            final Object          result,
-                            final TemporalObject  samplingTime,
-                            final MetaData        observationMetadata,
-                            final String          resultDefinition,
-                            final TemporalObject  procedureTime,
-                            final Object          procedureParameter) 
+    public ObservationEntry(final String               name,
+                            final String               definition,
+                            final SamplingFeatureEntry featureOfInterest, 
+                            final PhenomenonEntry      observedProperty,
+                            final ProcessEntry         procedure,
+                            final DistributionEntry    distribution,
+                            final ElementEntry         quality,
+                            final Object               result,
+                            final TemporalObjectEntry  samplingTime,
+                            final MetaDataEntry        observationMetadata,
+                            final String               resultDefinition,
+                            final TemporalObjectEntry  procedureTime,
+                            final Object               procedureParameter) 
     {
         super(name);
         this.definition          = definition;
@@ -135,7 +170,7 @@ public class ObservationEntry extends Entry implements Observation {
         this.observedProperty    = observedProperty;
         this.procedure           = procedure;
         this.distribution        = distribution;
-        this.quality             = quality;
+        this.resultQuality       = quality;
         this.result              = result;
         this.samplingTime        = samplingTime;
         this.observationMetadata = observationMetadata;
@@ -147,21 +182,22 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * Construit une observation reduite adapté a BRGM.
      * 
+     * 
      * @param featureOfInterest La station d'observation (par exemple une position de pêche).
      * @param observedProperty  Le phénomène observé.
      * @param procedure         La procédure associée.
-     * @param quality    La qualité de la donnée, ou {@code null} si inconnue.
+     * @param resultQuality    La qualité de la donnée, ou {@code null} si inconnue.
      */
-    public ObservationEntry(final String          name,
-                            final String          definition,
-                            final SamplingFeature featureOfInterest, 
-                            final Phenomenon      observedProperty,
-                            final Process         procedure,
-                            final Distribution    distribution,
-                         // final Element         quality,
-                            final Object          result,
-                            final TemporalObject  samplingTime,
-                            final String          resultDefinition)
+    public ObservationEntry(final String                name,
+                            final String                definition,
+                            final SamplingFeatureEntry  featureOfInterest, 
+                            final PhenomenonEntry       observedProperty,
+                            final ProcessEntry          procedure,
+                            final DistributionEntry     distribution,
+                         // final ElementEntry          resultQuality,
+                            final Object                result,
+                            final TemporalObjectEntry   samplingTime,
+                            final String                resultDefinition)
     {
         super(name);
         this.definition          = definition;
@@ -169,7 +205,7 @@ public class ObservationEntry extends Entry implements Observation {
         this.observedProperty    = observedProperty;
         this.procedure           = procedure;
         this.distribution        = distribution;
-        this.quality             = null;       //= quality;
+        this.resultQuality             = null;       //= resultQuality;
         this.result              = result;
         this.samplingTime        = samplingTime;
         this.observationMetadata = null;
@@ -210,7 +246,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public Distribution getDistribution() {
+    public DistributionEntry getDistribution() {
         return distribution;
     }
     
@@ -218,7 +254,7 @@ public class ObservationEntry extends Entry implements Observation {
      * {@inheritDoc}
      */
     public Element getQuality() {
-        return quality;
+        return resultQuality;
     }
 
     /**
@@ -292,7 +328,7 @@ public class ObservationEntry extends Entry implements Observation {
             return Utilities.equals(this.featureOfInterest,   that.featureOfInterest) &&
                    Utilities.equals(this.observedProperty,    that.observedProperty) &&
                    Utilities.equals(this.procedure,           that.procedure)  &&
-                   Utilities.equals(this.quality,             that.quality)    && 
+                   Utilities.equals(this.resultQuality,             that.resultQuality)    && 
                    Utilities.equals(this.distribution,        that.distribution) &&
                    Utilities.equals(this.result,              that.result) &&
                    Utilities.equals(this.samplingTime,        that.samplingTime) &&

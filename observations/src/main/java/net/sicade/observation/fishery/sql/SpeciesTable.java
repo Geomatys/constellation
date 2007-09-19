@@ -38,7 +38,7 @@ import net.sicade.catalog.SingletonTable;
  * @author Antoine Hnawia
  */
 @Deprecated
-public class SpeciesTable extends SingletonTable<Species> {
+public class SpeciesTable extends SingletonTable<SpeciesEntry> {
     /**
      * Requête SQL pour obtenir un stage de développement à partir de son identifiant.
      */
@@ -65,7 +65,7 @@ public class SpeciesTable extends SingletonTable<Species> {
     /**
      * Construit une espèce pour l'enregistrement courant.
      */
-    protected Species createEntry(final ResultSet result) throws SQLException {
+    protected SpeciesEntry createEntry(final ResultSet result) throws SQLException {
         final String name    = result.getString(NAME);
         final String english = result.getString(ENGLISH);
         final String french  = result.getString(FRENCH);

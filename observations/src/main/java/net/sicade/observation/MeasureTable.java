@@ -28,7 +28,7 @@ import org.opengis.observation.Measure;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class MeasureTable extends SingletonTable<Measure> {
+public class MeasureTable extends SingletonTable<MeasureEntry> {
     
     /**
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
@@ -57,7 +57,7 @@ public class MeasureTable extends SingletonTable<Measure> {
     /**
      * Construit un resultat de mesure pour l'enregistrement courant.
      */
-    protected Measure createEntry(final ResultSet results) throws SQLException, CatalogException {
+    protected MeasureEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
         final MeasureQuery query = (MeasureQuery) super.query;
         if(uoms == null) {
             uoms =  getDatabase().getTable(UnitOfMeasureTable.class);

@@ -32,7 +32,7 @@ import net.sicade.catalog.SingletonTable;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class ProcessTable extends SingletonTable<Process> {
+public class ProcessTable extends SingletonTable<ProcessEntry> {
 
     /**
      * Construit une table des procédures.
@@ -54,7 +54,7 @@ public class ProcessTable extends SingletonTable<Process> {
     /**
      * Construit une procédure pour l'enregistrement courant.
      */
-    protected Process createEntry(final ResultSet results) throws SQLException {
+    protected ProcessEntry createEntry(final ResultSet results) throws SQLException {
         final ProcessQuery query = (ProcessQuery) super.query;
         return new ProcessEntry(results.getString(indexOf(query.name   )),
                                 results.getString(indexOf(query.remarks)));

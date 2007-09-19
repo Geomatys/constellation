@@ -36,7 +36,7 @@ import org.opengis.observation.Phenomenon;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class PhenomenonTable extends SingletonTable<Phenomenon> {
+public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
    
     /**
      * Construit une table des phénomènes.
@@ -58,7 +58,7 @@ public class PhenomenonTable extends SingletonTable<Phenomenon> {
     /**
      * Construit un phénomène pour l'enregistrement courant.
      */
-    protected Phenomenon createEntry(final ResultSet results) throws SQLException {
+    protected PhenomenonEntry createEntry(final ResultSet results) throws SQLException {
         final PhenomenonQuery query = (PhenomenonQuery) super.query;
         return new PhenomenonEntry(results.getString(indexOf(query.name)),
                                    results.getString(indexOf(query.remarks)),

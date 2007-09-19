@@ -23,6 +23,11 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
      */
     private Date endTime;
     
+    /**
+     * Constructeur vide utilisé par JAXB.
+     */
+    private TemporalObjectEntry(){}
+    
     /** 
      * Create a new Temporal Object. 
      * It can be a TimeInstant Object if only the beginTime is define and endTime is null.

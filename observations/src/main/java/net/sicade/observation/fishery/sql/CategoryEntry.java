@@ -23,18 +23,15 @@ import org.geotools.resources.Utilities;
 
 // Sicade dependencies
 import net.sicade.coverage.model.Distribution;
+import net.sicade.observation.ElementEntry;
+import net.sicade.observation.MetaDataEntry;
 import net.sicade.observation.fishery.Stage;
 import net.sicade.observation.fishery.Species;
 import net.sicade.observation.fishery.Category;
 import net.sicade.observation.fishery.FisheryType;
 import net.sicade.observation.ObservationEntry;
-
-
-// openGis dependencies
-import org.opengis.metadata.quality.Element;
-import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.temporal.TemporalObject;
-import org.opengis.metadata.MetaData;
+import net.sicade.observation.SamplingFeatureEntry;
+import net.sicade.observation.TemporalObjectEntry;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Category catégorie}.
@@ -62,19 +59,19 @@ public class CategoryEntry extends ObservationEntry implements Category {
      * @param procedure   La procédure associée.
      * @param remarks     Remarques s'appliquant à cette entrée, ou {@code null}.
      */
-    public CategoryEntry(final String          name,
-                         final String          definition,
-                         final SamplingFeature featureOfInterest,
-                         final Species         species,
-                         final Stage           stage,
-                         final FisheryType     procedure,
-                         final Element         quality,
-                         final Object          result,
-                         final TemporalObject  samplingTime,
-                         final MetaData        observationMetadata,
-                         final String          resultDefinition,
-                         final TemporalObject  procedureTime,
-                         final Object          procedureParameter)
+    public CategoryEntry(final String               name,
+                         final String               definition,
+                         final SamplingFeatureEntry featureOfInterest,
+                         final SpeciesEntry         species,
+                         final StageEntry           stage,
+                         final FisheryTypeEntry     procedure,
+                         final ElementEntry         quality,
+                         final Object               result,
+                         final TemporalObjectEntry  samplingTime,
+                         final MetaDataEntry        observationMetadata,
+                         final String               resultDefinition,
+                         final TemporalObjectEntry  procedureTime,
+                         final Object               procedureParameter)
     {
         super(name, definition, featureOfInterest, species, procedure, Distribution.NORMAL, quality, result, samplingTime,
                 observationMetadata, resultDefinition, procedureTime, procedureParameter);

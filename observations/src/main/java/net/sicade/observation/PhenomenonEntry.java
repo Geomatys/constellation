@@ -45,6 +45,11 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     private String description;
     
     /**
+     * Constructeur vide utilisé par JAXB.
+     */
+    private PhenomenonEntry(){}
+    
+    /**
      * Construit un nouveau phénomène du nom spécifié.
      *
      * @param id L'identifiant de ce phenomene.

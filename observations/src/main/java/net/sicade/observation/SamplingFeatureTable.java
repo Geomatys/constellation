@@ -33,7 +33,7 @@ import org.opengis.observation.sampling.SurveyProcedure;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
+public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
    
        
     /**
@@ -94,7 +94,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * <code>{@linkplain #createEntry(int,String,Platform,DataQuality,Citation,ResultSet)
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
-    protected SamplingFeature createEntry(final ResultSet result) throws CatalogException, SQLException {
+    protected SamplingFeatureEntry createEntry(final ResultSet result) throws CatalogException, SQLException {
         final SamplingFeatureQuery query = (SamplingFeatureQuery) super.query;
         return new SamplingFeatureEntry(result.getString(indexOf(query.identifier)),
                                         result.getString(indexOf(query.name)),
@@ -113,7 +113,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeature> {
      * cette méthode va l'accepter comme approche conservative.
      */
     @Override
-    protected boolean accept(final SamplingFeature entry) throws CatalogException, SQLException {
+    protected boolean accept(final SamplingFeatureEntry entry) throws CatalogException, SQLException {
         
         return super.accept(entry);
     }

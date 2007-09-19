@@ -48,13 +48,13 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * L'identifiant alphanumérique de la station.
      */
-    private final String identifier;
+    private String identifier;
     
     
     /**
      * La description de la station.
      */
-    private final String description;
+    private String description;
     
     /**
      * 
@@ -87,6 +87,11 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     private final ObservationTable<? extends Observation> observations = null;
     
 
+    /**
+     * Constructeur vide utilisé par JAXB.
+     */
+    private SamplingFeatureEntry(){}
+    
     /** 
      * Construit une entrée pour l'identifiant de station spécifié.
      * adapté au modele de BRGM.

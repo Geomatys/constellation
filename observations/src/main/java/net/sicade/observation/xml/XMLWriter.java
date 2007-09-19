@@ -51,7 +51,7 @@ public class XMLWriter {
      * @throws CatalogException, SQLException, IOException.
      */
     public void WritePhenomenonDictionary(String urlFile, PhenomenonTable phenomenons) throws CatalogException, SQLException, IOException{
-        Set<Phenomenon> list = phenomenons.getEntries();
+        Set<PhenomenonEntry> list = phenomenons.getEntries();
         String codeSpace = "urn:x-ogc:tc:arch:doc-rp(05-010)";
         
         write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n', urlFile);

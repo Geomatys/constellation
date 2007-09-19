@@ -39,7 +39,7 @@ import net.sicade.catalog.SingletonTable;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class StageTable extends SingletonTable<Stage> {
+public class StageTable extends SingletonTable<StageEntry> {
     /**
      * Requête SQL pour obtenir un stage de développement à partir de son identifiant.
      */
@@ -63,7 +63,7 @@ public class StageTable extends SingletonTable<Stage> {
     /**
      * Construit un stage de développement pour l'enregistrement courant.
      */
-    protected Stage createEntry(final ResultSet result) throws SQLException {
+    protected StageEntry createEntry(final ResultSet result) throws SQLException {
         final String name    = result.getString(NAME);
         final String remarks = result.getString(REMARKS);
         return new StageEntry(name, remarks);

@@ -39,7 +39,7 @@ import net.sicade.observation.SamplingFeatureTable;
  * @author Martin Desruisseaux
  */
 @Deprecated
-public class CategoryTable extends SingletonTable<Category> {
+public class CategoryTable extends SingletonTable<CategoryEntry> {
     /**
      * Requête SQL pour obtenir une catégorie à partir de son identifiant.
      */
@@ -94,7 +94,7 @@ public class CategoryTable extends SingletonTable<Category> {
     /**
      * Construit une catégorie pour l'enregistrement courant.
      */
-    protected Category createEntry(final ResultSet result) throws SQLException, CatalogException {
+    protected CategoryEntry createEntry(final ResultSet result) throws SQLException, CatalogException {
         final String station     = result.getString(FEATUREOFINTEREST);
         final String phenomenon = result.getString(PHENOMENON);
         final String procedure  = result.getString(PROCEDURE);
