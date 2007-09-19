@@ -16,6 +16,7 @@ package net.sicade.observation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.swe.UnitOfMeasureTable;
@@ -56,7 +57,7 @@ public class MeasureTable extends SingletonTable<Measure> {
     /**
      * Construit un resultat de mesure pour l'enregistrement courant.
      */
-    protected Measure createEntry(final ResultSet results) throws SQLException {
+    protected Measure createEntry(final ResultSet results) throws SQLException, CatalogException {
         final MeasureQuery query = (MeasureQuery) super.query;
         if(uoms == null) {
             uoms =  getDatabase().getTable(UnitOfMeasureTable.class);

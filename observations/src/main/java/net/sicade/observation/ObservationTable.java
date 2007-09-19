@@ -259,7 +259,7 @@ public abstract class ObservationTable<EntryType extends Observation> extends Si
           results = getDatabase().getTable(AnyResultTable.class);
       }
       AnyResultEntry any = results.getEntry(result.getString(indexOf(query.result)));
-      Object resultat;
+      Object resultat = null;
       if(any.getReference() == null && any.getDataBlock() != null) {
           resultat = any.getDataBlock();
       } else if(any.getReference() != null && any.getDataBlock() == null)  {

@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
 import org.opengis.observation.CompositePhenomenon;
@@ -66,7 +67,7 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
     /**
      * Construit un phénoméne pour l'enregistrement courant.
      */
-    protected CompositePhenomenon createEntry(final ResultSet results) throws SQLException {
+    protected CompositePhenomenon createEntry(final ResultSet results) throws SQLException, CatalogException {
         final CompositePhenomenonQuery query = (CompositePhenomenonQuery) super.query;
         
         String idCompositePhenomenon = results.getString(indexOf(query.identifier));

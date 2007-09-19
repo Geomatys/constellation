@@ -18,6 +18,7 @@ package net.sicade.swe;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
 
@@ -62,7 +63,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
     /**
      * Construit un data block pour l'enregistrement courant.
      */
-    protected DataBlockDefinition createEntry(final ResultSet results) throws SQLException {
+    protected DataBlockDefinition createEntry(final ResultSet results) throws SQLException, CatalogException {
         final DataBlockDefinitionQuery query = (DataBlockDefinitionQuery) super.query;
         String idDataBlock = results.getString(indexOf(query.id));
         

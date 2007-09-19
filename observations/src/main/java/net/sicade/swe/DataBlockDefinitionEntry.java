@@ -35,7 +35,7 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
     /**
      * Liste de composant Data record.
      */
-     private Collection<AbstractDataComponent> components;
+     private Collection<SimpleDataRecord> components;
      
     /**
      * Decrit l'encodage des données.
@@ -51,7 +51,7 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
      * @param components liste de composant data record.
      * @param encoding encodage des données.
      */
-    public DataBlockDefinitionEntry(final String id, final Collection<AbstractDataComponent> components,
+    public DataBlockDefinitionEntry(final String id, final Collection<SimpleDataRecord> components,
             final AbstractEncoding encoding) {
         super(null);
         this.id         = id;
@@ -69,7 +69,7 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
     /**
      * {@inheritDoc}
      */
-    public Collection<AbstractDataComponent> getComponents() {
+    public Collection<SimpleDataRecord> getComponents() {
         return components;
     }
 

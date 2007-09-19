@@ -33,7 +33,7 @@ public interface DataBlockDefinition {
     String getId();
     
     @UML(identifier="components", obligation=MANDATORY, specification=UNSPECIFIED)
-    Collection<AbstractDataComponent> getComponents();
+    Collection<SimpleDataRecord> getComponents();
     
     AbstractEncoding getEncoding();
     
