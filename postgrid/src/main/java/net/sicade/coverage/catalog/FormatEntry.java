@@ -55,8 +55,9 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.gui.swing.tree.MutableTreeNode;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
-import org.geotools.image.io.RawBinaryImageReadParam;
 import org.geotools.image.io.IIOListeners;
+import org.geotools.image.io.RawBinaryImageReadParam;
+import org.geotools.image.io.netcdf.NetcdfImageReader;
 import org.geotools.resources.Utilities;
 
 import net.sicade.catalog.Entry;
@@ -287,6 +288,21 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
+     * Handle special cases for image reader configuration.
+     */
+    private void handleSpecialCases(final ImageReader reader, final ImageReadParam param) {
+        if (reader instanceof NetcdfImageReader) {
+            final NetcdfImageReader r = (NetcdfImageReader) reader;
+            final GridSampleDimension[] bands = getSampleDimensions(param);
+            final String[] names = new String[bands.length];
+            for (int i=0; i<names.length; i++) {
+                names[i] = bands[i].getDescription().toString();
+            }
+            r.setVariables(names);
+        }
+    }
+    
+    /**
      * Procède à la lecture d'une image. Il est possible que l'image soit lue non pas
      * localement, mais plutôt à travers un réseau. Cette méthode n'est appelée que par
      * {@link GridCoverageEntry#getCoverage}.
@@ -374,6 +390,7 @@ final class FormatEntry extends Entry implements Format {
          * Cette étape existe en deux versions: avec utilisation de l'opération
          * "ImageRead", ou lecture directe à partir du ImageReader.
          */
+        handleSpecialCases(reader, param);
         if (USE_IMAGE_READ_OPERATION) {
             /*
              * Utilisation de l'opération "ImageRead": cette approche retarde la lecture des
@@ -408,7 +425,7 @@ final class FormatEntry extends Entry implements Format {
                 checkSize(reader.getWidth(imageIndex), reader.getHeight(imageIndex), expected, file);
             }
             /*
-             * Read the file, close it in the "finally" block and returns the image.
+             * Reads the file, closes it in the "finally" block and returns the image.
              * The reading will not be performed if the user aborted it before we reach
              * this point.
              */

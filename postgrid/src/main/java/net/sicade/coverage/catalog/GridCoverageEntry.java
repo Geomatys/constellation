@@ -723,6 +723,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
                     param.setSourceSubsampling(subsampling.x,   subsampling.y,
                                                subsampling.x/2, subsampling.y/2);
                     if (band != 0) {
+                        // Selects a particular depth in a 3D coverage.
                         param.setSourceBands(new int[] {band});
                     }
                     handleSpecialCases(param);
