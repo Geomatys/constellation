@@ -56,7 +56,7 @@ public class GridCoverageTableTest extends DatabaseTest {
         table.setLayer(LayerTableTest.SAMPLE_NAME);
         final Set<Date> allTimes = table.getAvailableTimes();
         final CoverageReference entry = table.getEntry(SAMPLE_NAME);
-        assertEquals(SeriesTableTest.SAMPLE_NAME + ':' + SAMPLE_NAME, entry.getName());
+        assertEquals(SeriesTableTest.SAMPLE_NAME + ':' + SAMPLE_NAME + ":1", entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
         /*
          * Tests the envelope of a single entry.

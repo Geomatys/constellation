@@ -230,7 +230,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
                                 final String            remarks)
             throws CatalogException, SQLException
     {
-        super(createName(series, filename, band), remarks);
+        super(createName(series, filename, band, timeIndex), remarks);
         // TODO: need to include the temporal CRS here.
         CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem();
         this.filename   = filename;
@@ -250,9 +250,14 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * Workaround for RFE #4093999
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static String createName(final String series, final String filename, final short band) {
+    private static String createName(final String series, final String filename,
+                                     final short band, final short timeIndex)
+{
         final StringBuilder buffer = new StringBuilder(series.trim());
         buffer.append(':').append(filename);
+        if (timeIndex != 0) {
+            buffer.append(':').append(timeIndex);
+        }
         if (band != 0) {
             buffer.append(':').append(band);
         }
@@ -483,7 +488,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
         if (param instanceof NetcdfReadParam) {
             final NetcdfReadParam p = (NetcdfReadParam) param;
             p.setBandDimensionTypes(new AxisType[] {AxisType.Height, AxisType.Pressure});
-            p.setSliceIndice(AxisType.Time, timeIndex - 1);
+            if (timeIndex != 0) {
+                p.setSliceIndice(AxisType.Time, timeIndex - 1);
+            }
         }
     }
 

@@ -679,7 +679,7 @@ loop:   for (final CoverageReference newReference : entries) {
         final String extension = result.getString   (indexOf(query.extension));
         final Date   startTime = result.getTimestamp(indexOf(query.startTime), calendar);
         final Date   endTime   = result.getTimestamp(indexOf(query.endTime),   calendar);
-        final short  timeIndex = result.getShort    (indexOf(query.index));
+        final short  timeIndex = result.getShort    (indexOf(query.index)); // We expect 0 if null.
         final String extent    = result.getString   (indexOf(query.spatialExtent));
         final String format    = result.getString   (indexOf(query.format));
         if (gridGeometryTable == null) {
