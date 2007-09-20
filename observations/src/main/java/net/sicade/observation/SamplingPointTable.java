@@ -57,13 +57,13 @@ public class SamplingPointTable extends SingletonTable<SamplingPoint> {
         Point p = new Point(result.getString(indexOf(query.pointIdentifier)),
                             new Position(result.getString(indexOf(query.srsName)),
                                          result.getInt(indexOf(query.srsDimension)),
-                                         result.getInt(indexOf(query.positionValue))));
+                                         result.getString(indexOf(query.positionValue))));
                             
         return new SamplingPointEntry( result.getString(indexOf(query.identifier)),
                                        result.getString(indexOf(query.name)),
                                        result.getString(indexOf(query.description)),
                                        result.getString(indexOf(query.sampledFeature)),
-                                       p);
+                                       p,"test");
         
     }
     

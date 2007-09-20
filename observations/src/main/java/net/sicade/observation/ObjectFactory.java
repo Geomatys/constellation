@@ -15,7 +15,7 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
     
     private final static QName _Observation_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation");
-    private final static QName _ProcessPropertyTypeProcess_QNAME = new QName("http://www.opengis.net/om/1.0", "Process");
+     
     /**
      *
      */
@@ -23,20 +23,21 @@ public class ObjectFactory {
     }
     
      /**
-     * Create an instance of {@link ObservationType }
+     * Create an instance of {@link ObservationEntry }
      * 
      */
-    public ObservationEntry createObservationType() {
+    public ObservationEntry createObservationEntry() {
         return new ObservationEntry();
     }
     
+    
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ObservationType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ObservationEntry }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.opengis.net/om/1.0", name = "Observation", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractFeature")
     public JAXBElement<ObservationEntry> createObservation(ObservationEntry value) {
         return new JAXBElement<ObservationEntry>(_Observation_QNAME, ObservationEntry.class, null, value);
     }
-    
+
 }

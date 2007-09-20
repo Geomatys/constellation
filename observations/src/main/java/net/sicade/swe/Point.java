@@ -15,7 +15,8 @@
 
 package net.sicade.swe;
 
-import net.sicade.observation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import org.geotools.resources.Utilities;
 
 
@@ -25,6 +26,7 @@ import org.geotools.resources.Utilities;
  *
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Point {
    
     /**
@@ -37,9 +39,13 @@ public class Point {
      */
     private Position position;
     
-            
+    /**
+     * constructeur vide utilisé par jaxb.
+     */
+    public Point(){}
+    
     /** 
-     * Cr�e un nouveau point design� par l'identifiant et la position specifi�  
+     * Crée un nouveau point design� par l'identifiant et la position specifi�  
      */
     public Point(String id, Position position) {
         this.id       = id;

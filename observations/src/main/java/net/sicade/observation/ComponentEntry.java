@@ -33,12 +33,12 @@ public class ComponentEntry extends Entry {
     /**
      * Le phenomene associé a ce phenomene composé.
      */
-    private Phenomenon component;
+    private PhenomenonEntry component;
     
     /**
      * Crée une nouvelle liste de phénomene. 
      */
-    public ComponentEntry(String idCompositePhenomenon, Phenomenon component) {
+    public ComponentEntry(String idCompositePhenomenon, PhenomenonEntry component) {
         super(idCompositePhenomenon);
         this.idCompositePhenomenon = idCompositePhenomenon;
         this.component             = component;
@@ -54,7 +54,7 @@ public class ComponentEntry extends Entry {
     /**
      * Retourne le phénomène associé.
      */
-    public Phenomenon getComponent() {
+    public PhenomenonEntry getComponent() {
         return component;
     }
     

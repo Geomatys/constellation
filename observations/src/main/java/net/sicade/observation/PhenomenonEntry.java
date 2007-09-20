@@ -15,6 +15,9 @@
 package net.sicade.observation;
 
 // Sicade dependencies
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import net.sicade.catalog.Entry;
 import org.geotools.resources.Utilities;
 
@@ -28,6 +31,7 @@ import org.opengis.observation.Phenomenon;
  * @version $Id$
  * @author Antoine Hnawia
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
@@ -37,8 +41,14 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
      * L'identifiant du phenomene.
      */
+    @XmlAttribute(required = true)
     private String id;
-       
+    
+    /**
+     * Le nom du phénomène.
+     */
+    private String name;
+    
     /**
      * La description du phenomene.
      */
@@ -57,20 +67,24 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      */
     public PhenomenonEntry(final String id, final String name) {
         super(name);
-        this.id = id;
+        this.id          = id;
+        this.name        = name;
         this.description = null;
     }
 
-    /** 
+    /**
+     * 
      * Construit un nouveau phénomène du nom spécifié.
-     *
+     * 
+     * 
      * @param id L'identifiant de ce phenomene.
-     * @param name    Le nom du phénomène.
+     * @param name Le nom du phénomène.
      * @param description La description de ce phénomène, ou {@code null}.
      */
     public PhenomenonEntry(final String id, final String name, final String description ) {
         super(name, description);
-        this.id = id;
+        this.id          = id;
+        this.name        = name;
         this.description = description;
     }
 
@@ -110,5 +124,13 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
                    Utilities.equals(this.description, that.description);
         }
         return false;
+    }
+    
+    /**
+     * Retourne une chaine de charactere representant le phenomene.
+     */
+    @Override
+    public String toString() {
+        return " id=" + id + " name=" + name + " description=" + description;
     }
 }

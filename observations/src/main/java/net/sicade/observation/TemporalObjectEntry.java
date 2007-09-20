@@ -1,7 +1,10 @@
 
 package net.sicade.observation;
 
-import java.sql.Date;
+import java.util.Date;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import net.sicade.catalog.Entry;
 import org.geotools.resources.Utilities;
 import org.opengis.temporal.TemporalObject;
@@ -11,11 +14,13 @@ import org.opengis.temporal.TemporalObject;
  *
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TemporalObjectEntry extends Entry implements TemporalObject{
     
     /**
      * The begin date of a duration or a single TimeInstant.
      */
+    @XmlElement(required = true)
     private Date beginTime;
     
     /**
@@ -68,7 +73,13 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
         return false;
     }
     
-
+    /**
+     * Retourne une chaine de charactere representant l'objet.
+     */
+    @Override
+    public String toString() {
+        return " beginTime=" + beginTime + "EndTime=" + endTime;
+    }
    
     
 }

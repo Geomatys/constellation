@@ -15,35 +15,42 @@
 package net.sicade.observation;
 
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import net.sicade.swe.Point;
 import org.geotools.resources.Utilities;
-import org.opengis.observation.Observation;
-import org.opengis.observation.sampling.SamplingFeatureRelation;
 import org.opengis.observation.sampling.SamplingPoint;
-import org.opengis.observation.sampling.SurveyProcedure;
 
 /**
  * Description d'une station localisé.
  *
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SamplingPointEntry extends SamplingFeatureEntry implements SamplingPoint{
-   
+    @XmlElement(required = true)
+    private String test;
     /**
      * La position de la station.
      */
     private Point position;
     
+    /**
+     * Constructeur utilisé par JAXB.
+     */
+    public SamplingPointEntry(){};
+            
     /** 
      * Créé une nouvelle station localisé.
      */
     public SamplingPointEntry(final String            identifier,
                               final String            name,
                               final String            remarks,
-                              final List<SamplingFeatureRelation> relatedSamplingFeature,
-                              final List<Observation> relatedObservation,
+                              final List<SamplingFeatureRelationEntry > relatedSamplingFeature,
+                              final List<ObservationEntry > relatedObservation,
                               final List<Object>      sampledFeature,
-                              final SurveyProcedure   surveyDetail,
+                              final SurveyProcedureEntry   surveyDetail,
                               final Point location) 
     {
         super(identifier, name, remarks, relatedSamplingFeature, relatedObservation, sampledFeature, surveyDetail);
@@ -59,10 +66,12 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
                               final String            name,
                               final String            remarks,
                               final String            sampledFeature,
-                              final Point location) 
+                              final Point             location,
+                              final String            test) 
     {
         super(identifier, name, remarks, sampledFeature);
         this.position = position;
+        this.test = test;
     }
     
     /**

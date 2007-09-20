@@ -100,7 +100,7 @@ public class XMLWriter {
             SamplingPointEntry sp = (SamplingPointEntry)i.next();
             write(decalage + "<gml:dictionaryEntry>" + '\n', urlFile);
             decalage += '\t';
-            write(decalage + "<sa:SamplingPoint gml:id=\"" + sp.getIdentifier() + "\">" + '\n', urlFile);
+            write(decalage + "<sa:SamplingPoint gml:id=\"" + sp.getId() + "\">" + '\n', urlFile);
             decalage += '\t';
             write(decalage + "<gml:description>\"" + sp.getDescription() + "</gml:description>" + '\n', urlFile);
             write(decalage + "<gml:name codeSpace=\"" + codeSpace + "\">" + sp.getName() + "</gml:name>" + '\n', urlFile);

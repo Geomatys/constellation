@@ -32,7 +32,7 @@ import org.opengis.observation.Phenomenon;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon>{
+public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenonEntry>{
     
     /**
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
@@ -67,7 +67,7 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
     /**
      * Construit un phénoméne pour l'enregistrement courant.
      */
-    protected CompositePhenomenon createEntry(final ResultSet results) throws SQLException, CatalogException {
+    protected CompositePhenomenonEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
         final CompositePhenomenonQuery query = (CompositePhenomenonQuery) super.query;
         
         String idCompositePhenomenon = results.getString(indexOf(query.identifier));
@@ -75,7 +75,7 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
-        Phenomenon base = phenomenons.getEntry(results.getString(indexOf(query.base)));
+        PhenomenonEntry base = phenomenons.getEntry(results.getString(indexOf(query.base)));
         
         if (components == null) {
             components =  getDatabase().getTable(ComponentTable.class);
@@ -83,7 +83,7 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
         components.setIdCompositePhenomenon(idCompositePhenomenon);
         Collection<ComponentEntry> entries = components.getEntries();
         
-        Collection<Phenomenon> components = new HashSet<Phenomenon>();
+        Collection<PhenomenonEntry> components = new HashSet<PhenomenonEntry>();
         
         Iterator i = entries.iterator();
         while(i.hasNext()) {

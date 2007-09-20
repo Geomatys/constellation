@@ -25,7 +25,7 @@ import org.opengis.temporal.TemporalObject;
 import org.opengis.util.GenericName;
 
 /**
- *Impl�mentation d'une entr�e repr�sentant une {@linkplain SurveyProcedure SurveyProcedure}.
+ *Implémentation d'une entrée représentant une {@linkplain SurveyProcedure SurveyProcedure}.
  *
  * @version $Id:
  * @author Guilhem Legal
@@ -57,6 +57,11 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     private GenericName projection;
     
     private TemporalObject surveyTime;
+    
+    /**
+     * Constructeur utilisé par JAXB
+     */
+    private SurveyProcedureEntry() {}
     
     /** Creates a new instance of SurveyProcedureEntry */
     public SurveyProcedureEntry( final String name,

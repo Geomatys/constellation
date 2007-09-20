@@ -16,8 +16,7 @@ package net.sicade.observation;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlAttribute;
 import org.opengis.observation.Process;
 import net.sicade.catalog.Entry;
 
@@ -29,7 +28,6 @@ import net.sicade.catalog.Entry;
  * @author Antoine Hnawia
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ProcessEntry", propOrder = {"href"})
 public class ProcessEntry extends Entry implements Process {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
@@ -39,7 +37,7 @@ public class ProcessEntry extends Entry implements Process {
     /**
      * Le nom/identifiant du capteur.
      */
-    @XmlElement(required = true)
+    @XmlAttribute(required = true)
     private String href;
     
      /**
@@ -66,5 +64,13 @@ public class ProcessEntry extends Entry implements Process {
     public ProcessEntry(final String name, final String remarks) {
         super(name, remarks);
         this.href = name;
+    }
+    
+     /**
+     * Retourne une chaine de charactere representant la procedure.
+     */
+    @Override
+    public String toString() {
+        return  " href=" + href;
     }
 }

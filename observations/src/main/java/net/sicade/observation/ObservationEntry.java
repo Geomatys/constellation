@@ -17,6 +17,7 @@ package net.sicade.observation;
 // jaxb import
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -58,18 +59,24 @@ import org.geotools.resources.Utilities;
     "procedure",
     "procedureParameter",
     "procedureTime",
-    "resultQuality",
-    "resultDefinition",
     "observedProperty",
     "featureOfInterest",
-    "result"
+    "result",
+    "resultQuality",
+    "resultDefinition"
 })
-@XmlRootElement
+@XmlRootElement(name = "Observation")
 public class ObservationEntry extends Entry implements Observation {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = 3269639171560208276L;
+    
+    /**
+     * Le nom de l'observation.
+     */
+    @XmlAttribute(required = true)
+    private String name;
     
     /**
      * La description de l'observation
@@ -79,7 +86,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * La station à laquelle a été pris cet échantillon.
      */
-     @XmlElement(required = true)
+    @XmlElement(required = true)
     private SamplingFeatureEntry featureOfInterest;
     
     /**
@@ -165,6 +172,7 @@ public class ObservationEntry extends Entry implements Observation {
                             final Object               procedureParameter) 
     {
         super(name);
+        this.name                = name;
         this.definition          = definition;
         this.featureOfInterest   = featureOfInterest;
         this.observedProperty    = observedProperty;
@@ -200,6 +208,7 @@ public class ObservationEntry extends Entry implements Observation {
                             final String                resultDefinition)
     {
         super(name);
+        this.name                = name;
         this.definition          = definition;
         this.featureOfInterest   = featureOfInterest;
         this.observedProperty    = observedProperty;
@@ -338,6 +347,19 @@ public class ObservationEntry extends Entry implements Observation {
                    Utilities.equals(this.procedureParameter,  that.procedureParameter);
         }
         return false;
+    }
+    
+    /**
+     * Retourne une chaine de charactere representant l'observation.
+     */
+    @Override
+    public String toString() {
+        return "name=" + name + " definition=" + definition + " samplingTime=" + 
+                samplingTime.toString() + " procedure=" + procedure.toString() + 
+                " observedProperty=" + observedProperty.toString() + " featureOfInterest=" +
+                featureOfInterest.toString() + " result=" + result.toString() + " resultDefinition=" +
+                resultDefinition.toString(); 
+                
     }
 
     

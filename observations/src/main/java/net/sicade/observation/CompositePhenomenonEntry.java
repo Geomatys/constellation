@@ -34,7 +34,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Le phenomene de base.
      */
-    private Phenomenon base;
+    private PhenomenonEntry base;
     
     /**
      * le nombre de composant
@@ -44,13 +44,13 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Les composants.
      */
-    private Collection<Phenomenon> component;
+    private Collection<PhenomenonEntry> component;
    
     /** 
      * Crée un nouveau phenomene composé
      */
     public CompositePhenomenonEntry(final String id, final String name, final String description
-            ,final Phenomenon base, final Collection<Phenomenon> component) {
+            ,final PhenomenonEntry base, final Collection<PhenomenonEntry> component) {
         super(id, name, description);
         this.base = base;
         this.component = component;
@@ -61,21 +61,21 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Retourne le phenomene de base.
      */
-    public Phenomenon getBase(){
+    public PhenomenonEntry getBase(){
         return base;
     }
     
     /**
      * Ajoute un composant a la liste 
      */
-    public void addComponent(Phenomenon phenomenon) {
+    public void addComponent(PhenomenonEntry phenomenon) {
         component.add(phenomenon);
     }
     
     /**
      * Retourne les composants.
      */
-    public Collection<Phenomenon> getComponent() {
+    public Collection<PhenomenonEntry> getComponent() {
         return component;
     }
 

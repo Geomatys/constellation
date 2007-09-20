@@ -16,7 +16,11 @@ package net.sicade.observation;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -24,9 +28,6 @@ import net.sicade.catalog.Entry;
 
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.observation.Observation;
-import org.opengis.observation.sampling.SamplingFeatureRelation;
-import org.opengis.observation.sampling.SurveyProcedure;
 
 /**
  * Implémentation d'une entrée représentant une {@link SamplingFeature station}.
@@ -39,6 +40,7 @@ import org.opengis.observation.sampling.SurveyProcedure;
  *       une connexion à la base de données. Une version future devrait rétablir la connexion au
  *       moment de la <cite>deserialization</cite>.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
@@ -48,7 +50,8 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * L'identifiant alphanumérique de la station.
      */
-    private String identifier;
+    @XmlAttribute(required = true)
+    private String id;
     
     
     /**
@@ -57,88 +60,84 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     private String description;
     
     /**
+     * Le nom de la station (un code alphanumerique)
+     */
+    private String name;
+    
+    /**
      * 
      */
-    private Collection<SamplingFeatureRelation> relatedSamplingFeature;
+    private Collection<SamplingFeatureRelationEntry> relatedSamplingFeature;
     
     /**
      * Les Observations
      */
-    private Collection<Observation> relatedObservation;
+    private Collection<ObservationEntry> relatedObservation;
     
     /**
      * Les features designé
      */
-    private Collection<Object> sampledFeature; 
+    private Collection<String> sampledFeature; 
     
     /**
      * Connexion vers la table des "survey details"
      * Optionnel peut etre {@code null}
      */
-    private SurveyProcedure surveyDetail;
-    
-
-    /**
-     * Connexion vers la table des observations. Contrairement à la plupart des autres
-     * entrées du paquet {@code net.sicade.observation}, les observations ne seront pas
-     * conservées dans une cache car elle sont potentiellement très nombreuses. Il nous
-     * faudra donc conserver la connexion en permanence.
-     */
-    private final ObservationTable<? extends Observation> observations = null;
+    private SurveyProcedureEntry surveyDetail;
     
 
     /**
      * Constructeur vide utilisé par JAXB.
      */
-    private SamplingFeatureEntry(){}
+    protected SamplingFeatureEntry(){}
     
-    /** 
+    /**
+     * 
      * Construit une entrée pour l'identifiant de station spécifié.
      * adapté au modele de BRGM.
-     *
-     * @param identifier  L'identifiant numérique de la station.
+     * 
+     * 
+     * @param id  L'identifiant numérique de la station.
      * @param name        Le nom de la station.
      * @param description Une description de la station.
-     * @param le 
+     * @param le
      */
-    public SamplingFeatureEntry(   final String            identifier,
+    public SamplingFeatureEntry(   final String            id,
                                    final String            name,
                                    final String            description,
                                    final String            sampledFeature)
     {
         super(name, description);
-        this.identifier             = identifier;
+        this.id                     = id;
+        this.name                   = name;
         this.description            = description;
-        this.sampledFeature = new ArrayList<Object>();
+        this.sampledFeature         = new ArrayList<String>();
         this.sampledFeature.add(sampledFeature);
-        this.surveyDetail           = null;
-        this.relatedSamplingFeature = null;
-        this.relatedObservation     = null;
-        this.sampledFeature         = null;
+        
     }
     
-    public SamplingFeatureEntry(   final String            identifier,
-                                   final String            name,
-                                   final String            description,
-                                   final List<SamplingFeatureRelation> relatedSamplingFeature,
-                                   final List<Observation> relatedObservation,
-                                   final List<Object>      sampledFeature,
-                                   final SurveyProcedure   surveyDetail)
+    public SamplingFeatureEntry(   final String                 id,
+                                   final String                 name,
+                                   final String                 description,
+                                   final List<SamplingFeatureRelationEntry> relatedSamplingFeature,
+                                   final List<ObservationEntry> relatedObservation,
+                                   final List<Object>           sampledFeature,
+                                   final SurveyProcedureEntry   surveyDetail)
     {
         super(name, description);
-        this.identifier             = identifier;
+        this.id                     = id;
         this.description            = description;
         this.surveyDetail           = surveyDetail;
         this.relatedSamplingFeature = relatedSamplingFeature;
         this.relatedObservation     = relatedObservation;
-        this.sampledFeature         = sampledFeature;
+       // this.sampledFeature         = sampledFeature;
     }
 
     /**
      * retourne l'identifiant de la station.
      */
-    public String getIdentifier() {
-        return identifier;
+    public String getId() {
+        return id;
     }
     
     /**
@@ -151,7 +150,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * {@inheritDoc}
      */
-    public synchronized Collection<SamplingFeatureRelation> getRelatedSamplingFeatures() {
+    public synchronized Collection<SamplingFeatureRelationEntry> getRelatedSamplingFeatures() {
     
         return relatedSamplingFeature;
     }
@@ -160,7 +159,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * {@inheritDoc}
      */
-    public synchronized Collection<Observation> getRelatedObservations() {
+    public synchronized Collection<ObservationEntry> getRelatedObservations() {
        
         return relatedObservation;
     }
@@ -168,12 +167,12 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      /**
      * {@inheritDoc}
      */
-    public synchronized Collection<Object> getSampledFeatures() {
+    public synchronized Collection<String> getSampledFeatures() {
         
         return sampledFeature;
     }
 
-    public SurveyProcedure getSurveyDetail() {
+    public SurveyProcedureEntry getSurveyDetail() {
         return this.surveyDetail;
     }
     
@@ -183,7 +182,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      */
     @Override
     public int hashCode() {
-        return identifier.hashCode();
+        return id.hashCode();
     }
 
     /**
@@ -196,7 +195,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         }
         if (super.equals(object)) {
             final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
-            return Utilities.equals(this.identifier,             that.identifier) &&
+            return Utilities.equals(this.id,             that.id) &&
                    Utilities.equals(this.surveyDetail,           that.surveyDetail)   &&
                    Utilities.equals(this.description,            that.description)   && 
                    Utilities.equals(this.relatedObservation,     that.relatedObservation) &&
@@ -206,7 +205,18 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         return false;
     }
 
-  
-
+   /**
+     * Retourne une chaine de charactere representant la station.
+     */
+    @Override
+    public String toString() {
+        Iterator i =  sampledFeature.iterator();
+        String sampledFeatures = "";
+        while (i.hasNext()) {
+            sampledFeatures += i.next() + " ";
+        }
+        return " id=" + id + " name=" + name  + "description=" + description + " sampledFeature=" +
+               sampledFeatures; 
+    }
    
 }

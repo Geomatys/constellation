@@ -14,6 +14,8 @@
  */
 package net.sicade.swe;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import org.geotools.resources.Utilities;
 
 /**
@@ -21,14 +23,20 @@ import org.geotools.resources.Utilities;
  *
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Position {
     
     private String srsName;
     private int srsDimension;
-    private int value;
+    private String value;
+    
+    /**
+     * constructeur vide utilisé par jaxb.
+     */
+    public Position(){}
     
     /** Creates a new instance of position */
-    public Position(String srsName, int srsDimension, int value) {
+    public Position(String srsName, int srsDimension, String value) {
         this.srsName = srsName;
         this.srsDimension = srsDimension;
         this.value = value;
@@ -42,7 +50,7 @@ public class Position {
         return srsDimension;
     }
 
-    public int getValue() {
+    public String getValue() {
         return value;
     }
     
