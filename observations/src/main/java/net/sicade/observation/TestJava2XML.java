@@ -5,12 +5,13 @@
 package net.sicade.observation;
 
 import java.io.FileWriter;
+import java.math.BigInteger;
 import java.sql.Date;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
-import net.sicade.swe.Point;
-import net.sicade.swe.Position;
+import net.opengis.gml.DirectPositionType;
+import net.opengis.gml.PointType;
 
 /**
  * Marshalles the created java Objects to the specified XML Document.
@@ -30,9 +31,10 @@ public class TestJava2XML {
                 /*ObjectFactory objFactory = new ObjectFactory();
                 // Creates first rental
                 GetCapabilities request = objFactory.createGetCapabilities();*/
-        Position pos = new Position("urn:ogc:crs:EPSG:27582", 2, "1630002345192");
-        Point p = new Point("STATION_LOCALISATION", pos);
-        SamplingPointEntry sf    = new SamplingPointEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X", p, "blavlabvlvlvl");
+        DirectPositionType pos   = new DirectPositionType("urn:ogc:crs:EPSG:27582", new BigInteger("2"), 163000.2345192);
+        PointType p = new PointType("STATION_LOCALISATION", pos);
+        SamplingPointEntry sf    = new SamplingPointEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X", p);
+        //SamplingFeatureEntry sf  = new SamplingFeatureEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X");
         PhenomenonEntry ph       = new PhenomenonEntry("level","urn:x-ogc:phenomenon:BRGM:level","Niveau d'eau dans une source" );
         ProcessEntry proc        = new ProcessEntry("un capteur");
         TemporalObjectEntry t    = new TemporalObjectEntry(new Date(2002,02,12),null);
@@ -49,7 +51,7 @@ public class TestJava2XML {
        
         
         // Marshalles objects to the specified file
-        JAXBContext context = JAXBContext.newInstance(ObservationEntry.class,SamplingPointEntry.class);
+        JAXBContext context = JAXBContext.newInstance(ObservationEntry.class,SamplingPointEntry.class,PointType.class);//"net.sicade.observation:net.opengis.gml"
         Marshaller marshaller = context.createMarshaller();
         try {
             marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",new NamespacePrefixMapperImpl());

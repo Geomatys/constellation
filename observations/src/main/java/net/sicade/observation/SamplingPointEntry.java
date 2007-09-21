@@ -18,7 +18,9 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import net.sicade.swe.Point;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlType;
+import net.opengis.gml.PointType;
 import org.geotools.resources.Utilities;
 import org.opengis.observation.sampling.SamplingPoint;
 
@@ -28,13 +30,17 @@ import org.opengis.observation.sampling.SamplingPoint;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "SamplingPoint", namespace="http://www.opengis.net/sa/1.0",
+propOrder = { "test", "position"})
+
 public class SamplingPointEntry extends SamplingFeatureEntry implements SamplingPoint{
     @XmlElement(required = true)
     private String test;
     /**
      * La position de la station.
      */
-    private Point position;
+    @XmlElement
+    private PointType position;
     
     /**
      * Constructeur utilisé par JAXB.
@@ -51,10 +57,10 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
                               final List<ObservationEntry > relatedObservation,
                               final List<Object>      sampledFeature,
                               final SurveyProcedureEntry   surveyDetail,
-                              final Point location) 
+                              final PointType location) 
     {
         super(identifier, name, remarks, relatedSamplingFeature, relatedObservation, sampledFeature, surveyDetail);
-        this.position = position;
+        this.position = location;
     }
     
      /** 
@@ -66,18 +72,18 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
                               final String            name,
                               final String            remarks,
                               final String            sampledFeature,
-                              final Point             location,
+                              final PointType         location,
                               final String            test) 
     {
         super(identifier, name, remarks, sampledFeature);
-        this.position = position;
+        this.position = location;
         this.test = test;
     }
     
     /**
      * Retourne la position de la station.
      */
-    public Point getPosition(){
+    public PointType getPosition(){
         return position;
     }
     
@@ -95,4 +101,6 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
         }
         return false;
     }
+
+  
 }

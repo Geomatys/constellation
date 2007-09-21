@@ -109,8 +109,8 @@ public class XMLWriter {
             decalage += '\t';
             write(decalage + "<gml:Point gml:id=\"" + sp.getPosition().getId() + "\">" + '\n', urlFile);
             decalage += '\t';
-            write(decalage + "<gml:pos srsName=\"" + sp.getPosition().getPosition().getSrsName() + "\" srsDimension=\"" + sp.getPosition().getPosition().getSrsDimension() +
-                    "\">" + sp.getPosition().getPosition().getValue() + "</gml:pos>" + '\n', urlFile);
+            write(decalage + "<gml:pos srsName=\"" + sp.getPosition().getPos().getSrsName() + "\" srsDimension=\"" + sp.getPosition().getPos().getSrsDimension() +
+                    "\">" + sp.getPosition().getPos().getValue() + "</gml:pos>" + '\n', urlFile);
             decalage = decalage.substring(0, decalage.length()-1);
             
             write(decalage + "</gml:Point>" + '\n', urlFile);

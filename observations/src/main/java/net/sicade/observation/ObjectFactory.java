@@ -30,6 +30,14 @@ public class ObjectFactory {
         return new ObservationEntry();
     }
     
+    /**
+     * Create an instance of {@link SamplingPointEntry }
+     * 
+     */
+    public SamplingPointEntry createSamplingPointEntry() {
+        return new SamplingPointEntry();
+    }
+    
     
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ObservationEntry }{@code >}}

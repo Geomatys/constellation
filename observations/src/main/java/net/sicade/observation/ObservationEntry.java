@@ -2,7 +2,7 @@
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
  *
- *    This library is free software; you can redistribute it and/or
+ *    This library is free software; you can redistribute it or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
  *    version 2.1 of the License, or (at your option) any later version.

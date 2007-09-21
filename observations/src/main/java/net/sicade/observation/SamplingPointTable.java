@@ -15,13 +15,14 @@
 
 package net.sicade.observation;
 
+import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import net.opengis.gml.DirectPositionType;
+import net.opengis.gml.PointType;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.Point;
-import net.sicade.swe.Position;
 import org.opengis.observation.sampling.SamplingPoint;
 
 /**
@@ -54,10 +55,10 @@ public class SamplingPointTable extends SingletonTable<SamplingPoint> {
     protected SamplingPoint createEntry(final ResultSet result) throws CatalogException, SQLException {
         final SamplingPointQuery query = (SamplingPointQuery) super.query;
         
-        Point p = new Point(result.getString(indexOf(query.pointIdentifier)),
-                            new Position(result.getString(indexOf(query.srsName)),
-                                         result.getInt(indexOf(query.srsDimension)),
-                                         result.getString(indexOf(query.positionValue))));
+        PointType p = new PointType(result.getString(indexOf(query.pointIdentifier)),
+                                    new DirectPositionType(result.getString(indexOf(query.srsName)),
+                                    new BigInteger(result.getString(indexOf(query.srsDimension))),
+                                    result.getDouble(indexOf(query.positionValue))));
                             
         return new SamplingPointEntry( result.getString(indexOf(query.identifier)),
                                        result.getString(indexOf(query.name)),
