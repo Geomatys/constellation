@@ -15,7 +15,13 @@
 package net.sicade.swe;
 
 import java.util.Collection;
-import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import net.sicade.catalog.Entry;
 import org.geotools.resources.Utilities;
 
@@ -25,22 +31,34 @@ import org.geotools.resources.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "DataBlockDefinition", propOrder = {
+    "components",
+    "encoding"})
 public class DataBlockDefinitionEntry extends Entry implements DataBlockDefinition {
     
     /**
      * L'identifiant du resultat.
      */
+    @XmlAttribute
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @XmlID
     private String id;
     
     /**
      * Liste de composant Data record.
      */
-     private Collection<? extends AbstractDataComponent> components;
+     private Collection<? extends AbstractDataComponentEntry> components;
      
     /**
      * Decrit l'encodage des données.
      */
-     private AbstractEncoding encoding;
+     private AbstractEncodingEntry encoding;
+    
+    /**
+     * constructeur utilisé par jaxB
+     */ 
+     protected DataBlockDefinitionEntry() {}
      
     /**
      * créé un nouveau resultat d'observation.
@@ -51,8 +69,8 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
      * @param components liste de composant data record.
      * @param encoding encodage des données.
      */
-    public DataBlockDefinitionEntry(final String id, final Collection<? extends AbstractDataComponent> components,
-            final AbstractEncoding encoding) {
+    public DataBlockDefinitionEntry(final String id, final Collection<? extends AbstractDataComponentEntry> components,
+            final AbstractEncodingEntry encoding) {
         super(null);
         this.id         = id;
         this.components = components;
@@ -69,7 +87,7 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
     /**
      * {@inheritDoc}
      */
-    public Collection<? extends AbstractDataComponent> getComponents() {
+    public Collection<? extends AbstractDataComponentEntry> getComponents() {
         return components;
     }
 

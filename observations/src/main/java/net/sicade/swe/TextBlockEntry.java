@@ -14,7 +14,10 @@
  */
 package net.sicade.swe;
 
-import net.sicade.catalog.Entry;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import org.geotools.resources.Utilities;
 
 /**
@@ -23,46 +26,46 @@ import org.geotools.resources.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class TextBlockEntry extends Entry implements TextBlock {
-    
-    /**
-     * L'identifiant de l'encodage.
-     */
-    private String id;
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "TextBlock", propOrder = {
+    "tokenSeparator",
+    "decimalSeparator",
+    "blockSeparator"})
+public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
     
     /**
      * chaine de 3 caractere maximum pour separer les tokens.
      */
+    @XmlAttribute(required = true)
     private String tokenSeparator;
     
     /**
      * chaine de 3 caractere maximum pour separer les blocks.
      */
+    @XmlAttribute(required = true)
     private String blockSeparator;
     
     /**
      * un caractere pour separer les decimaux.
      */
+    @XmlAttribute(required = true)
     private char decimalSeparator;
     
     /**
-     *
+     * Constructeur utilisé par jaxB.
      */
-    public TextBlockEntry(String id, String tokenSeparator, String blockSeparator,char decimalSeparator) {
+    public TextBlockEntry() {}
+    
+    /**
+     * Crée un nouveau encodage de texte.
+     */
+    public TextBlockEntry(String id, String tokenSeparator, String blockSeparator, char decimalSeparator) {
         super(id);
-        this.id               = id;
         this.tokenSeparator   = tokenSeparator;
         this.blockSeparator   = blockSeparator;
         this.decimalSeparator = decimalSeparator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getId() {
-        return id;
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -85,14 +88,6 @@ public class TextBlockEntry extends Entry implements TextBlock {
     }
 
     /**
-     * Retourne le code numérique identifiant cette entrée.
-     */
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-    
-    /**
      * Vérifie que cette station est identique à l'objet spécifié
      */
     @Override
@@ -102,8 +97,7 @@ public class TextBlockEntry extends Entry implements TextBlock {
         }
         if (super.equals(object)) {
             final TextBlockEntry that = (TextBlockEntry) object;
-            return Utilities.equals(this.id,              that.id) &&
-                   Utilities.equals(this.tokenSeparator,          that.tokenSeparator)   &&
+            return Utilities.equals(this.tokenSeparator,          that.tokenSeparator)   &&
                    Utilities.equals(this.blockSeparator,    that.blockSeparator)   && 
                    Utilities.equals(this.decimalSeparator,   that.decimalSeparator) ;
         }

@@ -31,7 +31,7 @@ public class ReferenceQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column idReference;
+    protected final Column idReference, actuate, arcrole, href, role, show, title, type, owns, nilReason;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -47,6 +47,15 @@ public class ReferenceQuery extends Query {
         super(database);
         final QueryType[] usage = {SELECT};
         idReference = addColumn("reference", "id_reference", usage);
+        actuate     = addColumn("reference", "actuate"     , usage);
+        arcrole     = addColumn("reference", "arcrole"     , usage);
+        href        = addColumn("reference", "href"        , usage);
+        role        = addColumn("reference", "role"        , usage);
+        show        = addColumn("reference", "show"        , usage);
+        title       = addColumn("reference", "title"       , usage);
+        type        = addColumn("reference", "type"        , usage);
+        owns        = addColumn("reference", "owns"        , usage);
+        nilReason   = addColumn("reference", "nil_reason"  , usage);
         
         byIdReference          = addParameter(idReference, SELECT);
     }

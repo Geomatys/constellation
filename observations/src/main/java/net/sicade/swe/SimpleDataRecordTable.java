@@ -31,7 +31,7 @@ import org.geotools.resources.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecord>{
+public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>{
     
     /**
      * identifiant secondaire de la table
@@ -85,7 +85,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecord>{
     /**
      * Construit un data record pour l'enregistrement courant.
      */
-    protected SimpleDataRecord createEntry(final ResultSet results) throws CatalogException, SQLException {
+    protected SimpleDataRecordEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         String idDataBlock = results.getString(indexOf(query.idBlock));
         String idDataRecord = results.getString(indexOf(query.idDataRecord));

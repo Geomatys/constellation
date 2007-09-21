@@ -56,6 +56,11 @@ public class DataRecordFieldEntry extends Entry{
     private Object value;
     
     /**
+     * Constructeur utilisé par jaxB.
+     */
+    public DataRecordFieldEntry() {}
+            
+    /**
      * crée un nouveau champ de DataRecord.
      */
     public DataRecordFieldEntry(String idDataRecord, String name, String definition, String type,

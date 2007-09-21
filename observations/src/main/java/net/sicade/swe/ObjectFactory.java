@@ -14,38 +14,54 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
     
-    private final static QName _Point_QNAME = new QName("http://www.opengis.net/swe/1.0", "Point");
     /**
      *
      */
     public ObjectFactory() {
     }
     
-     /**
-     * Create an instance of {@link Point }
+    /**
+     * Create an instance of {@link AnyResultEntry }
      * 
      */
-    public Point createPoint() {
-        return new Point();
+    public AnyResultEntry createAnyResultEntry() {
+        return new AnyResultEntry();
     }
-    
-     /**
-     * Create an instance of {@link Position }
-     * 
-     */
-    public Position createPosition() {
-        return new Position();
-    }
-    
     
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ObservationEntry }{@code >}}
+     * Create an instance of {@link ObservationEntry }
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0", name = "Point")
-    public JAXBElement<Point> createPoint(Point value) {
-        return new JAXBElement<Point>(_Point_QNAME, Point.class, null, value);
+    public ReferenceEntry createReferenceEntry() {
+        return new ReferenceEntry();
     }
+    
+    /**
+     * Create an instance of {@link DataBlockDefinitionEntry }
+     * 
+     */
+    public DataBlockDefinitionEntry createDataBlockDefinitionEntry() {
+        return new DataBlockDefinitionEntry();
+    }
+    
+    /**
+     * Create an instance of {@link TextBlockEntry }
+     * 
+     */
+    public TextBlockEntry createTextBlockEntry() {
+        return new TextBlockEntry();
+    }
+    
+     /**
+     * Create an instance of {@link TextBlockEntry }
+     * 
+     */
+    public SimpleDataRecordEntry createSimpleDataRecordEntry() {
+        return new SimpleDataRecordEntry();
+    }
+    
+    
+    
     
   
 

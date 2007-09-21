@@ -35,12 +35,6 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
     private ReferenceTable references;
     
     /**
-     * Connexion vers la table des {@linkplain DataBlockDefinition dataBlockDefinition}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
-     */
-    private DataBlockTable dataBlocks;
-    
-    /**
      * Construit une table des resultats.
      *
      * @param  database Connexion vers la base de données.
@@ -66,14 +60,10 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
          if(references == null) {
              references = getDatabase().getTable(ReferenceTable.class);
          }
-         Reference ref = references.getEntry(results.getString(indexOf(query.reference)));
+         ReferenceEntry ref = references.getEntry(results.getString(indexOf(query.reference)));
          
-         if(dataBlocks == null) {
-             dataBlocks = getDatabase().getTable(DataBlockTable.class);
-         }
-         DataBlockEntry dataBlock = dataBlocks.getEntry(results.getString(indexOf(query.dataBlock)));
-         
-         return new AnyResultEntry(results.getInt(indexOf(query.idResult)), ref, dataBlock);
+         return new AnyResultEntry(results.getString(indexOf(query.idResult)), ref, 
+                                   results.getString(indexOf(query.dataBlock)));
     }
     
 }

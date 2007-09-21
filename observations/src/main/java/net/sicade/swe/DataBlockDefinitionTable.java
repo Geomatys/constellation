@@ -71,13 +71,13 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
             dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
         }
         dataRecords.setIdDataBlock(idDataBlock);
-        Collection<SimpleDataRecord> entries = dataRecords.getEntries();
+        Collection<SimpleDataRecordEntry> entries = dataRecords.getEntries();
         
         if (textBlockEncodings == null) {
             textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
         }
         
-        TextBlock encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
+        TextBlockEntry encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
         
         return new DataBlockDefinitionEntry(idDataBlock, entries, encoding);
     }

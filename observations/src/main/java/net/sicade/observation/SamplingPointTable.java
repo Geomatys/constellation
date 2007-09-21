@@ -64,7 +64,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPoint> {
                                        result.getString(indexOf(query.name)),
                                        result.getString(indexOf(query.description)),
                                        result.getString(indexOf(query.sampledFeature)),
-                                       p,"test");
+                                       p);
         
     }
     

@@ -10,16 +10,38 @@
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
+ *    Lesser General License for more details.
  */
 
 package net.sicade.swe;
+
+import java.util.List;
 
 /**
  * Une reference
  *
  * @author legal
  */
-public interface Reference {
+interface Reference {
+    
+    List<String> getNilReason();
+
+    String getRemoteSchema();
+
+    String getActuate();
+
+    String getArcrole();
+
+    String getHref();
+
+    String getRole();
+
+    String getShow();
+
+    String getTitle();
+
+    String getType();
+
+    java.lang.Boolean getOwns();
     
 }

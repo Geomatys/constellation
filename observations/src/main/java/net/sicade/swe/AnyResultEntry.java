@@ -14,6 +14,9 @@
  */
 package net.sicade.swe;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import net.sicade.catalog.Entry;
 
 /**
@@ -24,22 +27,29 @@ import net.sicade.catalog.Entry;
  * @version $Id:
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class AnyResultEntry extends Entry {
     
     /**
      * Lidentifiant du resultat.
      */
-    private int id;
+    @XmlAttribute
+    private String id;
     
     /**
      * Le resultat peut etre de type Reference.
      */
-    private Reference reference;
+    private ReferenceEntry reference;
     
     /**
-     * Le resultat peut être de type DataBlockDefinition.
+     * Le resultat peut être un bloc de donnée.
      */
-    private DataBlockEntry dataBlock;
+    private String dataBlock;
+    
+    /**
+     * Constructeur utilisé par jaxB
+     */
+    public AnyResultEntry(){}
     
     /**
      * créé un nouveau resultat en specifiant son type.
@@ -48,7 +58,7 @@ public class AnyResultEntry extends Entry {
      * @param reference l'identifiant de la reference si le resultat en est une, {@code null} sinon.
      * @param dataBlockDefinition l'identifiant du dataBlock si le resultat en est un, {@code null} sinon.
      */
-    public AnyResultEntry(int id, Reference reference, DataBlockEntry dataBlock) {
+    public AnyResultEntry(String id, ReferenceEntry reference, String dataBlock) {
         super(null);
         this.id = id;
         this.reference = reference;
@@ -58,21 +68,21 @@ public class AnyResultEntry extends Entry {
     /**
      * Retourne l'identifiant du resultat
      */
-    public int getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * retourne un resultat de type reference si s'en est un, {@code null} sinon.
      */
-    public Reference getReference() {
+    public ReferenceEntry getReference() {
         return reference;
     }
 
     /**
      * retourne un resultat de type dataBlockDefinition si s'en est un, {@code null} sinon.
      */
-    public DataBlockEntry getDataBlock() {
+    public String getDataBlock() {
         return dataBlock;
     }
     

@@ -19,7 +19,6 @@ import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.TextBlockEntry;
 
 /**
  *  Connexion vers la table des {@linkplain TextBlock textBlock}.
@@ -27,7 +26,7 @@ import net.sicade.swe.TextBlockEntry;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class TextBlockTable extends SingletonTable<TextBlock>{
+public class TextBlockTable extends SingletonTable<TextBlockEntry>{
     
     /**
      * Construit une table des text Block encodage.
@@ -46,7 +45,7 @@ public class TextBlockTable extends SingletonTable<TextBlock>{
         setIdentifierParameters(query.byId, null);
     }
 
-    protected TextBlock createEntry(final ResultSet results) throws CatalogException, SQLException {
+    protected TextBlockEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final TextBlockQuery query = (TextBlockQuery) super.query;
         return new TextBlockEntry(results.getString(indexOf(query.id )),
                                   results.getString(indexOf(query.tokenSeparator )),

@@ -31,11 +31,10 @@ import org.opengis.observation.sampling.SamplingPoint;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SamplingPoint", namespace="http://www.opengis.net/sa/1.0",
-propOrder = { "test", "position"})
+propOrder = {"position"})
 
 public class SamplingPointEntry extends SamplingFeatureEntry implements SamplingPoint{
-    @XmlElement(required = true)
-    private String test;
+    
     /**
      * La position de la station.
      */
@@ -72,12 +71,10 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
                               final String            name,
                               final String            remarks,
                               final String            sampledFeature,
-                              final PointType         location,
-                              final String            test) 
+                              final PointType         location) 
     {
         super(identifier, name, remarks, sampledFeature);
         this.position = location;
-        this.test = test;
     }
     
     /**

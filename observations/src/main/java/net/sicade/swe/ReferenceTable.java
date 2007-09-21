@@ -26,7 +26,7 @@ import net.sicade.swe.ReferenceQuery;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class ReferenceTable extends SingletonTable<Reference>{
+public class ReferenceTable extends SingletonTable<ReferenceEntry>{
     
     /**
      * Construit une table des reference.
@@ -48,9 +48,10 @@ public class ReferenceTable extends SingletonTable<Reference>{
     /**
      * Construit une reference pour l'enregistrement courant.
      */
-    protected Reference createEntry(final ResultSet results) throws CatalogException, SQLException {
+    protected ReferenceEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
          final ReferenceQuery query = (ReferenceQuery) super.query;
-         return new ReferenceEntry(results.getString(indexOf(query.idReference)));
+         return new ReferenceEntry(results.getString(indexOf(query.idReference)),
+                                   results.getString(indexOf(query.href)));
     }
     
 }

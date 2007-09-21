@@ -15,8 +15,10 @@
 package net.sicade.swe;
 
 import java.util.Collection;
-import java.util.List;
-import net.sicade.catalog.Entry;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import org.geotools.resources.Utilities;
 
 /**
@@ -25,18 +27,25 @@ import org.geotools.resources.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class SimpleDataRecordEntry extends Entry implements SimpleDataRecord {
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "SimpleDataRecord", propOrder = {
+    "definition",
+    "fields"})
+public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements SimpleDataRecord {
     
     /**
      * L'identifiant du dataBlock qui contient ce data record.
      */
+    @XmlAttribute
     private String blockId;
     
     /**
      * L'identifiant du dataRecord
      */
+    @XmlAttribute
     private String id;
     
+    @XmlAttribute
     private boolean fixed;
     
     /**
@@ -49,6 +58,11 @@ public class SimpleDataRecordEntry extends Entry implements SimpleDataRecord {
      */
     private Collection<DataRecordFieldEntry> fields;
    
+    /**
+     *  Constructeur utilisé par jaxB.
+     */
+    public SimpleDataRecordEntry() {}
+    
     /** 
      * Créé une nouvelle Liste de valeur textuelle ou scalaire.
      */

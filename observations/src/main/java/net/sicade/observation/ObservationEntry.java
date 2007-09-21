@@ -51,7 +51,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ObservationEntry", propOrder = {
+@XmlType(name = "Observation", propOrder = {
     "definition",
     "observationMetadata",
     "samplingTime",
@@ -131,7 +131,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * Definition du resultat. 
      */
-    private String resultDefinition;
+    private Object resultDefinition;
     
     /**
      * 
@@ -205,7 +205,7 @@ public class ObservationEntry extends Entry implements Observation {
                          // final ElementEntry          resultQuality,
                             final Object                result,
                             final TemporalObjectEntry   samplingTime,
-                            final String                resultDefinition)
+                            final Object                resultDefinition)
     {
         super(name);
         this.name                = name;
@@ -276,7 +276,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public String getResultDefinition() {
+    public Object getResultDefinition() {
         return resultDefinition;
     }
 
