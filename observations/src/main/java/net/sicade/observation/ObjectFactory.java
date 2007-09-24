@@ -30,12 +30,28 @@ public class ObjectFactory {
         return new ObservationEntry();
     }
     
+      /**
+     * Create an instance of {@link ObservationEntry }
+     * 
+     */
+    public MeasurementEntry createMeasurementEntry() {
+        return new MeasurementEntry();
+    }
+    
     /**
      * Create an instance of {@link SamplingPointEntry }
      * 
      */
     public SamplingPointEntry createSamplingPointEntry() {
         return new SamplingPointEntry();
+    }
+    
+    /**
+     * Create an instance of {@link SamplingPointEntry }
+     * 
+     */
+    public CompositePhenomenonEntry createCompositePhenomenonEntry() {
+        return new CompositePhenomenonEntry();
     }
     
     

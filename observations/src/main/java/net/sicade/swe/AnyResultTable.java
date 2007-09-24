@@ -19,6 +19,8 @@ import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
+import net.sicade.gml.ReferenceEntry;
+import net.sicade.gml.ReferenceTable;
 
 /**
  * Connexion vers la table des {@linkplain AnyResultEntry AnyResult}.

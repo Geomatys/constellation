@@ -12,14 +12,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.swe;
+package net.sicade.gml;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.ReferenceQuery;
+import net.sicade.gml.ReferenceQuery;
 
 /**
  *

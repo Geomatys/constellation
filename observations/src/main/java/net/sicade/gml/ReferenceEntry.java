@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.swe;
+package net.sicade.gml;
 
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -28,12 +28,13 @@ import net.sicade.catalog.Entry;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ReferenceType")
+@XmlType(name = "Reference")
 public class ReferenceEntry extends Entry implements Reference{
     
     /**
      * L'identifiant de la reference.
      */
+    @XmlAttribute
     private String id;
     
     @XmlAttribute
@@ -68,7 +69,8 @@ public class ReferenceEntry extends Entry implements Reference{
      */
     public ReferenceEntry(String id, String href) {
         super(id);
-        this.id = id;
+        this.id   = id;
+        this.href = href;
     }
 
     /**
@@ -78,42 +80,72 @@ public class ReferenceEntry extends Entry implements Reference{
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<String> getNilReason() {
         return nilReason;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getRemoteSchema() {
         return remoteSchema;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getActuate() {
         return actuate;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getArcrole() {
         return arcrole;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getHref() {
         return href;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getRole() {
         return role;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getShow() {
         return show;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public java.lang.Boolean getOwns() {
         return owns;
     }

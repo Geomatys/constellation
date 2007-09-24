@@ -15,6 +15,10 @@
 package net.sicade.observation;
 
 import javax.units.Unit;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import net.sicade.coverage.model.DistributionEntry;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measure;
@@ -26,6 +30,9 @@ import org.opengis.observation.Measure;
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Measurement")
+@XmlRootElement(name = "Measurement")
 public class MeasurementEntry extends ObservationEntry implements Measurement {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
@@ -38,6 +45,10 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      */
     private MeasureEntry result;
     
+    /**
+     * constructeur vide utilisé par JAXB.
+     */
+    protected MeasurementEntry() {}
     
     /**
      * Crée une nouvelle mesure.
@@ -55,18 +66,18 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      * @param procedureParameter
      */
     public MeasurementEntry(final String name,
-            final String definition,
-            final SamplingFeatureEntry station,
-            final PhenomenonEntry      observedProperty,
-            final ProcessEntry         procedure,
-            final DistributionEntry    distribution,
-            final ElementEntry         quality,
-            final MeasureEntry         result,
-            final TemporalObjectEntry  samplingTime,
-            final MetaDataEntry        observationMetadata,
-            final String               resultDefinition,
-            final TemporalObjectEntry  procedureTime,
-            final Object               procedureParameter) {
+            final String                 definition,
+            final SamplingFeatureEntry   station,
+            final PhenomenonEntry        observedProperty,
+            final ProcessEntry           procedure,
+            final DistributionEntry      distribution,
+            final ElementEntry           quality,
+            final MeasureEntry           result,
+            final TemporalObjectEntry    samplingTime,
+            final MetaDataEntry          observationMetadata,
+            final String                 resultDefinition,
+            final TemporalObjectEntry    procedureTime,
+            final Object                 procedureParameter) {
         super(name, definition, station, observedProperty, procedure, distribution, quality, result,
                 samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
     }

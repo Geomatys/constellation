@@ -28,9 +28,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SimpleDataRecord", propOrder = {
-    "definition",
-    "fields"})
+@XmlType(name = "SimpleDataRecord")
 public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements SimpleDataRecord {
     
     /**
@@ -38,20 +36,6 @@ public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements
      */
     @XmlAttribute
     private String blockId;
-    
-    /**
-     * L'identifiant du dataRecord
-     */
-    @XmlAttribute
-    private String id;
-    
-    @XmlAttribute
-    private boolean fixed;
-    
-    /**
-     * definition du record.
-     */
-    private String definition;
     
     /**
      * List de valeur textuelle ou scalaire.
@@ -68,11 +52,8 @@ public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements
      */
     public SimpleDataRecordEntry(final String blockId, final String id, final String definition, final boolean fixed,
             final Collection<DataRecordFieldEntry> fields) {
-        super(id);
-        this.id = id;
+        super(id, definition, fixed);
         this.blockId = blockId;
-        this.definition = definition;
-        this.fixed      = fixed;
         this.fields = fields;
     }
 
@@ -84,42 +65,12 @@ public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public String getDefinition() {
-        return definition;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isFixed() {
-        return fixed;
-    }
-
-    /**
      * Retourne l'identifiant du block qui contient ce data record.
      */
     public String getBlockId() {
         return blockId;
     }
 
-     /**
-     * Retourne l'identifiant de ce data record.
-     */
-    public String getId() {
-        return id;
-    }
-    
-    
-    /**
-     * Retourne le code numérique identifiant cette entrée.
-     */
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-    
     /**
      * Vérifie que cette station est identique à l'objet spécifié
      */
@@ -130,11 +81,8 @@ public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements
         }
         if (super.equals(object)) {
             final SimpleDataRecordEntry that = (SimpleDataRecordEntry) object;
-            return Utilities.equals(this.id,         that.id) &&
-                   Utilities.equals(this.blockId,    that.blockId)   &&
-                   Utilities.equals(this.definition, that.definition)   && 
-                   Utilities.equals(this.fields,     that.fields) &&
-                   Utilities.equals(this.fixed,      that.fixed);
+            return Utilities.equals(this.blockId,    that.blockId)   &&
+                   Utilities.equals(this.fields,     that.fields);
         }
         return false;
     }

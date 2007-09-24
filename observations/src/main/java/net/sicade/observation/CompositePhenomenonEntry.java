@@ -16,9 +16,11 @@
 package net.sicade.observation;
 
 import java.util.Collection;
-import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.observation.CompositePhenomenon;
-import org.opengis.observation.Phenomenon;
 
 // geotools dependencies
 import org.geotools.resources.Utilities;
@@ -29,6 +31,8 @@ import org.geotools.resources.Utilities;
   * @version $Id:
   * @author Guilhem Legal
   */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "CompositePhenomenon")
 public class CompositePhenomenonEntry extends PhenomenonEntry implements CompositePhenomenon{
     
     /**
@@ -39,6 +43,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * le nombre de composant
      */
+    @XmlAttribute
     private int dimension;
     
     /**
@@ -47,10 +52,15 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     private Collection<PhenomenonEntry> component;
    
     /** 
+     * constructeur vide utilisé par JAXB.
+     */
+    protected CompositePhenomenonEntry(){}
+            
+    /** 
      * Crée un nouveau phenomene composé
      */
-    public CompositePhenomenonEntry(final String id, final String name, final String description
-            ,final PhenomenonEntry base, final Collection<PhenomenonEntry> component) {
+    public CompositePhenomenonEntry(final String id, final String name, final String description,
+            final PhenomenonEntry base, final Collection<PhenomenonEntry> component) {
         super(id, name, description);
         this.base = base;
         this.component = component;

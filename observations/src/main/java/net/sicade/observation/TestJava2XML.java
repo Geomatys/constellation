@@ -14,9 +14,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import net.opengis.gml.DirectPositionType;
 import net.opengis.gml.PointType;
+import net.sicade.coverage.model.Distribution;
 import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.DataBlockDefinitionEntry;
 import net.sicade.swe.DataRecordFieldEntry;
+import net.sicade.gml.ReferenceEntry;
 import net.sicade.swe.SimpleDataRecordEntry;
 import net.sicade.swe.TextBlockEntry;
 
@@ -35,30 +37,61 @@ public class TestJava2XML {
         String fileName = "generated-ObservationEntry.xml";
         
               
-        
+        // La station
+        //SamplingFeatureEntry sf        = new SamplingFeatureEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X");
         DirectPositionType pos           = new DirectPositionType("urn:ogc:crs:EPSG:27582", new BigInteger("2"), 163000.2345192);
         PointType p                      = new PointType("STATION_LOCALISATION", pos);
         SamplingPointEntry sf            = new SamplingPointEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X", p);
-        //SamplingFeatureEntry sf        = new SamplingFeatureEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X");
-        PhenomenonEntry ph               = new PhenomenonEntry("level","urn:x-ogc:phenomenon:BRGM:level","Niveau d'eau dans une source" );
+        
+        // le phenomene observé
+        //PhenomenonEntry ph               = new PhenomenonEntry("level","urn:x-ogc:phenomenon:BRGM:level","Niveau d'eau dans une source" );
+        List<PhenomenonEntry> compPheno  = new ArrayList<PhenomenonEntry>();
+        PhenomenonEntry ph1              = new PhenomenonEntry("phe1","urn:x-ogc:phenomenon:BRGM:phe1","un phenomene" );
+        PhenomenonEntry ph2              = new PhenomenonEntry("phe2","urn:x-ogc:phenomenon:BRGM:phe2","un phenomene" );
+        PhenomenonEntry ph3              = new PhenomenonEntry("phe3","urn:x-ogc:phenomenon:BRGM:phe3","un phenomene" );
+        compPheno.add(ph1);compPheno.add(ph2);compPheno.add(ph3);
+        CompositePhenomenonEntry ph      = new CompositePhenomenonEntry("aggregatePhenomenon", "urn:x-ogc:phenomenon:BRGM:aggregate", null, null, compPheno);
+        
+        // le capteur
         ProcessEntry proc                = new ProcessEntry("un capteur");
+        
+        // le samping time
         TemporalObjectEntry t            = new TemporalObjectEntry(new Date(2002,02,12),null);
-        AnyResultEntry result            = new AnyResultEntry("idresultat", null, "un bloc de donné");
+        
+        //le resultat
+        //AnyResultEntry result            = new AnyResultEntry("idresultat", null, "un bloc de donné");
+        //UnitOfMeasureEntry uom           = new UnitOfMeasureEntry("unit1", "centimetre", "longueur", "refSyS");
+        //MeasureEntry result              = new MeasureEntry("mesure1", uom, 35 );
+        ReferenceEntry ref               = new ReferenceEntry("ref1", "blablabla");   
+        AnyResultEntry result            = new AnyResultEntry("idresultat", ref, null);
+        
+        // la description du resultat
         List<SimpleDataRecordEntry> comp = new ArrayList<SimpleDataRecordEntry>();
         List<DataRecordFieldEntry> fds   = new ArrayList<DataRecordFieldEntry>();
         SimpleDataRecordEntry dr         = new SimpleDataRecordEntry("idDef", "idDataRecord", null, false, fds);
         comp.add(dr);
         TextBlockEntry tbe               = new TextBlockEntry("enc1", ",", "@@", '.');
         DataBlockDefinitionEntry dbd     = new DataBlockDefinitionEntry("idDef", comp, tbe);
+        
+        // l'observation
         ObservationEntry request         = new ObservationEntry("obsTest", 
                                                             "une observation test",
                                                             sf,
                                                             ph,
                                                             proc,
-                                                            null,
+                                                            Distribution.NORMAL,
                                                             result,
                                                             t,
                                                             dbd);
+        /*MeasurementEntry request         = new MeasurementEntry("obsTest", 
+                                                                "une observation test",
+                                                                sf,
+                                                                ph,
+                                                                proc,
+                                                                Distribution.NORMAL,
+                                                                result,
+                                                                t,
+                                                                null);*/
         
        
         

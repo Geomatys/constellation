@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.swe;
+package net.sicade.gml;
 
 import net.sicade.catalog.Column;
 import net.sicade.catalog.Database;

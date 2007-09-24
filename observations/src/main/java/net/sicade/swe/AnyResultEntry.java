@@ -17,7 +17,9 @@ package net.sicade.swe;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import net.sicade.catalog.Entry;
+import net.sicade.gml.ReferenceEntry;
 
 /**
  * Enregistrement permettant de regrouper plusieur type de resultat en un meme type.
@@ -28,6 +30,7 @@ import net.sicade.catalog.Entry;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Any")
 public class AnyResultEntry extends Entry {
     
     /**

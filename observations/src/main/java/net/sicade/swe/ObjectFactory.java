@@ -5,6 +5,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
+import net.sicade.gml.ReferenceEntry;
 
 /**
  *
@@ -26,14 +27,6 @@ public class ObjectFactory {
      */
     public AnyResultEntry createAnyResultEntry() {
         return new AnyResultEntry();
-    }
-    
-    /**
-     * Create an instance of {@link ObservationEntry }
-     * 
-     */
-    public ReferenceEntry createReferenceEntry() {
-        return new ReferenceEntry();
     }
     
     /**

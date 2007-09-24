@@ -19,9 +19,8 @@ import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.UnitOfMeasureTable;
-import org.opengis.observation.BaseUnit;
-import org.opengis.observation.Measure;
+import net.sicade.gml.UnitOfMeasureEntry;
+import net.sicade.gml.UnitOfMeasureTable;
 
 /**
  *
@@ -62,7 +61,7 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
         if(uoms == null) {
             uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
         }
-        BaseUnit uom = uoms.getEntry(results.getString(indexOf(query.uom)));
+        UnitOfMeasureEntry uom = uoms.getEntry(results.getString(indexOf(query.uom)));
         return new MeasureEntry(results.getString(indexOf(query.name   )),
                                 uom,
                                 results.getFloat(indexOf(query.value)));

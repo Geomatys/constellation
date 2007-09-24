@@ -27,8 +27,8 @@ import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.SamplingPointEntry;
 import net.sicade.observation.PhenomenonTable;
 import net.sicade.observation.SamplingPointTable;
-import net.sicade.swe.UnitOfMeasureEntry;
-import net.sicade.swe.UnitOfMeasureTable;
+import net.sicade.gml.UnitOfMeasureEntry;
+import net.sicade.gml.UnitOfMeasureTable;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingPoint;
 
@@ -130,7 +130,7 @@ public class XMLWriter {
      * Ecris le fichier dictionnaire des unites de mesure.
      */
     public void WriteUOMDictionary(String urlFile, UnitOfMeasureTable units) throws CatalogException, SQLException, IOException{
-        Set<BaseUnit> list = units.getEntries();
+        Set<UnitOfMeasureEntry> list = units.getEntries();
         String codeSpace = "urn:x-ogc:tc:arch:doc-rp(05-010)";
         
         write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n', urlFile);

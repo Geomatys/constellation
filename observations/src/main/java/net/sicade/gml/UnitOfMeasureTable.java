@@ -12,15 +12,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.swe;
+package net.sicade.gml;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.UnitOfMeasureEntry;
-import org.opengis.observation.BaseUnit;
+import net.sicade.gml.UnitOfMeasureEntry;
 
 /**
  * Connexion vers la table des {@linkplain UnitOfMeasure unit of measure}.
@@ -28,7 +27,7 @@ import org.opengis.observation.BaseUnit;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class UnitOfMeasureTable extends SingletonTable<BaseUnit>{
+public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry>{
     
    /**
     * Construit une table des unites de mesure.
@@ -50,7 +49,7 @@ public class UnitOfMeasureTable extends SingletonTable<BaseUnit>{
     /**
      * Crée une entrée pour l'untié de mesure courante.
      */
-    protected BaseUnit createEntry(final ResultSet results) throws CatalogException, SQLException {
+    protected UnitOfMeasureEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
           final UnitOfMeasureQuery query = (UnitOfMeasureQuery) super.query;
           return new UnitOfMeasureEntry(results.getString(indexOf(query.id )),
                                          results.getString(indexOf(query.name )),

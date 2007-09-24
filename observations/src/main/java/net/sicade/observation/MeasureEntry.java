@@ -16,7 +16,11 @@
 package net.sicade.observation;
 
 // Sicade dependencies
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 import net.sicade.catalog.Entry;
+import net.sicade.gml.UnitOfMeasureEntry;
 
 // GeoTools dependencies
 import org.geotools.resources.Utilities;
@@ -30,6 +34,8 @@ import org.opengis.observation.BaseUnit;
  * @version $Id:
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Measure")
 public class MeasureEntry extends Entry implements Measure{
     
     /**
@@ -40,12 +46,17 @@ public class MeasureEntry extends Entry implements Measure{
     /**
      * L'unite de la mesure
      */
-    private BaseUnit uom;
+    private UnitOfMeasureEntry uom;
     
     /**
      * La valeur de la mesure
      */
     private float value;
+    
+    /**
+     * constructeur vide utilisé par jaxB
+     */
+    protected MeasureEntry(){}
     
     /** 
      * crée un nouveau resultat de mesure.
@@ -54,9 +65,9 @@ public class MeasureEntry extends Entry implements Measure{
      * @param uom   L'unité de mesure.
      * @param value La valeur mesurée.
      */
-    public MeasureEntry(final String   name,
-                        final BaseUnit uom,
-                        final float    value)
+    public MeasureEntry(final String             name,
+                        final UnitOfMeasureEntry uom,
+                        final float              value)
     {
         super(name);
         this.name = name;
@@ -69,7 +80,7 @@ public class MeasureEntry extends Entry implements Measure{
      *
      * @todo Implementer le retour des unites.
      */
-    public BaseUnit getUom() {
+    public UnitOfMeasureEntry getUom() {
         return uom;
     }
 

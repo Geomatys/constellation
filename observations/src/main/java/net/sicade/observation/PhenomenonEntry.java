@@ -41,7 +41,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
      * L'identifiant du phenomene.
      */
-    @XmlAttribute(required = true)
+    @XmlAttribute(required = true, namespace="http://www.opengis.net/gml/3.2")
     private String id;
     
     /**
@@ -57,7 +57,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
      * Constructeur vide utilisé par JAXB.
      */
-    private PhenomenonEntry(){}
+    protected PhenomenonEntry(){}
     
     /**
      * Construit un nouveau phénomène du nom spécifié.

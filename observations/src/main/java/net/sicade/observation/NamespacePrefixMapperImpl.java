@@ -112,6 +112,11 @@ class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         if( "http://www.isotc211.org/2005/gts".equals(namespaceUri) )
             return "gts";
         
+        if( "http://www.w3.org/2001/XMLSchema-instance".equals(namespaceUri) )
+            return "xsi";
+        
+        if( "http://www.w3.org/1999/xlink".equals(namespaceUri) )
+            return "xlink"; 
         
         // otherwise I don't care. Just use the default suggestion, whatever it may be.
         return suggestion;
@@ -166,6 +171,6 @@ class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
      *      JAXB RI 1.0.2
      */
     public String[] getPreDeclaredNamespaceUris() {
-        return new String[] { };
+        return new String[] { "http://www.w3.org/2001/XMLSchema-instance"};
     }
 }

@@ -12,8 +12,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.swe;
+package net.sicade.gml;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import net.sicade.catalog.Entry;
 import org.opengis.observation.BaseUnit;
 
@@ -23,10 +27,13 @@ import org.opengis.observation.BaseUnit;
  * @version $Id:
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "BaseUnit")
 public class UnitOfMeasureEntry extends Entry implements BaseUnit {
     /**
      * l'identifiant de l'unité ( exemple cm, és, ...)
      */
+    @XmlAttribute
     private String id;
     
     /**
@@ -43,6 +50,11 @@ public class UnitOfMeasureEntry extends Entry implements BaseUnit {
      * Le system qui definit cette unité de mesure.
      */
     private String unitsSystem;
+    
+    /**
+     * constructeur videé utilisé par JAXB
+     */
+    protected UnitOfMeasureEntry() {}
     
     /**
      * Créé une nouvelle unité de mesure.
