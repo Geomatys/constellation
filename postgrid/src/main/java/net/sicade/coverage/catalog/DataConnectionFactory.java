@@ -43,7 +43,7 @@ interface DataConnectionFactory extends Remote {
      * @throws SQLException si la connexion à la base de données a échoué.
      * @throws RemoteException si la connexion n'a pas pu être établie.
      */
-    DataConnection connectSeries(final String series) throws CatalogException, SQLException, RemoteException;
+    DataConnection connectLayer(final String layer) throws CatalogException, SQLException, RemoteException;
 
     /**
      * Retourne la couverture de données pour le descripteur spécifié. Appeller cette méthode est

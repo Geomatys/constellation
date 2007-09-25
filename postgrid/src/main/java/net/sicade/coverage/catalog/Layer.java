@@ -59,6 +59,18 @@ public interface Layer extends Element {
     Set<Series> getSeries();
 
     /**
+     * Returns the series for the given name, or {@code null} if none. Names are case-sensitive,
+     * because the series name may be a short variable name with different meaning for <var>t</var>
+     * and <var>T</var>. Leading and trealing spaces are ignored in order to avoid unexpected
+     * mismatch between columns using the {@code character} and the {@code character varying}
+     * SQL types.
+     *
+     * @param  name The case-sensitive series name.
+     * @return The series in this layer for the given name, or {@code null} if none.
+     */
+    Series getSeries(String name);
+
+    /**
      * Returns a typical time intervale (in days) between two coverages of this layer. For example
      * a layer of weekly <cite>Sea Surface Temperature</cite> (SST) coverages may returns 7, while
      * a layer of mounthly SST coverage may returns 30. This value is only approximative.

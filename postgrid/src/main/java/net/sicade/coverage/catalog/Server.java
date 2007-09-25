@@ -147,7 +147,7 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
     /**
      * {@inheritDoc}
      */
-    public DataConnection connectSeries(final String layer) throws CatalogException, SQLException, RemoteException {
+    public DataConnection connectLayer(final String layer) throws CatalogException, SQLException, RemoteException {
         final GridCoverageTable data = database.getTable(GridCoverageTable.class);
         data.setLayer(this.layer.getEntry(layer));
         return new GridCoverageServer(data);

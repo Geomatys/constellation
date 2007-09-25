@@ -14,6 +14,9 @@
  */
 package net.sicade.coverage.catalog;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import net.sicade.catalog.Element;
 
 
@@ -46,4 +49,27 @@ public interface Series extends Element {
      * Returns the format of all coverages in this series.
      */
     Format getFormat();
+
+    /**
+     * Returns the given filename as a {@link File} augmented with series-dependent
+     * {@linkplain File#getParent parent} and extension. The returned file should be
+     * {@linkplain File#isAbsolute absolute}. If it is not, then there is probably no
+     * {@linkplain net.sicade.catalog.ConfigurationKey#ROOT_DIRECTORY root directory}
+     * set and consequently the file is probably not accessible locally.
+     *
+     * @param  filename The filename, not including the extension.
+     * @return The file.
+     */
+    File file(String filename);
+
+    /**
+     * Returns a {@link URL} for the given file. The given file should be the object returned
+     * by {@link #file}. If the file is not absolute, then this method adds a series-dependent
+     * host and encode the result in a URL.
+     *
+     * @param  file The file returned by {@link #file}.
+     * @return The file as a URL.
+     * @throws IOException If the file can't be encoded as a URL.
+     */
+    URL url(File file) throws IOException;
 }

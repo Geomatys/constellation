@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.sql.Types;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -43,7 +44,6 @@ import org.geotools.resources.geometry.XRectangle2D;
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.model.Operation;
 import net.sicade.catalog.BoundedSingletonTable;
-import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.resources.i18n.Resources;
@@ -72,7 +72,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private static final double DAY = 24*60*60*1000.0;
 
     /**
-     * Réference vers la couche d'images.
+     * The currently selected layer, or {@code null} if not yet set.
      */
     private Layer layer;
 
@@ -108,13 +108,12 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private final DateFormat dateFormat;
 
     /**
-     * Table of grid geometry. Will be created only when first needed.
+     * Shared instance of a table of grid geometries. Will be created only when first needed.
      */
     private transient GridGeometryTable gridGeometryTable;
 
     /**
-     * Table des formats. Cette table ne sera construite que la première fois
-     * où elle sera nécessaire.
+     * Shared instance of a table of formats. Will be created only when first needed.
      */
     private transient FormatTable formatTable;
 
@@ -213,17 +212,38 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * {inheritDoc}
      */
+    @Override
     public GridCoverageTable newInstance(final Operation operation) {
         final GridCoverageTable view = new GridCoverageTable(this);
         view.setOperation(operation);
         return view;
     }
-
+    
     /**
-     * Returns the layer for the coverages in this table.
+     * Returns the layer for the coverages in this table, or {@code null} if not yet set.
      */
     public Layer getLayer() {
         return layer;
+    }
+    
+    /**
+     * Returns the layer for the coverages in this table.
+     * 
+     * @throws CatalogException if the layer is not set.
+     */
+    final Layer getNonNullLayer() throws CatalogException {
+        assert Thread.holdsLock(this);
+        if (layer == null) {
+            throw new CatalogException("Aucune couche n'a été spécifiée."); // TODO: localize
+        }
+        return layer;
+    }
+
+    /**
+     * Returns the name of the current layer, or {@code null} if none.
+     */
+    private String getLayerName() {
+        return (layer != null) ? layer.getName() : null;
     }
 
     /**
@@ -234,16 +254,22 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
             clearCacheKeepEntries();
             this.layer = layer;
             fireStateChanged("Layer");
-            log("setLayer", Level.CONFIG, ResourceKeys.SET_SERIES_$1, layer.getName());
+            log("setLayer", Level.CONFIG, ResourceKeys.SET_LAYER_$1, layer.getName());
         }
     }
 
     /**
-     * Sets the later as a string. This methode should be avoided as much as possible -
-     * use {@link #setLayer(Layer)} instead. However it still useful for debugging purpose.
+     * Sets the layer as a string.
+     *
+     * @param  name The layer name.
+     * @throws CatalogException If no layer was found for the given name,
+     *         or if an other logical error occured.
+     * @throws SQLException If the database access failed for an other reason.
      */
-    public void setLayer(final String layer) {
-        setLayer(new LayerEntry(layer, null, 1, null));
+    public synchronized void setLayer(final String layer) throws CatalogException, SQLException {
+        // We don't keep a reference to the layer table since this method
+        // should only be a commodity and should not be invoked often.
+        setLayer(getDatabase().getTable(LayerTable.class).getEntry(layer));
     }
 
     /**
@@ -260,7 +286,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
                 endText   = dateFormat.format(  endTime);
             }
             log("setTimeRange", Level.CONFIG, ResourceKeys.SET_TIME_RANGE_$3,
-                                new String[]{startText, endText, layer.getName()});
+                                new String[]{startText, endText, getLayerName()});
         }
         return change;
     }
@@ -275,7 +301,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
             clearCache();
             log("setGeographicArea", Level.CONFIG, ResourceKeys.SET_GEOGRAPHIC_AREA_$2, new String[] {
                 GeographicBoundingBoxImpl.toString(area, ANGLE_PATTERN, getDatabase().getLocale()),
-                layer.getName()
+                getLayerName()
             });
         }
         return change;
@@ -310,12 +336,12 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
                 param = new Object[] {
                     new Double(resolution.getWidth()),
                     new Double(resolution.getHeight()),
-                    layer.getName()
+                    getLayerName()
                 };
             } else {
                 resolution = null;
                 clé = ResourceKeys.UNSET_RESOLUTION_$1;
-                param = layer.getName();
+                param = getLayerName();
             }
             fireStateChanged("PreferredResolution");
             log("setPreferredResolution", Level.CONFIG, clé, param);
@@ -345,10 +371,10 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
             final int clé;
             final Object param;
             if (operation != null) {
-                param = new String[] {operation.getName(), layer.getName()};
+                param = new String[] {operation.getName(), getLayerName()};
                 clé   = ResourceKeys.SET_OPERATION_$2;
             } else {
-                param = layer.getName();
+                param = getLayerName();
                 clé   = ResourceKeys.UNSET_OPERATION_$1;
             }
             fireStateChanged("Operation");
@@ -430,6 +456,7 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws CatalogException si un enregistrement est invalide.
      * @throws SQLException si la base de données n'a pas pu être interrogée pour une autre raison.
      */
+    @Override
     public synchronized CoverageReference getEntry() throws CatalogException, SQLException {
         /*
          * Obtient la liste des entrées avant toute opération impliquant l'envelope,
@@ -479,6 +506,7 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws SQLException If an error occured while reading the database.
      * @throws CatalogException if an illegal record was found.
      */
+    @Override
     public synchronized SortedSet<Date> getAvailableTimes()
             throws SQLException, CatalogException
     {
@@ -508,6 +536,7 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws SQLException If an error occured while reading the database.
      * @throws CatalogException if an illegal record was found.
      */
+    @Override
     public synchronized SortedSet<Number> getAvailableElevations()
             throws SQLException, CatalogException
     {
@@ -619,13 +648,13 @@ loop:   for (final CoverageReference newReference : entries) {
         final ResultSet  result  = getStatement(AVAILABLE_DATA).executeQuery();
         final int startTimeIndex = indexOf(query.startTime);
         final int   endTimeIndex = indexOf(query.endTime);
+        final long timeInterval  = Math.round((layer!=null ? layer.getTimeInterval() : 1) * DAY);
         if (addTo == null) {
             addTo = new RangeSet(Date.class);
         }
         while (result.next()) {
-            final long timeInterval = Math.round(layer.getTimeInterval() * DAY);
-            final Date    startTime = result.getTimestamp(startTimeIndex, calendar);
-            final Date      endTime = result.getTimestamp(  endTimeIndex, calendar);
+            final Date startTime = result.getTimestamp(startTimeIndex, calendar);
+            final Date   endTime = result.getTimestamp(  endTimeIndex, calendar);
             if (startTime!=null && endTime!=null) {
                 final long lgEndTime = endTime.getTime();
                 final long checkTime = lgEndTime - timeInterval;
@@ -644,8 +673,8 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Configure la requête spécifiée. Cette méthode est appelée automatiquement lorsque la table
-     * a {@linkplain #fireStateChanged changé d'état}.
+     * Configure the specified query. This method is invoked automatically after this table
+     * {@linkplain #fireStateChanged changed its state}.
      */
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
@@ -653,9 +682,12 @@ loop:   for (final CoverageReference newReference : entries) {
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
         int index = query.byLayer.indexOf(type);
         if (index != 0) {
-            final String name = (layer != null) ? layer.getName() : null;
-            statement.setString(index, name);
-            // TODO: need to take in account the case where the layer is null.
+            final String name = getLayerName();
+            if (name != null) {
+                statement.setString(index, name);
+            } else {
+                statement.setNull(index, Types.VARCHAR);
+            }
         }
         index = query.byVisibility.indexOf(type);
         if (index != 0) {
@@ -664,32 +696,40 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Retourne l'image correspondant à l'enregistrement courant. Les classes dérivées peuvent
-     * redéfinir cette méthode si elle souhaite contruire autrement la référence vers l'image.
+     * Creates an entry from the current row in the specified result set.
      */
     @Override
     protected CoverageReference createEntry(final ResultSet result) throws CatalogException, SQLException {
         assert Thread.holdsLock(this);
         final Calendar calendar = getCalendar();
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
-        final String layer     = result.getString   (indexOf(query.layer));
-        final String series    = result.getString   (indexOf(query.series));
-        final String pathname  = result.getString   (indexOf(query.pathname));
+        final String seriesID  = result.getString   (indexOf(query.series));
         final String filename  = result.getString   (indexOf(query.filename));
-        final String extension = result.getString   (indexOf(query.extension));
         final Date   startTime = result.getTimestamp(indexOf(query.startTime), calendar);
         final Date   endTime   = result.getTimestamp(indexOf(query.endTime),   calendar);
         final short  timeIndex = result.getShort    (indexOf(query.index)); // We expect 0 if null.
         final String extent    = result.getString   (indexOf(query.spatialExtent));
-        final String format    = result.getString   (indexOf(query.format));
+        /*
+         * Gets the SeriesEntry in which this coverage is declared. The entry should be available
+         * from the layer HashMap. If not, we will query the SeriesTable as a fallback, but there
+         * is probably a bug (so it is not worth to keep a reference to the series table).
+         */
+        Series series = getNonNullLayer().getSeries(seriesID);
+        if (series == null) {
+            LOGGER.warning(Resources.format(ResourceKeys.ERROR_WRONG_LAYER_$1, getLayerName()));
+            series = getDatabase().getTable(SeriesTable.class).getEntry(seriesID);
+        }
+        /*
+         * Process to the entry creation.
+         */
         if (gridGeometryTable == null) {
             gridGeometryTable = getDatabase().getTable(GridGeometryTable.class);
         }
         final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
         final NumberRange  verticalRange = getVerticalRange();
         final short band = geometry.indexOf(0.5*(verticalRange.getMinimum() + verticalRange.getMaximum()));
-        return new GridCoverageEntry(this, layer, series, pathname, filename, extension, startTime,
-                    endTime, timeIndex, geometry, band, format, null).canonicalize();
+        return new GridCoverageEntry(this, series, filename, startTime, endTime, timeIndex,
+                                     geometry, band, null).canonicalize();
     }
 
     /**
@@ -699,28 +739,15 @@ loop:   for (final CoverageReference newReference : entries) {
      * <p>
      * Cette méthode est appelée par le constructeur de {@link GridCoverageEntry}.
      *
-     * @param seriesID    Nom ID de la couche, pour fin de vérification. Ce nom doit correspondre
-     *                     à celui de la couche examinée par cette table.
-     * @param formatID    Nom ID du format des images.
      * @param coverageCRS Système de référence des coordonnées.
-     * @param pathname    Chemin relatif des images.
-     * @param extension   Extension (sans le point) des noms de fichier des images à lire.
      * @return Un objet incluant les paramètres demandées ainsi que ceux de la table.
      * @throws CatalogException si les paramètres n'ont pas pu être obtenus.
      * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
      * @todo L'implémentation actuelle n'accepte pas d'autres implémentations de Format que FormatEntry.
      */
-    final synchronized GridCoverageSettings getParameters(final String seriesID,
-                                                final String formatID,
-                                                final CoordinateReferenceSystem coverageCRS,
-                                                final String pathname,
-                                                final String extension)
+    final synchronized GridCoverageSettings getParameters(final CoordinateReferenceSystem coverageCRS)
             throws CatalogException, SQLException
     {
-        final String seriesName = layer.getName();
-        if (!Utilities.equals(seriesID, seriesName)) {
-            throw new CatalogException(Resources.format(ResourceKeys.ERROR_WRONG_SERIES_$1, seriesName));
-        }
         /*
          * Vérifie que l'enveloppe n'a pas changé. Note: getEnvelope() doit avoir été appelée au
          * moins une fois (sauf si elle n'a pas changée) juste avant super.getEntries(), afin
@@ -732,12 +759,7 @@ loop:   for (final CoverageReference newReference : entries) {
          * Si les paramètres spécifiés sont identiques à ceux qui avaient été
          * spécifiés la dernière fois, retourne le dernier bloc de paramètres.
          */
-        if (parameters != null &&
-            Utilities.equals(parameters.format.getName(), formatID) &&
-            Utilities.equals(parameters.coverageCRS,   coverageCRS) &&
-            Utilities.equals(parameters.pathname,         pathname) &&
-            Utilities.equals(parameters.extension,       extension))
-        {
+        if (parameters != null && Utilities.equals(parameters.coverageCRS, coverageCRS)) {
             return parameters;
         }
         /*
@@ -750,19 +772,8 @@ loop:   for (final CoverageReference newReference : entries) {
         if (formatTable == null) {
             formatTable = getDatabase().getTable(FormatTable.class);
         }
-        parameters = new GridCoverageSettings(layer,
-                                    (FormatEntry) formatTable.getEntry(formatID),
-                                    pathname.intern(),
-                                    extension.intern(),
-                                    operation,
-                                    getCoordinateReferenceSystem(),
-                                    coverageCRS,
-                                    geographicArea,
-                                    resolution,
-                                    dateFormat,
-                                    getProperty(ConfigurationKey.ROOT_DIRECTORY),
-                                    getProperty(ConfigurationKey.ROOT_URL),
-                                    getProperty(ConfigurationKey.URL_ENCODING));
+        parameters = new GridCoverageSettings(operation, getCoordinateReferenceSystem(),
+                            coverageCRS, geographicArea, resolution, dateFormat);
         return parameters;
     }
 
@@ -788,6 +799,7 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized double evaluate(final double x, final double y, final double t, final short band)
             throws CatalogException, SQLException, IOException
     {
@@ -799,6 +811,7 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized double[] snap(final double x, final double y, final double t)
             throws CatalogException, SQLException, IOException
     {
@@ -810,6 +823,7 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public synchronized List<Coverage> coveragesAt(final DirectPosition position)
             throws CatalogException, SQLException, IOException

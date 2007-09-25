@@ -16,7 +16,6 @@ package net.sicade.coverage.catalog;
 
 import java.util.Locale;
 import net.sicade.catalog.Element;
-import org.opengis.coverage.SampleDimension;
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.gui.swing.tree.MutableTreeNode;
@@ -29,6 +28,11 @@ import org.geotools.gui.swing.tree.MutableTreeNode;
  * @author Martin Desruisseaux
  */
 public interface Format extends Element {
+    /**
+     * Returns the MIME type for this format.
+     */
+    String getMimeType();
+
     /**
      * Returns the ranges of valid sample values for each band in this format.
      * The range are always expressed in <cite>geophysics</cite> values.
@@ -46,7 +50,7 @@ public interface Format extends Element {
      * while coverages read from ASCII files will often store their pixel values as real numbers
      * (<code>{@linkplain GridSampleDimension#geophysics geophysics}(true)</code>).
      */
-    SampleDimension[] getSampleDimensions();
+    GridSampleDimension[] getSampleDimensions();
 
     /**
      * Returns a tree representation of this format, including {@linkplain SampleDimension

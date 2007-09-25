@@ -47,30 +47,9 @@ final class GridCoverageSettings implements Serializable {
     private static final long serialVersionUID = 6418640591318515042L;
 
     /**
-     * Réference vers la couche d'images. Cette référence est construite à
-     * partir du champ ID dans la table "Layers" de la base de données.
-     */
-    public final Layer layer;
-
-    /**
      * L'opération à appliquer sur les images lue, ou {@code null} s'il n'y en a aucune.
      */
     public final Operation operation;
-
-    /**
-     * Format à utiliser pour lire les images.
-     */
-    public final FormatEntry format;
-
-    /**
-     * Chemin relatif des images.
-     */
-    public final String pathname;
-
-    /**
-     * Extension (sans le point) des noms de fichier des images à lire.
-     */
-    public final String extension;
 
     /**
      * La partie temporelle de {@link #tableCRS}. Ne sera construit que la première fois
@@ -113,22 +92,6 @@ final class GridCoverageSettings implements Serializable {
     public final Dimension2D resolution;
 
     /**
-     * Root images directory, for access through a local network.
-     */
-    public final String rootDirectory;
-
-    /**
-     * Root URL directory (usually a FTP server), for access through a distant network.
-     */
-    public final String rootURL;
-
-    /**
-     * Encodage des noms de fichiers (typiquement {@code "UTF-8"}), ou {@code null} si aucun
-     * encodage ne doit être effectué.
-     */
-    public final String encoding;
-
-    /**
      * Formatteur à utiliser pour écrire des dates pour l'utilisateur. Les caractères et
      * les conventions linguistiques dépendront de la langue de l'utilisateur. Toutefois,
      * le fuseau horaire devrait être celui de la région d'étude plutôt que celui du pays
@@ -139,10 +102,6 @@ final class GridCoverageSettings implements Serializable {
     /**
      * Construit un bloc de paramètres.
      *
-     * @param layer Référence vers la couche d'images.
-     * @param format Format à utiliser pour lire les images.
-     * @param pathname Chemin relatif des images.
-     * @param extension Extension (sans le point) des noms de fichier des images à lire.
      * @param operation Opération à appliquer sur les images, ou {@code null}.
      * @param tableCRS Système de référence des coordonnées de la table. Le système de
      *        coordonnées de tête ("head") doit obligatoirement être un CRS horizontal.
@@ -154,36 +113,20 @@ final class GridCoverageSettings implements Serializable {
      *        ou {@code null} pour la meilleure résolution disponible.
      *        Doit être exprimé dans le système de coordonnées {@code tableCRS}.
      * @param dateFormat Formatteur à utiliser pour écrire des dates pour l'utilisateur.
-     * @param encoding Encodage des noms de fichiers, ou {@code null} si aucun encodage ne doit être
-     *        effectué.
      */
-    public GridCoverageSettings(final Layer                     layer,
-                      final FormatEntry               format,
-                      final String                    pathname,
-                      final String                    extension,
-                      final Operation                 operation,
-                      final CoordinateReferenceSystem tableCRS,
-                      final CoordinateReferenceSystem coverageCRS,
-                      final Rectangle2D               geographicArea,
-                      final Dimension2D               resolution,
-                      final DateFormat                dateFormat,
-                      final String                    rootDirectory,
-                      final String                    rootURL,
-                      final String                    encoding)
+    public GridCoverageSettings(final Operation                 operation,
+                                final CoordinateReferenceSystem tableCRS,
+                                final CoordinateReferenceSystem coverageCRS,
+                                final Rectangle2D               geographicArea,
+                                final Dimension2D               resolution,
+                                final DateFormat                dateFormat)
     {
-        this.layer          = layer;
-        this.format         = format;
-        this.pathname       = pathname;
-        this.extension      = extension;
         this.operation      = operation;
         this.tableCRS       = tableCRS;
         this.coverageCRS    = coverageCRS;
         this.geographicArea = geographicArea;
         this.resolution     = resolution;
         this.dateFormat     = dateFormat;
-        this.rootDirectory  = rootDirectory;
-        this.rootURL        = rootURL;
-        this.encoding       = encoding;
     }
 
     /**
@@ -193,19 +136,12 @@ final class GridCoverageSettings implements Serializable {
     public boolean equals(final Object o) {
         if (o instanceof GridCoverageSettings) {
             final GridCoverageSettings that = (GridCoverageSettings) o;
-            return Utilities.equals(this.layer          , that.layer         ) &&
-                   Utilities.equals(this.format         , that.format        ) &&
-                   Utilities.equals(this.pathname       , that.pathname      ) &&
-                   Utilities.equals(this.extension      , that.extension     ) &&
-                   Utilities.equals(this.operation      , that.operation     ) &&
+            return Utilities.equals(this.operation      , that.operation     ) &&
                    Utilities.equals(this.tableCRS       , that.tableCRS      ) &&
                    Utilities.equals(this.coverageCRS    , that.coverageCRS   ) &&
                    Utilities.equals(this.geographicArea , that.geographicArea) &&
                    Utilities.equals(this.resolution     , that.resolution    ) &&
-                   Utilities.equals(this.dateFormat     , that.dateFormat    ) &&
-                   Utilities.equals(this.rootDirectory  , that.rootDirectory ) &&
-                   Utilities.equals(this.rootURL        , that.rootURL       ) &&
-                   Utilities.equals(this.encoding       , that.encoding      );
+                   Utilities.equals(this.dateFormat     , that.dateFormat    );
         }
         return false;
     }

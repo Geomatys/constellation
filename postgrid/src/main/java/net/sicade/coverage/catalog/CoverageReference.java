@@ -62,20 +62,9 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     String REFERENCE_KEY = "net.sicade.observation.CoverageReference";
 
     /**
-     * Returns the layer of this coverage reference.
-     *
-     * @deprecated We need to replace this method by a {@code getSeries()} method.
+     * Returns the series of this coverage reference.
      */
-    @Deprecated
-    Layer getLayer();
-
-    /**
-     * Returns the format of this coverage reference.
-     *
-     * @deprecated We need to replace this method by a {@code getSeries()} method.
-     */
-    @Deprecated
-    Format getFormat();
+    Series getSeries();
 
     /**
      * Returns the path to the image file, or {@code null} if the file is not accessible
@@ -98,6 +87,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     /**
      * Returns the spatio-temporal envelope for the {@linkplain #getCoverage coverage}.
      */
+    @Override
     Envelope getEnvelope();
 
     /**
@@ -117,11 +107,13 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     /**
      * For {@link org.geotools.coverage.CoverageStack.Element} implementation only.
      */
+    @Override
     NumberRange getZRange();
 
     /**
      * Returns the {@linkplain #getCoverage coverage} grid geometry.
      */
+    @Override
     GridGeometry2D getGridGeometry();
 
     /**
@@ -130,6 +122,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
      * (<code>{@linkplain GridSampleDimension#geophysics geophysics}(true)</code>), which is
      * consistent with the coverage returned by {@link #getCoverage getCoverage(...)}.
      */
+    @Override
     SampleDimension[] getSampleDimensions();
 
     /**
@@ -153,6 +146,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
      *
      * @todo Should probable thrown an exception instead of returning null when the reading is aborted.
      */
+    @Override
     GridCoverage2D getCoverage(IIOListeners listeners) throws IOException;
 
     /**
@@ -190,20 +184,19 @@ public interface CoverageReference extends Element, CoverageStack.Element {
             }
         }
 
-        public CoverageReference         getBackingElement()            {return ref;}
-        public Layer                     getLayer()                     {return ref.getLayer();}
-        public Format                    getFormat()                    {return ref.getFormat();}
-        public File                      getFile()                      {return ref.getFile();}
-        public URL                       getURL()                       {return ref.getURL();}
-        public GridGeometry2D            getGridGeometry()              {return ref.getGridGeometry();}
-        public CoordinateReferenceSystem getCoordinateReferenceSystem() {return ref.getCoordinateReferenceSystem();}
-        public Envelope                  getEnvelope()                  {return ref.getEnvelope();}
-        public NumberRange               getZRange()                    {return ref.getZRange();}
-        public DateRange                 getTimeRange()                 {return ref.getTimeRange();}
-        public GeographicBoundingBox     getGeographicBoundingBox()     {return ref.getGeographicBoundingBox();}
-        public SampleDimension[]         getSampleDimensions()          {return ref.getSampleDimensions();}
-        public void                      abort()                        {       ref.abort();}
-        public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
+        public @Override CoverageReference         getBackingElement()            {return ref;}
+        public @Override Series                    getSeries()                    {return ref.getSeries();}
+        public @Override File                      getFile()                      {return ref.getFile();}
+        public @Override URL                       getURL()                       {return ref.getURL();}
+        public @Override GridGeometry2D            getGridGeometry()              {return ref.getGridGeometry();}
+        public @Override CoordinateReferenceSystem getCoordinateReferenceSystem() {return ref.getCoordinateReferenceSystem();}
+        public @Override Envelope                  getEnvelope()                  {return ref.getEnvelope();}
+        public @Override NumberRange               getZRange()                    {return ref.getZRange();}
+        public @Override DateRange                 getTimeRange()                 {return ref.getTimeRange();}
+        public @Override GeographicBoundingBox     getGeographicBoundingBox()     {return ref.getGeographicBoundingBox();}
+        public @Override SampleDimension[]         getSampleDimensions()          {return ref.getSampleDimensions();}
+        public @Override void                      abort()                        {       ref.abort();}
+        public @Override GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
             return ref.getCoverage(listeners);
         }
     }

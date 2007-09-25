@@ -15,7 +15,6 @@
  */
 package net.sicade.coverage.catalog;
 
-import java.util.Collections;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.rmi.RemoteException;
@@ -56,9 +55,11 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     private LinearModelTable models;
 
     /**
-     * Connexion vers la table des séries.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Connection to the table of series. A new instance will be
+     * created when first needed for each layer table.
      */
+    // Note: a previous version was used to share this instance, but we had to
+    // remove this sharing because it produces wrong values for Series.layer.
     private SeriesTable series;
 
     /**
@@ -74,7 +75,8 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         /**
          * {@inheritDoc}
          */
-        public DataConnection connectSeries(final String layer) throws CatalogException, SQLException {
+        @Override
+        public DataConnection connectLayer(final String layer) throws CatalogException, SQLException {
             final GridCoverageTable table = new GridCoverageTable(getDatabase().getTable(GridCoverageTable.class));
             table.setLayer(getEntry(layer));
             table.setEnvelope(getEnvelope());
@@ -88,6 +90,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
          * {@link LayerTable#postCreateEntry} et que cette dernière n'utilise pas cette
          * méthode. Nous l'implémentons toujours par prudence.
          */
+        @Override
         public GridCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException {
             return getDatabase().getTable(DescriptorTable.class).getEntryLenient(descriptor).getCoverage();
         }
@@ -111,6 +114,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
      * @throws CatalogException if an inconsistent record is found in the database.
      * @throws SQLException if an error occured while reading the database.
      */
+    @Override
     protected Layer createEntry(final ResultSet results) throws CatalogException, SQLException {
         final LayerQuery query = (LayerQuery) super.query;
         final String name      = results.getString(indexOf(query.name     ));
@@ -151,13 +155,10 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         super.postCreateEntry(layer);
         final LayerEntry entry = (LayerEntry) layer;
         if (series == null) {
-            series = getDatabase().getTable(SeriesTable.class).getShared();
-            // We use a shareable instance because we will always use it in synchronized block.
+            series = new SeriesTable(getDatabase().getTable(SeriesTable.class));
         }
-        synchronized (series) {
-            series.setLayer(entry);
-            entry.series = Collections.unmodifiableSet(series.getEntries());
-        }
+        series.setLayer(entry);
+        entry.setSeries(series.getEntries());
         if (entry.fallback instanceof String) {
             entry.fallback = getEntry((String) entry.fallback);
         }
@@ -195,7 +196,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         }
         final DataConnection data;
         try {
-            data = factory.connectSeries(layer.getName());
+            data = factory.connectLayer(layer.getName());
         } catch (RemoteException exception) {
             throw new ServerException(exception);
         }

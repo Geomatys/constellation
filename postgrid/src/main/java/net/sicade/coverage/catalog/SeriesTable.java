@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.geotools.resources.Utilities;
 import net.sicade.catalog.CatalogException;
+import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
@@ -52,29 +53,22 @@ public class SeriesTable extends SingletonTable<Series> {
      * @param database Connection to the database.
      */
     public SeriesTable(final Database database) {
-        super(new SeriesQuery(database));
-        setIdentifierParameters(((SeriesQuery) query).byName, null);
+        this(new SeriesQuery(database));
+    }
+
+    /**
+     * Creates a series table using the specified query.
+     */
+    private SeriesTable(final SeriesQuery query) {
+        super(query);
+        setIdentifierParameters(query.byName, null);
     }
 
     /**
      * Creates a series table connected to the same database than the specified one.
      */
-    private SeriesTable(final SeriesTable table) {
+    public SeriesTable(final SeriesTable table) {
         super(table);
-    }
-
-    /**
-     * Returns a modifiable, shared instance of this table.
-     * For internal use by {@link LayerTable} only.
-     */
-    final SeriesTable getShared() {
-        synchronized (query) {
-            final SeriesQuery query = (SeriesQuery) super.query;
-            if (query.sharedTable == null) {
-                query.sharedTable = new SeriesTable(this);
-            }
-            return query.sharedTable;
-        }
     }
 
     /**
@@ -128,14 +122,22 @@ public class SeriesTable extends SingletonTable<Series> {
     /**
      * Creates a series from the current row in the specified result set.
      */
+    @Override
     protected Series createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final SeriesQuery query = (SeriesQuery) super.query;
-        final String name = results.getString(indexOf(query.name));
-        final String remarks = null;
+        final SeriesQuery query     = (SeriesQuery) super.query;
+        final String  name          = results.getString (indexOf(query.name));
+        final String  pathname      = results.getString (indexOf(query.pathname));
+        final String  extension     = results.getString (indexOf(query.extension));
+        final boolean visible       = results.getBoolean(indexOf(query.visible));
+        final String  remarks       = results.getString (indexOf(query.remarks));
+        final String  rootDirectory = getProperty(ConfigurationKey.ROOT_DIRECTORY);
+        final String  rootURL       = getProperty(ConfigurationKey.ROOT_URL);
+        final String  encoding      = getProperty(ConfigurationKey.URL_ENCODING);
         if (formats == null) {
             formats = getDatabase().getTable(FormatTable.class);
         }
         final Format format = formats.getEntry(results.getString(indexOf(query.format)));
-        return new SeriesEntry(name, layer, format, remarks);
+        return new SeriesEntry(name, layer, rootDirectory, rootURL, pathname, extension,
+                               encoding, format, visible, remarks);
     }
 }

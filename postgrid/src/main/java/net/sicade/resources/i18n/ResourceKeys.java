@@ -540,7 +540,7 @@ public final class ResourceKeys {
     /**
      * L''image demandée n''appartient pas à la série "{0}".
      */
-    public static final int ERROR_WRONG_SERIES_$1 = 115;
+    public static final int ERROR_WRONG_LAYER_$1 = 115;
 
     /**
      * Exception
@@ -898,7 +898,7 @@ Les lignes rouges représentent les images manquantes.
     /**
      * Sélectionne la série "{0}".
      */
-    public static final int SET_SERIES_$1 = 174;
+    public static final int SET_LAYER_$1 = 174;
 
     /**
      * Sélectionne la plage de temps du {0} au {1} pour la série "{2}".

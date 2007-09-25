@@ -33,8 +33,7 @@ final class GridCoverageQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column layer, series, pathname, filename, extension,
-            index, startTime, endTime, spatialExtent, format;
+    protected final Column series, filename, index, startTime, endTime, spatialExtent;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -48,7 +47,7 @@ final class GridCoverageQuery extends Query {
      */
     public GridCoverageQuery(final Database database) {
         super(database);
-        final Column horizontalExtent, visibility;
+        final Column layer, horizontalExtent, visibility;
         final QueryType[] hiden = {                                                  };
         final QueryType[] SL    = {SELECT, LIST                                      };
         final QueryType[] SLI   = {SELECT, LIST,                               INSERT};
@@ -56,17 +55,14 @@ final class GridCoverageQuery extends Query {
         final QueryType[] SLABI = {SELECT, LIST, AVAILABLE_DATA, BOUNDING_BOX, INSERT};
         final QueryType[] SLAB  = {SELECT, LIST, AVAILABLE_DATA, BOUNDING_BOX        };
         final QueryType[]    B  = {                              BOUNDING_BOX        };
-        layer            = addColumn("Series",         "layer",            SL   );
+        layer            = addColumn("Series",         "layer",            hiden);
         series           = addColumn("GridCoverages",  "series",           SLI  );
-        pathname         = addColumn("Series",         "pathname",         SL   );
         filename         = addColumn("GridCoverages",  "filename",         SLI  );
-        extension        = addColumn("Series",         "extension",        SL   );
         index            = addColumn("GridCoverages",  "index", 1,         SLI  );
         startTime        = addColumn("GridCoverages",  "startTime",        SLABI);
         endTime          = addColumn("GridCoverages",  "endTime",          SLABI);
         spatialExtent    = addColumn("GridCoverages",  "extent",           SLAI );
         horizontalExtent = addColumn("GridGeometries", "horizontalExtent",    B );
-        format           = addColumn("Series",         "format",           SL   );
         visibility       = addColumn("Series",         "visible", true,    hiden);
 
         startTime.setFunction("MIN", B);

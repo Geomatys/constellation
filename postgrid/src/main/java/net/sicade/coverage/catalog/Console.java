@@ -224,7 +224,7 @@ public final class Console extends Arguments {
                 if (file != null) {
                     String message;
                     if (file.isFile()) try {
-                        if (coverage.getFormat().getName().startsWith("HDF")) {
+                        if (coverage.getSeries().getFormat().getName().startsWith("HDF")) {
                             // TODO: Lecture de fichier HDF désactivée pour l'instant.
                             continue;
                         }

@@ -27,6 +27,7 @@ import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.geotools.coverage.AbstractCoverage;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 
@@ -69,7 +70,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      * d'éviter d'avoir à retenir une référence vers {@link Descriptor}, qui contient des
      * dépendences qui peuvent être assez lourdes.
      */
-    private final SampleDimension sampleDimension;
+    private final GridSampleDimension sampleDimension;
 
     /**
      * La position spatio-temporelle relative.
@@ -108,13 +109,13 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     private DataCoverage(final Descriptor descriptor, final DataConnection data) throws RemoteException {
         super(descriptor.getName(), data.getCoordinateReferenceSystem(), null, null);
         final RegionOfInterest offset = descriptor.getRegionOfInterest();
-        this.data       = data;
-        this.dt         = offset.getDayOffset();
-        this.band       = descriptor.getBand();
+        this.data = data;
+        this.dt   = offset.getDayOffset();
+        this.band = descriptor.getBand();
         final Set<Series> series = descriptor.getLayer().getSeries();
         if (!series.isEmpty()) {
             final Format format = series.iterator().next().getFormat();
-            final SampleDimension[] sd = format.getSampleDimensions();
+            final GridSampleDimension[] sd = format.getSampleDimensions();
             sampleDimension = sd[band];
         } else {
             sampleDimension = null;
@@ -305,6 +306,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      * @return La valeur évaluée à la position spécifiée, sous forme de tableau {@code double[]}.
      * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
      */
+    @Override
     public Object evaluate(final DirectPosition position) throws CannotEvaluateException {
         return evaluate(position, (double[]) null);
     }
@@ -312,6 +314,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DirectPosition snap(final DirectPosition position) throws CatalogException {
         final double[] ordinates;
         try {
@@ -329,6 +332,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<Coverage> coveragesAt(DirectPosition position) throws CatalogException {
         if (dt != 0) {
             position = new GeneralDirectPosition(position);
@@ -348,6 +352,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      * Retourne le nombre de bandes dans cette couverture. Pour ce type de couverture, il
      * sera toujours égal à 1.
      */
+    @Override
     public int getNumSampleDimensions() {
         return 1;
     }
@@ -358,6 +363,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      *
      * @throws IndexOutOfBoundsException si {@code index} est en dehors des limites permises.
      */
+    @Override
     public SampleDimension getSampleDimension(final int index) throws IndexOutOfBoundsException {
         if (index != 0) {
             throw new IndexOutOfBoundsException(String.valueOf(index));

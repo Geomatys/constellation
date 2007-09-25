@@ -490,7 +490,7 @@ public class CoverageBuilder {
             return null;
         } 
         // Dates et nom du fichier
-        final Layer         layer = lastSuccessful.getLayer();
+        final Layer         layer = lastSuccessful.getSeries().getLayer();
         final long   timeInterval = Math.round(layer.getTimeInterval() * (24*60*60*1000L));
         final DateRange timeRange = lastSuccessful.getTimeRange();
         final Date      startTime = new Date(timeRange.getMinValue().getTime() + timeInterval);

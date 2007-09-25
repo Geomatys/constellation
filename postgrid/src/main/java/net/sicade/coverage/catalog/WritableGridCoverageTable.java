@@ -72,24 +72,61 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Returns the series in which to insert the coverages.
+     * Returns the most appropriate series in which to insert the coverage.
      *
-     * @throws CatalogException if no series has been specified, or if the layer contains
-     *         zero or more than one series.
+     * @param  mimeTypes The set of legal MIME types.
+     * @param  path The path to the coverage file (not including the filename).
+     * @param  extension The file extension.
+     * @return The series that seems the best match.
+     * @throws CatalogException if there is ambiguity between series.
      */
-    private Series getSeries() throws CatalogException {
-        final Layer layer = getLayer();
-        if (layer == null) {
-            throw new CatalogException("Aucune couche n'a été spécifiée."); // TODO: localize
+    private Series getSeries(final String[] mimeTypes, final String path, final String extension)
+            throws CatalogException
+    {
+        Series series = null;
+        int matchingParents = 0;
+        for (final Series candidate : getNonNullLayer().getSeries()) {
+            if (candidate instanceof SeriesEntry) {
+                final SeriesEntry entry = (SeriesEntry) candidate;
+                if (!extension.equals(entry.extension)) {
+                    continue;
+                }
+                if (!contains(mimeTypes, entry.getFormat().getMimeType())) {
+                    continue;
+                }
+                /*
+                 * 
+                 */
+                int depth = 0;
+                File f1 = new File(path);
+                File f2 = new File(entry.pathname);
+                while (f1.getName().equals(f2.getName())) {
+                    f1 = f1.getParentFile(); if (f1 == null) break;
+                    f2 = f2.getParentFile(); if (f2 == null) break;
+                    depth++;
+                }
+                if (depth < matchingParents) {
+                    continue;
+                }
+                matchingParents = depth;
+            }
+            series = candidate;
         }
-        final Iterator<Series> it = layer.getSeries().iterator();
-        if (it.hasNext()) {
-            final Series series = it.next();
-            if (!it.hasNext()) {
-                return series;
+        return series;
+    }
+    
+    /**
+     * Returns {@code true} if the given list containst the given element.
+     * Comparaison is case-insensitive.
+     */
+    private static boolean contains(final String[] list, String element) {
+        element = element.trim();
+        for (final String candidate : list) {
+            if (element.equalsIgnoreCase(candidate.trim())) {
+                return true;
             }
         }
-        throw new CatalogException("La couche devrait contenir exactement une série."); // TODO: localize
+        return false;
     }
 
     /**
@@ -166,7 +203,6 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             throws CatalogException, SQLException, IOException
     {
         final GridCoverageQuery query     = (GridCoverageQuery) this.query;
-        final Series            series    = getSeries();
         final Calendar          calendar  = getCalendar();
         final PreparedStatement statement = getStatement(QueryType.INSERT);
         final GridGeometryTable gridTable = getDatabase().getTable(GridGeometryTable.class);
@@ -176,7 +212,6 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         final int byStartTime = indexOf(query.startTime);
         final int byEndTime   = indexOf(query.endTime);
         final int byExtent    = indexOf(query.spatialExtent);
-        statement.setString(bySeries, series.getName());
         while (readers.hasNext()) {
             final ImageReader reader = readers.next();
             final File  input = path(reader.getInput());
@@ -193,6 +228,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                     extension = "";
                 }
             }
+            final String[] types = reader.getOriginatingProvider().getMIMETypes(); // TODO
+            final Series series = getSeries(types, path, extension);
             /*
              * Gets the metadata of interest.
              */
@@ -208,12 +245,14 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             final int horizontalSRID = metadata.getHorizontalSRID();
             final int verticalSRID = metadata.getVerticalSRID();
             final double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
-            final String extent = gridTable.getIdentifier(new Dimension(width, height), gridToCRS,
-                    horizontalSRID, verticalOrdinates, verticalSRID, getSuggestedID(gridTable.getName()));
+            final String extent = gridTable.getIdentifier(new Dimension(width, height),
+                    gridToCRS, horizontalSRID, verticalOrdinates, verticalSRID,
+                    getSuggestedID(series, gridTable.getName()));
             /*
              * Adds the entries for each image found in the file.
              * There is often only one image per file, but not always.
              */
+            statement.setString(bySeries, series.getName());
             statement.setString(byFilename, filename);
             statement.setString(byExtent,   extent);
             for (int i=0; i<dates.length; i++) {
@@ -230,9 +269,13 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Returns a suggested ID for records to be added in the given table. The default
      * implementation returns the series name in all cases.
+     *
+     * @param series The series for which an image will be added.
+     * @param table  The table in which a new entry need to be added. Typically
+     *               {@code "Series"} or {@code "GridGeometries"}.
      */
-    protected String getSuggestedID(final String table) throws CatalogException {
-        return getSeries().getName();
+    protected String getSuggestedID(final Series series, final String table) throws CatalogException {
+        return series.getName();
     }
 
     /**

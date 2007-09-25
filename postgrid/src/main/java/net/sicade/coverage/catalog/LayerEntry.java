@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.SortedSet;
+import java.util.Iterator;
 import java.util.Collections;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -40,6 +41,8 @@ import net.sicade.catalog.ServerException;
 import net.sicade.coverage.model.Model;
 import net.sicade.coverage.model.Operation;
 import net.sicade.resources.XArray;
+import net.sicade.resources.i18n.Resources;
+import net.sicade.resources.i18n.ResourceKeys;
 
 
 /**
@@ -77,9 +80,15 @@ final class LayerEntry extends Entry implements Layer {
     Model model;
 
     /**
-     * Les séries. Sera construit par {@link LayerTable#postCreateEntry}.
+     * The series associated with their names. This map will be created by
+     * {@link LayerTable#postCreateEntry}.
      */
-    Set<Series> series;
+    private Map<String,Series> seriesMap;
+
+    /**
+     * A immutable view over the values of {@link #seriesMap}.
+     */
+    private Set<Series> series;
 
     /**
      * Une couche de second recours qui peut être utilisée si aucune données n'est disponible
@@ -127,19 +136,20 @@ final class LayerEntry extends Entry implements Layer {
      *                     de jours), ou {@link Double#NaN} si elle est inconnue.
      * @param remarks      Remarques s'appliquant à cette entrée, ou {@code null}.
      */
-    protected LayerEntry(final String    name,
-                         final Thematic  thematic,
-                         final double    timeInterval,
-                         final String    remarks)
+    protected LayerEntry(final String   name,
+                         final Thematic thematic,
+                         final double   timeInterval,
+                         final String   remarks)
     {
         super(name, remarks);
-        this.thematic   = thematic;
+        this.thematic     = thematic;
         this.timeInterval = timeInterval;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Thematic getThematic() {
         return thematic;
     }
@@ -147,16 +157,46 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Layer getFallback() {
         final Object fallback = this.fallback; // Protect from changes in concurrent threads.
         return (fallback instanceof Layer) ? (Layer) fallback : null;
     }
 
     /**
+     * Sets the series for this layer.
+     */
+    final void setSeries(final Set<Series> series) {
+        final Map<String,Series> map = new HashMap<String,Series>((int) (series.size() / 0.75f) + 1);
+        for (final Iterator<Series> it=series.iterator(); it.hasNext();) {
+            final Series entry = it.next();
+            assert entry.getLayer() == this : entry;
+            final String name = entry.getName().trim();
+            if (map.put(name, entry) != null) {
+                throw new IllegalArgumentException(Resources.format(
+                        ResourceKeys.ERROR_DUPLICATED_RECORD_$1, name));
+            }
+            // Following is specific to SeriesEntry implementation. If faced with a different
+            // implementation, we will conservatively assume that all series are to be shown.
+            if (entry instanceof SeriesEntry) {
+                if (!((SeriesEntry) entry).visible) {
+                    it.remove();
+                }
+            }
+        }
+        this.seriesMap = map;
+        this.series = Collections.unmodifiableSet(series);
+    }
+
+    /**
      * {@inheritDoc}
      */
+    @Override
     public Set<Series> getSeries() {
         if (series != null) {
+            // Note: The series Set may have less entries than
+            // the series Map since some series may be hidden.
+            assert seriesMap.values().containsAll(series) : this;
             return series;
         } else {
             return Collections.emptySet();
@@ -166,6 +206,15 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public Series getSeries(final String name) {
+        return (seriesMap != null) ? seriesMap.get(name.trim()) : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public double getTimeInterval() {
         return timeInterval;
     }
@@ -173,6 +222,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -188,6 +238,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -203,6 +254,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public NumberRange[] getSampleValueRanges() {
         NumberRange[] ranges = null;
         for (final Series series : getSeries()) {
@@ -233,6 +285,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DateRange getTimeRange() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -246,6 +299,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -259,6 +313,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized CoverageReference getCoverageReference(final Date time, final Number elevation)
             throws CatalogException
     {
@@ -287,6 +342,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<CoverageReference> getCoverageReferences() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -303,6 +359,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized Coverage getCoverage() throws CatalogException {
         Coverage c = null;
         if (coverage != null) {
@@ -326,6 +383,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Model getModel() throws CatalogException {
         return model;
     }

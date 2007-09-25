@@ -466,7 +466,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
             throw exception;
         }
         /*
-         * Recopie tous dans un nouvel ensemble, car set.keySet() n'est pas serializable.
+         * Copies all entries in a new set because set.keySet() is not serializable.
+         * In addition, some callers will modify the returned set.
          */
         return new LinkedHashSet<E>(set.keySet());
     }

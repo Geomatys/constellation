@@ -33,17 +33,12 @@ final class SeriesQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, format;
+    protected final Column name, layer, pathname, extension, format, visible, remarks;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
     protected final Parameter byName, byLayer;
-
-    /**
-     * A shared series table. For internal usage by {@link SeriesTable#getShared} only.
-     */
-    transient SeriesTable sharedTable;
 
     /**
      * Creates a new query for the specified database.
@@ -52,13 +47,16 @@ final class SeriesQuery extends Query {
      */
     public SeriesQuery(final Database database) {
         super(database);
-        final Column layer;
         final QueryType[] usage = {SELECT, LIST, FILTERED_LIST};
-        name    = addColumn("Series", "identifier", usage);
-        layer   = addColumn("Series", "layer",      usage);
-        format  = addColumn("Series", "format",     usage);
-        byName  = addParameter(name,  SELECT);
-        byLayer = addParameter(layer, FILTERED_LIST);
+        name      = addColumn("Series", "identifier",    usage);
+        layer     = addColumn("Series", "layer",         usage);
+        pathname  = addColumn("Series", "pathname",      usage);
+        extension = addColumn("Series", "extension",     usage);
+        format    = addColumn("Series", "format",        usage);
+        visible   = addColumn("Series", "visible", true, usage);
+        remarks   = addColumn("Series", "remarks", null, usage);
+        byName    = addParameter(name,  SELECT);
+        byLayer   = addParameter(layer, FILTERED_LIST);
         name.setOrdering("ASC", LIST, FILTERED_LIST);
     }
 }

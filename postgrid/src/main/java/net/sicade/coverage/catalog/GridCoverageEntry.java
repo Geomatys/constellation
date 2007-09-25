@@ -24,12 +24,10 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectStreamException;
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.ref.SoftReference;
 import java.net.URL;
-import java.net.URLEncoder;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import java.rmi.server.RemoteStub;
@@ -167,6 +165,11 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     private final GridGeometryEntry geometry;
 
     /**
+     * The series in which this coverage is declared.
+     */
+    private final Series series;
+    
+    /**
      * Bloc de paramètres de la table d'images. On retient ce bloc de paramètres plutôt qu'une
      * référence directe vers {@link GridCoverageTable} afin de ne pas empêcher le ramasse-miettes
      * de détruire la table et ses connections vers la base de données.
@@ -216,27 +219,24 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
      */
     protected GridCoverageEntry(final GridCoverageTable table,
-                                final String            layer,
-                                final String            series,
-                                final String            pathname,
+                                final Series            series,
                                 final String            filename,
-                                final String            extension,
                                 final Date              startTime,
                                 final Date              endTime,
                                 final short             timeIndex,
                                 final GridGeometryEntry geometry,
                                 final short             band,
-                                final String            format,
                                 final String            remarks)
             throws CatalogException, SQLException
     {
-        super(createName(series, filename, band, timeIndex), remarks);
+        super(createName(series.getName(), filename, band, timeIndex), remarks);
         // TODO: need to include the temporal CRS here.
         CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem();
+        this.series     = series;
         this.filename   = filename;
         this.geometry   = geometry;
         this.band       = band;
-        this.parameters = table.getParameters(layer, format, crs, pathname, extension);
+        this.parameters = table.getParameters(crs);
         this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
         this.timeIndex  = timeIndex;
@@ -283,103 +283,48 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
-    public Layer getLayer() {
-        return parameters.layer;
+    @Override
+    public Series getSeries() {
+        return series;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Format getFormat() {
-        return parameters.format;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public File getFile() {
-        try {
-            final Object input = getInput(true);
-            if (input instanceof File) {
-                return (File) input;
-            }
-        } catch (IOException exception) {
-            Logging.unexpectedException(LOGGER, GridCoverageEntry.class, "getFile", exception);
-        }
-        return null;
+        final File file = series.file(filename);
+        return (file.isAbsolute()) ? file : null;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public URL getURL() {
         try {
-            final Object input = getInput(false);
-            if (input instanceof URL) {
-                return (URL) input;
-            }
+            return series.url(series.file(filename));
         } catch (IOException exception) {
             Logging.unexpectedException(LOGGER, GridCoverageEntry.class, "getURL", exception);
+            return null;
         }
-        return null;
     }
-
+    
     /**
      * Returns the source as a {@link File} or an {@link URL}, in this preference order.
-     *
-     * @param  local {@code true} if the file are going to be read from a local machine,
-     *         or {@code false} if it is going to be read through internet.
-     * @return The input, usually a {@link File} object if {@code local} was {@code true}
-     *         and an {@link URL} object if {@code local} was {@code false}.
      */
-    private Object getInput(final boolean local) throws IOException {
-        final File file = new File(parameters.pathname, filename + '.' + parameters.extension);
-        if (!file.isAbsolute()) {
-            if (local) {
-                if (parameters.rootDirectory != null) {
-                    if (!(loader instanceof RemoteStub)) {
-                        return new File(parameters.rootDirectory, file.getPath());
-                    }
-                    // File loading delegated to a remote server.
-                }
-                // No root directory: means that the file is not accessible localy.
-            }
-            if (parameters.rootURL != null) {
-                final StringBuilder buffer = new StringBuilder(parameters.rootURL);
-                final int last = buffer.length()-1;
-                if (last >= 0) {
-                    if (buffer.charAt(last) == '/') {
-                        buffer.setLength(last);
-                    }
-                }
-                encodeURL(file, buffer, parameters.encoding);
-                return new URL(buffer.toString());
-            }
+    private Object getInput() throws IOException {
+        final File file = series.file(filename);
+        if (file.isAbsolute() && !(loader instanceof RemoteStub)) {
+            return file;
         }
-        return (local) ? file : file.toURI().toURL();
-    }
-
-    /**
-     * Transforme un chemin en URL. Si {@code encoding} est non-nul, alors le chemin est encodé.
-     */
-    private static void encodeURL(final File path, final StringBuilder buffer, final String encoding)
-            throws UnsupportedEncodingException
-    {
-        final File parent = path.getParentFile();
-        if (parent != null) {
-            encodeURL(parent, buffer, encoding);
-        }
-        buffer.append('/');
-        String name = path.getName();
-        if (encoding != null) {
-            name = URLEncoder.encode(name, encoding);
-        }
-        buffer.append(name);
+        return series.url(file);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return parameters.coverageCRS;
     }
@@ -387,6 +332,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
+    @Override
     public Envelope getEnvelope() {
         final Rectangle clipPixels = new Rectangle();
         try {
@@ -407,6 +353,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *
      * @todo Revisit now that we are 4D.
      */
+    @Override
     public NumberRange getZRange() {
         final DefaultTemporalCRS temporalCRS = parameters.getTemporalCRS();
         return new NumberRange(temporalCRS.toValue(new Date(startTime)),
@@ -416,6 +363,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
+    @Override
     public DateRange getTimeRange() {
         return new DateRange((startTime!=Long.MIN_VALUE) ? new Date(startTime) : null, true,
                                (endTime!=Long.MAX_VALUE) ? new Date(  endTime) : null, false);
@@ -426,6 +374,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *
      * @todo L'implémentation actuelle suppose que le CRS de la table est toujours WGS84.
      */
+    @Override
     public GeographicBoundingBox getGeographicBoundingBox() {
         try {
             assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, CRSUtilities.getCRS2D(parameters.tableCRS));
@@ -443,6 +392,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *
      * @todo Should compute the geometry by {@link GridGeometryEntry} instead.
      */
+    @Override
     @SuppressWarnings("fallthrough")
     public GridGeometry2D getGridGeometry() {
         final Rectangle clipPixels = new Rectangle();
@@ -473,8 +423,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
+    @Override
     public SampleDimension[] getSampleDimensions() {
-        final GridSampleDimension[] bands = parameters.format.getSampleDimensions();
+        final GridSampleDimension[] bands = series.getFormat().getSampleDimensions();
         for (int i=0; i<bands.length; i++) {
             bands[i] = bands[i].geophysics(true);
         }
@@ -710,8 +661,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
              * A ce stade, nous savons que nous devrons effectuer la lecture nous-mêmes et nous
              * disposons des coordonnées en pixels de la région à charger. Procède maintenant à
              * la lecture.
+             *
+             * TODO: Current implementation requires a FormatEntry implementation.
              */
-            final FormatEntry format = parameters.format;
+            final FormatEntry format = (FormatEntry) series.getFormat();
             final GridSampleDimension[] bands;
             try {
                 format.setReading(this, true);
@@ -729,7 +682,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
                     handleSpecialCases(param);
                     if (image == null) {
                         final Dimension size = geometry.getSize();
-                        image = format.read(getInput(true), imageIndex, param, listeners, size, this);
+                        image = format.read(getInput(), imageIndex, param, listeners, size, this);
                         if (image == null) {
                             return null;
                         }
@@ -800,6 +753,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * {@link GridCoverageTable#getEntries} a été appelée (les changement subséquents des paramètres
      * de {@link GridCoverageTable} n'ont pas d'effets sur les {@code GridCoverageEntry} déjà créés).
      */
+    @Override
     public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
         try {
             return getCoverage(0, listeners);
@@ -812,6 +766,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * Retourne l'image correspondant à cette entrée. Cette méthode délègue son travail à
      * <code>{@linkplain #getCoverage(IIOListeners) getCoverage}(null)</code>.
      */
+    @Override
     public final GridCoverage2D getCoverage() throws IOException {
         return getCoverage(null);
     }
@@ -831,8 +786,12 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
+    @Override
     public void abort() {
-        parameters.format.abort(this);
+        final Format format = series.getFormat();
+        if (format instanceof FormatEntry) {
+            ((FormatEntry) format).abort(this);
+        }
     }
 
     /**
@@ -864,7 +823,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
         final int height  = gridRange .getLength(1);
         final int width2  = gridRange2.getLength(0);
         final int height2 = gridRange2.getLength(1);
-        if (Utilities.equals(this.parameters.layer, that.parameters.layer) && sameEnvelope(that)) {
+        if (Utilities.equals(this.series.getLayer(), that.series.getLayer()) && sameEnvelope(that)) {
             if (width <= width2 && height <= height2) return this;
             if (width >= width2 && height >= height2) return that;
         }
@@ -904,6 +863,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
                    this.startTime == that.startTime &&
                    this.endTime   == that.endTime   &&
                    this.timeIndex == that.timeIndex &&
+                   Utilities.equals(this.series,     that.series    ) &&
                    Utilities.equals(this.filename,   that.filename  ) &&
                    Utilities.equals(this.geometry,   that.geometry  ) &&
                    Utilities.equals(this.parameters, that.parameters);
