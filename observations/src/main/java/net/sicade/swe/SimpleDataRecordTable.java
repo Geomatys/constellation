@@ -44,7 +44,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      * Connexion vers la table des {@linkplain DataRecordField dataRecord field}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    private DataRecordFieldTable fields;
+    private AnyScalarTable fields;
     
     /**
      * Construit une table des data record.
@@ -91,12 +91,12 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
         String idDataRecord = results.getString(indexOf(query.idDataRecord));
         
         if (fields == null) {
-            fields = getDatabase().getTable(DataRecordFieldTable.class);
+            fields = getDatabase().getTable(AnyScalarTable.class);
         }
        
         fields.setIdDataBlock(idDataBlock);
         fields.setIdDataRecord(idDataRecord);
-        Collection<DataRecordFieldEntry> entries = fields.getEntries();
+        Collection<AnyScalarEntry> entries = fields.getEntries();
         
         return new SimpleDataRecordEntry(idDataBlock, idDataRecord,
                 results.getString(indexOf(query.definition)),
@@ -110,7 +110,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        final DataRecordFieldQuery query = (DataRecordFieldQuery) super.query;
+        final AnyScalarQuery query = (AnyScalarQuery) super.query;
         statement.setString(indexOf(query.byIdDataBlock), idDataBlock);
         
     }

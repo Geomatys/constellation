@@ -27,7 +27,7 @@ import static net.sicade.catalog.QueryType.*;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class DataRecordFieldQuery extends Query{
+public class AnyScalarQuery extends Query{
     
     /**
      * Column to appear after the {@code "SELECT"} clause.
@@ -44,7 +44,7 @@ public class DataRecordFieldQuery extends Query{
      *
      * @param database The database for which this query is created.
      */
-    public DataRecordFieldQuery(final Database database) {
+    public AnyScalarQuery(final Database database) {
         super (database);
         final QueryType[] usage = {SELECT, LIST};
         idDataRecord  = addColumn("data_record_fields", "id_datarecord", usage);

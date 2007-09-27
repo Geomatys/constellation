@@ -15,6 +15,9 @@ import net.sicade.gml.ReferenceEntry;
 @XmlRegistry
 public class ObjectFactory {
     
+    private final static QName _SimpleDataRecord_QNAME = new QName("http://www.opengis.net/swe/1.0", "SimpleDataRecord");
+    
+    
     /**
      *
      */
@@ -53,9 +56,13 @@ public class ObjectFactory {
         return new SimpleDataRecordEntry();
     }
     
-    
-    
-    
-  
+     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SimpleDataRecordType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0", name = "SimpleDataRecord", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0", substitutionHeadName = "AbstractDataRecord")
+    public JAXBElement<SimpleDataRecordEntry> createSimpleDataRecord(SimpleDataRecordEntry value) {
+        return new JAXBElement<SimpleDataRecordEntry>(_SimpleDataRecord_QNAME, SimpleDataRecordEntry.class, null, value);
+    }
 
 }

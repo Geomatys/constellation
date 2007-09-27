@@ -29,7 +29,7 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SimpleDataRecord")
-public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements SimpleDataRecord {
+public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements SimpleDataRecord {
     
     /**
      * L'identifiant du dataBlock qui contient ce data record.
@@ -40,7 +40,7 @@ public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements
     /**
      * List de valeur textuelle ou scalaire.
      */
-    private Collection<DataRecordFieldEntry> fields;
+    private Collection<AnyScalarEntry> field;
    
     /**
      *  Constructeur utilisé par jaxB.
@@ -51,17 +51,17 @@ public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements
      * Créé une nouvelle Liste de valeur textuelle ou scalaire.
      */
     public SimpleDataRecordEntry(final String blockId, final String id, final String definition, final boolean fixed,
-            final Collection<DataRecordFieldEntry> fields) {
+            final Collection<AnyScalarEntry> fields) {
         super(id, definition, fixed);
         this.blockId = blockId;
-        this.fields = fields;
+        this.field = fields;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Collection<DataRecordFieldEntry> getFields() {
-        return fields;
+    public Collection<AnyScalarEntry> getField() {
+        return field;
     }
 
     /**
@@ -82,7 +82,7 @@ public class SimpleDataRecordEntry extends AbstractDataComponentEntry implements
         if (super.equals(object)) {
             final SimpleDataRecordEntry that = (SimpleDataRecordEntry) object;
             return Utilities.equals(this.blockId,    that.blockId)   &&
-                   Utilities.equals(this.fields,     that.fields);
+                   Utilities.equals(this.field,     that.field);
         }
         return false;
     }

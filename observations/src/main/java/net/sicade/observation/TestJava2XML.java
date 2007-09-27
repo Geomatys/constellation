@@ -17,7 +17,7 @@ import net.opengis.gml.PointType;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.DataBlockDefinitionEntry;
-import net.sicade.swe.DataRecordFieldEntry;
+import net.sicade.swe.AnyScalarEntry;
 import net.sicade.gml.ReferenceEntry;
 import net.sicade.swe.SimpleDataRecordEntry;
 import net.sicade.swe.TextBlockEntry;
@@ -67,7 +67,7 @@ public class TestJava2XML {
         
         // la description du resultat
         List<SimpleDataRecordEntry> comp = new ArrayList<SimpleDataRecordEntry>();
-        List<DataRecordFieldEntry> fds   = new ArrayList<DataRecordFieldEntry>();
+        List<AnyScalarEntry> fds   = new ArrayList<AnyScalarEntry>();
         SimpleDataRecordEntry dr         = new SimpleDataRecordEntry("idDef", "idDataRecord", null, false, fds);
         comp.add(dr);
         TextBlockEntry tbe               = new TextBlockEntry("enc1", ",", "@@", '.');

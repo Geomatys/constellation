@@ -20,16 +20,17 @@ import java.sql.SQLException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.DataRecordFieldQuery;
+import net.sicade.swe.AnyScalarQuery;
 import org.geotools.resources.Utilities;
 
 /**
- * Connexion vers la table des {@linkplain DataRecordFieldEntry dataRecord field}.
- *
- * @version $Id:
+ * Connexion vers la table des {@linkplain AnyScalarEntry dataRecord field}.
+ * 
+ * 
  * @author Guilhem Legal
+ * @version $Id:
  */
-public class DataRecordFieldTable extends SingletonTable<DataRecordFieldEntry>{
+public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
     
     /**
      * identifiant secondaire de la table
@@ -48,14 +49,14 @@ public class DataRecordFieldTable extends SingletonTable<DataRecordFieldEntry>{
      *
      * @param  database Connexion vers la base de données.
      */
-    public DataRecordFieldTable(final Database database) {
-        this(new DataRecordFieldQuery(database));
+    public AnyScalarTable(final Database database) {
+        this(new AnyScalarQuery(database));
     }
     
     /**
      * Initialise l'identifiant de la table.
      */
-    private DataRecordFieldTable(final DataRecordFieldQuery query) {
+    private AnyScalarTable(final AnyScalarQuery query) {
         super(query);
         setIdentifierParameters(query.byName, null);
     }
@@ -101,9 +102,9 @@ public class DataRecordFieldTable extends SingletonTable<DataRecordFieldEntry>{
     /**
      * Construit un data block pour l'enregistrement courant.
      */
-    protected DataRecordFieldEntry createEntry(final ResultSet results) throws SQLException {
-        final DataRecordFieldQuery query = (DataRecordFieldQuery) super.query;
-        return new DataRecordFieldEntry(
+    protected AnyScalarEntry createEntry(final ResultSet results) throws SQLException {
+        final AnyScalarQuery query = (AnyScalarQuery) super.query;
+        return new AnyScalarEntry(
                 results.getString(indexOf(query.idDataRecord )),
                 results.getString(indexOf(query.name )),
                 results.getString(indexOf(query.definition )),
@@ -118,7 +119,7 @@ public class DataRecordFieldTable extends SingletonTable<DataRecordFieldEntry>{
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        final DataRecordFieldQuery query = (DataRecordFieldQuery) super.query;
+        final AnyScalarQuery query = (AnyScalarQuery) super.query;
         statement.setString(indexOf(query.byIdDataRecord), idDataRecord);
         statement.setString(indexOf(query.byIdDataBlock), idDataBlock);
         

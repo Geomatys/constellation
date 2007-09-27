@@ -146,7 +146,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * Construit une observation vide (utilisé pour la serialisation par JAXB)
      */
-    protected ObservationEntry() {}
+    public ObservationEntry() {}
     
     /**
      * Construit une observation.

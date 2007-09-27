@@ -23,7 +23,7 @@ import org.geotools.resources.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class DataRecordFieldEntry extends Entry{
+public class AnyScalarEntry extends Entry{
     
     /**
      * Identifiant du datarecord qui contient cet valeur.
@@ -58,12 +58,12 @@ public class DataRecordFieldEntry extends Entry{
     /**
      * Constructeur utilisé par jaxB.
      */
-    public DataRecordFieldEntry() {}
+    public AnyScalarEntry() {}
             
     /**
      * crée un nouveau champ de DataRecord.
      */
-    public DataRecordFieldEntry(String idDataRecord, String name, String definition, String type,
+    public AnyScalarEntry(String idDataRecord, String name, String definition, String type,
             String uom, Object value) {
         super(name, definition);
         this.idDataRecord = idDataRecord;
@@ -127,7 +127,7 @@ public class DataRecordFieldEntry extends Entry{
             return true;
         }
         if (super.equals(object)) {
-            final DataRecordFieldEntry that = (DataRecordFieldEntry) object;
+            final AnyScalarEntry that = (AnyScalarEntry) object;
             return Utilities.equals(this.name,         that.name) &&
                    Utilities.equals(this.idDataRecord, that.idDataRecord) &&
                    Utilities.equals(this.definition,   that.definition) && 
