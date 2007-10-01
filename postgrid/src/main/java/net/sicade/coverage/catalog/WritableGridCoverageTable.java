@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
+import javax.imageio.spi.ImageReaderSpi;
 import javax.units.SI;
 
 import org.geotools.resources.Utilities;
@@ -41,6 +42,8 @@ import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.CatalogException;
 import net.sicade.coverage.io.MetadataParser;
+import net.sicade.resources.i18n.ResourceKeys;
+import net.sicade.resources.i18n.Resources;
 
 
 /**
@@ -74,59 +77,81 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Returns the most appropriate series in which to insert the coverage.
      *
-     * @param  mimeTypes The set of legal MIME types.
+     * @param  spi The image reader provider, or {@code null} if unknown.
      * @param  path The path to the coverage file (not including the filename).
-     * @param  extension The file extension.
+     * @param  extension The file extension, or {@code null} if it doesn't matter.
      * @return The series that seems the best match.
      * @throws CatalogException if there is ambiguity between series.
      */
-    private Series getSeries(final String[] mimeTypes, final String path, final String extension)
+    private Series getSeries(final ImageReaderSpi spi, final File path, final String extension)
             throws CatalogException
     {
         Series series = null;
-        int matchingParents = 0;
+        int mimeMatching = 0; // Greater the number, better is the matching of MIME type.
+        int pathMatching = 0; // Greater the number, better is the matching of the file path.
         for (final Series candidate : getNonNullLayer().getSeries()) {
-            if (candidate instanceof SeriesEntry) {
-                final SeriesEntry entry = (SeriesEntry) candidate;
-                if (!extension.equals(entry.extension)) {
+            /*
+             * Asks for every files in the Series directory (e.g. "/home/data/foo/*.png"). The
+             * filename contains a wildcard, but we will not use that. It is just a way to get
+             * the path & extension, so we can check if the series have the expected extension.
+             */
+            final File allFiles = candidate.file("*");
+            if (extension != null) {
+                String name = allFiles.getName();
+                final int split = name.indexOf('.');
+                if (split >= 0) {
+                    name = name.substring(split + 1);
+                }
+                if (!extension.equalsIgnoreCase(name)) {
                     continue;
                 }
-                if (!contains(mimeTypes, entry.getFormat().getMimeType())) {
-                    continue;
-                }
-                /*
-                 * 
-                 */
-                int depth = 0;
-                File f1 = new File(path);
-                File f2 = new File(entry.pathname);
-                while (f1.getName().equals(f2.getName())) {
-                    f1 = f1.getParentFile(); if (f1 == null) break;
-                    f2 = f2.getParentFile(); if (f2 == null) break;
-                    depth++;
-                }
-                if (depth < matchingParents) {
-                    continue;
-                }
-                matchingParents = depth;
             }
-            series = candidate;
+            /*
+             * Checks if the Series's MIME type matches one of the ImageReader's MIME types. If the
+             * ImageReader declares more generic types than the expected one, for example if the
+             * ImageReader declares "image/x-netcdf" while the Series expects "image/x-netcdf-foo",
+             * we will accept the ImageReader anyway but we will keep a trace of the quality of the
+             * matching, so we can select a better match if we find one later.
+             */
+            if (spi != null) {
+                final String[] mimeTypes = spi.getMIMETypes();
+                if (mimeTypes != null) {
+                    final String format = candidate.getFormat().getMimeType().trim().toLowerCase();
+                    for (String type : mimeTypes) {
+                        type = type.trim().toLowerCase();
+                        final int length = type.length();
+                        if (length > mimeMatching && format.startsWith(type)) {
+                            mimeMatching = length;
+                            pathMatching = 0; // MIME matching has precedence over path matching.
+                        }
+                    }
+                }
+            }
+            /*
+             * The most straightforward properties match (file extension, mime type...).
+             * Now check the path in a more lenient way: we compare the Series path with
+             * the ImageReader input's path starting from the end, and retain the series
+             * with the deepest (in directory tree) match. If more than one series match
+             * with the same deep, we retains the last one assuming that it is the one
+             * for the most recent data.
+             */
+            int depth = 0;
+            File f1 = path;
+            File f2 = allFiles.getParentFile();
+            while (f1.getName().equals(f2.getName())) {
+                depth++;
+                f1 = f1.getParentFile(); if (f1 == null) break;
+                f2 = f2.getParentFile(); if (f2 == null) break;
+            }
+            if (depth >= pathMatching) {
+                pathMatching = depth;
+                series = candidate;
+            }
+        }
+        if (series == null) {
+            throw new CatalogException(Resources.format(ResourceKeys.ERROR_NO_SERIES_SELECTION));
         }
         return series;
-    }
-    
-    /**
-     * Returns {@code true} if the given list containst the given element.
-     * Comparaison is case-insensitive.
-     */
-    private static boolean contains(final String[] list, String element) {
-        element = element.trim();
-        for (final String candidate : list) {
-            if (element.equalsIgnoreCase(candidate.trim())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -214,8 +239,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         final int byExtent    = indexOf(query.spatialExtent);
         while (readers.hasNext()) {
             final ImageReader reader = readers.next();
-            final File  input = path(reader.getInput());
-            final String path = input.getParent();
+            final File input = path(reader.getInput());
+            final File path = input.getParentFile();
             final String filename, extension;
             if (true) {
                 final String name = input.getName();
@@ -228,8 +253,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                     extension = "";
                 }
             }
-            final String[] types = reader.getOriginatingProvider().getMIMETypes(); // TODO
-            final Series series = getSeries(types, path, extension);
+            final Series series = getSeries(reader.getOriginatingProvider(), path, extension);
             /*
              * Gets the metadata of interest.
              */
