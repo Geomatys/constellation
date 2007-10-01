@@ -2,13 +2,14 @@
  * @author Hyacinthe MENIET
  * Created on 15 juil. 07
  */
-package net.sicade.observation;
+package net.sicade.observation.test;
 
 import java.io.FileReader;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import net.sicade.observation.*;
 
 /**
  * Unmarshalles the given XML Document.

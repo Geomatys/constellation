@@ -63,7 +63,7 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
-        PhenomenonEntry component = phenomenons.getEntry(results.getString(indexOf(query.idComponent)));
+        PhenomenonEntry component = (PhenomenonEntry)phenomenons.getEntry(results.getString(indexOf(query.idComponent)));
         
         return new ComponentEntry(results.getString(indexOf(query.idCompositePhenomenon)), component);
     }

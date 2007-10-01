@@ -1,4 +1,4 @@
-package net.sicade.observation;
+package net.sicade.observation.test;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 

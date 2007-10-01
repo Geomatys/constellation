@@ -2,7 +2,7 @@
  * @author Hyacinthe MENIET
  * Created on 15 juil. 07
  */
-package net.sicade.observation;
+package net.sicade.observation.test;
 
 import java.io.FileWriter;
 import java.math.BigInteger;
@@ -15,6 +15,7 @@ import javax.xml.bind.PropertyException;
 import net.opengis.gml.DirectPositionType;
 import net.opengis.gml.PointType;
 import net.sicade.coverage.model.Distribution;
+import net.sicade.observation.*;
 import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.DataBlockDefinitionEntry;
 import net.sicade.swe.AnyScalarEntry;

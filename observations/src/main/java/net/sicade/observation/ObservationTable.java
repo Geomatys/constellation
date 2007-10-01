@@ -59,7 +59,7 @@ import org.geotools.resources.Utilities;
  * @author Antoine Hnawia
  * @author Guilhem Legal
  */
-public abstract class ObservationTable<EntryType extends Observation> extends SingletonTable<Observation> {
+public class ObservationTable<EntryType extends Observation> extends SingletonTable<Observation> {
 
     /**
      * Connexion vers la table des stations.
@@ -70,12 +70,28 @@ public abstract class ObservationTable<EntryType extends Observation> extends Si
      * ensuite.
      */
     protected SamplingFeatureTable stations;
+    
+    /**
+     * Connexion vers la table des stations.
+     * <p>
+     * <strong>NOTE:</strong> {@link StationTable} garde elle-même une référence vers cette instance
+     * de {@code ObservationTable}, mais seule {@link StationEntry} l'utilise. L'ordre d'acquisition
+     * des verrous devrait toujours être {@code ObservationTable} d'abord, et {@code StationTable}
+     * ensuite.
+     */
+    protected SamplingPointTable stationPoints;
 
    /**
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected PhenomenonTable phenomenons;
+    
+    /**
+     * Connexion vers la table des {@linkplain CompositePhenomenon phénomènes composés}.
+     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     */
+    protected CompositePhenomenonTable compositePhenomenons;
 
     /**
      * Connexion vers la table des {@linkplain Procedure procedures}.
@@ -242,18 +258,32 @@ public abstract class ObservationTable<EntryType extends Observation> extends Si
           distributions = getDatabase().getTable(DistributionTable.class);
       }
       DistributionEntry distrib = distributions.getEntry(result.getString(indexOf(query.distribution)));
+      
       if (phenomenons == null) {
           phenomenons = getDatabase().getTable(PhenomenonTable.class);
       }
-      PhenomenonEntry pheno = phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
+      PhenomenonEntry pheno = (PhenomenonEntry)phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
+     
+      if (compositePhenomenons == null) {
+          compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+      }
+      CompositePhenomenonEntry compoPheno = (CompositePhenomenonEntry)compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
+      
       if (stations == null) {
           stations = getDatabase().getTable(SamplingFeatureTable.class);
       }
       SamplingFeatureEntry station = stations.getEntry(result.getString(indexOf(query.featureOfInterest)));
+     
+      if (stationPoints == null) {
+          stationPoints = getDatabase().getTable(SamplingPointTable.class);
+      }
+      SamplingPointEntry stationPoint = stationPoints.getEntry(result.getString(indexOf(query.featureOfInterestPoint)));
+      
       if (procedures == null) {
           procedures = getDatabase().getTable(ProcessTable.class);
       }
       ProcessEntry procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
+      
       if (results == null) {
           results = getDatabase().getTable(AnyResultTable.class);
       }
@@ -270,6 +300,8 @@ public abstract class ObservationTable<EntryType extends Observation> extends Si
       }
       DataBlockDefinition dataBlockDef = dataBlockDefinitions.getEntry(result.getString(indexOf(query.resultDefinition)));
       
+      if(pheno == null) pheno = compoPheno;
+      if(station == null) station =  stationPoint;
       
       return new ObservationEntry(result.getString(indexOf(query.name)),
                                   result.getString(indexOf(query.description)),

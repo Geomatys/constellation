@@ -38,7 +38,7 @@ public class PhenomenonQuery extends Query{
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byIdentifier;
+    protected final Parameter byName;
 
     /**
      * Creates a new query for the specified database.
@@ -48,11 +48,11 @@ public class PhenomenonQuery extends Query{
     public PhenomenonQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT};
-        identifier = addColumn ("Phenomenons", "id",        usage);
+        identifier = addColumn ("Phenomenons", "id",          usage);
         name       = addColumn ("Phenomenons", "name",        usage);
         remarks    = addColumn ("Phenomenons", "description", usage);
         
-        byIdentifier  = addParameter(identifier, SELECT);
+        byName     = addParameter(identifier, SELECT);
         name.setOrdering("ASC");
     }
     

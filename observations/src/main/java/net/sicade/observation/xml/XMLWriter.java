@@ -84,7 +84,7 @@ public class XMLWriter {
      * Ecris le fichier dictionnaire des stations.
      */
     public void WriteStationDictionary(String urlFile, SamplingPointTable stations)  throws CatalogException, SQLException, IOException{
-        Set<SamplingPoint> list = stations.getEntries();
+        Set<SamplingPointEntry> list = stations.getEntries();
         String codeSpace = "urn:x-brgm:def:samplingStation:bss";
         
         write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n', urlFile);

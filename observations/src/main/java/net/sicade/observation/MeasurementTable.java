@@ -62,7 +62,8 @@ public class MeasurementTable extends ObservationTable<Measurement> {
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
-        PhenomenonEntry pheno = phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
+        PhenomenonEntry pheno = (PhenomenonEntry)phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
+        
         if (stations == null) {
             stations = getDatabase().getTable(SamplingFeatureTable.class);
         }

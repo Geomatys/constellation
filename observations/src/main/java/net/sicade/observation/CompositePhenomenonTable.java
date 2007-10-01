@@ -32,7 +32,7 @@ import org.opengis.observation.Phenomenon;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenonEntry>{
+public class CompositePhenomenonTable extends PhenomenonTable<CompositePhenomenon> {//SingletonTable<CompositePhenomenonEntry>{
     
     /**
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
@@ -61,21 +61,21 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
      */
     private CompositePhenomenonTable(final CompositePhenomenonQuery query) {
         super(query);
-        setIdentifierParameters(query.byIdentifier, null);
+        setIdentifierParameters(query.byName, null);
     }
     
     /**
      * Construit un phénoméne pour l'enregistrement courant.
      */
-    protected CompositePhenomenonEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
+    protected CompositePhenomenonEntry createEntry(final ResultSet results) throws SQLException, CatalogException{
         final CompositePhenomenonQuery query = (CompositePhenomenonQuery) super.query;
         
         String idCompositePhenomenon = results.getString(indexOf(query.identifier));
         
-        if (phenomenons == null) {
+       if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
-        PhenomenonEntry base = phenomenons.getEntry(results.getString(indexOf(query.base)));
+        PhenomenonEntry base = (PhenomenonEntry)phenomenons.getEntry(results.getString(indexOf(query.base)));
         
         if (components == null) {
             components =  getDatabase().getTable(ComponentTable.class);
@@ -83,19 +83,19 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
         components.setIdCompositePhenomenon(idCompositePhenomenon);
         Collection<ComponentEntry> entries = components.getEntries();
         
-        Collection<PhenomenonEntry> components = new HashSet<PhenomenonEntry>();
+        Collection<PhenomenonEntry> compos = new HashSet<PhenomenonEntry>();
         
         Iterator i = entries.iterator();
         while(i.hasNext()) {
             ComponentEntry c =(ComponentEntry) i.next();
-            components.add(c.getComponent());
+            compos.add(c.getComponent());
         }
         
         return new CompositePhenomenonEntry(results.getString(indexOf(query.name   )),
                                    results.getString(indexOf(query.remarks)),
                                    idCompositePhenomenon,
-                                   base,
-                                   components);
+                                   null,
+                                   compos);
     }
     
 }

@@ -30,7 +30,7 @@ import org.opengis.observation.sampling.SamplingPoint;
  *
  * @author Guilhem Legal
  */
-public class SamplingPointTable extends SingletonTable<SamplingPoint> {
+public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
     
     /** Creates a new instance of SamplingPointTable */
     public SamplingPointTable(final Database database) {
@@ -52,7 +52,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPoint> {
      * <code>{@linkplain #createEntry(int,String,Platform,DataQuality,Citation,ResultSet)
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
-    protected SamplingPoint createEntry(final ResultSet result) throws CatalogException, SQLException {
+    protected SamplingPointEntry createEntry(final ResultSet result) throws CatalogException, SQLException {
         final SamplingPointQuery query = (SamplingPointQuery) super.query;
         
         PointType p = new PointType(result.getString(indexOf(query.pointIdentifier)),

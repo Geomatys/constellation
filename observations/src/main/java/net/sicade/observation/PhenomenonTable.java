@@ -16,14 +16,9 @@ package net.sicade.observation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-// Sicade dependencies
-import net.sicade.catalog.ConfigurationKey;
+import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
-import net.sicade.catalog.Query;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.observation.PhenomenonEntry;
-import net.sicade.observation.PhenomenonQuery;
 
 // OpenGis dependencies
 import org.opengis.observation.Phenomenon;
@@ -36,7 +31,7 @@ import org.opengis.observation.Phenomenon;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
+public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTable<PhenomenonEntry> {
    
     /**
      * Construit une table des phénomènes.
@@ -50,15 +45,15 @@ public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
     /**
      * Initialise l'identifiant de la table.
      */
-    private PhenomenonTable(final PhenomenonQuery query) {
+    protected PhenomenonTable(final PhenomenonQuery query) {
         super(query);
-        setIdentifierParameters(query.byIdentifier, null);
+        setIdentifierParameters(query.byName, null);
     }
-
+    
     /**
      * Construit un phénomène pour l'enregistrement courant.
      */
-    protected PhenomenonEntry createEntry(final ResultSet results) throws SQLException {
+    protected PhenomenonEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
         final PhenomenonQuery query = (PhenomenonQuery) super.query;
         return new PhenomenonEntry(results.getString(indexOf(query.name)),
                                    results.getString(indexOf(query.remarks)),

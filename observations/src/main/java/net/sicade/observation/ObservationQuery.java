@@ -33,8 +33,8 @@ public class ObservationQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, featureOfInterest,  procedure, observedProperty, distribution, 
-             samplingTimeBegin, samplingTimeEnd, result, resultDefinition, description;
+    protected final Column name, featureOfInterest, featureOfInterestPoint, procedure, observedProperty, observedPropertyComposite,
+            distribution, samplingTimeBegin, samplingTimeEnd, result, resultDefinition, description;
  // quality, , observationMetadata, procedureTime, procedureParameter,
  
     /**
@@ -50,16 +50,18 @@ public class ObservationQuery extends Query {
     public ObservationQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT};
-        name                = addColumn("observations", "name",                usage);
-        description         = addColumn("observations", "description",         usage);
-        featureOfInterest   = addColumn("observations", "feature_of_interest", usage);
-        procedure           = addColumn("observations", "procedure",           usage);
-        observedProperty    = addColumn("observations", "observed_property",   usage);
-        distribution        = addColumn("observations", "distribution",        usage);
-        samplingTimeBegin   = addColumn("observations", "sampling_time_begin", usage);
-        samplingTimeEnd     = addColumn("observations", "sampling_time_end",   usage);
-        result              = addColumn("observations", "result",              usage);
-        resultDefinition    = addColumn("observations", "result_definition",   usage);
+        name                      = addColumn("observations", "name",                       usage);
+        description               = addColumn("observations", "description",                usage);
+        featureOfInterest         = addColumn("observations", "feature_of_interest",        usage);
+        featureOfInterestPoint    = addColumn("observations", "feature_of_interest_point",  usage);
+        procedure                 = addColumn("observations", "procedure",                  usage);
+        observedProperty          = addColumn("observations", "observed_property",          usage);
+        observedPropertyComposite = addColumn("observations", "observed_property_composite",usage);
+        distribution              = addColumn("observations", "distribution",               usage);
+        samplingTimeBegin         = addColumn("observations", "sampling_time_begin",        usage);
+        samplingTimeEnd           = addColumn("observations", "sampling_time_end",          usage);
+        result                    = addColumn("observations", "result",                     usage);
+        resultDefinition          = addColumn("observations", "result_definition",          usage);
 /*
         observationMetadata = addColumn("observations", "observationMetadata", usage);
         quality             = addColumn("observations", "quality",             usage);
