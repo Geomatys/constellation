@@ -52,8 +52,8 @@ public class SimpleDataRecordQuery extends Query{
         definition    = addColumn("simple_data_records", "definition",    usage);
         fixed         = addColumn("simple_data_records", "fixed",         usage);
         
-        byIdBlock       = addParameter(idBlock, SELECT);
-        byIdDataRecord  = addParameter(idDataRecord, SELECT, LIST);
+        byIdBlock       = addParameter(idBlock, SELECT, LIST);
+        byIdDataRecord  = addParameter(idDataRecord, SELECT);
         
         
     }

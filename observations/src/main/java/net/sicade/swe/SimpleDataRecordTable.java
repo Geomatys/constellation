@@ -64,6 +64,14 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
     }
     
     /**
+     * Un constructeur qui prend en parametre un table partagée afin d'en creer
+     * une qui ne l'ai pas.
+     */
+    public SimpleDataRecordTable(final SimpleDataRecordTable table) {
+        super(table);
+    }
+    
+    /**
      * retourne l'identifiant du DataBlock contenant le dataRecord qui possede ce champ.
      */
     public String getIdDataBlock() {
@@ -92,6 +100,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
         
         if (fields == null) {
             fields = getDatabase().getTable(AnyScalarTable.class);
+            fields = new AnyScalarTable(fields);
         }
        
         fields.setIdDataBlock(idDataBlock);
@@ -110,8 +119,11 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
     @Override
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
-        final AnyScalarQuery query = (AnyScalarQuery) super.query;
-        statement.setString(indexOf(query.byIdDataBlock), idDataBlock);
+        final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
+        statement.setString(indexOf(query.byIdBlock), idDataBlock);
+        
+        /*final AnyScalarQuery query = (AnyScalarQuery) super.query;
+        statement.setString(indexOf(query.byIdDataBlock), idDataBlock);*/
         
     }
     

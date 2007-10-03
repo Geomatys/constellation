@@ -87,4 +87,28 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
         return false;
     }
     
+    /**
+     * Retourne une representation de l'objet (debug).
+     */
+    @Override
+    public String toString() {
+        final StringBuilder buffer = new StringBuilder();
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        buffer.append('[').append(this.getClass().getSimpleName()).append("]:").append(blockId).append(lineSeparator);
+        appendTo(buffer, "", lineSeparator);
+        return buffer.toString();
+    }
+    
+    /**
+     * Ajoute la description des composants du dataBlock definition.
+     */
+    private void appendTo(final StringBuilder buffer, String margin, final String lineSeparator) {
+        buffer.append("fields: ").append(lineSeparator);
+        margin += "  ";
+        for (final AnyScalarEntry a : field) {
+            buffer.append(margin).append(a.toString()).append(lineSeparator);
+        }
+    }
+    
+    
 }

@@ -104,5 +104,14 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
         return false;
     }
     
+    /**
+     * Retourne une representation de l'objet (debug).
+     */
+    @Override
+    public String toString() {
+        return '[' + this.getClass().getSimpleName() + "]:" + this.blockSeparator 
+                + '|' + this.decimalSeparator + '|' + this.tokenSeparator;
+    }
+    
     
 }

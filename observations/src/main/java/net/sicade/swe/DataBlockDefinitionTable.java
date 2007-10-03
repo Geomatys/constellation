@@ -69,6 +69,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
         
         if (dataRecords == null) {
             dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
+            dataRecords = new SimpleDataRecordTable(dataRecords);
         }
         dataRecords.setIdDataBlock(idDataBlock);
         Collection<SimpleDataRecordEntry> entries = dataRecords.getEntries();

@@ -137,6 +137,17 @@ public class AnyScalarEntry extends Entry{
         }
         return false;
     }
+    
+    /**
+     * Retourne une representation de l'objet (debug).
+     */
+    @Override
+    public String toString() {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[').append(this.getClass().getSimpleName()).append("]:").append(idDataRecord)
+        .append('-').append(name).append(" type=").append(type).append(" uom=").append(uom);
+                return buffer.toString();
+    }
 
     
 }

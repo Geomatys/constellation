@@ -27,7 +27,7 @@ import org.geotools.resources.Utilities;
 
 /**
  * Resultat d'une observation de type DataBlockDefinition.
- * 
+ *
  * @version $Id:
  * @author Guilhem Legal
  */
@@ -35,7 +35,7 @@ import org.geotools.resources.Utilities;
 @XmlType(name = "DataBlockDefinition", propOrder = {
     "components",
     "encoding"})
-public class DataBlockDefinitionEntry extends Entry implements DataBlockDefinition {
+    public class DataBlockDefinitionEntry extends Entry implements DataBlockDefinition {
     
     /**
      * L'identifiant du resultat.
@@ -48,18 +48,18 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
     /**
      * Liste de composant Data record.
      */
-     private Collection<? extends AbstractDataComponentEntry> components;
-     
+    private Collection<? extends AbstractDataComponentEntry> components;
+    
     /**
      * Decrit l'encodage des données.
      */
-     private AbstractEncodingEntry encoding;
+    private AbstractEncodingEntry encoding;
     
     /**
      * constructeur utilisé par jaxB
-     */ 
-     protected DataBlockDefinitionEntry() {}
-     
+     */
+    protected DataBlockDefinitionEntry() {}
+    
     /**
      * créé un nouveau resultat d'observation.
      * Liste de valeur decrite dans swe:DatablockDefinition de type simple,
@@ -76,21 +76,21 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
         this.components = components;
         this.encoding   = encoding;
     }
-
+    
     /**
      * {@inheritDoc}
      */
     public String getId() {
         return id;
     }
-
+    
     /**
      * {@inheritDoc}
      */
     public Collection<? extends AbstractDataComponentEntry> getComponents() {
         return components;
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -105,7 +105,7 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
     public final int hashCode() {
         return id.hashCode();
     }
-
+    
     /**
      * Vérifie si cette entré est identique à l'objet spécifié.
      */
@@ -117,10 +117,34 @@ public class DataBlockDefinitionEntry extends Entry implements DataBlockDefiniti
         if (super.equals(object)) {
             final DataBlockDefinitionEntry that = (DataBlockDefinitionEntry) object;
             return Utilities.equals(this.id,         that.id) &&
-                   Utilities.equals(this.components, that.components) &&
-                   Utilities.equals(this.encoding,   that.encoding) ;
+                    Utilities.equals(this.components, that.components) &&
+                    Utilities.equals(this.encoding,   that.encoding) ;
         }
         return false;
+    }
+    
+    /**
+     * Retourne une representation de l'objet (debug).
+     */
+    @Override
+    public String toString() {
+        final StringBuilder buffer = new StringBuilder();
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        buffer.append('[').append(this.getClass().getSimpleName()).append("]:").append(id).append(lineSeparator);
+        buffer.append("encoding: ").append(this.encoding.toString()).append(lineSeparator);
+        appendTo(buffer, "", lineSeparator);
+        return buffer.toString();
+    }
+    
+    /**
+     * Ajoute la description des composants du dataBlock definition.
+     */
+    private void appendTo(final StringBuilder buffer, String margin, final String lineSeparator) {
+        buffer.append("components: ").append(lineSeparator);
+        margin += "  ";
+        for (final AbstractDataComponentEntry a : components) {
+            buffer.append(margin).append(a.toString()).append(lineSeparator);
+        }
     }
     
 }

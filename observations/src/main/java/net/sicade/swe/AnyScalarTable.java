@@ -61,6 +61,14 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
         setIdentifierParameters(query.byName, null);
     }
     
+     /**
+     * Un constructeur qui prend en parametre un table partagée afin d'en creer
+     * une qui ne l'ai pas.
+     */
+    public AnyScalarTable(final AnyScalarTable table) {
+        super(table);
+    }
+    
     /**
      * retourne l'identifiant du DataBlock contenant le dataRecord qui possede ce champ.
      */
