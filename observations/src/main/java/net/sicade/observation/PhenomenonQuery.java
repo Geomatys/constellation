@@ -48,12 +48,11 @@ public class PhenomenonQuery extends Query{
     public PhenomenonQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT};
-        identifier = addColumn ("Phenomenons", "id",          usage);
-        name       = addColumn ("Phenomenons", "name",        usage);
-        remarks    = addColumn ("Phenomenons", "description", usage);
+        identifier = addColumn ("phenomenons", "id",          usage);
+        name       = addColumn ("phenomenons", "name",        usage);
+        remarks    = addColumn ("phenomenons", "description", usage);
         
         byName     = addParameter(identifier, SELECT);
-        name.setOrdering("ASC");
     }
     
 }

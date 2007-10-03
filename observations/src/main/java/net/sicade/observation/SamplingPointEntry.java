@@ -98,6 +98,14 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
         }
         return false;
     }
+    
+    /**
+     * Retourne une chaine de charactere representant la station.
+     */
+    @Override
+    public String toString() {
+        return super.toString() + '\n' + "Position: " + position.toString() ;
+    }
 
   
 }

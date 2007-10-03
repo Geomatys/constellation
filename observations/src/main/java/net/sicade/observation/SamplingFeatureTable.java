@@ -48,6 +48,8 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      */
     public SamplingFeatureTable(final Database database) {
         super(new SamplingFeatureQuery(database));
+        SamplingFeatureQuery query = new SamplingFeatureQuery(database);
+        setIdentifierParameters(query.byIdentifier, null);
     }
     
     /**

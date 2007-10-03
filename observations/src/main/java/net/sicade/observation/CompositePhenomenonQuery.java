@@ -19,6 +19,7 @@ package net.sicade.observation;
 import net.sicade.catalog.Column;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.Parameter;
+import net.sicade.catalog.Query;
 import static net.sicade.catalog.QueryType.*;
 import net.sicade.catalog.QueryType;
 
@@ -29,14 +30,19 @@ import net.sicade.catalog.QueryType;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class CompositePhenomenonQuery extends PhenomenonQuery{
+public class CompositePhenomenonQuery extends Query{
     
     /** 
      * Column to appear after the {@code "SELECT"} clause.
+     * we forget the attribute base for now 
      */
-    protected final Column base, dimension;
+    protected final Column identifier, name, remarks, dimension;
     
-        
+    /**
+     * Parameter to appear after the {@code "FROM"} clause.
+     */
+    protected final Parameter byName;
+    
     /**
      * Creates a new query for the specified database.
      *
@@ -44,9 +50,14 @@ public class CompositePhenomenonQuery extends PhenomenonQuery{
      */
     public CompositePhenomenonQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        base      = addColumn ("composite_phenomenons", "base", usage);
-        dimension = addColumn ("composite_phenomenons", "dimension", usage);
+        final QueryType[] usage = {SELECT};
+        
+        identifier = addColumn ("composite_phenomenons", "id",          usage);
+        name       = addColumn ("composite_phenomenons", "name",        usage);
+        remarks    = addColumn ("composite_phenomenons", "description", usage);
+        dimension  = addColumn ("composite_phenomenons", "dimension",   usage);
+        
+        byName     = addParameter(identifier, SELECT);
     }
     
 }

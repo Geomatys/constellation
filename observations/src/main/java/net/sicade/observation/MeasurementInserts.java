@@ -110,7 +110,7 @@ final class MeasurementInserts extends Thread {
                 break;
             }
             //measures.setObservable(pair.descriptor);  // TODO
-            measures.setStation   (pair.samplingFeature);
+            //measures.setStation   (pair.samplingFeature);
             /*try {
                 measures.setValue(pair.value, Float.NaN); //TODO
             } catch (CatalogException cause) {

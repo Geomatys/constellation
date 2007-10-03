@@ -116,4 +116,12 @@ public class MeasureEntry extends Entry implements Measure{
         return false;
     }
     
+    
+    /**
+     * Retourne une description de l'objet (debug).
+     */
+    public String toString() {
+        return "name=" + name + " value=" + value + '\n' + "uom =" + uom.toString();
+    }
+    
 }

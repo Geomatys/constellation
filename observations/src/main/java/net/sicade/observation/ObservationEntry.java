@@ -214,7 +214,7 @@ public class ObservationEntry extends Entry implements Observation {
         this.observedProperty    = observedProperty;
         this.procedure           = procedure;
         this.distribution        = distribution;
-        this.resultQuality             = null;       //= resultQuality;
+        this.resultQuality       = null;       //= resultQuality;
         this.result              = result;
         this.samplingTime        = samplingTime;
         this.observationMetadata = null;

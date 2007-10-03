@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import net.sicade.catalog.Entry;
+import org.geotools.resources.Utilities;
 import org.opengis.observation.BaseUnit;
 
 /**
@@ -88,4 +89,26 @@ public class UnitOfMeasureEntry extends Entry implements BaseUnit {
         return unitsSystem;
     }
     
+    /**
+     * Vérifie si cette entrée est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final UnitOfMeasureEntry that = (UnitOfMeasureEntry) object;
+        return Utilities.equals(this.name,  that.name) &&
+               Utilities.equals(this.id,   that.id) &&
+               Utilities.equals(this.quantityType, that.quantityType) &&
+               Utilities.equals(this.unitsSystem, that.unitsSystem);
+    }
+    
+    /**
+     * Retourne une representation de l'objet.
+     */
+     @Override
+     public String toString() {
+         return " id= " + id + " name=" + name + " quantity type=" + quantityType + " unitSystem=" + unitsSystem; 
+     }
 }

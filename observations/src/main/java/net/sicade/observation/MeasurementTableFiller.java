@@ -218,7 +218,7 @@ public class MeasurementTableFiller implements Runnable {
                 }
                 //measures.setObservable(descriptor);  // TODO
                 for (final SamplingFeature samplingFeature : samplingFeatures) {
-                    measures.setStation(samplingFeature);
+                   // measures.setStation(samplingFeature);
                     /*try {
                         if (measures.exists()) {
                             continue;

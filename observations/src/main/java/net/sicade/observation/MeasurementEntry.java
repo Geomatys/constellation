@@ -104,7 +104,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         super(name, definition, station, observedProperty, procedure, distribution, result,
                 samplingTime, resultDefinition);
         
-        
+        this.result = result;
     }
     
     /**
@@ -137,6 +137,5 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         }
         return false;
     }
-    
     
 }

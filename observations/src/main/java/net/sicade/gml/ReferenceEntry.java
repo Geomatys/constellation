@@ -150,4 +150,38 @@ public class ReferenceEntry extends Entry implements Reference{
         return owns;
     }
     
+    /**
+     * Retourne une representation de l'objet.
+     */
+    @Override
+    public String toString() {
+        String s = "id= " + id + '\n';
+        
+        if(actuate != null) {
+            s = s + "actuate=" + actuate + '\n';
+        }
+        if(arcrole != null) {
+            s = s + "arcrole=" + arcrole + '\n';
+        }
+        if(href != null) {
+            s = s + "href=" + href + '\n';
+        }
+        if(role != null) {
+            s = s + "role=" + role + '\n';
+        }
+        if(show != null) {
+            s = s + "show=" + show + '\n';
+        }
+        if(title != null) {
+            s = s + "title=" + title + '\n';
+        }
+        if(owns != null) {
+            s = s + "owns=" + owns + '\n';
+        }
+        if(title != null) {
+            s = s + "title=" + title + '\n';
+        }
+        return s;
+    }
+    
 }

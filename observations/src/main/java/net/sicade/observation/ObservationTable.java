@@ -313,7 +313,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                                   resultat,
                                   new TemporalObjectEntry(result.getDate(indexOf(query.samplingTimeBegin)),
                                                           result.getDate(indexOf(query.samplingTimeEnd))),
-                                  dataBlockDef.getId());
+                                  dataBlockDef);
         
         
     }

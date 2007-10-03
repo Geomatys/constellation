@@ -39,7 +39,7 @@ public class ComponentEntry extends Entry {
      * Crée une nouvelle liste de phénomene. 
      */
     public ComponentEntry(String idCompositePhenomenon, PhenomenonEntry component) {
-        super(idCompositePhenomenon);
+        super(component.getId());
         this.idCompositePhenomenon = idCompositePhenomenon;
         this.component             = component;
     }

@@ -35,7 +35,7 @@ public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry>{
     * @param  database Connexion vers la base de données.
     */
     public UnitOfMeasureTable(final Database database) {
-        super(new UnitOfMeasureQuery(database)); 
+        this(new UnitOfMeasureQuery(database)); 
     }
     
     /**

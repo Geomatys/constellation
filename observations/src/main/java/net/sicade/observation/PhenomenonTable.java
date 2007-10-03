@@ -40,6 +40,8 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
      */
     public PhenomenonTable(final Database database) {
         super(new PhenomenonQuery(database));
+        PhenomenonQuery query = new PhenomenonQuery(database);
+        setIdentifierParameters(query.byName, null);
     }
     
     /**
@@ -55,8 +57,8 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
      */
     protected PhenomenonEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
         final PhenomenonQuery query = (PhenomenonQuery) super.query;
-        return new PhenomenonEntry(results.getString(indexOf(query.name)),
-                                   results.getString(indexOf(query.remarks)),
-                                   results.getString(indexOf(query.identifier)));
+        return new PhenomenonEntry(results.getString(indexOf(query.identifier)),
+                                   results.getString(indexOf(query.name)),
+                                   results.getString(indexOf(query.remarks)));
     }
 }

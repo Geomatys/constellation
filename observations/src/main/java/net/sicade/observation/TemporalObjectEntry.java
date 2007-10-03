@@ -78,7 +78,7 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
      */
     @Override
     public String toString() {
-        return " beginTime=" + beginTime + "EndTime=" + endTime;
+        return " beginTime=" + beginTime + " EndTime=" + endTime;
     }
    
     

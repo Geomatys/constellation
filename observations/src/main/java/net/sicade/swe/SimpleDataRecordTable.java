@@ -122,9 +122,6 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         statement.setString(indexOf(query.byIdBlock), idDataBlock);
         
-        /*final AnyScalarQuery query = (AnyScalarQuery) super.query;
-        statement.setString(indexOf(query.byIdDataBlock), idDataBlock);*/
-        
     }
     
 }

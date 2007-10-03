@@ -16,6 +16,7 @@
 package net.sicade.observation;
 
 import java.util.Collection;
+import java.util.Iterator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -120,6 +121,26 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
         }
         return false;
     }
+   
+    /**
+     * Retourne une chaine de charactere representant la station.
+     */
+    @Override
+    public String toString() { 
+        String s = super.toString() + '\n';
+        if( base != null) {
+            s = s + "base: " + base.toString() + '\n';
+        }
         
+        Iterator i =  component.iterator();
+        String compos = "";
+        while (i.hasNext()) {
+            compos += i.next().toString() + '\n';
+        }
+        
+        s = s + "dimension=" + dimension + " components : " + '\n' + compos;
+        
+        return s;
+    }    
     
 }

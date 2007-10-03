@@ -217,7 +217,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         while (i.hasNext()) {
             sampledFeatures += i.next() + " ";
         }
-        return " id=" + id + " name=" + name  + "description=" + description + " sampledFeature=" +
+        return " id=" + id + " name=" + name  + " description=" + description + " sampledFeature=" +
                sampledFeatures; 
     }
    

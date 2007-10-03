@@ -32,13 +32,7 @@ import org.opengis.observation.Phenomenon;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class CompositePhenomenonTable extends PhenomenonTable<CompositePhenomenon> {//SingletonTable<CompositePhenomenonEntry>{
-    
-    /**
-     * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
-     */
-    protected PhenomenonTable phenomenons;
+public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenonEntry> {
     
     /**
      * Connexion vers la table des {@linkplain ComponentTable composants}.
@@ -53,7 +47,7 @@ public class CompositePhenomenonTable extends PhenomenonTable<CompositePhenomeno
      * @param  database Connexion vers la base de données.
      */
     public CompositePhenomenonTable(final Database database) {
-        super(new CompositePhenomenonQuery(database));
+        this(new CompositePhenomenonQuery(database));
     }
     
     /**
@@ -65,6 +59,14 @@ public class CompositePhenomenonTable extends PhenomenonTable<CompositePhenomeno
     }
     
     /**
+     * Initialise l'identifiant de la table.
+     */
+   /* private CompositePhenomenonTable(final CompositePhenomenonQuery query) {
+        super(query);
+        setIdentifierParameters(query.byIdentifier, null);
+    }*/
+    
+    /**
      * Construit un phénoméne pour l'enregistrement courant.
      */
     protected CompositePhenomenonEntry createEntry(final ResultSet results) throws SQLException, CatalogException{
@@ -72,13 +74,9 @@ public class CompositePhenomenonTable extends PhenomenonTable<CompositePhenomeno
         
         String idCompositePhenomenon = results.getString(indexOf(query.identifier));
         
-       if (phenomenons == null) {
-            phenomenons = getDatabase().getTable(PhenomenonTable.class);
-        }
-        PhenomenonEntry base = (PhenomenonEntry)phenomenons.getEntry(results.getString(indexOf(query.base)));
-        
         if (components == null) {
             components =  getDatabase().getTable(ComponentTable.class);
+            components =  new ComponentTable(components);
         }
         components.setIdCompositePhenomenon(idCompositePhenomenon);
         Collection<ComponentEntry> entries = components.getEntries();
@@ -91,7 +89,7 @@ public class CompositePhenomenonTable extends PhenomenonTable<CompositePhenomeno
             compos.add(c.getComponent());
         }
         
-        return new CompositePhenomenonEntry(results.getString(indexOf(query.name   )),
+        return new CompositePhenomenonEntry(results.getString(indexOf(query.name)),
                                    results.getString(indexOf(query.remarks)),
                                    idCompositePhenomenon,
                                    null,

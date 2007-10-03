@@ -14,13 +14,15 @@
  */
 package net.sicade.observation;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
+import net.sicade.swe.SimpleDataRecordQuery;
 import org.geotools.resources.Utilities;
-import org.opengis.observation.Phenomenon;
 
 /**
  *
@@ -49,6 +51,13 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
     }
     
     /**
+     * Construit une nouvelle table non partagée
+     */
+    public ComponentTable(final ComponentTable table) {
+        super(table);
+    }
+    
+    /**
      * Initialise l'identifiant de la table.
      */
     private ComponentTable(final ComponentQuery query) {
@@ -68,11 +77,23 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
         return new ComponentEntry(results.getString(indexOf(query.idCompositePhenomenon)), component);
     }
     
+    /**
+     * Specifie les parametres a utiliser dans la requetes de type "type".
+     */
+    @Override
+    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
+        super.configure(type, statement);
+        final ComponentQuery query = (ComponentQuery) super.query;
+        statement.setString(indexOf(query.byComposite), idCompositePhenomenon);
+        
+    }
+    
+    
     public String getIdCompositePhenomenon() {
         return idCompositePhenomenon;
     }
     
-    public void setIdCompositePhenomenon(String idCompositPhenomenon) {
+    public void setIdCompositePhenomenon(String idCompositePhenomenon) {
         if (!Utilities.equals(this.idCompositePhenomenon, idCompositePhenomenon)) {
             this.idCompositePhenomenon = idCompositePhenomenon;
             fireStateChanged("idCompositePhenomenon");

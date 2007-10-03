@@ -41,7 +41,7 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
      * @param  database Connexion vers la base de données.
      */
     public MeasureTable(final Database database) {
-         super(new MeasureQuery(database));
+         this(new MeasureQuery(database));
     }
     
     /**

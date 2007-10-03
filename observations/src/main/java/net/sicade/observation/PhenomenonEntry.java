@@ -66,7 +66,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      * @param name Le nom du phénomène.
      */
     public PhenomenonEntry(final String id, final String name) {
-        super(name);
+        super(id);
         this.id          = id;
         this.name        = name;
         this.description = null;
@@ -82,7 +82,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      * @param description La description de ce phénomène, ou {@code null}.
      */
     public PhenomenonEntry(final String id, final String name, final String description ) {
-        super(name, description);
+        super(id, description);
         this.id          = id;
         this.name        = name;
         this.description = description;

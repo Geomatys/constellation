@@ -21,6 +21,7 @@ package net.sicade.observation.fishery.sql;
 // Sicade dependencies
 import net.sicade.catalog.ConfigurationKey;
 import net.sicade.catalog.Database;
+import net.sicade.observation.MeasurementQuery;
 import net.sicade.observation.SamplingFeatureTable;
 import net.sicade.observation.MeasurementTable;
 
@@ -63,7 +64,7 @@ public class EnvironmentTable extends MeasurementTable {
      * @param  stations La table des stations à utiliser.
      */
     public EnvironmentTable(final SamplingFeatureTable stations) {
-        super(null);//stations);
+        super(new MeasurementQuery(null));
     }
 
     /**

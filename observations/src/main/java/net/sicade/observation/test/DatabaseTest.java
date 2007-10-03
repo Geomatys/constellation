@@ -5,15 +5,16 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 import net.opengis.gml.DirectPositionType;
 import net.opengis.gml.PointType;
 import net.sicade.catalog.Database;
 import net.sicade.coverage.model.Distribution;
-import net.sicade.coverage.model.DistributionTable;
 import net.sicade.gml.ReferenceEntry;
 import net.sicade.observation.CompositePhenomenonEntry;
+import net.sicade.observation.MeasurementEntry;
+import net.sicade.observation.MeasurementTable;
 import net.sicade.observation.ObservationEntry;
-import net.sicade.observation.ObservationTable;
 import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.ProcessEntry;
 import net.sicade.observation.SamplingPointEntry;
@@ -32,14 +33,14 @@ import org.postgresql.ds.PGSimpleDataSource;
  */
 public class DatabaseTest {
     
-    
+    public static Logger logger = Logger.getLogger("net.sicade.test");
     /**
      * The main method.
      * @param args the path to file to generate.
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception {    
-         // La station
+    public static void main(String[] args) throws Exception {
+        // La station
         //SamplingFeatureEntry sf        = new SamplingFeatureEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X");
         DirectPositionType pos           = new DirectPositionType("urn:ogc:crs:EPSG:27582", new BigInteger("2"), 163000.2345192);
         PointType p                      = new PointType("STATION_LOCALISATION", pos);
@@ -64,7 +65,7 @@ public class DatabaseTest {
         //AnyResultEntry result            = new AnyResultEntry("idresultat", null, "un bloc de donnée");
         //UnitOfMeasureEntry uom           = new UnitOfMeasureEntry("unit1", "centimetre", "longueur", "refSyS");
         //MeasureEntry result              = new MeasureEntry("mesure1", uom, 35 );
-        ReferenceEntry ref               = new ReferenceEntry("ref1", "blablabla");   
+        ReferenceEntry ref               = new ReferenceEntry("ref1", "blablabla");
         AnyResultEntry result            = new AnyResultEntry("idresultat1", ref, null);
         
         // la description du resultat
@@ -76,16 +77,16 @@ public class DatabaseTest {
         DataBlockDefinitionEntry dbd     = new DataBlockDefinitionEntry("idDef", comp, tbe);
         
         // l'observation
-        ObservationEntry request         = new ObservationEntry("obsTest1", 
-                                                            "une observation test",
-                                                            sf,
-                                                            ph,
-                                                            proc,
-                                                            Distribution.NORMAL,
-                                                            result,
-                                                            t,
-                                                            dbd);
-        /*MeasurementEntry request         = new MeasurementEntry("obsTest", 
+        ObservationEntry request         = new ObservationEntry("obsTest1",
+                "une observation test",
+                sf,
+                ph,
+                proc,
+                Distribution.NORMAL,
+                result,
+                t,
+                dbd);
+        /*MeasurementEntry request         = new MeasurementEntry("obsTest",
                                                                 "une observation test",
                                                                 sf,
                                                                 ph,
@@ -103,9 +104,40 @@ public class DatabaseTest {
         
         Database db = new Database(dataSource);
         
-        ObservationTable obsTable = new ObservationTable(db);
-        obsTable.getEntry("obsTest2");
-      
+        /*ObservationTable obsTable = new ObservationTable(db);
+        ObservationEntry obs = (ObservationEntry) obsTable.getEntry("obsTest3");*/
+        
+        MeasurementTable obsTable = new MeasurementTable(db);
+        MeasurementEntry obs = (MeasurementEntry) obsTable.getEntry("MeasurementTest1");
+        
+        logger.finer("obs null:" + (obs == null));
+        
+        logger.finer("name : "               + obs.getName());
+        logger.finer("desc : "               + obs.getDefinition());
+        logger.finer("process : "            + obs.getProcedure().toString());
+        logger.finer("phenomenon : "         + obs.getObservedProperty().toString());
+        logger.finer("distrib : "            + obs.getDistribution().toString());
+        logger.finer("samplingTimeBegin : "  + obs.getSamplingTime().toString());
+        logger.finer("feature of interest: " + obs.getFeatureOfInterest().toString());
+       
+        if(obs.getResult() != null ) {
+            logger.finer("result class: "    + obs.getResult().getClass().getSimpleName());
+            logger.finer("result : "         + obs.getResult());
+        } else {
+            logger.finer("result est null");
+        }
+        
+        if (obs.getResultDefinition() != null) {
+            logger.finer(" result definition class : " +
+                    obs.getResultDefinition().getClass().getSimpleName() );
+            if(obs.getResultDefinition() instanceof DataBlockDefinitionEntry ) {
+                DataBlockDefinitionEntry dbde = (DataBlockDefinitionEntry)obs.getResultDefinition();
+                logger.finer(dbde.toString());
+            }
+        }
+        
+        
+        
     }
     
 }

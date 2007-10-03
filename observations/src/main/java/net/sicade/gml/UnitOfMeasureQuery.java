@@ -46,10 +46,10 @@ public class UnitOfMeasureQuery extends Query{
     public UnitOfMeasureQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT, LIST};
-        id           = addColumn("data_record_fields", "id",           usage);
-        name         = addColumn("data_record_fields", "name",         usage);
-        quantityType = addColumn("data_record_fields", "quantityType", usage);
-        unitSystem   = addColumn("data_record_fields", "unitSystem",   usage);
+        id           = addColumn("unit_of_measures", "id",           usage);
+        name         = addColumn("unit_of_measures", "name",         usage);
+        quantityType = addColumn("unit_of_measures", "quantity_type", usage);
+        unitSystem   = addColumn("unit_of_measures", "unit_system",   usage);
         
         byId         = addParameter(id, SELECT);
     }

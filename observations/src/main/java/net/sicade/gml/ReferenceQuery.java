@@ -31,7 +31,7 @@ public class ReferenceQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column idReference, actuate, arcrole, href, role, show, title, type, owns, nilReason;
+    protected final Column idReference, actuate, arcrole, href, role, show, title, type, owns;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -46,16 +46,15 @@ public class ReferenceQuery extends Query {
     public ReferenceQuery(final Database database) {
         super(database);
         final QueryType[] usage = {SELECT};
-        idReference = addColumn("reference", "id_reference", usage);
-        actuate     = addColumn("reference", "actuate"     , usage);
-        arcrole     = addColumn("reference", "arcrole"     , usage);
-        href        = addColumn("reference", "href"        , usage);
-        role        = addColumn("reference", "role"        , usage);
-        show        = addColumn("reference", "show"        , usage);
-        title       = addColumn("reference", "title"       , usage);
-        type        = addColumn("reference", "type"        , usage);
-        owns        = addColumn("reference", "owns"        , usage);
-        nilReason   = addColumn("reference", "nil_reason"  , usage);
+        idReference = addColumn("references", "id_reference", usage);
+        actuate     = addColumn("references", "actuate"     , usage);
+        arcrole     = addColumn("references", "arcrole"     , usage);
+        href        = addColumn("references", "href"        , usage);
+        role        = addColumn("references", "role"        , usage);
+        show        = addColumn("references", "show"        , usage);
+        title       = addColumn("references", "title"       , usage);
+        type        = addColumn("references", "type"        , usage);
+        owns        = addColumn("references", "owns"        , usage);
         
         byIdReference          = addParameter(idReference, SELECT);
     }

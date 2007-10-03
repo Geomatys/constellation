@@ -18,6 +18,8 @@ package net.sicade.observation;
 
 import net.sicade.catalog.Column;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.Parameter;
+import net.sicade.catalog.Query;
 import static net.sicade.catalog.QueryType.*;
 import net.sicade.catalog.QueryType;
 
@@ -26,14 +28,17 @@ import net.sicade.catalog.QueryType;
  *
  * @author Guilhem Legal
  */
-public class SamplingPointQuery extends SamplingFeatureQuery {
+public class SamplingPointQuery extends Query {
     
     
     /** 
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column pointIdentifier, srsName, srsDimension, positionValue;
-        
+    protected final Column identifier, name, description, sampledFeature,pointIdentifier, srsName, srsDimension, positionValue;
+    /**
+     * Parameter to appear after the {@code "FROM"} clause.
+     */
+    protected final Parameter byIdentifier;   
     
    /**
     * Creates a new query for the specified database.
@@ -44,10 +49,16 @@ public class SamplingPointQuery extends SamplingFeatureQuery {
         super(database);
         final QueryType[] usage = {SELECT, LIST};
         
-        pointIdentifier        = addColumn   ("sampling_points", "point_id", usage);
-        srsName                = addColumn   ("sampling_points", "point_srsname",        usage);
+        identifier             = addColumn   ("sampling_points", "id",                 usage);
+        name                   = addColumn   ("sampling_points", "name",               usage);
+        description            = addColumn   ("sampling_points", "description",        usage);
+        sampledFeature         = addColumn   ("sampling_points", "sampled_feature",    usage);
+        pointIdentifier        = addColumn   ("sampling_points", "point_id",           usage);
+        srsName                = addColumn   ("sampling_points", "point_srsname",      usage);
         srsDimension           = addColumn   ("sampling_points", "point_srsdimension", usage);
-        positionValue          = addColumn   ("sampling_points", "pos_value", usage);
+        positionValue          = addColumn   ("sampling_points", "pos_value",          usage);
+        
+        byIdentifier  = addParameter(identifier, SELECT);
     }
     
 }
