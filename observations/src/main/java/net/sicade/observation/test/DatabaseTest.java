@@ -1,9 +1,8 @@
 
 package net.sicade.observation.test;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import net.opengis.gml.DirectPositionType;
@@ -12,11 +11,10 @@ import net.sicade.catalog.Database;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.gml.ReferenceEntry;
 import net.sicade.observation.CompositePhenomenonEntry;
-import net.sicade.observation.MeasurementEntry;
-import net.sicade.observation.MeasurementTable;
 import net.sicade.observation.ObservationEntry;
 import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.ProcessEntry;
+import net.sicade.observation.ProcessTable;
 import net.sicade.observation.SamplingPointEntry;
 import net.sicade.observation.TemporalObjectEntry;
 import net.sicade.swe.AnyResultEntry;
@@ -42,7 +40,7 @@ public class DatabaseTest {
     public static void main(String[] args) throws Exception {
         // La station
         //SamplingFeatureEntry sf        = new SamplingFeatureEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X");
-        DirectPositionType pos           = new DirectPositionType("urn:ogc:crs:EPSG:27582", new BigInteger("2"), 163000.2345192);
+        DirectPositionType pos           = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, 163000.2345192);
         PointType p                      = new PointType("STATION_LOCALISATION", pos);
         SamplingPointEntry sf            = new SamplingPointEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X", p);
         
@@ -104,8 +102,12 @@ public class DatabaseTest {
         
         Database db = new Database(dataSource);
         
+        ProcessTable procTable = new ProcessTable(db);
+        procTable.getIdentifier(proc);        
         /*ObservationTable obsTable = new ObservationTable(db);
-        ObservationEntry obs = (ObservationEntry) obsTable.getEntry("obsTest3");*/
+        obsTable.getIdentifier(request);*/
+        
+        /*ObservationEntry obs = (ObservationEntry) obsTable.getEntry("obsTest3");
         
         MeasurementTable obsTable = new MeasurementTable(db);
         MeasurementEntry obs = (MeasurementEntry) obsTable.getEntry("MeasurementTest1");
@@ -135,7 +137,7 @@ public class DatabaseTest {
                 logger.finer(dbde.toString());
             }
         }
-        
+        */
         
         
     }

@@ -46,18 +46,19 @@ public class AnyScalarQuery extends Query{
      */
     public AnyScalarQuery(final Database database) {
         super (database);
-        final QueryType[] usage = {SELECT, LIST};
-        idDataRecord  = addColumn("data_record_fields", "id_datarecord", usage);
-        idDataBlock   = addColumn("data_record_fields", "id_datablock",  usage);
-        name          = addColumn("data_record_fields", "name",          usage);
-        definition    = addColumn("data_record_fields", "definition",    usage);
-        type          = addColumn("data_record_fields", "type",          usage);
-        uom           = addColumn("data_record_fields", "uom",           usage);
-        value         = addColumn("data_record_fields", "value",         usage);
+        final QueryType[] SLI  = {SELECT, LIST, INSERT};
+        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
+        idDataRecord  = addColumn("any_scalars", "id_datarecord", SLIE);
+        idDataBlock   = addColumn("any_scalars", "id_datablock",  SLI);
+        name          = addColumn("any_scalars", "name",          SLI);
+        definition    = addColumn("any_scalars", "definition",    SLI);
+        type          = addColumn("any_scalars", "type",          SLI);
+        uom           = addColumn("any_scalars", "uom",           SLI);
+        value         = addColumn("any_scalars", "value",         SLI);
         
-        byName         = addParameter(name, SELECT);
-        byIdDataRecord = addParameter(idDataRecord, SELECT, LIST);
-        byIdDataBlock  = addParameter(idDataBlock,  SELECT, LIST);
+        byName         = addParameter(name, SELECT, EXISTS);
+        byIdDataRecord = addParameter(idDataRecord, SELECT, LIST, EXISTS);
+        byIdDataBlock  = addParameter(idDataBlock,  SELECT, LIST, EXISTS);
     }
     
 }

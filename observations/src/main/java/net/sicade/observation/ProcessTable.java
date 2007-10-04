@@ -14,13 +14,12 @@
  */
 package net.sicade.observation;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.opengis.observation.Process;
-import net.sicade.catalog.ConfigurationKey;
+import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
-import net.sicade.catalog.Query;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 
 
@@ -33,14 +32,14 @@ import net.sicade.catalog.SingletonTable;
  * @author Guilhem Legal
  */
 public class ProcessTable extends SingletonTable<ProcessEntry> {
-
+    
     /**
      * Construit une table des procédures.
-     * 
+     *
      * @param  database Connexion vers la base de données.
      */
     public ProcessTable(final Database database) {
-        this(new ProcessQuery(database)); 
+        this(new ProcessQuery(database));
     }
     
     /**
@@ -50,13 +49,42 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
         super(query);
         setIdentifierParameters(query.byName, null);
     }
-
+    
     /**
      * Construit une procédure pour l'enregistrement courant.
      */
     protected ProcessEntry createEntry(final ResultSet results) throws SQLException {
         final ProcessQuery query = (ProcessQuery) super.query;
         return new ProcessEntry(results.getString(indexOf(query.name   )),
-                                results.getString(indexOf(query.remarks)));
+                results.getString(indexOf(query.remarks)));
+    }
+    
+    /**
+     * Retourne un nouvel identifier (ou l'identifier du capteur passée en parametre si non-null)
+     * et enregistre le nouveau capteur dans la base de donnée si il n'y est pas deja.
+     *
+     * @param proc le capteur a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final ProcessEntry proc) throws SQLException, CatalogException {
+        final ProcessQuery query  = (ProcessQuery) super.query;
+        String id;
+        if (proc.getName() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.name), proc.getName());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return proc.getName();
+            else
+                id = proc.getName();
+        } else {
+            id = searchFreeIdentifier("procedure");
+        }
+        
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        
+        statement.setString(indexOf(query.name), id);
+        statement.setString(indexOf(query.remarks), proc.getRemarks());
+        insertSingleton(statement);
+        return id;
     }
 }

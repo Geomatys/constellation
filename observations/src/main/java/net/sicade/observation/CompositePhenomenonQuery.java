@@ -50,14 +50,15 @@ public class CompositePhenomenonQuery extends Query{
      */
     public CompositePhenomenonQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT};
+        final QueryType[] SI = {SELECT, INSERT};
+        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
         
-        identifier = addColumn ("composite_phenomenons", "id",          usage);
-        name       = addColumn ("composite_phenomenons", "name",        usage);
-        remarks    = addColumn ("composite_phenomenons", "description", usage);
-        dimension  = addColumn ("composite_phenomenons", "dimension",   usage);
+        identifier = addColumn ("composite_phenomenons", "id",          SIE);
+        name       = addColumn ("composite_phenomenons", "name",        SI);
+        remarks    = addColumn ("composite_phenomenons", "description", SI);
+        dimension  = addColumn ("composite_phenomenons", "dimension",   SI);
         
-        byName     = addParameter(identifier, SELECT);
+        byName     = addParameter(identifier, SELECT, EXISTS);
     }
     
 }

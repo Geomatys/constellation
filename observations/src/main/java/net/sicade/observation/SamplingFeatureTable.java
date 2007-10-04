@@ -14,16 +14,14 @@
  */
 package net.sicade.observation;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.observation.Observation;
+import java.util.Iterator;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
-import org.opengis.observation.sampling.SurveyProcedure;
-
-
 
 /**
  * Connexion vers la table des {@linkplain Station stations}.
@@ -118,5 +116,43 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
     protected boolean accept(final SamplingFeatureEntry entry) throws CatalogException, SQLException {
         
         return super.accept(entry);
+    }
+    
+    /**
+     * Retourne un nouvel identifier (ou l'identifier de la station passée en parametre si non-null)
+     * et enregistre la nouvelle station dans la base de donnée.
+     *
+     * @param result le resultat a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final SamplingFeatureEntry station) throws SQLException, CatalogException {
+        final SamplingFeatureQuery query  = (SamplingFeatureQuery) super.query;
+        String id;
+        if (station.getId() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.identifier), station.getId());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return station.getId();
+            else
+                id = station.getId();
+        } else {
+            id = searchFreeIdentifier("station");
+        }
+        
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.identifier), id);
+        
+        if (station.getDescription() != null) {
+            statement.setString(indexOf(query.description), station.getDescription());
+        } else {
+            statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
+        }
+        
+        statement.setString(indexOf(query.name), station.getName());
+        Iterator i = station.getSampledFeatures().iterator();
+        statement.setString(indexOf(query.sampledFeature), (String)i.next());
+        
+        insertSingleton(statement); 
+        return id;
     }
 }

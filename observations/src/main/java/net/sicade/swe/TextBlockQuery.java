@@ -45,13 +45,14 @@ public class TextBlockQuery extends Query{
      */
     public TextBlockQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT};
-        id               = addColumn("text_block_encodings", "id_encoding",       usage);
-        tokenSeparator   = addColumn("text_block_encodings", "token_separator",   usage);
-        blockSeparator   = addColumn("text_block_encodings", "block_separator",   usage);
-        decimalSeparator = addColumn("text_block_encodings", "decimal_separator", usage);
+        final QueryType[] SI  = {SELECT, INSERT};
+        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
+        id               = addColumn("text_block_encodings", "id_encoding",       SIE);
+        tokenSeparator   = addColumn("text_block_encodings", "token_separator",   SI);
+        blockSeparator   = addColumn("text_block_encodings", "block_separator",   SI);
+        decimalSeparator = addColumn("text_block_encodings", "decimal_separator", SI);
 
-        byId  = addParameter(id, SELECT);
+        byId  = addParameter(id, SELECT, EXISTS);
     }
     
 }

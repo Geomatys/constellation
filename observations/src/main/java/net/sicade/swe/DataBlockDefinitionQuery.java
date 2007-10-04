@@ -46,11 +46,12 @@ public class DataBlockDefinitionQuery extends Query{
      */
     public DataBlockDefinitionQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT};
-        id       = addColumn ("data_block_definitions", "id",       usage);
-        encoding = addColumn ("data_block_definitions", "encoding", usage);
+        final QueryType[] SI = {SELECT, INSERT};
+        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
+        id       = addColumn ("data_block_definitions", "id",       SIE);
+        encoding = addColumn ("data_block_definitions", "encoding", SI);
 
-        byId  = addParameter(id, SELECT);
+        byId  = addParameter(id, SELECT, EXISTS);
     }
     
 }

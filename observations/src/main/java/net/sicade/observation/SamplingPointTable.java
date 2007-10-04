@@ -16,14 +16,16 @@
 package net.sicade.observation;
 
 import java.math.BigInteger;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import net.opengis.gml.DirectPositionType;
 import net.opengis.gml.PointType;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
-import org.opengis.observation.sampling.SamplingPoint;
 
 /**
  *SamplingPointTable.java
@@ -57,7 +59,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
         
         PointType p = new PointType(result.getString(indexOf(query.pointIdentifier)),
                                     new DirectPositionType(result.getString(indexOf(query.srsName)),
-                                    new BigInteger(result.getString(indexOf(query.srsDimension))),
+                                    result.getInt(indexOf(query.srsDimension)),
                                     result.getDouble(indexOf(query.positionValue))));
                             
         return new SamplingPointEntry( result.getString(indexOf(query.identifier)),
@@ -66,6 +68,55 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
                                        result.getString(indexOf(query.sampledFeature)),
                                        p);
         
+    }
+    
+    /**
+     * Retourne un nouvel identifier (ou l'identifier de la station passée en parametre si non-null)
+     * et enregistre la nouvelle station dans la base de donnée.
+     *
+     * @param result le resultat a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final SamplingPointEntry station) throws SQLException, CatalogException {
+        final SamplingPointQuery query  = (SamplingPointQuery) super.query;
+        String id;
+        if (station.getId() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.identifier), station.getId());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return station.getId();
+            else
+                id = station.getId();
+        } else {
+            id = searchFreeIdentifier("station");
+        }
+        
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.identifier), id);
+        
+        if (station.getDescription() != null) {
+            statement.setString(indexOf(query.description), station.getDescription());
+        } else {
+            statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
+        }
+        
+        statement.setString(indexOf(query.name), station.getName());
+        Iterator i = station.getSampledFeatures().iterator();
+        statement.setString(indexOf(query.sampledFeature), (String)i.next());
+        
+        if( station.getPosition() != null ) {
+            statement.setString(indexOf(query.pointIdentifier), station.getPosition().getId());
+            statement.setString(indexOf(query.srsName), station.getPosition().getPos().getSrsName());
+            statement.setString(indexOf(query.positionValue), Double.toString(station.getPosition().getPos().getValue().get(0)));
+            statement.setInt(indexOf(query.srsDimension), station.getPosition().getPos().getSrsDimension());
+        } else {
+            statement.setNull(indexOf(query.pointIdentifier), java.sql.Types.VARCHAR);
+            statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
+            statement.setNull(indexOf(query.positionValue), java.sql.Types.VARCHAR);
+            statement.setNull(indexOf(query.srsDimension), java.sql.Types.INTEGER);
+        }
+        insertSingleton(statement); 
+        return id;
     }
     
 }

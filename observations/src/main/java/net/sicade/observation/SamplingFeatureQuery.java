@@ -45,13 +45,15 @@ public class SamplingFeatureQuery extends Query {
      */
     public SamplingFeatureQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT, LIST};
-        identifier              = addColumn   ("sampling_features", "id", usage);
-        name                    = addColumn   ("sampling_features", "name",        usage);
-        description             = addColumn   ("sampling_features", "description", usage);
-        sampledFeature          = addColumn   ("sampling_features", "sampled_feature", usage);
+        final QueryType[] SLI = {SELECT, LIST, INSERT};
+        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         
-        byIdentifier  = addParameter(identifier, SELECT);
+        identifier              = addColumn   ("sampling_features", "id",              SLIE);
+        name                    = addColumn   ("sampling_features", "name",            SLI);
+        description             = addColumn   ("sampling_features", "description",     SLI);
+        sampledFeature          = addColumn   ("sampling_features", "sampled_feature", SLI);
+        
+        byIdentifier  = addParameter(identifier, SELECT, EXISTS);
     }
     
 }

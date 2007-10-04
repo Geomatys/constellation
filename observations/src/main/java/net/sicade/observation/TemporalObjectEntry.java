@@ -1,7 +1,7 @@
 
 package net.sicade.observation;
 
-import java.util.Date;
+import java.sql.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;

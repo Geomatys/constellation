@@ -45,12 +45,14 @@ public class ComponentQuery extends Query{
      */
     public ComponentQuery(final Database database) {
         super (database);
-        final QueryType[] usage = {SELECT, LIST};
-        idCompositePhenomenon  = addColumn("components", "composite_phenomenon", usage);
-        idComponent            = addColumn("components", "component",  usage);
+        final QueryType[] SLI  = {SELECT, LIST, INSERT};
+        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         
-        byComposite = addParameter(idCompositePhenomenon, SELECT, LIST);
-        byComponent = addParameter(idComponent,  SELECT);
+        idCompositePhenomenon  = addColumn("components", "composite_phenomenon", SLIE);
+        idComponent            = addColumn("components", "component",  SLI);
+        
+        byComposite = addParameter(idCompositePhenomenon, SELECT, LIST, EXISTS);
+        byComponent = addParameter(idComponent,  SELECT, EXISTS);
     }
     
 }

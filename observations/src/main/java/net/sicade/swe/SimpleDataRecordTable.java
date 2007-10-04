@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Iterator;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.SingletonTable;
@@ -124,4 +125,44 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
         
     }
     
+    /**
+     * Retourne un nouvel identifier (ou l'identifier du data record passée en parametre si non-null)
+     * et enregistre le nouveau data record dans la base de donnée si il n'y est pas deja.
+     *
+     * @param datarecord le data record a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final SimpleDataRecordEntry datarecord) throws SQLException, CatalogException {
+        final SimpleDataRecordQuery query  = (SimpleDataRecordQuery) super.query;
+        String id;
+        if (datarecord.getId() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.idBlock),      datarecord.getBlockId());
+            statement.setString(indexOf(query.idDataRecord), datarecord.getId());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return datarecord.getId();
+            else
+                id = datarecord.getId();
+        } else {
+            id = searchFreeIdentifier("datarecord");
+        }
+        
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.idDataRecord), id);
+        statement.setString(indexOf(query.idBlock),      datarecord.getBlockId());
+        statement.setString(indexOf(query.definition),   datarecord.getDefinition());
+        statement.setBoolean(indexOf(query.fixed),       datarecord.isFixed());
+        insertSingleton(statement);
+         
+        if (fields == null) {
+            fields = getDatabase().getTable(AnyScalarTable.class);
+        }
+        Iterator<AnyScalarEntry> i = datarecord.getField().iterator();
+        
+        while (i.hasNext()) {
+            fields.getIdentifier(i.next(), datarecord.getBlockId());
+        }
+        
+        return id;
+    }
 }

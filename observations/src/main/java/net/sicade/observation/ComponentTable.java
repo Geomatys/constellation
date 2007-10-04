@@ -21,7 +21,6 @@ import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.SimpleDataRecordQuery;
 import org.geotools.resources.Utilities;
 
 /**
@@ -68,7 +67,7 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
     
     protected ComponentEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final ComponentQuery query = (ComponentQuery) super.query;
-                
+        
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
@@ -99,6 +98,30 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
             fireStateChanged("idCompositePhenomenon");
         }
         
+    }
+    
+    /**
+     *Insere un nouveau composant d'une phenomene composé dans la base de donnée.
+     *
+     */
+    public synchronized void getIdentifier(String idComposite, PhenomenonEntry pheno) throws SQLException, CatalogException {
+        final ComponentQuery query  = (ComponentQuery) super.query;
+        if (phenomenons == null) {
+            phenomenons = getDatabase().getTable(PhenomenonTable.class);
+        }
+        String idPheno = phenomenons.getIdentifier(pheno);
+        
+        PreparedStatement statement = getStatement(QueryType.EXISTS);
+        statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
+        statement.setString(indexOf(query.idComponent), idPheno);
+        ResultSet result = statement.executeQuery();
+        if(result.next())
+            return ;
+              
+        statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
+        statement.setString(indexOf(query.idComponent), idPheno);
+        insertSingleton(statement);
     }
     
 }

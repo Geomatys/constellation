@@ -14,10 +14,12 @@
  */
 package net.sicade.observation;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 
 // OpenGis dependencies
@@ -60,5 +62,34 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
         return new PhenomenonEntry(results.getString(indexOf(query.identifier)),
                                    results.getString(indexOf(query.name)),
                                    results.getString(indexOf(query.remarks)));
+    }
+    
+     /**
+     * Retourne un nouvel identifier (ou l'identifier du phenomene passée en parametre si non-null)
+     * et enregistre le nouveau phenomene dans la base de donnée.
+     *
+     * @param result le resultat a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final PhenomenonEntry pheno) throws SQLException, CatalogException {
+        final PhenomenonQuery query  = (PhenomenonQuery) super.query;
+        String id;
+        if (pheno.getId() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.identifier), pheno.getId());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return pheno.getId();
+            else
+                id = pheno.getId();
+        } else {
+            id = searchFreeIdentifier("pheno");
+        }
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.identifier), id);
+        statement.setString(indexOf(query.name), pheno.getName());
+        statement.setString(indexOf(query.remarks), pheno.getDescription());
+        
+        insertSingleton(statement); 
+        return id;
     }
 }

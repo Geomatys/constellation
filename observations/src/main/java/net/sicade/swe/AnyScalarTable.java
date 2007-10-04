@@ -17,10 +17,10 @@ package net.sicade.swe;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
-import net.sicade.swe.AnyScalarQuery;
 import org.geotools.resources.Utilities;
 
 /**
@@ -133,6 +133,39 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
         
     }
     
-    
-    
+     /**
+     * Retourne un nouvel identifier (ou l'identifier du champ passée en parametre si non-null)
+     * et enregistre le nouveau champ dans la base de donnée si il n'y est pas deja.
+     *
+     * @param datarecord le data record a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final AnyScalarEntry field, String blockId) throws SQLException, CatalogException {
+        final AnyScalarQuery query  = (AnyScalarQuery) super.query;
+        String id;
+        if (field.getName() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.byIdDataBlock), blockId);
+            statement.setString(indexOf(query.idDataRecord),  field.getIdDataRecord());
+            statement.setString(indexOf(query.name),          field.getName());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return field.getName();
+            else
+                id = field.getName();
+        } else {
+            id = searchFreeIdentifier("field");
+        }
+        
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.idDataRecord), field.getIdDataRecord());
+        statement.setString(indexOf(query.idDataBlock),  blockId);
+        statement.setString(indexOf(query.name),         id);
+        statement.setString(indexOf(query.definition),   field.getDefinition());
+        statement.setString(indexOf(query.type),         field.getType());
+        statement.setString(indexOf(query.uom),          field.getUom());
+        statement.setString(indexOf(query.value),        (String)field.getValue());
+        insertSingleton(statement);
+     
+        return id;
+    }
 }

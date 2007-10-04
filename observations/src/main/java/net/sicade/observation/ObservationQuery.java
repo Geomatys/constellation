@@ -49,28 +49,30 @@ public class ObservationQuery extends Query {
      */
     public ObservationQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT};
-        name                      = addColumn("observations", "name",                       usage);
-        description               = addColumn("observations", "description",                usage);
-        featureOfInterest         = addColumn("observations", "feature_of_interest",        usage);
-        featureOfInterestPoint    = addColumn("observations", "feature_of_interest_point",  usage);
-        procedure                 = addColumn("observations", "procedure",                  usage);
-        observedProperty          = addColumn("observations", "observed_property",          usage);
-        observedPropertyComposite = addColumn("observations", "observed_property_composite",usage);
-        distribution              = addColumn("observations", "distribution",               usage);
-        samplingTimeBegin         = addColumn("observations", "sampling_time_begin",        usage);
-        samplingTimeEnd           = addColumn("observations", "sampling_time_end",          usage);
-        result                    = addColumn("observations", "result",                     usage);
-        resultDefinition          = addColumn("observations", "result_definition",          usage);
+        final QueryType[] SI  = {SELECT, INSERT};
+        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
+        
+        name                      = addColumn("observations", "name",                        SIE);
+        description               = addColumn("observations", "description",                 SI);
+        featureOfInterest         = addColumn("observations", "feature_of_interest",         SI);
+        featureOfInterestPoint    = addColumn("observations", "feature_of_interest_point",   SI);
+        procedure                 = addColumn("observations", "procedure",                   SI);
+        observedProperty          = addColumn("observations", "observed_property",           SI);
+        observedPropertyComposite = addColumn("observations", "observed_property_composite", SI);
+        distribution              = addColumn("observations", "distribution",                SI);
+        samplingTimeBegin         = addColumn("observations", "sampling_time_begin",         SI);
+        samplingTimeEnd           = addColumn("observations", "sampling_time_end",           SI);
+        result                    = addColumn("observations", "result",                      SI);
+        resultDefinition          = addColumn("observations", "result_definition",           SI);
 /*
-        observationMetadata = addColumn("observations", "observationMetadata", usage);
-        quality             = addColumn("observations", "quality",             usage);
-        result              = addColumn("observations", "result",              usage);
-        procedureTime       = addColumn("observations", "procedureTime",       usage);
-        procedureParameter  = addColumn("observations", "procedureParameter",  usage);*/
+        observationMetadata       = addColumn("observations", "observationMetadata",         SI);
+        quality                   = addColumn("observations", "quality",                     SI);
+        result                    = addColumn("observations", "result",                      SI);
+        procedureTime             = addColumn("observations", "procedureTime",               SI);
+        procedureParameter        = addColumn("observations", "procedureParameter",          SI);*/
                 
         
-        byName = addParameter(name, SELECT);
+        byName = addParameter(name, SELECT, EXISTS);
     }
     
 }

@@ -34,28 +34,30 @@ public class MeasurementQuery extends Query{
      */
     public MeasurementQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT};
-        name                      = addColumn("measurements", "name",                       usage);
-        description               = addColumn("measurements", "description",                usage);
-        featureOfInterest         = addColumn("measurements", "feature_of_interest",        usage);
-        featureOfInterestPoint    = addColumn("measurements", "feature_of_interest_point",  usage);
-        procedure                 = addColumn("measurements", "procedure",                  usage);
-        observedProperty          = addColumn("measurements", "observed_property",          usage);
-        observedPropertyComposite = addColumn("measurements", "observed_property_composite",usage);
-        distribution              = addColumn("measurements", "distribution",               usage);
-        samplingTimeBegin         = addColumn("measurements", "sampling_time_begin",        usage);
-        samplingTimeEnd           = addColumn("measurements", "sampling_time_end",          usage);
-        result                    = addColumn("measurements", "result",                     usage);
-        resultDefinition          = addColumn("measurements", "result_definition",          usage);
+        final QueryType[] SI  = {SELECT, INSERT};
+        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
+        
+        name                      = addColumn("measurements", "name",                        SIE);
+        description               = addColumn("measurements", "description",                 SI);
+        featureOfInterest         = addColumn("measurements", "feature_of_interest",         SI);
+        featureOfInterestPoint    = addColumn("measurements", "feature_of_interest_point",   SI);
+        procedure                 = addColumn("measurements", "procedure",                   SI);
+        observedProperty          = addColumn("measurements", "observed_property",           SI);
+        observedPropertyComposite = addColumn("measurements", "observed_property_composite", SI);
+        distribution              = addColumn("measurements", "distribution",                SI);
+        samplingTimeBegin         = addColumn("measurements", "sampling_time_begin",         SI);
+        samplingTimeEnd           = addColumn("measurements", "sampling_time_end",           SI);
+        result                    = addColumn("measurements", "result",                      SI);
+        resultDefinition          = addColumn("measurements", "result_definition",           SI);
 /*
-        observationMetadata = addColumn("measurements", "observationMetadata", usage);
-        quality             = addColumn("measurements", "quality",             usage);
-        result              = addColumn("measurements", "result",              usage);
-        procedureTime       = addColumn("measurements", "procedureTime",       usage);
-        procedureParameter  = addColumn("measurements", "procedureParameter",  usage);*/
+        observationMetadata       = addColumn("measurements", "observationMetadata",         SI);
+        quality                   = addColumn("measurements", "quality",                     SI);
+        result                    = addColumn("measurements", "result",                      SI);
+        procedureTime             = addColumn("measurements", "procedureTime",               SI);
+        procedureParameter        = addColumn("measurements", "procedureParameter",          SI);*/
                 
         
-        byName = addParameter(name, SELECT);
+        byName = addParameter(name, SELECT, EXISTS);
     }
     
 }

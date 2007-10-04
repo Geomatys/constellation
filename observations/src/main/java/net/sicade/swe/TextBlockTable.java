@@ -14,10 +14,12 @@
  */
 package net.sicade.swe;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 
 /**
@@ -45,6 +47,11 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
         setIdentifierParameters(query.byId, null);
     }
 
+    /**
+     * Crée un nouveau encodage a partir de la base de donnée.
+     *
+     * @param results un resultSet contenant un tuple de la table de encodage textuel.
+     */
     protected TextBlockEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final TextBlockQuery query = (TextBlockQuery) super.query;
         return new TextBlockEntry(results.getString(indexOf(query.id )),
@@ -53,4 +60,33 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
                                   results.getString(indexOf(query.decimalSeparator)).charAt(0));
     }
     
+    /**
+     * Retourne un nouvel identifier (ou l'identifier du textBlock passée en parametre si non-null)
+     * et enregistre le nouveau TextBlock dans la base de donnée si il n'y est pas deja.
+     *
+     * @param databloc le datablockDefinition a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final TextBlockEntry textbloc) throws SQLException, CatalogException {
+        final TextBlockQuery query  = (TextBlockQuery) super.query;
+        String id;
+        if (textbloc.getId() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.id), textbloc.getId());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return textbloc.getId();
+            else
+                id = textbloc.getId();
+        } else {
+            id = searchFreeIdentifier("textblock");
+        }
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.id), id);
+        statement.setString(indexOf(query.decimalSeparator), textbloc.getDecimalSeparator() + "");
+        statement.setString(indexOf(query.blockSeparator), textbloc.getBlockSeparator());
+        statement.setString(indexOf(query.tokenSeparator), textbloc.getTokenSeparator());
+        
+        insertSingleton(statement);
+        return id;
+    }
 }

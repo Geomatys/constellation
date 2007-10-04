@@ -37,7 +37,7 @@ public class AnyResultQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byIdResult;
+    protected final Parameter byIdResult, byDataBloc, byRef;
     
     /**
      * Creates a new query for the specified database.
@@ -46,12 +46,15 @@ public class AnyResultQuery extends Query {
      */
     public AnyResultQuery(final Database database) {
         super(database);
-        final QueryType[] usage = {SELECT};
-        idResult   = addColumn("any_results", "id_result",  usage);
-        reference  = addColumn("any_results", "reference",  usage);
-        dataBlock  = addColumn("any_results", "data_block", usage);
+        final QueryType[] SI = {SELECT, INSERT};
+        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
+        idResult   = addColumn("any_results", "id_result",  SIE);
+        reference  = addColumn("any_results", "reference",  SI);
+        dataBlock  = addColumn("any_results", "data_block", SI);
         
-        byIdResult = addParameter(idResult, SELECT);
+        byIdResult = addParameter(idResult,  SELECT);
+        byDataBloc = addParameter(dataBlock,  EXISTS);
+        byRef      = addParameter(reference, EXISTS);
     }
     
 }

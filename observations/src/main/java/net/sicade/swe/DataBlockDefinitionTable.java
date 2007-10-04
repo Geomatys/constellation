@@ -15,11 +15,14 @@
 
 package net.sicade.swe;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Iterator;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 
 /**
@@ -83,4 +86,44 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
         return new DataBlockDefinitionEntry(idDataBlock, entries, encoding);
     }
     
+    /**
+     * Retourne un nouvel identifier (ou l'identifier du datablockDefinition passée en parametre si non-null)
+     * et enregistre le nouveau datablockDefinition dans la base de donnée si il n'y est pas deja.
+     *
+     * @param databloc le datablockDefinition a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final DataBlockDefinitionEntry databloc) throws SQLException, CatalogException {
+        final DataBlockDefinitionQuery query  = (DataBlockDefinitionQuery) super.query;
+        String id;
+        if (databloc.getId() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.id), databloc.getId());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return databloc.getId();
+            else
+                id = databloc.getId();
+        } else {
+            id = searchFreeIdentifier("datablockDef");
+        }
+        
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.id), id);
+
+        if (textBlockEncodings == null) {
+            textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
+        }
+        statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry)databloc.getEncoding()));
+        insertSingleton(statement);
+        
+        if (dataRecords == null) {
+            dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
+        }
+        Iterator i = databloc.getComponents().iterator();
+        while (i.hasNext()) {
+            dataRecords.getIdentifier((SimpleDataRecordEntry) i.next());
+        }
+        
+        return id;
+    }
 }

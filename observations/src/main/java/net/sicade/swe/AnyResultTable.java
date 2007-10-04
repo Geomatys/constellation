@@ -14,10 +14,12 @@
  */
 package net.sicade.swe;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.gml.ReferenceEntry;
 import net.sicade.gml.ReferenceTable;
@@ -66,6 +68,63 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
          
          return new AnyResultEntry(results.getString(indexOf(query.idResult)), ref, 
                                    results.getString(indexOf(query.dataBlock)));
+    }
+    
+     /**
+     * Retourne un nouvel identifier (ou l'identifier du resultat passée en parametre si non-null)
+     * et enregistre le nouveau resultat dans la base de donnée.
+     *
+     * @param result le resultat a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final Object result) throws SQLException, CatalogException {
+        final AnyResultQuery query = (AnyResultQuery) super.query;
+        
+        String id;
+        if (result instanceof String) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.dataBlock), (String)result);
+            statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+            ResultSet results = statement.executeQuery();
+            if(results.next())
+                return results.getString(1);
+            else
+                id = searchFreeIdentifier("idresult");
+        } else if (result instanceof ReferenceEntry) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
+            statement.setNull(indexOf(query.dataBlock), java.sql.Types.VARCHAR);
+            ResultSet results = statement.executeQuery();
+            if(results.next())
+                return results.getString(1);
+            else
+                id = searchFreeIdentifier("idresult");
+        } else {
+            throw new CatalogException(" ce type de resultat n'est pas accepté");
+        }
+        
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.idResult), id);
+        if (result instanceof String) {
+            statement.setString(indexOf(query.dataBlock), (String)result);
+            statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+        } else {
+            if (result instanceof ReferenceEntry) {
+                ReferenceEntry ref = (ReferenceEntry) result;
+                String idRef;
+                
+                if(references == null) {
+                    references = getDatabase().getTable(ReferenceTable.class);
+                }
+                idRef = references.getIdentifier(ref);
+                
+                statement.setString(indexOf(query.reference), idRef);
+                statement.setNull(indexOf(query.dataBlock), java.sql.Types.VARCHAR);
+            } else {
+                throw new CatalogException(" ce type de resultat n'est pas accepté");
+            }
+        }
+        insertSingleton(statement);   
+        return id;
     }
     
 }

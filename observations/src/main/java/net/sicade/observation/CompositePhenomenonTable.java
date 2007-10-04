@@ -15,6 +15,7 @@
 
 package net.sicade.observation;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -22,9 +23,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
-import org.opengis.observation.CompositePhenomenon;
-import org.opengis.observation.Phenomenon;
 
 /**
  * Connexion vers la table des {@linkplain CompositePhenomenon phénoménes composé}.
@@ -94,6 +94,46 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
                                    idCompositePhenomenon,
                                    null,
                                    compos);
+    }
+    
+    /**
+     * Retourne un nouvel identifier (ou l'identifier du phenomene passée en parametre si non-null)
+     * et enregistre le nouveau phenomene dans la base de donnée.
+     *
+     * @param pheno le phenomene a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final CompositePhenomenonEntry pheno) throws SQLException, CatalogException {
+        final CompositePhenomenonQuery query  = (CompositePhenomenonQuery) super.query;
+        String id;
+        if (pheno.getId() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.identifier), pheno.getId());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return pheno.getId();
+            else
+                id = pheno.getId();
+        } else {
+            id = searchFreeIdentifier("compositepheno");
+        }
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        
+        statement.setString(indexOf(query.identifier), id);
+        statement.setString(indexOf(query.name), pheno.getName());
+        statement.setString(indexOf(query.remarks), pheno.getDescription());
+        statement.setInt(indexOf(query.dimension), pheno.getDimension());
+        insertSingleton(statement); 
+
+        if (components == null) {
+                    components = getDatabase().getTable(ComponentTable.class);
+        }
+        Iterator<PhenomenonEntry> i = pheno.getComponent().iterator();
+        
+        while(i.hasNext()) {
+            components.getIdentifier(id, i.next());
+        }
+        
+        return id;
     }
     
 }

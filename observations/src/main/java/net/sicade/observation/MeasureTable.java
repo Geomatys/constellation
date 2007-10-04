@@ -14,10 +14,12 @@
  */
 package net.sicade.observation;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
+import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.gml.UnitOfMeasureEntry;
 import net.sicade.gml.UnitOfMeasureTable;
@@ -65,6 +67,39 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
         return new MeasureEntry(results.getString(indexOf(query.name   )),
                                 uom,
                                 results.getFloat(indexOf(query.value)));
+    }
+    
+    /**
+     * Retourne un nouvel identifier (ou l'identifier du resultat de mesure passée en parametre si non-null)
+     * et enregistre le nouveau resultat de mesure dans la base de donnée si il n'y est pas deja.
+     *
+     * @param meas le resultat de mesure a inserer dans la base de donnée.
+     */
+    public synchronized String getIdentifier(final MeasureEntry meas) throws SQLException, CatalogException {
+        final MeasureQuery query  = (MeasureQuery) super.query;
+        String id;
+        if (meas.getName() != null) {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.name), meas.getName());
+            ResultSet result = statement.executeQuery();
+            if(result.next())
+                return meas.getName();
+            else
+                id = meas.getName();
+        } else {
+            id = searchFreeIdentifier("mesure");
+        }
+        
+        PreparedStatement statement = getStatement(QueryType.INSERT);
+        
+        statement.setString(indexOf(query.name), id);
+        if (uoms == null) {
+             uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
+        }
+        statement.setString(indexOf(query.uom), uoms.getIdentifier(meas.getUom()));
+        statement.setDouble(indexOf(query.value), meas.getValue());
+        insertSingleton(statement);
+        return id;
     }
     
 }
