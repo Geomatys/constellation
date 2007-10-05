@@ -83,7 +83,8 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
         final ComponentQuery query = (ComponentQuery) super.query;
-        statement.setString(indexOf(query.byComposite), idCompositePhenomenon);
+        if (! type.equals(QueryType.INSERT))
+            statement.setString(indexOf(query.byComposite), idCompositePhenomenon);
         
     }
     

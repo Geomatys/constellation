@@ -218,7 +218,15 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         statement.setString(indexOf(query.distribution), meas.getDistribution().getName());
         
         // on insere la station qui a effectué cette measervation
-        if (meas.getFeatureOfInterest() instanceof SamplingFeatureEntry){
+         if (meas.getFeatureOfInterest() instanceof SamplingPointEntry){
+            SamplingPointEntry station = (SamplingPointEntry)meas.getFeatureOfInterest();
+            if (stationPoints == null) {
+                    stationPoints = getDatabase().getTable(SamplingPointTable.class);
+            }
+            statement.setString(indexOf(query.featureOfInterestPoint),stationPoints.getIdentifier(station));
+            statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
+       
+        } else  if (meas.getFeatureOfInterest() instanceof SamplingFeatureEntry){
             SamplingFeatureEntry station = (SamplingFeatureEntry)meas.getFeatureOfInterest();
             if (stations == null) {
                 stations = getDatabase().getTable(SamplingFeatureTable.class);
@@ -226,20 +234,21 @@ public class MeasurementTable extends SingletonTable<Measurement> {
             statement.setString(indexOf(query.featureOfInterest),stations.getIdentifier(station));
             statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
             
-        } else if (meas.getFeatureOfInterest() instanceof SamplingPointEntry){
-            SamplingPointEntry station = (SamplingPointEntry)meas.getFeatureOfInterest();
-            if (stationPoints == null) {
-                    stationPoints = getDatabase().getTable(SamplingPointTable.class);
-            }
-            statement.setString(indexOf(query.featureOfInterestPoint),stationPoints.getIdentifier(station));
-            statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
         } else {
             statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
             statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
         }
         
         // on insere le phenomene measervé
-        if(meas.getObservedProperty() instanceof PhenomenonEntry){
+        if(meas.getObservedProperty() instanceof CompositePhenomenonEntry){
+            CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)meas.getObservedProperty();
+            if (compositePhenomenons == null) {
+                compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+            }
+            statement.setString(indexOf(query.observedPropertyComposite), compositePhenomenons.getIdentifier(pheno));
+            statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
+        
+        } else if(meas.getObservedProperty() instanceof PhenomenonEntry){
             PhenomenonEntry pheno = (PhenomenonEntry)meas.getObservedProperty();
             if (phenomenons == null) {
                 phenomenons = getDatabase().getTable(PhenomenonTable.class);
@@ -247,14 +256,6 @@ public class MeasurementTable extends SingletonTable<Measurement> {
             statement.setString(indexOf(query.observedProperty), phenomenons.getIdentifier(pheno));
             statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
         
-        } else if(meas.getObservedProperty() instanceof CompositePhenomenonEntry){
-            CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)meas.getObservedProperty();
-            if (compositePhenomenons == null) {
-                compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
-            }
-            statement.setString(indexOf(query.observedPropertyComposite), compositePhenomenons.getIdentifier(pheno));
-            statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
-       
         } else {
             statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
             statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);

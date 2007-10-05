@@ -128,8 +128,10 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
         final AnyScalarQuery query = (AnyScalarQuery) super.query;
-        statement.setString(indexOf(query.byIdDataRecord), idDataRecord);
-        statement.setString(indexOf(query.byIdDataBlock), idDataBlock);
+        if(!type.equals(QueryType.INSERT)){
+            statement.setString(indexOf(query.byIdDataRecord), idDataRecord);
+            statement.setString(indexOf(query.byIdDataBlock), idDataBlock);
+        }
         
     }
     

@@ -119,7 +119,7 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
         PreparedStatement statement = getStatement(QueryType.INSERT);
         
         statement.setString(indexOf(query.identifier), id);
-        statement.setString(indexOf(query.name), pheno.getName());
+        statement.setString(indexOf(query.name), pheno.getPhenomenonName());
         statement.setString(indexOf(query.remarks), pheno.getDescription());
         statement.setInt(indexOf(query.dimension), pheno.getDimension());
         insertSingleton(statement); 
@@ -130,7 +130,8 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
         Iterator<PhenomenonEntry> i = pheno.getComponent().iterator();
         
         while(i.hasNext()) {
-            components.getIdentifier(id, i.next());
+            PhenomenonEntry ph = i.next();
+            components.getIdentifier(id, ph);
         }
         
         return id;

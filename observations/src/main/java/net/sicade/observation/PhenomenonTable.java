@@ -86,7 +86,7 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
         }
         PreparedStatement statement = getStatement(QueryType.INSERT);
         statement.setString(indexOf(query.identifier), id);
-        statement.setString(indexOf(query.name), pheno.getName());
+        statement.setString(indexOf(query.name), pheno.getPhenomenonName());
         statement.setString(indexOf(query.remarks), pheno.getDescription());
         
         insertSingleton(statement); 

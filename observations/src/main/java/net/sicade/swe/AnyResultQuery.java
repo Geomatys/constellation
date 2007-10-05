@@ -46,15 +46,15 @@ public class AnyResultQuery extends Query {
      */
     public AnyResultQuery(final Database database) {
         super(database);
-        final QueryType[] SI = {SELECT, INSERT};
+        final QueryType[] SI = {SELECT, INSERT, FILTERED_LIST};
         final QueryType[] SIE = {SELECT, INSERT, EXISTS};
         idResult   = addColumn("any_results", "id_result",  SIE);
         reference  = addColumn("any_results", "reference",  SI);
         dataBlock  = addColumn("any_results", "data_block", SI);
         
-        byIdResult = addParameter(idResult,  SELECT);
-        byDataBloc = addParameter(dataBlock,  EXISTS);
-        byRef      = addParameter(reference, EXISTS);
+        byIdResult = addParameter(idResult,  SELECT, EXISTS);
+        byDataBloc = addParameter(dataBlock, FILTERED_LIST);
+        byRef      = addParameter(reference, FILTERED_LIST);
     }
     
 }

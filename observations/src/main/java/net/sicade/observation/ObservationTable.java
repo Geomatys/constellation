@@ -346,45 +346,54 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         PreparedStatement statement = getStatement(QueryType.INSERT);
         statement.setString(indexOf(query.name),         id);
         statement.setString(indexOf(query.description),  obs.getDefinition());
-        statement.setString(indexOf(query.distribution), obs.getDistribution().getName());
+        
+        // on insere la distribution
+        if (obs.getDistribution() != null) {
+            if (distributions == null) {
+                distributions = getDatabase().getTable(DistributionTable.class);
+            }
+            statement.setString(indexOf(query.distribution), distributions.getIdentifier(obs.getDistribution()));
+        } else {
+            statement.setNull(indexOf(query.distribution), java.sql.Types.VARCHAR);
+        }
         
         // on insere la station qui a effectué cette observation
-        if (obs.getFeatureOfInterest() instanceof SamplingFeatureEntry){
-            SamplingFeatureEntry station = (SamplingFeatureEntry)obs.getFeatureOfInterest();
-            if (stations == null) {
-                stations = getDatabase().getTable(SamplingFeatureTable.class);
-            }
-            statement.setString(indexOf(query.featureOfInterest),stations.getIdentifier(station));
-            statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
-            
-        } else if (obs.getFeatureOfInterest() instanceof SamplingPointEntry){
+         if (obs.getFeatureOfInterest() instanceof SamplingPointEntry){
             SamplingPointEntry station = (SamplingPointEntry)obs.getFeatureOfInterest();
             if (stationPoints == null) {
                     stationPoints = getDatabase().getTable(SamplingPointTable.class);
             }
             statement.setString(indexOf(query.featureOfInterestPoint),stationPoints.getIdentifier(station));
             statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
+            
+        } else if (obs.getFeatureOfInterest() instanceof SamplingFeatureEntry){
+            SamplingFeatureEntry station = (SamplingFeatureEntry)obs.getFeatureOfInterest();
+            if (stations == null) {
+                stations = getDatabase().getTable(SamplingFeatureTable.class);
+            }
+            statement.setString(indexOf(query.featureOfInterest),stations.getIdentifier(station));
+            statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
         } else {
             statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
             statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
         }
         
         // on insere le phenomene observé
-        if(obs.getObservedProperty() instanceof PhenomenonEntry){
-            PhenomenonEntry pheno = (PhenomenonEntry)obs.getObservedProperty();
-            if (phenomenons == null) {
-                phenomenons = getDatabase().getTable(PhenomenonTable.class);
-            }
-            statement.setString(indexOf(query.observedProperty), phenomenons.getIdentifier(pheno));
-            statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
-        
-        } else if(obs.getObservedProperty() instanceof CompositePhenomenonEntry){
+         if(obs.getObservedProperty() instanceof CompositePhenomenonEntry){
             CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)obs.getObservedProperty();
             if (compositePhenomenons == null) {
                 compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
             }
             statement.setString(indexOf(query.observedPropertyComposite), compositePhenomenons.getIdentifier(pheno));
             statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
+        
+         } else if(obs.getObservedProperty() instanceof PhenomenonEntry){
+            PhenomenonEntry pheno = (PhenomenonEntry)obs.getObservedProperty();
+            if (phenomenons == null) {
+                phenomenons = getDatabase().getTable(PhenomenonTable.class);
+            }
+            statement.setString(indexOf(query.observedProperty), phenomenons.getIdentifier(pheno));
+            statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
        
         } else {
             statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);

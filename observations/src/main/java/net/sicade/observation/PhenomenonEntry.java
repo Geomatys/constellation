@@ -103,6 +103,13 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     }
     
     /**
+     * Retourne le nom du phenomene (une URN le plus souvent).
+     */
+    public String getPhenomenonName(){
+        return name;
+    } 
+    
+    /**
      * Retourne un code représentant ce phenomene.
      */
     @Override

@@ -49,7 +49,7 @@ public class SimpleDataRecordQuery extends Query{
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         idBlock       = addColumn("simple_data_records", "id_datablock",  SLIE);
-        idDataRecord  = addColumn("simple_data_records", "id_datarecord", SLI);
+        idDataRecord  = addColumn("simple_data_records", "id_datarecord", SLIE);
         definition    = addColumn("simple_data_records", "definition",    SLI);
         fixed         = addColumn("simple_data_records", "fixed",         SLI);
         

@@ -251,6 +251,17 @@ public class ObservationEntry extends Entry implements Observation {
     public Process getProcedure() {
         return procedure;
     }
+    
+    /**
+     * fixe le capteur qui a effectué cette observation.
+     * seulement si null pour l'instant ou lance une exception.
+     */
+    public void setProcedure(ProcessEntry process) throws Exception {
+        if (procedure == null)
+            this.procedure = process;
+        else
+            throw new Exception("cette observation a deja un capteur!!");
+    }
 
     /**
      * {@inheritDoc}

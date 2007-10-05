@@ -81,7 +81,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         
         String id;
         if (result instanceof String) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
             statement.setString(indexOf(query.dataBlock), (String)result);
             statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
             ResultSet results = statement.executeQuery();
@@ -90,7 +90,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
             else
                 id = searchFreeIdentifier("idresult");
         } else if (result instanceof ReferenceEntry) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
             statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
             statement.setNull(indexOf(query.dataBlock), java.sql.Types.VARCHAR);
             ResultSet results = statement.executeQuery();

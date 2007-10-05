@@ -10,14 +10,17 @@ import net.opengis.gml.PointType;
 import net.sicade.catalog.Database;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.gml.ReferenceEntry;
+import net.sicade.gml.UnitOfMeasureEntry;
 import net.sicade.observation.CompositePhenomenonEntry;
+import net.sicade.observation.MeasureEntry;
+import net.sicade.observation.MeasurementEntry;
+import net.sicade.observation.MeasurementTable;
 import net.sicade.observation.ObservationEntry;
+import net.sicade.observation.ObservationTable;
 import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.ProcessEntry;
-import net.sicade.observation.ProcessTable;
 import net.sicade.observation.SamplingPointEntry;
 import net.sicade.observation.TemporalObjectEntry;
-import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.AnyScalarEntry;
 import net.sicade.swe.DataBlockDefinitionEntry;
 import net.sicade.swe.SimpleDataRecordEntry;
@@ -54,21 +57,24 @@ public class DatabaseTest {
         CompositePhenomenonEntry ph      = new CompositePhenomenonEntry("aggregatePhenomenon", "urn:x-ogc:phenomenon:BRGM:aggregate", null, null, compPheno);
         
         // le capteur
-        ProcessEntry proc                = new ProcessEntry("un capteur");
+        ProcessEntry proc                = new ProcessEntry("un capteur", "la description de ce capteur");
         
         // le sampling time
-        TemporalObjectEntry t            = new TemporalObjectEntry(new Date(2002,02,12),null);
+        TemporalObjectEntry t            = new TemporalObjectEntry(Date.valueOf("2002-02-12"),null);
         
         //le resultat
         //AnyResultEntry result            = new AnyResultEntry("idresultat", null, "un bloc de donnée");
-        //UnitOfMeasureEntry uom           = new UnitOfMeasureEntry("unit1", "centimetre", "longueur", "refSyS");
-        //MeasureEntry result              = new MeasureEntry("mesure1", uom, 35 );
-        ReferenceEntry ref               = new ReferenceEntry("ref1", "blablabla");
-        AnyResultEntry result            = new AnyResultEntry("idresultat1", ref, null);
+        UnitOfMeasureEntry uom           = new UnitOfMeasureEntry("unit1", "centimetre", "longueur", "refSyS");
+        MeasureEntry mesure              = new MeasureEntry("mesure1", uom, 35 );
+        ReferenceEntry result            = new ReferenceEntry("ref2", "blablabla");
         
         // la description du resultat
         List<SimpleDataRecordEntry> comp = new ArrayList<SimpleDataRecordEntry>();
-        List<AnyScalarEntry> fds   = new ArrayList<AnyScalarEntry>();
+        List<AnyScalarEntry> fds         = new ArrayList<AnyScalarEntry>();
+        AnyScalarEntry  f1               = new AnyScalarEntry("idDataRecord", "time", "urn:x-ogc:def:phenomenon:OGC:time", "Time", "urn:x-ogc:def:unit:ISO:8601", null);
+        AnyScalarEntry  f2               = new AnyScalarEntry("idDataRecord", "depth", "urn:x-ogc:def:phenomenon:BRGM:depth", "Quantity", "cm", null);
+        AnyScalarEntry  f3               = new AnyScalarEntry("idDataRecord", "validity", "urn:x-ogc:def:phenomenon:BRGM:validity", "Boolean", null, null);
+        fds.add(f1);fds.add(f2);fds.add(f3);
         SimpleDataRecordEntry dr         = new SimpleDataRecordEntry("idDef", "idDataRecord", null, false, fds);
         comp.add(dr);
         TextBlockEntry tbe               = new TextBlockEntry("enc1", ",", "@@", '.');
@@ -84,15 +90,15 @@ public class DatabaseTest {
                 result,
                 t,
                 dbd);
-        /*MeasurementEntry request         = new MeasurementEntry("obsTest",
-                                                                "une observation test",
+        MeasurementEntry meas           = new MeasurementEntry("measTest",
+                                                                "une mesure test",
                                                                 sf,
                                                                 ph,
                                                                 proc,
                                                                 Distribution.NORMAL,
-                                                                result,
+                                                                mesure,
                                                                 t,
-                                                                null);*/
+                                                                null);
         
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setServerName("localhost");
@@ -102,11 +108,11 @@ public class DatabaseTest {
         
         Database db = new Database(dataSource);
         
-        ProcessTable procTable = new ProcessTable(db);
-        procTable.getIdentifier(proc);        
         /*ObservationTable obsTable = new ObservationTable(db);
         obsTable.getIdentifier(request);*/
         
+        MeasurementTable measTable = new MeasurementTable(db);
+        measTable.getIdentifier(meas);
         /*ObservationEntry obs = (ObservationEntry) obsTable.getEntry("obsTest3");
         
         MeasurementTable obsTable = new MeasurementTable(db);

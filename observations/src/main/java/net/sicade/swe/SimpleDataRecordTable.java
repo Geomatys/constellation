@@ -121,7 +121,8 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         super.configure(type, statement);
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
-        statement.setString(indexOf(query.byIdBlock), idDataBlock);
+        if (!type.equals(QueryType.INSERT))
+            statement.setString(indexOf(query.byIdBlock), idDataBlock);
         
     }
     
