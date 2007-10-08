@@ -14,6 +14,7 @@
  */
 package net.sicade.observation;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -348,14 +349,14 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         statement.setString(indexOf(query.description),  obs.getDefinition());
         
         // on insere la distribution
-        if (obs.getDistribution() != null) {
-            if (distributions == null) {
-                distributions = getDatabase().getTable(DistributionTable.class);
-            }
-            statement.setString(indexOf(query.distribution), distributions.getIdentifier(obs.getDistribution()));
-        } else {
-            statement.setNull(indexOf(query.distribution), java.sql.Types.VARCHAR);
+        if (obs.getDistribution() == null) {
+            obs.setDistribution(DistributionEntry.NORMAL);
         }
+        if (distributions == null) {
+            distributions = getDatabase().getTable(DistributionTable.class);
+        }
+        statement.setString(indexOf(query.distribution), distributions.getIdentifier(obs.getDistribution()));
+        
         
         // on insere la station qui a effectué cette observation
          if (obs.getFeatureOfInterest() instanceof SamplingPointEntry){
@@ -437,9 +438,11 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         }
         // on insere le "samplingTime""
         if (obs.getSamplingTime() != null){
-            statement.setDate(indexOf(query.samplingTimeBegin), ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime());
+            Date date = new Date(((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime().getTime());
+            statement.setDate(indexOf(query.samplingTimeBegin), date);
             if (((TemporalObjectEntry)obs.getSamplingTime()).getEndTime() != null) {
-                statement.setDate(indexOf(query.samplingTimeEnd),   ((TemporalObjectEntry)obs.getSamplingTime()).getEndTime());
+                date = new Date(((TemporalObjectEntry)obs.getSamplingTime()).getEndTime().getTime());           
+                statement.setDate(indexOf(query.samplingTimeEnd), date);
             } else {
                 statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
             }

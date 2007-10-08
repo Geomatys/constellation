@@ -14,6 +14,7 @@
  */
 package net.sicade.observation;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +24,6 @@ import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.coverage.model.DistributionEntry;
 import net.sicade.coverage.model.DistributionTable;
-import net.sicade.gml.ReferenceEntry;
 import net.sicade.observation.CompositePhenomenonEntry;
 import net.sicade.observation.CompositePhenomenonTable;
 import net.sicade.observation.MeasureEntry;
@@ -40,9 +40,6 @@ import net.sicade.observation.SamplingFeatureTable;
 import net.sicade.observation.SamplingPointEntry;
 import net.sicade.observation.SamplingPointTable;
 import net.sicade.observation.TemporalObjectEntry;
-import net.sicade.swe.AnyResultTable;
-import net.sicade.swe.DataBlockDefinitionEntry;
-import net.sicade.swe.DataBlockDefinitionTable;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measurement;
 
@@ -136,6 +133,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
     /**
      * Construit une mesure pour l'enregistrement courant
      */
+    @Override
     public MeasurementEntry createEntry(final ResultSet result) throws SQLException, CatalogException {
         final MeasurementQuery query = (MeasurementQuery) super.query;
         if (distributions == null) {
@@ -291,9 +289,11 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         
         // on insere le "samplingTime""
         if (meas.getSamplingTime() != null){
-            statement.setDate(indexOf(query.samplingTimeBegin), ((TemporalObjectEntry)meas.getSamplingTime()).getBeginTime());
+            Date date = Date.valueOf(((TemporalObjectEntry)meas.getSamplingTime()).getBeginTime().toString());
+            statement.setDate(indexOf(query.samplingTimeBegin), date);
             if (((TemporalObjectEntry)meas.getSamplingTime()).getEndTime() != null) {
-                statement.setDate(indexOf(query.samplingTimeEnd),   ((TemporalObjectEntry)meas.getSamplingTime()).getEndTime());
+                date = Date.valueOf(((TemporalObjectEntry)meas.getSamplingTime()).getEndTime().toString());
+                statement.setDate(indexOf(query.samplingTimeEnd),  date);
             } else {
                 statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
             }

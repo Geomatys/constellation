@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 // Sicade dependencies 
@@ -27,6 +28,7 @@ import net.sicade.catalog.Entry;
 import net.sicade.coverage.model.DistributionEntry;
 
 // openGis dependencies
+import net.sicade.swe.DataBlockDefinitionEntry;
 import org.opengis.observation.Process;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -66,6 +68,9 @@ import org.geotools.resources.Utilities;
     "resultDefinition"
 })
 @XmlRootElement(name = "Observation")
+@XmlSeeAlso({ SamplingFeatureEntry.class, SamplingPointEntry.class, 
+              PhenomenonEntry.class, CompositePhenomenonEntry.class,
+              DataBlockDefinitionEntry.class})
 public class ObservationEntry extends Entry implements Observation {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
@@ -177,7 +182,10 @@ public class ObservationEntry extends Entry implements Observation {
         this.featureOfInterest   = featureOfInterest;
         this.observedProperty    = observedProperty;
         this.procedure           = procedure;
-        this.distribution        = distribution;
+        if (distribution == null)
+            this.distribution    = DistributionEntry.NORMAL;
+        else
+            this.distribution    = distribution;
         this.resultQuality       = quality;
         this.result              = result;
         this.samplingTime        = samplingTime;
@@ -213,7 +221,10 @@ public class ObservationEntry extends Entry implements Observation {
         this.featureOfInterest   = featureOfInterest;
         this.observedProperty    = observedProperty;
         this.procedure           = procedure;
-        this.distribution        = distribution;
+        if (distribution == null)
+            this.distribution    = DistributionEntry.NORMAL;
+        else
+            this.distribution    = distribution;
         this.resultQuality       = null;       //= resultQuality;
         this.result              = result;
         this.samplingTime        = samplingTime;
@@ -221,14 +232,6 @@ public class ObservationEntry extends Entry implements Observation {
         this.resultDefinition    = resultDefinition;
         this.procedureTime       = null;
         this.procedureParameter  = null; 
-    }
-
-    /**
-     * Construit un nom à partir des autres informations disponibles.
-     */
-    @Override
-    protected String createName() {
-        return "";
     }
 
     /**
@@ -254,13 +257,9 @@ public class ObservationEntry extends Entry implements Observation {
     
     /**
      * fixe le capteur qui a effectué cette observation.
-     * seulement si null pour l'instant ou lance une exception.
      */
-    public void setProcedure(ProcessEntry process) throws Exception {
-        if (procedure == null)
-            this.procedure = process;
-        else
-            throw new Exception("cette observation a deja un capteur!!");
+    public void setProcedure(ProcessEntry process) {
+        this.procedure = process;
     }
 
     /**
@@ -268,6 +267,13 @@ public class ObservationEntry extends Entry implements Observation {
      */
     public DistributionEntry getDistribution() {
         return distribution;
+    }
+    
+    /**
+     * fixe la distribution de cette observation.
+     */
+    public void setDistribution(DistributionEntry distrib) {
+        this.distribution = distrib;
     }
     
     /**

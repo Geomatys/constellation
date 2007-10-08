@@ -15,17 +15,16 @@
 
 package net.sicade.observation;
 
-import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
-import net.opengis.gml.DirectPositionType;
-import net.opengis.gml.PointType;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
+import net.sicade.gml.DirectPositionType;
+import net.sicade.gml.PointType;
 
 /**
  *SamplingPointTable.java

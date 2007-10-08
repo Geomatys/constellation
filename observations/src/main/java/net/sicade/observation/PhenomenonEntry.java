@@ -14,11 +14,16 @@
  */
 package net.sicade.observation;
 
-// Sicade dependencies
+//jaxB import
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSeeAlso;
+
+// Sicade dependencies
 import net.sicade.catalog.Entry;
+
+// geotools dependencies
 import org.geotools.resources.Utilities;
 
 // GeoAPI dependencies 
@@ -32,6 +37,7 @@ import org.opengis.observation.Phenomenon;
  * @author Antoine Hnawia
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlSeeAlso({ CompositePhenomenonEntry.class })
 public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.

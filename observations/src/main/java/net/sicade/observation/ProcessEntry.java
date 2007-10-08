@@ -53,6 +53,7 @@ public class ProcessEntry extends Entry implements Process {
     public ProcessEntry(final String name) {
         super(name);
         this.href = name;
+        
     }
 
     /** 
@@ -66,11 +67,18 @@ public class ProcessEntry extends Entry implements Process {
         this.href = name;
     }
     
+    /**
+     * Retourne la reference du capteur.
+     */
+    public String getHref() {
+        return href;
+    }
+    
      /**
      * Retourne une chaine de charactere representant la procedure.
      */
     @Override
     public String toString() {
-        return  " href=" + href;
+        return  " href=" + this.getName();
     }
 }

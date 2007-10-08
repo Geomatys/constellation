@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 // Geotools dependencies
@@ -43,6 +44,7 @@ import org.opengis.observation.sampling.SamplingFeature;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SamplingFeature", namespace="http://www.opengis.net/sa/1.0")
+@XmlSeeAlso({ SamplingPointEntry.class})
 public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.

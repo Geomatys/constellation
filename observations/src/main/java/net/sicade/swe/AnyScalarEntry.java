@@ -14,6 +14,10 @@
  */
 package net.sicade.swe;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import net.sicade.catalog.Entry;
 import org.geotools.resources.Utilities;
 
@@ -23,16 +27,20 @@ import org.geotools.resources.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "AnyScalar")
 public class AnyScalarEntry extends Entry{
     
     /**
      * Identifiant du datarecord qui contient cet valeur.
      */
+    @XmlAttribute
     private String idDataRecord;
     
     /**
      * Identifiant du champ.
      */
+    @XmlAttribute
     private String name;
     
     /**

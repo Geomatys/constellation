@@ -5,7 +5,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import net.sicade.gml.ReferenceEntry;
 
 /**
  *
@@ -15,6 +14,7 @@ import net.sicade.gml.ReferenceEntry;
 @XmlRegistry
 public class ObjectFactory {
     
+    private final static QName _AbstractDataRecord_QNAME = new QName("http://www.opengis.net/swe/1.0", "AbstractDataRecord");
     private final static QName _SimpleDataRecord_QNAME = new QName("http://www.opengis.net/swe/1.0", "SimpleDataRecord");
     
     
@@ -49,7 +49,7 @@ public class ObjectFactory {
     }
     
      /**
-     * Create an instance of {@link TextBlockEntry }
+     * Create an instance of {@link SimpleDataRecordEntry }
      * 
      */
     public SimpleDataRecordEntry createSimpleDataRecordEntry() {
@@ -57,12 +57,32 @@ public class ObjectFactory {
     }
     
      /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link SimpleDataRecordType }{@code >}}
+     * Create an instance of {@link AnyScalarEntry }
      * 
      */
+    public AnyScalarEntry createAnyScalarEntry() {
+        return new AnyScalarEntry();
+    }
+    
+    
+     /**
+      * 
+      *  A REMETTRE lors de la suppression de dependance vers Sosall
+     * Create an instance of {@link JAXBElement }{@code <}{@link SimpleDataRecordType }{@code >}}
+     * 
+     
     @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0", name = "SimpleDataRecord", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0", substitutionHeadName = "AbstractDataRecord")
     public JAXBElement<SimpleDataRecordEntry> createSimpleDataRecord(SimpleDataRecordEntry value) {
         return new JAXBElement<SimpleDataRecordEntry>(_SimpleDataRecord_QNAME, SimpleDataRecordEntry.class, null, value);
     }
+    
+     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractDataRecordType }{@code >}}
+     * 
+     
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0", name = "AbstractDataRecord")
+    public JAXBElement<AbstractDataRecordEntry> createAbstractDataRecord(AbstractDataRecordEntry value) {
+        return new JAXBElement<AbstractDataRecordEntry>(_AbstractDataRecord_QNAME, AbstractDataRecordEntry.class, null, value);
+    }*/
 
 }

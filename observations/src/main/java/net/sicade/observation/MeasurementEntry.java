@@ -14,7 +14,6 @@
  */
 package net.sicade.observation;
 
-import javax.units.Unit;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -117,6 +116,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         return name.toString();
     }
     
+    @Override
     public Measure getResult() {
         return result;
     }
