@@ -16,12 +16,12 @@ public class OfferingPhenomenonQuery extends Query {
      /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column idOffering, phenomenon;
+    protected final Column idOffering, phenomenon, compositePhenomenon;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byOffering, byPhenomenon;
+    protected final Parameter byOffering, byPhenomenon, byCompositePhenomenon;
     
     /**
      * Creates a new query for the specified database.
@@ -33,10 +33,12 @@ public class OfferingPhenomenonQuery extends Query {
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         
-        idOffering   = addColumn("offering_phenomenons", "id_offering", SLIE);
-        phenomenon   = addColumn("offering_phenomenons", "phenomenon",  SLIE);
+        idOffering          = addColumn("offering_phenomenons", "id_offering", SLIE);
+        phenomenon          = addColumn("offering_phenomenons", "phenomenon",  SLIE);
+        compositePhenomenon = addColumn("offering_phenomenons", "composite_phenomenon",  SLIE);
         
-        byOffering   = addParameter(idOffering, SELECT, LIST, EXISTS);
-        byPhenomenon = addParameter(phenomenon,  SELECT, EXISTS);
+        byOffering            = addParameter(idOffering, SELECT, LIST, EXISTS);
+        byPhenomenon          = addParameter(phenomenon,  SELECT, EXISTS);
+        byCompositePhenomenon = addParameter(compositePhenomenon,  SELECT, EXISTS);
     }
 }

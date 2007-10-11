@@ -8,6 +8,7 @@ import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
+import net.sicade.observation.CompositePhenomenonTable;
 import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.PhenomenonTable;
 import org.geotools.resources.Utilities;
@@ -28,6 +29,11 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
      * un lien vers la table des process.
      */
     private PhenomenonTable phenomenons;
+    
+     /**
+     * un lien vers la table des process.
+     */
+    private CompositePhenomenonTable compositePhenomenons;
     
     /**
      * Construit une table des phenomene composé.
@@ -57,12 +63,19 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
     @Override
     protected OfferingPhenomenonEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final OfferingPhenomenonQuery query = (OfferingPhenomenonQuery) super.query;
+        PhenomenonEntry phenomenon;
         
-        if (phenomenons == null) {
-            phenomenons = getDatabase().getTable(PhenomenonTable.class);
+        if (results.getString(indexOf(query.phenomenon)) != null) {
+            if (phenomenons == null) {
+                phenomenons = getDatabase().getTable(PhenomenonTable.class);
+            }
+            phenomenon = (PhenomenonEntry)phenomenons.getEntry(results.getString(indexOf(query.phenomenon)));
+        } else {
+            if (compositePhenomenons == null) {
+                compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+            }
+            phenomenon = compositePhenomenons.getEntry(results.getString(indexOf(query.compositePhenomenon)));
         }
-        PhenomenonEntry phenomenon = (PhenomenonEntry)phenomenons.getEntry(results.getString(indexOf(query.phenomenon)));
-        
         return new OfferingPhenomenonEntry(results.getString(indexOf(query.idOffering)), phenomenon);
     }
     

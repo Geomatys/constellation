@@ -17,7 +17,7 @@ public class ObservationOfferingQuery extends Query {
      * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column id, name, srsName, description, eventTimeBegin, 
-            eventTimeEnd, featureOfInterest, boundedBy, resultModel, 
+            eventTimeEnd, boundedBy, resultModel, 
             responseFormat, responseMode;
     
     /**
@@ -40,7 +40,6 @@ public class ObservationOfferingQuery extends Query {
         description       = addColumn("observation_offerings", "description",         SLI);
         eventTimeBegin    = addColumn("observation_offerings", "event_time_begin",    SLI);
         eventTimeEnd      = addColumn("observation_offerings", "event_time_end",      SLI);
-        featureOfInterest = addColumn("observation_offerings", "feature_of_interest", SLI);
         boundedBy         = addColumn("observation_offerings", "bounded_by",          SLI);
         resultModel       = addColumn("observation_offerings", "resultModel",         SLI);
         responseFormat    = addColumn("observation_offerings", "responseFormat",      SLI);
