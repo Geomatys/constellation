@@ -5,9 +5,9 @@
 package net.sicade.observation.test;
 
 import java.io.FileReader;
-import java.sql.Date;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import net.opengeospatial.sos.InsertObservation;
 import net.opengeospatial.sos.RegisterSensor;
 import net.sicade.observation.*;
 
@@ -23,19 +23,25 @@ public class XML2Java {
      */
     public static void main(String[] args) throws Exception {
 
-        String fileName = "generated-RegisterSensor.xml";
+        String fileName = "generated-Measurement.xml";
         // Unmarshalles the given XML file to objects
         JAXBContext context;
         context = JAXBContext.newInstance("net.opengeospatial.sos:net.opengis.ogc:net.opengis.ows:net.opengis.gml:net.sicade.observation:net.sicade.swe");
         Unmarshaller unmarshaller = context.createUnmarshaller();
         Object request = unmarshaller.unmarshal(new FileReader(fileName));
 
-        if (request instanceof ObservationEntry) {
+        if (request instanceof MeasurementEntry) {
+            MeasurementEntry meas = (MeasurementEntry)request;
+            if(meas.getResult() == null) System.out.println("result null");
+            else System.out.println("result non null");
+        } else if (request instanceof ObservationEntry) {
             ObservationEntry o = (ObservationEntry) request;
 
 
             System.out.println(o.toString());
         }
+        
+        
         if (request instanceof RegisterSensor) {
             RegisterSensor o = (RegisterSensor) request;
            
@@ -51,5 +57,7 @@ public class XML2Java {
                 System.out.println("observation null");
             }
         }
+        
+        
     }
 }

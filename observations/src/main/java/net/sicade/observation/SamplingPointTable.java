@@ -18,7 +18,9 @@ package net.sicade.observation;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
@@ -56,10 +58,14 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
     protected SamplingPointEntry createEntry(final ResultSet result) throws CatalogException, SQLException {
         final SamplingPointQuery query = (SamplingPointQuery) super.query;
         
+        List<Double> value = new ArrayList<Double>();
+        value.add(result.getDouble(indexOf((query.positionValueX))));
+        value.add(result.getDouble(indexOf((query.positionValueY))));
+                
         PointType p = new PointType(result.getString(indexOf(query.pointIdentifier)),
                                     new DirectPositionType(result.getString(indexOf(query.srsName)),
                                     result.getInt(indexOf(query.srsDimension)),
-                                    result.getDouble(indexOf(query.positionValue))));
+                                    value));
                             
         return new SamplingPointEntry( result.getString(indexOf(query.identifier)),
                                        result.getString(indexOf(query.name)),
@@ -106,12 +112,14 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
         if( station.getPosition() != null ) {
             statement.setString(indexOf(query.pointIdentifier), station.getPosition().getId());
             statement.setString(indexOf(query.srsName), station.getPosition().getPos().getSrsName());
-            statement.setString(indexOf(query.positionValue), Double.toString(station.getPosition().getPos().getValue().get(0)));
+            statement.setString(indexOf(query.positionValueX), Double.toString(station.getPosition().getPos().getValue().get(0)));
+            statement.setString(indexOf(query.positionValueY), Double.toString(station.getPosition().getPos().getValue().get(1)));
             statement.setInt(indexOf(query.srsDimension), station.getPosition().getPos().getSrsDimension());
         } else {
             statement.setNull(indexOf(query.pointIdentifier), java.sql.Types.VARCHAR);
             statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
-            statement.setNull(indexOf(query.positionValue), java.sql.Types.VARCHAR);
+            statement.setNull(indexOf(query.positionValueX), java.sql.Types.VARCHAR);
+            statement.setNull(indexOf(query.positionValueY), java.sql.Types.VARCHAR);
             statement.setNull(indexOf(query.srsDimension), java.sql.Types.INTEGER);
         }
         insertSingleton(statement); 

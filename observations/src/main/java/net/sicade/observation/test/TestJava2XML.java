@@ -11,7 +11,8 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
-import net.opengeospatial.sos.RegisterSensor;
+import net.opengeospatial.sos.GetObservation;
+import net.opengeospatial.sos.InsertObservation;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.gml.DirectPositionType;
 import net.sicade.gml.PointType;
@@ -36,12 +37,17 @@ public class TestJava2XML {
     public static void main(String[] args) throws Exception {
         
        // String fileName = "generated-ObservationEntry.xml";
-        String fileName = "generated-RegisterSensor.xml";
-        
-              
-       // La station
+       // String fileName = "generated-RegisterSensor.xml";
+       String fileName = "generated-Measurement.xml";
+       // String fileName = "generated-RegisterSensor-Measurement.xml";     
+       // String fileName = "generated-InsertObservation-Measurement.xml"; 
+       
+        // La station
         //SamplingFeatureEntry sf        = new SamplingFeatureEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X");
-        DirectPositionType pos           = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, 163000.2345192);
+        List<Double> values = new ArrayList<Double>();
+        values.add(163000.0);
+        values.add(2345192.0); 
+        DirectPositionType pos           = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, values);
         PointType p                      = new PointType("STATION_LOCALISATION", pos);
         SamplingPointEntry sf            = new SamplingPointEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X", p);
         
@@ -78,7 +84,8 @@ public class TestJava2XML {
         TextBlockEntry tbe               = new TextBlockEntry("enc1", ",", "@@", '.');
         DataBlockDefinitionEntry dbd     = new DataBlockDefinitionEntry("idDef", comp, tbe);
         
-        RegisterSensor request = new RegisterSensor();
+        
+        
         
         // l'observation
         ObservationEntry obs         = new ObservationEntry("obsTest1",
@@ -99,9 +106,12 @@ public class TestJava2XML {
                                                                 mesure,
                                                                 t,
                                                                 null);
-        
-       request.setObservationTemplate(obs);
-       request.setSensorDescription("une fichier sensor mli");
+        /*RegisterSensor request = new RegisterSensor();
+        request.setObservationTemplate(meas);
+        request.setSensorDescription("une fichier sensor mli");*/
+        InsertObservation request = new InsertObservation();
+        request.setAssignedSensorId("asensorId");
+        request.setObservation(meas);
         
         // Marshalles objects to the specified file
         JAXBContext context = JAXBContext.newInstance("net.sicade.observation:net.opengis.gml:net.sicade.swe:net.opengeospatial.sos");//ObservationEntry.class,SamplingPointEntry.class,PointType.class);//
@@ -113,7 +123,8 @@ public class TestJava2XML {
         }
         
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(request, new FileWriter(fileName));
+        marshaller.marshal(meas, new FileWriter(fileName));
     }
+    
     
 }

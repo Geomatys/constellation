@@ -18,8 +18,10 @@ package net.sicade.observation;
 import java.util.Collection;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import net.sicade.catalog.Entry;
 import org.opengis.observation.ObservationCollection;
 
 /**
@@ -29,11 +31,12 @@ import org.opengis.observation.ObservationCollection;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ObservationCollection")
 @XmlRootElement(name = "ObservationCollection")
-public class ObservationCollectionEntry implements ObservationCollection {
+public class ObservationCollectionEntry extends Entry implements ObservationCollection {
 
     /**
      *  The observation collection
      */
+    @XmlElement(name="member", namespace="http://www.opengis.net/om/1.0")
     private Collection<ObservationEntry> member;
     
     /**
@@ -58,6 +61,7 @@ public class ObservationCollectionEntry implements ObservationCollection {
     /**
      * Return a collection of Observation
      */
+    @Override
     public Collection<ObservationEntry> getMember() {
         return this.member;
     }

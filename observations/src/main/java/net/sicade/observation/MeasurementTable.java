@@ -24,22 +24,6 @@ import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.coverage.model.DistributionEntry;
 import net.sicade.coverage.model.DistributionTable;
-import net.sicade.observation.CompositePhenomenonEntry;
-import net.sicade.observation.CompositePhenomenonTable;
-import net.sicade.observation.MeasureEntry;
-import net.sicade.observation.MeasureTable;
-import net.sicade.observation.MeasurementEntry;
-import net.sicade.observation.MeasurementQuery;
-import net.sicade.observation.MetadataTable;
-import net.sicade.observation.PhenomenonEntry;
-import net.sicade.observation.PhenomenonTable;
-import net.sicade.observation.ProcessEntry;
-import net.sicade.observation.ProcessTable;
-import net.sicade.observation.SamplingFeatureEntry;
-import net.sicade.observation.SamplingFeatureTable;
-import net.sicade.observation.SamplingPointEntry;
-import net.sicade.observation.SamplingPointTable;
-import net.sicade.observation.TemporalObjectEntry;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measurement;
 
@@ -149,7 +133,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         if (compositePhenomenons == null) {
             compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
         }
-        CompositePhenomenonEntry compoPheno = (CompositePhenomenonEntry)compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
+        CompositePhenomenonEntry compoPheno = compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
         
         
         if (stations == null) {
@@ -213,7 +197,14 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         PreparedStatement statement = getStatement(QueryType.INSERT);
         statement.setString(indexOf(query.name),         id);
         statement.setString(indexOf(query.description),  meas.getDefinition());
-        statement.setString(indexOf(query.distribution), meas.getDistribution().getName());
+        // on insere la distribution
+        if (meas.getDistribution() == null) {
+            meas.setDistribution(DistributionEntry.NORMAL);
+        }
+        if (distributions == null) {
+            distributions = getDatabase().getTable(DistributionTable.class);
+        }
+        statement.setString(indexOf(query.distribution), distributions.getIdentifier(meas.getDistribution()));
         
         // on insere la station qui a effectué cette measervation
          if (meas.getFeatureOfInterest() instanceof SamplingPointEntry){
@@ -289,10 +280,10 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         
         // on insere le "samplingTime""
         if (meas.getSamplingTime() != null){
-            Date date = Date.valueOf(((TemporalObjectEntry)meas.getSamplingTime()).getBeginTime().toString());
+            Date date = new Date(((TemporalObjectEntry)meas.getSamplingTime()).getBeginTime().getTime());
             statement.setDate(indexOf(query.samplingTimeBegin), date);
             if (((TemporalObjectEntry)meas.getSamplingTime()).getEndTime() != null) {
-                date = Date.valueOf(((TemporalObjectEntry)meas.getSamplingTime()).getEndTime().toString());
+                date = new Date(((TemporalObjectEntry)meas.getSamplingTime()).getEndTime().getTime());
                 statement.setDate(indexOf(query.samplingTimeEnd),  date);
             } else {
                 statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);

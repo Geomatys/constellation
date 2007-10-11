@@ -27,7 +27,6 @@ import org.geotools.resources.Utilities;
 
 // OpenGis dependencies
 import org.opengis.observation.Measure;
-import org.opengis.observation.BaseUnit;
 /**
  * Resultat d'une observation de type {linkplain Measurement measurement}.
  *
@@ -80,6 +79,7 @@ public class MeasureEntry extends Entry implements Measure{
      *
      * @todo Implementer le retour des unites.
      */
+    @Override
     public UnitOfMeasureEntry getUom() {
         return uom;
     }
@@ -87,6 +87,7 @@ public class MeasureEntry extends Entry implements Measure{
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getValue() {
         return value;
     }
@@ -120,6 +121,7 @@ public class MeasureEntry extends Entry implements Measure{
     /**
      * Retourne une description de l'objet (debug).
      */
+    @Override
     public String toString() {
         return "name=" + name + " value=" + value + '\n' + "uom =" + uom.toString();
     }

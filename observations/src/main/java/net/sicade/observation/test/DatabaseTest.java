@@ -42,7 +42,10 @@ public class DatabaseTest {
     public static void main(String[] args) throws Exception {
         // La station
         //SamplingFeatureEntry sf        = new SamplingFeatureEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X");
-        DirectPositionType pos           = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, 163000.2345192);
+        List<Double> values = new ArrayList<Double>();
+        values.add(163000.0);
+        values.add(2345192.0);
+        DirectPositionType pos           = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, values);
         PointType p                      = new PointType("STATION_LOCALISATION", pos);
         SamplingPointEntry sf            = new SamplingPointEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X", p);
         
@@ -104,7 +107,6 @@ public class DatabaseTest {
         dataSource.setDatabaseName("seagis");
         dataSource.setUser("postgres");
         dataSource.setPassword("postgres");
-        
         Database db = new Database(dataSource);
         
         /*ObservationTable obsTable = new ObservationTable(db);

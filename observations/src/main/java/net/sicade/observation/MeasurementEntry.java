@@ -16,6 +16,7 @@ package net.sicade.observation;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.sicade.coverage.model.DistributionEntry;
@@ -38,11 +39,6 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      */
     private static final long serialVersionUID = 6700527485309897974L;
     
-    
-    /**
-     * le resultat de la mesure
-     */
-    private MeasureEntry result;
     
     /**
      * constructeur vide utilisé par JAXB.
@@ -103,7 +99,6 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
         super(name, definition, station, observedProperty, procedure, distribution, result,
                 samplingTime, resultDefinition);
         
-        this.result = result;
     }
     
     /**
@@ -118,7 +113,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     
     @Override
     public Measure getResult() {
-        return result;
+       return (Measure)super.getResult();
     }
     
     

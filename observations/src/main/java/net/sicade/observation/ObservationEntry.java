@@ -70,7 +70,8 @@ import org.geotools.resources.Utilities;
 @XmlRootElement(name = "Observation")
 @XmlSeeAlso({ SamplingFeatureEntry.class, SamplingPointEntry.class, 
               PhenomenonEntry.class, CompositePhenomenonEntry.class,
-              DataBlockDefinitionEntry.class})
+              DataBlockDefinitionEntry.class, MeasurementEntry.class,
+              MeasureEntry.class})
 public class ObservationEntry extends Entry implements Observation {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.

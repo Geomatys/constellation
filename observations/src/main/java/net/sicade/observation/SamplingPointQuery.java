@@ -34,7 +34,7 @@ public class SamplingPointQuery extends Query {
     /** 
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column identifier, name, description, sampledFeature,pointIdentifier, srsName, srsDimension, positionValue;
+    protected final Column identifier, name, description, sampledFeature,pointIdentifier, srsName, srsDimension, positionValueX, positionValueY;
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
@@ -57,7 +57,8 @@ public class SamplingPointQuery extends Query {
         pointIdentifier        = addColumn   ("sampling_points", "point_id",           SLI);
         srsName                = addColumn   ("sampling_points", "point_srsname",      SLI);
         srsDimension           = addColumn   ("sampling_points", "point_srsdimension", SLI);
-        positionValue          = addColumn   ("sampling_points", "pos_value",          SLI);
+        positionValueX         = addColumn   ("sampling_points", "pos_value_x",          SLI);
+        positionValueY         = addColumn   ("sampling_points", "pos_value_y",          SLI);
         
         byIdentifier  = addParameter(identifier, SELECT, EXISTS);
     }

@@ -1,7 +1,6 @@
 
 package net.sicade.gml;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -35,11 +34,10 @@ public class DirectPositionType {
 
     public DirectPositionType() {}
     
-    public DirectPositionType(String srsName, int srsDimension, double value) {
+    public DirectPositionType(String srsName, int srsDimension, List<Double> value) {
         this.srsName      = srsName;
         this.srsDimension = srsDimension;
-        this.value = new ArrayList<Double>();
-        this.value.add(value);
+        this.value = value;
     }    
     /**
      * A type for a list of values of the respective simple type.Gets the value of the value property.
@@ -179,8 +177,13 @@ public class DirectPositionType {
     /**
      * Retourne un description de l'objet.
      */
+    @Override
     public String toString() {
-        String s = " srsName=" + srsName + " srsDimension=" + srsDimension + " value=" + value.get(0); 
+        String s = " srsName=" + srsName + " srsDimension=" + srsDimension + " value:" + '\n';
+        
+        for(double v :value) {
+           s +=  v;
+        }
         return s;
     }
 }

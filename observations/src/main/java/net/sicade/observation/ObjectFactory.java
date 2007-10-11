@@ -30,8 +30,16 @@ public class ObjectFactory {
         return new ObservationEntry();
     }
     
+    /**
+     * Create an instance of {@link ObservationCollectionEntry }
+     * 
+     */
+    public ObservationCollectionEntry createObservationCollectionEntry() {
+        return new ObservationCollectionEntry();
+    }
+    
       /**
-     * Create an instance of {@link ObservationEntry }
+     * Create an instance of {@link MeasurementEntry }
      * 
      */
     public MeasurementEntry createMeasurementEntry() {
@@ -47,7 +55,7 @@ public class ObjectFactory {
     }
     
     /**
-     * Create an instance of {@link SamplingPointEntry }
+     * Create an instance of {@link CompositePhenomenonEntry }
      * 
      */
     public CompositePhenomenonEntry createCompositePhenomenonEntry() {
