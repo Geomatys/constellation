@@ -89,4 +89,18 @@ public class AnyResultEntry extends Entry {
         return dataBlock;
     }
     
+    /**
+     * retourne une chaine de caractere decrivant le resultat (debug)
+     * 
+     */
+    @Override
+    public String toString() {
+        String res;
+        if (reference == null)
+            res = dataBlock;
+        else
+            res = reference.toString();
+        
+        return "id = " + id + " value/idref: " + res;
+    }
 }

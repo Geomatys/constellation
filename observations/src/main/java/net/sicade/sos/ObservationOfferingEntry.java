@@ -25,6 +25,7 @@ import net.sicade.observation.TemporalObjectEntry;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ObservationOfferingType", propOrder = {
+    "srsName",
     "intendedApplication",
     "eventTime",
     "procedure",
@@ -38,6 +39,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
 
     @XmlElementRef(name = "intendedApplication", namespace = "http://www.opengeospatial.net/sos/0", type = JAXBElement.class)
     protected List<JAXBElement<String>> intendedApplication;
+    protected String srsName;
     @XmlElement(required = true)
     protected TemporalObjectEntry eventTime;
     @XmlElement(required = true)
@@ -61,11 +63,12 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      *  Construit un nouvel offering.
      */ 
     public ObservationOfferingEntry(String id, String name, String description, ReferenceEntry descriptionReference,
-            BoundingShapeEntry boundedBy, TemporalObjectEntry eventTime, List<ProcessEntry> procedure,
+            BoundingShapeEntry boundedBy, String srsName, TemporalObjectEntry eventTime, List<ProcessEntry> procedure,
             List<PhenomenonEntry> observedProperty, List<? extends SamplingFeatureEntry> featureOfInterest,
             String responseFormat, String resultModel, ResponseMode responseMode) {
         
         super(id, name, description, descriptionReference, boundedBy);
+        this.srsName = srsName;
         this.eventTime = eventTime;
         this.procedure = procedure;
         this.observedProperty = observedProperty;
@@ -178,6 +181,13 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      */
     public ResponseMode getResponseMode() {
         return this.responseMode;
+    }
+    
+    /**
+     * Return the value of srsName.
+     */
+    public String getSrsName() {
+        return this.srsName;
     }
 
 }

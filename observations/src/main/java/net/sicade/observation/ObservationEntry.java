@@ -28,6 +28,7 @@ import net.sicade.catalog.Entry;
 import net.sicade.coverage.model.DistributionEntry;
 
 // openGis dependencies
+import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.DataBlockDefinitionEntry;
 import org.opengis.observation.Process;
 import org.opengis.observation.Phenomenon;
@@ -71,7 +72,7 @@ import org.geotools.resources.Utilities;
 @XmlSeeAlso({ SamplingFeatureEntry.class, SamplingPointEntry.class, 
               PhenomenonEntry.class, CompositePhenomenonEntry.class,
               DataBlockDefinitionEntry.class, MeasurementEntry.class,
-              MeasureEntry.class})
+              MeasureEntry.class, AnyResultEntry.class})
 public class ObservationEntry extends Entry implements Observation {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
@@ -236,8 +237,14 @@ public class ObservationEntry extends Entry implements Observation {
     }
 
     /**
+     */
+    public void setName(String name) {
+        super.name = name;
+    }
+    /**
      * {@inheritDoc}
      */
+    @Override
     public SamplingFeature getFeatureOfInterest() {
         return featureOfInterest;
     }
@@ -245,6 +252,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Phenomenon getObservedProperty() {
         return observedProperty;
     }
@@ -252,6 +260,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Process getProcedure() {
         return procedure;
     }
@@ -280,6 +289,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Element getQuality() {
         return resultQuality;
     }
@@ -287,6 +297,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getResult() {
         return result;
     }
@@ -294,6 +305,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getResultDefinition() {
         return resultDefinition;
     }
@@ -301,6 +313,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TemporalObject getSamplingTime() {
         return samplingTime;
     }
@@ -308,6 +321,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MetaData getObservationMetadata() {
         return observationMetadata;
     }
@@ -315,6 +329,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
+    @Override
      public TemporalObject getProcedureTime() {
         return procedureTime;
     }
@@ -322,6 +337,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */ 
+    @Override
     public Object getProcedureParameter() {
         return procedureParameter;
     }
@@ -330,6 +346,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */ 
+    @Override
     public String getDefinition() {
         return definition;
     }

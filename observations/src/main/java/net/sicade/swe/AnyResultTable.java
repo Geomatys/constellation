@@ -80,9 +80,9 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         final AnyResultQuery query = (AnyResultQuery) super.query;
         
         String id;
-        if (result instanceof String) {
+        if (result instanceof AnyResultEntry) {
             PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-            statement.setString(indexOf(query.dataBlock), (String)result);
+            statement.setString(indexOf(query.dataBlock),((AnyResultEntry)result).getDataBlock());
             statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
             ResultSet results = statement.executeQuery();
             if(results.next())
@@ -104,8 +104,8 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         
         PreparedStatement statement = getStatement(QueryType.INSERT);
         statement.setString(indexOf(query.idResult), id);
-        if (result instanceof String) {
-            statement.setString(indexOf(query.dataBlock), (String)result);
+        if (result instanceof AnyResultEntry) {
+            statement.setString(indexOf(query.dataBlock), ((AnyResultEntry)result).getDataBlock());
             statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
         } else {
             if (result instanceof ReferenceEntry) {

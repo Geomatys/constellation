@@ -2,6 +2,7 @@
 package net.sicade.swe;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import net.sicade.catalog.Entry;
 import org.geotools.resources.Utilities;
 
@@ -10,7 +11,8 @@ import org.geotools.resources.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public abstract class AbstractDataComponentEntry extends Entry implements AbstractDataComponent{
+@XmlSeeAlso({AbstractDataRecordEntry.class})
+public class AbstractDataComponentEntry extends Entry implements AbstractDataComponent{
     
     /**
      * L'identifiant du composant (normalement herité de abstractGML Type).

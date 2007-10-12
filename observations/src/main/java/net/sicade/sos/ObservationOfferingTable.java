@@ -136,6 +136,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                                              results.getString(indexOf(query.description)),
                                              null,
                                              boundedBy,
+                                             results.getString(indexOf(query.srsName)),
                                              eventTime,
                                              process,
                                              phenos,

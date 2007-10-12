@@ -1,12 +1,15 @@
 
 package net.sicade.swe;
 
+import javax.xml.bind.annotation.XmlSeeAlso;
+
 /**
  *
  * @version $Id:
  * @author Guilhem Legal
  */
-public abstract class AbstractDataRecordEntry extends AbstractDataComponentEntry {
+@XmlSeeAlso({SimpleDataRecordEntry.class})
+public class AbstractDataRecordEntry extends AbstractDataComponentEntry {
     
     /**
      * constructeur utilisé par jaxB.

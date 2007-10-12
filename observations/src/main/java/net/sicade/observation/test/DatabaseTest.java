@@ -16,6 +16,7 @@ import net.sicade.observation.MeasureEntry;
 import net.sicade.observation.MeasurementEntry;
 import net.sicade.observation.MeasurementTable;
 import net.sicade.observation.ObservationEntry;
+import net.sicade.observation.ObservationTable;
 import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.ProcessEntry;
 import net.sicade.observation.SamplingPointEntry;
@@ -59,7 +60,7 @@ public class DatabaseTest {
         CompositePhenomenonEntry ph      = new CompositePhenomenonEntry("aggregatePhenomenon", "urn:x-ogc:phenomenon:BRGM:aggregate", null, null, compPheno);
         
         // le capteur
-        ProcessEntry proc                = new ProcessEntry("un capteur", "la description de ce capteur");
+        ProcessEntry proc                = new ProcessEntry("urn:ogc:object:sensor:BRGM:12349", null);
         
         // le sampling time
         TemporalObjectEntry t            = new TemporalObjectEntry(Date.valueOf("2002-02-12"),null);
@@ -109,11 +110,15 @@ public class DatabaseTest {
         dataSource.setPassword("postgres");
         Database db = new Database(dataSource);
         
-        /*ObservationTable obsTable = new ObservationTable(db);
-        obsTable.getIdentifier(request);*/
+        ObservationTable obsTable = new ObservationTable(db);
+        obsTable.getIdentifier(request);
         
-        MeasurementTable measTable = new MeasurementTable(db);
-        measTable.getIdentifier(meas);
+        
+        /*MeasurementTable measTable = new MeasurementTable(db);
+        MeasurementEntry m = (MeasurementEntry) measTable.getEntry("test");
+        if (m == null) logger.finer("OK");
+        else logger.finer (":-((((((((((((((");*/
+        //measTable.getIdentifier(meas);
         /*ObservationEntry obs = (ObservationEntry) obsTable.getEntry("obsTest3");
         
         MeasurementTable obsTable = new MeasurementTable(db);

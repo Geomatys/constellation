@@ -23,10 +23,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-
+import net.sicade.catalog.Entry;
 // Geotools dependencies
 import org.geotools.resources.Utilities;
-import net.sicade.catalog.Entry;
 
 // openGis dependencies
 import org.opengis.observation.sampling.SamplingFeature;

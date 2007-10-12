@@ -57,8 +57,8 @@ public class SamplingPointQuery extends Query {
         pointIdentifier        = addColumn   ("sampling_points", "point_id",           SLI);
         srsName                = addColumn   ("sampling_points", "point_srsname",      SLI);
         srsDimension           = addColumn   ("sampling_points", "point_srsdimension", SLI);
-        positionValueX         = addColumn   ("sampling_points", "pos_value_x",          SLI);
-        positionValueY         = addColumn   ("sampling_points", "pos_value_y",          SLI);
+        positionValueX         = addColumn   ("sampling_points", "x_value",            SLI);
+        positionValueY         = addColumn   ("sampling_points", "y_value",            SLI);
         
         byIdentifier  = addParameter(identifier, SELECT, EXISTS);
     }

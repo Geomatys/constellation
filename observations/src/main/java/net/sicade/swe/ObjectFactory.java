@@ -25,6 +25,30 @@ public class ObjectFactory {
     }
     
     /**
+     * Create an instance of {@link AbstractDataComponentEntry }
+     * 
+     */
+    public AbstractDataComponentEntry createAbstractDataComponentEntry() {
+        return new AbstractDataComponentEntry();
+    }
+    
+    /**
+     * Create an instance of {@link AbstractDataComponentEntry }
+     * 
+     */
+    public AbstractDataRecordEntry createAbstractDataRecordEntry() {
+        return new AbstractDataRecordEntry();
+    }
+    
+    /**
+     * Create an instance of {@link AbstractEncodingEntry }
+     * 
+     */
+    public AbstractEncodingEntry createAbstractEncodingEntry() {
+        return new AbstractEncodingEntry();
+    }
+    
+    /**
      * Create an instance of {@link AnyResultEntry }
      * 
      */

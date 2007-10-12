@@ -13,6 +13,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import net.opengeospatial.sos.GetObservation;
 import net.opengeospatial.sos.InsertObservation;
+import net.opengeospatial.sos.RegisterSensor;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.gml.DirectPositionType;
 import net.sicade.gml.PointType;
@@ -21,6 +22,7 @@ import net.sicade.swe.DataBlockDefinitionEntry;
 import net.sicade.swe.AnyScalarEntry;
 import net.sicade.gml.ReferenceEntry;
 import net.sicade.gml.UnitOfMeasureEntry;
+import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.SimpleDataRecordEntry;
 import net.sicade.swe.TextBlockEntry;
 
@@ -38,8 +40,9 @@ public class TestJava2XML {
         
        // String fileName = "generated-ObservationEntry.xml";
        // String fileName = "generated-RegisterSensor.xml";
-       String fileName = "generated-Measurement.xml";
-       // String fileName = "generated-RegisterSensor-Measurement.xml";     
+       //String fileName = "generated-Measurement.xml";
+       // String fileName = "generated-RegisterSensor-Measurement.xml";    
+        String fileName = "generated-InsertObservation-Observation.xml";
        // String fileName = "generated-InsertObservation-Measurement.xml"; 
        
         // La station
@@ -67,10 +70,10 @@ public class TestJava2XML {
         TemporalObjectEntry t            = new TemporalObjectEntry(Date.valueOf("2002-02-12"),null);
         
         //le resultat
-        //AnyResultEntry result            = new AnyResultEntry("idresultat", null, "un bloc de donnée");
+        AnyResultEntry result            = new AnyResultEntry("idresultat", null, "2002-10-02,15.0,true@@2002-10-03,12.1,true@@");
         UnitOfMeasureEntry uom           = new UnitOfMeasureEntry("unit1", "centimetre", "longueur", "refSyS");
         MeasureEntry mesure              = new MeasureEntry("mesure1", uom, 35 );
-        ReferenceEntry result            = new ReferenceEntry("ref2", "blablabla");
+       // ReferenceEntry result            = new ReferenceEntry("ref2", "blablabla");
         
         // la description du resultat
         List<SimpleDataRecordEntry> comp = new ArrayList<SimpleDataRecordEntry>();
@@ -106,12 +109,12 @@ public class TestJava2XML {
                                                                 mesure,
                                                                 t,
                                                                 null);
-        /*RegisterSensor request = new RegisterSensor();
-        request.setObservationTemplate(meas);
+       /* RegisterSensor request = new RegisterSensor();
+        request.setObservationTemplate(obs);
         request.setSensorDescription("une fichier sensor mli");*/
         InsertObservation request = new InsertObservation();
         request.setAssignedSensorId("asensorId");
-        request.setObservation(meas);
+        request.setObservation(obs);
         
         // Marshalles objects to the specified file
         JAXBContext context = JAXBContext.newInstance("net.sicade.observation:net.opengis.gml:net.sicade.swe:net.opengeospatial.sos");//ObservationEntry.class,SamplingPointEntry.class,PointType.class);//
@@ -123,7 +126,7 @@ public class TestJava2XML {
         }
         
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(meas, new FileWriter(fileName));
+        marshaller.marshal(request, new FileWriter(fileName));
     }
     
     

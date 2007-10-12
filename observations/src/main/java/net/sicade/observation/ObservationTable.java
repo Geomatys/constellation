@@ -294,12 +294,13 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         }
         AnyResultEntry any = results.getEntry(result.getString(indexOf(query.result)));
         Object resultat = null;
-        if(any.getReference() == null && any.getDataBlock() != null) {
-            resultat = any.getDataBlock();
-        } else if(any.getReference() != null && any.getDataBlock() == null)  {
-            resultat = any.getReference();
+        if (any != null) {
+            if (any.getReference() == null && any.getDataBlock() != null) {
+                resultat = any.getDataBlock();
+            } else if (any.getReference() != null && any.getDataBlock() == null)  {
+                resultat = any.getReference();
+            }
         }
-        
         if (dataBlockDefinitions == null) {
             dataBlockDefinitions = getDatabase().getTable(DataBlockDefinitionTable.class);
         }
@@ -413,7 +414,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         }
         
         // on insere le resultat
-        if (obs.getResult() instanceof ReferenceEntry || obs.getResult() instanceof String){
+        if (obs.getResult() instanceof ReferenceEntry || obs.getResult() instanceof AnyResultEntry){
             if (results == null) {
                 results = getDatabase().getTable(AnyResultTable.class);
             }

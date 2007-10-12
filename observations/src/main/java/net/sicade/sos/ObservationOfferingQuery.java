@@ -41,9 +41,9 @@ public class ObservationOfferingQuery extends Query {
         eventTimeBegin    = addColumn("observation_offerings", "event_time_begin",    SLI);
         eventTimeEnd      = addColumn("observation_offerings", "event_time_end",      SLI);
         boundedBy         = addColumn("observation_offerings", "bounded_by",          SLI);
-        resultModel       = addColumn("observation_offerings", "resultModel",         SLI);
-        responseFormat    = addColumn("observation_offerings", "responseFormat",      SLI);
-        responseMode      = addColumn("observation_offerings", "responseMode",        SLI);
+        resultModel       = addColumn("observation_offerings", "result_model",         SLI);
+        responseFormat    = addColumn("observation_offerings", "response_format",      SLI);
+        responseMode      = addColumn("observation_offerings", "response_mode",        SLI);
         
         
         byId         = addParameter(id, SELECT, EXISTS);
