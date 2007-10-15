@@ -317,8 +317,8 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 distrib,
                 //manque quality
                 resultat,
-                new TemporalObjectEntry(result.getDate(indexOf(query.samplingTimeBegin)),
-                result.getDate(indexOf(query.samplingTimeEnd))),
+                new TemporalObjectEntry(result.getTimestamp(indexOf(query.samplingTimeBegin)),
+                result.getTimestamp(indexOf(query.samplingTimeEnd))),
                 dataBlockDef);
         
         

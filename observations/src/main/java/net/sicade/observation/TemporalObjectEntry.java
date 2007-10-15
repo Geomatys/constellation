@@ -1,7 +1,7 @@
 
 package net.sicade.observation;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -21,12 +21,12 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
      * The begin date of a duration or a single TimeInstant.
      */
     @XmlElement(required = true)
-    private Date beginTime;
+    private Timestamp beginTime;
     
     /**
      * The end date of a duration or {@code null}.
      */
-    private Date endTime;
+    private Timestamp endTime;
     
     /**
      * Constructeur vide utilisé par JAXB.
@@ -41,17 +41,17 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
      * @param beginTime The instant time or the begin date of the period.
      * @param endTime   if not {@code null} the object became a time period.
      */
-    public TemporalObjectEntry(Date beginTime, Date endTime) {
+    public TemporalObjectEntry(Timestamp beginTime, Timestamp endTime) {
         super(null);
         this.beginTime = beginTime;
         this.endTime   = endTime;
     }
 
-    public Date getBeginTime() {
+    public Timestamp getBeginTime() {
         return beginTime;
     }
 
-    public Date getEndTime() {
+    public Timestamp getEndTime() {
         return endTime;
     }
     

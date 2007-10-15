@@ -3,6 +3,7 @@ package net.sicade.observation.test;
 
 import java.util.ArrayList;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.Logger;
 import net.sicade.catalog.Database;
@@ -63,7 +64,7 @@ public class DatabaseTest {
         ProcessEntry proc                = new ProcessEntry("urn:ogc:object:sensor:BRGM:12349", null);
         
         // le sampling time
-        TemporalObjectEntry t            = new TemporalObjectEntry(Date.valueOf("2002-02-12"),null);
+        TemporalObjectEntry t            = new TemporalObjectEntry(Timestamp.valueOf("2002-02-12 10:20:14"),null);
         
         //le resultat
         //AnyResultEntry result            = new AnyResultEntry("idresultat", null, "un bloc de donnée");

@@ -352,6 +352,21 @@ public class ObservationEntry extends Entry implements Observation {
     }
     
     /**
+     * Retourne vrai si l'observation satisfait le template specifié
+     */ 
+    public boolean matchTemplate(ObservationEntry template) {
+        return Utilities.equals(this.featureOfInterest,   template.featureOfInterest) &&
+               Utilities.equals(this.observedProperty,    template.observedProperty) &&
+               Utilities.equals(this.procedure,           template.procedure)  &&
+               Utilities.equals(this.resultQuality,       template.resultQuality)    && 
+               Utilities.equals(this.distribution,        template.distribution) &&
+               Utilities.equals(this.observationMetadata, template.observationMetadata) &&
+               Utilities.equals(this.resultDefinition,    template.resultDefinition) &&
+               Utilities.equals(this.procedureTime,       template.procedureTime) &&
+               Utilities.equals(this.procedureParameter,  template.procedureParameter);
+        
+    }
+    /**
      * Retourne un code reprÃ©sentant cette observation.
      */
     @Override
@@ -372,7 +387,7 @@ public class ObservationEntry extends Entry implements Observation {
             return Utilities.equals(this.featureOfInterest,   that.featureOfInterest) &&
                    Utilities.equals(this.observedProperty,    that.observedProperty) &&
                    Utilities.equals(this.procedure,           that.procedure)  &&
-                   Utilities.equals(this.resultQuality,             that.resultQuality)    && 
+                   Utilities.equals(this.resultQuality,       that.resultQuality)    && 
                    Utilities.equals(this.distribution,        that.distribution) &&
                    Utilities.equals(this.result,              that.result) &&
                    Utilities.equals(this.samplingTime,        that.samplingTime) &&

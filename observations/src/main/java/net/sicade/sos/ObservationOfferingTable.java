@@ -128,8 +128,8 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             sampling.add(c.getComponent());
          }
          
-         TemporalObjectEntry eventTime = new TemporalObjectEntry(results.getDate(indexOf(query.eventTimeBegin)),
-                                                                 results.getDate(indexOf(query.eventTimeEnd)));
+         TemporalObjectEntry eventTime = new TemporalObjectEntry(results.getTimestamp(indexOf(query.eventTimeBegin)),
+                                                                 results.getTimestamp(indexOf(query.eventTimeEnd)));
                 
          return new ObservationOfferingEntry(idOffering,
                                              results.getString(indexOf(query.name)),

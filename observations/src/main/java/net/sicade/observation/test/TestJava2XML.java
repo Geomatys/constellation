@@ -5,22 +5,19 @@
 package net.sicade.observation.test;
 
 import java.io.FileWriter;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
-import net.opengeospatial.sos.GetObservation;
 import net.opengeospatial.sos.InsertObservation;
-import net.opengeospatial.sos.RegisterSensor;
 import net.sicade.coverage.model.Distribution;
 import net.sicade.gml.DirectPositionType;
 import net.sicade.gml.PointType;
 import net.sicade.observation.*;
 import net.sicade.swe.DataBlockDefinitionEntry;
 import net.sicade.swe.AnyScalarEntry;
-import net.sicade.gml.ReferenceEntry;
 import net.sicade.gml.UnitOfMeasureEntry;
 import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.SimpleDataRecordEntry;
@@ -67,7 +64,7 @@ public class TestJava2XML {
         ProcessEntry proc                = new ProcessEntry("un capteur", "la description de ce capteur");
         
         // le sampling time
-        TemporalObjectEntry t            = new TemporalObjectEntry(Date.valueOf("2002-02-12"),null);
+        TemporalObjectEntry t            = new TemporalObjectEntry(Timestamp.valueOf("2002-02-12 14:15:22"),null);
         
         //le resultat
         AnyResultEntry result            = new AnyResultEntry("idresultat", null, "2002-10-02,15.0,true@@2002-10-03,12.1,true@@");
