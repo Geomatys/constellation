@@ -26,6 +26,7 @@ import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.ProcessEntry;
 import net.sicade.observation.SamplingFeatureEntry;
 import net.sicade.observation.TemporalObjectEntry;
+import net.sicade.observation.TimestampEntry;
 
 /**
  *
@@ -128,8 +129,8 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             sampling.add(c.getComponent());
          }
          
-         TemporalObjectEntry eventTime = new TemporalObjectEntry(results.getTimestamp(indexOf(query.eventTimeBegin)),
-                                                                 results.getTimestamp(indexOf(query.eventTimeEnd)));
+         TemporalObjectEntry eventTime = new TemporalObjectEntry(new TimestampEntry(results.getTimestamp(indexOf(query.eventTimeBegin))),
+                                                                 new TimestampEntry(results.getTimestamp(indexOf(query.eventTimeEnd))));
                 
          return new ObservationOfferingEntry(idOffering,
                                              results.getString(indexOf(query.name)),

@@ -352,17 +352,29 @@ public class ObservationEntry extends Entry implements Observation {
     }
     
     /**
-     * Retourne vrai si l'observation satisfait le template specifié
+     * Retourne vrai si l'observation satisfait le template specifie
      */ 
     public boolean matchTemplate(ObservationEntry template) {
-        return Utilities.equals(this.featureOfInterest,   template.featureOfInterest) &&
-               Utilities.equals(this.observedProperty,    template.observedProperty) &&
-               Utilities.equals(this.procedure,           template.procedure)  &&
-               Utilities.equals(this.resultQuality,       template.resultQuality)    && 
-               Utilities.equals(this.distribution,        template.distribution) &&
+        System.out.println("OBSERVATION:" + this.featureOfInterest.toString() + '\n' +
+                "TEMPLATE: " +  template.featureOfInterest.toString() + '\n' +
+               this.featureOfInterest.equals(template.featureOfInterest)    + '\n' +
+               Utilities.equals(this.observedProperty,    template.observedProperty)    + '\n' + 
+               Utilities.equals(this.procedure,           template.procedure)           + '\n' + 
+               Utilities.equals(this.resultQuality,       template.resultQuality)       + '\n' +  
+               Utilities.equals(this.distribution,        template.distribution)        + '\n' + 
+               Utilities.equals(this.observationMetadata, template.observationMetadata) + '\n' + 
+               Utilities.equals(this.resultDefinition,    template.resultDefinition)    + '\n' + 
+               Utilities.equals(this.procedureTime,       template.procedureTime)       + '\n' + 
+               Utilities.equals(this.procedureParameter,  template.procedureParameter));
+        
+        return Utilities.equals(this.featureOfInterest,   template.featureOfInterest)   &&
+               Utilities.equals(this.observedProperty,    template.observedProperty)    &&
+               Utilities.equals(this.procedure,           template.procedure)           &&
+               Utilities.equals(this.resultQuality,       template.resultQuality)       && 
+               Utilities.equals(this.distribution,        template.distribution)        &&
                Utilities.equals(this.observationMetadata, template.observationMetadata) &&
-               Utilities.equals(this.resultDefinition,    template.resultDefinition) &&
-               Utilities.equals(this.procedureTime,       template.procedureTime) &&
+               Utilities.equals(this.resultDefinition,    template.resultDefinition)    &&
+               Utilities.equals(this.procedureTime,       template.procedureTime)       &&
                Utilities.equals(this.procedureParameter,  template.procedureParameter);
         
     }
@@ -384,16 +396,16 @@ public class ObservationEntry extends Entry implements Observation {
         }
         if (super.equals(object)) {
             final ObservationEntry that = (ObservationEntry) object;
-            return Utilities.equals(this.featureOfInterest,   that.featureOfInterest) &&
-                   Utilities.equals(this.observedProperty,    that.observedProperty) &&
-                   Utilities.equals(this.procedure,           that.procedure)  &&
-                   Utilities.equals(this.resultQuality,       that.resultQuality)    && 
-                   Utilities.equals(this.distribution,        that.distribution) &&
-                   Utilities.equals(this.result,              that.result) &&
-                   Utilities.equals(this.samplingTime,        that.samplingTime) &&
+            return Utilities.equals(this.featureOfInterest,   that.featureOfInterest)   &&
+                   Utilities.equals(this.observedProperty,    that.observedProperty)    &&
+                   Utilities.equals(this.procedure,           that.procedure)           &&
+                   Utilities.equals(this.resultQuality,       that.resultQuality)       && 
+                   Utilities.equals(this.distribution,        that.distribution)        &&
+                   Utilities.equals(this.result,              that.result)              &&
+                   Utilities.equals(this.samplingTime,        that.samplingTime)        &&
                    Utilities.equals(this.observationMetadata, that.observationMetadata) &&
-                   Utilities.equals(this.resultDefinition,    that.resultDefinition) &&
-                   Utilities.equals(this.procedureTime,       that.procedureTime) &&
+                   Utilities.equals(this.resultDefinition,    that.resultDefinition)    &&
+                   Utilities.equals(this.procedureTime,       that.procedureTime)       &&
                    Utilities.equals(this.procedureParameter,  that.procedureParameter);
         }
         return false;
@@ -404,10 +416,17 @@ public class ObservationEntry extends Entry implements Observation {
      */
     @Override
     public String toString() {
+        String sampling = "null";
+        if (samplingTime != null)
+            sampling = samplingTime.toString();
+        String res = "null";
+        if (result != null)
+            res = result.toString();
+                
         return "name=" + name + " definition=" + definition + " samplingTime=" + 
-                samplingTime.toString() + " procedure=" + procedure.toString() + 
+                sampling + " procedure=" + procedure.toString() + 
                 " observedProperty=" + observedProperty.toString() + " featureOfInterest=" +
-                featureOfInterest.toString() + " result=" + result.toString() + " resultDefinition=" +
+                featureOfInterest.toString() + " result=" + res + " resultDefinition=" +
                 resultDefinition.toString(); 
                 
     }

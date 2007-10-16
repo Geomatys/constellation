@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -185,5 +186,35 @@ public class DirectPositionType {
            s +=  v;
         }
         return s;
+    }
+    
+     /**
+     * Vérifie que cette station est identique à l'objet spécifié
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final DirectPositionType that = (DirectPositionType) object;
+            return  Utilities.equals(this.axisLabels, that.axisLabels)     &&
+                    Utilities.equals(this.srsDimension, that.srsDimension) &&
+                    Utilities.equals(this.srsName, that.srsName)           &&
+                    Utilities.equals(this.uomLabels, that.uomLabels)       &&
+                    Utilities.equals(this.value, that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 71 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 71 * hash + this.srsDimension;
+        hash = 71 * hash + (this.srsName != null ? this.srsName.hashCode() : 0);
+        hash = 71 * hash + (this.axisLabels != null ? this.axisLabels.hashCode() : 0);
+        hash = 71 * hash + (this.uomLabels != null ? this.uomLabels.hashCode() : 0);
+        return hash;
     }
 }

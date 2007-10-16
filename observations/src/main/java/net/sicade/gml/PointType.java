@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import net.opengis.gml.AbstractGeometricPrimitiveType;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -79,6 +80,7 @@ public class PointType extends AbstractGeometricPrimitiveType {
     /**
      * Retourne un description de l'objet.
      */
+    @Override
     public String toString() {
         String s = "id = " + this.id + '\n'; 
         if(pos != null) {
@@ -90,6 +92,27 @@ public class PointType extends AbstractGeometricPrimitiveType {
         }
         
         return s;
+    }
+    
+    /**
+     * Vérifie que cette station est identique à l'objet spécifié
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final PointType that = (PointType) object;
+            return  Utilities.equals(this.pos, that.pos) &&
+                    Utilities.equals(this.coordinates, that.coordinates);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
     }
 
 }

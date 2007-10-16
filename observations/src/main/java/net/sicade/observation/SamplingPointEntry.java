@@ -79,6 +79,7 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
     /**
      * Retourne la position de la station.
      */
+    @Override
     public PointType getPosition(){
         return position;
     }
@@ -93,9 +94,16 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
         }
         if (super.equals(object)) {
             final SamplingPointEntry that = (SamplingPointEntry) object;
+            System.out.println("equals SP " + Utilities.equals(this.position, that.position));
             return  Utilities.equals(this.position, that.position);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+       
+        return getId().hashCode();
     }
     
     /**

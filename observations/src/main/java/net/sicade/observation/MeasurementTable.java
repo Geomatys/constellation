@@ -18,6 +18,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
@@ -160,6 +161,18 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         if(pheno == null) pheno = compoPheno;
         if(station == null) station =  stationPoint;
         
+        Timestamp tb = result.getTimestamp(indexOf(query.samplingTimeBegin));
+        Timestamp te = result.getTimestamp(indexOf(query.samplingTimeEnd));
+        TemporalObjectEntry samplingTime = null;
+        if (tb != null && te != null) {
+            samplingTime =  new TemporalObjectEntry(new TimestampEntry(tb),
+                                                    new TimestampEntry(te));
+        } else if (tb != null && te == null) {
+            samplingTime =  new TemporalObjectEntry(new TimestampEntry(tb), null);
+        } else if (tb == null && te != null) {
+            samplingTime =  new TemporalObjectEntry(null, new TimestampEntry(te));
+        } 
+        
         return new MeasurementEntry(result.getString(indexOf(query.name   )),
                 result.getString(indexOf(query.description)),
                 station,
@@ -168,8 +181,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
                 distrib,
                 //manque quality
                 resultat,
-                new TemporalObjectEntry(result.getTimestamp(indexOf(query.samplingTimeBegin)),
-                result.getTimestamp(indexOf(query.samplingTimeEnd))),
+                samplingTime,
                 result.getString(indexOf(query.resultDefinition)));
     }
     

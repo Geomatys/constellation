@@ -21,6 +21,7 @@ import java.sql.SQLException;
 
 
 // Sicade dependencies
+import java.sql.Timestamp;
 import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
@@ -309,6 +310,19 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         if(pheno == null) pheno = compoPheno;
         if(station == null) station =  stationPoint;
         
+        Timestamp tb = result.getTimestamp(indexOf(query.samplingTimeBegin));
+        Timestamp te = result.getTimestamp(indexOf(query.samplingTimeEnd));
+        TemporalObjectEntry samplingTime = null;
+        if (tb != null && te != null) {
+            samplingTime =  new TemporalObjectEntry(new TimestampEntry(tb),
+                                                    new TimestampEntry(te));
+        } else if (tb != null && te == null) {
+            samplingTime =  new TemporalObjectEntry(new TimestampEntry(tb), null);
+        } else if (tb == null && te != null) {
+            samplingTime =  new TemporalObjectEntry(null, new TimestampEntry(te));
+        } 
+        
+        
         return new ObservationEntry(result.getString(indexOf(query.name)),
                 result.getString(indexOf(query.description)),
                 station,
@@ -317,8 +331,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 distrib,
                 //manque quality
                 resultat,
-                new TemporalObjectEntry(result.getTimestamp(indexOf(query.samplingTimeBegin)),
-                result.getTimestamp(indexOf(query.samplingTimeEnd))),
+                samplingTime,
                 dataBlockDef);
         
         
