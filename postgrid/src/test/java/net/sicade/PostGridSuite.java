@@ -33,6 +33,8 @@ public class PostGridSuite extends TestSuite {
         addTestSuite(net.sicade.coverage.io.MetadataParserTest.class);
 
         addTestSuite(net.sicade.catalog.DatabaseTest.Open.class); // Must be first
+        addTestSuite(org.geotools.referencing.factory.wkt.PostgisAuthorityFactoryTest.class);
+
         addTestSuite(net.sicade.catalog.         SpatialFunctionsTest         .class);
         addTestSuite(net.sicade.catalog.         TimeStampTest                .class);
         addTestSuite(net.sicade.catalog.         QueryTest                    .class);

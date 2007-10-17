@@ -31,3 +31,9 @@ INSERT INTO postgis.spatial_ref_sys (srid, auth_name, auth_srid, srtext) VALUES 
 INSERT INTO postgis.spatial_ref_sys (srid, auth_name, auth_srid, srtext) VALUES (5773, 'EPSG', 5773, 'VERT_CS["EGM96 geoid",VERT_DATUM["EGM96 geoid",2005,AUTHORITY["EPSG","5171"]],UNIT["m",1.0],AXIS["Gravity-related height",UP],AUTHORITY["EPSG","5773"]]');
 INSERT INTO postgis.spatial_ref_sys (srid, auth_name, auth_srid, srtext) VALUES (5714, 'EPSG', 5714, 'VERT_CS["mean sea level height",VERT_DATUM["Mean Sea Level",2005,AUTHORITY["EPSG","5100"]],UNIT["m",1.0],AXIS["Gravity-related height",UP],AUTHORITY["EPSG","5714"]]');
 INSERT INTO postgis.spatial_ref_sys (srid, auth_name, auth_srid, srtext) VALUES (5715, 'EPSG', 5715, 'VERT_CS["mean sea level depth",VERT_DATUM["Mean Sea Level",2005,AUTHORITY["EPSG","5100"]],UNIT["m",1.0],AXIS["Gravity-related depth",DOWN],AUTHORITY["EPSG","5715"]]');
+
+
+--
+-- Grants read-only access to everyone.
+--
+GRANT SELECT ON TABLE postgis.spatial_ref_sys TO public;
