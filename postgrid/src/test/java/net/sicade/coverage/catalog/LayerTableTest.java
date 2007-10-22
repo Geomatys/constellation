@@ -21,6 +21,8 @@ import java.util.TimeZone;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.sql.SQLException;
 
 import org.geotools.util.NumberRange;
@@ -116,5 +118,10 @@ public class LayerTableTest extends DatabaseTest {
         assertEquals(1, validRanges.length);
         assertEquals(-3.0, validRanges[0].getMinimum(true), 1E-8);
         assertEquals(40.0, validRanges[0].getMaximum(true), 1E-8);
+
+        final BufferedImage legend = entry.getLegend(new Dimension(400, 30));
+        assertNotNull(legend);
+        assertEquals(400, legend.getWidth());
+        assertEquals( 30, legend.getHeight());
     }
 }

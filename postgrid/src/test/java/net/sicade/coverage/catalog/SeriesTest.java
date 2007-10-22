@@ -34,9 +34,7 @@ import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import net.sicade.catalog.CatalogException;
-import net.sicade.coverage.catalog.LayerTable;
 import net.sicade.coverage.model.OperationTable;
-import net.sicade.coverage.catalog.GridCoverageTable;
 
 
 /**
@@ -144,7 +142,7 @@ public class SeriesTest extends AbstractTest {
         assertFalse(selected.isEmpty());
         /* TODO: notre base a été épurée de certaines données, pour les tests on modifie la condition qui était
          * un inférieur strict par un inférieur ou égal (dans notre cas selected.size() et all.size() sont égaux.
-         */ 
+         */
         assertTrue (selected.size() <= all.size());
         assertTrue (all.containsAll(selected));
         /* TODO: Après épuration des données, selected et all sont identiques pour la zone choisie. Le test

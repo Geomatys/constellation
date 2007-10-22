@@ -15,6 +15,8 @@
 package net.sicade.coverage.catalog;
 
 import java.util.Locale;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import net.sicade.catalog.Element;
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.GridSampleDimension;
@@ -51,6 +53,16 @@ public interface Format extends Element {
      * (<code>{@linkplain GridSampleDimension#geophysics geophysics}(true)</code>).
      */
     GridSampleDimension[] getSampleDimensions();
+
+    /**
+     * Returns a legend of the specified dimension. The legend is a
+     * {@linkplain org.geotools.gui.swing.image.ColorRamp color ramp}
+     * with gratuation on it.
+     *
+     * @param  dimension The dimension of the image to be returned.
+     * @return The color ramp as an image of the specified dimension.
+     */
+    BufferedImage getLegend(Dimension dimension);
 
     /**
      * Returns a tree representation of this format, including {@linkplain SampleDimension

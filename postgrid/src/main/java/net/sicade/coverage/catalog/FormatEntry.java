@@ -19,6 +19,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
+import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +54,7 @@ import com.sun.media.imageio.stream.RawImageInputStream;
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.gui.swing.image.ColorRamp;
 import org.geotools.gui.swing.tree.MutableTreeNode;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.image.io.IIOListeners;
@@ -311,7 +313,7 @@ final class FormatEntry extends Entry implements Format {
             r.setVariables(names);
         }
     }
-    
+
     /**
      * Procède à la lecture d'une image. Il est possible que l'image soit lue non pas
      * localement, mais plutôt à travers un réseau. Cette méthode n'est appelée que par
@@ -552,6 +554,18 @@ final class FormatEntry extends Entry implements Format {
         } else {
             return file.toString();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BufferedImage getLegend(final Dimension dimension) {
+        final GridSampleDimension band = getSampleDimensions()[0];
+        final ColorRamp legend = new ColorRamp();
+        legend.setColors(band);
+        legend.setSize(dimension);
+        return legend.toImage();
     }
 
     /**

@@ -17,6 +17,8 @@ package net.sicade.coverage.catalog;
 import java.util.Set;
 import java.util.Date;
 import java.util.SortedSet;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -155,6 +157,16 @@ public interface Layer extends Element {
      * @throws CatalogException if the coverage can not be created.
      */
     Coverage getCoverage() throws CatalogException;
+
+    /**
+     * Returns a legend of the specified dimension. The legend is a
+     * {@linkplain org.geotools.gui.swing.image.ColorRamp color ramp}
+     * with gratuation on it.
+     *
+     * @param  dimension The dimension of the image to be returned.
+     * @return The color ramp as an image of the specified dimension.
+     */
+    BufferedImage getLegend(Dimension dimension);
 
     /**
      * If this layer is the result of a numerical model, returns this model.

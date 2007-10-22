@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.Collections;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.rmi.RemoteException;
@@ -378,6 +380,31 @@ final class LayerEntry extends Entry implements Layer {
             throw new ServerException(exception);
         }
         return c;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BufferedImage getLegend(final Dimension dimension) {
+        final Map<Format,Integer> count = new HashMap<Format,Integer>();
+        Format format = null;
+        int occurs = 0;
+        // Search for the most frequently used format.
+        for (final Series series : getSeries()) {
+            final Format candidate = series.getFormat();
+            int n = 1;
+            final Integer c = count.put(candidate, n);
+            if (c != null) {
+                n = c + 1;
+                count.put(candidate, n);
+            }
+            if (n > occurs) {
+                occurs = n;
+                format = candidate;
+            }
+        }
+        return (format != null) ? format.getLegend(dimension) : null;
     }
 
     /**
