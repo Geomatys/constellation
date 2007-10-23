@@ -24,7 +24,7 @@ import org.geotools.resources.Utilities;
 // Sicade dependencies
 import net.sicade.coverage.model.Distribution;
 import net.sicade.observation.ElementEntry;
-import net.sicade.observation.MetaDataEntry;
+import net.sicade.metadata.MetaDataEntry;
 import net.sicade.observation.fishery.Stage;
 import net.sicade.observation.fishery.Species;
 import net.sicade.observation.fishery.Category;

@@ -254,6 +254,7 @@ public class TimestampEntry  extends java.util.Date {
      * @return a <code>String</code> object in
      *           <code>yyyy-mm-dd hh:mm:ss.fffffffff</code> format
      */
+    @Override
     public String toString () {
 
 	int year = super.getYear() + 1900;

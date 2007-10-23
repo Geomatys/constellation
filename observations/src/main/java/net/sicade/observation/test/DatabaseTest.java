@@ -105,6 +105,10 @@ public class DatabaseTest {
                                                                 t,
                                                                 null);
         
+        StringBuilder s = new StringBuilder();
+        s.append("551411;20000;bla");
+        System.out.println(s.toString());
+        /*
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setServerName("localhost");
         dataSource.setDatabaseName("seagis");
@@ -114,7 +118,7 @@ public class DatabaseTest {
         
         ObservationTable obsTable = new ObservationTable(db);
         obsTable.getIdentifier(request);
-        
+        */
         
         /*MeasurementTable measTable = new MeasurementTable(db);
         MeasurementEntry m = (MeasurementEntry) measTable.getEntry("test");

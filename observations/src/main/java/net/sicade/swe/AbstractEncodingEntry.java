@@ -43,6 +43,7 @@ public class AbstractEncodingEntry extends Entry implements AbstractEncoding{
         this.id = id;
     }
     
+    @Override
     public String getId() {
         return id;
     }

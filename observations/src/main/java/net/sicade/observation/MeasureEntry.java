@@ -123,7 +123,9 @@ public class MeasureEntry extends Entry implements Measure{
      */
     @Override
     public String toString() {
-        return "name=" + name + " value=" + value + '\n' + "uom =" + uom.toString();
+        StringBuilder s = new StringBuilder();
+        s.append("name=").append(name).append(" value=").append(value).append('\n').append("uom =").append(uom.toString());
+        return  s.toString();
     }
     
 }

@@ -25,6 +25,7 @@ import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.coverage.model.DistributionEntry;
 import net.sicade.coverage.model.DistributionTable;
+import net.sicade.metadata.MetadataTable;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measurement;
 

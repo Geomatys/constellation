@@ -215,13 +215,15 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      */
     @Override
     public String toString() {
+        StringBuilder s = new StringBuilder();
         Iterator i =  sampledFeature.iterator();
         String sampledFeatures = "";
         while (i.hasNext()) {
             sampledFeatures += i.next() + " ";
         }
-        return " id=" + id + " name=" + name  + " description=" + description + " sampledFeature=" +
-               sampledFeatures; 
+        s.append(" id=").append(id).append(" name=").append(name ).append(" description=")
+                .append(description).append(" sampledFeature=").append(sampledFeatures);
+        return s.toString();
     }
    
 }

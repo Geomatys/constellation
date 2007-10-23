@@ -29,6 +29,7 @@ import net.sicade.catalog.SingletonTable;
 import net.sicade.coverage.model.DistributionEntry;
 import net.sicade.coverage.model.DistributionTable;
 import net.sicade.gml.ReferenceEntry;
+import net.sicade.metadata.MetadataTable;
 import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.AnyResultTable;
 import net.sicade.swe.DataBlockDefinition;
@@ -257,6 +258,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
     /**
      * Construit une observation pour l'enregistrement courant.
      */
+    @Override
     public Observation createEntry(final ResultSet result) throws CatalogException, SQLException {
         final ObservationQuery query = (ObservationQuery) super.query;
         
@@ -273,7 +275,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         if (compositePhenomenons == null) {
             compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
         }
-        CompositePhenomenonEntry compoPheno = (CompositePhenomenonEntry)compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
+        CompositePhenomenonEntry compoPheno = compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
         
         if (stations == null) {
             stations = getDatabase().getTable(SamplingFeatureTable.class);
@@ -365,10 +367,15 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         // on insere la distribution
         if (obs.getDistribution() == null) {
             obs.setDistribution(DistributionEntry.NORMAL);
+        } else if (obs.getDistribution().getName() == null) {
+            obs.setDistribution(DistributionEntry.NORMAL);
+        } else {
+            System.out.println("NAME IS NOT NULL:" + obs.getDistribution().getName());
         }
         if (distributions == null) {
             distributions = getDatabase().getTable(DistributionTable.class);
         }
+        // TODO regler le probleme avec la distribution
         statement.setString(indexOf(query.distribution), distributions.getIdentifier(obs.getDistribution()));
         
         

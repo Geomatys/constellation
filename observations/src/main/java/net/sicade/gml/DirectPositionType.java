@@ -180,12 +180,14 @@ public class DirectPositionType {
      */
     @Override
     public String toString() {
-        String s = " srsName=" + srsName + " srsDimension=" + srsDimension + " value:" + '\n';
+        StringBuilder s = new StringBuilder("DirectPosition:");
+        s.append("srsName=").append(srsName).append('\n').append(" srsDimension=").append(srsDimension)
+                .append('\n').append(" value:").append('\n');
         
         for(double v :value) {
-           s +=  v;
+           s.append(v);
         }
-        return s;
+        return s.toString();
     }
     
      /**

@@ -109,6 +109,9 @@ public class UnitOfMeasureEntry extends Entry implements BaseUnit {
      */
      @Override
      public String toString() {
-         return " id= " + id + " name=" + name + " quantity type=" + quantityType + " unitSystem=" + unitsSystem; 
+         StringBuilder s = new StringBuilder();
+         s.append(" id= ").append(id).append(" name=").append(name).append(" quantity type=")
+                 .append(quantityType).append(" unitSystem=").append(unitsSystem);
+         return s.toString();
      }
 }

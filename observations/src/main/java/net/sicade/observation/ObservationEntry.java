@@ -28,6 +28,7 @@ import net.sicade.catalog.Entry;
 import net.sicade.coverage.model.DistributionEntry;
 
 // openGis dependencies
+import net.sicade.metadata.MetaDataEntry;
 import net.sicade.swe.AnyResultEntry;
 import net.sicade.swe.DataBlockDefinitionEntry;
 import org.opengis.observation.Process;
@@ -355,28 +356,17 @@ public class ObservationEntry extends Entry implements Observation {
      * Retourne vrai si l'observation satisfait le template specifie
      */ 
     public boolean matchTemplate(ObservationEntry template) {
-        System.out.println("OBSERVATION:" + this.observedProperty.toString() + '\n' +
-                "TEMPLATE: " +  template.observedProperty.toString() + '\n' +
-                 "ALL:"                                                                    + '\n' +
-               Utilities.equals(this.featureOfInterest,   template.featureOfInterest)   + '\n' +
-               Utilities.equals(this.observedProperty,    template.observedProperty)    + '\n' + 
-               Utilities.equals(this.procedure,           template.procedure)           + '\n' + 
-               Utilities.equals(this.resultQuality,       template.resultQuality)       + '\n' +  
-               Utilities.equals(this.distribution,        template.distribution)        + '\n' + 
-               Utilities.equals(this.observationMetadata, template.observationMetadata) + '\n' + 
-               Utilities.equals(this.resultDefinition,    template.resultDefinition)    + '\n' + 
-               Utilities.equals(this.procedureTime,       template.procedureTime)       + '\n' + 
-               Utilities.equals(this.procedureParameter,  template.procedureParameter));
-        
         return Utilities.equals(this.featureOfInterest,   template.featureOfInterest)   &&
                Utilities.equals(this.observedProperty,    template.observedProperty)    &&
                Utilities.equals(this.procedure,           template.procedure)           &&
                Utilities.equals(this.resultQuality,       template.resultQuality)       && 
-               Utilities.equals(this.distribution,        template.distribution)        &&
                Utilities.equals(this.observationMetadata, template.observationMetadata) &&
                Utilities.equals(this.resultDefinition,    template.resultDefinition)    &&
                Utilities.equals(this.procedureTime,       template.procedureTime)       &&
                Utilities.equals(this.procedureParameter,  template.procedureParameter);
+               //TODO corriger ce pb
+               //Utilities.equals(this.distribution,        template.distribution)        &&
+               
         
     }
     /**
@@ -417,19 +407,19 @@ public class ObservationEntry extends Entry implements Observation {
      */
     @Override
     public String toString() {
-        String sampling = "null";
+        StringBuilder s    = new StringBuilder();
+        char lineSeparator = '\n';
+        s.append("name=").append(name).append(lineSeparator).append("definition=").append(definition);
         if (samplingTime != null)
-            sampling = samplingTime.toString();
-        String res = "null";
-        if (result != null)
-            res = result.toString();
-                
-        return "name=" + name + " definition=" + definition + " samplingTime=" + 
-                sampling + " procedure=" + procedure.toString() + 
-                " observedProperty=" + observedProperty.toString() + " featureOfInterest=" +
-                featureOfInterest.toString() + " result=" + res + " resultDefinition=" +
-                resultDefinition.toString(); 
-                
+            s.append("samplingTime=").append(samplingTime.toString()).append(lineSeparator);
+        s.append("distribution:").append(distribution.toString()).append(lineSeparator);
+        s.append("procedure=").append(procedure.toString()).append(lineSeparator);
+        s.append("observedProperty=").append(observedProperty.toString()).append(lineSeparator);
+        s.append("featureOfInterest=").append(featureOfInterest.toString()).append(lineSeparator); 
+        if (result != null)       
+            s.append(" result=").append(result.toString()).append(lineSeparator);
+        s.append(" resultDefinition=").append(resultDefinition.toString()).append(lineSeparator);
+        return s.toString();
     }
 
     

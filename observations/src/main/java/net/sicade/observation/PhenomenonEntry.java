@@ -142,6 +142,9 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      */
     @Override
     public String toString() {
-        return " id=" + id + " name=" + name + " description=" + description;
+        StringBuilder s = new StringBuilder();
+        
+        s.append(" id=").append(id).append(" name=").append(name).append(" description=").append(description);
+        return s.toString();
     }
 }

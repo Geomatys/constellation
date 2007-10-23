@@ -15,6 +15,7 @@
 package net.sicade.observation;
 
 import net.sicade.catalog.Entry;
+import org.geotools.resources.Utilities;
 import org.opengis.observation.Phenomenon;
 
 /**
@@ -56,6 +57,28 @@ public class ComponentEntry extends Entry {
      */
     public PhenomenonEntry getComponent() {
         return component;
+    }
+    
+     /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final ComponentEntry that = (ComponentEntry) object;
+        
+        return  Utilities.equals(this.component,   that.component)   &&
+                Utilities.equals(this.idCompositePhenomenon,   that.idCompositePhenomenon);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 37 * hash + (this.idCompositePhenomenon != null ? this.idCompositePhenomenon.hashCode() : 0);
+        hash = 37 * hash + (this.component != null ? this.component.hashCode() : 0);
+        return hash;
     }
     
 }

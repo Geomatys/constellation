@@ -16,10 +16,10 @@ package net.sicade.observation;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.sicade.coverage.model.DistributionEntry;
+import net.sicade.metadata.MetaDataEntry;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measure;
 
@@ -106,9 +106,9 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
      */
     @Override
     protected String createName() {
-        final StringBuilder name = new StringBuilder(super.createName()).append(" = ");
+        final StringBuilder newName = new StringBuilder(super.createName()).append(" = ");
         
-        return name.toString();
+        return newName.toString();
     }
     
     @Override

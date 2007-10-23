@@ -83,6 +83,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public List<String> getNilReason() {
         return nilReason;
     }
@@ -90,6 +91,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getRemoteSchema() {
         return remoteSchema;
     }
@@ -97,6 +99,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getActuate() {
         return actuate;
     }
@@ -104,6 +107,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getArcrole() {
         return arcrole;
     }
@@ -111,6 +115,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getHref() {
         return href;
     }
@@ -118,6 +123,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getRole() {
         return role;
     }
@@ -125,6 +131,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getShow() {
         return show;
     }
@@ -132,6 +139,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getTitle() {
         return title;
     }
@@ -139,6 +147,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getType() {
         return type;
     }
@@ -146,6 +155,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
+    @Override
     public java.lang.Boolean getOwns() {
         return owns;
     }
@@ -155,33 +165,34 @@ public class ReferenceEntry extends Entry implements Reference{
      */
     @Override
     public String toString() {
-        String s = "id= " + id + '\n';
+        StringBuilder s = new StringBuilder("id=");
+        s.append(id).append('\n');
         
         if(actuate != null) {
-            s = s + "actuate=" + actuate + '\n';
+            s.append("actuate=").append(actuate).append('\n');
         }
         if(arcrole != null) {
-            s = s + "arcrole=" + arcrole + '\n';
+            s.append("arcrole=").append(arcrole).append('\n');
         }
         if(href != null) {
-            s = s + "href=" + href + '\n';
+            s.append("href=").append(href).append('\n');
         }
         if(role != null) {
-            s = s + "role=" + role + '\n';
+            s.append("role=").append(role).append('\n');
         }
         if(show != null) {
-            s = s + "show=" + show + '\n';
+            s.append("show=").append(show).append('\n');
         }
         if(title != null) {
-            s = s + "title=" + title + '\n';
+            s.append("title=").append(title).append('\n');
         }
         if(owns != null) {
-            s = s + "owns=" + owns + '\n';
+            s.append("owns=").append(owns).append('\n');
         }
         if(title != null) {
-            s = s + "title=" + title + '\n';
+            s.append("title=").append(title).append('\n');
         }
-        return s;
+        return s.toString();
     }
     
 }

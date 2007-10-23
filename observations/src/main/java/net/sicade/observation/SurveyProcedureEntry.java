@@ -15,7 +15,12 @@
 
 package net.sicade.observation;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 import net.sicade.catalog.Entry;
+import net.sicade.metadata.GenericNameEntry;
+import net.sicade.metadata.ResponsiblePartyEntry;
 import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.observation.Measure;
@@ -30,33 +35,30 @@ import org.opengis.util.GenericName;
  * @version $Id:
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "SurveyProcedure")
 public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     
-    /**
-     */
-    private String name;
     
     /**
      */
-    private ResponsibleParty operator;
+    private ResponsiblePartyEntry operator;
     
-    /**
-     */
-    private Datum elevationDatum;
+    // JAXB issue  private Datum elevationDatum;
     
-    private Process elevationMethod;
+    private ProcessEntry elevationMethod;
     
-    private Measure elevationAccuracy;
+    private MeasureEntry elevationAccuracy;
     
-    private Datum geodeticDatum;
+    // JAXB issue  private Datum geodeticDatum;
     
-    private Process positionMethod;
+    private ProcessEntry positionMethod;
     
-    private Measure positionAccuracy;
+    private MeasureEntry positionAccuracy;
     
-    private GenericName projection;
+    private GenericNameEntry projection;
     
-    private TemporalObject surveyTime;
+    private TemporalObjectEntry surveyTime;
     
     /**
      * Constructeur utilisé par JAXB
@@ -65,22 +67,22 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     
     /** Creates a new instance of SurveyProcedureEntry */
     public SurveyProcedureEntry( final String name,
-            final ResponsibleParty operator,
+            final ResponsiblePartyEntry operator,
             final Datum elevationDatum,
-            final Process elevationMethod,
-            final Measure elevationAccuracy,
+            final ProcessEntry elevationMethod,
+            final MeasureEntry elevationAccuracy,
             final Datum geodeticDatum,
-            final Process positionMethod,
-            final Measure positionAccuracy,
-            final GenericName projection,
-            final TemporalObject surveyTime) 
+            final ProcessEntry positionMethod,
+            final MeasureEntry positionAccuracy,
+            final GenericNameEntry projection,
+            final TemporalObjectEntry surveyTime) 
     {
         super(name);
         this.operator = operator;
-        this.elevationDatum = elevationDatum;
+       // JAXB issue  this.elevationDatum = elevationDatum;
         this.elevationMethod = elevationMethod;
         this.elevationAccuracy = elevationAccuracy;
-        this.geodeticDatum = geodeticDatum;
+        // JAXB issue this.geodeticDatum = geodeticDatum;
         this.positionMethod = positionMethod;
         this.positionAccuracy = positionAccuracy; 
         this.projection = projection;
@@ -88,38 +90,49 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
                 
     }
     
+    @Override
     public ResponsibleParty getOperator() {
         return operator;
     }
-    
+        
+    @Override
     public Datum getElevationDatum() {
-        return elevationDatum;
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return elevationDatum;
     }
     
-    public Process getElevationMethod() {
+    @Override
+    public org.opengis.observation.Process getElevationMethod() {
         return elevationMethod;
     }
     
+    @Override
     public Measure getElevationAccuracy() {
         return elevationAccuracy;
     }
     
+    @Override
     public Datum getGeodeticDatum() {
-        return geodeticDatum;
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return geodeticDatum;
     }
     
-    public Process getPositionMethod() {
+    @Override
+    public org.opengis.observation.Process getPositionMethod() {
     return positionMethod;
     }
     
+    @Override
     public Measure getPositionAccuracy() {
         return positionAccuracy;
     }
     
+    @Override
     public GenericName getProjection() {
         return projection;
     }
     
+    @Override
     public TemporalObject getSurveyTime() {
         return surveyTime;
     }
@@ -144,7 +157,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
             final SurveyProcedureEntry that = (SurveyProcedureEntry) object;
             return Utilities.equals(this.name,              that.name) &&
                    Utilities.equals(this.operator,          that.operator)   &&
-                   Utilities.equals(this.elevationDatum,    that.elevationDatum)   && 
+                   //Utilities.equals(this.elevationDatum,    that.elevationDatum)   && 
                    Utilities.equals(this.elevationMethod,   that.elevationMethod) &&
                    Utilities.equals(this.elevationAccuracy, that.elevationAccuracy) &&
                    Utilities.equals(this.positionAccuracy,  that.positionAccuracy) &&
@@ -154,5 +167,6 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
         }
         return false;
     }
+
     
 }

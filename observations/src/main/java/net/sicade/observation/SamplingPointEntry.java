@@ -113,7 +113,9 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
      */
     @Override
     public String toString() {
-        return super.toString() + '\n' + "Position: " + position.toString() ;
+        StringBuilder s = new StringBuilder(super.toString());
+        s.append('\n').append("Position: ").append(position.toString()) ;
+        return s.toString();
     }
 
   

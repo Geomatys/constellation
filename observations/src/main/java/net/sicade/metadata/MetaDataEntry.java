@@ -1,10 +1,28 @@
-
-package net.sicade.observation;
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package net.sicade.metadata;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 import net.sicade.catalog.Entry;
+import net.sicade.coverage.model.DistributionEntry;
 import org.opengis.metadata.ApplicationSchemaInformation;
 import org.opengis.metadata.MetaData;
 import org.opengis.metadata.MetadataExtensionInformation;
@@ -26,6 +44,8 @@ import org.opengis.referencing.ReferenceSystem;
  * @version $Id:
  * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "MetaData")
 public class MetaDataEntry extends Entry implements MetaData{
     
      /**
@@ -35,14 +55,16 @@ public class MetaDataEntry extends Entry implements MetaData{
 
     /**
      * Language used for documenting metadata.
+     
+JAXB issue    private Locale language;
      */
-    private Locale language;
-
+    
     /**
      * Full name of the character coding standard used for the metadata set.
+    
+JAXB issue    private CharacterSet characterSet;
      */
-    private CharacterSet characterSet;
-
+    
     /**
      * File identifier of the metadata to which this metadata is a subset (child).
      */
@@ -50,9 +72,10 @@ public class MetaDataEntry extends Entry implements MetaData{
 
     /**
      * Scope to which the metadata applies.
+     
+JAXB issue     private Collection<ScopeCode> hierarchyLevels;
      */
-    private Collection<ScopeCode> hierarchyLevels;
-
+    
     /**
      * Name of the hierarchy levels for which the metadata is provided.
      */
@@ -63,14 +86,14 @@ public class MetaDataEntry extends Entry implements MetaData{
      *
      * @deprecated Replaced by {@link #Contacts}.
      */
-    private ResponsibleParty contact;
+    private ResponsiblePartyEntry contact;
 
     /**
      * Party responsible for the metadata information.
      *
      * @since GeoAPI 2.1
      */
-    private Collection<? extends ResponsibleParty> contacts;
+    private Collection<? extends ResponsiblePartyEntry> contacts;
 
     /**
      * Date that the metadata was created.
@@ -99,65 +122,69 @@ public class MetaDataEntry extends Entry implements MetaData{
      * string for a linguistic extension
      *
      * @since GeoAPI 2.1
+     
+    JAXB issue private Collection<Locale> locales;    
      */
-    private Collection<Locale> locales;    
-
+    
     /**
      * Digital representation of spatial information in the dataset.
      */
-    private Collection<? extends SpatialRepresentation> spatialRepresentationInfo;
+    private Collection<? extends SpatialRepresentationEntry> spatialRepresentationInfo;
 
     /**
      * Description of the spatial and temporal reference systems used in the dataset.
+     
+    JAXB issue  private Collection<? extends ReferenceSystem> referenceSystemInfo;
      */
-    private Collection<? extends ReferenceSystem> referenceSystemInfo;
-
+    
     /**
      * Information describing metadata extensions.
      */
-    private Collection<? extends MetadataExtensionInformation> metadataExtensionInfo;
-
+    private Collection<? extends MetadataExtensionInformationEntry> metadataExtensionInfo;
+     
+    
     /**
      * Basic information about the resource(s) to which the metadata applies.
      */
-    private Collection<? extends Identification> identificationInfo;
+    private Collection<? extends IdentificationEntry> identificationInfo;
 
     /**
      * Provides information about the feature catalogue and describes the coverage and
      * image data characteristics.
      */
-    private Collection<? extends ContentInformation> contentInfo;
+    private Collection<? extends ContentInformationEntry> contentInfo;
 
     /**
      * Provides information about the distributor of and options for obtaining the resource(s).
      */
-    private Distribution distributionInfo;
+    private DistributionEntry distributionInfo;
 
     /**
      * Provides overall assessment of quality of a resource(s).
      */
-    private Collection<? extends DataQuality> dataQualityInfo;
+    private Collection<? extends DataQualityEntry> dataQualityInfo;
 
     /**
      * Provides information about the catalogue of rules defined for the portrayal of a resource(s).
      */
-    private Collection<? extends PortrayalCatalogueReference> portrayalCatalogueInfo;
+    private Collection<? extends PortrayalCatalogueReferenceEntry> portrayalCatalogueInfo;
 
     /**
      * Provides restrictions on the access and use of data.
      */
-    private Collection<? extends Constraints> metadataConstraints;
+    private Collection<? extends ConstraintsEntry> metadataConstraints;
 
     /**
      * Provides information about the conceptual schema of a dataset.
-     */
-    private Collection<? extends ApplicationSchemaInformation> applicationSchemaInfo;
      
+JAXB issue private Collection<? extends ApplicationSchemaInformation> applicationSchemaInfo;
+     */
+    
     /**
      * Provides information about the frequency of metadata updates, and the scope of those updates.
-     
-    public MaintenanceInformation metadataMaintenance;
-    */
+     */
+    public MaintenanceInformationEntry metadataMaintenance;
+    
     
     /**
      * Constructeur vide utilisé par JAXB.
@@ -167,6 +194,7 @@ public class MetaDataEntry extends Entry implements MetaData{
      /**
      * Unique identifier for this metadata file, or {@code null} if none.
      */
+    @Override
     public String getFileIdentifier(){
         return fileIdentifier;
     }
@@ -174,20 +202,25 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Language used for documenting metadata.
      */
+    @Override
     public Locale getLanguage(){
-        return language;
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return language;
     }
 
     /**
      * Full name of the character coding standard used for the metadata set.
      */
-    public CharacterSet getCharacterSet(){         
-        return characterSet;
+    @Override
+    public CharacterSet getCharacterSet(){
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return characterSet;
     }
 
     /**
      * File identifier of the metadata to which this metadata is a subset (child).
      */
+    @Override
     public String getParentIdentifier(){         
         return parentIdentifier;     
     }
@@ -195,13 +228,16 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Scope to which the metadata applies.
      */
-    public Collection<ScopeCode> getHierarchyLevels(){         
-        return hierarchyLevels;
+    @Override
+    public Collection<ScopeCode> getHierarchyLevels(){ 
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return hierarchyLevels;
     }
 
     /**
      * Name of the hierarchy levels for which the metadata is provided.
      */
+    @Override
     public Collection<String> getHierarchyLevelNames(){         
         return hierarchyLevelNames; 
     }
@@ -211,6 +247,7 @@ public class MetaDataEntry extends Entry implements MetaData{
      *
      * @deprecated Replaced by {@link #getContacts}.
      */
+    @Override
     public ResponsibleParty getContact(){         
         return contact;
     }
@@ -220,6 +257,7 @@ public class MetaDataEntry extends Entry implements MetaData{
      *
      * @since GeoAPI 2.1
      */
+    @Override
     public Collection<? extends ResponsibleParty> getContacts(){         
         return contacts;     
     }
@@ -227,6 +265,7 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Date that the metadata was created.
      */
+    @Override
     public Date getDateStamp(){         
         return dateStamp;     
     }
@@ -234,6 +273,7 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Name of the metadata standard (including profile name) used.
      */
+    @Override
     public String getMetadataStandardName(){         
         return metadataStandardName;     
     }
@@ -241,6 +281,7 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Version (profile) of the metadata standard used.
      */
+    @Override
     public String getMetadataStandardVersion(){        
         return metadataStandardVersion;    
     }
@@ -250,6 +291,7 @@ public class MetaDataEntry extends Entry implements MetaData{
      *
      * @since GeoAPI 2.1
      */
+    @Override
     public String getDataSetUri(){         
         return dataSetUri;
     }
@@ -260,13 +302,16 @@ public class MetaDataEntry extends Entry implements MetaData{
      *
      * @since GeoAPI 2.1
      */
-    public Collection<Locale> getLocales(){         
-        return locales;
+    @Override
+    public Collection<Locale> getLocales(){ 
+        throw new UnsupportedOperationException("Not supported yet.");
+       //return locales;
     }    
 
     /**
      * Digital representation of spatial information in the dataset.
      */
+    @Override
     public Collection<? extends SpatialRepresentation> getSpatialRepresentationInfo(){         
         return spatialRepresentationInfo;
     }
@@ -274,13 +319,16 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Description of the spatial and temporal reference systems used in the dataset.
      */
-    public Collection<? extends ReferenceSystem> getReferenceSystemInfo(){         
-        return referenceSystemInfo; 
+    @Override
+    public Collection<? extends ReferenceSystem> getReferenceSystemInfo(){ 
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return referenceSystemInfo; 
     }
 
     /**
      * Information describing metadata extensions.
      */
+    @Override
     public Collection<? extends MetadataExtensionInformation> getMetadataExtensionInfo(){         
         return metadataExtensionInfo;
     }
@@ -288,6 +336,7 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Basic information about the resource(s) to which the metadata applies.
      */
+    @Override
     public Collection<? extends Identification> getIdentificationInfo(){         
         return identificationInfo;
     }
@@ -296,6 +345,7 @@ public class MetaDataEntry extends Entry implements MetaData{
      * Provides information about the feature catalogue and describes the coverage and
      * image data characteristics.
      */
+    @Override
     public Collection<? extends ContentInformation> getContentInfo(){         
         return contentInfo;
     }
@@ -303,13 +353,16 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Provides information about the distributor of and options for obtaining the resource(s).
      */
-    public Distribution getDistributionInfo(){         
-        return distributionInfo;
+    @Override
+    public Distribution getDistributionInfo(){ 
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return distributionInfo;
     }
 
     /**
      * Provides overall assessment of quality of a resource(s).
      */
+    @Override
     public Collection<? extends DataQuality> getDataQualityInfo(){         
         return dataQualityInfo;
     }
@@ -317,6 +370,7 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Provides information about the catalogue of rules defined for the portrayal of a resource(s).
      */
+    @Override
     public Collection<? extends PortrayalCatalogueReference> getPortrayalCatalogueInfo(){         
         return portrayalCatalogueInfo;
     }
@@ -324,6 +378,7 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Provides restrictions on the access and use of data.
      */
+    @Override
     public Collection<? extends Constraints> getMetadataConstraints(){         
         return metadataConstraints;
     }
@@ -331,15 +386,18 @@ public class MetaDataEntry extends Entry implements MetaData{
     /**
      * Provides information about the conceptual schema of a dataset.
      */
-    public Collection<? extends ApplicationSchemaInformation> getApplicationSchemaInfo(){         
-        return applicationSchemaInfo;
+    @Override
+    public Collection<? extends ApplicationSchemaInformation> getApplicationSchemaInfo(){  
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return applicationSchemaInfo;
     }
      
     /**
      * Provides information about the frequency of metadata updates, and the scope of those updates.
      */
+    @Override
     public MaintenanceInformation getMetadataMaintenance(){         
-        return null;//metadataMaintenance;
+        return metadataMaintenance;
     }
 }
 
