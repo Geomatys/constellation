@@ -618,7 +618,7 @@ public class CoverageBuilder {
         }
         final PrintWriter           out = arguments.out;
         final Catalog observations = Catalog.getDefault();
-        final ProgressListener listener = new ProgressPrinter(out);
+        final ProgressListener listener = (ProgressListener) new ProgressPrinter(out);
         final char[]          separator = new char[72];
         Arrays.fill(separator, '_');
         /*

@@ -180,7 +180,7 @@ public class Database {
      * @throws IOException if an error occured while reading the configuration file.
      */
     public Database() throws IOException {
-        this(null);
+        this((DataSource) null);
     }
 
     /**
@@ -191,6 +191,16 @@ public class Database {
      */
     public Database(final DataSource source) throws IOException {
         this(source, CONFIG_FILENAME);
+    }
+
+    /**
+     * Opens a new connection using the provided configuration file.
+     *
+     * @param  configFile The configuration file or directory.
+     * @throws IOException if an error occured while reading the configuration file.
+     */
+    public Database(final File configFile) throws IOException {
+        this(null, configFile.getPath());
     }
 
     /**
@@ -257,14 +267,19 @@ public class Database {
         if (path.isFile()) {
             return path;
         }
+        if (path.isDirectory()) {
+            path = new File(path, CONFIG_FILENAME);
+        }
         /*
          * Recherche dans le répertoire de configuration de l'utilisateur.
          */
-        final String home = System.getProperty("user.home");
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
-            path = new File(home, WINDOWS_DIRECTORY);
-        } else {
-            path = new File(home, UNIX_DIRECTORY);
+        if (!path.isAbsolute()) {
+            final String home = System.getProperty("user.home");
+            if (System.getProperty("os.name", "").startsWith("Windows")) {
+                path = new File(home, WINDOWS_DIRECTORY);
+            } else {
+                path = new File(home, UNIX_DIRECTORY);
+            }
         }
         if (!path.exists()) {
             if (!create || !path.mkdir()) {
