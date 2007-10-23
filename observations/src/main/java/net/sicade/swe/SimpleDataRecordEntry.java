@@ -15,6 +15,7 @@
 package net.sicade.swe;
 
 import java.util.Collection;
+import java.util.Iterator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -81,10 +82,22 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
         }
         if (super.equals(object)) {
             final SimpleDataRecordEntry that = (SimpleDataRecordEntry) object;
-            return Utilities.equals(this.blockId,    that.blockId)   &&
-                   Utilities.equals(this.field,     that.field);
+            if (this.field.size() != that.field.size())
+                return false;
+        
+            Iterator<AnyScalarEntry> i = field.iterator();
+            while (i.hasNext()) {
+                if (!that.field.contains(i.next()))
+                    return false;
+            }
+            return Utilities.equals(this.blockId,    that.blockId);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getId().hashCode() + 37 * this.getBlockId().hashCode();
     }
     
     /**

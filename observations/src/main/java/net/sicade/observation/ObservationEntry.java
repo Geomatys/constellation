@@ -355,9 +355,10 @@ public class ObservationEntry extends Entry implements Observation {
      * Retourne vrai si l'observation satisfait le template specifie
      */ 
     public boolean matchTemplate(ObservationEntry template) {
-        System.out.println("OBSERVATION:" + this.featureOfInterest.toString() + '\n' +
-                "TEMPLATE: " +  template.featureOfInterest.toString() + '\n' +
-               this.featureOfInterest.equals(template.featureOfInterest)    + '\n' +
+        System.out.println("OBSERVATION:" + this.observedProperty.toString() + '\n' +
+                "TEMPLATE: " +  template.observedProperty.toString() + '\n' +
+                 "ALL:"                                                                    + '\n' +
+               Utilities.equals(this.featureOfInterest,   template.featureOfInterest)   + '\n' +
                Utilities.equals(this.observedProperty,    template.observedProperty)    + '\n' + 
                Utilities.equals(this.procedure,           template.procedure)           + '\n' + 
                Utilities.equals(this.resultQuality,       template.resultQuality)       + '\n' +  

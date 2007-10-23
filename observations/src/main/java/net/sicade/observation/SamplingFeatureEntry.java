@@ -153,6 +153,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized Collection<SamplingFeatureRelationEntry> getRelatedSamplingFeatures() {
     
         return relatedSamplingFeature;
@@ -162,6 +163,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized Collection<ObservationEntry> getRelatedObservations() {
        
         return relatedObservation;
@@ -170,11 +172,13 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized Collection<String> getSampledFeatures() {
         
         return sampledFeature;
     }
 
+    @Override
     public SurveyProcedureEntry getSurveyDetail() {
         return this.surveyDetail;
     }
@@ -196,16 +200,14 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
-            return Utilities.equals(this.id,             that.id) &&
-                   Utilities.equals(this.surveyDetail,           that.surveyDetail)   &&
-                   Utilities.equals(this.description,            that.description)   && 
-                   Utilities.equals(this.relatedObservation,     that.relatedObservation) &&
-                   Utilities.equals(this.relatedSamplingFeature, that.relatedSamplingFeature) &&
-                   Utilities.equals(this.sampledFeature,         that.sampledFeature);
-        }
-        return false;
+        
+        final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
+        return Utilities.equals(this.id,                     that.id) &&
+               Utilities.equals(this.surveyDetail,           that.surveyDetail)   &&
+               Utilities.equals(this.description,            that.description)   && 
+               Utilities.equals(this.relatedObservation,     that.relatedObservation) &&
+               Utilities.equals(this.relatedSamplingFeature, that.relatedSamplingFeature) &&
+               Utilities.equals(this.sampledFeature,         that.sampledFeature);
     }
 
    /**

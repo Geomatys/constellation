@@ -131,12 +131,10 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            final PhenomenonEntry that = (PhenomenonEntry) object;
-            return Utilities.equals(this.id,          that.id) &&
-                   Utilities.equals(this.description, that.description);
-        }
-        return false;
+        final PhenomenonEntry that = (PhenomenonEntry) object;
+        return Utilities.equals(this.id,          that.id) &&
+               Utilities.equals(this.name,        that.name) && 
+               Utilities.equals(this.description, that.description);
     }
     
     /**

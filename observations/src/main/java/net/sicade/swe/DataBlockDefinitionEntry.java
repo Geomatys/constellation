@@ -15,6 +15,7 @@
 package net.sicade.swe;
 
 import java.util.Collection;
+import java.util.Iterator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -80,6 +81,7 @@ import org.geotools.resources.Utilities;
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getId() {
         return id;
     }
@@ -87,6 +89,7 @@ import org.geotools.resources.Utilities;
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<? extends AbstractDataComponentEntry> getComponents() {
         return components;
     }
@@ -94,6 +97,7 @@ import org.geotools.resources.Utilities;
     /**
      * {@inheritDoc}
      */
+    @Override
     public AbstractEncoding getEncoding() {
         return encoding;
     }
@@ -114,13 +118,18 @@ import org.geotools.resources.Utilities;
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            final DataBlockDefinitionEntry that = (DataBlockDefinitionEntry) object;
-            return Utilities.equals(this.id,         that.id) &&
-                    Utilities.equals(this.components, that.components) &&
-                    Utilities.equals(this.encoding,   that.encoding) ;
+        
+        final DataBlockDefinitionEntry that = (DataBlockDefinitionEntry) object;
+        if (this.components.size() != that.components.size())
+            return false;
+        
+        Iterator<? extends AbstractDataComponentEntry> i = components.iterator();
+        while (i.hasNext()) {
+            if (!that.components.contains(i.next()))
+                return false;
         }
-        return false;
+        return Utilities.equals(this.id,         that.id) &&
+               Utilities.equals(this.encoding,   that.encoding) ;
     }
     
     /**

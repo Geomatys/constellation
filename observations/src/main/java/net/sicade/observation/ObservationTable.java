@@ -451,7 +451,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
             }
         }
         // on insere le "samplingTime""
-        if (obs.getSamplingTime() != null){
+        if (obs.getSamplingTime() != null && ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime() != null) {
             Date date = new Date(((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime().getTime());
             statement.setDate(indexOf(query.samplingTimeBegin), date);
             if (((TemporalObjectEntry)obs.getSamplingTime()).getEndTime() != null) {

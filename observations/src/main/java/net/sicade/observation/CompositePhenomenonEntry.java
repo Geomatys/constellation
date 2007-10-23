@@ -72,6 +72,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Retourne le phenomene de base.
      */
+    @Override
     public PhenomenonEntry getBase(){
         return base;
     }
@@ -86,6 +87,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Retourne les composants.
      */
+    @Override
     public Collection<PhenomenonEntry> getComponent() {
         return component;
     }
@@ -93,6 +95,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Retourne le nombre de composant.
      */
+    @Override
     public int getDimension() {
         return dimension;
     }
@@ -102,7 +105,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
      */
     @Override
     public final int hashCode() {
-        return base.hashCode() ^ component.hashCode();
+        return getId().hashCode();
     }
 
     /**
@@ -113,13 +116,22 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            final CompositePhenomenonEntry that = (CompositePhenomenonEntry) object;
-            return Utilities.equals(this.base,         that.base) &&
-                   Utilities.equals(this.component,    that.component) &&
-                   Utilities.equals(this.dimension,    that.dimension) ;
+        final CompositePhenomenonEntry that = (CompositePhenomenonEntry) object;
+        if (this.component.size() != that.component.size())
+            return false;
+        
+        Iterator<PhenomenonEntry> i = component.iterator();
+        while (i.hasNext()) {
+            if (!that.component.contains(i.next()))
+                return false;
         }
-        return false;
+        
+        return Utilities.equals(this.getId(),             that.getId()) &&
+               Utilities.equals(this.getDescription(),    that.getDescription()) &&
+               Utilities.equals(this.getPhenomenonName(), that.getPhenomenonName()) &&
+               Utilities.equals(this.base,                that.base) &&
+               Utilities.equals(this.dimension,           that.dimension) ;
+        
     }
    
     /**

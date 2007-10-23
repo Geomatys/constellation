@@ -128,9 +128,18 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             OfferingSamplingFeatureEntry c =(OfferingSamplingFeatureEntry) i.next();
             sampling.add(c.getComponent());
          }
+         TimestampEntry begin = null;
+         TimestampEntry end   = null;
          
-         TemporalObjectEntry eventTime = new TemporalObjectEntry(new TimestampEntry(results.getTimestamp(indexOf(query.eventTimeBegin))),
-                                                                 new TimestampEntry(results.getTimestamp(indexOf(query.eventTimeEnd))));
+         if (results.getTimestamp(indexOf(query.eventTimeBegin)) != null) {
+            begin =  new TimestampEntry(results.getTimestamp(indexOf(query.eventTimeBegin)));
+         }
+         
+         if (results.getTimestamp(indexOf(query.eventTimeEnd)) != null) {
+            end =  new TimestampEntry(results.getTimestamp(indexOf(query.eventTimeEnd)));
+         }
+         
+         TemporalObjectEntry eventTime = new TemporalObjectEntry(begin, end);
                 
          return new ObservationOfferingEntry(idOffering,
                                              results.getString(indexOf(query.name)),

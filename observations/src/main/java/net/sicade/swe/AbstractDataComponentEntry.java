@@ -61,6 +61,7 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getDefinition() {
         return definition;
     }
@@ -68,6 +69,7 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isFixed() {
         return fixed;
     }
@@ -80,13 +82,10 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            final AbstractDataComponentEntry that = (AbstractDataComponentEntry) object;
-            return Utilities.equals(this.id,         that.id)         &&
-                    Utilities.equals(this.definition, that.definition) &&
-                    Utilities.equals(this.fixed,      that.fixed);
-        }
-        return false;
+        final AbstractDataComponentEntry that = (AbstractDataComponentEntry) object;
+        return Utilities.equals(this.id,         that.id)         &&
+               Utilities.equals(this.definition, that.definition) &&
+               Utilities.equals(this.fixed,      that.fixed);
     }
     
 }

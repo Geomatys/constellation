@@ -3,6 +3,9 @@ package net.sicade.observation;
 
 import java.sql.Timestamp;
 import java.util.StringTokenizer;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -11,6 +14,8 @@ import java.util.StringTokenizer;
  *
  * @author legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "timestampEntry")
 public class TimestampEntry  extends java.util.Date {
     
     /**

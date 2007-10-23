@@ -63,11 +63,8 @@ public class AbstractEncodingEntry extends Entry implements AbstractEncoding{
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
             final AbstractEncodingEntry that = (AbstractEncodingEntry) object;
             return Utilities.equals(this.id,              that.id);
-        }
-        return false;
     }
     
 }

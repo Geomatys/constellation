@@ -196,15 +196,13 @@ public class DirectPositionType {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            final DirectPositionType that = (DirectPositionType) object;
-            return  Utilities.equals(this.axisLabels, that.axisLabels)     &&
-                    Utilities.equals(this.srsDimension, that.srsDimension) &&
-                    Utilities.equals(this.srsName, that.srsName)           &&
-                    Utilities.equals(this.uomLabels, that.uomLabels)       &&
-                    Utilities.equals(this.value, that.value);
-        }
-        return false;
+        
+        final DirectPositionType that = (DirectPositionType) object;
+        return  Utilities.equals(this.axisLabels, that.axisLabels)     &&
+                Utilities.equals(this.srsDimension, that.srsDimension) &&
+                Utilities.equals(this.srsName, that.srsName)           &&
+                Utilities.equals(this.uomLabels, that.uomLabels)       &&
+                Utilities.equals(this.value, that.value);
     }
 
     @Override

@@ -134,16 +134,13 @@ public class AnyScalarEntry extends Entry{
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            final AnyScalarEntry that = (AnyScalarEntry) object;
-            return Utilities.equals(this.name,         that.name) &&
-                   Utilities.equals(this.idDataRecord, that.idDataRecord) &&
-                   Utilities.equals(this.definition,   that.definition) && 
-                   Utilities.equals(this.type,         that.type) &&
-                   Utilities.equals(this.uom,          that.uom) && 
-                   Utilities.equals(this.value,        that.value) ;
-        }
-        return false;
+        final AnyScalarEntry that = (AnyScalarEntry) object;
+        return Utilities.equals(this.name,         that.name) &&
+               Utilities.equals(this.idDataRecord, that.idDataRecord) &&
+               Utilities.equals(this.definition,   that.definition) && 
+               Utilities.equals(this.type,         that.type) &&
+               Utilities.equals(this.uom,          that.uom) && 
+               Utilities.equals(this.value,        that.value) ;
     }
     
     /**
