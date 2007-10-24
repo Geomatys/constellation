@@ -345,6 +345,11 @@ public class MetadataParser {
         if (GeographicMetadataFormat.ELLIPSOIDAL.equalsIgnoreCase(type)) {
             return referencing.getDimension() <= 2 ? 4326 : 4327; // WGS 84
         }
+        type = referencing.getWKT();
+        if (type != null) {
+            // TODO: We should parse the WKT here.
+            return 35000;
+        }
         return 0;
     }
 

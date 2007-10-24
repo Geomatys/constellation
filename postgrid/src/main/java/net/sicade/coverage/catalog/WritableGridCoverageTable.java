@@ -14,6 +14,7 @@
  */
 package net.sicade.coverage.catalog;
 
+import java.sql.Types;
 import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -259,10 +260,6 @@ public class WritableGridCoverageTable extends GridCoverageTable {
              */
             final MetadataParser metadata = new MetadataParser(reader, imageIndex);
             final DateRange[] dates = metadata.getDateRanges();
-            if (dates == null) {
-                warning("Aucune méta-donnée pour le fichier \"" + filename + "\"."); // TODO: localize
-                continue;
-            }
             final int width  = reader.getWidth (imageIndex);
             final int height = reader.getHeight(imageIndex);
             final AffineTransform gridToCRS = metadata.getGridToCRS(0, 1);
@@ -279,14 +276,18 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             statement.setString(bySeries, series.getName());
             statement.setString(byFilename, filename);
             statement.setString(byExtent,   extent);
-            for (int i=0; i<dates.length; i++) {
+            if (dates == null) {
+                statement.setNull(byIndex,     Types.INTEGER);
+                statement.setNull(byStartTime, Types.TIMESTAMP);
+                statement.setNull(byEndTime,   Types.TIMESTAMP);
+            } else for (int i=0; i<dates.length; i++) {
                 final Date startTime = dates[i].getMinValue();
                 final Date   endTime = dates[i].getMaxValue();
                 statement.setInt      (byIndex,     i + 1);
                 statement.setTimestamp(byStartTime, new Timestamp(startTime.getTime()), calendar);
                 statement.setTimestamp(byEndTime,   new Timestamp(endTime  .getTime()), calendar);
-                insertSingleton(statement);
             }
+            insertSingleton(statement);
         }
     }
 
