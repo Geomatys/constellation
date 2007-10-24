@@ -132,6 +132,7 @@ public class Table {
                     disposer  = null;
                     querySQL  = null;
                     cancel();
+                    notifySleeping();
                 }
             }
         }
@@ -421,6 +422,14 @@ public class Table {
      */
     final void freeze() {
         unmodifiable = true;
+    }
+
+    /**
+     * Invoked by a timer after this instance has been unused for a while. The default
+     * implementation does nothing. Subclasses may override this method in order to
+     * dispose some resources.
+     */
+    protected void notifySleeping() {
     }
 
     /**

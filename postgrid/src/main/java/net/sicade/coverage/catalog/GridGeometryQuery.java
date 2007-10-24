@@ -31,7 +31,7 @@ import static net.sicade.catalog.QueryType.*;
  */
 final class GridGeometryQuery extends Query {
     /**
-     * Parameter to appear after the {@code "FROM"} clause.
+     * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column identifier, width, height, scaleX, scaleY, translateX, translateY,
             shearX, shearY, horizontalSRID, horizontalExtent, verticalSRID, verticalOrdinates;
@@ -39,13 +39,8 @@ final class GridGeometryQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byIdentifier;
-
-    /**
-     * Parameter to appear after the {@code "FROM"} clause.
-     */
-    protected final Parameter byWidth, byHeight, byScaleX, byScaleY, byTranslateX, byTranslateY,
-            byShearX, byShearY, byHorizontalSRID;
+    protected final Parameter byIdentifier, byWidth, byHeight, byScaleX, byScaleY,
+            byTranslateX, byTranslateY, byShearX, byShearY, byHorizontalSRID;
 
     /**
      * Creates a new query for the specified database.

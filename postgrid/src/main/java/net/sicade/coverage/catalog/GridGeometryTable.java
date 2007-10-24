@@ -31,6 +31,7 @@ import static java.lang.reflect.Array.getDouble;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.Matrix;
@@ -42,6 +43,8 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.factory.AbstractAuthorityFactory;
+import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import net.sicade.catalog.CatalogException;
@@ -63,12 +66,15 @@ import net.sicade.resources.i18n.ResourceKeys;
  */
 public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     /**
-     * The authority for CRS.
-     *
-     * @todo Should be obtained from the "spatial_ref_sys" table instead.
-     *       We should also parse the WKT if the code is not found.
+     * The authority factory connected to the PostGIS {@code "spatial_ref_sys"} table.
+     * Will be created when first needed.
      */
-    private static final String CRS_AUTHORITY = "EPSG:";
+    private transient CRSAuthorityFactory crsFactory;
+
+    /**
+     * A map of CRS created up to date.
+     */
+    private transient Map<Integer,CoordinateReferenceSystem> cachedCRS;
 
     /**
      * Constructs a new {@code GridGeometryTable}.
@@ -85,6 +91,32 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     private GridGeometryTable(final GridGeometryQuery query) {
         super(query);
         setIdentifierParameters(query.byIdentifier, null);
+    }
+
+    /**
+     * Returns a CRS for the specified identifier.
+     *
+     * @param  srid The CRS identifier.
+     * @return The coordinate reference system for the given identifier.
+     * @throws FactoryException if the CRS was not found or can not be created.
+     */
+    private CoordinateReferenceSystem getCoordinateReferenceSystem(final int srid)
+            throws SQLException, FactoryException
+    {
+        assert Thread.holdsLock(this);
+        final Integer key = srid;
+        if (cachedCRS == null) {
+            cachedCRS = new HashMap<Integer,CoordinateReferenceSystem>();
+        }
+        CoordinateReferenceSystem crs = cachedCRS.get(key);
+        if (crs == null) {
+            if (crsFactory == null) {
+                crsFactory = new PostgisAuthorityFactory(null, getDatabase().getConnection());
+            }
+            crs = crsFactory.createCoordinateReferenceSystem(key.toString());
+            cachedCRS.put(key, crs);
+        }
+        return crs;
     }
 
     /**
@@ -113,11 +145,11 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         final Array  verticalOrdinates = results.getArray (indexOf(query.verticalOrdinates));
         /*
          * Creates the horizontal CRS. We will append a vertical CRS later if
-         * the vertical, ordinates array is non-null, and a temporal CRS last.
+         * the vertical ordinates array is non-null, and a temporal CRS last.
          */
         CoordinateReferenceSystem crs;
         try {
-            crs = CRS.decode(CRS_AUTHORITY + horizontalSRID, true);
+            crs = getCoordinateReferenceSystem(horizontalSRID);
         } catch (FactoryException exception) {
             throw new IllegalRecordException(exception, results, indexOf(query.horizontalSRID), identifier);
         }
@@ -135,7 +167,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
                 if (z > max) max = z;
             }
             try {
-                verticalCRS = CRS.decode(CRS_AUTHORITY + verticalSRID);
+                verticalCRS = getCoordinateReferenceSystem(verticalSRID);
             } catch (FactoryException exception) {
                 throw new IllegalRecordException(exception, results, indexOf(query.verticalSRID), identifier);
             }
@@ -423,5 +455,30 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         }
         insertSingleton(statement);
         return ID;
+    }
+
+    /**
+     * Invoked by a timer after this instance has been unused for a while.
+     */
+    @Override
+    protected void notifySleeping() {
+        if (crsFactory instanceof AbstractAuthorityFactory) try {
+            ((AbstractAuthorityFactory) crsFactory).dispose();
+        } catch (FactoryException e) {
+            logWarning("notifySleeping", e);
+        }
+        crsFactory = null;
+        super.notifySleeping();
+    }
+
+    /**
+     * Clears the cache.
+     */
+    @Override
+    protected void clearCache() {
+        if (cachedCRS != null) {
+            cachedCRS.clear();
+        }
+        super.clearCache();
     }
 }

@@ -27,6 +27,7 @@ import javax.units.NonSI;
 import javax.units.Converter;
 
 import org.opengis.util.CodeList;
+import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.metadata.spatial.PixelOrientation;
 
 import org.geotools.image.io.GeographicImageReader;
@@ -228,15 +229,33 @@ public class MetadataParser {
      * transform maps always the pixel {@linkplain PixelOrientation#UPPER_LEFT upper left}
      * corner.
      *
-     * @param  xAxis The <var>x</var> axis (usually 0).
-     * @param  yAxis The <var>y</var> axis (usually 1).
      * @return The affine transform from grid to CRS, or {@code null} if it can't be computed.
      */
-    public AffineTransform getGridToCRS(final int xAxis, final int yAxis) {
+    public AffineTransform getGridToCRS() {
+        int xAxis = 0;
+        int yAxis = 1;
+        boolean reverseX = false;
+        boolean reverseY = true;
+        final ImageReferencing referencing = metadata.getReferencing();
+        for (int i=referencing.getDimension(); --i>=0;) {
+            final Axis axis = referencing.getAxis(i);
+            final AxisDirection dir = getCode(AxisDirection.values(), axis.getDirection());
+            if (dir != null) {
+                final AxisDirection abs = dir.absolute();
+                if (abs.equals(AxisDirection.EAST)) {
+                    xAxis = i;
+                    reverseX = !abs.equals(dir); // Really with !
+                } else if (abs.equals(AxisDirection.NORTH)) {
+                    yAxis = i;
+                    reverseY = abs.equals(dir); // Really without !
+                }
+            }
+        }
+
         final double[] flatmatrix = new double[6];
         final ImageGeometry geometry = metadata.getGeometry();
-        if (!computeAffineCoefficients(geometry, xAxis, xAxis, flatmatrix, false, false) ||
-            !computeAffineCoefficients(geometry, yAxis, yAxis, flatmatrix, true,  true))
+        if (!computeAffineCoefficients(geometry, xAxis, xAxis, flatmatrix, false, reverseX) ||
+            !computeAffineCoefficients(geometry, yAxis, yAxis, flatmatrix, true,  reverseY))
         {
             return null;
         }

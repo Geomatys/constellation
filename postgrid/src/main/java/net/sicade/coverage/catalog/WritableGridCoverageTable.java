@@ -262,7 +262,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             final DateRange[] dates = metadata.getDateRanges();
             final int width  = reader.getWidth (imageIndex);
             final int height = reader.getHeight(imageIndex);
-            final AffineTransform gridToCRS = metadata.getGridToCRS(0, 1);
+            final AffineTransform gridToCRS = metadata.getGridToCRS();
             final int horizontalSRID = metadata.getHorizontalSRID();
             final int verticalSRID = metadata.getVerticalSRID();
             final double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
