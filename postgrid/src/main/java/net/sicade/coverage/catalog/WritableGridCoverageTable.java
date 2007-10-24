@@ -277,7 +277,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             statement.setString(byFilename, filename);
             statement.setString(byExtent,   extent);
             if (dates == null) {
-                statement.setNull(byIndex,     Types.INTEGER);
+                statement.setInt (byIndex,     1);
                 statement.setNull(byStartTime, Types.TIMESTAMP);
                 statement.setNull(byEndTime,   Types.TIMESTAMP);
             } else for (int i=0; i<dates.length; i++) {
