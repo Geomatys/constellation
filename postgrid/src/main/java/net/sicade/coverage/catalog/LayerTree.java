@@ -78,7 +78,8 @@ public class LayerTree extends Table {
     @SuppressWarnings("unchecked")
     private static final Class<? extends SingletonTable>[] TYPES = new Class[FORMAT + 1];
     static {
-        TYPES[THEMATIC ] =  ThematicTable.class;
+//      TYPES[THEMATIC ] =  ThematicTable.class;
+//      TYPES[PROCEDURE] = ProcedureTable.class;
         TYPES[LAYER    ] =     LayerTable.class;
         TYPES[SERIES   ] =    SeriesTable.class;
         TYPES[FORMAT   ] =    FormatTable.class;

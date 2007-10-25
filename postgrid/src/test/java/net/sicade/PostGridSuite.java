@@ -38,14 +38,12 @@ public class PostGridSuite extends TestSuite {
         addTestSuite(net.sicade.catalog.         SpatialFunctionsTest         .class);
         addTestSuite(net.sicade.catalog.         TimeStampTest                .class);
         addTestSuite(net.sicade.catalog.         QueryTest                    .class);
-        addTestSuite(net.sicade.coverage.catalog.SchemaTest                   .class);
         addTestSuite(net.sicade.coverage.catalog.CategoryTableTest            .class);
         addTestSuite(net.sicade.coverage.catalog.SampleDimensionTableTest     .class);
         addTestSuite(net.sicade.coverage.catalog.FormatTableTest              .class);
         addTestSuite(net.sicade.coverage.catalog.GridGeometryTableTest        .class);
         addTestSuite(net.sicade.coverage.catalog.GridCoverageTableTest        .class);
         addTestSuite(net.sicade.coverage.catalog.WritableGridCoverageTableTest.class);
-        addTestSuite(net.sicade.coverage.catalog.ThematicTableTest            .class);
         addTestSuite(net.sicade.coverage.catalog.SeriesTableTest              .class);
         addTestSuite(net.sicade.coverage.catalog.LayerTableTest               .class);
         addTestSuite(net.sicade.coverage.model  .RegionOfInterestTableTest    .class);

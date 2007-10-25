@@ -43,7 +43,7 @@ public interface Layer extends Element {
      *
      * @return The thematic for this layer.
      */
-    Thematic getThematic();
+    String getThematic();
 
     /**
      * A layer to use as a fallback if no data is available in this layer for a given position. For

@@ -67,7 +67,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
      */
-    private final Thematic thematic;
+    private final String thematic;
 
     /**
      * L'intervalle de temps typique des images de cette couche (en nombre
@@ -138,10 +138,8 @@ final class LayerEntry extends Entry implements Layer {
      *                     de jours), ou {@link Double#NaN} si elle est inconnue.
      * @param remarks      Remarques s'appliquant à cette entrée, ou {@code null}.
      */
-    protected LayerEntry(final String   name,
-                         final Thematic thematic,
-                         final double   timeInterval,
-                         final String   remarks)
+    protected LayerEntry(final String name, final String thematic, final double timeInterval,
+                         final String remarks)
     {
         super(name, remarks);
         this.thematic     = thematic;
@@ -152,7 +150,7 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     @Override
-    public Thematic getThematic() {
+    public String getThematic() {
         return thematic;
     }
 

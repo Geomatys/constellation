@@ -43,12 +43,6 @@ import net.sicade.coverage.model.LinearModelTable;
  */
 public class LayerTable extends BoundedSingletonTable<Layer> {
     /**
-     * Connexion vers la table des thématiques.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
-     */
-    private ThematicTable thematics;
-
-    /**
      * Connexion vers la table des modèles.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
@@ -125,16 +119,13 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         }
         final String fallback  = results.getString(indexOf(query.fallback));
         final String remarks   = results.getString(indexOf(query.remarks ));
-        if (thematics == null) {
-            thematics = getDatabase().getTable(ThematicTable.class);
-        }
         /*
          * Utilise une table d'images distinctes pour chaque couches. La couche ne devrait plus
          * changer après la construction.  Pour cette raison, l'instance de GridCoverageTable
          * utilisée ici ne devra jamais être accessible publiquement.
          */
         final LayerEntry entry;
-        entry = new LayerEntry(name, thematics.getEntry(thematic), period, remarks);
+        entry = new LayerEntry(name, thematic, period, remarks);
         entry.fallback = fallback;
         return entry;
     }
