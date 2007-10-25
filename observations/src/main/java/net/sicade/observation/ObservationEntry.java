@@ -17,7 +17,6 @@ package net.sicade.observation;
 // jaxb import
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -79,12 +78,6 @@ public class ObservationEntry extends Entry implements Observation {
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = 3269639171560208276L;
-    
-    /**
-     * Le nom de l'observation.
-     */
-    @XmlAttribute(required = true)
-    private String name;
     
     /**
      * La description de l'observation
@@ -356,6 +349,9 @@ public class ObservationEntry extends Entry implements Observation {
      * Retourne vrai si l'observation satisfait le template specifie
      */ 
     public boolean matchTemplate(ObservationEntry template) {
+        if (this.observedProperty == null) System.out.println("OBSERVED PROP NULL");
+        if (this.featureOfInterest == null) System.out.println("F O I NULL");
+        
         return Utilities.equals(this.featureOfInterest,   template.featureOfInterest)   &&
                Utilities.equals(this.observedProperty,    template.observedProperty)    &&
                Utilities.equals(this.procedure,           template.procedure)           &&
@@ -412,10 +408,22 @@ public class ObservationEntry extends Entry implements Observation {
         s.append("name=").append(name).append(lineSeparator).append("definition=").append(definition);
         if (samplingTime != null)
             s.append("samplingTime=").append(samplingTime.toString()).append(lineSeparator);
-        s.append("distribution:").append(distribution.toString()).append(lineSeparator);
-        s.append("procedure=").append(procedure.toString()).append(lineSeparator);
-        s.append("observedProperty=").append(observedProperty.toString()).append(lineSeparator);
-        s.append("featureOfInterest=").append(featureOfInterest.toString()).append(lineSeparator); 
+        if (distribution != null)
+            s.append("distribution:").append(distribution.toString()).append(lineSeparator);
+        else 
+            s.append("DISTRIBUTION IS NULL").append(lineSeparator);
+        if (procedure != null)
+            s.append("procedure=").append(procedure.toString()).append(lineSeparator);
+        else
+            s.append("PROCEDURE IS NULL").append(lineSeparator);
+        
+        if (observedProperty != null)
+            s.append("observedProperty=").append(observedProperty.toString()).append(lineSeparator);
+        else s.append("OBSERVED PROPERTY IS NULL").append(lineSeparator);
+        if (featureOfInterest != null)
+            s.append("featureOfInterest=").append(featureOfInterest.toString()).append(lineSeparator); 
+        else
+            s.append("FEATURE OF INTEREST IS NULL").append(lineSeparator);
         if (result != null)       
             s.append(" result=").append(result.toString()).append(lineSeparator);
         s.append(" resultDefinition=").append(resultDefinition.toString()).append(lineSeparator);

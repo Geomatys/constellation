@@ -99,4 +99,31 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
         
     }
     
+     /**
+     * Insere un nouveau capteur a un offering dans la base de donnée.
+     *
+     */
+    public synchronized void getIdentifier(OfferingProcedureEntry offProc) throws SQLException, CatalogException {
+        final OfferingProcedureQuery query  = (OfferingProcedureQuery) super.query;
+        String idProc = "";
+        
+        PreparedStatement statement = getStatement(QueryType.EXISTS);
+        statement.setString(indexOf(query.idOffering), offProc.getIdOffering());
+         
+        if (process == null) {
+                process = getDatabase().getTable(ProcessTable.class);
+            }
+        idProc = process.getIdentifier(offProc.getComponent());
+        
+        statement.setString(indexOf(query.procedure), idProc);
+        ResultSet result = statement.executeQuery();
+        if(result.next())
+            return;
+        
+        PreparedStatement insert    = getStatement(QueryType.INSERT);
+        insert.setString(indexOf(query.idOffering), offProc.getIdOffering());
+        insert.setString(indexOf(query.procedure), idProc);
+        insertSingleton(insert);
+    }
+    
 }

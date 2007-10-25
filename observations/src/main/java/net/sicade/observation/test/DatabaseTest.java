@@ -22,7 +22,6 @@ import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.ProcessEntry;
 import net.sicade.observation.SamplingPointEntry;
 import net.sicade.observation.TemporalObjectEntry;
-import net.sicade.observation.TimestampEntry;
 import net.sicade.swe.AnyScalarEntry;
 import net.sicade.swe.DataBlockDefinitionEntry;
 import net.sicade.swe.SimpleDataRecordEntry;
@@ -65,7 +64,7 @@ public class DatabaseTest {
         ProcessEntry proc                = new ProcessEntry("urn:ogc:object:sensor:BRGM:12349", null);
         
         // le sampling time
-        TemporalObjectEntry t            = new TemporalObjectEntry(new TimestampEntry(Timestamp.valueOf("2002-02-12 10:20:14")),null);
+        TemporalObjectEntry t            = new TemporalObjectEntry(Timestamp.valueOf("2002-02-12 10:20:14"),null);
         
         //le resultat
         //AnyResultEntry result            = new AnyResultEntry("idresultat", null, "un bloc de donnée");

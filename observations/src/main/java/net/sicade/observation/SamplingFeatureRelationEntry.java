@@ -2,8 +2,8 @@
 package net.sicade.observation;
 
 import net.sicade.catalog.Entry;
-import org.geotools.util.GenericName;
 import org.opengis.observation.sampling.SamplingFeatureRelation;
+import org.opengis.util.GenericName;
 
 /**
  *
@@ -12,7 +12,7 @@ import org.opengis.observation.sampling.SamplingFeatureRelation;
  */
 public class SamplingFeatureRelationEntry extends Entry implements SamplingFeatureRelation {
     
-    private GenericName role;
+    // JAXBISSUE private GenericNameEntry role;
     
     private SamplingFeatureEntry target;
     
@@ -23,22 +23,25 @@ public class SamplingFeatureRelationEntry extends Entry implements SamplingFeatu
     
     /**
      */
-    public SamplingFeatureRelationEntry(String name, GenericName role, SamplingFeatureEntry target) {
+    public SamplingFeatureRelationEntry(String name, SamplingFeatureEntry target) {
         super(name);
-        this.role   = role;
+        //this.role   = role;
         this.target = target;
     }
     
     /**
      * {@inheritDoc}
      */
+    @Override
     public GenericName getRole(){
-        return role;
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return role;
     }
     
     /**
      * {@inheritDoc}
      */
+    @Override
     public SamplingFeatureEntry getTarget(){
         return target;
     }

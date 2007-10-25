@@ -8,6 +8,7 @@ import net.sicade.catalog.CatalogException;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
+import net.sicade.observation.CompositePhenomenonEntry;
 import net.sicade.observation.CompositePhenomenonTable;
 import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.PhenomenonTable;
@@ -104,4 +105,42 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
         
     }
     
+    /**
+     * Insere un nouveau capteur a un offering dans la base de donnée.
+     *
+     */
+    public synchronized void getIdentifier(OfferingPhenomenonEntry offPheno) throws SQLException, CatalogException {
+        final OfferingPhenomenonQuery query  = (OfferingPhenomenonQuery) super.query;
+        String idPheno = "";
+        
+        PreparedStatement statement = getStatement(QueryType.EXISTS);
+        PreparedStatement insert    = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
+        insert.setString(indexOf(query.idOffering), offPheno.getIdOffering());
+         
+        if (offPheno.getComponent() instanceof PhenomenonEntry) {
+            if ( phenomenons == null) {
+                phenomenons = getDatabase().getTable(PhenomenonTable.class);
+            }
+            idPheno = phenomenons.getIdentifier(offPheno.getComponent());
+            statement.setString(indexOf(query.phenomenon), idPheno);
+            statement.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
+            insert.setString(indexOf(query.phenomenon), idPheno);
+            insert.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
+            
+        } else if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
+             if (compositePhenomenons == null) {
+                compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+            }
+            idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
+            statement.setString(indexOf(query.compositePhenomenon), idPheno);
+            statement.setNull(indexOf(query.phenomenon), java.sql.Types.VARCHAR);
+            insert.setString(indexOf(query.compositePhenomenon), idPheno);
+            statement.setNull(indexOf(query.phenomenon), java.sql.Types.VARCHAR);
+        }
+        ResultSet result = statement.executeQuery();
+        if(!result.next())
+            insertSingleton(statement);
+              
+    }
 }

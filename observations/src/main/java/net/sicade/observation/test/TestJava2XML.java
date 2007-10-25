@@ -64,7 +64,7 @@ public class TestJava2XML {
         ProcessEntry proc                = new ProcessEntry("un capteur", "la description de ce capteur");
         
         // le sampling time
-        TemporalObjectEntry t            = new TemporalObjectEntry(new TimestampEntry(Timestamp.valueOf("2002-02-12 14:15:22")),null);
+        TemporalObjectEntry t            = new TemporalObjectEntry(Timestamp.valueOf("2002-02-12 14:15:22"),null);
         
         //le resultat
         AnyResultEntry result            = new AnyResultEntry("idresultat", null, "2002-10-02,15.0,true@@2002-10-03,12.1,true@@");

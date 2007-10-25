@@ -1,6 +1,7 @@
 
 package net.sicade.observation;
 
+import java.sql.Timestamp;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,15 +18,14 @@ import org.opengis.temporal.TemporalObject;
 public class TemporalObjectEntry extends Entry implements TemporalObject{
     
     /**
-     * The begin date of a duration or a single TimeInstant.
+     * The begin date of a duration or a single TimeInstant (store in a string for jaxB issue).
      */
     @XmlElement(required = true)
-    private TimestampEntry beginTime;
-    
+    private String beginTime;
     /**
-     * The end date of a duration or {@code null}.
+     * The end date of a duration or {@code null} (store in a string for jaxB issue).
      */
-    private TimestampEntry endTime;
+    private String endTime;
     
     /**
      * Constructeur vide utilisé par JAXB.
@@ -40,18 +40,24 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
      * @param beginTime The instant time or the begin date of the period.
      * @param endTime   if not {@code null} the object became a time period.
      */
-    public TemporalObjectEntry(TimestampEntry beginTime, TimestampEntry endTime) {
+    public TemporalObjectEntry(Timestamp beginTime, Timestamp endTime) {
         super(null);
-        this.beginTime = beginTime;
-        this.endTime   = endTime;
+        if (beginTime != null)
+            this.beginTime = beginTime.toString();
+        else
+            this.beginTime = null;
+        if (endTime != null)
+            this.endTime = endTime.toString();
+        else
+            this.endTime = null;
     }
 
-    public TimestampEntry getBeginTime() {
-        return beginTime;
+    public Timestamp getBeginTime() {
+        return Timestamp.valueOf(beginTime);
     }
 
-    public TimestampEntry getEndTime() {
-        return endTime;
+    public Timestamp getEndTime() {
+        return Timestamp.valueOf(endTime);
     }
     
    
@@ -70,6 +76,14 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
                    Utilities.equals(this.endTime,   that.endTime);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + (this.beginTime != null ? this.beginTime.hashCode() : 0);
+        hash = 89 * hash + (this.endTime != null ? this.endTime.hashCode() : 0);
+        return hash;
     }
     
     /**

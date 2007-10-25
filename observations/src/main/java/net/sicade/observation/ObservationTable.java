@@ -316,12 +316,11 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         Timestamp te = result.getTimestamp(indexOf(query.samplingTimeEnd));
         TemporalObjectEntry samplingTime = null;
         if (tb != null && te != null) {
-            samplingTime =  new TemporalObjectEntry(new TimestampEntry(tb),
-                                                    new TimestampEntry(te));
+            samplingTime =  new TemporalObjectEntry(tb, te);
         } else if (tb != null && te == null) {
-            samplingTime =  new TemporalObjectEntry(new TimestampEntry(tb), null);
+            samplingTime =  new TemporalObjectEntry(tb, null);
         } else if (tb == null && te != null) {
-            samplingTime =  new TemporalObjectEntry(null, new TimestampEntry(te));
+            samplingTime =  new TemporalObjectEntry(null, te);
         } 
         
         
@@ -459,11 +458,11 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         }
         // on insere le "samplingTime""
         if (obs.getSamplingTime() != null && ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime() != null) {
-            Date date = new Date(((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime().getTime());
-            statement.setDate(indexOf(query.samplingTimeBegin), date);
+            Timestamp date = ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime();
+            statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
             if (((TemporalObjectEntry)obs.getSamplingTime()).getEndTime() != null) {
-                date = new Date(((TemporalObjectEntry)obs.getSamplingTime()).getEndTime().getTime());           
-                statement.setDate(indexOf(query.samplingTimeEnd), date);
+                date = ((TemporalObjectEntry)obs.getSamplingTime()).getEndTime();           
+                statement.setTimestamp(indexOf(query.samplingTimeEnd), date);
             } else {
                 statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
             }

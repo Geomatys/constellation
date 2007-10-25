@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import net.sicade.catalog.Entry;
-import net.sicade.metadata.GenericNameEntry;
 import net.sicade.metadata.ResponsiblePartyEntry;
 import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -56,7 +55,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     
     private MeasureEntry positionAccuracy;
     
-    private GenericNameEntry projection;
+    // JAXB ISSUE private GenericNameEntry projection;
     
     private TemporalObjectEntry surveyTime;
     
@@ -74,7 +73,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
             final Datum geodeticDatum,
             final ProcessEntry positionMethod,
             final MeasureEntry positionAccuracy,
-            final GenericNameEntry projection,
+            final GenericName projection,
             final TemporalObjectEntry surveyTime) 
     {
         super(name);
@@ -85,7 +84,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
         // JAXB issue this.geodeticDatum = geodeticDatum;
         this.positionMethod = positionMethod;
         this.positionAccuracy = positionAccuracy; 
-        this.projection = projection;
+         // JAXB issue this.projection = projection;
         this.surveyTime = surveyTime;
                 
     }
@@ -129,7 +128,8 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     
     @Override
     public GenericName getProjection() {
-        return projection;
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return projection;
     }
     
     @Override
@@ -162,7 +162,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
                    Utilities.equals(this.elevationAccuracy, that.elevationAccuracy) &&
                    Utilities.equals(this.positionAccuracy,  that.positionAccuracy) &&
                    Utilities.equals(this.positionMethod,    that.positionMethod) &&
-                   Utilities.equals(this.projection,        that.projection) &&
+                   //Utilities.equals(this.projection,        that.projection) &&
                    Utilities.equals(this.surveyTime,        that.surveyTime);
         }
         return false;

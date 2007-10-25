@@ -166,12 +166,11 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         Timestamp te = result.getTimestamp(indexOf(query.samplingTimeEnd));
         TemporalObjectEntry samplingTime = null;
         if (tb != null && te != null) {
-            samplingTime =  new TemporalObjectEntry(new TimestampEntry(tb),
-                                                    new TimestampEntry(te));
+            samplingTime =  new TemporalObjectEntry(tb,te);
         } else if (tb != null && te == null) {
-            samplingTime =  new TemporalObjectEntry(new TimestampEntry(tb), null);
+            samplingTime =  new TemporalObjectEntry(tb, null);
         } else if (tb == null && te != null) {
-            samplingTime =  new TemporalObjectEntry(null, new TimestampEntry(te));
+            samplingTime =  new TemporalObjectEntry(null,te);
         } 
         
         return new MeasurementEntry(result.getString(indexOf(query.name   )),

@@ -9,6 +9,7 @@ import net.sicade.catalog.QueryType;
 import net.sicade.catalog.SingletonTable;
 import net.sicade.observation.SamplingFeatureEntry;
 import net.sicade.observation.SamplingFeatureTable;
+import net.sicade.observation.SamplingPointEntry;
 import net.sicade.observation.SamplingPointTable;
 import org.geotools.resources.Utilities;
 
@@ -97,5 +98,44 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
             this.idOffering = idOffering;
             fireStateChanged("idOffering");
         }
+    }
+    
+     /**
+     * Insere un nouveau capteur a un offering dans la base de donnée.
+     *
+     */
+    public synchronized void getIdentifier(OfferingSamplingFeatureEntry offSamplingFeature) throws SQLException, CatalogException {
+        final OfferingSamplingFeatureQuery query  = (OfferingSamplingFeatureQuery) super.query;
+        String idSF = "";
+        
+        PreparedStatement statement = getStatement(QueryType.EXISTS);
+        PreparedStatement insert    = getStatement(QueryType.INSERT);
+        statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
+        insert.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
+         
+        if (offSamplingFeature.getComponent() instanceof SamplingFeatureEntry) {
+            if ( samplingFeatures == null) {
+                samplingFeatures = getDatabase().getTable(SamplingFeatureTable.class);
+            }
+            idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
+            statement.setString(indexOf(query.samplingFeature), idSF);
+            statement.setNull(indexOf(query.samplingPoint), java.sql.Types.VARCHAR);
+            insert.setString(indexOf(query.samplingFeature), idSF);
+            insert.setNull(indexOf(query.samplingPoint), java.sql.Types.VARCHAR);
+            
+        } else if (offSamplingFeature.getComponent() instanceof SamplingPointEntry) {
+             if (samplingPoints == null) {
+                samplingPoints = getDatabase().getTable(SamplingPointTable.class);
+            }
+            idSF = samplingPoints.getIdentifier((SamplingPointEntry)offSamplingFeature.getComponent());
+            statement.setString(indexOf(query.samplingPoint), idSF);
+            statement.setNull(indexOf(query.samplingFeature), java.sql.Types.VARCHAR);
+            insert.setString(indexOf(query.samplingPoint), idSF);
+            insert.setNull(indexOf(query.samplingFeature), java.sql.Types.VARCHAR);
+        }
+        ResultSet result = statement.executeQuery();
+        if(!result.next())
+            insertSingleton(statement);
+              
     }
 }

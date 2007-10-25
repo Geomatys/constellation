@@ -11,9 +11,9 @@ package net.sicade.sos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import net.sicade.catalog.CatalogException;
@@ -26,7 +26,6 @@ import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.ProcessEntry;
 import net.sicade.observation.SamplingFeatureEntry;
 import net.sicade.observation.TemporalObjectEntry;
-import net.sicade.observation.TimestampEntry;
 
 /**
  *
@@ -72,7 +71,37 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
         setIdentifierParameters(query.byId, null);
     }
     
+    /**
+     * Return the procedure table for offering.
+     */
+     public OfferingProcedureTable getProcedures() {
+        return procedures;
+    }
+
+    /**
+     * Return the phenomenon table for offering.
+     */ 
+    public OfferingPhenomenonTable getPhenomenons() {
+        return phenomenons;
+    }
+
+    /**
+     * Return the station table for offering.
+     */
+    public OfferingSamplingFeatureTable getStations() {
+        return stations;
+    }
     
+    /**
+     *  Create a new offering from the database.
+     * 
+     * @param results a resultSet obtain by a "SELECT" SQL request.
+     * 
+     * @return A observationOffering object.
+     * 
+     * @throws net.sicade.catalog.CatalogException
+     * @throws java.sql.SQLException
+     */
     @Override
     protected ObservationOfferingEntry createEntry(ResultSet results) throws CatalogException, SQLException {
          final ObservationOfferingQuery query = (ObservationOfferingQuery) super.query;
@@ -128,15 +157,15 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             OfferingSamplingFeatureEntry c =(OfferingSamplingFeatureEntry) i.next();
             sampling.add(c.getComponent());
          }
-         TimestampEntry begin = null;
-         TimestampEntry end   = null;
+         Timestamp begin = null;
+         Timestamp end   = null;
          
          if (results.getTimestamp(indexOf(query.eventTimeBegin)) != null) {
-            begin =  new TimestampEntry(results.getTimestamp(indexOf(query.eventTimeBegin)));
+            begin =  results.getTimestamp(indexOf(query.eventTimeBegin));
          }
          
          if (results.getTimestamp(indexOf(query.eventTimeEnd)) != null) {
-            end =  new TimestampEntry(results.getTimestamp(indexOf(query.eventTimeEnd)));
+            end =  results.getTimestamp(indexOf(query.eventTimeEnd));
          }
          
          TemporalObjectEntry eventTime = new TemporalObjectEntry(begin, end);
@@ -156,5 +185,4 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                                              ResponseMode.fromValue(results.getString(indexOf(query.responseMode))));
          
     }
-
 }

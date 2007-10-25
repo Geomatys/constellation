@@ -3,6 +3,7 @@ package net.sicade.sos;
 
 import net.opengeospatial.sos.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -43,11 +44,11 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
     @XmlElement(required = true)
     protected TemporalObjectEntry eventTime;
     @XmlElement(required = true)
-    protected List<ProcessEntry> procedure;
+    protected List<ProcessEntry> procedure = new ArrayList<ProcessEntry>();
     @XmlElement(required = true)
-    protected List<PhenomenonEntry> observedProperty;
+    protected List<PhenomenonEntry> observedProperty = new ArrayList<PhenomenonEntry>();
     @XmlElement(required = true)
-    protected List<? extends SamplingFeatureEntry> featureOfInterest;
+    protected List<SamplingFeatureEntry> featureOfInterest = new ArrayList<SamplingFeatureEntry>();
     @XmlElement(required = true)
     protected String responseFormat;
     protected String resultModel;
@@ -64,7 +65,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      */ 
     public ObservationOfferingEntry(String id, String name, String description, ReferenceEntry descriptionReference,
             BoundingShapeEntry boundedBy, String srsName, TemporalObjectEntry eventTime, List<ProcessEntry> procedure,
-            List<PhenomenonEntry> observedProperty, List<? extends SamplingFeatureEntry> featureOfInterest,
+            List<PhenomenonEntry> observedProperty, List<SamplingFeatureEntry> featureOfInterest,
             String responseFormat, String resultModel, ResponseMode responseMode) {
         
         super(id, name, description, descriptionReference, boundedBy);
@@ -105,60 +106,30 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
     }
 
     /**
-     * Return the value of the procedure property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the procedure property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getProcedure().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link ProcessPropertyType }
-     * 
-     * 
+     *  Return an unmodifiable list of the procedures
      */
     public List<ProcessEntry> getProcedure() {
-        if (procedure == null) {
-            procedure = new ArrayList<ProcessEntry>();
-        }
-        return this.procedure;
+        
+        return Collections.unmodifiableList(procedure);
     }
-
+    
+    
     /**
-     * Return the value of the observedProperty property.
+     * Return an unmodifiable list of the observedProperty.
      */
     public List<PhenomenonEntry> getObservedProperty() {
-        if (observedProperty == null) {
-            observedProperty = new ArrayList<PhenomenonEntry>();
-        }
-        return this.observedProperty;
+        return Collections.unmodifiableList(observedProperty);
     }
 
     /**
-     * Return the value of the featureOfInterest property.
+     * Return an unmodifiable list of the featureOfInterest.
      * 
      */
-    public List<? extends SamplingFeatureEntry> getFeatureOfInterest() {
-        return featureOfInterest;
+    public List<SamplingFeatureEntry> getFeatureOfInterest() {
+        return Collections.unmodifiableList(featureOfInterest);
     }
 
-    /**
-     * Sets the value of the featureOfInterest property.
-     * 
-     */
-    public void setFeatureOfInterest(List<? extends SamplingFeatureEntry> value) {
-        this.featureOfInterest = value;
-    }
-
+   
     /**
      * Return the value of the resultFormat property.
      * 

@@ -20,6 +20,7 @@ import java.util.Iterator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.opengis.observation.CompositePhenomenon;
 
@@ -33,7 +34,7 @@ import org.geotools.resources.Utilities;
   * @author Guilhem Legal
   */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CompositePhenomenon")
+@XmlType(name = "CompositePhenomenon", propOrder = {"base", "dimension", "component"})
 public class CompositePhenomenonEntry extends PhenomenonEntry implements CompositePhenomenon{
     
     /**
@@ -50,6 +51,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Les composants.
      */
+    @XmlElement(name="component")
     private Collection<PhenomenonEntry> component;
    
     /** 
@@ -117,15 +119,19 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
             return true;
         }
         final CompositePhenomenonEntry that = (CompositePhenomenonEntry) object;
-        if (this.component.size() != that.component.size())
+        if ((this.component !=null && that.component == null)||(this.component ==null && that.component != null))
             return false;
         
-        Iterator<PhenomenonEntry> i = component.iterator();
-        while (i.hasNext()) {
-            if (!that.component.contains(i.next()))
-                return false;
-        }
+        if (this.component !=null && that.component != null && this.component.size() != that.component.size())
+            return false;
         
+        if (this.component !=null) {
+            Iterator<PhenomenonEntry> i = component.iterator();
+            while (i.hasNext()) {
+                if (!that.component.contains(i.next()))
+                    return false;
+            }
+        }
         return Utilities.equals(this.getId(),             that.getId()) &&
                Utilities.equals(this.getDescription(),    that.getDescription()) &&
                Utilities.equals(this.getPhenomenonName(), that.getPhenomenonName()) &&
@@ -139,20 +145,25 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
      */
     @Override
     public String toString() { 
-        String s = super.toString() + '\n';
+        StringBuilder s = new StringBuilder(super.toString() + '\n');
         if( base != null) {
-            s = s + "base: " + base.toString() + '\n';
+            s.append("base: ").append(base.toString()).append('\n');
+        } else {
+            s.append("base is null (relatively normal)");
         }
         
-        Iterator i =  component.iterator();
-        String compos = "";
-        while (i.hasNext()) {
-            compos += i.next().toString() + '\n';
+        s.append("dimension:").append(dimension).append('\n');
+        
+        if (component != null) {
+            Iterator i =  component.iterator();
+            s.append("components :").append('\n');
+            while (i.hasNext()) {
+                s.append(i.next().toString()).append('\n');
+            }
+        } else {
+             s.append("COMPONENT IS NULL");
         }
-        
-        s = s + "dimension=" + dimension + " components : " + '\n' + compos;
-        
-        return s;
+        return s.toString();
     }    
     
 }
