@@ -254,6 +254,13 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                     extension = "";
                 }
             }
+            /*
+             * Skips any files already declared in the database for the current layer.
+             */
+            if (exists(filename)) {
+                LOGGER.fine(filename + " est déjà dans la base de données."); // TODO: localize
+                continue;
+            }
             final Series series = getSeries(reader.getOriginatingProvider(), path, extension);
             /*
              * Gets the metadata of interest.

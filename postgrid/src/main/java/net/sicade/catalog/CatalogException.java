@@ -96,28 +96,29 @@ public class CatalogException extends Exception {
     public void setMetadata(final Table table, final ResultSet results, final int column, final String key)
             throws SQLException
     {
+        boolean noTable=true, noColumn=true;
         if (results != null && column != 0) {
             final ResultSetMetaData metadata = results.getMetaData();
             if (metadata != null) {
                 this.table  = metadata.getTableName (column);
                 this.column = metadata.getColumnName(column);
-                final boolean noTable  = (this.table  == null) || (this.table  = this.table .trim()).length() == 0;
-                final boolean noColumn = (this.column == null) || (this.column = this.column.trim()).length() == 0;
-                /*
-                 * We tried to use the database metadata in priority,  on the assumption that they
-                 * are closer to the SQL statement really executed (we could have a bug in the way
-                 * we created our SQL statement). But some JDBC drivers don't provide information.
-                 * In the later case, we fallback on the information found in our Column objects.
-                 */
-                if ((noTable || noColumn) && table != null) {
-                    final Column c = table.getColumn(column);
-                    if (c != null) {
-                        if (noTable)  this.table  = c.table;
-                        if (noColumn) this.column = c.name;
-                    }
-                }
+                noTable  = (this.table  == null) || (this.table  = this.table .trim()).length() == 0;
+                noColumn = (this.column == null) || (this.column = this.column.trim()).length() == 0;
             }
             results.close();
+        }
+        /*
+         * We tried to use the database metadata in priority,  on the assumption that they
+         * are closer to the SQL statement really executed (we could have a bug in the way
+         * we created our SQL statement). But some JDBC drivers don't provide information.
+         * In the later case, we fallback on the information found in our Column objects.
+         */
+        if ((noTable || noColumn) && table != null) {
+            final Column c = table.getColumn(column);
+            if (c != null) {
+                if (noTable)  this.table  = c.table;
+                if (noColumn) this.column = c.name;
+            }
         }
         this.key = key;
     }

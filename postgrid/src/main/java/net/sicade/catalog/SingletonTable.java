@@ -495,6 +495,33 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
+     * Checks if an element exists for the given name. This method do not attempt to create
+     * the element and doesn't check if the entry is valid.
+     *
+     * @param  name The name of the element to fetch.
+     * @return {@code true} if an element of the given name was found.
+     * @throws SQLException if an error occured will reading from the database.
+     */
+    public synchronized boolean exists(String name) throws SQLException {
+        if (name == null) {
+            return false;
+        }
+        name = name.trim();
+        if (pool.containsKey(name)) {
+            return true;
+        }
+        if (indexByName == 0) {
+            throw new IllegalStateException();
+        }
+        final PreparedStatement statement = getStatement(SELECT_BY_NAME);
+        statement.setString(indexByName, name);
+        final ResultSet results = statement.executeQuery();
+        final boolean hasNext = results.next();
+        results.close();
+        return hasNext;
+    }
+
+    /**
      * Searchs for an identifier not already in use. This method appends a decimal number to the
      * specified base and check if the resulting identifier is not in use. If it is, then the
      * decimal number is incremented until a unused identifier is found.
