@@ -538,7 +538,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
                     try {
                         envelope = SpatialFunctions.parse(bbox);
                     } catch (NumberFormatException e) {
-                        throw new IllegalRecordException(e, results, bboxColumn, null);
+                        throw new IllegalRecordException(e, this, results, bboxColumn, null);
                     }
                     final int dimension = envelope.getDimension();
                     for (int i=0; i<dimension; i++) {

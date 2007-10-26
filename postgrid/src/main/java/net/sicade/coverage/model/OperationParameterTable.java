@@ -121,9 +121,9 @@ public class OperationParameterTable extends Table {
                     parameter.setValue(results.getString(valueIndex));
                 }
             } catch (ParameterNotFoundException exception) {
-                throw new IllegalRecordException(exception, results, paramIndex, name);
+                throw new IllegalRecordException(exception, this, results, paramIndex, name);
             } catch (InvalidParameterValueException exception) {
-                throw new IllegalRecordException(exception, results, valueIndex, name);
+                throw new IllegalRecordException(exception, this, results, valueIndex, name);
             }
         }
     }
@@ -140,7 +140,7 @@ public class OperationParameterTable extends Table {
      * @throws  SQLException            Si l'interrogation de la base de données a échoué.
      * @throws  IllegalRecordException  Si la chaîne de caractères {@code value} n'est pas reconnue.
      */
-    private static KernelJAI createKernel(final String parameter, final ResultSet results, final int valueIndex)
+    private KernelJAI createKernel(final String parameter, final ResultSet results, final int valueIndex)
             throws SQLException, IllegalRecordException
     {
         final String value = results.getString(valueIndex).trim();
@@ -154,7 +154,7 @@ public class OperationParameterTable extends Table {
             try {
                 size = Integer.parseInt(value.substring(lp+1, rp));
             } catch (NumberFormatException exception) {
-                throw new IllegalRecordException(exception, results, valueIndex, parameter);
+                throw new IllegalRecordException(exception, this, results, valueIndex, parameter);
             }
             final String name = value.substring(0, lp).trim();
             if (name.equalsIgnoreCase("mean")) {
@@ -170,7 +170,8 @@ public class OperationParameterTable extends Table {
                 return createIsotropicKernel(size, false);
             }
         }
-        throw new IllegalRecordException("La valeur \"" + value + "\" n'est pas reconnue.", results, valueIndex, parameter);
+        throw new IllegalRecordException("La valeur \"" + value + "\" n'est pas reconnue.",
+                    this, results, valueIndex, parameter);
     }
 
     /**

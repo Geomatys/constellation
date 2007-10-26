@@ -214,13 +214,13 @@ public abstract class SingletonTable<E extends Element> extends Table {
             return createEntry(results);
         } catch (CatalogException exception) {
             if (!exception.isMetadataInitialized()) {
-                exception.setMetadata(results, index, (key!=null) ? key.toString() : null);
+                exception.setMetadata(this, results, index, (key!=null) ? key.toString() : null);
                 exception.clearColumnName();
             }
             throw exception;
         } catch (SQLException cause) {
             final ServerException exception = new ServerException(cause);
-            exception.setMetadata(results, index, (key!=null) ? key.toString() : null);
+            exception.setMetadata(this, results, index, (key!=null) ? key.toString() : null);
             exception.clearColumnName();
             throw exception;
         }
@@ -301,11 +301,11 @@ public abstract class SingletonTable<E extends Element> extends Table {
             if (entry == null) {
                 entry = candidate;
             } else if (!entry.equals(candidate)) {
-                throw new DuplicatedRecordException(results, index, String.valueOf(key));
+                throw new DuplicatedRecordException(this, results, index, String.valueOf(key));
             }
         }
         if (entry == null) {
-            throw new NoSuchRecordException(results, index, String.valueOf(key));
+            throw new NoSuchRecordException(this, results, index, String.valueOf(key));
         }
         results.close();
         /*
@@ -444,7 +444,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
                         cache(name, entry);
                     }
                     if (set.put(entry, initialized) != null) {
-                        throw new DuplicatedRecordException(results, indexByName, name);
+                        throw new DuplicatedRecordException(this, results, indexByName, name);
                     }
                 }
             }

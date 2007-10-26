@@ -87,17 +87,35 @@ public class CatalogException extends Exception {
      * <strong>Note that the result set will be closed</strong>, because this exception is always
      * thrown when an error occured while reading this result set.
      *
+     * @param table   The table that produced the result set, or {@code null} if unknown.
      * @param results The result set in which a problem occured, or {@code null} if none.
      * @param column  The column index where a problem occured (number starts at 1), or {@code 0} if unknow.
      * @param key     The key value for the record where a problem occured, or {@code null} if none.
      * @throws SQLException if the metadata can't be read from the result set.
      */
-    public void setMetadata(final ResultSet results, final int column, final String key) throws SQLException {
+    public void setMetadata(final Table table, final ResultSet results, final int column, final String key)
+            throws SQLException
+    {
         if (results != null && column != 0) {
             final ResultSetMetaData metadata = results.getMetaData();
             if (metadata != null) {
                 this.table  = metadata.getTableName (column);
                 this.column = metadata.getColumnName(column);
+                final boolean noTable  = (this.table  == null) || (this.table  = this.table .trim()).length() == 0;
+                final boolean noColumn = (this.column == null) || (this.column = this.column.trim()).length() == 0;
+                /*
+                 * We tried to use the database metadata in priority,  on the assumption that they
+                 * are closer to the SQL statement really executed (we could have a bug in the way
+                 * we created our SQL statement). But some JDBC drivers don't provide information.
+                 * In the later case, we fallback on the information found in our Column objects.
+                 */
+                if ((noTable || noColumn) && table != null) {
+                    final Column c = table.getColumn(column);
+                    if (c != null) {
+                        if (noTable)  this.table  = c.table;
+                        if (noColumn) this.column = c.name;
+                    }
+                }
             }
             results.close();
         }

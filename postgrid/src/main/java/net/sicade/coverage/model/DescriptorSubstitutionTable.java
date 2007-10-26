@@ -109,11 +109,11 @@ public class DescriptorSubstitutionTable extends Table {
         final String symbol1 = results.getString(indexOf(query.symbol1));
         final String symbol2 = results.getString(indexOf(query.symbol2));
         if (results.next()) {
-            throw new DuplicatedRecordException(results, bySymbol, key);
+            throw new DuplicatedRecordException(this, results, bySymbol, key);
         }
         if (key.equals(symbol1) || key.equals(symbol2)) {
             IllegalRecordException e = new IllegalRecordException("Définition récursive d'un gradient temporel.");
-            e.setMetadata(results, bySymbol, key);
+            e.setMetadata(this, results, bySymbol, key);
             throw e;
         }
         results.close();

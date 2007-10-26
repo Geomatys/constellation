@@ -71,7 +71,8 @@ public class FormatTable extends SingletonTable<Format> {
         } else if ("native".equalsIgnoreCase(encoding)) {
             geophysics = false;
         } else {
-            throw new IllegalRecordException("Type d'image inconnu: " + encoding, results, indexOf(query.encoding), name);
+            throw new IllegalRecordException("Type d'image inconnu: " + encoding,
+                        this, results, indexOf(query.encoding), name);
         }
         return new FormatEntry(name, mimeType, geophysics, bands.getSampleDimensions(name));
     }

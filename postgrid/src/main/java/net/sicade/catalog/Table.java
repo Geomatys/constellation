@@ -18,10 +18,11 @@ package net.sicade.catalog;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.GregorianCalendar;  // For javadoc
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -330,6 +331,22 @@ public class Table {
     protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
         assert Thread.holdsLock(this);
         changed = false;
+    }
+
+    /**
+     * Returns the column at the specified index, or {@code null} if none.
+     * 
+     * @param  index The column index (number starts at 1).
+     * @return The column, or {@code null} if none.
+     */
+    final Column getColumn(final int index) {
+        if (query != null && index >= 1) {
+            final List<Column> columns = query.getColumns(queryType);
+            if (columns != null && index <= columns.size()) {
+                return columns.get(index - 1);
+            }
+        }
+        return null;
     }
 
     /**

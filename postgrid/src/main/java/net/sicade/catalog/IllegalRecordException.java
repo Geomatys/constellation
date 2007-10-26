@@ -64,16 +64,17 @@ public class IllegalRecordException extends CatalogException {
      * occured while reading this result set.
      *
      * @param message The details message.
+     * @param table   The table that produced the result set, or {@code null} if unknown.
      * @param results The result set in which a problem occured, or {@code null} if none.
      * @param column  The column index where a problem occured (number starts at 1), or {@code 0} if unknow.
      * @param key     The key value for the record where a problem occured, or {@code null} if none.
      * @throws SQLException if the metadata can't be read from the result set.
      */
-    public IllegalRecordException(final String message, final ResultSet results, final int column, final String key)
-            throws SQLException
+    public IllegalRecordException(final String message, final Table table, final ResultSet results,
+                                  final int column, final String key) throws SQLException
     {
         super(message);
-        setMetadata(results, column, key);
+        setMetadata(table, results, column, key);
     }
 
     /**
@@ -83,15 +84,16 @@ public class IllegalRecordException extends CatalogException {
      * occured while reading this result set.
      *
      * @param cause   The cause for this exception.
+     * @param table   The table that produced the result set, or {@code null} if unknown.
      * @param results The result set in which a problem occured, or {@code null} if none.
      * @param column  The column index where a problem occured (number starts at 1), or {@code 0} if unknow.
      * @param key     The key value for the record where a problem occured, or {@code null} if none.
      * @throws SQLException if the metadata can't be read from the result set.
      */
-    public IllegalRecordException(final Exception cause, final ResultSet results, final int column, final String key)
-            throws SQLException
+    public IllegalRecordException(final Exception cause, final Table table, final ResultSet results,
+                                  final int column, final String key) throws SQLException
     {
         super(cause);
-        setMetadata(results, column, key);
+        setMetadata(table, results, column, key);
     }
 }

@@ -151,7 +151,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         try {
             crs = getCoordinateReferenceSystem(horizontalSRID);
         } catch (FactoryException exception) {
-            throw new IllegalRecordException(exception, results, indexOf(query.horizontalSRID), identifier);
+            throw new IllegalRecordException(exception, this, results, indexOf(query.horizontalSRID), identifier);
         }
         /*
          * Copies the vertical ordinates in an array of type double[].
@@ -169,7 +169,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
             try {
                 verticalCRS = getCoordinateReferenceSystem(verticalSRID);
             } catch (FactoryException exception) {
-                throw new IllegalRecordException(exception, results, indexOf(query.verticalSRID), identifier);
+                throw new IllegalRecordException(exception, this, results, indexOf(query.verticalSRID), identifier);
             }
         }
         /*
@@ -226,7 +226,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         try {
             bbox = new GeographicBoundingBoxImpl(geographicEnvelope);
         } catch (TransformException exception) {
-            throw new IllegalRecordException(exception, results, indexOf(query.horizontalExtent), identifier);
+            throw new IllegalRecordException(exception, this, results, indexOf(query.horizontalExtent), identifier);
         }
         /*
          * Creates the entry and performs some final checks.
@@ -235,7 +235,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         final GridGeometryEntry entry = new GridGeometryEntry(identifier, at, gridRange, envelope, bbox, altitudes);
         if (entry.geographicEnvelope.isEmpty()) {
             throw new IllegalRecordException("L'enveloppe géographique est vide. Elle a été calculée à partir de \"" +
-                    horizontalExtent + "\".", results, indexOf(query.horizontalExtent), identifier);
+                    horizontalExtent + "\".", this, results, indexOf(query.horizontalExtent), identifier);
         }
         return entry;
     }

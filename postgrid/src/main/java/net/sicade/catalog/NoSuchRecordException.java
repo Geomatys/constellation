@@ -38,13 +38,16 @@ public class NoSuchRecordException extends CatalogException {
      * set will be closed</strong>, because this exception is always thrown when an error
      * occured while reading this result set.
      *
+     * @param table   The table that produced the result set, or {@code null} if unknown.
      * @param results The result set used in order to look for a record.
      * @param column  The column index of the primary key (first column index is 1).
      * @param key     The key value for the record that was not found.
      * @throws SQLException if the metadata can't be read from the result set.
      */
-    public NoSuchRecordException(final ResultSet results, final int column, final String key) throws SQLException {
-        setMetadata(results, column, key);
+    public NoSuchRecordException(final Table table, final ResultSet results, final int column, final String key)
+            throws SQLException
+    {
+        setMetadata(table, results, column, key);
     }
 
     /**

@@ -91,11 +91,11 @@ public class SampleDimensionTable extends Table {
             try {
                 sampleDimension = new GridSampleDimension(identifier, categoryArray, unit);
             } catch (IllegalArgumentException exception) {
-                throw new IllegalRecordException(exception, results, idIndex, format);
+                throw new IllegalRecordException(exception, this, results, idIndex, format);
             }
             if (band-1 != lastBand) {
                 throw new IllegalRecordException(Resources.format(ResourceKeys.ERROR_NON_CONSECUTIVE_BANDS_$2,
-                        new Integer(lastBand), new Integer(band)), results, bandIndex, format);
+                        new Integer(lastBand), new Integer(band)), this, results, bandIndex, format);
             }
             lastBand = band;
             sampleDimensions.add(sampleDimension);

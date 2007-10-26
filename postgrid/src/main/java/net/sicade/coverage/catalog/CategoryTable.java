@@ -110,7 +110,7 @@ public class CategoryTable extends Table {
             if (colorID != null) try {
                 colors = decode(palettes, colorID);
             } catch (Exception exception) { // Includes IOException and ParseException
-                throw new IllegalRecordException(exception, results, colorsIndex, name);
+                throw new IllegalRecordException(exception, this, results, colorsIndex, name);
             }
             /*
              * Construit une catégorie correspondant à l'enregistrement qui vient d'être lu.
@@ -141,7 +141,8 @@ public class CategoryTable extends Table {
                         results.close();
                         throw new ServerException(exception);
                     } else {
-                        throw new IllegalRecordException("Fonction inconnue: " + function, results, functionIndex, name);
+                        throw new IllegalRecordException("Fonction inconnue: " + function,
+                                    this, results, functionIndex, name);
                     }
                 }
             }
