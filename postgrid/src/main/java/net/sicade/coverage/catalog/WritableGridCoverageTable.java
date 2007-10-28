@@ -22,14 +22,16 @@ import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import java.net.URL;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.units.SI;
@@ -255,13 +257,15 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 }
             }
             /*
-             * Skips any files already declared in the database for the current layer.
+             * If we are scanning new files for a specific series, gets that series.
+             * Otherwise try to guess it from the path name and file extension.
              */
-            if (exists(filename)) {
-                LOGGER.fine(filename + " est déjà dans la base de données."); // TODO: localize
-                continue;
+            final Series series;
+            if (readers instanceof ReaderIterator) {
+                series = ((ReaderIterator) readers).series;
+            } else {
+                series = getSeries(reader.getOriginatingProvider(), path, extension);
             }
-            final Series series = getSeries(reader.getOriginatingProvider(), path, extension);
             /*
              * Gets the metadata of interest.
              */
@@ -274,8 +278,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             final int verticalSRID = metadata.getVerticalSRID();
             final double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
             final String extent = gridTable.getIdentifier(new Dimension(width, height),
-                    gridToCRS, horizontalSRID, verticalOrdinates, verticalSRID,
-                    getSuggestedID(series, gridTable.getName()));
+                    gridToCRS, horizontalSRID, verticalOrdinates, verticalSRID, series.getName());
             /*
              * Adds the entries for each image found in the file.
              * There is often only one image per file, but not always.
@@ -287,36 +290,118 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 statement.setInt (byIndex,     1);
                 statement.setNull(byStartTime, Types.TIMESTAMP);
                 statement.setNull(byEndTime,   Types.TIMESTAMP);
+                insertSingleton(statement);
             } else for (int i=0; i<dates.length; i++) {
                 final Date startTime = dates[i].getMinValue();
                 final Date   endTime = dates[i].getMaxValue();
                 statement.setInt      (byIndex,     i + 1);
                 statement.setTimestamp(byStartTime, new Timestamp(startTime.getTime()), calendar);
                 statement.setTimestamp(byEndTime,   new Timestamp(endTime  .getTime()), calendar);
+                insertSingleton(statement);
             }
-            insertSingleton(statement);
         }
     }
 
     /**
-     * Returns a suggested ID for records to be added in the given table. The default
-     * implementation returns the series name in all cases.
+     * Searchs for new files in the {@linkplain #getLayer current layer} and {@linkplain #addEntries
+     * adds} them to the database. The {@link #setLayer(Layer) setLayer} method must be invoked prior
+     * this method. This method will process every {@linkplain Series series} for the current layer.
      *
-     * @param series The series for which an image will be added.
-     * @param table  The table in which a new entry need to be added. Typically
-     *               {@code "Series"} or {@code "GridGeometries"}.
+     * @param includeSubdirectories If {@code true}, then sub-directories will be included
+     *        in the scan. New series may be created if subdirectories are found.
      */
-    protected String getSuggestedID(final Series series, final String table) throws CatalogException {
-        return series.getName();
+    public synchronized void completeLayer(final boolean includeSubdirectories)
+            throws CatalogException, SQLException, IOException
+    {
+        final Map<File,Series> files = new LinkedHashMap<File,Series>();
+        for (final Series series : getLayer().getSeries()) {
+            File directory = series.file("*");
+            if (directory != null) {
+                final String filename = directory.getName();
+                final int split = filename.lastIndexOf('*');
+                final String extension = (split >= 0) ? filename.substring(split + 1) : "";
+                final FileFilter filter = new FileFilter() {
+                    public boolean accept(final File file) {
+                        if (file.isDirectory()) {
+                            return includeSubdirectories;
+                        }
+                        return file.getName().endsWith(extension);
+                    }
+                };
+                directory = directory.getParentFile();
+                if (directory != null) {
+                    final File[] list = directory.listFiles(filter);
+                    if (list != null) {
+                        add(files, list, filter, series);
+                        continue;
+                    }
+                }
+            }
+            LOGGER.warning("Le répertoire de la série \"" + series + "\" n'a pas été trouvé."); // TODO: localize
+        }
+        /*
+         * We now have a list of every files found in the directories. Now remove the files that
+         * are already present in the database. We perform this removal here instead than during
+         * the directories scan in order to make sure that we don't query the database twice for
+         * the same files (our usage of hash map ensures this condition).
+         */
+        for (final Iterator<File> it=files.keySet().iterator(); it.hasNext();) {
+            final File file = it.next();
+            String filename = file.getName();
+            final int split = filename.lastIndexOf('.');
+            if (split >= 0) {
+                filename  = filename.substring(0, split);
+            }
+            // TODO: 'exists' takes only the layer in account, not the series.
+            if (exists(filename)) {
+                it.remove();
+            }
+        }
+        /*
+         * Now process to the insertions in the database.
+         * 
+         * TODO: We need to decide what to do with new series (i.e. when series==null.
+         *       In current state of affairs, we will get a NullPointerException).
+         */
+        Iterator<Map.Entry<File,Series>> it;
+        while ((it = files.entrySet().iterator()).hasNext()) {
+            Map.Entry<File,Series> entry = it.next();
+            final Series series = entry.getValue();
+            File next = entry.getKey();
+            it.remove();
+            final Iterator<ImageReader> iterator = new ReaderIterator(series, it, next);
+            addEntries(iterator, 0); // TODO: is ther better value to provide for imageIndex?
+        }
     }
 
     /**
-     * Logs a warning.
+     * Adds the {@code toAdd} files or directories to the specified map. This
+     * method invokes itself recursively in order to scan for subdirectories.
+     *
+     * @param  files  The map in which to add the files.
+     * @param  toAdd  The files or directories to add. This list will be sorted in place.
+     * @param  filter The filename filter, or {@code null} for including all files.
+     * @param  series The series to use as value in the map.
      */
-    private static final void warning(final String message) {
-        final LogRecord record = new LogRecord(Level.WARNING, message);
-        record.setSourceClassName(WritableGridCoverageTable.class.getName());
-        record.setSourceMethodName("addEntry");
-        LOGGER.log(record);
+    private static void add(final Map<File,Series> files, final File[] toAdd,
+                            final FileFilter filter, final Series series)
+    {
+        Arrays.sort(toAdd);
+        for (final File file : toAdd) {
+            final File[] list = file.listFiles(filter);
+            if (list != null) {
+                // If scanning sub-directories, invokes this method recursively but without
+                // assigning series, since we will need to create a new series entry.
+                add(files, list, filter, null);
+            } else {
+                final Series old = files.put(file, series);
+                if (old != null) {
+                    // If this filename was already assigned to a series, keep the old entry.
+                    // It is more likely to occurs if we are scanning sub-directories while
+                    // one of those sub-directories is already used by an existing series.
+                    files.put(file, old);
+                }
+            }
+        }
     }
 }
