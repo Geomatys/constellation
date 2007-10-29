@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
+import net.opengis.gml.EnvelopeWithTimePeriodType;
 
 
 /**
@@ -47,41 +48,35 @@ import javax.xml.namespace.QName;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BoundingShapeType", propOrder = {
     "envelope",
+    "envelopeWithTimePeriod",
     "_null"
 })
 public class BoundingShapeEntry {
 
-    private final static QName _Envelope_QNAME = new QName("http://www.opengis.net/gml/3.2", "Envelope");
-    
-    @XmlElementRef(name = "Envelope", namespace = "http://www.opengis.net/gml/3.2", type = JAXBElement.class)
-    protected JAXBElement<? extends EnvelopeEntry> envelope;
+    @XmlElement(name = "Envelope", nillable = true)
+    protected EnvelopeEntry envelope;
+    @XmlElement(name = "EnvelopeWithTimePeriod", nillable = true)
+    protected EnvelopeWithTimePeriodType envelopeWithTimePeriod;
     @XmlList
     @XmlElement(name = "Null")
     protected List<String> _null;
     @XmlAttribute
     protected List<String> nilReason;
 
-    /**
-     * Constructeur vide utilis par JAXB.
-     */
     public BoundingShapeEntry() {}
     
-    /**
-     */
     public BoundingShapeEntry(EnvelopeEntry envelope) {
-        this.envelope = new JAXBElement<EnvelopeEntry>(_Envelope_QNAME, EnvelopeEntry.class, null, envelope);
+        this.envelope = envelope;
     }
-    
     /**
      * Gets the value of the envelope property.
      * 
      * @return
      *     possible object is
-     *     {@link JAXBElement }{@code <}{@link EnvelopeType }{@code >}
-     *     {@link JAXBElement }{@code <}{@link EnvelopeWithTimePeriodType }{@code >}
+     *     {@link EnvelopeType }
      *     
      */
-    public JAXBElement<? extends EnvelopeEntry> getEnvelope() {
+    public EnvelopeEntry getEnvelope() {
         return envelope;
     }
 
@@ -90,12 +85,35 @@ public class BoundingShapeEntry {
      * 
      * @param value
      *     allowed object is
-     *     {@link JAXBElement }{@code <}{@link EnvelopeType }{@code >}
-     *     {@link JAXBElement }{@code <}{@link EnvelopeWithTimePeriodType }{@code >}
+     *     {@link EnvelopeType }
      *     
      */
-    public void setEnvelope(JAXBElement<? extends EnvelopeEntry> value) {
-        this.envelope = ((JAXBElement<? extends EnvelopeEntry> ) value);
+    public void setEnvelope(EnvelopeEntry value) {
+        this.envelope = value;
+    }
+
+    /**
+     * Gets the value of the envelopeWithTimePeriod property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link EnvelopeWithTimePeriodType }
+     *     
+     */
+    public EnvelopeWithTimePeriodType getEnvelopeWithTimePeriod() {
+        return envelopeWithTimePeriod;
+    }
+
+    /**
+     * Sets the value of the envelopeWithTimePeriod property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link EnvelopeWithTimePeriodType }
+     *     
+     */
+    public void setEnvelopeWithTimePeriod(EnvelopeWithTimePeriodType value) {
+        this.envelopeWithTimePeriod = value;
     }
 
     /**

@@ -30,7 +30,7 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
     /**
      * Constructeur vide utilisé par JAXB.
      */
-    private TemporalObjectEntry(){}
+    public TemporalObjectEntry(){}
     
     /** 
      * Create a new Temporal Object. 
@@ -53,11 +53,27 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
     }
 
     public Timestamp getBeginTime() {
-        return Timestamp.valueOf(beginTime);
+        Timestamp t = null;
+        if(beginTime != null)
+            t = Timestamp.valueOf(beginTime);
+                    
+        return t;
     }
 
     public Timestamp getEndTime() {
-        return Timestamp.valueOf(endTime);
+        Timestamp t = null;
+        if(endTime != null)
+            t = Timestamp.valueOf(endTime);
+                    
+        return t;
+    }
+    
+     public void setBeginTime(Timestamp beginTime) {
+        this.beginTime = beginTime.toString();
+    }
+
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime.toString();
     }
     
    

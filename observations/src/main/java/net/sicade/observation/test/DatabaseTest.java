@@ -22,6 +22,7 @@ import net.sicade.observation.PhenomenonEntry;
 import net.sicade.observation.ProcessEntry;
 import net.sicade.observation.SamplingPointEntry;
 import net.sicade.observation.TemporalObjectEntry;
+import net.sicade.sos.ResponseMode;
 import net.sicade.swe.AnyScalarEntry;
 import net.sicade.swe.DataBlockDefinitionEntry;
 import net.sicade.swe.SimpleDataRecordEntry;
@@ -107,6 +108,8 @@ public class DatabaseTest {
         StringBuilder s = new StringBuilder();
         s.append("551411;20000;bla");
         System.out.println(s.toString());
+        ResponseMode r = ResponseMode.RESULT_TEMPLATE;
+        System.out.println(r.toString());
         /*
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setServerName("localhost");

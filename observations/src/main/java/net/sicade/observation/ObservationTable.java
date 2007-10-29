@@ -368,13 +368,11 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
             obs.setDistribution(DistributionEntry.NORMAL);
         } else if (obs.getDistribution().getName() == null) {
             obs.setDistribution(DistributionEntry.NORMAL);
-        } else {
-            System.out.println("NAME IS NOT NULL:" + obs.getDistribution().getName());
         }
         if (distributions == null) {
             distributions = getDatabase().getTable(DistributionTable.class);
         }
-        // TODO regler le probleme avec la distribution
+        // regler le probleme avec la distribution
         statement.setString(indexOf(query.distribution), distributions.getIdentifier(obs.getDistribution()));
         
         
@@ -464,11 +462,11 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 date = ((TemporalObjectEntry)obs.getSamplingTime()).getEndTime();           
                 statement.setTimestamp(indexOf(query.samplingTimeEnd), date);
             } else {
-                statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
+                statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.TIMESTAMP);
             }
         } else {
-            statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.DATE);
-            statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
+            statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
+            statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.TIMESTAMP);
         }
         
         insertSingleton(statement);

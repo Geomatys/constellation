@@ -114,33 +114,51 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
         String idPheno = "";
         
         PreparedStatement statement = getStatement(QueryType.EXISTS);
-        PreparedStatement insert    = getStatement(QueryType.INSERT);
+        
         statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
-        insert.setString(indexOf(query.idOffering), offPheno.getIdOffering());
+        
          
-        if (offPheno.getComponent() instanceof PhenomenonEntry) {
-            if ( phenomenons == null) {
-                phenomenons = getDatabase().getTable(PhenomenonTable.class);
-            }
-            idPheno = phenomenons.getIdentifier(offPheno.getComponent());
-            statement.setString(indexOf(query.phenomenon), idPheno);
-            statement.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
-            insert.setString(indexOf(query.phenomenon), idPheno);
-            insert.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
-            
-        } else if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
+        if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
              if (compositePhenomenons == null) {
                 compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
             }
             idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
             statement.setString(indexOf(query.compositePhenomenon), idPheno);
             statement.setNull(indexOf(query.phenomenon), java.sql.Types.VARCHAR);
-            insert.setString(indexOf(query.compositePhenomenon), idPheno);
-            statement.setNull(indexOf(query.phenomenon), java.sql.Types.VARCHAR);
-        }
+        
+        } else if (offPheno.getComponent() instanceof PhenomenonEntry) {
+            if ( phenomenons == null) {
+                phenomenons = getDatabase().getTable(PhenomenonTable.class);
+            }
+            idPheno = phenomenons.getIdentifier(offPheno.getComponent());
+            statement.setString(indexOf(query.phenomenon), idPheno);
+            statement.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
+            
+        } 
         ResultSet result = statement.executeQuery();
-        if(!result.next())
-            insertSingleton(statement);
+        if(result.next()) {
+            return;
+        }
+        
+        PreparedStatement insert    = getStatement(QueryType.INSERT);
+        insert.setString(indexOf(query.idOffering), offPheno.getIdOffering());
+        if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
+             if (compositePhenomenons == null) {
+                compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+            }
+            idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
+            insert.setString(indexOf(query.compositePhenomenon), idPheno);
+            insert.setNull(indexOf(query.phenomenon), java.sql.Types.VARCHAR);
+        } else if (offPheno.getComponent() instanceof PhenomenonEntry) {
+            if ( phenomenons == null) {
+                phenomenons = getDatabase().getTable(PhenomenonTable.class);
+            }
+            idPheno = phenomenons.getIdentifier(offPheno.getComponent());
+            insert.setString(indexOf(query.phenomenon), idPheno);
+            insert.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
+            
+        }
+        insertSingleton(insert);
               
     }
 }

@@ -52,7 +52,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
     @XmlElement(required = true)
     protected String responseFormat;
     protected String resultModel;
-    protected ResponseMode responseMode;
+    protected List<ResponseMode> responseMode;
 
     
     /**
@@ -66,7 +66,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
     public ObservationOfferingEntry(String id, String name, String description, ReferenceEntry descriptionReference,
             BoundingShapeEntry boundedBy, String srsName, TemporalObjectEntry eventTime, List<ProcessEntry> procedure,
             List<PhenomenonEntry> observedProperty, List<SamplingFeatureEntry> featureOfInterest,
-            String responseFormat, String resultModel, ResponseMode responseMode) {
+            String responseFormat, String resultModel, List<ResponseMode> responseMode) {
         
         super(id, name, description, descriptionReference, boundedBy);
         this.srsName = srsName;
@@ -150,7 +150,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      * Return the value of the responseMode property.
      * 
      */
-    public ResponseMode getResponseMode() {
+    public List<ResponseMode> getResponseMode() {
         return this.responseMode;
     }
     

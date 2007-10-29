@@ -231,6 +231,22 @@ public class ObservationEntry extends Entry implements Observation {
     }
 
     /**
+     * Construit un nouveau template temporaire d'observation a partir d'un template fournit en argument.
+     * On y rajoute un samplingTime et un id temporaire. 
+     */
+    public ObservationEntry getTemporaryTemplate(String temporaryName, TemporalObjectEntry time) {
+            return new ObservationEntry(temporaryName,
+                                        this.definition,
+                                        this.featureOfInterest, 
+                                        this.observedProperty,
+                                        this.procedure,
+                                        this.distribution,
+                                        null,
+                                        time,
+                                        this.resultDefinition);
+        
+    }
+    /**
      */
     public void setName(String name) {
         super.name = name;
@@ -310,6 +326,13 @@ public class ObservationEntry extends Entry implements Observation {
     @Override
     public TemporalObject getSamplingTime() {
         return samplingTime;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setSamplingTime(TemporalObjectEntry samplingTime) {
+        this.samplingTime = samplingTime;
     }
 
     /**

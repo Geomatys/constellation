@@ -62,7 +62,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * COnstructeur utilisé par jaxB
      */
-    protected ReferenceEntry(){}
+    public ReferenceEntry(){}
     
     /**
      * Créé une nouvelle reference. reduit pour l'instant a voir en fontion des besoins.

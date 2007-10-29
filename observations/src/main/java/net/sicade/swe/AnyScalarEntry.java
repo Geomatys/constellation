@@ -38,12 +38,6 @@ public class AnyScalarEntry extends Entry{
     private String idDataRecord;
     
     /**
-     * Identifiant du champ.
-     */
-    @XmlAttribute
-    private String name;
-    
-    /**
      * description du champ.
      */
     private String definition;

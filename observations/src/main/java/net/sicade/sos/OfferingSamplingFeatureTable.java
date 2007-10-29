@@ -109,33 +109,44 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
         String idSF = "";
         
         PreparedStatement statement = getStatement(QueryType.EXISTS);
-        PreparedStatement insert    = getStatement(QueryType.INSERT);
         statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
-        insert.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
-         
-        if (offSamplingFeature.getComponent() instanceof SamplingFeatureEntry) {
-            if ( samplingFeatures == null) {
-                samplingFeatures = getDatabase().getTable(SamplingFeatureTable.class);
-            }
-            idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
-            statement.setString(indexOf(query.samplingFeature), idSF);
-            statement.setNull(indexOf(query.samplingPoint), java.sql.Types.VARCHAR);
-            insert.setString(indexOf(query.samplingFeature), idSF);
-            insert.setNull(indexOf(query.samplingPoint), java.sql.Types.VARCHAR);
-            
-        } else if (offSamplingFeature.getComponent() instanceof SamplingPointEntry) {
+        if (offSamplingFeature.getComponent() instanceof SamplingPointEntry) {
              if (samplingPoints == null) {
                 samplingPoints = getDatabase().getTable(SamplingPointTable.class);
             }
             idSF = samplingPoints.getIdentifier((SamplingPointEntry)offSamplingFeature.getComponent());
             statement.setString(indexOf(query.samplingPoint), idSF);
             statement.setNull(indexOf(query.samplingFeature), java.sql.Types.VARCHAR);
+        } else if (offSamplingFeature.getComponent() instanceof SamplingFeatureEntry) {
+            if ( samplingFeatures == null) {
+                samplingFeatures = getDatabase().getTable(SamplingFeatureTable.class);
+            }
+            idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
+            statement.setString(indexOf(query.samplingFeature), idSF);
+            statement.setNull(indexOf(query.samplingPoint), java.sql.Types.VARCHAR);
+            
+        } 
+        ResultSet result = statement.executeQuery();
+        if(result.next()) {
+            return;
+        }
+        PreparedStatement insert    = getStatement(QueryType.INSERT);
+        insert.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
+        if (offSamplingFeature.getComponent() instanceof SamplingPointEntry) {
+             if (samplingPoints == null) {
+                samplingPoints = getDatabase().getTable(SamplingPointTable.class);
+            }
+            idSF = samplingPoints.getIdentifier((SamplingPointEntry)offSamplingFeature.getComponent());
             insert.setString(indexOf(query.samplingPoint), idSF);
             insert.setNull(indexOf(query.samplingFeature), java.sql.Types.VARCHAR);
+        } else if (offSamplingFeature.getComponent() instanceof SamplingFeatureEntry) {
+            if ( samplingFeatures == null) {
+                samplingFeatures = getDatabase().getTable(SamplingFeatureTable.class);
+            }
+            idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
+            insert.setString(indexOf(query.samplingFeature), idSF);
+            insert.setNull(indexOf(query.samplingPoint), java.sql.Types.VARCHAR);
         }
-        ResultSet result = statement.executeQuery();
-        if(!result.next())
-            insertSingleton(statement);
-              
+        insertSingleton(insert);
     }
 }
