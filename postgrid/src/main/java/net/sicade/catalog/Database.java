@@ -270,6 +270,10 @@ public class Database {
         if (path.isDirectory()) {
             path = new File(path, CONFIG_FILENAME);
         }
+        final String envGeoserverDataDir = System.getenv("GEOSERVER_DATA_DIR");
+        if (envGeoserverDataDir != null) {
+            return new File(envGeoserverDataDir, configFilename);
+        }
         /*
          * Recherche dans le répertoire de configuration de l'utilisateur.
          */
