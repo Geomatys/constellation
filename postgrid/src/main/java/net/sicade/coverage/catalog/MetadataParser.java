@@ -12,12 +12,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.coverage.io;
+package net.sicade.coverage.catalog;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.Date;
 import java.io.IOException;
+import java.sql.SQLException;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
@@ -27,6 +28,7 @@ import javax.units.NonSI;
 import javax.units.Converter;
 
 import org.opengis.util.CodeList;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.metadata.spatial.PixelOrientation;
 
@@ -42,6 +44,9 @@ import org.geotools.util.NumberRange;
 
 import net.sicade.util.Ranks;
 import net.sicade.util.DateRange;
+import net.sicade.catalog.Database;
+import net.sicade.catalog.ServerException;
+import net.sicade.catalog.CatalogException;
 
 
 /**
@@ -50,11 +55,16 @@ import net.sicade.util.DateRange;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class MetadataParser {
+final class MetadataParser {
     /**
      * Small number for rounding errors.
      */
     private static final double EPS = 1E-5;
+
+    /**
+     * The source database.
+     */
+    private final Database database;
 
     /**
      * The metadata to parse.
@@ -69,7 +79,8 @@ public class MetadataParser {
      * @throws IOException if an error occured during metadata reading, or if no metadata
      *         were found.
      */
-    public MetadataParser(final ImageReader reader, final int imageIndex) throws IOException {
+    public MetadataParser(final Database database, final ImageReader reader, final int imageIndex) throws IOException {
+        this.database = database;
         if (reader instanceof GeographicImageReader) {
             metadata = ((GeographicImageReader) reader).getGeographicMetadata(imageIndex);
         } else {
@@ -99,15 +110,23 @@ public class MetadataParser {
         if (symbol.equalsIgnoreCase("seconds")) {
             return SI.SECOND;
         }
+        if (symbol.equalsIgnoreCase("psu")) { // Pratical Salinity Scale
+            return Unit.ONE;
+        }
+        if (symbol.equalsIgnoreCase("level")) { // Sigma level
+            return Unit.ONE;
+        }
         return Unit.valueOf(symbol);
     }
 
     /**
      * Returns the code matching the specified name, or {@code null} if none.
+     *
+     * @todo Needs a warning for unknown code.
      */
     private static <E extends CodeList> E getCode(final E[] values, String name) {
         if (name != null) {
-            name = name.trim();
+            name = name.toUpperCase().trim().replace(' ', '_');
             for (final E code : values) {
                 if (name.equalsIgnoreCase(code.name())) {
                     return code;
@@ -345,8 +364,20 @@ public class MetadataParser {
      * @todo Current implementation uses hard-coded values from EPSG code space.
      *       We need to do something more generic.
      */
-    public int getSRID() {
+    public int getSRID() throws SQLException, CatalogException {
         final ImageReferencing referencing = metadata.getReferencing();
+        final String wkt = referencing.getWKT();
+        if (wkt != null) {
+            final int srid;
+            try {
+                srid = database.getTable(GridGeometryTable.class).getSRID(wkt);
+            } catch (FactoryException e) {
+                throw new ServerException(e);
+            }
+            if (srid != 0) {
+                return srid;
+            }
+        }
         String type = referencing.getCoordinateReferenceSystem().type;
         if (GeographicMetadataFormat.PROJECTED.equalsIgnoreCase(type)) {
             return 3395; // World Mercator
@@ -364,11 +395,6 @@ public class MetadataParser {
         if (GeographicMetadataFormat.ELLIPSOIDAL.equalsIgnoreCase(type)) {
             return referencing.getDimension() <= 2 ? 4326 : 4327; // WGS 84
         }
-        type = referencing.getWKT();
-        if (type != null) {
-            // TODO: We should parse the WKT here.
-            return 35000;
-        }
         return 0;
     }
 
@@ -378,7 +404,7 @@ public class MetadataParser {
      * @todo Current implementation uses hard-coded values from EPSG code space.
      *       We need to do something more generic.
      */
-    public int getHorizontalSRID() {
+    public int getHorizontalSRID() throws SQLException, CatalogException {
         int id = getSRID();
         switch (id) {
             case 4327: id = 4326; break;

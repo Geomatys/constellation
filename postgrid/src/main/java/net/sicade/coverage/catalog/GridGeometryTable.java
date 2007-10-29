@@ -31,7 +31,6 @@ import static java.lang.reflect.Array.getDouble;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.Matrix;
@@ -43,6 +42,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -69,7 +69,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * The authority factory connected to the PostGIS {@code "spatial_ref_sys"} table.
      * Will be created when first needed.
      */
-    private transient CRSAuthorityFactory crsFactory;
+    private transient AbstractAuthorityFactory crsFactory;
 
     /**
      * A map of CRS created up to date.
@@ -94,29 +94,59 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     }
 
     /**
-     * Returns a CRS for the specified identifier.
+     * Returns the CRS authority factory.
+     */
+    private AbstractAuthorityFactory getAuthorityFactory() throws SQLException {
+        assert Thread.holdsLock(this);
+        if (crsFactory == null) {
+            crsFactory = new PostgisAuthorityFactory(null, getDatabase().getConnection());
+        }
+        return crsFactory;
+    }
+
+    /**
+     * Returns a CRS for the specified identifier. The given identifier should be a primary
+     * key in the PostGIS {@code "spatial_ref_sys"} table.
      *
      * @param  srid The CRS identifier.
      * @return The coordinate reference system for the given identifier.
      * @throws FactoryException if the CRS was not found or can not be created.
      */
-    private CoordinateReferenceSystem getCoordinateReferenceSystem(final int srid)
+    public synchronized CoordinateReferenceSystem getCoordinateReferenceSystem(final int srid)
             throws SQLException, FactoryException
     {
-        assert Thread.holdsLock(this);
         final Integer key = srid;
         if (cachedCRS == null) {
             cachedCRS = new HashMap<Integer,CoordinateReferenceSystem>();
         }
         CoordinateReferenceSystem crs = cachedCRS.get(key);
         if (crs == null) {
-            if (crsFactory == null) {
-                crsFactory = new PostgisAuthorityFactory(null, getDatabase().getConnection());
-            }
-            crs = crsFactory.createCoordinateReferenceSystem(key.toString());
+            crs = getAuthorityFactory().createCoordinateReferenceSystem(key.toString());
             cachedCRS.put(key, crs);
         }
         return crs;
+    }
+
+    /**
+     * Returns a CRS identifier for the specified WKT. The given WKT should appears in the PostGIS
+     * {@code "spatial_ref_sys"} table. The returned value is a primary key in the same table.
+     *
+     * @param  wkt The WKT of the CRS to search.
+     * @return The identifier for the given CRS, or 0 if none.
+     * @throws FactoryException if the CRS was not found or can not be created.
+     */
+    public synchronized int getSRID(final String wkt) throws SQLException, FactoryException {
+        final CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
+        final IdentifiedObjectFinder finder = getAuthorityFactory().getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
+        final String srid = finder.findIdentifier(crs);
+        if (srid == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(srid);
+        } catch (NumberFormatException e) {
+            throw new FactoryException(e);
+        }
     }
 
     /**

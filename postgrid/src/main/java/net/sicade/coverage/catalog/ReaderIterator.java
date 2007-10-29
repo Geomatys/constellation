@@ -17,6 +17,7 @@ package net.sicade.coverage.catalog;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
+import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import net.sicade.resources.i18n.Resources;
@@ -56,24 +57,31 @@ final class ReaderIterator implements Iterator<ImageReader> {
     /**
      * Creates an iterator for the specified files using the specified format.
      *
-     * @param series The series in which the images will be added.
-     * @param file   The files to read.
-     * @param next   The first element from the given iterator.
+     * @param  series The series in which the images will be added.
+     * @param  file   The files to read.
+     * @param  next   The first element from the given iterator.
+     * @throws IIOException if the format was not found.
      */
-    ReaderIterator(final Series series, final Iterator<Map.Entry<File,Series>> files, final File next) {
+    ReaderIterator(final Series series, final Iterator<Map.Entry<File,Series>> files, final File next)
+            throws IIOException
+    {
         this.series = series;
         this.files  = files;
         this.next   = next;
-        final String mimeType = series.getFormat().getMimeType();
+        final Format format = series.getFormat();
+        if (format instanceof FormatEntry) {
+            reader = ((FormatEntry) format).createImageReader();
+            return;
+        }
+        // Fallback (should not occurs with our implementation)
+        final String mimeType = format.getMimeType();
         final Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(mimeType);
         if (!readers.hasNext()) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_NO_IMAGE_FORMAT_$1, mimeType));
+            throw new IIOException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_FORMAT_$1, mimeType));
         }
         reader = readers.next();
         if (readers.hasNext()) {
-            throw new IllegalArgumentException(Resources.format(
-                    ResourceKeys.ERROR_TOO_MANY_IMAGE_FORMATS_$1, mimeType));
+            throw new IIOException(Resources.format(ResourceKeys.ERROR_TOO_MANY_IMAGE_FORMATS_$1, mimeType));
         }
     }
 

@@ -221,14 +221,45 @@ final class FormatEntry extends Entry implements Format {
      */
     private ImageReader getImageReader() throws IIOException {
         assert Thread.holdsLock(this);
-        if (reader != null) {
-            return reader;
+        if (reader == null) {
+            reader = createImageReader();
         }
+        return reader;
+    }
+
+    /**
+     * Creates a new image reader for this format.
+     *
+     * @return The image reader for this format.
+     * @throws IIOException if no image reader was found for this format.
+     */
+    final ImageReader createImageReader() throws IIOException {
         final Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(mimeType);
-        if (readers.hasNext()) {
-            return reader = readers.next();
+        if (!readers.hasNext()) {
+            throw new IIOException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_DECODER_$1, mimeType));
         }
-        throw new IIOException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_DECODER_$1, mimeType));
+        final ImageReader reader = readers.next();
+        if (false && readers.hasNext()) { // Check disabled for now.
+            throw new IllegalArgumentException(Resources.format(
+                    ResourceKeys.ERROR_TOO_MANY_IMAGE_FORMATS_$1, mimeType));
+        }
+        handleSpecialCases(reader, null);
+        return reader;
+    }
+
+    /**
+     * Handles special cases for image reader configuration.
+     */
+    private void handleSpecialCases(final ImageReader reader, final ImageReadParam param) {
+        if (reader instanceof NetcdfImageReader) {
+            final NetcdfImageReader r = (NetcdfImageReader) reader;
+            final GridSampleDimension[] bands = getSampleDimensions(param);
+            final String[] names = new String[bands.length];
+            for (int i=0; i<names.length; i++) {
+                names[i] = bands[i].getDescription().toString();
+            }
+            r.setVariables(names);
+        }
     }
 
     /**
@@ -297,21 +328,6 @@ final class FormatEntry extends Entry implements Format {
             // Ignore... Le code suivant sera un "fallback" raisonable.
         }
         return null;
-    }
-
-    /**
-     * Handle special cases for image reader configuration.
-     */
-    private void handleSpecialCases(final ImageReader reader, final ImageReadParam param) {
-        if (reader instanceof NetcdfImageReader) {
-            final NetcdfImageReader r = (NetcdfImageReader) reader;
-            final GridSampleDimension[] bands = getSampleDimensions(param);
-            final String[] names = new String[bands.length];
-            for (int i=0; i<names.length; i++) {
-                names[i] = bands[i].getDescription().toString();
-            }
-            r.setVariables(names);
-        }
     }
 
     /**

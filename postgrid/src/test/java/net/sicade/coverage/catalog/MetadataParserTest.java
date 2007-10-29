@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.sicade.coverage.io;
+package net.sicade.coverage.catalog;
 
 import java.io.File;
 import java.util.Iterator;
@@ -21,9 +21,11 @@ import javax.imageio.ImageReader;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import net.sicade.catalog.Element;
-import net.sicade.util.DateRange;
 import org.geotools.util.MeasurementRange;
+
+import net.sicade.util.DateRange;
+import net.sicade.catalog.Element;
+import net.sicade.catalog.DatabaseTest;
 
 
 /**
@@ -32,7 +34,7 @@ import org.geotools.util.MeasurementRange;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class MetadataParserTest extends TestCase {
+public class MetadataParserTest extends DatabaseTest {
     /**
      * The file to test for inclusion.
      *
@@ -55,7 +57,7 @@ public class MetadataParserTest extends TestCase {
         final ImageReader reader = readers.next();
         reader.setInput(file);
 
-        final MetadataParser metadata = new MetadataParser(reader, 0);
+        final MetadataParser metadata = new MetadataParser(database, reader, 0);
         final DateRange[] dates = metadata.getDateRanges();
         assertNotNull(dates);
         assertEquals(1, dates.length);

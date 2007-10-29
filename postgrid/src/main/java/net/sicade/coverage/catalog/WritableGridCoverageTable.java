@@ -44,7 +44,6 @@ import net.sicade.util.DateRange;
 import net.sicade.catalog.Database;
 import net.sicade.catalog.QueryType;
 import net.sicade.catalog.CatalogException;
-import net.sicade.coverage.io.MetadataParser;
 import net.sicade.resources.i18n.ResourceKeys;
 import net.sicade.resources.i18n.Resources;
 
@@ -269,7 +268,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             /*
              * Gets the metadata of interest.
              */
-            final MetadataParser metadata = new MetadataParser(reader, imageIndex);
+            final MetadataParser metadata = new MetadataParser(getDatabase(), reader, imageIndex);
             final DateRange[] dates = metadata.getDateRanges();
             final int width  = reader.getWidth (imageIndex);
             final int height = reader.getHeight(imageIndex);
