@@ -377,22 +377,35 @@ final class MetadataParser {
             if (srid != 0) {
                 return srid;
             }
+            if (wkt.contains("PROJECTION[\"Mercator\"]")) {
+                // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
+                return 3395; // World Mercator
+            }
+            if (wkt.contains("PROJECTION[\"Lambert_Conformal_Conic\"]")) {
+                // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
+                return 27574; // NTF (Paris) / Lambert zone IV
+            }
         }
         String type = referencing.getCoordinateReferenceSystem().type;
         if (GeographicMetadataFormat.PROJECTED.equalsIgnoreCase(type)) {
+            // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
             return 3395; // World Mercator
         }
         if (GeographicMetadataFormat.GEOGRAPHIC.equalsIgnoreCase(type)) {
+            // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
             return 4326; // WGS 84
         }
         if (GeographicMetadataFormat.GEOGRAPHIC_3D.equalsIgnoreCase(type)) {
+            // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
             return 4327; // WGS 84
         }
         type = referencing.getCoordinateSystem().type;
         if (GeographicMetadataFormat.CARTESIAN.equalsIgnoreCase(type)) {
+            // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
             return 3395; // World Mercator
         }
         if (GeographicMetadataFormat.ELLIPSOIDAL.equalsIgnoreCase(type)) {
+            // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
             return referencing.getDimension() <= 2 ? 4326 : 4327; // WGS 84
         }
         return 0;
@@ -428,6 +441,8 @@ final class MetadataParser {
     /**
      * Returns the vertical coordinate values in the specified units, or {@code null} if none.
      *
+     * @param units The desired units, or {@code null} for returning the values in their native units.
+     * 
      * @todo Current implementation uses hard-coded values.
      *       We need to do something more generic.
      */

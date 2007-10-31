@@ -275,7 +275,19 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             final AffineTransform gridToCRS = metadata.getGridToCRS();
             final int horizontalSRID = metadata.getHorizontalSRID();
             final int verticalSRID = metadata.getVerticalSRID();
-            final double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
+            double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
+            if (verticalOrdinates == null) {
+                /*
+                 * We tried to get the vertical coordinates in meters if possible, so conversions
+                 * from other linear units like feet were applied if needed.   If such conversion
+                 * was not possible, gets the coordinates in whatever units they are. It may be a
+                 * pressure unit or a dimensionless unit (e.g. "sigma level").
+                 *
+                 * TODO: We need to revisit that. Maybe a different column for altitudes in meters
+                 *       and altitudes in native units.
+                 */
+                verticalOrdinates = metadata.getVerticalValues(null);
+            }
             final String extent = gridTable.getIdentifier(new Dimension(width, height),
                     gridToCRS, horizontalSRID, verticalOrdinates, verticalSRID, series.getName());
             /*

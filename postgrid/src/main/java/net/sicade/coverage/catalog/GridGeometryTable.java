@@ -458,7 +458,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         statement.setInt   (indexOf(query.horizontalSRID), horizontalSRID);
         vsIndex = indexOf(query.verticalSRID);
         voIndex = indexOf(query.verticalOrdinates);
-        if (verticalOrdinates == null || verticalOrdinates.length != 0) {
+        if (verticalOrdinates == null || verticalOrdinates.length == 0) {
             statement.setNull(vsIndex, Types.INTEGER);
             statement.setNull(voIndex, Types.ARRAY);
         } else {
@@ -492,8 +492,8 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      */
     @Override
     protected void notifySleeping() {
-        if (crsFactory instanceof AbstractAuthorityFactory) try {
-            ((AbstractAuthorityFactory) crsFactory).dispose();
+        if (crsFactory != null) try {
+            crsFactory.dispose();
         } catch (FactoryException e) {
             logWarning("notifySleeping", e);
         }
