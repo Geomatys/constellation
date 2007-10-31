@@ -435,7 +435,18 @@ final class MetadataParser {
         // Following rule is not exact since the third dimension could be time. This is okay as a
         // patch for now since this vertical SRID will be ignored by WritableGridCoverageTable if
         // getVerticalValues(SI.METER) returns null.
-        return metadata.getReferencing().getDimension() > 2 ? 5714 : 0;
+        if (metadata.getReferencing().getDimension() > 2) {
+            final Unit units = getVerticalUnits();
+            if (units != null) {
+                if (units.isCompatible(SI.METER)) {
+                    return 5714; // Mean Sea Level
+                }
+                if (units.isCompatible(Unit.ONE)) {
+                    return 35000; // Sigma level
+                }
+            }
+        }
+        return 0;
     }
 
     /**
@@ -482,6 +493,26 @@ final class MetadataParser {
                     }
                 }
                 return values;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the vertical units, or {@code null} if none.
+     * 
+     * @todo Current implementation uses hard-coded values.
+     *       We need to do something more generic.
+     */
+    private Unit getVerticalUnits() {
+        final ImageReferencing referencing = metadata.getReferencing();
+        for (int i=referencing.getDimension(); --i>=0;) {
+            final Axis axis = referencing.getAxis(i);
+            final String direction = axis.getDirection();
+            if (direction != null) {
+                if (direction.equalsIgnoreCase("up") || direction.equalsIgnoreCase("down")) {
+                    return getUnits(axis);
+                }
             }
         }
         return null;

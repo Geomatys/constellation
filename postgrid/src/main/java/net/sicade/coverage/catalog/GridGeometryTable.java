@@ -292,6 +292,26 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     }
 
     /**
+     * Returns {@code true} if the specified arrays are equal when comparing the values
+     * at {@code float} precision. This method is a workaround for the cases where some
+     * original array was stored with {@code double} precision while the other array has
+     * been casted to {@code float} precision. The precision lost cause the comparaison
+     * to fails when comparing the array at full {@code double} precision. For example
+     * {@code (double) 0.1f} is not equals to {@code 0.1}.
+     */
+    private static boolean equalsAsFloat(final double[] a1, final double[] a2) {
+        if (a1 == null || a2 == null || a1.length != a2.length) {
+            return false;
+        }
+        for (int i=0; i<a1.length; i++) {
+            if (Float.floatToIntBits((float) a1[i]) != Float.floatToIntBits((float) a2[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * For every values in the specified map, replace the collection of identifiers by a set of
      * altitudes. On input, the values are usually {@code List<String>}. On output, all values
      * will be {@code SortedSet<Number>}.
@@ -399,6 +419,7 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         statement.setInt   (indexOf(query.byHorizontalSRID), horizontalSRID);
 
         String ID = null;
+        boolean strictlyEquals = false;
         int idIndex = indexOf(query.identifier);
         int vsIndex = indexOf(query.verticalSRID);
         int voIndex = indexOf(query.verticalOrdinates);
@@ -406,36 +427,53 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         while (results.next()) {
             final String nextID = results.getString(idIndex);
             final int  nextSRID = results.getInt   (vsIndex);
+            /*
+             * We check vertical SRID in Java code rather than in the SQL statement because it is
+             * uneasy to write a statement that works for both non-null and null values (the former
+             * requires "? IS NULL" since the "? = NULL" statement doesn't work with PostgreSQL 8.2.
+             */
             if (results.wasNull() != (verticalOrdinates == null) ||
                 (verticalOrdinates != null && nextSRID != verticalSRID))
             {
-                /*
-                 * NOTE: we check for vertical SRID in Java code rather than in the SQL statement
-                 * because it is uneasy to write a statement that work for both non-null and null
-                 * values (the former requires "? IS NULL" since the "? = NULL" statement doesn't
-                 * work with PostgreSQL 8.2.
-                 */
                 continue;
             }
+            /*
+             * We compare the arrays in this Java code rather than in the SQL statement (in the
+             * WHERE clause) in order to make sure that we are insensitive to the array type
+             * (since we convert to double[] in all cases), and because we need to relax the
+             * tolerance threshold in some cases.
+             */
             final double[] altitudes = asDoubleArray(results.getArray(voIndex));
-            if (!Arrays.equals(altitudes, verticalOrdinates)) {
-                /*
-                 * NOTE:  we compare the array in this Java code rather than inserting it as a
-                 * parameter in the WHERE clause in order to make sure that we are insensitive
-                 * to the array type, since we convert to double[] in all cases.
-                 */
+            final boolean strict;
+            if (Arrays.equals(altitudes, verticalOrdinates)) {
+                strict = true;
+            } else if (equalsAsFloat(altitudes, verticalOrdinates)) {
+                strict = false;
+            } else {
                 continue;
             }
+            /*
+             * If there is more than one record with different ID, then there is a choice:
+             *   1) If the new record is more accurate than the previous one, keep the new one.
+             *   2) Otherwise we keep the previous record. A warning will be logged if and only
+             *      if the two records are strictly equals.
+             */
             if (ID!=null && !ID.equals(nextID)) {
-                // Could happen if there is insuffisient conditions in the WHERE clause.
-                final LogRecord record = Resources.getResources(getDatabase().getLocale()).
-                        getLogRecord(Level.WARNING, ResourceKeys.ERROR_DUPLICATED_GEOMETRY_$1, nextID);
-                record.setSourceClassName("GridGeometryTable");
-                record.setSourceMethodName("getIdentifier");
-                LOGGER.log(record);
-            } else {
-                ID = nextID;
+                if (!strict) {
+                    continue;
+                }
+                if (strictlyEquals) {
+                    // Could happen if there is insuffisient conditions in the WHERE clause.
+                    final LogRecord record = Resources.getResources(getDatabase().getLocale()).
+                            getLogRecord(Level.WARNING, ResourceKeys.ERROR_DUPLICATED_GEOMETRY_$1, nextID);
+                    record.setSourceClassName("GridGeometryTable");
+                    record.setSourceMethodName("getIdentifier");
+                    LOGGER.log(record);
+                    continue;
+                }
             }
+            ID = nextID;
+            strictlyEquals = strict;
         }
         results.close();
         if (ID != null || newIdentifier == null) {
