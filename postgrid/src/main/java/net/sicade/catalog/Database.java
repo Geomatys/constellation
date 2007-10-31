@@ -270,19 +270,19 @@ public class Database {
         if (path.isDirectory()) {
             path = new File(path, CONFIG_FILENAME);
         }
-        final String envGeoserverDataDir = System.getenv("GEOSERVER_DATA_DIR");
-        if (envGeoserverDataDir != null) {
-            return new File(envGeoserverDataDir, configFilename);
-        }
         /*
-         * Recherche dans le répertoire de configuration de l'utilisateur.
+         * Recherche dans le répertoire de configuration de l'utilisateur,
+         * en commançant par le répertoire de de GeoServer s'il est définit.
          */
         if (!path.isAbsolute()) {
-            final String home = System.getProperty("user.home");
-            if (System.getProperty("os.name", "").startsWith("Windows")) {
-                path = new File(home, WINDOWS_DIRECTORY);
-            } else {
-                path = new File(home, UNIX_DIRECTORY);
+            String home = System.getenv("GEOSERVER_DATA_DIR");
+            if (home == null || !(path=new File(home)).isDirectory()) {
+                home = System.getProperty("user.home");
+                if (System.getProperty("os.name", "").startsWith("Windows")) {
+                    path = new File(home, WINDOWS_DIRECTORY);
+                } else {
+                    path = new File(home, UNIX_DIRECTORY);
+                }
             }
         }
         if (!path.exists()) {
