@@ -300,13 +300,9 @@ public class Query {
             buffer.append(separator);
             if (columnExists) {
                 final String function = column.getFunction(type);
-                if (function != null) {
-                    buffer.append(function).append('(');
-                }
+                appendFunctionPrefix(buffer, function);
                 buffer.append(quote).append(column.name).append(quote);
-                if (function != null) {
-                    buffer.append(')');
-                }
+                appendFunctionSuffix(buffer, function);
             } else {
                 // Don't put quote for number, boolean and null values.
                 final boolean needQuotes = (column.defaultValue instanceof CharSequence);
@@ -570,6 +566,7 @@ scan:       while (!tables.isEmpty()) {
         buffer.append(quote).append(table).append(quote);
         String separator = " (";
         int count = 0;
+        final String[] functions = new String[columns.length];
         for (final Column column : columns) {
             if (!table.equals(column.table) || !columnNames.contains(column.name)) {
                 // Column not to be included for an insert statement.
@@ -585,6 +582,7 @@ scan:       while (!tables.isEmpty()) {
                  */
                 continue;
             }
+            functions[count] = column.getFunction(QueryType.INSERT);
             if (++count != index) {
                 // Safety check.
                 throw new IllegalStateException(String.valueOf(column));
@@ -597,11 +595,38 @@ scan:       while (!tables.isEmpty()) {
         }
         buffer.append(") VALUES");
         separator = " (";
-        while (--count >= 0) {
+        for (int i=0; i<count; i++) {
+            final String function = functions[i];
+            appendFunctionPrefix(buffer, function);
             buffer.append(separator).append('?');
+            appendFunctionSuffix(buffer, function);
             separator = ", ";
         }
         return buffer.append(')').toString();
+    }
+
+    /**
+     * Appends the specified function before its operands.
+     */
+    private static void appendFunctionPrefix(final StringBuilder buffer, final String function) {
+        if (function != null) {
+            if (!function.startsWith("::")) {
+                buffer.append(function).append('(');
+            }
+        }
+    }
+
+    /**
+     * Appends the specified function after its operands.
+     */
+    private static void appendFunctionSuffix(final StringBuilder buffer, final String function) {
+        if (function != null) {
+            if (function.startsWith("::")) {
+                buffer.append(function);
+            } else {
+                buffer.append(')');
+            }
+        }
     }
 
     /**

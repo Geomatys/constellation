@@ -501,25 +501,16 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
             statement.setNull(voIndex, Types.ARRAY);
         } else {
             statement.setInt(vsIndex, verticalSRID);
-            if (false) {
-                // TODO: Enable this bloc when we will be allowed to compile for J2SE 1.6, and
-                //       if the PostgreSQL JDBC driver implements the createArrayOf(...) method.
-                final Double[] numbers = new Double[verticalOrdinates.length];
-                for (int i=0; i<numbers.length; i++) {
-                    numbers[i] = verticalOrdinates[i];
-                }
-                final Array array = null;//statement.getConnection().createArrayOf("float8", numbers);
-                statement.setArray(voIndex, array);
-            } else {
-                final StringBuilder buffer = new StringBuilder();
-                char separator = '{';
-                for (int i=0; i<verticalOrdinates.length; i++) {
-                    buffer.append(separator).append(verticalOrdinates[i]);
-                    separator = ',';
-                }
-                final String array = buffer.append('}').toString();
-                statement.setString(voIndex, array);
+            final Double[] numbers = new Double[verticalOrdinates.length];
+            for (int i=0; i<numbers.length; i++) {
+                numbers[i] = verticalOrdinates[i];
             }
+            // TODO: Use the following line instead when we will be allowed to compile for J2SE 1.6,
+            //       and if the PostgreSQL JDBC driver implements the createArrayOf(...) method.
+            //
+            //       array = statement.getConnection().createArrayOf("float8", numbers);
+            final Array array = new DoubleArray(numbers);
+            statement.setArray(voIndex, array);
         }
         insertSingleton(statement);
         return ID;
