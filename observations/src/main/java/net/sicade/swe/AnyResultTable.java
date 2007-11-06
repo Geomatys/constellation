@@ -79,7 +79,6 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
     public synchronized String getIdentifier(final Object result) throws SQLException, CatalogException {
         final AnyResultQuery query = (AnyResultQuery) super.query;
         
-        String id;
         if (result instanceof AnyResultEntry) {
             PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
             statement.setString(indexOf(query.dataBlock),((AnyResultEntry)result).getDataBlock());
@@ -87,8 +86,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
             ResultSet results = statement.executeQuery();
             if(results.next())
                 return results.getString(1);
-            else
-                id = searchFreeIdentifier("idresult");
+            
         } else if (result instanceof ReferenceEntry) {
             PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
             statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
@@ -96,14 +94,12 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
             ResultSet results = statement.executeQuery();
             if(results.next())
                 return results.getString(1);
-            else
-                id = searchFreeIdentifier("idresult");
         } else {
             throw new CatalogException(" ce type de resultat n'est pas accepté");
         }
         
         PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.idResult), id);
+
         if (result instanceof AnyResultEntry) {
             statement.setString(indexOf(query.dataBlock), ((AnyResultEntry)result).getDataBlock());
             statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
@@ -123,8 +119,15 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 throw new CatalogException(" ce type de resultat n'est pas accepté");
             }
         }
-        insertSingleton(statement);   
-        return id;
+        insertSingleton(statement);
+        
+        //we get the new id generated
+        PreparedStatement p = getStatement("SELECT currval('any_result_id_result_seq')");
+        ResultSet r = p.executeQuery();
+        if (r.next())
+            return r.getString(1);
+        else
+            return null;
     }
     
 }

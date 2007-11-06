@@ -55,6 +55,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
      * <code>{@linkplain #createEntry(int,String,Platform,DataQuality,Citation,ResultSet)
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
+    @Override
     protected SamplingPointEntry createEntry(final ResultSet result) throws CatalogException, SQLException {
         final SamplingPointQuery query = (SamplingPointQuery) super.query;
         
@@ -112,14 +113,14 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
         if( station.getPosition() != null ) {
             statement.setString(indexOf(query.pointIdentifier), station.getPosition().getId());
             statement.setString(indexOf(query.srsName), station.getPosition().getPos().getSrsName());
-            statement.setString(indexOf(query.positionValueX), Double.toString(station.getPosition().getPos().getValue().get(0)));
-            statement.setString(indexOf(query.positionValueY), Double.toString(station.getPosition().getPos().getValue().get(1)));
+            statement.setDouble(indexOf(query.positionValueX), station.getPosition().getPos().getValue().get(0));
+            statement.setDouble(indexOf(query.positionValueY), station.getPosition().getPos().getValue().get(1));
             statement.setInt(indexOf(query.srsDimension), station.getPosition().getPos().getSrsDimension());
         } else {
             statement.setNull(indexOf(query.pointIdentifier), java.sql.Types.VARCHAR);
             statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
-            statement.setNull(indexOf(query.positionValueX), java.sql.Types.VARCHAR);
-            statement.setNull(indexOf(query.positionValueY), java.sql.Types.VARCHAR);
+            statement.setNull(indexOf(query.positionValueX), java.sql.Types.DOUBLE);
+            statement.setNull(indexOf(query.positionValueY), java.sql.Types.DOUBLE);
             statement.setNull(indexOf(query.srsDimension), java.sql.Types.INTEGER);
         }
         insertSingleton(statement); 

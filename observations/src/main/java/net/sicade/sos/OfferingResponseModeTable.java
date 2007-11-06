@@ -93,14 +93,14 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
         
         PreparedStatement statement = getStatement(QueryType.EXISTS);
         statement.setString(indexOf(query.idOffering), offres.getIdOffering());
-        statement.setString(indexOf(query.mode), offres.getMode().value() );
+        statement.setString(indexOf(query.mode), offres.getMode().name());
         ResultSet result = statement.executeQuery();
         if(result.next())
             return;
         
         PreparedStatement insert    = getStatement(QueryType.INSERT);
         insert.setString(indexOf(query.idOffering), offres.getIdOffering());
-        insert.setString(indexOf(query.mode), offres.getMode().value() );
+        insert.setString(indexOf(query.mode), offres.getMode().name() );
         insertSingleton(insert);
     }
     

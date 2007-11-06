@@ -82,6 +82,10 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
      * Return the procedure table for offering.
      */
      public OfferingProcedureTable getProcedures() {
+        if (procedures == null) {
+            procedures =  getDatabase().getTable(OfferingProcedureTable.class);
+            procedures =  new OfferingProcedureTable(procedures);
+         }
         return procedures;
     }
 
@@ -89,6 +93,10 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
      * Return the phenomenon table for offering.
      */ 
     public OfferingPhenomenonTable getPhenomenons() {
+        if (phenomenons == null) {
+            phenomenons =  getDatabase().getTable(OfferingPhenomenonTable.class);
+            phenomenons =  new OfferingPhenomenonTable(phenomenons);
+        }
         return phenomenons;
     }
 
@@ -96,7 +104,19 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
      * Return the station table for offering.
      */
     public OfferingSamplingFeatureTable getStations() {
+        if (stations == null) {
+            stations =  getDatabase().getTable(OfferingSamplingFeatureTable.class);
+            stations =  new OfferingSamplingFeatureTable(stations);
+        }
         return stations;
+    }
+    
+    public OfferingResponseModeTable getResponseModes() {
+        if (responseModes == null) {
+            responseModes =  getDatabase().getTable(OfferingResponseModeTable.class);
+            responseModes =  new OfferingResponseModeTable(responseModes);
+        }
+        return responseModes;
     }
     
     /**
@@ -120,12 +140,8 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          EnvelopeEntry envelope = envelopes.getEntry(results.getString(indexOf(query.boundedBy)));
          BoundingShapeEntry boundedBy = new  BoundingShapeEntry(envelope);
          
-         if (phenomenons == null) {
-            phenomenons =  getDatabase().getTable(OfferingPhenomenonTable.class);
-            phenomenons =  new OfferingPhenomenonTable(phenomenons);
-         }
-         phenomenons.setIdOffering(idOffering);
-         Collection<OfferingPhenomenonEntry> entries1 = phenomenons.getEntries();
+         getPhenomenons().setIdOffering(idOffering);
+         Collection<OfferingPhenomenonEntry> entries1 = getPhenomenons().getEntries();
         
          List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();
         
@@ -135,12 +151,8 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             phenos.add(c.getComponent());
          }
          
-          if (procedures == null) {
-            procedures =  getDatabase().getTable(OfferingProcedureTable.class);
-            procedures =  new OfferingProcedureTable(procedures);
-         }
-         procedures.setIdOffering(idOffering);
-         Collection<OfferingProcedureEntry> entries2 = procedures.getEntries();
+         getProcedures().setIdOffering(idOffering);
+         Collection<OfferingProcedureEntry> entries2 = getProcedures().getEntries();
         
          List<ProcessEntry> process = new ArrayList<ProcessEntry>();
         
@@ -150,11 +162,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             process.add(c.getComponent());
          }
          
-         if (stations == null) {
-            stations =  getDatabase().getTable(OfferingSamplingFeatureTable.class);
-            stations =  new OfferingSamplingFeatureTable(stations);
-         }
-         stations.setIdOffering(idOffering);
+         getStations().setIdOffering(idOffering);
          Collection<OfferingSamplingFeatureEntry> entries3 = stations.getEntries();
         
          List<SamplingFeatureEntry> sampling = new ArrayList<SamplingFeatureEntry>();
@@ -177,12 +185,8 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          
          TemporalObjectEntry eventTime = new TemporalObjectEntry(begin, end);
          
-         if (responseModes == null) {
-            responseModes =  getDatabase().getTable(OfferingResponseModeTable.class);
-            responseModes =  new OfferingResponseModeTable(responseModes);
-         }
-         responseModes.setIdOffering(idOffering);
-         Collection<OfferingResponseModeEntry> entries4 = responseModes.getEntries();
+         getResponseModes().setIdOffering(idOffering);
+         Collection<OfferingResponseModeEntry> entries4 = getResponseModes().getEntries();
          List<ResponseMode> modes = new ArrayList<ResponseMode>();
          i = entries4.iterator();
          
@@ -276,20 +280,14 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          // on insere les modes de reponse
         if (off.getResponseMode() != null && off.getResponseMode().size() != 0){
             for (ResponseMode mode:off.getResponseMode()) {
-                if (responseModes == null) {
-                    responseModes = getDatabase().getTable(OfferingResponseModeTable.class);
-                }
-                responseModes.getIdentifier(new OfferingResponseModeEntry(off.getId(), mode));
+                getResponseModes().getIdentifier(new OfferingResponseModeEntry(off.getId(), mode));
             } 
         }
          // on insere la liste de station qui a effectué cette observation
          if (off.getFeatureOfInterest() != null && off.getFeatureOfInterest().size() != 0) {
              for (SamplingFeatureEntry station:off.getFeatureOfInterest()) {
                     
-                if (stations == null) {
-                    stations = getDatabase().getTable(OfferingSamplingFeatureTable.class);
-                }
-                stations.getIdentifier(new OfferingSamplingFeatureEntry(off.getId(), station));
+                getStations().getIdentifier(new OfferingSamplingFeatureEntry(off.getId(), station));
              }
         }
         
@@ -297,20 +295,14 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          if(off.getObservedProperty() != null && off.getObservedProperty().size() != 0){
              
             for (PhenomenonEntry pheno: off.getObservedProperty()){
-                if (phenomenons == null) {
-                    phenomenons = getDatabase().getTable(OfferingPhenomenonTable.class);
-                }
-                phenomenons.getIdentifier(new OfferingPhenomenonEntry(off.getId(), pheno));
+                getPhenomenons().getIdentifier(new OfferingPhenomenonEntry(off.getId(), pheno));
             }
          } 
         
         //on insere les capteur
         if (off.getProcedure() != null) {
             for (ProcessEntry process:off.getProcedure()){
-                if (procedures == null) {
-                    procedures = getDatabase().getTable(OfferingProcedureTable.class);
-                }
-                procedures.getIdentifier(new OfferingProcedureEntry(off.getId(), process));
+                getProcedures().getIdentifier(new OfferingProcedureEntry(off.getId(), process));
             }
         } 
         return id;

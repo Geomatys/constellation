@@ -27,12 +27,12 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
     private String idOffering;
     
     /**
-     * un lien vers la table des process.
+     * un lien vers la table des phenomenes.
      */
     private PhenomenonTable phenomenons;
     
      /**
-     * un lien vers la table des process.
+     * un lien vers la table des phenomenes compose.
      */
     private CompositePhenomenonTable compositePhenomenons;
     

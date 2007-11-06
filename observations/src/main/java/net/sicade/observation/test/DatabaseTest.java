@@ -43,7 +43,7 @@ public class DatabaseTest {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        // La station
+        /*// La station
         //SamplingFeatureEntry sf        = new SamplingFeatureEntry("station1", "02442X0111/F", "Point d'eau BSSS", "urn:-sandre:object:bdrhf:123X");
         List<Double> values = new ArrayList<Double>();
         values.add(163000.0);
@@ -103,13 +103,13 @@ public class DatabaseTest {
                                                                 Distribution.NORMAL,
                                                                 mesure,
                                                                 t,
-                                                                null);
+                                                                null);*/
         
         StringBuilder s = new StringBuilder();
         s.append("551411;20000;bla");
         System.out.println(s.toString());
         ResponseMode r = ResponseMode.RESULT_TEMPLATE;
-        System.out.println(r.toString());
+        System.out.println(r.value() +" name:" + r.name());
         /*
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setServerName("localhost");
