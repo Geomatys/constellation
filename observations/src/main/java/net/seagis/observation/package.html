@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+  <HEAD>
+    <TITLE>package net.seagis.observation</TITLE>
+  </HEAD>
+  <BODY>
+  Interfaces communes à tous types d'observations supportées par Sicade. Le type le plus
+  couramment utilisé est la {@linkplain net.seagis.observation.Measurement mesure}, qui
+  est un cas particulier d'{@linkplain net.seagis.observation.Observation observation} où
+  la valeur observée est un scalaire. Chaque observation est associée (directement ou
+  indirectement) à un {@linkplain net.seagis.observation.Phenomenon phénomène} mesuré à
+  l'aide d'une certaine {@linkplain net.seagis.observation.Procedure procédure} à une
+  certaine {@linkplain net.seagis.observation.Station station}.
+  <p>
+  Les notions de phénomène, procédure et de station peuvent être spécialisés en fonction de la
+  discipline étudiée. Ces spécialisations apparaissent dans des sous-paquets. Par exemple dans le
+  cas des images (sous-paquet {@link net.seagis.observation.coverage coverage}), une procédure est
+  une {@linkplain net.seagis.observation.coverage.Operation opération} appliquée sur les images. De
+  même dans le cas des pêches palangrières (sous paquet {@link net.seagis.observation.fishery fishery}),
+  une station est une {@linkplain net.seagis.observation.fishery.LongLine ligne de palangre} ou un
+  {@linkplain net.seagis.observation.fishery.SeineSet coup de senne}.
+  <p>
+  Le point de départ le plus pratique pour utiliser ce paquet est
+  {@link net.seagis.observation.Observations#getDefault()}.
+  </BODY>
+</HTML>

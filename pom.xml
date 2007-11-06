@@ -25,7 +25,7 @@
     liens brisés dans les pages qui seront générées et pour permettre à
     Continuum de fonctionner.
   -->
-  <groupId>net.sicade</groupId>
+  <groupId>net.seagis</groupId>
   <artifactId>seagis</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
@@ -343,20 +343,20 @@
             <link>http://javadoc.geotools.fr/snapshot</link>
             <link>http://jsr-108.sourceforge.net/javadoc</link>
           </links>
-          <excludePackageNames>net.sicade.resources</excludePackageNames>
+          <excludePackageNames>net.seagis.resources</excludePackageNames>
           <!-- Separates packages on the overview page into whatever groups is specified. -->
           <groups>
             <group>
               <title>Interfaces graphiques</title>
-              <packages>net.sicade.gui*</packages>
+              <packages>net.seagis.gui*</packages>
             </group>
             <group>
               <title>Calculs numériques</title>
-              <packages>net.sicade.numeric*</packages>
+              <packages>net.seagis.numeric*</packages>
             </group>
             <group>
               <title>Observations</title>
-              <packages>net.sicade.observation*</packages>
+              <packages>net.seagis.observation*</packages>
             </group>
           </groups>
           <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in

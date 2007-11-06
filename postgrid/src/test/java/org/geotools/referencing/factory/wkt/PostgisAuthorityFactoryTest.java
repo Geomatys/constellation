@@ -31,7 +31,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.citation.Citations;
 
-import net.sicade.catalog.Database;
+import net.seagis.catalog.Database;
 
 
 /**
