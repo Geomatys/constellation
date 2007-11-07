@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.image;
+package net.seagis.console;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -38,21 +38,27 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.resources.Arguments;
+
+import net.seagis.catalog.Database;
+import net.seagis.coverage.catalog.CoverageReference;
+import net.seagis.coverage.catalog.GridCoverageTable;
 
 
 /**
- * Command line utilities.
+ * Displays the image specified on the command line. This is utility is mostly for testing
+ * purpose.
  *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public final class Utilities {
+public final class ImageViewer {
     /**
      * Do not allows instantiation of this class.
      */
-    private Utilities() {
+    private ImageViewer() {
     }
 
     /**
@@ -231,8 +237,11 @@ public final class Utilities {
      *       Lists available formats.</li>
      *   <li>{@code -mimes}<br>
      *       Lists available mime types.</li>
-     *   <li>{@code -show} <var>filename</var><br>
-     *       Read and display the specified file.</li>
+     *   <li>{@code -show}<br>
+     *       Show the image instead of just printing metadata.</li>
+     *   <li>{@code -layer} <var>name</var><br>
+     *       If specified, get the image from the specified layer
+     *       (otherwise the image is get from an ordinary file).</li>
      * </ul>
      */
     public static void main(String[] args) throws IOException {
@@ -240,7 +249,7 @@ public final class Utilities {
         final boolean formats = arguments.getFlag("-formats");
         final boolean mimes   = arguments.getFlag("-mimes");
         final boolean show    = arguments.getFlag("-show");
-        final boolean props   = arguments.getFlag("-properties");
+        final String  layer   = arguments.getOptionalString("-layer");
         final PrintWriter out = arguments.out;
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
         if (formats) {
@@ -251,19 +260,32 @@ public final class Utilities {
             out.println("MIMES types:");
             list(out, ImageIO.getReaderMIMETypes(), ImageIO.getWriterMIMETypes());
         }
-        for (int i=0; i<args.length; i++) {
-            final String filename = args[i];
-            final RenderedImage image = read(new File(filename));
-            if (show || props) {
+        if (layer == null) {
+            for (int i=0; i<args.length; i++) {
+                final String filename = args[i];
+                final RenderedImage image = read(new File(filename));
                 out.println(filename);
                 out.print("  min X  : "); out.println(image.getMinX());
                 out.print("  min Y  : "); out.println(image.getMinY());
                 out.print("  Width  : "); out.println(image.getWidth());
                 out.print("  Height : "); out.println(image.getHeight());
+                if (show) {
+                    show(image, filename);
+                }
             }
-            if (show) {
-                show(image, filename);
+        } else try {
+            final Database database = new Database();
+            final GridCoverageTable coverages = new GridCoverageTable(database.getTable(GridCoverageTable.class));
+            coverages.setLayer(layer);
+            for (final String file : args) {
+                final CoverageReference ref = coverages.getEntry(file);
+                final GridCoverage2D coverage = ref.getCoverage(null);
+                final RenderedImage image = coverage.geophysics(false).getRenderedImage();
+                show(image, file);
             }
+            database.close();
+        } catch (Exception e) {
+            e.printStackTrace(arguments.err);
         }
     }
 }
