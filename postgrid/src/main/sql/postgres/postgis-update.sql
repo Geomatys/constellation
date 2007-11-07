@@ -1,6 +1,8 @@
 --
 -- Update the PostGIS schema.
 --
+-- For PostGrid installation instructions, see install.html.
+--
 
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = off;

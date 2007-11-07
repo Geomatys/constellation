@@ -1,5 +1,7 @@
 --
--- PostgreSQL database dump
+-- Creates the "postgrid" schema with no data.
+--
+-- For PostGrid installation instructions, see install.html.
 --
 
 SET client_encoding = 'UTF8';
@@ -76,7 +78,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: Categories; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Categories; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "Categories" (
@@ -166,7 +168,7 @@ COMMENT ON CONSTRAINT "Sample_coefficients" ON "Categories" IS 'Les coefficients
 
 
 --
--- Name: Formats; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Formats; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "Formats" (
@@ -215,7 +217,7 @@ COMMENT ON CONSTRAINT "Format_type" ON "Formats" IS 'Enumération des valeurs ac
 
 
 --
--- Name: SampleDimensions; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: SampleDimensions; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "SampleDimensions" (
@@ -289,7 +291,7 @@ COMMENT ON VIEW "CategoriesDetails" IS 'Liste des catégories et des noms de for
 
 
 --
--- Name: Descriptors; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Descriptors; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "Descriptors" (
@@ -370,7 +372,7 @@ COMMENT ON CONSTRAINT "Band_check" ON "Descriptors" IS 'Les numéros de bandes d
 
 
 --
--- Name: Distributions; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Distributions; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "Distributions" (
@@ -419,7 +421,7 @@ COMMENT ON COLUMN "Distributions".log IS 'Indique si les analyses statistiques d
 
 
 --
--- Name: GridGeometries; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: GridGeometries; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "GridGeometries" (
@@ -597,7 +599,7 @@ COMMENT ON VIEW "BoundingBoxes" IS 'Comparaison entre les enveloppes calculées 
 
 
 --
--- Name: GridCoverages; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: GridCoverages; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "GridCoverages" (
@@ -678,7 +680,7 @@ COMMENT ON CONSTRAINT "ImageIndex_check" ON "GridCoverages" IS 'L''index de l''i
 
 
 --
--- Name: Layers; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Layers; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "Layers" (
@@ -736,7 +738,7 @@ COMMENT ON COLUMN "Layers".description IS 'Remarques s''appliquant à la couche.
 
 
 --
--- Name: LinearModelTerms; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: LinearModelTerms; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "LinearModelTerms" (
@@ -785,7 +787,7 @@ COMMENT ON COLUMN "LinearModelTerms".coefficient IS 'Facteur par lequel multipli
 
 
 --
--- Name: OperationParameters; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: OperationParameters; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "OperationParameters" (
@@ -826,7 +828,7 @@ COMMENT ON COLUMN "OperationParameters".value IS 'Valeur du paramètre.';
 
 
 --
--- Name: Operations; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Operations; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "Operations" (
@@ -883,7 +885,7 @@ COMMENT ON COLUMN "Operations".description IS 'Description de l''opération.';
 
 
 --
--- Name: Procedures; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Procedures; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "Procedures" (
@@ -916,7 +918,7 @@ COMMENT ON COLUMN "Procedures".description IS 'Description de la procédure.';
 
 
 --
--- Name: RegionOfInterests; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: RegionOfInterests; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "RegionOfInterests" (
@@ -973,7 +975,7 @@ COMMENT ON COLUMN "RegionOfInterests".dt IS 'Décalage temporel, en nombre de jo
 
 
 --
--- Name: Series; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Series; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "Series" (
@@ -1080,7 +1082,7 @@ COMMENT ON VIEW "RangeOfSeries" IS 'Liste des régions géographiques utilisées
 
 
 --
--- Name: Thematics; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Thematics; Type: TABLE; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE TABLE "Thematics" (
@@ -1113,7 +1115,7 @@ COMMENT ON COLUMN "Thematics".description IS 'Description du paramètre géophys
 
 
 --
--- Name: Categories_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Categories_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Categories"
@@ -1121,7 +1123,7 @@ ALTER TABLE ONLY "Categories"
 
 
 --
--- Name: Descriptor_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Descriptor_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Descriptors"
@@ -1129,7 +1131,7 @@ ALTER TABLE ONLY "Descriptors"
 
 
 --
--- Name: Descriptors_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Descriptors_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Descriptors"
@@ -1137,7 +1139,7 @@ ALTER TABLE ONLY "Descriptors"
 
 
 --
--- Name: Distributions_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Distributions_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Distributions"
@@ -1145,7 +1147,7 @@ ALTER TABLE ONLY "Distributions"
 
 
 --
--- Name: Formats_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Formats_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Formats"
@@ -1153,7 +1155,7 @@ ALTER TABLE ONLY "Formats"
 
 
 --
--- Name: GridCoverages_extent; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: GridCoverages_extent; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "GridCoverages"
@@ -1168,7 +1170,7 @@ COMMENT ON CONSTRAINT "GridCoverages_extent" ON "GridCoverages" IS 'L''envelope 
 
 
 --
--- Name: GridCoverages_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: GridCoverages_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "GridCoverages"
@@ -1176,7 +1178,7 @@ ALTER TABLE ONLY "GridCoverages"
 
 
 --
--- Name: GridGeometries_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: GridGeometries_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "GridGeometries"
@@ -1184,7 +1186,7 @@ ALTER TABLE ONLY "GridGeometries"
 
 
 --
--- Name: Layers_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Layers_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Layers"
@@ -1192,7 +1194,7 @@ ALTER TABLE ONLY "Layers"
 
 
 --
--- Name: LinearModels_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: LinearModels_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "LinearModelTerms"
@@ -1200,7 +1202,7 @@ ALTER TABLE ONLY "LinearModelTerms"
 
 
 --
--- Name: LocationOffsets_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: LocationOffsets_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "RegionOfInterests"
@@ -1208,7 +1210,7 @@ ALTER TABLE ONLY "RegionOfInterests"
 
 
 --
--- Name: OperationParameters_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: OperationParameters_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "OperationParameters"
@@ -1216,7 +1218,7 @@ ALTER TABLE ONLY "OperationParameters"
 
 
 --
--- Name: Operations_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Operations_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Operations"
@@ -1224,7 +1226,7 @@ ALTER TABLE ONLY "Operations"
 
 
 --
--- Name: Prefix_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Prefix_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Operations"
@@ -1232,7 +1234,7 @@ ALTER TABLE ONLY "Operations"
 
 
 --
--- Name: Procedures_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Procedures_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Procedures"
@@ -1240,7 +1242,7 @@ ALTER TABLE ONLY "Procedures"
 
 
 --
--- Name: Quicklook_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Quicklook_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Series"
@@ -1255,7 +1257,7 @@ COMMENT ON CONSTRAINT "Quicklook_uniqueness" ON "Series" IS 'Chaque série a une
 
 
 --
--- Name: SampleDimension_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: SampleDimension_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "SampleDimensions"
@@ -1263,7 +1265,7 @@ ALTER TABLE ONLY "SampleDimensions"
 
 
 --
--- Name: SampleDimensions_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: SampleDimensions_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "SampleDimensions"
@@ -1271,7 +1273,7 @@ ALTER TABLE ONLY "SampleDimensions"
 
 
 --
--- Name: Series_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Series_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Series"
@@ -1279,7 +1281,7 @@ ALTER TABLE ONLY "Series"
 
 
 --
--- Name: Symbol_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Symbol_uniqueness; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Descriptors"
@@ -1287,7 +1289,7 @@ ALTER TABLE ONLY "Descriptors"
 
 
 --
--- Name: Thematics_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Thematics_pkey; Type: CONSTRAINT; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 ALTER TABLE ONLY "Thematics"
@@ -1295,7 +1297,7 @@ ALTER TABLE ONLY "Thematics"
 
 
 --
--- Name: Band_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Band_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Band_index" ON "SampleDimensions" USING btree (band);
@@ -1309,28 +1311,28 @@ COMMENT ON INDEX "Band_index" IS 'Classement des bandes dans leur ordre d''appar
 
 
 --
--- Name: Descriptors1_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Descriptors1_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Descriptors1_index" ON "LinearModelTerms" USING btree (source1);
 
 
 --
--- Name: Descriptors2_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Descriptors2_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Descriptors2_index" ON "LinearModelTerms" USING btree (source2);
 
 
 --
--- Name: Distributions_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Distributions_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Distributions_index" ON "Descriptors" USING btree (distribution);
 
 
 --
--- Name: EndTime_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: EndTime_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "EndTime_index" ON "GridCoverages" USING btree ("endTime");
@@ -1344,56 +1346,56 @@ COMMENT ON INDEX "EndTime_index" IS 'Recherche d''images par leur date de fin d'
 
 
 --
--- Name: Extent_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Extent_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Extent_index" ON "GridCoverages" USING btree (extent);
 
 
 --
--- Name: Format_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Format_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Format_index" ON "SampleDimensions" USING btree (format);
 
 
 --
--- Name: HorizontalExtent_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: HorizontalExtent_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "HorizontalExtent_index" ON "GridGeometries" USING gist ("horizontalExtent" postgis.gist_geometry_ops);
 
 
 --
--- Name: Layers_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Layers_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Layers_index" ON "Series" USING btree (layer);
 
 
 --
--- Name: LocationOffsets_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: LocationOffsets_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "LocationOffsets_index" ON "Descriptors" USING btree (region);
 
 
 --
--- Name: Operations_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Operations_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Operations_index" ON "Descriptors" USING btree (operation);
 
 
 --
--- Name: Phenomenons_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Phenomenons_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Phenomenons_index" ON "Descriptors" USING btree (operation);
 
 
 --
--- Name: SampleDimension_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: SampleDimension_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "SampleDimension_index" ON "Categories" USING btree (band);
@@ -1407,14 +1409,14 @@ COMMENT ON INDEX "SampleDimension_index" IS 'Recherche des catégories appartena
 
 
 --
--- Name: Series_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Series_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Series_index" ON "GridCoverages" USING btree (series);
 
 
 --
--- Name: StartTime_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: StartTime_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "StartTime_index" ON "GridCoverages" USING btree ("startTime");
@@ -1428,14 +1430,14 @@ COMMENT ON INDEX "StartTime_index" IS 'Recherche d''images par leur date de déb
 
 
 --
--- Name: Symbol_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Symbol_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Symbol_index" ON "Descriptors" USING btree (symbol);
 
 
 --
--- Name: Time_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Time_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Time_index" ON "GridCoverages" USING btree ("startTime", "endTime");
@@ -1449,14 +1451,14 @@ COMMENT ON INDEX "Time_index" IS 'Recherche de toutes les images à l''intérieu
 
 
 --
--- Name: Visibility_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: Visibility_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX "Visibility_index" ON "Series" USING btree (visible);
 
 
 --
--- Name: dt_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace: 
+-- Name: dt_index; Type: INDEX; Schema: postgrid; Owner: geoadmin; Tablespace:
 --
 
 CREATE INDEX dt_index ON "RegionOfInterests" USING btree (dt);
