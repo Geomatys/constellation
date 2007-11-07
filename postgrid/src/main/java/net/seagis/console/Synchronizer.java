@@ -12,8 +12,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.catalog;
+package net.seagis.console;
 
+import net.seagis.catalog.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
@@ -32,7 +33,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import net.seagis.resources.XArray;
-import org.geotools.util.Logging;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
@@ -370,7 +370,7 @@ public class Synchronizer {
             }
             final int count = pretend ? 1 : targetStatement.executeUpdate();
             if (count == 1) {
-                log(LoggingLevel.INSERT, "insert", target.isStatementFormatted ? targetStatement.toString() : sql);
+                log(LoggingLevel.INSERT, "insert", target.format(targetStatement, sql));
             } else {
                 log(Level.WARNING, "insert", String.valueOf(count) + " enregistrements ajoutés.");
             }

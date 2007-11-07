@@ -12,9 +12,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package net.seagis.console;
 
-import net.seagis.coverage.catalog.gui.CoverageTableModel;
 import java.util.Date;
 import java.io.File;
 import java.io.IOException;
@@ -31,9 +30,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.model.LinearModel;
-import net.seagis.coverage.model.Model;
 
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
@@ -43,6 +39,18 @@ import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.util.Logging;
 
 import net.seagis.catalog.Database;
+import net.seagis.catalog.CatalogException;
+import net.seagis.coverage.catalog.CoverageReference;
+import net.seagis.coverage.catalog.Format;
+import net.seagis.coverage.catalog.FormatTable;
+import net.seagis.coverage.catalog.GridCoverageTable;
+import net.seagis.coverage.catalog.Layer;
+import net.seagis.coverage.catalog.LayerTable;
+import net.seagis.coverage.catalog.LayerTree;
+import net.seagis.coverage.catalog.TreeDepth;
+import net.seagis.coverage.model.Model;
+import net.seagis.coverage.model.LinearModel;
+import net.seagis.widget.CoverageTableModel;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
 

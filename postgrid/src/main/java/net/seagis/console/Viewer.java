@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package net.seagis.console;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,13 +21,15 @@ import java.awt.image.RenderedImage;
 import org.geotools.resources.Arguments;
 import org.geotools.coverage.grid.GridCoverage2D;
 
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
 import net.seagis.image.Utilities;
+import net.seagis.catalog.Database;
+import net.seagis.catalog.CatalogException;
+import net.seagis.coverage.catalog.CoverageReference;
+import net.seagis.coverage.catalog.GridCoverageTable;
 
 
 /**
- * Display the image specified on the command line. This is utility is mostly for testing
+ * Displays the image specified on the command line. This is utility is mostly for testing
  * purpose.
  *
  * @author Martin Desruisseaux

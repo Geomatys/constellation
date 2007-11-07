@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package net.seagis.console;
 
 import java.util.Date;
 import java.util.TimeZone;
@@ -35,6 +35,8 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.coverage.OrdinateOutsideCoverageException;
+
+import net.seagis.coverage.catalog.Catalog;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.NoSuchRecordException;
 

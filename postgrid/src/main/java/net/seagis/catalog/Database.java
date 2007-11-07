@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javax.sql.DataSource;
 
 import java.io.File;
@@ -41,10 +42,10 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Properties;
-import java.util.NoSuchElementException;
-import java.lang.reflect.Constructor;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.NoSuchElementException;
+import java.lang.reflect.Constructor;
 
 import org.geotools.util.Logging;
 import org.geotools.io.TableWriter;
@@ -105,12 +106,12 @@ public class Database {
     /**
      * The catalog, or {@code null} if none.
      */
-    final String catalog;
+    public final String catalog;
 
     /**
      * The schema, or {@code null} if none.
      */
-    final String schema;
+    public final String schema;
 
     /**
      * Connection to the database. Will be etablished only when first needed.
@@ -127,7 +128,7 @@ public class Database {
      * returns the SQL query with parameters filled in. This is the case with the PostgreSQL
      * JDBC driver.
      */
-    final boolean isStatementFormatted;
+    private final boolean isStatementFormatted;
 
     /**
      * If non-null, SQL {@code INSERT} statements will not be executed but will rather
@@ -210,7 +211,7 @@ public class Database {
      * @param  configFilename The configuration filename.
      * @throws IOException if an error occured while reading the configuration file.
      */
-    Database(final DataSource source, final String configFilename) throws IOException {
+    public Database(final DataSource source, final String configFilename) throws IOException {
         this.source = source;
         this.configFilename = configFilename;
         /*
@@ -553,6 +554,21 @@ public class Database {
      */
     final PrintWriter getInsertSimulator() {
         return insertSimulator;
+    }
+
+    /**
+     * Returns a string representation of the specified statement. This method tries
+     * to replace the {@code '?'} parameters by the actual parameter values.
+     * 
+     * @param statement The SQL statement to format.
+     * @param query     The SQL query used for preparing the statement.
+     */
+    public String format(final Statement statement, final String query) {
+        if (isStatementFormatted) {
+            return statement.toString();
+        } else {
+            return query; // TODO: do something better.
+        }
     }
 
     /**

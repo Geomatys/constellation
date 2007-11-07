@@ -259,8 +259,8 @@ public class Table {
                 configure(queryType, statement);
                 final Level level = queryType!=null ? queryType.level : Level.FINE;
                 if (LOGGER.isLoggable(level)) {
-                    final LogRecord record = new LogRecord(level,
-                            getDatabase().isStatementFormatted ? statement.toString() : query);
+                    final LogRecord record =
+                            new LogRecord(level, getDatabase().format(statement, query));
                     record.setSourceClassName(getClass().getName());
                     record.setSourceMethodName(getCallerMethodName(queryType));
                     LOGGER.log(record);

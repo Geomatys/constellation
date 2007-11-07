@@ -18,9 +18,9 @@
  */
 package net.seagis.coverage.catalog;
 
-import net.seagis.coverage.catalog.gui.CoverageTableModel;
 import junit.framework.TestCase;
 import net.seagis.catalog.CatalogException;
+import net.seagis.widget.CoverageTableModel;
 
 
 /**
