@@ -215,6 +215,8 @@ COMMENT ON COLUMN "Layers".name IS
     'Nom identifiant la couche.';
 COMMENT ON COLUMN "Layers".thematic IS
     'Paramètre géophysique (ou thème) de cette couche.';
+COMMENT ON COLUMN "Layers"."procedure" IS
+    'Procédure appliquée pour produire les images.';
 COMMENT ON COLUMN "Layers".period IS
     'Nombre de jours prévus entre deux image. Cette information peut être approximative ou laissée blanc si elle ne s''applique pas.';
 COMMENT ON COLUMN "Layers".fallback IS
@@ -437,7 +439,8 @@ CREATE TABLE "GridCoverages" (
     "endTime" timestamp without time zone,
     extent character varying NOT NULL,
     CONSTRAINT "ImageIndex_check" CHECK (("index" >= 1)),
-    CONSTRAINT "TemporalExtent_range" CHECK (((("startTime" IS NULL) AND ("endTime" IS NULL)) OR ((("startTime" IS NOT NULL) AND ("endTime" IS NOT NULL)) AND ("startTime" < "endTime"))))
+    CONSTRAINT "TemporalExtent_range" CHECK (((("startTime" IS NULL) AND ("endTime" IS NULL)) OR
+        ((("startTime" IS NOT NULL) AND ("endTime" IS NOT NULL)) AND ("startTime" <= "endTime"))))
 );
 
 ALTER TABLE "GridCoverages" OWNER TO geoadmin;
@@ -478,7 +481,7 @@ COMMENT ON COLUMN "GridCoverages".extent IS
 COMMENT ON CONSTRAINT "Series_reference" ON "GridCoverages" IS
     'Chaque image appartient à une série.';
 COMMENT ON CONSTRAINT "TemporalExtent_range" ON "GridCoverages" IS
-    'Les dates de début et de fin doivent être nulles ou non-nulles en même temps, et la date de début doit être inférieure à la date de fin.';
+    'Les dates de début et de fin doivent être nulles ou non-nulles en même temps, et la date de début doit être inférieure ou égale à la date de fin.';
 COMMENT ON CONSTRAINT "ImageIndex_check" ON "GridCoverages" IS
     'L''index de l''image doit être strictement positif.';
 COMMENT ON CONSTRAINT "GridCoverages_extent" ON "GridCoverages" IS
