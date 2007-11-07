@@ -13,5 +13,5 @@ xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "sos", namespaceURI= "http:/
           @javax.xml.bind.annotation.XmlNs(prefix = "ows", namespaceURI= "http://www.opengis.net/ows/1.1"),
           @javax.xml.bind.annotation.XmlNs(prefix = "om", namespaceURI= "http://www.opengis.net/om/1.0"),
           @javax.xml.bind.annotation.XmlNs(prefix = "sml", namespaceURI= "http://www.opengis.net/sensorML/1.0"),
-          @javax.xml.bind.annotation.XmlNs(prefix = "sic", namespaceURI= "http://catalog.sicade.net")})
+          @javax.xml.bind.annotation.XmlNs(prefix = "sg", namespaceURI= "http://catalog.seagis.net")})
 package net.seagis.sos;

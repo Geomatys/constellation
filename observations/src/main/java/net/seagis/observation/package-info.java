@@ -3,5 +3,5 @@
 xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "gml", namespaceURI= "http://www.opengis.net/gml/3.2"),
           @javax.xml.bind.annotation.XmlNs(prefix = "om", namespaceURI= "http://www.opengis.net/om/1.0"),
           @javax.xml.bind.annotation.XmlNs(prefix = "sa", namespaceURI= "http://www.opengis.net/sa/1.0"),
-          @javax.xml.bind.annotation.XmlNs(prefix = "sic", namespaceURI= "http://catalog.sicade.net")})
+          @javax.xml.bind.annotation.XmlNs(prefix = "sg", namespaceURI= "http://catalog.seagis.net")})
 package net.seagis.observation;
