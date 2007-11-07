@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# -----------------------------------------------------------
+# Pour un nombre arbitraire de codes de CRS, affiche les
+# objets correspondants sous forme de "Well Known Text" (WKT)
+# -----------------------------------------------------------
+
+
+# Initialisation commune à tous les scripts
+export BASE_DIR=`dirname $0`/..
+source $BASE_DIR/etc/setenv.sh
+
+# Exécution de la commande Java
+export CLASSPATH=.
+export CLASSPATH=$CLASSPATH:$JARS/gt2-epsg-hsql-$GEOTOOLS_VERSION.jar
+export CLASSPATH=$CLASSPATH:$JARS/gt2-epsg-extension-$GEOTOOLS_VERSION.jar
+
+java $OPTS org.geotools.referencing.CRS $*
