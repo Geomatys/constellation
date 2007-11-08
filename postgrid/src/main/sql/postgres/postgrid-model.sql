@@ -92,7 +92,7 @@ ALTER TABLE "RegionOfInterests" OWNER TO geoadmin;
 GRANT ALL ON TABLE "RegionOfInterests" TO geoadmin;
 GRANT SELECT ON TABLE "RegionOfInterests" TO PUBLIC;
 
-CREATE INDEX "dt_index" ON "RegionOfInterests" ("dt");
+CREATE INDEX "RegionOfInterests_index" ON "RegionOfInterests" ("dt", "dz", "dy", "dx");
 
 COMMENT ON TABLE "RegionOfInterests" IS
     'Positions spatio-temporelles relatives à des observations.';
@@ -160,11 +160,8 @@ ALTER TABLE "Descriptors" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Descriptors" TO geoadmin;
 GRANT SELECT ON TABLE "Descriptors" TO PUBLIC;
 
-CREATE INDEX "Identifier_index"      ON "Descriptors" ("identifier");
-CREATE INDEX "Phenomenons_index"     ON "Descriptors" ("layer");
-CREATE INDEX "Operations_index"      ON "Descriptors" ("operation");
-CREATE INDEX "Regions_index"         ON "Descriptors" ("region");
-CREATE INDEX "Distributions_index"   ON "Descriptors" ("distribution");
+-- Don't create an index for "identifier" since it would duplicate the UNIQUE constraint.
+CREATE INDEX "Descriptors_index" ON "Descriptors" ("layer", "operation", "region");
 
 COMMENT ON TABLE "Descriptors" IS
     'Descripteurs du paysage océanique, chacun étant une combinaison d''une couche, d''une opération et d''un décalage spatio-temporel.';
@@ -213,8 +210,7 @@ ALTER TABLE "LinearModelTerms" OWNER TO geoadmin;
 GRANT ALL ON TABLE "LinearModelTerms" TO geoadmin;
 GRANT SELECT ON TABLE "LinearModelTerms" TO PUBLIC;
 
-CREATE INDEX "Descriptors1_index" ON "LinearModelTerms" ("source1");
-CREATE INDEX "Descriptors2_index" ON "LinearModelTerms" ("source2");
+CREATE INDEX "LinearModelTerms_index" ON "LinearModelTerms" ("source1", "source2");
 
 COMMENT ON TABLE "LinearModelTerms" IS
     'Poids à donner aux différentes combinaisons de descripteurs pour calculer une nouvelle image.';

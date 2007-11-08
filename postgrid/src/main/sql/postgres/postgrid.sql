@@ -69,8 +69,7 @@ ALTER TABLE "SampleDimensions" OWNER TO geoadmin;
 GRANT ALL ON TABLE "SampleDimensions" TO geoadmin;
 GRANT SELECT ON TABLE "SampleDimensions" TO PUBLIC;
 
-CREATE INDEX "Band_index" ON "SampleDimensions" ("band");
-CREATE INDEX "Format_index" ON "SampleDimensions" ("format");
+CREATE INDEX "SampleDimensions_index" ON "SampleDimensions" ("format", "band");
 
 COMMENT ON TABLE "SampleDimensions" IS
     'Descriptions des bandes comprises dans chaque format d''images.';
@@ -86,7 +85,7 @@ COMMENT ON CONSTRAINT "SampleDimensions_format_fkey" ON "SampleDimensions" IS
     'Chaque bande fait partie de la description d''une image.';
 COMMENT ON CONSTRAINT "SampleDimensions_band_check" ON "SampleDimensions" IS
     'Le numéro de bande doit être positif.';
-COMMENT ON INDEX "Band_index" IS
+COMMENT ON INDEX "SampleDimensions_index" IS
     'Classement des bandes dans leur ordre d''apparition.';
 
 
@@ -117,7 +116,7 @@ ALTER TABLE "Categories" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Categories" TO geoadmin;
 GRANT SELECT ON TABLE "Categories" TO PUBLIC;
 
-CREATE INDEX "SampleDimension_index" ON "Categories" ("band");
+CREATE INDEX "Categories_index" ON "Categories" ("band", "lower");
 
 COMMENT ON TABLE "Categories" IS
     'Plage de valeurs des différents thèmes et relation entre les valeurs des pixels et leurs mesures géophysiques.';
@@ -141,7 +140,7 @@ COMMENT ON CONSTRAINT "Categories_band_fkey" ON "Categories" IS
     'Chaque catégorie est un élément de la description d''une bande.';
 COMMENT ON CONSTRAINT "Categories_coefficients" ON "Categories" IS
     'Les coefficients C0 et C1 doivent être nuls ou non-nuls en même temps.';
-COMMENT ON INDEX "SampleDimension_index" IS
+COMMENT ON INDEX "Categories_index" IS
     'Recherche des catégories appartenant à une bande.';
 
 
@@ -196,6 +195,8 @@ ALTER TABLE "Layers" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Layers" TO geoadmin;
 GRANT SELECT ON TABLE "Layers" TO PUBLIC;
 
+CREATE INDEX "Layers_index" ON "Layers" ("thematic", "procedure");
+
 COMMENT ON TABLE "Layers" IS
     'Ensemble de séries d''images appartenant à une même thématique.';
 COMMENT ON COLUMN "Layers"."name" IS
@@ -210,6 +211,8 @@ COMMENT ON COLUMN "Layers"."fallback" IS
     'Couche de rechange proposée si aucune donnée n''est disponible pour la couche courante.';
 COMMENT ON CONSTRAINT "Layers_fallback_fkey" ON "Layers" IS
     'Chaque couche de second recours doit exister.';
+COMMENT ON INDEX "Layers_index" IS
+    'Recherche des couches appartenant à une thématique.';
 
 
 
@@ -233,8 +236,7 @@ ALTER TABLE "Series" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Series" TO geoadmin;
 GRANT SELECT ON TABLE "Series" TO PUBLIC;
 
-CREATE INDEX "Layers_index" ON "Series" ("layer");
-CREATE INDEX "Visibility_index" ON "Series" ("visible");
+CREATE INDEX "Series_index" ON "Series" ("layer", "visible");
 
 COMMENT ON TABLE "Series" IS
     'Séries d''images. Chaque images appartient à une série.';
@@ -260,6 +262,8 @@ COMMENT ON CONSTRAINT "Series_format_fkey" ON "Series" IS
     'Toutes les images d''une même série utilisent un même séries.';
 COMMENT ON CONSTRAINT "Series_quicklook_fkey" ON "Series" IS
     'Les aperçus s''appliquent à une autre séries d''images.';
+COMMENT ON INDEX "Series_index" IS
+    'Recherche des séries appartenant à une couche.';
 
 
 
@@ -304,6 +308,8 @@ ALTER TABLE ONLY "GridGeometries"
     ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 CREATE INDEX "HorizontalExtent_index" ON "GridGeometries" USING gist ("horizontalExtent" gist_geometry_ops);
+COMMENT ON INDEX "HorizontalExtent_index" IS
+    'Recherche des geométries interceptant une région géographique.';
 
 COMMENT ON TABLE "GridGeometries" IS
     'Envelope spatiales des images ainsi que la dimension de leurs grilles. La transformation affine doit représenter le coin supérieur gauche des pixels.';
@@ -444,11 +450,10 @@ ALTER TABLE "GridCoverages" OWNER TO geoadmin;
 GRANT ALL ON TABLE "GridCoverages" TO geoadmin;
 GRANT SELECT ON TABLE "GridCoverages" TO PUBLIC;
 
-CREATE INDEX "Series_index"    ON "GridCoverages" ("series");
-CREATE INDEX "StartTime_index" ON "GridCoverages" ("startTime");
-CREATE INDEX "EndTime_index"   ON "GridCoverages" ("endTime");
-CREATE INDEX "Time_index"      ON "GridCoverages" ("startTime", "endTime");
-CREATE INDEX "Extent_index"    ON "GridCoverages" ("extent");
+-- Index "endTime" before "startTime" because we most frequently sort by
+-- end time, since we are often interrested in the latest image available.
+CREATE INDEX "GridCoverages_index"        ON "GridCoverages" ("series", "endTime", "startTime");
+CREATE INDEX "GridCoverages_extent_index" ON "GridCoverages" ("series", "extent");
 
 COMMENT ON TABLE "GridCoverages" IS
     'Liste de toutes les images disponibles. Chaque enregistrement correspond à un fichier d''image.';
@@ -474,12 +479,10 @@ COMMENT ON CONSTRAINT "GridCoverages_check" ON "GridCoverages" IS
     'Les dates de début et de fin doivent être nulles ou non-nulles en même temps, et la date de début doit être inférieure ou égale à la date de fin.';
 COMMENT ON CONSTRAINT "GridCoverages_index_check" ON "GridCoverages" IS
     'L''index de l''image doit être strictement positif.';
-COMMENT ON INDEX "StartTime_index" IS
-    'Recherche d''images par leur date de début d''acquisition.';
-COMMENT ON INDEX "EndTime_index" IS
-    'Recherche d''images par leur date de fin d''acquisition.';
-COMMENT ON INDEX "Time_index" IS
+COMMENT ON INDEX "GridCoverages_index" IS
     'Recherche de toutes les images à l''intérieur d''une certaine plage de temps.';
+COMMENT ON INDEX "GridCoverages_extent_index" IS
+    'Recherche de toutes les images dans une région géographique.';
 
 
 
