@@ -204,8 +204,7 @@ CREATE TABLE "Layers" (
     "thematic"  character varying NOT NULL,
     "procedure" character varying NOT NULL,
     "period"    double precision,
-    "fallback"  character varying,
-    "description" text
+    "fallback"  character varying
 );
 
 ALTER TABLE "Layers" OWNER TO geoadmin;
@@ -230,8 +229,6 @@ COMMENT ON COLUMN "Layers"."period" IS
     'Nombre de jours prévus entre deux image. Cette information peut être approximative ou laissée blanc si elle ne s''applique pas.';
 COMMENT ON COLUMN "Layers"."fallback" IS
     'Couche de rechange proposée si aucune donnée n''est disponible pour la couche courante.';
-COMMENT ON COLUMN "Layers"."description" IS
-    'Remarques s''appliquant à la couche.';
 COMMENT ON CONSTRAINT "Fallback_reference" ON "Layers" IS
     'Chaque couche de second recours doit exister.';
 
@@ -318,16 +315,17 @@ CREATE TABLE "GridGeometries" (
     "shearX"            double precision DEFAULT 0    NOT NULL,
     "shearY"            double precision DEFAULT 0    NOT NULL,
     "horizontalSRID"    integer          DEFAULT 4326 NOT NULL,
-    "horizontalExtent"  geometry                      NOT NULL,
-    "verticalSRID"      integer,
-    "verticalOrdinates" double precision[],
-    CONSTRAINT "GridCoverageSize" CHECK (width > 0 AND height > 0),
-    CONSTRAINT "enforce_dims_horizontalExtent" CHECK (ndims("horizontalExtent") = 2),
-    CONSTRAINT "enforce_geotype_horizontalExtent" CHECK (("horizontalExtent" IS NULL) OR geometrytype("horizontalExtent") = 'POLYGON'),
-    CONSTRAINT "enforce_srid_horizontalExtent" CHECK (srid("horizontalExtent") = 4326),
-    CONSTRAINT "enforce_srid_verticalOrdinates" CHECK (((("verticalSRID" IS NULL) AND ("verticalOrdinates" IS NULL)) OR
-                (("verticalSRID" IS NOT NULL) AND ("verticalOrdinates" IS NOT NULL))))
+    CONSTRAINT "GridCoverageSize" CHECK (width > 0 AND height > 0)
 );
+
+SELECT AddGeometryColumn('GridGeometries', 'horizontalExtent', 4326, 'POLYGON', 2);
+ALTER TABLE "GridGeometries" ALTER COLUMN "horizontalExtent" SET NOT NULL;
+ALTER TABLE "GridGeometries" ADD COLUMN "verticalSRID" integer;
+ALTER TABLE "GridGeometries" ADD COLUMN "verticalOrdinates" double precision[];
+ALTER TABLE "GridGeometries"
+  ADD CONSTRAINT "enforce_srid_verticalOrdinates" CHECK
+            (((("verticalSRID" IS     NULL) AND ("verticalOrdinates" IS     NULL)) OR
+              (("verticalSRID" IS NOT NULL) AND ("verticalOrdinates" IS NOT NULL))));
 
 ALTER TABLE "GridGeometries" OWNER TO geoadmin;
 GRANT ALL ON TABLE "GridGeometries" TO geoadmin;
