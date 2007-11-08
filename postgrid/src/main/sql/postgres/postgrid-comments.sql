@@ -20,8 +20,8 @@ SET search_path = postgrid, pg_catalog;
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Thematics" (
-    name character varying NOT NULL,
-    description text NOT NULL
+    "name" character varying NOT NULL,
+    "description" text NOT NULL
 );
 
 ALTER TABLE "Thematics" OWNER TO geoadmin;
@@ -29,16 +29,16 @@ GRANT ALL ON TABLE "Thematics" TO geoadmin;
 GRANT SELECT ON TABLE "Thematics" TO PUBLIC;
 
 ALTER TABLE ONLY "Thematics"
-    ADD CONSTRAINT "Thematics_pkey" PRIMARY KEY (name);
+    ADD CONSTRAINT "Thematics_pkey" PRIMARY KEY ("name");
 ALTER TABLE ONLY "Layers"
-    ADD CONSTRAINT "Thematic_reference" FOREIGN KEY (thematic) REFERENCES "Thematics"(name)
+    ADD CONSTRAINT "Thematic_reference" FOREIGN KEY ("thematic") REFERENCES "Thematics"("name")
     ON UPDATE CASCADE ON DELETE CASCADE;
 
 COMMENT ON TABLE "Thematics" IS
     'Paramètres géophysiques représentés par les images (température, hauteur de l''eau...).';
-COMMENT ON COLUMN "Thematics".name IS
+COMMENT ON COLUMN "Thematics"."name" IS
     'Nom identifiant le paramètre géophysique.';
-COMMENT ON COLUMN "Thematics".description IS
+COMMENT ON COLUMN "Thematics"."description" IS
     'Description du paramètre géophysique.';
 
 
@@ -50,8 +50,8 @@ COMMENT ON COLUMN "Thematics".description IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Procedures" (
-    name character varying NOT NULL,
-    description text
+    "name" character varying NOT NULL,
+    "description" text
 );
 
 ALTER TABLE "Procedures" OWNER TO geoadmin;
