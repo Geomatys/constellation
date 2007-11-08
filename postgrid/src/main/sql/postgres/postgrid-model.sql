@@ -20,13 +20,11 @@ SET search_path = postgrid, postgis, pg_catalog;
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Operations" (
-    "name"        character varying NOT NULL,
-    "prefix"      character varying NOT NULL,
+    "name"        character varying NOT NULL PRIMARY KEY,
+    "prefix"      character varying NOT NULL UNIQUE,
     "operation"   character varying,
     "kernelSize"  smallint DEFAULT 1,
-    "description" text,
-    CONSTRAINT "Operations_pkey" PRIMARY KEY ("name"),
-    CONSTRAINT "Prefix_uniqueness" UNIQUE ("prefix")
+    "description" text
 );
 
 ALTER TABLE "Operations" OWNER TO geoadmin;
@@ -55,11 +53,10 @@ COMMENT ON COLUMN "Operations"."description" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "OperationParameters" (
-    "operation" character varying NOT NULL,
+    "operation" character varying NOT NULL REFERENCES "Operations" ON UPDATE CASCADE ON DELETE CASCADE,
     "parameter" character varying NOT NULL,
     "value"     character varying NOT NULL,
-    CONSTRAINT "OperationParameters_pkey" PRIMARY KEY ("operation", "parameter"),
-    CONSTRAINT "Operation_reference" FOREIGN KEY ("operation") REFERENCES "Operations"("name") ON UPDATE CASCADE ON DELETE CASCADE
+    CONSTRAINT "OperationParameters_pkey" PRIMARY KEY ("operation", "parameter")
 );
 
 ALTER TABLE "OperationParameters" OWNER TO geoadmin;
@@ -84,12 +81,11 @@ COMMENT ON COLUMN "OperationParameters"."value" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "RegionOfInterests" (
-    "name" character varying NOT NULL,
+    "name" character varying NOT NULL PRIMARY KEY,
     "dx"   double precision  NOT NULL,
     "dy"   double precision  NOT NULL,
     "dz"   double precision  NOT NULL,
-    "dt"   double precision  NOT NULL,
-    CONSTRAINT "LocationOffsets_pkey" PRIMARY KEY ("name")
+    "dt"   double precision  NOT NULL
 );
 
 ALTER TABLE "RegionOfInterests" OWNER TO geoadmin;
@@ -120,11 +116,10 @@ COMMENT ON COLUMN "RegionOfInterests"."dt" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Distributions" (
-    "name"   character varying NOT NULL,
-    "scale"  double precision DEFAULT 1 NOT NULL,
-    "offset" double precision DEFAULT 0 NOT NULL,
-    "log"    boolean DEFAULT false NOT NULL,
-    CONSTRAINT "Distributions_pkey" PRIMARY KEY ("name")
+    "name"   character varying NOT NULL PRIMARY KEY,
+    "scale"  double precision  NOT NULL DEFAULT 1,
+    "offset" double precision  NOT NULL DEFAULT 0,
+    "log"    boolean           NOT NULL DEFAULT false
 );
 
 ALTER TABLE "Distributions" OWNER TO geoadmin;
@@ -151,31 +146,24 @@ COMMENT ON COLUMN "Distributions"."log" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Descriptors" (
-    "identifier"   smallint NOT NULL,
-    "symbol"       character varying NOT NULL,
-    "layer"        character varying NOT NULL,
-    "operation"    character varying DEFAULT 'Valeur' NOT NULL,
-    "region"       character varying DEFAULT '+00' NOT NULL,
-    "band"         smallint DEFAULT 1 NOT NULL,
-    "distribution" character varying DEFAULT 'normale' NOT NULL,
-    CONSTRAINT "Descriptors_pkey" PRIMARY KEY ("identifier"),
-    CONSTRAINT "Symbol_uniqueness" UNIQUE ("symbol"),
-    CONSTRAINT "Descriptor_uniqueness" UNIQUE ("layer", "region", "band", "operation"),
-    CONSTRAINT "Layer_reference" FOREIGN KEY ("layer") REFERENCES "Layers"("name") ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT "Operation_reference" FOREIGN KEY ("operation") REFERENCES "Operations"("name") ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT "ROI_reference" FOREIGN KEY ("region") REFERENCES "RegionOfInterests"("name") ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT "Distribution_reference" FOREIGN KEY (distribution) REFERENCES "Distributions"("name") ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT "Band_check" CHECK ("band" >= 1)
+    "identifier"   smallint          NOT NULL UNIQUE,
+    "symbol"       character varying NOT NULL PRIMARY KEY,
+    "layer"        character varying NOT NULL                   REFERENCES "Layers"            ON UPDATE CASCADE ON DELETE CASCADE,
+    "operation"    character varying NOT NULL DEFAULT 'Valeur'  REFERENCES "Operations"        ON UPDATE CASCADE ON DELETE CASCADE,
+    "region"       character varying NOT NULL DEFAULT '+00'     REFERENCES "RegionOfInterests" ON UPDATE CASCADE ON DELETE CASCADE,
+    "band"         smallint          NOT NULL DEFAULT 1 CHECK ("band" >= 1),
+    "distribution" character varying NOT NULL DEFAULT 'normale' REFERENCES "Distributions"     ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT "Descriptor_uniqueness" UNIQUE ("layer", "region", "band", "operation")
 );
 
 ALTER TABLE "Descriptors" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Descriptors" TO geoadmin;
 GRANT SELECT ON TABLE "Descriptors" TO PUBLIC;
 
-CREATE INDEX "Symbol_index"          ON "Descriptors" ("symbol");
+CREATE INDEX "Identifier_index"      ON "Descriptors" ("identifier");
 CREATE INDEX "Phenomenons_index"     ON "Descriptors" ("layer");
 CREATE INDEX "Operations_index"      ON "Descriptors" ("operation");
-CREATE INDEX "LocationOffsets_index" ON "Descriptors" ("region");
+CREATE INDEX "Regions_index"         ON "Descriptors" ("region");
 CREATE INDEX "Distributions_index"   ON "Descriptors" ("distribution");
 
 COMMENT ON TABLE "Descriptors" IS
@@ -194,15 +182,15 @@ COMMENT ON COLUMN "Descriptors"."band" IS
     'Numéro (à partir de 1) de la bande à prendre en compte.';
 COMMENT ON COLUMN "Descriptors"."distribution" IS
     'Distribution approximative des données. La distribution "Amplitude" résulte d''une combinaison de distributions normales de la forme x²+y². Les distributions normales ne sont généralement pas indépendantes, ce qui distingue cette distribution de X².';
-COMMENT ON CONSTRAINT "Band_check" ON "Descriptors" IS
+COMMENT ON CONSTRAINT "Descriptors_band_check" ON "Descriptors" IS
     'Les numéros de bandes doivent être des entiers positifs non-nuls.';
-COMMENT ON CONSTRAINT "Layer_reference" ON "Descriptors" IS
+COMMENT ON CONSTRAINT "Descriptors_layer_fkey" ON "Descriptors" IS
     'Chaque descripteur concerne un phénomène.';
-COMMENT ON CONSTRAINT "Operation_reference" ON "Descriptors" IS
+COMMENT ON CONSTRAINT "Descriptors_operation_fkey" ON "Descriptors" IS
     'Chaque descripteur est le résultat d''une certaine opération appliquée sur les données du phénomène observé.';
-COMMENT ON CONSTRAINT "ROI_reference" ON "Descriptors" IS
+COMMENT ON CONSTRAINT "Descriptors_region_fkey" ON "Descriptors" IS
     'Chaque descripteur peut être évalué à une position spatio-temporelle décalée par rapport à la position de la station.';
-COMMENT ON CONSTRAINT "Distribution_reference" ON "Descriptors" IS
+COMMENT ON CONSTRAINT "Descriptors_distribution_fkey" ON "Descriptors" IS
     'Chaque descripteur possède des valeurs suivant une loi de distribution.';
 
 
@@ -214,14 +202,11 @@ COMMENT ON CONSTRAINT "Distribution_reference" ON "Descriptors" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "LinearModelTerms" (
-    "target"      character varying NOT NULL,
-    "source1"     character varying NOT NULL,
-    "source2"     character varying DEFAULT '①' NOT NULL,
-    "coefficient" double precision NOT NULL,
-    CONSTRAINT "LinearModels_pkey" PRIMARY KEY ("target", "source1", "source2"),
-    CONSTRAINT "ExplainedVariable_reference" FOREIGN KEY (target) REFERENCES "Layers"("name") ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT "Descriptor1_reference" FOREIGN KEY ("source1") REFERENCES "Descriptors"("symbol") ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT "Descriptor2_reference" FOREIGN KEY ("source2") REFERENCES "Descriptors"("symbol") ON UPDATE CASCADE ON DELETE RESTRICT
+    "target"      character varying NOT NULL             REFERENCES "Layers"      ON UPDATE CASCADE ON DELETE CASCADE,
+    "source1"     character varying NOT NULL             REFERENCES "Descriptors" ON UPDATE CASCADE ON DELETE RESTRICT,
+    "source2"     character varying NOT NULL DEFAULT '①' REFERENCES "Descriptors" ON UPDATE CASCADE ON DELETE RESTRICT,
+    "coefficient" double precision  NOT NULL,
+    CONSTRAINT "LinearModels_pkey" PRIMARY KEY ("target", "source1", "source2")
 );
 
 ALTER TABLE "LinearModelTerms" OWNER TO geoadmin;
@@ -241,11 +226,11 @@ COMMENT ON COLUMN "LinearModelTerms"."source2" IS
     'Deuxième descripteur entrant dans le terme. S''il n''est pas le descripteur identité, il sera multiplié par le premier descripteur.';
 COMMENT ON COLUMN "LinearModelTerms"."coefficient" IS
     'Facteur par lequel multiplier le terme du modèle linéaire.';
-COMMENT ON CONSTRAINT "ExplainedVariable_reference" ON "LinearModelTerms" IS
+COMMENT ON CONSTRAINT "LinearModelTerms_target_fkey" ON "LinearModelTerms" IS
     'La variable à expliquer doit être une série d''images.';
-COMMENT ON CONSTRAINT "Descriptor1_reference" ON "LinearModelTerms" IS
+COMMENT ON CONSTRAINT "LinearModelTerms_source1_fkey" ON "LinearModelTerms" IS
     'Le premier terme doit être un des descripteurs du paysage océanique.';
-COMMENT ON CONSTRAINT "Descriptor2_reference" ON "LinearModelTerms" IS
+COMMENT ON CONSTRAINT "LinearModelTerms_source2_fkey" ON "LinearModelTerms" IS
     'Le second terme doit être un des descripteurs du paysage océanique.';
 
 

@@ -28,11 +28,10 @@ SET search_path = postgrid, postgis, pg_catalog;
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Formats" (
-    "name"     character varying NOT NULL,
+    "name"     character varying NOT NULL PRIMARY KEY,
     "mime"     character varying NOT NULL,
-    "encoding" character varying DEFAULT 'native' NOT NULL,
-    CONSTRAINT "Formats_pkey" PRIMARY KEY ("name"),
-    CONSTRAINT "Format_type" CHECK ("encoding"='geophysics' OR "encoding"='native')
+    "encoding" character varying NOT NULL DEFAULT 'native'
+               CHECK ("encoding"='geophysics' OR "encoding"='native')
 );
 
 ALTER TABLE "Formats" OWNER TO geoadmin;
@@ -47,7 +46,7 @@ COMMENT ON COLUMN "Formats"."mime" IS
     'Nom MIME du format.';
 COMMENT ON COLUMN "Formats"."encoding" IS
     'Encodage des données de l''image: "geophysics" ou "native".';
-COMMENT ON CONSTRAINT "Format_type" ON "Formats" IS
+COMMENT ON CONSTRAINT "Formats_encoding_check" ON "Formats" IS
     'Énumération des valeurs acceptables.';
 
 
@@ -59,14 +58,11 @@ COMMENT ON CONSTRAINT "Format_type" ON "Formats" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "SampleDimensions" (
-    "identifier" character varying NOT NULL,
-    "format"     character varying NOT NULL,
-    "band"       smallint DEFAULT 1 NOT NULL,
-    "units"      character varying DEFAULT '' NOT NULL,
-    CONSTRAINT "SampleDimensions_pkey" PRIMARY KEY ("identifier"),
-    CONSTRAINT "SampleDimension_uniqueness" UNIQUE ("format", "band"),
-    CONSTRAINT "Format_reference" FOREIGN KEY ("format") REFERENCES "Formats"("name") ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT "Positive_band" CHECK (band >= 1)
+    "identifier" character varying NOT NULL PRIMARY KEY,
+    "format"     character varying NOT NULL REFERENCES "Formats" ON UPDATE CASCADE ON DELETE CASCADE,
+    "band"       smallint          NOT NULL DEFAULT 1 CHECK (band >= 1),
+    "units"      character varying NOT NULL DEFAULT '',
+    UNIQUE ("format", "band")
 );
 
 ALTER TABLE "SampleDimensions" OWNER TO geoadmin;
@@ -86,10 +82,10 @@ COMMENT ON COLUMN "SampleDimensions"."band" IS
     'Numéro de la bande (à partir de 1).';
 COMMENT ON COLUMN "SampleDimensions"."units" IS
     'Unités des mesures géophysiques. Ce champ peut être blanc s''il ne s''applique pas.';
-COMMENT ON CONSTRAINT "Positive_band" ON "SampleDimensions" IS
-    'Le numéro de bande doit être positif.';
-COMMENT ON CONSTRAINT "Format_reference" ON "SampleDimensions" IS
+COMMENT ON CONSTRAINT "SampleDimensions_format_fkey" ON "SampleDimensions" IS
     'Chaque bande fait partie de la description d''une image.';
+COMMENT ON CONSTRAINT "SampleDimensions_band_check" ON "SampleDimensions" IS
+    'Le numéro de bande doit être positif.';
 COMMENT ON INDEX "Band_index" IS
     'Classement des bandes dans leur ordre d''apparition.';
 
@@ -103,17 +99,16 @@ COMMENT ON INDEX "Band_index" IS
 
 CREATE TABLE "Categories" (
     "name"     character varying NOT NULL,
-    "band"     character varying NOT NULL,
-    "lower"    integer NOT NULL,
-    "upper"    integer NOT NULL,
+    "band"     character varying NOT NULL REFERENCES "SampleDimensions" ON UPDATE CASCADE ON DELETE CASCADE,
+    "lower"    integer           NOT NULL,
+    "upper"    integer           NOT NULL,
     "c0"       double precision,
     "c1"       double precision,
     "function" character varying,
-    "colors"   character varying DEFAULT '#000000' NOT NULL,
-    CONSTRAINT "Categories_pkey" PRIMARY KEY ("name", "band"),
-    CONSTRAINT "SampleDimension_reference" FOREIGN KEY ("band") REFERENCES "SampleDimensions"("identifier") ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT "Sample_range" CHECK ("lower" <= "upper"),
-    CONSTRAINT "Sample_coefficients" CHECK
+    "colors"   character varying NOT NULL DEFAULT '#000000',
+    PRIMARY KEY ("name", "band"),
+    CONSTRAINT "Categories_range" CHECK ("lower" <= "upper"),
+    CONSTRAINT "Categories_coefficients" CHECK
                     ((("c0" IS     NULL) AND ("c1" IS     NULL)) OR
                      (("c0" IS NOT NULL) AND ("c1" IS NOT NULL) AND ("c1" <> 0)))
 );
@@ -142,10 +137,10 @@ COMMENT ON COLUMN "Categories"."function" IS
     'Fonction appliquée sur les valeurs géophysiques. Par exemple la valeur "log" indique que les valeurs sont exprimées sous la forme log(y)=C0+C1*x.';
 COMMENT ON COLUMN "Categories"."colors" IS
     'Ce champ peut être soit un code d''une couleur, ou soit une adresse URL vers une palette de couleurs.';
-COMMENT ON CONSTRAINT "Sample_coefficients" ON "Categories" IS
-    'Les coefficients C0 et C1 doivent être nuls ou non-nuls en même temps.';
-COMMENT ON CONSTRAINT "SampleDimension_reference" ON "Categories" IS
+COMMENT ON CONSTRAINT "Categories_band_fkey" ON "Categories" IS
     'Chaque catégorie est un élément de la description d''une bande.';
+COMMENT ON CONSTRAINT "Categories_coefficients" ON "Categories" IS
+    'Les coefficients C0 et C1 doivent être nuls ou non-nuls en même temps.';
 COMMENT ON INDEX "SampleDimension_index" IS
     'Recherche des catégories appartenant à une bande.';
 
@@ -190,13 +185,11 @@ COMMENT ON VIEW "CategoriesDetails" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Layers" (
-    "name"      character varying NOT NULL,
+    "name"      character varying NOT NULL PRIMARY KEY,
     "thematic"  character varying NOT NULL,
     "procedure" character varying NOT NULL,
     "period"    double precision,
-    "fallback"  character varying,
-    CONSTRAINT "Layers_pkey" PRIMARY KEY ("name"),
-    CONSTRAINT "Fallback_reference" FOREIGN KEY ("fallback") REFERENCES "Layers"("name") ON UPDATE CASCADE ON DELETE RESTRICT
+    "fallback"  character varying REFERENCES "Layers" ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 ALTER TABLE "Layers" OWNER TO geoadmin;
@@ -215,7 +208,7 @@ COMMENT ON COLUMN "Layers"."period" IS
     'Nombre de jours prévus entre deux image. Cette information peut être approximative ou laissée blanc si elle ne s''applique pas.';
 COMMENT ON COLUMN "Layers"."fallback" IS
     'Couche de rechange proposée si aucune donnée n''est disponible pour la couche courante.';
-COMMENT ON CONSTRAINT "Fallback_reference" ON "Layers" IS
+COMMENT ON CONSTRAINT "Layers_fallback_fkey" ON "Layers" IS
     'Chaque couche de second recours doit exister.';
 
 
@@ -227,18 +220,13 @@ COMMENT ON CONSTRAINT "Fallback_reference" ON "Layers" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Series" (
-    "identifier" character varying NOT NULL,
-    "layer"      character varying NOT NULL,
+    "identifier" character varying NOT NULL PRIMARY KEY,
+    "layer"      character varying NOT NULL REFERENCES "Layers"  ON UPDATE CASCADE ON DELETE CASCADE,
     "pathname"   character varying NOT NULL,
     "extension"  character varying NOT NULL,
-    "format"     character varying NOT NULL,
-    "visible"    boolean DEFAULT true NOT NULL,
-    "quicklook"  character varying,
-    CONSTRAINT "Series_pkey" PRIMARY KEY ("identifier"),
-    CONSTRAINT "Quicklook_uniqueness" UNIQUE ("quicklook"),
-    CONSTRAINT "Series_reference" FOREIGN KEY ("layer")  REFERENCES "Layers"("name")  ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT "Format_reference" FOREIGN KEY ("format") REFERENCES "Formats"("name") ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT "Quicklook_reference" FOREIGN KEY ("quicklook") REFERENCES "Series"("identifier") ON UPDATE CASCADE ON DELETE RESTRICT
+    "format"     character varying NOT NULL REFERENCES "Formats" ON UPDATE CASCADE ON DELETE RESTRICT,
+    "visible"    boolean           NOT NULL DEFAULT true,
+    "quicklook"  character varying UNIQUE   REFERENCES "Series"  ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 ALTER TABLE "Series" OWNER TO geoadmin;
@@ -264,13 +252,13 @@ COMMENT ON COLUMN "Series"."visible" IS
     'Indique si les images de ce groupe doivent apparaître dans la liste des images proposées à l''utilisateur.';
 COMMENT ON COLUMN "Series"."quicklook" IS
     'Série dont les images sont des aperçus de cette série.';
-COMMENT ON CONSTRAINT "Series_reference" ON "Series" IS
-    'Chaque série appartient à une couche.';
-COMMENT ON CONSTRAINT "Quicklook_uniqueness" ON "Series" IS
+COMMENT ON CONSTRAINT "Series_quicklook_key" ON "Series" IS
     'Chaque série a une seule autre série d''aperçus.';
-COMMENT ON CONSTRAINT "Format_reference" ON "Series" IS
+COMMENT ON CONSTRAINT "Series_layer_fkey" ON "Series" IS
+    'Chaque série appartient à une couche.';
+COMMENT ON CONSTRAINT "Series_format_fkey" ON "Series" IS
     'Toutes les images d''une même série utilisent un même séries.';
-COMMENT ON CONSTRAINT "Quicklook_reference" ON "Series" IS
+COMMENT ON CONSTRAINT "Series_quicklook_fkey" ON "Series" IS
     'Les aperçus s''appliquent à une autre séries d''images.';
 
 
@@ -282,17 +270,17 @@ COMMENT ON CONSTRAINT "Quicklook_reference" ON "Series" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "GridGeometries" (
-    "identifier"        character varying             NOT NULL,
-    "width"             integer                       NOT NULL,
-    "height"            integer                       NOT NULL,
-    "translateX"        double precision DEFAULT 0    NOT NULL,
-    "translateY"        double precision DEFAULT 0    NOT NULL,
-    "scaleX"            double precision DEFAULT 1    NOT NULL,
-    "scaleY"            double precision DEFAULT 1    NOT NULL,
-    "shearX"            double precision DEFAULT 0    NOT NULL,
-    "shearY"            double precision DEFAULT 0    NOT NULL,
-    "horizontalSRID"    integer          DEFAULT 4326 NOT NULL,
-    CONSTRAINT "GridCoverageSize" CHECK (width > 0 AND height > 0)
+    "identifier"        character varying NOT NULL PRIMARY KEY,
+    "width"             integer           NOT NULL,
+    "height"            integer           NOT NULL,
+    "translateX"        double precision  NOT NULL DEFAULT 0,
+    "translateY"        double precision  NOT NULL DEFAULT 0,
+    "scaleX"            double precision  NOT NULL DEFAULT 1,
+    "scaleY"            double precision  NOT NULL DEFAULT 1,
+    "shearX"            double precision  NOT NULL DEFAULT 0,
+    "shearY"            double precision  NOT NULL DEFAULT 0,
+    "horizontalSRID"    integer           NOT NULL DEFAULT 4326,
+    CONSTRAINT "GridGeometries_size" CHECK (width > 0 AND height > 0)
 );
 
 SELECT AddGeometryColumn('GridGeometries', 'horizontalExtent', 4326, 'POLYGON', 2);
@@ -309,12 +297,10 @@ GRANT ALL ON TABLE "GridGeometries" TO geoadmin;
 GRANT SELECT ON TABLE "GridGeometries" TO PUBLIC;
 
 ALTER TABLE ONLY "GridGeometries"
-    ADD CONSTRAINT "GridGeometries_pkey" PRIMARY KEY ("identifier");
-ALTER TABLE ONLY "GridGeometries"
-    ADD CONSTRAINT "fk_SRID" FOREIGN KEY ("horizontalSRID") REFERENCES spatial_ref_sys("srid")
+    ADD CONSTRAINT "fk_SRID" FOREIGN KEY ("horizontalSRID") REFERENCES spatial_ref_sys(srid)
     ON UPDATE RESTRICT ON DELETE RESTRICT;
 ALTER TABLE ONLY "GridGeometries"
-    ADD CONSTRAINT "fk_VERT_SRID" FOREIGN KEY ("verticalSRID") REFERENCES spatial_ref_sys("srid")
+    ADD CONSTRAINT "fk_VERT_SRID" FOREIGN KEY ("verticalSRID") REFERENCES spatial_ref_sys(srid)
     ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 CREATE INDEX "HorizontalExtent_index" ON "GridGeometries" USING gist ("horizontalExtent" gist_geometry_ops);
@@ -347,7 +333,7 @@ COMMENT ON COLUMN "GridGeometries"."verticalSRID" IS
     'Code du système de référence des coordonnées verticales.';
 COMMENT ON COLUMN "GridGeometries"."verticalOrdinates" IS
     'Valeurs z de chacunes des couches d''une image 3D.';
-COMMENT ON CONSTRAINT "GridCoverageSize" ON "GridGeometries" IS
+COMMENT ON CONSTRAINT "GridGeometries_size" ON "GridGeometries" IS
     'Les dimensions des images doivent être positives.';
 COMMENT ON CONSTRAINT "enforce_dims_horizontalExtent" ON "GridGeometries" IS
     'Vérifie que l''étendue horizontale est à deux dimensions.';
@@ -442,19 +428,16 @@ COMMENT ON VIEW "BoundingBoxes" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "GridCoverages" (
-    "series"    character varying NOT NULL,
+    "series"    character varying NOT NULL REFERENCES "Series" ON UPDATE CASCADE ON DELETE CASCADE,
     "filename"  character varying NOT NULL,
-    "index"     smallint DEFAULT 1 NOT NULL,
+    "index"     smallint          NOT NULL DEFAULT 1 CHECK ("index" >= 1),
     "startTime" timestamp without time zone,
     "endTime"   timestamp without time zone,
-    "extent"    character varying NOT NULL,
-    CONSTRAINT "GridCoverages_pkey" PRIMARY KEY ("series", "filename", "index"),
-    CONSTRAINT "GridCoverages_extent" UNIQUE ("series", "startTime", "endTime", "extent"),
-    CONSTRAINT "Series_reference" FOREIGN KEY ("series") REFERENCES "Series"("identifier") ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT "GridGeometry_reference" FOREIGN KEY ("extent") REFERENCES "GridGeometries"("identifier") ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT "ImageIndex_check" CHECK ("index" >= 1),
-    CONSTRAINT "TemporalExtent_range" CHECK ((("startTime" IS NULL) AND ("endTime" IS NULL)) OR
-        (("startTime" IS NOT NULL) AND ("endTime" IS NOT NULL) AND ("startTime" <= "endTime")))
+    "extent"    character varying NOT NULL REFERENCES "GridGeometries" ON UPDATE CASCADE ON DELETE RESTRICT,
+    PRIMARY KEY ("series", "filename", "index"),
+    UNIQUE ("series", "startTime", "endTime", "extent"),
+    CHECK ((("startTime" IS     NULL) AND ("endTime" IS     NULL)) OR
+           (("startTime" IS NOT NULL) AND ("endTime" IS NOT NULL) AND ("startTime" <= "endTime")))
 );
 
 ALTER TABLE "GridCoverages" OWNER TO geoadmin;
@@ -481,16 +464,16 @@ COMMENT ON COLUMN "GridCoverages"."endTime" IS
     'Date et heure de la fin de l''acquisition de l''image, en heure universelle (UTC). Cette date doit être supérieure à la date de début d''acquisition; une valeur égale ne suffit pas.';
 COMMENT ON COLUMN "GridCoverages"."extent" IS
     'Coordonnées de la région géographique couverte par l''image, ainsi que sa résolution approximative. ';
-COMMENT ON CONSTRAINT "Series_reference" ON "GridCoverages" IS
-    'Chaque image appartient à une série.';
-COMMENT ON CONSTRAINT "TemporalExtent_range" ON "GridCoverages" IS
-    'Les dates de début et de fin doivent être nulles ou non-nulles en même temps, et la date de début doit être inférieure ou égale à la date de fin.';
-COMMENT ON CONSTRAINT "ImageIndex_check" ON "GridCoverages" IS
-    'L''index de l''image doit être strictement positif.';
-COMMENT ON CONSTRAINT "GridCoverages_extent" ON "GridCoverages" IS
+COMMENT ON CONSTRAINT "GridCoverages_series_key" ON "GridCoverages" IS
     'L''envelope de l''image doit être unique dans chaque série.';
-COMMENT ON CONSTRAINT "GridGeometry_reference" ON "GridCoverages" IS
+COMMENT ON CONSTRAINT "GridCoverages_series_fkey" ON "GridCoverages" IS
+    'Chaque image appartient à une série.';
+COMMENT ON CONSTRAINT "GridCoverages_extent_fkey" ON "GridCoverages" IS
     'Chaque images doit avoir une étendue spatiale.';
+COMMENT ON CONSTRAINT "GridCoverages_check" ON "GridCoverages" IS
+    'Les dates de début et de fin doivent être nulles ou non-nulles en même temps, et la date de début doit être inférieure ou égale à la date de fin.';
+COMMENT ON CONSTRAINT "GridCoverages_index_check" ON "GridCoverages" IS
+    'L''index de l''image doit être strictement positif.';
 COMMENT ON INDEX "StartTime_index" IS
     'Recherche d''images par leur date de début d''acquisition.';
 COMMENT ON INDEX "EndTime_index" IS

@@ -31,18 +31,13 @@ COMMENT ON COLUMN "Layers"."description" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Thematics" (
-    "name" character varying NOT NULL,
-    "description" text,
-    CONSTRAINT "Thematics_pkey" PRIMARY KEY ("name")
+    "name" character varying NOT NULL PRIMARY KEY,
+    "description" text
 );
 
 ALTER TABLE "Thematics" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Thematics" TO geoadmin;
 GRANT SELECT ON TABLE "Thematics" TO PUBLIC;
-
-ALTER TABLE ONLY "Layers"
-    ADD CONSTRAINT "Thematic_reference" FOREIGN KEY ("thematic") REFERENCES "Thematics"("name")
-    ON UPDATE CASCADE ON DELETE CASCADE;
 
 COMMENT ON TABLE "Thematics" IS
     'Paramètres géophysiques représentés par les images (température, hauteur de l''eau...).';
@@ -50,6 +45,13 @@ COMMENT ON COLUMN "Thematics"."name" IS
     'Nom identifiant le paramètre géophysique.';
 COMMENT ON COLUMN "Thematics"."description" IS
     'Description du paramètre géophysique.';
+
+ALTER TABLE ONLY "Layers"
+    ADD CONSTRAINT "Layers_thematic_fkey" FOREIGN KEY ("thematic") REFERENCES "Thematics"
+    ON UPDATE CASCADE ON DELETE CASCADE;
+
+COMMENT ON CONSTRAINT "Layers_thematic_fkey" ON "Layers" IS
+    'Chaque couche représente les données observées pour une thématique.';
 
 
 
@@ -60,17 +62,13 @@ COMMENT ON COLUMN "Thematics"."description" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Procedures" (
-    "name" character varying NOT NULL,
-    "description" text,
-    CONSTRAINT "Procedures_pkey" PRIMARY KEY ("name")
+    "name" character varying NOT NULL PRIMARY KEY,
+    "description" text
 );
 
 ALTER TABLE "Procedures" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Procedures" TO geoadmin;
 GRANT SELECT ON TABLE "Procedures" TO PUBLIC;
-ALTER TABLE ONLY "Layers"
-    ADD CONSTRAINT "Procedure_reference" FOREIGN KEY ("procedure") REFERENCES "Procedures"(name)
-    ON UPDATE CASCADE ON DELETE CASCADE;
 
 COMMENT ON TABLE "Procedures" IS
     'Procédures utilisées pour effectuer une observation.';
@@ -78,5 +76,7 @@ COMMENT ON COLUMN "Procedures".name IS
     'Nom unique identifiant cette procédure.';
 COMMENT ON COLUMN "Procedures".description IS
     'Description de la procédure.';
-COMMENT ON CONSTRAINT "Thematic_reference" ON "Layers" IS
-    'Chaque couche représente les données observées pour une thématique.';
+
+ALTER TABLE ONLY "Layers"
+    ADD CONSTRAINT "Layers_procedure_fkey" FOREIGN KEY ("procedure") REFERENCES "Procedures"
+    ON UPDATE CASCADE ON DELETE CASCADE;
