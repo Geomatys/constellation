@@ -32,15 +32,14 @@ COMMENT ON COLUMN "Layers"."description" IS
 
 CREATE TABLE "Thematics" (
     "name" character varying NOT NULL,
-    "description" text NOT NULL
+    "description" text,
+    CONSTRAINT "Thematics_pkey" PRIMARY KEY ("name")
 );
 
 ALTER TABLE "Thematics" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Thematics" TO geoadmin;
 GRANT SELECT ON TABLE "Thematics" TO PUBLIC;
 
-ALTER TABLE ONLY "Thematics"
-    ADD CONSTRAINT "Thematics_pkey" PRIMARY KEY ("name");
 ALTER TABLE ONLY "Layers"
     ADD CONSTRAINT "Thematic_reference" FOREIGN KEY ("thematic") REFERENCES "Thematics"("name")
     ON UPDATE CASCADE ON DELETE CASCADE;
@@ -62,12 +61,13 @@ COMMENT ON COLUMN "Thematics"."description" IS
 
 CREATE TABLE "Procedures" (
     "name" character varying NOT NULL,
-    "description" text
+    "description" text,
+    CONSTRAINT "Procedures_pkey" PRIMARY KEY ("name")
 );
 
 ALTER TABLE "Procedures" OWNER TO geoadmin;
-ALTER TABLE ONLY "Procedures"
-    ADD CONSTRAINT "Procedures_pkey" PRIMARY KEY (name);
+GRANT ALL ON TABLE "Procedures" TO geoadmin;
+GRANT SELECT ON TABLE "Procedures" TO PUBLIC;
 ALTER TABLE ONLY "Layers"
     ADD CONSTRAINT "Procedure_reference" FOREIGN KEY ("procedure") REFERENCES "Procedures"(name)
     ON UPDATE CASCADE ON DELETE CASCADE;

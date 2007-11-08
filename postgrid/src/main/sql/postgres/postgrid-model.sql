@@ -24,17 +24,14 @@ CREATE TABLE "Operations" (
     "prefix"      character varying NOT NULL,
     "operation"   character varying,
     "kernelSize"  smallint DEFAULT 1,
-    "description" text
+    "description" text,
+    CONSTRAINT "Operations_pkey" PRIMARY KEY ("name"),
+    CONSTRAINT "Prefix_uniqueness" UNIQUE ("prefix")
 );
 
 ALTER TABLE "Operations" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Operations" TO geoadmin;
 GRANT SELECT ON TABLE "Operations" TO PUBLIC;
-
-ALTER TABLE ONLY "Operations"
-    ADD CONSTRAINT "Operations_pkey" PRIMARY KEY (name);
-ALTER TABLE ONLY "Operations"
-    ADD CONSTRAINT "Prefix_uniqueness" UNIQUE (prefix);
 
 COMMENT ON TABLE "Operations" IS
     'Opérations mathématique ayant servit à produire les images.';
@@ -60,18 +57,14 @@ COMMENT ON COLUMN "Operations"."description" IS
 CREATE TABLE "OperationParameters" (
     "operation" character varying NOT NULL,
     "parameter" character varying NOT NULL,
-    "value" character varying NOT NULL
+    "value"     character varying NOT NULL,
+    CONSTRAINT "OperationParameters_pkey" PRIMARY KEY ("operation", "parameter"),
+    CONSTRAINT "Operation_reference" FOREIGN KEY ("operation") REFERENCES "Operations"("name") ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 ALTER TABLE "OperationParameters" OWNER TO geoadmin;
 GRANT ALL ON TABLE "OperationParameters" TO geoadmin;
 GRANT SELECT ON TABLE "OperationParameters" TO PUBLIC;
-
-ALTER TABLE ONLY "OperationParameters"
-    ADD CONSTRAINT "OperationParameters_pkey" PRIMARY KEY ("operation", "parameter");
-ALTER TABLE ONLY "OperationParameters"
-    ADD CONSTRAINT "Operation_reference" FOREIGN KEY ("operation") REFERENCES "Operations"("name")
-    ON UPDATE CASCADE ON DELETE CASCADE;
 
 COMMENT ON TABLE "OperationParameters" IS
     'Valeur des paramètres des opérations d''images.';
@@ -95,16 +88,15 @@ CREATE TABLE "RegionOfInterests" (
     "dx"   double precision  NOT NULL,
     "dy"   double precision  NOT NULL,
     "dz"   double precision  NOT NULL,
-    "dt"   double precision  NOT NULL
+    "dt"   double precision  NOT NULL,
+    CONSTRAINT "LocationOffsets_pkey" PRIMARY KEY ("name")
 );
 
 ALTER TABLE "RegionOfInterests" OWNER TO geoadmin;
 GRANT ALL ON TABLE "RegionOfInterests" TO geoadmin;
 GRANT SELECT ON TABLE "RegionOfInterests" TO PUBLIC;
 
-ALTER TABLE ONLY "RegionOfInterests"
-    ADD CONSTRAINT "LocationOffsets_pkey" PRIMARY KEY (name);
-CREATE INDEX dt_index ON "RegionOfInterests" USING btree (dt);
+CREATE INDEX "dt_index" ON "RegionOfInterests" ("dt");
 
 COMMENT ON TABLE "RegionOfInterests" IS
     'Positions spatio-temporelles relatives à des observations.';
@@ -131,15 +123,13 @@ CREATE TABLE "Distributions" (
     "name"   character varying NOT NULL,
     "scale"  double precision DEFAULT 1 NOT NULL,
     "offset" double precision DEFAULT 0 NOT NULL,
-    "log"    boolean DEFAULT false NOT NULL
+    "log"    boolean DEFAULT false NOT NULL,
+    CONSTRAINT "Distributions_pkey" PRIMARY KEY ("name")
 );
 
 ALTER TABLE "Distributions" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Distributions" TO geoadmin;
 GRANT SELECT ON TABLE "Distributions" TO PUBLIC;
-
-ALTER TABLE ONLY "Distributions"
-    ADD CONSTRAINT "Distributions_pkey" PRIMARY KEY ("name");
 
 COMMENT ON TABLE "Distributions" IS
     'Distributions approximatives (normale, log-normale...) des descripteurs.';
@@ -168,31 +158,19 @@ CREATE TABLE "Descriptors" (
     "region"       character varying DEFAULT '+00' NOT NULL,
     "band"         smallint DEFAULT 1 NOT NULL,
     "distribution" character varying DEFAULT 'normale' NOT NULL,
-    CONSTRAINT "Band_check" CHECK (band >= 1)
+    CONSTRAINT "Descriptors_pkey" PRIMARY KEY ("identifier"),
+    CONSTRAINT "Symbol_uniqueness" UNIQUE ("symbol"),
+    CONSTRAINT "Descriptor_uniqueness" UNIQUE ("layer", "region", "band", "operation"),
+    CONSTRAINT "Layer_reference" FOREIGN KEY ("layer") REFERENCES "Layers"("name") ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT "Operation_reference" FOREIGN KEY ("operation") REFERENCES "Operations"("name") ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT "ROI_reference" FOREIGN KEY ("region") REFERENCES "RegionOfInterests"("name") ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT "Distribution_reference" FOREIGN KEY (distribution) REFERENCES "Distributions"("name") ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT "Band_check" CHECK ("band" >= 1)
 );
 
 ALTER TABLE "Descriptors" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Descriptors" TO geoadmin;
 GRANT SELECT ON TABLE "Descriptors" TO PUBLIC;
-
-ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "Descriptors_pkey" PRIMARY KEY ("identifier");
-ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "Symbol_uniqueness" UNIQUE ("symbol");
-ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "Descriptor_uniqueness" UNIQUE ("layer", "region", "band", "operation");
-ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "Layer_reference" FOREIGN KEY ("layer") REFERENCES "Layers"("name")
-    ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "Operation_reference" FOREIGN KEY ("operation") REFERENCES "Operations"("name")
-    ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "ROI_reference" FOREIGN KEY ("region") REFERENCES "RegionOfInterests"("name")
-    ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE ONLY "Descriptors"
-    ADD CONSTRAINT "Distribution_reference" FOREIGN KEY (distribution) REFERENCES "Distributions"("name")
-    ON UPDATE CASCADE ON DELETE RESTRICT;
 
 CREATE INDEX "Symbol_index"          ON "Descriptors" ("symbol");
 CREATE INDEX "Phenomenons_index"     ON "Descriptors" ("layer");
@@ -239,24 +217,16 @@ CREATE TABLE "LinearModelTerms" (
     "target"      character varying NOT NULL,
     "source1"     character varying NOT NULL,
     "source2"     character varying DEFAULT '①' NOT NULL,
-    "coefficient" double precision NOT NULL
+    "coefficient" double precision NOT NULL,
+    CONSTRAINT "LinearModels_pkey" PRIMARY KEY ("target", "source1", "source2"),
+    CONSTRAINT "ExplainedVariable_reference" FOREIGN KEY (target) REFERENCES "Layers"("name") ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT "Descriptor1_reference" FOREIGN KEY ("source1") REFERENCES "Descriptors"("symbol") ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT "Descriptor2_reference" FOREIGN KEY ("source2") REFERENCES "Descriptors"("symbol") ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 ALTER TABLE "LinearModelTerms" OWNER TO geoadmin;
 GRANT ALL ON TABLE "LinearModelTerms" TO geoadmin;
 GRANT SELECT ON TABLE "LinearModelTerms" TO PUBLIC;
-
-ALTER TABLE ONLY "LinearModelTerms"
-    ADD CONSTRAINT "LinearModels_pkey" PRIMARY KEY ("target", "source1", "source2");
-ALTER TABLE ONLY "LinearModelTerms"
-    ADD CONSTRAINT "ExplainedVariable_reference" FOREIGN KEY (target) REFERENCES "Layers"("name")
-    ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE ONLY "LinearModelTerms"
-    ADD CONSTRAINT "Descriptor1_reference" FOREIGN KEY ("source1") REFERENCES "Descriptors"("symbol")
-    ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE ONLY "LinearModelTerms"
-    ADD CONSTRAINT "Descriptor2_reference" FOREIGN KEY ("source2") REFERENCES "Descriptors"("symbol")
-    ON UPDATE CASCADE ON DELETE RESTRICT;
 
 CREATE INDEX "Descriptors1_index" ON "LinearModelTerms" ("source1");
 CREATE INDEX "Descriptors2_index" ON "LinearModelTerms" ("source2");

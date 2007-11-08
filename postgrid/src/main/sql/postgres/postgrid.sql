@@ -31,15 +31,13 @@ CREATE TABLE "Formats" (
     "name"     character varying NOT NULL,
     "mime"     character varying NOT NULL,
     "encoding" character varying DEFAULT 'native' NOT NULL,
+    CONSTRAINT "Formats_pkey" PRIMARY KEY ("name"),
     CONSTRAINT "Format_type" CHECK ("encoding"='geophysics' OR "encoding"='native')
 );
 
 ALTER TABLE "Formats" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Formats" TO geoadmin;
 GRANT SELECT ON TABLE "Formats" TO PUBLIC;
-
-ALTER TABLE ONLY "Formats"
-    ADD CONSTRAINT "Formats_pkey" PRIMARY KEY ("name");
 
 COMMENT ON TABLE "Formats" IS
     'Formats des images (PNG, GIF, JPEG, etc...).';
@@ -65,20 +63,15 @@ CREATE TABLE "SampleDimensions" (
     "format"     character varying NOT NULL,
     "band"       smallint DEFAULT 1 NOT NULL,
     "units"      character varying DEFAULT '' NOT NULL,
+    CONSTRAINT "SampleDimensions_pkey" PRIMARY KEY ("identifier"),
+    CONSTRAINT "SampleDimension_uniqueness" UNIQUE ("format", "band"),
+    CONSTRAINT "Format_reference" FOREIGN KEY ("format") REFERENCES "Formats"("name") ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT "Positive_band" CHECK (band >= 1)
 );
 
 ALTER TABLE "SampleDimensions" OWNER TO geoadmin;
 GRANT ALL ON TABLE "SampleDimensions" TO geoadmin;
 GRANT SELECT ON TABLE "SampleDimensions" TO PUBLIC;
-
-ALTER TABLE ONLY "SampleDimensions"
-    ADD CONSTRAINT "SampleDimensions_pkey" PRIMARY KEY ("identifier");
-ALTER TABLE ONLY "SampleDimensions"
-    ADD CONSTRAINT "SampleDimension_uniqueness" UNIQUE ("format", "band");
-ALTER TABLE ONLY "SampleDimensions"
-    ADD CONSTRAINT "Format_reference" FOREIGN KEY ("format") REFERENCES "Formats"("name")
-    ON UPDATE CASCADE ON DELETE CASCADE;
 
 CREATE INDEX "Band_index" ON "SampleDimensions" ("band");
 CREATE INDEX "Format_index" ON "SampleDimensions" ("format");
@@ -117,20 +110,17 @@ CREATE TABLE "Categories" (
     "c1"       double precision,
     "function" character varying,
     "colors"   character varying DEFAULT '#000000' NOT NULL,
-    CONSTRAINT "Sample_coefficients" CHECK ((("c0" IS NULL) AND ("c1" IS NULL)) OR
-        (("c0" IS NOT NULL) AND ("c1" IS NOT NULL) AND ("c1" <> 0))),
-    CONSTRAINT "Sample_range" CHECK ("lower" <= "upper")
+    CONSTRAINT "Categories_pkey" PRIMARY KEY ("name", "band"),
+    CONSTRAINT "SampleDimension_reference" FOREIGN KEY ("band") REFERENCES "SampleDimensions"("identifier") ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT "Sample_range" CHECK ("lower" <= "upper"),
+    CONSTRAINT "Sample_coefficients" CHECK
+                    ((("c0" IS     NULL) AND ("c1" IS     NULL)) OR
+                     (("c0" IS NOT NULL) AND ("c1" IS NOT NULL) AND ("c1" <> 0)))
 );
 
 ALTER TABLE "Categories" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Categories" TO geoadmin;
 GRANT SELECT ON TABLE "Categories" TO PUBLIC;
-
-ALTER TABLE ONLY "Categories"
-    ADD CONSTRAINT "Categories_pkey" PRIMARY KEY ("name", "band");
-ALTER TABLE ONLY "Categories"
-    ADD CONSTRAINT "SampleDimension_reference" FOREIGN KEY ("band") REFERENCES "SampleDimensions"("identifier")
-    ON UPDATE CASCADE ON DELETE CASCADE;
 
 CREATE INDEX "SampleDimension_index" ON "Categories" ("band");
 
@@ -204,18 +194,14 @@ CREATE TABLE "Layers" (
     "thematic"  character varying NOT NULL,
     "procedure" character varying NOT NULL,
     "period"    double precision,
-    "fallback"  character varying
+    "fallback"  character varying,
+    CONSTRAINT "Layers_pkey" PRIMARY KEY ("name"),
+    CONSTRAINT "Fallback_reference" FOREIGN KEY ("fallback") REFERENCES "Layers"("name") ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 ALTER TABLE "Layers" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Layers" TO geoadmin;
 GRANT SELECT ON TABLE "Layers" TO PUBLIC;
-
-ALTER TABLE ONLY "Layers"
-    ADD CONSTRAINT "Layers_pkey" PRIMARY KEY ("name");
-ALTER TABLE ONLY "Layers"
-    ADD CONSTRAINT "Fallback_reference" FOREIGN KEY ("fallback") REFERENCES "Layers"("name")
-    ON UPDATE CASCADE ON DELETE RESTRICT;
 
 COMMENT ON TABLE "Layers" IS
     'Ensemble de séries d''images appartenant à une même thématique.';
@@ -247,26 +233,17 @@ CREATE TABLE "Series" (
     "extension"  character varying NOT NULL,
     "format"     character varying NOT NULL,
     "visible"    boolean DEFAULT true NOT NULL,
-    "quicklook"  character varying
+    "quicklook"  character varying,
+    CONSTRAINT "Series_pkey" PRIMARY KEY ("identifier"),
+    CONSTRAINT "Quicklook_uniqueness" UNIQUE ("quicklook"),
+    CONSTRAINT "Series_reference" FOREIGN KEY ("layer")  REFERENCES "Layers"("name")  ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT "Format_reference" FOREIGN KEY ("format") REFERENCES "Formats"("name") ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT "Quicklook_reference" FOREIGN KEY ("quicklook") REFERENCES "Series"("identifier") ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 ALTER TABLE "Series" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Series" TO geoadmin;
 GRANT SELECT ON TABLE "Series" TO PUBLIC;
-
-ALTER TABLE ONLY "Series"
-    ADD CONSTRAINT "Series_pkey" PRIMARY KEY ("identifier");
-ALTER TABLE ONLY "Series"
-    ADD CONSTRAINT "Series_reference" FOREIGN KEY ("layer") REFERENCES "Layers"("name")
-    ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE ONLY "Series"
-    ADD CONSTRAINT "Quicklook_uniqueness" UNIQUE ("quicklook");
-ALTER TABLE ONLY "Series"
-    ADD CONSTRAINT "Format_reference" FOREIGN KEY ("format") REFERENCES "Formats"("name")
-    ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE ONLY "Series"
-    ADD CONSTRAINT "Quicklook_reference" FOREIGN KEY ("quicklook") REFERENCES "Series"("identifier")
-    ON UPDATE CASCADE ON DELETE RESTRICT;
 
 CREATE INDEX "Layers_index" ON "Series" ("layer");
 CREATE INDEX "Visibility_index" ON "Series" ("visible");
@@ -471,6 +448,10 @@ CREATE TABLE "GridCoverages" (
     "startTime" timestamp without time zone,
     "endTime"   timestamp without time zone,
     "extent"    character varying NOT NULL,
+    CONSTRAINT "GridCoverages_pkey" PRIMARY KEY ("series", "filename", "index"),
+    CONSTRAINT "GridCoverages_extent" UNIQUE ("series", "startTime", "endTime", "extent"),
+    CONSTRAINT "Series_reference" FOREIGN KEY ("series") REFERENCES "Series"("identifier") ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT "GridGeometry_reference" FOREIGN KEY ("extent") REFERENCES "GridGeometries"("identifier") ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT "ImageIndex_check" CHECK ("index" >= 1),
     CONSTRAINT "TemporalExtent_range" CHECK ((("startTime" IS NULL) AND ("endTime" IS NULL)) OR
         (("startTime" IS NOT NULL) AND ("endTime" IS NOT NULL) AND ("startTime" <= "endTime")))
@@ -479,17 +460,6 @@ CREATE TABLE "GridCoverages" (
 ALTER TABLE "GridCoverages" OWNER TO geoadmin;
 GRANT ALL ON TABLE "GridCoverages" TO geoadmin;
 GRANT SELECT ON TABLE "GridCoverages" TO PUBLIC;
-
-ALTER TABLE ONLY "GridCoverages"
-    ADD CONSTRAINT "GridCoverages_pkey" PRIMARY KEY ("series", "filename", "index");
-ALTER TABLE ONLY "GridCoverages"
-    ADD CONSTRAINT "Series_reference" FOREIGN KEY ("series") REFERENCES "Series"("identifier")
-    ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE ONLY "GridCoverages"
-    ADD CONSTRAINT "GridCoverages_extent" UNIQUE ("series", "startTime", "endTime", "extent");
-ALTER TABLE ONLY "GridCoverages"
-    ADD CONSTRAINT "GridGeometry_reference" FOREIGN KEY ("extent") REFERENCES "GridGeometries"("identifier")
-    ON UPDATE CASCADE ON DELETE RESTRICT;
 
 CREATE INDEX "Series_index"    ON "GridCoverages" ("series");
 CREATE INDEX "StartTime_index" ON "GridCoverages" ("startTime");
