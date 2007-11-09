@@ -127,6 +127,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
     protected SingletonTable(final SingletonTable<E> table) {
         super(table);
         tableName     = table.tableName;
+        primaryKey    = table.primaryKey;
         indexByName   = table.indexByName;
         indexByNumber = table.indexByNumber;
     }
