@@ -240,7 +240,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
         this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
         this.timeIndex  = timeIndex;
-        if (geometry.geographicEnvelope.isEmpty() || this.startTime >= this.endTime) {
+        if (geometry.geographicEnvelope.isEmpty() || this.startTime > this.endTime) {
             // TODO: localize
             throw new IllegalRecordException("L'enveloppe spatio-temporelle est vide.");
         }

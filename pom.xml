@@ -10,9 +10,9 @@
 
   Version: $Id$
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -260,6 +260,7 @@
     nouvelles mise à jour sont disponibles en naviguant dans la page suivante:
 
     http://maven.apache.org/plugins/index.html
+    http://repo1.maven.org/maven2/org/apache/maven/plugins/
   -->
   <build>
     <plugins>
@@ -321,19 +322,20 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
         <configuration>
           <source>1.5</source>            <!-- Necessary to enable javadoc to handle J2SE 1.5 features.           -->
           <author>true</author>           <!-- Specifies whether or not the author text is included.              -->
           <version>false</version>        <!-- Includes the version text in the generated docs.                   -->
           <linksource>true</linksource>   <!-- Creates an HTML version of each source file (with line numbers).   -->
+          <sourcetab>4</sourcetab>        <!-- Specify the number of spaces each tab takes up in the source.      -->
           <noqualifier>all</noqualifier>  <!-- Omits qualifying package name from ahead of class names in output. -->
           <quiet>true</quiet>             <!-- Shuts off non-error and non-warning messages.                      -->
           <maxmemory>384M</maxmemory>     <!-- The maximum Java heap size to be used when launching the javadoc.  -->
           <encoding>UTF-8</encoding>      <!-- Specifies the encoding name of the source files.                   -->
           <charset>UTF-8</charset>        <!-- Specifies the HTML character set for this document.                -->
           <locale>fr</locale>            <!-- The locale that javadoc uses when generating documentation.        -->
-          <additionalparam>-keywords</additionalparam>
+          <keywords>true</keywords>       <!-- Adds HTML meta keyword tags to the generated file for each class.  -->
           <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
           <links>
             <link>http://java.sun.com/javase/6/docs/api/</link>
@@ -365,6 +367,14 @@
             <tag><name>todo</name><placement>tfmc</placement><head>TODO:</head></tag>
           </tags>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>javadoc</report>
+        <!--  <report>test-javadoc</report> -->
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
 
       <!-- Génération des rapports pour le site web. -->
@@ -384,13 +394,29 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
         <version>2.0.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+              <report>summary</report>
+              <report>license</report>
+              <report>project-team</report>
+        <!--  <report>mailing-list</report>   -->
+              <report>dependencies</report>
+              <report>dependencies-convergence</report>
+        <!--  <report>issue-tracking</report> -->
+              <report>scm</report>
+        <!--  <report>cim</report>            -->
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
 
       <!-- Publication de la liste des changements récents. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-changelog-plugin</artifactId>
-        <version>2.0</version>
+        <version>2.1</version>
         <configuration>
           <type>range</type>
           <range>30</range>
@@ -409,6 +435,18 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
         <version>2.1</version>
+        <configuration>
+          <inputEncoding>UTF-8</inputEncoding>
+          <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>jxr</report>
+        <!--  <report>test-jxr</report> -->
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
 
       <!-- Publication d'une liste de "todo" trouvés dans le code source. -->
