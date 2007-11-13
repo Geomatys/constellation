@@ -118,10 +118,14 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
         
         if (dataRecords == null) {
             dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
+            dataRecords = new SimpleDataRecordTable(dataRecords);
+            dataRecords.setIdDataBlock(id);
+        } else {
+            dataRecords.setIdDataBlock(id);
         }
         Iterator i = databloc.getComponents().iterator();
         while (i.hasNext()) {
-            dataRecords.getIdentifier((SimpleDataRecordEntry) i.next());
+            dataRecords.getIdentifier((SimpleDataRecordEntry) i.next(), id);
         }
         
         return id;

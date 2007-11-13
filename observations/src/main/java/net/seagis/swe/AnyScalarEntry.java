@@ -37,6 +37,8 @@ public class AnyScalarEntry extends Entry{
     @XmlAttribute
     private String idDataRecord;
     
+    private String name;
+    
     /**
      * description du champ.
      */
@@ -68,8 +70,8 @@ public class AnyScalarEntry extends Entry{
     public AnyScalarEntry(String idDataRecord, String name, String definition, String type,
             String uom, Object value) {
         super(name, definition);
-        this.idDataRecord = idDataRecord;
         this.name         = name;
+        this.idDataRecord = idDataRecord;
         this.definition   = definition;
         this.type         = type;
         this.value        = value;
@@ -112,13 +114,6 @@ public class AnyScalarEntry extends Entry{
         return uom;
     }
 
-    /**
-     * Retourne un code représentant ce champ de dataRecord.
-     */
-    @Override
-    public final int hashCode() {
-        return name.hashCode() + 13 * idDataRecord.hashCode();
-    }
 
     /**
      * Vérifie si cette entré est identique à l'objet spécifié.
@@ -135,6 +130,14 @@ public class AnyScalarEntry extends Entry{
                Utilities.equals(this.type,         that.type) &&
                Utilities.equals(this.uom,          that.uom) && 
                Utilities.equals(this.value,        that.value) ;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + (this.idDataRecord != null ? this.idDataRecord.hashCode() : 0);
+        hash = 31 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
     }
     
     /**

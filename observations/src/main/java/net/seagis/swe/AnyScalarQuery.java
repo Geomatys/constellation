@@ -49,7 +49,7 @@ public class AnyScalarQuery extends Query{
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         idDataRecord  = addColumn("any_scalars", "id_datarecord", SLIE);
-        idDataBlock   = addColumn("any_scalars", "id_datablock",  SLI);
+        idDataBlock   = addColumn("any_scalars", "id_datablock",  SLIE);
         name          = addColumn("any_scalars", "name",          SLIE);
         definition    = addColumn("any_scalars", "definition",    SLI);
         type          = addColumn("any_scalars", "type",          SLI);

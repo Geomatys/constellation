@@ -143,6 +143,10 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         return id;
     }
     
+    @Override
+    public String getName() {
+        return this.name;
+    }
     /**
      * retourne la description de la station.
      */

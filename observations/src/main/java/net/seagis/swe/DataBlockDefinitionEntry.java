@@ -72,7 +72,7 @@ import org.geotools.resources.Utilities;
      */
     public DataBlockDefinitionEntry(final String id, final Collection<? extends AbstractDataComponentEntry> components,
             final AbstractEncodingEntry encoding) {
-        super(null);
+        super(id);
         this.id         = id;
         this.components = components;
         this.encoding   = encoding;
@@ -86,6 +86,13 @@ import org.geotools.resources.Utilities;
         return id;
     }
     
+    /**
+     * surcharge le getName() de Entry
+     */
+    @Override
+    public String getName() {
+        return this.name;
+    }
     /**
      * {@inheritDoc}
      */

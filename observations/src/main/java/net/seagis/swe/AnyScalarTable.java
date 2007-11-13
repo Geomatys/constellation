@@ -141,13 +141,13 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
      *
      * @param datarecord le data record a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final AnyScalarEntry field, String blockId) throws SQLException, CatalogException {
+    public synchronized String getIdentifier(final AnyScalarEntry field, String blockId, String dataRecordId) throws SQLException, CatalogException {
         final AnyScalarQuery query  = (AnyScalarQuery) super.query;
         String id;
         if (field.getName() != null) {
             PreparedStatement statement = getStatement(QueryType.EXISTS);
             statement.setString(indexOf(query.byIdDataBlock), blockId);
-            statement.setString(indexOf(query.idDataRecord),  field.getIdDataRecord());
+            statement.setString(indexOf(query.idDataRecord),  dataRecordId);
             statement.setString(indexOf(query.name),          field.getName());
             ResultSet result = statement.executeQuery();
             if(result.next())
@@ -156,10 +156,11 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
                 id = field.getName();
         } else {
             id = searchFreeIdentifier("field");
+            System.out.println("Id choisi:" + id);
         }
         
         PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.idDataRecord), field.getIdDataRecord());
+        statement.setString(indexOf(query.idDataRecord), dataRecordId);
         statement.setString(indexOf(query.idDataBlock),  blockId);
         statement.setString(indexOf(query.name),         id);
         statement.setString(indexOf(query.definition),   field.getDefinition());

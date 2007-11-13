@@ -118,25 +118,29 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
         if (object == this) {
             return true;
         }
-        final CompositePhenomenonEntry that = (CompositePhenomenonEntry) object;
-        if ((this.component !=null && that.component == null)||(this.component ==null && that.component != null))
-            return false;
         
-        if (this.component !=null && that.component != null && this.component.size() != that.component.size())
-            return false;
+        if (object instanceof CompositePhenomenonEntry) {
+            final CompositePhenomenonEntry that = (CompositePhenomenonEntry) object;
+            if ((this.component !=null && that.component == null)||(this.component ==null && that.component != null))
+                return false;
         
-        if (this.component !=null) {
-            Iterator<PhenomenonEntry> i = component.iterator();
-            while (i.hasNext()) {
-                if (!that.component.contains(i.next()))
-                    return false;
+            if (this.component !=null && that.component != null && this.component.size() != that.component.size())
+                return false;
+        
+            if (this.component !=null) {
+                Iterator<PhenomenonEntry> i = component.iterator();
+                while (i.hasNext()) {
+                    if (!that.component.contains(i.next()))
+                        return false;
+                }
             }
-        }
-        return Utilities.equals(this.getId(),             that.getId()) &&
-               Utilities.equals(this.getDescription(),    that.getDescription()) &&
-               Utilities.equals(this.getPhenomenonName(), that.getPhenomenonName()) &&
-               Utilities.equals(this.base,                that.base) &&
-               Utilities.equals(this.dimension,           that.dimension) ;
+            return Utilities.equals(this.getId(),             that.getId()) &&
+                   Utilities.equals(this.getDescription(),    that.getDescription()) &&
+                   Utilities.equals(this.getPhenomenonName(), that.getPhenomenonName()) &&
+                   Utilities.equals(this.base,                that.base) &&
+                   Utilities.equals(this.dimension,           that.dimension) ; 
+       } else return false;
+        
         
     }
    

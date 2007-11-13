@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 // Sicade dependencies 
@@ -55,10 +56,10 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Observation", propOrder = {
+    "name",
     "definition",
     "observationMetadata",
     "samplingTime",
-    "distribution",
     "procedure",
     "procedureParameter",
     "procedureTime",
@@ -78,6 +79,11 @@ public class ObservationEntry extends Entry implements Observation {
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = 3269639171560208276L;
+    
+    /**
+     * Le nom de l'observation
+     */
+    public String name;
     
     /**
      * La description de l'observation
@@ -105,6 +111,7 @@ public class ObservationEntry extends Entry implements Observation {
      /**
      * Référence vers la {@linkplain Distribution distribution} associée à cet observable.
      */
+    @XmlTransient
     private DistributionEntry distribution;
     
     /**
@@ -246,11 +253,19 @@ public class ObservationEntry extends Entry implements Observation {
                                         this.resultDefinition);
         
     }
+    
     /**
      */
     public void setName(String name) {
         super.name = name;
+        this.name  = name;
     }
+    
+    @Override
+    public String getName() {
+        return this.name;
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -372,20 +387,17 @@ public class ObservationEntry extends Entry implements Observation {
      * Retourne vrai si l'observation satisfait le template specifie
      */ 
     public boolean matchTemplate(ObservationEntry template) {
-        if (this.observedProperty == null) System.out.println("OBSERVED PROP NULL");
-        if (this.featureOfInterest == null) System.out.println("F O I NULL");
         
         return Utilities.equals(this.featureOfInterest,   template.featureOfInterest)   &&
                Utilities.equals(this.observedProperty,    template.observedProperty)    &&
                Utilities.equals(this.procedure,           template.procedure)           &&
                Utilities.equals(this.resultQuality,       template.resultQuality)       && 
                Utilities.equals(this.observationMetadata, template.observationMetadata) &&
-               Utilities.equals(this.resultDefinition,    template.resultDefinition)    &&
                Utilities.equals(this.procedureTime,       template.procedureTime)       &&
                Utilities.equals(this.procedureParameter,  template.procedureParameter);
                //TODO corriger ce pb
                //Utilities.equals(this.distribution,        template.distribution)        &&
-               
+               //Utilities.equals(this.resultDefinition,    template.resultDefinition)    && 
         
     }
     /**

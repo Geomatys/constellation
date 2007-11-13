@@ -17,6 +17,7 @@ package net.seagis.observation;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.observation.Process;
 import net.seagis.catalog.Entry;
 
@@ -28,6 +29,7 @@ import net.seagis.catalog.Entry;
  * @author Antoine Hnawia
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name="Process")
 public class ProcessEntry extends Entry implements Process {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.

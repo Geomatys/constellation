@@ -31,17 +31,17 @@ public class ObservationOfferingQuery extends Query {
      */
     public ObservationOfferingQuery(final Database database) {
         super (database);
-        final QueryType[] SI  = {SELECT, INSERT};
-        final QueryType[] SIE = {SELECT,INSERT, EXISTS};
-        id                = addColumn("observation_offerings", "id",                   SIE);
-        name              = addColumn("observation_offerings", "name",                 SI);
-        srsName           = addColumn("observation_offerings", "srs_name",             SI);
-        description       = addColumn("observation_offerings", "description",          SI);
-        eventTimeBegin    = addColumn("observation_offerings", "event_time_begin",     SI);
-        eventTimeEnd      = addColumn("observation_offerings", "event_time_end",       SI);
-        boundedBy         = addColumn("observation_offerings", "bounded_by",           SI);
-        resultModel       = addColumn("observation_offerings", "result_model",         SI);
-        responseFormat    = addColumn("observation_offerings", "response_format",      SI);
+        final QueryType[] SIL  = {SELECT, INSERT, LIST};
+        final QueryType[] SIEL = {SELECT,INSERT, EXISTS, LIST};
+        id                = addColumn("observation_offerings", "id",                   SIEL);
+        name              = addColumn("observation_offerings", "name",                 SIL);
+        srsName           = addColumn("observation_offerings", "srs_name",             SIL);
+        description       = addColumn("observation_offerings", "description",          SIL);
+        eventTimeBegin    = addColumn("observation_offerings", "event_time_begin",     SIL);
+        eventTimeEnd      = addColumn("observation_offerings", "event_time_end",       SIL);
+        boundedBy         = addColumn("observation_offerings", "bounded_by",           SIL);
+        resultModel       = addColumn("observation_offerings", "result_model",         SIL);
+        responseFormat    = addColumn("observation_offerings", "response_format",      SIL);
         
         byId         = addParameter(id, SELECT, EXISTS);
     }

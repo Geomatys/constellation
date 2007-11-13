@@ -3,6 +3,7 @@ package net.seagis.swe;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 import org.geotools.resources.Utilities;
 
@@ -12,6 +13,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem Legal
  */
 @XmlSeeAlso({AbstractDataRecordEntry.class})
+@XmlType(name="AbstractDataComponent")
 public class AbstractDataComponentEntry extends Entry implements AbstractDataComponent{
     
     /**

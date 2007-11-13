@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 import org.geotools.resources.Utilities;
 import org.opengis.temporal.TemporalObject;
@@ -15,6 +16,7 @@ import org.opengis.temporal.TemporalObject;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name="TemporalObject")
 public class TemporalObjectEntry extends Entry implements TemporalObject{
     
     /**

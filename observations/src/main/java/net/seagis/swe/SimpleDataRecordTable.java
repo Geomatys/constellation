@@ -132,12 +132,12 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      *
      * @param datarecord le data record a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final SimpleDataRecordEntry datarecord) throws SQLException, CatalogException {
+    public synchronized String getIdentifier(final SimpleDataRecordEntry datarecord, String dataBlockId) throws SQLException, CatalogException {
         final SimpleDataRecordQuery query  = (SimpleDataRecordQuery) super.query;
         String id;
         if (datarecord.getId() != null) {
             PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.idBlock),      datarecord.getBlockId());
+            statement.setString(indexOf(query.idBlock),      dataBlockId);
             statement.setString(indexOf(query.idDataRecord), datarecord.getId());
             ResultSet result = statement.executeQuery();
             if(result.next())
@@ -150,18 +150,24 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
         
         PreparedStatement statement = getStatement(QueryType.INSERT);
         statement.setString(indexOf(query.idDataRecord), id);
-        statement.setString(indexOf(query.idBlock),      datarecord.getBlockId());
+        statement.setString(indexOf(query.idBlock),      dataBlockId);
         statement.setString(indexOf(query.definition),   datarecord.getDefinition());
         statement.setBoolean(indexOf(query.fixed),       datarecord.isFixed());
         insertSingleton(statement);
          
         if (fields == null) {
             fields = getDatabase().getTable(AnyScalarTable.class);
+            fields = new AnyScalarTable(fields);
+            fields.setIdDataBlock(dataBlockId);
+            fields.setIdDataRecord(id);
+        } else {
+            fields.setIdDataBlock(dataBlockId);
+            fields.setIdDataRecord(id);
         }
         Iterator<AnyScalarEntry> i = datarecord.getField().iterator();
         
         while (i.hasNext()) {
-            fields.getIdentifier(i.next(), datarecord.getBlockId());
+            fields.getIdentifier(i.next(), dataBlockId, id);
         }
         
         return id;

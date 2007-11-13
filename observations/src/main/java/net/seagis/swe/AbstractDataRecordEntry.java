@@ -2,6 +2,7 @@
 package net.seagis.swe;
 
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  *
@@ -9,6 +10,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  * @author Guilhem Legal
  */
 @XmlSeeAlso({SimpleDataRecordEntry.class})
+@XmlType(name="AbstractDataRecord")
 public class AbstractDataRecordEntry extends AbstractDataComponentEntry {
     
     /**

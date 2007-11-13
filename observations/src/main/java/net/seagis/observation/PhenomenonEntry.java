@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 // Sicade dependencies
+import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 
 // geotools dependencies
@@ -37,6 +38,7 @@ import org.opengis.observation.Phenomenon;
  * @author Antoine Hnawia
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Phenomenon")
 @XmlSeeAlso({ CompositePhenomenonEntry.class })
 public class PhenomenonEntry extends Entry implements Phenomenon {
     /**

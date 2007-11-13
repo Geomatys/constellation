@@ -1,6 +1,7 @@
 
 package net.seagis.observation;
 
+import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 import org.opengis.observation.sampling.SamplingFeatureRelation;
 import org.opengis.util.GenericName;
@@ -10,6 +11,7 @@ import org.opengis.util.GenericName;
  * @version $Id:
  * @author Guilhem Legal
  */
+@XmlType(name="SamplingFeatureRelation")
 public class SamplingFeatureRelationEntry extends Entry implements SamplingFeatureRelation {
     
     // JAXBISSUE private GenericNameEntry role;
