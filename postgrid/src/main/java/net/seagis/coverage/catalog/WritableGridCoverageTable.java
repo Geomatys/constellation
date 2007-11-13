@@ -187,9 +187,10 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * This method will typically not read the full image, but only the metadata required.
      *
      * @param readers The image reader.
+     * @return The number of images inserted (should be 0 or 1).
      */
-    public void addEntry(final ImageReader reader) throws CatalogException, SQLException, IOException {
-        addEntries(Collections.singleton(reader).iterator(), 0);
+    public int addEntry(final ImageReader reader) throws CatalogException, SQLException, IOException {
+        return addEntries(Collections.singleton(reader).iterator(), 0);
     }
 
     /**
@@ -202,16 +203,18 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * @param readers    The image readers. The iterator may recycle the same reader with different
      *                   {@linkplain ImageReader#getInput input} on each call to {@link Iterator#next}.
      * @param imageIndex The index of the image to insert in the database.
+     * @return The number of images inserted.
      */
-    public synchronized void addEntries(final Iterator<ImageReader> readers, final int imageIndex)
+    public synchronized int addEntries(final Iterator<ImageReader> readers, final int imageIndex)
             throws CatalogException, SQLException, IOException
     {
         final Connection connection = getDatabase().getConnection();
         final boolean autoCommit = connection.getAutoCommit();
         boolean success = false;
+        int count = 0;
         try {
             connection.setAutoCommit(false);
-            insertEntries(readers, imageIndex);
+            count = insertEntries(readers, imageIndex);
             connection.commit();
             success = true;
         } finally {
@@ -220,15 +223,19 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             }
             connection.setAutoCommit(autoCommit);
         }
+        return count;
     }
 
     /**
      * Adds entries without the protection provided by the database rollback mechanism.
      * The commit or rollback must be performed by the caller.
+     *
+     * @return The number of images inserted.
      */
-    private void insertEntries(final Iterator<ImageReader> readers, final int imageIndex)
+    private int insertEntries(final Iterator<ImageReader> readers, final int imageIndex)
             throws CatalogException, SQLException, IOException
     {
+        int count = 0;
         final GridCoverageQuery query     = (GridCoverageQuery) this.query;
         final Calendar          calendar  = getCalendar();
         final PreparedStatement statement = getStatement(QueryType.INSERT);
@@ -302,6 +309,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 statement.setNull(byStartTime, Types.TIMESTAMP);
                 statement.setNull(byEndTime,   Types.TIMESTAMP);
                 insertSingleton(statement);
+                count++;
             } else for (int i=0; i<dates.length; i++) {
                 final Date startTime = dates[i].getMinValue();
                 final Date   endTime = dates[i].getMaxValue();
@@ -309,8 +317,10 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 statement.setTimestamp(byStartTime, new Timestamp(startTime.getTime()), calendar);
                 statement.setTimestamp(byEndTime,   new Timestamp(endTime  .getTime()), calendar);
                 insertSingleton(statement);
+                count++;
             }
         }
+        return count;
     }
 
     /**
@@ -318,10 +328,11 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * adds} them to the database. The {@link #setLayer(Layer) setLayer} method must be invoked prior
      * this method. This method will process every {@linkplain Series series} for the current layer.
      *
-     * @param includeSubdirectories If {@code true}, then sub-directories will be included
-     *        in the scan. New series may be created if subdirectories are found.
+     * @param  includeSubdirectories If {@code true}, then sub-directories will be included
+     *         in the scan. New series may be created if subdirectories are found.
+     * @return The number of images inserted.
      */
-    public synchronized void completeLayer(final boolean includeSubdirectories)
+    public synchronized int completeLayer(final boolean includeSubdirectories)
             throws CatalogException, SQLException, IOException
     {
         final Map<File,Series> files = new LinkedHashMap<File,Series>();
@@ -370,19 +381,34 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         }
         /*
          * Now process to the insertions in the database.
-         * 
+         *
          * TODO: We need to decide what to do with new series (i.e. when series==null.
          *       In current state of affairs, we will get a NullPointerException).
          */
-        Iterator<Map.Entry<File,Series>> it;
-        while ((it = files.entrySet().iterator()).hasNext()) {
-            Map.Entry<File,Series> entry = it.next();
-            final Series series = entry.getValue();
-            File next = entry.getKey();
-            it.remove();
-            final Iterator<ImageReader> iterator = new ReaderIterator(series, it, next);
-            addEntries(iterator, 0); // TODO: is ther better value to provide for imageIndex?
+        int count = 0;
+        final Connection connection = getDatabase().getConnection();
+        final boolean autoCommit = connection.getAutoCommit();
+        boolean success = false;
+        try {
+            connection.setAutoCommit(false);
+            Iterator<Map.Entry<File,Series>> it;
+            while ((it = files.entrySet().iterator()).hasNext()) {
+                Map.Entry<File,Series> entry = it.next();
+                final Series series = entry.getValue();
+                File next = entry.getKey();
+                it.remove();
+                final Iterator<ImageReader> iterator = new ReaderIterator(series, it, next);
+                count += addEntries(iterator, 0); // TODO: do we have a better value to provide for imageIndex?
+            }
+            connection.commit();
+            success = true;
+        } finally {
+            if (!success) {
+                connection.rollback();
+            }
+            connection.setAutoCommit(autoCommit);
         }
+        return count;
     }
 
     /**
