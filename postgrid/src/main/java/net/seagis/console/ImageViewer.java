@@ -245,9 +245,6 @@ public final class ImageViewer {
      * </ul>
      */
     public static void main(String[] args) throws IOException {
-        args = new String[] {
-            "-layer", "OpenDAP_(SST)", "aggregated_time_serie"
-        };
         final Arguments arguments = new Arguments(args);
         final boolean formats = arguments.getFlag("-formats");
         final boolean mimes   = arguments.getFlag("-mimes");
