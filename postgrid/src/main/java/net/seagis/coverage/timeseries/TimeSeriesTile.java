@@ -43,7 +43,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;

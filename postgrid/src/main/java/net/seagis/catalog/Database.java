@@ -47,11 +47,11 @@ import java.util.GregorianCalendar;
 import java.util.NoSuchElementException;
 import java.lang.reflect.Constructor;
 
-import org.geotools.util.Logging;
 import org.geotools.io.TableWriter;
 import org.geotools.resources.JDBC;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
+import org.geotools.util.logging.Logging;
 
 
 /**
@@ -201,47 +201,9 @@ public class Database {
      * @throws IOException if an error occured while reading the configuration file.
      */
     public Database(final File configFile) throws IOException {
-        this((DataSource) null, configFile.getPath());
+        this(null, configFile.getPath());
     }
 
-    /**
-     * Use the provided connection in order to connect to the Database. Some properties are
-     * added to this parameter, to hanle the root directory of images for example. This method 
-     * is used when the connection is already defined in another way (like with Talend).
-     * 
-     * @param connection The connection object for the database.
-     * @param properties Some properties, like the driver used or the root directory for images.
-     * @throws IOException
-     */
-    public Database(final Connection connection,  final Properties properties) throws IOException {
-        source = null;
-        configFilename = null;
-        this.properties = properties;
-        this.connection = connection;
-        final String ID = getProperty(ConfigurationKey.TIMEZONE);
-        timezone = (ID!=null && !ID.equalsIgnoreCase("local")) ? TimeZone.getTimeZone(ID) : TimeZone.getDefault();
-        catalog = getProperty(ConfigurationKey.CATALOG);
-        schema = getProperty(ConfigurationKey.SCHEMA);
-        /*
-         * Checks if the database is spatial-enabled.
-         * TODO: Following code is PostgreSQL specific. We need to make it more generic.
-         */
-        final String driver = getProperty(ConfigurationKey.DRIVER);
-        if (driver.startsWith("org.postgresql")) {
-            isSpatialEnabled = true;
-            isStatementFormatted = true;
-        } else {
-            isSpatialEnabled = false;
-            isStatementFormatted = false;
-        }
-        /*
-         * Prépare un processus qui fermera automatiquement les connections lors de l'arrêt
-         * de la machine virtuelle si l'utilisateur n'appelle par close() lui-même.
-         */
-        finalizer = new Finalizer();
-        Runtime.getRuntime().addShutdownHook(finalizer);
-    }
-    
     /**
      * Opens a new connection using the provided data source and configuration file.
      *
@@ -250,6 +212,40 @@ public class Database {
      * @throws IOException if an error occured while reading the configuration file.
      */
     public Database(final DataSource source, final String configFilename) throws IOException {
+        this(source, null, configFilename);
+    }
+
+    /**
+     * Uses an existing connection and configuration properties. The properties are the same
+     * ones than the ones usually read from a configuration file, with the same {@linkplain
+     * ConfigurationKey configuration keys}. The configuration file will not be read at all.
+     * <p>
+     * This method is used when the connection and the configuration are already defined in
+     * another way, for example in the <cite>Talend</cite> framework.
+     *
+     * @param  connection The connection to the database.
+     * @param  properties The configuration properties, like the driver used or the root
+     *         directory for images.
+     * @throws IOException if an error occured.
+     */
+    public Database(final Connection connection,  final Properties properties) throws IOException {
+        this(null, properties, null);
+        this.connection = connection;
+    }
+
+    /**
+     * Opens a new connection ou uses an existing ones.
+     *
+     * @param  source The data source, or {@code null} if none.
+     * @param  connection The connection to the database,
+     *         or {@code null} to fetch it from the data source.
+     * @param  properties The configuration properties, or {@code null} if none.
+     * @param  configFilename The configuration filename. Ignored if {@code properties} is non-null.
+     * @throws IOException if an error occured while reading the configuration file.
+     */
+    private Database(final DataSource source, final Properties props, final String configFilename)
+            throws IOException
+    {
         this.source = source;
         this.configFilename = configFilename;
         /*
@@ -258,26 +254,30 @@ public class Database {
          * les lignes suivantes, et risque aussi d'Ãªtre surchargÃ©e.
          */
         properties = new Properties();
-        final File file = getConfigurationFile(false);
-        if (file!=null && file.exists()) {
-            final InputStream in = new FileInputStream(file);
-            properties.loadFromXML(in);
-            in.close();
+        if (props != null) {
+            properties.putAll(props);
+        } else {
+            final File file = getConfigurationFile(false);
+            if (file!=null && file.exists()) {
+                final InputStream in = new FileInputStream(file);
+                properties.loadFromXML(in);
+                in.close();
+            }
         }
         final String ID = getProperty(ConfigurationKey.TIMEZONE);
         timezone = (ID!=null && !ID.equalsIgnoreCase("local")) ? TimeZone.getTimeZone(ID) : TimeZone.getDefault();
-        catalog = getProperty(ConfigurationKey.CATALOG);
-        schema = getProperty(ConfigurationKey.SCHEMA);
+        catalog  = getProperty(ConfigurationKey.CATALOG);
+        schema   = getProperty(ConfigurationKey.SCHEMA);
         /*
          * Checks if the database is spatial-enabled.
          * TODO: Following code is PostgreSQL specific. We need to make it more generic.
          */
         final String driver = (source!=null) ? source.getClass().getName() : getProperty(ConfigurationKey.DRIVER);
         if (driver.startsWith("org.postgresql")) {
-            isSpatialEnabled = true;
+            isSpatialEnabled     = true;
             isStatementFormatted = true;
         } else {
-            isSpatialEnabled = false;
+            isSpatialEnabled     = false;
             isStatementFormatted = false;
         }
         /*
@@ -299,6 +299,9 @@ public class Database {
      * @return The configuration file, or {@code null} if none.
      */
     File getConfigurationFile(final boolean create) {
+        if (configFilename == null) {
+            return null;
+        }
         /*
          * Donne prioritÃ© au fichier de configuration dans le rÃ©pertoire courant, s'il existe.
          */
@@ -597,7 +600,7 @@ public class Database {
     /**
      * Returns a string representation of the specified statement. This method tries
      * to replace the {@code '?'} parameters by the actual parameter values.
-     * 
+     *
      * @param statement The SQL statement to format.
      * @param query     The SQL query used for preparing the statement.
      */

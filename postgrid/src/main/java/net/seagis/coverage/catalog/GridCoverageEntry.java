@@ -27,7 +27,8 @@ import java.io.ObjectStreamException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.ref.SoftReference;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import java.rmi.server.RemoteStub;
@@ -62,9 +63,9 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-import org.geotools.util.Logging;
 import org.geotools.util.NumberRange;
 import org.geotools.util.CanonicalSet;
+import org.geotools.util.logging.Logging;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
@@ -168,7 +169,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * The series in which this coverage is declared.
      */
     private final Series series;
-    
+
     /**
      * Bloc de paramètres de la table d'images. On retient ce bloc de paramètres plutôt qu'une
      * référence directe vers {@link GridCoverageTable} afin de ne pas empêcher le ramasse-miettes
@@ -294,31 +295,37 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     @Override
     public File getFile() {
         final File file = series.file(filename);
-        return (file.isAbsolute()) ? file : null;
+        return file.isAbsolute() ? file : null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public URL getURL() {
+    public URI getURI() {
         try {
-            return series.url(series.file(filename));
-        } catch (IOException exception) {
-            Logging.unexpectedException(LOGGER, GridCoverageEntry.class, "getURL", exception);
+            return series.uri(filename);
+        } catch (URISyntaxException exception) {
+            Logging.unexpectedException(LOGGER, GridCoverageEntry.class, "getURI", exception);
             return null;
         }
     }
-    
+
     /**
-     * Returns the source as a {@link File} or an {@link URL}, in this preference order.
+     * Returns the source as a {@link File} or an {@link URI}, in this preference order.
      */
     private Object getInput() throws IOException {
-        final File file = series.file(filename);
-        if (file.isAbsolute() && !(loader instanceof RemoteStub)) {
-            return file;
+        if (!(loader instanceof RemoteStub)) {
+            final File file = series.file(filename);
+            if (file.isAbsolute()) {
+                return file;
+            }
         }
-        return series.url(file);
+        try {
+            return series.uri(filename);
+        } catch (URISyntaxException e) {
+            throw new IIOException(e.getLocalizedMessage(), e);
+        }
     }
 
     /**

@@ -34,9 +34,9 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.geotools.factory.Hints;
-import org.geotools.util.Logging;
 import org.geotools.util.GenericName;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.logging.Logging;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.resources.i18n.ErrorKeys;

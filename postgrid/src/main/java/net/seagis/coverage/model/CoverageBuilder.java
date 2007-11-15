@@ -41,7 +41,7 @@ import javax.media.jai.TileCache;
 import javax.media.jai.RasterFactory;
 
 import java.sql.SQLException;
-import java.net.URL;
+import java.net.URI;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -76,8 +76,8 @@ import org.geotools.coverage.OrdinateOutsideCoverageException;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.gui.headless.ProgressPrinter;
-import org.geotools.util.Logging;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
 import org.geotools.math.Statistics;
@@ -363,9 +363,9 @@ public class CoverageBuilder {
         if (file == null) {
             file = entry.getFile();
             if (file == null) {
-                final URL url = entry.getURL();
-                if (url != null) {
-                    String path = url.getPath();
+                final URI uri = entry.getURI();
+                if (uri != null) {
+                    String path = uri.getPath();
                     if (path!=null && (path=path.trim()).length()!=0) {
                         file = new File(path);
                         if (!file.getParentFile().isDirectory()) {

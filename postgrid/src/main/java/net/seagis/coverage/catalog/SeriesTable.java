@@ -132,12 +132,11 @@ public class SeriesTable extends SingletonTable<Series> {
         final String  remarks       = results.getString (indexOf(query.remarks));
         final String  rootDirectory = getProperty(ConfigurationKey.ROOT_DIRECTORY);
         final String  rootURL       = getProperty(ConfigurationKey.ROOT_URL);
-        final String  encoding      = getProperty(ConfigurationKey.URL_ENCODING);
         if (formats == null) {
             formats = getDatabase().getTable(FormatTable.class);
         }
         final Format format = formats.getEntry(results.getString(indexOf(query.format)));
-        return new SeriesEntry(name, layer, rootDirectory, rootURL, pathname, extension,
-                               encoding, format, visible, remarks);
+        return new SeriesEntry(name, layer, rootDirectory != null ? rootDirectory : rootURL,
+                               pathname, extension, format, visible, remarks);
     }
 }

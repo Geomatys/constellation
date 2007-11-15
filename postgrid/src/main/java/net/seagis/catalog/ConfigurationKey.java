@@ -46,13 +46,6 @@ public enum ConfigurationKey {
     ROOT_URL("RootURL", "ftp://localhost/"),
 
     /**
-     * Key for the URL encoding. Typical values are {@code "UTF-8"} and {@code "ISO-8859-1"}.
-     * The default value is {@code null}, which means that no encoding will be applied on the
-     * URL.
-     */
-    URL_ENCODING("URL_encoding", null),
-
-    /**
      * Key for the database driver. A typical value is {@code "org.postgresql.Driver"}. This is
      * used only if no data source has been given explicitly to the {@linkplain Database database}
      * constructor.

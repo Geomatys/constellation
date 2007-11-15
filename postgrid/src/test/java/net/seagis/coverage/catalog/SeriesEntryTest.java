@@ -15,8 +15,8 @@
 package net.seagis.coverage.catalog;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.junit.*;
 import junit.framework.TestCase;
 import static org.junit.Assert.*;
@@ -33,62 +33,62 @@ public class SeriesEntryTest extends TestCase {
      * Returns a dummy series for the given root and path.
      */
     private static SeriesEntry series(final String root, final String path) {
-        return new SeriesEntry("Some entry", null, root, path, "png", "UTF-8", null, true, null);
+        return new SeriesEntry("Some entry", null, root, path, "png", null, true, null);
     }
 
     /**
      * Tests a relative file name.
      */
     @Test
-    public void testRelativeFile() throws IOException {
+    public void testRelativeFile() throws URISyntaxException {
         final SeriesEntry entry = series("/SomeRoot/SomeSub/", "SomeSeries/2");
         final String   expected = "/SomeRoot/SomeSub/SomeSeries/2/foo.png";
         final File         file = entry.file("foo");
-        final URL           url = entry.url(file);
+        final URI           uri = entry.uri ("foo");
         assertTrue  (file.isAbsolute());
         assertEquals(new File(expected), file);
-        assertEquals(new URL("file://" + expected), url);
+        assertEquals(new URI("file://" + expected), uri);
     }
 
     /**
      * Tests an absolute file name.
      */
     @Test
-    public void testAbsoluteFile() throws IOException {
+    public void testAbsoluteFile() throws URISyntaxException {
         final SeriesEntry entry = series("/SomeRoot/SomeSub/", "/SomeSeries/2");
         final String   expected = "/SomeSeries/2/foo.png";
         final File         file = entry.file("foo");
-        final URL           url = entry.url(file);
+        final URI           uri = entry.uri ("foo");
         assertTrue  (file.isAbsolute());
         assertEquals(new File(expected), file);
-        assertEquals(new URL("file://" + expected), url);
+        assertEquals(new URI("file://" + expected), uri);
     }
 
     /**
      * Tests a relative URL.
      */
     @Test
-    public void testRelativeURL() throws IOException {
+    public void testRelativeURL() throws URISyntaxException {
         final SeriesEntry entry = series("ftp://localhost/SomeRoot/SomeSub/", "SomeSeries/2");
         final String   expected = "SomeRoot/SomeSub/SomeSeries/2/foo.png";
         final File         file = entry.file("foo");
-        final URL           url = entry.url(file);
+        final URI           uri = entry.uri ("foo");
         assertFalse (file.isAbsolute());
         assertEquals(new File(expected), file);
-        assertEquals(new URL("ftp://localhost/" + expected), url);
+        assertEquals(new URI("ftp://localhost/" + expected), uri);
     }
 
     /**
      * Tests an absolute URL.
      */
     @Test
-    public void testAbsoluteURL() throws IOException {
+    public void testAbsoluteURL() throws URISyntaxException {
         final SeriesEntry entry = series("ftp://localhost/SomeRoot/SomeSub/", "ftp://localhost/SomeSeries/2");
         final String   expected = "SomeSeries/2/foo.png";
         final File         file = entry.file("foo");
-        final URL           url = entry.url(file);
+        final URI           uri = entry.uri ("foo");
         assertFalse (file.isAbsolute());
         assertEquals(new File(expected), file);
-        assertEquals(new URL("ftp://localhost/" + expected), url);
+        assertEquals(new URI("ftp://localhost/" + expected), uri);
     }
 }

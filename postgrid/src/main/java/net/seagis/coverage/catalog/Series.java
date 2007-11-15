@@ -15,8 +15,8 @@
 package net.seagis.coverage.catalog;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import net.seagis.catalog.Element;
 
 
@@ -64,13 +64,13 @@ public interface Series extends Element {
     File file(String filename);
 
     /**
-     * Returns a {@link URL} for the given file. The given file should be the object returned
-     * by {@link #file}. If the file is not absolute, then this method adds a series-dependent
-     * host and encode the result in a URL.
+     * Returns the given filename as a {@link URI} augmented with series-dependent
+     * {@linkplain URI#getHost host}, parent and extension.
      *
-     * @param  file The file returned by {@link #file}.
-     * @return The file as a URL.
-     * @throws IOException If the file can't be encoded as a URL.
+     * @param  filename The filename, not including the extension.
+     * @return The file.
+     * @throws URISyntaxException if the URI can not be created from the informations
+     *         provided in the database.
      */
-    URL url(File file) throws IOException;
+    URI uri(String filename) throws URISyntaxException;
 }

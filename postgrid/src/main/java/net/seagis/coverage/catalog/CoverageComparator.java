@@ -29,7 +29,7 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.geometry.Envelope;
 
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.datum.DefaultEllipsoid;

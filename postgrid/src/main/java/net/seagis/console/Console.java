@@ -36,7 +36,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.gui.swing.tree.Trees;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
-import org.geotools.util.Logging;
+import org.geotools.util.logging.Logging;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;

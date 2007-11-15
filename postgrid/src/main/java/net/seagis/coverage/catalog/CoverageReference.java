@@ -14,11 +14,11 @@
  */
 package net.seagis.coverage.catalog;
 
-import java.net.URL;
+import java.net.URI;
 import java.io.File;
 import java.io.IOException;
-import java.rmi.RemoteException;
-import javax.imageio.IIOException;
+import java.rmi.RemoteException;    // For javadoc
+import javax.imageio.IIOException;  // For javadoc
 
 import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.Envelope;
@@ -27,7 +27,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.geotools.image.io.IIOListeners;
 import org.geotools.coverage.CoverageStack;
-import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.GridSampleDimension;  // For javadoc
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.util.NumberRange;
@@ -73,10 +73,10 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     File getFile();
 
     /**
-     * Returns the URL to the image data, or {@code null} if none. The data may or may not
+     * Returns the URI to the image data, or {@code null} if none. The data may or may not
      * be a file hosted on the local machine.
      */
-    URL getURL();
+    URI getURI();
 
     /**
      * Returns the coordinate reference system for the {@linkplain #getCoverage coverage}.
@@ -187,7 +187,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
         public @Override CoverageReference         getBackingElement()            {return ref;}
         public @Override Series                    getSeries()                    {return ref.getSeries();}
         public @Override File                      getFile()                      {return ref.getFile();}
-        public @Override URL                       getURL()                       {return ref.getURL();}
+        public @Override URI                       getURI()                       {return ref.getURI();}
         public @Override GridGeometry2D            getGridGeometry()              {return ref.getGridGeometry();}
         public @Override CoordinateReferenceSystem getCoordinateReferenceSystem() {return ref.getCoordinateReferenceSystem();}
         public @Override Envelope                  getEnvelope()                  {return ref.getEnvelope();}
