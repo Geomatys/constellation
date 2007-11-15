@@ -201,9 +201,47 @@ public class Database {
      * @throws IOException if an error occured while reading the configuration file.
      */
     public Database(final File configFile) throws IOException {
-        this(null, configFile.getPath());
+        this((DataSource) null, configFile.getPath());
     }
 
+    /**
+     * Use the provided connection in order to connect to the Database. Some properties are
+     * added to this parameter, to hanle the root directory of images for example. This method 
+     * is used when the connection is already defined in another way (like with Talend).
+     * 
+     * @param connection The connection object for the database.
+     * @param properties Some properties, like the driver used or the root directory for images.
+     * @throws IOException
+     */
+    public Database(final Connection connection,  final Properties properties) throws IOException {
+        source = null;
+        configFilename = null;
+        this.properties = properties;
+        this.connection = connection;
+        final String ID = getProperty(ConfigurationKey.TIMEZONE);
+        timezone = (ID!=null && !ID.equalsIgnoreCase("local")) ? TimeZone.getTimeZone(ID) : TimeZone.getDefault();
+        catalog = getProperty(ConfigurationKey.CATALOG);
+        schema = getProperty(ConfigurationKey.SCHEMA);
+        /*
+         * Checks if the database is spatial-enabled.
+         * TODO: Following code is PostgreSQL specific. We need to make it more generic.
+         */
+        final String driver = getProperty(ConfigurationKey.DRIVER);
+        if (driver.startsWith("org.postgresql")) {
+            isSpatialEnabled = true;
+            isStatementFormatted = true;
+        } else {
+            isSpatialEnabled = false;
+            isStatementFormatted = false;
+        }
+        /*
+         * Prépare un processus qui fermera automatiquement les connections lors de l'arrêt
+         * de la machine virtuelle si l'utilisateur n'appelle par close() lui-même.
+         */
+        finalizer = new Finalizer();
+        Runtime.getRuntime().addShutdownHook(finalizer);
+    }
+    
     /**
      * Opens a new connection using the provided data source and configuration file.
      *
