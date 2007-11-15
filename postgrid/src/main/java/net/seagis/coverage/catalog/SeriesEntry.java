@@ -38,7 +38,7 @@ final class SeriesEntry extends Entry implements Series {
      * The layer which contains this series.
      */
     private final Layer layer;
-    
+
     /**
      * The protocol in a URL, or {@code "file"} if the files should be read locally.
      */
@@ -183,8 +183,11 @@ final class SeriesEntry extends Entry implements Series {
      * {@inheritDoc}
      */
     @Override
-    public File file(final String filename) {
-        return new File(path, filename + '.' + extension);
+    public File file(String filename) {
+        if (extension != null && extension.length() != 0) {
+            filename = filename + '.' + extension;
+        }
+        return new File(path, filename);
     }
 
     /**
@@ -203,7 +206,10 @@ final class SeriesEntry extends Entry implements Series {
         if (!path.endsWith("/") && !filename.startsWith("/")) {
             buffer.append('/');
         }
-        buffer.append(filename).append('.').append(extension);
+        buffer.append(filename);
+        if (extension != null && extension.length() != 0) {
+            buffer.append('.').append(extension);
+        }
         return new URI(protocol, host, buffer.toString(), null);
     }
 

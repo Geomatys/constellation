@@ -226,7 +226,7 @@ CREATE TABLE "Series" (
     "identifier" character varying NOT NULL PRIMARY KEY,
     "layer"      character varying NOT NULL REFERENCES "Layers"  ON UPDATE CASCADE ON DELETE CASCADE,
     "pathname"   character varying NOT NULL,
-    "extension"  character varying NOT NULL,
+    "extension"  character varying, -- Accepts NULL since some files has no extension
     "format"     character varying NOT NULL REFERENCES "Formats" ON UPDATE CASCADE ON DELETE RESTRICT,
     "visible"    boolean           NOT NULL DEFAULT true,
     "quicklook"  character varying UNIQUE   REFERENCES "Series"  ON UPDATE CASCADE ON DELETE RESTRICT

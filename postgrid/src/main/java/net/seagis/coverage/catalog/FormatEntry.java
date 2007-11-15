@@ -653,6 +653,11 @@ final class FormatEntry extends Entry implements Format {
      */
     private static final class TreeNode extends DefaultMutableTreeNode {
         /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 9030373781984474394L;
+
+        /**
          * Le texte à retourner par {@link #toString}.
          */
         private final String text;
