@@ -34,7 +34,7 @@ final class SeriesEntry extends Entry implements Series {
     /**
      * For cross-version compatibility.
      */
-    private static final long serialVersionUID = -7991804359597967276L;
+    private static final long serialVersionUID = 7119677073947466143L;
 
     /**
      * The layer which contains this series.
@@ -42,27 +42,21 @@ final class SeriesEntry extends Entry implements Series {
     private final Layer layer;
 
     /**
-     * Root images directory, for access through a local network.
-     * May be {@code null} if the file are not accessible locally.
+     * The protocol and host in a URL, or {@code null} if the files should be read locally.
      */
-    private final String rootDirectory;
+    private final String host;
 
     /**
-     * Root URL directory (usually a FTP server), for access through a distant network.
+     * The directory which contains the data files for this series.
+     * The path separator is Unix slash, never the Windows backslash.
+     * May be an empty string but never {@code null}.
      */
-    private final String rootURL;
-
-    /**
-     * The relative or absolute directory which contains the data files for this series.
-     * The path separator is Unix slash, never the Windows backslash. This path may be
-     * relative to a root directory or to a base URL.
-     */
-    final String pathname;
+    private final String path;
 
     /**
      * The extension to add to filenames, not including the dot character.
      */
-    final String extension;
+    private final String extension;
 
     /**
      * The URL encoding (typically {@code "UTF-8"}), or {@code null} if no encoding should be done.
@@ -74,7 +68,7 @@ final class SeriesEntry extends Entry implements Series {
      * The format of all coverages in this series.
      */
     private final Format format;
-    
+
     /**
      * {@code true} if this series should be included in {@link Layer#getSeries}.
      */
@@ -91,20 +85,104 @@ final class SeriesEntry extends Entry implements Series {
      * @param visible   {@code true} if this series should be included in {@link Layer#getSeries}.
      * @param remarks   The remarks, or {@code null} if none.
      */
+    @Deprecated
     protected SeriesEntry(final String name, final Layer layer, final String rootDirectory,
                           final String rootURL, final String pathname, final String extension,
                           final String encoding, final Format format, final boolean visible,
                           final String remarks)
+    {
+        this(name, layer, rootDirectory != null ? rootDirectory : rootURL, pathname,
+             extension, encoding, format, visible, remarks);
+    }
+
+    /**
+     * Creates a new series entry.
+     *
+     * @param name      The name for this series.
+     * @param layer     The layer which contains this series.
+     * @param root      The root directory or URL, or {@code null} if none.
+     * @param pathname  The relative or absolute directory which contains the data files for this series.
+     * @param extension The extension to add to filenames, not including the dot character.
+     * @param encoding  The encoding for URL (usually {@code "UTF-8"}).
+     * @param format    The format of all coverages in this series.
+     * @param visible   {@code true} if this series should be included in {@link Layer#getSeries}.
+     * @param remarks   The remarks, or {@code null} if none.
+     */
+    protected SeriesEntry(final String name, final Layer layer, final String root,
+                          final String pathname, final String extension, final String encoding,
+                          final Format format, final boolean visible, final String remarks)
 {
         super(name, remarks);
-        this.layer         = layer;
-        this.rootDirectory = rootDirectory;
-        this.rootURL       = rootURL;
-        this.pathname      = pathname;
-        this.extension     = extension;
-        this.encoding      = encoding;
-        this.format        = format;
-        this.visible       = visible;
+        this.layer     = layer;
+        this.extension = extension;
+        this.encoding  = encoding;
+        this.format    = format;
+        this.visible   = visible;
+        /*
+         * Checks if the pathname contains a URL host.  If it does, then this URL will have
+         * precedence over the root parameter. The following section make this check, which
+         * ignore totally the root parameter.
+         */
+        int split = pathname.indexOf("://");
+        if (split >= 0) {
+            final String protocol = pathname.substring(0, split).trim();
+            split += 3;
+            if (protocol.equalsIgnoreCase("file")) {
+                host = null;
+                path = pathname.substring(split);
+                // Path is likely to contains a leading '/' since the syntax is usualy "file:///".
+            } else {
+                split = pathname.indexOf('/', split);
+                if (split < 0) {
+                    // No host after the protocol (e.g. "dods://www.foo.org").
+                    host = pathname;
+                    path = "";
+                } else {
+                    host = pathname.substring(0, ++split);
+                    path = pathname.substring(split);
+                }
+            }
+            return;
+        }
+        /*
+         * Below this point, we known that the pathname is not an URL.
+         * but maybe the "root" parameter is an URL. Checks it now.
+         */
+        if (root == null) {
+            host = null;
+            path = pathname;
+            return;
+        }
+        split = root.indexOf("://");
+        if (split < 0) {
+            host = null;
+            split = 0; // Used for computing 'path' later.
+        } else {
+            final String protocol = root.substring(0, split).trim();
+            split += 3;
+            if (protocol.equalsIgnoreCase("file")) {
+                host = null;
+            } else {
+                split = root.indexOf('/', split);
+                if (split < 0) {
+                    host = root;
+                    path = pathname;
+                    return;
+                }
+                host = root.substring(0, ++split);
+            }
+        }
+        final boolean isAbsolute = pathname.startsWith("/");
+        if (isAbsolute) {
+            path = pathname;
+        } else {
+            final String directory = root.substring(split);
+            final StringBuilder buffer = new StringBuilder(directory);
+            if (!directory.endsWith("/")) {
+                buffer.append('/');
+            }
+            path = buffer.append(pathname).toString();
+        }
     }
 
     /**
@@ -128,11 +206,7 @@ final class SeriesEntry extends Entry implements Series {
      */
     @Override
     public File file(final String filename) {
-        File file = new File(pathname, filename + '.' + extension);
-        if (rootDirectory != null && !file.isAbsolute()) {
-            file = new File(rootDirectory, file.getPath());
-        }
-        return file;
+        return new File(path, filename + '.' + extension);
     }
 
     /**
@@ -140,8 +214,8 @@ final class SeriesEntry extends Entry implements Series {
      */
     @Override
     public URL url(final File file) throws IOException {
-        if (rootURL != null && !file.isAbsolute()) {
-            final StringBuilder buffer = new StringBuilder(rootURL);
+        if (host != null && !file.isAbsolute()) {
+            final StringBuilder buffer = new StringBuilder(host);
             final int last = buffer.length() - 1;
             if (last >= 0) {
                 if (buffer.charAt(last) == '/') {
@@ -183,13 +257,12 @@ final class SeriesEntry extends Entry implements Series {
         }
         if (super.equals(object)) {
             final SeriesEntry that = (SeriesEntry) object;
-            return Utilities.equals(this.layer,         that.layer )        &&
-                   Utilities.equals(this.rootDirectory, that.rootDirectory) &&
-                   Utilities.equals(this.rootURL,       that.rootURL)       &&
-                   Utilities.equals(this.pathname,      that.pathname)      &&
-                   Utilities.equals(this.extension,     that.extension)     &&
-                   Utilities.equals(this.encoding,      that.encoding)      &&
-                   Utilities.equals(this.format,        that.format);
+            return Utilities.equals(this.layer,     that.layer )    &&
+                   Utilities.equals(this.host,      that.host)      &&
+                   Utilities.equals(this.path,      that.path)      &&
+                   Utilities.equals(this.extension, that.extension) &&
+                   Utilities.equals(this.encoding,  that.encoding)  &&
+                   Utilities.equals(this.format,    that.format);
         }
         return false;
     }

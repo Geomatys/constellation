@@ -143,9 +143,9 @@ public final class ImageViewer {
             filename += ".png";
             file      = new File(file.getParentFile(), filename);
         }
-        final Iterator/*<ImageWriter>*/ it = ImageIO.getImageWritersBySuffix(extension);
+        final Iterator<ImageWriter> it = ImageIO.getImageWritersBySuffix(extension);
         if (it!=null && it.hasNext()) {
-            final ImageWriter writer = (ImageWriter) it.next();
+            final ImageWriter writer = it.next();
             final ImageWriterSpi spi = writer.getOriginatingProvider();
             final ImageOutputStream output;
             if (spi!=null && acceptFile(spi.getOutputTypes())) {
@@ -245,6 +245,9 @@ public final class ImageViewer {
      * </ul>
      */
     public static void main(String[] args) throws IOException {
+        args = new String[] {
+            "-layer", "OpenDAP_(SST)", "aggregated_time_serie"
+        };
         final Arguments arguments = new Arguments(args);
         final boolean formats = arguments.getFlag("-formats");
         final boolean mimes   = arguments.getFlag("-mimes");
