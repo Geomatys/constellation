@@ -96,7 +96,7 @@ public class LayerTree extends Table {
      * @param database  Connexion vers la base de données d'observations.
      */
     public LayerTree(final Database database) {
-        super(new net.seagis.catalog.Query(database)); // TODO
+        super(new net.seagis.catalog.Query(database, null)); // TODO
     }
 
     /**

@@ -183,6 +183,14 @@ final class SeriesEntry extends Entry implements Series {
      * {@inheritDoc}
      */
     @Override
+    public String getProtocol() {
+        return protocol;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public File file(String filename) {
         if (extension != null && extension.length() != 0) {
             filename = filename + '.' + extension;

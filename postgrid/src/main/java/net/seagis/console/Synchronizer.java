@@ -188,7 +188,7 @@ public class Synchronizer {
         final String sql = buffer.toString();
         final Statement targetStatement = target.getConnection().createStatement();
         final int count = pretend ? 0 : targetStatement.executeUpdate(sql);
-        log(LoggingLevel.DELETE, "delete", sql + '\n' + count + " lignes supprimées.");
+        log(LoggingLevel.UPDATE, "delete", sql + '\n' + count + " lignes supprimées.");
         targetStatement.close();
     }
 
@@ -370,7 +370,7 @@ public class Synchronizer {
             }
             final int count = pretend ? 1 : targetStatement.executeUpdate();
             if (count == 1) {
-                log(LoggingLevel.INSERT, "insert", target.format(targetStatement, sql));
+                log(LoggingLevel.UPDATE, "insert", target.format(targetStatement, sql));
             } else {
                 log(Level.WARNING, "insert", String.valueOf(count) + " enregistrements ajoutés.");
             }

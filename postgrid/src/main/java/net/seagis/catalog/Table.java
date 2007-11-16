@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Calendar;
-import java.util.GregorianCalendar;  // For javadoc
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -144,9 +143,9 @@ public class Table {
      * calendrier utilisera le fuseau horaire spécifié par la propriété {@link Database#TIMEZONE},
      * qui devrait désigner le fuseau horaire des dates dans la base de données.
      * <p>
-     * Nous construisons une instance de {@link GregorianCalendar} pour chaque table (plutôt
-     * qu'une instance partagée par tous) afin d'éviter des problèmes en cas d'utilisation des
-     * tables dans un environnement multi-thread.
+     * Nous construisons une instance de {@link java.util.GregorianCalendar} pour chaque table
+     * (plutôt qu'une instance partagée par tous) afin d'éviter des problèmes en cas d'utilisation
+     * des tables dans un environnement multi-thread.
      *
      * @see #getCalendar
      */
@@ -181,13 +180,10 @@ public class Table {
     }
 
     /**
-     * Returns the table name. If the {@linkplain #query} mix columns from different tables,
-     * then the value returned by this method is implementation-dependant. It may be the name
-     * of the table which contain the entry identifiers, or simply the name of the table that
-     * occurs most frequently.
+     * Returns the table name.
      */
     public String getName() {
-        return query.getTableName();
+        return query.table;
     }
 
     /**
@@ -294,19 +290,57 @@ public class Table {
     }
 
     /**
-     * Executes the specified SQL {@code INSERT} statement, which is expected to insert exactly
-     * one record. As a special case, this method do not execute the statement during testing
-     * and debugging phases. In the later case, this method rather prints the statement to the
-     * stream specified to {@link Database#setInsertSimulator}.
+     * Invoked before an arbitrary amount of {@code INSERT}, {@code UPDATE} or {@code DELETE}
+     * SQL statement. This method <strong>must</strong> be invoked in a {@code try} ... {@code
+     * finally} block as below:
+     *
+     * <blockquote><pre>
+     * boolean success = false;
+     * transactionBegin();
+     * try {
+     *     // Do some operation here...
+     *     success = true;  // Must be the very last line in the try block.
+     * } finally {
+     *     transactionEnd(success);
+     * }
+     * </pre></blockquote>
+     *
+     * @throws SQLException If the operation failed.
+     */
+    protected void transactionBegin() throws SQLException {
+        getDatabase().transactionBegin();
+    }
+
+    /**
+     * Invoked after the {@code INSERT}, {@code UPDATE} or {@code DELETE}
+     * SQL statement finished.
+     *
+     * @param  success {@code true} if the operation succeed and should be commited,
+     *         or {@code false} if we should rollback.
+     * @throws SQLException If the commit or the rollback failed.
+     */
+    protected void transactionEnd(final boolean success) throws SQLException {
+        getDatabase().transactionEnd(success);
+    }
+
+    /**
+     * Executes the specified SQL {@code INSERT}, {@code UPDATE} or {@code DELETE} statement,
+     * which is expected to insert exactly one record. As a special case, this method do not
+     * execute the statement during testing and debugging phases. In the later case, this method
+     * rather prints the statement to the stream specified to {@link Database#setUpdateSimulator}.
      *
      * @param  statement The statement to execute.
-     * @throws CatalogException if the number of records added is not exactly one.
+     * @throws IllegalMonitorStateException if {@link #transactionBegin} has not been invoked
+     *         at least once before this method is invoked.
+     * @throws CatalogException if the number of updated records is not exactly one.
      * @throws SQLException if an other error occured.
      */
-    protected final void insertSingleton(final PreparedStatement statement)
-            throws CatalogException, SQLException
+    protected final void updateSingleton(final PreparedStatement statement)
+            throws IllegalMonitorStateException, CatalogException, SQLException
     {
-        final PrintWriter out = getDatabase().getInsertSimulator();
+        final Database database = getDatabase();
+        database.ensureTransaction();
+        final PrintWriter out = database.getUpdateSimulator();
         if (out != null) {
             out.println(statement);
         } else {
@@ -335,7 +369,7 @@ public class Table {
 
     /**
      * Returns the column at the specified index, or {@code null} if none.
-     * 
+     *
      * @param  index The column index (number starts at 1).
      * @return The column, or {@code null} if none.
      */

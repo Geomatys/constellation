@@ -48,24 +48,24 @@ final class GridGeometryQuery extends Query {
      * @param database The database for which this query is created.
      */
     public GridGeometryQuery(final Database database) {
-        super(database);
+        super(database, "GridGeometries");
         final QueryType[] LFSEI = {LIST, FILTERED_LIST, SELECT, EXISTS, INSERT};
         final QueryType[] LFSI  = {LIST, FILTERED_LIST, SELECT,         INSERT};
         final QueryType[] LSI   = {LIST,                SELECT,         INSERT};
         final QueryType[] LS    = {LIST,                SELECT                };
-        identifier        = addColumn("GridGeometries", "identifier",             LFSEI);
-        width             = addColumn("GridGeometries", "width",                    LSI);
-        height            = addColumn("GridGeometries", "height",                   LSI);
-        scaleX            = addColumn("GridGeometries", "scaleX",                   LSI);
-        scaleY            = addColumn("GridGeometries", "scaleY",                   LSI);
-        translateX        = addColumn("GridGeometries", "translateX",               LSI);
-        translateY        = addColumn("GridGeometries", "translateY",               LSI);
-        shearX            = addColumn("GridGeometries", "shearX",               0,  LSI);
-        shearY            = addColumn("GridGeometries", "shearY",               0,  LSI);
-        horizontalSRID    = addColumn("GridGeometries", "horizontalSRID",           LSI);
-        horizontalExtent  = addColumn("GridGeometries", "horizontalExtent",         LS ); // Will rely on trigger for insertion.
-        verticalSRID      = addColumn("GridGeometries", "verticalSRID",      null, LFSI);
-        verticalOrdinates = addColumn("GridGeometries", "verticalOrdinates", null, LFSI);
+        identifier        = addColumn("identifier",             LFSEI);
+        width             = addColumn("width",                    LSI);
+        height            = addColumn("height",                   LSI);
+        scaleX            = addColumn("scaleX",                   LSI);
+        scaleY            = addColumn("scaleY",                   LSI);
+        translateX        = addColumn("translateX",               LSI);
+        translateY        = addColumn("translateY",               LSI);
+        shearX            = addColumn("shearX",               0,  LSI);
+        shearY            = addColumn("shearY",               0,  LSI);
+        horizontalSRID    = addColumn("horizontalSRID",           LSI);
+        horizontalExtent  = addColumn("horizontalExtent",         LS ); // Will rely on trigger for insertion.
+        verticalSRID      = addColumn("verticalSRID",      null, LFSI);
+        verticalOrdinates = addColumn("verticalOrdinates", null, LFSI);
         if (database.isSpatialEnabled()) {
             horizontalExtent.setFunction("Box2D", LS);
         }

@@ -24,7 +24,6 @@ import java.net.URL;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -208,20 +207,14 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     public synchronized int addEntries(final Iterator<ImageReader> readers, final int imageIndex)
             throws CatalogException, SQLException, IOException
     {
-        final Connection connection = getDatabase().getConnection();
-        final boolean autoCommit = connection.getAutoCommit();
-        boolean success = false;
         int count = 0;
+        boolean success = false;
+        transactionBegin();
         try {
-            connection.setAutoCommit(false);
-            count = insertEntries(readers, imageIndex);
-            connection.commit();
-            success = true;
+            count = addEntriesUnsafe(readers, imageIndex);
+            success = true; // Must be the very last line in the try block.
         } finally {
-            if (!success) {
-                connection.rollback();
-            }
-            connection.setAutoCommit(autoCommit);
+            transactionEnd(success);
         }
         return count;
     }
@@ -232,7 +225,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      *
      * @return The number of images inserted.
      */
-    private int insertEntries(final Iterator<ImageReader> readers, final int imageIndex)
+    private int addEntriesUnsafe(final Iterator<ImageReader> readers, final int imageIndex)
             throws CatalogException, SQLException, IOException
     {
         int count = 0;
@@ -308,7 +301,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 statement.setInt (byIndex,     1);
                 statement.setNull(byStartTime, Types.TIMESTAMP);
                 statement.setNull(byEndTime,   Types.TIMESTAMP);
-                insertSingleton(statement);
+                updateSingleton(statement);
                 count++;
             } else for (int i=0; i<dates.length; i++) {
                 final Date startTime = dates[i].getMinValue();
@@ -316,7 +309,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 statement.setInt      (byIndex,     i + 1);
                 statement.setTimestamp(byStartTime, new Timestamp(startTime.getTime()), calendar);
                 statement.setTimestamp(byEndTime,   new Timestamp(endTime  .getTime()), calendar);
-                insertSingleton(statement);
+                updateSingleton(statement);
                 count++;
             }
         }
@@ -335,7 +328,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     public synchronized int completeLayer(final boolean includeSubdirectories)
             throws CatalogException, SQLException, IOException
     {
-        final Map<File,Series> files = new LinkedHashMap<File,Series>();
+        final Map<Object,Series> files = new LinkedHashMap<Object,Series>();
         for (final Series series : getLayer().getSeries()) {
             File directory = series.file("*");
             if (directory != null) {
@@ -367,46 +360,40 @@ public class WritableGridCoverageTable extends GridCoverageTable {
          * the directories scan in order to make sure that we don't query the database twice for
          * the same files (our usage of hash map ensures this condition).
          */
-        for (final Iterator<File> it=files.keySet().iterator(); it.hasNext();) {
-            final File file = it.next();
-            String filename = file.getName();
-            final int split = filename.lastIndexOf('.');
-            if (split >= 0) {
-                filename  = filename.substring(0, split);
-            }
-            // TODO: 'exists' takes only the layer in account, not the series.
-            if (exists(filename)) {
-                it.remove();
-            }
-        }
-        /*
-         * Now process to the insertions in the database.
-         *
-         * TODO: We need to decide what to do with new series (i.e. when series==null.
-         *       In current state of affairs, we will get a NullPointerException).
-         */
         int count = 0;
-        final Connection connection = getDatabase().getConnection();
-        final boolean autoCommit = connection.getAutoCommit();
         boolean success = false;
+        transactionBegin();
         try {
-            connection.setAutoCommit(false);
-            Iterator<Map.Entry<File,Series>> it;
+            for (final Iterator<Object> it=files.keySet().iterator(); it.hasNext();) {
+                final File file = (File) it.next();
+                String filename = file.getName();
+                final int split = filename.lastIndexOf('.');
+                if (split >= 0) {
+                    filename = filename.substring(0, split);
+                }
+                // TODO: 'exists' takes only the layer in account, not the series.
+                if (exists(filename)) {
+                    it.remove();
+                }
+            }
+            /*
+             * Now process to the insertions in the database.
+             *
+             * TODO: We need to decide what to do with new series (i.e. when series==null.
+             *       In current state of affairs, we will get a NullPointerException).
+             */
+            Iterator<Map.Entry<Object,Series>> it;
             while ((it = files.entrySet().iterator()).hasNext()) {
-                Map.Entry<File,Series> entry = it.next();
+                Map.Entry<Object,Series> entry = it.next();
                 final Series series = entry.getValue();
-                File next = entry.getKey();
+                final Object next = entry.getKey();
                 it.remove();
                 final Iterator<ImageReader> iterator = new ReaderIterator(series, it, next);
-                count += addEntries(iterator, 0); // TODO: do we have a better value to provide for imageIndex?
+                count += addEntriesUnsafe(iterator, 0); // TODO: do we have a better value to provide for imageIndex?
             }
-            connection.commit();
-            success = true;
+            success = true; // Must be the very last line in the try block.
         } finally {
-            if (!success) {
-                connection.rollback();
-            }
-            connection.setAutoCommit(autoCommit);
+            transactionEnd(success);
         }
         return count;
     }
@@ -420,7 +407,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * @param  filter The filename filter, or {@code null} for including all files.
      * @param  series The series to use as value in the map.
      */
-    private static void add(final Map<File,Series> files, final File[] toAdd,
+    private static void add(final Map<Object,Series> files, final File[] toAdd,
                             final FileFilter filter, final Series series)
     {
         Arrays.sort(toAdd);

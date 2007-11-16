@@ -482,37 +482,44 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         /*
          * No match found. Adds a new record in the database.
          */
-        ID = searchFreeIdentifier(newIdentifier);
-        statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.identifier),     ID);
-        statement.setInt   (indexOf(query.width),          size.width );
-        statement.setInt   (indexOf(query.height),         size.height);
-        statement.setDouble(indexOf(query.scaleX),         gridToCRS.getScaleX());
-        statement.setDouble(indexOf(query.scaleY),         gridToCRS.getScaleY());
-        statement.setDouble(indexOf(query.translateX),     gridToCRS.getTranslateX());
-        statement.setDouble(indexOf(query.translateY),     gridToCRS.getTranslateY());
-        statement.setDouble(indexOf(query.shearX),         gridToCRS.getShearX());
-        statement.setDouble(indexOf(query.shearY),         gridToCRS.getShearY());
-        statement.setInt   (indexOf(query.horizontalSRID), horizontalSRID);
-        vsIndex = indexOf(query.verticalSRID);
-        voIndex = indexOf(query.verticalOrdinates);
-        if (verticalOrdinates == null || verticalOrdinates.length == 0) {
-            statement.setNull(vsIndex, Types.INTEGER);
-            statement.setNull(voIndex, Types.ARRAY);
-        } else {
-            statement.setInt(vsIndex, verticalSRID);
-            final Double[] numbers = new Double[verticalOrdinates.length];
-            for (int i=0; i<numbers.length; i++) {
-                numbers[i] = verticalOrdinates[i];
+        boolean success = false;
+        transactionBegin();
+        try {
+            ID = searchFreeIdentifier(newIdentifier);
+            statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.identifier),     ID);
+            statement.setInt   (indexOf(query.width),          size.width );
+            statement.setInt   (indexOf(query.height),         size.height);
+            statement.setDouble(indexOf(query.scaleX),         gridToCRS.getScaleX());
+            statement.setDouble(indexOf(query.scaleY),         gridToCRS.getScaleY());
+            statement.setDouble(indexOf(query.translateX),     gridToCRS.getTranslateX());
+            statement.setDouble(indexOf(query.translateY),     gridToCRS.getTranslateY());
+            statement.setDouble(indexOf(query.shearX),         gridToCRS.getShearX());
+            statement.setDouble(indexOf(query.shearY),         gridToCRS.getShearY());
+            statement.setInt   (indexOf(query.horizontalSRID), horizontalSRID);
+            vsIndex = indexOf(query.verticalSRID);
+            voIndex = indexOf(query.verticalOrdinates);
+            if (verticalOrdinates == null || verticalOrdinates.length == 0) {
+                statement.setNull(vsIndex, Types.INTEGER);
+                statement.setNull(voIndex, Types.ARRAY);
+            } else {
+                statement.setInt(vsIndex, verticalSRID);
+                final Double[] numbers = new Double[verticalOrdinates.length];
+                for (int i=0; i<numbers.length; i++) {
+                    numbers[i] = verticalOrdinates[i];
+                }
+                // TODO: Use the following line instead when we will be allowed to compile for J2SE 1.6,
+                //       and if the PostgreSQL JDBC driver implements the createArrayOf(...) method.
+                //
+                //       array = statement.getConnection().createArrayOf("float8", numbers);
+                final Array array = new DoubleArray(numbers);
+                statement.setArray(voIndex, array);
             }
-            // TODO: Use the following line instead when we will be allowed to compile for J2SE 1.6,
-            //       and if the PostgreSQL JDBC driver implements the createArrayOf(...) method.
-            //
-            //       array = statement.getConnection().createArrayOf("float8", numbers);
-            final Array array = new DoubleArray(numbers);
-            statement.setArray(voIndex, array);
+            updateSingleton(statement);
+            success = true; // Must be the very last line in the try block.
+        } finally {
+            transactionEnd(success);
         }
-        insertSingleton(statement);
         return ID;
     }
 

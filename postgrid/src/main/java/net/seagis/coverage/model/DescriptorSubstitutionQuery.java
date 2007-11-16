@@ -46,12 +46,12 @@ final class DescriptorSubstitutionQuery extends Query {
      * @param database The database for which this query is created.
      */
     public DescriptorSubstitutionQuery(final Database database) {
-        super(database);
+        super(database, "TemporalGradientDescriptors");
         final Column symbol;
         final QueryType[] usage = {SELECT, LIST};
-        symbol   = addColumn   ("TemporalGradientDescriptors", "symbol",  LIST);
-        symbol1  = addColumn   ("TemporalGradientDescriptors", "symbol1", usage);
-        symbol2  = addColumn   ("TemporalGradientDescriptors", "symbol2", usage);
+        symbol   = addColumn   ("symbol",  LIST);
+        symbol1  = addColumn   ("symbol1", usage);
+        symbol2  = addColumn   ("symbol2", usage);
         bySymbol = addParameter(symbol, SELECT);
     }
 }

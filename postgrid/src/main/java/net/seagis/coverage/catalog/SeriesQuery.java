@@ -46,15 +46,15 @@ final class SeriesQuery extends Query {
      * @param database The database for which this query is created.
      */
     public SeriesQuery(final Database database) {
-        super(database);
+        super(database, "Series");
         final QueryType[] usage = {SELECT, LIST, FILTERED_LIST};
-        name      = addColumn("Series", "identifier",    usage);
-        layer     = addColumn("Series", "layer",         usage);
-        pathname  = addColumn("Series", "pathname",      usage);
-        extension = addColumn("Series", "extension",     usage);
-        format    = addColumn("Series", "format",        usage);
-        visible   = addColumn("Series", "visible", true, usage);
-        remarks   = addColumn("Series", "remarks", null, usage);
+        name      = addColumn("identifier",    usage);
+        layer     = addColumn("layer",         usage);
+        pathname  = addColumn("pathname",      usage);
+        extension = addColumn("extension",     usage);
+        format    = addColumn("format",        usage);
+        visible   = addColumn("visible", true, usage);
+        remarks   = addColumn("remarks", null, usage);
         byName    = addParameter(name,  SELECT);
         byLayer   = addParameter(layer, FILTERED_LIST);
         name.setOrdering("ASC", LIST, FILTERED_LIST);

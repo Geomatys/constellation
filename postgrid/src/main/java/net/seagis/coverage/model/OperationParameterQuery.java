@@ -46,12 +46,12 @@ final class OperationParameterQuery extends Query {
      * @param database The database for which this query is created.
      */
     public OperationParameterQuery(final Database database) {
-        super(database);
+        super(database, "OperationParameters");
         final Column operation;
         final QueryType[] usage = {SELECT, LIST};
-        operation   = addColumn   ("OperationParameters", "operation", LIST);
-        parameter   = addColumn   ("OperationParameters", "parameter", usage);
-        value       = addColumn   ("OperationParameters", "value",     usage);
+        operation   = addColumn   ("operation", LIST);
+        parameter   = addColumn   ("parameter", usage);
+        value       = addColumn   ("value",     usage);
         byOperation = addParameter(operation, SELECT);
     }
 }

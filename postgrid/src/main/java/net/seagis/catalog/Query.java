@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -34,7 +33,6 @@ import org.geotools.resources.Utilities;
 import net.seagis.resources.XArray;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
-import net.seagis.util.FrequencySortedSet;
 
 
 /**
@@ -71,6 +69,11 @@ public class Query {
     protected final Database database;
 
     /**
+     * The name of the main table.
+     */
+    protected final String table;
+
+    /**
      * The columns in this query.
      */
     private Column[] columns = EMPTY_COLUMNS;
@@ -97,34 +100,11 @@ public class Query {
      * Creates an initially empty query with no schema.
      *
      * @param database The database for which this query is created, or {@code null}.
+     * @param table    The main table name.
      */
-    public Query(final Database database) {
-        this(database, null, null);
-    }
-
-    /**
-     * Creates an initially empty query.
-     *
-     * @param database The database for which this query is created, or {@code null}.
-     * @param catalog  The catalog, or {@code null} if none.
-     * @param schema   The schema, or {@code null} if none.
-     */
-    private Query(final Database database, final String catalog, final String schema) {
+    public Query(final Database database, final String table) {
         this.database = database;
-    }
-
-    /**
-     * If every columns come from the same table (the usual case), returns their table name.
-     * Otherwise returns the table name that occurs most frequently.
-     *
-     * @throws NoSuchElementException if this query do not contains any column.
-     */
-    final String getTableName() throws NoSuchElementException {
-        final FrequencySortedSet<String> names = new FrequencySortedSet<String>(true);
-        for (int i=0; i<columns.length; i++) {
-            names.add(columns[i].table);
-        }
-        return names.first();
+        this.table    = table;
     }
 
     /**
@@ -152,6 +132,32 @@ public class Query {
     }
 
     /**
+     * Creates a new mandatory column with the specified name.
+     *
+     * @param name  The column name.
+     * @param types Types of the queries where the column shall appears, or {@code null}
+     *              if the column is applicable to any kind of queries.
+     * @return The newly added column.
+     */
+    protected final Column addColumn(final String name, final QueryType... types) {
+        return addForeignerColumn(table, name, types);
+    }
+
+    /**
+     * Creates a new optional column with the specified name and default value.
+     *
+     * @param name  The column name.
+     * @param defaultValue The default value if the column is not present in the database.
+     *              Should be a {@link Number}, a {@link String} or {@code null}.
+     * @param types Types of the queries where the column shall appears, or {@code null}
+     *              if the column is applicable to any kind of queries.
+     * @return The newly added column.
+     */
+    protected final Column addColumn(final String name, final Object defaultValue, final QueryType... types) {
+        return addForeignerColumn(table, name, defaultValue, types);
+    }
+
+    /**
      * Creates a new mandatory column from the specified table with the specified name.
      *
      * @param table The name of the table that contains the column.
@@ -160,8 +166,9 @@ public class Query {
      *              if the column is applicable to any kind of queries.
      * @return The newly added column.
      */
-    protected Column addColumn(final String table, final String name, final QueryType... types) {
-        return addColumn(table, name, Column.MANDATORY, types);
+    protected Column addForeignerColumn(final String table, final String name, final QueryType... types) {
+        return new Column(this, table, name, name, Column.MANDATORY, types);
+        // The addition into this query is performed by the Column constructor.
     }
 
     /**
@@ -176,7 +183,7 @@ public class Query {
      *              if the column is applicable to any kind of queries.
      * @return The newly added column.
      */
-    protected Column addColumn(final String table, final String name, final Object defaultValue, final QueryType... types) {
+    protected Column addForeignerColumn(final String table, final String name, final Object defaultValue, final QueryType... types) {
         return new Column(this, table, name, name, defaultValue, types);
         // The addition into this query is performed by the Column constructor.
     }
@@ -239,17 +246,36 @@ public class Query {
     }
 
     /**
+     * Returns {@code true} if this query contains at least one column or parameter
+     * for the given type.
+     */
+    private boolean useQueryType(final QueryType type) {
+        for (final IndexedSqlElement element : columns) {
+            if (element.indexOf(type) != 0) {
+                return true;
+            }
+        }
+        for (final IndexedSqlElement element : parameters) {
+            if (element.indexOf(type) != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Creates the SQL statement for selecting all records.
      * No SQL parameters are expected for this statement.
      *
-     * @param  buffer The buffer in which to write the SQL statement.
-     * @param  type The query type.
-     * @param  metadata The database metadata, used for inspection of primary and foreigner keys.
+     * @param  buffer     The buffer in which to write the SQL statement.
+     * @param  type       The query type.
+     * @param  maxColumns The maximum number of columns to put in the query.
+     * @param  metadata   The database metadata, used for inspection of primary and foreigner keys.
      * @param  joinParameters {@code true} if we should take parameters in account for determining
      *         the {@code JOIN ... ON} clauses.
      * @throws SQLException if an error occured while reading the database.
      */
-    private void selectAll(final StringBuilder buffer, final QueryType type,
+    private void selectAll(final StringBuilder buffer, final QueryType type, int maxColumns,
                            final DatabaseMetaData metadata, final boolean joinParameters)
             throws SQLException
     {
@@ -264,6 +290,10 @@ public class Query {
         for (final Column column : columns) {
             if (column.indexOf(type) == 0) {
                 // Column not to be included for the requested query type.
+                continue;
+            }
+            if (--maxColumns < 0) {
+                // Reached the maximal amount of columns to accept.
                 continue;
             }
             final String table = column.table; // Because often requested.
@@ -507,15 +537,16 @@ scan:       while (!tables.isEmpty()) {
 
     /**
      * Creates the SQL statement for the query of the given type with no {@code WHERE} clause.
+     * This is mostly used for debugging purpose.
      *
      * @param  type The query type.
      * @return The SQL statement.
      * @throws SQLException if an error occured while reading the database.
      */
-    public String selectAll(final QueryType type) throws SQLException {
+    final String selectAll(final QueryType type) throws SQLException {
         final DatabaseMetaData metadata = database.getConnection().getMetaData();
         final StringBuilder buffer = new StringBuilder();
-        selectAll     (buffer, type, metadata, false);
+        selectAll(buffer, type, Integer.MAX_VALUE, metadata, false);
         appendOrdering(buffer, type, metadata);
         return buffer.toString();
     }
@@ -532,11 +563,34 @@ scan:       while (!tables.isEmpty()) {
         synchronized (cachedSQL) {
             sql = cachedSQL.get(type);
             if (sql == null) {
+                QueryType buildType   = type;
+                int       maxColumns  = Integer.MAX_VALUE;
+                boolean   sortEntries = true;
+                /*
+                 * If the type is not described at all in this query, then tries
+                 * to fallback on some default depending on the query type.
+                 */
+                if (!useQueryType(type)) switch (type) {
+                    case EXISTS: {
+                        /*
+                         * The user asked for a query of type EXISTS but didn't provided any explicit
+                         * definition for it. We will fallback on a default (and often suffisient) behavior:
+                         * handle EXISTS in the same way than SELECT, except that we will fetch only the first
+                         * column (usually the identifier) instead of all of them. Since we only want to see
+                         * if at least one row exists, this is usually suffisient.
+                         */
+                        buildType   = QueryType.SELECT;
+                        maxColumns  = 1;
+                        sortEntries = false;
+                    }
+                }
                 final DatabaseMetaData metadata = database.getConnection().getMetaData();
                 final StringBuilder buffer = new StringBuilder();
-                selectAll       (buffer, type, metadata, true);
-                appendParameters(buffer, type, metadata);
-                appendOrdering  (buffer, type, metadata);
+                selectAll(buffer, buildType, maxColumns, metadata, true);
+                appendParameters(buffer, buildType, metadata);
+                if (sortEntries) {
+                    appendOrdering(buffer, buildType, metadata);
+                }
                 sql = buffer.toString();
                 cachedSQL.put(type, sql);
             }

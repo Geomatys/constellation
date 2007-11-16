@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.io.File;
+import java.io.Writer;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.FileOutputStream;
@@ -33,6 +34,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
 import javax.imageio.IIOException;
+import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageInputStream;
@@ -44,6 +46,7 @@ import org.geotools.resources.Arguments;
 import net.seagis.catalog.Database;
 import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.catalog.GridCoverageTable;
+import org.geotools.image.io.metadata.GeographicMetadata;
 
 
 /**
@@ -95,6 +98,23 @@ public final class ImageViewer {
      * @throws IOException if an error occured during I/O.
      */
     public static RenderedImage read(final File file) throws IOException {
+        return read(file, 0, null);
+    }
+
+    /**
+     * Reads an image from a file of the given name. This method is different from
+     * {@link ImageIO#read(File)} in that the file format will be infered from the
+     * filename extension.
+     *
+     * @param  file The source filename.
+     * @param  imageIndex Index of the image to be read.
+     * @param  out If non-null, the stream where to write metadata.
+     * @return The image.
+     * @throws IOException if an error occured during I/O.
+     */
+    private static RenderedImage read(final File file, final int imageIndex, final Writer out)
+            throws IOException
+    {
         final String filename = file.getName();
         final int dot = filename.lastIndexOf('.');
         if (dot < 0) {
@@ -113,7 +133,13 @@ public final class ImageViewer {
                 input = ImageIO.createImageInputStream(file);
                 reader.setInput(input);
             }
-            final RenderedImage image = reader.readAsRenderedImage(0, null);
+            final RenderedImage image = reader.readAsRenderedImage(imageIndex, null);
+            if (out != null) {
+                final IIOMetadata metadata = reader.getImageMetadata(imageIndex);
+                if (metadata instanceof GeographicMetadata) {
+                    out.write(metadata.toString());
+                }
+            }
             reader.dispose();
             if (input != null) {
                 input.close();
@@ -136,7 +162,7 @@ public final class ImageViewer {
         int dot = filename.lastIndexOf('.');
         String extension;
         if (dot >= 0) {
-            extension = filename.substring(dot+1);
+            extension = filename.substring(dot + 1);
         } else {
             dot       = filename.length();
             extension = "png";
@@ -230,6 +256,17 @@ public final class ImageViewer {
     }
 
     /**
+     * Prints some properties about the given image.
+     */
+    private static void printProperties(final RenderedImage image, final PrintWriter out) {
+        out.println("Image properties");
+        out.print("  min x  : "); out.println(image.getMinX());
+        out.print("  min y  : "); out.println(image.getMinY());
+        out.print("  width  : "); out.println(image.getWidth());
+        out.print("  height : "); out.println(image.getHeight());
+    }
+
+    /**
      * Command line tool. Options are
      * <p>
      * <ul>
@@ -263,12 +300,9 @@ public final class ImageViewer {
         if (layer == null) {
             for (int i=0; i<args.length; i++) {
                 final String filename = args[i];
-                final RenderedImage image = read(new File(filename));
-                out.println(filename);
-                out.print("  min X  : "); out.println(image.getMinX());
-                out.print("  min Y  : "); out.println(image.getMinY());
-                out.print("  Width  : "); out.println(image.getWidth());
-                out.print("  Height : "); out.println(image.getHeight());
+                out.print("Filename: "); out.println(filename);
+                final RenderedImage image = read(new File(filename), 0, out);
+                printProperties(image, out);
                 if (show) {
                     show(image, filename);
                 }
@@ -281,7 +315,10 @@ public final class ImageViewer {
                 final CoverageReference ref = coverages.getEntry(file);
                 final GridCoverage2D coverage = ref.getCoverage(null);
                 final RenderedImage image = coverage.geophysics(false).getRenderedImage();
-                show(image, file);
+                printProperties(image, out);
+                if (show) {
+                    show(image, file);
+                }
             }
             database.close();
         } catch (Exception e) {

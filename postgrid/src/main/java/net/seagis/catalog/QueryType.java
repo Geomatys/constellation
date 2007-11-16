@@ -25,31 +25,39 @@ import java.util.logging.Level;
  */
 public enum QueryType {
     /**
-     * Only one record will be selected using a name. This is the kind of query executed by
+     * Only one entry will be selected using a name. This is the kind of query executed by
      * {@link SingletonTable#getEntry(String)}.
      */
     SELECT(),
 
     /**
-     * Only one record will be selected using a numeric identifier. This is the kind of
+     * Only one entry will be selected using a numeric identifier. This is the kind of
      * query executed by {@link SingletonTable#getEntry(int)}.
      */
     SELECT_BY_IDENTIFIER(),
 
     /**
-     * Every records will be listed. This is the kind of query executed by
+     * Checks if an entry exists. This query is similar to {@link #SELECT} except that it
+     * doesn't ask for any column, so the query is simplier for the database. The parameters
+     * are usually the same than {@link #SELECT} and we are only interrested to see if the
+     * result set contains at least one entry.
+     */
+    EXISTS(),
+
+    /**
+     * Every entries will be listed. This is the kind of query executed by
      * {@link SingletonTable#getEntries()}.
      */
     LIST(),
 
     /**
-     * Records will be listed using some filter. This is the same as {@link #LIST},
+     * Entries will be listed using some filter. This is the same as {@link #LIST},
      * but with some additional criterions left to {@link Table} implementations.
      */
     FILTERED_LIST(),
 
     /**
-     * Selects spatio-temporal envelope in a set of records. This is the kind of
+     * Selects spatio-temporal envelope in a set of entries. This is the kind of
      * query executed by {@link BoundedSingletonTable#getEnvelope()}.
      */
     BOUNDING_BOX(),
@@ -60,14 +68,9 @@ public enum QueryType {
     AVAILABLE_DATA(),
 
     /**
-     * Checks if a record exists. This query usually don't fetch values.
+     * An entry to be added in a table.
      */
-    EXISTS(),
-
-    /**
-     * A record to be added in a table.
-     */
-    INSERT(LoggingLevel.INSERT);
+    INSERT(LoggingLevel.UPDATE);
 
     /**
      * The suggested level for logging SQL statement of this kind.

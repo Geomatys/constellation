@@ -46,13 +46,13 @@ final class SampleDimensionQuery extends Query {
      * @param database The database for which this query is created.
      */
     public SampleDimensionQuery(final Database database) {
-        super(database);
+        super(database, "SampleDimensions");
         final Column format;
         final QueryType[] usage = {LIST, FILTERED_LIST};
-        identifier = addColumn("SampleDimensions", "identifier", usage);
-        format     = addColumn("SampleDimensions", "format",     LIST );
-        band       = addColumn("SampleDimensions", "band", 1,    usage);
-        units      = addColumn("SampleDimensions", "units",      usage);
+        identifier = addColumn("identifier", usage);
+        format     = addColumn("format",     LIST );
+        band       = addColumn("band", 1,    usage);
+        units      = addColumn("units",      usage);
         byFormat   = addParameter(format, FILTERED_LIST);
         band.setOrdering("ASC", usage);
     }

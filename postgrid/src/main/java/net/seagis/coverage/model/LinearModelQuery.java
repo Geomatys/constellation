@@ -46,13 +46,13 @@ final class LinearModelQuery extends Query {
      * @param database The database for which this query is created.
      */
     public LinearModelQuery(final Database database) {
-        super(database);
+        super(database, "LinearModelTerms");
         final Column target;
         final QueryType[] usage = {SELECT};
-        target      = addColumn   ("LinearModelTerms", "target",      LIST);
-        source1     = addColumn   ("LinearModelTerms", "source1",     usage);
-        source2     = addColumn   ("LinearModelTerms", "source2",     usage);
-        coefficient = addColumn   ("LinearModelTerms", "coefficient", usage);
+        target      = addColumn   ("target",      LIST);
+        source1     = addColumn   ("source1",     usage);
+        source2     = addColumn   ("source2",     usage);
+        coefficient = addColumn   ("coefficient", usage);
         byTarget    = addParameter(target, usage);
         source1.setOrdering("ASC", usage);
         source2.setOrdering("ASC", usage);

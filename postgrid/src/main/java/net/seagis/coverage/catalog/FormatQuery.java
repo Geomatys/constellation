@@ -46,11 +46,11 @@ final class FormatQuery extends Query {
      * @param database The database for which this query is created.
      */
     public FormatQuery(final Database database) {
-        super(database);
+        super(database, "Formats");
         final QueryType[] usage = {SELECT, LIST};
-        name     = addColumn("Formats", "name",     usage);
-        mimeType = addColumn("Formats", "mime",     usage);
-        encoding = addColumn("Formats", "encoding", usage);
+        name     = addColumn("name",     usage);
+        mimeType = addColumn("mime",     usage);
+        encoding = addColumn("encoding", usage);
         byName   = addParameter(name, SELECT);
         name.setOrdering("ASC", LIST);
     }

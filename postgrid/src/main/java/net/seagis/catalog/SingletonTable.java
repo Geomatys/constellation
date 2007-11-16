@@ -514,7 +514,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
         if (indexByName == 0) {
             throw new IllegalStateException();
         }
-        final PreparedStatement statement = getStatement(SELECT_BY_NAME);
+        final PreparedStatement statement = getStatement(QueryType.EXISTS);
         statement.setString(indexByName, name);
         final ResultSet results = statement.executeQuery();
         final boolean hasNext = results.next();

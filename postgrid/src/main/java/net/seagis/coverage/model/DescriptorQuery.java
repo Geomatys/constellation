@@ -46,15 +46,15 @@ final class DescriptorQuery extends Query {
      * @param database The database for which this query is created.
      */
     public DescriptorQuery(final Database database) {
-        super(database);
+        super(database, "Descriptors");
         final QueryType[] usage  = {SELECT, SELECT_BY_IDENTIFIER, LIST};
-        identifier   = addColumn   ("Descriptors", "identifier",   usage);
-        symbol       = addColumn   ("Descriptors", "symbol",       usage);
-        layer        = addColumn   ("Descriptors", "layer",        usage);
-        operation    = addColumn   ("Descriptors", "operation",    usage);
-        region       = addColumn   ("Descriptors", "region",       usage);
-        band         = addColumn   ("Descriptors", "band",         usage);
-        distribution = addColumn   ("Descriptors", "distribution", usage);
+        identifier   = addColumn   ("identifier",   usage);
+        symbol       = addColumn   ("symbol",       usage);
+        layer        = addColumn   ("layer",        usage);
+        operation    = addColumn   ("operation",    usage);
+        region       = addColumn   ("region",       usage);
+        band         = addColumn   ("band",         usage);
+        distribution = addColumn   ("distribution", usage);
         bySymbol     = addParameter(symbol,     SELECT);
         byIdentifier = addParameter(identifier, SELECT_BY_IDENTIFIER);
         identifier.setOrdering("ASC", LIST);

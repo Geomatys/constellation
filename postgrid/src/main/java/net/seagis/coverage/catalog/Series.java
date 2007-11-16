@@ -51,12 +51,18 @@ public interface Series extends Element {
     Format getFormat();
 
     /**
+     * Returns the URL protocol for data transmission. The protocol may be for example
+     * {@code "file"}, {@code "ftp"} or {@code "dods"} (the later is for OpenDAP).
+     */
+    String getProtocol();
+
+    /**
      * Returns the given filename as a {@link File} augmented with series-dependent
      * {@linkplain File#getParent parent} and extension. The returned file should be
      * {@linkplain File#isAbsolute absolute}. If it is not, then there is probably no
      * {@linkplain net.seagis.catalog.ConfigurationKey#ROOT_DIRECTORY root directory}
      * set and consequently the file is probably not accessible locally. In such case,
-     * consider using {@link #url} instead.
+     * consider using {@link #uri} instead.
      *
      * @param  filename The filename, not including the extension.
      * @return The file.

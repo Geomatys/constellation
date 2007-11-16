@@ -45,6 +45,7 @@ import java.util.Properties;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.NoSuchElementException;
+import java.util.concurrent.locks.ReentrantLock;
 import java.lang.reflect.Constructor;
 
 import org.geotools.io.TableWriter;
@@ -131,10 +132,20 @@ public class Database {
     private final boolean isStatementFormatted;
 
     /**
-     * If non-null, SQL {@code INSERT} statements will not be executed but will rather
-     * be printed to this stream. This is used for testing and debugging purpose only.
+     * If non-null, SQL {@code INSERT}, {@code UPDATE} or {@code DELETE} statements will not be
+     * executed but will rather be printed to this stream. This is used for testing and debugging
+     * purpose only.
      */
-    private PrintWriter insertSimulator;
+    private PrintWriter updateSimulator;
+
+    /**
+     * Lock for transactions performing write operations. The {@link Connection#commit} or
+     * {@link Connection#rollback} method will be invoked when the lock count reach zero.
+     *
+     * @see #transactionBegin
+     * @see #transactionEnd
+     */
+    private final ReentrantLock transactionLock = new ReentrantLock(true);
 
     /**
      * The tables created up to date.
@@ -226,11 +237,15 @@ public class Database {
      * @param  connection The connection to the database.
      * @param  properties The configuration properties, like the driver used or the root
      *         directory for images.
-     * @throws IOException if an error occured.
+     * @throws SQLException if an error occured while configuring the connection.
+     * @throws IOException if an error occured while reading additional configuration data.
      */
-    public Database(final Connection connection,  final Properties properties) throws IOException {
+    public Database(final Connection connection,  final Properties properties)
+            throws IOException, SQLException
+    {
         this(null, properties, null);
         this.connection = connection;
+        setupConnection();
     }
 
     /**
@@ -370,12 +385,23 @@ public class Database {
                     connection = null;
                 }
             }
-            if (connection != null) {
-                connection.setReadOnly(Boolean.valueOf(getProperty(ConfigurationKey.READONLY)));
-                Element.LOGGER.info("Connecté à la base de données " + connection.getMetaData().getURL());
-            }
+            setupConnection();
         }
         return connection;
+    }
+
+    /**
+     * Setup the connection. This method is invoked when a new connection is etablished
+     * or supplied by user.
+     *
+     * @throws SQLException if an error occured while setting-up the connection.
+     */
+    private void setupConnection() throws SQLException {
+        if (connection != null) {
+            connection.setReadOnly(Boolean.valueOf(getProperty(ConfigurationKey.READONLY)));
+            connection.setAutoCommit(false);
+            Element.LOGGER.info("Connecté à la base de données " + connection.getMetaData().getURL());
+        }
     }
 
     /**
@@ -582,19 +608,20 @@ public class Database {
     }
 
     /**
-     * If non-null, SQL {@code INSERT} statements will not be executed but will rather
-     * be printed to this stream. This is used for testing and debugging purpose only.
+     * If non-null, SQL {@code INSERT}, {@code UPDATE} or {@code DELETE} statements will not be
+     * executed but will rather be printed to this stream. This is used for testing and debugging
+     * purpose only.
      */
-    public void setInsertSimulator(final PrintWriter out) {
-        insertSimulator = out;
+    public void setUpdateSimulator(final PrintWriter out) {
+        updateSimulator = out;
     }
 
     /**
-     * Returns the value set by the last call to {@link #setInsertSimulator},
+     * Returns the value set by the last call to {@link #setUpdateSimulator},
      * or {@code null} if none.
      */
-    final PrintWriter getInsertSimulator() {
-        return insertSimulator;
+    final PrintWriter getUpdateSimulator() {
+        return updateSimulator;
     }
 
     /**
@@ -619,6 +646,60 @@ public class Database {
      */
     private void unexpectedException(final String method, final Exception exception) {
         Logging.unexpectedException(Element.LOGGER, Database.class, method, exception);
+    }
+
+    /**
+     * Invoked before an arbitrary amount of {@code INSERT}, {@code UPDATE} or {@code DELETE}
+     * SQL statement. This method <strong>must</strong> be invoked in a {@code try} ... {@code
+     * finally} block as below:
+     *
+     * <blockquote><pre>
+     * boolean success = false;
+     * transactionBegin();
+     * try {
+     *     // Do some operation here...
+     *     success = true;
+     * } finally {
+     *     transactionEnd(success);
+     * }
+     * </pre></blockquote>
+     *
+     * @throws SQLException If the operation failed.
+     */
+    final void transactionBegin() throws SQLException {
+        transactionLock.lock();
+    }
+
+    /**
+     * Invoked after the {@code INSERT}, {@code UPDATE} or {@code DELETE}
+     * SQL statement finished.
+     *
+     * @param  success {@code true} if the operation succeed and should be commited,
+     *         or {@code false} if we should rollback.
+     * @throws SQLException If the commit or the rollback failed.
+     */
+    final void transactionEnd(final boolean success) throws SQLException {
+        if (transactionLock.getHoldCount() == 1) {
+            if (connection != null) {
+                synchronized (this) {
+                    if (success) {
+                        connection.commit();
+                    } else {
+                        connection.rollback();
+                    }
+                }
+            }
+        }
+        transactionLock.unlock();
+    }
+
+    /**
+     * Ensures that the current thread is allowed to performs a transaction.
+     */
+    final void ensureTransaction() throws IllegalMonitorStateException {
+        if (!transactionLock.isHeldByCurrentThread()) {
+            throw new IllegalMonitorStateException();
+        }
     }
 
     /**

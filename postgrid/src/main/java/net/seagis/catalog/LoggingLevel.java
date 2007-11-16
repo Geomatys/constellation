@@ -27,7 +27,7 @@ import java.util.logging.Level;
  */
 public final class LoggingLevel extends Level {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * For cross-version compatibility.
      */
     private static final long serialVersionUID = 7505485471495575298L;
 
@@ -37,35 +37,21 @@ public final class LoggingLevel extends Level {
     private static final int BASE = 750;
 
     /**
-     * Logging level for SQL {@code SELECT} statements.
+     * Logging level for any read operations (SQL {@code SELECT} statements).
      */
     public static final Level SELECT = new LoggingLevel("SELECT", BASE);
 
     /**
-     * Logging level for SQL {@code INSERT} statements.
+     * Logging level for any write operations (SQL {@code INSERT},
+     * {@code UPDATE}, {@code DELETE} or {@code CREATE} statements).
      */
-    public static final Level INSERT = new LoggingLevel("INSERT", BASE + 10);
+    public static final Level UPDATE = new LoggingLevel("UPDATE", BASE + 25);
 
     /**
-     * Logging level for SQL {@code UPDATE} statements.
-     */
-    public static final Level UPDATE = new LoggingLevel("UPDATE", BASE + 20);
-
-    /**
-     * Logging level for SQL {@code DELETE} statements.
-     */
-    public static final Level DELETE = new LoggingLevel("DELETE", BASE + 30);
-
-    /**
-     * Logging level for SQL {@code CREATE} statements.
-     */
-    public static final Level CREATE = new LoggingLevel("CREATE", BASE + 40);
-
-    /**
-     * Construit un nouveau niveau de journalisation.
+     * Constructs a new logging level.
      *
-     * @param name  Le nom du niveau (par exemple {@code "SQL_UPDATE"}.
-     * @param value La valeur du niveau.
+     * @param name  The logging level name (e.g. {@code "SELECT"}.
+     * @param value The level value.
      */
     private LoggingLevel(final String name, final int value) {
         super(name, value);

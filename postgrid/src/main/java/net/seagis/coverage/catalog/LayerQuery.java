@@ -77,13 +77,13 @@ final class LayerQuery extends Query {
      * @param database The database for which this query is created.
      */
     public LayerQuery(final Database database) {
-        super(database);
+        super(database, "Layers");
         final QueryType[] SL = {SELECT, LIST};
-        name      = addColumn("Layers", "name",              SL);
-        thematic  = addColumn("Layers", "thematic",    null, SL);
-        period    = addColumn("Layers", "period",         1, SL);
-        fallback  = addColumn("Layers", "fallback",    null, SL);
-        remarks   = addColumn("Layers", "description", null, SL);
+        name      = addColumn("name",              SL);
+        thematic  = addColumn("thematic",    null, SL);
+        period    = addColumn("period",         1, SL);
+        fallback  = addColumn("fallback",    null, SL);
+        remarks   = addColumn("description", null, SL);
         byName    = addParameter(name, SELECT);
     }
 }

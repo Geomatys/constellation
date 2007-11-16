@@ -46,7 +46,7 @@ final class GridCoverageQuery extends Query {
      * @param  database The database for which this query is created.
      */
     public GridCoverageQuery(final Database database) {
-        super(database);
+        super(database, "GridCoverages");
         final Column layer, horizontalExtent, visibility;
         final QueryType[] hiden = {                                                  };
         final QueryType[] SL    = {SELECT, LIST                                      };
@@ -55,15 +55,15 @@ final class GridCoverageQuery extends Query {
         final QueryType[] SLABI = {SELECT, LIST, AVAILABLE_DATA, BOUNDING_BOX, INSERT};
         final QueryType[] SLAB  = {SELECT, LIST, AVAILABLE_DATA, BOUNDING_BOX        };
         final QueryType[]    B  = {                              BOUNDING_BOX        };
-        layer            = addColumn("Series",         "layer",            hiden);
-        series           = addColumn("GridCoverages",  "series",           SLI  );
-        filename         = addColumn("GridCoverages",  "filename",         SLI  );
-        index            = addColumn("GridCoverages",  "index", 1,         SLI  );
-        startTime        = addColumn("GridCoverages",  "startTime",        SLABI);
-        endTime          = addColumn("GridCoverages",  "endTime",          SLABI);
-        spatialExtent    = addColumn("GridCoverages",  "extent",           SLAI );
-        horizontalExtent = addColumn("GridGeometries", "horizontalExtent",    B );
-        visibility       = addColumn("Series",         "visible", true,    hiden);
+        layer            = addForeignerColumn("Series", "layer", hiden);
+        series           = addColumn("series",    SLI  );
+        filename         = addColumn("filename",  SLI  );
+        index            = addColumn("index", 1,  SLI  );
+        startTime        = addColumn("startTime", SLABI);
+        endTime          = addColumn("endTime",   SLABI);
+        spatialExtent    = addColumn("extent",    SLAI );
+        horizontalExtent = addForeignerColumn("GridGeometries", "horizontalExtent", B);
+        visibility       = addForeignerColumn("Series", "visible", true, hiden);
 
         startTime.setFunction("MIN", B);
         endTime  .setFunction("MAX", B);

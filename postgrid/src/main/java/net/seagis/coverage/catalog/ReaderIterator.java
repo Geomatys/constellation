@@ -14,9 +14,8 @@
  */
 package net.seagis.coverage.catalog;
 
-import java.io.File;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Iterator;
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -43,16 +42,16 @@ final class ReaderIterator implements Iterator<ImageReader> {
     private final ImageReader reader;
 
     /**
-     * An iterator over the file to read, relative to current directory.
+     * An iterator over the files or URIs to read, relative to current directory.
      * The {@link Iterator#remove} method will be invoked during each iteration
      * (this is required by {@link WritableGridCoverageTable}).
      */
-    private final Iterator<Map.Entry<File,Series>> files;
+    private final Iterator<Map.Entry<Object,Series>> files;
 
     /**
-     * The next file to read, or {@code null} if none.
+     * The next file or URI to read, or {@code null} if none.
      */
-    private File next;
+    private Object next;
 
     /**
      * Creates an iterator for the specified files using the specified format.
@@ -62,7 +61,7 @@ final class ReaderIterator implements Iterator<ImageReader> {
      * @param  next   The first element from the given iterator.
      * @throws IIOException if the format was not found.
      */
-    ReaderIterator(final Series series, final Iterator<Map.Entry<File,Series>> files, final File next)
+    ReaderIterator(final Series series, final Iterator<Map.Entry<Object,Series>> files, final Object next)
             throws IIOException
     {
         this.series = series;
@@ -99,7 +98,7 @@ final class ReaderIterator implements Iterator<ImageReader> {
         reader.setInput(next);
         next = null;
         while (files.hasNext()) {
-            final Map.Entry<File,Series> entry = files.next();
+            final Map.Entry<?,Series> entry = files.next();
             if (series.equals(entry.getValue())) {
                 next = entry.getKey();
                 files.remove();

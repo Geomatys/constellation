@@ -46,17 +46,17 @@ final class CategoryQuery extends Query {
      * @param database The database for which this query is created.
      */
     public CategoryQuery(final Database database) {
-        super(database);
+        super(database, "Categories");
         final Column band;
         final QueryType[] usage = {LIST, FILTERED_LIST};
-        name     = addColumn("Categories", "name",           usage);
-        band     = addColumn("Categories", "band",           LIST );
-        lower    = addColumn("Categories", "lower",          usage);
-        upper    = addColumn("Categories", "upper",          usage);
-        c0       = addColumn("Categories", "c0",             usage);
-        c1       = addColumn("Categories", "c1",             usage);
-        function = addColumn("Categories", "function", null, usage);
-        colors   = addColumn("Categories", "colors",         usage);
+        name     = addColumn("name",           usage);
+        band     = addColumn("band",           LIST );
+        lower    = addColumn("lower",          usage);
+        upper    = addColumn("upper",          usage);
+        c0       = addColumn("c0",             usage);
+        c1       = addColumn("c1",             usage);
+        function = addColumn("function", null, usage);
+        colors   = addColumn("colors",         usage);
         byBand   = addParameter(band, FILTERED_LIST);
         lower.setOrdering("ASC", usage);
     }

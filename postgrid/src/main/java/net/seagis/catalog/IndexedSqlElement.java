@@ -64,6 +64,7 @@ abstract class IndexedSqlElement {
         if (types == null) {
             typeSet = EnumSet.allOf(QueryType.class);
             typeSet.remove(QueryType.INSERT);
+            typeSet.remove(QueryType.EXISTS); // In order to get default behavior.
         } else {
             typeSet = EnumSet.noneOf(QueryType.class);
             for (final QueryType type : types) {

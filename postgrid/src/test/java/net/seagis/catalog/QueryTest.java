@@ -36,7 +36,7 @@ public class QueryTest extends DatabaseTest {
      */
     @Test
     public void testSimple() throws SQLException {
-        final Query  query = new Query(database);
+        final Query  query = new Query(database, "Formats");
         final Column name  = new Column(query, "Formats", "name");
         final Column mime  = new Column(query, "Formats", "mime");
         final Column type  = new Column(query, "Formats", "encoding");
@@ -47,6 +47,7 @@ public class QueryTest extends DatabaseTest {
         assertEquals(3, type.indexOf(SELECT));
         assertEquals(Arrays.asList(name, mime, type), query.getColumns(SELECT));
         assertEquals("SELECT \"name\", \"mime\", \"encoding\" FROM \"Formats\"", SQL);
+        assertEquals("SELECT \"name\" FROM \"Formats\"", query.select(EXISTS));
         tryStatement(SQL);
 
         final ListIterator<Column> iterator = query.getColumns(SELECT).listIterator(2);
@@ -73,7 +74,7 @@ public class QueryTest extends DatabaseTest {
      */
     @Test
     public void testJoins() throws SQLException {
-        final Query  query     = new Query(database);
+        final Query  query     = new Query(database, "GridCoverages");
         final Column layer     = new Column(query, "Series",         "layer");
         final Column pathname  = new Column(query, "Series",         "pathname");
         final Column filename  = new Column(query, "GridCoverages",  "filename");
@@ -106,7 +107,7 @@ public class QueryTest extends DatabaseTest {
      */
     @Test
     public void testParameters() throws SQLException {
-        final Query     query      = new Query(database);
+        final Query     query      = new Query(database, "Categories");
         final Column    name       = new Column   (query, "Categories", "name");
         final Column    identifier = new Column   (query, "Categories", "lower", "identifier", null, (QueryType[]) null);
         final Column    colors     = new Column   (query, "Categories", "colors");
@@ -136,6 +137,10 @@ public class QueryTest extends DatabaseTest {
 
         actual = query.select(SELECT);
         String expected = expectedAll + " WHERE (\"name\" = ?)";
+        assertEquals(expected, actual);
+
+        actual = query.select(EXISTS);
+        expected = "SELECT \"name\" FROM \"Categories\" WHERE (\"name\" = ?)";
         assertEquals(expected, actual);
 
         actual = query.select(SELECT_BY_IDENTIFIER);
