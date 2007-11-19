@@ -24,8 +24,6 @@ import java.util.TimeZone;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.io.IOException;
-import java.sql.SQLException;
 
 import org.geotools.resources.CRSUtilities;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -44,11 +42,6 @@ import net.seagis.catalog.CRS;
  */
 public class ModelTest extends AbstractTest {
     /**
-     * Définir à {@code true} pour afficher des informations de déboguage.
-     */
-    private static final boolean verbose = true;
-
-    /**
      * L'objet à utiliser pour lire des dates.
      */
     private DateFormat dateFormat;
@@ -64,7 +57,7 @@ public class ModelTest extends AbstractTest {
      * Initialise cette suite de test.
      */
     @Override
-    protected void setUp() throws SQLException, IOException {
+    protected void setUp() throws Exception {
         super.setUp();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CANADA);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

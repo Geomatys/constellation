@@ -87,7 +87,6 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     /**
      * Returns the spatio-temporal envelope for the {@linkplain #getCoverage coverage}.
      */
-    @Override
     Envelope getEnvelope();
 
     /**
@@ -107,13 +106,11 @@ public interface CoverageReference extends Element, CoverageStack.Element {
     /**
      * For {@link org.geotools.coverage.CoverageStack.Element} implementation only.
      */
-    @Override
     NumberRange getZRange();
 
     /**
      * Returns the {@linkplain #getCoverage coverage} grid geometry.
      */
-    @Override
     GridGeometry2D getGridGeometry();
 
     /**
@@ -122,7 +119,6 @@ public interface CoverageReference extends Element, CoverageStack.Element {
      * (<code>{@linkplain GridSampleDimension#geophysics geophysics}(true)</code>), which is
      * consistent with the coverage returned by {@link #getCoverage getCoverage(...)}.
      */
-    @Override
     SampleDimension[] getSampleDimensions();
 
     /**
@@ -146,7 +142,6 @@ public interface CoverageReference extends Element, CoverageStack.Element {
      *
      * @todo Should probable thrown an exception instead of returning null when the reading is aborted.
      */
-    @Override
     GridCoverage2D getCoverage(IIOListeners listeners) throws IOException;
 
     /**
@@ -184,19 +179,19 @@ public interface CoverageReference extends Element, CoverageStack.Element {
             }
         }
 
-        public @Override CoverageReference         getBackingElement()            {return ref;}
-        public @Override Series                    getSeries()                    {return ref.getSeries();}
-        public @Override File                      getFile()                      {return ref.getFile();}
-        public @Override URI                       getURI()                       {return ref.getURI();}
-        public @Override GridGeometry2D            getGridGeometry()              {return ref.getGridGeometry();}
-        public @Override CoordinateReferenceSystem getCoordinateReferenceSystem() {return ref.getCoordinateReferenceSystem();}
-        public @Override Envelope                  getEnvelope()                  {return ref.getEnvelope();}
-        public @Override NumberRange               getZRange()                    {return ref.getZRange();}
-        public @Override DateRange                 getTimeRange()                 {return ref.getTimeRange();}
-        public @Override GeographicBoundingBox     getGeographicBoundingBox()     {return ref.getGeographicBoundingBox();}
-        public @Override SampleDimension[]         getSampleDimensions()          {return ref.getSampleDimensions();}
-        public @Override void                      abort()                        {       ref.abort();}
-        public @Override GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
+        public CoverageReference         getBackingElement()            {return ref;}
+        public Series                    getSeries()                    {return ref.getSeries();}
+        public File                      getFile()                      {return ref.getFile();}
+        public URI                       getURI()                       {return ref.getURI();}
+        public GridGeometry2D            getGridGeometry()              {return ref.getGridGeometry();}
+        public CoordinateReferenceSystem getCoordinateReferenceSystem() {return ref.getCoordinateReferenceSystem();}
+        public Envelope                  getEnvelope()                  {return ref.getEnvelope();}
+        public NumberRange               getZRange()                    {return ref.getZRange();}
+        public DateRange                 getTimeRange()                 {return ref.getTimeRange();}
+        public GeographicBoundingBox     getGeographicBoundingBox()     {return ref.getGeographicBoundingBox();}
+        public SampleDimension[]         getSampleDimensions()          {return ref.getSampleDimensions();}
+        public void                      abort()                        {       ref.abort();}
+        public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
             return ref.getCoverage(listeners);
         }
     }

@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.units.SI;
@@ -42,6 +43,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 import net.seagis.util.DateRange;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
+import net.seagis.catalog.UpdatePolicy;
 import net.seagis.catalog.CatalogException;
 import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.resources.i18n.Resources;
@@ -58,6 +60,11 @@ import net.seagis.resources.i18n.Resources;
  * @author Antoine Hnawia
  */
 public class WritableGridCoverageTable extends GridCoverageTable {
+    /**
+     * The 
+     */
+    private Series series;
+
     /**
      * Constructs a new {@code WritableGridCoverageTable}.
      *
@@ -325,11 +332,32 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      *         in the scan. New series may be created if subdirectories are found.
      * @return The number of images inserted.
      */
-    public synchronized int completeLayer(final boolean includeSubdirectories)
+    public synchronized int completeLayer(final boolean includeSubdirectories, final UpdatePolicy policy)
             throws CatalogException, SQLException, IOException
     {
-        final Map<Object,Series> files = new LinkedHashMap<Object,Series>();
-        for (final Series series : getLayer().getSeries()) {
+        final Layer layer = getNonNullLayer();
+        Set<CoverageReference> coverages = null;
+        final Map<Object,Series> inputs = new LinkedHashMap<Object,Series>();
+        for (final Series series : layer.getSeries()) {
+            /*
+             * The inputs map will contains File or URI objects. If the protocol is "file",
+             * we will scan the directory and put File objects in the map. Otherwise and if
+             * the user asked for the replacement of existing file, we just copy the set of
+             * existing URI. Otherwise we do nothing since we can't get the list of new items.
+             */
+            if (!series.getProtocol().equalsIgnoreCase("file")) {
+                if (UpdatePolicy.REPLACE_EXISTING.equals(policy)) {
+                    if (coverages == null) {
+                        coverages = layer.getCoverageReferences();
+                    }
+                    for (final CoverageReference coverage : coverages) {
+                        if (series.equals(coverage.getSeries())) {
+                            inputs.put(coverage.getURI(), series);
+                        }
+                    }
+                }
+                continue;
+            }
             File directory = series.file("*");
             if (directory != null) {
                 final String filename = directory.getName();
@@ -347,12 +375,12 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 if (directory != null) {
                     final File[] list = directory.listFiles(filter);
                     if (list != null) {
-                        add(files, list, filter, series);
+                        addFiles(inputs, list, filter, series);
                         continue;
                     }
                 }
             }
-            LOGGER.warning("Le répertoire de la série \"" + series + "\" n'a pas été trouvé."); // TODO: localize
+            LOGGER.warning(Resources.format(ResourceKeys.ERROR_DIRECTORY_NOT_FOUND_$1, directory.getPath()));
         }
         /*
          * We now have a list of every files found in the directories. Now remove the files that
@@ -364,7 +392,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         boolean success = false;
         transactionBegin();
         try {
-            for (final Iterator<Object> it=files.keySet().iterator(); it.hasNext();) {
+            for (final Iterator<Object> it=inputs.keySet().iterator(); it.hasNext();) {
                 final File file = (File) it.next();
                 String filename = file.getName();
                 final int split = filename.lastIndexOf('.');
@@ -383,7 +411,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
              *       In current state of affairs, we will get a NullPointerException).
              */
             Iterator<Map.Entry<Object,Series>> it;
-            while ((it = files.entrySet().iterator()).hasNext()) {
+            while ((it = inputs.entrySet().iterator()).hasNext()) {
                 Map.Entry<Object,Series> entry = it.next();
                 final Series series = entry.getValue();
                 final Object next = entry.getKey();
@@ -407,8 +435,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * @param  filter The filename filter, or {@code null} for including all files.
      * @param  series The series to use as value in the map.
      */
-    private static void add(final Map<Object,Series> files, final File[] toAdd,
-                            final FileFilter filter, final Series series)
+    private static void addFiles(final Map<Object,Series> files, final File[] toAdd,
+                                 final FileFilter filter, final Series series)
     {
         Arrays.sort(toAdd);
         for (final File file : toAdd) {
@@ -416,7 +444,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             if (list != null) {
                 // If scanning sub-directories, invokes this method recursively but without
                 // assigning series, since we will need to create a new series entry.
-                add(files, list, filter, null);
+                addFiles(files, list, filter, null);
             } else {
                 final Series old = files.put(file, series);
                 if (old != null) {

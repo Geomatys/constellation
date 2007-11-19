@@ -76,6 +76,16 @@ public class CatalogException extends Exception {
     }
 
     /**
+     * Creates an exception with the specified details message and cause.
+     *
+     * @param message The detail message.
+     * @param cause The cause for this exception.
+     */
+    public CatalogException(final String message, final Exception cause) {
+        super(message, cause);
+    }
+
+    /**
      * Returns {@code true} if {@link #setMetadata} has been invoked with non-null values.
      */
     final boolean isMetadataInitialized() {

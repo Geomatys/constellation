@@ -27,7 +27,6 @@ import junit.framework.TestSuite;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.util.Logging;
 import org.geotools.resources.Arguments;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
@@ -79,19 +78,18 @@ public class SeriesTest extends AbstractTest {
      * Exécute la suite de tests à partir de la ligne de commande.
      */
     public static void main(final String[] args) {
-        Logging.ALL.forceMonolineConsoleOutput();
         final Arguments arguments = new Arguments(args);
         Locale.setDefault(arguments.locale);
         junit.textui.TestRunner.run(suite());
     }
 
     /**
-     * Etablit la connexion avec la base de données. Cette connexion ne sera établie que la
+     * Établit la connexion avec la base de données. Cette connexion ne sera établie que la
      * première fois où un test sera exécuté. Pour la fermeture des connections, on se fiera
      * au rammase-miettes et aux "shutdown hooks" mis en place par {@code Database}.
      */
     @Override
-    protected void setUp() throws SQLException, IOException {
+    protected void setUp() throws Exception {
         super.setUp();
         if (layers == null) {
             layers = database.getTable(LayerTable.class);

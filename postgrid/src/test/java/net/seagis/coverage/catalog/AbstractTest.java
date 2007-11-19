@@ -65,10 +65,10 @@ public class AbstractTest extends TestCase {
     }
 
     /**
-     * Etablit la connexion avec la base de données.
+     * Établit la connexion avec la base de données.
      */
     @Override
-    protected void setUp() throws SQLException, IOException {
+    protected void setUp() throws Exception {
         if (database == null) {
             database = new Database();
         }

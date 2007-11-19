@@ -110,7 +110,9 @@ public class SeriesTable extends SingletonTable<Series> {
      * selected layer}.
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
+    protected void configure(final QueryType type, final PreparedStatement statement)
+            throws CatalogException, SQLException
+    {
         super.configure(type, statement);
         final SeriesQuery query = (SeriesQuery) super.query;
         final int index = query.byLayer.indexOf(type);

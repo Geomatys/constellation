@@ -73,11 +73,6 @@ public abstract class SingletonTable<E extends Element> extends Table {
     private static final int MAXIMUM_AUTO_INCREMENT = 999;
 
     /**
-     * The table name for insert statements, or {@code null} if not yet computed.
-     */
-    private String tableName;
-
-    /**
      * The main parameter to use for the identification of a record, or {@code null}
      * if unknown.
      */
@@ -126,7 +121,6 @@ public abstract class SingletonTable<E extends Element> extends Table {
      */
     protected SingletonTable(final SingletonTable<E> table) {
         super(table);
-        tableName     = table.tableName;
         primaryKey    = table.primaryKey;
         indexByName   = table.indexByName;
         indexByNumber = table.indexByNumber;
@@ -187,21 +181,9 @@ public abstract class SingletonTable<E extends Element> extends Table {
             primaryKey    = newPK;
             indexByName   = newByName;
             indexByNumber = newByNumber;
-            tableName     = (newPK != null) ? newPK.column.table : null;
             clearCache();
             fireStateChanged("identifierParameters");
         }
-    }
-
-    /**
-     * Returns the name of the table that contains the entry identifiers.
-     */
-    @Override
-    public String getName() {
-        if (tableName == null) {
-            tableName = super.getName();
-        }
-        return tableName;
     }
 
     /**
@@ -286,8 +268,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * @param  key The primary key for the record to look for.
      * @param  index The primary key column. Used mostly for formatting error messages.
      * @return The record (never {@code null}).
-     * @throws CatalogException if no record was found for the specified key, or if a
-     *         record is invalid.
+     * @throws NoSuchRecordException if no record was found for the specified key.
+     * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if a SQL error occured while reading the database.
      */
     private E executeQuery(final PreparedStatement statement, Object key, final int index)
@@ -358,8 +340,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
      *
      * @param  identifier The numeric identifier of the element to fetch.
      * @return The element for the given numeric identifier.
-     * @throws CatalogException if no element has been found for the specified identifier,
-     *         or if an element contains invalid data.
+     * @throws NoSuchRecordException if no record was found for the specified key.
+     * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from the database.
      */
     public synchronized E getEntry(final int identifier) throws CatalogException, SQLException {
@@ -381,8 +363,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
      *
      * @param  name The name of the element to fetch.
      * @return The element for the given name, or {@code null} if {@code name} was null.
-     * @throws CatalogException if no element has been found for the specified name,
-     *         or if an element contains invalid data.
+     * @throws NoSuchRecordException if no record was found for the specified key.
+     * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from the database.
      */
     public synchronized E getEntry(String name) throws CatalogException, SQLException {
@@ -407,7 +389,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * set will not alter this table.
      *
      * @return The set of entries. May be empty, but neven {@code null}.
-     * @throws CatalogException if an element contains invalid data.
+     * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from the database.
      */
     public synchronized Set<E> getEntries() throws CatalogException, SQLException {
@@ -419,7 +401,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
      *
      * @param  The query type, usually {@link QueryType#LIST}.
      * @return The set of entries. May be empty, but neven {@code null}.
-     * @throws CatalogException if an element contains invalid data.
+     * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from the database.
      */
     protected Set<E> getEntries(final QueryType type) throws CatalogException, SQLException {
@@ -501,9 +483,10 @@ public abstract class SingletonTable<E extends Element> extends Table {
      *
      * @param  name The name of the element to fetch.
      * @return {@code true} if an element of the given name was found.
+     * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from the database.
      */
-    public synchronized boolean exists(String name) throws SQLException {
+    public synchronized boolean exists(String name) throws CatalogException, SQLException {
         if (name == null) {
             return false;
         }
@@ -511,15 +494,43 @@ public abstract class SingletonTable<E extends Element> extends Table {
         if (pool.containsKey(name)) {
             return true;
         }
-        if (indexByName == 0) {
-            throw new IllegalStateException();
-        }
         final PreparedStatement statement = getStatement(QueryType.EXISTS);
-        statement.setString(indexByName, name);
+        statement.setString(indexOf(primaryKey), name);
         final ResultSet results = statement.executeQuery();
         final boolean hasNext = results.next();
         results.close();
         return hasNext;
+    }
+
+    /**
+     * Deletes at most one element for the given name.
+     *
+     * @param  name The name of the element to delete.
+     * @return {@code true} if an element of the given name was found and deleted.
+     * @throws CatalogException if a logical error has been detected in the database content.
+     * @throws SQLException if an error occured will reading from or writting to the database.
+     */
+    public synchronized boolean delete(String name) throws CatalogException, SQLException {
+        if (name == null) {
+            return false;
+        }
+        name = name.trim();
+        final int count;
+        boolean success = false;
+        transactionBegin();
+        try {
+            final PreparedStatement statement = getStatement(QueryType.DELETE);
+            statement.setString(indexOf(primaryKey), name);
+            count = statement.executeUpdate();
+            if (count > 1) {
+                throw new IllegalUpdateException(count);
+            }
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
+        pool.remove(name);
+        return count != 0;
     }
 
     /**

@@ -82,7 +82,7 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
      * @throws IOException si le fichier de configuration n'a pas pu être lu.
      * @throws RemoteException si ce serveur n'a pas pu s'exporter.
      */
-    protected Server(final DataSource datasource) throws SQLException, IOException {
+    protected Server(final DataSource datasource) throws CatalogException, SQLException, IOException {
         database = new Local(datasource);
         layer = database.getTable(LayerTable.class);
     }
@@ -163,7 +163,7 @@ public class Server extends UnicastRemoteObject implements DataConnectionFactory
     /**
      * Lance le serveur RMI. Voyez la description de cette classe pour la liste des arguments.
      */
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws CatalogException, IOException, SQLException {
         final Arguments arguments = new Arguments(args);
         final boolean start    = arguments.getFlag("-start");
         final boolean stop     = arguments.getFlag("-stop");

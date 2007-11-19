@@ -70,7 +70,18 @@ public enum QueryType {
     /**
      * An entry to be added in a table.
      */
-    INSERT(LoggingLevel.UPDATE);
+    INSERT(LoggingLevel.UPDATE),
+
+    /**
+     * An entry to be deleted from a table.
+     */
+    DELETE(LoggingLevel.UPDATE);
+
+    /**
+     * Last enum value (or actually, the last one for which {@link Query} may attempt to infer
+     * column position).
+     */
+    static final int LAST = DELETE.ordinal() + 1;
 
     /**
      * The suggested level for logging SQL statement of this kind.

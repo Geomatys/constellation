@@ -69,7 +69,6 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         /**
          * {@inheritDoc}
          */
-        @Override
         public DataConnection connectLayer(final String layer) throws CatalogException, SQLException {
             final GridCoverageTable table = new GridCoverageTable(getDatabase().getTable(GridCoverageTable.class));
             table.setLayer(getEntry(layer));
@@ -84,7 +83,6 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
          * {@link LayerTable#postCreateEntry} et que cette dernière n'utilise pas cette
          * méthode. Nous l'implémentons toujours par prudence.
          */
-        @Override
         public GridCoverage getDescriptorCoverage(final String descriptor) throws CatalogException, SQLException {
             return getDatabase().getTable(DescriptorTable.class).getEntryLenient(descriptor).getCoverage();
         }
@@ -108,7 +106,6 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
      * @throws CatalogException if an inconsistent record is found in the database.
      * @throws SQLException if an error occured while reading the database.
      */
-    @Override
     protected Layer createEntry(final ResultSet results) throws CatalogException, SQLException {
         final LayerQuery query = (LayerQuery) super.query;
         final String name      = results.getString(indexOf(query.name     ));

@@ -74,7 +74,7 @@ public class DescriptorTest extends AbstractTest {
      * Etablit la connexion avec la base de données.
      */
     @Override
-    protected void setUp() throws SQLException, IOException {
+    protected void setUp() throws Exception {
         super.setUp();
         if (descriptors == null) {
             descriptors = database.getTable(DescriptorTable.class);

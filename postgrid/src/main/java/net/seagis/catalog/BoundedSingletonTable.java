@@ -511,10 +511,11 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * {@link #getGeographicBoundingBox}, {@link #getVerticalRange} and {@link #getTimeRange}. A
      * shrinking is performed only if explicitly requested by a call to {@link #trimEnvelope}.
      *
+     * @throws CatalogException If the statement can not be configured.
      * @throws SQLException if an error occured while reading the database.
      * @throws IllegalRecordException if a record contains an illegal value.
      */
-    private void ensureTrimmed(final QueryType type) throws IllegalRecordException, SQLException {
+    private void ensureTrimmed(final QueryType type) throws CatalogException, SQLException {
         assert Thread.holdsLock(this);
         if (trimRequested && !trimmed) {
             final PreparedStatement statement = getStatement(type);
@@ -569,10 +570,12 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      *
      * @param  type The query type (mat be {@code null}).
      * @param  statement The statement to configure (never {@code null}).
-     * @throws SQLException If the statement can not be configured.
+     * @throws CatalogException If the statement can not be configured.
+     * @throws SQLException if a SQL error occured while configuring the statement.
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
+    protected void configure(final QueryType type, final PreparedStatement statement)
+            throws CatalogException, SQLException {
         super.configure(type, statement);
         if (byTimeRange != null) {
             final int index = byTimeRange.indexOf(type);

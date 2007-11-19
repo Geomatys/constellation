@@ -437,7 +437,7 @@ scan:       while (!tables.isEmpty()) {
             tables = ordered;
         }
         /*
-         * Write the "FROM" and "JOIN" clauses.
+         * Writes the "FROM" and "JOIN" clauses.
          */
         separator = " FROM ";
         for (final Map.Entry<String,CrossReference> entry : tables.entrySet()) {
@@ -599,18 +599,109 @@ scan:       while (!tables.isEmpty()) {
     }
 
     /**
-     * Creates the SQL statement for inserting elements in the table that contains the given
-     * column. This method should be invoked only for queries of type {@link QueryType#INSERT}.
+     * Creates the SQL statement for inserting elements in the table.
+     * This method should be invoked only for queries of type {@link QueryType#INSERT}.
      *
-     * @param  table The name of the table in which to insert a statement.
+     * @param  type The query type (should be {@link QueryType#INSERT}).
      * @return The SQL statement, or {@code null} if there is no column in the query.
      * @throws SQLException if an error occured while reading the database.
      */
-    final String insert(final String table) throws SQLException {
-        final DatabaseMetaData metadata = database.getConnection().getMetaData();
-        final String quote = metadata.getIdentifierQuoteString().trim();
-        final Set<String> columnNames = getColumnNames(metadata, table);
-        final StringBuilder buffer = new StringBuilder("INSERT INTO ");
+    public String insert(final QueryType type) throws SQLException {
+        String sql;
+        synchronized (cachedSQL) {
+            sql = cachedSQL.get(type);
+            if (sql == null) {
+                final DatabaseMetaData metadata = database.getConnection().getMetaData();
+                final String quote = metadata.getIdentifierQuoteString().trim();
+                final Set<String> columnNames = getColumnNames(metadata, table);
+                final StringBuilder buffer = new StringBuilder("INSERT INTO ");
+                appendTable(buffer, quote);
+                String separator = " (";
+                int count = 0;
+                final String[] functions = new String[columns.length];
+                for (final Column column : columns) {
+                    if (!table.equals(column.table) || !columnNames.contains(column.name)) {
+                        // Column not to be included for an insert statement.
+                        continue;
+                    }
+                    final int index = column.indexOf(type);
+                    if (index == 0) {
+                        /*
+                         * We require the column to be explicitly declared as to be included in an INSERT
+                         * statement. This is in order to reduce the risk of unintentional write into the
+                         * database, and also because some columns are expected to be left to their default
+                         * value (sometime computed by trigger, e.g. GridGeometries.horizontalExtent).
+                         */
+                        continue;
+                    }
+                    functions[count] = column.getFunction(type);
+                    if (++count != index) {
+                        // Safety check.
+                        throw new IllegalStateException(String.valueOf(column));
+                    }
+                    buffer.append(separator).append(quote).append(column.name).append(quote);
+                    separator = ", ";
+                }
+                if (count == 0) {
+                    return null;
+                }
+                buffer.append(") VALUES");
+                separator = " (";
+                for (int i=0; i<count; i++) {
+                    final String function = functions[i];
+                    appendFunctionPrefix(buffer, function);
+                    buffer.append(separator).append('?');
+                    appendFunctionSuffix(buffer, function);
+                    separator = ", ";
+                }
+                sql = buffer.append(')').toString();
+                cachedSQL.put(type, sql);
+            }
+        }
+        return sql;
+    }
+
+    /**
+     * Creates the SQL statement for deleting elements from the table.
+     * This method should be invoked only for queries of type {@link QueryType#DELETE}.
+     *
+     * @param  type The query type (should be {@link QueryType#DELETE}).
+     * @return The SQL statement, or {@code null} if none.
+     * @throws SQLException if an error occured while reading the database.
+     */
+    public String delete(final QueryType type) throws SQLException {
+        String sql;
+        synchronized (cachedSQL) {
+            sql = cachedSQL.get(type);
+            if (sql == null) {
+                QueryType buildType = type;
+                /*
+                 * If the type is not described at all in this query,
+                 * then tries to fallback on some default.
+                 */
+                if (!useQueryType(type)) {
+                    buildType = QueryType.EXISTS;
+                    if (!useQueryType(type)) {
+                        buildType = QueryType.SELECT;
+                    }
+                }
+                final DatabaseMetaData metadata = database.getConnection().getMetaData();
+                final String quote = metadata.getIdentifierQuoteString().trim();
+                final StringBuilder buffer = new StringBuilder("DELETE FROM ");
+                appendTable(buffer, quote);
+                appendParameters(buffer, buildType, metadata);
+                sql = buffer.toString();
+                cachedSQL.put(type, sql);
+            }
+        }
+        return sql;
+    }
+
+    /**
+     * Appends the {@linkplain #table table name} to the specified buffer. The catalog and
+     * schema name are prefixed if needed.
+     */
+    private void appendTable(final StringBuilder buffer, final String quote) {
         if (database.catalog != null) {
             buffer.append(quote).append(database.catalog).append(quote).append('.');
         }
@@ -618,45 +709,6 @@ scan:       while (!tables.isEmpty()) {
             buffer.append(quote).append(database.schema).append(quote).append('.');
         }
         buffer.append(quote).append(table).append(quote);
-        String separator = " (";
-        int count = 0;
-        final String[] functions = new String[columns.length];
-        for (final Column column : columns) {
-            if (!table.equals(column.table) || !columnNames.contains(column.name)) {
-                // Column not to be included for an insert statement.
-                continue;
-            }
-            final int index = column.indexOf(QueryType.INSERT);
-            if (index == 0) {
-                /*
-                 * We require the column to be explicitly declared as to be included in an INSERT
-                 * statement. This is in order to reduce the risk of unintentional write into the
-                 * database, and also because some columns are expected to be left to their default
-                 * value (sometime computed by trigger, e.g. GridGeometries.horizontalExtent).
-                 */
-                continue;
-            }
-            functions[count] = column.getFunction(QueryType.INSERT);
-            if (++count != index) {
-                // Safety check.
-                throw new IllegalStateException(String.valueOf(column));
-            }
-            buffer.append(separator).append(quote).append(column.name).append(quote);
-            separator = ", ";
-        }
-        if (count == 0) {
-            return null;
-        }
-        buffer.append(") VALUES");
-        separator = " (";
-        for (int i=0; i<count; i++) {
-            final String function = functions[i];
-            appendFunctionPrefix(buffer, function);
-            buffer.append(separator).append('?');
-            appendFunctionSuffix(buffer, function);
-            separator = ", ";
-        }
-        return buffer.append(')').toString();
     }
 
     /**

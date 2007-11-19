@@ -26,8 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.geotools.resources.Utilities;
-import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.i18n.ResourceKeys;
 
 
 /**
@@ -62,12 +60,6 @@ public class Table {
      * @see #getStatement(QueryType)
      */
     protected final Query query;
-
-    /**
-     * The name of what looks like tha "main" table. In the simpliest case, all columns in
-     * the {@link #query} come from the same table and this field is the name of this table.
-     */
-    private String name;
 
     /**
      * The query type for current {@linkplain #statement}, or {@code null} if none.
@@ -180,13 +172,6 @@ public class Table {
     }
 
     /**
-     * Returns the table name.
-     */
-    public String getName() {
-        return query.table;
-    }
-
-    /**
      * Returns a property for the given key. This method tries to {@linkplain Database#getProperty
      * get the property} from the {@linkplain #getDatabase database} if available, or return the
      * {@linkplain ConfigurationKey#getDefaultValue default value} otherwise.
@@ -222,9 +207,12 @@ public class Table {
      *
      * @param  query The SQL query to prepare, {@code null} if none.
      * @return The prepared statement, or {@code null} if {@code query} was null.
-     * @throws SQLException if the statement can not be created.
+     * @throws CatalogException If the statement can not be configured.
+     * @throws SQLException if a SQL error occured while configuring the statement.
      */
-    protected final PreparedStatement getStatement(final String query) throws SQLException {
+    protected final PreparedStatement getStatement(final String query)
+            throws CatalogException, SQLException
+    {
         assert Thread.holdsLock(this);
         if (!Utilities.equals(querySQL, query)) {
             if (statement != null) {
@@ -272,15 +260,18 @@ public class Table {
      *
      * @param  type The query type, or {@code null}.
      * @return The prepared statement, or {@code null} if none.
-     * @throws SQLException if the statement can not be created.
+     * @throws CatalogException If the statement can not be configured.
+     * @throws SQLException if a SQL error occured while configuring the statement.
      */
-    protected final PreparedStatement getStatement(final QueryType type) throws SQLException {
+    protected final PreparedStatement getStatement(final QueryType type)
+            throws CatalogException, SQLException
+    {
         final String sql;
         if (type != null) {
-            if (type.equals(QueryType.INSERT)) {
-                sql = query.insert(getName());
-            } else {
-                sql = query.select(type);
+            switch (type) {
+                default:     sql = query.select(type); break;
+                case INSERT: sql = query.insert(type); break;
+                case DELETE: sql = query.delete(type); break;
             }
         } else {
             sql = null;
@@ -332,21 +323,21 @@ public class Table {
      * @param  statement The statement to execute.
      * @throws IllegalMonitorStateException if {@link #transactionBegin} has not been invoked
      *         at least once before this method is invoked.
-     * @throws CatalogException if the number of updated records is not exactly one.
+     * @throws CatalogException if the update can not occurs for a logical error.
      * @throws SQLException if an other error occured.
      */
     protected final void updateSingleton(final PreparedStatement statement)
-            throws IllegalMonitorStateException, CatalogException, SQLException
+            throws CatalogException, SQLException
     {
         final Database database = getDatabase();
-        database.ensureTransaction();
+        database.ensureOngoingTransaction();
         final PrintWriter out = database.getUpdateSimulator();
         if (out != null) {
             out.println(statement);
         } else {
             final int count = statement.executeUpdate();
             if (count != 1) {
-                throw new CatalogException(Resources.format(ResourceKeys.ERROR_UNEXPECTED_UPDATE_$1, count));
+                throw new IllegalUpdateException(count);
             }
         }
     }
@@ -360,9 +351,12 @@ public class Table {
      *
      * @param  type The query type.
      * @param  statement The statement to configure (never {@code null}).
-     * @throws SQLException If the statement can not be configured.
+     * @throws CatalogException If the statement can not be configured.
+     * @throws SQLException if a SQL error occured while configuring the statement.
      */
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
+    protected void configure(final QueryType type, final PreparedStatement statement)
+            throws CatalogException, SQLException
+    {
         assert Thread.holdsLock(this);
         changed = false;
     }
@@ -392,6 +386,8 @@ public class Table {
      * @param  column The column.
      * @return The column index (starting with 1).
      * @throws SQLException if the specified column is not applicable.
+     *
+     * @todo Throws {@link java.sql.SQLDataException} when we will be allowed to compile for Java 6.
      */
     protected final int indexOf(final Column column) throws SQLException {
         final int index = column.indexOf(queryType);
@@ -411,6 +407,8 @@ public class Table {
      * @param  parameter The parameter.
      * @return The parameter index (starting with 1).
      * @throws SQLException if the specified parameter is not applicable.
+     *
+     * @todo Throws {@link java.sql.SQLDataException} when we will be allowed to compile for Java 6.
      */
     protected final int indexOf(final Parameter parameter) throws SQLException {
         final int index = parameter.indexOf(queryType);
@@ -451,7 +449,7 @@ public class Table {
      *
      * @param property The name of the property that changed.
      *
-     * @todo Log the changes.
+     * @todo Log the changes. Consider throwing {@link CatalogException}.
      */
     protected void fireStateChanged(final String property) {
         assert Thread.holdsLock(this);

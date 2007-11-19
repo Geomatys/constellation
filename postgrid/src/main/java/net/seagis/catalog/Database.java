@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Statement;
 import javax.sql.DataSource;
 
@@ -44,7 +45,6 @@ import java.util.TimeZone;
 import java.util.Properties;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.NoSuchElementException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.lang.reflect.Constructor;
 
@@ -237,8 +237,8 @@ public class Database {
      * @param  connection The connection to the database.
      * @param  properties The configuration properties, like the driver used or the root
      *         directory for images.
-     * @throws SQLException if an error occured while configuring the connection.
      * @throws IOException if an error occured while reading additional configuration data.
+     * @throws SQLException if an error occured while configuring the connection.
      */
     public Database(final Connection connection,  final Properties properties)
             throws IOException, SQLException
@@ -401,6 +401,7 @@ public class Database {
             connection.setReadOnly(Boolean.valueOf(getProperty(ConfigurationKey.READONLY)));
             connection.setAutoCommit(false);
             Element.LOGGER.info("Connecté à la base de données " + connection.getMetaData().getURL());
+            // TODO: localize
         }
     }
 
@@ -487,9 +488,9 @@ public class Database {
      *
      * @param  type The table class.
      * @return An instance of a table of the specified type.
-     * @throws NoSuchElementException if the specified type is unknown to this database.
+     * @throws NoSuchTableException if the specified type is unknown to this database.
      */
-    public final <T extends Table> T getTable(final Class<T> type) throws NoSuchElementException {
+    public final <T extends Table> T getTable(final Class<T> type) throws NoSuchTableException {
         synchronized (tables) {
             T table = type.cast(tables.get(type));
             if (table == null) {
@@ -511,9 +512,9 @@ public class Database {
      *
      * @param  type Le type de la table (par exemple <code>{@linkplain StationTable}.class</code>).
      * @return Une nouvelle instance d'une table du type spécifié.
-     * @throws NoSuchElementException si le type spécifié n'est pas connu.
+     * @throws NoSuchTableException si le type spécifié n'est pas connu.
      */
-    private <T extends Table> T createTable(final Class<T> type) throws NoSuchElementException {
+    private <T extends Table> T createTable(final Class<T> type) throws NoSuchTableException {
         try {
             final Constructor<T> c = type.getConstructor(Database.class);
             return c.newInstance(this);
@@ -522,9 +523,7 @@ public class Database {
              * Attraper toutes les exceptions n'est pas recommandé,
              * mais il y en a un bon paquet dans le code ci-dessus.
              */
-            final NoSuchElementException e = new NoSuchElementException(Utilities.getShortName(type));
-            e.initCause(exception);
-            throw e;
+            throw new NoSuchTableException(Utilities.getShortName(type), exception);
         }
     }
 
@@ -679,6 +678,7 @@ public class Database {
      * @throws SQLException If the commit or the rollback failed.
      */
     final void transactionEnd(final boolean success) throws SQLException {
+        ensureOngoingTransaction();
         if (transactionLock.getHoldCount() == 1) {
             if (connection != null) {
                 synchronized (this) {
@@ -695,10 +695,12 @@ public class Database {
 
     /**
      * Ensures that the current thread is allowed to performs a transaction.
+     *
+     * @todo Use {@link java.sql.SQLNonTransientException} when we will be allowed to target Java 6.
      */
-    final void ensureTransaction() throws IllegalMonitorStateException {
+    final void ensureOngoingTransaction() throws SQLException {
         if (!transactionLock.isHeldByCurrentThread()) {
-            throw new IllegalMonitorStateException();
+            throw new SQLException("La transaction n'a pas commencé dans ce thread."); // TODO: localize
         }
     }
 
@@ -707,9 +709,8 @@ public class Database {
      * method does nothing.
      *
      * @throws SQLException if an error occured while closing the connection.
-     * @throws IOException if some {@linkplain #setProperty properties changed} but can't be saved.
      */
-    public synchronized void close() throws SQLException, IOException {
+    public synchronized void close() throws SQLException {
         // We should not have a deadlock here since 'getRemote' and 'getProperty' do not
         // synchronize on 'this'. We use Thread.holdLocks(...) assertions for checking that.
         synchronized (remotes) {
@@ -720,6 +721,7 @@ public class Database {
          * if a table is shared by an other user.  However Table.getStatement(null) has the
          * side effect of closing the statement and canceling the timer.
          */
+        SQLException exception = null;
         synchronized (tables) {
             if (finalizer != null) {
                 Runtime.getRuntime().removeShutdownHook(finalizer);
@@ -728,8 +730,23 @@ public class Database {
             for (final Iterator<Table> it=tables.values().iterator(); it.hasNext();) {
                 final Table table = it.next();
                 synchronized (table) {
-                    if (table.getStatement((QueryType) null) != null) {
-                        throw new AssertionError(table); // Should never occurs
+                    try {
+                        if (table.getStatement((QueryType) null) != null) {
+                            throw new AssertionError(table); // Should never occurs
+                        }
+                    } catch (SQLException e) {
+                        if (exception == null) {
+                            exception = e;
+                        } else {
+                            exception.setNextException(e);
+                        }
+                    } catch (CatalogException e) {
+                        final SQLException warning = new SQLException(e.getLocalizedMessage(), e);
+                        if (exception == null) {
+                            exception = warning;
+                        } else {
+                            exception.setNextException(warning);
+                        }
                     }
                     table.clearCache();
                 }
@@ -765,12 +782,22 @@ public class Database {
             if (modified) {
                 modified = false;
                 final File file = getConfigurationFile(true);
-                if (file != null) {
+                if (file != null) try {
                     final BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
                     properties.storeToXML(out, "PostGrid configuration", "UTF-8");
                     out.close();
+                } catch (IOException e) {
+                    final SQLWarning warning = new SQLWarning(e.getLocalizedMessage(), e);
+                    if (exception == null) {
+                        exception = warning;
+                    } else {
+                        exception.setNextException(warning);
+                    }
                 }
             }
+        }
+        if (exception != null) {
+            throw exception;
         }
     }
 
@@ -812,7 +839,7 @@ public class Database {
     /**
      * Tries the connection to the database.
      */
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws SQLException, IOException {
         final Arguments arguments = new Arguments(args);
         args = arguments.getRemainingArguments(0);
         final Database database = new Database();

@@ -212,23 +212,38 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * {inheritDoc}
      */
-    @Override
     public GridCoverageTable newInstance(final Operation operation) {
         final GridCoverageTable view = new GridCoverageTable(this);
         view.setOperation(operation);
         return view;
     }
-    
+
+    /**
+     * Returns the series for the current layer. The default implementation expects a layer
+     * with only one series. The {@link WritableGridCoverageTable} will override this method
+     * with a more appropriate value.
+     */
+    Series getSeries() throws CatalogException {
+        final Iterator<Series> iterator = getNonNullLayer().getSeries().iterator();
+        if (iterator.hasNext()) {
+            final Series series = iterator.next();
+            if (!iterator.hasNext()) {
+                return series;
+            }
+        }
+        throw new CatalogException(Resources.format(ResourceKeys.ERROR_NO_SERIES_SELECTION));
+    }
+
     /**
      * Returns the layer for the coverages in this table, or {@code null} if not yet set.
      */
     public Layer getLayer() {
         return layer;
     }
-    
+
     /**
      * Returns the layer for the coverages in this table.
-     * 
+     *
      * @throws CatalogException if the layer is not set.
      */
     final Layer getNonNullLayer() throws CatalogException {
@@ -456,7 +471,6 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws CatalogException si un enregistrement est invalide.
      * @throws SQLException si la base de données n'a pas pu être interrogée pour une autre raison.
      */
-    @Override
     public synchronized CoverageReference getEntry() throws CatalogException, SQLException {
         /*
          * Obtient la liste des entrées avant toute opération impliquant l'envelope,
@@ -503,12 +517,11 @@ loop:   for (final CoverageReference newReference : entries) {
      * the currently {@linkplain #getEnvelope selected envelope} are considered.
      *
      * @return The set of dates.
-     * @throws SQLException If an error occured while reading the database.
      * @throws CatalogException if an illegal record was found.
+     * @throws SQLException If an error occured while reading the database.
      */
-    @Override
     public synchronized SortedSet<Date> getAvailableTimes()
-            throws SQLException, CatalogException
+            throws CatalogException, SQLException
     {
         if (availableTimes == null) {
             final SortedMap<Date, SortedSet<Number>> centroids = getAvailableCentroids();
@@ -533,12 +546,11 @@ loop:   for (final CoverageReference newReference : entries) {
      * only the altitudes found in every images.
      *
      * @return The set of altitudes. May be empty, but will never be null.
-     * @throws SQLException If an error occured while reading the database.
      * @throws CatalogException if an illegal record was found.
+     * @throws SQLException If an error occured while reading the database.
      */
-    @Override
     public synchronized SortedSet<Number> getAvailableElevations()
-            throws SQLException, CatalogException
+            throws CatalogException, SQLException
     {
         if (availableElevations == null) {
             final SortedSet<Number> commons = new TreeSet<Number>();
@@ -571,10 +583,11 @@ loop:   for (final CoverageReference newReference : entries) {
      *
      * @return An immutable collection of centroids. Keys are the dates, are values ar the set
      *         of altitudes for that date.
+     * @throws CatalogException if an illegal record was found.
      * @throws SQLException If an error occured while reading the database.
      */
     final synchronized SortedMap<Date, SortedSet<Number>> getAvailableCentroids()
-            throws SQLException, CatalogException
+            throws CatalogException, SQLException
     {
         if (availableCentroids == null) {
             final SortedMap<Date,List<String>> centroids = new TreeMap<Date,List<String>>();
@@ -639,9 +652,12 @@ loop:   for (final CoverageReference newReference : entries) {
      * @param  addTo If non-null, the set where to add the time range of available coverages.
      * @return The time range of available coverages. This method returns {@code addTo} if it
      *         was non-null or a new object otherwise.
+     * @throws CatalogException If the statement can not be configured.
      * @throws SQLException If an error occured while reading the database.
      */
-    public synchronized RangeSet getAvailableTimeRanges(RangeSet addTo) throws SQLException {
+    public synchronized RangeSet getAvailableTimeRanges(RangeSet addTo)
+            throws CatalogException, SQLException
+    {
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
         long  lastEndTime        = Long.MIN_VALUE;
         final Calendar calendar  = getCalendar();
@@ -673,11 +689,16 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Configure the specified query. This method is invoked automatically after this table
+     * Configures the specified query. This method is invoked automatically after this table
      * {@linkplain #fireStateChanged changed its state}.
+     *
+     * @throws CatalogException If the statement can not be configured.
+     * @throws SQLException if a SQL error occured while configuring the statement.
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
+    protected void configure(final QueryType type, final PreparedStatement statement)
+            throws CatalogException, SQLException
+    {
         super.configure(type, statement);
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
         int index = query.byLayer.indexOf(type);
@@ -689,6 +710,10 @@ loop:   for (final CoverageReference newReference : entries) {
                 statement.setNull(index, Types.VARCHAR);
             }
         }
+        index = query.bySeries.indexOf(type);
+        if (index != 0) {
+            statement.setString(index, getSeries().getName());
+        }
         index = query.byVisibility.indexOf(type);
         if (index != 0) {
             statement.setBoolean(index, true);
@@ -698,7 +723,6 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * Creates an entry from the current row in the specified result set.
      */
-    @Override
     protected CoverageReference createEntry(final ResultSet result) throws CatalogException, SQLException {
         assert Thread.holdsLock(this);
         final Calendar calendar = getCalendar();
@@ -799,7 +823,6 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * {@inheritDoc}
      */
-    @Override
     public synchronized double evaluate(final double x, final double y, final double t, final short band)
             throws CatalogException, SQLException, IOException
     {
@@ -811,7 +834,6 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * {@inheritDoc}
      */
-    @Override
     public synchronized double[] snap(final double x, final double y, final double t)
             throws CatalogException, SQLException, IOException
     {
@@ -823,7 +845,6 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * {@inheritDoc}
      */
-    @Override
     @SuppressWarnings("unchecked")
     public synchronized List<Coverage> coveragesAt(final DirectPosition position)
             throws CatalogException, SQLException, IOException

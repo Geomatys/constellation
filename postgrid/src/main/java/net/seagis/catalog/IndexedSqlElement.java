@@ -14,8 +14,6 @@
  */
 package net.seagis.catalog;
 
-import java.sql.ResultSet;          // For javadoc
-import java.sql.PreparedStatement;  // For javadoc
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -27,9 +25,9 @@ import java.util.EnumSet;
  * <p>
  * <ul>
  *   <li>{@linkplain Column Columns}, which are accessible by index using
- *       {@link ResultSet#getString(int)}</li>
+ *       {@link java.sql.ResultSet#getString(int)}</li>
  *   <li>{@linkplain Parameter Parameters}, which are accessible by index using
- *       {@link PreparedStatement#setString(int, String)}</li>
+ *       {@link java.sql.PreparedStatement#setString(int, String)}</li>
  * </ul>
  *
  * @version $Id$
@@ -83,7 +81,7 @@ abstract class IndexedSqlElement {
          * the previous elements until we find one supporting the same QueryType. The index
          * is then the previous index + columnSpan.
          */
-        index = new short[length];
+        index = new short[Math.max(length, QueryType.LAST)];
         if (query != null) {
             final IndexedSqlElement[] existingElements = query.add(this);
 search:     for (final QueryType type : typeSet) {
@@ -104,6 +102,17 @@ search:     for (final QueryType type : typeSet) {
                 index[typeOrdinal] = 1;
             }
         }
+    }
+
+    /**
+     * Copies the column or parameter index of a query type.
+     */
+    final void copyIndex(final QueryType source, final QueryType target) {
+        final int i = target.ordinal();
+        if (index[i] != 0) {
+            throw new IllegalStateException(target.toString());
+        }
+        index[i] = index[source.ordinal()];
     }
 
     /**

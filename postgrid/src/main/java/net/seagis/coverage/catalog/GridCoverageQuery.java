@@ -38,7 +38,8 @@ final class GridCoverageQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byFilename, byLayer, byStartTime, byEndTime, byHorizontalExtent, byVisibility;
+    protected final Parameter byFilename, byLayer, bySeries,
+            byStartTime, byEndTime, byHorizontalExtent, byVisibility;
 
     /**
      * Creates a new query for the specified database.
@@ -72,6 +73,7 @@ final class GridCoverageQuery extends Query {
 
         byFilename         = addParameter(filename,       SELECT);
         byLayer            = addParameter(layer,            SLAB);
+        bySeries           = addParameter(series,         EXISTS);
         byStartTime        = addParameter(startTime,        SLAB);
         byEndTime          = addParameter(endTime,          SLAB);
         byHorizontalExtent = addParameter(horizontalExtent, SLAB);
