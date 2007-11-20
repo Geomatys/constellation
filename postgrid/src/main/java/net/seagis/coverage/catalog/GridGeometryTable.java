@@ -515,8 +515,8 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
                 final Array array = new DoubleArray(numbers);
                 statement.setArray(voIndex, array);
             }
-            updateSingleton(statement);
-            success = true; // Must be the very last line in the try block.
+            success = updateSingleton(statement);
+            // 'success' must be assigned last in this try block.
         } finally {
             transactionEnd(success);
         }

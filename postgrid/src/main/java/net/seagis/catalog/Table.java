@@ -321,24 +321,28 @@ public class Table {
      * rather prints the statement to the stream specified to {@link Database#setUpdateSimulator}.
      *
      * @param  statement The statement to execute.
+     * @return {@code true} if the singleton has been found and updated.
      * @throws IllegalMonitorStateException if {@link #transactionBegin} has not been invoked
      *         at least once before this method is invoked.
      * @throws CatalogException if the update can not occurs for a logical error.
      * @throws SQLException if an other error occured.
      */
-    protected final void updateSingleton(final PreparedStatement statement)
+    protected final boolean updateSingleton(final PreparedStatement statement)
             throws CatalogException, SQLException
     {
+        assert Thread.holdsLock(this);
         final Database database = getDatabase();
         database.ensureOngoingTransaction();
         final PrintWriter out = database.getUpdateSimulator();
         if (out != null) {
             out.println(statement);
+            return true;
         } else {
             final int count = statement.executeUpdate();
             if (count != 1) {
                 throw new IllegalUpdateException(count);
             }
+            return count != 0;
         }
     }
 

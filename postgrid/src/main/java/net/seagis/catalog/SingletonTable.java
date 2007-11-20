@@ -73,8 +73,9 @@ public abstract class SingletonTable<E extends Element> extends Table {
     private static final int MAXIMUM_AUTO_INCREMENT = 999;
 
     /**
-     * The main parameter to use for the identification of a record, or {@code null}
-     * if unknown.
+     * The main parameter to use for the identification of a record, or {@code null} if
+     * unknown. If non-null, this is the parameter corresponding to {@link #indexByName}
+     * (the preferred key) or {@link #indexByNumber}.
      */
     private Parameter primaryKey;
 
@@ -515,22 +516,19 @@ public abstract class SingletonTable<E extends Element> extends Table {
             return false;
         }
         name = name.trim();
-        final int count;
+        final boolean found;
         boolean success = false;
         transactionBegin();
         try {
             final PreparedStatement statement = getStatement(QueryType.DELETE);
             statement.setString(indexOf(primaryKey), name);
-            count = statement.executeUpdate();
-            if (count > 1) {
-                throw new IllegalUpdateException(count);
-            }
+            pool.remove(name); // Must be before 'executeUpdate' in case an exception is thrown.
+            found = updateSingleton(statement);
             success = true;
         } finally {
             transactionEnd(success);
         }
-        pool.remove(name);
-        return count != 0;
+        return found;
     }
 
     /**

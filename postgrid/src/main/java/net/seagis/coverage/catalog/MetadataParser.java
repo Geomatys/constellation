@@ -57,11 +57,6 @@ import net.seagis.catalog.CatalogException;
  */
 final class MetadataParser {
     /**
-     * Small number for rounding errors.
-     */
-    private static final double EPS = 1E-5;
-
-    /**
      * The source database.
      */
     private final Database database;

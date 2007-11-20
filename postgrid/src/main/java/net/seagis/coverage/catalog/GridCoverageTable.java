@@ -223,7 +223,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * with only one series. The {@link WritableGridCoverageTable} will override this method
      * with a more appropriate value.
      */
-    Series getSeries() throws CatalogException {
+    synchronized Series getSeries() throws CatalogException {
         final Iterator<Series> iterator = getNonNullLayer().getSeries().iterator();
         if (iterator.hasNext()) {
             final Series series = iterator.next();
@@ -712,7 +712,9 @@ loop:   for (final CoverageReference newReference : entries) {
         }
         index = query.bySeries.indexOf(type);
         if (index != 0) {
-            statement.setString(index, getSeries().getName());
+            final Series series = getSeries();
+            assert getNonNullLayer().getSeries().contains(series) : series;
+            statement.setString(index, series.getName());
         }
         index = query.byVisibility.indexOf(type);
         if (index != 0) {

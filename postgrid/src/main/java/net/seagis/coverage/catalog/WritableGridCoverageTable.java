@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import java.net.URL;
+import java.net.URI;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -61,7 +62,8 @@ import net.seagis.resources.i18n.Resources;
  */
 public class WritableGridCoverageTable extends GridCoverageTable {
     /**
-     * The 
+     * The series to be returned by {@link #getSeries}, or {@code null} if unknown.
+     * In the later case, the series will be inferred from the layer.
      */
     private Series series;
 
@@ -83,7 +85,16 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
+     * Returns the currently selected series.
+     */
+    @Override
+    synchronized Series getSeries() throws CatalogException {
+        return (series != null) ? series : super.getSeries();
+    }
+
+    /**
      * Returns the most appropriate series in which to insert the coverage.
+     * This is heuristic rules used when no series was explicitly defined.
      *
      * @param  spi The image reader provider, or {@code null} if unknown.
      * @param  path The path to the coverage file (not including the filename).
@@ -221,6 +232,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             count = addEntriesUnsafe(readers, imageIndex);
             success = true; // Must be the very last line in the try block.
         } finally {
+            series = null;
             transactionEnd(success);
         }
         return count;
@@ -235,6 +247,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     private int addEntriesUnsafe(final Iterator<ImageReader> readers, final int imageIndex)
             throws CatalogException, SQLException, IOException
     {
+        assert Thread.holdsLock(this);
         int count = 0;
         final GridCoverageQuery query     = (GridCoverageQuery) this.query;
         final Calendar          calendar  = getCalendar();
@@ -266,7 +279,6 @@ public class WritableGridCoverageTable extends GridCoverageTable {
              * If we are scanning new files for a specific series, gets that series.
              * Otherwise try to guess it from the path name and file extension.
              */
-            final Series series;
             if (readers instanceof ReaderIterator) {
                 series = ((ReaderIterator) readers).series;
             } else {
@@ -308,16 +320,14 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 statement.setInt (byIndex,     1);
                 statement.setNull(byStartTime, Types.TIMESTAMP);
                 statement.setNull(byEndTime,   Types.TIMESTAMP);
-                updateSingleton(statement);
-                count++;
+                if (updateSingleton(statement)) count++;
             } else for (int i=0; i<dates.length; i++) {
                 final Date startTime = dates[i].getMinValue();
                 final Date   endTime = dates[i].getMaxValue();
                 statement.setInt      (byIndex,     i + 1);
                 statement.setTimestamp(byStartTime, new Timestamp(startTime.getTime()), calendar);
                 statement.setTimestamp(byEndTime,   new Timestamp(endTime  .getTime()), calendar);
-                updateSingleton(statement);
-                count++;
+                if (updateSingleton(statement)) count++;
             }
         }
         return count;
@@ -335,6 +345,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     public synchronized int completeLayer(final boolean includeSubdirectories, final UpdatePolicy policy)
             throws CatalogException, SQLException, IOException
     {
+        final boolean replaceExisting = UpdatePolicy.REPLACE_EXISTING.equals(policy);
         final Layer layer = getNonNullLayer();
         Set<CoverageReference> coverages = null;
         final Map<Object,Series> inputs = new LinkedHashMap<Object,Series>();
@@ -346,7 +357,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
              * existing URI. Otherwise we do nothing since we can't get the list of new items.
              */
             if (!series.getProtocol().equalsIgnoreCase("file")) {
-                if (UpdatePolicy.REPLACE_EXISTING.equals(policy)) {
+                if (replaceExisting) {
                     if (coverages == null) {
                         coverages = layer.getCoverageReferences();
                     }
@@ -392,15 +403,28 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         boolean success = false;
         transactionBegin();
         try {
-            for (final Iterator<Object> it=inputs.keySet().iterator(); it.hasNext();) {
-                final File file = (File) it.next();
+            for (final Iterator<Map.Entry<Object,Series>> it=inputs.entrySet().iterator(); it.hasNext();) {
+                final Map.Entry<Object,Series> entry = it.next();
+                final Object input = entry.getKey();
+                final File file;
+                if (input instanceof File) {
+                    file = (File) input;
+                } else if (input instanceof URL) {
+                    file = new File(((URL) input).getPath());
+                } else if (input instanceof URI) {
+                    file = new File(((URI) input).getPath());
+                } else {
+                    continue;
+                }
                 String filename = file.getName();
                 final int split = filename.lastIndexOf('.');
                 if (split >= 0) {
                     filename = filename.substring(0, split);
                 }
-                // TODO: 'exists' takes only the layer in account, not the series.
-                if (exists(filename)) {
+                series = entry.getValue();
+                if (replaceExisting) {
+                    delete(filename);
+                } else if (exists(filename)) {
                     it.remove();
                 }
             }
@@ -413,7 +437,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             Iterator<Map.Entry<Object,Series>> it;
             while ((it = inputs.entrySet().iterator()).hasNext()) {
                 Map.Entry<Object,Series> entry = it.next();
-                final Series series = entry.getValue();
+                series = entry.getValue();
                 final Object next = entry.getKey();
                 it.remove();
                 final Iterator<ImageReader> iterator = new ReaderIterator(series, it, next);
@@ -421,6 +445,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             }
             success = true; // Must be the very last line in the try block.
         } finally {
+            series = null;
             transactionEnd(success);
         }
         return count;
