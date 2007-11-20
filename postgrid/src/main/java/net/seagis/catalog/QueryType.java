@@ -75,7 +75,12 @@ public enum QueryType {
     /**
      * An entry to be deleted from a table.
      */
-    DELETE(LoggingLevel.UPDATE);
+    DELETE(LoggingLevel.UPDATE),
+
+    /**
+     * Many entries to be deleted from a table.
+     */
+    CLEAR(LoggingLevel.UPDATE);
 
     /**
      * The suggested level for logging SQL statement of this kind.

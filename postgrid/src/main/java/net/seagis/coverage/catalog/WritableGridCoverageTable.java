@@ -345,10 +345,10 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      *         in the scan. New series may be created if subdirectories are found.
      * @return The number of images inserted.
      */
-    public synchronized int completeLayer(final boolean includeSubdirectories, final UpdatePolicy policy)
+    public synchronized int updateLayer(final boolean includeSubdirectories, final UpdatePolicy policy)
             throws CatalogException, SQLException, IOException
     {
-        final boolean replaceExisting = UpdatePolicy.REPLACE_EXISTING.equals(policy);
+        final boolean replaceExisting = !UpdatePolicy.SKIP_EXISTING.equals(policy);
         final Layer layer = getNonNullLayer();
         Set<CoverageReference> coverages = null;
         final Map<Object,Series> inputs = new LinkedHashMap<Object,Series>();
@@ -406,7 +406,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         boolean success = false;
         transactionBegin();
         try {
-            for (final Iterator<Map.Entry<Object,Series>> it=inputs.entrySet().iterator(); it.hasNext();) {
+            if (UpdatePolicy.CLEAR_BEFORE_UPDATE.equals(policy)) {
+                clear();
+            } else for (final Iterator<Map.Entry<Object,Series>> it=inputs.entrySet().iterator(); it.hasNext();) {
                 final Map.Entry<Object,Series> entry = it.next();
                 final Object input = entry.getKey();
                 final File file;

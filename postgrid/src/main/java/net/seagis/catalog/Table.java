@@ -15,7 +15,6 @@
  */
 package net.seagis.catalog;
 
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -272,6 +271,7 @@ public class Table {
                 default:     sql = query.select(type); break;
                 case INSERT: sql = query.insert(type); break;
                 case DELETE: sql = query.delete(type); break;
+                case CLEAR:  sql = query.delete(type); break;
             }
         } else {
             sql = null;
@@ -312,38 +312,6 @@ public class Table {
      */
     protected void transactionEnd(final boolean success) throws SQLException {
         getDatabase().transactionEnd(success);
-    }
-
-    /**
-     * Executes the specified SQL {@code INSERT}, {@code UPDATE} or {@code DELETE} statement,
-     * which is expected to insert exactly one record. As a special case, this method do not
-     * execute the statement during testing and debugging phases. In the later case, this method
-     * rather prints the statement to the stream specified to {@link Database#setUpdateSimulator}.
-     *
-     * @param  statement The statement to execute.
-     * @return {@code true} if the singleton has been found and updated.
-     * @throws IllegalMonitorStateException if {@link #transactionBegin} has not been invoked
-     *         at least once before this method is invoked.
-     * @throws CatalogException if the update can not occurs for a logical error.
-     * @throws SQLException if an other error occured.
-     */
-    protected final boolean updateSingleton(final PreparedStatement statement)
-            throws CatalogException, SQLException
-    {
-        assert Thread.holdsLock(this);
-        final Database database = getDatabase();
-        database.ensureOngoingTransaction();
-        final PrintWriter out = database.getUpdateSimulator();
-        if (out != null) {
-            out.println(statement);
-            return true;
-        } else {
-            final int count = statement.executeUpdate();
-            if (count != 1) {
-                throw new IllegalUpdateException(count);
-            }
-            return count != 0;
-        }
     }
 
     /**

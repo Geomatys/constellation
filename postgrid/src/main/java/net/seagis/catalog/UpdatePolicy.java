@@ -31,5 +31,10 @@ public enum UpdatePolicy {
     /**
      * The old record is deleted and the new record is inserted as a replacement.
      */
-    REPLACE_EXISTING
+    REPLACE_EXISTING,
+
+    /**
+     * Remove all previous records before to insert new ones.
+     */
+    CLEAR_BEFORE_UPDATE
 }

@@ -15,6 +15,7 @@
  */
 package net.seagis.catalog;
 
+import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -504,31 +505,106 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Deletes at most one element for the given name.
+     * Deletes the elements for the given name.
      *
      * @param  name The name of the element to delete.
-     * @return {@code true} if an element of the given name was found and deleted.
+     * @return The number of elements deleted.
      * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from or writting to the database.
      */
-    public synchronized boolean delete(String name) throws CatalogException, SQLException {
+    public synchronized int delete(String name) throws CatalogException, SQLException {
         if (name == null) {
-            return false;
+            return 0;
         }
         name = name.trim();
-        final boolean found;
+        final int count;
         boolean success = false;
         transactionBegin();
         try {
             final PreparedStatement statement = getStatement(QueryType.DELETE);
             statement.setString(indexOf(primaryKey), name);
-            pool.remove(name); // Must be before 'executeUpdate' in case an exception is thrown.
-            found = updateSingleton(statement);
+            count = update(statement);
             success = true;
         } finally {
             transactionEnd(success);
         }
-        return found;
+        // Updates the cache. Note that it is safe to execute this update
+        // last since we rolled back the transaction in case of failure.
+        pool.remove(name);
+        return count;
+    }
+
+    /**
+     * Deletes many elements. "Many" depends on the configuration set by {@link #configure}.
+     * It may be the whole table. Note that the this action may be blocked if the user doesn't
+     * have the required database authorisations, or if some records are still referenced in
+     * foreigner tables.
+     *
+     * @return The number of elements deleted.
+     * @throws CatalogException if a logical error has been detected in the database content.
+     * @throws SQLException if an error occured will reading from or writting to the database.
+     */
+    public synchronized int clear() throws CatalogException, SQLException {
+        final int count;
+        boolean success = false;
+        transactionBegin();
+        try {
+            final PreparedStatement statement = getStatement(QueryType.CLEAR);
+            count = update(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
+        // Updates the cache. Note that it is safe to execute this update
+        // last since we rolled back the transaction in case of failure.
+        pool.clear();
+        return count;
+    }
+
+    /**
+     * Executes the specified SQL {@code INSERT}, {@code UPDATE} or {@code DELETE} statement.
+     * As a special case, this method do not execute the statement during testing and debugging
+     * phases. In the later case, this method rather prints the statement to the stream specified
+     * to {@link Database#setUpdateSimulator}.
+     *
+     * @param  statement The statement to execute.
+     * @return The number of elements updated.
+     * @throws CatalogException if {@link #transactionBegin} has not been invoked
+     *         at least once before this method is invoked.
+     * @throws SQLException if an error occured.
+     */
+    private int update(final PreparedStatement statement) throws SQLException {
+        assert Thread.holdsLock(this);
+        final Database database = getDatabase();
+        database.ensureOngoingTransaction();
+        final PrintWriter out = database.getUpdateSimulator();
+        if (out != null) {
+            out.println(statement);
+            return 0;
+        } else {
+            return statement.executeUpdate();
+        }
+    }
+
+    /**
+     * Executes the specified SQL {@code INSERT}, {@code UPDATE} or {@code DELETE} statement,
+     * which is expected to insert exactly one record. As a special case, this method do not
+     * execute the statement during testing and debugging phases. In the later case, this method
+     * rather prints the statement to the stream specified to {@link Database#setUpdateSimulator}.
+     *
+     * @param  statement The statement to execute.
+     * @return {@code true} if the singleton has been found and updated.
+     * @throws IllegalUpdateException if more than one elements has been updated.
+     * @throws SQLException if an error occured.
+     */
+    protected final boolean updateSingleton(final PreparedStatement statement)
+            throws IllegalUpdateException, SQLException
+    {
+        final int count = update(statement);
+        if (count > 1) {
+            throw new IllegalUpdateException(count);
+        }
+        return count != 0;
     }
 
     /**
