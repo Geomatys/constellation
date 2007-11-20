@@ -189,6 +189,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         if (input instanceof URL) {
             return new File(((URL) input).getPath());
         }
+        if (input instanceof URI) {
+            return new File(((URI) input).getPath());
+        }
         if (input instanceof CharSequence) {
             return new File(input.toString());
         }
