@@ -246,36 +246,17 @@ public class Query {
     }
 
     /**
-     * Returns {@code true} if this query contains at least one column or parameter
-     * for the given type.
-     */
-    private boolean useQueryType(final QueryType type) {
-        for (final IndexedSqlElement element : columns) {
-            if (element.indexOf(type) != 0) {
-                return true;
-            }
-        }
-        for (final IndexedSqlElement element : parameters) {
-            if (element.indexOf(type) != 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Creates the SQL statement for selecting all records.
      * No SQL parameters are expected for this statement.
      *
      * @param  buffer     The buffer in which to write the SQL statement.
      * @param  type       The query type.
-     * @param  maxColumns The maximum number of columns to put in the query.
      * @param  metadata   The database metadata, used for inspection of primary and foreigner keys.
      * @param  joinParameters {@code true} if we should take parameters in account for determining
      *         the {@code JOIN ... ON} clauses.
      * @throws SQLException if an error occured while reading the database.
      */
-    private void selectAll(final StringBuilder buffer, final QueryType type, int maxColumns,
+    private void selectAll(final StringBuilder buffer, final QueryType type,
                            final DatabaseMetaData metadata, final boolean joinParameters)
             throws SQLException
     {
@@ -290,10 +271,6 @@ public class Query {
         for (final Column column : columns) {
             if (column.indexOf(type) == 0) {
                 // Column not to be included for the requested query type.
-                continue;
-            }
-            if (--maxColumns < 0) {
-                // Reached the maximal amount of columns to accept.
                 continue;
             }
             final String table = column.table; // Because often requested.
@@ -546,7 +523,7 @@ scan:       while (!tables.isEmpty()) {
     final String selectAll(final QueryType type) throws SQLException {
         final DatabaseMetaData metadata = database.getConnection().getMetaData();
         final StringBuilder buffer = new StringBuilder();
-        selectAll(buffer, type, Integer.MAX_VALUE, metadata, false);
+        selectAll(buffer, type, metadata, false);
         appendOrdering(buffer, type, metadata);
         return buffer.toString();
     }
@@ -563,34 +540,11 @@ scan:       while (!tables.isEmpty()) {
         synchronized (cachedSQL) {
             sql = cachedSQL.get(type);
             if (sql == null) {
-                QueryType buildType   = type;
-                int       maxColumns  = Integer.MAX_VALUE;
-                boolean   sortEntries = true;
-                /*
-                 * If the type is not described at all in this query, then tries
-                 * to fallback on some default depending on the query type.
-                 */
-                if (!useQueryType(type)) switch (type) {
-                    case EXISTS: {
-                        /*
-                         * The user asked for a query of type EXISTS but didn't provided any explicit
-                         * definition for it. We will fallback on a default (and often suffisient) behavior:
-                         * handle EXISTS in the same way than SELECT, except that we will fetch only the first
-                         * column (usually the identifier) instead of all of them. Since we only want to see
-                         * if at least one row exists, this is usually suffisient.
-                         */
-                        buildType   = QueryType.SELECT;
-                        maxColumns  = 1;
-                        sortEntries = false;
-                    }
-                }
                 final DatabaseMetaData metadata = database.getConnection().getMetaData();
                 final StringBuilder buffer = new StringBuilder();
-                selectAll(buffer, buildType, maxColumns, metadata, true);
-                appendParameters(buffer, buildType, metadata);
-                if (sortEntries) {
-                    appendOrdering(buffer, buildType, metadata);
-                }
+                selectAll       (buffer, type, metadata, true);
+                appendParameters(buffer, type, metadata);
+                appendOrdering  (buffer, type, metadata);
                 sql = buffer.toString();
                 cachedSQL.put(type, sql);
             }
@@ -674,22 +628,11 @@ scan:       while (!tables.isEmpty()) {
         synchronized (cachedSQL) {
             sql = cachedSQL.get(type);
             if (sql == null) {
-                QueryType buildType = type;
-                /*
-                 * If the type is not described at all in this query,
-                 * then tries to fallback on some default.
-                 */
-                if (!useQueryType(type)) {
-                    buildType = QueryType.EXISTS;
-                    if (!useQueryType(type)) {
-                        buildType = QueryType.SELECT;
-                    }
-                }
                 final DatabaseMetaData metadata = database.getConnection().getMetaData();
                 final String quote = metadata.getIdentifierQuoteString().trim();
                 final StringBuilder buffer = new StringBuilder("DELETE FROM ");
                 appendTable(buffer, quote);
-                appendParameters(buffer, buildType, metadata);
+                appendParameters(buffer, type, metadata);
                 sql = buffer.toString();
                 cachedSQL.put(type, sql);
             }

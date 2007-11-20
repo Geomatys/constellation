@@ -148,7 +148,6 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getMimeType() {
         return mimeType;
     }
@@ -156,7 +155,6 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
-    @Override
     public NumberRange[] getSampleValueRanges() {
         final GridSampleDimension[] bands = getSampleDimensions();
         final NumberRange[] ranges = new NumberRange[bands.length];
@@ -170,7 +168,6 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
-    @Override
     public final GridSampleDimension[] getSampleDimensions() {
         return getSampleDimensions(null);
     }
@@ -575,7 +572,6 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
-    @Override
     public BufferedImage getLegend(final Dimension dimension) {
         final GridSampleDimension band = getSampleDimensions()[0];
         final ColorRamp legend = new ColorRamp();
@@ -587,7 +583,6 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
-    @Override
     public MutableTreeNode getTree(final Locale locale) {
         final DefaultMutableTreeNode root = new TreeNode(this);
         for (final GridSampleDimension band : bands) {

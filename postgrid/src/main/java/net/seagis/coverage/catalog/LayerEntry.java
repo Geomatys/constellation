@@ -149,7 +149,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getThematic() {
         return thematic;
     }
@@ -157,7 +156,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Layer getFallback() {
         final Object fallback = this.fallback; // Protect from changes in concurrent threads.
         return (fallback instanceof Layer) ? (Layer) fallback : null;
@@ -191,7 +189,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<Series> getSeries() {
         if (series != null) {
             // Note: The series Set may have less entries than
@@ -206,7 +203,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Series getSeries(final String name) {
         return (seriesMap != null) ? seriesMap.get(name.trim()) : null;
     }
@@ -214,7 +210,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public double getTimeInterval() {
         return timeInterval;
     }
@@ -222,7 +217,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -238,7 +232,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -254,7 +247,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public NumberRange[] getSampleValueRanges() {
         NumberRange[] ranges = null;
         for (final Series series : getSeries()) {
@@ -285,7 +277,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public DateRange getTimeRange() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -299,7 +290,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -313,7 +303,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public synchronized CoverageReference getCoverageReference(final Date time, final Number elevation)
             throws CatalogException
     {
@@ -342,7 +331,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<CoverageReference> getCoverageReferences() throws CatalogException {
         final DataConnection server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
@@ -359,7 +347,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public synchronized Coverage getCoverage() throws CatalogException {
         Coverage c = null;
         if (coverage != null) {
@@ -383,7 +370,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public BufferedImage getLegend(final Dimension dimension) {
         final Map<Format,Integer> count = new HashMap<Format,Integer>();
         Format format = null;
@@ -408,7 +394,6 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Model getModel() throws CatalogException {
         return model;
     }

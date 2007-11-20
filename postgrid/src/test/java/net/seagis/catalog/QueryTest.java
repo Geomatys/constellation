@@ -36,10 +36,11 @@ public class QueryTest extends DatabaseTest {
      */
     @Test
     public void testSimple() throws SQLException {
+        final QueryType[] uses = new QueryType[] {SELECT, LIST};
         final Query  query = new Query(database, "Formats");
-        final Column name  = new Column(query, "Formats", "name");
-        final Column mime  = new Column(query, "Formats", "mime");
-        final Column type  = new Column(query, "Formats", "encoding");
+        final Column name  = new Column(query,   "Formats", "name");
+        final Column mime  = new Column(query,   "Formats", "mime",     "mime",     null, uses);
+        final Column type  = new Column(query,   "Formats", "encoding", "encoding", null, uses);
         final String SQL   = query.select(SELECT);
 
         assertEquals(1, name.indexOf(SELECT));
@@ -65,6 +66,7 @@ public class QueryTest extends DatabaseTest {
         final Column dummy = new Column(query, "Formats", "dummy", "dummy", 10,  (QueryType[]) null);
         final String SQL2 = query.select(SELECT);
         assertEquals("SELECT \"name\", \"mime\", \"encoding\", 10 AS \"dummy\" FROM \"Formats\"", SQL2);
+        assertEquals(4, dummy.indexOf(SELECT));
         tryStatement(SQL);
     }
 
@@ -107,11 +109,12 @@ public class QueryTest extends DatabaseTest {
      */
     @Test
     public void testParameters() throws SQLException {
-        final Query     query      = new Query(database, "Categories");
+        final QueryType[] uses = new QueryType[] {SELECT, SELECT_BY_IDENTIFIER, LIST};
+        final Query     query      = new Query(database,  "Categories");
         final Column    name       = new Column   (query, "Categories", "name");
-        final Column    identifier = new Column   (query, "Categories", "lower", "identifier", null, (QueryType[]) null);
-        final Column    colors     = new Column   (query, "Categories", "colors");
-        final Parameter byName     = new Parameter(query, name,       SELECT);
+        final Column    identifier = new Column   (query, "Categories", "lower", "identifier", null, uses);
+        final Column    colors     = new Column   (query, "Categories", "colors", "colors",    null, uses);
+        final Parameter byName     = new Parameter(query, name,       SELECT, EXISTS);
         final Parameter byId       = new Parameter(query, identifier, SELECT_BY_IDENTIFIER);
         byId.setComparator("IS NULL OR >=");
 

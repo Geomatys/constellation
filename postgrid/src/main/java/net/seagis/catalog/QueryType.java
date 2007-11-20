@@ -78,12 +78,6 @@ public enum QueryType {
     DELETE(LoggingLevel.UPDATE);
 
     /**
-     * Last enum value (or actually, the last one for which {@link Query} may attempt to infer
-     * column position).
-     */
-    static final int LAST = DELETE.ordinal() + 1;
-
-    /**
      * The suggested level for logging SQL statement of this kind.
      */
     final Level level;

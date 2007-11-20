@@ -62,7 +62,7 @@ abstract class IndexedSqlElement {
         if (types == null) {
             typeSet = EnumSet.allOf(QueryType.class);
             typeSet.remove(QueryType.INSERT);
-            typeSet.remove(QueryType.EXISTS); // In order to get default behavior.
+            typeSet.remove(QueryType.DELETE);
         } else {
             typeSet = EnumSet.noneOf(QueryType.class);
             for (final QueryType type : types) {
@@ -81,7 +81,7 @@ abstract class IndexedSqlElement {
          * the previous elements until we find one supporting the same QueryType. The index
          * is then the previous index + columnSpan.
          */
-        index = new short[Math.max(length, QueryType.LAST)];
+        index = new short[length];
         if (query != null) {
             final IndexedSqlElement[] existingElements = query.add(this);
 search:     for (final QueryType type : typeSet) {
@@ -102,17 +102,6 @@ search:     for (final QueryType type : typeSet) {
                 index[typeOrdinal] = 1;
             }
         }
-    }
-
-    /**
-     * Copies the column or parameter index of a query type.
-     */
-    final void copyIndex(final QueryType source, final QueryType target) {
-        final int i = target.ordinal();
-        if (index[i] != 0) {
-            throw new IllegalStateException(target.toString());
-        }
-        index[i] = index[source.ordinal()];
     }
 
     /**

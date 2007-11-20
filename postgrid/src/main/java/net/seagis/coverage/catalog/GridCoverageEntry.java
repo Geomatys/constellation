@@ -253,7 +253,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      */
     private static String createName(final String series, final String filename,
                                      final short band, final short timeIndex)
-{
+    {
         final StringBuilder buffer = new StringBuilder(series.trim());
         buffer.append(':').append(filename);
         if (timeIndex != 0) {
@@ -284,7 +284,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
-    @Override
     public Series getSeries() {
         return series;
     }
@@ -292,7 +291,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
-    @Override
     public File getFile() {
         final File file = series.file(filename);
         return file.isAbsolute() ? file : null;
@@ -301,7 +299,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
-    @Override
     public URI getURI() {
         try {
             return series.uri(filename);
@@ -331,7 +328,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
-    @Override
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return parameters.coverageCRS;
     }
@@ -339,7 +335,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
-    @Override
     public Envelope getEnvelope() {
         final Rectangle clipPixels = new Rectangle();
         try {
@@ -360,7 +355,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *
      * @todo Revisit now that we are 4D.
      */
-    @Override
     public NumberRange getZRange() {
         final DefaultTemporalCRS temporalCRS = parameters.getTemporalCRS();
         return new NumberRange(temporalCRS.toValue(new Date(startTime)),
@@ -370,7 +364,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
-    @Override
     public DateRange getTimeRange() {
         return new DateRange((startTime!=Long.MIN_VALUE) ? new Date(startTime) : null, true,
                                (endTime!=Long.MAX_VALUE) ? new Date(  endTime) : null, false);
@@ -381,7 +374,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *
      * @todo L'implémentation actuelle suppose que le CRS de la table est toujours WGS84.
      */
-    @Override
     public GeographicBoundingBox getGeographicBoundingBox() {
         try {
             assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, CRSUtilities.getCRS2D(parameters.tableCRS));
@@ -399,7 +391,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *
      * @todo Should compute the geometry by {@link GridGeometryEntry} instead.
      */
-    @Override
     @SuppressWarnings("fallthrough")
     public GridGeometry2D getGridGeometry() {
         final Rectangle clipPixels = new Rectangle();
@@ -430,7 +421,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
-    @Override
     public SampleDimension[] getSampleDimensions() {
         final GridSampleDimension[] bands = series.getFormat().getSampleDimensions();
         for (int i=0; i<bands.length; i++) {
@@ -760,7 +750,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * {@link GridCoverageTable#getEntries} a été appelée (les changement subséquents des paramètres
      * de {@link GridCoverageTable} n'ont pas d'effets sur les {@code GridCoverageEntry} déjà créés).
      */
-    @Override
     public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
         try {
             return getCoverage(0, listeners);
@@ -773,7 +762,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * Retourne l'image correspondant à cette entrée. Cette méthode délègue son travail à
      * <code>{@linkplain #getCoverage(IIOListeners) getCoverage}(null)</code>.
      */
-    @Override
     public final GridCoverage2D getCoverage() throws IOException {
         return getCoverage(null);
     }
@@ -793,7 +781,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     /**
      * {@inheritDoc}
      */
-    @Override
     public void abort() {
         final Format format = series.getFormat();
         if (format instanceof FormatEntry) {
