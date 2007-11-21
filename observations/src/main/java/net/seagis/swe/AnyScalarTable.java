@@ -136,7 +136,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
+    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
         super.configure(type, statement);
         final AnyScalarQuery query = (AnyScalarQuery) super.query;
         if(!type.equals(QueryType.INSERT)){

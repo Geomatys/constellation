@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
+import net.seagis.catalog.NoSuchTableException;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 import net.seagis.gml.BoundingShapeEntry;
@@ -81,7 +82,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
     /**
      * Return the procedure table for offering.
      */
-     public OfferingProcedureTable getProcedures() {
+     public OfferingProcedureTable getProcedures() throws NoSuchTableException {
         if (procedures == null) {
             procedures =  getDatabase().getTable(OfferingProcedureTable.class);
             procedures =  new OfferingProcedureTable(procedures);
@@ -92,7 +93,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
     /**
      * Return the phenomenon table for offering.
      */ 
-    public OfferingPhenomenonTable getPhenomenons() {
+    public OfferingPhenomenonTable getPhenomenons() throws NoSuchTableException {
         if (phenomenons == null) {
             phenomenons =  getDatabase().getTable(OfferingPhenomenonTable.class);
             phenomenons =  new OfferingPhenomenonTable(phenomenons);
@@ -103,7 +104,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
     /**
      * Return the station table for offering.
      */
-    public OfferingSamplingFeatureTable getStations() {
+    public OfferingSamplingFeatureTable getStations() throws NoSuchTableException {
         if (stations == null) {
             stations =  getDatabase().getTable(OfferingSamplingFeatureTable.class);
             stations =  new OfferingSamplingFeatureTable(stations);
@@ -111,7 +112,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
         return stations;
     }
     
-    public OfferingResponseModeTable getResponseModes() {
+    public OfferingResponseModeTable getResponseModes() throws NoSuchTableException {
         if (responseModes == null) {
             responseModes =  getDatabase().getTable(OfferingResponseModeTable.class);
             responseModes =  new OfferingResponseModeTable(responseModes);

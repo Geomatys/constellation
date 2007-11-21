@@ -118,7 +118,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException {
+    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
         super.configure(type, statement);
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         if (!type.equals(QueryType.INSERT))

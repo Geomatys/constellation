@@ -21,6 +21,7 @@ package net.seagis.observation.fishery.sql;
 // Sicade dependencies
 import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
+import net.seagis.catalog.NoSuchTableException;
 import net.seagis.observation.MeasurementQuery;
 import net.seagis.observation.SamplingFeatureTable;
 import net.seagis.observation.MeasurementTable;
@@ -79,7 +80,7 @@ public class EnvironmentTable extends MeasurementTable {
      */
     public EnvironmentTable(final Database                  database,
                             final Class<? extends SamplingFeatureTable> type,
-                            final String...                providers)
+                            final String...                providers) throws NoSuchTableException
     {
         this(database);
         final SamplingFeatureTable stations = database.getTable(type);
