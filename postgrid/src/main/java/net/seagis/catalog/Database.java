@@ -46,6 +46,7 @@ import java.util.Properties;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.locks.ReentrantLock;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.lang.reflect.Constructor;
 
 import org.geotools.io.TableWriter;
@@ -656,8 +657,26 @@ public class Database {
      */
     final void transactionBegin() throws SQLException {
         transactionLock.lock();
-        if (transactionLock.getHoldCount() == 1) {
-            connection.setAutoCommit(false);
+        try {
+            if (transactionLock.getHoldCount() == 1) {
+                synchronized (this) {
+                    if (connection != null) {
+                        connection.setAutoCommit(false);
+                    }
+                }
+            }
+        } catch (SQLException exception) {
+            transactionLock.unlock();
+            throw exception;
+        } catch (RuntimeException exception) {
+            transactionLock.unlock();
+            throw exception;
+        } catch (Error exception) {
+            transactionLock.unlock();
+            throw exception;
+        } catch (Throwable exception) {
+            transactionLock.unlock();
+            throw new UndeclaredThrowableException(exception);
         }
     }
 
@@ -671,19 +690,22 @@ public class Database {
      */
     final void transactionEnd(final boolean success) throws SQLException {
         ensureOngoingTransaction();
-        if (transactionLock.getHoldCount() == 1) {
-            synchronized (this) {
-                if (connection != null) {
-                    if (success) {
-                        connection.commit();
-                    } else {
-                        connection.rollback();
+        try {
+            if (transactionLock.getHoldCount() == 1) {
+                synchronized (this) {
+                    if (connection != null) {
+                        if (success) {
+                            connection.commit();
+                        } else {
+                            connection.rollback();
+                        }
+                        connection.setAutoCommit(true);
                     }
-                    connection.setAutoCommit(true);
                 }
             }
+        } finally {
+            transactionLock.unlock();
         }
-        transactionLock.unlock();
     }
 
     /**
