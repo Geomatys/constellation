@@ -49,14 +49,14 @@ public class CompositePhenomenonQuery extends Query{
      * @param database The database for which this query is created.
      */
     public CompositePhenomenonQuery(final Database database) {
-        super(database);
+        super(database, "composite_phenomenons");
         final QueryType[] SI = {SELECT, INSERT};
         final QueryType[] SIE = {SELECT, INSERT, EXISTS};
         
-        identifier = addColumn ("composite_phenomenons", "id",          SIE);
-        name       = addColumn ("composite_phenomenons", "name",        SI);
-        remarks    = addColumn ("composite_phenomenons", "description", SI);
-        dimension  = addColumn ("composite_phenomenons", "dimension",   SI);
+        identifier = addColumn ("id",          SIE);
+        name       = addColumn ("name",        SI);
+        remarks    = addColumn ("description", SI);
+        dimension  = addColumn ("dimension",   SI);
         
         byName     = addParameter(identifier, SELECT, EXISTS);
     }

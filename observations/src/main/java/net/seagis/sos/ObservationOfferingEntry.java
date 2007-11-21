@@ -1,7 +1,6 @@
 
 package net.seagis.sos;
 
-import net.opengeospatial.sos.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

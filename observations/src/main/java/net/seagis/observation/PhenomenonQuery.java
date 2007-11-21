@@ -46,13 +46,13 @@ public class PhenomenonQuery extends Query{
      * @param database The database for which this query is created.
      */
     public PhenomenonQuery(final Database database) {
-        super(database);
+        super(database, "phenomenons");
         final QueryType[] SI  = {SELECT, INSERT};
         final QueryType[] SIE = {SELECT, INSERT, EXISTS};
         
-        identifier = addColumn ("phenomenons", "id",          SIE);
-        name       = addColumn ("phenomenons", "name",        SI);
-        remarks    = addColumn ("phenomenons", "description", SI);
+        identifier = addColumn ("id",          SIE);
+        name       = addColumn ("name",        SI);
+        remarks    = addColumn ("description", SI);
         
         byName     = addParameter(identifier, SELECT, EXISTS);
     }

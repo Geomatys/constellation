@@ -29,13 +29,13 @@ public class OfferingPhenomenonQuery extends Query {
      * @param database The database for which this query is created.
      */
     public OfferingPhenomenonQuery(final Database database) {
-        super (database);
+        super (database, "offering_phenomenons");
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         
-        idOffering          = addColumn("offering_phenomenons", "id_offering", SLIE);
-        phenomenon          = addColumn("offering_phenomenons", "phenomenon",  SLIE);
-        compositePhenomenon = addColumn("offering_phenomenons", "composite_phenomenon",  SLIE);
+        idOffering          = addColumn("id_offering", SLIE);
+        phenomenon          = addColumn("phenomenon",  SLIE);
+        compositePhenomenon = addColumn("composite_phenomenon",  SLIE);
         
         byOffering            = addParameter(idOffering, SELECT, LIST, EXISTS);
         byPhenomenon          = addParameter(phenomenon,  SELECT, EXISTS);

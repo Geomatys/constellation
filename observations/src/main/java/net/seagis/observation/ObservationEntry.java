@@ -83,7 +83,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * Le nom de l'observation
      */
-    public String name;
+    private String name;
     
     /**
      * La description de l'observation
@@ -434,6 +434,14 @@ public class ObservationEntry extends Entry implements Observation {
     }
     
     /**
+     * Verifie si l'observation est complete.
+     */
+    public boolean isComplete() {
+        //TODO appeler les isCOmplete des attributs
+        return (procedure != null) && (observedProperty != null) && (featureOfInterest != null);
+    }
+    
+    /**
      * Retourne une chaine de charactere representant l'observation.
      */
     @Override
@@ -461,7 +469,10 @@ public class ObservationEntry extends Entry implements Observation {
             s.append("FEATURE OF INTEREST IS NULL").append(lineSeparator);
         if (result != null)       
             s.append(" result=").append(result.toString()).append(lineSeparator);
-        s.append(" resultDefinition=").append(resultDefinition.toString()).append(lineSeparator);
+        if (resultDefinition != null)
+            s.append(" resultDefinition=").append(resultDefinition.toString()).append(lineSeparator);
+        else
+            s.append("RESULT DEFINITION IS NULL").append(lineSeparator);
         return s.toString();
     }
 

@@ -3,6 +3,7 @@ package net.seagis.swe;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 import org.geotools.resources.Utilities;
@@ -12,7 +13,7 @@ import org.geotools.resources.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-@XmlSeeAlso({AbstractDataRecordEntry.class})
+@XmlSeeAlso({AbstractDataRecordEntry.class, TimeType.class, BooleanType.class, QuantityType.class})
 @XmlType(name="AbstractDataComponent")
 public class AbstractDataComponentEntry extends Entry implements AbstractDataComponent{
     
@@ -22,13 +23,13 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
     @XmlAttribute
     private String id;
     
-    @XmlAttribute
+    @XmlTransient //@XmlAttribute
     private boolean fixed;
     
     /**
      * definition du record.
      */
-    private String definition;
+    protected String definition;
     
     /**
      * Constructeur utilisé par jaxb.

@@ -17,6 +17,8 @@ package net.seagis.swe;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 import org.geotools.resources.Utilities;
@@ -29,35 +31,19 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AnyScalar")
+@XmlSeeAlso({TimeType.class, QuantityType.class, BooleanType.class})
 public class AnyScalarEntry extends Entry{
     
     /**
      * Identifiant du datarecord qui contient cet valeur.
      */
-    @XmlAttribute
+    @XmlTransient
     private String idDataRecord;
     
+    @XmlAttribute
     private String name;
     
-    /**
-     * description du champ.
-     */
-    private String definition;
-    
-    /**
-     * Type swe du champ (Time, Quantity, Boolean).
-     */
-    private String type;
-    
-    /**
-     * l'unité de mesure du champ.
-     */
-    private String uom;
-    
-    /**
-     * La valeur de type text ou float
-     */
-    private Object value;
+    private AbstractDataComponentEntry component;
     
     /**
      * Constructeur utilisé par jaxB.
@@ -67,18 +53,21 @@ public class AnyScalarEntry extends Entry{
     /**
      * crée un nouveau champ de DataRecord.
      */
-    public AnyScalarEntry(String idDataRecord, String name, String definition, String type,
-            String uom, Object value) {
-        super(name, definition);
+    public AnyScalarEntry(String idDataRecord, String name, AbstractDataComponentEntry component) {
+        super(name);
         this.name         = name;
         this.idDataRecord = idDataRecord;
-        this.definition   = definition;
-        this.type         = type;
-        this.value        = value;
-        this.uom          = uom;
+        this.component = component;
         
     }
 
+    /**
+     * surcharge le getName() de Entry
+     */
+    @Override
+    public String getName() {
+        return this.name;
+    }
     /** 
      * retourne l'identifiant du data record qui contient ce champ.
      */
@@ -87,34 +76,12 @@ public class AnyScalarEntry extends Entry{
     }
 
     /**
-     * Retourne la definition du champ.
+     * Retourne le component du champ.
      */
-    public String getDefinition() {
-        return definition;
+    public AbstractDataComponentEntry getComponent() {
+        return component;
     }
-
-    /**
-     * Retourne le type swe du champ.
-     */
-    public String getType() {
-        return type;
-    }
-    
-    /**
-     * retourne la valeur du champ textuelle ou scalaire.
-     */
-    public Object getValue() {
-        return value;
-    }
-    
-    /**
-     * Retourne L'unité de mesure du champ.
-     */
-    public String getUom() {
-        return uom;
-    }
-
-
+        
     /**
      * Vérifie si cette entré est identique à l'objet spécifié.
      */
@@ -126,10 +93,7 @@ public class AnyScalarEntry extends Entry{
         final AnyScalarEntry that = (AnyScalarEntry) object;
         return Utilities.equals(this.name,         that.name) &&
                Utilities.equals(this.idDataRecord, that.idDataRecord) &&
-               Utilities.equals(this.definition,   that.definition) && 
-               Utilities.equals(this.type,         that.type) &&
-               Utilities.equals(this.uom,          that.uom) && 
-               Utilities.equals(this.value,        that.value) ;
+               Utilities.equals(this.component,    that.component);
     }
 
     @Override
@@ -146,9 +110,15 @@ public class AnyScalarEntry extends Entry{
     @Override
     public String toString() {
         final StringBuilder buffer = new StringBuilder();
-        buffer.append('[').append(this.getClass().getSimpleName()).append("]:").append(idDataRecord)
-        .append('-').append(name).append(" type=").append(type).append(" uom=").append(uom);
-                return buffer.toString();
+        if (this != null) {
+            buffer.append('[').append(this.getClass().getSimpleName()).append("]:").append(idDataRecord)
+            .append('-').append(name);
+            if(component != null)
+                buffer.append(" type=").append(component.getClass().getSimpleName());
+            else 
+                buffer.append(" COMPONENT NULL");
+        }   
+        return buffer.toString();
     }
 
     

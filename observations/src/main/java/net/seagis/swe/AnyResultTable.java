@@ -79,49 +79,58 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
     public synchronized String getIdentifier(final Object result) throws SQLException, CatalogException {
         final AnyResultQuery query = (AnyResultQuery) super.query;
         
-        if (result instanceof AnyResultEntry) {
-            PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-            statement.setString(indexOf(query.dataBlock),((AnyResultEntry)result).getDataBlock());
-            statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
-            ResultSet results = statement.executeQuery();
-            if(results.next())
-                return results.getString(1);
-            
-        } else if (result instanceof ReferenceEntry) {
-            PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-            statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
-            statement.setNull(indexOf(query.dataBlock), java.sql.Types.VARCHAR);
-            ResultSet results = statement.executeQuery();
-            if(results.next())
-                return results.getString(1);
-        } else {
-            throw new CatalogException(" ce type de resultat n'est pas accepté");
-        }
-        
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-
-        if (result instanceof AnyResultEntry) {
-            statement.setString(indexOf(query.dataBlock), ((AnyResultEntry)result).getDataBlock());
-            statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
-        } else {
-            if (result instanceof ReferenceEntry) {
-                ReferenceEntry ref = (ReferenceEntry) result;
-                String idRef;
-                
-                if(references == null) {
-                    references = getDatabase().getTable(ReferenceTable.class);
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (result instanceof AnyResultEntry) {
+                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                statement.setString(indexOf(query.dataBlock),((AnyResultEntry)result).getDataBlock());
+                statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+                ResultSet results = statement.executeQuery();
+                if(results.next()){
+                    success = true;
+                    return results.getString(1);
                 }
-                idRef = references.getIdentifier(ref);
-                
-                statement.setString(indexOf(query.reference), idRef);
+            } else if (result instanceof ReferenceEntry) {
+                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
                 statement.setNull(indexOf(query.dataBlock), java.sql.Types.VARCHAR);
+                ResultSet results = statement.executeQuery();
+                if(results.next()) {
+                    success = true;
+                    return results.getString(1);
+                }
             } else {
                 throw new CatalogException(" ce type de resultat n'est pas accepté");
             }
-        }
-        insertSingleton(statement);
         
-        //we get the new id generated
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+
+            if (result instanceof AnyResultEntry) {
+                statement.setString(indexOf(query.dataBlock), ((AnyResultEntry)result).getDataBlock());
+                statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+            } else {
+                if (result instanceof ReferenceEntry) {
+                    ReferenceEntry ref = (ReferenceEntry) result;
+                    String idRef;
+                
+                    if(references == null) {
+                        references = getDatabase().getTable(ReferenceTable.class);
+                    }
+                    idRef = references.getIdentifier(ref);
+                
+                    statement.setString(indexOf(query.reference), idRef);
+                    statement.setNull(indexOf(query.dataBlock), java.sql.Types.VARCHAR);
+                } else {
+                    throw new CatalogException(" ce type de resultat n'est pas accepté");
+                }
+            }   
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
+            //we get the new id generated
         PreparedStatement p = getStatement("SELECT currval('any_result_id_result_seq')");
         ResultSet r = p.executeQuery();
         if (r.next())

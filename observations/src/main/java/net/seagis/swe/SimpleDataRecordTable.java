@@ -135,41 +135,49 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
     public synchronized String getIdentifier(final SimpleDataRecordEntry datarecord, String dataBlockId) throws SQLException, CatalogException {
         final SimpleDataRecordQuery query  = (SimpleDataRecordQuery) super.query;
         String id;
-        if (datarecord.getId() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (datarecord.getId() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.idBlock),      dataBlockId);
+                statement.setString(indexOf(query.idDataRecord), datarecord.getId());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return datarecord.getId();
+                } else {
+                    id = datarecord.getId();
+                }
+            } else {
+                id = searchFreeIdentifier("datarecord");
+            }
+        
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.idDataRecord), id);
             statement.setString(indexOf(query.idBlock),      dataBlockId);
-            statement.setString(indexOf(query.idDataRecord), datarecord.getId());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return datarecord.getId();
-            else
-                id = datarecord.getId();
-        } else {
-            id = searchFreeIdentifier("datarecord");
-        }
-        
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.idDataRecord), id);
-        statement.setString(indexOf(query.idBlock),      dataBlockId);
-        statement.setString(indexOf(query.definition),   datarecord.getDefinition());
-        statement.setBoolean(indexOf(query.fixed),       datarecord.isFixed());
-        insertSingleton(statement);
+            statement.setString(indexOf(query.definition),   datarecord.getDefinition());
+            statement.setBoolean(indexOf(query.fixed),       datarecord.isFixed());
+            updateSingleton(statement);
          
-        if (fields == null) {
-            fields = getDatabase().getTable(AnyScalarTable.class);
-            fields = new AnyScalarTable(fields);
-            fields.setIdDataBlock(dataBlockId);
-            fields.setIdDataRecord(id);
-        } else {
-            fields.setIdDataBlock(dataBlockId);
-            fields.setIdDataRecord(id);
-        }
-        Iterator<AnyScalarEntry> i = datarecord.getField().iterator();
+            if (fields == null) {
+                fields = getDatabase().getTable(AnyScalarTable.class);
+                fields = new AnyScalarTable(fields);
+                fields.setIdDataBlock(dataBlockId);
+                fields.setIdDataRecord(id);
+            } else {
+                fields.setIdDataBlock(dataBlockId);
+                fields.setIdDataRecord(id);
+            }
+            Iterator<AnyScalarEntry> i = datarecord.getField().iterator();
         
-        while (i.hasNext()) {
-            fields.getIdentifier(i.next(), dataBlockId, id);
+            while (i.hasNext()) {
+                fields.getIdentifier(i.next(), dataBlockId, id);
+            }
+            success = true;
+        } finally {
+            transactionEnd(success);
         }
-        
         return id;
     }
 }

@@ -66,6 +66,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
     /**
      * Construit un data block pour l'enregistrement courant.
      */
+    @Override
     protected DataBlockDefinition createEntry(final ResultSet results) throws SQLException, CatalogException {
         final DataBlockDefinitionQuery query = (DataBlockDefinitionQuery) super.query;
         String idDataBlock = results.getString(indexOf(query.id));
@@ -95,39 +96,47 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
     public synchronized String getIdentifier(final DataBlockDefinitionEntry databloc) throws SQLException, CatalogException {
         final DataBlockDefinitionQuery query  = (DataBlockDefinitionQuery) super.query;
         String id;
-        if (databloc.getId() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.id), databloc.getId());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return databloc.getId();
-            else
-                id = databloc.getId();
-        } else {
-            id = searchFreeIdentifier("datablockDef");
-        }
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (databloc.getId() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.id), databloc.getId());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return databloc.getId();
+                } else {
+                    id = databloc.getId();
+                }
+            } else {
+                id = searchFreeIdentifier("datablockDef");
+            }
         
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.id), id);
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.id), id);
 
-        if (textBlockEncodings == null) {
-            textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
-        }
-        statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry)databloc.getEncoding()));
-        insertSingleton(statement);
+            if (textBlockEncodings == null) {
+                textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
+            }
+            statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry)databloc.getEncoding()));
+            updateSingleton(statement);
         
-        if (dataRecords == null) {
-            dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
-            dataRecords = new SimpleDataRecordTable(dataRecords);
-            dataRecords.setIdDataBlock(id);
-        } else {
-            dataRecords.setIdDataBlock(id);
+            if (dataRecords == null) {
+                dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
+                dataRecords = new SimpleDataRecordTable(dataRecords);
+                dataRecords.setIdDataBlock(id);
+            } else {
+                dataRecords.setIdDataBlock(id);
+            }
+            Iterator i = databloc.getComponents().iterator();
+            while (i.hasNext()) {
+                dataRecords.getIdentifier((SimpleDataRecordEntry) i.next(), id);
+            }
+            success = false;
+        } finally {
+            transactionEnd(success);
         }
-        Iterator i = databloc.getComponents().iterator();
-        while (i.hasNext()) {
-            dataRecords.getIdentifier((SimpleDataRecordEntry) i.next(), id);
-        }
-        
         return id;
     }
 }

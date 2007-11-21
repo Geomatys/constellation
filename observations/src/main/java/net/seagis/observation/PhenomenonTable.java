@@ -73,23 +73,32 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
     public synchronized String getIdentifier(final PhenomenonEntry pheno) throws SQLException, CatalogException {
         final PhenomenonQuery query  = (PhenomenonQuery) super.query;
         String id;
-        if (pheno.getId() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.identifier), pheno.getId());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return pheno.getId();
-            else
-                id = pheno.getId();
-        } else {
-            id = searchFreeIdentifier("pheno");
-        }
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.identifier), id);
-        statement.setString(indexOf(query.name), pheno.getPhenomenonName());
-        statement.setString(indexOf(query.remarks), pheno.getDescription());
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (pheno.getId() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.identifier), pheno.getId());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return pheno.getId();
+                } else {
+                    id = pheno.getId();
+                }
+            } else {
+                id = searchFreeIdentifier("pheno");
+            }
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.identifier), id);
+            statement.setString(indexOf(query.name), pheno.getPhenomenonName());
+            statement.setString(indexOf(query.remarks), pheno.getDescription());
         
-        insertSingleton(statement); 
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
         return id;
     }
 }

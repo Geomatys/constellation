@@ -15,8 +15,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
-import net.seagis.gml.CoordinatesType;
-import net.seagis.gml.DirectPositionType;
 
 
 /**

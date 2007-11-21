@@ -85,45 +85,54 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
     public synchronized String getIdentifier(final SamplingPointEntry station) throws SQLException, CatalogException {
         final SamplingPointQuery query  = (SamplingPointQuery) super.query;
         String id;
-        if (station.getId() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.identifier), station.getId());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return station.getId();
-            else
-                id = station.getId();
-        } else {
-            id = searchFreeIdentifier("station");
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (station.getId() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.identifier), station.getId());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return station.getId();
+                } else {
+                    id = station.getId(); 
+                }
+            } else {
+                id = searchFreeIdentifier("station");
+            }
+        
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.identifier), id);
+        
+            if (station.getDescription() != null) {
+                statement.setString(indexOf(query.description), station.getDescription());
+            } else {
+                statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
+            }
+        
+            statement.setString(indexOf(query.name), station.getName());
+            Iterator i = station.getSampledFeatures().iterator();
+            statement.setString(indexOf(query.sampledFeature), (String)i.next());
+        
+            if( station.getPosition() != null ) {
+                statement.setString(indexOf(query.pointIdentifier), station.getPosition().getId());
+                statement.setString(indexOf(query.srsName), station.getPosition().getPos().getSrsName());
+                statement.setDouble(indexOf(query.positionValueX), station.getPosition().getPos().getValue().get(0));
+                statement.setDouble(indexOf(query.positionValueY), station.getPosition().getPos().getValue().get(1));
+                statement.setInt(indexOf(query.srsDimension), station.getPosition().getPos().getSrsDimension());
+            } else {
+                statement.setNull(indexOf(query.pointIdentifier), java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.positionValueX), java.sql.Types.DOUBLE);
+                statement.setNull(indexOf(query.positionValueY), java.sql.Types.DOUBLE);
+                statement.setNull(indexOf(query.srsDimension), java.sql.Types.INTEGER);
+            }
+            updateSingleton(statement); 
+            success = true;
+        } finally {
+            transactionEnd(success);
         }
-        
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.identifier), id);
-        
-        if (station.getDescription() != null) {
-            statement.setString(indexOf(query.description), station.getDescription());
-        } else {
-            statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
-        }
-        
-        statement.setString(indexOf(query.name), station.getName());
-        Iterator i = station.getSampledFeatures().iterator();
-        statement.setString(indexOf(query.sampledFeature), (String)i.next());
-        
-        if( station.getPosition() != null ) {
-            statement.setString(indexOf(query.pointIdentifier), station.getPosition().getId());
-            statement.setString(indexOf(query.srsName), station.getPosition().getPos().getSrsName());
-            statement.setDouble(indexOf(query.positionValueX), station.getPosition().getPos().getValue().get(0));
-            statement.setDouble(indexOf(query.positionValueY), station.getPosition().getPos().getValue().get(1));
-            statement.setInt(indexOf(query.srsDimension), station.getPosition().getPos().getSrsDimension());
-        } else {
-            statement.setNull(indexOf(query.pointIdentifier), java.sql.Types.VARCHAR);
-            statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
-            statement.setNull(indexOf(query.positionValueX), java.sql.Types.DOUBLE);
-            statement.setNull(indexOf(query.positionValueY), java.sql.Types.DOUBLE);
-            statement.setNull(indexOf(query.srsDimension), java.sql.Types.INTEGER);
-        }
-        insertSingleton(statement); 
         return id;
     }
     

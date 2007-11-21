@@ -127,32 +127,41 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
     public synchronized String getIdentifier(final SamplingFeatureEntry station) throws SQLException, CatalogException {
         final SamplingFeatureQuery query  = (SamplingFeatureQuery) super.query;
         String id;
-        if (station.getId() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.identifier), station.getId());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return station.getId();
-            else
-                id = station.getId();
-        } else {
-            id = searchFreeIdentifier("station");
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (station.getId() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.identifier), station.getId());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return station.getId();
+                } else {
+                    id = station.getId();
+                }
+            } else {
+                id = searchFreeIdentifier("station");
+            }
+        
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.identifier), id);
+        
+            if (station.getDescription() != null) {
+                statement.setString(indexOf(query.description), station.getDescription());
+            } else {
+                statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
+            }
+        
+            statement.setString(indexOf(query.name), station.getName());
+            Iterator i = station.getSampledFeatures().iterator();
+            statement.setString(indexOf(query.sampledFeature), (String)i.next());
+        
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
         }
-        
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.identifier), id);
-        
-        if (station.getDescription() != null) {
-            statement.setString(indexOf(query.description), station.getDescription());
-        } else {
-            statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
-        }
-        
-        statement.setString(indexOf(query.name), station.getName());
-        Iterator i = station.getSampledFeatures().iterator();
-        statement.setString(indexOf(query.sampledFeature), (String)i.next());
-        
-        insertSingleton(statement); 
         return id;
     }
 }

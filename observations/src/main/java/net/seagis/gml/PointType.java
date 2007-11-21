@@ -3,7 +3,6 @@ package net.seagis.gml;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
-import net.opengis.gml.AbstractGeometricPrimitiveType;
 import org.geotools.resources.Utilities;
 
 

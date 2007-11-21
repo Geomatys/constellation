@@ -107,22 +107,31 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
      */
     public synchronized void getIdentifier(String idComposite, PhenomenonEntry pheno) throws SQLException, CatalogException {
         final ComponentQuery query  = (ComponentQuery) super.query;
-        if (phenomenons == null) {
-            phenomenons = getDatabase().getTable(PhenomenonTable.class);
-        }
-        String idPheno = phenomenons.getIdentifier(pheno);
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (phenomenons == null) {
+                phenomenons = getDatabase().getTable(PhenomenonTable.class);
+            }
+            String idPheno = phenomenons.getIdentifier(pheno);
         
-        PreparedStatement statement = getStatement(QueryType.EXISTS);
-        statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
-        statement.setString(indexOf(query.idComponent), idPheno);
-        ResultSet result = statement.executeQuery();
-        if(result.next())
-            return ;
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
+            statement.setString(indexOf(query.idComponent), idPheno);
+            ResultSet result = statement.executeQuery();
+            if(result.next()) {
+                success = true;
+                return ;
+            }
               
-        statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
-        statement.setString(indexOf(query.idComponent), idPheno);
-        insertSingleton(statement);
+            statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
+            statement.setString(indexOf(query.idComponent), idPheno);
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
     }
     
 }

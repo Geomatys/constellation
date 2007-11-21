@@ -78,27 +78,36 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
     public synchronized String getIdentifier(final MeasureEntry meas) throws SQLException, CatalogException {
         final MeasureQuery query  = (MeasureQuery) super.query;
         String id;
-        if (meas.getName() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.name), meas.getName());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return meas.getName();
-            else
-                id = meas.getName();
-        } else {
-            id = searchFreeIdentifier("mesure");
-        }
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (meas.getName() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.name), meas.getName());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return meas.getName();
+                } else {
+                    id = meas.getName();
+                }
+            } else {
+                id = searchFreeIdentifier("mesure");
+            }
         
-        PreparedStatement statement = getStatement(QueryType.INSERT);
+            PreparedStatement statement = getStatement(QueryType.INSERT);
         
-        statement.setString(indexOf(query.name), id);
-        if (uoms == null) {
-             uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
+            statement.setString(indexOf(query.name), id);
+            if (uoms == null) {
+                uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
+            }
+            statement.setString(indexOf(query.uom), uoms.getIdentifier(meas.getUom()));
+            statement.setDouble(indexOf(query.value), meas.getValue());
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
         }
-        statement.setString(indexOf(query.uom), uoms.getIdentifier(meas.getUom()));
-        statement.setDouble(indexOf(query.value), meas.getValue());
-        insertSingleton(statement);
         return id;
     }
     

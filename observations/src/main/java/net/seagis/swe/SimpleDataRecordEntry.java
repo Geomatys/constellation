@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.resources.Utilities;
 
@@ -35,7 +35,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     /**
      * L'identifiant du dataBlock qui contient ce data record.
      */
-    @XmlAttribute
+    @XmlTransient
     private String blockId;
     
     /**
@@ -61,6 +61,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<AnyScalarEntry> getField() {
         return field;
     }

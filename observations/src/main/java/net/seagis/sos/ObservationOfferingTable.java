@@ -220,91 +220,98 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
     public synchronized String getIdentifier(final ObservationOfferingEntry off) throws SQLException, CatalogException {
         final ObservationOfferingQuery query = (ObservationOfferingQuery) super.query;
         String id;
-        if (off.getName() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.id), off.getId());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return off.getId();
-            else
-                id = off.getId();
-        } else {
-            id = searchFreeIdentifier("urn:BRGM:offering:");
-        }
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.name), off.getName());
-        statement.setString(indexOf(query.id), id);
-        if (off.getRemarks() != null) {
-            statement.setString(indexOf(query.description),  off.getRemarks());
-        } else {
-            statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
-        }
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (off.getName() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.id), off.getId());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return off.getId();
+                } else {
+                    id = off.getId();
+                }
+            } else {
+                id = searchFreeIdentifier("urn:BRGM:offering:");
+            }
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.name), off.getName());
+            statement.setString(indexOf(query.id), id);
+            if (off.getRemarks() != null) {
+                statement.setString(indexOf(query.description),  off.getRemarks());
+            } else {
+                statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
+            }
        
 
-        //on insere le srs name
-        if (off.getSrsName() != null) {
-            statement.setString(indexOf(query.srsName), off.getSrsName());
-        } else {
-            statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
-        }
-            
-        // on insere le "eventTime""
-        if (off.getEventTime() != null && ((TemporalObjectEntry)off.getEventTime()).getBeginTime() != null) {
-            Timestamp date = ((TemporalObjectEntry)off.getEventTime()).getBeginTime();
-            statement.setTimestamp(indexOf(query.eventTimeBegin), date);
-            if (((TemporalObjectEntry)off.getEventTime()).getEndTime() != null) {
-                date = ((TemporalObjectEntry)off.getEventTime()).getEndTime();           
-                statement.setTimestamp(indexOf(query.eventTimeEnd), date);
+            //on insere le srs name
+            if (off.getSrsName() != null) {
+                statement.setString(indexOf(query.srsName), off.getSrsName());
             } else {
-                statement.setNull(indexOf(query.eventTimeEnd), java.sql.Types.TIMESTAMP);
+                statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
             }
-        } else {
-            statement.setNull(indexOf(query.eventTimeBegin), java.sql.Types.TIMESTAMP);
-            statement.setNull(indexOf(query.eventTimeEnd),   java.sql.Types.TIMESTAMP);
-        }
-        
-        // on insere l'envellope qui borde l'offering
-        if (off.getBoundedBy() != null) {
-            if (envelopes == null) {
-                envelopes = getDatabase().getTable(EnvelopeTable.class);
+            
+            // on insere le "eventTime""
+            if (off.getEventTime() != null && ((TemporalObjectEntry)off.getEventTime()).getBeginTime() != null) {
+                Timestamp date = ((TemporalObjectEntry)off.getEventTime()).getBeginTime();
+                statement.setTimestamp(indexOf(query.eventTimeBegin), date);
+                if (((TemporalObjectEntry)off.getEventTime()).getEndTime() != null) {
+                    date = ((TemporalObjectEntry)off.getEventTime()).getEndTime();           
+                    statement.setTimestamp(indexOf(query.eventTimeEnd), date);
+                } else {
+                    statement.setNull(indexOf(query.eventTimeEnd), java.sql.Types.TIMESTAMP);
+                }
+            } else {
+                statement.setNull(indexOf(query.eventTimeBegin), java.sql.Types.TIMESTAMP);
+                statement.setNull(indexOf(query.eventTimeEnd),   java.sql.Types.TIMESTAMP);
             }
-            statement.setString(indexOf(query.boundedBy), envelopes.getIdentifier(off.getBoundedBy().getEnvelope()));
-        } else {
-            statement.setNull(indexOf(query.boundedBy), java.sql.Types.VARCHAR);
-        }
-        statement.setString(indexOf(query.responseFormat), off.getResponseFormat());
-        statement.setString(indexOf(query.resultModel), off.getResultModel());
         
-        insertSingleton(statement);
+            // on insere l'envellope qui borde l'offering
+            if (off.getBoundedBy() != null) {
+                if (envelopes == null) {
+                    envelopes = getDatabase().getTable(EnvelopeTable.class);
+                }
+                statement.setString(indexOf(query.boundedBy), envelopes.getIdentifier(off.getBoundedBy().getEnvelope()));
+            } else {
+                statement.setNull(indexOf(query.boundedBy), java.sql.Types.VARCHAR);
+            }
+            statement.setString(indexOf(query.responseFormat), off.getResponseFormat());
+            statement.setString(indexOf(query.resultModel), off.getResultModel());
         
-         // on insere les modes de reponse
-        if (off.getResponseMode() != null && off.getResponseMode().size() != 0){
-            for (ResponseMode mode:off.getResponseMode()) {
-                getResponseModes().getIdentifier(new OfferingResponseModeEntry(off.getId(), mode));
+            updateSingleton(statement);
+        
+            // on insere les modes de reponse
+            if (off.getResponseMode() != null && off.getResponseMode().size() != 0){
+                for (ResponseMode mode:off.getResponseMode()) {
+                    getResponseModes().getIdentifier(new OfferingResponseModeEntry(off.getId(), mode));
+                } 
+            }
+            // on insere la liste de station qui a effectué cette observation
+            if (off.getFeatureOfInterest() != null && off.getFeatureOfInterest().size() != 0) {
+                for (SamplingFeatureEntry station:off.getFeatureOfInterest()) {
+                    getStations().getIdentifier(new OfferingSamplingFeatureEntry(off.getId(), station));
+                }
+            }
+        
+            // on insere les phenomene observé
+            if(off.getObservedProperty() != null && off.getObservedProperty().size() != 0){
+                for (PhenomenonEntry pheno: off.getObservedProperty()){
+                    getPhenomenons().getIdentifier(new OfferingPhenomenonEntry(off.getId(), pheno));
+                }
             } 
-        }
-         // on insere la liste de station qui a effectué cette observation
-         if (off.getFeatureOfInterest() != null && off.getFeatureOfInterest().size() != 0) {
-             for (SamplingFeatureEntry station:off.getFeatureOfInterest()) {
-                    
-                getStations().getIdentifier(new OfferingSamplingFeatureEntry(off.getId(), station));
-             }
-        }
         
-        // on insere les phenomene observé
-         if(off.getObservedProperty() != null && off.getObservedProperty().size() != 0){
-             
-            for (PhenomenonEntry pheno: off.getObservedProperty()){
-                getPhenomenons().getIdentifier(new OfferingPhenomenonEntry(off.getId(), pheno));
+            //on insere les capteur
+            if (off.getProcedure() != null) {
+                for (ProcessEntry process:off.getProcedure()){
+                    getProcedures().getIdentifier(new OfferingProcedureEntry(off.getId(), process));
+                }
             }
-         } 
-        
-        //on insere les capteur
-        if (off.getProcedure() != null) {
-            for (ProcessEntry process:off.getProcedure()){
-                getProcedures().getIdentifier(new OfferingProcedureEntry(off.getId(), process));
-            }
-        } 
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
         return id;
     }
 }

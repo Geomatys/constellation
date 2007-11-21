@@ -64,62 +64,71 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
     public synchronized String getIdentifier(final ReferenceEntry ref) throws SQLException, CatalogException {
         final ReferenceQuery query  = (ReferenceQuery) super.query;
         String id;
-        if (ref.getId() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.idReference), ref.getId());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return ref.getId();
-            else
-                id = ref.getId();
-        } else {
-            id = searchFreeIdentifier("reference");
-        }
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (ref.getId() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.idReference), ref.getId());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return ref.getId();
+                } else {
+                    id = ref.getId();
+                }
+            } else {
+                id = searchFreeIdentifier("reference");
+            }
         
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.idReference), id);
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.idReference), id);
         
-        if (ref.getActuate() != null) {
-            statement.setString(indexOf(query.actuate), ref.getActuate());
-        } else {
-            statement.setNull(indexOf(query.actuate), java.sql.Types.VARCHAR);
+            if (ref.getActuate() != null) {
+                statement.setString(indexOf(query.actuate), ref.getActuate());
+            } else {
+                statement.setNull(indexOf(query.actuate), java.sql.Types.VARCHAR);
+            }
+            if (ref.getArcrole() != null) {
+                statement.setString(indexOf(query.arcrole), ref.getArcrole());
+            } else {
+                statement.setNull(indexOf(query.arcrole), java.sql.Types.VARCHAR);
+            }
+            if (ref.getHref() != null) {
+                statement.setString(indexOf(query.href), ref.getHref());
+            } else {
+                statement.setNull(indexOf(query.href), java.sql.Types.VARCHAR);
+            }
+            if (ref.getRole() != null) {
+                statement.setString(indexOf(query.role), ref.getRole());
+            } else {
+                statement.setNull(indexOf(query.role), java.sql.Types.VARCHAR);
+            }
+            if (ref.getShow() != null) {
+                statement.setString(indexOf(query.show), ref.getShow());
+            } else {
+                statement.setNull(indexOf(query.show), java.sql.Types.VARCHAR);
+            }
+            if (ref.getTitle() != null) {
+                statement.setString(indexOf(query.title), ref.getTitle());
+            } else {
+                statement.setNull(indexOf(query.title), java.sql.Types.VARCHAR);
+            }
+            if (ref.getOwns() != null) {
+                statement.setBoolean(indexOf(query.owns), ref.getOwns());
+            } else {
+                statement.setNull(indexOf(query.owns), java.sql.Types.BOOLEAN);
+            }
+            if (ref.getType() != null) {
+                statement.setString(indexOf(query.type), ref.getType());
+            } else {
+                statement.setNull(indexOf(query.type), java.sql.Types.VARCHAR);
+            }
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
         }
-        if (ref.getArcrole() != null) {
-            statement.setString(indexOf(query.arcrole), ref.getArcrole());
-        } else {
-            statement.setNull(indexOf(query.arcrole), java.sql.Types.VARCHAR);
-        }
-        if (ref.getHref() != null) {
-            statement.setString(indexOf(query.href), ref.getHref());
-        } else {
-            statement.setNull(indexOf(query.href), java.sql.Types.VARCHAR);
-        }
-        if (ref.getRole() != null) {
-            statement.setString(indexOf(query.role), ref.getRole());
-        } else {
-            statement.setNull(indexOf(query.role), java.sql.Types.VARCHAR);
-        }
-        if (ref.getShow() != null) {
-            statement.setString(indexOf(query.show), ref.getShow());
-        } else {
-            statement.setNull(indexOf(query.show), java.sql.Types.VARCHAR);
-        }
-        if (ref.getTitle() != null) {
-            statement.setString(indexOf(query.title), ref.getTitle());
-        } else {
-            statement.setNull(indexOf(query.title), java.sql.Types.VARCHAR);
-        }
-        if (ref.getOwns() != null) {
-            statement.setBoolean(indexOf(query.owns), ref.getOwns());
-        } else {
-            statement.setNull(indexOf(query.owns), java.sql.Types.BOOLEAN);
-        }
-        if (ref.getType() != null) {
-            statement.setString(indexOf(query.type), ref.getType());
-        } else {
-            statement.setNull(indexOf(query.type), java.sql.Types.VARCHAR);
-        }
-        insertSingleton(statement); 
         return id;
     }
 }

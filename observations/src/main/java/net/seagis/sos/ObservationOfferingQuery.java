@@ -30,18 +30,18 @@ public class ObservationOfferingQuery extends Query {
      * @param database The database for which this query is created.
      */
     public ObservationOfferingQuery(final Database database) {
-        super (database);
+        super (database, "observation_offerings");
         final QueryType[] SIL  = {SELECT, INSERT, LIST};
         final QueryType[] SIEL = {SELECT,INSERT, EXISTS, LIST};
-        id                = addColumn("observation_offerings", "id",                   SIEL);
-        name              = addColumn("observation_offerings", "name",                 SIL);
-        srsName           = addColumn("observation_offerings", "srs_name",             SIL);
-        description       = addColumn("observation_offerings", "description",          SIL);
-        eventTimeBegin    = addColumn("observation_offerings", "event_time_begin",     SIL);
-        eventTimeEnd      = addColumn("observation_offerings", "event_time_end",       SIL);
-        boundedBy         = addColumn("observation_offerings", "bounded_by",           SIL);
-        resultModel       = addColumn("observation_offerings", "result_model",         SIL);
-        responseFormat    = addColumn("observation_offerings", "response_format",      SIL);
+        id                = addColumn("id",                   SIEL);
+        name              = addColumn("name",                 SIL);
+        srsName           = addColumn("srs_name",             SIL);
+        description       = addColumn("description",          SIL);
+        eventTimeBegin    = addColumn("event_time_begin",     SIL);
+        eventTimeEnd      = addColumn("event_time_end",       SIL);
+        boundedBy         = addColumn("bounded_by",           SIL);
+        resultModel       = addColumn("result_model",         SIL);
+        responseFormat    = addColumn("response_format",      SIL);
         
         byId         = addParameter(id, SELECT, EXISTS);
     }

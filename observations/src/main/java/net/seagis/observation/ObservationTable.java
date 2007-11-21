@@ -348,128 +348,137 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
     public synchronized String getIdentifier(final ObservationEntry obs) throws SQLException, CatalogException {
         final ObservationQuery query = (ObservationQuery) super.query;
         String id;
-        if (obs.getName() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.name), obs.getName());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return obs.getName();
-            else
-                id = obs.getName();
-        } else {
-            id = searchFreeIdentifier("urn:BRGM:observation:");
-        }
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.name),         id);
-        statement.setString(indexOf(query.description),  obs.getDefinition());
-        
-        // on insere la distribution
-        if (obs.getDistribution() == null) {
-            obs.setDistribution(DistributionEntry.NORMAL);
-        } else if (obs.getDistribution().getName() == null) {
-            obs.setDistribution(DistributionEntry.NORMAL);
-        }
-        if (distributions == null) {
-            distributions = getDatabase().getTable(DistributionTable.class);
-        }
-        // regler le probleme avec la distribution
-        statement.setString(indexOf(query.distribution), distributions.getIdentifier(obs.getDistribution()));
-        
-        
-        // on insere la station qui a effectué cette observation
-         if (obs.getFeatureOfInterest() instanceof SamplingPointEntry){
-            SamplingPointEntry station = (SamplingPointEntry)obs.getFeatureOfInterest();
-            if (stationPoints == null) {
-                    stationPoints = getDatabase().getTable(SamplingPointTable.class);
-            }
-            statement.setString(indexOf(query.featureOfInterestPoint),stationPoints.getIdentifier(station));
-            statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
-            
-        } else if (obs.getFeatureOfInterest() instanceof SamplingFeatureEntry){
-            SamplingFeatureEntry station = (SamplingFeatureEntry)obs.getFeatureOfInterest();
-            if (stations == null) {
-                stations = getDatabase().getTable(SamplingFeatureTable.class);
-            }
-            statement.setString(indexOf(query.featureOfInterest),stations.getIdentifier(station));
-            statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
-        } else {
-            statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
-            statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
-        }
-        
-        // on insere le phenomene observé
-         if(obs.getObservedProperty() instanceof CompositePhenomenonEntry){
-            CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)obs.getObservedProperty();
-            if (compositePhenomenons == null) {
-                compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
-            }
-            statement.setString(indexOf(query.observedPropertyComposite), compositePhenomenons.getIdentifier(pheno));
-            statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
-        
-         } else if(obs.getObservedProperty() instanceof PhenomenonEntry){
-            PhenomenonEntry pheno = (PhenomenonEntry)obs.getObservedProperty();
-            if (phenomenons == null) {
-                phenomenons = getDatabase().getTable(PhenomenonTable.class);
-            }
-            statement.setString(indexOf(query.observedProperty), phenomenons.getIdentifier(pheno));
-            statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
-       
-        } else {
-            statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
-            statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
-        }
-        
-        //on insere le capteur
-        if (obs.getProcedure() != null) {
-            ProcessEntry process = (ProcessEntry)obs.getProcedure();
-            if (procedures == null) {
-                procedures = getDatabase().getTable(ProcessTable.class);
-            }
-            statement.setString(indexOf(query.procedure), procedures.getIdentifier(process));
-        } else {
-            statement.setNull(indexOf(query.procedure), java.sql.Types.VARCHAR);
-        }
-        
-        // on insere le resultat
-        if (obs.getResult() instanceof ReferenceEntry || obs.getResult() instanceof AnyResultEntry){
-            if (results == null) {
-                results = getDatabase().getTable(AnyResultTable.class);
-            }
-            statement.setString(indexOf(query.result), results.getIdentifier(obs.getResult()));
-        } else {
-            statement.setNull(indexOf(query.result), java.sql.Types.VARCHAR);
-        }
-        
-        //on insere la defintion du resultat
-        if (obs.getResultDefinition() instanceof String) {
-            statement.setString(indexOf(query.resultDefinition), (String)obs.getResultDefinition());
-        } else {
-            if (obs.getResultDefinition() instanceof DataBlockDefinitionEntry ){
-                DataBlockDefinitionEntry block = (DataBlockDefinitionEntry)obs.getResultDefinition(); 
-                if (dataBlockDefinitions == null) {
-                   dataBlockDefinitions = getDatabase().getTable(DataBlockDefinitionTable.class);
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (obs.getName() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.name), obs.getName());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return obs.getName();
+                } else {
+                    id = obs.getName();
                 }
-                statement.setString(indexOf(query.resultDefinition), dataBlockDefinitions.getIdentifier(block));
             } else {
-                statement.setNull(indexOf(query.resultDefinition), java.sql.Types.VARCHAR);
+                id = searchFreeIdentifier("urn:BRGM:observation:");
             }
-        }
-        // on insere le "samplingTime""
-        if (obs.getSamplingTime() != null && ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime() != null) {
-            Timestamp date = ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime();
-            statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
-            if (((TemporalObjectEntry)obs.getSamplingTime()).getEndTime() != null) {
-                date = ((TemporalObjectEntry)obs.getSamplingTime()).getEndTime();           
-                statement.setTimestamp(indexOf(query.samplingTimeEnd), date);
-            } else {
-                statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.TIMESTAMP);
-            }
-        } else {
-            statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
-            statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.TIMESTAMP);
-        }
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.name),         id);
+            statement.setString(indexOf(query.description),  obs.getDefinition());
         
-        insertSingleton(statement);
+            // on insere la distribution
+            if (obs.getDistribution() == null) {
+                obs.setDistribution(DistributionEntry.NORMAL);
+            } else if (obs.getDistribution().getName() == null) {
+                obs.setDistribution(DistributionEntry.NORMAL);
+            }
+            if (distributions == null) {
+                distributions = getDatabase().getTable(DistributionTable.class);
+            }
+            // regler le probleme avec la distribution
+            statement.setString(indexOf(query.distribution), distributions.getIdentifier(obs.getDistribution()));
+        
+        
+            // on insere la station qui a effectué cette observation
+            if (obs.getFeatureOfInterest() instanceof SamplingPointEntry){
+                SamplingPointEntry station = (SamplingPointEntry)obs.getFeatureOfInterest();
+                if (stationPoints == null) {
+                    stationPoints = getDatabase().getTable(SamplingPointTable.class);
+                }
+                statement.setString(indexOf(query.featureOfInterestPoint),stationPoints.getIdentifier(station));
+                statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
+            
+            } else if (obs.getFeatureOfInterest() instanceof SamplingFeatureEntry){
+                SamplingFeatureEntry station = (SamplingFeatureEntry)obs.getFeatureOfInterest();
+                if (stations == null) {
+                    stations = getDatabase().getTable(SamplingFeatureTable.class);
+                }
+                statement.setString(indexOf(query.featureOfInterest),stations.getIdentifier(station));
+                statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
+            } else {
+                statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
+            }
+        
+            // on insere le phenomene observé
+            if(obs.getObservedProperty() instanceof CompositePhenomenonEntry){
+                CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)obs.getObservedProperty();
+                if (compositePhenomenons == null) {
+                    compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+                }
+                statement.setString(indexOf(query.observedPropertyComposite), compositePhenomenons.getIdentifier(pheno));
+                statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
+        
+            } else if(obs.getObservedProperty() instanceof PhenomenonEntry){
+                PhenomenonEntry pheno = (PhenomenonEntry)obs.getObservedProperty();
+                if (phenomenons == null) {
+                    phenomenons = getDatabase().getTable(PhenomenonTable.class);
+                }
+                statement.setString(indexOf(query.observedProperty), phenomenons.getIdentifier(pheno));
+                statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
+       
+            } else {
+                statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
+            }
+        
+            //on insere le capteur
+            if (obs.getProcedure() != null) {
+                ProcessEntry process = (ProcessEntry)obs.getProcedure();
+                if (procedures == null) {
+                    procedures = getDatabase().getTable(ProcessTable.class);
+                }
+                statement.setString(indexOf(query.procedure), procedures.getIdentifier(process));
+            } else {
+                statement.setNull(indexOf(query.procedure), java.sql.Types.VARCHAR);
+            }
+        
+            // on insere le resultat
+            if (obs.getResult() instanceof ReferenceEntry || obs.getResult() instanceof AnyResultEntry){
+                if (results == null) {
+                    results = getDatabase().getTable(AnyResultTable.class);
+                }
+                statement.setString(indexOf(query.result), results.getIdentifier(obs.getResult()));
+            } else {
+                statement.setNull(indexOf(query.result), java.sql.Types.VARCHAR);
+            }
+        
+            //on insere la defintion du resultat
+            if (obs.getResultDefinition() instanceof String) {
+                statement.setString(indexOf(query.resultDefinition), (String)obs.getResultDefinition());
+            } else {
+                if (obs.getResultDefinition() instanceof DataBlockDefinitionEntry ){
+                    DataBlockDefinitionEntry block = (DataBlockDefinitionEntry)obs.getResultDefinition(); 
+                    if (dataBlockDefinitions == null) {
+                        dataBlockDefinitions = getDatabase().getTable(DataBlockDefinitionTable.class);
+                    }
+                    statement.setString(indexOf(query.resultDefinition), dataBlockDefinitions.getIdentifier(block));
+                } else {
+                    statement.setNull(indexOf(query.resultDefinition), java.sql.Types.VARCHAR);
+                }
+            }
+            // on insere le "samplingTime""
+            if (obs.getSamplingTime() != null && ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime() != null) {
+                Timestamp date = ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime();
+                statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
+                if (((TemporalObjectEntry)obs.getSamplingTime()).getEndTime() != null) {
+                    date = ((TemporalObjectEntry)obs.getSamplingTime()).getEndTime();           
+                    statement.setTimestamp(indexOf(query.samplingTimeEnd), date);
+                } else {
+                    statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.TIMESTAMP);
+                }
+            } else {
+                statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
+                statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.TIMESTAMP);
+            }
+        
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
         return id;
     }
     

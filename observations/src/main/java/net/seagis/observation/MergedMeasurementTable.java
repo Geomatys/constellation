@@ -79,7 +79,7 @@ public class MergedMeasurementTable extends Table {
      * @param database Connexion vers la base de données d'observations.
      */
     public MergedMeasurementTable(final Database database) {
-        super(new Query(database)); // TODO
+        super(new Query(database, "???")); // TODO
     }
 
     /**
@@ -350,7 +350,7 @@ public class MergedMeasurementTable extends Table {
             dest = creator.executeQuery(buffer.toString());
             if (true) {
                 // Log the SQL statement.
-                final LogRecord record = new LogRecord(LoggingLevel.CREATE, sqlCreate);
+                final LogRecord record = new LogRecord(LoggingLevel.UPDATE, sqlCreate);
                 record.setSourceClassName ("MergedMeasurementTable");
                 record.setSourceMethodName("copyToTable");
                 //Observation.LOGGER.log(record);

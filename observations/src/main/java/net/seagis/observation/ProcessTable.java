@@ -68,23 +68,32 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
     public synchronized String getIdentifier(final ProcessEntry proc) throws SQLException, CatalogException {
         final ProcessQuery query  = (ProcessQuery) super.query;
         String id;
-        if (proc.getName() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.name), proc.getName());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return proc.getName();
-            else
-                id = proc.getName();
-        } else {
-            id = searchFreeIdentifier("procedure");
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (proc.getName() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.name), proc.getName());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return proc.getName();
+                } else {
+                    id = proc.getName();
+                }
+            } else {
+                id = searchFreeIdentifier("procedure");
+            }
+        
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+        
+            statement.setString(indexOf(query.name), id);
+            statement.setString(indexOf(query.remarks), proc.getRemarks());
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
         }
-        
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        
-        statement.setString(indexOf(query.name), id);
-        statement.setString(indexOf(query.remarks), proc.getRemarks());
-        insertSingleton(statement);
         return id;
     }
 }

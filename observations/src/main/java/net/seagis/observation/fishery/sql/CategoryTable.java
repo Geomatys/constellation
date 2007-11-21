@@ -88,7 +88,7 @@ public class CategoryTable extends SingletonTable<CategoryEntry> {
      * @param  database Connexion vers la base de données.
      */
     public CategoryTable(final Database database) {
-        super(new net.seagis.catalog.Query(database)); // TODO
+        super(new net.seagis.catalog.Query(database, "category")); // TODO
     }
 
     /**

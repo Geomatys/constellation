@@ -74,47 +74,56 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
     public synchronized String getIdentifier(final EnvelopeEntry envelope) throws SQLException, CatalogException {
         final EnvelopeQuery query = (EnvelopeQuery) super.query;
         String id;
-        if (envelope.getName() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.id), envelope.getName());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return envelope.getName();
-            else
-                id = envelope.getName();
-        } else {
-            id = searchFreeIdentifier("envelope:");
-        }
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.id), id);
-        if (envelope.getSrsName() != null) {
-            statement.setString(indexOf(query.srsName), envelope.getSrsName());
-        } else {
-            statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
-        }
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (envelope.getName() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.id), envelope.getName());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return envelope.getName();
+                } else {
+                    id = envelope.getName();
+                }
+            } else {
+                id = searchFreeIdentifier("envelope:");
+            }
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.id), id);
+            if (envelope.getSrsName() != null) {
+                statement.setString(indexOf(query.srsName), envelope.getSrsName());
+            } else {
+                statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
+            }
         
-        if (envelope.getAxisLabels() != null && envelope.getAxisLabels().size() != 0) {
-            System.out.println("Axis Labels are not yet recordable");
-        }
+            if (envelope.getAxisLabels() != null && envelope.getAxisLabels().size() != 0) {
+                System.out.println("Axis Labels are not yet recordable");
+            }
         
-        if (envelope.getLowerCorner() != null && envelope.getLowerCorner().getValue().size() == 2) {
-            statement.setDouble(indexOf(query.lowerCornerX), envelope.getLowerCorner().getValue().get(0));
-            statement.setDouble(indexOf(query.lowerCornerY), envelope.getLowerCorner().getValue().get(1));
-        } else {
-            System.out.println("lowerCorner null ou mal forme");
-            statement.setNull(indexOf(query.lowerCornerX), java.sql.Types.DOUBLE);
-            statement.setNull(indexOf(query.lowerCornerY), java.sql.Types.DOUBLE);
-        }
+            if (envelope.getLowerCorner() != null && envelope.getLowerCorner().getValue().size() == 2) {
+                statement.setDouble(indexOf(query.lowerCornerX), envelope.getLowerCorner().getValue().get(0));
+                statement.setDouble(indexOf(query.lowerCornerY), envelope.getLowerCorner().getValue().get(1));
+            } else {
+                System.out.println("lowerCorner null ou mal forme");
+                statement.setNull(indexOf(query.lowerCornerX), java.sql.Types.DOUBLE);
+                statement.setNull(indexOf(query.lowerCornerY), java.sql.Types.DOUBLE);
+            }
         
-        if (envelope.getUpperCorner() != null && envelope.getUpperCorner().getValue().size() == 2) {
-            statement.setDouble(indexOf(query.upperCornerX), envelope.getUpperCorner().getValue().get(0));
-            statement.setDouble(indexOf(query.upperCornerY), envelope.getUpperCorner().getValue().get(1));
-        } else {
-            System.out.println("upperCorner null ou mal forme");
-            statement.setNull(indexOf(query.upperCornerX), java.sql.Types.DOUBLE);
-            statement.setNull(indexOf(query.upperCornerY), java.sql.Types.DOUBLE);
+            if (envelope.getUpperCorner() != null && envelope.getUpperCorner().getValue().size() == 2) {
+                statement.setDouble(indexOf(query.upperCornerX), envelope.getUpperCorner().getValue().get(0));
+                statement.setDouble(indexOf(query.upperCornerY), envelope.getUpperCorner().getValue().get(1));
+            } else {
+                System.out.println("upperCorner null ou mal forme");
+                statement.setNull(indexOf(query.upperCornerX), java.sql.Types.DOUBLE);
+                statement.setNull(indexOf(query.upperCornerY), java.sql.Types.DOUBLE);
+            }
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
         }
-        insertSingleton(statement);
         return id;
     }
     

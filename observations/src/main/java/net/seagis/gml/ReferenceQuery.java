@@ -44,18 +44,18 @@ public class ReferenceQuery extends Query {
      * @param database The database for which this query is created.
      */
     public ReferenceQuery(final Database database) {
-        super(database);
+        super(database, "references");
         final QueryType[] SI  = {SELECT, INSERT};
         final QueryType[] SIE = {SELECT, INSERT, EXISTS};
-        idReference = addColumn("references", "id_reference", SIE);
-        actuate     = addColumn("references", "actuate"     , SI);
-        arcrole     = addColumn("references", "arcrole"     , SI);
-        href        = addColumn("references", "href"        , SI);
-        role        = addColumn("references", "role"        , SI);
-        show        = addColumn("references", "show"        , SI);
-        title       = addColumn("references", "title"       , SI);
-        type        = addColumn("references", "type"        , SI);
-        owns        = addColumn("references", "owns"        , SI);
+        idReference = addColumn("id_reference", SIE);
+        actuate     = addColumn("actuate"     , SI);
+        arcrole     = addColumn("arcrole"     , SI);
+        href        = addColumn("href"        , SI);
+        role        = addColumn("role"        , SI);
+        show        = addColumn("show"        , SI);
+        title       = addColumn("title"       , SI);
+        type        = addColumn("type"        , SI);
+        owns        = addColumn("owns"        , SI);
         
         byIdReference          = addParameter(idReference, SELECT, EXISTS);
     }

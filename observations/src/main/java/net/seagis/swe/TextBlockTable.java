@@ -69,24 +69,33 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
     public synchronized String getIdentifier(final TextBlockEntry textbloc) throws SQLException, CatalogException {
         final TextBlockQuery query  = (TextBlockQuery) super.query;
         String id;
-        if (textbloc.getId() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.id), textbloc.getId());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return textbloc.getId();
-            else
-                id = textbloc.getId();
-        } else {
-            id = searchFreeIdentifier("textblock");
-        }
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.id), id);
-        statement.setString(indexOf(query.decimalSeparator), textbloc.getDecimalSeparator() + "");
-        statement.setString(indexOf(query.blockSeparator), textbloc.getBlockSeparator());
-        statement.setString(indexOf(query.tokenSeparator), textbloc.getTokenSeparator());
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (textbloc.getId() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.id), textbloc.getId());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return textbloc.getId();
+                } else {
+                    id = textbloc.getId();
+                }
+            } else {
+                id = searchFreeIdentifier("textblock");
+            }
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.id), id);
+            statement.setString(indexOf(query.decimalSeparator), textbloc.getDecimalSeparator() + "");
+            statement.setString(indexOf(query.blockSeparator), textbloc.getBlockSeparator());
+            statement.setString(indexOf(query.tokenSeparator), textbloc.getTokenSeparator());
         
-        insertSingleton(statement);
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
         return id;
     }
 }

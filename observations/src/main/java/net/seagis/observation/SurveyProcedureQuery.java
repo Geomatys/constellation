@@ -46,18 +46,18 @@ public class SurveyProcedureQuery extends Query {
      * @param database The database for which this query is created.
      */
     public SurveyProcedureQuery(final Database database) {
-        super(database);
+        super(database, "SurveyProcedure");
         final QueryType[] usage = {SELECT, LIST};
-        name              = addColumn   ("SurveyProcedure", "name",              usage);
-        operator          = addColumn   ("SurveyProcedure", "operator",          usage);
-        elevationDatum    = addColumn   ("SurveyProcedure", "elevationDatum",    usage);
-        elevationMethod   = addColumn   ("SurveyProcedure", "elevationMethod",   usage);
-        elevationAccuracy = addColumn   ("SurveyProcedure", "elevationAccuracy", usage);
-        geodeticDatum     = addColumn   ("SurveyProcedure", "geodeticDatum",     usage);
-        positionMethod    = addColumn   ("SurveyProcedure", "positionMethod",    usage);
-        positionAccuracy  = addColumn   ("SurveyProcedure", "positionAccuracy",  usage);
-        projection        = addColumn   ("SurveyProcedure", "projection",        usage);
-        surveyTime        = addColumn   ("SurveyProcedure", "surveyTime",        usage);
+        name              = addColumn   ("name",              usage);
+        operator          = addColumn   ("operator",          usage);
+        elevationDatum    = addColumn   ("elevationDatum",    usage);
+        elevationMethod   = addColumn   ("elevationMethod",   usage);
+        elevationAccuracy = addColumn   ("elevationAccuracy", usage);
+        geodeticDatum     = addColumn   ("geodeticDatum",     usage);
+        positionMethod    = addColumn   ("positionMethod",    usage);
+        positionAccuracy  = addColumn   ("positionAccuracy",  usage);
+        projection        = addColumn   ("projection",        usage);
+        surveyTime        = addColumn   ("surveyTime",        usage);
         
         byName  = addParameter(name, SELECT);
     }

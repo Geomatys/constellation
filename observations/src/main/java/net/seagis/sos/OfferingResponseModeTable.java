@@ -90,18 +90,26 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
      */
     public synchronized void getIdentifier(OfferingResponseModeEntry offres) throws SQLException, CatalogException {
         final OfferingResponseModeQuery query  = (OfferingResponseModeQuery) super.query;
+        boolean success = false;
+        transactionBegin();
+        try {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.idOffering), offres.getIdOffering());
+            statement.setString(indexOf(query.mode), offres.getMode().name());
+            ResultSet result = statement.executeQuery();
+            if(result.next()) {
+                success = true;
+                return;
+            }
         
-        PreparedStatement statement = getStatement(QueryType.EXISTS);
-        statement.setString(indexOf(query.idOffering), offres.getIdOffering());
-        statement.setString(indexOf(query.mode), offres.getMode().name());
-        ResultSet result = statement.executeQuery();
-        if(result.next())
-            return;
-        
-        PreparedStatement insert    = getStatement(QueryType.INSERT);
-        insert.setString(indexOf(query.idOffering), offres.getIdOffering());
-        insert.setString(indexOf(query.mode), offres.getMode().name() );
-        insertSingleton(insert);
+            PreparedStatement insert    = getStatement(QueryType.INSERT);
+            insert.setString(indexOf(query.idOffering), offres.getIdOffering());
+            insert.setString(indexOf(query.mode), offres.getMode().name() );
+            updateSingleton(insert);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
     }
     
 }

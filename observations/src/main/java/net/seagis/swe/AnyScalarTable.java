@@ -110,15 +110,26 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
     /**
      * Construit un data block pour l'enregistrement courant.
      */
+    @Override
     protected AnyScalarEntry createEntry(final ResultSet results) throws SQLException {
         final AnyScalarQuery query = (AnyScalarQuery) super.query;
+        AbstractDataComponentEntry component = null;
+        if (results.getString(indexOf(query.type)).equals("Quantity")) {
+            component = new QuantityType(results.getString(indexOf(query.definition )), 
+                                              results.getString(indexOf(query.uomCode)),
+                                              results.getString(indexOf(query.uomHref))); 
+        } else if (results.getString(indexOf(query.type)).equals("Time")) {
+            component = new TimeType(results.getString(indexOf(query.definition )), 
+                                     results.getString(indexOf(query.uomCode)),
+                                     results.getString(indexOf(query.uomHref))); 
+        } else if (results.getString(indexOf(query.type)).equals("Boolean")) {
+            component = new BooleanType(results.getString(indexOf(query.definition )), 
+                                        results.getBoolean(indexOf(query.value))); 
+        } 
         return new AnyScalarEntry(
                 results.getString(indexOf(query.idDataRecord )),
                 results.getString(indexOf(query.name )),
-                results.getString(indexOf(query.definition )),
-                results.getString(indexOf(query.type )),
-                results.getString(indexOf(query.uom )),
-                results.getString(indexOf(query.value)));
+                component);
     }
     
     /**
@@ -144,31 +155,82 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
     public synchronized String getIdentifier(final AnyScalarEntry field, String blockId, String dataRecordId) throws SQLException, CatalogException {
         final AnyScalarQuery query  = (AnyScalarQuery) super.query;
         String id;
-        if (field.getName() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.byIdDataBlock), blockId);
-            statement.setString(indexOf(query.idDataRecord),  dataRecordId);
-            statement.setString(indexOf(query.name),          field.getName());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return field.getName();
-            else
-                id = field.getName();
-        } else {
-            id = searchFreeIdentifier("field");
-            System.out.println("Id choisi:" + id);
-        }
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (field.getName() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.byIdDataBlock), blockId);
+                statement.setString(indexOf(query.idDataRecord),  dataRecordId);
+                statement.setString(indexOf(query.name),          field.getName());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return field.getName();
+                } else {
+                    id = field.getName();
+                }
+            } else {
+                id = searchFreeIdentifier("field");
+                System.out.println("Id choisi:" + id);
+            }
         
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        statement.setString(indexOf(query.idDataRecord), dataRecordId);
-        statement.setString(indexOf(query.idDataBlock),  blockId);
-        statement.setString(indexOf(query.name),         id);
-        statement.setString(indexOf(query.definition),   field.getDefinition());
-        statement.setString(indexOf(query.type),         field.getType());
-        statement.setString(indexOf(query.uom),          field.getUom());
-        statement.setString(indexOf(query.value),        (String)field.getValue());
-        insertSingleton(statement);
-     
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.idDataRecord), dataRecordId);
+            statement.setString(indexOf(query.idDataBlock),  blockId);
+            statement.setString(indexOf(query.name),         id);
+            statement.setString(indexOf(query.definition),   field.getComponent().getDefinition());
+        
+            if (field.getComponent() instanceof QuantityType) {
+                QuantityType q = (QuantityType) field.getComponent();
+            
+                statement.setString(indexOf(query.type), "Quantity");
+                if ( q.getUom().getCode() != null)
+                    statement.setString(indexOf(query.uomCode), q.getUom().getCode());
+                else
+                    statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
+            
+                if ( q.getUom().getHref() != null)
+                    statement.setString(indexOf(query.uomHref), q.getUom().getHref());
+                else
+                    statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
+            
+                statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
+            
+            } else if (field.getComponent() instanceof TimeType) {
+                TimeType t = (TimeType) field.getComponent();
+            
+                statement.setString(indexOf(query.type), "Time");
+                if ( t.getUom().getCode() != null)
+                    statement.setString(indexOf(query.uomCode), t.getUom().getCode());
+                else
+                    statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
+            
+                if ( t.getUom().getHref() != null)
+                    statement.setString(indexOf(query.uomHref), t.getUom().getHref());
+                else
+                    statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
+            
+                statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
+            
+            } else if (field.getComponent() instanceof BooleanType) {
+                BooleanType b = (BooleanType) field.getComponent();
+            
+                statement.setString(indexOf(query.type), "Boolean");
+                if (b.isValue() != null)
+                    statement.setBoolean(indexOf(query.value), b.isValue());
+                else
+                    statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
+            
+                statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
+            
+            }
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
         return id;
     }
 }

@@ -46,19 +46,19 @@ public class SamplingPointQuery extends Query {
     * @param database The database for which this query is created.
     */
     public SamplingPointQuery(final Database database) {
-        super(database);
+        super(database, "sampling_points");
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         
-        identifier             = addColumn   ("sampling_points", "id",                 SLIE);
-        name                   = addColumn   ("sampling_points", "name",               SLI);
-        description            = addColumn   ("sampling_points", "description",        SLI);
-        sampledFeature         = addColumn   ("sampling_points", "sampled_feature",    SLI);
-        pointIdentifier        = addColumn   ("sampling_points", "point_id",           SLI);
-        srsName                = addColumn   ("sampling_points", "point_srsname",      SLI);
-        srsDimension           = addColumn   ("sampling_points", "point_srsdimension", SLI);
-        positionValueX         = addColumn   ("sampling_points", "x_value",            SLI);
-        positionValueY         = addColumn   ("sampling_points", "y_value",            SLI);
+        identifier             = addColumn   ("id",                 SLIE);
+        name                   = addColumn   ("name",               SLI);
+        description            = addColumn   ("description",        SLI);
+        sampledFeature         = addColumn   ("sampled_feature",    SLI);
+        pointIdentifier        = addColumn   ("point_id",           SLI);
+        srsName                = addColumn   ("point_srsname",      SLI);
+        srsDimension           = addColumn   ("point_srsdimension", SLI);
+        positionValueX         = addColumn   ("x_value",            SLI);
+        positionValueY         = addColumn   ("y_value",            SLI);
         
         byIdentifier  = addParameter(identifier, SELECT, EXISTS);
     }

@@ -44,14 +44,14 @@ public class UnitOfMeasureQuery extends Query{
      * @param database The database for which this query is created.
      */
     public UnitOfMeasureQuery(final Database database) {
-        super(database);
+        super(database, "unit_of_measures");
         final QueryType[] SLI = {SELECT, LIST, INSERT};
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         
-        id           = addColumn("unit_of_measures", "id",            SLIE);
-        name         = addColumn("unit_of_measures", "name",          SLI);
-        quantityType = addColumn("unit_of_measures", "quantity_type", SLI);
-        unitSystem   = addColumn("unit_of_measures", "unit_system",   SLI);
+        id           = addColumn("id",            SLIE);
+        name         = addColumn("name",          SLI);
+        quantityType = addColumn("quantity_type", SLI);
+        unitSystem   = addColumn("unit_system",   SLI);
         
         byId         = addParameter(id, SELECT, EXISTS);
     }

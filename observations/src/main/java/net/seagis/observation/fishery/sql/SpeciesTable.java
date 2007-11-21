@@ -59,7 +59,7 @@ public class SpeciesTable extends SingletonTable<SpeciesEntry> {
      * @param  database Connexion vers la base de données.
      */
     public SpeciesTable(final Database database) {
-        super(new net.seagis.catalog.Query(database)); // TODO
+        super(new net.seagis.catalog.Query(database, "species")); // TODO
     }
 
     /**

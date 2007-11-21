@@ -106,24 +106,32 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
     public synchronized void getIdentifier(OfferingProcedureEntry offProc) throws SQLException, CatalogException {
         final OfferingProcedureQuery query  = (OfferingProcedureQuery) super.query;
         String idProc = "";
-        
-        PreparedStatement statement = getStatement(QueryType.EXISTS);
-        statement.setString(indexOf(query.idOffering), offProc.getIdOffering());
+        boolean success = false;
+        transactionBegin();
+        try {
+            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            statement.setString(indexOf(query.idOffering), offProc.getIdOffering());
          
-        if (process == null) {
+            if (process == null) {
                 process = getDatabase().getTable(ProcessTable.class);
             }
-        idProc = process.getIdentifier(offProc.getComponent());
+            idProc = process.getIdentifier(offProc.getComponent());
         
-        statement.setString(indexOf(query.procedure), idProc);
-        ResultSet result = statement.executeQuery();
-        if(result.next())
-            return;
+            statement.setString(indexOf(query.procedure), idProc);
+            ResultSet result = statement.executeQuery();
+            if(result.next()) {
+                success = true;
+                return;
+            }
         
-        PreparedStatement insert    = getStatement(QueryType.INSERT);
-        insert.setString(indexOf(query.idOffering), offProc.getIdOffering());
-        insert.setString(indexOf(query.procedure), idProc);
-        insertSingleton(insert);
+            PreparedStatement insert    = getStatement(QueryType.INSERT);
+            insert.setString(indexOf(query.idOffering), offProc.getIdOffering());
+            insert.setString(indexOf(query.procedure), idProc);
+            updateSingleton(insert);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
     }
     
 }

@@ -38,12 +38,12 @@ public class OfferingResponseModeQuery extends Query {
      * @param database The database for which this query is created.
      */
     public OfferingResponseModeQuery(final Database database) {
-        super (database);
+        super (database, "offering_response_modes");
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         
-        idOffering  = addColumn("offering_response_modes", "id_offering", SLIE);
-        mode        = addColumn("offering_response_modes", "mode",  SLIE);
+        idOffering  = addColumn("id_offering", SLIE);
+        mode        = addColumn("mode",  SLIE);
         
         byOffering  = addParameter(idOffering, SELECT, LIST, EXISTS);
         byMode      = addParameter(mode,  SELECT, EXISTS);

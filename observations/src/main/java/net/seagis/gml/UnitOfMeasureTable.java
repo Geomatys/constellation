@@ -67,25 +67,34 @@ public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry>{
     public synchronized String getIdentifier(final UnitOfMeasureEntry uom) throws SQLException, CatalogException {
         final UnitOfMeasureQuery query  = (UnitOfMeasureQuery) super.query;
         String id;
-        if (uom.getId() != null) {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.id), uom.getId());
-            ResultSet result = statement.executeQuery();
-            if(result.next())
-                return uom.getId();
-            else
-                id = uom.getId();
-        } else {
-            id = searchFreeIdentifier("uom");
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (uom.getId() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.id), uom.getId());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return uom.getId();
+                } else {
+                    id = uom.getId();
+                }
+            } else {
+                id = searchFreeIdentifier("uom");
+            }
+        
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+        
+            statement.setString(indexOf(query.id),           id);
+            statement.setString(indexOf(query.name),         uom.getName());
+            statement.setString(indexOf(query.quantityType), uom.getQuantityType());
+            statement.setString(indexOf(query.unitSystem),   uom.getUnitsSystem());
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
         }
-        
-        PreparedStatement statement = getStatement(QueryType.INSERT);
-        
-        statement.setString(indexOf(query.id),           id);
-        statement.setString(indexOf(query.name),         uom.getName());
-        statement.setString(indexOf(query.quantityType), uom.getQuantityType());
-        statement.setString(indexOf(query.unitSystem),   uom.getUnitsSystem());
-        insertSingleton(statement);
         return id;
     }
     

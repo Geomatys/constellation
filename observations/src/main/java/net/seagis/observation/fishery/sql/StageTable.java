@@ -23,10 +23,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 // Sicade dependencies
-import net.seagis.observation.fishery.Stage;
 import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
+import net.seagis.catalog.Query;
 import net.seagis.catalog.SingletonTable;
 
 
@@ -57,7 +56,7 @@ public class StageTable extends SingletonTable<StageEntry> {
      * @param  database Connexion vers la base de données.
      */
     public StageTable(final Database database) {
-        super(new net.seagis.catalog.Query(database)); // TODO
+        super(new Query(database, "stage")); // TODO
     }
 
     /**

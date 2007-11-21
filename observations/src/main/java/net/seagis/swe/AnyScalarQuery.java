@@ -32,7 +32,7 @@ public class AnyScalarQuery extends Query{
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column idDataRecord, idDataBlock, name, definition, type,  uom, value;
+    protected final Column idDataRecord, idDataBlock, name, definition, type,  uomCode, value, uomHref;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -45,16 +45,17 @@ public class AnyScalarQuery extends Query{
      * @param database The database for which this query is created.
      */
     public AnyScalarQuery(final Database database) {
-        super (database);
+        super (database, "any_scalars");
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
-        idDataRecord  = addColumn("any_scalars", "id_datarecord", SLIE);
-        idDataBlock   = addColumn("any_scalars", "id_datablock",  SLIE);
-        name          = addColumn("any_scalars", "name",          SLIE);
-        definition    = addColumn("any_scalars", "definition",    SLI);
-        type          = addColumn("any_scalars", "type",          SLI);
-        uom           = addColumn("any_scalars", "uom",           SLI);
-        value         = addColumn("any_scalars", "value",         SLI);
+        idDataRecord  = addColumn("id_datarecord", SLIE);
+        idDataBlock   = addColumn("id_datablock",  SLIE);
+        name          = addColumn("name",          SLIE);
+        definition    = addColumn("definition",    SLI);
+        type          = addColumn("type",          SLI);
+        uomCode       = addColumn("uom_code",      SLI);
+        uomHref       = addColumn("uom_href",      SLI);
+        value         = addColumn("value",         SLI);
         
         byName         = addParameter(name, SELECT, EXISTS);
         byIdDataRecord = addParameter(idDataRecord, SELECT, LIST, EXISTS);

@@ -44,13 +44,13 @@ public class TextBlockQuery extends Query{
      * @param database The database for which this query is created.
      */
     public TextBlockQuery(final Database database) {
-        super(database);
+        super(database, "text_block_encodings");
         final QueryType[] SI  = {SELECT, INSERT};
         final QueryType[] SIE = {SELECT, INSERT, EXISTS};
-        id               = addColumn("text_block_encodings", "id_encoding",       SIE);
-        tokenSeparator   = addColumn("text_block_encodings", "token_separator",   SI);
-        blockSeparator   = addColumn("text_block_encodings", "block_separator",   SI);
-        decimalSeparator = addColumn("text_block_encodings", "decimal_separator", SI);
+        id               = addColumn("id_encoding",       SIE);
+        tokenSeparator   = addColumn("token_separator",   SI);
+        blockSeparator   = addColumn("block_separator",   SI);
+        decimalSeparator = addColumn("decimal_separator", SI);
 
         byId  = addParameter(id, SELECT, EXISTS);
     }

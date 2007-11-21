@@ -1,8 +1,6 @@
 
 package net.seagis.swe;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 
@@ -24,6 +22,39 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
     
+    /**
+     * Create an instance of {@link Boolean }
+     * 
+     */
+    public BooleanType createBooleanType() {
+        return new BooleanType();
+    }
+
+    
+    /**
+     * Create an instance of {@link Time }
+     * 
+     */
+    public TimeType createTimeType() {
+        return new TimeType();
+    }
+
+    /**
+     * Create an instance of {@link Quantity }
+     * 
+     */
+    public QuantityType createQuantityType() {
+        return new QuantityType();
+    }
+    
+    /**
+     * Create an instance of {@link UomPropertyType }
+     * 
+     */
+    public UomPropertyType createUomPropertyType() {
+        return new UomPropertyType();
+    }
+
     /**
      * Create an instance of {@link AbstractDataComponentEntry }
      * 

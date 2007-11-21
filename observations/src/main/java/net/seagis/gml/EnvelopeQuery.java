@@ -29,15 +29,15 @@ public class EnvelopeQuery extends Query {
      * @param database The database for which this query is created.
      */
     public EnvelopeQuery(final Database database) {
-        super (database);
+        super (database, "envelopes");
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
-        id           = addColumn("envelopes", "id",             SLIE);
-        srsName      = addColumn("envelopes", "srs_name",       SLI);
-        lowerCornerX = addColumn("envelopes", "lower_corner_x", SLI);
-        lowerCornerY = addColumn("envelopes", "lower_corner_y", SLI);
-        upperCornerX = addColumn("envelopes", "upper_corner_x", SLI);
-        upperCornerY = addColumn("envelopes", "upper_corner_y", SLI);
+        id           = addColumn("id",             SLIE);
+        srsName      = addColumn("srs_name",       SLI);
+        lowerCornerX = addColumn("corner_x", SLI);
+        lowerCornerY = addColumn("lower_corner_y", SLI);
+        upperCornerX = addColumn("upper_corner_x", SLI);
+        upperCornerY = addColumn("upper_corner_y", SLI);
         
         byId         = addParameter(id, SELECT, EXISTS);
     }

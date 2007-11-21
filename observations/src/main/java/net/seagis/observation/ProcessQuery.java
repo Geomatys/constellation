@@ -45,11 +45,11 @@ public class ProcessQuery extends Query{
      * @param database The database for which this query is created.
      */
     public ProcessQuery(final Database database) {
-        super(database);
+        super(database, "process");
         final QueryType[] SI  = {SELECT, INSERT};
         final QueryType[] SIE = {SELECT, EXISTS, INSERT};
-        name    = addColumn   ("process", "name",        SIE);
-        remarks = addColumn   ("process", "description", SI);
+        name    = addColumn   ("name",        SIE);
+        remarks = addColumn   ("description", SI);
 
         byName  = addParameter(name, SELECT, EXISTS);
     }

@@ -31,13 +31,13 @@ public class OfferingSamplingFeatureQuery extends Query {
      * @param database The database for which this query is created.
      */
     public OfferingSamplingFeatureQuery(final Database database) {
-        super (database);
+        super (database, "offering_sampling_features");
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         
-        idOffering      = addColumn("offering_sampling_features", "id_offering", SLIE);
-        samplingFeature = addColumn("offering_sampling_features", "sampling_feature",  SLIE);
-        samplingPoint   = addColumn("offering_sampling_features", "sampling_point",  SLIE);
+        idOffering      = addColumn("id_offering", SLIE);
+        samplingFeature = addColumn("sampling_feature",  SLIE);
+        samplingPoint   = addColumn("sampling_point",  SLIE);
         
         byOffering        = addParameter(idOffering, SELECT, LIST, EXISTS);
         bySamplingFeature = addParameter(samplingFeature,  SELECT, EXISTS);
