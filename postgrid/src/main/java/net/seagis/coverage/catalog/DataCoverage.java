@@ -306,7 +306,6 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      * @return La valeur évaluée à la position spécifiée, sous forme de tableau {@code double[]}.
      * @throws CannotEvaluateException si une erreur est survenue lors de l'évaluation.
      */
-    @Override
     public Object evaluate(final DirectPosition position) throws CannotEvaluateException {
         return evaluate(position, (double[]) null);
     }
@@ -314,7 +313,6 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     /**
      * {@inheritDoc}
      */
-    @Override
     public DirectPosition snap(final DirectPosition position) throws CatalogException {
         final double[] ordinates;
         try {
@@ -332,7 +330,6 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     /**
      * {@inheritDoc}
      */
-    @Override
     public List<Coverage> coveragesAt(DirectPosition position) throws CatalogException {
         if (dt != 0) {
             position = new GeneralDirectPosition(position);
@@ -352,7 +349,6 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      * Retourne le nombre de bandes dans cette couverture. Pour ce type de couverture, il
      * sera toujours égal à 1.
      */
-    @Override
     public int getNumSampleDimensions() {
         return 1;
     }
@@ -363,7 +359,6 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      *
      * @throws IndexOutOfBoundsException si {@code index} est en dehors des limites permises.
      */
-    @Override
     public SampleDimension getSampleDimension(final int index) throws IndexOutOfBoundsException {
         if (index != 0) {
             throw new IndexOutOfBoundsException(String.valueOf(index));

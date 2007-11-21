@@ -120,11 +120,6 @@ public class Database {
     private Connection connection;
 
     /**
-     * {@code true} if the database supports spatial extension, like the {code BBOX3D} type.
-     */
-    private final boolean isSpatialEnabled;
-
-    /**
      * {@code true} if the {@code toString()} method on {@link PreparedStatement} instances
      * returns the SQL query with parameters filled in. This is the case with the PostgreSQL
      * JDBC driver.
@@ -144,6 +139,12 @@ public class Database {
      *
      * @see #transactionBegin
      * @see #transactionEnd
+     *
+     * @todo This lock alone is not suffisient. We also need to use a {@link Connection}
+     *       for write operation which is different than the connection for read operations,
+     *       in order to avoid the read operation to see ungoing changes before they are
+     *       commited. In this process, we should probably consider replacing the permanent
+     *       {@link #connection} reference by a connection pool.
      */
     private final ReentrantLock transactionLock = new ReentrantLock(true);
 
@@ -289,10 +290,8 @@ public class Database {
          */
         final String driver = (source!=null) ? source.getClass().getName() : getProperty(ConfigurationKey.DRIVER);
         if (driver.startsWith("org.postgresql")) {
-            isSpatialEnabled     = true;
             isStatementFormatted = true;
         } else {
-            isSpatialEnabled     = false;
             isStatementFormatted = false;
         }
         /*
@@ -399,7 +398,6 @@ public class Database {
     private void setupConnection() throws SQLException {
         if (connection != null) {
             connection.setReadOnly(Boolean.valueOf(getProperty(ConfigurationKey.READONLY)));
-            connection.setAutoCommit(false);
             Element.LOGGER.info("Connecté à la base de données " + connection.getMetaData().getURL());
             // TODO: localize
         }
@@ -598,15 +596,6 @@ public class Database {
     }
 
     /**
-     * Returns {@code true} if the database support spatial extensions. For example
-     * PostGIS is an optional spatial extension to PostgreSQL. Those extensions define
-     * new types like {@code BOX3D}.
-     */
-    public boolean isSpatialEnabled() {
-        return isSpatialEnabled;
-    }
-
-    /**
      * If non-null, SQL {@code INSERT}, {@code UPDATE} or {@code DELETE} statements will not be
      * executed but will rather be printed to this stream. This is used for testing and debugging
      * purpose only.
@@ -667,6 +656,9 @@ public class Database {
      */
     final void transactionBegin() throws SQLException {
         transactionLock.lock();
+        if (transactionLock.getHoldCount() == 1) {
+            connection.setAutoCommit(false);
+        }
     }
 
     /**
@@ -680,13 +672,14 @@ public class Database {
     final void transactionEnd(final boolean success) throws SQLException {
         ensureOngoingTransaction();
         if (transactionLock.getHoldCount() == 1) {
-            if (connection != null) {
-                synchronized (this) {
+            synchronized (this) {
+                if (connection != null) {
                     if (success) {
                         connection.commit();
                     } else {
                         connection.rollback();
                     }
+                    connection.setAutoCommit(true);
                 }
             }
         }
@@ -741,7 +734,8 @@ public class Database {
                             exception.setNextException(e);
                         }
                     } catch (CatalogException e) {
-                        final SQLException warning = new SQLException(e.getLocalizedMessage(), e);
+                        final SQLException warning = new SQLException(e.getLocalizedMessage());
+                        warning.initCause(e); // TODO: put in constructor when we will be allowed to compile for Java 6.
                         if (exception == null) {
                             exception = warning;
                         } else {
@@ -787,7 +781,8 @@ public class Database {
                     properties.storeToXML(out, "PostGrid configuration", "UTF-8");
                     out.close();
                 } catch (IOException e) {
-                    final SQLWarning warning = new SQLWarning(e.getLocalizedMessage(), e);
+                    final SQLWarning warning = new SQLWarning(e.getLocalizedMessage());
+                    warning.initCause(e); // TODO: put in constructor when we will be allowed to compile for Java 6.
                     if (exception == null) {
                         exception = warning;
                     } else {

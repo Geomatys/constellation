@@ -53,6 +53,8 @@ final class GridGeometryQuery extends Query {
         final QueryType[] LFSI  = {LIST, FILTERED_LIST, SELECT,         INSERT};
         final QueryType[] LSI   = {LIST,                SELECT,         INSERT};
         final QueryType[] LS    = {LIST,                SELECT                };
+        final QueryType[] SE    = {                     SELECT, EXISTS        };
+        final QueryType[] F     = {      FILTERED_LIST                        };
         identifier        = addColumn("identifier",             LFSEI);
         width             = addColumn("width",                    LSI);
         height            = addColumn("height",                   LSI);
@@ -66,19 +68,16 @@ final class GridGeometryQuery extends Query {
         horizontalExtent  = addColumn("horizontalExtent",         LS ); // Will rely on trigger for insertion.
         verticalSRID      = addColumn("verticalSRID",      null, LFSI);
         verticalOrdinates = addColumn("verticalOrdinates", null, LFSI);
-        if (database.isSpatialEnabled()) {
-            horizontalExtent.setFunction("Box2D", LS);
-        }
-        final QueryType[] F = {FILTERED_LIST};
-        byIdentifier        = addParameter(identifier, SELECT, EXISTS);
-        byWidth             = addParameter(width,          F);
-        byHeight            = addParameter(height,         F);
-        byScaleX            = addParameter(scaleX,         F);
-        byScaleY            = addParameter(scaleY,         F);
-        byTranslateX        = addParameter(translateX,     F);
-        byTranslateY        = addParameter(translateY,     F);
-        byShearX            = addParameter(shearX,         F);
-        byShearY            = addParameter(shearY,         F);
-        byHorizontalSRID    = addParameter(horizontalSRID, F);
+        horizontalExtent.setFunction("Box2D", LS);
+        byIdentifier      = addParameter(identifier,    SE);
+        byWidth           = addParameter(width,          F);
+        byHeight          = addParameter(height,         F);
+        byScaleX          = addParameter(scaleX,         F);
+        byScaleY          = addParameter(scaleY,         F);
+        byTranslateX      = addParameter(translateX,     F);
+        byTranslateY      = addParameter(translateY,     F);
+        byShearX          = addParameter(shearX,         F);
+        byShearY          = addParameter(shearY,         F);
+        byHorizontalSRID  = addParameter(horizontalSRID, F);
     }
 }

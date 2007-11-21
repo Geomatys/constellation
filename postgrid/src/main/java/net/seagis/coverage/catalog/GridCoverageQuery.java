@@ -82,14 +82,9 @@ final class GridCoverageQuery extends Query {
         byEndTime          = addParameter(endTime,            SELAB_DC);
         byHorizontalExtent = addParameter(horizontalExtent,   S_LAB___);
         byVisibility       = addParameter(visibility,         S_LAB___);
-        if (database.isSpatialEnabled()) {
-            byHorizontalExtent.setComparator("&&");
-            byHorizontalExtent.setFunction("GeometryFromText(?,4326)", S_LAB___);
-            horizontalExtent  .setFunction("EXTENT",                   ____B___);
-        } else {
-            throw new UnsupportedOperationException();
-            // TODO: revisit.
-        }
+        byHorizontalExtent.setComparator("&&");
+        byHorizontalExtent.setFunction("GeometryFromText(?,4326)", S_LAB___);
+        horizontalExtent  .setFunction("EXTENT",                   ____B___);
         byStartTime.setComparator("IS NULL OR <=");
         byEndTime  .setComparator("IS NULL OR >=");
     }
