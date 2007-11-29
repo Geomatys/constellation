@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -26,7 +27,7 @@ import javax.xml.bind.annotation.XmlValue;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CodeType", namespace="http://www.opengis.net/gml/3.2", propOrder = {
@@ -42,10 +43,6 @@ public class CodeType {
     /**
      * Gets the value of the value property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getValue() {
         return value;
@@ -54,10 +51,6 @@ public class CodeType {
     /**
      * Sets the value of the value property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setValue(String value) {
         this.value = value;
@@ -66,10 +59,6 @@ public class CodeType {
     /**
      * Gets the value of the codeSpace property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCodeSpace() {
         return codeSpace;
@@ -77,14 +66,33 @@ public class CodeType {
 
     /**
      * Sets the value of the codeSpace property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setCodeSpace(String value) {
         this.codeSpace = value;
     }
+    
+    /**
+     * Verifie si cette entree est identique l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final CodeType that = (CodeType) object;
+
+        return Utilities.equals(this.codeSpace, that.codeSpace) &&
+               Utilities.equals(this.value,     that.value);
+        
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 97 * hash + (this.codeSpace != null ? this.codeSpace.hashCode() : 0);
+        return hash;
+    }
+
 
 }

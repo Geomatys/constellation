@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -25,7 +26,7 @@ import javax.xml.bind.annotation.XmlValue;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "StringOrRefType", propOrder = {
@@ -36,7 +37,7 @@ public class StringOrRefType {
     @XmlValue
     protected String value;
     @XmlAttribute
-    protected List<String> nilReason;
+    protected List<String> nilReason = new ArrayList<String>();
     @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
     protected String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
@@ -57,10 +58,6 @@ public class StringOrRefType {
     /**
      * Gets the value of the value property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getValue() {
         return value;
@@ -69,10 +66,6 @@ public class StringOrRefType {
     /**
      * Sets the value of the value property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setValue(String value) {
         this.value = value;
@@ -81,39 +74,14 @@ public class StringOrRefType {
     /**
      * Gets the value of the nilReason property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the nilReason property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getNilReason().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getNilReason() {
-        if (nilReason == null) {
-            nilReason = new ArrayList<String>();
-        }
         return this.nilReason;
     }
 
     /**
      * Gets the value of the remoteSchema property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getRemoteSchema() {
         return remoteSchema;
@@ -122,10 +90,6 @@ public class StringOrRefType {
     /**
      * Sets the value of the remoteSchema property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setRemoteSchema(String value) {
         this.remoteSchema = value;
@@ -134,10 +98,6 @@ public class StringOrRefType {
     /**
      * Gets the value of the actuate property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getActuate() {
         return actuate;
@@ -146,10 +106,6 @@ public class StringOrRefType {
     /**
      * Sets the value of the actuate property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setActuate(String value) {
         this.actuate = value;
@@ -158,10 +114,6 @@ public class StringOrRefType {
     /**
      * Gets the value of the arcrole property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getArcrole() {
         return arcrole;
@@ -170,10 +122,6 @@ public class StringOrRefType {
     /**
      * Sets the value of the arcrole property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setArcrole(String value) {
         this.arcrole = value;
@@ -181,11 +129,6 @@ public class StringOrRefType {
 
     /**
      * Gets the value of the href property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getHref() {
         return href;
@@ -194,10 +137,6 @@ public class StringOrRefType {
     /**
      * Sets the value of the href property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setHref(String value) {
         this.href = value;
@@ -206,10 +145,6 @@ public class StringOrRefType {
     /**
      * Gets the value of the role property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getRole() {
         return role;
@@ -218,10 +153,6 @@ public class StringOrRefType {
     /**
      * Sets the value of the role property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setRole(String value) {
         this.role = value;
@@ -230,10 +161,6 @@ public class StringOrRefType {
     /**
      * Gets the value of the show property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getShow() {
         return show;
@@ -241,11 +168,6 @@ public class StringOrRefType {
 
     /**
      * Sets the value of the show property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setShow(String value) {
         this.show = value;
@@ -254,10 +176,6 @@ public class StringOrRefType {
     /**
      * Gets the value of the title property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getTitle() {
         return title;
@@ -266,10 +184,6 @@ public class StringOrRefType {
     /**
      * Sets the value of the title property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setTitle(String value) {
         this.title = value;
@@ -277,11 +191,6 @@ public class StringOrRefType {
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getType() {
         if (type == null) {
@@ -293,14 +202,48 @@ public class StringOrRefType {
 
     /**
      * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
     public void setType(String value) {
         this.type = value;
+    }
+    
+     /**
+     * Verifie si cette entree est identique l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final LocationPropertyType that = (LocationPropertyType) object;
+
+        return Utilities.equals(this.actuate,            that.actuate)          &&
+               Utilities.equals(this.value,              that._null)            &&
+               Utilities.equals(this.arcrole,            that.arcrole)          &&
+               Utilities.equals(this.type,               that.type)             &&
+               Utilities.equals(this.href,               that.href)             &&
+               Utilities.equals(this.nilReason,          that.nilReason)        &&
+               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+               Utilities.equals(this.show,               that.show)             &&
+               Utilities.equals(this.role,               that.role)             &&
+               Utilities.equals(this.title,              that.title);
+        
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 23 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 23 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
+        hash = 23 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 23 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 23 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 23 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 23 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 23 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 23 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 23 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
     }
 
 }

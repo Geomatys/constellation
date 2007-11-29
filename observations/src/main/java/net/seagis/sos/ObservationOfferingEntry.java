@@ -17,11 +17,12 @@ import net.seagis.observation.PhenomenonEntry;
 import net.seagis.observation.ProcessEntry;
 import net.seagis.observation.SamplingFeatureEntry;
 import net.seagis.observation.TemporalObjectEntry;
+import org.geotools.resources.Utilities;
 
 
 /**
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ObservationOfferingType", propOrder = {
@@ -159,5 +160,59 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
     public String getSrsName() {
         return this.srsName;
     }
+    
+     /**
+     * Verifie si cette entree est identique a l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final ObservationOfferingEntry that = (ObservationOfferingEntry) object;
+            boolean intendedApplicationEqual = true;
+            if (this.intendedApplication != null && that.intendedApplication != null) {
+                if (this.intendedApplication.size() == that.intendedApplication.size()) {
+                    
+                    for (int i = 0; i < this.intendedApplication.size(); i++) {
+                        if (!Utilities.equals(this.intendedApplication.get(i).getValue(), that.intendedApplication.get(i).getValue())){
+                            intendedApplicationEqual = false;
+                        }
+                    }
+                
+                } else {
+                    intendedApplicationEqual = false;
+                }
+            }
+            
+            return Utilities.equals(this.eventTime,           that.eventTime)           &&
+                   Utilities.equals(this.featureOfInterest,   that.featureOfInterest)   &&
+                   intendedApplicationEqual                                             &&
+                   Utilities.equals(this.observedProperty,    that.observedProperty)    &&
+                   Utilities.equals(this.procedure,           that.procedure)           &&
+                   Utilities.equals(this.responseFormat,      that.responseFormat)      &&
+                   Utilities.equals(this.responseMode,        that.responseMode)        &&
+                   Utilities.equals(this.resultModel,         that.resultModel)         &&
+                   Utilities.equals(this.srsName,             that.srsName);
+        } else System.out.println("SUPER NULLLLLLLLLLLLLLLLLLLLLLL");
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 67 * hash + (this.intendedApplication != null ? this.intendedApplication.hashCode() : 0);
+        hash = 67 * hash + (this.srsName != null ? this.srsName.hashCode() : 0);
+        hash = 67 * hash + (this.eventTime != null ? this.eventTime.hashCode() : 0);
+        hash = 67 * hash + (this.procedure != null ? this.procedure.hashCode() : 0);
+        hash = 67 * hash + (this.observedProperty != null ? this.observedProperty.hashCode() : 0);
+        hash = 67 * hash + (this.featureOfInterest != null ? this.featureOfInterest.hashCode() : 0);
+        hash = 67 * hash + (this.responseFormat != null ? this.responseFormat.hashCode() : 0);
+        hash = 67 * hash + (this.resultModel != null ? this.resultModel.hashCode() : 0);
+        hash = 67 * hash + (this.responseMode != null ? this.responseMode.hashCode() : 0);
+        return hash;
+    }
+
 
 }

@@ -17,7 +17,7 @@ import org.opengis.temporal.TemporalObject;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name="TemporalObject")
-public class TemporalObjectEntry extends Entry implements TemporalObject{
+public class TemporalObjectEntry implements TemporalObject{
     
     /**
      * The begin date of a duration or a single TimeInstant (store in a string for jaxB issue).
@@ -43,7 +43,6 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
      * @param endTime   if not {@code null} the object became a time period.
      */
     public TemporalObjectEntry(Timestamp beginTime, Timestamp endTime) {
-        super(null);
         if (beginTime != null)
             this.beginTime = beginTime.toString();
         else
@@ -88,12 +87,9 @@ public class TemporalObjectEntry extends Entry implements TemporalObject{
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            final TemporalObjectEntry that = (TemporalObjectEntry) object;
-            return Utilities.equals(this.beginTime, that.beginTime) &&
-                   Utilities.equals(this.endTime,   that.endTime);
-        }
-        return false;
+        final TemporalObjectEntry that = (TemporalObjectEntry) object;
+        return Utilities.equals(this.beginTime, that.beginTime) &&
+               Utilities.equals(this.endTime,   that.endTime);
     }
 
     @Override

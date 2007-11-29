@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import org.opengis.observation.Process;
 import net.seagis.catalog.Entry;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -70,17 +71,45 @@ public class ProcessEntry extends Entry implements Process {
     }
     
     /**
+     * surcharge le getName de entry
+     */
+    @Override
+    public String getName() {
+        return this.name;
+    }
+    
+    /**
      * Retourne la reference du capteur.
      */
     public String getHref() {
         return href;
     }
     
+    
+     /**
+     * Verifie si cette entree est identique a l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final ProcessEntry that = (ProcessEntry) object;
+
+        return Utilities.equals(this.href, that.href);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + (this.href != null ? this.href.hashCode() : 0);
+        return hash;
+    }
      /**
      * Retourne une chaine de charactere representant la procedure.
      */
     @Override
     public String toString() {
-        return  " href=" + this.getName();
+        return  super.toString() + " href=" + this.getHref();
     }
 }

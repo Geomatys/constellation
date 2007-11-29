@@ -1,6 +1,7 @@
 
 package net.seagis.gml;
 
+import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
@@ -47,6 +48,10 @@ public class ObjectFactory {
     private final static QName _UnitDefinition_QNAME = new QName("http://www.opengis.net/gml/3.2", "UnitDefinition");
     private final static QName _UnitOfMeasure_QNAME = new QName("http://www.opengis.net/gml/3.2", "unitOfMeasure");
     private final static QName _Definition_QNAME = new QName("http://www.opengis.net/gml/3.2", "Definition");
+    private final static QName _AbstractScalarValueList_QNAME = new QName("http://www.opengis.net/gml/3.2", "AbstractScalarValueList");
+    private final static QName _AbstractScalarValue_QNAME = new QName("http://www.opengis.net/gml/3.2", "AbstractScalarValue");
+    private final static QName _CountExtent_QNAME = new QName("http://www.opengis.net/gml/3.2", "CountExtent");
+    private final static QName _EnvelopeWithTimePeriod_QNAME = new QName("http://www.opengis.net/gml/3.2", "EnvelopeWithTimePeriod");
     
     /**
      *
@@ -54,6 +59,14 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
     
+    /**
+     * Create an instance of {@link EnvelopeWithTimePeriodType }
+     * 
+     */
+    public EnvelopeWithTimePeriodType createEnvelopeWithTimePeriodType() {
+        return new EnvelopeWithTimePeriodType();
+    }
+
     /**
      * Create an instance of {@link BaseUnitType }
      * 
@@ -104,6 +117,41 @@ public class ObjectFactory {
         return new JAXBElement<CodeType>(_MethodFormula_QNAME, CodeType.class, null, value);
     }
 
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "AbstractScalarValueList", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractValue")
+    public JAXBElement<Object> createAbstractScalarValueList(Object value) {
+        return new JAXBElement<Object>(_AbstractScalarValueList_QNAME, Object.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "AbstractScalarValue", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractValue")
+    public JAXBElement<Object> createAbstractScalarValue(Object value) {
+        return new JAXBElement<Object>(_AbstractScalarValue_QNAME, Object.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link String }{@code >}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "CountExtent", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractValue")
+    public JAXBElement<List<String>> createCountExtent(List<String> value) {
+        return new JAXBElement<List<String>>(_CountExtent_QNAME, ((Class) List.class), null, ((List<String> ) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link EnvelopeWithTimePeriodType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "EnvelopeWithTimePeriod", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "Envelope")
+    public JAXBElement<EnvelopeWithTimePeriodType> createEnvelopeWithTimePeriod(EnvelopeWithTimePeriodType value) {
+        return new JAXBElement<EnvelopeWithTimePeriodType>(_EnvelopeWithTimePeriod_QNAME, EnvelopeWithTimePeriodType.class, null, value);
+    }
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link StringOrRefType }{@code >}}
      * 

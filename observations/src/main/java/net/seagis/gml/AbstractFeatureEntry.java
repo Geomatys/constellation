@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -14,6 +15,7 @@ import javax.xml.bind.annotation.XmlType;
  * The value of the gml:boundedBy property describes an envelope that encloses the entire feature instance, and is primarily useful for supporting rapid searching for features that occur in a particular location. 
  * The value of the gml:location property describes the extent, position or relative location of the feature.
  * 
+ * @author Guilhem Legal 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractFeatureType", propOrder = {
@@ -89,6 +91,37 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
      */
     public void setLocation(JAXBElement<? extends LocationPropertyType> value) {
         this.location = ((JAXBElement<? extends LocationPropertyType> ) value);
+    }
+    
+     /**
+     * Verifie si cette entree est identique l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final AbstractFeatureEntry that = (AbstractFeatureEntry) object;
+            
+            boolean locationEquals = false;
+            if (this.location == null && that.location == null)
+                locationEquals = true;
+            else
+                locationEquals = Utilities.equals(this.location.getValue(), that.location.getValue());
+            
+            return Utilities.equals(this.boundedBy,           that.boundedBy) &&
+                   locationEquals;
+        } else System.out.println("ENCORE SUPER NULLLLLLLLLLLLLLLLLLLLLLL");
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + (this.boundedBy != null ? this.boundedBy.hashCode() : 0);
+        hash = 23 * hash + (this.location != null ? this.location.hashCode() : 0);
+        return hash;
     }
 
 }

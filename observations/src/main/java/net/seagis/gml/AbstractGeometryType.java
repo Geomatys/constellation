@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.AbstractGMLEntry;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -31,7 +31,7 @@ import net.seagis.gml.AbstractGMLEntry;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractGeometryType")
@@ -42,9 +42,9 @@ public abstract class AbstractGeometryType extends AbstractGMLEntry {
     @XmlAttribute
     protected String srsName;
     @XmlAttribute
-    protected List<String> axisLabels;
+    protected List<String> axisLabels = new ArrayList<String>();
     @XmlAttribute
-    protected List<String> uomLabels;
+    protected List<String> uomLabels  = new ArrayList<String>();
 
     /**
      * Gets the value of the srsDimension property.
@@ -97,59 +97,47 @@ public abstract class AbstractGeometryType extends AbstractGMLEntry {
     /**
      * Gets the value of the axisLabels property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the axisLabels property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getAxisLabels().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getAxisLabels() {
-        if (axisLabels == null) {
-            axisLabels = new ArrayList<String>();
-        }
         return this.axisLabels;
     }
 
     /**
      * Gets the value of the uomLabels property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the uomLabels property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getUomLabels().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getUomLabels() {
-        if (uomLabels == null) {
-            uomLabels = new ArrayList<String>();
-        }
         return this.uomLabels;
     }
+    
+    /**
+     * Verifie si cette entree est identique l'objet specifie.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final AbstractGeometryType that = (AbstractGeometryType) object;
+
+            return Utilities.equals(this.axisLabels,   that.axisLabels)   &&
+                   Utilities.equals(this.srsDimension, that.srsDimension) &&
+                   Utilities.equals(this.srsName,      that.srsName)      &&
+                   Utilities.equals(this.uomLabels,    that.uomLabels);
+        } 
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.srsDimension != null ? this.srsDimension.hashCode() : 0);
+        hash = 37 * hash + (this.srsName != null ? this.srsName.hashCode() : 0);
+        hash = 37 * hash + (this.axisLabels != null ? this.axisLabels.hashCode() : 0);
+        hash = 37 * hash + (this.uomLabels != null ? this.uomLabels.hashCode() : 0);
+        return hash;
+    }
+
 
 }
