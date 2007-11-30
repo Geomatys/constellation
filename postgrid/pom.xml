@@ -21,7 +21,7 @@
   <groupId>net.seagis</groupId>
   <artifactId>postgrid</artifactId>
   <packaging>jar</packaging>
-  <name>SeaGIS - PostGrid database</name>
+  <name>PostGrid database</name>
   <description>
     Utilitaires dédiés à l'exploitation d'une base de données PostgreSQL contenant un ensemble d'images.
   </description>

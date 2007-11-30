@@ -147,33 +147,36 @@ COMMENT ON INDEX "Categories_index" IS
 
 
 --------------------------------------------------------------------------------------------------
--- Creates the "CategoriesDetails" view.                                                        --
+-- Creates the "RangeOfFormats" view.                                                        --
 -- Dependencies: "Categories", "SampleDimensions", "Format"                                     --
 --------------------------------------------------------------------------------------------------
+CREATE VIEW "RangeOfFormats" AS
+ SELECT "SampleDimensions"       ."format",
+        "SampleDimensions"       ."identifier" AS "band",
+        "RangeOfSampleDimensions"."fillValue",
+        "RangeOfSampleDimensions"."lower",
+        "RangeOfSampleDimensions"."upper",
+        "RangeOfSampleDimensions"."minimum",
+        "RangeOfSampleDimensions"."maximum",
+        "SampleDimensions"       ."units",
+        "Formats"                ."encoding"
+   FROM "SampleDimensions" JOIN (
+ SELECT "band", count("band") AS "numCategories",
+        min("lower") AS "lower",
+        max("upper") AS "upper",
+        min(CASE WHEN "c1" IS NULL THEN "lower" ELSE NULL END) AS "fillValue",
+        min((CASE WHEN "c1" < 0 THEN "upper" ELSE "lower" END) * "c1" + "c0") AS "minimum",
+        max((CASE WHEN "c1" < 0 THEN "lower" ELSE "upper" END) * "c1" + "c0") AS "maximum"
+   FROM "Categories" GROUP BY "band") AS "RangeOfSampleDimensions"
+     ON "SampleDimensions"."identifier" = "RangeOfSampleDimensions"."band"
+   JOIN "Formats" ON "SampleDimensions"."format" = "Formats"."name"
+  ORDER BY "SampleDimensions"."format", "SampleDimensions"."band";
 
-CREATE VIEW "CategoriesDetails" AS
-    SELECT "Formats"         ."name" AS "format",
-           "SampleDimensions"."units",
-           "Categories"      ."name",
-           "SampleDimensions"."band",
-           "Categories"      ."lower",
-           "Categories"      ."upper",
-           "Categories"      ."c0",
-           "Categories"      ."c1",
-           "Categories"      ."function",
-           "Formats"         ."encoding" AS "type",
-           "Categories"      ."colors"
-      FROM "Formats"
-      JOIN "SampleDimensions" ON "SampleDimensions"."format"     = "Formats"."name"
-      JOIN "Categories"       ON "SampleDimensions"."identifier" = "Categories"."band"
-  ORDER BY "Formats"."name", "SampleDimensions"."band", "Categories"."lower";
-
-ALTER TABLE "CategoriesDetails" OWNER TO geoadmin;
-GRANT ALL ON TABLE "CategoriesDetails" TO geoadmin;
-GRANT SELECT ON TABLE "CategoriesDetails" TO PUBLIC;
-
-COMMENT ON VIEW "CategoriesDetails" IS
-    'Liste des catégories et des noms de formats dans la même table.';
+ALTER TABLE "RangeOfFormats" OWNER TO geoadmin;
+GRANT ALL ON TABLE "RangeOfFormats" TO geoadmin;
+GRANT SELECT ON TABLE "RangeOfFormats" TO PUBLIC;
+COMMENT ON VIEW "RangeOfFormats" IS
+    'Plage des valeurs de chaque format d''images.';
 
 
 
@@ -520,7 +523,7 @@ GRANT ALL ON TABLE "RangeOfLayers" TO geoadmin;
 GRANT SELECT ON TABLE "RangeOfLayers" TO PUBLIC;
 
 COMMENT ON VIEW "RangeOfLayers" IS
-    'Nombre d''images pour chacune des couches utilisées.';
+    'Nombre d''images et région géographique pour chacune des couches utilisées.';
 
 
 
