@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.resources.Utilities;
 
 
 
@@ -21,7 +22,7 @@ public class TimeType extends AbstractDataComponentEntry {
     //protected AllowedTimesPropertyType constraint;
     //protected QualityPropertyType quality;
     @XmlList
-    protected List<String> value;
+    protected List<String> value = new ArrayList<String>();
     @XmlAttribute
     protected String localFrame;
     @XmlAttribute
@@ -72,29 +73,8 @@ public class TimeType extends AbstractDataComponentEntry {
     /**
      * Gets the value of the value property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the value property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getValue().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getValue() {
-        if (value == null) {
-            value = new ArrayList<String>();
-        }
         return this.value;
     }
 
@@ -169,4 +149,52 @@ public class TimeType extends AbstractDataComponentEntry {
     public void setReferenceTime(String value) {
         this.referenceTime = value;
     }
+    
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+        final TimeType that = (TimeType) object;
+        return Utilities.equals(this.localFrame,     that.localFrame)     &&
+               Utilities.equals(this.referenceFrame, that.referenceFrame) &&
+               Utilities.equals(this.referenceTime,  that.referenceTime)  &&
+               Utilities.equals(this.uom,            that.uom)            &&
+               Utilities.equals(this.value,          that.value);
+        } 
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 61 * hash + (this.uom != null ? this.uom.hashCode() : 0);
+        hash = 61 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 61 * hash + (this.localFrame != null ? this.localFrame.hashCode() : 0);
+        hash = 61 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
+        hash = 61 * hash + (this.referenceTime != null ? this.referenceTime.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("[TimeType]").append('\n').append("super:").append(super.toString()).append('\n');
+        s.append("localFrame:").append(localFrame).append('\n');
+        s.append("referenceFrame:").append(referenceFrame).append('\n');
+        s.append("referenceTime:").append(referenceTime).append('\n');
+        s.append("value:").append('\n');
+        for (String ss:value){
+            s.append(ss).append('\n');
+        }
+        if (uom != null) {
+            s.append("uom: ").append(uom.toString());
+        }
+        return s.toString();
+    }
+    
 }

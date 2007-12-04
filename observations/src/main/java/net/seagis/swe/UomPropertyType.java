@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.BaseUnitType;
 import net.seagis.gml.UnitDefinitionType;
+import org.geotools.resources.Utilities;
 
 /**
  * <p>Java class for UomPropertyType complex type.
@@ -58,7 +59,7 @@ public class UomPropertyType {
     @XmlAttribute
     protected String code;
     @XmlAttribute
-    protected List<String> nilReason;
+    protected List<String> nilReason = new ArrayList<String>();
     @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
     protected String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
@@ -79,7 +80,7 @@ public class UomPropertyType {
     
     public UomPropertyType() {}
     
-    public UomPropertyType(String code, String ref) {
+    public UomPropertyType(String code, String href) {
         this.code = code;
         this.href = href;
     }
@@ -159,29 +160,8 @@ public class UomPropertyType {
     /**
      * Gets the value of the nilReason property.
      * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the nilReason property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getNilReason().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getNilReason() {
-        if (nilReason == null) {
-            nilReason = new ArrayList<String>();
-        }
         return this.nilReason;
     }
 
@@ -375,6 +355,86 @@ public class UomPropertyType {
      */
     public void setType(String value) {
         this.type = value;
+    }
+    
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final UomPropertyType that = (UomPropertyType) object;
+        return Utilities.equals(this.actuate,        that.actuate)        &&
+               Utilities.equals(this.arcrole,        that.arcrole)        &&
+               Utilities.equals(this.baseUnit,       that.baseUnit)       &&
+               Utilities.equals(this.code,           that.code)           &&
+               Utilities.equals(this.href,           that.href)           &&
+               Utilities.equals(this.nilReason,      that.nilReason)      &&
+               Utilities.equals(this.remoteSchema,   that.remoteSchema)   &&
+               Utilities.equals(this.role,           that.role)           &&
+               Utilities.equals(this.show,           that.show)           &&
+               Utilities.equals(this.title,          that.title)          &&
+               Utilities.equals(this.type,           that.type)           &&
+               Utilities.equals(this.unitDefinition, that.unitDefinition);
+        
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + (this.unitDefinition != null ? this.unitDefinition.hashCode() : 0);
+        hash = 41 * hash + (this.baseUnit != null ? this.baseUnit.hashCode() : 0);
+        hash = 41 * hash + (this.code != null ? this.code.hashCode() : 0);
+        hash = 41 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
+        hash = 41 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 41 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 41 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 41 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 41 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 41 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 41 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 41 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        if(actuate != null && !actuate.equals("")) 
+            s.append("actuate:").append(actuate).append('\n');
+        if(arcrole != null && !arcrole.equals("")) 
+            s.append("arcrole:").append(arcrole).append('\n');
+        if(baseUnit != null) 
+            s.append("baseUnit:").append(baseUnit.toString()).append('\n');
+        if(code != null && !code.equals("")) 
+            s.append("code:").append(code).append('\n');
+        if(href != null && !href.equals("")) 
+            s.append("href:").append(href).append('\n');
+        s.append("nilReason:").append('\n');
+        for (String ss:nilReason) {
+            s.append(ss).append('\n');
+        }
+        if(remoteSchema != null && !remoteSchema.equals("")) 
+            s.append("remoteSchema:").append(remoteSchema).append('\n');
+        if(role != null && !role.equals("")) 
+            s.append("role:").append(role).append('\n');
+        if(show != null && !show.equals("")) 
+            s.append("show:").append(show).append('\n');
+        if(title != null && !title.equals("")) 
+            s.append("title:").append(title).append('\n');
+        if(type != null && !type.equals("")) 
+            s.append("type:").append(type).append('\n');
+        if(unitDefinition != null) 
+            s.append("unitDefinition:").append(unitDefinition).append('\n');
+        
+        
+        
+        
+        
+        
+        return s.toString();
     }
 
 }

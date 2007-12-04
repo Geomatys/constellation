@@ -91,4 +91,9 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
                Utilities.equals(this.fixed,      that.fixed);
     }
     
+    @Override
+    public String toString() {
+        return "id=" + id + " definition=" + definition + " fixed=" + fixed;
+    }
+    
 }

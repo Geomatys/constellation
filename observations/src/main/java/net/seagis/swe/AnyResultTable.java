@@ -130,8 +130,8 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         } finally {
             transactionEnd(success);
         }
-            //we get the new id generated
-        PreparedStatement p = getStatement("SELECT currval('any_result_id_result_seq')");
+        //we get the new id generated
+        PreparedStatement p = getStatement("SELECT max(id_result) FROM any_results" );
         ResultSet r = p.executeQuery();
         if (r.next())
             return r.getString(1);

@@ -129,7 +129,7 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
      */
     @Override
     public String toString() {
-        return '[' + this.getClass().getSimpleName() + "]:" + this.blockSeparator 
+        return '[' + this.getClass().getSimpleName() + "]:" + super.toString()+ " " + this.blockSeparator 
                 + '|' + this.decimalSeparator + '|' + this.tokenSeparator;
     }
     

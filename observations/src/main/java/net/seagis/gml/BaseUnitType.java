@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -58,5 +59,33 @@ public class BaseUnitType extends UnitDefinitionType {
     public void setUnitsSystem(ReferenceEntry value) {
         this.unitsSystem = value;
     }
+    
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final BaseUnitType that = (BaseUnitType) object;
+            return Utilities.equals(this.unitsSystem,        that.unitsSystem); 
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (this.unitsSystem != null ? this.unitsSystem.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        return "BaseUnit unitSystem:" + unitsSystem.toString();
+    }
+
 
 }

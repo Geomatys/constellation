@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.resources.Utilities;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -109,5 +110,35 @@ public class BooleanType extends AbstractDataComponentEntry {
         this.referenceFrame = value;
     }
     
+      /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+        final BooleanType that = (BooleanType) object;
+        return Utilities.equals(this.referenceFrame, that.referenceFrame) &&
+               Utilities.equals(this.axisID,         that.axisID)  &&
+               Utilities.equals(this.value,          that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 11 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 11 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+        hash = 11 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString(){
+        return "AxisId: " + axisID + " referenceFrame: " + referenceFrame + " value=" + value;
+    }
 
 }

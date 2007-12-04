@@ -15,6 +15,7 @@
 package net.seagis.observation;
 
 // jaxb import
+import java.sql.Timestamp;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -242,7 +243,9 @@ public class ObservationEntry extends Entry implements Observation {
      * On y rajoute un samplingTime et un id temporaire. 
      */
     public ObservationEntry getTemporaryTemplate(String temporaryName, TemporalObjectEntry time) {
-            return new ObservationEntry(temporaryName,
+        if (time == null) 
+            time = new TemporalObjectEntry(Timestamp.valueOf("1900-01-01 00:00:00"), null);
+        return new ObservationEntry(temporaryName,
                                         this.definition,
                                         this.featureOfInterest, 
                                         this.observedProperty,
@@ -328,11 +331,25 @@ public class ObservationEntry extends Entry implements Observation {
     }
     
     /**
+     * fixe le resultat de l'observation
+     */
+    public void setResult(Object result) {
+        this.result = result;
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @Override
     public Object getResultDefinition() {
         return resultDefinition;
+    }
+    
+    /**
+     * fixe la definition du resultat.
+     */
+    public void setResultDefinition(Object definition) {
+        this.resultDefinition = definition;
     }
 
     /**
@@ -450,9 +467,9 @@ public class ObservationEntry extends Entry implements Observation {
         char lineSeparator = '\n';
         s.append("name=").append(name).append(lineSeparator).append("definition=").append(definition);
         if (samplingTime != null)
-            s.append("samplingTime=").append(samplingTime.toString()).append(lineSeparator);
+            s.append(" samplingTime=").append(samplingTime.toString()).append(lineSeparator);
         if (distribution != null)
-            s.append("distribution:").append(distribution.toString()).append(lineSeparator);
+            s.append(" distribution:").append(distribution.toString()).append(lineSeparator);
         else 
             s.append("DISTRIBUTION IS NULL").append(lineSeparator);
         if (procedure != null)

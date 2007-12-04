@@ -49,7 +49,7 @@ public class ComponentQuery extends Query{
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         
         idCompositePhenomenon  = addColumn("composite_phenomenon", SLIE);
-        idComponent            = addColumn("components", "component",  SLIE);
+        idComponent            = addColumn("component",  SLIE);
         
         byComposite = addParameter(idCompositePhenomenon, SELECT, LIST, EXISTS);
         byComponent = addParameter(idComponent,  SELECT, EXISTS);

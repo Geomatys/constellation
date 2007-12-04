@@ -113,9 +113,10 @@ public class AnyScalarEntry extends Entry{
         if (this != null) {
             buffer.append('[').append(this.getClass().getSimpleName()).append("]:").append(idDataRecord)
             .append('-').append(name);
-            if(component != null)
-                buffer.append(" type=").append(component.getClass().getSimpleName());
-            else 
+            if(component != null) {
+                buffer.append(" type=").append(component.getClass().getSimpleName()).append('\n');
+                buffer.append(component.toString());
+            } else 
                 buffer.append(" COMPONENT NULL");
         }   
         return buffer.toString();

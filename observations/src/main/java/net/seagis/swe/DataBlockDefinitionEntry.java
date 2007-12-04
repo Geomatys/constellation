@@ -130,10 +130,10 @@ import org.geotools.resources.Utilities;
         if (this.components.size() != that.components.size())
             return false;
         
-        Iterator<? extends AbstractDataComponentEntry> i = components.iterator();
-        while (i.hasNext()) {
-            if (!that.components.contains(i.next()))
-                return false;
+        Iterator<? extends AbstractDataComponentEntry> i  = this.components.iterator();
+        Iterator<? extends AbstractDataComponentEntry> i2 = that.components.iterator();
+        while (i.hasNext() && i2.hasNext()) {
+            if (!Utilities.equals(i.next(), i2.next())) return false;
         }
         return Utilities.equals(this.id,         that.id) &&
                Utilities.equals(this.encoding,   that.encoding) ;

@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -113,4 +114,43 @@ public class UnitDefinitionType extends DefinitionType {
         this.catalogSymbol = value;
     }
 
+    /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final UnitDefinitionType that = (UnitDefinitionType) object;
+            return Utilities.equals(this.catalogSymbol,        that.catalogSymbol)        &&
+                   Utilities.equals(this.quantityType,        that.quantityType)        &&
+                   Utilities.equals(this.quantityTypeReference,       that.quantityTypeReference); 
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 43 * hash + (this.quantityType != null ? this.quantityType.hashCode() : 0);
+        hash = 43 * hash + (this.quantityTypeReference != null ? this.quantityTypeReference.hashCode() : 0);
+        hash = 43 * hash + (this.catalogSymbol != null ? this.catalogSymbol.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("[UnitdefinitionType]").append('\n');
+        if (catalogSymbol != null)
+            s.append("CatalogSymbol=").append(catalogSymbol.toString()).append('\n');
+        if (quantityType != null)
+            s.append("quantityType=").append(quantityType.toString()).append('\n');
+        if (quantityTypeReference != null)
+            s.append("quantityTypeReference=").append(quantityTypeReference).append('\n');
+        return s.toString();
+    }
+    
 }

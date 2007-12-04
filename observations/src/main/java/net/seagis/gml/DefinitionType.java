@@ -11,6 +11,7 @@ package net.seagis.gml;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -48,6 +49,7 @@ public class DefinitionType extends DefinitionBaseType {
      *     {@link String }
      *     
      */
+    @Override
     public String getRemarks() {
         return remarks;
     }
@@ -62,6 +64,32 @@ public class DefinitionType extends DefinitionBaseType {
      */
     public void setRemarks(String value) {
         this.remarks = value;
+    }
+    
+     /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final DefinitionType that = (DefinitionType) object;
+            return Utilities.equals(this.remarks, that.remarks); 
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + (this.remarks != null ? this.remarks.hashCode() : 0);
+        return hash;
+    }
+    
+    public String toString() {
+        return "remarks:" + remarks;
     }
 
 }

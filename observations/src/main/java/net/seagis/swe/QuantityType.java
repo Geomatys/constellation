@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotools.resources.Utilities;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -137,5 +138,46 @@ public class QuantityType extends AbstractDataComponentEntry {
      */
     public void setReferenceFrame(String value) {
         this.referenceFrame = value;
+    }
+    
+      /**
+     * Vérifie si cette entré est identique à l'objet spécifié.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+        final QuantityType that = (QuantityType) object;
+        return Utilities.equals(this.axisID,     that.axisID)     &&
+               Utilities.equals(this.referenceFrame, that.referenceFrame) &&
+               Utilities.equals(this.uom,            that.uom)            &&
+               Utilities.equals(this.value,          that.value);
+        } 
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + (this.uom != null ? this.uom.hashCode() : 0);
+        hash = 23 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 23 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+        hash = 23 * hash + (this.referenceFrame != null ? this.referenceFrame.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("[QuantityType]").append('\n').append("super:").append(super.toString()).append('\n');
+        s.append("axisId:").append(axisID).append('\n');
+        s.append("referenceFrame:").append(referenceFrame).append('\n');
+        s.append("value:").append(value).append('\n');
+        if (uom != null) {
+            s.append("uom: ").append(uom.toString());
+        }
+        return s.toString();
     }
 }
