@@ -81,8 +81,8 @@ import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
 import org.geotools.math.Statistics;
+import org.geotools.util.DateRange;
 
-import net.seagis.util.DateRange;
 import net.seagis.image.operation.Equalizer;
 import net.seagis.coverage.catalog.WritableGridCoverageTable;
 
@@ -618,7 +618,7 @@ public class CoverageBuilder {
         }
         final PrintWriter           out = arguments.out;
         final Catalog observations = Catalog.getDefault();
-        final ProgressListener listener = (ProgressListener) new ProgressPrinter(out);
+        final ProgressListener listener = null; // TODO (ProgressListener) new ProgressPrinter(out);
         final char[]          separator = new char[72];
         Arrays.fill(separator, '_');
         /*

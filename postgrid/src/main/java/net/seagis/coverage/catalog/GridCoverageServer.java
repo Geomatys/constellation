@@ -33,8 +33,8 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.util.NumberRange;
+import org.geotools.util.DateRange;
 
-import net.seagis.util.DateRange;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.model.Operation;
 

@@ -41,9 +41,9 @@ import org.geotools.image.io.metadata.GeographicMetadataFormat;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.util.MeasurementRange;
 import org.geotools.util.NumberRange;
+import org.geotools.util.DateRange;
+import org.geotools.util.Ranks;
 
-import net.seagis.util.Ranks;
-import net.seagis.util.DateRange;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.ServerException;
 import net.seagis.catalog.CatalogException;

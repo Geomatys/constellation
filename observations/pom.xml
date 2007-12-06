@@ -90,7 +90,7 @@
     </dependency>
     <dependency>
       <groupId>org.opengis</groupId>
-      <artifactId>geoapi-nogenerics</artifactId>
+      <artifactId>geoapi</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>

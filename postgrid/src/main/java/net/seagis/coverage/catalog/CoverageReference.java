@@ -31,9 +31,9 @@ import org.geotools.coverage.GridSampleDimension;  // For javadoc
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.util.NumberRange;
+import org.geotools.util.DateRange;
 
 import net.seagis.catalog.Element;
-import net.seagis.util.DateRange;
 
 
 /**

@@ -53,10 +53,10 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CannotRedoException;
 
+import org.geotools.util.DateRange;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.coverage.grid.GridCoverage2D;
 
-import net.seagis.util.DateRange;
 import net.seagis.resources.XArray;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;

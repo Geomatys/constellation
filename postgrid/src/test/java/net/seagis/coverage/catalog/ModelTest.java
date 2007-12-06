@@ -73,7 +73,8 @@ public class ModelTest extends AbstractTest {
     {
         final Date d = dateFormat.parse(date);
         final GeneralDirectPosition position = new GeneralDirectPosition(CRS.XYT.getCoordinateReferenceSystem());
-        final DefaultTemporalCRS crs = DefaultTemporalCRS.wrap(CRSUtilities.getTemporalCRS(position.getCoordinateReferenceSystem()));
+        final DefaultTemporalCRS crs = DefaultTemporalCRS.wrap(
+                org.geotools.referencing.CRS.getTemporalCRS(position.getCoordinateReferenceSystem()));
         position.setOrdinate(0, longitude);
         position.setOrdinate(1, latitude);
         position.setOrdinate(2, crs.toValue(d));

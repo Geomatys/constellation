@@ -23,8 +23,8 @@ import java.awt.image.BufferedImage;
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.util.NumberRange;
+import org.geotools.util.DateRange;
 
-import net.seagis.util.DateRange;
 import net.seagis.catalog.Element;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.model.Model;

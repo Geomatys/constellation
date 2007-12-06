@@ -31,12 +31,13 @@ import java.rmi.RemoteException;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+
+import org.geotools.util.DateRange;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-import net.seagis.util.DateRange;
 import net.seagis.catalog.Entry;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.ServerException;

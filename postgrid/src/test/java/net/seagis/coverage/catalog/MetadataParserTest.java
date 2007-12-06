@@ -22,8 +22,8 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import org.geotools.util.MeasurementRange;
+import org.geotools.util.DateRange;
 
-import net.seagis.util.DateRange;
 import net.seagis.catalog.Element;
 import net.seagis.catalog.DatabaseTest;
 

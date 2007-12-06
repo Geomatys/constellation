@@ -63,6 +63,7 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
+import org.geotools.util.DateRange;
 import org.geotools.util.NumberRange;
 import org.geotools.util.CanonicalSet;
 import org.geotools.util.logging.Logging;
@@ -71,7 +72,6 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
 
-import net.seagis.util.DateRange;
 import net.seagis.catalog.Entry;
 import net.seagis.coverage.model.Operation;
 import net.seagis.catalog.IllegalRecordException;

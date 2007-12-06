@@ -33,6 +33,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import org.geotools.util.DateRange;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.geometry.GeneralEnvelope;
@@ -40,8 +41,6 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import static org.geotools.referencing.CRS.getCoordinateOperationFactory;
 import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
 import static org.geotools.referencing.CRS.transform;
-
-import net.seagis.util.DateRange;
 
 
 /**
