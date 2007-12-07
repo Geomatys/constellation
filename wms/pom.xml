@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Configuration du module "postgrid" du projet Sicade.
+  Version: $Id: pom.xml 196 2007-11-30 11:34:31Z desruisseaux $
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.seagis</groupId>
+    <artifactId>seagis</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Description du module.
+  -->
+  <groupId>net.seagis</groupId>
+  <artifactId>wms</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>wms web service</name>
+  <description>
+    a Web Map Service producing maps of spatially referenced data dynamically from geographic information.
+  </description>
+
+
+
+  <!--
+    Liste des développeurs et des contributeurs.
+  -->
+  <developers>
+    <developer>
+      <id>glegal</id>
+      <name>Guilhem Legal</name>
+      <email>guilhem.legal@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  
+
+  <repositories>
+    <repository>
+      <id>java.net</id>
+      <url>http://download.java.net/maven/1</url>
+      <layout>legacy</layout>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <!--
+    Dépendances requises pour la compilation. Ces dépendances seront incluses
+    dans la liste de JARs que Maven placera dans le répertoire "target/binaries".
+  -->
+  <dependencies>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>postgrid</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>jersey</groupId>
+      <artifactId>jersey</artifactId>
+      <version>0.4-ea</version>
+    </dependency>
+  </dependencies>
+
+</project>
