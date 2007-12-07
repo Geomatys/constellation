@@ -18,9 +18,7 @@
  */
 package net.seagis.coverage.timeseries;
 
-// J2SE dependencies
 import java.awt.image.DataBuffer;
-import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.Writer;
@@ -32,7 +30,6 @@ import java.text.NumberFormat;
 import javax.imageio.ImageIO;
 import javax.media.jai.RasterFactory;
 
-// OpenGIS dependencies
 import org.opengis.util.ProgressListener;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.CannotEvaluateException;
@@ -42,7 +39,6 @@ import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 
-// Geotools dependencies
 import org.geotools.util.logging.Logging;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.coverage.FactoryFinder;
@@ -53,7 +49,6 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -76,18 +71,18 @@ public class TimeSeriesTile {
      * La source de données tri-dimensionnelle.
      */
     private final Coverage coverage;
-    
+
     /**
      * La transforamtion mathématique qui permet de passer des coordonnées image aux coordonnées
      * réelles.
      */
     private final MathTransform gridToCRS;
-    
+
     /**
      * La fabrique à utiliser pour la création d'objets {@link GridCoverage2D}.
      */
     private final GridCoverageFactory gridCoverageFactory = FactoryFinder.getGridCoverageFactory(null);
-    
+
     /**
      * L'enveloppe de la grille de destination. Ce n'est pas nécessairement l'enveloppe de
      * {@link #coverage}, car l'utilisateur peut ne souhaiter extraire que les séries temporelles
@@ -412,7 +407,7 @@ public class TimeSeriesTile {
         for (int i=0; i<layer.length; i++) {
             layer[i].rewind();
         }
-        
+
         // Pour chaque pas de temps...
         for (int j=0; j<seriesLength; j+=tSubsampling) {
             if (listener != null) {
@@ -425,24 +420,24 @@ public class TimeSeriesTile {
                     raster.setSample(x, y, 0, layer[(x*size[yDimension])+y].next());
                 }
             }
-            
+
             final GridSampleDimension[] bands = {((GridSampleDimension) coverage.getSampleDimension(0)).geophysics(true)};
-            
+
             final GridCoverage2D gridCoverage = gridCoverageFactory.create(
-                    "immageT" + j, 
-                    raster, 
-                    coverage.getCoordinateReferenceSystem(), 
-                    gridToCRS, 
+                    "immageT" + j,
+                    raster,
+                    coverage.getCoordinateReferenceSystem(),
+                    gridToCRS,
                     bands);
-            
+
             // création du png...
             // TODO : trouver un nom plus générique pour les images... ATTENTION au chemin !!!
             final String fileName = "C:\\Documents and Settings\\Antoine\\Bureau\\TestTimeSeriesTile\\imageT";
             ImageIO.write(
-                    gridCoverage.geophysics(false).getRenderedImage(), 
-                    "png", 
+                    gridCoverage.geophysics(false).getRenderedImage(),
+                    "png",
                     new File(fileName + j + ".png"));
-            
+
         }
         if (listener != null) {
             listener.complete();
@@ -556,7 +551,7 @@ public class TimeSeriesTile {
             listener.complete();
         }
     }
-    
+
     /**
      * Retourne une représentation de cet objet sous forme de chaîne de caractères.
      */
@@ -574,12 +569,7 @@ public class TimeSeriesTile {
             try {
                 data = layer[i].getData(null);
             } catch (IOException e) {
-                buffer.append(Utilities.getShortClassName(e));
-                final String message = e.getLocalizedMessage();
-                if (e != null) {
-                    buffer.append(": ");
-                    buffer.append(e);
-                }
+                buffer.append(e);
                 continue;
             }
             for (int j=0; j<data.length; j++) {

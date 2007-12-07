@@ -105,7 +105,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
      *       visible. Une solution possible serait de prévoir un Listener à appeller lorsque la base
      *       de données a été mise à jour.
      */
-    private final Map<Object,E> pool = new WeakValueHashMap();
+    private final Map<Object,E> pool = new WeakValueHashMap<Object,E>();
 
     /**
      * Creates a new table using the specified query. The query given in argument should be some

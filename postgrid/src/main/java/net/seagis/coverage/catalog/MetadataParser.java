@@ -448,7 +448,7 @@ final class MetadataParser {
      * Returns the vertical coordinate values in the specified units, or {@code null} if none.
      *
      * @param units The desired units, or {@code null} for returning the values in their native units.
-     * 
+     *
      * @todo Current implementation uses hard-coded values.
      *       We need to do something more generic.
      */
@@ -495,7 +495,7 @@ final class MetadataParser {
 
     /**
      * Returns the vertical units, or {@code null} if none.
-     * 
+     *
      * @todo Current implementation uses hard-coded values.
      *       We need to do something more generic.
      */

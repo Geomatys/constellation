@@ -51,7 +51,7 @@ import java.lang.reflect.Constructor;
 
 import org.geotools.io.TableWriter;
 import org.geotools.resources.JDBC;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Arguments;
 import org.geotools.util.logging.Logging;
 
@@ -522,7 +522,7 @@ public class Database {
              * Attraper toutes les exceptions n'est pas recommandé,
              * mais il y en a un bon paquet dans le code ci-dessus.
              */
-            throw new NoSuchTableException(Utilities.getShortName(type), exception);
+            throw new NoSuchTableException(Classes.getShortName(type), exception);
         }
     }
 

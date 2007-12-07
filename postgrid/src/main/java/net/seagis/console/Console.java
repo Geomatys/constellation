@@ -32,7 +32,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.gui.swing.tree.Trees;
 import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
@@ -242,7 +242,7 @@ public final class Console extends Arguments {
                         }
                         message = "Pas de vue géophysique.";
                     } catch (Exception e) {
-                        message = Utilities.getShortClassName(e);
+                        message = Classes.getShortClassName(e);
                         final String m = e.getLocalizedMessage();
                         if (m != null) {
                             message = message + ": " + m;

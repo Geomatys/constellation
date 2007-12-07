@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 import net.seagis.resources.XArray;
 import net.seagis.resources.i18n.Resources;
@@ -295,7 +295,7 @@ public class Query {
                 if (!columnExists) {
                     final LogRecord record = new LogRecord(Level.CONFIG, Resources.format(
                             ResourceKeys.COLUMN_NOT_FOUND_$3, column.name, table, column.defaultValue));
-                    record.setSourceClassName(Utilities.getShortClassName(this));
+                    record.setSourceClassName(Classes.getShortClassName(this));
                     record.setSourceMethodName("select");
                     Element.LOGGER.log(record);
                 }

@@ -67,8 +67,7 @@ public class Catalog {
     /**
      * L'ensemble des couvertures de données obtenues par {@link #getCoverage}.
      */
-    @SuppressWarnings("unchecked")
-    private final Map<String, GridCoverage> coverages = new WeakValueHashMap();
+    private final Map<String, GridCoverage> coverages = new WeakValueHashMap<String, GridCoverage>();
 
     /**
      * Construit une instance de {@code Catalog} pour la base de données spécifiée.

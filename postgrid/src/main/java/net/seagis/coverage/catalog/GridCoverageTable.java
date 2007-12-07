@@ -38,6 +38,7 @@ import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.util.NumberRange;
 import org.geotools.util.RangeSet;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XRectangle2D;
 
@@ -902,12 +903,8 @@ loop:   for (final CoverageReference newReference : entries) {
         } catch (CatalogException e) {
             area = e.getLocalizedMessage();
         }
-        final StringBuilder buffer = new StringBuilder(Utilities.getShortClassName(this));
-        buffer.append("[\"");
-        buffer.append(String.valueOf(layer));
-        buffer.append("\": ");
-        buffer.append(area);
-        buffer.append(']');
+        final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
+        buffer.append("[\"").append(String.valueOf(layer)).append("\": ").append(area).append(']');
         return buffer.toString();
     }
 }

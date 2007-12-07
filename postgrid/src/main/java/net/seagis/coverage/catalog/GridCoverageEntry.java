@@ -68,6 +68,7 @@ import org.geotools.util.NumberRange;
 import org.geotools.util.CanonicalSet;
 import org.geotools.util.logging.Logging;
 import org.geotools.referencing.CRS;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -119,7 +120,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *
      * @deprecated Use the cache inherited from SingletonTable instead.
      */
-    private static final CanonicalSet POOL = new CanonicalSet();
+    private static final CanonicalSet<GridCoverageEntry> POOL = CanonicalSet.newInstance(GridCoverageEntry.class);
 
     /**
      * Liste des derniers {@link GridCoverageEntry} pour lesquels la méthode {@link #getCoverage}
@@ -278,7 +279,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * si {@code u.equals(v)} est vrai.
      */
     public GridCoverageEntry canonicalize() {
-        return (GridCoverageEntry) POOL.unique(this);
+        return POOL.unique(this);
     }
 
     /**
@@ -871,18 +872,14 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
     @Override
     public String toString() {
         final StringBuilder buffer = new StringBuilder(40);
-        buffer.append(Utilities.getShortClassName(this));
-        buffer.append('[');
-        buffer.append(getName());
+        buffer.append(Classes.getShortClassName(this)).append('[').append(getName());
         if (startTime!=Long.MIN_VALUE && endTime!=Long.MAX_VALUE) {
-            buffer.append(" (");
-            buffer.append(parameters.format(new Date((startTime+endTime)/2)));
-            buffer.append(')');
+            buffer.append(" (").append(parameters.format(new Date((startTime+endTime)/2))).append(')');
         }
-        buffer.append(' ');
-        buffer.append(GeographicBoundingBoxImpl.toString(getGeographicBoundingBox(),
-                      GridCoverageTable.ANGLE_PATTERN, null));
-        buffer.append(']');
+        buffer.append(' ')
+              .append(GeographicBoundingBoxImpl.toString(getGeographicBoundingBox(),
+                      GridCoverageTable.ANGLE_PATTERN, null))
+              .append(']');
         return buffer.toString();
     }
 

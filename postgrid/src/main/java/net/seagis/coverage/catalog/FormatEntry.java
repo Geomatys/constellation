@@ -61,6 +61,7 @@ import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.RawBinaryImageReadParam;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 import net.seagis.catalog.Entry;
 import net.seagis.resources.i18n.Resources;
@@ -614,11 +615,8 @@ final class FormatEntry extends Entry implements Format {
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder(40);
-        buffer.append(Utilities.getShortClassName(this));
-        buffer.append('[');
-        buffer = toString(buffer);
-        buffer.append(']');
-        return buffer.toString();
+        buffer.append(Classes.getShortClassName(this)).append('[');
+        return toString(buffer).append(']').toString();
     }
 
     /**

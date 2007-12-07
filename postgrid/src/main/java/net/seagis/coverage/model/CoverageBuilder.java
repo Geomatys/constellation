@@ -75,11 +75,10 @@ import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.OrdinateOutsideCoverageException;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.gui.headless.ProgressPrinter;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.Arguments;
+import org.geotools.resources.Classes;
 import org.geotools.math.Statistics;
 import org.geotools.util.DateRange;
 
@@ -190,7 +189,7 @@ public class CoverageBuilder {
 
     /**
      * Spécifie un objet à informer des progrès. La valeur {@code null} retire tous objets
-     * qui aurait été déclaré lors d'un appel précédent. 
+     * qui aurait été déclaré lors d'un appel précédent.
      */
     public void setProgressListener(final ProgressListener listener) {
         this.listener = listener;
@@ -318,7 +317,7 @@ public class CoverageBuilder {
         final String name = String.valueOf(coverage.getName());
         final GridCoverage2D coverage2D = getDescriptorImage(coverage);
         if (coverage2D == null) {
-            message = "Type d'images non-affichable: " + Utilities.getShortClassName(coverage);
+            message = "Type d'images non-affichable: " + Classes.getShortClassName(coverage);
         } else {
             final File file = new File(directory, name + ".png");
             final RenderedImage image = coverage2D.geophysics(false).getRenderedImage();
@@ -488,7 +487,7 @@ public class CoverageBuilder {
     {
         if (lastSuccessful == null || datePattern == null) {
             return null;
-        } 
+        }
         // Dates et nom du fichier
         final Layer         layer = lastSuccessful.getSeries().getLayer();
         final long   timeInterval = Math.round(layer.getTimeInterval() * (24*60*60*1000L));
@@ -575,7 +574,7 @@ public class CoverageBuilder {
      *   </tr>
      *   <tr>
      *     <td nowrap>{@code -date-pattern}</td>
-     *     <td>Nomenclature du nom de l'image (date incluse, en heure UTC). Si l'utilisateur ne fournit pas de 
+     *     <td>Nomenclature du nom de l'image (date incluse, en heure UTC). Si l'utilisateur ne fournit pas de
      *      {@code -date-pattern}, alors on ne rajoute pas d'entrée dans la table "{@code GridCoverages}".</td>
      *   </tr>
      * </table>
@@ -634,7 +633,7 @@ public class CoverageBuilder {
             try {
                 layer = observations.getLayer(area, null, args[i]);
             } catch (NoSuchRecordException e) {
-                out.print(Utilities.getShortClassName(e));
+                out.print(Classes.getShortClassName(e));
                 out.print(": ");
                 out.println(e.getLocalizedMessage());
                 return;

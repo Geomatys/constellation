@@ -162,7 +162,7 @@ public class LayerTree extends Table {
                  * Construit le noeud. Si les catégories ont été demandées, elles seront
                  * ajoutées après le dernier noeud qui est du ressort de cette table.
                  */
-                final DefaultMutableTreeNode node = new NamedTreeNode(name, entry, i!=depth.rank);
+                final DefaultMutableTreeNode node = new NamedTreeNode(name, entry, i != depth.rank);
                 if (continueAfter) {
                     node.add(((Format) entry).getTree(locale));
                 }

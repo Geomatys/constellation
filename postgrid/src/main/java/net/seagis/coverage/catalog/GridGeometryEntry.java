@@ -161,7 +161,7 @@ final class GridGeometryEntry extends Entry {
      * @param The band number. Numbering start at 0.
      */
     final Envelope getEnvelope(final int band) {
-        final GeneralEnvelope envelope = (GeneralEnvelope) this.envelope.clone();
+        final GeneralEnvelope envelope = this.envelope.clone();
         if (verticalOrdinates != null && verticalOrdinates.length > 1) {
             final double z = verticalOrdinates[band];
             final int floor = Math.max(0, band - 1);

@@ -266,8 +266,7 @@ final class LayerEntry extends Entry implements Layer {
                         System.arraycopy(candidates, length, ranges, length, candidates.length-length);
                     }
                     for (int i=0; i<length; i++) {
-                        ranges[i] = (NumberRange) ranges[i].intersect(candidates[i]);
-                        // TODO: remove cast when Geotools will be allowed to compile for J2SE 1.5.
+                        ranges[i] = ranges[i].intersect(candidates[i]);
                     }
                 }
             }

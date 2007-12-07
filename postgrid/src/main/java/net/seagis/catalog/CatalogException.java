@@ -19,7 +19,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.resources.i18n.Resources;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 
 
 /**
@@ -173,7 +173,7 @@ public class CatalogException extends Exception {
             if (cause != null) {
                 message = cause.getLocalizedMessage();
                 if (message == null) {
-                    message = Utilities.getShortClassName(cause);
+                    message = Classes.getShortClassName(cause);
                 }
             }
         }

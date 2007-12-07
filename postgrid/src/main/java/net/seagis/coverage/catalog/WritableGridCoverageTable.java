@@ -38,7 +38,7 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.units.SI;
 
 import org.geotools.util.DateRange;
-import org.geotools.resources.Utilities;
+import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -195,7 +195,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         if (input instanceof CharSequence) {
             return new File(input.toString());
         }
-        throw new CatalogException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, Utilities.getShortClassName(input)));
+        throw new CatalogException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, Classes.getShortClassName(input)));
     }
 
     /**
