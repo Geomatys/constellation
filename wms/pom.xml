@@ -60,7 +60,6 @@
     <dependency>
       <groupId>jersey</groupId>
       <artifactId>jersey</artifactId>
-      <version>0.4-ea</version>
     </dependency>
   </dependencies>
 
