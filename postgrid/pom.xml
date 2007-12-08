@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  Configuration du module "postgrid" du projet Sicade.
+  Configuration of "postgrid" module from SeaGIS project.
   Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,20 +16,20 @@
 
 
   <!--
-    Description du module.
+    Module description.
   -->
   <groupId>net.seagis</groupId>
   <artifactId>postgrid</artifactId>
   <packaging>jar</packaging>
   <name>PostGrid database</name>
   <description>
-    Utilitaires dédiés à l'exploitation d'une base de données PostgreSQL contenant un ensemble d'images.
+    PostgreSQL database schema and Java toolkit for 4-dimensional rasters.
   </description>
 
 
 
   <!--
-    Liste des développeurs et des contributeurs.
+    Developers and contributors.
   -->
   <developers>
     <developer>
@@ -39,8 +39,8 @@
       <organization>Geomatys</organization>
       <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <roles>
-        <role>Administrateur du projet</role>
-        <role>Développeur Java</role>
+        <role>Administrator</role>
+        <role>Developer</role>
       </roles>
       <timezone>+1</timezone>
     </developer>

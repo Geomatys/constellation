@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  Configuration du module "postgrid" du projet Sicade.
-  Version: $Id: pom.xml 196 2007-11-30 11:34:31Z desruisseaux $
+  Configuration of "wms" module from SeaGIS project.
+  Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -16,21 +16,20 @@
 
 
   <!--
-    Description du module.
+    Module description.
   -->
   <groupId>net.seagis</groupId>
   <artifactId>wms</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>wms web service</name>
+  <name>Web Map Service</name>
   <description>
-    a Web Map Service producing maps of spatially referenced data dynamically from geographic information.
+    A Web Map Service producing maps of spatially referenced data dynamically from geographic information.
   </description>
 
 
 
   <!--
-    Liste des développeurs et des contributeurs.
+    Developers and contributors.
   -->
   <developers>
     <developer>
@@ -40,26 +39,13 @@
       <organization>Geomatys</organization>
       <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <roles>
-        <role>Développeur Java</role>
+        <role>Developer</role>
       </roles>
       <timezone>+1</timezone>
     </developer>
   </developers>
-  
 
-  <repositories>
-    <repository>
-      <id>java.net</id>
-      <url>http://download.java.net/maven/1</url>
-      <layout>legacy</layout>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+
 
   <!--
     Dépendances requises pour la compilation. Ces dépendances seront incluses
@@ -69,7 +55,7 @@
     <dependency>
       <groupId>net.seagis</groupId>
       <artifactId>postgrid</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>jersey</groupId>

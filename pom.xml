@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  Configuration globale du projet Seagis. Les projets enfants hériteront par
-  défaut des informations déclarées dans ce fichier,  mais pourront les redéfinir
-  si nécessaire. La configuration par défaut suppose que:
+  Global configuration of SeaGIS project. Every files in this project shoud
+  comply to the following rules:
 
-  - L'arborescence des répertoires respecte la convention de Maven
-  - Le code source de tous les fichiers Java utilise l'encodage UTF-8
+  - Directory structures must comply to Maven 2 conventions.
+  - Source code must be in UTF-8 encoding.
 
   Version: $Id$
 -->
@@ -51,6 +50,11 @@
     <url>http://seagis.svn.sourceforge.net/viewcvs.cgi/seagis/trunk</url>
   </scm>
 
+  <ciManagement>
+    <system>hudson</system>
+    <url>http://hudson.geomatys.fr/job/SeaAPI/</url>
+  </ciManagement>
+
 
 
   <!--
@@ -66,8 +70,8 @@
       <organization>Geomatys</organization>
       <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <roles>
-        <role>Administrateur du projet</role>
-        <role>Développeur Java</role>
+        <role>Administrator</role>
+        <role>Developer</role>
       </roles>
       <timezone>+1</timezone>
     </developer>
@@ -230,8 +234,14 @@
   -->
   <repositories>
     <repository>
-      <id>javanet</id>
-      <name>Communauté java.net</name>
+      <id>java.net.1</id>
+      <name>java.net community</name>
+      <url>http://download.java.net/maven/1</url>
+      <layout>legacy</layout>
+    </repository>
+    <repository>
+      <id>java.net.2</id>
+      <name>java.net community</name>
       <url>http://download.java.net/maven/2/</url>
     </repository>
     <repository>
@@ -259,11 +269,6 @@
     lancer une application facilement en spécifiant simplement le JAR final, sans
     avoir à spécifier toutes les dépendances dans le "classpath".
 
-    En principe, il n'est pas nécessaire de déclarer de numéro de version pour les
-    plugins de Maven. Dans la pratique, ces déclarations aident à garder un "build"
-    stable et cohérent sur différentes machines. On peut facilement vérifier si de
-    nouvelles mise à jour sont disponibles en naviguant dans la page suivante:
-
     http://maven.apache.org/plugins/index.html
     http://repo1.maven.org/maven2/org/apache/maven/plugins/
   -->
@@ -272,7 +277,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
         <configuration>
           <source>1.5</source>        <!-- The -source argument for the Java compiler.   -->
           <target>1.5</target>        <!-- The -target argument for the Java compiler.   -->
@@ -282,7 +286,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.1</version>
         <configuration>
           <archive>
             <manifest>
@@ -293,7 +296,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.3</version> <!-- Version minimale supportant JUnit 4 -->
       </plugin>
       <plugin>
         <groupId>org.geotools.maven</groupId>
@@ -327,26 +329,25 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.3</version>
         <configuration>
           <source>1.5</source>            <!-- Necessary to enable javadoc to handle J2SE 1.5 features.           -->
           <author>true</author>           <!-- Specifies whether or not the author text is included.              -->
           <version>false</version>        <!-- Includes or not the version text in the generated docs.            -->
-          <linksource>true</linksource>   <!-- Creates an HTML version of each source file (with line numbers).   -->
+          <linksource>false</linksource>  <!-- Creates an HTML version of each source file (with line numbers).   -->
           <sourcetab>4</sourcetab>        <!-- Specify the number of spaces each tab takes up in the source.      -->
           <noqualifier>all</noqualifier>  <!-- Omits qualifying package name from ahead of class names in output. -->
           <quiet>true</quiet>             <!-- Shuts off non-error and non-warning messages.                      -->
           <maxmemory>384M</maxmemory>     <!-- The maximum Java heap size to be used when launching the javadoc.  -->
           <encoding>UTF-8</encoding>      <!-- Specifies the encoding name of the source files.                   -->
           <charset>UTF-8</charset>        <!-- Specifies the HTML character set for this document.                -->
-          <locale>fr</locale>             <!-- The locale that javadoc uses when generating documentation.        -->
+          <locale>en</locale>             <!-- The locale that javadoc uses when generating documentation.        -->
           <keywords>true</keywords>       <!-- Adds HTML meta keyword tags to the generated file for each class.  -->
           <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
           <links>
             <link>http://java.sun.com/javase/6/docs/api/</link>
             <link>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs</link>
             <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
-            <link>http://geoapi.sourceforge.net/pending/javadoc</link>
+            <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
             <link>http://javadoc.geotools.fr/snapshot</link>
             <link>http://jsr-108.sourceforge.net/javadoc</link>
           </links>
@@ -354,11 +355,19 @@
           <!-- Separates packages on the overview page into whatever groups is specified. -->
           <groups>
             <group>
-              <title>Interfaces graphiques</title>
+              <title>PostGrid</title>
+              <packages>net.seagis.catalog*:net.seagis.coverage*:net.seagis.image*</packages>
+            </group>
+            <group>
+              <title>Web Services</title>
+              <packages>net.seagis.wms*</packages>
+            </group>
+            <group>
+              <title>Graphical interfaces</title>
               <packages>net.seagis.gui*</packages>
             </group>
             <group>
-              <title>Calculs numériques</title>
+              <title>Numerical</title>
               <packages>net.seagis.numeric*</packages>
             </group>
             <group>
@@ -376,89 +385,48 @@
           <reportSet>
             <reports>
               <report>javadoc</report>
-        <!--  <report>test-javadoc</report> -->
             </reports>
           </reportSet>
         </reportSets>
       </plugin>
 
-      <!-- Génération des rapports pour le site web. -->
+      <!-- Publish web site. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>2.0-beta-5</version>
         <configuration>
-          <locales>fr</locales>
+          <locales>en</locales>
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
         </configuration>
       </plugin>
 
-      <!-- Publication de la section "info". -->
+      <!-- Publish project informations. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.0.1</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>index</report>
-              <report>summary</report>
-              <report>license</report>
-              <report>project-team</report>
-        <!--  <report>mailing-list</report>   -->
-              <report>dependencies</report>
-              <report>dependencies-convergence</report>
-        <!--  <report>issue-tracking</report> -->
-              <report>scm</report>
-        <!--  <report>cim</report>            -->
-            </reports>
-          </reportSet>
-        </reportSets>
       </plugin>
 
-      <!-- Publication de la liste des changements récents. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-changelog-plugin</artifactId>
-        <version>2.1</version>
-        <configuration>
-          <type>range</type>
-          <range>30</range>
-        </configuration>
-      </plugin>
-
-      <!-- Publication des résultats des tests unitaires. -->
+      <!-- Publish test results. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.3</version>
       </plugin>
 
-      <!-- Publication du code source. -->
+      <!-- Publish source code. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.1</version>
         <configuration>
           <inputEncoding>UTF-8</inputEncoding>
           <outputEncoding>UTF-8</outputEncoding>
         </configuration>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>jxr</report>
-        <!--  <report>test-jxr</report> -->
-            </reports>
-          </reportSet>
-        </reportSets>
       </plugin>
 
-      <!-- Publication d'une liste de "todo" trouvés dans le code source. -->
+      <!-- Publish "TODO" tasks. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
-        <version>2.0</version>
       </plugin>
     </plugins>
   </reporting>
@@ -466,7 +434,7 @@
 
 
   <!--
-    Serveurs vers lesquels déployer la documentation.
+    Server where to deploy the web site.
   -->
   <distributionManagement>
     <site>
@@ -479,11 +447,12 @@
 
 
   <!--
-    Liste de tous les modules de SICADE.
+    All SeaGIS modules.
   -->
   <modules>
     <module>numeric</module>
     <module>postgrid</module>
+    <module>wms</module>
 <!-- <module>observations</module> -->
 <!-- <module>widgets</module> -->
 <!-- <module>openoffice</module> -->
