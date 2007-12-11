@@ -1,3 +1,17 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package net.opengis.ogc;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -5,100 +19,97 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import net.seagis.coverage.wms.WMSExceptionCode;
 
 
 /**
- * <p>Java class for ServiceExceptionType complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * Provides the details for an exception to be included in a {@link ServiceExceptionReport}.
+ * The following schema fragment specifies the expected content contained within this class.
+ *
  * <pre>
- * &lt;complexType name="ServiceExceptionType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
- *       &lt;attribute name="code" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="locator" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="ServiceExceptionType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string"&gt;
+ *       &lt;attribute name="code" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *       &lt;attribute name="locator" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
- * 
+ *
  * @author Guilhem Legal
+ * @author Martin Desruisseaux
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ServiceExceptionType", propOrder = {
-    "value"
-})
-public class ServiceExceptionType {
-
-    @XmlValue
-    protected String value;
-    @XmlAttribute
-    protected String code;
-    @XmlAttribute
-    protected String locator;
-
+@XmlType(name = "ServiceExceptionType", propOrder = {"value"})
+public final class ServiceExceptionType {
     /**
-     * empty constructor used by JAXB
+     * The exception message.
      */
-    protected ServiceExceptionType() {}
-    
+    @XmlValue
+    private String message;
+
     /**
-     * Build a new Exception with the specified message and code.
-     * 
-     * @param value The message of the exception
+     * The exception code. Must be one of {@link ExceptionCode} constants.
+     */
+    @XmlAttribute
+    private String code;
+
+    /**
+     * The method where the error occured.
+     */
+    @XmlAttribute
+    private String locator;
+
+    /**
+     * Empty constructor used by JAXB.
+     */
+    ServiceExceptionType() {
+    }
+
+    /**
+     * Builds a new exception with the specified message and code.
+     *
+     * @param message The message of the exception.
      * @param code A standard code for exception (OWS).
      */
-    public ServiceExceptionType(String value, String code) {
-        this.value   = value;
-        this.code    = code;
-        this.locator = null;
-    }
-    
-    /**
-     * Gets the value of the value property.
-     * 
-     */
-    public String getValue() {
-        return value;
+    public ServiceExceptionType(final String message, final WMSExceptionCode code) {
+        this.message = message;
+        this.code    = code.name();
     }
 
     /**
-     * Sets the value of the value property.
-     * 
+     * Build a new exception with the specified message, code and locator.
+     *
+     * @param message The message of the exception.
+     * @param code A standard code for exception (OWS).
+     * @param locator The method where the error occured.
      */
-    public void setValue(String value) {
-        this.value = value;
+    public ServiceExceptionType(final String value, final WMSExceptionCode code, final String locator) {
+        this.message = value;
+        this.code    = code.name();
+        this.locator = locator;
     }
 
     /**
-     * Gets the value of the code property.
-     * 
+     * Returns the message of the exception, or {@code null} if none.
      */
-    public String getCode() {
-        return code;
+    public String getMessage() {
+        return message;
     }
 
     /**
-     * Sets the value of the code property.
+     * Returns the exception code, or {@code null} if none.
      */
-    public void setCode(String value) {
-        this.code = value;
+    public WMSExceptionCode getCode() {
+        return WMSExceptionCode.valueOf(code);
     }
 
     /**
-     * Gets the value of the locator property.
-     * 
+     * Returns the locator, or {@code null} if none.
+     * @return
      */
     public String getLocator() {
         return locator;
     }
-
-    /**
-     * Sets the value of the locator property.
-     */
-    public void setLocator(String value) {
-        this.locator = value;
-    }
-
 }
