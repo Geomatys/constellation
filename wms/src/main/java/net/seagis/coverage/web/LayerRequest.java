@@ -19,7 +19,7 @@ import org.opengis.geometry.Envelope;
 import org.geotools.resources.Utilities;
 
 /**
- * The request for a layer, including its envelope.
+ * The request for a layer, including its envelope. To be used in a hash map only.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -54,7 +54,14 @@ final class LayerRequest {
      */
     @Override
     public int hashCode() {
-        return layer.hashCode() + 37*envelope.hashCode() + 31*size.hashCode();
+        int code = layer.hashCode();
+        if (envelope != null) {
+            code += 37 * envelope.hashCode();
+        }
+        if (size != null) {
+            code += 31 * size.hashCode();
+        }
+        return code;
     }
 
     /**

@@ -47,6 +47,30 @@ public class WebServiceException extends CatalogException {
      * Creates a new exception with the specified details.
      *
      * @param message The message for this exception.
+     * @param code    The OGC code that describes the error.
+     * @param version The version of the web service that produced the error.
+     */
+    public WebServiceException(final String message, final WMSExceptionCode code, final Version version) {
+        super(message);
+        setServiceExceptionReport(message, code, version);
+    }
+
+    /**
+     * Creates a new exception with the specified cause.
+     *
+     * @param cause   The cause for this exception.
+     * @param code    The OGC code that describes the error.
+     * @param version The version of the web service that produced the error.
+     */
+    public WebServiceException(final Exception cause, final WMSExceptionCode code, final Version version) {
+        super(cause);
+        setServiceExceptionReport(cause.getLocalizedMessage(), code, version);
+    }
+
+    /**
+     * Creates a new exception with the specified details.
+     *
+     * @param message The message for this exception.
      * @param cause   The cause for this exception.
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
@@ -55,6 +79,17 @@ public class WebServiceException extends CatalogException {
                                final WMSExceptionCode code, final Version version)
     {
         super(message, cause);
+        setServiceExceptionReport(message, code, version);
+    }
+
+    /**
+     * Set the exception. Used by constructors only.
+     *
+     * @param message The message for this exception.
+     * @param code    The OGC code that describes the error.
+     * @param version The version of the web service that produced the error.
+     */
+    private void setServiceExceptionReport(final String message, final WMSExceptionCode code, final Version version) {
         final ServiceExceptionType details = new ServiceExceptionType(message, code);
         exception = new ServiceExceptionReport(version, details);
     }

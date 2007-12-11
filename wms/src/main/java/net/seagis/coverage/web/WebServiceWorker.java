@@ -14,16 +14,19 @@
  */
 package net.seagis.coverage.web;
 
+import java.io.*;
+import java.sql.SQLException;
 import java.awt.image.RenderedImage;
 import java.util.Date;
 import java.util.Map;
-
 import java.util.StringTokenizer;
+
 import org.opengis.referencing.FactoryException;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.util.LRULinkedHashMap;
 import org.geotools.util.Version;
@@ -31,8 +34,14 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 import net.seagis.catalog.Database;
+import net.seagis.catalog.CatalogException;
+import net.seagis.catalog.NoSuchRecordException;
+import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.wms.WMSExceptionCode;
+import net.seagis.coverage.catalog.LayerTable;
+import net.seagis.resources.i18n.ResourceKeys;
+import net.seagis.resources.i18n.Resources;
+import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 
 /**
@@ -40,6 +49,7 @@ import net.seagis.coverage.wms.WMSExceptionCode;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Guihlem Legal
  */
 public class WebServiceWorker {
     /**
@@ -91,9 +101,14 @@ public class WebServiceWorker {
     private Number elevation;
 
     /**
+     * The layer table. Will be created when first needed.
+     */
+    private transient LayerTable layerTable;
+
+    /**
      * The most recently used layers.
      */
-    private final Map<LayerRequest,Layer> layers = LRULinkedHashMap.createForRecentAccess(12);
+    private final transient Map<LayerRequest,Layer> layers = LRULinkedHashMap.createForRecentAccess(12);
 
     /**
      * Creates a new image producer connected to the specified database.
@@ -154,7 +169,7 @@ public class WebServiceWorker {
             }
         } catch (FactoryException exception) {
             throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM),
-                    exception, WMSExceptionCode.INVALID_CRS, version);
+                    exception, INVALID_CRS, version);
         }
         envelope = new GeneralEnvelope(crs);
         envelope.setToInfinite();
@@ -191,14 +206,14 @@ public class WebServiceWorker {
                 }
             } catch (NumberFormatException exception) {
                 throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, token),
-                        exception, WMSExceptionCode.INVALID_PARAMETER_VALUE, version);
+                        exception, INVALID_PARAMETER_VALUE, version);
             }
             try {
                 envelope.setRange(dimension++, minimum, maximum);
             } catch (IndexOutOfBoundsException exception) {
                 throw new WebServiceException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3, "envelope",
                         dimension + ((tokens.countTokens() + 1) >> 1), envelope.getDimension()),
-                        exception, WMSExceptionCode.INVALID_DIMENSION_VALUE, version);
+                        exception, INVALID_DIMENSION_VALUE, version);
             }
         }
     }
@@ -217,7 +232,82 @@ public class WebServiceWorker {
             this.elevation = Double.parseDouble(elevation);
         } catch (NumberFormatException exception) {
             throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, elevation),
-                    exception, WMSExceptionCode.INVALID_PARAMETER_VALUE, version);
+                    exception, INVALID_PARAMETER_VALUE, version);
         }
+    }
+
+    /**
+     * Returns the layer for the current configuration.
+     *
+     * @throws WebServiceException if an error occured while fetching the table.
+     */
+    private Layer getLayer() throws WebServiceException {
+        if (layer == null) {
+            throw new WebServiceException(Resources.format(ResourceKeys.ERROR_NO_SERIES_SELECTION),
+                    LAYER_NOT_DEFINED, version);
+        }
+        final LayerRequest request = new LayerRequest(layer, envelope, null);
+        Layer candidate;
+        synchronized (layers) {
+            candidate = layers.get(request);
+            if (candidate == null) try {
+                if (layerTable == null) {
+                    layerTable = new LayerTable(database.getTable(LayerTable.class));
+                }
+                candidate = layerTable.getEntry(layer);
+            } catch (NoSuchRecordException exception) {
+                throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
+            } catch (CatalogException exception) {
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            } catch (SQLException exception) {
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            }
+        }
+        return candidate;
+    }
+
+    /**
+     * Gets the grid coverage for the current layer, time, elevation, <cite>etc.</cite>
+     * The image dimension may <strong>not</strong> be honored by this method.
+     *
+     * @throws WebServiceException if an error occured while querying the coverage.
+     */
+    public GridCoverage2D getGridCoverage2D() throws WebServiceException {
+        final Layer layer = getLayer();
+        final CoverageReference ref;
+        try {
+            ref = layer.getCoverageReference(time, elevation);
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+        }
+        try {
+            return ref.getCoverage(null);
+        } catch (IOException exception) {
+            throw new WebServiceException(Errors.format(ErrorKeys.CANT_READ_$1, ref.getFile()),
+                    exception, LAYER_NOT_QUERYABLE, version);
+        }
+    }
+
+    /**
+     * Gets the image for the current layer. The image is resized to the requested dimension
+     * and CRS.
+     *
+     * @throws WebServiceException if an error occured while querying the coverage.
+     */
+    public RenderedImage getRenderedImage() throws WebServiceException {
+        final GridCoverage2D coverage = getGridCoverage2D();
+        // TODO: resample the coverage.
+        RenderedImage image = coverage.geophysics(false).getRenderedImage();
+        return image;
+    }
+    
+    /**
+     * Returns the rendered image as a file.
+     *
+     * @throws WebServiceException if an error occured while processing the image.
+     */
+    public File getImageFile() throws WebServiceException {
+        // TODO
+        return null;
     }
 }

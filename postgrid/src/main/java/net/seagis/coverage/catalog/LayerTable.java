@@ -99,6 +99,13 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     }
 
     /**
+     * Creates a layer table using the same initial configuration than the specified table.
+     */
+    public LayerTable(final LayerTable table) {
+        super(table);
+    }
+
+    /**
      * Creates a layer from the current row in the specified result set.
      *
      * @param  results The result set to read.
