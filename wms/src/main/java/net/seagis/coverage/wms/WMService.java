@@ -15,22 +15,12 @@
 
 package net.seagis.coverage.wms;
 
-import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpContext;
@@ -41,15 +31,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
-import net.seagis.catalog.NoSuchTableException;
-import net.seagis.coverage.catalog.CoverageReference;
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.LayerTable;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.opengis.metadata.extent.GeographicBoundingBox;
 import javax.ws.rs.core.Response;
 import net.opengis.wms.WMSCapabilities;
+import net.seagis.coverage.web.WebServiceException;
+import net.seagis.coverage.web.WebServiceWorker;
+import org.geotools.util.Version;
 /**
  * WMS 1.3.0 web service implementing the operation getMap, getFeatureInfo and getCapabilities.
  *
@@ -62,22 +48,24 @@ public class WMService {
     @HttpContext
     private UriInfo context;
     
-    private Database database;
-    
-    private LayerTable layers;
-    
     private Logger logger = Logger.getLogger("fr.geomatys.wms");
     
     private Marshaller marshaller;
+    
+    private Version version = new Version("1.3");
+    
+    private WebServiceWorker webServiceWorker;
     
     
     /** 
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
-    public WMService() throws JAXBException {
+    public WMService() throws JAXBException, IOException, WebServiceException {
         JAXBContext jbcontext = JAXBContext.newInstance("net.opengis.ogc");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        webServiceWorker = new WebServiceWorker(new Database());
+        webServiceWorker.setService("WMS", "1.3");
     }
    
     
@@ -91,7 +79,7 @@ public class WMService {
 
         try {
             try {
-                String request = (String) getParameter("REQUEST", 'M', "String");
+                String request = (String) getParameter("REQUEST", 'M');
                 if (request.equals("GetMap")) {
                     
                     return Response.Builder.representation(getMap(), "image/png").build();
@@ -105,19 +93,19 @@ public class WMService {
                     return Response.Builder.representation(getCapabilities(), "text/xml").build();
                     
                 } else {
-                    throw new WMServiceException("The operation " + request + " is not supported by the service",
-                                                  WMSExceptionCode.OPERATION_NOT_SUPPORTED);
+                    throw new WebServiceException("The operation " + request + " is not supported by the service",
+                                                  WMSExceptionCode.OPERATION_NOT_SUPPORTED, version);
                 }
             } catch (CatalogException ex) {
-                throw new WMServiceException("The service has throw an CatalogException:" + ex.getMessage() ,
-                                              WMSExceptionCode.NO_APPLICABLE_CODE);
+                throw new WebServiceException("The service has throw an CatalogException:" + ex.getMessage() ,
+                                              WMSExceptionCode.NO_APPLICABLE_CODE, version);
             } catch (SQLException ex) {
-                throw new WMServiceException("The service has throw an SQLException:" + ex.getMessage() ,
-                                              WMSExceptionCode.NO_APPLICABLE_CODE);
+                throw new WebServiceException("The service has throw an SQLException:" + ex.getMessage() ,
+                                              WMSExceptionCode.NO_APPLICABLE_CODE, version);
             }
-        } catch (WMServiceException ex) {
+        } catch (WebServiceException ex) {
             StringWriter sw = new StringWriter();    
-            marshaller.marshal(ex.getException(), sw);
+            marshaller.marshal(ex.getServiceExceptionReport(), sw);
             return Response.Builder.representation(sw.toString(), "text/xml").build();
         }
     }
@@ -136,83 +124,22 @@ public class WMService {
      * @return the parameter or null if not specified
      * @throw 
      */
-    private Object getParameter(String parameterName, char obligation, String type) throws WMServiceException {
+    private String getParameter(String parameterName, char obligation) throws WebServiceException {
         
         MultivaluedMap parameters = context.getQueryParameters();
         LinkedList<String> list = (LinkedList) parameters.get(parameterName);
         if (list == null) {
             if (obligation == 'O') {
-                
-                if (type.equals("int") || type.equals("Double")) {
-                    return -1;
-                } else if (type.equals("Boolean")) {
-                    return false;
-                } else return null;
-                
+                return null;
             } else {
-                throw new WMServiceException("The parameter " + parameterName + " must be specify",
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE);
+                throw new WebServiceException("The parameter " + parameterName + " must be specify",
+                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
             }
-        }
-        if (type.equals("String")) {
+        } else {
             return list.get(0);
-            
-        } else if (type.equals("int")) {
-            try {
-                return Integer.parseInt(list.get(0));
-
-            } catch (NumberFormatException ex) {
-                throw new WMServiceException("The parameter " + parameterName + "must be an integer",
-                                             WMSExceptionCode.INVALID_PARAMETER_VALUE);
-            }
-        } else if (type.equals("Double")) {
-            try {
-                return Double.parseDouble(list.get(0));
-                
-            } catch (NumberFormatException ex) {
-                 throw new WMServiceException("The parameter " + parameterName + "must be a double",
-                                              WMSExceptionCode.INVALID_PARAMETER_VALUE);
-            }
-        } else if (type.equals("Date")) {
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                return sdf.parse(list.get(0));
-
-            } catch (ParseException ex) {
-                throw new WMServiceException("The parameter " + parameterName +" is mal-formated (yyyy-MM-dd)",
-                                              WMSExceptionCode.INVALID_PARAMETER_VALUE);
-            }
-        } else if (type.equals("Boolean")) {
-            return Boolean.parseBoolean(list.get(0));
-        }
-        return null;
-        
+        } 
     }
-    
-    /**
-     * Return an new instance of the postgrid database.
-     * 
-     * @return
-     * @throws java.io.IOException
-     */
-    private Database getDatabase() throws IOException {
-        if (database == null) {
-            database = new Database();
-        }
-        return database;
-    }
-    
-    private Layer getLayer(String name, GeographicBoundingBox bbox) throws IOException, NoSuchTableException, CatalogException, SQLException {
-        if (layers == null) {
-            layers = getDatabase().getTable(LayerTable.class);
-            //layers = new LayerTable(layers);
-        }
-        // layers.setGeographicBoundingBox(bbox);
-        // layers.setTimeRange(...);
-        return layers.getEntry(name);
-    }
-
-    
+   
     /**
      * Return a map for the specified parameters in the query.
      * 
@@ -220,51 +147,38 @@ public class WMService {
      * @throws net.seagis.catalog.CatalogException
      * @throws java.io.IOException
      * @throws java.sql.SQLException
-     * @throws fr.geomatys.wms.WMServiceException
+     * @throws fr.geomatys.wms.WebServiceException
      */
-    private File getMap() throws CatalogException, IOException, SQLException, WMServiceException {
+    private File getMap() throws CatalogException, IOException, SQLException, WebServiceException {
         logger.info("getMap request received");
         
         //we begin by extract the mandatory attribute
-        if (!getParameter("VERSION", 'M', "String").equals("1.3.0")) {
-            throw new WMServiceException("The parameter VERSION=1.3.0 must be specify",
-                                         WMSExceptionCode.MISSING_PARAMETER_VALUE);
+        if (!getParameter("VERSION", 'M').equals("1.3.0")) {
+            throw new WebServiceException("The parameter VERSION=1.3.0 must be specify",
+                                         WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
         }
         
-        String styles       = (String)getParameter("STYLES", 'M', "String");
-        String layerName    = (String)getParameter("LAYERS", 'M', "String");
-        String crs          = (String)getParameter("CRS", 'M', "String");
-        String format       = (String)getParameter("FORMAT", 'M', "String");
+        String styles       = getParameter("STYLES", 'M');
+        String format       = getParameter("FORMAT", 'M');
         
-        String boundingBox  = (String)getParameter("BBOX", 'M', "String");
-        GeographicBoundingBox bbox = null;
-        if (boundingBox != null) {
-            double p1   = Double.parseDouble(boundingBox.substring(0, boundingBox.indexOf(',')));
-            boundingBox = boundingBox.substring(boundingBox.indexOf(',') + 1);
-            double p2   = Double.parseDouble(boundingBox.substring(0, boundingBox.indexOf(',')));
-            boundingBox = boundingBox.substring(boundingBox.indexOf(',') + 1);
-            double p3   = Double.parseDouble(boundingBox.substring(0, boundingBox.indexOf(',')));
-            boundingBox = boundingBox.substring(boundingBox.indexOf(',') + 1);
-            double p4   = Double.parseDouble(boundingBox);
-            bbox = new GeographicBoundingBoxImpl(p1, p2, p3, p4);
-        } else {
-            throw new WMServiceException("The parameter BBOX must be specify",
-                                         WMSExceptionCode.MISSING_PARAMETER_VALUE);
-        }
+        webServiceWorker.setLayer(getParameter("LAYERS", 'M'));
+        webServiceWorker.setCoordinateReferenceSystem(getParameter("CRS", 'M'));
+        webServiceWorker.setBoundingBox(getParameter("BBOX", 'M'));
+        webServiceWorker.setElevation(getParameter("ELEVATION", 'O'));
         
-        int width  =  (Integer)getParameter("WIDTH", 'M', "int"); 
-        int height  = (Integer)getParameter("HEIGHT", 'M', "int"); 
+        String width  =  getParameter("WIDTH", 'M'); 
+        String height = getParameter("HEIGHT", 'M'); 
                 
         // and then we extract the optional attribute
-        boolean transparent = (Boolean)getParameter("TRANSPARENT", 'O', "Boolean");
+        String transparent = getParameter("TRANSPARENT", 'O');
         
-        Date time      = (Date)getParameter("TIME", 'O', "Date");
-        String bgColor = (String)getParameter("BGCOLOR", 'O', "String");
+        String time        = getParameter("TIME", 'O');
+        String bgColor = getParameter("BGCOLOR", 'O');
         if (bgColor == null) 
             bgColor = "0xFFFFFF";
         
-        Double elevation = 200.0;// getParameter("ELEVATION", 'O', "Double");
-        if (elevation != null) {
+        
+       /* if (elevation != null) {
         
             Date date = new Date(86, 0, 1);
             Layer layer = getLayer(layerName, bbox);
@@ -290,30 +204,31 @@ public class WMService {
                     }
                     throw new IOException("Format inconnu: " + format);
                 } else logger.severe("ref null");
-            } else  throw new WMServiceException("There is no layer call " + layerName,
-                                                 WMSExceptionCode.LAYER_NOT_DEFINED);
-        } return null;//"<pb>no elevation<pb>";
+            } else  throw new WebServiceException("There is no layer call " + layerName,
+                                                 WMSExceptionCode.LAYER_NOT_DEFINED, version);
+        } */
+        return null;
     }
     
-    private Response getFeatureInfo() throws WMServiceException {
+    private Response getFeatureInfo() throws WebServiceException {
         logger.info("getFeatureInfo request received");
         
         //we begin by extract the mandatory attribute
-        if (!getParameter("VERSION", 'M', "String").equals("1.3.0")) {
-            throw new WMServiceException("The parameter VERSION=1.3.0 must be specify",
-                                         WMSExceptionCode.MISSING_PARAMETER_VALUE);
+        if (!getParameter("VERSION", 'M').equals("1.3.0")) {
+            throw new WebServiceException("The parameter VERSION=1.3.0 must be specify",
+                                         WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
         }
         
-        String query_layers = (String)getParameter("QUERY_LAYERS", 'M', "String");
-        String info_format  = (String)getParameter("INFO_FORMAT", 'M', "String");
+        String query_layers = getParameter("QUERY_LAYERS", 'M');
+        String info_format  = getParameter("INFO_FORMAT", 'M');
         
-        int i = (Integer) getParameter("I", 'M', "int");
-        int j = (Integer) getParameter("J", 'M', "int");
+        String i = getParameter("I", 'M');
+        String j = getParameter("J", 'M');
        
         //and then the optional attribute
-        int feature_count = (Integer) getParameter("FEATURE_COUNT", 'O', "int");
+        String feature_count = getParameter("FEATURE_COUNT", 'O');
         
-        String exception = (String)getParameter("EXCEPTIONS", 'O', "String");
+        String exception = getParameter("EXCEPTIONS", 'O');
         if ( exception == null)
             exception = "XML";
         
@@ -331,26 +246,26 @@ public class WMService {
             return Response.Builder.representation(response, "application/vnd.ogc.gml").build();
     }
     
-    private String getCapabilities() throws WMServiceException, JAXBException {
+    private String getCapabilities() throws WebServiceException, JAXBException {
         logger.info("getCapabilities request received");
         
         // the service shall return WMSCapabilities marshalled
         WMSCapabilities response = new WMSCapabilities();
         
         //we begin by extract the mandatory attribute
-        if (!getParameter("SERVICE", 'M', "String").equals("WMS")) {
-            throw new WMServiceException("The parameters SERVICE=WMS must be specify",
-                                         WMSExceptionCode.MISSING_PARAMETER_VALUE);
+        if (!getParameter("SERVICE", 'M').equals("WMS")) {
+            throw new WebServiceException("The parameters SERVICE=WMS must be specify",
+                                         WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
         }
         
         //and the the optional attribute
-        String version = (String)getParameter("VERSION", 'O', "String");
-         if (version != null && !version.equals("1.3.0")) {
-            throw new WMServiceException("The parameter VERSION must be 1.3.0",
-                                         WMSExceptionCode.MISSING_PARAMETER_VALUE);
+        String requestVersion = getParameter("VERSION", 'O');
+        if (requestVersion != null && !requestVersion.equals("1.3.0")) {
+            throw new WebServiceException("The parameter VERSION must be 1.3.0",
+                                         WMSExceptionCode.MISSING_PARAMETER_VALUE, this.version);
         }
         
-        String format = (String) getParameter("FORMAT", 'O', "String");
+        String format = getParameter("FORMAT", 'O');
         
         
         //we marshall the response and return the XML String

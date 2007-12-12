@@ -41,7 +41,7 @@ import net.seagis.coverage.wms.WMSExceptionCode;
  * @author Martin Desruisseaux
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ServiceExceptionType", propOrder = {"value"})
+@XmlType(name = "ServiceExceptionType", propOrder = {"message"})
 public final class ServiceExceptionType {
     /**
      * The exception message.

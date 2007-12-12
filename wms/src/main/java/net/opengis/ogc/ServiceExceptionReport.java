@@ -47,7 +47,7 @@ import org.geotools.util.Version;
  * @author Martin Desruisseaux
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {"serviceException"})
+@XmlType(name = "", propOrder = {"serviceExceptions"})
 @XmlRootElement(name = "ServiceExceptionReport")
 public final class ServiceExceptionReport {
     /**
