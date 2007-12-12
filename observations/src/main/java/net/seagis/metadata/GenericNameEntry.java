@@ -85,7 +85,7 @@ public class GenericNameEntry extends Entry implements GenericName {
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(GenericName o) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

@@ -46,7 +46,7 @@ public class InternationalStringEntry implements InternationalString {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public int compareTo(Object o) {
+    public int compareTo(InternationalString o) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

@@ -29,10 +29,10 @@ import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.sampling.SamplingFeatureCollection;
 
 // Sicade dependencies
-import net.seagis.util.DateRange;
 import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
 import net.seagis.observation.SamplingFeatureTable;
+import org.geotools.util.DateRange;
 
 
 

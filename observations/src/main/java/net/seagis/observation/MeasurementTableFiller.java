@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.awt.Component;
-import java.awt.geom.Point2D;
 import java.sql.SQLException;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.ServerException;
@@ -37,7 +36,6 @@ import org.geotools.gui.swing.ExceptionMonitor;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 
 // Sicade dependencies
-import net.seagis.observation.MeasurementTable;
 import net.seagis.coverage.model.DescriptorTable;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.XArray;
