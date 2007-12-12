@@ -20,7 +20,7 @@
   -->
   <groupId>net.seagis</groupId>
   <artifactId>wms</artifactId>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <name>Web Map Service</name>
   <description>
     A Web Map Service producing maps of spatially referenced data dynamically from geographic information.
@@ -56,6 +56,26 @@
       <groupId>net.seagis</groupId>
       <artifactId>postgrid</artifactId>
       <version>${project.version}</version>
+    </dependency>
+	<dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>persistence-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+	<dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4</version>
+    </dependency>
+	<dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
+      <version>1.0-RC2</version>
+    </dependency>
+	<dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+      <version>0.9</version>
     </dependency>
     <dependency>
       <groupId>jersey</groupId>
