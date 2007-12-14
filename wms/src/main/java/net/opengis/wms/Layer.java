@@ -138,7 +138,7 @@ public class Layer {
      }
 
     /**
-     * Build a new capability object.
+     * Build a new Layer object.
      */
     public Layer(final String name, final String title, final String _abstract,
             final KeywordList keywordList, final List<String> crs, final EXGeographicBoundingBox exGeographicBoundingBox,

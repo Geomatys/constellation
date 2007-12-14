@@ -17,6 +17,7 @@ package net.seagis.coverage.wms;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.logging.Logger;
@@ -31,6 +32,10 @@ import javax.xml.bind.Marshaller;
 import net.seagis.catalog.Database;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.Unmarshaller;
+import net.opengis.sld.DescribeLayerResponseType;
+import net.opengis.sld.LayerDescriptionType;
+import net.opengis.sld.StyledLayerDescriptor;
+import net.opengis.wms.Layer;
 import net.opengis.wms.WMSCapabilities;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
@@ -50,11 +55,26 @@ public class WMService {
     
     private Logger logger = Logger.getLogger("fr.geomatys.wms");
     
+    /**
+     * A JAXB marshaller used to transform the java object in XML String.
+     */
     private Marshaller marshaller;
     
+    /**
+     * A JAXB unmarshaller used to create java object from XML file.
+     */
     private Unmarshaller unmarshaller;
     
+    /**
+     * The version of the WMS web service. fixed a 1.3.0 for now.
+     */
     private Version version = new Version("1.3.0");
+    
+    /**
+     * The version of the SLD profile for the WMS web service. fixed a 1.1.0 for now.
+     */
+    private Version sldVersion = new Version("1.1.0");
+    
     
     private WebServiceWorker webServiceWorker;
     
@@ -94,7 +114,7 @@ public class WMService {
    
     
     /**
-     * Treat the incomming request and call the right function.
+     * Treat the incomming GET request and call the right function.
      * 
      * @return an image or xml response.
      * @throw JAXBException
@@ -104,7 +124,7 @@ public class WMService {
 
         try {
             
-                String request = (String) getParameter("REQUEST", 'M');
+                String request = (String) getParameter("REQUEST", true);
                 if (request.equals("GetMap")) {
                     
                     return Response.Builder.representation(getMap(), webServiceWorker.getMimeType()).build();
@@ -116,6 +136,14 @@ public class WMService {
                 } else if (request.equals("GetCapabilities")) {
                     
                     return Response.Builder.representation(getCapabilities(), "text/xml").build();
+                    
+                } else if (request.equals("DescribeLayer")) {
+                    
+                    return Response.Builder.representation(describeLayer(), "text/xml").build();
+                    
+                } else if (request.equals("GetLegendGraphic")) {
+                    
+                    return Response.Builder.representation(getLegendGraphic(), webServiceWorker.getMimeType()).build();
                     
                 } else {
                     throw new WebServiceException("The operation " + request + " is not supported by the service",
@@ -130,42 +158,84 @@ public class WMService {
     }
 
     /**
-     * Verify the base parameter or each request
+     * Verify the base parameter or each request.
+     * 
+     * @param sld if true the operation versify as well the version of the sld.
      * 
      * @throws net.seagis.coverage.web.WebServiceException
      */
-    private void verifyBaseParameter() throws WebServiceException {  
-        if (!getParameter("VERSION", 'M').equals(version.toString())) {
+    private void verifyBaseParameter(boolean sld) throws WebServiceException {  
+        if (!getParameter("VERSION", true).equals(version.toString())) {
             throw new WebServiceException("The parameter VERSION=" + version.toString() + "must be specify",
                                          WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
         }
+        if (sld) {
+            if (!getParameter("SLD_VERSION", true).equals(version.toString())) {
+                throw new WebServiceException("The parameter VERSION=" + version.toString() + "must be specify",
+                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
+            }
+        }
     } 
+   
     /**
      * Extract The parameter named parameterName from the query.
-     * If obligation is M (mandatory) and if the parameter is null it throw an exception.
-     * else if obligation is O it return null.
-     * This function made the parsing to the specified type.
+     * If the parameter is mandatory and if it is null it throw an exception.
+     * else it return null.
      * 
      * @param parameterName The name of the parameter.
-     * @param obligation can be M (Mandatory) or O (Optional) 
+     * @param mandatory true if this parameter is mandatory, false if its optional. 
      * 
      * @return the parameter or null if not specified
      * @throw WebServiceException
      */
-    private String getParameter(String parameterName, char obligation) throws WebServiceException {
+    private String getParameter(String parameterName, boolean mandatory) throws WebServiceException {
         
         MultivaluedMap parameters = context.getQueryParameters();
         LinkedList<String> list = (LinkedList) parameters.get(parameterName);
         if (list == null) {
-            if (obligation == 'O') {
-                return null;
-            } else {
-                throw new WebServiceException("The parameter " + parameterName + " must be specify",
+            list = (LinkedList) parameters.get(parameterName.toLowerCase());
+            if (list == null) {
+                if (!mandatory) {
+                    return null;
+                } else {
+                    throw new WebServiceException("The parameter " + parameterName + " must be specify",
                                               WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
-            }
-        } else {
-            return list.get(0);
+                }
+            } 
         } 
+        
+        return list.get(0);
+    }
+    
+    /**
+     * Extract The complex parameter encoded in XML from the query.
+     * If the parameter is mandatory and if it is null it throw an exception.
+     * else it return null.
+     * 
+     * @param parameterName The name of the parameter.
+     * @param mandatory true if this parameter is mandatory, false if its optional. 
+     * 
+     * @return the parameter or null if not specified
+     * @throw WebServiceException
+     */
+    private Object getComplexParameter(String parameterName, boolean mandatory) throws WebServiceException, JAXBException {
+        
+        MultivaluedMap parameters = context.getQueryParameters();
+        LinkedList<String> list = (LinkedList) parameters.get(parameterName);
+        if (list == null) {
+            list = (LinkedList) parameters.get(parameterName.toLowerCase());
+            if (list == null) {
+                if (!mandatory) {
+                    return null;
+                } else {
+                    throw new WebServiceException("The parameter " + parameterName + " must be specify",
+                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
+                }
+            } 
+        }
+        StringReader sr = new StringReader(list.get(0));
+                
+        return unmarshaller.unmarshal(sr);
     }
    
     /**
@@ -177,41 +247,53 @@ public class WMService {
     private File getMap() throws  WebServiceException {
         logger.info("getMap request received");
         
-        verifyBaseParameter();
-        webServiceWorker.setFormat(getParameter("FORMAT", 'M'));
-        webServiceWorker.setLayer(getParameter("LAYERS", 'M'));
-        webServiceWorker.setCoordinateReferenceSystem(getParameter("CRS", 'M'));
-        webServiceWorker.setBoundingBox(getParameter("BBOX", 'M'));
-        webServiceWorker.setElevation(getParameter("ELEVATION", 'O'));
-        webServiceWorker.setTime(getParameter("TIME", 'O'));
-        webServiceWorker.setDimension(getParameter("WIDTH", 'M'), getParameter("HEIGHT", 'M'));
+        verifyBaseParameter(false);
+        
+        //we set the attribute od the webservice worker with the parameters.
+        webServiceWorker.setFormat(getParameter("FORMAT", true));
+        webServiceWorker.setLayer(getParameter("LAYERS", true));
+        webServiceWorker.setCoordinateReferenceSystem(getParameter("CRS", true));
+        webServiceWorker.setBoundingBox(getParameter("BBOX", true));
+        webServiceWorker.setElevation(getParameter("ELEVATION", false));
+        webServiceWorker.setTime(getParameter("TIME", false));
+        webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true));
 
         //this parameters are not yet used
-        String styles       = getParameter("STYLES", 'M');
-        String transparent = getParameter("TRANSPARENT", 'O');
+        String styles      = getParameter("STYLES", true);
+        String transparent = getParameter("TRANSPARENT", false);
         
-        String bgColor = getParameter("BGCOLOR", 'O');
+        String bgColor = getParameter("BGCOLOR", false);
         if (bgColor == null) 
             bgColor = "0xFFFFFF";
+        
+        //extended parameter of the specification SLD
+        String sld           = getParameter("SLD", false);
+        String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
+        String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
         
         return webServiceWorker.getImageFile();
     }
     
+    /**
+     * 
+     * @return
+     * @throws net.seagis.coverage.web.WebServiceException
+     */
     private Response getFeatureInfo() throws WebServiceException {
         logger.info("getFeatureInfo request received");
         
-        verifyBaseParameter();
+        verifyBaseParameter(false);
         
-        String query_layers = getParameter("QUERY_LAYERS", 'M');
-        String info_format  = getParameter("INFO_FORMAT", 'M');
+        String query_layers = getParameter("QUERY_LAYERS", true);
+        String info_format  = getParameter("INFO_FORMAT", true);
         
-        String i = getParameter("I", 'M');
-        String j = getParameter("J", 'M');
+        String i = getParameter("I", true);
+        String j = getParameter("J", true);
        
         //and then the optional attribute
-        String feature_count = getParameter("FEATURE_COUNT", 'O');
+        String feature_count = getParameter("FEATURE_COUNT", false);
         
-        String exception = getParameter("EXCEPTIONS", 'O');
+        String exception = getParameter("EXCEPTIONS", false);
         if ( exception == null)
             exception = "XML";
         
@@ -229,6 +311,13 @@ public class WMService {
             return Response.Builder.representation(response, "application/vnd.ogc.gml").build();
     }
     
+    /**
+     * 
+     * @return a WMSCapabilities XML document describing the capabilities of the service.
+     * 
+     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws javax.xml.bind.JAXBException
+     */
     private String getCapabilities() throws WebServiceException, JAXBException {
         logger.info("getCapabilities request received");
         
@@ -236,25 +325,70 @@ public class WMService {
         WMSCapabilities response = (WMSCapabilities)unmarshaller.unmarshal(getCapabilitiesFile(false));
         
         //we begin by extract the mandatory attribute
-        if (!getParameter("SERVICE", 'M').equals("WMS")) {
+        if (!getParameter("SERVICE", true).equals("WMS")) {
             throw new WebServiceException("The parameters SERVICE=WMS must be specify",
                                          WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
         }
         
         //and the the optional attribute
-        String requestVersion = getParameter("VERSION", 'O');
+        String requestVersion = getParameter("VERSION", false);
         if (requestVersion != null && !requestVersion.equals(version.toString())) {
             throw new WebServiceException("The parameter VERSION must be 1.3.0",
                                          WMSExceptionCode.MISSING_PARAMETER_VALUE, this.version);
         }
         
-        String format = getParameter("FORMAT", 'O');
+        String format = getParameter("FORMAT", false);
         
-        response.getCapability().
+        Layer layer = null;
+        response.getCapability().setLayer(layer);
         //we marshall the response and return the XML String
         StringWriter sw = new StringWriter();    
         marshaller.marshal(response, sw);
         return sw.toString();
+        
+    }
+    
+    
+    
+    /**
+     * 
+     * @return
+     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws javax.xml.bind.JAXBException
+     */
+    private String describeLayer() throws WebServiceException, JAXBException {
+        
+        verifyBaseParameter(true);
+        
+        String layers = getParameter("LAYERS", true);
+        
+        LayerDescriptionType layersDescription = new LayerDescriptionType(null);         
+        DescribeLayerResponseType response = new DescribeLayerResponseType(sldVersion.toString(), layersDescription);
+       
+        //we marshall the response and return the XML String
+        StringWriter sw = new StringWriter();    
+        marshaller.marshal(response, sw);
+        return sw.toString();
+    }
+    
+    
+    private File getLegendGraphic() throws WebServiceException, JAXBException {
+        
+        verifyBaseParameter(true);
+        
+        String layer = getParameter("LAYER", true);
+        String style = getParameter("STYLE", false);
+       
+        String remoteSld     = getParameter("SLD", false);
+        String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
+        String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
+        String coverage      = getParameter("COVERAGE", false);
+        String rule          = getParameter("RULE", false);
+        String scale         = getParameter("SCALE", false);
+        
+        StyledLayerDescriptor sld = (StyledLayerDescriptor) getComplexParameter("SLD_BODY", false);
+        
+        return new File("null");
         
     }
     

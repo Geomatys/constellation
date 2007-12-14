@@ -101,7 +101,7 @@ public class Capability {
      * Gets the value of the layer property.
      */
     public void setLayer(Layer layer) {
-        return layer;
+        this.layer = layer;
     }
 
 }
