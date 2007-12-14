@@ -96,5 +96,12 @@ public class Capability {
     public Layer getLayer() {
         return layer;
     }
+    
+     /**
+     * Gets the value of the layer property.
+     */
+    public void setLayer(Layer layer) {
+        return layer;
+    }
 
 }

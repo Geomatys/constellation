@@ -68,7 +68,7 @@ import static net.seagis.coverage.wms.WMSExceptionCode.*;
  *
  * @version $Id$
  * @author Martin Desruisseaux
- * @author Guihlem Legal
+ * @author Guilhem Legal
  */
 public class WebServiceWorker {
     /**
@@ -494,6 +494,7 @@ public class WebServiceWorker {
         final Layer layer = getLayer();
         final CoverageReference ref;
         try {
+            time = new Date(86,0,1);
             ref = layer.getCoverageReference(time, elevation);
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
