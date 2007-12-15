@@ -1,0 +1,128 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package net.seagis.coverage.web;
+
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.SampleModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.IndexColorModel;
+
+import org.geotools.coverage.grid.GridCoverage2D;
+import net.seagis.coverage.catalog.Layer;
+import net.seagis.coverage.catalog.LayerTableTest;
+import net.seagis.catalog.DatabaseTest;
+
+import org.junit.Test;
+
+
+/**
+ * Tests {@link WebServiceWorkerTest}.
+ *
+ * @author Martin Desruisseaux
+ */
+public class WebServiceWorkerTest extends DatabaseTest {
+    /**
+     * Tests with the default test layer.
+     */
+    @Test
+    public void testSST() throws WebServiceException, IOException {
+        final WebServiceWorker worker = new WebServiceWorker(database);
+        worker.setService("WMS", "1.0");
+        worker.setLayer(LayerTableTest.SAMPLE_NAME);
+        worker.setCoordinateReferenceSystem("EPSG:4326");
+        worker.setTime(LayerTableTest.SAMPLE_TIME_AS_TEXT);
+
+        Layer layer = worker.getLayer();
+        assertEquals(layer.getName(), LayerTableTest.SAMPLE_NAME);
+        assertSame("The layer should be cached.", layer, worker.getLayer());
+
+        GridCoverage2D coverage = worker.getGridCoverage2D(false);
+        assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
+        assertSame("Expected no ressampling.",       coverage, worker.getGridCoverage2D(true ));
+
+        String format = worker.getMimeType();
+        assertEquals("image/png", format);
+
+        File file = worker.getImageFile();
+        assertTrue(file.getName().endsWith(".png"));
+        assertTrue(file.isFile());
+
+        RenderedImage image = ImageIO.read(file);
+        assertEquals(4096, image.getWidth());
+        assertEquals(2048, image.getHeight());
+        assertEquals(IndexColorModel.class, image.getColorModel().getClass());
+        IndexColorModel model = (IndexColorModel) image.getColorModel();
+        assertEquals(256, model.getMapSize());
+
+        /*
+         * Forces a crop.
+         */
+        int width  = 342; // Expected width
+        int height = 341; // Expected height
+        worker.setBoundingBox("-10,20,20,50");
+        assertEquals(layer.getName(), LayerTableTest.SAMPLE_NAME);
+        assertSame("The layer should be cached.", layer, worker.getLayer());
+        assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
+
+        image = worker.getRenderedImage();
+        assertEquals(width,  image.getWidth());
+        assertEquals(height, image.getHeight());
+        if (false) {
+            SampleModel sm = image.getSampleModel();
+            assertEquals(width,  image.getTileWidth());
+            assertEquals(height, image.getTileHeight());
+            assertEquals(1,      image.getNumXTiles());
+            assertEquals(1,      image.getNumYTiles());
+            assertEquals(width,  sm.getWidth());
+            assertEquals(height, sm.getHeight());
+        }
+        file = worker.getImageFile();
+        assertTrue(file.getName().endsWith(".png"));
+        assertTrue(file.isFile());
+
+        image = ImageIO.read(file);
+        assertEquals(width,  image.getWidth());
+        assertEquals(height, image.getHeight());
+        assertEquals(IndexColorModel.class, image.getColorModel().getClass());
+        model = (IndexColorModel) image.getColorModel();
+        assertEquals(256, model.getMapSize());
+
+        /*
+         * Adds a size.
+         */
+        width  = 300; // Expected width
+        height = 300; // Expected height
+        worker.setDimension("300","300");
+        assertEquals(layer.getName(), LayerTableTest.SAMPLE_NAME);
+        assertSame("The layer should be cached.", layer, worker.getLayer());
+        assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
+
+        image = worker.getRenderedImage();
+        assertEquals(width,  image.getWidth());
+        assertEquals(height, image.getHeight());
+        file = worker.getImageFile();
+        assertTrue(file.getName().endsWith(".png"));
+        assertTrue(file.isFile());
+
+        image = ImageIO.read(file);
+        assertEquals(width,  image.getWidth());
+        assertEquals(height, image.getHeight());
+        assertEquals(IndexColorModel.class, image.getColorModel().getClass());
+        model = (IndexColorModel) image.getColorModel();
+        assertEquals(256, model.getMapSize());
+    }
+}

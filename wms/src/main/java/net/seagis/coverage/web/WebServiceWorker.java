@@ -17,6 +17,7 @@ package net.seagis.coverage.web;
 import java.io.*;
 import java.util.*;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -268,7 +269,7 @@ public class WebServiceWorker {
      * @throws WebServiceException if the layer is not recognize.
      */
     public void setLayer(String layer) throws WebServiceException {
-        if (layer != null) {
+        if (layer == null) {
             this.layer = null;
         } else {
             layer = layer.trim();
@@ -387,20 +388,31 @@ public class WebServiceWorker {
         }
         gridRange = new GeneralGridRange(new int[upper.length], upper);
     }
-    
+
     /**
      * Sets the time, or {@code null} if unknown.
      *
      * @param  elevation The elevation.
      * @throws WebServiceException if the elevation can't be parsed from the given string.
+     *
+     * @todo Needs to take the whole list in account.
      */
     public void setTime(String date) throws WebServiceException {
         if (date == null) {
             time = null;
             return;
         }
-        date = date.trim();
-        
+        final List<Date> dates;
+        try {
+            dates = TimeParser.parse(date.trim(), TimeParser.MILLIS_IN_DAY);
+        } catch (ParseException exception) {
+            throw new WebServiceException(exception, INVALID_PARAMETER_VALUE, version);
+        }
+        if (dates.isEmpty()) {
+            time = null;
+        } else {
+            time = dates.get(0);
+        }
     }
 
     /**
@@ -455,7 +467,7 @@ public class WebServiceWorker {
      *
      * @throws WebServiceException if an error occured while fetching the table.
      */
-    private Layer getLayer() throws WebServiceException {
+    public Layer getLayer() throws WebServiceException {
         if (layer == null) {
             throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "layer"),
                     LAYER_NOT_DEFINED, version);
@@ -491,6 +503,10 @@ public class WebServiceWorker {
      * @throws WebServiceException if an error occured while querying the coverage.
      */
     public GridCoverage2D getGridCoverage2D(final boolean resample) throws WebServiceException {
+        if (time == null) {
+            throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1,
+                    "time"), MISSING_PARAMETER_VALUE, version);
+        }
         final Layer layer = getLayer();
         final CoverageReference ref;
         try {
@@ -506,16 +522,18 @@ public class WebServiceWorker {
                     exception, LAYER_NOT_QUERYABLE, version);
         }
         if (resample && envelope != null) {
+            final CoordinateReferenceSystem targetCRS = envelope.getCoordinateReferenceSystem();
             final Operations op = Operations.DEFAULT;
             if (gridRange != null) {
                 final GridGeometry gridGeometry;
-                final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
                 if (envelope.isInfinite()) {
-                    gridGeometry = new GeneralGridGeometry(gridRange, null, crs);
+                    gridGeometry = new GeneralGridGeometry(gridRange, null, targetCRS);
                 } else {
                     gridGeometry = new GeneralGridGeometry(gridRange, envelope);
                 }
-                coverage = (GridCoverage2D) op.resample(coverage, crs, gridGeometry, interpolation);
+                coverage = (GridCoverage2D) op.resample(coverage, targetCRS, gridGeometry, interpolation);
+            } else if (envelope.isInfinite()) {
+                coverage = (GridCoverage2D) op.resample(coverage, targetCRS, null, interpolation);
             } else {
                 coverage = (GridCoverage2D) op.resample(coverage, envelope, interpolation);
             }
@@ -678,7 +696,11 @@ public class WebServiceWorker {
             } else {
                 final String[] candidates = spi.getFileSuffixes();
                 if (candidates != null && candidates.length != 0) {
-                    writerSuffix = candidates[0];
+                    String candidate = candidates[0];
+                    if (!candidate.startsWith(".")) {
+                        candidate = '.' + candidate;
+                    }
+                    writerSuffix = candidate;
                 } else {
                     writerSuffix = DEFAULT_SUFFIX;
                 }

@@ -188,8 +188,8 @@ COMMENT ON VIEW "RangeOfFormats" IS
 
 CREATE TABLE "Layers" (
     "name"      character varying NOT NULL PRIMARY KEY,
-    "thematic"  character varying NOT NULL,
-    "procedure" character varying NOT NULL,
+    "thematic"  character varying,
+    "procedure" character varying,
     "period"    double precision,
     "fallback"  character varying REFERENCES "Layers" ON UPDATE CASCADE ON DELETE RESTRICT
 );
