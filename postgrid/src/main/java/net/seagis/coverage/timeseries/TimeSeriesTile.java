@@ -290,8 +290,7 @@ public class TimeSeriesTile {
         try {
             samples = coverage.evaluate(position, samples);
         } catch (CannotEvaluateException exception) {
-            Logging.unexpectedException("net.seagis.observation.coverage",
-                                        TimeSeriesTile.class, "evaluate", exception);
+            Logging.unexpectedException(TimeSeriesTile.class, "evaluate", exception);
             return Double.NaN;
         }
         return samples[band];

@@ -520,7 +520,7 @@ public class CoverageBuilder {
      * Appelée lorsqu'une exception non-fatale est survenue.
      */
     private static void unexpectedException(final String method, final Exception exception) {
-        Logging.unexpectedException("net.seagis.observation.coverage", CoverageBuilder.class, method, exception);
+        Logging.unexpectedException(CoverageBuilder.class, method, exception);
     }
 
     /**

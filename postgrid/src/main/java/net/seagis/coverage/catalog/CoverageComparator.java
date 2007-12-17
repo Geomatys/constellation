@@ -247,8 +247,7 @@ final class CoverageComparator implements Comparator<CoverageReference> {
      * Signale qu'une exception inatendue est survenue lors de l'exécution de {@link #evaluator}.
      */
     private static void unexpectedException(final Exception exception) {
-        Logging.unexpectedException("net.seagis.observation.coverage",
-                                    CoverageComparator.class, "evaluator", exception);
+        Logging.unexpectedException(CoverageComparator.class, "evaluator", exception);
     }
 
     /**
