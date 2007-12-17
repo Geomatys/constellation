@@ -18,7 +18,6 @@ package org.geotools.referencing.factory.wkt;
 
 import java.util.Set;
 import java.util.Collections;
-import junit.framework.TestCase;
 
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.GeographicCRS;
@@ -31,7 +30,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.citation.Citations;
 
-import net.seagis.catalog.Database;
+import net.seagis.catalog.DatabaseTest;
 
 
 /**
@@ -41,12 +40,11 @@ import net.seagis.catalog.Database;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class PostgisAuthorityFactoryTest extends TestCase {
+public class PostgisAuthorityFactoryTest extends DatabaseTest {
     /**
      * Every tests grouped in a single method in order to get the connection only once.
      */
     public void testConnected() throws Exception {
-        final Database database = new Database();
         final PostgisAuthorityFactory factory = new PostgisAuthorityFactory(null, database.getConnection());
         assertEquals(Citations.EPSG, factory.getAuthority());
 
@@ -90,6 +88,5 @@ public class PostgisAuthorityFactoryTest extends TestCase {
         assertTrue(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
 
         factory.dispose();
-        database.close();
     }
 }

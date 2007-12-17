@@ -158,7 +158,7 @@
       <plugin>
         <groupId>org.geotools.maven</groupId>
         <artifactId>gt2-rmic</artifactId>
-        <version>2.5-SNAPSHOT</version>
+        <version>${geotools.version}</version>
         <configuration>
           <includes>
             net.seagis.coverage.catalog.Server,

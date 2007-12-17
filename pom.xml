@@ -331,6 +331,9 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <useSystemClassLoader>true</useSystemClassLoader>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.geotools.maven</groupId>
