@@ -54,6 +54,8 @@ import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTable;
+import net.seagis.resources.i18n.ResourceKeys;
+import net.seagis.resources.i18n.Resources;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 
@@ -488,6 +490,10 @@ public class WebServiceWorker {
                     throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
                 } catch (SQLException exception) {
                     throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+                }
+                if (candidate == null) {
+                    throw new WebServiceException(Resources.format(
+                            ResourceKeys.ERROR_SERIES_NOT_FOUND_$1, layer), LAYER_NOT_DEFINED, version);
                 }
                 layers.put(request, candidate);
             }

@@ -169,6 +169,26 @@
         <version>0.4-ea</version>
       </dependency>
       <dependency>
+        <groupId>javax.persistence</groupId>
+        <artifactId>persistence-api</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jettison</groupId>
+        <artifactId>jettison</artifactId>
+        <version>1.0-RC2</version>
+      </dependency>
+      <dependency>
+        <groupId>rome</groupId>
+        <artifactId>rome</artifactId>
+        <version>0.9</version>
+      </dependency>
+      <dependency>
         <groupId>org.opengis</groupId>
         <artifactId>geoapi</artifactId>
         <version>2.2-SNAPSHOT</version>
