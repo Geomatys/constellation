@@ -19,7 +19,8 @@ import junit.textui.TestRunner;
 
 
 /**
- * All PostGrid-related tests.
+ * All PostGrid-related tests. They are grouped in this suite in order to open
+ * the database connection only once.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -30,6 +31,7 @@ public class PostGridSuite extends TestSuite {
      */
     public PostGridSuite() {
         addTestSuite(net.seagis.catalog.DatabaseTest.Open.class); // Must be first
+
         addTestSuite(org.geotools.referencing.factory.wkt.PostgisAuthorityFactoryTest.class);
 
         addTestSuite(net.seagis.catalog.         SpatialFunctionsTest         .class);
@@ -49,6 +51,9 @@ public class PostGridSuite extends TestSuite {
         addTestSuite(net.seagis.coverage.model  .OperationTableTest           .class);
         addTestSuite(net.seagis.coverage.model  .DistributionTableTest        .class);
         addTestSuite(net.seagis.coverage.model  .DescriptorTableTest          .class);
+        addTestSuite(net.seagis.coverage.web    .TimeParserTest               .class);
+        addTestSuite(net.seagis.coverage.web    .WebServiceWorkerTest         .class);
+
         addTestSuite(net.seagis.catalog.DatabaseTest.Close.class); // Must be last
     }
 

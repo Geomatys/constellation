@@ -25,8 +25,7 @@ import net.seagis.widget.CoverageTableModel;
 
 /**
  * Teste l'utilisation de la classe {@link Catalog}.
- * 
- * 
+ *
  * @author Martin Desruisseaux
  * @version $Id$
  * @todo Ajouter des tests sur le même modèle que ceux que l'on peut trouver dans le projet SICADE.

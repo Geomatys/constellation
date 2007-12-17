@@ -150,8 +150,8 @@
 
 
   <!--
-    Compilation et création du fichier JAR. Par rapport à la configuration
-    définie dans le pom.xml parent, on ajoute la compilation des stubs RMI.
+    Compiles and creates the JAR files. We inherit the configuration
+    from the parent "pom.xml" and add the compilation of RMI stubs.
   -->
   <build>
     <plugins>
@@ -176,8 +176,9 @@
       </plugin>
 
       <!--
-        Exécution des tests. La propriété "rmi.enabled" indique si
-        la suite de tests est autorisée à se connecter au serveur RMI.
+        Executes the test suite. The "rmi.enabled" property tells if the
+        test suite is allowed to connect to a RMI server. For those tests,
+        we don't want RMI.
       -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
