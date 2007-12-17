@@ -103,13 +103,14 @@ public class WMService {
     public WMService() throws JAXBException, IOException, WebServiceException {
         
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        JAXBContext jbcontext = JAXBContext.newInstance("net.opengis.ogc:net.opengis.wms");
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wms:net.seagis.sld");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl());
         unmarshaller = jbcontext.createUnmarshaller();
         
         webServiceWorker = new WebServiceWorker(new Database());
-        webServiceWorker.setService("WMS", "1.3.0");
+        webServiceWorker.setService("WMS", version.toString());
     }
    
     
@@ -191,15 +192,24 @@ public class WMService {
     private String getParameter(String parameterName, boolean mandatory) throws WebServiceException {
         
         MultivaluedMap parameters = context.getQueryParameters();
+        //we try with the parameter in Upper case.
         LinkedList<String> list = (LinkedList) parameters.get(parameterName);
         if (list == null) {
+            //else with the parameter in lower case.
             list = (LinkedList) parameters.get(parameterName.toLowerCase());
             if (list == null) {
-                if (!mandatory) {
-                    return null;
-                } else {
-                    throw new WebServiceException("The parameter " + parameterName + " must be specify",
+                //and finally with the first character in uppercase
+                String s = parameterName.toLowerCase();
+                s = s.substring(1);
+                s = parameterName.charAt(0) + s;
+                list = (LinkedList) parameters.get(s);
+                if (list == null) {
+                    if (!mandatory) {
+                        return null;
+                    } else {
+                        throw new WebServiceException("The parameter " + parameterName + " must be specify",
                                               WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
+                    }
                 }
             } 
         } 
@@ -312,6 +322,7 @@ public class WMService {
     }
     
     /**
+     * Describe the capabilities and the layers available of this service.
      * 
      * @return a WMSCapabilities XML document describing the capabilities of the service.
      * 
@@ -333,13 +344,14 @@ public class WMService {
         //and the the optional attribute
         String requestVersion = getParameter("VERSION", false);
         if (requestVersion != null && !requestVersion.equals(version.toString())) {
-            throw new WebServiceException("The parameter VERSION must be 1.3.0",
+            throw new WebServiceException("The parameter VERSION must be " + version.toString(),
                                          WMSExceptionCode.MISSING_PARAMETER_VALUE, this.version);
         }
         
         String format = getParameter("FORMAT", false);
         
         Layer layer = null;
+        
         response.getCapability().setLayer(layer);
         //we marshall the response and return the XML String
         StringWriter sw = new StringWriter();    

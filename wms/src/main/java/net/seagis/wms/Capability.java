@@ -1,11 +1,12 @@
 package net.seagis.wms;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -46,8 +47,8 @@ public class Capability {
     private Request request;
     @XmlElement(name = "Exception", required = true)
     private Exception exception;
-    @XmlElement(name = "_ExtendedCapabilities")
-    private List<Object> extendedCapabilities = new ArrayList<Object>();
+    @XmlElementRef(name = "_ExtendedCapabilities", namespace = "http://www.opengis.net/wms", type = JAXBElement.class)
+    protected List<JAXBElement<?>> extendedCapabilities;
     @XmlElement(name = "Layer")
     private Layer layer;
 
@@ -61,11 +62,11 @@ public class Capability {
      * Build a new capability object.
      */
     public Capability(final Request request, final Exception exception, final Layer layer,
-            final Object... extendedCapabilities) {
+            final JAXBElement<?>... extendedCapabilities) {
         this.request   = request;
         this.exception = exception;
         this.layer     = layer;
-        for (final Object element : extendedCapabilities) {
+        for (final JAXBElement<?> element : extendedCapabilities) {
             this.extendedCapabilities.add(element);
         }
     }
@@ -86,7 +87,7 @@ public class Capability {
     /**
      * Gets the value of the extendedCapabilities property.
      */
-    public List<Object> getExtendedCapabilities() {
+    public List<JAXBElement<?>> getExtendedCapabilities() {
         return Collections.unmodifiableList(extendedCapabilities);
     }
 

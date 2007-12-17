@@ -1,3 +1,18 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package net.seagis.sld;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -25,7 +40,7 @@ import net.seagis.se.OnlineResourceType;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -37,28 +52,17 @@ public class UseSLDLibrary {
     @XmlElement(name = "OnlineResource", namespace = "http://www.opengis.net/se", required = true)
     protected OnlineResourceType onlineResource;
 
+    UseSLDLibrary(){
+    }
+    
+    public UseSLDLibrary(OnlineResourceType onlineResource){
+        this.onlineResource = onlineResource;
+    }
+    
     /**
      * Gets the value of the onlineResource property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link OnlineResourceType }
-     *     
      */
     public OnlineResourceType getOnlineResource() {
         return onlineResource;
     }
-
-    /**
-     * Sets the value of the onlineResource property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link OnlineResourceType }
-     *     
-     */
-    public void setOnlineResource(OnlineResourceType value) {
-        this.onlineResource = value;
-    }
-
 }
