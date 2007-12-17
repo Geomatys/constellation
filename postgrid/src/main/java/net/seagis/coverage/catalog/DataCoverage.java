@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.rmi.RemoteException;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.SampleDimension;
@@ -30,6 +29,7 @@ import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.util.UnsupportedImplementationException;
 
 import net.seagis.coverage.model.Operation;
 import net.seagis.coverage.model.Descriptor;
@@ -56,14 +56,15 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     private static final long serialVersionUID = -7029210034299675921L;
 
     /**
-     * Connexion vers la source de données.
+     * Connection to the grid coverage table.
      */
-    private final DataConnection data;
+    private final GridCoverageTable data;
 
     /**
-     * Sources de données de second recours, ou un tableau de longeur 0 si aucune.
+     * Connection to the tables to use as fallback, or an empty array if none.
+     * Should never be {@code null}.
      */
-    private final DataConnection[] fallback;
+    private final GridCoverageTable[] fallback;
 
     /**
      * L'unique bande de cette couverture. Cette bande est déterminée dès la construction afin
@@ -93,9 +94,8 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      * vers les données} sera établie automatiquement à partir du descripteur spécifié.
      *
      * @param  descriptor Descripteur pour lequel on veut une vue des données.
-     * @throws RemoteException si une connexion à un serveur distant a échoué.
      */
-    public DataCoverage(final Descriptor descriptor) throws RemoteException {
+    public DataCoverage(final Descriptor descriptor) {
         this(descriptor, getDataConnection(descriptor));
     }
 
@@ -104,9 +104,8 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      *
      * @param  descriptor Descripteur pour lequel on veut une vue des données.
      * @param  data La source de données à utiliser.
-     * @throws RemoteException si une connexion à un serveur distant a échoué.
      */
-    private DataCoverage(final Descriptor descriptor, final DataConnection data) throws RemoteException {
+    private DataCoverage(final Descriptor descriptor, final GridCoverageTable data) {
         super(descriptor.getName(), data.getCoordinateReferenceSystem(), null, null);
         final RegionOfInterest offset = descriptor.getRegionOfInterest();
         this.data = data;
@@ -130,11 +129,11 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
          * Recherche les sources de données de second recours.
          */
         final Operation operation = descriptor.getOperation();
-        final List<DataConnection> fallback = new ArrayList<DataConnection>();
+        final List<GridCoverageTable> fallback = new ArrayList<GridCoverageTable>();
         Layer layer = descriptor.getLayer();
         while ((layer=layer.getFallback()) != null) {
             if (layer instanceof LayerEntry) {
-                final DataConnection candidate = ((LayerEntry) layer).getDataConnection(operation);
+                final GridCoverageTable candidate = ((LayerEntry) layer).getDataConnection(operation);
                 if (crs.equals(candidate.getCoordinateReferenceSystem())) {
                     fallback.add(candidate);
                     continue;
@@ -142,7 +141,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
             }
             Layer.LOGGER.warning("Couche de second recours ignorée: \""+layer.getName() + '"');
         }
-        this.fallback = fallback.toArray(new DataConnection[fallback.size()]);
+        this.fallback = fallback.toArray(new GridCoverageTable[fallback.size()]);
     }
 
     /**
@@ -150,10 +149,10 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      * dans le premier constructeur si seulement Sun voulait bien faire le RFE #4093999
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static DataConnection getDataConnection(final Descriptor descriptor) throws RemoteException {
+    private static GridCoverageTable getDataConnection(final Descriptor descriptor) {
         final Layer layer = descriptor.getLayer();
         if (!(layer instanceof LayerEntry)) {
-            throw new UnsupportedOperationException("Implémentation non-supportée de la couche.");
+            throw new UnsupportedImplementationException("Implémentation non-supportée de la couche.");
         }
         return ((LayerEntry) layer).getDataConnection(descriptor.getOperation());
     }
@@ -168,8 +167,6 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
             try {
                 e = data.getEnvelope();
             } catch (CatalogException exception) {
-                throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
-            } catch (RemoteException exception) {
                 throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
             }
             if (dt != 0) {

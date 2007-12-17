@@ -474,7 +474,7 @@ public class WebServiceWorker {
             throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "layer"),
                     LAYER_NOT_DEFINED, version);
         }
-        final LayerRequest request = new LayerRequest(layer, envelope, null);
+        final LayerRequest request = new LayerRequest(layer, envelope, gridRange);
         Layer candidate;
         synchronized (layers) {
             candidate = layers.get(request);
@@ -483,6 +483,7 @@ public class WebServiceWorker {
                     if (layerTable == null) {
                         layerTable = new LayerTable(database.getTable(LayerTable.class));
                     }
+                    layerTable.setGeographicBoundingBox(request.getGeographicBoundingBox());
                     candidate = layerTable.getEntry(layer);
                 } catch (NoSuchRecordException exception) {
                     throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);

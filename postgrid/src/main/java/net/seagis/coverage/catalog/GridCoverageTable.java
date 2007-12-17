@@ -61,7 +61,7 @@ import static net.seagis.catalog.QueryType.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> implements DataConnection {
+public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> {
     /**
      * Le modèle à utiliser pour formatter des angles.
      */
@@ -806,8 +806,9 @@ loop:   for (final CoverageReference newReference : entries) {
 
     /**
      * Prépare l'évaluation d'un point.
+     *
+     * @deprecated Move in some CoverageWrapper class. Copy Javadoc from DataConnection.
      */
-    @SuppressWarnings("fallthrough")
     private void prepare(final DirectPosition location)
             throws CatalogException, SQLException, IOException
     {
@@ -825,6 +826,8 @@ loop:   for (final CoverageReference newReference : entries) {
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated Move in some CoverageWrapper class. Copy Javadoc from DataConnection.
      */
     public synchronized double evaluate(final double x, final double y, final double t, final short band)
             throws CatalogException, SQLException, IOException
@@ -836,6 +839,8 @@ loop:   for (final CoverageReference newReference : entries) {
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated Move in some CoverageWrapper class. Copy Javadoc from DataConnection.
      */
     public synchronized double[] snap(final double x, final double y, final double t)
             throws CatalogException, SQLException, IOException
@@ -847,6 +852,8 @@ loop:   for (final CoverageReference newReference : entries) {
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated Move in some CoverageWrapper class. Copy Javadoc from DataConnection.
      */
     @SuppressWarnings("unchecked")
     public synchronized List<Coverage> coveragesAt(final DirectPosition position)

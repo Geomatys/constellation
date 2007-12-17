@@ -27,7 +27,6 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.rmi.RemoteException;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -111,24 +110,22 @@ final class LayerEntry extends Entry implements Layer {
     private transient Reference<Coverage> coverage;
 
     /**
-     * La fabrique à utiliser pour construire des objets {@link CoverageReference}. Cette fabrique
-     * peut être un objet {@link java.rmi.server.RemoteServer}, et donc construire les images sur
-     * un serveur distant.
+     * Connection to the grid coverage table. Will be created when first needed.
      */
-    private DataConnection server;
+    private GridCoverageTable server;
 
     /**
      * Ensemble des fabriques pour différentes opérations. Ne seront construites que lorsque
      * nécessaire. Si {@link #server} était une connexion vers un objet RMI, alors il en sera
      * de même pour les valeurs de ce {@code Map}.
      */
-    private transient Map<Operation,DataConnection> servers;
+    private transient Map<Operation,GridCoverageTable> servers;
 
     /**
      * La fabrique à utiliser pour obtenir une seule image à une date spécifique.
      * Ne sera construit que la première fois où elle sera nécessaire.
      */
-    private transient DataConnection singleCoverageServer;
+    private transient GridCoverageTable singleCoverageServer;
 
     /**
      * Construit une nouvelle couches.
@@ -219,12 +216,10 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
-        final DataConnection server = this.server;   // Protect against concurrent changes.
+        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
             return server.getAvailableTimes();
         } catch (SQLException e) {
-            throw new ServerException(e);
-        } catch (RemoteException e) {
             throw new ServerException(e);
         }
         return null;
@@ -234,12 +229,10 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
-        final DataConnection server = this.server;   // Protect against concurrent changes.
+        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
             return server.getAvailableElevations();
         } catch (SQLException e) {
-            throw new ServerException(e);
-        } catch (RemoteException e) {
             throw new ServerException(e);
         }
         return null;
@@ -278,11 +271,9 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public DateRange getTimeRange() throws CatalogException {
-        final DataConnection server = this.server;   // Protect against concurrent changes.
-        if (server != null) try {
+        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
+        if (server != null) {
             return server.getTimeRange();
-        } catch (RemoteException e) {
-            throw new ServerException(e);
         }
         return null;
     }
@@ -291,11 +282,9 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
-        final DataConnection server = this.server;   // Protect against concurrent changes.
-        if (server != null) try {
+        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
+        if (server != null) {
             return server.getGeographicBoundingBox();
-        } catch (RemoteException e) {
-            throw new ServerException(e);
         }
         return GeographicBoundingBoxImpl.WORLD;
     }
@@ -321,8 +310,6 @@ final class LayerEntry extends Entry implements Layer {
             final double z = (elevation != null) ? elevation.doubleValue() : 0;
             singleCoverageServer.setVerticalRange(z, z); // TODO: choose a better range.
             return singleCoverageServer.getEntry();
-        } catch (RemoteException exception) {
-            throw new ServerException(exception);
         } catch (SQLException exception) {
             throw new ServerException(exception);
         }
@@ -332,11 +319,9 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public Set<CoverageReference> getCoverageReferences() throws CatalogException {
-        final DataConnection server = this.server;   // Protect against concurrent changes.
+        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
         if (server != null) try {
             return server.getEntries();
-        } catch (RemoteException exception) {
-            throw new ServerException(exception);
         } catch (SQLException exception) {
             throw new ServerException(exception);
         } else {
@@ -404,16 +389,15 @@ final class LayerEntry extends Entry implements Layer {
      *
      * @param  operation L'opération désirée, ou {@code null} si aucune.
      * @return Une connexion vers les données produites par l'opération spécifiée.
-     * @throws RemoteException  si un problème est survenu lors de la communication avec le serveur.
      */
-    protected synchronized DataConnection getDataConnection(final Operation operation) throws RemoteException {
+    protected synchronized GridCoverageTable getDataConnection(final Operation operation) {
         if (operation==null || server==null) {
             return server;
         }
         if (servers == null) {
-            servers = new HashMap<Operation,DataConnection>();
+            servers = new HashMap<Operation,GridCoverageTable>();
         }
-        DataConnection candidate = servers.get(operation);
+        GridCoverageTable candidate = servers.get(operation);
         if (candidate == null) {
             candidate = server.newInstance(operation);
             servers.put(operation, candidate);
@@ -429,7 +413,7 @@ final class LayerEntry extends Entry implements Layer {
      * @param data Connexion vers une vue des données comme une matrice tri-dimensionnelle.
      * @throws IllegalStateException si une connexion existait déjà pour cette entrée.
      */
-    protected synchronized void setDataConnection(final DataConnection data) throws IllegalStateException {
+    protected synchronized void setDataConnection(final GridCoverageTable data) throws IllegalStateException {
         if (server != null) {
             throw new IllegalStateException(getName());
         }

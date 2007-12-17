@@ -140,46 +140,14 @@
 
 
   <!--
-    Compiles and creates the JAR files. We inherit the configuration
-    from the parent "pom.xml" and add the compilation of RMI stubs.
+    Compiles and creates the JAR files.
   -->
   <build>
     <plugins>
       <plugin>
-        <groupId>org.geotools.maven</groupId>
-        <artifactId>gt2-rmic</artifactId>
-        <version>${geotools.version}</version>
-        <configuration>
-          <includes>
-            net.seagis.coverage.catalog.Server,
-            net.seagis.coverage.catalog.RemoteLoader,
-            net.seagis.coverage.catalog.GridCoverageServer
-          </includes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>rmic</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!--
-        Executes the test suite. The "rmi.enabled" property tells if the
-        test suite is allowed to connect to a RMI server. For those tests,
-        we don't want RMI.
-      -->
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <systemProperties>
-            <property>
-              <name>rmi.enabled</name>
-              <value>false</value>
-            </property>
-          </systemProperties>
           <includes>
             <include>**/*Suite.java</include>
           </includes>

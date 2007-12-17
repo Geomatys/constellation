@@ -14,9 +14,13 @@
  */
 package net.seagis.coverage.web;
 
-import java.awt.Dimension;
 import org.opengis.geometry.Envelope;
+import org.opengis.coverage.grid.GridRange;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+
 import org.geotools.resources.Utilities;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 /**
  * The request for a layer, including its envelope. To be used in a hash map only.
@@ -38,15 +42,28 @@ final class LayerRequest {
     /**
      * The size of target image.
      */
-    private final Dimension size;
+    private final GridRange size;
 
     /**
      * Crestes a {@code LayerRequest} for the given layer name, source envelope and target size.
      */
-    public LayerRequest(final String layer, final Envelope envelope, final Dimension size) {
+    public LayerRequest(final String layer, final Envelope envelope, final GridRange size) {
         this.layer    = layer;
         this.envelope = envelope;
         this.size     = size;
+    }
+
+    /**
+     * Returns the envelope as a geographic bounding box, or {@code null} if none.
+     */
+    public GeographicBoundingBox getGeographicBoundingBox() {
+        if (envelope != null) try {
+            return new GeographicBoundingBoxImpl(envelope);
+        } catch (TransformException exception) {
+            // Can't transform. Returns 'null', which is legal and means
+            // no geographic bounding box selection (return the full image).
+        }
+        return null;
     }
 
     /**

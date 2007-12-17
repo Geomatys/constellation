@@ -31,8 +31,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
-import java.rmi.server.RemoteStub;
-import java.rmi.RemoteException;
 import java.sql.SQLException;
 
 import java.util.Map;
@@ -89,7 +87,7 @@ import ucar.nc2.dataset.AxisType;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class GridCoverageEntry extends Entry implements CoverageReference, CoverageLoader {
+final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * Compare deux entrées selon le même critère que celui qui apparait dans l'instruction
      * {@code "ORDER BY"} de la réquête SQL de {@link GridCoverageTable}). Les entrés sans
@@ -177,13 +175,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * de détruire la table et ses connections vers la base de données.
      */
     private final GridCoverageSettings parameters;
-
-    /**
-     * Un décodeur sur lequel déléguer le chargement des images, ou {@code null} pour le lire
-     * directement avec cette entrée. Dans ce dernier cas, l'image sera typiquement rapatriée
-     * par FTP.
-     */
-    private CoverageLoader loader;
 
     /**
      * Référence molle vers l'image {@link GridCoverage2D} qui a été retournée lors du dernier appel
@@ -313,11 +304,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      * Returns the source as a {@link File} or an {@link URI}, in this preference order.
      */
     private Object getInput() throws IOException {
-        if (!(loader instanceof RemoteStub)) {
-            final File file = series.file(filename);
-            if (file.isAbsolute()) {
-                return file;
-            }
+        final File file = series.file(filename);
+        if (file.isAbsolute()) {
+            return file;
         }
         try {
             return series.uri(filename);
@@ -587,6 +576,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      *        NOTE: si on permet d'obtenir des images à différents index, il faudra en
      *              tenir compte dans {@link #gridCoverage} et {@link #renderedImage}.
      * @param listeners Liste des objets à informer des progrès de la lecture.
+     *
+     * @todo Current implementation requires a {@link FormatEntry} implementation.
      */
     private synchronized GridCoverage2D getCoverage(final int          imageIndex,
                                                     final IIOListeners listeners)
@@ -645,73 +636,53 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
                 LOGGER.fine("Charge une nouvelle fois les données de \"" + getName() + "\".");
             }
         }
-        /*
-         * Si la lecture de l'image doit être effectuée par un serveur distant, délègue cette lecture.
-         * Le serveur effectuera toutes les traitements jusqu'à l'application de l'opération, inclusivement.
-         */
-        GridCoverage2D coverage;
-        if (image==null && loader instanceof RemoteStub) {
-            coverage = loader.getCoverage();
-            image    = coverage.getRenderedImage();
-            coverage = coverage.geophysics(true);
-        } else {
-            /*
-             * A ce stade, nous savons que nous devrons effectuer la lecture nous-mêmes et nous
-             * disposons des coordonnées en pixels de la région à charger. Procède maintenant à
-             * la lecture.
-             *
-             * TODO: Current implementation requires a FormatEntry implementation.
-             */
-            final FormatEntry format = (FormatEntry) series.getFormat();
-            final GridSampleDimension[] bands;
-            try {
-                format.setReading(this, true);
-                synchronized (format) {
-                    final ImageReadParam param = format.getDefaultReadParam();
-                    if (!clipPixel.isEmpty()) {
-                        param.setSourceRegion(clipPixel);
-                    }
-                    param.setSourceSubsampling(subsampling.x,   subsampling.y,
-                                               subsampling.x/2, subsampling.y/2);
-                    if (band != 0) {
-                        // Selects a particular depth in a 3D coverage.
-                        param.setSourceBands(new int[] {band});
-                    }
-                    handleSpecialCases(param);
-                    if (image == null) {
-                        final Dimension size = geometry.getSize();
-                        image = format.read(getInput(), imageIndex, param, listeners, size, this);
-                        if (image == null) {
-                            return null;
-                        }
-                    }
-                    bands = format.getSampleDimensions(param);
+        final FormatEntry format = (FormatEntry) series.getFormat();
+        final GridSampleDimension[] bands;
+        try {
+            format.setReading(this, true);
+            synchronized (format) {
+                final ImageReadParam param = format.getDefaultReadParam();
+                if (!clipPixel.isEmpty()) {
+                    param.setSourceRegion(clipPixel);
                 }
-            } finally {
-                format.setReading(this, false);
+                param.setSourceSubsampling(subsampling.x,   subsampling.y,
+                                           subsampling.x/2, subsampling.y/2);
+                if (band != 0) {
+                    // Selects a particular depth in a 3D coverage.
+                    param.setSourceBands(new int[] {band});
+                }
+                handleSpecialCases(param);
+                if (image == null) {
+                    final Dimension size = geometry.getSize();
+                    image = format.read(getInput(), imageIndex, param, listeners, size, this);
+                    if (image == null) {
+                        return null;
+                    }
+                }
+                bands = format.getSampleDimensions(param);
             }
-            /*
-             * La lecture est terminée et n'a pas été annulée. On construit maintenant l'objet
-             * GridCoverage2D, on le conserve dans une cache interne puis on le retourne. Note:
-             * la source n'est pas conservée si cet objet est susceptible d'être utilisé comme
-             * serveur, afin d'éviter de transmettre une copie de GridCoverageEntry via le réseau.
-             */
-            final Map properties = (loader==null) ? Collections.singletonMap(REFERENCE_KEY, this) : null;
-            coverage = FACTORY.create(filename, image, envelope, bands, null, properties);
-            /*
-             * Retourne toujours la version "géophysique" de l'image.
-             */
-            coverage = coverage.geophysics(true);
-            /*
-             * Si l'utilisateur a spécifié une operation à appliquer
-             * sur les images, applique cette opération maintenant.
-             */
-            Operation operation = parameters.operation;
-            if (operation == null) {
-                operation = Operation.DEFAULT;
-            }
-            coverage = (GridCoverage2D) operation.doOperation(coverage);
+        } finally {
+            format.setReading(this, false);
         }
+        /*
+         * La lecture est terminée et n'a pas été annulée. On construit maintenant l'objet
+         * GridCoverage2D, on le conserve dans une cache interne puis on le retourne.
+         */
+        final Map properties = Collections.singletonMap(REFERENCE_KEY, this);
+        GridCoverage2D coverage = FACTORY.create(filename, image, envelope, bands, null, properties);
+        /*
+         * Retourne toujours la version "géophysique" de l'image.
+         */
+        coverage = coverage.geophysics(true);
+        /*
+         * Si l'utilisateur a spécifié une operation à appliquer
+         * sur les images, applique cette opération maintenant.
+         */
+        Operation operation = parameters.operation;
+        if (operation == null) {
+            operation = Operation.DEFAULT;
+        }
+        coverage = (GridCoverage2D) operation.doOperation(coverage);
         renderedImage = new WeakReference<RenderedImage>(image);
         gridCoverage  = new SoftReference<GridCoverage2D>(coverage);
         /*
@@ -892,27 +863,5 @@ final class GridCoverageEntry extends Entry implements CoverageReference, Covera
      */
     protected final Object readResolve() throws ObjectStreamException {
         return canonicalize();
-    }
-
-    /**
-     * Exporte cette entrée comme service RMI ((<code>Remote Method Invocation</cite>). Lorsque
-     * cette entrée est envoyée vers un client via le réseau (typiquement comme objet retourné
-     * par une autre fonction exécutée sur un serveur distant), une connexion vers le serveur
-     * d'origine sera conservée. La plupart des méthodes que le client appellera s'exécuteront
-     * localement, excepté {@link #getCoverage()} et ses variantes qui liront et traiteront
-     * l'image sur un serveur distant avant de l'envoyer sur le réseau.
-     * <p>
-     * Il est innofensif d'appeller cette méthode plusieurs fois, mais seul le premier appel aura un
-     * effet. Cette méthode est utilisée par {@link net.seagis.observation.coverage.rmi.GridCoverageServer}
-     * et n'a habituellement pas besoin d'être appelée directement.
-     *
-     * @throws RemoteException si l'exportation du service RMI a échouée.
-     *
-     * @see RemoteLoader
-     */
-    public final synchronized void export() throws RemoteException {
-        if (loader == null) {
-            loader = new RemoteLoader(this);
-        }
     }
 }

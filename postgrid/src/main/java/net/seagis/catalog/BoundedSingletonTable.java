@@ -363,10 +363,10 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      */
     public synchronized boolean setGeographicBoundingBox(final GeographicBoundingBox area) {
         boolean change;
-        change  = (xMin != (xMin = area.getWestBoundLongitude()));
-        change |= (xMax != (xMax = area.getEastBoundLongitude()));
-        change |= (yMin != (yMin = area.getSouthBoundLatitude()));
-        change |= (yMax != (yMax = area.getNorthBoundLatitude()));
+        change  = (xMin != (xMin = Math.max(area.getWestBoundLongitude(), -360)));
+        change |= (xMax != (xMax = Math.min(area.getEastBoundLongitude(), +360)));
+        change |= (yMin != (yMin = Math.max(area.getSouthBoundLatitude(),  -90)));
+        change |= (yMax != (yMax = Math.min(area.getNorthBoundLatitude(),  +90)));
         trimRequested = false;
         if (change) {
             trimmed = false;

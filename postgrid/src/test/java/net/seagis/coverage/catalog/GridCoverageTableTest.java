@@ -142,8 +142,8 @@ public class GridCoverageTableTest extends DatabaseTest {
         Envelope envelope = table.getEnvelope();
         assertEquals(-200, envelope.getMinimum(0), 0.0);
         assertEquals(+200, envelope.getMaximum(0), 0.0);
-        assertEquals(-100, envelope.getMinimum(1), 0.0);
-        assertEquals(+100, envelope.getMaximum(1), 0.0);
+        assertEquals( -90, envelope.getMinimum(1), 0.0);
+        assertEquals( +90, envelope.getMaximum(1), 0.0);
         
         table.trimEnvelope();
         envelope = table.getEnvelope();

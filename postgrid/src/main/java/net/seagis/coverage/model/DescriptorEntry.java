@@ -14,7 +14,6 @@
  */
 package net.seagis.coverage.model;
 
-import java.rmi.RemoteException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 
@@ -24,7 +23,6 @@ import net.seagis.coverage.catalog.GridCoverage;
 import net.seagis.coverage.catalog.DataCoverage;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Entry;
-import net.seagis.catalog.ServerException;
 
 
 /**
@@ -183,10 +181,8 @@ final class DescriptorEntry extends Entry implements Descriptor {
             LOGGER.fine("Reconstruit à nouveau la converture de \"" + getName() + "\".");
         }
         c = FunctionalCoverage.getCoverage(getName());
-        if (c == null) try {
+        if (c == null) {
             c = new DataCoverage(this);
-        } catch (RemoteException exception) {
-            throw new ServerException(exception);
         }
         coverage = new SoftReference<GridCoverage>(c);
         return c;
