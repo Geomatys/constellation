@@ -14,6 +14,7 @@
  */
 package net.seagis.coverage.web;
 
+import java.awt.Dimension;
 import java.io.*;
 import java.util.*;
 import java.sql.SQLException;
@@ -51,6 +52,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.NoSuchRecordException;
+import net.seagis.catalog.NoSuchTableException;
 import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTable;
@@ -264,7 +266,7 @@ public class WebServiceWorker {
         this.version = (version != null) ? new Version(version) : null;
     }
 
-    /**
+   /**
      * Sets the layer of interest.
      *
      * @param  layer The layer, or {@code null} if unknown.
@@ -534,6 +536,29 @@ public class WebServiceWorker {
         return candidate;
     }
 
+     /**
+     * Returns all the available layers for the getCapabilities operation.
+     *
+     * @throws WebServiceException if an error occured while building the table.
+     */
+    public Set<Layer> getLayers() throws WebServiceException {
+        try {
+
+            if (layerTable == null) {
+                try {
+                    layerTable = new LayerTable(database.getTable(LayerTable.class));
+                } catch (NoSuchTableException exception) {
+                    throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+                }
+            }
+            return layerTable.getEntries();
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        } catch (SQLException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        }
+    }
+
     /**
      * Gets the grid coverage for the current layer, time, elevation, <cite>etc.</cite>
      *
@@ -607,6 +632,15 @@ public class WebServiceWorker {
     }
 
     /**
+     *
+     */
+    public File getLegendFile() throws WebServiceException {
+        final Dimension dimension;
+        dimension = new Dimension(gridRange.getUpper(0), gridRange.getUpper(1));
+        return getImageFile(getLayer().getLegend(dimension));
+    }
+
+    /**
      * Returns the {@linkplain #getRenderedImage current rendered image} as a file in the
      * {@linkplain #getMimeType current format}. The file is created in the temporary
      * directory, may be overwritten during the next invocation of this method and will
@@ -617,7 +651,10 @@ public class WebServiceWorker {
      * @todo As an optimization, returns the current file if it still valid.
      */
     public File getImageFile() throws WebServiceException {
-        final RenderedImage image = getRenderedImage();
+        return getImageFile(getRenderedImage());
+    }
+
+    private File getImageFile(final RenderedImage image) throws WebServiceException {
         RenderedImage formated = image;
         try {
             /*
