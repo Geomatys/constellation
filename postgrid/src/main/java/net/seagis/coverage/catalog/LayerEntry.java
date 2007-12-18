@@ -116,8 +116,7 @@ final class LayerEntry extends Entry implements Layer {
 
     /**
      * Ensemble des fabriques pour différentes opérations. Ne seront construites que lorsque
-     * nécessaire. Si {@link #server} était une connexion vers un objet RMI, alors il en sera
-     * de même pour les valeurs de ce {@code Map}.
+     * nécessaire.
      */
     private transient Map<Operation,GridCoverageTable> servers;
 
@@ -304,7 +303,7 @@ final class LayerEntry extends Entry implements Layer {
         final Date   endTime = new Date(t + delay);
         try {
             if (singleCoverageServer == null) {
-                singleCoverageServer = server.newInstance(null);
+                singleCoverageServer = new GridCoverageTable(server);
             }
             singleCoverageServer.setTimeRange(startTime, endTime);
             final double z = (elevation != null) ? elevation.doubleValue() : 0;
@@ -399,7 +398,8 @@ final class LayerEntry extends Entry implements Layer {
         }
         GridCoverageTable candidate = servers.get(operation);
         if (candidate == null) {
-            candidate = server.newInstance(operation);
+            candidate = new GridCoverageTable(server);
+            server.setOperation(operation);
             servers.put(operation, candidate);
         }
         return candidate;
@@ -413,7 +413,9 @@ final class LayerEntry extends Entry implements Layer {
      * @param data Connexion vers une vue des données comme une matrice tri-dimensionnelle.
      * @throws IllegalStateException si une connexion existait déjà pour cette entrée.
      */
-    protected synchronized void setDataConnection(final GridCoverageTable data) throws IllegalStateException {
+    protected synchronized void setGridCoverageTable(final GridCoverageTable data)
+            throws IllegalStateException
+    {
         if (server != null) {
             throw new IllegalStateException(getName());
         }

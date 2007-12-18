@@ -118,9 +118,10 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         final GridCoverageTable data;
         data = new GridCoverageTable(getDatabase().getTable(GridCoverageTable.class));
         data.setLayer(layer);
+        data.setTimeRange(getTimeRange());
         data.setEnvelope(getEnvelope());
         data.trimEnvelope();
-        entry.setDataConnection(data);
+        entry.setGridCoverageTable(data);
         if (models == null) {
             final Database database = getDatabase();
             DescriptorTable descriptors = database.getTable(DescriptorTable.class);
@@ -130,5 +131,17 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
             models.setDescriptorTable(descriptors);
         }
         entry.model = models.getEntry(entry);
+    }
+
+    /**
+     * Invoked when the state of this field changed. This method {@linkplain #clearCache clears
+     * the cache} if the changed property is the geographic bounding box or the time range.
+     */
+    @Override
+    protected void fireStateChanged(final String property) {
+        super.fireStateChanged(property);
+        if (property.equalsIgnoreCase("GeographicBoundingBox") || property.equalsIgnoreCase("TimeRange")) {
+            clearCache();
+        }
     }
 }

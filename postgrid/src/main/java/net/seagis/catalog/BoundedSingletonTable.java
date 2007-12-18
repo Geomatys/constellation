@@ -534,6 +534,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
                         tMax = min(tMax, time.getTime());
                     }
                     final String bbox = results.getString(bboxColumn);
+                    if (bbox == null) {
+                        continue;
+                    }
                     final Envelope envelope;
                     try {
                         envelope = SpatialFunctions.parse(bbox);

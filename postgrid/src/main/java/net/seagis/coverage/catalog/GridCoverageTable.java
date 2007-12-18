@@ -211,15 +211,6 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * {inheritDoc}
-     */
-    public GridCoverageTable newInstance(final Operation operation) {
-        final GridCoverageTable view = new GridCoverageTable(this);
-        view.setOperation(operation);
-        return view;
-    }
-
-    /**
      * Returns the series for the current layer. The default implementation expects a layer
      * with only one series. The {@link WritableGridCoverageTable} will override this method
      * with a more appropriate value.
@@ -883,8 +874,8 @@ loop:   for (final CoverageReference newReference : entries) {
         comparator = null;
         envelope   = null;
         availableElevations = null;
-        availableTimes     = null;
-        availableCentroids = null;
+        availableTimes      = null;
+        availableCentroids  = null;
     }
 
     /**

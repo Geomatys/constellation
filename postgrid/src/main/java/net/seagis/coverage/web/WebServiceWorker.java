@@ -321,11 +321,15 @@ public class WebServiceWorker {
     }
 
     /**
-     * Sets the bounding box.
+     * Sets the bounding box. The expected order is
+     * (<var>x</var><sub>min</sub>, <var>y</var><sub>min</sub>,
+     *  <var>x</var><sub>max</sub>, <var>y</var><sub>max</sub>,
+     *  <var>z</var><sub>min</sub>, <var>z</var><sub>max</sub>)
      *
      * @param  The bounding box, or {@code null} if unknown.
      * @throws WebServiceException if the given bounding box can't be parsed.
      */
+    @SuppressWarnings("fallthrough")
     public void setBoundingBox(final String bbox) throws WebServiceException {
         if (bbox == null) {
             if (envelope != null) {
@@ -336,29 +340,57 @@ public class WebServiceWorker {
         final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
         if (envelope == null) {
             envelope = new GeneralEnvelope((tokens.countTokens() + 1) >> 1);
+            envelope.setToInfinite();
         }
-        int dimension = 0;
+        final double[] coordinates = new double[envelope.getDimension() * 2];
+        int index = 0;
         while (tokens.hasMoreTokens()) {
-            final double minimum, maximum;
-            String token = tokens.nextToken().trim();
+            final String token = tokens.nextToken().trim();
+            final double value;
             try {
-                minimum = Double.parseDouble(token);
-                if (tokens.hasMoreTokens()) {
-                    token = tokens.nextToken().trim();
-                    maximum = Double.parseDouble(token);
-                } else {
-                    maximum = minimum;
-                }
+                value = Double.parseDouble(token);
             } catch (NumberFormatException exception) {
                 throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, token),
                         exception, INVALID_PARAMETER_VALUE, version);
             }
-            try {
-                envelope.setRange(dimension++, minimum, maximum);
-            } catch (IndexOutOfBoundsException exception) {
+            if (index >= coordinates.length) {
                 throw new WebServiceException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3, "envelope",
-                        dimension + ((tokens.countTokens() + 1) >> 1), envelope.getDimension()),
-                        exception, INVALID_DIMENSION_VALUE, version);
+                        ((index + tokens.countTokens()) >> 1) + 1, envelope.getDimension()),
+                        INVALID_DIMENSION_VALUE, version);
+            }
+            coordinates[index++] = value;
+        }
+        if ((index & 1) != 0) {
+            throw new WebServiceException(Errors.format(ErrorKeys.ODD_ARRAY_LENGTH_$1, index),
+                    INVALID_DIMENSION_VALUE, version);
+        }
+        // Fallthrough in every cases.
+        switch (index) {
+            default: {
+                while (index >= 6) {
+                    final double maximum = coordinates[--index];
+                    final double minimum = coordinates[--index];
+                    envelope.setRange(index >> 1, minimum, maximum);
+                }
+            }
+            case 4: envelope.setRange(1, coordinates[1], coordinates[3]);
+            case 3:
+            case 2: envelope.setRange(0, coordinates[0], coordinates[2]);
+            case 1:
+            case 0: break;
+        }
+        /*
+         * Checks the envelope validity. Given that the parameter order in the bounding box
+         * is a little-bit counter-intuitive, it is worth to perform this check in order to
+         * avoid a NonInvertibleTransformException at some later stage.
+         */
+        final int dimension = envelope.getDimension();
+        for (index=0; index<dimension; index++) {
+            final double minimum = envelope.getMinimum(index);
+            final double maximum = envelope.getMaximum(index);
+            if (!(minimum < maximum)) {
+                throw new WebServiceException(Errors.format(ErrorKeys.BAD_RANGE_$2, minimum, maximum),
+                        INVALID_PARAMETER_VALUE, version);
             }
         }
     }
@@ -483,7 +515,7 @@ public class WebServiceWorker {
                     if (layerTable == null) {
                         layerTable = new LayerTable(database.getTable(LayerTable.class));
                     }
-                    layerTable.setGeographicBoundingBox(request.getGeographicBoundingBox());
+                    //layerTable.setGeographicBoundingBox(request.getGeographicBoundingBox());
                     candidate = layerTable.getEntry(layer);
                 } catch (NoSuchRecordException exception) {
                     throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
