@@ -3,9 +3,11 @@ package net.seagis.wms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -48,8 +50,8 @@ public class Request {
     private OperationType getMap;
     @XmlElement(name = "GetFeatureInfo")
     private OperationType getFeatureInfo;
-    @XmlElement(name = "_ExtendedOperation")
-    private List<OperationType> extendedOperation = new ArrayList<OperationType>();
+    @XmlElementRef(name = "_ExtendedOperation", namespace = "http://www.opengis.net/wms", type = JAXBElement.class)
+    protected List<JAXBElement<OperationType>> extendedOperation = new ArrayList<JAXBElement<OperationType>>();
 
     /**
      * An empty constructor used by JAXB.
@@ -61,11 +63,11 @@ public class Request {
      * Build a new Request.
      */
     public Request(final OperationType getCapabilities, final OperationType getMap,
-            final OperationType getFeatureInfo, OperationType... extendedOperations) {
+            final OperationType getFeatureInfo, JAXBElement<OperationType>... extendedOperations) {
         this.getCapabilities = getCapabilities;
         this.getFeatureInfo  = getFeatureInfo;
         this.getMap          = getMap;
-        for (final OperationType element : extendedOperations) {
+        for (final JAXBElement<OperationType> element : extendedOperations) {
             this.extendedOperation.add(element);
         }
     }
@@ -96,7 +98,7 @@ public class Request {
     /**
      * Gets the value of the extendedOperation property.
      */
-    public List<OperationType> getExtendedOperation() {
+    public List<JAXBElement<OperationType>> getExtendedOperation() {
         return Collections.unmodifiableList(extendedOperation);
     }
 

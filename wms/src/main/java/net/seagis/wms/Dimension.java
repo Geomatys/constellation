@@ -61,8 +61,21 @@ public class Dimension {
      Dimension() {
      }
 
+     /**
+      * Build a new Dimension object.
+      *  
+      * @param name     The name (often the type) of this Dimension block (time, elevation,...)
+      * @param units    The unit of the value (example:ISO8601 for time).
+      * @param _default The default value if its not specified.
+      */
+    public Dimension(final String name, final String units, final String _default) {
+        this._default       = _default;
+        this.name           = name;
+        this.units          = units;
+    }
+    
     /**
-     * Build a new Dimension object.
+     * Build a new Dimension object with full parameter.
      */
     public Dimension(final String value, final String name, final String units, final String unitSymbol, 
             final String _default, final Boolean multipleValues, final Boolean nearestValue,
@@ -83,6 +96,14 @@ public class Dimension {
     */
     public String getValue() {
         return value;
+    }
+
+    /**
+     * Sets the value of the value property.
+     * 
+    */
+    public void setValue(String value) {
+        this.value = value;
     }
 
     /**

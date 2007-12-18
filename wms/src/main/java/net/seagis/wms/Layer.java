@@ -152,8 +152,50 @@ public class Layer {
      Layer() {
      }
 
+     /**
+      * Build a root layer with only few arguments
+      * 
+      * @param title                   The title of the layer.
+      * @param _abstract               A description of the layer.
+      * @param crs                     The list of supported CRS.
+      * @param exGeographicBoundingBox A general bounding box including all the child map.
+      */
+     public Layer(final String title, final String _abstract, final List<String> crs, 
+             final EXGeographicBoundingBox exGeographicBoundingBox, List<Layer> layer) {
+         this.title                   = title;
+         this._abstract               = _abstract;
+         this.crs                     = crs;
+         this.exGeographicBoundingBox = exGeographicBoundingBox;
+         this.layer                   = layer;
+     }
+     
+     /**
+      * Build a child layer
+      * 
+      * @param name      The title of the layer.
+      * @param _abstract A description of the layer.
+      * @param keyword   A keyword on the layer.
+      * @param crs       The list of supported CRS by this layer.
+      * @param exGeographicBoundingBox A latitude/longitude boundingBox.
+      * @param boundingBox             A normal boundingBox.
+      * @param queryable  A boolean indicating if the layer is queryable
+      * @param dimension  A list of Dimension block.
+      */
+     public Layer(final String name, final String _abstract, final String keyword, final List<String> crs, 
+             final EXGeographicBoundingBox exGeographicBoundingBox, final BoundingBox boundingBox, final boolean queryable,
+             final List<Dimension> dimension) {
+         this.name                    = name;
+         this._abstract               = _abstract;
+         this.keywordList             = new KeywordList(new Keyword(keyword));
+         this.crs                     = crs;
+         this.exGeographicBoundingBox = exGeographicBoundingBox;
+         this.boundingBox.add(boundingBox);
+         this.queryable = queryable;
+         this.dimension = dimension;
+     }
+     
     /**
-     * Build a new Layer object.
+     * Build a full Layer object.
      */
     public Layer(final String name, final String title, final String _abstract,
             final KeywordList keywordList, final List<String> crs, final EXGeographicBoundingBox exGeographicBoundingBox,
@@ -162,6 +204,31 @@ public class Layer {
             final List<DataURL> dataURL, final List<FeatureListURL> featureListURL, final List<Style> style, final Double minScaleDenominator,
             final Double maxScaleDenominator, final List<Layer> layer, final Boolean queryable, final BigInteger cascaded,
             final Boolean opaque, final Boolean noSubsets, final BigInteger fixedWidth,  final BigInteger fixedHeight) {
+        
+        this._abstract               = _abstract;
+        this.attribution             = attribution;
+        this.authorityURL            = authorityURL;
+        this.boundingBox             = boundingBox;
+        this.cascaded                = cascaded;
+        this.crs                     = crs;
+        this.dataURL                 = dataURL;
+        this.dimension               = dimension;
+        this.exGeographicBoundingBox = exGeographicBoundingBox;
+        this.featureListURL          = featureListURL;
+        this.fixedHeight             = fixedHeight;
+        this.fixedWidth              = fixedWidth;
+        this.identifier              = identifier;
+        this.keywordList             = keywordList;
+        this.layer                   = layer;
+        this.maxScaleDenominator     = maxScaleDenominator;
+        this.metadataURL             = metadataURL;
+        this.minScaleDenominator     = minScaleDenominator;
+        this.name                    = name;
+        this.noSubsets               = noSubsets;
+        this.opaque                  = opaque;
+        this.queryable               = queryable;
+        this.style                   = style;
+        this.title                   = title;
         
     }
 

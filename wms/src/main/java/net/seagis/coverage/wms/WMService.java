@@ -19,7 +19,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
@@ -29,9 +35,11 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.Unmarshaller;
+import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.sld.DescribeLayerResponseType;
 import net.seagis.sld.LayerDescriptionType;
 import net.seagis.sld.StyledLayerDescriptor;
@@ -39,7 +47,11 @@ import net.seagis.wms.Layer;
 import net.seagis.wms.WMSCapabilities;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.wms.Dimension;
+import net.seagis.wms.EXGeographicBoundingBox;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.util.Version;
+import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
  * WMS 1.3.0 web service implementing the operation getMap, getFeatureInfo and getCapabilities.
@@ -161,18 +173,26 @@ public class WMService {
     /**
      * Verify the base parameter or each request.
      * 
-     * @param sld if true the operation versify as well the version of the sld.
+     * @param sld case 0: no sld.
+     *            case 1: VERSION parameter for WMS version and SLD_VERSION for sld version.
+     *            case 2: VERSION paramter for sld version.
      * 
      * @throws net.seagis.coverage.web.WebServiceException
      */
-    private void verifyBaseParameter(boolean sld) throws WebServiceException {  
-        if (!getParameter("VERSION", true).equals(version.toString())) {
-            throw new WebServiceException("The parameter VERSION=" + version.toString() + "must be specify",
+    private void verifyBaseParameter(int sld) throws WebServiceException {  
+        Version v;
+        if (sld == 2)
+            v = sldVersion;
+        else
+            v = version;
+        
+        if (!getParameter("VERSION", true).equals(v.toString())) {
+            throw new WebServiceException("The parameter VERSION=" + v.toString() + "must be specify",
                                          WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
         }
-        if (sld) {
-            if (!getParameter("SLD_VERSION", true).equals(version.toString())) {
-                throw new WebServiceException("The parameter VERSION=" + version.toString() + "must be specify",
+        if (sld == 1) {
+            if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
+                throw new WebServiceException("The parameter VERSION=" + sldVersion.toString() + "must be specify",
                                               WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
             }
         }
@@ -257,7 +277,7 @@ public class WMService {
     private File getMap() throws  WebServiceException {
         logger.info("getMap request received");
         
-        verifyBaseParameter(false);
+        verifyBaseParameter(0);
         
         //we set the attribute od the webservice worker with the parameters.
         webServiceWorker.setFormat(getParameter("FORMAT", true));
@@ -292,7 +312,7 @@ public class WMService {
     private Response getFeatureInfo() throws WebServiceException {
         logger.info("getFeatureInfo request received");
         
-        verifyBaseParameter(false);
+        verifyBaseParameter(0);
         
         String query_layers = getParameter("QUERY_LAYERS", true);
         String info_format  = getParameter("INFO_FORMAT", true);
@@ -332,9 +352,6 @@ public class WMService {
     private String getCapabilities() throws WebServiceException, JAXBException {
         logger.info("getCapabilities request received");
         
-        // the service shall return WMSCapabilities marshalled
-        WMSCapabilities response = (WMSCapabilities)unmarshaller.unmarshal(getCapabilitiesFile(false));
-        
         //we begin by extract the mandatory attribute
         if (!getParameter("SERVICE", true).equals("WMS")) {
             throw new WebServiceException("The parameters SERVICE=WMS must be specify",
@@ -347,10 +364,87 @@ public class WMService {
             throw new WebServiceException("The parameter VERSION must be " + version.toString(),
                                          WMSExceptionCode.MISSING_PARAMETER_VALUE, this.version);
         }
+        // the service shall return WMSCapabilities marshalled
+        WMSCapabilities response = (WMSCapabilities)unmarshaller.unmarshal(getCapabilitiesFile(false));
         
         String format = getParameter("FORMAT", false);
         
-        Layer layer = null;
+        //we build the layers object of the document
+        
+        //we get the list of layers
+         List<Layer> layers = new ArrayList<Layer>();
+        for (net.seagis.coverage.catalog.Layer inputLayer: webServiceWorker.getLayers()) {
+            try {
+                
+                List<String> crs = new ArrayList<String>();
+                
+                GeographicBoundingBox inputBox = inputLayer.getGeographicBoundingBox();
+                
+                //we add the list od available date and elevation
+                List<Dimension> dimensions = new ArrayList<Dimension>();
+                
+                //the available date
+                String defaut = null;
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                if ( inputLayer.getAvailableTimes().size() > 0)
+                    defaut = df.format(inputLayer.getAvailableTimes().first());
+                else
+                    logger.severe("availableTime size=0");
+                
+                Dimension dim = new Dimension("time", "ISO8601", defaut);
+                String value = "";
+                for (Date d:inputLayer.getAvailableTimes()){
+                    
+                    value += df.format(d) + ','; 
+                }
+                dim.setValue(value);
+                dimensions.add(dim);
+                
+                //the available elevation
+                defaut = null;
+                if ( inputLayer.getAvailableElevations().size() > 0)
+                    defaut = inputLayer.getAvailableElevations().first().toString();
+                else
+                    logger.severe("availableElevation size=0");
+                dim = new Dimension("elevation", "EPSG:5030", defaut);
+                value = "";
+                for (Number n:inputLayer.getAvailableElevations()){
+                    value += n.toString() + ','; 
+                }
+                dim.setValue(value);
+                dimensions.add(dim);
+                
+                Layer outputLayer = new Layer(inputLayer.getName(), 
+                                              inputLayer.getRemarks(),
+                                              inputLayer.getThematic(), 
+                                              crs, 
+                                              new EXGeographicBoundingBox(inputBox.getWestBoundLongitude(), 
+                                                                          inputBox.getEastBoundLongitude(), 
+                                                                          inputBox.getSouthBoundLatitude(), 
+                                                                          inputBox.getNorthBoundLatitude()), 
+                                              null,  
+                                              true,
+                                              dimensions);
+                layers.add(outputLayer);
+                
+            } catch (CatalogException exception) {
+                throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, this.version);
+            }
+        }
+       
+        
+        //we build the list of accepted crs
+        List<String> crs = new ArrayList<String>();
+        crs.add("EPSG:4326");crs.add("EPSG:3395");crs.add("EPSG:27574");
+        
+        //we build a general boundingbox
+        EXGeographicBoundingBox exGeographicBoundingBox = null;
+        //we build the general layer and add it to the document
+        Layer layer = new Layer("Seagis Web Map Layer", 
+                                "description of the service(need to be fill)", 
+                                crs, 
+                                exGeographicBoundingBox, 
+                                layers);
         
         response.getCapability().setLayer(layer);
         //we marshall the response and return the XML String
@@ -370,7 +464,7 @@ public class WMService {
      */
     private String describeLayer() throws WebServiceException, JAXBException {
         
-        verifyBaseParameter(true);
+        verifyBaseParameter(2);
         
         String layers = getParameter("LAYERS", true);
         
@@ -386,11 +480,15 @@ public class WMService {
     
     private File getLegendGraphic() throws WebServiceException, JAXBException {
         
-        verifyBaseParameter(true);
+        verifyBaseParameter(2);
+        webServiceWorker.setLayer(getParameter("LAYER", true));
+        webServiceWorker.setFormat(getParameter("FORMAT", false));
+        webServiceWorker.setDimension(getParameter("WIDTH", false), getParameter("HEIGHT", false));
+
         
-        String layer = getParameter("LAYER", true);
         String style = getParameter("STYLE", false);
        
+        String featureType   = getParameter("FEATURETYPE", false);
         String remoteSld     = getParameter("SLD", false);
         String remoteOwsType = getParameter("REMOTE_OWS_TYPE", false);
         String remoteOwsUrl  = getParameter("REMOTE_OWS_URL", false);
@@ -400,7 +498,7 @@ public class WMService {
         
         StyledLayerDescriptor sld = (StyledLayerDescriptor) getComplexParameter("SLD_BODY", false);
         
-        return new File("null");
+        return  webServiceWorker.getLegendFile();
         
     }
     

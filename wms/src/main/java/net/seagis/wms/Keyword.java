@@ -44,8 +44,15 @@ public class Keyword {
      Keyword() {
      }
 
+     /**
+     * Build a new Keyword object.
+     */
+    public Keyword(final String value) {
+        this.value      = value;
+    }
+    
     /**
-     * Build a new Contact person primary object.
+     * Build a new Keyword object.
      */
     public Keyword(final String value, final String vocabulary) {
         this.value      = value;
