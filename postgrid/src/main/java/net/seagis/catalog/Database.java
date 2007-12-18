@@ -279,6 +279,7 @@ public class Database {
                 final InputStream in = new FileInputStream(file);
                 properties.loadFromXML(in);
                 in.close();
+                Element.LOGGER.config("PostGrid configuration file is " + file);
             }
         }
         final String ID = getProperty(ConfigurationKey.TIMEZONE);
