@@ -273,10 +273,10 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      *         or if an other logical error occured.
      * @throws SQLException If the database access failed for an other reason.
      */
-    public synchronized void setLayer(final String layer) throws CatalogException, SQLException {
+    public synchronized void setLayer(final String name) throws CatalogException, SQLException {
         // We don't keep a reference to the layer table since this method
         // should only be a commodity and should not be invoked often.
-        setLayer(getDatabase().getTable(LayerTable.class).getEntry(layer));
+        setLayer(getDatabase().getTable(LayerTable.class).getEntry(name));
     }
 
     /**

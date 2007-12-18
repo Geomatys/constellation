@@ -608,9 +608,10 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Searchs for an identifier not already in use. This method appends a decimal number to the
-     * specified base and check if the resulting identifier is not in use. If it is, then the
-     * decimal number is incremented until a unused identifier is found.
+     * Searchs for an identifier not already in use. If the given string is not in use, then
+     * it is returned as-is. Otherwise, this method appends a decimal number to the specified
+     * base and check if the resulting identifier is not in use. If it is, then the decimal
+     * number is incremented until a unused identifier is found.
      *
      * @param  base The base for the identifier.
      * @return A unused identifier.
@@ -621,14 +622,17 @@ public abstract class SingletonTable<E extends Element> extends Table {
         final PreparedStatement statement    = getStatement(QueryType.EXISTS);
         final int               byPrimaryKey = indexOf(primaryKey);
         final int               indexPK      = primaryKey.column.indexOf(QueryType.EXISTS);
-        final StringBuilder     buffer       = new StringBuilder(base).append('-');
+        final StringBuilder     buffer       = new StringBuilder(base.trim());
         final int               offset       = buffer.length();
-scan:   for (int n=1; n<=MAXIMUM_AUTO_INCREMENT; n++) {
-            buffer.setLength(offset);
-            if (n < 100) buffer.append('0');
-            if (n <  10) buffer.append('0');
-            buffer.append(n);
-            final String ID = buffer.toString().trim();
+scan:   for (int n=0; n<=MAXIMUM_AUTO_INCREMENT; n++) {
+            if (n != 0) {
+                buffer.setLength(offset);
+                buffer.append('-');
+                if (n < 100) buffer.append('0');
+                if (n <  10) buffer.append('0');
+                buffer.append(n);
+            }
+            final String ID = buffer.toString();
             statement.setString(byPrimaryKey, ID);
             final ResultSet results = statement.executeQuery();
             while (results.next()) {

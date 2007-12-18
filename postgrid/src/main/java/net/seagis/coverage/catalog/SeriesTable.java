@@ -15,10 +15,13 @@
  */
 package net.seagis.coverage.catalog;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import org.geotools.resources.Utilities;
 import net.seagis.catalog.CatalogException;
@@ -26,6 +29,8 @@ import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
+import net.seagis.resources.i18n.ResourceKeys;
+import net.seagis.resources.i18n.Resources;
 
 
 /**
@@ -131,7 +136,7 @@ public class SeriesTable extends SingletonTable<Series> {
         final String  pathname      = results.getString (indexOf(query.pathname));
         final String  extension     = results.getString (indexOf(query.extension));
         final boolean visible       = results.getBoolean(indexOf(query.visible));
-        final String  remarks       = results.getString (indexOf(query.remarks));
+        final String  quicklook     = results.getString (indexOf(query.quicklook));
         final String  rootDirectory = getProperty(ConfigurationKey.ROOT_DIRECTORY);
         final String  rootURL       = getProperty(ConfigurationKey.ROOT_URL);
         if (formats == null) {
@@ -139,6 +144,86 @@ public class SeriesTable extends SingletonTable<Series> {
         }
         final Format format = formats.getEntry(results.getString(indexOf(query.format)));
         return new SeriesEntry(name, layer, rootDirectory != null ? rootDirectory : rootURL,
-                               pathname, extension, format, visible, remarks);
+                               pathname, extension, format, visible, quicklook);
+    }
+    
+    /**
+     * Returns the identifier for a series having the specified properties. If no
+     * matching record is found, then a new one is created and added to the database.
+     *
+     * @param layer The layer name.
+     * @param path The file relative to the root directory.
+     * @param extension The extension to add to filenames.
+     * @param format The format for the series considered.
+     * @return The identifier of a matching entry (never {@code null}).
+     * @throws CatalogException if a logical error occured.
+     * @throws SQLException if an error occured while reading from or writing to the database.
+     */
+    final synchronized String getIdentifier(final String layer,
+            final File path, final String extension, final String format)
+            throws SQLException, CatalogException
+    {
+        final SeriesQuery query = (SeriesQuery) super.query;
+        PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+        statement.setString(indexOf(query.byLayer), layer);
+
+        String ID = null;
+        final int idIndex = indexOf(query.name);
+        final int pnIndex = indexOf(query.pathname);
+        final int exIndex = indexOf(query.extension);
+        final int ftIndex = indexOf(query.format);
+        final ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            final String nextID = results.getString(idIndex);
+            String candidate = results.getString(pnIndex);
+            if (candidate == null || !candidate.equals(path)) {
+                continue;
+            }
+            candidate = results.getString(exIndex);
+            if (candidate == null) {
+                continue;
+            }
+            candidate = results.getString(ftIndex);
+            if (candidate == null) {
+                continue;
+            }
+            if (ID != null && !ID.equals(nextID)) {
+                // Could happen if there is insuffisient conditions in the WHERE clause.
+                final LogRecord record = Resources.getResources(getDatabase().getLocale()).
+                        getLogRecord(Level.WARNING, ResourceKeys.ERROR_DUPLICATED_RECORD_$1, nextID);
+                record.setSourceClassName("SeriesTable");
+                record.setSourceMethodName("getIdentifier");
+                LOGGER.log(record);
+                continue;
+            }
+            ID = nextID;
+        }
+        results.close();
+        if (ID != null) {
+            return ID;
+        }
+        /*
+         * No match found. Adds a new record in the database.
+         */
+        boolean success = false;
+        LayerTable layers = getDatabase().getTable(LayerTable.class);
+        final boolean layerExists = layers.exists(layer);
+        transactionBegin();
+        try {
+            final String layerName = layerExists ? layer : layers.getIdentifier(layer);
+            ID = searchFreeIdentifier(layer);
+            statement = getStatement(QueryType.INSERT);
+            statement.setString (indexOf(query.name),      ID);
+            statement.setString (indexOf(query.layer),     layerName);
+            statement.setString (indexOf(query.pathname),  path.getAbsolutePath());
+            statement.setString (indexOf(query.extension), extension);
+            statement.setString (indexOf(query.format),    format);
+            statement.setBoolean(indexOf(query.visible),   true);
+            success = updateSingleton(statement);
+            // 'success' must be assigned last in this try block.
+        } finally {
+            transactionEnd(success);
+        }
+        return ID;
     }
 }

@@ -15,15 +15,21 @@
  */
 package net.seagis.coverage.catalog;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import net.seagis.catalog.CRS;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.BoundedSingletonTable;
 import net.seagis.catalog.CatalogException;
+import net.seagis.catalog.QueryType;
 import net.seagis.coverage.model.DescriptorTable;
 import net.seagis.coverage.model.LinearModelTable;
+import net.seagis.resources.i18n.ResourceKeys;
+import net.seagis.resources.i18n.Resources;
 
 
 /**
@@ -143,5 +149,58 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         if (property.equalsIgnoreCase("GeographicBoundingBox") || property.equalsIgnoreCase("TimeRange")) {
             clearCache();
         }
+    }
+    
+        
+    /**
+     * Returns the identifier for the specified layer. If no matching record is found and
+     * {@code allowCreate} is {@code true}, then a new one is created and added to the database.
+     *
+     * @param name The name of the layer.
+     * @return
+     *              The identifier of a matching entry, or {@code null} if none if none was
+     *              found and {@code newIdentifier} is {@code null}.
+     * @throws SQLException
+     *              If the operation failed.
+     */
+    final synchronized String getIdentifier(final String name) throws SQLException, CatalogException {
+        final LayerQuery query = (LayerQuery) super.query;
+        PreparedStatement statement = getStatement(QueryType.SELECT);
+        statement.setString(indexOf(query.byName), name);
+        String ID = null;
+        final int idIndex = indexOf(query.name);
+        final ResultSet results = statement.executeQuery();
+        while (results.next()) {
+            final String nextID = results.getString(idIndex);
+            if (ID != null && !ID.equals(nextID)) {
+                // Could happen if there is insuffisient conditions in the WHERE clause.
+                final LogRecord record = Resources.getResources(getDatabase().getLocale()).
+                        getLogRecord(Level.WARNING, ResourceKeys.ERROR_DUPLICATED_RECORD_$1, nextID);
+                record.setSourceClassName("LayerTable");
+                record.setSourceMethodName("getIdentifier");
+                LOGGER.log(record);
+                continue;
+            }
+            ID = nextID;
+        }
+        results.close();
+        if (ID != null) {
+            return ID;
+        }
+        /*
+         * No match found. Adds a new record in the database.
+         */
+        boolean success = false;
+        transactionBegin();
+        try {
+            ID = searchFreeIdentifier(name);
+            statement = getStatement(QueryType.INSERT);
+            statement.setString(indexOf(query.name), ID);
+            success = updateSingleton(statement);
+            // 'success' must be assigned last in this try block.
+        } finally {
+            transactionEnd(success);
+        }
+        return ID;
     }
 }

@@ -68,6 +68,11 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     private Series series;
 
     /**
+     * Allow the creation of a new {@code LayerEntry} if true.
+     */
+    private boolean allowsNewLayer;
+    
+    /**
      * Constructs a new {@code WritableGridCoverageTable}.
      *
      * @param connection The connection to the database.
@@ -84,6 +89,40 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         super(table);
     }
 
+    /**
+     * Returns true if the creation of a new layer is allowed. False otherwise.
+     */
+    public boolean getAllowsNewLayer() {
+        return allowsNewLayer;
+    }
+    
+    /**
+     * 
+     * @param allowed
+     */
+    public void setAllowsNewLayer(final boolean allowed) {
+        this.allowsNewLayer = allowed;
+    }
+
+    /**
+     * Sets the layer as a string. If no layer exists for the given name,
+     * a new one will be created.
+     *
+     * @param  name The layer name.
+     * @throws CatalogException If a logical error occured.
+     * @throws SQLException If the database access failed for an other reason.
+     */
+    @Override
+    public synchronized void setLayer(String name) throws CatalogException, SQLException {
+        if (allowsNewLayer) {
+            final LayerTable layers = getDatabase().getTable(LayerTable.class);
+            name = layers.getIdentifier(name);
+            setLayer(layers.getEntry(name));
+        } else {
+            super.setLayer(name);
+        } 
+    }
+    
     /**
      * Returns the currently selected series.
      */

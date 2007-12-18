@@ -33,7 +33,7 @@ final class LayerQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, thematic, period, fallback, remarks;
+    protected final Column name, thematic, procedure, period, fallback, remarks;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -78,12 +78,14 @@ final class LayerQuery extends Query {
      */
     public LayerQuery(final Database database) {
         super(database, "Layers");
-        final QueryType[] SL = {SELECT, LIST};
-        name      = addColumn("name",              SL);
-        thematic  = addColumn("thematic",    null, SL);
-        period    = addColumn("period",         1, SL);
-        fallback  = addColumn("fallback",    null, SL);
-        remarks   = addColumn("description", null, SL);
-        byName    = addParameter(name, SELECT);
+        final QueryType[] SL   = {SELECT, LIST};
+        final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
+        name      = addColumn("name",              SLEI);
+        thematic  = addColumn("thematic",    null, SL  );
+        procedure = addColumn("procedure",   null, SL  );
+        period    = addColumn("period",         1, SL  );
+        fallback  = addColumn("fallback",    null, SL  );
+        remarks   = addColumn("description", null, SL  );
+        byName    = addParameter(name, SELECT, EXISTS);
     }
 }
