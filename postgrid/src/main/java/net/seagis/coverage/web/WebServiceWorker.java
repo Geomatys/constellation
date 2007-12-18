@@ -48,11 +48,11 @@ import org.geotools.util.Version;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.image.ImageUtilities;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.catalog.NoSuchTableException;
 import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTable;
@@ -76,6 +76,13 @@ import static net.seagis.coverage.wms.WMSExceptionCode.*;
  * @author Guilhem Legal
  */
 public class WebServiceWorker {
+    /**
+     * Disable some JAI codecs. The codecs provided in standard Java are sometime more reliable.
+     */
+    static {
+        ImageUtilities.allowNativeCodec("png", ImageWriterSpi.class, false);
+    }
+
     /**
      * WMS before this version needs longitude before latitude. WMS after this version don't
      * perform axis switch. WMS at this exact version switch axis only for EPSG:4326.
@@ -225,6 +232,11 @@ public class WebServiceWorker {
      * The layer table. Will be created when first needed.
      */
     private transient LayerTable layerTable;
+
+    /**
+     * The layer names in an unmodifiable set. Will be created when first needed.
+     */
+    private transient Set<String> layerNames;
 
     /**
      * The most recently used layers. Different {@code WebServiceWorker} may share the same
@@ -499,6 +511,58 @@ public class WebServiceWorker {
     }
 
     /**
+     * Returns the layer table.
+     *
+     * @throws WebServiceException if the layer table can not be created.
+     */
+    private LayerTable getLayerTable() throws WebServiceException {
+        if (layerTable == null) try {
+            layerTable = new LayerTable(database.getTable(LayerTable.class));
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        }
+        return layerTable;
+    }
+
+    /**
+     * Returns only the name of all available layers. This method is much cheaper than
+     * {@link #getLayers} when only the names are wanted.
+     *
+     * @throws WebServiceException if an error occured while fetching the table.
+     */
+    public Set<String> getLayerNames() throws WebServiceException {
+        if (layerNames == null) try {
+            final LayerTable layerTable = getLayerTable();
+            layerTable.setGeographicBoundingBox(null);
+            layerTable.setTimeRange(null);
+            layerNames = Collections.unmodifiableSet(layerTable.getIdentifiers());
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        } catch (SQLException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        }
+        return layerNames;
+    }
+
+    /**
+     * Returns all available layers.
+     *
+     * @throws WebServiceException if an error occured while fetching the table.
+     */
+    public Set<Layer> getLayers() throws WebServiceException {
+        try {
+            final LayerTable layerTable = getLayerTable();
+            layerTable.setGeographicBoundingBox(null);
+            layerTable.setTimeRange(null);
+            return layerTable.getEntries();
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        } catch (SQLException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        }
+    }
+
+    /**
      * Returns the layer for the current configuration.
      *
      * @throws WebServiceException if an error occured while fetching the table.
@@ -513,11 +577,9 @@ public class WebServiceWorker {
         synchronized (layers) {
             candidate = layers.get(request);
             if (candidate == null) {
+                final LayerTable layerTable = getLayerTable();
                 try {
-                    if (layerTable == null) {
-                        layerTable = new LayerTable(database.getTable(LayerTable.class));
-                    }
-                    //layerTable.setGeographicBoundingBox(request.getGeographicBoundingBox());
+                    layerTable.setGeographicBoundingBox(request.getGeographicBoundingBox());
                     candidate = layerTable.getEntry(layer);
                 } catch (NoSuchRecordException exception) {
                     throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
@@ -534,29 +596,6 @@ public class WebServiceWorker {
             }
         }
         return candidate;
-    }
-
-     /**
-     * Returns all the available layers for the getCapabilities operation.
-     *
-     * @throws WebServiceException if an error occured while building the table.
-     */
-    public Set<Layer> getLayers() throws WebServiceException {
-        try {
-
-            if (layerTable == null) {
-                try {
-                    layerTable = new LayerTable(database.getTable(LayerTable.class));
-                } catch (NoSuchTableException exception) {
-                    throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
-                }
-            }
-            return layerTable.getEntries();
-        } catch (CatalogException exception) {
-            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
-        } catch (SQLException exception) {
-            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
-        }
     }
 
     /**
@@ -577,6 +616,10 @@ public class WebServiceWorker {
             ref = layer.getCoverageReference(time, elevation);
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+        }
+        if (ref == null) {
+            // TODO: provides a better message.
+            throw new WebServiceException(Errors.format(ResourceKeys.NO_DATA_TO_DISPLAY), INVALID_PARAMETER_VALUE, version);
         }
         GridCoverage2D coverage;
         try {
@@ -632,11 +675,21 @@ public class WebServiceWorker {
     }
 
     /**
+     * Returns the legend as an image. The {@link #setDimension dimension} and {@link #setFormat
+     * format} are honored.
      *
+     * @throws WebServiceException if an error occured while processing the legend.
+     *
+     * @todo As an optimization, returns the current file if it still valid. May be worth since
+     *       there is typically one legend by layer.
      */
     public File getLegendFile() throws WebServiceException {
         final Dimension dimension;
-        dimension = new Dimension(gridRange.getUpper(0), gridRange.getUpper(1));
+        if (gridRange != null) {
+            dimension = new Dimension(gridRange.getUpper(0), gridRange.getUpper(1));
+        } else {
+            dimension = new Dimension(200, 40);
+        }
         return getImageFile(getLayer().getLegend(dimension));
     }
 
@@ -654,6 +707,13 @@ public class WebServiceWorker {
         return getImageFile(getRenderedImage());
     }
 
+    /**
+     * Returns the given image as a file in the {@linkplain #getMimeType current format}.
+     * The file is created in the temporary directory, may be overwritten during the next
+     * invocation of this method and will be deleted at JVM exit.
+     *
+     * @throws WebServiceException if an error occured while processing the image.
+     */
     private File getImageFile(final RenderedImage image) throws WebServiceException {
         RenderedImage formated = image;
         try {
@@ -819,6 +879,34 @@ public class WebServiceWorker {
     }
 
     /**
+     * Clears the cache. This method should be invoked when the database content changed.
+     * This {@code WebServiceWorker} instance can still be used, but the first next invocation
+     * may be a little bit slower until the cache is rebuild.
+     *
+     * @throws WebServiceException if an error occured while clearing the cache.
+     */
+    public void flush() throws WebServiceException {
+        disposeWriter();
+        if (files != null) {
+            for (final File file : files.values()) {
+                file.delete();
+            }
+            files = null;
+        }
+        formats = null;
+        layers.clear();
+        layerNames = null;
+        layerTable = null;
+        try {
+            database.flush();
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        } catch (SQLException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        }
+    }
+
+    /**
      * Disposes the {@linkplain #writer} and information derived from the writer.
      * Other fields must be left untouched.
      */
@@ -834,9 +922,13 @@ public class WebServiceWorker {
 
     /**
      * Disposes any resources held by this worker. This method should be invoked
-     * when waiting for the garbage collector would be over-conservative.
+     * when waiting for the garbage collector would be over-conservative. This
+     * {@code WebServiceWorker} instance should not be used anymore after disposal.
+     *
+     * @throws WebServiceException if an error occured while disposing the resources.
      */
-    public void dispose() {
-        disposeWriter();
+    public void dispose() throws WebServiceException {
+        flush();
+        // Do not close the database connection, since it may be shared by other instances.
     }
 }

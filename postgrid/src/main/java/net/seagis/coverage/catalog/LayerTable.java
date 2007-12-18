@@ -87,13 +87,14 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         final LayerQuery query = (LayerQuery) super.query;
         final String name      = results.getString(indexOf(query.name     ));
         final String thematic  = results.getString(indexOf(query.thematic ));
+        final String procedure = results.getString(indexOf(query.procedure));
         double       period    = results.getDouble(indexOf(query.period   ));
         if (results.wasNull()) {
             period = Double.NaN;
         }
         final String fallback  = results.getString(indexOf(query.fallback));
         final String remarks   = results.getString(indexOf(query.remarks ));
-        final LayerEntry entry = new LayerEntry(name, thematic, period, remarks);
+        final LayerEntry entry = new LayerEntry(name, thematic, procedure, period, remarks);
         entry.fallback = fallback; // Will be replaced by a Layer in postCreateEntry.
         return entry;
     }
@@ -121,15 +122,14 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         if (entry.fallback instanceof String) {
             entry.fallback = getEntry((String) entry.fallback);
         }
-        final GridCoverageTable data;
-        data = new GridCoverageTable(getDatabase().getTable(GridCoverageTable.class));
+        final Database database = getDatabase();
+        final GridCoverageTable data = new GridCoverageTable(database.getTable(GridCoverageTable.class));
         data.setLayer(layer);
         data.setTimeRange(getTimeRange());
         data.setEnvelope(getEnvelope());
         data.trimEnvelope();
         entry.setGridCoverageTable(data);
         if (models == null) {
-            final Database database = getDatabase();
             DescriptorTable descriptors = database.getTable(DescriptorTable.class);
             descriptors = new DescriptorTable(descriptors); // Protect the shared instance from changes.
             descriptors.setLayerTable(this);
@@ -190,14 +190,28 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     }
 
     /**
-     * Invoked when the state of this field changed. This method {@linkplain #clearCache clears
+     * Invoked when the state of this field changed. This method {@linkplain #flush clears
      * the cache} if the changed property is the geographic bounding box or the time range.
      */
     @Override
     protected void fireStateChanged(final String property) {
         super.fireStateChanged(property);
         if (property.equalsIgnoreCase("GeographicBoundingBox") || property.equalsIgnoreCase("TimeRange")) {
-            clearCache();
+            flush();
         }
+    }
+
+    /**
+     * Clears this table cache.
+     */
+    @Override
+    public synchronized void flush() {
+        if (series != null) {
+            series.flush();
+        }
+        if (models != null) {
+            models.flush();
+        }
+        super.flush();
     }
 }

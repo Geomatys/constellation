@@ -34,13 +34,18 @@ public enum QueryType {
      * Only one entry will be selected using a numeric identifier. This is the kind of
      * query executed by {@link SingletonTable#getEntry(int)}.
      */
-    SELECT_BY_IDENTIFIER(),
+    SELECT_BY_NUMBER(),
 
     /**
      * Checks if an entry exists. This query is similar to {@link #SELECT} except that it
      * doesn't ask for any column, so the query is simplier for the database. The parameters
      * are usually the same than {@link #SELECT} and we are only interrested to see if the
      * result set contains at least one entry.
+     *
+     * @deprecated we should be able to figure out the query by ourself using the primary
+     *             key given in {@link SingletonTable}. Once done, it would allow us to
+     *             optimize {@link SingletonTable#getIdentifiers} (asking only the required
+     *             column) as a side effect.
      */
     EXISTS(),
 

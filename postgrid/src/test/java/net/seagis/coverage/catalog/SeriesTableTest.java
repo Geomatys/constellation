@@ -51,7 +51,7 @@ public class SeriesTableTest extends DatabaseTest {
 
         // Ask only for series in a given layer.
         assertNull(table.getLayer());
-        table.setLayer(new LayerEntry(LayerTableTest.SAMPLE_NAME, null, 1, null));
+        table.setLayer(new LayerEntry(LayerTableTest.SAMPLE_NAME, null, null, 1, null));
         assertSame(entry, table.getEntry(SAMPLE_NAME));
 
         final Set<Series> filtered = table.getEntries();

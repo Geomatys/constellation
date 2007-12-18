@@ -72,6 +72,17 @@ public class LayerTableTest extends DatabaseTest {
     public static final String SAMPLE_TIME_AS_TEXT = "1986-01-20";
 
     /**
+     * Tests the {@link LayerTableTest#getIdentifiers} method.
+     */
+    @Test
+    public void testIdentifiers() throws CatalogException, SQLException {
+        final LayerTable table = new LayerTable(database);
+        final Set<String> identifiers = table.getIdentifiers();
+        assertTrue(identifiers.contains(SAMPLE_NAME));
+        assertTrue(identifiers.contains(NETCDF_NAME));
+    }
+
+    /**
      * Tests the {@link LayerTableTest#getEntry} and @link LayerTableTest#getEntries} methods.
      */
     @Test

@@ -41,9 +41,17 @@ public interface Layer extends Element {
      * Returns the thematic for this layer. Examples: <cite>temperature</cite>,
      * <cite>sea level anomaly</cite>, <cite>chlorophylle-a concentration</cite>, etc.
      *
-     * @return The thematic for this layer.
+     * @return The thematic for this layer, or {@code null} if unknown.
      */
     String getThematic();
+
+    /**
+     * Returns the procedure applied on this layer. Examples: <cite>gradient magnitude</cite>,
+     * <cite>monthly average</cite>, etc.
+     *
+     * @return The procedure for this layer, or {@code null} if unknown.
+     */
+    String getProcedure();
 
     /**
      * A layer to use as a fallback if no data is available in this layer for a given position. For

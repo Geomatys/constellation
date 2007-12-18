@@ -258,7 +258,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      */
     public synchronized void setLayer(final Layer layer) {
         if (!layer.equals(this.layer)) {
-            clearCacheKeepEntries();
+            flushExceptEntries();
             this.layer = layer;
             fireStateChanged("Layer");
             log("setLayer", Level.CONFIG, ResourceKeys.SET_LAYER_$1, layer.getName());
@@ -286,7 +286,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     public synchronized boolean setTimeRange(final Date startTime, final Date endTime) {
         final boolean change = super.setTimeRange(startTime, endTime);
         if (change) {
-            clearCacheKeepEntries();
+            flushExceptEntries();
             final String startText, endText;
             synchronized (dateFormat) {
                 startText = dateFormat.format(startTime);
@@ -305,7 +305,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     public synchronized boolean setGeographicBoundingBox(final GeographicBoundingBox area) {
         final boolean change = super.setGeographicBoundingBox(area);
         if (change) {
-            clearCache();
+            flush();
             log("setGeographicArea", Level.CONFIG, ResourceKeys.SET_GEOGRAPHIC_AREA_$2, new String[] {
                 GeographicBoundingBoxImpl.toString(area, ANGLE_PATTERN, getDatabase().getLocale()),
                 getLayerName()
@@ -334,7 +334,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      */
     public synchronized void setPreferredResolution(final Dimension2D pixelSize) {
         if (!Utilities.equals(resolution, pixelSize)) {
-            clearCache();
+            flush();
             final int clé;
             final Object param;
             if (pixelSize != null) {
@@ -373,7 +373,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      */
     public synchronized void setOperation(final Operation operation) {
         if (!Utilities.equals(operation, this.operation)) {
-            clearCache();
+            flush();
             this.operation = operation;
             final int clé;
             final Object param;
@@ -493,7 +493,9 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
      */
     @Override
-    public synchronized CoverageReference getEntry(final String name) throws CatalogException, SQLException {
+    public synchronized CoverageReference getEntry(final String name)
+            throws CatalogException, SQLException
+    {
         if (name == null) {
             return null;
         }
@@ -858,17 +860,17 @@ loop:   for (final CoverageReference newReference : entries) {
      * Vide la cache de toutes les références vers les entrées précédemment créées.
      */
     @Override
-    protected void clearCache() {
-        super.clearCache();
-        clearCacheKeepEntries();
+    public synchronized void flush() {
+        flushExceptEntries();
+        super.flush();
     }
 
     /**
      * Réinitialise les caches, mais en gardant les références vers les entrées déjà créées.
-     * Cette méthode devrait être appellée à la place de {@link #clearCache} lorsque l'état
+     * Cette méthode devrait être appellée à la place de {@link #flush} lorsque l'état
      * de la table a changé, mais que cet état n'affecte pas les prochaines entrées à créer.
      */
-    private void clearCacheKeepEntries() {
+    private void flushExceptEntries() {
         coverage3D = null;
         parameters = null;
         comparator = null;
@@ -897,8 +899,10 @@ loop:   for (final CoverageReference newReference : entries) {
         String area;
         try {
             area = GeographicBoundingBoxImpl.toString(getGeographicBoundingBox(),
-                                                      ANGLE_PATTERN, getDatabase().getLocale());
+                    ANGLE_PATTERN, getDatabase().getLocale());
         } catch (CatalogException e) {
+            area = e.getLocalizedMessage();
+        } catch (SQLException e) {
             area = e.getLocalizedMessage();
         }
         final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));

@@ -53,16 +53,6 @@ import net.seagis.resources.i18n.ResourceKeys;
  */
 public abstract class SingletonTable<E extends Element> extends Table {
     /**
-     * The query to use for selecting a record by its name.
-     */
-    private static final QueryType SELECT_BY_NAME = QueryType.SELECT;
-
-    /**
-     * The query to use for selecting a record by its number.
-     */
-    private static final QueryType SELECT_BY_NUMBER = QueryType.SELECT_BY_IDENTIFIER;
-
-    /**
      * The maximal value (inclusive) for auto-increment. Used in order to avoid long
      * iteration over too big tables (in which case we need to find a better algorithm).
      * <p>
@@ -137,7 +127,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * @param  byNumber The parameter for looking an element by its numeric identifier, or
      *                  {@code null} if none. Most table do not provide a numeric identifer.
      * @throws IllegalArgumentException if the specified parameters are not one of those
-     *         declared for {@link QueryType#SELECT} or {@link QueryType#SELECT_BY_IDENTIFIER}.
+     *         declared for {@link QueryType#SELECT} or {@link QueryType#SELECT_BY_NUMBER}.
      */
     protected synchronized void setIdentifierParameters(final Parameter byName, final Parameter byNumber)
             throws IllegalArgumentException
@@ -151,13 +141,13 @@ public abstract class SingletonTable<E extends Element> extends Table {
         if (byName == null) {
             newPK = byNumber;
             if (byNumber != null) {
-                newByName = byNumber.indexOf(SELECT_BY_NAME);
+                newByName = byNumber.indexOf(QueryType.SELECT);
                 // Optional, so don't test for success.
             }
         } else {
             newPK = byName;
-            if (success = query.getParameters(SELECT_BY_NAME).contains(byName)) {
-                newByName = byName.indexOf(SELECT_BY_NAME);
+            if (success = query.getParameters(QueryType.SELECT).contains(byName)) {
+                newByName = byName.indexOf(QueryType.SELECT);
                 success = (newByName != 0);
             }
         }
@@ -166,12 +156,12 @@ public abstract class SingletonTable<E extends Element> extends Table {
             param = byNumber;
             if (byNumber == null) {
                 if (byName != null) {
-                    newByNumber = byName.indexOf(SELECT_BY_NUMBER);
+                    newByNumber = byName.indexOf(QueryType.SELECT_BY_NUMBER);
                     // Optional, so don't test for success.
                 }
             } else {
-                if (success = query.getParameters(SELECT_BY_NUMBER).contains(byNumber)) {
-                    newByNumber = byNumber.indexOf(SELECT_BY_NUMBER);
+                if (success = query.getParameters(QueryType.SELECT_BY_NUMBER).contains(byNumber)) {
+                    newByNumber = byNumber.indexOf(QueryType.SELECT_BY_NUMBER);
                     success = (newByNumber != 0);
                 }
             }
@@ -183,7 +173,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
             primaryKey    = newPK;
             indexByName   = newByName;
             indexByNumber = newByNumber;
-            clearCache();
+            flush();
             fireStateChanged("identifierParameters");
         }
     }
@@ -355,7 +345,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
         if (indexByNumber == 0) {
             throw new IllegalStateException();
         }
-        final PreparedStatement statement = getStatement(SELECT_BY_NUMBER);
+        final PreparedStatement statement = getStatement(QueryType.SELECT_BY_NUMBER);
         statement.setInt(indexByNumber, identifier);
         return executeQuery(statement, key, indexByNumber);
     }
@@ -381,7 +371,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
         if (indexByName == 0) {
             throw new IllegalStateException();
         }
-        final PreparedStatement statement = getStatement(SELECT_BY_NAME);
+        final PreparedStatement statement = getStatement(QueryType.SELECT);
         statement.setString(indexByName, name);
         return executeQuery(statement, name, indexByName);
     }
@@ -477,6 +467,38 @@ public abstract class SingletonTable<E extends Element> extends Table {
                 pool.remove(entry.getKey().getName());
             }
         }
+    }
+
+    /**
+     * Returns the names of all entries available in the database. This method is much
+     * more economical than {@link #getEntries} when only the identifiers are wanted.
+     *
+     * @return The set of entry identifiers. May be empty, but neven {@code null}.
+     * @throws CatalogException if a logical error has been detected in the database content.
+     * @throws SQLException if an error occured will reading from the database.
+     */
+    public synchronized Set<String> getIdentifiers() throws CatalogException, SQLException {
+        return getIdentifiers(QueryType.LIST);
+    }
+
+    /**
+     * Returns the names of all entries available in the database using the specified query type.
+     *
+     * @param  The query type, usually {@link QueryType#LIST}.
+     * @return The set of entry identifiers. May be empty, but neven {@code null}.
+     * @throws CatalogException if a logical error has been detected in the database content.
+     * @throws SQLException if an error occured will reading from the database.
+     */
+    private Set<String> getIdentifiers(final QueryType type) throws CatalogException, SQLException {
+        assert Thread.holdsLock(this);
+        final int index = (indexByName != 0) ? indexByName : indexByNumber;
+        final Set<String> identifiers = new LinkedHashSet<String>();
+        final ResultSet results = getStatement(type).executeQuery();
+        while (results.next()) {
+            identifiers.add(results.getString(index));
+        }
+        results.close();
+        return identifiers;
     }
 
     /**
@@ -666,8 +688,8 @@ scan:   for (int n=0; n<=MAXIMUM_AUTO_INCREMENT; n++) {
      * to be returned.
      */
     @Override
-    protected void clearCache() {
-        super.clearCache();
+    public synchronized void flush() {
+        super.flush();
         pool.clear();
     }
 }

@@ -721,6 +721,23 @@ public class Database {
     }
 
     /**
+     * Clears the cache. This method should be invoked when the database content changed.
+     *
+     * @throws CatalogException if a logical error occured.
+     * @throws SQLException if an error occured while reading the database.
+     */
+    public synchronized void flush() throws CatalogException, SQLException {
+        for (final Table table : tables.values()) {
+            synchronized (table) {
+                if (table.getStatement((QueryType) null) != null) {
+                    throw new AssertionError(table); // Should never occurs
+                }
+                table.flush();
+            }
+        }
+    }
+
+    /**
      * Closes the connection to the database. If the connection was already closed, then this
      * method does nothing.
      *
@@ -765,7 +782,7 @@ public class Database {
                             exception.setNextException(warning);
                         }
                     }
-                    table.clearCache();
+                    table.flush();
                 }
                 it.remove();
             }

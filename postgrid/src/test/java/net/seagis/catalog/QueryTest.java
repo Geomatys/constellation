@@ -109,25 +109,25 @@ public class QueryTest extends DatabaseTest {
      */
     @Test
     public void testParameters() throws SQLException {
-        final QueryType[] uses = new QueryType[] {SELECT, SELECT_BY_IDENTIFIER, LIST};
+        final QueryType[] uses = new QueryType[] {SELECT, SELECT_BY_NUMBER, LIST};
         final Query     query      = new Query(database,  "Categories");
         final Column    name       = new Column   (query, "Categories", "name");
         final Column    identifier = new Column   (query, "Categories", "lower", "identifier", null, uses);
         final Column    colors     = new Column   (query, "Categories", "colors", "colors",    null, uses);
         final Parameter byName     = new Parameter(query, name,       SELECT, EXISTS);
-        final Parameter byId       = new Parameter(query, identifier, SELECT_BY_IDENTIFIER);
+        final Parameter byId       = new Parameter(query, identifier, SELECT_BY_NUMBER);
         byId.setComparator("IS NULL OR >=");
 
         assertEquals(1, name      .indexOf(SELECT));
-        assertEquals(1, name      .indexOf(SELECT_BY_IDENTIFIER));
+        assertEquals(1, name      .indexOf(SELECT_BY_NUMBER));
         assertEquals(2, identifier.indexOf(SELECT));
-        assertEquals(2, identifier.indexOf(SELECT_BY_IDENTIFIER));
+        assertEquals(2, identifier.indexOf(SELECT_BY_NUMBER));
         assertEquals(3, colors    .indexOf(SELECT));
-        assertEquals(3, colors    .indexOf(SELECT_BY_IDENTIFIER));
+        assertEquals(3, colors    .indexOf(SELECT_BY_NUMBER));
         assertEquals(1, byName    .indexOf(SELECT));
-        assertEquals(0, byName    .indexOf(SELECT_BY_IDENTIFIER));
+        assertEquals(0, byName    .indexOf(SELECT_BY_NUMBER));
         assertEquals(0, byId      .indexOf(SELECT));
-        assertEquals(1, byId      .indexOf(SELECT_BY_IDENTIFIER));
+        assertEquals(1, byId      .indexOf(SELECT_BY_NUMBER));
         assertEquals(Arrays.asList(name, identifier, colors), query.getColumns(SELECT));
 
         String actual = query.select(LIST);
@@ -146,7 +146,7 @@ public class QueryTest extends DatabaseTest {
         expected = "SELECT \"name\" FROM \"Categories\" WHERE (\"name\" = ?)";
         assertEquals(expected, actual);
 
-        actual = query.select(SELECT_BY_IDENTIFIER);
+        actual = query.select(SELECT_BY_NUMBER);
         expected = expectedAll + " WHERE (\"identifier\" IS NULL OR \"identifier\" >= ?)";
         assertEquals(expected, actual);
     }

@@ -541,10 +541,10 @@ public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * Clears the cache.
      */
     @Override
-    protected void clearCache() {
+    public synchronized void flush() {
         if (cachedCRS != null) {
             cachedCRS.clear();
         }
-        super.clearCache();
+        super.flush();
     }
 }

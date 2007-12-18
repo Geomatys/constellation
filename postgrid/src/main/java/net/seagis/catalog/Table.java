@@ -242,8 +242,7 @@ public class Table {
                 configure(queryType, statement);
                 final Level level = queryType!=null ? queryType.level : Level.FINE;
                 if (LOGGER.isLoggable(level)) {
-                    final LogRecord record =
-                            new LogRecord(level, getDatabase().format(statement, query));
+                    LogRecord record = new LogRecord(level, getDatabase().format(statement, query));
                     record.setSourceClassName(getClass().getName());
                     record.setSourceMethodName(getCallerMethodName(queryType));
                     LOGGER.log(record);
@@ -474,20 +473,17 @@ public class Table {
      */
     private String getCallerMethodName(final QueryType type) {
         switch (type) {
-            case SELECT:               return "getEntry(String)";
-            case SELECT_BY_IDENTIFIER: return "getEntry(int)";
-            case LIST:                 return "getEntries()";
-            default:                   return "getStatement";
+            case SELECT:           return "getEntry(String)";
+            case SELECT_BY_NUMBER: return "getEntry(int)";
+            case LIST:             return "getEntries()";
+            default:               return "getStatement";
         }
     }
 
     /**
-     * Clears the cache, if any. This method is overriden and given {@code protected}
-     * access by {@link SingletonTable}. An empty method with package-private access
-     * is defined here as a hook invoked by {@link Database#close}.
+     * Clears the cache, if any.
      */
-    void clearCache() {
-        assert Thread.holdsLock(this);
+    public void flush() {
     }
 
     /**

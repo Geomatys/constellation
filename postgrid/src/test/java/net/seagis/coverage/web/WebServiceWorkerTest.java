@@ -75,21 +75,24 @@ public class WebServiceWorkerTest extends DatabaseTest {
         int height = 341; // Expected height
         worker.setBoundingBox("-10,20,20,50");
         assertEquals(layer.getName(), LayerTableTest.SAMPLE_NAME);
+        assertNotSame("A new layer should be created.", layer, worker.getLayer());
+        assertNotSame("A new coverage should be created.", coverage, worker.getGridCoverage2D(false));
+        layer    = worker.getLayer();
+        coverage = worker.getGridCoverage2D(false);
+        worker.setBoundingBox("-10,20,20,50");  // Same value should not flush the cache.
         assertSame("The layer should be cached.", layer, worker.getLayer());
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
 
         image = worker.getRenderedImage();
+        SampleModel sm = image.getSampleModel();
         assertEquals(width,  image.getWidth());
         assertEquals(height, image.getHeight());
-        if (false) {
-            SampleModel sm = image.getSampleModel();
-            assertEquals(width,  image.getTileWidth());
-            assertEquals(height, image.getTileHeight());
-            assertEquals(1,      image.getNumXTiles());
-            assertEquals(1,      image.getNumYTiles());
-            assertEquals(width,  sm.getWidth());
-            assertEquals(height, sm.getHeight());
-        }
+        assertEquals(width,  image.getTileWidth());
+        assertEquals(height, image.getTileHeight());
+        assertEquals(1,      image.getNumXTiles());
+        assertEquals(1,      image.getNumYTiles());
+        assertEquals(width,  sm.getWidth());
+        assertEquals(height, sm.getHeight());
         file = worker.getImageFile();
         assertTrue(file.getName().endsWith(".png"));
         assertTrue(file.isFile());
@@ -108,6 +111,11 @@ public class WebServiceWorkerTest extends DatabaseTest {
         height = 300; // Expected height
         worker.setDimension("300","300");
         assertEquals(layer.getName(), LayerTableTest.SAMPLE_NAME);
+//      assertNotSame("A new layer should be created.", layer, worker.getLayer());
+//      assertNotSame("A new coverage should be created.", coverage, worker.getGridCoverage2D(false));
+        layer    = worker.getLayer();
+        coverage = worker.getGridCoverage2D(false);
+        worker.setDimension("300","300");  // Same value should not flush the cache.
         assertSame("The layer should be cached.", layer, worker.getLayer());
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
 

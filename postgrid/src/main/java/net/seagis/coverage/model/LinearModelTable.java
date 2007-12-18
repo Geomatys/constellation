@@ -56,7 +56,7 @@ public class LinearModelTable extends Table {
 
     /**
      * Creates a linear model table.
-     * 
+     *
      * @param database Connection to the database.
      */
     public LinearModelTable(final Database database) {
@@ -128,7 +128,7 @@ public class LinearModelTable extends Table {
     }
 
     /**
-     * Retourne les termes de modèle linéaire pour la couche d'images spécifiée. 
+     * Retourne les termes de modèle linéaire pour la couche d'images spécifiée.
      * Si cette couche n'est pas le résultat d'un modèle linéaire, alors cette
      * méthode retourne {@code null}.
      *
@@ -205,5 +205,19 @@ public class LinearModelTable extends Table {
             t.setDescriptors(term);
         }
         return Arrays.asList(terms.toArray(new LinearModel.Term[terms.size()]));
+    }
+
+    /**
+     * Clears the cache, if any.
+     */
+    @Override
+    public synchronized void flush() {
+        if (substitution != null) {
+            substitution.flush();
+        }
+        if (descriptors != null) {
+            descriptors.flush();
+        }
+        super.flush();
     }
 }

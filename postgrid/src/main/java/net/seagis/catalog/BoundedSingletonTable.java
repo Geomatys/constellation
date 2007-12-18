@@ -177,7 +177,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         if (!Utilities.equals(this.byTimeRange, byTimeRange) || !Utilities.equals(this.bySpatialExtent, bySpatialExtent)) {
             this.byTimeRange     = byTimeRange;
             this.bySpatialExtent = bySpatialExtent;
-            clearCache();
+            flush();
             fireStateChanged("extentParameters");
         }
     }
@@ -241,15 +241,15 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * {@link #getGeographicBoundingBox}, {@link #getVerticalRange} and {@link #getTimeRange},
      * applying a coordinate transformation if needed.
      *
-     * @throws CatalogException if the envelope can not be obtained or an error occured
-     *         during the transformation.
+     * @throws CatalogException if a logical error occured.
+     * @throws SQLException if an error occured while reading the database.
      *
      * @see #getGeographicBoundingBox
      * @see #getVerticalRange
      * @see #getTimeRange
      * @see #trimEnvelope
      */
-    public synchronized Envelope getEnvelope() throws CatalogException {
+    public synchronized Envelope getEnvelope() throws CatalogException, SQLException {
         final GeographicBoundingBox box = getGeographicBoundingBox();
         final NumberRange      altitude = getVerticalRange();
         final DateRange            time = getTimeRange();
@@ -287,13 +287,20 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * {@link #setVerticalRange} and {@link #setTimeRange}, applying a coordinate
      * transformation if needed.
      *
-     * @param  envelope The envelope.
+     * @param  envelope The envelope, or {@code null} to reset full coverage.
      * @return {@code true} if the envelope changed as a result of this call, or
      *         {@code false} if the specified envelope is equals to the one already set.
      * @throws CatalogException if an error occured during the transformation or
      *         the envelope can not be set.
      */
     public synchronized boolean setEnvelope(Envelope envelope) throws CatalogException {
+        if (envelope == null) {
+            boolean changed;
+            changed  = setGeographicBoundingBox(null);
+            changed |= setVerticalRange        (null);
+            changed |= setTimeRange            (null);
+            return changed;
+        }
         final CoordinateReferenceSystem sourceCRS = envelope.getCoordinateReferenceSystem();
         if (sourceCRS != null) {
             final CoordinateReferenceSystem targetCRS = getCoordinateReferenceSystem();
@@ -312,19 +319,22 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         }
         boolean changed = false;
         if (crsType.xdim >= 0 && crsType.ydim >= 0) {
-            changed |= setGeographicBoundingBox(new GeographicBoundingBoxImpl(
+            final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(
                     envelope.getMinimum(crsType.xdim),
                     envelope.getMaximum(crsType.xdim),
                     envelope.getMinimum(crsType.ydim),
-                    envelope.getMaximum(crsType.ydim)));
+                    envelope.getMaximum(crsType.ydim));
+            changed |= setGeographicBoundingBox(bbox);
         }
         if (crsType.zdim >= 0) {
-            changed |= setVerticalRange(envelope.getMinimum(crsType.zdim),
-                                        envelope.getMaximum(crsType.zdim));
+            final double minimum = envelope.getMinimum(crsType.zdim);
+            final double maximum = envelope.getMaximum(crsType.zdim);
+            changed |= setVerticalRange(minimum, maximum);
         }
         if (crsType.tdim >= 0) {
-            changed |= setTimeRange(CRS.TEMPORAL.toDate(envelope.getMinimum(crsType.tdim)),
-                                    CRS.TEMPORAL.toDate(envelope.getMaximum(crsType.tdim)));
+            final Date minimum = CRS.TEMPORAL.toDate(envelope.getMinimum(crsType.tdim));
+            final Date maximum = CRS.TEMPORAL.toDate(envelope.getMaximum(crsType.tdim));
+            changed |= setTimeRange(minimum, maximum);
         }
         return changed;
     }
@@ -336,19 +346,18 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * be smaller if {@link #trimEnvelope} has been invoked.
      *
      * @return The bounding box of the elements to be read.
-     * @throws CatalogException if the bounding box can not be obtained.
+     * @throws CatalogException if a logical error occured.
+     * @throws SQLException if an error occured while reading the database.
      *
      * @see #getVerticalRange
      * @see #getTimeRange
      * @see #getEnvelope
      * @see #trimEnvelope
      */
-    public synchronized GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
-        try {
-            ensureTrimmed(QueryType.BOUNDING_BOX);
-        } catch (SQLException e) {
-            throw new ServerException(e);
-        }
+    public synchronized GeographicBoundingBox getGeographicBoundingBox()
+            throws CatalogException, SQLException
+    {
+        ensureTrimmed(QueryType.BOUNDING_BOX);
         return new GeographicBoundingBoxImpl(xMin, xMax, yMin, yMax);
     }
 
@@ -363,10 +372,10 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      */
     public synchronized boolean setGeographicBoundingBox(final GeographicBoundingBox area) {
         boolean change;
-        change  = (xMin != (xMin = Math.max(area.getWestBoundLongitude(), -360)));
-        change |= (xMax != (xMax = Math.min(area.getEastBoundLongitude(), +360)));
-        change |= (yMin != (yMin = Math.max(area.getSouthBoundLatitude(),  -90)));
-        change |= (yMax != (yMax = Math.min(area.getNorthBoundLatitude(),  +90)));
+        change  = (xMin != (xMin = area!=null ? Math.max(area.getWestBoundLongitude(), -360) : -360));
+        change |= (xMax != (xMax = area!=null ? Math.min(area.getEastBoundLongitude(), +360) : +360));
+        change |= (yMin != (yMin = area!=null ? Math.max(area.getSouthBoundLatitude(),  -90) :  -90));
+        change |= (yMax != (yMax = area!=null ? Math.min(area.getNorthBoundLatitude(),  +90) :  +90));
         trimRequested = false;
         if (change) {
             trimmed = false;
@@ -382,19 +391,16 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * {@link #trimEnvelope} has been invoked.
      *
      * @return The vertical range of the elements to be read.
-     * @throws CatalogException if the vertical range can not be obtained.
+     * @throws CatalogException if a logical error occured.
+     * @throws SQLException if an error occured while reading the database.
      *
      * @see #getGeographicBoundingBox
      * @see #getTimeRange
      * @see #getEnvelope
      * @see #trimEnvelope
      */
-    public synchronized NumberRange getVerticalRange() throws CatalogException {
-        try {
-            ensureTrimmed(QueryType.BOUNDING_BOX);
-        } catch (SQLException e) {
-            throw new ServerException(e);
-        }
+    public synchronized NumberRange getVerticalRange() throws CatalogException, SQLException {
+        ensureTrimmed(QueryType.BOUNDING_BOX);
         return new NumberRange(zMin, zMax);
     }
 
@@ -402,12 +408,20 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * Sets the vertical range of the elements to be read by this table.
      * The range should be specified in metres above the WGS&nbsp;1984 ellipsoid.
      *
-     * @param  range The vertical range.
+     * @param  range The vertical range, or {@code null} for full coverage.
      * @return {@code true} if the vertical range changed as a result of this call, or
      *         {@code false} if the specified range is equals to the one already set.
      */
     public final boolean setVerticalRange(final NumberRange range) {
-        return setVerticalRange(range.getMinimum(true), range.getMaximum(true));
+        final double minimum, maximum;
+        if (range != null) {
+            minimum = range.getMinimum(true);
+            maximum = range.getMaximum(true);
+        } else {
+            minimum = Double.NEGATIVE_INFINITY;
+            maximum = Double.POSITIVE_INFINITY;
+        }
+        return setVerticalRange(minimum, maximum);
     }
 
     /**
@@ -438,19 +452,16 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * {@link #trimEnvelope} has been invoked.
      *
      * @return The time range of the elements to be read.
-     * @throws CatalogException if the time range can not be obtained.
+     * @throws CatalogException if a logical error occured.
+     * @throws SQLException if an error occured while reading the database.
      *
      * @see #getGeographicBoundingBox
      * @see #getVerticalRange
      * @see #getEnvelope
      * @see #trimEnvelope
      */
-    public synchronized DateRange getTimeRange() throws CatalogException {
-        try {
-            ensureTrimmed(QueryType.BOUNDING_BOX);
-        } catch (SQLException e) {
-            throw new ServerException(e);
-        }
+    public synchronized DateRange getTimeRange() throws CatalogException, SQLException {
+        ensureTrimmed(QueryType.BOUNDING_BOX);
         return new DateRange(tMin != Long.MIN_VALUE ? new Date(tMin) : null,
                              tMax != Long.MAX_VALUE ? new Date(tMax) : null);
     }
@@ -463,12 +474,18 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      *         {@code false} if the specified range is equals to the one already set.
      */
     public final boolean setTimeRange(final DateRange timeRange) {
-        Date startTime = timeRange.getMinValue();
-        Date   endTime = timeRange.getMaxValue();
-        if (!timeRange.isMinIncluded()) {
+        Date startTime, endTime;
+        if (timeRange != null) {
+            startTime = timeRange.getMinValue();
+            endTime   = timeRange.getMaxValue();
+        } else {
+            startTime = null;
+            endTime   = null;
+        }
+        if (startTime!=null && !timeRange.isMinIncluded()) {
             startTime = new Date(startTime.getTime() + 1);
         }
-        if (!timeRange.isMaxIncluded()) {
+        if (endTime!=null && !timeRange.isMaxIncluded()) {
             endTime = new Date(endTime.getTime() - 1);
         }
         return setTimeRange(startTime, endTime);
@@ -512,57 +529,63 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      *
      * @throws CatalogException If the statement can not be configured.
      * @throws SQLException if an error occured while reading the database.
-     * @throws IllegalRecordException if a record contains an illegal value.
      */
     private void ensureTrimmed(final QueryType type) throws CatalogException, SQLException {
         assert Thread.holdsLock(this);
-        if (trimRequested && !trimmed) {
+        if (!trimRequested || trimmed) {
+            return;
+        }
+        final int timeColumn = (byTimeRange     != null) ? byTimeRange    .column.indexOf(type) : 0;
+        final int bboxColumn = (bySpatialExtent != null) ? bySpatialExtent.column.indexOf(type) : 0;
+        if (timeColumn != 0 || bboxColumn != 0) {
             final PreparedStatement statement = getStatement(type);
             if (statement != null) {
-                final int timeColumn = (byTimeRange     != null) ? byTimeRange    .column.indexOf(type) : 0;
-                final int bboxColumn = (bySpatialExtent != null) ? bySpatialExtent.column.indexOf(type) : 0;
                 final ResultSet results = statement.executeQuery();
                 while (results.next()) { // Should contains only one record.
-                    Date time;
-                    final Calendar calendar = getCalendar();
-                    time = results.getTimestamp(timeColumn, calendar);
-                    if (time != null) {
-                        tMin = max(tMin, time.getTime());
+                    if (timeColumn != 0) {
+                        Date time;
+                        final Calendar calendar = getCalendar();
+                        time = results.getTimestamp(timeColumn, calendar);
+                        if (time != null) {
+                            tMin = max(tMin, time.getTime());
+                        }
+                        time = results.getTimestamp(timeColumn + 1, calendar);
+                        if (time != null) {
+                            tMax = min(tMax, time.getTime());
+                        }
                     }
-                    time = results.getTimestamp(timeColumn + 1, calendar);
-                    if (time != null) {
-                        tMax = min(tMax, time.getTime());
-                    }
-                    final String bbox = results.getString(bboxColumn);
-                    if (bbox == null) {
-                        continue;
-                    }
-                    final Envelope envelope;
-                    try {
-                        envelope = SpatialFunctions.parse(bbox);
-                    } catch (NumberFormatException e) {
-                        throw new IllegalRecordException(e, this, results, bboxColumn, null);
-                    }
-                    final int dimension = envelope.getDimension();
-                    for (int i=0; i<dimension; i++) {
-                        final double min = envelope.getMinimum(i);
-                        final double max = envelope.getMaximum(i);
-                        switch (i) {
-                            case 0: if (min > xMin) xMin = min;
-                                    if (max < xMax) xMax = max; break;
-                            case 1: if (min > yMin) yMin = min;
-                                    if (max < yMax) yMax = max; break;
-                            case 2: if (min > zMin) zMin = min;
-                                    if (max < zMax) zMax = max; break;
-                            default: break; // Ignore extra dimensions, if any.
+                    if (bboxColumn != 0) {
+                        final String bbox = results.getString(bboxColumn);
+                        if (bbox == null) {
+                            continue;
+                        }
+                        final Envelope envelope;
+                        try {
+                            envelope = SpatialFunctions.parse(bbox);
+                        } catch (NumberFormatException e) {
+                            throw new IllegalRecordException(e, this, results, bboxColumn, null);
+                        }
+                        final int dimension = envelope.getDimension();
+                        for (int i=0; i<dimension; i++) {
+                            final double min = envelope.getMinimum(i);
+                            final double max = envelope.getMaximum(i);
+                            switch (i) {
+                                case 0: if (min > xMin) xMin = min;
+                                        if (max < xMax) xMax = max; break;
+                                case 1: if (min > yMin) yMin = min;
+                                        if (max < yMax) yMax = max; break;
+                                case 2: if (min > zMin) zMin = min;
+                                        if (max < zMax) zMax = max; break;
+                                default: break; // Ignore extra dimensions, if any.
+                            }
                         }
                     }
                 }
                 results.close();
                 fireStateChanged("Envelope");
             }
-            trimmed = true;
         }
+        trimmed = true;
     }
 
     /**

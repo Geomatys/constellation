@@ -507,12 +507,12 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             /*
              * Conversion [coordonnées logiques] --> [coordonnées pixels].
              */
-            final double scaleX =  width/fullArea.getWidth();
-            final double scaleY = height/fullArea.getHeight();
-            clipPixel.x      = (int)floor(scaleX*(clipLogical.getMinX()-fullArea.getMinX()) + EPS);
-            clipPixel.y      = (int)floor(scaleY*(fullArea.getMaxY()-clipLogical.getMaxY()) + EPS);
-            clipPixel.width  = (int)ceil (scaleX*clipLogical.getWidth()                     - EPS);
-            clipPixel.height = (int)ceil (scaleY*clipLogical.getHeight()                    - EPS);
+            final double scaleX =  width / fullArea.getWidth();
+            final double scaleY = height / fullArea.getHeight();
+            clipPixel.x      = (int)floor(scaleX * (clipLogical.getMinX() - fullArea.getMinX()) + EPS);
+            clipPixel.y      = (int)floor(scaleY * (fullArea.getMaxY() - clipLogical.getMaxY()) + EPS);
+            clipPixel.width  = (int)ceil (scaleX * clipLogical.getWidth()                       - EPS);
+            clipPixel.height = (int)ceil (scaleY * clipLogical.getHeight()                      - EPS);
             if (clipPixel.width <  MIN_SIZE) {
                 clipPixel.x    -= (MIN_SIZE-clipPixel.width)/2;
                 clipPixel.width =  MIN_SIZE;
@@ -529,14 +529,14 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             final int clipY2 = min(height, clipPixel.height + clipPixel.y);
             if (clipPixel.x < 0) clipPixel.x = 0;
             if (clipPixel.y < 0) clipPixel.y = 0;
-            clipPixel.width  = clipX2-clipPixel.x;
-            clipPixel.height = clipY2-clipPixel.y;
+            clipPixel.width  = clipX2 - clipPixel.x;
+            clipPixel.height = clipY2 - clipPixel.y;
             /*
              * Vérifie que la largeur du rectangle est un
              * multiple entier de la fréquence d'échantillonage.
              */
-            clipPixel.width  = (clipPixel.width /xSubsampling) * xSubsampling;
-            clipPixel.height = (clipPixel.height/ySubsampling) * ySubsampling;
+            clipPixel.width  = (clipPixel.width  / xSubsampling) * xSubsampling;
+            clipPixel.height = (clipPixel.height / ySubsampling) * ySubsampling;
             if (clipPixel.isEmpty()) {
                 return null;
             }
@@ -545,10 +545,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
              *
              * 'clipLogical' ne devrait pas beaucoup changer (mais parfois un peu).
              */
-            clipLogical.setRect(fullArea.getMinX() + clipPixel.getMinX()  /scaleX,
-                                fullArea.getMaxY() - clipPixel.getMaxY()  /scaleY,
-                                                     clipPixel.getWidth() /scaleX,
-                                                     clipPixel.getHeight()/scaleY);
+            clipLogical.setRect(fullArea.getMinX() + clipPixel.getMinX()   / scaleX,
+                                fullArea.getMaxY() - clipPixel.getMaxY()   / scaleY,
+                                                     clipPixel.getWidth()  / scaleX,
+                                                     clipPixel.getHeight() / scaleY);
         }
         CoordinateReferenceSystem coverageCRS = parameters.coverageCRS;
         final DefaultTemporalCRS  temporalCRS = parameters.getTemporalCRS();

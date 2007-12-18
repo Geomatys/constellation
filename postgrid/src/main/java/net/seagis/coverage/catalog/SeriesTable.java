@@ -15,7 +15,6 @@
  */
 package net.seagis.coverage.catalog;
 
-import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;

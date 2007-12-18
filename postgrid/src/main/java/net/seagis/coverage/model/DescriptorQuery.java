@@ -47,7 +47,7 @@ final class DescriptorQuery extends Query {
      */
     public DescriptorQuery(final Database database) {
         super(database, "Descriptors");
-        final QueryType[] usage  = {SELECT, SELECT_BY_IDENTIFIER, LIST};
+        final QueryType[] usage  = {SELECT, SELECT_BY_NUMBER, LIST};
         identifier   = addColumn   ("identifier",   usage);
         symbol       = addColumn   ("symbol",       usage);
         layer        = addColumn   ("layer",        usage);
@@ -56,7 +56,7 @@ final class DescriptorQuery extends Query {
         band         = addColumn   ("band",         usage);
         distribution = addColumn   ("distribution", usage);
         bySymbol     = addParameter(symbol,     SELECT);
-        byIdentifier = addParameter(identifier, SELECT_BY_IDENTIFIER);
+        byIdentifier = addParameter(identifier, SELECT_BY_NUMBER);
         identifier.setOrdering("ASC", LIST);
     }
 }

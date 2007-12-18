@@ -133,7 +133,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
         Layer layer = descriptor.getLayer();
         while ((layer=layer.getFallback()) != null) {
             if (layer instanceof LayerEntry) {
-                final GridCoverageTable candidate = ((LayerEntry) layer).getDataConnection(operation);
+                final GridCoverageTable candidate = ((LayerEntry) layer).getGridCoverageTable(operation);
                 if (crs.equals(candidate.getCoordinateReferenceSystem())) {
                     fallback.add(candidate);
                     continue;
@@ -154,7 +154,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
         if (!(layer instanceof LayerEntry)) {
             throw new UnsupportedImplementationException("Implémentation non-supportée de la couche.");
         }
-        return ((LayerEntry) layer).getDataConnection(descriptor.getOperation());
+        return ((LayerEntry) layer).getGridCoverageTable(descriptor.getOperation());
     }
 
     /**
@@ -167,6 +167,8 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
             try {
                 e = data.getEnvelope();
             } catch (CatalogException exception) {
+                throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
+            } catch (SQLException exception) {
                 throw new CannotEvaluateException(exception.getLocalizedMessage(), exception);
             }
             if (dt != 0) {

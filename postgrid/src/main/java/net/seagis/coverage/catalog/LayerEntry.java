@@ -48,98 +48,110 @@ import net.seagis.resources.i18n.ResourceKeys;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain Layer couche d'images}.
+ * Implementation of a {@linkplain Layer layer}.
  *
  * @author Martin Desruisseaux
  * @version $Id$
  */
 final class LayerEntry extends Entry implements Layer {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * For cros-version compatibility.
      */
     private static final long serialVersionUID = 5283559646740856038L;
 
     /**
-     * Nombre de millisecondes dans une journée.
+     * Amount of milliseconds in a day.
      */
     private static final long MILLIS_IN_DAY = 24*60*60*1000L;
 
     /**
-     * Référence vers le {@linkplain Phenomenon phénomène} observé.
+     * The theme of this layer (e.g. Temperature, Salinity, etc.).
      */
     private final String thematic;
 
     /**
-     * L'intervalle de temps typique des images de cette couche (en nombre
-     * de jours), ou {@link Double#NaN} si elle est inconnue.
+     * Procedure applied for this layer (e.g. Gradients, etc.).
+     */
+    private final String procedure;
+
+    /**
+     * Typical time interval (in days) between images, or {@link Double#NaN} if unknown.
      */
     private final double timeInterval;
 
     /**
-     * Si cette couche est le résultat d'un modèle numérique, ce modèle.
-     * Sinon, {@code null}. Ce champ sera initialisé par {@link LayerTable}.
+     * If this layer is the result of some numerical model, the model. Other wise, {@code null}.
+     * This field is set by {@link LayerTable#postCreateEntry} only.
      */
     Model model;
 
     /**
      * The series associated with their names. This map will be created by
-     * {@link LayerTable#postCreateEntry}.
+     * {@link LayerTable#postCreateEntry}. It will contains every series,
+     * including the hidden ones.
      */
     private Map<String,Series> seriesMap;
 
     /**
-     * A immutable view over the values of {@link #seriesMap}.
+     * A immutable view over the visible series. It may contains less entries
+     * than {@link #seriesMap} because some series may be hidden.
      */
     private Set<Series> series;
 
     /**
-     * Une couche de second recours qui peut être utilisée si aucune données n'est disponible
-     * dans cette couche à une certaine position spatio-temporelle. Peut être {@code null} s'il
-     * n'y a pas de couche de second recours.
+     * A fallback layer to be used if no image can be found for a given date in this layer.
+     * May be {@code null} if there is no fallback.
      * <p>
-     * Lors de la construction d'une couche, ce champ est initialement le nom de la couche sous forme
-     * d'objet {@link String}. Ce n'est que lors de l'appel de {@link LayerTable#postCreateEntry}
-     * que ce nom est convertit en objet {@link LayerEntry}.
+     * Upon construction, this field contains only the layer name as a {@link String}. After
+     * {@link LayerTable#postCreateEntry} processing, the string will have be replaced by a
+     * {@link LayerEntry} instance.
      */
     Object fallback;
 
     /**
-     * Une vue tri-dimensionnelle des données retournée par {@link #getCoverage}.
-     * Sera construit la première fois où elle sera demandée.
+     * A tri or four-dimensional view over the data to be returned by {@link #getCoverage}.
+     * Will be created only when first needed.
      */
     private transient Reference<Coverage> coverage;
 
     /**
      * Connection to the grid coverage table. Will be created when first needed.
      */
-    private GridCoverageTable server;
+    private GridCoverageTable data;
 
     /**
      * Ensemble des fabriques pour différentes opérations. Ne seront construites que lorsque
      * nécessaire.
+     *
+     * @deprecated We should handle that in a separated LayerEntry instance instead.
      */
     private transient Map<Operation,GridCoverageTable> servers;
 
     /**
      * La fabrique à utiliser pour obtenir une seule image à une date spécifique.
      * Ne sera construit que la première fois où elle sera nécessaire.
+     *
+     * @deprecated Try to use {@link #data} instead.
      */
     private transient GridCoverageTable singleCoverageServer;
 
     /**
-     * Construit une nouvelle couches.
+     * Creates a new layer.
      *
-     * @param name         Le nom de la couche.
-     * @param thematic     La thématique de cette couche de données.
-     * @param timeInterval L'intervalle de temps typique des images de cette couche (en nombre
-     *                     de jours), ou {@link Double#NaN} si elle est inconnue.
-     * @param remarks      Remarques s'appliquant à cette entrée, ou {@code null}.
+     * @param name         The layer name.
+     * @param thematic     Thematic for this layer (e.g. Temperature, Salinity, etc.).
+     * @param procedure    Procedure applied for this layer (e.g. Gradients, etc.).
+     * @param timeInterval Typical time interval (in days) between images, or {@link Double#NaN}
+     *                     if unknown.
+     * @param remarks      Optional remarks, or {@code null}.
      */
-    protected LayerEntry(final String name, final String thematic, final double timeInterval,
+    protected LayerEntry(final String name, final String thematic, final String procedure,
+                         final double timeInterval,
                          final String remarks)
     {
         super(name, remarks);
         this.thematic     = thematic;
+        this.procedure    = procedure;
         this.timeInterval = timeInterval;
     }
 
@@ -153,13 +165,24 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    public String getProcedure() {
+        return procedure;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public Layer getFallback() {
         final Object fallback = this.fallback; // Protect from changes in concurrent threads.
         return (fallback instanceof Layer) ? (Layer) fallback : null;
     }
 
     /**
-     * Sets the series for this layer.
+     * Sets the series for this layer. This method is invoked by {@link LayerTable#postCreateEntry}
+     * only. The series set given will be trimmed (every hidden series will be removed from it). A
+     * direct reference to this set will be retained.
+     *
+     * @param series The series to set. <strong>This collection will be modified</strong>.
      */
     final void setSeries(final Set<Series> series) {
         final Map<String,Series> map = new HashMap<String,Series>((int) (series.size() / 0.75f) + 1);
@@ -201,7 +224,7 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public Series getSeries(final String name) {
-        return (seriesMap != null) ? seriesMap.get(name.trim()) : null;
+        return (seriesMap != null && name != null) ? seriesMap.get(name.trim()) : null;
     }
 
     /**
@@ -215,9 +238,9 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
-        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
-        if (server != null) try {
-            return server.getAvailableTimes();
+        final GridCoverageTable data = this.data;   // Protect against concurrent changes.
+        if (data != null) try {
+            return data.getAvailableTimes();
         } catch (SQLException e) {
             throw new ServerException(e);
         }
@@ -228,9 +251,9 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
-        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
-        if (server != null) try {
-            return server.getAvailableElevations();
+        final GridCoverageTable data = this.data;   // Protect against concurrent changes.
+        if (data != null) try {
+            return data.getAvailableElevations();
         } catch (SQLException e) {
             throw new ServerException(e);
         }
@@ -270,9 +293,11 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public DateRange getTimeRange() throws CatalogException {
-        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
-        if (server != null) {
-            return server.getTimeRange();
+        final GridCoverageTable data = this.data;   // Protect against concurrent changes.
+        if (data != null) try {
+            return data.getTimeRange();
+        } catch (SQLException exception) {
+            throw new ServerException(exception);
         }
         return null;
     }
@@ -281,9 +306,11 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
-        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
-        if (server != null) {
-            return server.getGeographicBoundingBox();
+        final GridCoverageTable data = this.data;   // Protect against concurrent changes.
+        if (data != null) try {
+            return data.getGeographicBoundingBox();
+        } catch (SQLException exception) {
+            throw new ServerException(exception);
         }
         return GeographicBoundingBoxImpl.WORLD;
     }
@@ -303,7 +330,7 @@ final class LayerEntry extends Entry implements Layer {
         final Date   endTime = new Date(t + delay);
         try {
             if (singleCoverageServer == null) {
-                singleCoverageServer = new GridCoverageTable(server);
+                singleCoverageServer = new GridCoverageTable(data);
             }
             singleCoverageServer.setTimeRange(startTime, endTime);
             final double z = (elevation != null) ? elevation.doubleValue() : 0;
@@ -318,9 +345,9 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public Set<CoverageReference> getCoverageReferences() throws CatalogException {
-        final GridCoverageTable server = this.server;   // Protect against concurrent changes.
-        if (server != null) try {
-            return server.getEntries();
+        final GridCoverageTable data = this.data;   // Protect against concurrent changes.
+        if (data != null) try {
+            return data.getEntries();
         } catch (SQLException exception) {
             throw new ServerException(exception);
         } else {
@@ -340,10 +367,8 @@ final class LayerEntry extends Entry implements Layer {
             }
             LOGGER.fine("Reconstruit à nouveau la converture de \"" + getName() + "\".");
         }
-        if (server != null) try {
-            c = new CoverageStack(getName(),
-                                  server.getCoordinateReferenceSystem(),
-                                  getCoverageReferences());
+        if (data != null) try {
+            c = new CoverageStack(getName(), data.getCoordinateReferenceSystem(), getCoverageReferences());
             coverage = new SoftReference<Coverage>(c);
         } catch (IOException exception) {
             throw new ServerException(exception);
@@ -388,18 +413,20 @@ final class LayerEntry extends Entry implements Layer {
      *
      * @param  operation L'opération désirée, ou {@code null} si aucune.
      * @return Une connexion vers les données produites par l'opération spécifiée.
+     *
+     * @deprecated Should returns an other {@link LayerEntry} instance instead.
      */
-    protected synchronized GridCoverageTable getDataConnection(final Operation operation) {
-        if (operation==null || server==null) {
-            return server;
+    protected synchronized GridCoverageTable getGridCoverageTable(final Operation operation) {
+        if (operation==null || data==null) {
+            return data;
         }
         if (servers == null) {
             servers = new HashMap<Operation,GridCoverageTable>();
         }
         GridCoverageTable candidate = servers.get(operation);
         if (candidate == null) {
-            candidate = new GridCoverageTable(server);
-            server.setOperation(operation);
+            candidate = new GridCoverageTable(data);
+            data.setOperation(operation);
             servers.put(operation, candidate);
         }
         return candidate;
@@ -416,10 +443,10 @@ final class LayerEntry extends Entry implements Layer {
     protected synchronized void setGridCoverageTable(final GridCoverageTable data)
             throws IllegalStateException
     {
-        if (server != null) {
+        if (this.data != null) {
             throw new IllegalStateException(getName());
         }
-        server = data;
+        this.data = data;
     }
 
     /**
@@ -432,7 +459,8 @@ final class LayerEntry extends Entry implements Layer {
         }
         if (super.equals(object)) {
             final LayerEntry that = (LayerEntry) object;
-            return Utilities.equals(this.thematic, that.thematic) &&
+            return Utilities.equals(this.thematic,  that.thematic ) &&
+                   Utilities.equals(this.procedure, that.procedure) &&
                    Double.doubleToLongBits(this.timeInterval) ==
                    Double.doubleToLongBits(that.timeInterval);
             /*

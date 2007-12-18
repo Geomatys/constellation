@@ -40,37 +40,6 @@ final class LayerQuery extends Query {
      */
     protected final Parameter byName;
 
-//    private static final SpatialConfigurationKey LIST = new SpatialConfigurationKey("Layer:LIST",
-//            "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
-//            "  FROM \"Layers\" "                                                       +
-//            "  JOIN (\n"                                                               +
-//            "   SELECT DISTINCT layer, visible FROM \"Series\"\n"                      +
-//            "   JOIN \"GridCoverages\""         + " ON series=\"Series\".identifier\n" +
-//            "   JOIN \"GridGeometries\""        + " ON extent=\"GridGeometries\".id\n" +
-//            "   WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                 +
-//            "     AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                 +
-//            "     AND (\"eastBoundLongitude\">=? AND \"westBoundLongitude\"<=?)\n"     +
-//            "     AND (\"northBoundLatitude\">=? AND \"southBoundLatitude\"<=?)\n"     +
-//            "     AND (\"altitudeMax\"       >=? AND \"altitudeMin\"<=?)\n"            +
-//            "  ) "                                                                     +
-//            "  AS \"Selected\" ON layer=\"Layers\".name\n"                             +
-//            "  WHERE visible=TRUE\n"                                                   +
-//            "  ORDER BY name",
-//
-//            "SELECT name, phenomenon, procedure, period, fallback, description\n"      +
-//            "  FROM \"Layers\" "                                                       +
-//            "  JOIN (\n"                                                               +
-//            "   SELECT DISTINCT layer, visible FROM \"Series\"\n"                      +
-//            "   JOIN \"GridCoverages\""         + " ON series=\"Series\".identifier\n" +
-//            "   JOIN \"GridGeometries\""        + " ON extent=\"GridGeometries\".id\n" +
-//            "   WHERE (  \"endTime\" IS NULL OR   \"endTime\" >= ?)\n"                 +
-//            "     AND (\"startTime\" IS NULL OR \"startTime\" <= ?)\n"                 +
-//            "     AND (\"spatialExtent\" && ?)\n"     +
-//            "  ) "                                                                     +
-//            "  AS \"Selected\" ON layer=\"Layers\".name\n"                             +
-//            "  WHERE visible=TRUE\n"                                                   +
-//            "  ORDER BY name");
-
     /**
      * Creates a new query for the specified database.
      *

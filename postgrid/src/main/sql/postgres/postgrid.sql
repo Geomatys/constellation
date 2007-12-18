@@ -491,63 +491,28 @@ COMMENT ON INDEX "GridCoverages_extent_index" IS
 
 
 --------------------------------------------------------------------------------------------------
--- Creates the "RangeOfLayers" view.                                                            --
--- Dependencies: "GridCoverages", "BoundingBoxes", "Series"                                     --
---------------------------------------------------------------------------------------------------
-
-CREATE VIEW "RangeOfLayers" AS
-    SELECT "layer",
-           count("layer")   AS "count",
-           min("startTime") AS "startTime",
-           max("endTime")   AS "endTime",
-           min("west")      AS "west",
-           max("east")      AS "east",
-           min("south")     AS "south",
-           max("north")     AS "north"
-      FROM
-   (SELECT "Series"       ."layer",
-           "GridCoverages"."filename",
-           "GridCoverages"."startTime",
-           "GridCoverages"."endTime",
-           "BoundingBoxes"."west",
-           "BoundingBoxes"."east",
-           "BoundingBoxes"."south",
-           "BoundingBoxes"."north"
-      FROM "GridCoverages"
-      JOIN "BoundingBoxes" ON "GridCoverages"."extent" = "BoundingBoxes"."identifier"
-      JOIN "Series" ON "GridCoverages"."series" = "Series"."identifier") AS "GridCoveragesDetails"
-  GROUP BY "layer" ORDER BY "layer";
-
-ALTER TABLE "RangeOfLayers" OWNER TO geoadmin;
-GRANT ALL ON TABLE "RangeOfLayers" TO geoadmin;
-GRANT SELECT ON TABLE "RangeOfLayers" TO PUBLIC;
-
-COMMENT ON VIEW "RangeOfLayers" IS
-    'Nombre d''images et région géographique pour chacune des couches utilisées.';
-
-
-
-
---------------------------------------------------------------------------------------------------
 -- Creates the "RangeOfSeries" view.                                                            --
--- Dependencies: "GridCoverages", "BoundingBoxes", "Series"                                     --
+-- Dependencies: "GridCoverages", "BoundingBoxes"                                               --
 --------------------------------------------------------------------------------------------------
 
 CREATE VIEW "RangeOfSeries" AS
-    SELECT       "Series"       ."layer",
-                 "GridCoverages"."series",
-           count("GridCoverages"."extent")    AS "count",
-           min  ("GridCoverages"."startTime") AS "startTime",
-           max  ("GridCoverages"."endTime")   AS "endTime",
-           min  ("BoundingBoxes"."west")      AS "west",
-           max  ("BoundingBoxes"."east")      AS "east",
-           min  ("BoundingBoxes"."south")     AS "south",
-           max  ("BoundingBoxes"."north")     AS "north"
-      FROM "GridCoverages"
-      JOIN "Series" ON "GridCoverages"."series" = "Series"."identifier"
-      JOIN "BoundingBoxes" ON "GridCoverages"."extent" = "BoundingBoxes"."identifier"
-  GROUP BY "layer", "series", "extent"
-  ORDER BY "layer", "series", "count";
+    SELECT "TimeRanges"."series", "count", "startTime", "endTime", "west", "east", "south", "north"
+      FROM
+   (SELECT "series",
+           count("extent")  AS "count",
+           min("startTime") AS "startTime",
+           max("endTime")   AS "endTime"
+      FROM "GridCoverages" GROUP BY "series") AS "TimeRanges"
+      JOIN
+   (SELECT "series",
+           min("west")  AS "west",
+           max("east")  AS "east",
+           min("south") AS "south",
+           max("north") AS "north"
+      FROM (SELECT DISTINCT "series", "extent" FROM "GridCoverages") AS "Extents"
+ LEFT JOIN "BoundingBoxes" ON "Extents"."extent" = "BoundingBoxes"."identifier"
+  GROUP BY "series") AS "BoundingBoxRanges" ON "TimeRanges".series = "BoundingBoxRanges".series
+  ORDER BY "series";
 
 ALTER TABLE "RangeOfSeries" OWNER TO geoadmin;
 GRANT ALL ON TABLE "RangeOfSeries" TO geoadmin;
@@ -555,3 +520,31 @@ GRANT SELECT ON TABLE "RangeOfSeries" TO PUBLIC;
 
 COMMENT ON VIEW "RangeOfSeries" IS
     'Liste des régions géographiques utilisées par chaque sous-série.';
+
+
+
+
+--------------------------------------------------------------------------------------------------
+-- Creates the "RangeOfLayers" view.                                                            --
+-- Dependencies: "RangeOfSeries", "Series"                                                      --
+--------------------------------------------------------------------------------------------------
+
+CREATE VIEW "RangeOfLayers" AS
+ SELECT "layer",
+        sum("count")     AS "count",
+        min("startTime") AS "startTime",
+        max("endTime")   AS "endTime",
+        min("west")      AS "west",
+        max("east")      AS "east",
+        min("south")     AS "south",
+        max("north")     AS "north"
+   FROM "RangeOfSeries"
+   JOIN "Series" ON "RangeOfSeries"."series" = "Series"."identifier"
+  GROUP BY "layer";
+
+ALTER TABLE "RangeOfLayers" OWNER TO geoadmin;
+GRANT ALL ON TABLE "RangeOfLayers" TO geoadmin;
+GRANT SELECT ON TABLE "RangeOfLayers" TO PUBLIC;
+
+COMMENT ON VIEW "RangeOfLayers" IS
+    'Nombre d''images et région géographique pour chacune des couches utilisées.';
