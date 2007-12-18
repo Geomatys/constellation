@@ -33,7 +33,7 @@ final class SeriesQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, layer, pathname, extension, format, visible, quicklook;
+    protected final Column name, layer, pathname, extension, format, visible, quicklook, remarks;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -49,14 +49,15 @@ final class SeriesQuery extends Query {
         super(database, "Series");
         final QueryType[] SLF   = {SELECT, LIST, FILTERED_LIST};
         final QueryType[] SLFI  = {SELECT, LIST, FILTERED_LIST, INSERT};
-        final QueryType[] SLEFI = {SELECT, LIST, EXISTS, FILTERED_LIST, INSERT};
-        name      = addColumn("identifier",      SLEFI);
-        layer     = addColumn("layer",           SLFI);
-        pathname  = addColumn("pathname",        SLFI);
-        extension = addColumn("extension",       SLFI);
-        format    = addColumn("format",          SLFI);
-        visible   = addColumn("visible",   true, SLFI);
-        quicklook = addColumn("quicklook", null, SLF);
+        final QueryType[] SLFIE = {SELECT, LIST, FILTERED_LIST, INSERT, EXISTS};
+        name      = addColumn("identifier",      SLFIE);
+        layer     = addColumn("layer",           SLFI );
+        pathname  = addColumn("pathname",        SLFI );
+        extension = addColumn("extension",       SLFI );
+        format    = addColumn("format",          SLFI );
+        visible   = addColumn("visible",   true, SLF  );
+        quicklook = addColumn("quicklook", null, SLF  );
+        remarks   = addColumn("remarks",   null, SLF  );
         byName    = addParameter(name,  SELECT, EXISTS);
         byLayer   = addParameter(layer, FILTERED_LIST);
         name.setOrdering("ASC", LIST, FILTERED_LIST);

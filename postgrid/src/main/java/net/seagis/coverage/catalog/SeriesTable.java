@@ -144,23 +144,23 @@ public class SeriesTable extends SingletonTable<Series> {
         }
         final Format format = formats.getEntry(results.getString(indexOf(query.format)));
         return new SeriesEntry(name, layer, rootDirectory != null ? rootDirectory : rootURL,
-                               pathname, extension, format, visible, quicklook);
+                               pathname, extension, format, visible, null);
     }
-    
+
     /**
      * Returns the identifier for a series having the specified properties. If no
      * matching record is found, then a new one is created and added to the database.
      *
-     * @param layer The layer name.
-     * @param path The file relative to the root directory.
-     * @param extension The extension to add to filenames.
-     * @param format The format for the series considered.
+     * @param  layer     The layer name.
+     * @param  path      The path relative to the root directory, or the base URL.
+     * @param  extension The extension to add to filenames.
+     * @param  format    The format for the series considered.
      * @return The identifier of a matching entry (never {@code null}).
      * @throws CatalogException if a logical error occured.
      * @throws SQLException if an error occured while reading from or writing to the database.
      */
     final synchronized String getIdentifier(final String layer,
-            final File path, final String extension, final String format)
+            final String path, final String extension, final String format)
             throws SQLException, CatalogException
     {
         final SeriesQuery query = (SeriesQuery) super.query;
@@ -180,11 +180,11 @@ public class SeriesTable extends SingletonTable<Series> {
                 continue;
             }
             candidate = results.getString(exIndex);
-            if (candidate == null) {
+            if (candidate == null || !candidate.equals(extension)) {
                 continue;
             }
             candidate = results.getString(ftIndex);
-            if (candidate == null) {
+            if (candidate == null || !candidate.equals(format)) {
                 continue;
             }
             if (ID != null && !ID.equals(nextID)) {
@@ -215,10 +215,9 @@ public class SeriesTable extends SingletonTable<Series> {
             statement = getStatement(QueryType.INSERT);
             statement.setString (indexOf(query.name),      ID);
             statement.setString (indexOf(query.layer),     layerName);
-            statement.setString (indexOf(query.pathname),  path.getAbsolutePath());
+            statement.setString (indexOf(query.pathname),  path);
             statement.setString (indexOf(query.extension), extension);
             statement.setString (indexOf(query.format),    format);
-            statement.setBoolean(indexOf(query.visible),   true);
             success = updateSingleton(statement);
             // 'success' must be assigned last in this try block.
         } finally {

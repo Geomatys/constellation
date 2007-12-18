@@ -140,28 +140,13 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     }
 
     /**
-     * Invoked when the state of this field changed. This method {@linkplain #clearCache clears
-     * the cache} if the changed property is the geographic bounding box or the time range.
-     */
-    @Override
-    protected void fireStateChanged(final String property) {
-        super.fireStateChanged(property);
-        if (property.equalsIgnoreCase("GeographicBoundingBox") || property.equalsIgnoreCase("TimeRange")) {
-            clearCache();
-        }
-    }
-    
-        
-    /**
      * Returns the identifier for the specified layer. If no matching record is found and
      * {@code allowCreate} is {@code true}, then a new one is created and added to the database.
      *
-     * @param name The name of the layer.
-     * @return
-     *              The identifier of a matching entry, or {@code null} if none if none was
-     *              found and {@code newIdentifier} is {@code null}.
-     * @throws SQLException
-     *              If the operation failed.
+     * @param  name The name of the layer.
+     * @return The identifier of a matching entry, or {@code null} if none if none was
+     *         found and {@code newIdentifier} is {@code null}.
+     * @throws SQLException if an error occured while reading or writing the database.
      */
     final synchronized String getIdentifier(final String name) throws SQLException, CatalogException {
         final LayerQuery query = (LayerQuery) super.query;
@@ -202,5 +187,17 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
             transactionEnd(success);
         }
         return ID;
+    }
+
+    /**
+     * Invoked when the state of this field changed. This method {@linkplain #clearCache clears
+     * the cache} if the changed property is the geographic bounding box or the time range.
+     */
+    @Override
+    protected void fireStateChanged(final String property) {
+        super.fireStateChanged(property);
+        if (property.equalsIgnoreCase("GeographicBoundingBox") || property.equalsIgnoreCase("TimeRange")) {
+            clearCache();
+        }
     }
 }
