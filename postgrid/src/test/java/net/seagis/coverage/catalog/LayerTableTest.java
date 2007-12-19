@@ -72,6 +72,11 @@ public class LayerTableTest extends DatabaseTest {
     public static final String SAMPLE_TIME_AS_TEXT = "1986-01-20";
 
     /**
+     * A time in the NetCDF layer.
+     */
+    public static final String NETCDF_TIME_AS_TEXT = "2007-06-13";
+
+    /**
      * Tests the {@link LayerTableTest#getIdentifiers} method.
      */
     @Test

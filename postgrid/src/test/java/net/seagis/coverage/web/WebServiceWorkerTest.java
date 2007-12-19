@@ -21,7 +21,9 @@ import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.IndexColorModel;
 
+import org.geotools.util.logging.Logging;
 import org.geotools.coverage.grid.GridCoverage2D;
+
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTableTest;
 import net.seagis.catalog.DatabaseTest;
@@ -108,15 +110,15 @@ public class WebServiceWorkerTest extends DatabaseTest {
         /*
          * Adds a size.
          */
-        width  = 300; // Expected width
-        height = 300; // Expected height
-        worker.setDimension("300","300");
+        width  = 150; // Expected width
+        height = 150; // Expected height
+        worker.setDimension("150","150");
         assertEquals(layer.getName(), LayerTableTest.SAMPLE_NAME);
-//      assertNotSame("A new layer should be created.", layer, worker.getLayer());
-//      assertNotSame("A new coverage should be created.", coverage, worker.getGridCoverage2D(false));
+        assertNotSame("A new layer should be created.", layer, worker.getLayer());
+        assertNotSame("A new coverage should be created.", coverage, worker.getGridCoverage2D(false));
         layer    = worker.getLayer();
         coverage = worker.getGridCoverage2D(false);
-        worker.setDimension("300","300");  // Same value should not flush the cache.
+        worker.setDimension("150","150");  // Same value should not flush the cache.
         assertSame("The layer should be cached.", layer, worker.getLayer());
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
 
@@ -133,5 +135,51 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(IndexColorModel.class, image.getColorModel().getClass());
         model = (IndexColorModel) image.getColorModel();
         assertEquals(256, model.getMapSize());
+    }
+
+    /**
+     * Tests with the NetCDF test layer.
+     */
+    @Test
+    public void testNetCDF() throws WebServiceException, IOException {
+        final WebServiceWorker worker = new WebServiceWorker(database);
+        worker.setService("WMS", "1.0");
+        worker.setLayer(LayerTableTest.NETCDF_NAME);
+        worker.setCoordinateReferenceSystem("EPSG:3395");
+
+        Layer layer = worker.getLayer();
+        assertEquals(layer.getName(), LayerTableTest.NETCDF_NAME);
+        assertSame("The layer should be cached.", layer, worker.getLayer());
+
+        worker.setTime(LayerTableTest.NETCDF_TIME_AS_TEXT);
+        assertSame("The layer should be cached.", layer, worker.getLayer());
+
+        GridCoverage2D coverage;
+        try {
+            coverage = worker.getGridCoverage2D(false);
+        } catch (WebServiceException exception) {
+            final Throwable cause = exception.getCause();
+            if (cause instanceof IOException) {
+                // The test datafile is not present on every systems.
+                Logging.recoverableException(WebServiceWorkerTest.class, "testNetCDF", cause);
+                return;
+            }
+            throw exception;
+        }
+        assertEquals(4, coverage.getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
+        assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
+        assertEquals(2, worker.getGridCoverage2D(true).getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
+
+        String format = worker.getMimeType();
+        assertEquals("image/png", format);
+
+        File file = worker.getImageFile();
+        assertTrue(file.getName().endsWith(".png"));
+        assertTrue(file.isFile());
+        assertEquals("image/png", format); // Previous value was a default one. Now it has been computed.
+
+        RenderedImage image = ImageIO.read(file);
+        assertEquals(720, image.getWidth());
+        assertEquals(499, image.getHeight());
     }
 }

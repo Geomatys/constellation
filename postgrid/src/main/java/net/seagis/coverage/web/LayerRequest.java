@@ -68,7 +68,14 @@ final class LayerRequest {
         if (bbox == null) {
             if (envelope == null) {
                 return null;
-            } else try {
+            }
+            for (int i=envelope.getDimension(); --i>=0;) {
+                final double length = envelope.getLength(i);
+                if (Double.isInfinite(length) || !(length > 0)) {
+                    return null;
+                }
+            }
+            try {
                 bbox = new GeographicBoundingBoxImpl(envelope);
             } catch (TransformException exception) {
                 // Can't transform. Returns 'null', which is legal and means

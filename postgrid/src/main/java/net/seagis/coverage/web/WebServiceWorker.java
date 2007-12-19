@@ -14,19 +14,23 @@
  */
 package net.seagis.coverage.web;
 
-import java.awt.Dimension;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
@@ -78,17 +82,14 @@ import static net.seagis.coverage.wms.WMSExceptionCode.*;
  */
 public class WebServiceWorker {
     /**
-     * Disable some JAI codecs. The codecs provided in standard Java are sometime more reliable.
+     * Enable or disable some JAI codecs.
+     * The codecs provided in standard Java are sometime more reliable.
      */
     static {
-        ImageUtilities.allowNativeCodec("png", ImageWriterSpi.class, false);
+        ImageUtilities.allowNativeCodec("png", ImageReaderSpi.class, true);
+        ImageUtilities.allowNativeCodec("png", ImageWriterSpi.class, true);
     }
 
-    /**
-     * A logger for this worker.
-     */
-    private final Logger logger = Logger.getLogger("net.seagis.coverage.web");
-    
     /**
      * WMS before this version needs longitude before latitude. WMS after this version don't
      * perform axis switch. WMS at this exact version switch axis only for EPSG:4326.
@@ -127,6 +128,11 @@ public class WebServiceWorker {
         BufferedImage.TYPE_USHORT_555_RGB,
         BufferedImage.TYPE_USHORT_GRAY
     };
+
+    /**
+     * A logger for this worker.
+     */
+    private final Logger logger = Logger.getLogger("net.seagis.coverage.web");
 
     /**
      * The connection to the database.
@@ -581,6 +587,7 @@ public class WebServiceWorker {
             throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "layer"),
                     LAYER_NOT_DEFINED, version);
         }
+        boolean change = false;
         final LayerRequest request = new LayerRequest(layer, envelope, gridRange);
         Layer candidate;
         synchronized (layers) {
@@ -588,8 +595,8 @@ public class WebServiceWorker {
             if (candidate == null) {
                 final LayerTable layerTable = getLayerTable();
                 try {
-                    layerTable.setGeographicBoundingBox(request.getGeographicBoundingBox());
-                    layerTable.setPreferredResolution(request.getResolution());
+                    change   |= layerTable.setGeographicBoundingBox(request.getGeographicBoundingBox());
+                    change   |= layerTable.setPreferredResolution(request.getResolution());
                     candidate = layerTable.getEntry(layer);
                 } catch (NoSuchRecordException exception) {
                     throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
@@ -604,6 +611,9 @@ public class WebServiceWorker {
                 }
                 layers.put(request, candidate);
             }
+        }
+        if (change) {
+            logger.fine("LayerTable configuration changed.");
         }
         return candidate;
     }
@@ -736,8 +746,6 @@ public class WebServiceWorker {
                 File file = write(image);
                 if (file != null) {
                     return file;
-                } else {
-                    logger.severe("file is null 1");
                 }
                 if (writerNeedsReformat) {
                     formated = reformat(image);
@@ -747,8 +755,6 @@ public class WebServiceWorker {
                             return file;
                         }
                     }
-                } else {
-                    logger.severe("writter not need reformat");
                 }
             }
             /*
@@ -760,20 +766,26 @@ public class WebServiceWorker {
             File file = write(image, format);
             if (file != null) {
                 return file;
-            } else {
-              logger.severe("file is null 2");
-            }
-            if (formated == image) {
-                formated = reformat(image);
-                // May still the same image, so we need to compare again.
-            } else {
-                logger.severe("formated != image");
             }
             if (formated != image) {
                 file = write(formated, format);
                 if (file != null) {
                     writerNeedsReformat = true;
                     return file;
+                }
+            } else {
+                final Iterator<ImageWriter> it = getImageWriter(format);
+                while (it.hasNext()) {
+                    writer = it.next();
+                    formated = reformat(image);
+                    if (formated != image) {
+                        file = write(formated);
+                        if (file != null) {
+                            writerNeedsReformat = true;
+                            return file;
+                        }
+                        break;
+                    }
                 }
             }
         } catch (IOException exception) {
@@ -785,19 +797,30 @@ public class WebServiceWorker {
     }
 
     /**
+     * Returns {@code true} if the given color model is opaque (i.e. has no transparent pixels).
+     */
+    private static boolean isOpaque(final ColorModel model) {
+        return model.getTransparency() == Transparency.OPAQUE;
+    }
+
+    /**
      * Reformats the given image to a type appropriate for the current {@linkplain #writer}.
      * If this method can't reformat, then the image is returned unchanged.
      */
     private RenderedImage reformat(final RenderedImage image) {
-        logger.severe("entrer dans reformat");
         final ImageWriterSpi spi = writer.getOriginatingProvider();
         if (spi != null) {
+            final boolean opaque = isOpaque(image.getColorModel());
             for (int i=0; i<BUFFERED_TYPES.length; i++) {
-                logger.severe("REFORMAT: type=" + i);
                 final ImageTypeSpecifier type =
                         ImageTypeSpecifier.createFromBufferedImageType(BUFFERED_TYPES[i]);
+                if (opaque && isOpaque(type.getColorModel())) {
+                    // In order to reduce the file size, discarts
+                    // types with transparency if we don't need it.
+                    continue;
+                }
                 if (spi.canEncodeImage(type)) {
-                    logger.severe("can encode in type=" + i);
+                    logger.fine("Reformat image to type #" + i);
                     final BufferedImage buffered = type.createBufferedImage(image.getWidth(), image.getHeight());
                     final Graphics2D graphics = buffered.createGraphics();
                     graphics.drawRenderedImage(image, new AffineTransform());
@@ -810,6 +833,20 @@ public class WebServiceWorker {
     }
 
     /**
+     * Returns the image writer for the given format. We usually expect a MIME type,
+     * but we make this method tolerant to simple format names.
+     */
+    private static Iterator<ImageWriter> getImageWriter(final String format) {
+        if (format.indexOf('/') >= 0) {
+            return ImageIO.getImageWritersByMIMEType(format);
+        } else if (format.startsWith(".")) {
+            return ImageIO.getImageWritersBySuffix(format.substring(1));
+        } else {
+            return ImageIO.getImageWritersByFormatName(format);
+        }
+    }
+
+    /**
      * Attempts to write the given image using a writer of the given format.
      * The current {@linkplain #writer}, if any, is disposed.
      *
@@ -819,14 +856,7 @@ public class WebServiceWorker {
      * @throws IOException if an error occured while processing the image.
      */
     private File write(final RenderedImage image, final String format) throws IOException {
-        final Iterator<ImageWriter> it;
-        if (format.indexOf('/') >= 0) {
-            it = ImageIO.getImageWritersByMIMEType(format);
-        } else if (format.startsWith(".")) {
-            it = ImageIO.getImageWritersBySuffix(format.substring(1));
-        } else {
-            it = ImageIO.getImageWritersByFormatName(format);
-        }
+        final Iterator<ImageWriter> it = getImageWriter(format);
         while (it.hasNext()) {
             disposeWriter();
             writer = it.next();
@@ -849,6 +879,14 @@ public class WebServiceWorker {
         final ImageWriterSpi spi = writer.getOriginatingProvider();
         if (spi != null && !spi.canEncodeImage(image)) {
             return null; // Can not encode the image.
+        }
+        // Additional check for format that doesn't support 16 bits palettes.
+        final ColorModel model = image.getColorModel();
+        if (model.getPixelSize() > 8 && model instanceof IndexColorModel) {
+            final String name = writer.getClass().getName();
+            if (name.indexOf("PNG", name.lastIndexOf('.') + 1) >= 0) {
+                return null;
+            }
         }
         /*
          * If the suffix and output types are not yet determined for the current writer,
