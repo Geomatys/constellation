@@ -729,6 +729,8 @@ public class WebServiceWorker {
                 File file = write(image);
                 if (file != null) {
                     return file;
+                } else {
+                    logger.severe("file is null 1");
                 }
                 if (writerNeedsReformat) {
                     formated = reformat(image);
@@ -738,6 +740,8 @@ public class WebServiceWorker {
                             return file;
                         }
                     }
+                } else {
+                    logger.severe("writter not need reformat");
                 }
             }
             /*
@@ -749,10 +753,14 @@ public class WebServiceWorker {
             File file = write(image, format);
             if (file != null) {
                 return file;
+            } else {
+              logger.severe("file is null 2");
             }
             if (formated == image) {
                 formated = reformat(image);
                 // May still the same image, so we need to compare again.
+            } else {
+                logger.severe("formated != image")
             }
             if (formated != image) {
                 file = write(formated, format);
