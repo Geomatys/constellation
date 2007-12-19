@@ -84,6 +84,14 @@ public class ObjectFactory {
     public EXGeographicBoundingBox createEXGeographicBoundingBox() {
         return new EXGeographicBoundingBox();
     }
+    
+    /**
+     * Create an instance of {@link EXGeographicBoundingBox }
+     * 
+     */
+    public LatLonBoundingBox createLatLonBoundingBox() {
+        return new LatLonBoundingBox();
+    }
 
     /**
      * Create an instance of {@link LogoURL }

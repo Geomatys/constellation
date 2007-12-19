@@ -68,10 +68,12 @@ public class Dimension {
       * @param units    The unit of the value (example:ISO8601 for time).
       * @param _default The default value if its not specified.
       */
-    public Dimension(final String name, final String units, final String _default) {
-        this._default       = _default;
+    public Dimension(final String name, final String units, final String _default, String value) {
+        
         this.name           = name;
+        this._default       = _default;
         this.units          = units;
+        this.value          = value;
     }
     
     /**
@@ -80,10 +82,11 @@ public class Dimension {
     public Dimension(final String value, final String name, final String units, final String unitSymbol, 
             final String _default, final Boolean multipleValues, final Boolean nearestValue,
             final Boolean current) {
-        this._default       = _default;
+       
         this.current        = current;
         this.multipleValues = multipleValues;
         this.name           = name;
+        this._default       = _default;
         this.nearestValue   = nearestValue;
         this.unitSymbol     = unitSymbol;
         this.units          = units;
@@ -135,7 +138,15 @@ public class Dimension {
     public String getDefault() {
         return _default;
     }
-
+  
+    /**
+     * Sets the value of the Default property.
+     * 
+     */
+    public void setDefault(String _default) {
+        this._default = _default;
+    }
+    
     /**
      * Gets the value of the multipleValues property.
      */

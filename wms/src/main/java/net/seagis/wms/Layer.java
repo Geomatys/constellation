@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Version;
 
 
 /**
@@ -77,9 +78,12 @@ import javax.xml.bind.annotation.XmlType;
     "_abstract",
     "keywordList",
     "crs",
+    "srs",
     "exGeographicBoundingBox",
+    "latLonBoundingBox",
     "boundingBox",
     "dimension",
+    "extent",
     "attribution",
     "authorityURL",
     "identifier",
@@ -102,14 +106,31 @@ public class Layer {
     private String _abstract;
     @XmlElement(name = "KeywordList")
     private KeywordList keywordList;
+    /**
+     *  VERSION 1.3.0
+     */
     @XmlElement(name = "CRS")
     private List<String> crs = new ArrayList<String>();
     @XmlElement(name = "EX_GeographicBoundingBox")
     private EXGeographicBoundingBox exGeographicBoundingBox;
-    @XmlElement(name = "BoundingBox")
-    private List<BoundingBox> boundingBox = new ArrayList<BoundingBox>();
     @XmlElement(name = "Dimension")
     private List<Dimension> dimension = new ArrayList<Dimension>();
+    /**
+     *  VERSION 1.1.1
+     */
+    @XmlElement(name = "SRS")
+    private List<String> srs = new ArrayList<String>();
+    @XmlElement(name = "Extent")
+    private List<Dimension> extent = new ArrayList<Dimension>();
+    @XmlElement(name = "LatLonBoundingBox")
+    private LatLonBoundingBox latLonBoundingBox;
+    
+    
+    @XmlElement(name = "BoundingBox")
+    private List<BoundingBox> boundingBox = new ArrayList<BoundingBox>();
+   
+    
+    
     @XmlElement(name = "Attribution")
     private Attribution attribution;
     @XmlElement(name = "AuthorityURL")
@@ -161,16 +182,30 @@ public class Layer {
       * @param exGeographicBoundingBox A general bounding box including all the child map.
       */
      public Layer(final String title, final String _abstract, final List<String> crs, 
-             final EXGeographicBoundingBox exGeographicBoundingBox, List<Layer> layer) {
+             final EXGeographicBoundingBox exGeographicBoundingBox, List<Layer> layer, Version version) {
          this.title                   = title;
          this._abstract               = _abstract;
-         this.crs                     = crs;
-         this.exGeographicBoundingBox = exGeographicBoundingBox;
          this.layer                   = layer;
+         
+         if (version.toString().equals("1.3.0")) {
+            this.crs                     = crs;
+            this.exGeographicBoundingBox = exGeographicBoundingBox;
+            
+         } else if (version.toString().equals("1.1.1")){
+            this.srs                     = crs;
+            if (exGeographicBoundingBox != null)
+                this.latLonBoundingBox = new LatLonBoundingBox(exGeographicBoundingBox.getWestBoundLongitude(),
+                                                               exGeographicBoundingBox.getSouthBoundLatitude(),
+                                                               exGeographicBoundingBox.getEastBoundLongitude(),
+                                                               exGeographicBoundingBox.getNorthBoundLatitude());
+            
+         }
+        
+         
      }
      
      /**
-      * Build a child layer
+      * Build a child layer for the specified version
       * 
       * @param name      The title of the layer.
       * @param _abstract A description of the layer.
@@ -181,20 +216,43 @@ public class Layer {
       * @param queryable  A boolean indicating if the layer is queryable
       * @param dimension  A list of Dimension block.
       * @param style      An object describing the style of the layer.
+      * @param version    The version of the wms service.
       */
      public Layer(final String name, final String _abstract, final String keyword, final List<String> crs, 
              final EXGeographicBoundingBox exGeographicBoundingBox, final BoundingBox boundingBox, final boolean queryable,
-             final List<Dimension> dimension, final Style style) {
+             final List<Dimension> dimension, final Style style, final Version version) {
          this.name                    = name;
          this._abstract               = _abstract;
          this.keywordList             = new KeywordList(new Keyword(keyword));
-         this.crs                     = crs;
-         this.exGeographicBoundingBox = exGeographicBoundingBox;
          this.boundingBox.add(boundingBox);
          this.queryable = queryable;
-         this.dimension = dimension;
          this.style.add(style);
+         
+         // the specific attribute for different versions
+         if (version.toString().equals("1.3.0")) {
+            this.crs                     = crs;
+            this.dimension = dimension;
+            this.exGeographicBoundingBox = exGeographicBoundingBox;
+            
+         } else if (version.toString().equals("1.1.1")){
+             this.srs = crs;
+             for (Dimension d:dimension) {
+                 Dimension ext = new Dimension(d.getName(), null, d.getDefault(), d.getValue());
+                 this.extent.add(ext);
+                 d.setValue(null);
+                 d.setDefault(null);
+                 this.dimension.add(d);
+             }
+             this.latLonBoundingBox = new LatLonBoundingBox(exGeographicBoundingBox.getWestBoundLongitude(),
+                                                           exGeographicBoundingBox.getSouthBoundLatitude(),
+                                                           exGeographicBoundingBox.getEastBoundLongitude(),
+                                                           exGeographicBoundingBox.getNorthBoundLatitude()); 
+         }
      }
+     
+     
+     
+     
      
     /**
      * Build a full Layer object.
