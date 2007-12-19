@@ -760,7 +760,7 @@ public class WebServiceWorker {
                 formated = reformat(image);
                 // May still the same image, so we need to compare again.
             } else {
-                logger.severe("formated != image")
+                logger.severe("formated != image");
             }
             if (formated != image) {
                 file = write(formated, format);
