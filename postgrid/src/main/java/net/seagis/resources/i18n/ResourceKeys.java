@@ -515,7 +515,7 @@ public final class ResourceKeys {
     /**
      * La série "{0}" n''a pas été trouvée.
      */
-    public static final int ERROR_SERIES_NOT_FOUND_$1 = 110;
+    public static final int ERROR_LAYER_NOT_FOUND_$1 = 110;
 
     /**
      * Le format #{0} est définit plusieurs fois.

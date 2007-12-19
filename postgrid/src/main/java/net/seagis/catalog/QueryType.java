@@ -58,6 +58,11 @@ public enum QueryType {
     /**
      * Entries will be listed using some filter. This is the same as {@link #LIST},
      * but with some additional criterions left to {@link Table} implementations.
+     * 
+     * @deprecated This type could be retrofited in {@link #LIST}, i.e. when a query defined
+     *             both LIST and FILTERED_LIST, the LIST type is useless for every queries I
+     *             found in current state. The only exception is BoundingBoxTables. This type
+     *             could be renamed to SELECT_BY_VALUES to better reflect its usage there.
      */
     FILTERED_LIST(),
 

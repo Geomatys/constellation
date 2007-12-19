@@ -84,6 +84,9 @@ public class WebServiceWorker {
         ImageUtilities.allowNativeCodec("png", ImageWriterSpi.class, false);
     }
 
+    /**
+     * A logger for this worker.
+     */
     private final Logger logger = Logger.getLogger("net.seagis.coverage.web");
     
     /**
@@ -498,6 +501,7 @@ public class WebServiceWorker {
             if (!format.equals(this.format)) {
                 if (formats == null) {
                     formats = new HashSet<String>(Arrays.asList(ImageIO.getWriterMIMETypes()));
+                    formats.addAll(Arrays.asList(ImageIO.getWriterFormatNames()));
                 }
                 if (!formats.contains(format)) {
                     throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
@@ -538,6 +542,7 @@ public class WebServiceWorker {
             final LayerTable layerTable = getLayerTable();
             layerTable.setGeographicBoundingBox(null);
             layerTable.setTimeRange(null);
+            // Do not set the resolution - it has no impact on the returned layers.
             layerNames = Collections.unmodifiableSet(layerTable.getIdentifiers());
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
@@ -557,6 +562,7 @@ public class WebServiceWorker {
             final LayerTable layerTable = getLayerTable();
             layerTable.setGeographicBoundingBox(null);
             layerTable.setTimeRange(null);
+            // Do not set the resolution - it has no impact on the returned layers.
             return layerTable.getEntries();
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
@@ -583,6 +589,7 @@ public class WebServiceWorker {
                 final LayerTable layerTable = getLayerTable();
                 try {
                     layerTable.setGeographicBoundingBox(request.getGeographicBoundingBox());
+                    layerTable.setPreferredResolution(request.getResolution());
                     candidate = layerTable.getEntry(layer);
                 } catch (NoSuchRecordException exception) {
                     throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
@@ -593,7 +600,7 @@ public class WebServiceWorker {
                 }
                 if (candidate == null) {
                     throw new WebServiceException(Resources.format(
-                            ResourceKeys.ERROR_SERIES_NOT_FOUND_$1, layer), LAYER_NOT_DEFINED, version);
+                            ResourceKeys.ERROR_LAYER_NOT_FOUND_$1, layer), LAYER_NOT_DEFINED, version);
                 }
                 layers.put(request, candidate);
             }
@@ -610,8 +617,8 @@ public class WebServiceWorker {
      */
     public GridCoverage2D getGridCoverage2D(final boolean resample) throws WebServiceException {
         if (time == null) {
-            throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1,
-                    "time"), MISSING_PARAMETER_VALUE, version);
+            throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "time"),
+                    MISSING_PARAMETER_VALUE, version);
         }
         final Layer layer = getLayer();
         final CoverageReference ref;
@@ -812,7 +819,15 @@ public class WebServiceWorker {
      * @throws IOException if an error occured while processing the image.
      */
     private File write(final RenderedImage image, final String format) throws IOException {
-        for (final Iterator<ImageWriter> it=ImageIO.getImageWritersByMIMEType(format); it.hasNext();) {
+        final Iterator<ImageWriter> it;
+        if (format.indexOf('/') >= 0) {
+            it = ImageIO.getImageWritersByMIMEType(format);
+        } else if (format.startsWith(".")) {
+            it = ImageIO.getImageWritersBySuffix(format.substring(1));
+        } else {
+            it = ImageIO.getImageWritersByFormatName(format);
+        }
+        while (it.hasNext()) {
             disposeWriter();
             writer = it.next();
             final File file = write(image);
@@ -887,6 +902,15 @@ public class WebServiceWorker {
                 writer.write(image);
             } finally {
                 stream.close();
+            }
+        }
+        /*
+         * Retains the MIME type used, if it was not already a MIME type.
+         */
+        if ((format == null || format.indexOf('/') < 0) && spi != null) {
+            final String[] mimes = spi.getMIMETypes();
+            if (mimes != null && mimes.length != 0) {
+                format = mimes[0];
             }
         }
         return file;

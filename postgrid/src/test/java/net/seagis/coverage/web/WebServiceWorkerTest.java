@@ -60,6 +60,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         File file = worker.getImageFile();
         assertTrue(file.getName().endsWith(".png"));
         assertTrue(file.isFile());
+        assertEquals("image/png", format); // Previous value was a default one. Now it has been computed.
 
         RenderedImage image = ImageIO.read(file);
         assertEquals(4096, image.getWidth());

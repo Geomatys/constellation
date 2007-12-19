@@ -60,11 +60,6 @@ final class LayerEntry extends Entry implements Layer {
     private static final long serialVersionUID = 5283559646740856038L;
 
     /**
-     * Amount of milliseconds in a day.
-     */
-    private static final long MILLIS_IN_DAY = 24*60*60*1000L;
-
-    /**
      * The theme of this layer (e.g. Temperature, Salinity, etc.).
      */
     private final String thematic;
@@ -294,10 +289,8 @@ final class LayerEntry extends Entry implements Layer {
      */
     public DateRange getTimeRange() throws CatalogException {
         final GridCoverageTable data = this.data;   // Protect against concurrent changes.
-        if (data != null) try {
+        if (data != null) {
             return data.getTimeRange();
-        } catch (SQLException exception) {
-            throw new ServerException(exception);
         }
         return null;
     }
@@ -307,10 +300,8 @@ final class LayerEntry extends Entry implements Layer {
      */
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         final GridCoverageTable data = this.data;   // Protect against concurrent changes.
-        if (data != null) try {
+        if (data != null) {
             return data.getGeographicBoundingBox();
-        } catch (SQLException exception) {
-            throw new ServerException(exception);
         }
         return GeographicBoundingBoxImpl.WORLD;
     }
@@ -321,9 +312,9 @@ final class LayerEntry extends Entry implements Layer {
     public synchronized CoverageReference getCoverageReference(final Date time, final Number elevation)
             throws CatalogException
     {
-        long delay = Math.round(timeInterval * (MILLIS_IN_DAY/2));
+        long delay = Math.round(timeInterval * (GridCoverageTable.MILLIS_IN_DAY / 2));
         if (delay <= 0) {
-            delay = MILLIS_IN_DAY / 2;
+            delay = GridCoverageTable.MILLIS_IN_DAY / 2;
         }
         final long t = time.getTime();
         final Date startTime = new Date(t - delay);
@@ -450,7 +441,7 @@ final class LayerEntry extends Entry implements Layer {
     }
 
     /**
-     * Vérifie si l'objet spécifié est identique à cette couche.
+     * Compares this layer with the specified object for equality.
      */
     @Override
     public boolean equals(final Object object) {

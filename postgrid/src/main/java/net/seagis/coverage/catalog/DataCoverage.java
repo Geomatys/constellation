@@ -25,10 +25,14 @@ import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.referencing.operation.TransformException;
+
+import org.geotools.coverage.CoverageStack;
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.util.UnsupportedImplementationException;
 
 import net.seagis.coverage.model.Operation;
@@ -48,8 +52,11 @@ import net.seagis.catalog.ServerException;
  *
  * @todo Les déplacements horizontaux ne sont pas encore implémentés.
  * @todo Les transformations de coordonnées ne sont prises en compte.
+ *
+ * @deprecated Need a deep review.
  */
-public class DataCoverage extends AbstractCoverage implements GridCoverage {
+@Deprecated
+public class DataCoverage extends AbstractCoverage {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -74,6 +81,16 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     private final GridSampleDimension sampleDimension;
 
     /**
+     * Une instance d'une coordonnées à utiliser avec {@link #evaluate}.
+     */
+    private transient TransformedDirectPosition position;
+
+    /**
+     * Un buffer pré-alloué à utiliser avec {@link #evaluate}.
+     */
+    private transient double[] samples;
+
+    /**
      * La position spatio-temporelle relative.
      */
     private final double dt;
@@ -96,7 +113,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      * @param  descriptor Descripteur pour lequel on veut une vue des données.
      */
     public DataCoverage(final Descriptor descriptor) {
-        this(descriptor, getDataConnection(descriptor));
+        this(descriptor, getGridCoverageTable(descriptor));
     }
 
     /**
@@ -149,7 +166,7 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
      * dans le premier constructeur si seulement Sun voulait bien faire le RFE #4093999
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private static GridCoverageTable getDataConnection(final Descriptor descriptor) {
+    private static GridCoverageTable getGridCoverageTable(final Descriptor descriptor) {
         final Layer layer = descriptor.getLayer();
         if (!(layer instanceof LayerEntry)) {
             throw new UnsupportedImplementationException("Implémentation non-supportée de la couche.");
@@ -182,6 +199,42 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     }
 
     /**
+     * Prépare l'évaluation d'un point.
+     */
+    private void prepare(final DirectPosition location) throws CatalogException, SQLException, IOException {
+        if (position == null) {
+            position = new TransformedDirectPosition(null, getCoordinateReferenceSystem(), null);
+        }
+        try {
+            position.transform(location);
+        } catch (TransformException e) {
+            throw new CatalogException(e);
+        }
+    }
+
+    /**
+     * @todo Copy javadoc from DataConnection
+     */
+    private double evaluate(final double x, final double y, final double t, final short band)
+            throws CatalogException, SQLException, IOException
+    {
+        // prepare(x, y, t); // TODO
+        samples = data.asCoverage().evaluate(position, samples);
+        return samples[band];
+    }
+
+    /**
+     * @todo Copy javadoc from DataConnection
+     */
+    private double[] snap(final double x, final double y, final double t)
+            throws CatalogException, SQLException, IOException
+    {
+        //prepare(x, y, t); TODO
+        ((CoverageStack) data.asCoverage()).snap(position);
+        return position.ordinates.clone();
+    }
+
+    /**
      * Retourne la valeur à la position spécifiée. Cette méthode délègue le travail à
      * <code>{@linkplain #data}.{@linkplain DataConnection#evaluate evaluate}(<var>x</var>,
      * <var>y</var>, <var>t</var>, <var>band</var>)</code>.
@@ -195,10 +248,10 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
         final double y = position.getOrdinate(1) + dy;
         final double t = position.getOrdinate(2) + dt;
         try {
-            double v = data.evaluate(x, y, t, band);
+            double v = evaluate(x, y, t, band);
             if (Double.isNaN(v)) {
                 for (int f=0; f<fallback.length; f++) {
-                    v = fallback[f].evaluate(x, y, t, band);
+// TODO             v = fallback[f].evaluate(x, y, t, band);
                     if (!Double.isNaN(v)) break;
                 }
             }
@@ -315,9 +368,9 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
     public DirectPosition snap(final DirectPosition position) throws CatalogException {
         final double[] ordinates;
         try {
-            ordinates = data.snap(position.getOrdinate(0) + dx,
-                                  position.getOrdinate(1) + dy,
-                                  position.getOrdinate(2) + dt);
+            ordinates = snap(position.getOrdinate(0) + dx,
+                             position.getOrdinate(1) + dy,
+                             position.getOrdinate(2) + dt);
         } catch (SQLException exception) {
             throw new ServerException(exception);
         } catch (IOException exception) {
@@ -336,7 +389,8 @@ public class DataCoverage extends AbstractCoverage implements GridCoverage {
             position.setOrdinate(dim, position.getOrdinate(dim) + dt);
         }
         try {
-            return data.coveragesAt(position);
+            prepare(position);
+            return ((CoverageStack) data.asCoverage()).coveragesAt(position.getOrdinate(position.getDimension() - 1));
         } catch (SQLException exception) {
             throw new ServerException(exception);
         } catch (IOException exception) {

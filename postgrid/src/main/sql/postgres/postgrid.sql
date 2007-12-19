@@ -496,7 +496,8 @@ COMMENT ON INDEX "GridCoverages_extent_index" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE VIEW "RangeOfSeries" AS
-    SELECT "TimeRanges"."series", "count", "startTime", "endTime", "west", "east", "south", "north"
+    SELECT "TimeRanges"."series", "count", "startTime", "endTime",
+           "west", "east", "south", "north", "XResolution", "YResolution"
       FROM
    (SELECT "series",
            count("extent")  AS "count",
@@ -508,7 +509,9 @@ CREATE VIEW "RangeOfSeries" AS
            min("west")  AS "west",
            max("east")  AS "east",
            min("south") AS "south",
-           max("north") AS "north"
+           max("north") AS "north",
+           avg(("east"  - "west" ) / "width" ) AS "XResolution",
+           avg(("north" - "south") / "height") AS "YResolution"
       FROM (SELECT DISTINCT "series", "extent" FROM "GridCoverages") AS "Extents"
  LEFT JOIN "BoundingBoxes" ON "Extents"."extent" = "BoundingBoxes"."identifier"
   GROUP BY "series") AS "BoundingBoxRanges" ON "TimeRanges".series = "BoundingBoxRanges".series
@@ -537,10 +540,13 @@ CREATE VIEW "RangeOfLayers" AS
         min("west")      AS "west",
         max("east")      AS "east",
         min("south")     AS "south",
-        max("north")     AS "north"
+        max("north")     AS "north",
+        sum("XResolution" * "count") / sum("count") AS "XResolution",
+        sum("YResolution" * "count") / sum("count") AS "YResolution"
    FROM "RangeOfSeries"
    JOIN "Series" ON "RangeOfSeries"."series" = "Series"."identifier"
-  GROUP BY "layer";
+  GROUP BY "layer"
+  ORDER BY "layer";
 
 ALTER TABLE "RangeOfLayers" OWNER TO geoadmin;
 GRANT ALL ON TABLE "RangeOfLayers" TO geoadmin;

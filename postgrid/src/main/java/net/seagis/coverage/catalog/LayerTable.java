@@ -38,10 +38,7 @@ import net.seagis.resources.i18n.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @todo L'implémentation actuelle ne transmet pas l'enveloppe spatio-temporelle de {@code this}
- *       vers les objets {@link GridCoverageTable} créés. Il faudrait le faire, en prennant soin
- *       de transmettre cette informations aux objets RMI aussi. Dans la version actuelle, ce n'est
- *       pris en compte que pour les connections locales.
+ * @todo Current version do yet take in bounding box in account for layer filtered list.
  */
 public class LayerTable extends BoundedSingletonTable<Layer> {
     /**
@@ -127,7 +124,10 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         data.setLayer(layer);
         data.setTimeRange(getTimeRange());
         data.setEnvelope(getEnvelope());
-        data.trimEnvelope();
+        data.setPreferredResolution(getPreferredResolution());
+        if (false) {
+            data.trimEnvelope(); // TODO revisit
+        }
         entry.setGridCoverageTable(data);
         if (models == null) {
             DescriptorTable descriptors = database.getTable(DescriptorTable.class);

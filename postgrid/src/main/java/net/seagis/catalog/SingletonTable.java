@@ -689,7 +689,7 @@ scan:   for (int n=0; n<=MAXIMUM_AUTO_INCREMENT; n++) {
      */
     @Override
     public synchronized void flush() {
-        super.flush();
         pool.clear();
+        super.flush();
     }
 }

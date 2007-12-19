@@ -14,12 +14,14 @@
  */
 package net.seagis.coverage.web;
 
+import java.awt.geom.Dimension2D;
 import org.opengis.geometry.Envelope;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.geotools.resources.Utilities;
+import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 /**
@@ -33,6 +35,11 @@ final class LayerRequest {
      * The layer name.
      */
     private final String layer;
+
+    /**
+     * The geographic bounding box. Will be computed when first needed.
+     */
+    private transient GeographicBoundingBox bbox;
 
     /**
      * The bounding box, including the CRS.
@@ -55,13 +62,39 @@ final class LayerRequest {
 
     /**
      * Returns the envelope as a geographic bounding box, or {@code null} if none.
+     * The returned box is not cloned - <strong>do not modify</strong>.
      */
     public GeographicBoundingBox getGeographicBoundingBox() {
-        if (envelope != null) try {
-            return new GeographicBoundingBoxImpl(envelope);
-        } catch (TransformException exception) {
-            // Can't transform. Returns 'null', which is legal and means
-            // no geographic bounding box selection (return the full image).
+        if (bbox == null) {
+            if (envelope == null) {
+                return null;
+            } else try {
+                bbox = new GeographicBoundingBoxImpl(envelope);
+            } catch (TransformException exception) {
+                // Can't transform. Returns 'null', which is legal and means
+                // no geographic bounding box selection (return the full image).
+            }
+        }
+        return bbox;
+    }
+
+    /**
+     * Returns the desired resolution in geographic coordinates, or {@code null} for best
+     * resolution.
+     *
+     * @todo Revisit if it is really appropriate to assumes that x and y axis are at 0 and 1
+     *       index in the grid range.
+     */
+    public Dimension2D getResolution() {
+        if (size != null) {
+            final GeographicBoundingBox bbox = getGeographicBoundingBox();
+            if (bbox != null) {
+                final int width  = size.getLength(0);
+                final int height = size.getLength(1);
+                return new XDimension2D.Double(
+                        (bbox.getEastBoundLongitude() - bbox.getWestBoundLongitude()) / width,
+                        (bbox.getNorthBoundLatitude() - bbox.getSouthBoundLatitude()) / height);
+            }
         }
         return null;
     }

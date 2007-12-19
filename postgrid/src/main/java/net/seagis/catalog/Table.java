@@ -206,7 +206,7 @@ public class Table {
      *
      * @param  query The SQL query to prepare, {@code null} if none.
      * @return The prepared statement, or {@code null} if {@code query} was null.
-     * @throws CatalogException If the statement can not be configured.
+     * @throws CatalogException if the statement can not be configured.
      * @throws SQLException if a SQL error occured while configuring the statement.
      */
     protected final PreparedStatement getStatement(final String query)
@@ -258,7 +258,7 @@ public class Table {
      *
      * @param  type The query type, or {@code null}.
      * @return The prepared statement, or {@code null} if none.
-     * @throws CatalogException If the statement can not be configured.
+     * @throws CatalogException if the statement can not be configured.
      * @throws SQLException if a SQL error occured while configuring the statement.
      */
     protected final PreparedStatement getStatement(final QueryType type)
@@ -295,7 +295,7 @@ public class Table {
      * }
      * </pre></blockquote>
      *
-     * @throws SQLException If the operation failed.
+     * @throws SQLException if the operation failed.
      */
     protected void transactionBegin() throws SQLException {
         getDatabase().transactionBegin();
@@ -307,7 +307,7 @@ public class Table {
      *
      * @param  success {@code true} if the operation succeed and should be commited,
      *         or {@code false} if we should rollback.
-     * @throws SQLException If the commit or the rollback failed.
+     * @throws SQLException if the commit or the rollback failed.
      */
     protected void transactionEnd(final boolean success) throws SQLException {
         getDatabase().transactionEnd(success);
@@ -322,7 +322,7 @@ public class Table {
      *
      * @param  type The query type.
      * @param  statement The statement to configure (never {@code null}).
-     * @throws CatalogException If the statement can not be configured.
+     * @throws CatalogException if the statement can not be configured.
      * @throws SQLException if a SQL error occured while configuring the statement.
      */
     protected void configure(final QueryType type, final PreparedStatement statement)

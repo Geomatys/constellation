@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.awt.geom.Dimension2D;
 import static java.lang.Math.min;
 import static java.lang.Math.max;
 import static java.lang.Double.doubleToLongBits;
@@ -37,6 +38,7 @@ import org.geotools.util.DateRange;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.Utilities;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import static org.geotools.referencing.CRS.getCoordinateOperationFactory;
 import static org.geotools.referencing.CRS.equalsIgnoreMetadata;
@@ -96,30 +98,37 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     private CoordinateOperation standardToUser;
 
     /**
+     * The bounding box computed by {@link #getEnvelope}, or {@code null}
+     * if not yet computed. Cached for performance reasons.
+     */
+    private transient GeneralEnvelope envelope;
+
+    /**
      * The envelope time component, in milliseconds since January 1st, 1970.
      * May be {@link Long#MIN_VALUE} or {@link Long#MAX_VALUE} if unbounded.
      */
     private long tMin, tMax;
 
     /**
-     * The envelope spatial component. The longitude range may be larger than needed
-     * (±360° instead of ±180°) because we don't know in advance if the longitudes
+     * The envelope spatial component in WGS84 coordinates. The longitude range may be larger
+     * than needed (±360° instead of ±180°) because we don't know in advance if the longitudes
      * are inside the [-180 .. +180°} range or the [0 .. 360°] range.
      */
     private double xMin, xMax, yMin, yMax, zMin, zMax;
 
     /**
-     * {@code true} if the {@link #ensureTrimmed} method already shrinked the
+     * The preferred resolution along the <var>x</var> and <var>y</var> axis. Units shall be
+     * degrees of longitude or latitude, as in the geographic bounding box. This information
+     * is only approximative; there is no garantee that an image to be read will have that
+     * resolution. A null value (zero) means that the best resolution should be used.
+     */
+    private float xResolution, yResolution;
+
+    /**
+     * {@code true} if the {@link #trimEnvelope} method already shrinked the
      * {@linkplain #getEnvelope spatio-temporal envelope} for this table.
      */
     private boolean trimmed;
-
-    /**
-     * {@code true} if the user invoked {@link #trimEnvelope}. In such case, {@link #ensureTrimmed}
-     * will need to shrink the {@linkplain #getEnvelope spatio-temporal envelope} next time it will
-     * be invoked.
-     */
-    private boolean trimRequested;
 
     /**
      * Creates a new table using the specified query. The query given in argument should be some
@@ -151,6 +160,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     protected BoundedSingletonTable(final BoundedSingletonTable<E> table) {
         super(table);
         crsType         = table.crsType;
+        envelope        = table.envelope;
         tMin            = table.tMin;
         tMax            = table.tMax;
         xMin            = table.xMin;
@@ -159,8 +169,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         yMax            = table.yMax;
         zMin            = table.zMin;
         zMax            = table.zMax;
+        xResolution     = table.xResolution;
+        yResolution     = table.yResolution;
         trimmed         = table.trimmed;
-        trimRequested   = table.trimRequested;
         standardToUser  = table.standardToUser;
         byTimeRange     = table.byTimeRange;
         bySpatialExtent = table.bySpatialExtent;
@@ -217,6 +228,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         final CoordinateReferenceSystem sourceCRS = crsType.getCoordinateReferenceSystem();
         if (crs == null || crs.equals(sourceCRS)) {
             standardToUser = null;
+            envelope = null;
+            fireStateChanged("CoordinateReferenceSystem");
             return;
         }
         final CoordinateOperationFactory factory = getCoordinateOperationFactory(true);
@@ -228,6 +241,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         }
         if (!candidate.equals(standardToUser)) {
             standardToUser = candidate;
+            envelope = null;
             fireStateChanged("CoordinateReferenceSystem");
         }
     }
@@ -250,6 +264,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * @see #trimEnvelope
      */
     public synchronized Envelope getEnvelope() throws CatalogException, SQLException {
+        if (envelope != null) {
+            return envelope.clone();
+        }
         final GeographicBoundingBox box = getGeographicBoundingBox();
         final NumberRange      altitude = getVerticalRange();
         final DateRange            time = getTimeRange();
@@ -275,7 +292,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         } catch (TransformException exception) {
             throw new ServerException(exception);
         }
-        return envelope;
+        this.envelope = envelope;
+        return envelope.clone();
     }
 
     /**
@@ -346,18 +364,13 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * be smaller if {@link #trimEnvelope} has been invoked.
      *
      * @return The bounding box of the elements to be read.
-     * @throws CatalogException if a logical error occured.
-     * @throws SQLException if an error occured while reading the database.
      *
      * @see #getVerticalRange
      * @see #getTimeRange
      * @see #getEnvelope
      * @see #trimEnvelope
      */
-    public synchronized GeographicBoundingBox getGeographicBoundingBox()
-            throws CatalogException, SQLException
-    {
-        ensureTrimmed(QueryType.BOUNDING_BOX);
+    public synchronized GeographicBoundingBox getGeographicBoundingBox() {
         return new GeographicBoundingBoxImpl(xMin, xMax, yMin, yMax);
     }
 
@@ -376,8 +389,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         change |= (xMax != (xMax = area!=null ? Math.min(area.getEastBoundLongitude(), +360) : +360));
         change |= (yMin != (yMin = area!=null ? Math.max(area.getSouthBoundLatitude(),  -90) :  -90));
         change |= (yMax != (yMax = area!=null ? Math.min(area.getNorthBoundLatitude(),  +90) :  +90));
-        trimRequested = false;
         if (change) {
+            envelope = null;
             trimmed = false;
             fireStateChanged("GeographicBoundingBox");
         }
@@ -391,16 +404,13 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * {@link #trimEnvelope} has been invoked.
      *
      * @return The vertical range of the elements to be read.
-     * @throws CatalogException if a logical error occured.
-     * @throws SQLException if an error occured while reading the database.
      *
      * @see #getGeographicBoundingBox
      * @see #getTimeRange
      * @see #getEnvelope
      * @see #trimEnvelope
      */
-    public synchronized NumberRange getVerticalRange() throws CatalogException, SQLException {
-        ensureTrimmed(QueryType.BOUNDING_BOX);
+    public synchronized NumberRange getVerticalRange() {
         return new NumberRange(zMin, zMax);
     }
 
@@ -437,8 +447,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         boolean change;
         change  = (doubleToLongBits(zMin) != doubleToLongBits(zMin = minimum));
         change |= (doubleToLongBits(zMax) != doubleToLongBits(zMax = maximum));
-        trimRequested = false;
         if (change) {
+            envelope = null;
             trimmed = false;
             fireStateChanged("VerticalRange");
         }
@@ -452,16 +462,13 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * {@link #trimEnvelope} has been invoked.
      *
      * @return The time range of the elements to be read.
-     * @throws CatalogException if a logical error occured.
-     * @throws SQLException if an error occured while reading the database.
      *
      * @see #getGeographicBoundingBox
      * @see #getVerticalRange
      * @see #getEnvelope
      * @see #trimEnvelope
      */
-    public synchronized DateRange getTimeRange() throws CatalogException, SQLException {
-        ensureTrimmed(QueryType.BOUNDING_BOX);
+    public synchronized DateRange getTimeRange() {
         return new DateRange(tMin != Long.MIN_VALUE ? new Date(tMin) : null,
                              tMax != Long.MAX_VALUE ? new Date(tMax) : null);
     }
@@ -503,10 +510,53 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         boolean change;
         change  = (tMin != (tMin = (startTime != null) ? startTime.getTime() : Long.MIN_VALUE));
         change |= (tMax != (tMax = (  endTime != null) ?   endTime.getTime() : Long.MAX_VALUE));
-        trimRequested = false;
         if (change) {
+            envelope = null;
             trimmed = false;
             fireStateChanged("TimeRange");
+        }
+        return change;
+    }
+
+    /**
+     * Returns the approximative resolution desired, or {@code null} for best
+     * resolution. The units are degrees of longitude or latitude, as in the
+     * {@linkplain #getGeographicBoundingBox geographic bounding box}.
+     */
+    public synchronized Dimension2D getPreferredResolution() {
+        if (xResolution > 0 || yResolution > 0) {
+            return new XDimension2D.Float(xResolution, yResolution);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Sets the preferred resolution in degrees of longitude or latitude. This is only an
+     * approximative hint, since there is no garantee that an image will be read with that
+     * resolution. A null values means that the best available resolution should be used.
+     *
+     * @param  resolution The preferred geographic resolution, or {@code null} for best resolution.
+     * @return {@code true} if the resolution changed as a result of this call, or
+     *         {@code false} if the specified resolution is equals to the one already set.
+     */
+    public synchronized boolean setPreferredResolution(final Dimension2D resolution) {
+        float x,y;
+        if (resolution != null) {
+            x = (float) resolution.getWidth ();
+            y = (float) resolution.getHeight();
+            if (!(x >= 0)) x = 0; // '!' for catching NaN
+            if (!(y >= 0)) y = 0;
+        } else {
+            x = 0;
+            y = 0;
+        }
+        boolean change;
+        change  = (xResolution != (xResolution = x));
+        change |= (yResolution != (yResolution = y));
+        if (change) {
+            // Do not clear the envelope since it still valid.
+            fireStateChanged("PreferredResolution");
         }
         return change;
     }
@@ -517,29 +567,21 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * the elements that intercept the envelope specified by {@code setXXX(...)} methods.
      * Then the envelope is altered in such a way that the {@code getXXX(...)} method returns
      * an identical or smaller envelope intercepting the same set of elements.
-     */
-    public synchronized void trimEnvelope() {
-        trimRequested = true;
-    }
-
-    /**
-     * Process to envelope shrinking, if not already done. This method is invoked when needed by
-     * {@link #getGeographicBoundingBox}, {@link #getVerticalRange} and {@link #getTimeRange}. A
-     * shrinking is performed only if explicitly requested by a call to {@link #trimEnvelope}.
      *
-     * @throws CatalogException If the statement can not be configured.
+     * @throws CatalogException if a logical error occured.
      * @throws SQLException if an error occured while reading the database.
      */
-    private void ensureTrimmed(final QueryType type) throws CatalogException, SQLException {
-        assert Thread.holdsLock(this);
-        if (!trimRequested || trimmed) {
+    public synchronized void trimEnvelope() throws CatalogException, SQLException {
+        if (trimmed) {
             return;
         }
+        final QueryType type = QueryType.BOUNDING_BOX;
         final int timeColumn = (byTimeRange     != null) ? byTimeRange    .column.indexOf(type) : 0;
         final int bboxColumn = (bySpatialExtent != null) ? bySpatialExtent.column.indexOf(type) : 0;
         if (timeColumn != 0 || bboxColumn != 0) {
             final PreparedStatement statement = getStatement(type);
             if (statement != null) {
+                envelope = null; // Clears now in case of failure.
                 final ResultSet results = statement.executeQuery();
                 while (results.next()) { // Should contains only one record.
                     if (timeColumn != 0) {
@@ -595,7 +637,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      *
      * @param  type The query type (mat be {@code null}).
      * @param  statement The statement to configure (never {@code null}).
-     * @throws CatalogException If the statement can not be configured.
+     * @throws CatalogException if the statement can not be configured.
      * @throws SQLException if a SQL error occured while configuring the statement.
      */
     @Override
@@ -621,5 +663,25 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
                 statement.setString(index, SpatialFunctions.formatPolygon(envelope));
             }
         }
+    }
+
+    /**
+     * Notifies that this table state changed.
+     */
+    @Override
+    protected void fireStateChanged(final String property) {
+        if (!Utilities.equals(property, "PreferredResolution")) {
+            envelope = null; // As a safety (not that expensive to recompute).
+        }
+        super.fireStateChanged(property);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public synchronized void flush() {
+        envelope = null;
+        super.flush();
     }
 }

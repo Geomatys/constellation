@@ -31,10 +31,8 @@ import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.geometry.TransformedDirectPosition;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.util.NumberRange;
 import org.geotools.util.RangeSet;
@@ -53,24 +51,24 @@ import static net.seagis.catalog.QueryType.*;
 
 
 /**
- * Connexion vers une table d'images. Cette table contient des références vers des images sous
- * forme d'objets {@link CoverageReference}. Une table {@code GridCoverageTable} est capable
- * de fournir la liste des images qui interceptent une certaines région géographique et une
- * certaine plage de dates.
+ * Connection to a table of grid coverages. This table builds references in the form of
+ * {@link CoverageReference} objects, which will defer the image loading until first needed.
+ * A {@code GridCoverageTable} can produce a list of available image intercepting a given
+ * {@linkplain #setGeographicArea geographic area} and {@linkplain #setTimeRange time range}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> {
     /**
-     * Le modèle à utiliser pour formatter des angles.
+     * Pattern to use for formatting angle.
      */
     static final String ANGLE_PATTERN = "D°MM.m'";
 
     /**
-     * Nombre de millisecondes dans une journée.
+     * Amount of milliseconds in a day.
      */
-    private static final double DAY = 24*60*60*1000.0;
+    static final long MILLIS_IN_DAY = 24*60*60*1000L;
 
     /**
      * The currently selected layer, or {@code null} if not yet set.
@@ -78,22 +76,12 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private Layer layer;
 
     /**
-     * L'opération à appliquer sur les images lue, ou {@code null} s'il n'y en a aucune.
+     * Operation to apply on the image to be read, or {@code null} if none.
      */
     private Operation operation;
 
     /**
-     * Dimension logique (en degrés de longitude et de latitude) désirée des pixels
-     * de l'images. Cette information n'est qu'approximative. Il n'est pas garantie
-     * que les lectures produiront effectivement des images de cette résolution.
-     * Une valeur nulle signifie que les lectures doivent se faire avec la meilleure
-     * résolution possible.
-     */
-    private Dimension2D resolution;
-
-    /**
-     * Index des ordonnées dans une position géographique qui correspondent aux coordonnées
-     * (<var>x</var>,<var>y</var>) dans une image.
+     * Dimension index for (<var>x</var>,<var>y</var>) in a coordinate.
      *
      * @todo Codés en dur pour l'instant. Peut avoir besoin d'être paramètrables dans une
      *       version future.
@@ -101,10 +89,9 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private static final int xDimension=0, yDimension=1;
 
     /**
-     * Formatteur à utiliser pour écrire des dates pour le journal. Les caractères et les
-     * conventions linguistiques dépendront de la langue de l'utilisateur. Toutefois, le
-     * fuseau horaire devrait être celui de la région d'étude (ou GMT) plutôt que celui
-     * du pays de l'utilisateur.
+     * Object to use for formatting dates. The symbols are local-dependent, but the time zone
+     * should be GMT or the timezone applicable to the region of interest. This is used for
+     * loggings only, so it is not a big deal if not accurate.
      */
     private final DateFormat dateFormat;
 
@@ -119,23 +106,13 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private transient FormatTable formatTable;
 
     /**
-     * Le comparateur à utiliser pour choisir une image parmis un ensemble d'images interceptant
-     * les coordonnées spatio-temporelles spécifiées. Ne sera construit que la première fois où
-     * il sera nécessaire.
+     * Comparator for selecting the "best" image when more than one is available in
+     * the spatio-temporal area of interest. Will be created only when first needed.
      */
     private transient CoverageComparator comparator;
 
     /**
-     * Envelope spatio-temporelle couvertes par l'ensemble des images de cette table, ou
-     * {@code null} si elle n'a pas encore été déterminée. Cette envelope est calculée par
-     * {@link BoundedSingletonTable#getEnvelope} et cachée ici pour des raisons de performances.
-     */
-    private transient Envelope envelope;
-
-    /**
-     * Derniers paramètres à avoir été construits. Ces paramètres sont
-     * retenus afin d'éviter d'avoir à les reconstruires trop souvent
-     * si c'est évitable.
+     * Last parameters used for creating {@link CoverageReference} instances.
      */
     private transient GridCoverageSettings parameters;
 
@@ -158,20 +135,10 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private transient SortedMap<Date, SortedSet<Number>> availableCentroids;
 
     /**
-     * Une vue tri-dimensionnelle de toutes les données d'une couche.
-     * Ne sera construite que la première fois où elle sera nécessaire.
+     * A 2, 3 or 4-dimensional view over this table.
+     * Will be created only when first needed.
      */
-    private transient CoverageStack coverage3D;
-
-    /**
-     * Une instance d'une coordonnées à utiliser avec {@link #evaluate}.
-     */
-    private transient TransformedDirectPosition position;
-
-    /**
-     * Un buffer pré-alloué à utiliser avec {@link #evaluate}.
-     */
-    private transient double[] samples;
+    private transient Coverage asCoverage;
 
     /**
      * Constructs a new {@code GridCoverageTable}.
@@ -201,13 +168,12 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
         super(table);
         layer             = table.layer;
         operation         = table.operation;
-        resolution        = table.resolution;
         dateFormat        = table.dateFormat;
         gridGeometryTable = table.gridGeometryTable;
         formatTable       = table.formatTable;
         comparator        = table.comparator;
         parameters        = table.parameters;
-        coverage3D        = table.coverage3D;
+        asCoverage        = table.asCoverage;
     }
 
     /**
@@ -269,9 +235,9 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * Sets the layer as a string.
      *
      * @param  name The layer name.
-     * @throws CatalogException If no layer was found for the given name,
+     * @throws CatalogException if no layer was found for the given name,
      *         or if an other logical error occured.
-     * @throws SQLException If the database access failed for an other reason.
+     * @throws SQLException if the database access failed for an other reason.
      */
     public synchronized void setLayer(final String name) throws CatalogException, SQLException {
         // We don't keep a reference to the layer table since this method
@@ -280,7 +246,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Définit la période de temps d'intérêt (dans laquelle rechercher des images).
+     * {@inheritDoc}
      */
     @Override
     public synchronized boolean setTimeRange(final Date startTime, final Date endTime) {
@@ -299,7 +265,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Définit la région géographique d'intérêt dans laquelle rechercher des images.
+     * {@inheritDoc}
      */
     @Override
     public synchronized boolean setGeographicBoundingBox(final GeographicBoundingBox area) {
@@ -315,61 +281,41 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Retourne la dimension désirée des pixels de l'images.
-     *
-     * @return Résolution préférée, ou {@code null} si la lecture doit se faire avec
-     *         la meilleure résolution disponible.
+     * {@inheritDoc}
      */
-    public synchronized Dimension2D getPreferredResolution() {
-        return (resolution!=null) ? (Dimension2D)resolution.clone() : null;
-    }
-
-    /**
-     * Définit la dimension désirée des pixels de l'images.  Cette information n'est
-     * qu'approximative. Il n'est pas garantie que la lecture produira effectivement
-     * des images de cette résolution. Une valeur nulle signifie que la lecture doit
-     * se faire avec la meilleure résolution disponible.
-     *
-     * @param  pixelSize Taille préférée des pixels, en degrés de longitude et de latitude.
-     */
-    public synchronized void setPreferredResolution(final Dimension2D pixelSize) {
-        if (!Utilities.equals(resolution, pixelSize)) {
+    @Override
+    public synchronized boolean setPreferredResolution(final Dimension2D resolution) {
+        final boolean change = super.setPreferredResolution(resolution);
+        if (change) {
             flush();
             final int clé;
             final Object param;
-            if (pixelSize != null) {
-                resolution = (Dimension2D)pixelSize.clone();
+            if (resolution != null) {
                 clé = ResourceKeys.SET_RESOLUTION_$3;
                 param = new Object[] {
-                    new Double(resolution.getWidth()),
-                    new Double(resolution.getHeight()),
+                    resolution.getWidth(),
+                    resolution.getHeight(),
                     getLayerName()
                 };
             } else {
-                resolution = null;
                 clé = ResourceKeys.UNSET_RESOLUTION_$1;
                 param = getLayerName();
             }
-            fireStateChanged("PreferredResolution");
             log("setPreferredResolution", Level.CONFIG, clé, param);
         }
+        return change;
     }
 
     /**
-     * Retourne l'opération appliquée sur les images lues. L'opération retournée
-     * peut représenter par exemple un gradient. Si aucune opération n'est appliquée
-     * (c'est-à-dire si les images retournées représentent les données originales),
-     * alors cette méthode retourne {@code null}.
+     * Returns the operation to apply on rasters. It may be for example a gradient magnitude.
+     * If no operation are applied, then this method returns {@code null}.
      */
     public Operation getOperation() {
         return operation;
     }
 
     /**
-     * Définit l'opération à appliquer sur les images lues.
-     *
-     * @param  operation L'opération à appliquer sur les images, ou {@code null} pour
-     *         n'appliquer aucune opération.
+     * Sets the operation to apply on rasters, or {@code null} if none.
      */
     public synchronized void setOperation(final Operation operation) {
         if (!Utilities.equals(operation, this.operation)) {
@@ -390,27 +336,18 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     }
 
     /**
-     * Retourne la liste des images disponibles dans la plage de coordonnées spatio-temporelles
-     * préalablement sélectionnées. Ces plages auront été spécifiées à l'aide des différentes
-     * méthodes {@code set...} de cette classe.
+     * Returns the two-dimensional coverages that intercept the
+     * {@linkplain #getEnvelope current spatio-temporal envelope}.
      *
-     * @return Liste d'images qui interceptent la plage de temps et la région géographique d'intérêt.
-     * @throws CatalogException si un enregistrement est invalide.
-     * @throws SQLException si la base de données n'a pas pu être interrogée pour une autre raison.
+     * @return List of coverages in the current envelope of interest.
+     * @throws CatalogException if a record is invalid.
+     * @throws SQLException if an error occured while reading the database.
      */
     @Override
     public Set<CoverageReference> getEntries() throws CatalogException, SQLException {
-        if (envelope == null) {
-            /*
-             * getEnvelope() doit être appelée au moins une fois (sauf si l'enveloppe n'a
-             * pas changé) avant super.getEntries() afin d'éviter que le java.sql.Statement
-             * de QueryType.LIST ne soit fermé en pleine itération pour exécuter le Statement
-             * de QueryType.BOUNDING_BOX.
-             */
-            envelope = getEnvelope();
-        }
         final  Set<CoverageReference> entries  = super.getEntries();
         final List<CoverageReference> filtered = new ArrayList<CoverageReference>(entries.size());
+        final Dimension2D resolution = getPreferredResolution();
 loop:   for (final CoverageReference newReference : entries) {
             if (newReference instanceof GridCoverageEntry) {
                 final GridCoverageEntry newEntry = (GridCoverageEntry) newReference;
@@ -452,58 +389,34 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Retourne une des images disponibles dans la plage de coordonnées spatio-temporelles
-     * préalablement sélectionnées. Si plusieurs images interceptent la région et la plage
-     * de temps (c'est-à-dire si {@link #getEntries} retourne un ensemble d'au moins deux
-     * entrées), alors le choix de l'image se fera en utilisant un objet
-     * {@link CoverageComparator} par défaut.
+     * Returns one of the two-dimensional coverages that intercept the
+     * {@linkplain #getEnvelope current spatio-temporal envelope}. If more than one coverage
+     * intercept the envelope (i.e. if {@link #getEntries} returns a set containing at least
+     * two elements), then a coverage will be selected using the default
+     * {@link CoverageComparator}.
      *
-     * @return Une image choisie arbitrairement dans la région et la plage de date
-     *         sélectionnées, ou {@code null} s'il n'y a pas d'image dans ces plages.
-     * @throws CatalogException si un enregistrement est invalide.
-     * @throws SQLException si la base de données n'a pas pu être interrogée pour une autre raison.
+     * @return A coverage intercepting the given envelope, or {@code null} if none.
+     * @throws CatalogException if a record is invalid.
+     * @throws SQLException if an error occured while reading the database.
      */
     public synchronized CoverageReference getEntry() throws CatalogException, SQLException {
-        /*
-         * Obtient la liste des entrées avant toute opération impliquant l'envelope,
-         * puisque cette envelope peut avoir été calculée par 'getEntries()'.
-         */
-        final Set<CoverageReference> entries = getEntries();
-        assert getEnvelope().equals(envelope) : envelope; // Vérifie que l'enveloppe n'a pas changée.
+        final Iterator<CoverageReference> entries = getEntries().iterator();
         CoverageReference best = null;
-        if (comparator == null) {
-            comparator = new CoverageComparator(getCoordinateReferenceSystem(), envelope);
-        }
-        for (final CoverageReference entry : entries) {
-            if (best==null || comparator.compare(entry, best) <= -1) {
-                best = entry;
+        if (entries.hasNext()) {
+            best = entries.next();
+            if (entries.hasNext()) {
+                if (comparator == null) {
+                    comparator = new CoverageComparator(getCoordinateReferenceSystem(), getEnvelope());
+                }
+                do {
+                    final CoverageReference entry = entries.next();
+                    if (comparator.compare(entry, best) <= -1) {
+                        best = entry;
+                    }
+                } while (entries.hasNext());
             }
         }
         return best;
-    }
-
-    /**
-     * Retourne l'entrée pour le nom de fichier spécifié. Ces noms sont habituellement unique pour
-     * une couche donnée (mais pas obligatoirement). En cas de doublon, une exception sera lancée.
-     *
-     * @param  name Le nom du fichier.
-     * @return L'entrée demandée, ou {@code null} si {@code name} était nul.
-     * @throws CatalogException si aucun enregistrement ne correspond au nom demandé,
-     *         ou si un enregistrement est invalide.
-     * @throws SQLException si l'interrogation de la base de données a échoué pour une autre raison.
-     */
-    @Override
-    public synchronized CoverageReference getEntry(final String name)
-            throws CatalogException, SQLException
-    {
-        if (name == null) {
-            return null;
-        }
-        if (envelope == null) {
-            envelope = getEnvelope();
-            // Voir le commentaire du code équivalent de 'getEntries()'
-        }
-        return super.getEntry(name);
     }
 
     /**
@@ -512,7 +425,7 @@ loop:   for (final CoverageReference newReference : entries) {
      *
      * @return The set of dates.
      * @throws CatalogException if an illegal record was found.
-     * @throws SQLException If an error occured while reading the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     public synchronized SortedSet<Date> getAvailableTimes()
             throws CatalogException, SQLException
@@ -541,7 +454,7 @@ loop:   for (final CoverageReference newReference : entries) {
      *
      * @return The set of altitudes. May be empty, but will never be null.
      * @throws CatalogException if an illegal record was found.
-     * @throws SQLException If an error occured while reading the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     public synchronized SortedSet<Number> getAvailableElevations()
             throws CatalogException, SQLException
@@ -575,10 +488,10 @@ loop:   for (final CoverageReference newReference : entries) {
      * replaced by the middle time. This method considers only the vertical and temporal axis.
      * The horizontal axis are omitted.
      *
-     * @return An immutable collection of centroids. Keys are the dates, are values ar the set
-     *         of altitudes for that date.
+     * @return An immutable collection of centroids. Keys are the dates, and values are the set
+     *         of altitudes for a given date.
      * @throws CatalogException if an illegal record was found.
-     * @throws SQLException If an error occured while reading the database.
+     * @throws SQLException if an error occured while reading the database.
      */
     final synchronized SortedMap<Date, SortedSet<Number>> getAvailableCentroids()
             throws CatalogException, SQLException
@@ -641,13 +554,13 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Returns the range of date of available images.
+     * Returns the range of date for available images.
      *
      * @param  addTo If non-null, the set where to add the time range of available coverages.
      * @return The time range of available coverages. This method returns {@code addTo} if it
      *         was non-null or a new object otherwise.
-     * @throws CatalogException If the statement can not be configured.
-     * @throws SQLException If an error occured while reading the database.
+     * @throws CatalogException if an illegal record was found.
+     * @throws SQLException if an error occured while reading the database.
      */
     public synchronized RangeSet getAvailableTimeRanges(RangeSet addTo)
             throws CatalogException, SQLException
@@ -658,7 +571,7 @@ loop:   for (final CoverageReference newReference : entries) {
         final ResultSet  result  = getStatement(AVAILABLE_DATA).executeQuery();
         final int startTimeIndex = indexOf(query.startTime);
         final int   endTimeIndex = indexOf(query.endTime);
-        final long timeInterval  = Math.round((layer!=null ? layer.getTimeInterval() : 1) * DAY);
+        final long timeInterval  = Math.round((layer!=null ? layer.getTimeInterval() : 1) * MILLIS_IN_DAY);
         if (addTo == null) {
             addTo = new RangeSet(Date.class);
         }
@@ -686,7 +599,7 @@ loop:   for (final CoverageReference newReference : entries) {
      * Configures the specified query. This method is invoked automatically after this table
      * {@linkplain #fireStateChanged changed its state}.
      *
-     * @throws CatalogException If the statement can not be configured.
+     * @throws CatalogException if the statement can not be configured.
      * @throws SQLException if a SQL error occured while configuring the statement.
      */
     @Override
@@ -718,6 +631,9 @@ loop:   for (final CoverageReference newReference : entries) {
 
     /**
      * Creates an entry from the current row in the specified result set.
+     *
+     * @throws CatalogException if an illegal record was found.
+     * @throws SQLException if an error occured while reading the database.
      */
     protected CoverageReference createEntry(final ResultSet result) throws CatalogException, SQLException {
         assert Thread.holdsLock(this);
@@ -753,28 +669,23 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Retourne les paramètres de cette table. Pour des raisons d'économie de mémoire (de très
-     * nombreux objets {@code GridCoverageSettings} pouvant être créés), cette méthode retourne un exemplaire
-     * unique autant que possible. L'objet retourné ne doit donc pas être modifié!
+     * Returns the current values of some parameters in this table. Those parameters are grouped
+     * in a single object in order to reduce memory usage, because a large amount of coverages may
+     * share a single instance of {@code GridCoverageSettings}. The returned object should be
+     * considered immutable - <strong>do not modify</strong>.
      * <p>
-     * Cette méthode est appelée par le constructeur de {@link GridCoverageEntry}.
+     * This method is invoked by {@link GridCoverageEntry} constructor.
      *
-     * @param coverageCRS Système de référence des coordonnées.
-     * @return Un objet incluant les paramètres demandées ainsi que ceux de la table.
-     * @throws CatalogException si les paramètres n'ont pas pu être obtenus.
-     * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
+     * @param  coverageCRS CRS of the coverages to be created.
+     * @return An object containing the given CRS and parameter values defined in this table.
+     * @throws CatalogException if an illegal record was found.
+     * @throws SQLException if an error occured while reading the database.
+     *
      * @todo L'implémentation actuelle n'accepte pas d'autres implémentations de Format que FormatEntry.
      */
     final synchronized GridCoverageSettings getParameters(final CoordinateReferenceSystem coverageCRS)
             throws CatalogException, SQLException
     {
-        /*
-         * Vérifie que l'enveloppe n'a pas changé. Note: getEnvelope() doit avoir été appelée au
-         * moins une fois (sauf si elle n'a pas changée) juste avant super.getEntries(), afin
-         * d'éviter que le java.sql.Statement de QueryType.LIST n'aie été fermé pour exécuter
-         * le Statement de QueryType.BOUNDING_BOX.
-         */
-        assert getEnvelope().equals(envelope) : envelope;
         /*
          * Si les paramètres spécifiés sont identiques à ceux qui avaient été
          * spécifiés la dernière fois, retourne le dernier bloc de paramètres.
@@ -786,74 +697,50 @@ loop:   for (final CoverageReference newReference : entries) {
          * Construit un nouveau bloc de paramètres et projète les
          * coordonnées vers le système de coordonnées de l'image.
          */
+        final Envelope envelope = getEnvelope();
         final Rectangle2D geographicArea = XRectangle2D.createFromExtremums(
                             envelope.getMinimum(xDimension), envelope.getMinimum(yDimension),
                             envelope.getMaximum(xDimension), envelope.getMaximum(yDimension));
         if (formatTable == null) {
             formatTable = getDatabase().getTable(FormatTable.class);
         }
+        final Dimension2D resolution = getPreferredResolution();
         parameters = new GridCoverageSettings(operation, getCoordinateReferenceSystem(),
                             coverageCRS, geographicArea, resolution, dateFormat);
         return parameters;
     }
 
     /**
-     * Prépare l'évaluation d'un point.
+     * Returns a <var>n</var>-dimensional coverage backed by this table.
      *
-     * @deprecated Move in some CoverageWrapper class. Copy Javadoc from DataConnection.
+     * @return A 2, 3 or 4 dimensional coverage, or {@code null} if there is no data.
+     * @throws CatalogException if an illegal record was found.
+     * @throws SQLException if an error occured while reading the database.
+     * @throws IOException If an error occured while reading an image file.
+     *
+     * @todo Current implementation does not take depth in account, so there is actually
+     *       no 4-D coverage yet.
      */
-    private void prepare(final DirectPosition location)
-            throws CatalogException, SQLException, IOException
-    {
-        assert Thread.holdsLock(this);
-        if (coverage3D == null) {
-            coverage3D = new CoverageStack(getLayer().getName(), getCoordinateReferenceSystem(), getEntries());
-            position   = new TransformedDirectPosition(null, getCoordinateReferenceSystem(), null);
+    public synchronized Coverage asCoverage() throws CatalogException, SQLException, IOException {
+        if (asCoverage == null) {
+            final Set<CoverageReference> entries = getEntries();
+            switch (entries.size()) {
+                case 0: {
+                    // No data - coverage will stay null.
+                    break;
+                }
+                case 1: {
+                    asCoverage = entries.iterator().next().getCoverage(null);
+                    break;
+                }
+                default: {
+                    final CoordinateReferenceSystem crs = getCoordinateReferenceSystem();
+                    asCoverage = new CoverageStack(getLayer().getName(), crs, entries);
+                    break;
+                }
+            }
         }
-        try {
-            position.transform(location);
-        } catch (TransformException e) {
-            throw new CatalogException(e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Move in some CoverageWrapper class. Copy Javadoc from DataConnection.
-     */
-    public synchronized double evaluate(final double x, final double y, final double t, final short band)
-            throws CatalogException, SQLException, IOException
-    {
-        //prepare(x, y, t); TODO
-        samples = coverage3D.evaluate(position, samples);
-        return samples[band];
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Move in some CoverageWrapper class. Copy Javadoc from DataConnection.
-     */
-    public synchronized double[] snap(final double x, final double y, final double t)
-            throws CatalogException, SQLException, IOException
-    {
-        //prepare(x, y, t); TODO
-        coverage3D.snap(position);
-        return position.ordinates.clone();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Move in some CoverageWrapper class. Copy Javadoc from DataConnection.
-     */
-    @SuppressWarnings("unchecked")
-    public synchronized List<Coverage> coveragesAt(final DirectPosition position)
-            throws CatalogException, SQLException, IOException
-    {
-        prepare(position);
-        return coverage3D.coveragesAt(position.getOrdinate(position.getDimension() - 1));
+        return asCoverage;
     }
 
     /**
@@ -871,10 +758,9 @@ loop:   for (final CoverageReference newReference : entries) {
      * de la table a changé, mais que cet état n'affecte pas les prochaines entrées à créer.
      */
     private void flushExceptEntries() {
-        coverage3D = null;
+        asCoverage = null;
         parameters = null;
         comparator = null;
-        envelope   = null;
         availableElevations = null;
         availableTimes      = null;
         availableCentroids  = null;
@@ -896,15 +782,8 @@ loop:   for (final CoverageReference newReference : entries) {
      */
     @Override
     public final String toString() {
-        String area;
-        try {
-            area = GeographicBoundingBoxImpl.toString(getGeographicBoundingBox(),
+        final String area = GeographicBoundingBoxImpl.toString(getGeographicBoundingBox(),
                     ANGLE_PATTERN, getDatabase().getLocale());
-        } catch (CatalogException e) {
-            area = e.getLocalizedMessage();
-        } catch (SQLException e) {
-            area = e.getLocalizedMessage();
-        }
         final StringBuilder buffer = new StringBuilder(Classes.getShortClassName(this));
         buffer.append("[\"").append(String.valueOf(layer)).append("\": ").append(area).append(']');
         return buffer.toString();

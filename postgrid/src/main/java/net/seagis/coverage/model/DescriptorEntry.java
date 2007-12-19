@@ -20,7 +20,6 @@ import java.lang.ref.SoftReference;
 import org.geotools.resources.Utilities;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.GridCoverage;
-import net.seagis.coverage.catalog.DataCoverage;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Entry;
 
@@ -29,7 +28,7 @@ import net.seagis.catalog.Entry;
  * Implémentation d'une entrée représentant une {@linkplain Descriptor descripteur du paysage océanique}.
  *
  * @version $Id$
- * @author Martin Desruisseaux 
+ * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
 final class DescriptorEntry extends Entry implements Descriptor {
@@ -108,7 +107,7 @@ final class DescriptorEntry extends Entry implements Descriptor {
         this.band         = band;
         this.offset       = offset;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -182,7 +181,8 @@ final class DescriptorEntry extends Entry implements Descriptor {
         }
         c = FunctionalCoverage.getCoverage(getName());
         if (c == null) {
-            c = new DataCoverage(this);
+            throw new UnsupportedOperationException("Not yet implemented.");
+            // c = new DataCoverage(this);
         }
         coverage = new SoftReference<GridCoverage>(c);
         return c;
