@@ -15,6 +15,7 @@
 
 package net.seagis.coverage.wms;
 
+import com.sun.ws.rest.spi.resource.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.SortedSet;
 import java.util.logging.Logger;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
@@ -39,7 +40,6 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.Unmarshaller;
-import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.sld.DescribeLayerResponseType;
 import net.seagis.sld.LayerDescriptionType;
 import net.seagis.sld.StyledLayerDescriptor;
@@ -49,9 +49,13 @@ import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.wms.Dimension;
 import net.seagis.wms.EXGeographicBoundingBox;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import net.seagis.wms.LegendURL;
+import net.seagis.wms.OnlineResource;
+import net.seagis.wms.Style;
 import org.geotools.util.Version;
+import org.geotools.referencing.CRS;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.FactoryException;
 
 /**
  * WMS 1.3.0 web service implementing the operation getMap, getFeatureInfo and getCapabilities.
@@ -60,36 +64,44 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @author Guilhem Legal
  */
 @UriTemplate("wms")
+@Singleton
 public class WMService {
     
     @HttpContext
     private UriInfo context;
     
-    private Logger logger = Logger.getLogger("fr.geomatys.wms");
+    private final Logger logger = Logger.getLogger("net.seagis.wms");
     
     /**
      * A JAXB marshaller used to transform the java object in XML String.
      */
-    private Marshaller marshaller;
+    private final Marshaller marshaller;
     
     /**
      * A JAXB unmarshaller used to create java object from XML file.
      */
-    private Unmarshaller unmarshaller;
+    private final Unmarshaller unmarshaller;
     
     /**
      * The version of the WMS web service. fixed a 1.3.0 for now.
      */
-    private Version version = new Version("1.3.0");
+    private final Version version = new Version("1.3.0");
     
     /**
      * The version of the SLD profile for the WMS web service. fixed a 1.1.0 for now.
      */
-    private Version sldVersion = new Version("1.1.0");
+    private final Version sldVersion = new Version("1.1.0");
     
+    /**
+     * The object whitch made all the operation on the postgrid database
+     */
+    private final WebServiceWorker webServiceWorker;
     
-    private WebServiceWorker webServiceWorker;
-    
+    /**
+     * 
+     */
+    private final String serviceURL;
+            
     /** 
      * these attributes will be removed. 
      */
@@ -123,6 +135,7 @@ public class WMService {
         
         webServiceWorker = new WebServiceWorker(new Database());
         webServiceWorker.setService("WMS", version.toString());
+        serviceURL = "http://sensor.geomatys.fr/wms-1.0-SNAPSHOT/wms?";
     }
    
     
@@ -187,12 +200,12 @@ public class WMService {
             v = version;
         
         if (!getParameter("VERSION", true).equals(v.toString())) {
-            throw new WebServiceException("The parameter VERSION=" + v.toString() + "must be specify",
+            throw new WebServiceException("The parameter VERSION=" + v + "must be specify",
                                          WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
         }
         if (sld == 1) {
             if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
-                throw new WebServiceException("The parameter VERSION=" + sldVersion.toString() + "must be specify",
+                throw new WebServiceException("The parameter VERSION=" + sldVersion + "must be specify",
                                               WMSExceptionCode.MISSING_PARAMETER_VALUE, version);
             }
         }
@@ -378,6 +391,10 @@ public class WMService {
                 
                 List<String> crs = new ArrayList<String>();
                 
+                Integer code = CRS.lookupEpsgCode(inputLayer.getCoverage().getCoordinateReferenceSystem(), false);
+                if(code != null)
+                    crs.add(code.toString());
+                
                 GeographicBoundingBox inputBox = inputLayer.getGeographicBoundingBox();
                 
                 //we add the list od available date and elevation
@@ -386,14 +403,14 @@ public class WMService {
                 //the available date
                 String defaut = null;
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                if ( inputLayer.getAvailableTimes().size() > 0)
-                    defaut = df.format(inputLayer.getAvailableTimes().first());
-                else
-                    logger.severe("availableTime size=0");
+                SortedSet<Date> dates = inputLayer.getAvailableTimes();
+                if (dates.size() > 0)
+                    defaut = df.format(dates.first());
+                
                 
                 Dimension dim = new Dimension("time", "ISO8601", defaut);
                 String value = "";
-                for (Date d:inputLayer.getAvailableTimes()){
+                for (Date d:dates){
                     
                     value += df.format(d) + ','; 
                 }
@@ -402,18 +419,27 @@ public class WMService {
                 
                 //the available elevation
                 defaut = null;
-                if ( inputLayer.getAvailableElevations().size() > 0)
-                    defaut = inputLayer.getAvailableElevations().first().toString();
-                else
-                    logger.severe("availableElevation size=0");
+                SortedSet<Number> elevations = inputLayer.getAvailableElevations();
+                if (elevations.size() > 0)
+                    defaut = elevations.first().toString();
+                
                 dim = new Dimension("elevation", "EPSG:5030", defaut);
                 value = "";
-                for (Number n:inputLayer.getAvailableElevations()){
+                for (Number n:elevations){
                     value += n.toString() + ','; 
                 }
                 dim.setValue(value);
                 dimensions.add(dim);
                 
+                // we build a Style Object
+                OnlineResource or = new OnlineResource(this.serviceURL + "REQUEST=GetLegendGraphic&VERSION=1.3.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
+                LegendURL legendURL1 = new LegendURL("image/png", or);
+
+                or = new OnlineResource(this.serviceURL + "REQUEST=GetLegendGraphic&VERSION=1.3.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
+                LegendURL legendURL2 = new LegendURL("image/gif", or);
+                Style style = new Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
+                
+                //we build and add a layer 
                 Layer outputLayer = new Layer(inputLayer.getName(), 
                                               inputLayer.getRemarks(),
                                               inputLayer.getThematic(), 
@@ -424,9 +450,12 @@ public class WMService {
                                                                           inputBox.getNorthBoundLatitude()), 
                                               null,  
                                               true,
-                                              dimensions);
+                                              dimensions,
+                                              style);
                 layers.add(outputLayer);
                 
+            } catch (FactoryException exception) {
+                throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, this.version);
             } catch (CatalogException exception) {
                 throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, this.version);
             }

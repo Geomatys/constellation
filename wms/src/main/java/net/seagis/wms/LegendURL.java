@@ -56,9 +56,17 @@ public class LegendURL {
      */
      LegendURL() {
      }
+     
+     /**
+     * Build a legend URL without specifyng the dimensions.
+     */
+     public LegendURL(final String format, final OnlineResource onlineResource) {
+         this.format         = format;
+         this.onlineResource = onlineResource;
+     }
 
     /**
-     * Build a new DCP object.
+     * Build a new legend url object.
      */
     public LegendURL(final String format, final OnlineResource onlineResource, final BigInteger width,
             final BigInteger height) {

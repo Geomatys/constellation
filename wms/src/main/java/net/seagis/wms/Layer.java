@@ -180,10 +180,11 @@ public class Layer {
       * @param boundingBox             A normal boundingBox.
       * @param queryable  A boolean indicating if the layer is queryable
       * @param dimension  A list of Dimension block.
+      * @param style      An object describing the style of the layer.
       */
      public Layer(final String name, final String _abstract, final String keyword, final List<String> crs, 
              final EXGeographicBoundingBox exGeographicBoundingBox, final BoundingBox boundingBox, final boolean queryable,
-             final List<Dimension> dimension) {
+             final List<Dimension> dimension, final Style style) {
          this.name                    = name;
          this._abstract               = _abstract;
          this.keywordList             = new KeywordList(new Keyword(keyword));
@@ -192,6 +193,7 @@ public class Layer {
          this.boundingBox.add(boundingBox);
          this.queryable = queryable;
          this.dimension = dimension;
+         this.style.add(style);
      }
      
     /**

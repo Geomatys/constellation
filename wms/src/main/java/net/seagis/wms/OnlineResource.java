@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
  * <p>Java class for anonymous complex type.
  * 
@@ -48,25 +47,35 @@ public class OnlineResource {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
-     /**
+    /**
      * An empty constructor used by JAXB.
      */
-     OnlineResource() {
-     }
+    OnlineResource() {
+    }
 
     /**
-     * Build a new OnlineResource object.
+     * Build an online resource with only the href attribute (most of the case.
+     * 
+     * @param href The url of the resource.
+     */
+    public OnlineResource(final String type) {
+        this.href = href;   
+    }
+    
+    /**
+     * Build a full OnlineResource object.
      */
     public OnlineResource(final String type, final String href, final String role,
-            final String arcrole, final String title, final String show, String actuate ) {
+            final String arcrole, final String title, final String show, String actuate) {
         this.actuate = actuate;
         this.arcrole = arcrole;
-        this.href    = href;
-        this.role    = role;
-        this.show    = show;
-        this.title   = title;
-        this.type    = type;
+        this.href = href;
+        this.role = role;
+        this.show = show;
+        this.title = title;
+        this.type = type;
     }
+
     /**
      * Gets the value of the type property.
      * 
@@ -79,7 +88,7 @@ public class OnlineResource {
         }
     }
 
-   /**
+    /**
      * Gets the value of the href property.
      * 
      */
