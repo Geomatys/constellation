@@ -23,6 +23,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.ImageTypeSpecifier;
@@ -83,6 +84,8 @@ public class WebServiceWorker {
         ImageUtilities.allowNativeCodec("png", ImageWriterSpi.class, false);
     }
 
+    private final Logger logger = Logger.getLogger("net.seagis.coverage.web");
+    
     /**
      * WMS before this version needs longitude before latitude. WMS after this version don't
      * perform axis switch. WMS at this exact version switch axis only for EPSG:4326.
@@ -771,12 +774,15 @@ public class WebServiceWorker {
      * If this method can't reformat, then the image is returned unchanged.
      */
     private RenderedImage reformat(final RenderedImage image) {
+        logger.severe("entrer dans reformat");
         final ImageWriterSpi spi = writer.getOriginatingProvider();
         if (spi != null) {
             for (int i=0; i<BUFFERED_TYPES.length; i++) {
+                logger.severe("REFORMAT: type=" + i);
                 final ImageTypeSpecifier type =
                         ImageTypeSpecifier.createFromBufferedImageType(BUFFERED_TYPES[i]);
                 if (spi.canEncodeImage(type)) {
+                    logger.severe("can encode in type=" + i);
                     final BufferedImage buffered = type.createBufferedImage(image.getWidth(), image.getHeight());
                     final Graphics2D graphics = buffered.createGraphics();
                     graphics.drawRenderedImage(image, new AffineTransform());
