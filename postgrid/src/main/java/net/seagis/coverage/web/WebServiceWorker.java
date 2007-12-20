@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Graphics2D;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
@@ -40,17 +41,22 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.util.Version;
+import org.geotools.util.NumberRange;
+import org.geotools.util.MeasurementRange;
 import org.geotools.util.LRULinkedHashMap;
 import org.geotools.util.logging.Logging;
-import org.geotools.util.Version;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -63,9 +69,7 @@ import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTable;
 import net.seagis.resources.i18n.ResourceKeys;
-import org.geotools.coverage.processing.ColorMap;
-import org.geotools.util.MeasurementRange;
-import org.geotools.util.NumberRange;
+import net.seagis.resources.i18n.Resources;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 
@@ -170,10 +174,17 @@ public class WebServiceWorker {
     private GridRange gridRange;
 
     /**
+     * The <cite>grid to CRS</cite> transform, or {@code null} if not yet computed.
+     *
+     * @see #getGridToCRS.
+     */
+    private AffineTransform gridToCRS;
+
+    /**
      * The range on value on which to apply a color ramp.
      */
     private NumberRange colormapRange;
-    
+
     /**
      * The requested time.
      */
@@ -338,8 +349,9 @@ public class WebServiceWorker {
      * @throws WebServiceException if no CRS object can be built from the given code.
      */
     public void setCoordinateReferenceSystem(final String code) throws WebServiceException {
+        gridToCRS = null;
         if (code == null) {
-            envelope = null;
+            envelope  = null;
             return;
         }
         final int versionThreshold;
@@ -373,6 +385,7 @@ public class WebServiceWorker {
      */
     @SuppressWarnings("fallthrough")
     public void setBoundingBox(final String bbox) throws WebServiceException {
+        gridToCRS = null;
         if (bbox == null) {
             if (envelope != null) {
                 envelope.setToInfinite();
@@ -446,6 +459,7 @@ public class WebServiceWorker {
      * @throws WebServiceException if the dimension can't be parsed from the given strings.
      */
     public void setDimension(final String width, final String height) throws WebServiceException {
+        gridToCRS = null;
         if (width == null && height == null) {
             gridRange = null;
             return;
@@ -511,7 +525,7 @@ public class WebServiceWorker {
 
     /**
      *  Sets the range value of the color palette
-     * 
+     *
      * @param
      */
     public void setDimensionRange(String dimensionRange) {
@@ -648,6 +662,45 @@ public class WebServiceWorker {
     }
 
     /**
+     * Computes the <cite>grid to CRS</cite> affine transform. Returns {@code null}
+     * if the transform can not be computed.
+     *
+     * @throws WebServiceException if an error occured while querying the layer.
+     */
+    public AffineTransform getGridToCRS() throws WebServiceException {
+        if (gridToCRS == null) {
+            GridRange       gridRange = this.gridRange;
+            GeneralEnvelope envelope  = this.envelope;
+            if (envelope == null || gridRange == null) {
+                // Computes both properties or none, for making sure that we are consistent.
+                if (envelope != null || gridRange != null) {
+                    return null;
+                }
+                final Rectangle bounds;
+                final GeographicBoundingBox box;
+                final Layer layer = getLayer();
+                try {
+                    bounds = layer.getBounds();
+                    if (bounds == null) {
+                        return null;
+                    }
+                    box = layer.getGeographicBoundingBox();
+                    if (box == null) {
+                        return null;
+                    }
+                } catch (CatalogException exception) {
+                    throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+                }
+                gridRange = new GeneralGridRange(bounds);
+                envelope  = new GeneralEnvelope(box);
+            }
+            final GridGeometry2D geometry = new GridGeometry2D(gridRange, envelope);
+            gridToCRS = (AffineTransform) geometry.getGridToCRS2D();
+        }
+        return gridToCRS;
+    }
+
+    /**
      * Gets the grid coverage for the current layer, time, elevation, <cite>etc.</cite>
      *
      * @param  resample {@code true} for resampling the coverage to the specified envelope
@@ -668,7 +721,7 @@ public class WebServiceWorker {
         }
         if (ref == null) {
             // TODO: provides a better message.
-            throw new WebServiceException(Errors.format(ResourceKeys.NO_DATA_TO_DISPLAY), INVALID_PARAMETER_VALUE, version);
+            throw new WebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY), INVALID_PARAMETER_VALUE, version);
         }
         GridCoverage2D coverage;
         try {
@@ -1009,6 +1062,7 @@ public class WebServiceWorker {
         layerNames       = null;
         layerTable       = null;
         globalLayerTable = null;
+        gridToCRS        = null;
         try {
             database.flush();
         } catch (CatalogException exception) {
