@@ -213,6 +213,8 @@ public class WMService {
             if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
                 throw new WebServiceException("The parameter VERSION=" + sldVersion + "must be specify",
                                               WMSExceptionCode.MISSING_PARAMETER_VALUE, sldVersion);
+            } else {
+                return;
             }
         }
         if (!(getParameter("VERSION", true).equals(versions.get(0).toString()) || getParameter("VERSION", true).equals(versions.get(1).toString()) )) {
