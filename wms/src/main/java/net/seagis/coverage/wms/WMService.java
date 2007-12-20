@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
@@ -44,7 +45,6 @@ import net.seagis.sld.DescribeLayerResponseType;
 import net.seagis.sld.LayerDescriptionType;
 import net.seagis.sld.StyledLayerDescriptor;
 import net.seagis.wms.Layer;
-import net.seagis.wms.WMSCapabilities;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.wms.AbstractWMSCapabilities;
@@ -53,9 +53,11 @@ import net.seagis.wms.EXGeographicBoundingBox;
 import net.seagis.wms.LegendURL;
 import net.seagis.wms.OnlineResource;
 import net.seagis.wms.Style;
+import org.geotools.referencing.CRS;
 import org.geotools.util.NumberRange;
 import org.geotools.util.Version;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.FactoryException;
 
 /**
  * WMS 1.3.0 web service implementing the operation getMap, getFeatureInfo and getCapabilities.
@@ -447,9 +449,9 @@ public class WMService {
                 
                 List<String> crs = new ArrayList<String>();
                 
-                /*Integer code = CRS.lookupEpsgCode(inputLayer.getCoverage().getCoordinateReferenceSystem(), false);
+                Integer code = 4326;//CRS.lookupEpsgCode(inputLayer.getCoordinateReferenceSystem(), false);
                 if(code != null)
-                    crs.add(code.toString());*/
+                    crs.add(code.toString());
                 
                 GeographicBoundingBox inputBox = inputLayer.getGeographicBoundingBox();
                 
@@ -494,7 +496,7 @@ public class WMService {
                 defaut = null;
                 NumberRange[] ranges = inputLayer.getSampleValueRanges();
                 if (ranges != null && ranges[0]!= null) {
-                    defaut = ranges[0].getMinimum() + "";
+                    defaut = ranges[0].getMinimum() + "," + ranges[0].getMaximum();
                 
                     dim = new Dimension("dim_range", "degrees", defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
                     dimensions.add(dim);

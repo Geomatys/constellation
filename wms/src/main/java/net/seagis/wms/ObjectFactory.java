@@ -132,6 +132,15 @@ public class ObjectFactory {
     public WMSCapabilities createWMSCapabilities() {
         return new WMSCapabilities();
     }
+    
+    /**
+     * Create an instance of {@link WMSCapabilities }
+     * 
+     */
+    public WMT_MS_Capabilities createWMT_MS_Capabilities() {
+        return new WMT_MS_Capabilities();
+    }
+
 
     /**
      * Create an instance of {@link FeatureListURL }

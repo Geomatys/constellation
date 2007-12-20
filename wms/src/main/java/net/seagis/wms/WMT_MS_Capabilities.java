@@ -87,7 +87,7 @@ public class WMT_MS_Capabilities extends AbstractWMSCapabilities {
      */
     public String getVersion() {
         if (version == null) {
-            return "1.3.0";
+            return "1.1.1";
         } else {
             return version;
         }

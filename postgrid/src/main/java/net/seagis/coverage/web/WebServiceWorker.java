@@ -27,8 +27,6 @@ import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.ImageTypeSpecifier;
@@ -171,6 +169,11 @@ public class WebServiceWorker {
      */
     private GridRange gridRange;
 
+    /**
+     * The range on value on which to apply a color ramp.
+     */
+    private NumberRange colormapRange;
+    
     /**
      * The requested time.
      */
@@ -515,13 +518,9 @@ public class WebServiceWorker {
        if (dimensionRange!= null) {
            double min = Double.parseDouble(dimensionRange.substring(0, dimensionRange.indexOf(",")));
            double max = Double.parseDouble(dimensionRange.substring(dimensionRange.indexOf(",") + 1));
-       NumberRange dimRange = new NumberRange(min, max);
-       if (dimRange != null) {
-            final ColorMap colorMap = new ColorMap();
-            colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new
-            MeasurementRange(dimRange, null));
-           // coverage = Operations.DEFAULT.recolor(coverage, new ColorMap[] {colorMap});
-        }
+           colormapRange = new NumberRange(min, max);
+       } else {
+           colormapRange = null;
        }
     }
     /**
@@ -705,7 +704,13 @@ public class WebServiceWorker {
      * @throws WebServiceException if an error occured while querying the coverage.
      */
     public RenderedImage getRenderedImage() throws WebServiceException {
-        return getGridCoverage2D(true).geophysics(false).getRenderedImage();
+        GridCoverage2D coverage = getGridCoverage2D(true).geophysics(false);
+        if (colormapRange != null) {
+            final ColorMap colorMap = new ColorMap();
+            colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange(colormapRange, null));
+            coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[] {colorMap});
+        }
+        return coverage.getRenderedImage();
     }
 
     /**
