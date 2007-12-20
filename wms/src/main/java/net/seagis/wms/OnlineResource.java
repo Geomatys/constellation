@@ -58,7 +58,7 @@ public class OnlineResource {
      * 
      * @param href The url of the resource.
      */
-    public OnlineResource(final String type) {
+    public OnlineResource(final String href) {
         this.href = href;   
     }
     

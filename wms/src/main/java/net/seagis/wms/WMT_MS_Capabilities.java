@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Root element of a getCapabilities Document version 1.3.0.
+ * <p>Root element of a getCapabilities Document version 1.1.1.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
@@ -35,8 +35,8 @@ import javax.xml.bind.annotation.XmlType;
     "service",
     "capability"
 })
-@XmlRootElement(name = "WMS_Capabilities")
-public class WMSCapabilities extends AbstractWMSCapabilities {
+@XmlRootElement(name = "WMT_MS_Capabilities")
+public class WMT_MS_Capabilities extends AbstractWMSCapabilities {
 
     @XmlElement(name = "Service", required = true)
     private Service service;
@@ -50,13 +50,13 @@ public class WMSCapabilities extends AbstractWMSCapabilities {
     /**
      * An empty constructor used by JAXB.
      */
-    WMSCapabilities() {
+    WMT_MS_Capabilities() {
     }
 
     /**
      * Build a new WMSCapabilities object.
      */
-    public WMSCapabilities(final Service service, final Capability capability, 
+    public WMT_MS_Capabilities(final Service service, final Capability capability, 
             final String version, final String updateSequence) {
         this.capability     = capability;
         this.service        = service;

@@ -109,7 +109,7 @@ class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
             return "gts";
         
         if( "http://www.opengis.net/wms".equals(namespaceUri) )
-            return "wms";
+            return "";
         
         if( "http://www.w3.org/1999/xlink".equals(namespaceUri) )
             return "xlink";

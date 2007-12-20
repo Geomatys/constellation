@@ -47,11 +47,13 @@ import net.seagis.wms.Layer;
 import net.seagis.wms.WMSCapabilities;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.wms.AbstractWMSCapabilities;
 import net.seagis.wms.Dimension;
 import net.seagis.wms.EXGeographicBoundingBox;
 import net.seagis.wms.LegendURL;
 import net.seagis.wms.OnlineResource;
 import net.seagis.wms.Style;
+import org.geotools.util.NumberRange;
 import org.geotools.util.Version;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
@@ -121,7 +123,12 @@ public class WMService {
     /**
      * The file where to store configuration parameters.
      */
-    private static final String CAPABILITIES_FILENAME = "WMSCapabilities.xml";
+    private static final String CAPABILITIES_FILENAME_1_3_0 = "WMSCapabilities1.3.0.xml";
+    
+    /**
+     * The file where to store configuration parameters.
+     */
+    private static final String CAPABILITIES_FILENAME_1_1_1 = "WMSCapabilities1.1.1.xml";
     
     
     /** 
@@ -184,7 +191,7 @@ public class WMService {
                                                   WMSExceptionCode.OPERATION_NOT_SUPPORTED, versions.get(0));
                 }
         } catch (WebServiceException ex) {
-            //ex.printStackTrace();
+            ex.printStackTrace();
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
             return Response.Builder.representation(sw.toString(), "text/xml").build();
@@ -202,7 +209,7 @@ public class WMService {
      */
     private void verifyBaseParameter(int sld) throws WebServiceException {  
         if (sld == 2) {
-            if (!getParameter("VERSION", true).equals(sldVersion)) {
+            if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
                 throw new WebServiceException("The parameter VERSION=" + sldVersion + "must be specify",
                                               WMSExceptionCode.MISSING_PARAMETER_VALUE, sldVersion);
             }
@@ -314,6 +321,7 @@ public class WMService {
         //we set the attribute od the webservice worker with the parameters.
         webServiceWorker.setFormat(getParameter("FORMAT", true));
         webServiceWorker.setLayer(getParameter("LAYERS", true));
+        webServiceWorker.setDimensionRange(getParameter("DIM_RANGE", false));
         
         String crs;
         if (currentVersion.equals(versions.get(0))){
@@ -353,7 +361,21 @@ public class WMService {
         
         verifyBaseParameter(0);
         
-        String query_layers = getParameter("QUERY_LAYERS", true);
+        webServiceWorker.setLayer(getParameter("QUERY_LAYERS", true));
+        
+        String crs;
+        if (currentVersion.equals(versions.get(0))){
+            crs = getParameter("CRS", true);
+        } else {
+            crs = getParameter("SRS", true);
+        }
+        webServiceWorker.setCoordinateReferenceSystem(crs);
+        webServiceWorker.setBoundingBox(getParameter("BBOX", true));
+        webServiceWorker.setElevation(getParameter("ELEVATION", false));
+        webServiceWorker.setTime(getParameter("TIME", false));
+        webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true));
+        
+
         String info_format  = getParameter("INFO_FORMAT", true);
         
         String i = getParameter("I", true);
@@ -401,18 +423,18 @@ public class WMService {
         String inputVersion = getParameter("VERSION", false);
         if(inputVersion != null) {
             if (!(inputVersion.equals(versions.get(0).toString()) || inputVersion.equals(versions.get(1).toString())) 
-                    || inputVersion.equals(versions.get(1).toString())) {
-                currentVersion = versions.get(1);
+                    || inputVersion.equals(versions.get(0).toString())) {
+                currentVersion = versions.get(0);
         
             } else if (inputVersion.equals(versions.get(1).toString())){
                 currentVersion = versions.get(1);
             }
         } else {
-            currentVersion = versions.get(1);
+            currentVersion = versions.get(0);
         } 
         
         // the service shall return WMSCapabilities marshalled
-        WMSCapabilities response = (WMSCapabilities)unmarshaller.unmarshal(getCapabilitiesFile(false));
+        AbstractWMSCapabilities response = (AbstractWMSCapabilities)unmarshaller.unmarshal(getCapabilitiesFile(false, currentVersion));
         
         String format = getParameter("FORMAT", false);
         
@@ -433,6 +455,7 @@ public class WMService {
                 
                 //we add the list od available date and elevation
                 List<Dimension> dimensions = new ArrayList<Dimension>();
+                
                 
                 //the available date
                 String defaut = null;
@@ -456,7 +479,7 @@ public class WMService {
                 defaut = null;
                 SortedSet<Number> elevations = inputLayer.getAvailableElevations();
                 if (elevations.size() > 0) {
-                    defaut = elevations.last().toString();
+                    defaut = elevations.first().toString();
                 
                     dim = new Dimension("elevation", "EPSG:5030", defaut, null);
                     value = "";
@@ -464,6 +487,16 @@ public class WMService {
                         value += n.toString() + ','; 
                     }
                     dim.setValue(value);
+                    dimensions.add(dim);
+                }
+                
+                //the dimension range
+                defaut = null;
+                NumberRange[] ranges = inputLayer.getSampleValueRanges();
+                if (ranges != null && ranges[0]!= null) {
+                    defaut = ranges[0].getMinimum() + "";
+                
+                    dim = new Dimension("dim_range", "degrees", defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
                     dimensions.add(dim);
                 }
                 
@@ -579,19 +612,26 @@ public class WMService {
      * @param  create {@code true} if this method is allowed to create the destination directory.
      * @return The configuration file, or {@code null} if none.
      */
-    File getCapabilitiesFile(final boolean create) {
-        if (CAPABILITIES_FILENAME == null) {
+    File getCapabilitiesFile(final boolean create, Version version) {
+        String fileName = null;
+        if (version.toString().equals("1.1.1")){
+            fileName = CAPABILITIES_FILENAME_1_1_1;
+        } else {
+            fileName = CAPABILITIES_FILENAME_1_3_0;
+        }
+            
+        if (fileName == null) {
             return null;
         }
         /*
          * Donne priorité au fichier de configuration dans le répertoire courant, s'il existe.
          */
-        File path = new File(CAPABILITIES_FILENAME);
+        File path = new File(fileName);
         if (path.isFile()) {
             return path;
         }
         if (path.isDirectory()) {
-            path = new File(path, CAPABILITIES_FILENAME);
+            path = new File(path, fileName);
         }
         /*
          * Recherche dans le répertoire de configuration de l'utilisateur,
@@ -613,7 +653,7 @@ public class WMService {
                 return null;
             }
         }
-        return new File(path, CAPABILITIES_FILENAME);
+        return new File(path, fileName);
     }
    
 }
