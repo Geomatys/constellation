@@ -397,29 +397,24 @@ CREATE VIEW "BoundingBoxes" AS
     SELECT "identifier",
            "width",
            "height",
-           "crs",
-           xmin("nativeBox")     AS "minX",
-           xmax("nativeBox")     AS "maxX",
-           ymin("nativeBox")     AS "minY",
-           ymax("nativeBox")     AS "maxY",
-           xmin("geographicBox") AS "west",
-           xmax("geographicBox") AS "east",
-           ymin("geographicBox") AS "south",
-           ymax("geographicBox") AS "north"
+           srid("envelope")         AS "crs",
+           xmin("envelope")         AS "minX",
+           xmax("envelope")         AS "maxX",
+           ymin("envelope")         AS "minY",
+           ymax("envelope")         AS "maxY",
+           xmin("horizontalExtent") AS "west",
+           xmax("horizontalExtent") AS "east",
+           ymin("horizontalExtent") AS "south",
+           ymax("horizontalExtent") AS "north"
       FROM
    (SELECT "identifier",
            "width",
            "height",
-           srid("TransformedGeometries".envelope) AS crs,
-           box2d("TransformedGeometries".envelope) AS "nativeBox",
-           box2d(transform("TransformedGeometries".envelope, 4326)) AS "geographicBox"
-      FROM
-   (SELECT "identifier",
-           "width",
-           "height",
-           affine(geometryfromtext('POLYGON((0 0,0 ' || "height" || ',' || "width" || ' ' || "height" || ',' || "width" || ' 0,0 0))', "horizontalSRID"),
-           "scaleX", "shearX", "shearY", "scaleY", "translateX", "translateY") AS envelope
-      FROM "GridGeometries") AS "TransformedGeometries") AS "GeometryDetails";
+           Affine(GeometryFromText('POLYGON((0 0,0 ' || "height" || ',' || "width" || ' ' || "height" || ',' || "width" || ' 0,0 0))', "horizontalSRID"),
+           "scaleX", "shearX", "shearY", "scaleY", "translateX", "translateY") AS "envelope",
+           "horizontalExtent"
+      FROM "GridGeometries") AS "GridGeometries2D"
+  ORDER BY "identifier";
 
 ALTER TABLE "BoundingBoxes" OWNER TO geoadmin;
 GRANT ALL ON TABLE "BoundingBoxes" TO geoadmin;

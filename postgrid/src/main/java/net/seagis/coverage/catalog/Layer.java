@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.Date;
 import java.util.SortedSet;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
 
@@ -95,7 +96,7 @@ public interface Layer extends Element {
      * Returns the set of dates when a coverage is available.
      *
      * @return The set of dates.
-     * @throws CatalogException if the set can not be obtained.
+     * @throws CatalogException if an error occured while fetching the set.
      */
     SortedSet<Date> getAvailableTimes() throws CatalogException;
 
@@ -105,7 +106,7 @@ public interface Layer extends Element {
      * are common to every coverages.
      *
      * @return The set of altitudes. May be empty, but will never be null.
-     * @throws CatalogException if the set can not be obtained.
+     * @throws CatalogException if an error occured while fetching the set.
      */
     SortedSet<Number> getAvailableElevations() throws CatalogException;
 
@@ -118,14 +119,14 @@ public interface Layer extends Element {
     /**
      * Returns a time range encompassing all coverages in this layer.
      *
-     * @throws CatalogException if the time range can not be obtained.
+     * @throws CatalogException if an error occured while fetching the time range.
      */
     DateRange getTimeRange() throws CatalogException;
 
     /**
      * Returns a geographic bounding box encompassing all coverages in this layer.
      *
-     * @throws CatalogException if the bounding box can not be obtained.
+     * @throws CatalogException if an error occured while fetching the bounding box.
      */
     GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
 
@@ -133,9 +134,17 @@ public interface Layer extends Element {
      * Returns the average pixel resolution in this layer, or {@code null} if unknown.
      * Values are degrees of longitude and latitude.
      *
-     * @throws CatalogException if the resolution can not be obtained.
+     * @throws CatalogException if an error occured while fetching the resolution.
      */
     Dimension2D getAverageResolution() throws CatalogException;
+
+    /**
+     * Returns a typical image bounds in this layer, or {@code null} if unknown.
+     * This is a hint only - there is no garantee that images will really have this bounds.
+     *
+     * @throws CatalogException if an error occured while fetching the bounds.
+     */
+    Rectangle getBounds() throws CatalogException;
 
     /**
      * Returns a reference to a coverage for the given date and elevation.

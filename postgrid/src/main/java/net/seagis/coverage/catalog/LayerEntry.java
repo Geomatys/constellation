@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -334,6 +335,22 @@ final class LayerEntry extends Entry implements Layer {
             final Dimension2D resolution = domain.resolution;
             if (resolution != null) {
                 return (Dimension2D) resolution.clone();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Rectangle getBounds() throws CatalogException {
+        final Dimension2D resolution = getAverageResolution();
+        if (resolution != null) {
+            final GeographicBoundingBox box = getGeographicBoundingBox();
+            if (box != null) {
+                return new Rectangle(0, 0,
+                    (int)Math.round((box.getEastBoundLongitude() - box.getWestBoundLongitude()) / resolution.getWidth()),
+                    (int)Math.round((box.getNorthBoundLatitude() - box.getSouthBoundLatitude()) / resolution.getHeight()));
             }
         }
         return null;
