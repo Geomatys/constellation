@@ -45,8 +45,15 @@ public class FormatTable extends SingletonTable<Format> {
      * @param database Connection to the database.
      */
     public FormatTable(final Database database) {
-        super(new FormatQuery(database));
-        setIdentifierParameters(((FormatQuery) query).byName, null);
+        this(new FormatQuery(database));
+    }
+
+    /**
+     * Constructs a new {@code FormatTable} from the specified query.
+     */
+    private FormatTable(final FormatQuery query) {
+        super(query);
+        setIdentifierParameters(query.byName, null);
     }
 
     /**

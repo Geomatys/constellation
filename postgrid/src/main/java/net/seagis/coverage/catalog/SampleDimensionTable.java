@@ -42,7 +42,7 @@ import net.seagis.resources.i18n.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SampleDimensionTable extends Table {
+final class SampleDimensionTable extends Table {
     /**
      * Connexion vers la table des {@linkplain Category catégories}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.

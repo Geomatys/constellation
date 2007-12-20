@@ -20,9 +20,14 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+
+import net.seagis.coverage.catalog.Layer;
+import net.seagis.catalog.CatalogException;
+
 
 /**
  * The request for a layer, including its envelope. To be used in a hash map only.
@@ -32,78 +37,123 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
  */
 final class LayerRequest {
     /**
-     * The layer name.
+     * Snaps the geographic bounding boxes in order to simulate tile of this size (in pixels).
+     * A smaller value will reduce the amount of pixels to load but will increase cache misses.
+     * A greater value will reduce the cache misses but increase the amount of data to load and
+     * cache.
      */
-    private final String layer;
+    private static final int TILE_SIZE = 256;
 
     /**
-     * The geographic bounding box. Will be computed when first needed.
+     * The global layer. We keep it by reference in order to prevent too early garbage
+     * collection, since {@code LayerTable} cache its entries by weak references.
      */
-    private transient GeographicBoundingBox bbox;
+    private final Layer layer;
 
     /**
-     * The bounding box, including the CRS.
+     * The geographic bounding box, or {@code null}.
+     * <strong>Do not modify</strong>.
      */
-    private final Envelope envelope;
+    final GeographicBoundingBox bbox;
 
     /**
-     * The size of target image.
+     * The resolution, or {@code null}.
+     * <strong>Do not modify</strong>.
      */
-    private final GridRange size;
+    final Dimension2D resolution;
 
     /**
-     * Crestes a {@code LayerRequest} for the given layer name, source envelope and target size.
+     * Creates a {@code LayerRequest} for the given layer name, source envelope and target size.
      */
-    public LayerRequest(final String layer, final Envelope envelope, final GridRange size) {
-        this.layer    = layer;
-        this.envelope = envelope;
-        this.size     = size;
-    }
-
-    /**
-     * Returns the envelope as a geographic bounding box, or {@code null} if none.
-     * The returned box is not cloned - <strong>do not modify</strong>.
-     */
-    public GeographicBoundingBox getGeographicBoundingBox() {
-        if (bbox == null) {
-            if (envelope == null) {
-                return null;
-            }
-            for (int i=envelope.getDimension(); --i>=0;) {
-                final double length = envelope.getLength(i);
-                if (Double.isInfinite(length) || !(length > 0)) {
-                    return null;
+    public LayerRequest(final Layer layer, final Envelope envelope, final GridRange size)
+            throws CatalogException
+    {
+        this.layer = layer;
+        /*
+         * Transforms the envelope from arbitrary CRS to WGS 84.  In case of failure, we will
+         * keep the bounding box as null, which is legal and means no geographic bounding box
+         * selection (load the full image).
+         */
+        GeographicBoundingBoxImpl bbox = null;
+        if (isValid(envelope)) try {
+            bbox = new GeographicBoundingBoxImpl(envelope);
+        } catch (TransformException exception) {
+            Logging.unexpectedException(WebServiceWorker.LOGGER, WebServiceWorker.class, "getLayer", exception);
+        }
+        /*
+         * "Rounds" the bounding box to something a little bit bigger, and the resolution to
+         * something a little bit finer. We do not allows arbitrary values because the layer
+         * cache is flushed every time those values change, so we are better to have bigger
+         * values than necessary and flush the cache less often. This method conceptually
+         * "rounds" the bounding box on a grid.
+         */
+        Dimension2D resolution = layer.getAverageResolution();
+        if (resolution != null && bbox != null) {
+            double xResolution = resolution.getWidth();
+            double yResolution = resolution.getHeight();
+            double west  = bbox.getWestBoundLongitude();
+            double east  = bbox.getEastBoundLongitude();
+            double south = bbox.getSouthBoundLatitude();
+            double north = bbox.getNorthBoundLatitude();
+            final double xRange = (east  - west);
+            final double yRange = (north - south);
+            final GeographicBoundingBox global = layer.getGeographicBoundingBox();
+            if (global != null) {
+                /*
+                 * Converts the user's envelope from geographic coordinates to pixel coordinates.
+                 * Then, round the pixel coordinates on a grid of TILE_SIZE pixels width. Finally,
+                 * converts back to geographic coordinates and make sure that the result still in
+                 * the global envelope bounds.
+                 */
+                if (xResolution > 0 && xResolution < xRange && yResolution > 0 && yResolution < yRange) {
+                    final double xOrigin = global.getWestBoundLongitude();
+                    final double yOrigin = global.getSouthBoundLatitude();
+                    final double xMin    = Math.floor((west  - xOrigin) / (xResolution * TILE_SIZE)) * TILE_SIZE;
+                    final double xMax    = Math.ceil ((east  - xOrigin) / (xResolution * TILE_SIZE)) * TILE_SIZE;
+                    final double yMin    = Math.floor((south - yOrigin) / (yResolution * TILE_SIZE)) * TILE_SIZE;
+                    final double yMax    = Math.ceil ((north - yOrigin) / (yResolution * TILE_SIZE)) * TILE_SIZE;
+                    west  = Math.max(xMin, 0) * xResolution + xOrigin;
+                    south = Math.max(yMin, 0) * yResolution + yOrigin;
+                    east  = Math.min(xMax * xResolution + xOrigin, global.getEastBoundLongitude());
+                    north = Math.min(yMax * yResolution + yOrigin, global.getNorthBoundLatitude());
+                    bbox.setBounds(west, east, south, north);
+                } else {
+                    bbox.intersect(global);
                 }
             }
-            try {
-                bbox = new GeographicBoundingBoxImpl(envelope);
-            } catch (TransformException exception) {
-                // Can't transform. Returns 'null', which is legal and means
-                // no geographic bounding box selection (return the full image).
+            /*
+             * Ensures that the resolution is an integer multiple of global resolution.
+             * We allows zero, which means best resolution available.
+             */
+            if (size != null) {
+                xResolution *= Math.max(0, Math.floor(xRange / (size.getLength(0) * xResolution)));
+                yResolution *= Math.max(0, Math.floor(yRange / (size.getLength(1) * yResolution)));
+                resolution = (xResolution != 0 || yResolution != 0) ?
+                        new XDimension2D.Double(xResolution, yResolution) : null;
+            } else {
+                resolution = null;
             }
         }
-        return bbox;
+        // We could call bbox.freeze() here, but it has a cost.
+        // We will rather be carefull to not modify this box.
+        this.bbox       = bbox;
+        this.resolution = resolution;
     }
 
     /**
-     * Returns the desired resolution in geographic coordinates, or {@code null} for best
-     * resolution.
-     *
-     * @todo Revisit if it is really appropriate to assumes that x and y axis are at 0 and 1
-     *       index in the grid range.
+     * Returns {@code true} if the given envelope is non-empty and non-infinite.
      */
-    public Dimension2D getResolution() {
-        if (size != null) {
-            final GeographicBoundingBox bbox = getGeographicBoundingBox();
-            if (bbox != null) {
-                final int width  = size.getLength(0);
-                final int height = size.getLength(1);
-                return new XDimension2D.Double(
-                        (bbox.getEastBoundLongitude() - bbox.getWestBoundLongitude()) / width,
-                        (bbox.getNorthBoundLatitude() - bbox.getSouthBoundLatitude()) / height);
+    private static boolean isValid(final Envelope envelope) {
+        if (envelope == null) {
+            return false;
+        }
+        for (int i=envelope.getDimension(); --i>=0;) {
+            final double length = envelope.getLength(i);
+            if (Double.isInfinite(length) || !(length > 0)) {
+                return false;
             }
         }
-        return null;
+        return true;
     }
 
     /**
@@ -111,12 +161,12 @@ final class LayerRequest {
      */
     @Override
     public int hashCode() {
-        int code = layer.hashCode();
-        if (envelope != null) {
-            code += 37 * envelope.hashCode();
+        int code = layer.getName().hashCode();
+        if (bbox != null) {
+            code += 37 * bbox.hashCode();
         }
-        if (size != null) {
-            code += 31 * size.hashCode();
+        if (resolution != null) {
+            code += 31 * resolution.hashCode();
         }
         return code;
     }
@@ -128,9 +178,9 @@ final class LayerRequest {
     public boolean equals(final Object object) {
         if (object instanceof LayerRequest) {
             final LayerRequest that = (LayerRequest) object;
-            return Utilities.equals(this.layer,    that.layer)    &&
-                   Utilities.equals(this.envelope, that.envelope) &&
-                   Utilities.equals(this.size,     that.size);
+            return Utilities.equals(this.layer.getName(), that.layer.getName()) &&
+                   Utilities.equals(this.bbox,            that.bbox) &&
+                   Utilities.equals(this.resolution,      that.resolution);
         }
         return false;
     }
@@ -140,6 +190,11 @@ final class LayerRequest {
      */
     @Override
     public String toString() {
-        return layer;
+        final String layer = String.valueOf(this.layer);
+        if (bbox != null) {
+            return layer + " inside " + bbox;
+        } else {
+            return layer;
+        }
     }
 }

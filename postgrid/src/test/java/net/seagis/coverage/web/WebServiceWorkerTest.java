@@ -87,15 +87,17 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
 
         image = worker.getRenderedImage();
-        SampleModel sm = image.getSampleModel();
         assertEquals(width,  image.getWidth());
         assertEquals(height, image.getHeight());
-        assertEquals(width,  image.getTileWidth());
-        assertEquals(height, image.getTileHeight());
-        assertEquals(1,      image.getNumXTiles());
-        assertEquals(1,      image.getNumYTiles());
-        assertEquals(width,  sm.getWidth());
-        assertEquals(height, sm.getHeight());
+        if (false) {
+            SampleModel sm = image.getSampleModel();
+            assertEquals(width,  image.getTileWidth());
+            assertEquals(height, image.getTileHeight());
+            assertEquals(1,      image.getNumXTiles());
+            assertEquals(1,      image.getNumYTiles());
+            assertEquals(width,  sm.getWidth());
+            assertEquals(height, sm.getHeight());
+        }
         file = worker.getImageFile();
         assertTrue(file.getName().endsWith(".png"));
         assertTrue(file.isFile());
@@ -135,6 +137,18 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(IndexColorModel.class, image.getColorModel().getClass());
         model = (IndexColorModel) image.getColorModel();
         assertEquals(256, model.getMapSize());
+
+        /*
+         * Changes only a little bit the envelope.
+         */
+        worker.setBoundingBox("-10,20,20,50");  // Same value should not flush the cache.
+        assertSame("The layer should be cached.", layer, worker.getLayer());
+
+        worker.setBoundingBox("-9,20,21,49");  // Value not different enough
+        assertSame("The layer should be cached.", layer, worker.getLayer());
+
+        worker.setBoundingBox("-10,20,140,50");  // Different value should flush the cache.
+        assertNotSame("A new layer should be created.", layer, worker.getLayer());
     }
 
     /**

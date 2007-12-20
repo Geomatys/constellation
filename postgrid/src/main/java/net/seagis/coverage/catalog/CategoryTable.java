@@ -51,7 +51,7 @@ import net.seagis.catalog.QueryType;
  * @author Martin Desruisseaux
  * @version $Id$
  */
-public class CategoryTable extends Table {
+final class CategoryTable extends Table {
     /**
      * Transformation <code>f(x) = 10<sup>x</sup></code>. Utilisée pour le décodage des images de
      * concentrations en chlorophylle-a. Ne sera construite que la première fois où elle sera

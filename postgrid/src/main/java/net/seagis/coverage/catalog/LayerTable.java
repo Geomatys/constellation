@@ -20,10 +20,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import org.geotools.util.logging.Logging;
 
 import net.seagis.catalog.CRS;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.BoundedSingletonTable;
+import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.QueryType;
 import net.seagis.coverage.model.DescriptorTable;
@@ -41,6 +43,13 @@ import net.seagis.resources.i18n.Resources;
  * @todo Current version do yet take in bounding box in account for layer filtered list.
  */
 public class LayerTable extends BoundedSingletonTable<Layer> {
+    /**
+     * Connection to the table of domains. Will be created when first needed.
+     * This table will be shared by all {@code LayerTable} and should not be
+     * flushed by this class, since it is independent of {@link LayerTable} settings.
+     */
+    private DomainOfLayerTable domains;
+
     /**
      * Connection to the table of linear models. Will be created when first needed.
      */
@@ -61,8 +70,15 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
      * @param database Connection to the database.
      */
     public LayerTable(final Database database) {
-        super(new LayerQuery(database), CRS.XYT);
-        setIdentifierParameters(((LayerQuery) query).byName, null);
+        this(new LayerQuery(database));
+    }
+
+    /**
+     * Constructs a new {@code LayerTable} from the specified query.
+     */
+    private LayerTable(final LayerQuery query) {
+        super(query, CRS.XYT);
+        setIdentifierParameters(query.byName, null);
     }
 
     /**
@@ -122,13 +138,26 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         final Database database = getDatabase();
         final GridCoverageTable data = new GridCoverageTable(database.getTable(GridCoverageTable.class));
         data.setLayer(layer);
-        data.setTimeRange(getTimeRange());
-        data.setEnvelope(getEnvelope());
-        data.setPreferredResolution(getPreferredResolution());
-        if (false) {
-            data.trimEnvelope(); // TODO revisit
+        boolean changed;
+        changed  = data.setTimeRange(getTimeRange());
+        changed |= data.setVerticalRange(getVerticalRange());
+        changed |= data.setGeographicBoundingBox(getGeographicBoundingBox());
+        changed |= data.setPreferredResolution(getPreferredResolution());
+        DomainOfLayerEntry domain = null;
+        if (!changed) {
+            // Settings had no effect, so we are better to use the global domain for efficienty.
+            // This case occurs more often than it may look like since we often want to get the
+            // bounding box of a Layer obtained from the global (unmodifiable) LayerTable.
+            if (domains == null) {
+                domains = getDatabase().getTable(DomainOfLayerTable.class);
+            }
+            try {
+                domain = domains.getEntry(layer.getName());
+            } catch (NoSuchRecordException exception) {
+                Logging.recoverableException(Layer.LOGGER, LayerTable.class, "postCreateEntry", exception);
+            }
         }
-        entry.setGridCoverageTable(data);
+        entry.setGridCoverageTable(data, domain);
         if (models == null) {
             DescriptorTable descriptors = database.getTable(DescriptorTable.class);
             descriptors = new DescriptorTable(descriptors); // Protect the shared instance from changes.
@@ -209,6 +238,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
      */
     @Override
     public synchronized void flush() {
+        // Do not flush DomainOfLayerTable.
         if (series != null) {
             series.flush();
         }

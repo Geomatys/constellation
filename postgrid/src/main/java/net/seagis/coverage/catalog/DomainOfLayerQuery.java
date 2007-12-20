@@ -1,6 +1,5 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
  * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -24,37 +23,39 @@ import static net.seagis.catalog.QueryType.*;
 
 
 /**
- * The query to execute for a {@link LayerTable}.
+ * The query to execute for a {@link DomainOfLayerTable}.
  *
  * @author Martin Desruisseaux
  * @version $Id$
  */
-final class LayerQuery extends Query {
+final class DomainOfLayerQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, thematic, procedure, period, fallback, remarks;
+    protected final Column layer, startTime, endTime, west, east, south, north, xResolution, yResolution;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName;
+    protected final Parameter byLayer;
 
     /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
-    public LayerQuery(final Database database) {
-        super(database, "Layers");
-        final QueryType[] SL   = {SELECT, LIST};
-        final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
-        name      = addColumn("name",              SLEI);
-        thematic  = addColumn("thematic",    null, SL  );
-        procedure = addColumn("procedure",   null, SL  );
-        period    = addColumn("period",         1, SL  );
-        fallback  = addColumn("fallback",    null, SL  );
-        remarks   = addColumn("description", null, SL  );
-        byName    = addParameter(name, SELECT, EXISTS);
+    public DomainOfLayerQuery(final Database database) {
+        super(database, "DomainOfLayers");
+        final QueryType[] SL = {SELECT, LIST};
+        layer       = addColumn("layer",       SL);
+        startTime   = addColumn("startTime",   SL);
+        endTime     = addColumn("endTime",     SL);
+        west        = addColumn("west",        SL);
+        east        = addColumn("east",        SL);
+        south       = addColumn("south",       SL);
+        north       = addColumn("north",       SL);
+        xResolution = addColumn("xResolution", SL);
+        yResolution = addColumn("yResolution", SL);
+        byLayer     = addParameter(layer, SELECT);
     }
 }

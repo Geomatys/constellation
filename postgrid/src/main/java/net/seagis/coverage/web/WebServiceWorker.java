@@ -49,6 +49,7 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.util.LRULinkedHashMap;
+import org.geotools.util.logging.Logging;
 import org.geotools.util.Version;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
@@ -86,9 +87,15 @@ public class WebServiceWorker {
      * The codecs provided in standard Java are sometime more reliable.
      */
     static {
+        Logging.ALL.forceMonolineConsoleOutput();
         ImageUtilities.allowNativeCodec("png", ImageReaderSpi.class, true);
         ImageUtilities.allowNativeCodec("png", ImageWriterSpi.class, true);
     }
+
+    /**
+     * A logger for every {@link WebServiceWorker} instances.
+     */
+    static final Logger LOGGER = Logger.getLogger("net.seagis.coverage.web");
 
     /**
      * WMS before this version needs longitude before latitude. WMS after this version don't
@@ -128,11 +135,6 @@ public class WebServiceWorker {
         BufferedImage.TYPE_USHORT_555_RGB,
         BufferedImage.TYPE_USHORT_GRAY
     };
-
-    /**
-     * A logger for this worker.
-     */
-    private final Logger logger = Logger.getLogger("net.seagis.coverage.web");
 
     /**
      * The connection to the database.
@@ -244,6 +246,13 @@ public class WebServiceWorker {
      * The layer table. Will be created when first needed.
      */
     private transient LayerTable layerTable;
+
+    /**
+     * The global layer table, <strong>without</strong> any bounding box or time range setting.
+     * Will be created when first needed. Will be shared by every workers using the same
+     * {@linkplain #database} instance.
+     */
+    private transient LayerTable globalLayerTable;
 
     /**
      * The layer names in an unmodifiable set. Will be created when first needed.
@@ -526,13 +535,22 @@ public class WebServiceWorker {
     /**
      * Returns the layer table.
      *
+     * @param  global {@code true} for the global (<strong>unmodifiable</strong>) layer
+     *         table, or {@code false} for the specific table that we can modify.
+     * @return The layer table.
      * @throws WebServiceException if the layer table can not be created.
      */
-    private LayerTable getLayerTable() throws WebServiceException {
-        if (layerTable == null) try {
-            layerTable = new LayerTable(database.getTable(LayerTable.class));
+    private LayerTable getLayerTable(final boolean global) throws WebServiceException {
+        if (globalLayerTable == null) try {
+            globalLayerTable = database.getTable(LayerTable.class);
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        }
+        if (global) {
+            return globalLayerTable;
+        }
+        if (layerTable == null) {
+            layerTable = new LayerTable(globalLayerTable);
         }
         return layerTable;
     }
@@ -545,11 +563,8 @@ public class WebServiceWorker {
      */
     public Set<String> getLayerNames() throws WebServiceException {
         if (layerNames == null) try {
-            final LayerTable layerTable = getLayerTable();
-            layerTable.setGeographicBoundingBox(null);
-            layerTable.setTimeRange(null);
-            // Do not set the resolution - it has no impact on the returned layers.
-            layerNames = Collections.unmodifiableSet(layerTable.getIdentifiers());
+            final LayerTable table = getLayerTable(true);
+            layerNames = Collections.unmodifiableSet(table.getIdentifiers());
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
@@ -565,11 +580,8 @@ public class WebServiceWorker {
      */
     public Set<Layer> getLayers() throws WebServiceException {
         try {
-            final LayerTable layerTable = getLayerTable();
-            layerTable.setGeographicBoundingBox(null);
-            layerTable.setTimeRange(null);
-            // Do not set the resolution - it has no impact on the returned layers.
-            return layerTable.getEntries();
+            final LayerTable table = getLayerTable(true);
+            return table.getEntries();
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
@@ -587,33 +599,29 @@ public class WebServiceWorker {
             throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "layer"),
                     LAYER_NOT_DEFINED, version);
         }
-        boolean change = false;
-        final LayerRequest request = new LayerRequest(layer, envelope, gridRange);
         Layer candidate;
-        synchronized (layers) {
-            candidate = layers.get(request);
-            if (candidate == null) {
-                final LayerTable layerTable = getLayerTable();
-                try {
-                    change   |= layerTable.setGeographicBoundingBox(request.getGeographicBoundingBox());
-                    change   |= layerTable.setPreferredResolution(request.getResolution());
-                    candidate = layerTable.getEntry(layer);
-                } catch (NoSuchRecordException exception) {
-                    throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
-                } catch (CatalogException exception) {
-                    throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-                } catch (SQLException exception) {
-                    throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-                }
+        boolean change = false;
+        try {
+            final LayerRequest request = new LayerRequest(getLayerTable(true).getEntry(layer), envelope, gridRange);
+            synchronized (layers) {
+                candidate = layers.get(request);
                 if (candidate == null) {
-                    throw new WebServiceException(Resources.format(
-                            ResourceKeys.ERROR_LAYER_NOT_FOUND_$1, layer), LAYER_NOT_DEFINED, version);
+                    final LayerTable table = getLayerTable(false);
+                    change   |= table.setGeographicBoundingBox(request.bbox);
+                    change   |= table.setPreferredResolution(request.resolution);
+                    candidate = table.getEntry(layer);
+                    layers.put(request, candidate);
                 }
-                layers.put(request, candidate);
             }
+        } catch (NoSuchRecordException exception) {
+            throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+        } catch (SQLException exception) {
+            throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
         if (change) {
-            logger.fine("LayerTable configuration changed.");
+            LOGGER.fine("LayerTable configuration changed.");
         }
         return candidate;
     }
@@ -820,7 +828,7 @@ public class WebServiceWorker {
                     continue;
                 }
                 if (spi.canEncodeImage(type)) {
-                    logger.fine("Reformat image to type #" + i);
+                    LOGGER.fine("Reformat image to type #" + i);
                     final BufferedImage buffered = type.createBufferedImage(image.getWidth(), image.getHeight());
                     final Graphics2D graphics = buffered.createGraphics();
                     graphics.drawRenderedImage(image, new AffineTransform());
@@ -969,10 +977,11 @@ public class WebServiceWorker {
             }
             files = null;
         }
-        formats = null;
         layers.clear();
-        layerNames = null;
-        layerTable = null;
+        formats          = null;
+        layerNames       = null;
+        layerTable       = null;
+        globalLayerTable = null;
         try {
             database.flush();
         } catch (CatalogException exception) {

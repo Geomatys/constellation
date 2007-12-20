@@ -39,7 +39,7 @@ import net.seagis.resources.i18n.Resources;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SeriesTable extends SingletonTable<Series> {
+final class SeriesTable extends SingletonTable<Series> {
     /**
      * Connection to the format table. This connection will be etablished
      * when first needed and may be shared by many series tables.

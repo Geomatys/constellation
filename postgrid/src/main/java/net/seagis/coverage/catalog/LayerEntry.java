@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.awt.Dimension;
+import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -41,7 +42,6 @@ import net.seagis.catalog.Entry;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.ServerException;
 import net.seagis.coverage.model.Model;
-import net.seagis.coverage.model.Operation;
 import net.seagis.resources.XArray;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
@@ -55,7 +55,7 @@ import net.seagis.resources.i18n.ResourceKeys;
  */
 final class LayerEntry extends Entry implements Layer {
     /**
-     * For cros-version compatibility.
+     * For cross-version compatibility.
      */
     private static final long serialVersionUID = 5283559646740856038L;
 
@@ -73,6 +73,12 @@ final class LayerEntry extends Entry implements Layer {
      * Typical time interval (in days) between images, or {@link Double#NaN} if unknown.
      */
     private final double timeInterval;
+
+    /**
+     * The domain for this layer. May be shared by many instances of {@code LayerEntry}.
+     * May be {@code null} if not applicable.
+     */
+    private DomainOfLayerEntry domain;
 
     /**
      * If this layer is the result of some numerical model, the model. Other wise, {@code null}.
@@ -110,17 +116,9 @@ final class LayerEntry extends Entry implements Layer {
     private transient Reference<Coverage> coverage;
 
     /**
-     * Connection to the grid coverage table. Will be created when first needed.
+     * Connection to the grid coverage table.
      */
     private GridCoverageTable data;
-
-    /**
-     * Ensemble des fabriques pour différentes opérations. Ne seront construites que lorsque
-     * nécessaire.
-     *
-     * @deprecated We should handle that in a separated LayerEntry instance instead.
-     */
-    private transient Map<Operation,GridCoverageTable> servers;
 
     /**
      * La fabrique à utiliser pour obtenir une seule image à une date spécifique.
@@ -136,13 +134,11 @@ final class LayerEntry extends Entry implements Layer {
      * @param name         The layer name.
      * @param thematic     Thematic for this layer (e.g. Temperature, Salinity, etc.).
      * @param procedure    Procedure applied for this layer (e.g. Gradients, etc.).
-     * @param timeInterval Typical time interval (in days) between images, or {@link Double#NaN}
-     *                     if unknown.
+     * @param timeInterval Typical time interval (in days) between images, or {@link Double#NaN} if unknown.
      * @param remarks      Optional remarks, or {@code null}.
      */
     protected LayerEntry(final String name, final String thematic, final String procedure,
-                         final double timeInterval,
-                         final String remarks)
+                         final double timeInterval, final String remarks)
     {
         super(name, remarks);
         this.thematic     = thematic;
@@ -288,8 +284,20 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public DateRange getTimeRange() throws CatalogException {
+        if (domain != null) {
+            final DateRange timeRange = domain.timeRange;
+            if (timeRange != null) {
+                return timeRange; // Immutable instance.
+            }
+        }
+        // Fallback to a search in the GridCoverages table.
         final GridCoverageTable data = this.data;   // Protect against concurrent changes.
         if (data != null) {
+            try {
+                data.trimEnvelope(); // Do a real work only when first invoked.
+            } catch (SQLException exception) {
+                throw new ServerException(exception);
+            }
             return data.getTimeRange();
         }
         return null;
@@ -299,11 +307,36 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
+        if (domain != null) {
+            final GeographicBoundingBox bbox = domain.bbox;
+            if (bbox != null) {
+                return bbox; // Immutable instance.
+            }
+        }
+        // Fallback to a search in the GridCoverages table.
         final GridCoverageTable data = this.data;   // Protect against concurrent changes.
         if (data != null) {
+            try {
+                data.trimEnvelope(); // Do a real work only when first invoked.
+            } catch (SQLException exception) {
+                throw new ServerException(exception);
+            }
             return data.getGeographicBoundingBox();
         }
         return GeographicBoundingBoxImpl.WORLD;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Dimension2D getAverageResolution() throws CatalogException {
+        if (domain != null) {
+            final Dimension2D resolution = domain.resolution;
+            if (resolution != null) {
+                return (Dimension2D) resolution.clone();
+            }
+        }
+        return null;
     }
 
     /**
@@ -399,31 +432,6 @@ final class LayerEntry extends Entry implements Layer {
     }
 
     /**
-     * Retourne une connexion vers les données de la même couche, mais avec l'opération spécifiée.
-     * Cette méthode est appelée par le constructeur de {@link DataCoverage}.
-     *
-     * @param  operation L'opération désirée, ou {@code null} si aucune.
-     * @return Une connexion vers les données produites par l'opération spécifiée.
-     *
-     * @deprecated Should returns an other {@link LayerEntry} instance instead.
-     */
-    protected synchronized GridCoverageTable getGridCoverageTable(final Operation operation) {
-        if (operation==null || data==null) {
-            return data;
-        }
-        if (servers == null) {
-            servers = new HashMap<Operation,GridCoverageTable>();
-        }
-        GridCoverageTable candidate = servers.get(operation);
-        if (candidate == null) {
-            candidate = new GridCoverageTable(data);
-            data.setOperation(operation);
-            servers.put(operation, candidate);
-        }
-        return candidate;
-    }
-
-    /**
      * Définit la connexion vers les données à utiliser pour cette entrée. Cette méthode est
      * appellée une et une seule fois par {@link LayerTable#postCreateEntry} pour chaque
      * entrée créée.
@@ -431,13 +439,14 @@ final class LayerEntry extends Entry implements Layer {
      * @param data Connexion vers une vue des données comme une matrice tri-dimensionnelle.
      * @throws IllegalStateException si une connexion existait déjà pour cette entrée.
      */
-    protected synchronized void setGridCoverageTable(final GridCoverageTable data)
-            throws IllegalStateException
+    protected synchronized void setGridCoverageTable(final GridCoverageTable data,
+            final DomainOfLayerEntry domain) throws IllegalStateException
     {
         if (this.data != null) {
             throw new IllegalStateException(getName());
         }
-        this.data = data;
+        this.data   = data;
+        this.domain = domain;
     }
 
     /**
@@ -457,7 +466,7 @@ final class LayerEntry extends Entry implements Layer {
             /*
              * On ne teste pas 'fallback' car la méthode 'equals' doit fonctionner dès que la
              * construction de l'entrée est complétée, alors que 'fallback' est définit un peu
-             * plus tard ('postCreateEntry').
+             * plus tard ('postCreateEntry'). Même chose pour 'domain'.
              */
         }
         return false;

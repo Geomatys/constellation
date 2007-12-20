@@ -396,12 +396,15 @@ public class Database {
      * or supplied by user.
      *
      * @throws SQLException if an error occured while setting-up the connection.
+     *
+     * @todo Localize
      */
     private void setupConnection() throws SQLException {
         if (connection != null) {
             connection.setReadOnly(Boolean.valueOf(getProperty(ConfigurationKey.READONLY)));
-            Element.LOGGER.info("Connecté à la base de données " + connection.getMetaData().getURL());
-            // TODO: localize
+            final DatabaseMetaData metadata = connection.getMetaData();
+            Element.LOGGER.info("Connected to \"" + metadata.getURL() +
+                                "\" database as \"" + metadata.getUserName() + "\" user.");
         }
     }
 
@@ -517,6 +520,7 @@ public class Database {
     private <T extends Table> T createTable(final Class<T> type) throws NoSuchTableException {
         try {
             final Constructor<T> c = type.getConstructor(Database.class);
+            c.setAccessible(true);
             return c.newInstance(this);
         } catch (Exception exception) {
             /*
@@ -794,7 +798,7 @@ public class Database {
         if (connection != null) {
             connection.close();
             connection = null;
-            Element.LOGGER.info("Connexion à la base de données fermée.");
+            Element.LOGGER.info("Database connection closed.");
         }
         String database = getProperty(ConfigurationKey.DATABASE);
         if (database != null && database.startsWith("jdbc:derby:")) {

@@ -491,13 +491,13 @@ COMMENT ON INDEX "GridCoverages_extent_index" IS
 
 
 --------------------------------------------------------------------------------------------------
--- Creates the "RangeOfSeries" view.                                                            --
+-- Creates the "DomainOfSeries" view.                                                           --
 -- Dependencies: "GridCoverages", "BoundingBoxes"                                               --
 --------------------------------------------------------------------------------------------------
 
-CREATE VIEW "RangeOfSeries" AS
+CREATE VIEW "DomainOfSeries" AS
     SELECT "TimeRanges"."series", "count", "startTime", "endTime",
-           "west", "east", "south", "north", "XResolution", "YResolution"
+           "west", "east", "south", "north", "xResolution", "yResolution"
       FROM
    (SELECT "series",
            count("extent")  AS "count",
@@ -510,29 +510,29 @@ CREATE VIEW "RangeOfSeries" AS
            max("east")  AS "east",
            min("south") AS "south",
            max("north") AS "north",
-           avg(("east"  - "west" ) / "width" ) AS "XResolution",
-           avg(("north" - "south") / "height") AS "YResolution"
+           avg(("east"  - "west" ) / "width" ) AS "xResolution",
+           avg(("north" - "south") / "height") AS "yResolution"
       FROM (SELECT DISTINCT "series", "extent" FROM "GridCoverages") AS "Extents"
  LEFT JOIN "BoundingBoxes" ON "Extents"."extent" = "BoundingBoxes"."identifier"
   GROUP BY "series") AS "BoundingBoxRanges" ON "TimeRanges".series = "BoundingBoxRanges".series
   ORDER BY "series";
 
-ALTER TABLE "RangeOfSeries" OWNER TO geoadmin;
-GRANT ALL ON TABLE "RangeOfSeries" TO geoadmin;
-GRANT SELECT ON TABLE "RangeOfSeries" TO PUBLIC;
+ALTER TABLE "DomainOfSeries" OWNER TO geoadmin;
+GRANT ALL ON TABLE "DomainOfSeries" TO geoadmin;
+GRANT SELECT ON TABLE "DomainOfSeries" TO PUBLIC;
 
-COMMENT ON VIEW "RangeOfSeries" IS
+COMMENT ON VIEW "DomainOfSeries" IS
     'Liste des régions géographiques utilisées par chaque sous-série.';
 
 
 
 
 --------------------------------------------------------------------------------------------------
--- Creates the "RangeOfLayers" view.                                                            --
--- Dependencies: "RangeOfSeries", "Series"                                                      --
+-- Creates the "DomainOfLayers" view.                                                           --
+-- Dependencies: "DomainOfSeries", "Series"                                                     --
 --------------------------------------------------------------------------------------------------
 
-CREATE VIEW "RangeOfLayers" AS
+CREATE VIEW "DomainOfLayers" AS
  SELECT "layer",
         sum("count")     AS "count",
         min("startTime") AS "startTime",
@@ -541,16 +541,16 @@ CREATE VIEW "RangeOfLayers" AS
         max("east")      AS "east",
         min("south")     AS "south",
         max("north")     AS "north",
-        sum("XResolution" * "count") / sum("count") AS "XResolution",
-        sum("YResolution" * "count") / sum("count") AS "YResolution"
-   FROM "RangeOfSeries"
-   JOIN "Series" ON "RangeOfSeries"."series" = "Series"."identifier"
+        sum("xResolution" * "count") / sum("count") AS "xResolution",
+        sum("yResolution" * "count") / sum("count") AS "yResolution"
+   FROM "DomainOfSeries"
+   JOIN "Series" ON "DomainOfSeries"."series" = "Series"."identifier"
   GROUP BY "layer"
   ORDER BY "layer";
 
-ALTER TABLE "RangeOfLayers" OWNER TO geoadmin;
-GRANT ALL ON TABLE "RangeOfLayers" TO geoadmin;
-GRANT SELECT ON TABLE "RangeOfLayers" TO PUBLIC;
+ALTER TABLE "DomainOfLayers" OWNER TO geoadmin;
+GRANT ALL ON TABLE "DomainOfLayers" TO geoadmin;
+GRANT SELECT ON TABLE "DomainOfLayers" TO PUBLIC;
 
-COMMENT ON VIEW "RangeOfLayers" IS
+COMMENT ON VIEW "DomainOfLayers" IS
     'Nombre d''images et région géographique pour chacune des couches utilisées.';

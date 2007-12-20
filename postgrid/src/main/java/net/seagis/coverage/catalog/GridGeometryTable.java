@@ -64,7 +64,7 @@ import net.seagis.resources.i18n.ResourceKeys;
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
  */
-public class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
+final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     /**
      * The authority factory connected to the PostGIS {@code "spatial_ref_sys"} table.
      * Will be created when first needed.

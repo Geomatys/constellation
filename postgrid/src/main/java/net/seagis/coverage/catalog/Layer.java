@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.Date;
 import java.util.SortedSet;
 import java.awt.Dimension;
+import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
 
 import org.opengis.coverage.Coverage;
@@ -127,6 +128,14 @@ public interface Layer extends Element {
      * @throws CatalogException if the bounding box can not be obtained.
      */
     GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
+
+    /**
+     * Returns the average pixel resolution in this layer, or {@code null} if unknown.
+     * Values are degrees of longitude and latitude.
+     *
+     * @throws CatalogException if the resolution can not be obtained.
+     */
+    Dimension2D getAverageResolution() throws CatalogException;
 
     /**
      * Returns a reference to a coverage for the given date and elevation.
