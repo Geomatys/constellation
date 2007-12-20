@@ -53,6 +53,13 @@ import net.seagis.catalog.QueryType;
  */
 final class CategoryTable extends Table {
     /**
+     * A transparent color for missing data.
+     */
+    private static final Color[] TRANSPARENT = new Color[] {
+        new Color(0,0,0,0)
+    };
+
+    /**
      * Transformation <code>f(x) = 10<sup>x</sup></code>. Utilisée pour le décodage des images de
      * concentrations en chlorophylle-a. Ne sera construite que la première fois où elle sera
      * nécessaire.
@@ -121,7 +128,10 @@ final class CategoryTable extends Table {
             final NumberRange range = new NumberRange(lower, upper);
             if (!isQuantifiable) {
                 // Catégorie qualitative.
-                category = new Category(name, colors, range, (MathTransform1D)null);
+                if (colors == null) {
+                    colors = TRANSPARENT;
+                }
+                category = new Category(name, colors, range, (MathTransform1D) null);
             } else {
                 // Catégorie quantitative
                 category = new Category(name, colors, range, c1, c0);
@@ -167,25 +177,14 @@ final class CategoryTable extends Table {
             throws IOException, ParseException
     {
         /*
-         * Retire les guillements au début et à la fin de la chaîne, s'il y en a.
-         * Cette opération vise à éviter des problèmes de compatibilités lorsque
-         * l'importation des thèmes dans la base des données s'est senti obligée
-         * de placer des guillemets partout.
-         */
-        if (true) {
-            colors = colors.trim();
-            final int length = colors.length();
-            if (length>=2 && colors.charAt(0)=='"' && colors.charAt(length-1)=='"') {
-                colors = colors.substring(1, length-1);
-            }
-        }
-        /*
          * Vérifie si la chaîne de caractère représente un code de couleurs
          * unique, comme par exemple "#D2C8A0". Si oui, ce code sera retourné
          * dans un tableau de longueur 1.
          */
         try {
-            return new Color[] {Color.decode(colors)};
+            return new Color[] {
+                Color.decode(colors)
+            };
         } catch (NumberFormatException exception) {
             /*
              * Le décodage de la chaîne a échoué. C'est peut-être

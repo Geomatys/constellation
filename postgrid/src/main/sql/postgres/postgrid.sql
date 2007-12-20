@@ -104,7 +104,7 @@ CREATE TABLE "Categories" (
     "c0"       double precision,
     "c1"       double precision,
     "function" character varying,
-    "colors"   character varying NOT NULL DEFAULT '#000000',
+    "colors"   character varying,
     PRIMARY KEY ("name", "band"),
     CONSTRAINT "Categories_range" CHECK ("lower" <= "upper"),
     CONSTRAINT "Categories_coefficients" CHECK
