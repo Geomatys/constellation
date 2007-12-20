@@ -16,6 +16,7 @@
 package net.seagis.coverage.wms;
 
 import com.sun.ws.rest.spi.resource.Singleton;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -27,7 +28,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
@@ -48,16 +48,15 @@ import net.seagis.wms.Layer;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.wms.AbstractWMSCapabilities;
+import net.seagis.wms.BoundingBox;
 import net.seagis.wms.Dimension;
 import net.seagis.wms.EXGeographicBoundingBox;
 import net.seagis.wms.LegendURL;
 import net.seagis.wms.OnlineResource;
 import net.seagis.wms.Style;
-import org.geotools.referencing.CRS;
 import org.geotools.util.NumberRange;
 import org.geotools.util.Version;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.FactoryException;
 
 /**
  * WMS 1.3.0 web service implementing the operation getMap, getFeatureInfo and getCapabilities.
@@ -453,8 +452,18 @@ public class WMService {
                 if(code != null)
                     crs.add(code.toString());
                 
-                GeographicBoundingBox inputBox = inputLayer.getGeographicBoundingBox();
-                
+                GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
+                Rectangle inputBox                = inputLayer.getBounds();
+                BoundingBox outputBBox = null;
+                if(inputBox != null) {
+                    outputBBox = new BoundingBox(code.toString(), 
+                                                 inputBox.x + 0.0,
+                                                 inputBox.y + 0.0,
+                                                 inputBox.x + inputBox.width + 0.0,
+                                                 inputBox.y + inputBox.height + 0.0,
+                                                 0.0, 0.0,
+                                                 currentVersion);
+                }
                 //we add the list od available date and elevation
                 List<Dimension> dimensions = new ArrayList<Dimension>();
                 
@@ -495,7 +504,7 @@ public class WMService {
                 //the dimension range
                 defaut = null;
                 NumberRange[] ranges = inputLayer.getSampleValueRanges();
-                if (ranges != null && ranges[0]!= null) {
+                if (ranges!= null && ranges.length>0 && ranges[0]!= null) {
                     defaut = ranges[0].getMinimum() + "," + ranges[0].getMaximum();
                 
                     dim = new Dimension("dim_range", "degrees", defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
@@ -515,11 +524,11 @@ public class WMService {
                                               inputLayer.getRemarks(),
                                               inputLayer.getThematic(), 
                                               crs, 
-                                              new EXGeographicBoundingBox(inputBox.getWestBoundLongitude(), 
-                                                                          inputBox.getEastBoundLongitude(), 
-                                                                          inputBox.getSouthBoundLatitude(), 
-                                                                          inputBox.getNorthBoundLatitude()), 
-                                              null,  
+                                              new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(), 
+                                                                          inputGeoBox.getEastBoundLongitude(), 
+                                                                          inputGeoBox.getSouthBoundLatitude(), 
+                                                                          inputGeoBox.getNorthBoundLatitude()), 
+                                              outputBBox,  
                                               true,
                                               dimensions,
                                               style,

@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Version;
 
 
 /**
@@ -35,8 +36,17 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "BoundingBox")
 public class BoundingBox {
 
-    @XmlAttribute(name = "CRS", required = true)
+    /**
+     * version 1.3.0
+     */
+    @XmlAttribute(name = "CRS")
     private String crs;
+    /**
+     * version 1.1.1
+     */
+    @XmlAttribute(name = "SRS")
+    private String srs;
+    
     @XmlAttribute(required = true)
     private double minx;
     @XmlAttribute(required = true)
@@ -57,19 +67,26 @@ public class BoundingBox {
     }
 
     /**
-     * Build a new bounding box.
+     * Build a new bounding box version 1.3.0.
      *
      */
     public BoundingBox(final String crs, final double minx, final double miny,
-            final double maxx, final double maxy, final double resx, final double resy) {
-        this.crs  = crs;
+            final double maxx, final double maxy, final double resx, final double resy, Version version) {
         this.maxx = maxx;
         this.maxy = maxy;
         this.minx = minx;
         this.miny = miny;
-        this.resx = resx;
-        this.resy = resy;
-        
+       
+        if (version.toString().equals("1.3.0")){
+            this.crs  = crs;
+            this.resx = resx;
+            this.resy = resy;
+        }
+        else {
+            this.srs = crs;
+            this.resx = null;
+            this.resy = null;
+        }
     }
     
     /**
