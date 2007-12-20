@@ -17,6 +17,8 @@ package net.seagis.coverage.wms;
 
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -56,6 +58,7 @@ import net.seagis.wms.OnlineResource;
 import net.seagis.wms.Style;
 import org.geotools.util.NumberRange;
 import org.geotools.util.Version;
+import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
@@ -363,11 +366,11 @@ public class WMService {
         logger.info("getFeatureInfo request received");
         
         verifyBaseParameter(0);
-        
-        webServiceWorker.setLayer(getParameter("QUERY_LAYERS", true));
+        String layer = getParameter("QUERY_LAYERS", true);
+        webServiceWorker.setLayer(layer);
         
         String crs;
-        if (currentVersion.equals(versions.get(0))){
+        if (currentVersion.toString().equals("1.3.0")){
             crs = getParameter("CRS", true);
         } else {
             crs = getParameter("SRS", true);
@@ -379,22 +382,48 @@ public class WMService {
         webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true));
         
 
-        String info_format  = getParameter("INFO_FORMAT", true);
+        double[] values = null;
+        AffineTransform gridToCRS = webServiceWorker.getGridToCRS();
+        if (gridToCRS != null) {
+            String i = null;
+            String j = null;
+            if (currentVersion.toString().equals("1.3.0")) {
+                i = getParameter("I", true);
+                j = getParameter("J", true);
+            } else {
+                i = getParameter("X", true);
+                j = getParameter("Y", true);
+            }
+            Point2D.Double coordinate = new Point2D.Double();
+            coordinate.x = Double.parseDouble(i);
+            coordinate.y = Double.parseDouble(j);
+            gridToCRS.transform(coordinate, coordinate);
+            try {
+                values = webServiceWorker.getGridCoverage2D(false).evaluate(coordinate, values);
+            } catch (PointOutsideCoverageException exception) {
+                throw new WebServiceException(exception,
+                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, currentVersion);
+            }
+        }
         
-        String i = getParameter("I", true);
-        String j = getParameter("J", true);
-       
-        //and then the optional attribute
+        String info_format  = getParameter("INFO_FORMAT", false); // TODO true);
         String feature_count = getParameter("FEATURE_COUNT", false);
         
         String exception = getParameter("EXCEPTIONS", false);
         if ( exception == null)
             exception = "XML";
         
+        double result = 0.0;
+        if (values != null && values.length > 0) {
+            result = values[0];
+        }
         
         // plusieur type de retour possible
-        String response = "";
-        // si on retourne du html
+        String response = "result for " + layer + " is:" + result;
+        logger.info("returned:" + response);
+        return Response.Builder.representation(response, "text/plain").build();
+        
+        /* si on retourne du html
         if (info_format.equals("text/html"))
             return Response.Builder.representation(response, "text/html").build();
         //si on retourne du xml
@@ -402,7 +431,7 @@ public class WMService {
             return Response.Builder.representation(response, "text/xml").build();
         //si on retourne du gml
         else 
-            return Response.Builder.representation(response, "application/vnd.ogc.gml").build();
+            return Response.Builder.representation(response, "application/vnd.ogc.gml").build();*/
     }
     
     /**
