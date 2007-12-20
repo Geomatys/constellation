@@ -524,19 +524,31 @@ public class WebServiceWorker {
     }
 
     /**
-     *  Sets the range value of the color palette
-     *
-     * @param
+     * Sets the range on value on which to apply a color ramp.
      */
-    public void setDimensionRange(String dimensionRange) {
-       if (dimensionRange!= null) {
-           double min = Double.parseDouble(dimensionRange.substring(0, dimensionRange.indexOf(",")));
-           double max = Double.parseDouble(dimensionRange.substring(dimensionRange.indexOf(",") + 1));
-           colormapRange = new NumberRange(min, max);
+    public void setDimensionRange(String colormapRange) throws WebServiceException {
+       if (colormapRange == null) {
+           this.colormapRange = null;
        } else {
-           colormapRange = null;
+           colormapRange = colormapRange.trim();
+           final int split = colormapRange.indexOf(',');
+           if (split < 0 || colormapRange.indexOf(',', split+1) >= 0) {
+               throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, "range"),
+                       INVALID_PARAMETER_VALUE, version);
+           }
+           String n = null;
+           final double min, max;
+           try {
+               min = Double.parseDouble(n = colormapRange.substring(0,  split).trim());
+               max = Double.parseDouble(n = colormapRange.substring(split + 1).trim());
+           } catch (NumberFormatException exception) {
+               throw new WebServiceException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, n),
+                       exception, INVALID_PARAMETER_VALUE, version);
+           }
+           this.colormapRange = new NumberRange(min, max);
        }
     }
+
     /**
      * Sets the output format as a MIME type.
      *
