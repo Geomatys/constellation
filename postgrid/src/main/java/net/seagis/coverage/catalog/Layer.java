@@ -24,7 +24,7 @@ import java.awt.image.BufferedImage;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotools.util.NumberRange;
+import org.geotools.util.MeasurementRange;
 import org.geotools.util.DateRange;
 
 import net.seagis.catalog.Element;
@@ -114,7 +114,7 @@ public interface Layer extends Element {
      * Returns the ranges of valid sample values for each band.
      * The ranges are always expressed in <cite>geophysics</cite> values.
      */
-    NumberRange[] getSampleValueRanges();
+    MeasurementRange[] getSampleValueRanges();
 
     /**
      * Returns a time range encompassing all coverages in this layer.

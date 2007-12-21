@@ -34,7 +34,7 @@ import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.geotools.util.DateRange;
-import org.geotools.util.NumberRange;
+import org.geotools.util.MeasurementRange;
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -255,12 +255,12 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    public NumberRange[] getSampleValueRanges() {
-        NumberRange[] ranges = null;
+    public MeasurementRange[] getSampleValueRanges() {
+        MeasurementRange[] ranges = null;
         for (final Series series : getSeries()) {
             final Format format = series.getFormat();
             if (format != null) {
-                final NumberRange[] candidates = format.getSampleValueRanges();
+                final MeasurementRange[] candidates = format.getSampleValueRanges();
                 if (ranges == null) {
                     ranges = candidates;
                 } else {
@@ -273,7 +273,7 @@ final class LayerEntry extends Entry implements Layer {
                         System.arraycopy(candidates, length, ranges, length, candidates.length-length);
                     }
                     for (int i=0; i<length; i++) {
-                        ranges[i] = ranges[i].intersect(candidates[i]);
+                        ranges[i] = (MeasurementRange) ranges[i].intersect(candidates[i]);
                     }
                 }
             }

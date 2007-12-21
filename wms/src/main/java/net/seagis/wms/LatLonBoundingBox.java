@@ -34,8 +34,8 @@ public class LatLonBoundingBox {
      * Build a new bounding box.
      *
      */
-    public LatLonBoundingBox(final double maxy, final double minx,
-            final double maxx, final double miny) {
+    public LatLonBoundingBox(final double minx, final double miny, 
+            final double maxx, final double maxy) {
         this.minx = minx;
         this.miny = miny;
         this.maxx = maxx;

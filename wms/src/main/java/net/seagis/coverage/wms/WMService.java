@@ -16,7 +16,6 @@
 package net.seagis.coverage.wms;
 
 import com.sun.ws.rest.spi.resource.Singleton;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -30,7 +29,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.logging.Logger;
+import javax.units.Unit;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpContext;
@@ -56,7 +57,7 @@ import net.seagis.wms.EXGeographicBoundingBox;
 import net.seagis.wms.LegendURL;
 import net.seagis.wms.OnlineResource;
 import net.seagis.wms.Style;
-import org.geotools.util.NumberRange;
+import org.geotools.util.MeasurementRange;
 import org.geotools.util.Version;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -87,7 +88,7 @@ public class WMService {
     private final Unmarshaller unmarshaller;
     
     /**
-     * The version of the WMS web service. fixed a 1.3.0 for now.
+     * The supported versions supportd by this WMS web service.
      */
     private final List<Version> versions = new ArrayList<Version>();
     
@@ -107,13 +108,14 @@ public class WMService {
     private final WebServiceWorker webServiceWorker;
     
     /**
-     * 
+     * the service URL (used in getCapabilities document).
      */
     private final String serviceURL;
             
     /** 
      * these attributes will be removed. 
      */
+    
     /**
      * The user directory where to store the configuration file on Unix platforms.
      */
@@ -125,12 +127,12 @@ public class WMService {
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
     /**
-     * The file where to store configuration parameters.
+     * The file where to store capabilities static information version 1.3.0.
      */
     private static final String CAPABILITIES_FILENAME_1_3_0 = "WMSCapabilities1.3.0.xml";
     
     /**
-     * The file where to store configuration parameters.
+     * The file where to store capabilities static information version 1.1.1.
      */
     private static final String CAPABILITIES_FILENAME_1_1_1 = "WMSCapabilities1.1.1.xml";
     
@@ -479,19 +481,25 @@ public class WMService {
                 
                 List<String> crs = new ArrayList<String>();
                 
-                Integer code = 4326;//CRS.lookupEpsgCode(inputLayer.getCoordinateReferenceSystem(), false);
+                Integer code = 4326;
+                //code = CRS.lookupEpsgCode(inputLayer.getCoverage().getEnvelope().getCoordinateReferenceSystem(), false);
+                
                 if(code != null)
                     crs.add(code.toString());
                 
                 GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
-                Rectangle inputBox                = inputLayer.getBounds();
+               
+                /*
+                 * TODO
+                 * Envelope inputBox                 = inputLayer.getCoverage().getEnvelope();
+                 */
                 BoundingBox outputBBox = null;
-                if(inputBox != null) {
+                if(inputGeoBox != null) {
                     outputBBox = new BoundingBox(code.toString(), 
-                                                 inputBox.x + 0.0,
-                                                 inputBox.y + 0.0,
-                                                 inputBox.x + inputBox.width + 0.0,
-                                                 inputBox.y + inputBox.height + 0.0,
+                                                 inputGeoBox.getWestBoundLongitude(),
+                                                 inputGeoBox.getEastBoundLongitude(),
+                                                 inputGeoBox.getSouthBoundLatitude(),
+                                                 inputGeoBox.getNorthBoundLatitude(),
                                                  0.0, 0.0,
                                                  currentVersion);
                 }
@@ -502,6 +510,7 @@ public class WMService {
                 //the available date
                 String defaut = null;
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 Dimension dim;
                 String value = "";
                 SortedSet<Date> dates = inputLayer.getAvailableTimes();
@@ -533,20 +542,23 @@ public class WMService {
                 }
                 
                 //the dimension range
-                defaut = null;
-                NumberRange[] ranges = inputLayer.getSampleValueRanges();
+                defaut      = null;
+                String unit = null;
+                MeasurementRange[] ranges = inputLayer.getSampleValueRanges();
                 if (ranges!= null && ranges.length>0 && ranges[0]!= null) {
                     defaut = ranges[0].getMinimum() + "," + ranges[0].getMaximum();
-                
-                    dim = new Dimension("dim_range", "degrees", defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
+                    Unit u = ranges[0].getUnits();
+                    if (u != null)
+                        unit = u.toString();
+                    dim = new Dimension("dim_range", unit, defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
                     dimensions.add(dim);
                 }
                 
                 // we build a Style Object
-                OnlineResource or = new OnlineResource(this.serviceURL + "REQUEST=GetLegendGraphic&VERSION=1.3.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
+                OnlineResource or = new OnlineResource(this.serviceURL + "REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
                 LegendURL legendURL1 = new LegendURL("image/png", or);
 
-                or = new OnlineResource(this.serviceURL + "REQUEST=GetLegendGraphic&VERSION=1.3.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
+                or = new OnlineResource(this.serviceURL + "REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
                 LegendURL legendURL2 = new LegendURL("image/gif", or);
                 Style style = new Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
                 

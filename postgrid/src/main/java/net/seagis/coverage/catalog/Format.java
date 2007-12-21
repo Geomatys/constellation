@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import net.seagis.catalog.Element;
-import org.geotools.util.NumberRange;
+import org.geotools.util.MeasurementRange;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.gui.swing.tree.MutableTreeNode;
 
@@ -39,7 +39,7 @@ public interface Format extends Element {
      * Returns the ranges of valid sample values for each band in this format.
      * The range are always expressed in <cite>geophysics</cite> values.
      */
-    NumberRange[] getSampleValueRanges();
+    MeasurementRange[] getSampleValueRanges();
 
     /**
      * Returns the list of sample dimensions that should be common to every coverage in that format.

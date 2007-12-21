@@ -51,7 +51,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.util.Range;
 import com.sun.media.imageio.stream.RawImageInputStream;
 
-import org.geotools.util.NumberRange;
+import org.geotools.util.MeasurementRange;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.gui.swing.image.ColorRamp;
@@ -156,12 +156,12 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
-    public NumberRange[] getSampleValueRanges() {
+    public MeasurementRange[] getSampleValueRanges() {
         final GridSampleDimension[] bands = getSampleDimensions();
-        final NumberRange[] ranges = new NumberRange[bands.length];
+        final MeasurementRange[] ranges = new MeasurementRange[bands.length];
         for (int i=0; i<ranges.length; i++) {
             final GridSampleDimension band = bands[i].geophysics(true);
-            ranges[i] = new NumberRange(band.getMinimumValue(), band.getMaximumValue());
+            ranges[i] = new MeasurementRange(band.getMinimumValue(), band.getMaximumValue(), band.getUnits());
         }
         return ranges;
     }
