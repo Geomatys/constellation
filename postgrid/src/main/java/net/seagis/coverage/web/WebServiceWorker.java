@@ -720,10 +720,6 @@ public class WebServiceWorker {
      * @throws WebServiceException if an error occured while querying the coverage.
      */
     public GridCoverage2D getGridCoverage2D(final boolean resample) throws WebServiceException {
-        if (time == null) {
-            throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "time"),
-                    MISSING_PARAMETER_VALUE, version);
-        }
         final Layer layer = getLayer();
         final CoverageReference ref;
         try {
