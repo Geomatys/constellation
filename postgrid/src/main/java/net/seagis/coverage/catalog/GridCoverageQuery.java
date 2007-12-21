@@ -25,6 +25,7 @@ import static net.seagis.catalog.QueryType.*;
 
 /**
  * The query to execute for a {@link GridCoverageTable}.
+ * Entries <strong>must</strong> be sorted by date (either start or end time).
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -44,7 +45,14 @@ final class GridCoverageQuery extends Query {
     /**
      * Creates a new query for the specified database.
      *
-     * @param  database The database for which this query is created.
+     * @param database The database for which this query is created.
+     *
+     * @todo Currently, we sort by end time first, then by series. In practice, there
+     *       is no interrest in querying the full table instead of a table for a specific
+     *       series, so we could swap the ordering, which would fit better the table index.
+     *       It would also allow us to simplifying the Column implementation and remove the
+     *       code that keep trace of "sorted by" order - we would put them in same order than
+     *       columns, which again make the code simplier.
      */
     public GridCoverageQuery(final Database database) {
         super(database, "GridCoverages");
@@ -72,7 +80,7 @@ final class GridCoverageQuery extends Query {
 
         startTime.setFunction("MIN",  ____B___);
         endTime  .setFunction("MAX",  ____B___);
-        endTime  .setOrdering("DESC", S_L_____);
+        endTime  .setOrdering("DESC", S_L_____); // Sort by date is mandatory.
         series   .setOrdering("ASC",  S_L_____);
 
         byFilename         = addParameter(filename,           SE____D_);

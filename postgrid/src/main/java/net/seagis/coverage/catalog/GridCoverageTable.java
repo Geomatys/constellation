@@ -29,7 +29,6 @@ import java.util.logging.LogRecord;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
-import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -47,6 +46,7 @@ import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
+import org.geotools.util.DateRange;
 import static net.seagis.catalog.QueryType.*;
 
 
@@ -345,45 +345,27 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      */
     @Override
     public Set<CoverageReference> getEntries() throws CatalogException, SQLException {
-        final  Set<CoverageReference> entries  = super.getEntries();
-        final List<CoverageReference> filtered = new ArrayList<CoverageReference>(entries.size());
-        final Dimension2D resolution = getPreferredResolution();
-loop:   for (final CoverageReference newReference : entries) {
-            if (newReference instanceof GridCoverageEntry) {
-                final GridCoverageEntry newEntry = (GridCoverageEntry) newReference;
+        final Set<CoverageReference>  entries = super.getEntries();
+        List<GridCoverageEntry> mosaicEntries = null; // Will be created only if needed.
+        DateRange               lastTimeRange = null;
+        for (final CoverageReference entry : entries) {
+            final DateRange timeRange = entry.getTimeRange();
+            if (Utilities.equals(timeRange, lastTimeRange)) {
                 /*
-                 * Vérifie si une entrée existait déjà précédemment pour les mêmes coordonnées
-                 * spatio-temporelle mais une autre résolution. Si c'était le cas, alors l'entrée
-                 * avec une résolution proche de la résolution demandée sera retenue et les autres
-                 * retirées de la liste.
+                 * Found an entry with exactly the same time range than the previous one
+                 * (note that the dates may be null). We presume that this entry is part
+                 * of a mosaic.
                  */
-                for (int i=filtered.size(); --i>=0;) {
-                    final CoverageReference oldReference = filtered.get(i);
-                    if (oldReference instanceof GridCoverageEntry) {
-                        final GridCoverageEntry oldEntry = (GridCoverageEntry) oldReference;
-                        if (!oldEntry.compare(newEntry)) {
-                            // Entries not equal according the "ORDER BY" clause.
-                            break;
-                        }
-                        final GridCoverageEntry lowestResolution = oldEntry.getLowestResolution(newEntry);
-                        if (lowestResolution != null) {
-                            // Two entries has the same spatio-temporal coordinates.
-                            if (lowestResolution.hasEnoughResolution(resolution)) {
-                                // The entry with the lowest resolution is enough.
-                                filtered.set(i, lowestResolution);
-                            } else if (lowestResolution == oldEntry) {
-                                // No entry has enough resolution;
-                                // keep the one with the finest resolution.
-                                filtered.set(i, newEntry);
-                            }
-                            continue loop;
-                        }
+                if (entry instanceof GridCoverageEntry) {
+                    if (mosaicEntries == null) {
+                        mosaicEntries = new ArrayList<GridCoverageEntry>(entries.size());
                     }
+                    mosaicEntries.add((GridCoverageEntry) entry);
+                    continue;
                 }
             }
-            filtered.add(newReference);
+            lastTimeRange = timeRange;
         }
-        entries.retainAll(filtered);
         log("getEntries", Level.FINE, ResourceKeys.FOUND_COVERAGES_$1, entries.size());
         return entries;
     }
@@ -665,7 +647,7 @@ loop:   for (final CoverageReference newReference : entries) {
         final NumberRange  verticalRange = getVerticalRange();
         final short band = geometry.indexOf(0.5*(verticalRange.getMinimum() + verticalRange.getMaximum()));
         return new GridCoverageEntry(this, series, filename, startTime, endTime, timeIndex,
-                                     geometry, band, null).canonicalize();
+                                     geometry, band, null).unique();
     }
 
     /**

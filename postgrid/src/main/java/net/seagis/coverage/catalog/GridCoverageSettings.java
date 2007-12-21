@@ -32,28 +32,27 @@ import net.seagis.coverage.model.Operation;
 
 
 /**
- * Bloc de paramètres pour une table {@link GridCoverageTable}. Les blocs de paramètres doivent
- * être immutables. Ce principe d'imutabilité s'applique aussi aux objets référencés par
- * les champs publiques, même si ces objets sont en principe mutables ({@link Rectangle2D},
- * {@link Dimension2D}...).
+ * Set of parameters for a {@link GridCoverageTable} to be shared by every {@link GridCoverageEntry}
+ * created from that table. {@code GridCoverageSettings} instances <strong>must</strong> be immutable.
+ * Public mutable fields like {@link Rectangle2D} and {@link Dimension2D} must not be changed after
+ * construction.
  *
  * @author Martin Desruisseaux
  * @version $Id$
  */
 final class GridCoverageSettings implements Serializable {
     /**
-     * Numéro de série (pour compatibilité avec des versions antérieures).
+     * For cross-version compatibility.
      */
     private static final long serialVersionUID = 6418640591318515042L;
 
     /**
-     * L'opération à appliquer sur les images lue, ou {@code null} s'il n'y en a aucune.
+     * Operation to apply on image after reading, or {@code null} if none.
      */
     public final Operation operation;
 
     /**
-     * La partie temporelle de {@link #tableCRS}. Ne sera construit que la première fois
-     * où elle sera nécessaire.
+     * The temporal part of {@link #tableCRS}. Will be computed only when first needed.
      */
     private transient DefaultTemporalCRS temporalCRS;
 
@@ -189,7 +188,7 @@ final class GridCoverageSettings implements Serializable {
     }
 
     /**
-     * Formate la date spécifiée.
+     * Formats the specified date using a shared formatter.
      */
     public String format(final Date date) {
         synchronized (dateFormat) {
@@ -198,7 +197,7 @@ final class GridCoverageSettings implements Serializable {
     }
 
     /**
-     * Retourne un code représentant ce bloc de paramètres.
+     * Returns a hash code value for this parameter block.
      */
     @Override
     public int hashCode() {

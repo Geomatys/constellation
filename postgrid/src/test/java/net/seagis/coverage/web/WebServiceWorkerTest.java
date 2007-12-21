@@ -17,6 +17,7 @@ package net.seagis.coverage.web;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import java.awt.Transparency;
 import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.IndexColorModel;
@@ -183,6 +184,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(4, coverage.getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
         assertEquals(2, worker.getGridCoverage2D(true).getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
+        assertEquals(Transparency.BITMASK, worker.getRenderedImage().getColorModel().getTransparency());
 
         String format = worker.getMimeType();
         assertEquals("image/png", format);
@@ -195,5 +197,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
         RenderedImage image = ImageIO.read(file);
         assertEquals(720, image.getWidth());
         assertEquals(499, image.getHeight());
+        assertEquals(Transparency.TRANSLUCENT, image.getColorModel().getTransparency());
     }
 }

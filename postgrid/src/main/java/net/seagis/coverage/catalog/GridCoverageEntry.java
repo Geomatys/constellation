@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,7 +20,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Dimension2D;
-import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +36,6 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Date;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Collections;
 import static java.lang.Math.*;
 
@@ -51,19 +49,16 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.netcdf.NetcdfReadParam;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import org.geotools.util.DateRange;
 import org.geotools.util.NumberRange;
-import org.geotools.util.CanonicalSet;
 import org.geotools.util.logging.Logging;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Classes;
@@ -80,66 +75,17 @@ import ucar.nc2.dataset.AxisType;
 
 
 /**
- * Implémentation d'une entrée représentant une {@linkplain CoverageReference référence vers une
- * image}. Un objet {@code GridCoverageEntry} correspond à un enregistrement de la base de données
- * d'images. Chaque instance est imutable et sécuritaire dans un environnement multi-threads.
+ * Implementation of {@linkplain CoverageReference coverage reference} to a single image.
+ * This implementation is immutable and thread-safe.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class GridCoverageEntry extends Entry implements CoverageReference {
+class GridCoverageEntry extends Entry implements CoverageReference {
     /**
-     * Compare deux entrées selon le même critère que celui qui apparait dans l'instruction
-     * {@code "ORDER BY"} de la réquête SQL de {@link GridCoverageTable}). Les entrés sans
-     * dates sont une exception: elles sont considérées comme non-ordonnées.
-     */
-    final boolean compare(final GridCoverageEntry other) {
-        if (startTime==Long.MIN_VALUE && endTime==Long.MAX_VALUE) {
-            return false;
-        }
-        return endTime == other.endTime;
-    }
-
-    /**
-     * Fabrique à utiliser pour la création des objets {@link GridCoverage2D}.
-     */
-    private static GridCoverageFactory FACTORY = FactoryFinder.getGridCoverageFactory(null);
-
-    /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * For cross-version compatibility.
      */
     private static final long serialVersionUID = -5725249398707248625L;
-
-    /**
-     * Ensemble des entrées qui ont déjà été retournées par {@link #canonicalize()} et qui n'ont pas
-     * encore été réclamées par le ramasse-miettes. La classe {@link GridCoverageTable} tentera autant
-     * que possible de retourner des entrées qui existent déjà en mémoire afin de leur donner une chance
-     * de faire un meilleur travail de cache sur les images.
-     *
-     * @deprecated Use the cache inherited from SingletonTable instead.
-     */
-    private static final CanonicalSet<GridCoverageEntry> POOL = CanonicalSet.newInstance(GridCoverageEntry.class);
-
-    /**
-     * Liste des derniers {@link GridCoverageEntry} pour lesquels la méthode {@link #getCoverage}
-     * a été appelée. Lorsqu'une nouvelle image est lue, les références molles les plus anciennes
-     * sont changées en références faibles afin d'augmenter les chances que le ramasse-miette se
-     * débarasse des images les plus anciennes avant que la mémoire ne sature.
-     */
-    private static final LinkedList<GridCoverageEntry> LAST_INVOKED = new LinkedList<GridCoverageEntry>();
-
-    /**
-     * Quantité maximale de mémoire (en octets) que l'on autorise pour l'ensemble des images
-     * énumérées dans {@link #LAST_INVOKED}.  Si cette quantité de mémoire est dépassée, les
-     * images les plus anciennes seront retirées de la liste {@link #LAST_INVOKED} jusqu'à ce
-     * qu'elle soit ramenée en dessous de cette limite.
-     */
-    private static final long MAX_MEMORY_USAGE = 128L * 1024 * 1024;
-
-    /**
-     * Somme de {@link #memoryUsage} pour toutes les images de la liste {@link #LAST_INVOKED}.
-     */
-    private static long lastInvokedMemoryUsage;
 
     /**
      * Petite valeur utilisée pour contourner les erreurs d'arrondissement.
@@ -156,13 +102,14 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /** Image start time, inclusive. */ private final long   startTime;
     /** Image end time, exclusive.   */ private final long   endTime;
     /** Index in the time dimension. */ private final short  timeIndex;
+    /** Index of image to be read.   */         final short  imageIndex = 0; // TODO
     /** The band to read, or 0.      */ private final short  band;
 
     /**
      * The grid geometry. Include the image size (in pixels), the geographic envelope
-     * and the vertical ordinate values.
+     * and the vertical ordinate values. This field is read by {@link GridCoverageMosaic}.
      */
-    private final GridGeometryEntry geometry;
+    final GridGeometryEntry geometry;
 
     /**
      * The series in which this coverage is declared.
@@ -240,6 +187,22 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     }
 
     /**
+     * Creates an entry with most values from the specified one except geometry.
+     * This is for {@link GridCoverageMosaic} constructor only.
+     */
+    GridCoverageEntry(final GridCoverageEntry entry, final GridGeometryEntry geometry) {
+        super(null, null);
+        this.series     = entry.series;
+        this.filename   = entry.filename;
+        this.geometry   = geometry;
+        this.band       = entry.band;
+        this.parameters = entry.parameters;
+        this.startTime  = entry.startTime;
+        this.endTime    = entry.endTime;
+        this.timeIndex  = entry.timeIndex;
+    }
+
+    /**
      * Workaround for RFE #4093999
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
@@ -260,23 +223,23 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * Retourne un exemplaire unique de cette entrée. Une banque d'entrées, initialement vide, est
      * maintenue de façon interne par la classe {@code GridCoverageEntry}. Lorsque la méthode
-     * {@code canonicalize} est appelée, elle recherchera une entrée égale à {@code this} au
+     * {@code unique} est appelée, elle recherchera une entrée égale à {@code this} au
      * sens de la méthode {@link #equals}. Si une telle entrée est trouvée, elle sera retournée.
      * Sinon, l'entrée {@code this} sera ajoutée à la banque de données en utilisant une
      * {@linkplain WeakReference référence faible} et cette méthode retournera {@code this}.
      * <p>
      * De cette méthode il s'ensuit que pour deux entrées <var>u</var> et <var>v</var>,
-     * la condition {@code u.canonicalize()==v.canonicalize()} sera vrai si et seulement
+     * la condition {@code u.unique()==v.unique()} sera vrai si et seulement
      * si {@code u.equals(v)} est vrai.
      */
-    public GridCoverageEntry canonicalize() {
-        return POOL.unique(this);
+    public final GridCoverageEntry unique() {
+        return GridCoveragePool.DEFAULT.unique(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Series getSeries() {
+    public final Series getSeries() {
         return series;
     }
 
@@ -302,8 +265,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
 
     /**
      * Returns the source as a {@link File} or an {@link URI}, in this preference order.
+     * {@link GridCoverageMosaic} subclass will override this method in order to returns
+     * a collection of tiles.
      */
-    private Object getInput() throws IOException {
+    protected Object getInput() throws IOException {
         final File file = series.file(filename);
         if (file.isAbsolute()) {
             return file;
@@ -318,14 +283,14 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
-    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+    public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return parameters.coverageCRS;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Envelope getEnvelope() {
+    public final Envelope getEnvelope() {
         final Rectangle clipPixels = new Rectangle();
         try {
             return computeBounds(clipPixels, null);
@@ -345,7 +310,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      *
      * @todo Revisit now that we are 4D.
      */
-    public NumberRange getZRange() {
+    public final NumberRange getZRange() {
         final DefaultTemporalCRS temporalCRS = parameters.getTemporalCRS();
         return new NumberRange(temporalCRS.toValue(new Date(startTime)),
                                temporalCRS.toValue(new Date(  endTime)));
@@ -354,7 +319,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
-    public DateRange getTimeRange() {
+    public final DateRange getTimeRange() {
         return new DateRange((startTime!=Long.MIN_VALUE) ? new Date(startTime) : null, true,
                                (endTime!=Long.MAX_VALUE) ? new Date(  endTime) : null, false);
     }
@@ -364,7 +329,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      *
      * @todo L'implémentation actuelle suppose que le CRS de la table est toujours WGS84.
      */
-    public GeographicBoundingBox getGeographicBoundingBox() {
+    public final GeographicBoundingBox getGeographicBoundingBox() {
         try {
             assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, CRSUtilities.getCRS2D(parameters.tableCRS));
         } catch (TransformException e) {
@@ -382,7 +347,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * @todo Should compute the geometry by {@link GridGeometryEntry} instead.
      */
     @SuppressWarnings("fallthrough")
-    public GridGeometry2D getGridGeometry() {
+    public final GridGeometry2D getGridGeometry() {
         final Rectangle clipPixels = new Rectangle();
         final Envelope envelope;
         try {
@@ -411,7 +376,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
-    public SampleDimension[] getSampleDimensions() {
+    public final SampleDimension[] getSampleDimensions() {
         final GridSampleDimension[] bands = series.getFormat().getSampleDimensions();
         for (int i=0; i<bands.length; i++) {
             bands[i] = bands[i].geophysics(true);
@@ -570,19 +535,28 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     }
 
     /**
-     * Procède à la lecture d'une image à l'index spécifié.
-     *
-     * @param imageIndex Index de l'image à lire.
-     *        NOTE: si on permet d'obtenir des images à différents index, il faudra en
-     *              tenir compte dans {@link #gridCoverage} et {@link #renderedImage}.
-     * @param listeners Liste des objets à informer des progrès de la lecture.
+     * Retourne l'image correspondant à cette entrée. Cette méthode délègue son travail à
+     * <code>{@linkplain #getCoverage(IIOListeners) getCoverage}(null)</code>.
+     */
+    public final GridCoverage2D getCoverage() throws IOException {
+        return getCoverage(null);
+    }
+
+    /**
+     * Retourne l'image correspondant à cette entrée. Si l'image avait déjà été lue précédemment et
+     * qu'elle n'a pas encore été réclamée par le ramasse-miette, alors l'image existante sera
+     * retournée sans qu'une nouvelle lecture du fichier ne soit nécessaire. Si au contraire l'image
+     * n'était pas déjà en mémoire, alors un décodage du fichier sera nécessaire.
+     * <p>
+     * Cette méthode ne décodera pas nécessairement l'ensemble de l'image. La partie décodée dépend de la
+     * {@linkplain GridCoverageTable#setGeographicBoundingBox région géographique} et de la {@linkplain
+     * GridCoverageTable#setPreferredResolution résolution} qui étaient actifs au moment où
+     * {@link GridCoverageTable#getEntries} a été appelée (les changement subséquents des paramètres
+     * de {@link GridCoverageTable} n'ont pas d'effets sur les {@code GridCoverageEntry} déjà créés).
      *
      * @todo Current implementation requires a {@link FormatEntry} implementation.
      */
-    private synchronized GridCoverage2D getCoverage(final int          imageIndex,
-                                                    final IIOListeners listeners)
-            throws IOException, TransformException
-    {
+    public final GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
         /*
          * NOTE SUR LES SYNCHRONISATIONS: Cette méthode est synchronisée à plusieurs niveau:
          *
@@ -619,7 +593,12 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          */
         final Rectangle       clipPixel   = new Rectangle();
         final Point           subsampling = new Point();
-        final GeneralEnvelope envelope    = computeBounds(clipPixel, subsampling);
+        final GeneralEnvelope envelope;
+        try {
+            envelope = computeBounds(clipPixel, subsampling);
+        } catch (TransformException exception) {
+            throw new IIOException(exception.getLocalizedMessage(), exception);
+        }
         if (envelope == null) {
             return null;
         }
@@ -669,7 +648,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * GridCoverage2D, on le conserve dans une cache interne puis on le retourne.
          */
         final Map properties = Collections.singletonMap(REFERENCE_KEY, this);
-        GridCoverage2D coverage = FACTORY.create(filename, image, envelope, bands, null, properties);
+        GridCoverage2D coverage = GridCoveragePool.DEFAULT.factory.create(
+                filename, image, envelope, bands, null, properties);
         /*
          * Retourne toujours la version "géophysique" de l'image.
          */
@@ -690,60 +670,23 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * les dernières images dépasse un seuil maximal, alors les images les plus anciennes veront
          * leurs références molles transformées en références faibles.
          */
-        memoryUsage = (DataBuffer.getDataTypeSize(image.getSampleModel().getDataType()) / Byte.SIZE)
-                    * image.getWidth() * image.getHeight();
-        synchronized (LAST_INVOKED) {
-            lastInvokedMemoryUsage += memoryUsage;
-            for (final Iterator<GridCoverageEntry> it=LAST_INVOKED.iterator(); it.hasNext();) {
-                final GridCoverageEntry previous = it.next();
-                if (previous != this) {
-                    if (lastInvokedMemoryUsage <= MAX_MEMORY_USAGE) {
-                        continue;
-                    }
-                    previous.clearSoftReference();
-                }
-                it.remove();
-                lastInvokedMemoryUsage -= previous.memoryUsage;
-            }
-            LAST_INVOKED.addLast(this);
-        }
+        memoryUsage = (int) Math.min(GridCoveragePool.DEFAULT.addMemoryUsage(this, image), Integer.MAX_VALUE);
         return coverage;
     }
 
     /**
-     * Retourne l'image correspondant à cette entrée. Si l'image avait déjà été lue précédemment et
-     * qu'elle n'a pas encore été réclamée par le ramasse-miette, alors l'image existante sera
-     * retournée sans qu'une nouvelle lecture du fichier ne soit nécessaire. Si au contraire l'image
-     * n'était pas déjà en mémoire, alors un décodage du fichier sera nécessaire.
-     * <p>
-     * Cette méthode ne décodera pas nécessairement l'ensemble de l'image. La partie décodée dépend de la
-     * {@linkplain GridCoverageTable#setGeographicBoundingBox région géographique} et de la {@linkplain
-     * GridCoverageTable#setPreferredResolution résolution} qui étaient actifs au moment où
-     * {@link GridCoverageTable#getEntries} a été appelée (les changement subséquents des paramètres
-     * de {@link GridCoverageTable} n'ont pas d'effets sur les {@code GridCoverageEntry} déjà créés).
+     * Returns an estimation of memory usage in bytes, or 0 if unknown.
      */
-    public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
-        try {
-            return getCoverage(0, listeners);
-        } catch (TransformException exception) {
-            throw new IIOException(exception.getLocalizedMessage(), exception);
-        }
+    final int getMemoryUsage() {
+        return memoryUsage;
     }
 
     /**
-     * Retourne l'image correspondant à cette entrée. Cette méthode délègue son travail à
-     * <code>{@linkplain #getCoverage(IIOListeners) getCoverage}(null)</code>.
+     * Replace {@link #gridCoverage} soft reference by a weak reference. This method is invoked
+     * when it has been decided that the memory allocated to the {@link GridCoverage2D} should
+     * be collected.
      */
-    public final GridCoverage2D getCoverage() throws IOException {
-        return getCoverage(null);
-    }
-
-    /**
-     * Remplace la référence molle de {@link #gridCoverage} par une référence faible.
-     * Cette méthode est appelée par quand on a déterminé que la mémoire allouée par
-     * un {@link GridCoverage2D} devrait être libérée.
-     */
-    private synchronized void clearSoftReference() {
+    final synchronized void clearSoftReference() {
         if (gridCoverage instanceof SoftReference) {
             final GridCoverage2D coverage = gridCoverage.get();
             gridCoverage = (coverage!=null) ? new WeakReference<GridCoverage2D>(coverage) : null;
@@ -753,60 +696,11 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
-    public void abort() {
+    public final void abort() {
         final Format format = series.getFormat();
         if (format instanceof FormatEntry) {
             ((FormatEntry) format).abort(this);
         }
-    }
-
-    /**
-     * Indique si cette image a au moins la résolution spécifiée.
-     *
-     * @param  resolution Résolution désirée, exprimée selon le CRS de la table d'images.
-     * @return {@code true} si la résolution de cette image est égale ou supérieure à la résolution
-     *         demandée. Cette méthode retourne {@code false} si {@code resolution} était nul.
-     */
-    final boolean hasEnoughResolution(final Dimension2D resolution) {
-        final GridRange gridRange = geometry.getGridRange();
-        final int width  = gridRange.getLength(0);
-        final int height = gridRange.getLength(1);
-        final XRectangle2D boundingBox = geometry.geographicEnvelope;
-        return (resolution != null) &&
-               (1+EPS)*resolution.getWidth()  >= boundingBox.getWidth() /width &&
-               (1+EPS)*resolution.getHeight() >= boundingBox.getHeight()/height;
-    }
-
-    /**
-     * Si les deux images couvrent les mêmes coordonnées spatio-temporelles, retourne celle qui a
-     * la plus basse résolution. Si les deux images ne couvrent pas les mêmes coordonnées ou si
-     * leurs résolutions sont incompatibles, alors cette méthode retourne {@code null}.
-     */
-    final GridCoverageEntry getLowestResolution(final GridCoverageEntry that) {
-        final GridRange gridRange  = this.geometry.getGridRange();
-        final GridRange gridRange2 = that.geometry.getGridRange();
-        final int width   = gridRange .getLength(0);
-        final int height  = gridRange .getLength(1);
-        final int width2  = gridRange2.getLength(0);
-        final int height2 = gridRange2.getLength(1);
-        if (Utilities.equals(this.series.getLayer(), that.series.getLayer()) && sameEnvelope(that)) {
-            if (width <= width2 && height <= height2) return this;
-            if (width >= width2 && height >= height2) return that;
-        }
-        return null;
-    }
-
-    /**
-     * Indique si l'image de cette entrée couvre la même région géographique et la même plage
-     * de temps que celles de l'entré spécifiée. Les deux entrés peuvent toutefois appartenir
-     * à des couches différentes.
-     */
-    private boolean sameEnvelope(final GridCoverageEntry that) {
-        return this.band      == that.band      &&
-               this.startTime == that.startTime &&
-               this.endTime   == that.endTime   &&
-               geometry.sameEnvelope(that.geometry) &&
-               CRS.equalsIgnoreMetadata(parameters.tableCRS, that.parameters.tableCRS);
     }
 
     /**
@@ -819,7 +713,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * les deux objets {@code GridCoverageEntry} proviennent de la même base de données.
      */
     @Override
-    public boolean equals(final Object object) {
+    public final boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
@@ -838,10 +732,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     }
 
     /**
-     * Retourne une chaîne de caractères représentant cette entrée.
+     * Returns a string representation of this entry.
      */
     @Override
-    public String toString() {
+    public final String toString() {
         final StringBuilder buffer = new StringBuilder(40);
         buffer.append(Classes.getShortClassName(this)).append('[').append(getName());
         if (startTime!=Long.MIN_VALUE && endTime!=Long.MAX_VALUE) {
@@ -859,9 +753,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * déjà en mémoire, si une telle entrée existe. Ce remplacement augmente les chances
      * que la méthode {@code #getCoverage} retourne une image qui se trouvait déjà en mémoire.
      *
-     * @see #canonicalize
+     * @see #unique
      */
     protected final Object readResolve() throws ObjectStreamException {
-        return canonicalize();
+        return unique();
     }
 }

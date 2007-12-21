@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.logging.LogRecord;
 import java.util.logging.Level;
@@ -92,7 +91,7 @@ final class FormatEntry extends Entry implements Format {
      * ou {@link Boolean#FALSE} si elle est en attente.
      */
     private final transient Map<CoverageReference,Boolean> enqueued =
-            Collections.synchronizedMap(new IdentityHashMap<CoverageReference,Boolean>());
+            new IdentityHashMap<CoverageReference,Boolean>();
 
     /**
      * Nom MIME du format lisant les images.
@@ -329,9 +328,8 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Procède à la lecture d'une image. Il est possible que l'image soit lue non pas
-     * localement, mais plutôt à travers un réseau. Cette méthode n'est appelée que par
-     * {@link GridCoverageEntry#getCoverage}.
+     * Process to image reading. This method is invoked by {@link GridCoverageEntry#getCoverage}
+     * only.
      * <p>
      * Note 1: cette méthode <strong>doit</strong> être appelée à partir d'un bloc
      * synchronisé sur {@code this}.
@@ -455,7 +453,11 @@ final class FormatEntry extends Entry implements Format {
              * The reading will not be performed if the user aborted it before we reach
              * this point.
              */
-            if (enqueued.put(source, Boolean.TRUE) != null) try {
+            final boolean waiting;
+            synchronized (enqueued) {
+                waiting = enqueued.put(source, Boolean.TRUE) != null;
+            }
+            if (waiting) try {
                 image = reader.readAsRenderedImage(imageIndex, param);
             } catch (OutOfMemoryError e) {
                 System.gc();
@@ -464,7 +466,11 @@ final class FormatEntry extends Entry implements Format {
                 image = reader.readAsRenderedImage(imageIndex, param);
             }
         } finally {
-            if (enqueued.remove(source) == null) {
+            final boolean aborted;
+            synchronized (enqueued) {
+                aborted = enqueued.remove(source) == null;
+            }
+            if (aborted) {
                 // User aborted the reading while it was in process.
                 image = null;
             }
@@ -495,11 +501,17 @@ final class FormatEntry extends Entry implements Format {
     final void setReading(final CoverageReference source, final boolean starting) {
         assert !Thread.holdsLock(this); // The thread must *not* hold the lock.
         if (starting) {
-            if (enqueued.put(source, Boolean.FALSE) != null) {
+            final boolean waiting;
+            synchronized (enqueued) {
+                waiting = enqueued.put(source, Boolean.FALSE) != null;
+            }
+            if (waiting) {
                 throw new AssertionError();
             }
         } else {
-            enqueued.remove(source);
+            synchronized (enqueued) {
+                enqueued.remove(source);
+            }
         }
     }
 
@@ -587,11 +599,11 @@ final class FormatEntry extends Entry implements Format {
     public MutableTreeNode getTree(final Locale locale) {
         final DefaultMutableTreeNode root = new TreeNode(this);
         for (final GridSampleDimension band : bands) {
-            final List             categories = band.getCategories();
-            final int           categoryCount = categories.size();
+            final List<Category> categories = band.getCategories();
+            final int categoryCount = categories.size();
             final DefaultMutableTreeNode node = new TreeNode(band, locale);
             for (int j=0; j<categoryCount; j++) {
-                node.add(new TreeNode((Category)categories.get(j), locale));
+                node.add(new TreeNode(categories.get(j), locale));
             }
             root.add(node);
         }
@@ -602,11 +614,7 @@ final class FormatEntry extends Entry implements Format {
      * Retourne une chaîne de caractères représentant cette entrée.
      */
     final StringBuilder toString(final StringBuilder buffer) {
-        buffer.append(getName());
-        buffer.append(" (");
-        buffer.append(mimeType);
-        buffer.append(')');
-        return buffer;
+        return buffer.append(getName()).append(" (").append(mimeType).append(')');
     }
 
     /**
@@ -629,9 +637,9 @@ final class FormatEntry extends Entry implements Format {
         }
         if (super.equals(object)) {
             final FormatEntry that = (FormatEntry) object;
-            return Utilities.equals(this.mimeType,   that.mimeType )  &&
-                      Arrays.equals(this.bands,      that.bands    )  &&
-                                    this.geophysics==that.geophysics;
+            return Utilities.equals(this.mimeType,     that.mimeType )  &&
+                      Arrays.equals(this.bands,        that.bands    )  &&
+                                    this.geophysics == that.geophysics;
         }
         return false;
     }
@@ -681,8 +689,7 @@ final class FormatEntry extends Entry implements Format {
             final Range range = category.geophysics(false).getRange();
             buffer.append('[');  append(buffer, range.getMinValue());
             buffer.append(".."); append(buffer, range.getMaxValue()); // Inclusive
-            buffer.append("] ");
-            buffer.append(category.getName());
+            buffer.append("] ").append(category.getName());
             text = buffer.toString();
         }
 

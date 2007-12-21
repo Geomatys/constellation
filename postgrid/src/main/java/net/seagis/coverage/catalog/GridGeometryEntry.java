@@ -14,7 +14,9 @@
  */
 package net.seagis.coverage.catalog;
 
+import java.util.Arrays;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 
 import org.opengis.coverage.grid.GridRange;
@@ -135,6 +137,15 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
+     * Convenience method returning the two first dimension of the
+     * {@linkplain #getGridRange grid range}.
+     */
+    public Rectangle getBounds() {
+        return new Rectangle(gridRange.getLower (0), gridRange.getLower (1),
+                             gridRange.getLength(0), gridRange.getLength(1));
+    }
+
+    /**
      * Returns the grid range.
      */
     public GridRange getGridRange() {
@@ -152,7 +163,7 @@ final class GridGeometryEntry extends Entry {
      * Returns the envelope.
      */
     public Envelope getEnvelope() {
-        return (Envelope) envelope.clone();
+        return envelope.clone();
     }
 
     /**
@@ -201,12 +212,13 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * Returns {@code true} if the specified entry has the same envelope than this entry,
-     * regardless the grid size.
+     * Returns {@code true} if this grid geometry is compatible with the specified ony for a
+     * mosaic or pyramid. We do not checks the envelope since it will be TileCollection's job.
      */
-    final boolean sameEnvelope(final GridGeometryEntry that) {
-        return Utilities.equals(this.envelope,          that.envelope) &&
-               Utilities.equals(this.verticalOrdinates, that.verticalOrdinates);
+    final boolean canMosaic(final GridGeometryEntry that) {
+        return Arrays.equals(this.verticalOrdinates, that.verticalOrdinates) &&
+            CRS.equalsIgnoreMetadata(this.envelope.getCoordinateReferenceSystem(),
+                                     that.envelope.getCoordinateReferenceSystem());
     }
 
     /**
@@ -222,7 +234,7 @@ final class GridGeometryEntry extends Entry {
             return Utilities.equals(this.gridToCRS,         that.gridToCRS) &&
                    Utilities.equals(this.gridRange,         that.gridRange) &&
                    Utilities.equals(this.envelope,          that.envelope)  &&
-                   Utilities.equals(this.verticalOrdinates, that.verticalOrdinates);
+                   Arrays   .equals(this.verticalOrdinates, that.verticalOrdinates);
         }
         return false;
     }

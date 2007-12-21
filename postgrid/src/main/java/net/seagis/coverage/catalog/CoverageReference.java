@@ -68,7 +68,7 @@ public interface CoverageReference extends Element, CoverageStack.Element {
 
     /**
      * Returns the path to the image file, or {@code null} if the file is not accessible
-     * on the local machine. In the later case, {@link #getURL} should be used instead.
+     * on the local machine. In the later case, {@link #getURI} should be used instead.
      */
     File getFile();
 
