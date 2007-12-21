@@ -15,35 +15,38 @@
 
 package net.seagis.coverage.wms;
 
-import com.sun.ws.rest.spi.resource.Singleton;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 import javax.units.Unit;
+
+// jersey dependencies
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpContext;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response;
+import com.sun.ws.rest.spi.resource.Singleton;
+
+// JAXB xml binding dependencies
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
+//seagis dependencies
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.Unmarshaller;
 import net.seagis.sld.DescribeLayerResponseType;
 import net.seagis.sld.LayerDescriptionType;
 import net.seagis.sld.StyledLayerDescriptor;
@@ -57,8 +60,12 @@ import net.seagis.wms.EXGeographicBoundingBox;
 import net.seagis.wms.LegendURL;
 import net.seagis.wms.OnlineResource;
 import net.seagis.wms.Style;
+
+//geotools dependencies
 import org.geotools.util.MeasurementRange;
 import org.geotools.util.Version;
+
+//opengis dependencies
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
@@ -70,42 +77,15 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  */
 @UriTemplate("wms")
 @Singleton
-public class WMService {
+public class WMService extends WebService {
     
+    /**
+     * The http context containing the request parameter
+     */
     @HttpContext
     private UriInfo context;
     
     private final Logger logger = Logger.getLogger("net.seagis.wms");
-    
-    /**
-     * A JAXB marshaller used to transform the java object in XML String.
-     */
-    private final Marshaller marshaller;
-    
-    /**
-     * A JAXB unmarshaller used to create java object from XML file.
-     */
-    private final Unmarshaller unmarshaller;
-    
-    /**
-     * The supported versions supportd by this WMS web service.
-     */
-    private final List<Version> versions = new ArrayList<Version>();
-    
-    /**
-     * The current version used (since the last request)
-     */
-    private Version currentVersion;
-    
-    /**
-     * The version of the SLD profile for the WMS web service. fixed a 1.1.0 for now.
-     */
-    private final Version sldVersion = new Version("1.1.0");
-    
-    /**
-     * The object whitch made all the operation on the postgrid database
-     */
-    private final WebServiceWorker webServiceWorker;
     
     /**
      * the service URL (used in getCapabilities document).
@@ -141,7 +121,8 @@ public class WMService {
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
     public WMService() throws JAXBException, IOException, WebServiceException {
-        
+        super("1.3.0","1.1.1");
+
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wms:net.seagis.sld");
         marshaller = jbcontext.createMarshaller();
@@ -149,12 +130,7 @@ public class WMService {
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl());
         unmarshaller = jbcontext.createUnmarshaller();
         
-        versions.add(new Version("1.3.0"));
-        versions.add(new Version("1.1.1"));
-        currentVersion = versions.get(0);
-        
-        webServiceWorker = new WebServiceWorker(new Database());
-        webServiceWorker.setService("WMS", versions.get(0).toString());
+        webServiceWorker.setService("WMS", getCurrentVersion().toString());
         serviceURL = "http://sensor.geomatys.fr/wms-1.0-SNAPSHOT/wms?";
         
     }
@@ -194,7 +170,7 @@ public class WMService {
                     
                 } else {
                     throw new WebServiceException("The operation " + request + " is not supported by the service",
-                                                  WMSExceptionCode.OPERATION_NOT_SUPPORTED, versions.get(0));
+                                                  WMSExceptionCode.OPERATION_NOT_SUPPORTED, getCurrentVersion());
                 }
         } catch (WebServiceException ex) {
             ex.printStackTrace();
@@ -204,117 +180,6 @@ public class WMService {
         }
     }
 
-    /**
-     * Verify the base parameter or each request.
-     * 
-     * @param sld case 0: no sld.
-     *            case 1: VERSION parameter for WMS version and SLD_VERSION for sld version.
-     *            case 2: VERSION parameter for sld version.
-     * 
-     * @throws net.seagis.coverage.web.WebServiceException
-     */
-    private void verifyBaseParameter(int sld) throws WebServiceException {  
-        if (sld == 2) {
-            if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
-                throw new WebServiceException("The parameter VERSION=" + sldVersion + "must be specify",
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, sldVersion);
-            } else {
-                return;
-            }
-        }
-        if (!(getParameter("VERSION", true).equals(versions.get(0).toString()) || getParameter("VERSION", true).equals(versions.get(1).toString()) )) {
-            String message = "The parameter ";
-            for (Version vers:versions){
-                message += "VERSION=" + vers + "OR ";
-            }
-            message = message.substring(0, message.length()-3);
-            message += "must be specify";
-            throw new WebServiceException(message,
-                                         WMSExceptionCode.MISSING_PARAMETER_VALUE, versions.get(0));
-        
-        } else if (getParameter("VERSION", true).equals(versions.get(0).toString())){
-            currentVersion = versions.get(0);
-        } else if (getParameter("VERSION", true).equals(versions.get(1).toString())){
-            currentVersion = versions.get(1);
-        }
-        if (sld == 1) {
-            if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
-                throw new WebServiceException("The parameter SLD_VERSION=" + sldVersion + "must be specify",
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, versions.get(0));
-            }
-        }
-    } 
-   
-    /**
-     * Extract The parameter named parameterName from the query.
-     * If the parameter is mandatory and if it is null it throw an exception.
-     * else it return null.
-     * 
-     * @param parameterName The name of the parameter.
-     * @param mandatory true if this parameter is mandatory, false if its optional. 
-     * 
-     * @return the parameter or null if not specified
-     * @throw WebServiceException
-     */
-    private String getParameter(String parameterName, boolean mandatory) throws WebServiceException {
-        
-        MultivaluedMap parameters = context.getQueryParameters();
-        //we try with the parameter in Upper case.
-        LinkedList<String> list = (LinkedList) parameters.get(parameterName);
-        if (list == null) {
-            //else with the parameter in lower case.
-            list = (LinkedList) parameters.get(parameterName.toLowerCase());
-            if (list == null) {
-                //and finally with the first character in uppercase
-                String s = parameterName.toLowerCase();
-                s = s.substring(1);
-                s = parameterName.charAt(0) + s;
-                list = (LinkedList) parameters.get(s);
-                if (list == null) {
-                    if (!mandatory) {
-                        return null;
-                    } else {
-                        throw new WebServiceException("The parameter " + parameterName + " must be specify",
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, currentVersion);
-                    }
-                }
-            } 
-        } 
-        
-        return list.get(0);
-    }
-    
-    /**
-     * Extract The complex parameter encoded in XML from the query.
-     * If the parameter is mandatory and if it is null it throw an exception.
-     * else it return null.
-     * 
-     * @param parameterName The name of the parameter.
-     * @param mandatory true if this parameter is mandatory, false if its optional. 
-     * 
-     * @return the parameter or null if not specified
-     * @throw WebServiceException
-     */
-    private Object getComplexParameter(String parameterName, boolean mandatory) throws WebServiceException, JAXBException {
-        
-        MultivaluedMap parameters = context.getQueryParameters();
-        LinkedList<String> list = (LinkedList) parameters.get(parameterName);
-        if (list == null) {
-            list = (LinkedList) parameters.get(parameterName.toLowerCase());
-            if (list == null) {
-                if (!mandatory) {
-                    return null;
-                } else {
-                    throw new WebServiceException("The parameter " + parameterName + " must be specify",
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, currentVersion);
-                }
-            } 
-        }
-        StringReader sr = new StringReader(list.get(0));
-                
-        return unmarshaller.unmarshal(sr);
-    }
-   
     /**
      * Return a map for the specified parameters in the query.
      * 
@@ -332,7 +197,7 @@ public class WMService {
         webServiceWorker.setDimensionRange(getParameter("DIM_RANGE", false));
         
         String crs;
-        if (currentVersion.equals(versions.get(0))){
+        if (getCurrentVersion().toString().equals("1.3.0")) {
             crs = getParameter("CRS", true);
         } else {
             crs = getParameter("SRS", true);
@@ -372,7 +237,7 @@ public class WMService {
         webServiceWorker.setLayer(layer);
         
         String crs;
-        if (currentVersion.toString().equals("1.3.0")){
+        if (getCurrentVersion().toString().equals("1.3.0")){
             crs = getParameter("CRS", true);
         } else {
             crs = getParameter("SRS", true);
@@ -389,7 +254,7 @@ public class WMService {
         if (gridToCRS != null) {
             String i = null;
             String j = null;
-            if (currentVersion.toString().equals("1.3.0")) {
+            if (getCurrentVersion().toString().equals("1.3.0")) {
                 i = getParameter("I", true);
                 j = getParameter("J", true);
             } else {
@@ -404,7 +269,7 @@ public class WMService {
                 values = webServiceWorker.getGridCoverage2D(false).evaluate(coordinate, values);
             } catch (PointOutsideCoverageException exception) {
                 throw new WebServiceException(exception,
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, currentVersion);
+                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, getCurrentVersion());
             }
         }
         
@@ -450,25 +315,25 @@ public class WMService {
         //we begin by extract the mandatory attribute
         if (!getParameter("SERVICE", true).equalsIgnoreCase("WMS")) {
             throw new WebServiceException("The parameters SERVICE=WMS must be specify",
-                                         WMSExceptionCode.MISSING_PARAMETER_VALUE, currentVersion);
+                                         WMSExceptionCode.MISSING_PARAMETER_VALUE, getCurrentVersion());
         }
         
         //and the the optional attribute
         String inputVersion = getParameter("VERSION", false);
         if(inputVersion != null) {
-            if (!(inputVersion.equals(versions.get(0).toString()) || inputVersion.equals(versions.get(1).toString())) 
-                    || inputVersion.equals(versions.get(0).toString())) {
-                currentVersion = versions.get(0);
+            if (!(inputVersion.equals("1.3.0") || inputVersion.equals("1.1.1")) 
+                    || inputVersion.equals("1.1.1")) {
+                setCurrentVersion("1.1.1");
         
-            } else if (inputVersion.equals(versions.get(1).toString())){
-                currentVersion = versions.get(1);
+            } else if (inputVersion.equals("1.3.0")){
+                setCurrentVersion("1.3.0");
             }
         } else {
-            currentVersion = versions.get(0);
+            setCurrentVersion("1.1.1");
         } 
         
         // the service shall return WMSCapabilities marshalled
-        AbstractWMSCapabilities response = (AbstractWMSCapabilities)unmarshaller.unmarshal(getCapabilitiesFile(false, currentVersion));
+        AbstractWMSCapabilities response = (AbstractWMSCapabilities)unmarshaller.unmarshal(getCapabilitiesFile(false, getCurrentVersion()));
         
         String format = getParameter("FORMAT", false);
         
@@ -501,7 +366,7 @@ public class WMService {
                                                  inputGeoBox.getSouthBoundLatitude(),
                                                  inputGeoBox.getNorthBoundLatitude(),
                                                  0.0, 0.0,
-                                                 currentVersion);
+                                                 getCurrentVersion());
                 }
                 //we add the list od available date and elevation
                 List<Dimension> dimensions = new ArrayList<Dimension>();
@@ -575,11 +440,11 @@ public class WMService {
                                               true,
                                               dimensions,
                                               style,
-                                              currentVersion);
+                                              getCurrentVersion());
                 layers.add(outputLayer);
                 
             } catch (CatalogException exception) {
-                throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, currentVersion);
+                throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, getCurrentVersion());
             }
         }
        
@@ -596,7 +461,7 @@ public class WMService {
                                 crs, 
                                 exGeographicBoundingBox, 
                                 layers,
-                                currentVersion);
+                                getCurrentVersion());
         
         response.getCapability().setLayer(layer);
         //we marshall the response and return the XML String
@@ -621,7 +486,7 @@ public class WMService {
         String layers = getParameter("LAYERS", true);
         
         LayerDescriptionType layersDescription = new LayerDescriptionType(null);         
-        DescribeLayerResponseType response = new DescribeLayerResponseType(sldVersion.toString(), layersDescription);
+        DescribeLayerResponseType response = new DescribeLayerResponseType(getSldVersion().toString(), layersDescription);
        
         //we marshall the response and return the XML String
         StringWriter sw = new StringWriter();    
@@ -667,7 +532,11 @@ public class WMService {
      * @return The configuration file, or {@code null} if none.
      */
     File getCapabilitiesFile(final boolean create, Version version) {
-        String fileName = null;
+        String path = System.getenv().get("CATALINA_HOME") + "/webapps" + context.getBase().getPath() + "WEB-INF/";
+       
+        String fileName;
+        
+            
         if (version.toString().equals("1.1.1")){
             fileName = CAPABILITIES_FILENAME_1_1_1;
         } else {
@@ -676,38 +545,17 @@ public class WMService {
             
         if (fileName == null) {
             return null;
+        } else {
+            return new File(path + fileName);
         }
-        /*
-         * Donne priorité au fichier de configuration dans le répertoire courant, s'il existe.
-         */
-        File path = new File(fileName);
-        if (path.isFile()) {
-            return path;
-        }
-        if (path.isDirectory()) {
-            path = new File(path, fileName);
-        }
-        /*
-         * Recherche dans le répertoire de configuration de l'utilisateur,
-         * en commançant par le répertoire de de GeoServer s'il est définit.
-         */
-        if (!path.isAbsolute()) {
-            String home = System.getenv("GEOSERVER_DATA_DIR");
-            if (home == null || !(path=new File(home)).isDirectory()) {
-                home = System.getProperty("user.home");
-                if (System.getProperty("os.name", "").startsWith("Windows")) {
-                    path = new File(home, WINDOWS_DIRECTORY);
-                } else {
-                    path = new File(home, UNIX_DIRECTORY);
-                }
-            }
-        }
-        if (!path.exists()) {
-            if (!create || !path.mkdir()) {
-                return null;
-            }
-        }
-        return new File(path, fileName);
+    }
+
+    /**
+     * Return the current Http context. 
+     */
+    @Override
+    protected UriInfo getContext() {
+        return this.context;
     }
    
 }
