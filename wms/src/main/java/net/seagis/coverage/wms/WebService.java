@@ -74,7 +74,7 @@ public abstract class WebService {
     /**
      * The object whitch made all the operation on the postgrid database
      */
-    protected final WebServiceWorker webServiceWorker;
+    protected WebServiceWorker webServiceWorker;
     
     /**
      * Initialiise the basic attribute of a web service.
@@ -92,7 +92,7 @@ public abstract class WebService {
             this.currentVersion = this.versions.get(0);
         
         unmarshaller = null;
-        webServiceWorker = new WebServiceWorker(new Database());
+       
     }
     
      /**
