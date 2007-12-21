@@ -130,7 +130,6 @@ public class WMService extends WebService {
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl());
         unmarshaller = jbcontext.createUnmarshaller();
         
-        context.getBase().getPath();
         String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
         File configFile = new File(path);
         webServiceWorker = new WebServiceWorker(new Database(configFile));
