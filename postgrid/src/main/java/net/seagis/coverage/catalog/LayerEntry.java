@@ -366,9 +366,15 @@ final class LayerEntry extends Entry implements Layer {
         if (delay <= 0) {
             delay = GridCoverageTable.MILLIS_IN_DAY / 2;
         }
-        final long t = time.getTime();
-        final Date startTime = new Date(t - delay);
-        final Date   endTime = new Date(t + delay);
+        Date startTime, endTime;
+        if (time != null) {
+            final long t = time.getTime();
+            startTime = new Date(t - delay);
+            endTime = new Date(t + delay);
+        } else {
+            startTime = null;
+            endTime   = null;
+        }
         try {
             if (singleCoverageServer == null) {
                 singleCoverageServer = new GridCoverageTable(data);
