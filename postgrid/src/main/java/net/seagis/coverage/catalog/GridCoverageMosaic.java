@@ -19,14 +19,19 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.net.URI;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageReader;
 
+import org.opengis.coverage.grid.GridRange;
 import org.geotools.resources.Utilities;
 import org.geotools.image.io.mosaic.Tile;
-import org.geotools.image.io.mosaic.TileCollection;
+import org.geotools.image.io.mosaic.TileBuilder;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.coverage.grid.ImageGeometry;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 
 /**
@@ -78,19 +83,21 @@ final class GridCoverageMosaic extends GridCoverageEntry {
     private static List<GridCoverageEntry> createMosaic(final List<GridCoverageEntry> entries)
             throws IOException
     {
-        TileCollection               tiles   = null;
+        TileBuilder                  tiles   = null;
         List<GridCoverageEntry>      mosaics = null;
         Map<FormatEntry,ImageReader> readers = null;
         Iterator<GridCoverageEntry>  iterator;
         while ((iterator = entries.iterator()).hasNext()) {
             final GridCoverageEntry reference = iterator.next();
+            final GeneralEnvelope envelope = reference.geometry.getEnvelope(); // Need full envelope, not the clipped one.
+            final GeographicBoundingBoxImpl bbox = new GeographicBoundingBoxImpl(reference.geometry.geographicEnvelope);
             iterator.remove();
             while (iterator.hasNext()) {
                 final GridCoverageEntry candidate = iterator.next();
                 assert Utilities.equals(reference.getTimeRange(), candidate.getTimeRange());
                 if (reference.geometry.canMosaic(candidate.geometry)) {
                     if (tiles == null) {
-                        tiles = new TileCollection();
+                        tiles = new TileBuilder();
                     }
                     if (tiles.isEmpty()) {
                         if (readers == null) {
@@ -99,6 +106,8 @@ final class GridCoverageMosaic extends GridCoverageEntry {
                         add(tiles, reference, readers);
                     }
                     add(tiles, candidate, readers);
+                    envelope.add(candidate.geometry.envelope);
+                    bbox.add(new GeographicBoundingBoxImpl(candidate.geometry.geographicEnvelope));
                     iterator.remove();
                 }
             }
@@ -107,7 +116,13 @@ final class GridCoverageMosaic extends GridCoverageEntry {
              * using compatible CRS. Computes the pyramid levels now.
              */
             if (tiles != null && !tiles.isEmpty()) {
-
+                for (final Map.Entry<ImageGeometry,Tile[]> entry : tiles.tiles().entrySet()) {
+                    final ImageGeometry   geometry  = entry.getKey();
+                    final AffineTransform gridToCRS = geometry.getGridToCRS();
+                    final GridRange       gridRange = geometry.getGridRange();
+                    mosaics.add(new GridCoverageMosaic(reference, new GridGeometryEntry(
+                            "Mosaic", gridToCRS, gridRange, envelope, bbox, null)));
+                }
                 tiles.clear();
             } else {
                 mosaics.add(reference);
@@ -127,7 +142,7 @@ final class GridCoverageMosaic extends GridCoverageEntry {
      * @param  readers A pool of pre-allocated readers.
      * @throws IOException If an error occured while fetching the input.
      */
-    private static void add(final TileCollection tiles, final GridCoverageEntry entry,
+    private static void add(final TileBuilder tiles, final GridCoverageEntry entry,
                             final Map<FormatEntry,ImageReader> readers)
             throws IOException
     {

@@ -62,9 +62,11 @@ final class GridGeometryEntry extends Entry {
     private final AffineTransform gridToCRS;
 
     /**
-     * The full envelope, including the vertical and temporal extent if any.
+     * The full envelope, including the vertical and temporal extent if any. Should be considered
+     * as a read-only field. It is read directly by {@link GridCoverageMosaic} for efficienty, but
+     * all public API should returns a defensive copy.
      */
-    private final GeneralEnvelope envelope;
+    final GeneralEnvelope envelope;
 
     /**
      * Same as the envelope, but in WGS 84 geographic coordinates. This field is read
@@ -160,9 +162,9 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * Returns the envelope.
+     * Returns the a copy of the envelope.
      */
-    public Envelope getEnvelope() {
+    public GeneralEnvelope getEnvelope() {
         return envelope.clone();
     }
 
