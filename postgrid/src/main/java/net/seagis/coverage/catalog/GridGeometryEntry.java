@@ -29,7 +29,9 @@ import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import net.seagis.catalog.Entry;
 
@@ -62,11 +64,10 @@ final class GridGeometryEntry extends Entry {
     private final AffineTransform gridToCRS;
 
     /**
-     * The full envelope, including the vertical and temporal extent if any. Should be considered
-     * as a read-only field. It is read directly by {@link GridCoverageMosaic} for efficienty, but
-     * all public API should returns a defensive copy.
+     * The full envelope, including the vertical and temporal extent if any.
+     * Should not be modified after construction.
      */
-    final GeneralEnvelope envelope;
+    private final GeneralEnvelope envelope;
 
     /**
      * Same as the envelope, but in WGS 84 geographic coordinates. This field is read
@@ -120,6 +121,30 @@ final class GridGeometryEntry extends Entry {
         geographicEnvelope = XRectangle2D.createFromExtremums(
                 bbox.getWestBoundLongitude(), bbox.getSouthBoundLatitude(),
                 bbox.getEastBoundLongitude(), bbox.getNorthBoundLatitude());
+    }
+
+    /**
+     * For internal usage by {@linl GridCoverageMosaic} only.
+     */
+    GridGeometryEntry(final String name, final ImageGeometry geometry, final GeneralEnvelope envelope,
+                      final GeographicBoundingBox bbox, final GridGeometryEntry reference)
+    {
+        this(name, geometry.getGridToCRS(), geometry.getGridRange(), envelope, bbox, reference.verticalOrdinates);
+        assert canMosaic(reference) : reference;
+    }
+
+    /**
+     * Returns {@code true} if the geographic bounding box described by this entry is empty.
+     */
+    public boolean isEmpty() {
+        return geographicEnvelope.isEmpty();
+    }
+
+    /**
+     * Returns a copy of the geographic bounding box. This copy can be freely modified.
+     */
+    public GeographicBoundingBoxImpl getGeographicBoundingBox() {
+        return new GeographicBoundingBoxImpl(geographicEnvelope);
     }
 
     /**
@@ -221,6 +246,14 @@ final class GridGeometryEntry extends Entry {
         return Arrays.equals(this.verticalOrdinates, that.verticalOrdinates) &&
             CRS.equalsIgnoreMetadata(this.envelope.getCoordinateReferenceSystem(),
                                      that.envelope.getCoordinateReferenceSystem());
+    }
+
+    /**
+     * Adds the envelope and geographic bounding box from this entry to the specified object.
+     */
+    final void addTo(final GeneralEnvelope envelope, final GeographicBoundingBoxImpl bbox) {
+        envelope.add(this.envelope);
+        bbox.add(new GeographicBoundingBoxImpl(geographicEnvelope));
     }
 
     /**

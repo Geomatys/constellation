@@ -55,6 +55,11 @@ import static net.seagis.catalog.QueryType.*;
  * {@link CoverageReference} objects, which will defer the image loading until first needed.
  * A {@code GridCoverageTable} can produce a list of available image intercepting a given
  * {@linkplain #setGeographicArea geographic area} and {@linkplain #setTimeRange time range}.
+ * <p>
+ * <strong>Note:</strong> for proper working of this class, the SQL query must sort entries
+ * by time. It may be either start or end time, either ascending or descending order, as long
+ * as entries having the same {@linkplain CoverageReference#getTimeRange time range} appear
+ * grouped.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -338,6 +343,11 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * Returns the two-dimensional coverages that intercept the
      * {@linkplain #getEnvelope current spatio-temporal envelope}.
+     * <p>
+     * <strong>Note:</strong> for proper working of this method, the SQL query must sort entries
+     * by time. It may be either start or end time, either ascending or descending order, as long
+     * as entries having the same {@linkplain CoverageReference#getTimeRange time range} appear
+     * grouped.
      *
      * @return List of coverages in the current envelope of interest.
      * @throws CatalogException if a record is invalid.
@@ -345,26 +355,63 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      */
     @Override
     public Set<CoverageReference> getEntries() throws CatalogException, SQLException {
-        final Set<CoverageReference>  entries = super.getEntries();
-        List<GridCoverageEntry> mosaicEntries = null; // Will be created only if needed.
-        DateRange               lastTimeRange = null;
-        for (final CoverageReference entry : entries) {
-            final DateRange timeRange = entry.getTimeRange();
-            if (Utilities.equals(timeRange, lastTimeRange)) {
-                /*
-                 * Found an entry with exactly the same time range than the previous one
-                 * (note that the dates may be null). We presume that this entry is part
-                 * of a mosaic.
-                 */
-                if (entry instanceof GridCoverageEntry) {
+        Set<CoverageReference> entries = super.getEntries();
+        final int size = entries.size();
+        if (size > 1) {
+            final CoverageReference[] asArray = entries.toArray(new CoverageReference[size]);
+            CoverageReference previousEntry = asArray[0];
+            DateRange previousTimeRange = previousEntry.getTimeRange();
+            List<GridCoverageEntry> mosaicEntries = null; // Will be created only if needed.
+            for (int i=1; i<size; i++) {
+                final CoverageReference entry = asArray[i];
+                final DateRange timeRange = entry.getTimeRange();
+                if (Utilities.equals(timeRange, previousTimeRange)) {
+                    /*
+                     * Found an entry with exactly the same time range than the previous one
+                     * (note that the dates may be null). We presume that this entry is part
+                     * of a mosaic. If this is the first time we find such entry, create the
+                     * structures that we deferred until now and fill it with the entries that
+                     * we found before to reach this point.
+                     */
                     if (mosaicEntries == null) {
-                        mosaicEntries = new ArrayList<GridCoverageEntry>(entries.size());
+                        mosaicEntries = new LinkedList<GridCoverageEntry>();
+                        entries = new LinkedHashSet<CoverageReference>(size + size/4);
+                        for (int j=0; j<i-1; j++) {
+                            entries.add(asArray[j]);
+                        }
+                    }
+                    if (mosaicEntries.isEmpty()) { // May be true more than once.
+                        mosaicEntries.add((GridCoverageEntry) previousEntry);
                     }
                     mosaicEntries.add((GridCoverageEntry) entry);
-                    continue;
+                } else if (mosaicEntries != null) {
+                    /*
+                     * Founds an entry with a different time range. Flush any pending tiling
+                     * information to the new 'entries' set and clear the mosaic list in order
+                     * to make it ready to receive a new mosaic.
+                     */
+                    if (mosaicEntries.isEmpty()) {
+                        // Needed because 'mosaicEntries' contains 0 or 2+ entries, never 1.
+                        entries.add(entry);
+                    } else {
+                        entries.addAll(GridCoverageMosaic.createMosaic(mosaicEntries));
+                        mosaicEntries.clear(); // Makes it ready to receive a new mosaic, if any.
+                    }
+                }
+                previousEntry = entry;
+                previousTimeRange = timeRange;
+            }
+            /*
+             * Flush the remaining mosaic information, if there is any.
+             * This is basically the same code than in the loop above.
+             */
+            if (mosaicEntries != null) {
+                if (mosaicEntries.isEmpty()) {
+                    entries.add(previousEntry);
+                } else {
+                    entries.addAll(GridCoverageMosaic.createMosaic(mosaicEntries));
                 }
             }
-            lastTimeRange = timeRange;
         }
         log("getEntries", Level.FINE, ResourceKeys.FOUND_COVERAGES_$1, entries.size());
         return entries;

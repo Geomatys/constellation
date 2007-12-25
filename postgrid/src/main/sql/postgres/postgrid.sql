@@ -537,7 +537,8 @@ CREATE VIEW "DomainOfLayers" AS
         min("south")     AS "south",
         max("north")     AS "north",
         sum("xResolution" * "count") / sum("count") AS "xResolution",
-        sum("yResolution" * "count") / sum("count") AS "yResolution"
+        sum("yResolution" * "count") / sum("count") AS "yResolution",
+        bool_or("visible") AS "visible"
    FROM "DomainOfSeries"
    JOIN "Series" ON "DomainOfSeries"."series" = "Series"."identifier"
   GROUP BY "layer"

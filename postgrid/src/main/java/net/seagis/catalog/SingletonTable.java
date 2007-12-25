@@ -377,8 +377,9 @@ public abstract class SingletonTable<E extends Element> extends Table {
     }
 
     /**
-     * Returns all entries available in the database. Modification in the returned
-     * set will not alter this table.
+     * Returns all entries available in the database. The returned set may or may not be
+     * serializable or modifiable, at implementation choice. If allowed, modification in
+     * the returned set will not alter this table.
      *
      * @return The set of entries. May be empty, but neven {@code null}.
      * @throws CatalogException if a logical error has been detected in the database content.
@@ -440,11 +441,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
             roolback(set);
             throw exception;
         }
-        /*
-         * Copies all entries in a new set because set.keySet() is not serializable.
-         * In addition, some callers will modify the returned set.
-         */
-        return new LinkedHashSet<E>(set.keySet());
+        return set.keySet();
     }
 
     /**

@@ -45,6 +45,6 @@ public class BlueMarbleTest extends DatabaseTest {
         assertNotNull(layer);
 
         final Set<CoverageReference> reference = layer.getCoverageReferences();
-//        assertEquals(1, reference.size());
+        assertEquals(1, reference.size());
     }
 }

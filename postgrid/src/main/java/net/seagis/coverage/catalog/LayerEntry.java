@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.SortedSet;
 import java.util.Iterator;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.awt.Dimension;
@@ -171,12 +172,16 @@ final class LayerEntry extends Entry implements Layer {
 
     /**
      * Sets the series for this layer. This method is invoked by {@link LayerTable#postCreateEntry}
-     * only. The series set given will be trimmed (every hidden series will be removed from it). A
-     * direct reference to this set will be retained.
+     * only. The series set given will be trimmed (every hidden series will be removed from it).
+     * This works will be performed on a copy of the supplied set.
      *
-     * @param series The series to set. <strong>This collection will be modified</strong>.
+     * @param series The series to set. This given set will not be modified.
      */
-    final void setSeries(final Set<Series> series) {
+    final void setSeries(Set<Series> series) {
+        // Copies the set in order to protect the user-supplied set from the changes we are going to
+        // apply in this method, and also because the caller supplies a non-serializable set and we
+        // want to make it serializable.
+        series = new LinkedHashSet<Series>(series);
         final Map<String,Series> map = new HashMap<String,Series>((int) (series.size() / 0.75f) + 1);
         for (final Iterator<Series> it=series.iterator(); it.hasNext();) {
             final Series entry = it.next();

@@ -16,7 +16,7 @@ package net.seagis.catalog;
 
 
 /**
- * An exception that occured on the server side. The{@linkplain #getCause cause} is implementation
+ * An exception that occured on the server side. The {@linkplain #getCause cause} is implementation
  * dependent, but will typically be an instance of {@link java.sql.SQLException} or
  * {@link java.rmi.RemoteException}.
  *

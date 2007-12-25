@@ -228,7 +228,7 @@ final class FormatEntry extends Entry implements Format {
      * Creates a new image reader for this format.
      *
      * @return The image reader for this format.
-     * @throws IIOException if no image reader was found for this format.
+     * @throws IIOException if no image reader or too many readers was found for this format.
      */
     final ImageReader createImageReader() throws IIOException {
         final Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(mimeType);
@@ -237,7 +237,7 @@ final class FormatEntry extends Entry implements Format {
         }
         final ImageReader reader = readers.next();
         if (false && readers.hasNext()) { // Check disabled for now.
-            throw new IllegalArgumentException(Resources.format(
+            throw new IIOException(Resources.format(
                     ResourceKeys.ERROR_TOO_MANY_IMAGE_FORMATS_$1, mimeType));
         }
         handleSpecialCases(reader, null);

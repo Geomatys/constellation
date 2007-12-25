@@ -115,8 +115,7 @@ public class SeriesTest extends AbstractTest {
             table.setLayer(layer);
             table.setOperation(database.getTable(OperationTable.class).getEntry("Valeur directe"));
             final CoverageStack stack = new CoverageStack(seriesName,
-                                                          table.getCoordinateReferenceSystem(),
-                                                          table.getEntries());
+                    table.getCoordinateReferenceSystem(), table.getEntries());
             stack.setInterpolationEnabled(interpolate);
             c = stack;
         }
