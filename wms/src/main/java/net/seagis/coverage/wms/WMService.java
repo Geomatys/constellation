@@ -39,14 +39,12 @@ import javax.ws.rs.core.Response;
 import com.sun.ws.rest.spi.resource.Singleton;
 
 // JAXB xml binding dependencies
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 //seagis dependencies
 import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.Database;
 import net.seagis.sld.DescribeLayerResponseType;
 import net.seagis.sld.LayerDescriptionType;
 import net.seagis.sld.StyledLayerDescriptor;
@@ -130,13 +128,16 @@ public class WMService extends WebService {
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl());
         unmarshaller = jbcontext.createUnmarshaller();
         
-        String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
-        File configFile = new File(path);
-        webServiceWorker = new WebServiceWorker(new Database(configFile));
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         serviceURL = "http://sensor.geomatys.fr/wms-1.0-SNAPSHOT/wms?";
         
-        
+        /**
+         * only for ifremer configuration
+         * String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
+         * File configFile = new File(path);
+         * webServiceWorker = new WebServiceWorker(new Database(configFile));
+         */
         
     }
    
@@ -150,6 +151,7 @@ public class WMService extends WebService {
     @HttpMethod("GET")
     public Response treatGETrequest() throws JAXBException  {
 
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
             
                 String request = (String) getParameter("REQUEST", true);
@@ -195,6 +197,7 @@ public class WMService extends WebService {
         logger.info("getMap request received");
         
         verifyBaseParameter(0);
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         //we set the attribute od the webservice worker with the parameters.
         webServiceWorker.setFormat(getParameter("FORMAT", true));
@@ -236,6 +239,7 @@ public class WMService extends WebService {
      */
     private Response getFeatureInfo() throws WebServiceException {
         logger.info("getFeatureInfo request received");
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         verifyBaseParameter(0);
         String layer = getParameter("QUERY_LAYERS", true);
@@ -316,6 +320,7 @@ public class WMService extends WebService {
      */
     private String getCapabilities() throws WebServiceException, JAXBException {
         logger.info("getCapabilities request received");
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         //we begin by extract the mandatory attribute
         if (!getParameter("SERVICE", true).equalsIgnoreCase("WMS")) {
@@ -501,6 +506,7 @@ public class WMService extends WebService {
     
     
     private File getLegendGraphic() throws WebServiceException, JAXBException {
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         verifyBaseParameter(2);
         webServiceWorker.setLayer(getParameter("LAYER", true));

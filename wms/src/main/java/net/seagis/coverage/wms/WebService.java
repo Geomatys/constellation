@@ -74,7 +74,7 @@ public abstract class WebService {
     /**
      * The object whitch made all the operation on the postgrid database
      */
-    protected WebServiceWorker webServiceWorker;
+    protected final ThreadLocal<WebServiceWorker> webServiceWorker;
     
     /**
      * Initialiise the basic attribute of a web service.
@@ -92,7 +92,15 @@ public abstract class WebService {
             this.currentVersion = this.versions.get(0);
         
         unmarshaller = null;
-       
+        
+        final WebServiceWorker initialValue = new WebServiceWorker(new Database());
+        webServiceWorker = new ThreadLocal<WebServiceWorker>() {
+            @Override
+            protected WebServiceWorker initialValue() {
+                return new WebServiceWorker(initialValue);
+            }
+        };
+        webServiceWorker.set(initialValue);
     }
     
      /**
