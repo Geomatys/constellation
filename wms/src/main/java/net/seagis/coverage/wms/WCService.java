@@ -46,7 +46,7 @@ import net.seagis.wcs.CoveragesType;
  *
  * @author Guilhem Legal
  */
-@UriTemplate("wms")
+@UriTemplate("wcs")
 @Singleton
 public class WCService extends WebService {
 
