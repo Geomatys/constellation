@@ -68,8 +68,8 @@ public class WCService extends WebService {
      */
     public WCService() throws JAXBException, IOException {
         super("1.1.0");
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.wcs");
-        unmarshaller = jbcontext.createUnmarshaller();
+       // JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.wcs");
+       // unmarshaller = jbcontext.createUnmarshaller();
         
     }
     
