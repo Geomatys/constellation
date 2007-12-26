@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - Systemes integres de connaissances pour l'aide a la decision en environnement
+ * (C) 2005, Institut de Recherche pour le Developpement
  * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
@@ -17,6 +17,10 @@ package net.seagis.catalog;
 
 import java.util.UUID;
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 import org.geotools.resources.Utilities;
 
 
@@ -26,7 +30,10 @@ import org.geotools.resources.Utilities;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Guilhem Legal
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Entry")
 public class Entry implements Element, Serializable {
     /**
      * For cross-platform compatibility.
@@ -37,13 +44,22 @@ public class Entry implements Element, Serializable {
      * Nom de cette entrée. Dans certains cas, un nom peut être créé à la volé
      * la première fois où il sera demandé (voir {@link #createName}).
      */
-    private String name;
+    @XmlTransient
+    protected String name;
 
     /**
      * Remarques s'appliquant à cette entrée, ou {@code null}.
      */
+    @XmlTransient
     private final String remarks;
-
+    
+    /**
+     * Empty constructor used by JAXB.
+     */
+    protected Entry() {
+        remarks = null;
+    }
+    
     /**
      * Creates an entry for the specified name without remarks. If a {@code null} name
      * is specified, then a name will be {@linkplain #createName generated} on the fly
@@ -79,7 +95,8 @@ public class Entry implements Element, Serializable {
     /**
      * Returns the name for this entry.
      */
-    public final String getName() {
+    @Override
+    public String getName() {
         if (name == null) {
             name = createName();
         }
@@ -89,7 +106,8 @@ public class Entry implements Element, Serializable {
     /**
      * Returns the remarks for this entry, or {@code null} if none.
      */
-    public final String getRemarks() {
+    @Override
+    public String getRemarks() {
         return remarks;
     }
 
