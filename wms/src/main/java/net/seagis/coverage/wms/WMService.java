@@ -182,14 +182,14 @@ public class WMService extends WebService {
     private File getMap() throws  WebServiceException {
         logger.info("getMap request received");
         //debug
-        logger.info(context.getBase().getQuery());
+        logger.info(context.getAbsolute().toString());
         verifyBaseParameter(0);
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         //we set the attribute od the webservice worker with the parameters.
         webServiceWorker.setFormat(getParameter("FORMAT", true));
         webServiceWorker.setLayer(getParameter("LAYERS", true));
-        webServiceWorker.setDimensionRange(getParameter("DIM_RANGE", false));
+        webServiceWorker.setColormapRange(getParameter("DIM_RANGE", false));
         
         String crs;
         if (getCurrentVersion().toString().equals("1.3.0")) {

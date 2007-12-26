@@ -93,7 +93,7 @@ public class WebServiceWorker {
      * The codecs provided in standard Java are sometime more reliable.
      */
     static {
-        Logging.ALL.forceMonolineConsoleOutput();
+        Logging.ALL.forceMonolineConsoleOutput(java.util.logging.Level.CONFIG);
         ImageUtilities.allowNativeCodec("png", ImageReaderSpi.class, true);
         ImageUtilities.allowNativeCodec("png", ImageWriterSpi.class, true);
     }
@@ -526,7 +526,7 @@ public class WebServiceWorker {
     /**
      * Sets the range on value on which to apply a color ramp.
      */
-    public void setDimensionRange(String colormapRange) throws WebServiceException {
+    public void setColormapRange(String colormapRange) throws WebServiceException {
        if (colormapRange == null) {
            this.colormapRange = null;
        } else {
