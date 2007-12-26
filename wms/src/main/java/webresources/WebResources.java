@@ -21,6 +21,7 @@ public class WebResources
      */
     public WebResources() {
         getResourceClasses().add(net.seagis.coverage.wms.WMService.class);
+        getResourceClasses().add(net.seagis.coverage.wms.WCService.class);
         getResourceClasses().add(com.sun.ws.rest.wadl.resource.WadlResource.class);
         getFeatures().put("com.sun.ws.rest.config.feature.IgnoreMatrixParams", true);
         getFeatures().put("com.sun.ws.rest.config.feature.CanonicalizeURIPath", true);
