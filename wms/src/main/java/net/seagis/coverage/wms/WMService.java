@@ -90,20 +90,6 @@ public class WMService extends WebService {
      */
     private final String serviceURL;
             
-    /** 
-     * these attributes will be removed. 
-     */
-    
-    /**
-     * The user directory where to store the configuration file on Unix platforms.
-     */
-    private static final String UNIX_DIRECTORY = ".sicade";
-
-    /**
-     * The user directory where to store the configuration file on Windows platforms.
-     */
-    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
-
     /**
      * The file where to store capabilities static information version 1.3.0.
      */
@@ -195,7 +181,8 @@ public class WMService extends WebService {
      */
     private File getMap() throws  WebServiceException {
         logger.info("getMap request received");
-        
+        //debug
+        logger.info(context.getPath());
         verifyBaseParameter(0);
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
@@ -350,7 +337,7 @@ public class WMService extends WebService {
         //we build the layers object of the document
         
         //we get the list of layers
-         List<Layer> layers = new ArrayList<Layer>();
+        List<Layer> layers = new ArrayList<Layer>();
         for (net.seagis.coverage.catalog.Layer inputLayer: webServiceWorker.getLayers()) {
             try {
                 
