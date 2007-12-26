@@ -8,5 +8,11 @@
                 </response>
             </method>
         </resource>
+        <resource path="wcs">
+            <method name="GET">
+                <response>
+                    <representation/>
+                </response>
+            </method>
     </resources>
 </application>
