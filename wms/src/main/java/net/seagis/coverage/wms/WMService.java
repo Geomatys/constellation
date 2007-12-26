@@ -182,7 +182,7 @@ public class WMService extends WebService {
     private File getMap() throws  WebServiceException {
         logger.info("getMap request received");
         //debug
-        logger.info(context.getPath());
+        logger.info(context.getBase().getQuery());
         verifyBaseParameter(0);
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
