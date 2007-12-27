@@ -88,7 +88,11 @@ final class LayerRequest {
          * "rounds" the bounding box on a grid.
          */
         Dimension2D resolution = layer.getAverageResolution();
-        if (resolution != null && bbox != null) {
+        if (resolution != null) {
+            final GeographicBoundingBox global = layer.getGeographicBoundingBox();
+            if (bbox == null) {
+                bbox = new GeographicBoundingBoxImpl(global);
+            }
             double xResolution = resolution.getWidth();
             double yResolution = resolution.getHeight();
             double west  = bbox.getWestBoundLongitude();
@@ -97,7 +101,6 @@ final class LayerRequest {
             double north = bbox.getNorthBoundLatitude();
             final double xRange = (east  - west);
             final double yRange = (north - south);
-            final GeographicBoundingBox global = layer.getGeographicBoundingBox();
             if (global != null) {
                 /*
                  * Converts the user's envelope from geographic coordinates to pixel coordinates.
@@ -133,6 +136,9 @@ final class LayerRequest {
             } else {
                 resolution = null;
             }
+        }
+        if (bbox != null && bbox.isEmpty()) {
+            bbox = null;
         }
         // We could call bbox.freeze() here, but it has a cost.
         // We will rather be carefull to not modify this box.

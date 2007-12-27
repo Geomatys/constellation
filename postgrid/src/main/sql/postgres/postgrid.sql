@@ -390,31 +390,39 @@ COMMENT ON TRIGGER "addDefaultExtent" ON "GridGeometries" IS
 
 --------------------------------------------------------------------------------------------------
 -- Creates the "BoundingBoxes" view.                                                            --
--- Dependencies: "GridGeometries"                                                               --
+-- Dependencies:  "GridGeometries"                                                              --
+-- Inner queries: "Corners" contains 4 (x,y) corners as 4 rows for each grid geometries.        --
+--                "NativeBoxes" contains the minimum and maximum values of "Corners".           --
 --------------------------------------------------------------------------------------------------
 
 CREATE VIEW "BoundingBoxes" AS
-    SELECT "identifier",
-           "width",
-           "height",
-           srid("envelope")         AS "crs",
-           xmin("envelope")         AS "minX",
-           xmax("envelope")         AS "maxX",
-           ymin("envelope")         AS "minY",
-           ymax("envelope")         AS "maxY",
+    SELECT "GridGeometries"."identifier", "width", "height",
+           "horizontalSRID" AS "crs", "minX", "maxX", "minY", "maxY",
            xmin("horizontalExtent") AS "west",
            xmax("horizontalExtent") AS "east",
            ymin("horizontalExtent") AS "south",
            ymax("horizontalExtent") AS "north"
-      FROM
-   (SELECT "identifier",
-           "width",
-           "height",
-           Affine(GeometryFromText('POLYGON((0 0,0 ' || "height" || ',' || "width" || ' ' || "height" || ',' || "width" || ' 0,0 0))', "horizontalSRID"),
-           "scaleX", "shearX", "shearY", "scaleY", "translateX", "translateY") AS "envelope",
-           "horizontalExtent"
-      FROM "GridGeometries") AS "GridGeometries2D"
-  ORDER BY "identifier";
+      FROM "GridGeometries"
+ LEFT JOIN (SELECT "identifier",
+       min("x") AS "minX",
+       max("x") AS "maxX",
+       min("y") AS "minY",
+       max("y") AS "maxY"
+FROM (SELECT "identifier",
+             "translateX" AS "x",
+             "translateY" AS "y" FROM "GridGeometries"
+UNION SELECT "identifier",
+             "width"*"scaleX" + "translateX" AS "x",
+             "width"*"shearY" + "translateY" AS "y" FROM "GridGeometries"
+UNION SELECT "identifier",
+             "height"*"shearX" + "translateX" AS "x",
+             "height"*"scaleY" + "translateY" AS "y" FROM "GridGeometries"
+UNION SELECT "identifier",
+             "width"*"scaleX" + "height"*"shearX" + "translateX" AS "x",
+             "width"*"shearY" + "height"*"scaleY" + "translateY" AS "y" FROM "GridGeometries") AS "Corners"
+    GROUP BY "identifier") AS "NativeBoxes"
+          ON "GridGeometries"."identifier" = "NativeBoxes"."identifier"
+    ORDER BY "identifier";
 
 ALTER TABLE "BoundingBoxes" OWNER TO geoadmin;
 GRANT ALL ON TABLE "BoundingBoxes" TO geoadmin;

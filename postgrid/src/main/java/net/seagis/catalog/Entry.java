@@ -52,14 +52,14 @@ public class Entry implements Element, Serializable {
      */
     @XmlTransient
     private final String remarks;
-    
+
     /**
      * Empty constructor used by JAXB.
      */
     protected Entry() {
         remarks = null;
     }
-    
+
     /**
      * Creates an entry for the specified name without remarks. If a {@code null} name
      * is specified, then a name will be {@linkplain #createName generated} on the fly
@@ -95,7 +95,6 @@ public class Entry implements Element, Serializable {
     /**
      * Returns the name for this entry.
      */
-    @Override
     public String getName() {
         if (name == null) {
             name = createName();
@@ -106,7 +105,6 @@ public class Entry implements Element, Serializable {
     /**
      * Returns the remarks for this entry, or {@code null} if none.
      */
-    @Override
     public String getRemarks() {
         return remarks;
     }

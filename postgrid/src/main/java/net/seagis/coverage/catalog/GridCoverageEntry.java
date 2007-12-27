@@ -390,7 +390,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     private void handleSpecialCases(final ImageReadParam param) {
         if (param instanceof NetcdfReadParam) {
             final NetcdfReadParam p = (NetcdfReadParam) param;
-            p.setBandDimensionTypes(new AxisType[] {AxisType.Height, AxisType.Pressure});
+            p.setBandDimensionTypes(AxisType.Height, AxisType.Pressure);
             if (timeIndex != 0) {
                 p.setSliceIndice(AxisType.Time, timeIndex - 1);
             }
