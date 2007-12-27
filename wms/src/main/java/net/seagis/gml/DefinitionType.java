@@ -22,9 +22,9 @@ import org.geotools.resources.Utilities;
  * <pre>
  * &lt;complexType name="DefinitionType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml/3.2}DefinitionBaseType">
+ *     &lt;extension base="{http://www.opengis.net/gml}DefinitionBaseType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}remarks" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}remarks" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>

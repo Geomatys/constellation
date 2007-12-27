@@ -30,7 +30,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CodeType", namespace="http://www.opengis.net/gml/3.2", propOrder = {
+@XmlType(name = "CodeType", namespace="http://www.opengis.net/gml", propOrder = {
     "value"
 })
 public class CodeType {

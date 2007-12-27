@@ -51,7 +51,7 @@ public abstract class WebService {
     protected static final Logger logger = Logger.getLogger("net.seagis.wms");
     
     /**
-     * The supported versions supportd by this WMS web service.
+     * The supported versions supportd by this web service.
      */
     private final List<Version> versions = new ArrayList<Version>();
     
@@ -74,6 +74,11 @@ public abstract class WebService {
      * A JAXB marshaller used to transform the java object in XML String.
      */
     protected Marshaller marshaller;
+    
+    /**
+     * The name of the service (WMS, WCS,...)
+     */
+    private final String service;
     
     /**
      * The object whitch made all the operation on the postgrid database
@@ -105,7 +110,8 @@ public abstract class WebService {
      * 
      * @param versions A list of the supported version of this service.
      */
-    public WebService(String... versions) {
+    public WebService(String service, String... versions) {
+        this.service = service;
        
         for (final String element : versions) {
             this.versions.add(new Version(element));
@@ -276,4 +282,28 @@ public abstract class WebService {
      */
     public abstract Response treatGETrequest() throws JAXBException;
 
+   
+    /**
+     * @todo this method is duplicate from the database class. it must be fix.
+     *   
+     * Returns the file where to read or write user configuration. If no such file is found,
+     * then this method returns {@code null}. This method is allowed to create the destination
+     * directory if and only if {@code create} is {@code true}.
+     * <p>
+     * Subclasses may override this method in order to search for an other file than the default one.
+     *
+     * @param  create {@code true} if this method is allowed to create the destination directory.
+     * @return The configuration file, or {@code null} if none.
+     */
+    File getCapabilitiesFile(final boolean create, Version version) {
+       String path = System.getenv().get("CATALINA_HOME") + "/webapps" + getContext().getBase().getPath() + "WEB-INF/";
+       
+        String fileName = this.service + "Capabilities" + version.toString() + ".xml";
+        
+        if (fileName == null) {
+            return null;
+        } else {
+            return new File(path + fileName);
+        }
+    }
 }

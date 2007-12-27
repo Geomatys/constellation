@@ -106,7 +106,7 @@ public abstract class AbstractCoordinateSystemType
      */
     @Override
     public String getRemarks() {
-        return super.remarks;
+        return super.getRemarks();
     }
 
     /**

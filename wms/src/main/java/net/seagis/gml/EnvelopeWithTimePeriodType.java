@@ -16,10 +16,10 @@ import org.geotools.resources.Utilities;
  * <pre>
  * &lt;complexType name="EnvelopeWithTimePeriodType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml/3.2}EnvelopeType">
+ *     &lt;extension base="{http://www.opengis.net/gml}EnvelopeType">
  *       &lt;sequence>
- *         &lt;element name="beginPosition" type="{http://www.opengis.net/gml/3.2}TimePositionType"/>
- *         &lt;element name="endPosition" type="{http://www.opengis.net/gml/3.2}TimePositionType"/>
+ *         &lt;element name="beginPosition" type="{http://www.opengis.net/gml}TimePositionType"/>
+ *         &lt;element name="endPosition" type="{http://www.opengis.net/gml}TimePositionType"/>
  *       &lt;/sequence>
  *       &lt;attribute name="frame" type="{http://www.w3.org/2001/XMLSchema}anyURI" default="#ISO-8601" />
  *     &lt;/extension>

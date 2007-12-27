@@ -16,9 +16,9 @@ import org.geotools.resources.Utilities;
  * <pre>
  * &lt;complexType name="BaseUnitType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml/3.2}UnitDefinitionType">
+ *     &lt;extension base="{http://www.opengis.net/gml}UnitDefinitionType">
  *       &lt;sequence>
- *         &lt;element name="unitsSystem" type="{http://www.opengis.net/gml/3.2}ReferenceType"/>
+ *         &lt;element name="unitsSystem" type="{http://www.opengis.net/gml}ReferenceType"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>

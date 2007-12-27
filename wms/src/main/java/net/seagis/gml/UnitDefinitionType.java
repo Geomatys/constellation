@@ -16,11 +16,11 @@ import org.geotools.resources.Utilities;
  * <pre>
  * &lt;complexType name="UnitDefinitionType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml/3.2}DefinitionType">
+ *     &lt;extension base="{http://www.opengis.net/gml}DefinitionType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}quantityType" minOccurs="0"/>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}quantityTypeReference" minOccurs="0"/>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}catalogSymbol" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}quantityType" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}quantityTypeReference" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}catalogSymbol" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>

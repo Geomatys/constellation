@@ -24,8 +24,8 @@ import org.geotools.resources.Utilities;
  * <pre>
  * &lt;complexType name="AbstractGeometryType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml/3.2}AbstractGMLType">
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}SRSReferenceGroup"/>
+ *     &lt;extension base="{http://www.opengis.net/gml}AbstractGMLType">
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}SRSReferenceGroup"/>
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>

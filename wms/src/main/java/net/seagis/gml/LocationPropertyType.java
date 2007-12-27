@@ -24,13 +24,13 @@ import org.geotools.resources.Utilities;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;choice>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}AbstractGeometry"/>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}LocationKeyWord"/>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}LocationString"/>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}Null"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}AbstractGeometry"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}LocationKeyWord"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}LocationString"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}Null"/>
  *         &lt;/choice>
  *       &lt;/sequence>
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}AssociationAttributeGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -47,7 +47,7 @@ import org.geotools.resources.Utilities;
 })
 public class LocationPropertyType {
 
-    @XmlElementRef(name = "AbstractGeometry", namespace = "http://www.opengis.net/gml/3.2", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractGeometry", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     protected JAXBElement<? extends AbstractGeometryType> abstractGeometry;
     @XmlElement(name = "LocationKeyWord")
     protected CodeType locationKeyWord;
@@ -58,7 +58,7 @@ public class LocationPropertyType {
     protected List<String> _null;
     @XmlAttribute
     protected List<String> nilReason;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     protected String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     protected String actuate;

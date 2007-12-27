@@ -29,7 +29,7 @@ public abstract class AbstractGMLEntry extends Entry{
     protected String description;
     protected ReferenceEntry descriptionReference;
     protected String name;
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2", required = true)
+    @XmlAttribute(namespace = "http://www.opengis.net/gml", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
     protected String id;

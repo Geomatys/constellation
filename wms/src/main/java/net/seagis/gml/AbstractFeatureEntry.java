@@ -26,7 +26,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
 
     @XmlElement(nillable = true)
     protected BoundingShapeEntry boundedBy;
-    @XmlElementRef(name = "location", namespace = "http://www.opengis.net/gml/3.2", type = JAXBElement.class)
+    @XmlElementRef(name = "location", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     protected JAXBElement<? extends LocationPropertyType> location;
 
     /**

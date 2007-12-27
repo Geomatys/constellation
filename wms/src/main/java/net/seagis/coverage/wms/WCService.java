@@ -2,22 +2,16 @@ package net.seagis.coverage.wms;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.io.StringWriter;
 
 
 // JAXB xml binding dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-// geotools dependencies
 import org.geotools.util.Version;
 
 // jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
-import java.util.logging.Logger;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
@@ -25,15 +19,9 @@ import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
 
 // seagis dependencies
+import javax.xml.bind.Marshaller;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.web.WebServiceException;
-/*import net.seagis.wcs.Capabilities;
-import net.seagis.wcs.CoverageDescriptions;
-import net.seagis.wcs.CoveragesType;
-import net.seagis.wcs.DescribeCoverage;
-import net.seagis.wcs.GetCapabilities;
-import net.seagis.wcs.GetCoverage;
-import net.seagis.wcs.RequestBaseType;*/
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.wcs.Capabilities;
 import net.seagis.wcs.Contents;
@@ -56,21 +44,19 @@ public class WCService extends WebService {
     @HttpContext
     private UriInfo context;
     
-    private final Logger logger = Logger.getLogger("net.seagis.wms");
-     
-    /**
-     * The file where to store configuration parameters.
-     */
-    private static final String CAPABILITIES_FILENAME = "WCSCapabilities.xml";
-    
     /** 
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
-    public WCService() throws JAXBException, IOException {
-        super("1.1.0");
-       // JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.wcs");
-       // unmarshaller = jbcontext.createUnmarshaller();
+    public WCService() throws JAXBException, WebServiceException {
+        super("WCS", "1.1.1");
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wcs");
+        marshaller = jbcontext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wcs/1.1.1"));
+        unmarshaller = jbcontext.createUnmarshaller();
         
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
+        webServiceWorker.setService("WCS", getCurrentVersion().toString());
     }
     
      /**
@@ -113,9 +99,21 @@ public class WCService extends WebService {
     /**
      * Web service operation
      */ 
-    public Capabilities getCapabilities() throws JAXBException, WebServiceException {
+    public String getCapabilities() throws JAXBException, WebServiceException {
         logger.info("getCapabilities request received");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
+        
+        //we begin by extract the mandatory attribute
+        if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
+            throw new WebServiceException("The parameters SERVICE=WCS must be specify",
+                                         WMSExceptionCode.MISSING_PARAMETER_VALUE, getCurrentVersion());
+        }
+        
+        //and the the optional attribute
+        String inputVersion = getParameter("VERSION", false);
+        setCurrentVersion("1.1.1");
+        
+        
         Capabilities response = (Capabilities)unmarshaller.unmarshal(getCapabilitiesFile(false, getCurrentVersion()));
         Contents contents = new Contents();
         
@@ -127,7 +125,9 @@ public class WCService extends WebService {
             contents.getCoverageSummary().add(cs);
         }
         response.setContents(contents);
-        return response;
+        StringWriter sw = new StringWriter();    
+        marshaller.marshal(response, sw);
+        return sw.toString();
         
     }
     
@@ -168,39 +168,8 @@ public class WCService extends WebService {
         marshaller.marshal(response, sw);
         return sw.toString();
     }
-    
-    
-    /**
-     * @todo this method is duplicate from the database class. it must be fix.
-     *   
-     * Returns the file where to read or write user configuration. If no such file is found,
-     * then this method returns {@code null}. This method is allowed to create the destination
-     * directory if and only if {@code create} is {@code true}.
-     * <p>
-     * Subclasses may override this method in order to search for an other file than the default one.
-     *
-     * @param  create {@code true} if this method is allowed to create the destination directory.
-     * @return The configuration file, or {@code null} if none.
-     */
-    File getCapabilitiesFile(final boolean create, Version version) {
-       String path = System.getenv().get("CATALINA_HOME") + "/webapps" + context.getBase().getPath() + "WEB-INF/";
-       
-        String fileName = null;
-        
-            
-        if (version.toString().equals("1.1.1")){
-            fileName = CAPABILITIES_FILENAME;
-        }
-        
-        if (fileName == null) {
-            return null;
-        } else {
-            return new File(path + fileName);
-        }
-    }
-   
 
-     /**
+    /**
      * Return the current Http context. 
      */
     @Override

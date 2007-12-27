@@ -83,35 +83,22 @@ public class WMService extends WebService {
     @HttpContext
     private UriInfo context;
     
-    private final Logger logger = Logger.getLogger("net.seagis.wms");
-    
     /**
      * the service URL (used in getCapabilities document).
      */
     private final String serviceURL;
             
-    /**
-     * The file where to store capabilities static information version 1.3.0.
-     */
-    private static final String CAPABILITIES_FILENAME_1_3_0 = "WMSCapabilities1.3.0.xml";
-    
-    /**
-     * The file where to store capabilities static information version 1.1.1.
-     */
-    private static final String CAPABILITIES_FILENAME_1_1_1 = "WMSCapabilities1.1.1.xml";
-    
-    
     /** 
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
-    public WMService() throws JAXBException, IOException, WebServiceException {
-        super("1.3.0","1.1.1");
+    public WMService() throws JAXBException, WebServiceException {
+        super("WMS", "1.3.0","1.1.1");
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wms:net.seagis.sld");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl());
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wms"));
         unmarshaller = jbcontext.createUnmarshaller();
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
@@ -510,37 +497,6 @@ public class WMService extends WebService {
         
     }
     
-    /**
-     * @todo this method is duplicate from the database class. it must be fix.
-     *   
-     * Returns the file where to read or write user configuration. If no such file is found,
-     * then this method returns {@code null}. This method is allowed to create the destination
-     * directory if and only if {@code create} is {@code true}.
-     * <p>
-     * Subclasses may override this method in order to search for an other file than the default one.
-     *
-     * @param  create {@code true} if this method is allowed to create the destination directory.
-     * @return The configuration file, or {@code null} if none.
-     */
-    File getCapabilitiesFile(final boolean create, Version version) {
-        String path = System.getenv().get("CATALINA_HOME") + "/webapps" + context.getBase().getPath() + "WEB-INF/";
-       
-        String fileName;
-        
-            
-        if (version.toString().equals("1.1.1")){
-            fileName = CAPABILITIES_FILENAME_1_1_1;
-        } else {
-            fileName = CAPABILITIES_FILENAME_1_3_0;
-        }
-            
-        if (fileName == null) {
-            return null;
-        } else {
-            return new File(path + fileName);
-        }
-    }
-
     /**
      * Return the current Http context. 
      */

@@ -26,10 +26,10 @@ import org.geotools.resources.Utilities;
  * <pre>
  * &lt;complexType name="TimePositionType">
  *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://www.opengis.net/gml/3.2>TimePositionUnion">
+ *     &lt;extension base="&lt;http://www.opengis.net/gml>TimePositionUnion">
  *       &lt;attribute name="calendarEraName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="frame" type="{http://www.w3.org/2001/XMLSchema}anyURI" default="#ISO-8601" />
- *       &lt;attribute name="indeterminatePosition" type="{http://www.opengis.net/gml/3.2}TimeIndeterminateValueType" />
+ *       &lt;attribute name="indeterminatePosition" type="{http://www.opengis.net/gml}TimeIndeterminateValueType" />
  *     &lt;/extension>
  *   &lt;/simpleContent>
  * &lt;/complexType>

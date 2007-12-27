@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType name="AbstractGeometricPrimitiveType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml/3.2}AbstractGeometryType">
+ *     &lt;extension base="{http://www.opengis.net/gml}AbstractGeometryType">
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>

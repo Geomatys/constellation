@@ -21,13 +21,13 @@ import org.geotools.resources.Utilities;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
  *         &lt;sequence>
- *           &lt;element name="lowerCorner" type="{http://www.opengis.net/gml/3.2}DirectPositionType"/>
- *           &lt;element name="upperCorner" type="{http://www.opengis.net/gml/3.2}DirectPositionType"/>
+ *           &lt;element name="lowerCorner" type="{http://www.opengis.net/gml}DirectPositionType"/>
+ *           &lt;element name="upperCorner" type="{http://www.opengis.net/gml}DirectPositionType"/>
  *         &lt;/sequence>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}pos" maxOccurs="2" minOccurs="2"/>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}coordinates"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}pos" maxOccurs="2" minOccurs="2"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}coordinates"/>
  *       &lt;/choice>
- *       &lt;attGroup ref="{http://www.opengis.net/gml/3.2}SRSReferenceGroup"/>
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}SRSReferenceGroup"/>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -37,7 +37,7 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EnvelopeType",
-         namespace = "http://www.opengis.net/gml/3.2",
+         namespace = "http://www.opengis.net/gml",
          propOrder = {
     "id",
     "lowerCorner",

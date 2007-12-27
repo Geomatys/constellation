@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *       &lt;/sequence>
- *       &lt;attribute name="uom" use="required" type="{http://www.opengis.net/gml/3.2}UomIdentifier" />
+ *       &lt;attribute name="uom" use="required" type="{http://www.opengis.net/gml}UomIdentifier" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

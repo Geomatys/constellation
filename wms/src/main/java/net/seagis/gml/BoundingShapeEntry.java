@@ -22,11 +22,11 @@ import org.geotools.resources.Utilities;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;choice>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}Envelope"/>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}Null"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}Envelope"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}Null"/>
  *         &lt;/choice>
  *       &lt;/sequence>
- *       &lt;attribute name="nilReason" type="{http://www.opengis.net/gml/3.2}NilReasonType" />
+ *       &lt;attribute name="nilReason" type="{http://www.opengis.net/gml}NilReasonType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
