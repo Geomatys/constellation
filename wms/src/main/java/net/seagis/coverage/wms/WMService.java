@@ -118,13 +118,6 @@ public class WMService extends WebService {
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         serviceURL = "http://sensor.geomatys.fr/wms-1.0-SNAPSHOT/wms?";
         
-        /**
-         * only for ifremer configuration
-         * String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
-         * File configFile = new File(path);
-         * webServiceWorker = new WebServiceWorker(new Database(configFile));
-         */
-        
     }
    
     

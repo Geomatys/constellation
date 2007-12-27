@@ -15,6 +15,7 @@
 
 package net.seagis.coverage.wms;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -93,7 +94,12 @@ public abstract class WebService {
         
         unmarshaller = null;
         
-        final WebServiceWorker initialValue = new WebServiceWorker(new Database());
+        // only for ifremer configuration
+        String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
+        File configFile = new File(path);
+        final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile));
+        
+        //final WebServiceWorker initialValue = new WebServiceWorker(new Database());
         webServiceWorker = new ThreadLocal<WebServiceWorker>() {
             @Override
             protected WebServiceWorker initialValue() {
