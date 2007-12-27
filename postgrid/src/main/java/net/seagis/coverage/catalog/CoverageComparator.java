@@ -152,7 +152,7 @@ final class CoverageComparator implements Comparator<CoverageReference> {
      * la composante horizontale de l'envelope spécifiée.
      */
     private double getArea(final Envelope envelope) {
-        if (xDim<0 || yDim<0) {
+        if (xDim<0 || yDim<0 || Math.max(xDim,yDim) >= envelope.getDimension()) {
             return Double.NaN;
         }
         return getArea(envelope.getMinimum(xDim), envelope.getMinimum(yDim),
@@ -321,7 +321,9 @@ final class CoverageComparator implements Comparator<CoverageReference> {
          * en dehors de la plage demandée.
          */
         public double uncoveredTime() {
-            if (tDim<0) return Double.NaN;
+            if (tDim<0 || tDim>=source.getDimension()) {
+                return Double.NaN;
+            }
             final double srcMin = source.getMinimum(tDim);
             final double srcMax = source.getMaximum(tDim);
             final double dstMin = target.getMinimum(tDim);
@@ -340,10 +342,10 @@ final class CoverageComparator implements Comparator<CoverageReference> {
          * est décalée.
          */
         public double timeOffset() {
-            if (tDim<0) {
+            if (tDim<0 || tDim>=source.getDimension()) {
                 return Double.NaN;
             }
-            return Math.abs(source.getCenter(tDim)-target.getCenter(tDim));
+            return Math.abs(source.getCenter(tDim) - target.getCenter(tDim));
         }
 
         /**
@@ -353,7 +355,9 @@ final class CoverageComparator implements Comparator<CoverageReference> {
          * supérieure à 0 indique que certaines régions ne sont pas couvertes.
          */
         public double uncoveredArea() {
-            if (xDim<0 || yDim<0) return Double.NaN;
+            if (xDim<0 || yDim<0 || Math.max(xDim,yDim) >= source.getDimension()) {
+                return Double.NaN;
+            }
             return area - getArea(Math.max(source.getMinimum(xDim), target.getMinimum(xDim)),
                                   Math.max(source.getMinimum(yDim), target.getMinimum(yDim)),
                                   Math.min(source.getMaximum(xDim), target.getMaximum(xDim)),
@@ -365,7 +369,7 @@ final class CoverageComparator implements Comparator<CoverageReference> {
          * Une valeur de 0 signifierait qu'une image à une précision infinie...
          */
         public double resolution() {
-            final int num = width*height;
+            final int num = width * height;
             return (num>0) ? getArea(source)/num : Double.NaN;
         }
     }

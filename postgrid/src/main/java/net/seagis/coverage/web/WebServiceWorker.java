@@ -16,6 +16,7 @@ package net.seagis.coverage.web;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -93,9 +94,11 @@ public class WebServiceWorker {
      * The codecs provided in standard Java are sometime more reliable.
      */
     static {
-        Logging.ALL.forceMonolineConsoleOutput(java.util.logging.Level.CONFIG);
-        ImageUtilities.allowNativeCodec("png", ImageReaderSpi.class, true);
-        ImageUtilities.allowNativeCodec("png", ImageWriterSpi.class, true);
+        if (false) {
+            Logging.ALL.forceMonolineConsoleOutput(Level.CONFIG);
+        }
+        ImageUtilities.allowNativeCodec("png", ImageReaderSpi.class, false);
+        ImageUtilities.allowNativeCodec("png", ImageWriterSpi.class, false);
     }
 
     /**

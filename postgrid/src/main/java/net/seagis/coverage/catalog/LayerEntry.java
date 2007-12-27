@@ -278,7 +278,7 @@ final class LayerEntry extends Entry implements Layer {
                         System.arraycopy(candidates, length, ranges, length, candidates.length-length);
                     }
                     for (int i=0; i<length; i++) {
-                        ranges[i] = (MeasurementRange) ranges[i].intersect(candidates[i]);
+                        ranges[i] = ranges[i].intersect(candidates[i]);
                     }
                 }
             }

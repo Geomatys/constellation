@@ -78,7 +78,7 @@ final class LayerRequest {
         if (isValid(envelope)) try {
             bbox = new GeographicBoundingBoxImpl(envelope);
         } catch (TransformException exception) {
-            Logging.unexpectedException(WebServiceWorker.LOGGER, WebServiceWorker.class, "getLayer", exception);
+            Logging.recoverableException(WebServiceWorker.LOGGER, WebServiceWorker.class, "getLayer", exception);
         }
         /*
          * "Rounds" the bounding box to something a little bit bigger, and the resolution to
