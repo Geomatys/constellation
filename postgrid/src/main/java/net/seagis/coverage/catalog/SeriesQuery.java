@@ -33,7 +33,7 @@ final class SeriesQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, layer, pathname, extension, format, visible, quicklook, remarks;
+    protected final Column name, layer, pathname, extension, format, visible, remarks;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -56,7 +56,6 @@ final class SeriesQuery extends Query {
         extension = addColumn("extension",       SLFI );
         format    = addColumn("format",          SLFI );
         visible   = addColumn("visible",   true, SLF  );
-        quicklook = addColumn("quicklook", null, SLF  );
         remarks   = addColumn("remarks",   null, SLF  );
         byName    = addParameter(name,  SELECT, EXISTS);
         byLayer   = addParameter(layer, FILTERED_LIST);

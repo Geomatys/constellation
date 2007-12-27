@@ -224,13 +224,13 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
      */
     @Override
     protected void fireStateChanged(final String property) {
-        super.fireStateChanged(property);
         if (property.equalsIgnoreCase("GeographicBoundingBox") ||
             property.equalsIgnoreCase("PreferredResolution")   ||
             property.equalsIgnoreCase("TimeRange"))
         {
             flush();
         }
+        super.fireStateChanged(property);
     }
 
     /**

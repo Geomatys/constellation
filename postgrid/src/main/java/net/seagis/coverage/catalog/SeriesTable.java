@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import org.geotools.resources.Utilities;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
@@ -89,8 +88,12 @@ final class SeriesTable extends SingletonTable<Series> {
      * will remove the filtering, so all series will be returned no matter their layer.
      */
     public synchronized void setLayer(final Layer layer) {
-        if (!Utilities.equals(layer, this.layer)) {
+        // We compare the references instead of using LayerEntry.equals(...) because the
+        // LayerEntries may be created from two different LayerTables,  and each of them
+        // require their own SeriesEntry instances - they don't share them.
+        if (layer != this.layer) {
             this.layer = layer;
+            flush();
             fireStateChanged("layer");
         }
     }
@@ -135,7 +138,6 @@ final class SeriesTable extends SingletonTable<Series> {
         final String  pathname      = results.getString (indexOf(query.pathname));
         final String  extension     = results.getString (indexOf(query.extension));
         final boolean visible       = results.getBoolean(indexOf(query.visible));
-        final String  quicklook     = results.getString (indexOf(query.quicklook));
         final String  rootDirectory = getProperty(ConfigurationKey.ROOT_DIRECTORY);
         final String  rootURL       = getProperty(ConfigurationKey.ROOT_URL);
         if (formats == null) {

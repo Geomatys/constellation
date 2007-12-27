@@ -393,6 +393,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             envelope = null;
             trimmed = false;
             fireStateChanged("GeographicBoundingBox");
+            // Do not invoke 'flush()' - the decision is left to subclasses.
         }
         return change;
     }
@@ -451,6 +452,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             envelope = null;
             trimmed = false;
             fireStateChanged("VerticalRange");
+            // Do not invoke 'flush()' - the decision is left to subclasses.
         }
         return change;
     }
@@ -514,6 +516,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             envelope = null;
             trimmed = false;
             fireStateChanged("TimeRange");
+            // Do not invoke 'flush()' - the decision is left to subclasses.
         }
         return change;
     }
@@ -670,7 +673,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      */
     @Override
     protected void fireStateChanged(final String property) {
-        if (!Utilities.equals(property, "PreferredResolution")) {
+        if (!property.equalsIgnoreCase("PreferredResolution")) {
             envelope = null; // As a safety (not that expensive to recompute).
         }
         super.fireStateChanged(property);

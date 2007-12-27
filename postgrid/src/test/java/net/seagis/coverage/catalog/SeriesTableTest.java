@@ -42,6 +42,7 @@ public class SeriesTableTest extends DatabaseTest {
     public void testSelectAndList() throws CatalogException, SQLException {
         final SeriesTable table = new SeriesTable(database);
         final Series      entry = table.getEntry(SAMPLE_NAME);
+        final String      name  = entry.getName();
         assertEquals(SAMPLE_NAME, entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
 
@@ -52,18 +53,17 @@ public class SeriesTableTest extends DatabaseTest {
         // Ask only for series in a given layer.
         assertNull(table.getLayer());
         table.setLayer(new LayerEntry(LayerTableTest.SAMPLE_NAME, null, null, 1, null));
-        assertSame(entry, table.getEntry(SAMPLE_NAME));
+        assertNotSame("Should be assigned to a Layer", entry, table.getEntry(SAMPLE_NAME));
+        assertEquals(name, table.getEntry(SAMPLE_NAME).getName());
 
         final Set<Series> filtered = table.getEntries();
         assertFalse(filtered.isEmpty());
-        assertTrue(filtered.contains(entry));
-        assertTrue(entries.containsAll(filtered));
         assertTrue(filtered.size() < entries.size());
 
         // Restore the full list
         assertNotNull(table.getLayer());
         table.setLayer(null);
-        assertSame(entry, table.getEntry(SAMPLE_NAME));
+        assertEquals(name, table.getEntry(SAMPLE_NAME).getName());
         assertEquals(entries, table.getEntries());
     }
 }
