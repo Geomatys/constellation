@@ -84,7 +84,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public List<String> getNilReason() {
         return nilReason;
     }
@@ -92,7 +92,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getRemoteSchema() {
         return remoteSchema;
     }
@@ -100,7 +100,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getActuate() {
         return actuate;
     }
@@ -108,7 +108,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getArcrole() {
         return arcrole;
     }
@@ -116,7 +116,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getHref() {
         return href;
     }
@@ -124,7 +124,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getRole() {
         return role;
     }
@@ -132,7 +132,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getShow() {
         return show;
     }
@@ -140,7 +140,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getTitle() {
         return title;
     }
@@ -148,7 +148,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public String getType() {
         return type;
     }
@@ -156,7 +156,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
+    
     public java.lang.Boolean getOwns() {
         return owns;
     }
@@ -164,7 +164,7 @@ public class ReferenceEntry extends Entry implements Reference{
      /**
      * Verifie si cette entree est identique l'objet specifie.
      */
-    @Override
+    
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
@@ -187,7 +187,7 @@ public class ReferenceEntry extends Entry implements Reference{
         return false;
     }
 
-    @Override
+    
     public int hashCode() {
         int hash = 5;
         hash = 47 * hash + (this.id != null ? this.id.hashCode() : 0);
@@ -207,7 +207,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * Retourne une representation de l'objet.
      */
-    @Override
+    
     public String toString() {
         StringBuilder s = new StringBuilder("id=");
         s.append(id).append('\n');
