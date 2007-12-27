@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 //geotools dependencies
+import java.util.logging.Logger;
 import org.geotools.util.Version;
 
 // jersey dependencies
@@ -46,6 +47,8 @@ import net.seagis.coverage.web.WebServiceWorker;
  * @author legal
  */
 public abstract class WebService {
+    
+    protected static final Logger logger = Logger.getLogger("net.seagis.wms");
     
     /**
      * The supported versions supportd by this WMS web service.
@@ -75,14 +78,34 @@ public abstract class WebService {
     /**
      * The object whitch made all the operation on the postgrid database
      */
-    protected final ThreadLocal<WebServiceWorker> webServiceWorker;
+    protected static ThreadLocal<WebServiceWorker> webServiceWorker;
+    static {
+        try {
+            // only for ifremer configuration
+            String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
+            File configFile = new File(path);
+            final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile));
+        
+            //final WebServiceWorker initialValue = new WebServiceWorker(new Database());
+            webServiceWorker = new ThreadLocal<WebServiceWorker>() {
+                @Override
+                protected WebServiceWorker initialValue() {
+                    return new WebServiceWorker(initialValue);
+                }
+            };
+            
+       }catch (IOException e) {
+            logger.severe("IOException a l'initialisation du webServiceWorker:" + e);
+       }
+        
+    }
     
     /**
      * Initialiise the basic attribute of a web service.
      * 
      * @param versions A list of the supported version of this service.
      */
-    public WebService(String... versions) throws IOException {
+    public WebService(String... versions) {
        
         for (final String element : versions) {
             this.versions.add(new Version(element));
@@ -94,19 +117,7 @@ public abstract class WebService {
         
         unmarshaller = null;
         
-        // only for ifremer configuration
-        String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
-        File configFile = new File(path);
-        final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile));
-        
-        //final WebServiceWorker initialValue = new WebServiceWorker(new Database());
-        webServiceWorker = new ThreadLocal<WebServiceWorker>() {
-            @Override
-            protected WebServiceWorker initialValue() {
-                return new WebServiceWorker(initialValue);
-            }
-        };
-        webServiceWorker.set(initialValue);
+       
     }
     
      /**
