@@ -225,28 +225,13 @@ public class WMService extends WebService {
         webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true));
         
 
-        double[] values = null;
-        AffineTransform gridToCRS = webServiceWorker.getGridToCRS();
-        if (gridToCRS != null) {
-            String i = null;
-            String j = null;
-            if (getCurrentVersion().toString().equals("1.3.0")) {
-                i = getParameter("I", true);
-                j = getParameter("J", true);
-            } else {
-                i = getParameter("X", true);
-                j = getParameter("Y", true);
-            }
-            Point2D.Double coordinate = new Point2D.Double();
-            coordinate.x = Double.parseDouble(i);
-            coordinate.y = Double.parseDouble(j);
-            gridToCRS.transform(coordinate, coordinate);
-            try {
-                values = webServiceWorker.getGridCoverage2D(false).evaluate(coordinate, values);
-            } catch (PointOutsideCoverageException exception) {
-                throw new WebServiceException(exception,
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, getCurrentVersion());
-            }
+        final String i, j;
+        if (getCurrentVersion().toString().equals("1.3.0")) {
+            i = getParameter("I", true);
+            j = getParameter("J", true);
+        } else {
+            i = getParameter("X", true);
+            j = getParameter("Y", true);
         }
         
         String info_format  = getParameter("INFO_FORMAT", false); // TODO true);
@@ -256,10 +241,7 @@ public class WMService extends WebService {
         if ( exception == null)
             exception = "XML";
         
-        double result = 0.0;
-        if (values != null && values.length > 0) {
-            result = values[0];
-        }
+        double result = webServiceWorker.evaluatePixel(i,j);
         
         // plusieur type de retour possible
         String response = "result for " + layer + " is:" + result;

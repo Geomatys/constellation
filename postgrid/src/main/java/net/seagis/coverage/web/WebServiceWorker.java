@@ -38,11 +38,15 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.media.jai.Interpolation;
 
+import org.opengis.geometry.DirectPosition;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.coverage.PointOutsideCoverageException;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -53,6 +57,7 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.DirectPosition2D;
 import org.geotools.util.Version;
 import org.geotools.util.NumberRange;
 import org.geotools.util.MeasurementRange;
@@ -181,7 +186,7 @@ public class WebServiceWorker {
      *
      * @see #getGridToCRS.
      */
-    private AffineTransform gridToCRS;
+    private MathTransform gridToCRS;
 
     /**
      * The range on value on which to apply a color ramp.
@@ -677,12 +682,19 @@ public class WebServiceWorker {
     }
 
     /**
+     * Returns the coordinate reference system, or {@code null} if none.
+     */
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return (envelope != null) ? envelope.getCoordinateReferenceSystem() : null;
+    }
+
+    /**
      * Computes the <cite>grid to CRS</cite> affine transform. Returns {@code null}
      * if the transform can not be computed.
      *
      * @throws WebServiceException if an error occured while querying the layer.
      */
-    public AffineTransform getGridToCRS() throws WebServiceException {
+    public MathTransform getGridToCRS() throws WebServiceException {
         if (gridToCRS == null) {
             GridRange       gridRange = this.gridRange;
             GeneralEnvelope envelope  = this.envelope;
@@ -710,7 +722,7 @@ public class WebServiceWorker {
                 envelope  = new GeneralEnvelope(box);
             }
             final GridGeometry2D geometry = new GridGeometry2D(gridRange, envelope);
-            gridToCRS = (AffineTransform) geometry.getGridToCRS2D();
+            gridToCRS = geometry.getGridToCRS2D();
         }
         return gridToCRS;
     }
@@ -1051,6 +1063,51 @@ public class WebServiceWorker {
             }
         }
         return file;
+    }
+
+    /**
+     * Evaluates the {@linkplain #getGridCoverage2D current coverage} at the given position,
+     * <strong>in pixels coordinates</strong>. If the coverage has more than one band, only
+     * the value in the first band is returned. This methods returns the <cite>geophysics</cite>
+     * value, if possible.
+     */
+    public double evaluatePixel(final double x, final double y) throws WebServiceException {
+        final MathTransform gridToCRS = getGridToCRS();
+        if (gridToCRS != null) {
+            DirectPosition coordinate = new DirectPosition2D(getCoordinateReferenceSystem(), x, y);
+            try {
+                coordinate = gridToCRS.transform(coordinate, coordinate);
+            } catch (TransformException exception) {
+                throw new WebServiceException(exception, INVALID_POINT, version);
+            }
+            double[] values = null;
+            try {
+                values = getGridCoverage2D(false).evaluate(coordinate, values);
+            } catch (PointOutsideCoverageException exception) {
+                throw new WebServiceException(exception, INVALID_POINT, version);
+            }
+            if (values.length != 0) {
+                return values[0];
+            }
+        }
+        return Double.NaN;
+    }
+
+    /**
+     * Evaluates the {@linkplain #getGridCoverage2D current coverage} at the given position,
+     * <strong>in pixels coordinates</strong>. If the coverage has more than one band, only
+     * the value in the first band is returned. This methods returns the <cite>geophysics</cite>
+     * value, if possible.
+     */
+    public double evaluatePixel(final String x, final String y) throws WebServiceException {
+        final double xv, yv;
+        try {
+            xv = Double.parseDouble(x);
+            yv = Double.parseDouble(y);
+        } catch (NumberFormatException exception) {
+            throw new WebServiceException(exception, INVALID_POINT, version);
+        }
+        return evaluatePixel(xv, yv);
     }
 
     /**
