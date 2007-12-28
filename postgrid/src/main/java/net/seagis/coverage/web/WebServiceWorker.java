@@ -780,7 +780,12 @@ public class WebServiceWorker {
      * @throws WebServiceException if an error occured while querying the coverage.
      */
     public RenderedImage getRenderedImage() throws WebServiceException {
-        GridCoverage2D coverage = getGridCoverage2D(true).geophysics(false);
+        GridCoverage2D coverage;
+        if (service.equals(Service.WMS)) {
+            coverage = getGridCoverage2D(true).geophysics(false);
+        } else {
+            coverage = getGridCoverage2D(true).geophysics(true);
+        }
         if (colormapRange != null) {
             final ColorMap colorMap = new ColorMap();
             colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange(colormapRange, null));

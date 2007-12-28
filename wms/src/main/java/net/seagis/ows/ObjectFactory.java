@@ -56,7 +56,6 @@ public class ObjectFactory {
     private final static QName _AvailableCRS_QNAME = new QName("http://www.opengis.net/ows/1.1", "AvailableCRS");
     private final static QName _UOM_QNAME = new QName("http://www.opengis.net/ows/1.1", "UOM");
     private final static QName _Resource_QNAME = new QName("http://www.opengis.net/ows/1.1", "Resource");
-    private final static QName _Exception_QNAME = new QName("http://www.opengis.net/ows/1.1", "Exception");
     private final static QName _ContactInfo_QNAME = new QName("http://www.opengis.net/ows/1.1", "ContactInfo");
     private final static QName _MaximumValue_QNAME = new QName("http://www.opengis.net/ows/1.1", "MaximumValue");
     private final static QName _Value_QNAME = new QName("http://www.opengis.net/ows/1.1", "Value");
@@ -64,10 +63,7 @@ public class ObjectFactory {
     private final static QName _Abstract_QNAME = new QName("http://www.opengis.net/ows/1.1", "Abstract");
     private final static QName _ServiceReference_QNAME = new QName("http://www.opengis.net/ows/1.1", "ServiceReference");
     private final static QName _Metadata_QNAME = new QName("http://www.opengis.net/ows/1.1", "Metadata");
-    private final static QName _PointOfContact_QNAME = new QName("http://www.opengis.net/ows/1.1", "PointOfContact");
     private final static QName _AbstractMetaData_QNAME = new QName("http://www.opengis.net/ows/1.1", "AbstractMetaData");
-    private final static QName _GetResourceByID_QNAME = new QName("http://www.opengis.net/ows/1.1", "GetResourceByID");
-    private final static QName _GetCapabilities_QNAME = new QName("http://www.opengis.net/ows/1.1", "GetCapabilities");
     private final static QName _AccessConstraints_QNAME = new QName("http://www.opengis.net/ows/1.1", "AccessConstraints");
     private final static QName _HTTPGet_QNAME = new QName("http://www.opengis.net/ows/1.1", "Get");
     private final static QName _HTTPPost_QNAME = new QName("http://www.opengis.net/ows/1.1", "Post");

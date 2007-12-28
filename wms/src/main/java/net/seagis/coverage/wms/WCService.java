@@ -1,17 +1,15 @@
 package net.seagis.coverage.wms;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 
 
 // JAXB xml binding dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import org.geotools.util.Version;
-
-// jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
@@ -30,7 +28,6 @@ import net.seagis.wcs.Contents;
 import net.seagis.wcs.CoverageDescriptionType;
 import net.seagis.wcs.CoverageDescriptions;
 import net.seagis.wcs.CoverageSummaryType;
-import net.seagis.wcs.CoveragesType;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
@@ -118,9 +115,10 @@ public class WCService extends WebService {
         
         
         Capabilities response = (Capabilities)getCapabilitiesObject(getCurrentVersion());
-        Contents contents = new Contents();
-        
+        Contents contents;
+       
         //we get the list of layers
+        List<CoverageSummaryType> summary = new ArrayList<CoverageSummaryType>();
         net.seagis.wcs.ObjectFactory wcsFactory = new net.seagis.wcs.ObjectFactory();
         net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
         try {
@@ -142,8 +140,10 @@ public class WCService extends WebService {
                     cs.getRest().add(owsFactory.createWGS84BoundingBox(outputBBox));
                 }
            
-                contents.getCoverageSummary().add(cs);
+                summary.add(cs);
             }
+            contents = new Contents(summary, null, null, null);    
+        
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, getCurrentVersion());
         }

@@ -16,6 +16,7 @@
 package net.seagis.wcs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -46,7 +47,7 @@ import net.seagis.ows.OnlineResourceType;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -59,129 +60,59 @@ import net.seagis.ows.OnlineResourceType;
 public class Contents {
 
     @XmlElement(name = "CoverageSummary")
-    protected List<CoverageSummaryType> coverageSummary;
+    private List<CoverageSummaryType> coverageSummary  = new ArrayList<CoverageSummaryType>();
     @XmlElement(name = "SupportedCRS")
     @XmlSchemaType(name = "anyURI")
-    protected List<String> supportedCRS;
+    private List<String> supportedCRS = new ArrayList<String>();
     @XmlElement(name = "SupportedFormat")
-    protected List<String> supportedFormat;
+    private List<String> supportedFormat = new ArrayList<String>();
     @XmlElement(name = "OtherSource")
-    protected List<OnlineResourceType> otherSource;
+    private List<OnlineResourceType> otherSource = new ArrayList<OnlineResourceType>();
 
     /**
+     * empty constructor used by JAXB.
+     */
+    Contents(){
+    }
+    
+    /**
+     * Build the contents party of a Capabilities document.
+     */
+    public Contents(List<CoverageSummaryType> coverageSummary,  List<String> supportedCRS,
+            List<String> supportedFormat, List<OnlineResourceType> otherSource) {
+        this.coverageSummary = coverageSummary;
+        this.otherSource     = otherSource;
+        this.supportedCRS    = supportedCRS;
+        this.supportedFormat = supportedFormat;
+        
+    }
+    
+    /**
      * Unordered list of brief metadata describing top-level coverages available from this WCS server. This list shall be included unless one or more OtherSources are referenced and all this metadata is available from those sources. Gets the value of the coverageSummary property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the coverageSummary property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getCoverageSummary().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link CoverageSummaryType }
-     * 
-     * 
      */
     public List<CoverageSummaryType> getCoverageSummary() {
-        if (coverageSummary == null) {
-            coverageSummary = new ArrayList<CoverageSummaryType>();
-        }
-        return this.coverageSummary;
+        return Collections.unmodifiableList(this.coverageSummary);
     }
 
     /**
      * Gets the value of the supportedCRS property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the supportedCRS property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSupportedCRS().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getSupportedCRS() {
-        if (supportedCRS == null) {
-            supportedCRS = new ArrayList<String>();
-        }
-        return this.supportedCRS;
+        return Collections.unmodifiableList(this.supportedCRS);
     }
 
     /**
      * Gets the value of the supportedFormat property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the supportedFormat property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSupportedFormat().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getSupportedFormat() {
-        if (supportedFormat == null) {
-            supportedFormat = new ArrayList<String>();
-        }
-        return this.supportedFormat;
+        return Collections.unmodifiableList(this.supportedFormat);
     }
 
     /**
      * Gets the value of the otherSource property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the otherSource property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getOtherSource().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link OnlineResourceType }
-     * 
-     * 
      */
     public List<OnlineResourceType> getOtherSource() {
-        if (otherSource == null) {
-            otherSource = new ArrayList<OnlineResourceType>();
-        }
-        return this.otherSource;
+        return Collections.unmodifiableList(this.otherSource);
     }
 
 }
