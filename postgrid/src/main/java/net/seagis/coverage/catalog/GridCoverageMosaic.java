@@ -19,15 +19,14 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.net.URI;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 
-import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.resources.Utilities;
 import org.geotools.image.io.mosaic.Tile;
 import org.geotools.image.io.mosaic.TileBuilder;
@@ -51,12 +50,18 @@ final class GridCoverageMosaic extends GridCoverageEntry {
     private static final long serialVersionUID = 2950751064046936487L;
 
     /**
+     * The tiles to be used as input.
+     */
+    private final Tile[] tiles;
+
+    /**
      * Creates a new grid coverage mosaic from the specified entries.
      */
-    private GridCoverageMosaic(final GridCoverageEntry reference, final ImageGeometry geometry,
-                               final GeneralEnvelope envelope, final GeographicBoundingBox bbox)
+    private GridCoverageMosaic(final String name, final GridCoverageEntry reference,
+                               final GridGeometryEntry geometry, final Tile[] tiles)
     {
-        super(reference, new GridGeometryEntry("Mosaic", geometry, envelope, bbox, reference.geometry));
+        super(name, reference, geometry);
+        this.tiles = tiles;
     }
 
     /**
@@ -64,7 +69,7 @@ final class GridCoverageMosaic extends GridCoverageEntry {
      */
     @Override
     protected Tile[] getInput() {
-        return null;
+        return tiles;
     }
 
     /**
@@ -97,8 +102,9 @@ final class GridCoverageMosaic extends GridCoverageEntry {
             throws CatalogException
     {
         final List<GridCoverageEntry> mosaics = new ArrayList<GridCoverageEntry>(entries.size());
-        TileBuilder                   tiles   = null; // 'tiles' and 'readers' will be created
+        TileBuilder                   tiles   = null; // tiles, readers and names will be created
         Map<FormatEntry,ImageReader>  readers = null; // together when first needed (if they are).
+        Map<AffineTransform,String>   names   = null;
         Iterator<GridCoverageEntry>   iterator;
         while ((iterator = entries.iterator()).hasNext()) {
             final GridCoverageEntry reference = iterator.next();
@@ -116,14 +122,15 @@ final class GridCoverageMosaic extends GridCoverageEntry {
                      * created in order to use the same instance for a whole mosaic.
                      */
                     if (tiles == null) {
-                        tiles = new TileBuilder();
+                        tiles   = new TileBuilder();
                         readers = new HashMap<FormatEntry,ImageReader>();
+                        names   = new HashMap<AffineTransform,String>();
                     }
                     if (tiles.isEmpty()) { // May be true more than once.
                         assert readers.isEmpty();
-                        add(tiles, reference, readers);
+                        addTile(tiles, reference, readers, names);
                     }
-                    add(tiles, candidate, readers);
+                    addTile(tiles, candidate, readers, names);
                     assert !readers.isEmpty();
                     candidate.geometry.addTo(envelope, bbox);
                     iterator.remove();
@@ -144,7 +151,19 @@ final class GridCoverageMosaic extends GridCoverageEntry {
                 mosaics.add(reference);
             } else {
                 for (final Map.Entry<ImageGeometry,Tile[]> entry : tiles.tiles().entrySet()) {
-                    mosaics.add(new GridCoverageMosaic(reference, entry.getKey(), envelope, bbox));
+                    GridGeometryEntry geometry = reference.geometry;
+                    final String name = names.get(geometry.getGridToCRS2D());
+                    geometry = new GridGeometryEntry(name, entry.getKey(), envelope, bbox, geometry);
+                    GridCoverageEntry ref = new GridCoverageMosaic(name, reference, geometry, entry.getValue());
+                    /*
+                     * Gets a unique instance in order to leverage the cached RenderedImage. Note
+                     * that we selected a name of an entry having the same gridToCRS, which should
+                     * be the name of the upper-left tile in most case. We do so because the upper-
+                     * left tile and the mosaic could be handle in the same way as far as referencing
+                     * is concerned, except that the mosaic extends further.
+                     */
+                    ref = ref.unique();
+                    mosaics.add(ref);
                 }
                 tiles.clear();   // Make it ready for building new mosaics.
                 readers.clear(); // A different mosaic must use different ImageReader instances.
@@ -158,13 +177,31 @@ final class GridCoverageMosaic extends GridCoverageEntry {
      *
      * @param  tiles   The tile collection to add to.
      * @param  entry   The grid coverage entry to add.
-     * @param  readers A pool of pre-allocated readers.
+     * @param  readers A pool of pre-allocated readers. Will be filled by this method.
+     * @param  names   Will be filled by this method.
      * @throws CatalogException If an error occured while fetching the input.
      */
-    private static void add(final TileBuilder tiles, final GridCoverageEntry entry,
-                            final Map<FormatEntry,ImageReader> readers)
+    private static void addTile(final TileBuilder                  tiles,
+                                final GridCoverageEntry            entry,
+                                final Map<FormatEntry,ImageReader> readers,
+                                final Map<AffineTransform,String>  names)
             throws CatalogException
     {
+        /*
+         * Stores the entry's name for future use outside this method. We should have only
+         * one tile per 'gridToCRS' transform. If we don't, then we have overlapping tiles.
+         * This is legal but unusual. We will keep the name of the first tile in such case.
+         */
+        final AffineTransform gridToCRS = entry.geometry.getGridToCRS2D();
+        final String previous = names.put(gridToCRS, entry.getName());
+        if (previous != null) {
+            names.put(gridToCRS, previous);
+        }
+        /*
+         * Gets the image reader. We will try to reuse the same instance for every tiles.
+         * It will be true in the usual case where every tiles come from the same series,
+         * and concequently use the same format.
+         */
         final FormatEntry format = (FormatEntry) entry.getSeries().getFormat();
         ImageReader reader = readers.get(format);
         if (reader == null) {
@@ -175,15 +212,18 @@ final class GridCoverageMosaic extends GridCoverageEntry {
             }
             readers.put(format, reader);
         }
-        // We needs the full bounds, not the clipped ones.
-        Rectangle region = entry.geometry.getBounds();
         tiles.setImageReader(reader);
+        /*
+         * Gets the image input (but do not open it yet), the image bounds and builds the tile.
+         * Note that we needs the full image bounds, not the clipped ones.
+         */
         final Object input;
         try {
             input = entry.getInput();
         } catch (IOException exception) {
             throw new CatalogException(exception);
         }
-        tiles.add(input, entry.imageIndex, region, entry.geometry.getGridToCRS2D());
+        Rectangle region = entry.geometry.getBounds();
+        tiles.add(input, entry.imageIndex, region, gridToCRS);
     }
 }

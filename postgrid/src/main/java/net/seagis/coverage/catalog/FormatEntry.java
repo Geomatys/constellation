@@ -59,6 +59,7 @@ import org.geotools.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.RawBinaryImageReadParam;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
+import org.geotools.image.io.mosaic.MosaicImageReader;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Classes;
 
@@ -68,7 +69,7 @@ import net.seagis.resources.i18n.ResourceKeys;
 
 
 /**
- * Implémentation d'une entrée représentant un {@linkplain FormatEntry format d'image}.
+ * Default {@link Format} implementation.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -84,6 +85,16 @@ final class FormatEntry extends Entry implements Format {
      * pour utiliser directement l'objet {@link ImageReader}.
      */
     private static final boolean USE_IMAGE_READ_OPERATION = false;
+
+    /**
+     * The provider for mosaic image readers.
+     */
+    private static final MosaicImageReader.Spi MOSAIC_SPI = MosaicImageReader.Spi.DEFAULT;
+
+    /**
+     * The input types for {@link #MOSAIC_SPI}.
+     */
+    private static final Class<?>[] MOSAIC_INPUT_TYPES = MOSAIC_SPI.getInputTypes();
 
     /**
      * Images en cours de lecture. Les clés sont les objets {@link CoverageReference} en attente
@@ -368,30 +379,38 @@ final class FormatEntry extends Entry implements Format {
          * essaira de donner un objet de type 'File' ou 'URL', ce qui permet
          * au décodeur d'utiliser la connection la plus appropriée pour eux.
          */
-        final ImageReader reader = getImageReader();
-        final ImageReaderSpi spi = reader.getOriginatingProvider();
-        final Class<?>[] inputTypes = (spi!=null) ? spi.getInputTypes() : ImageReaderSpi.STANDARD_INPUT_TYPE;
-        inputObject = getInput(file, inputTypes);
-        if (inputObject == null) {
-            inputObject = inputStream = ImageIO.createImageInputStream(file);
+        final ImageReader reader;
+        final ImageReaderSpi spi;
+        if (contains(MOSAIC_INPUT_TYPES, file.getClass())) {
+            spi = MOSAIC_SPI;
+            reader = spi.createReaderInstance();
+            inputObject = file;
+        } else {
+            reader = getImageReader();
+            spi = reader.getOriginatingProvider();
+            final Class<?>[] inputTypes = (spi!=null) ? spi.getInputTypes() : ImageReaderSpi.STANDARD_INPUT_TYPE;
+            inputObject = getInput(file, inputTypes);
             if (inputObject == null) {
-                throw new FileNotFoundException(Resources.format(
-                        ResourceKeys.ERROR_FILE_NOT_FOUND_$1, getPath(file)));
+                inputObject = inputStream = ImageIO.createImageInputStream(file);
+                if (inputObject == null) {
+                    throw new FileNotFoundException(Resources.format(
+                            ResourceKeys.ERROR_FILE_NOT_FOUND_$1, getPath(file)));
+                }
             }
-        }
-        /*
-         * Si l'image à lire est au format "RAW", définit la taille de l'image.  C'est
-         * nécessaire puisque le format binaire RAW ne contient aucune information sur
-         * la taille des images qu'elle contient.
-         */
-        if (inputStream!=null && contains(inputTypes, RawImageInputStream.class)) {
-            final GridSampleDimension[] bands = getSampleDimensions(param);
-            final ColorModel  cm = bands[0].getColorModel(0, bands.length);
-            final SampleModel sm = cm.createCompatibleSampleModel(expected.width, expected.height);
-            inputObject = inputStream = new RawImageInputStream(inputStream,
-                                                                new ImageTypeSpecifier(cm, sm),
-                                                                new long[]{0},
-                                                                new Dimension[]{expected});
+            /*
+             * Si l'image à lire est au format "RAW", définit la taille de l'image.  C'est
+             * nécessaire puisque le format binaire RAW ne contient aucune information sur
+             * la taille des images qu'elle contient.
+             */
+            if (inputStream!=null && contains(inputTypes, RawImageInputStream.class)) {
+                final GridSampleDimension[] bands = getSampleDimensions(param);
+                final ColorModel  cm = bands[0].getColorModel(0, bands.length);
+                final SampleModel sm = cm.createCompatibleSampleModel(expected.width, expected.height);
+                inputObject = inputStream = new RawImageInputStream(inputStream,
+                                                                    new ImageTypeSpecifier(cm, sm),
+                                                                    new long[]{0},
+                                                                    new Dimension[]{expected});
+            }
         }
         // Patch temporaire, en attendant que les décodeurs spéciaux (e.g. "image/raw-msla")
         // soient adaptés à l'architecture du décodeur RAW de Sun.

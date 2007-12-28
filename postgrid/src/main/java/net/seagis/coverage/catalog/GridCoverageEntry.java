@@ -53,6 +53,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -187,11 +188,11 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     }
 
     /**
-     * Creates an entry with most values from the specified one except geometry.
+     * Creates an entry with most values from the specified one except name and geometry.
      * This is for {@link GridCoverageMosaic} constructor only.
      */
-    GridCoverageEntry(final GridCoverageEntry entry, final GridGeometryEntry geometry) {
-        super(null, null);
+    GridCoverageEntry(final String name, final GridCoverageEntry entry, final GridGeometryEntry geometry) {
+        super(name, null);
         this.series     = entry.series;
         this.filename   = entry.filename;
         this.geometry   = geometry;
@@ -349,9 +350,10 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     @SuppressWarnings("fallthrough")
     public final GridGeometry2D getGridGeometry() {
         final Rectangle clipPixels = new Rectangle();
+        final Point subsampling = new Point();
         final Envelope envelope;
         try {
-            envelope = computeBounds(clipPixels, null);
+            envelope = computeBounds(clipPixels, subsampling);
         } catch (TransformException exception) {
             // Should not happen if the coordinate in the database are valids.
             throw new IllegalStateException(exception.getLocalizedMessage(), exception);
@@ -365,8 +367,8 @@ class GridCoverageEntry extends Entry implements CoverageReference {
         switch (dimension) {
             // Fall through in every cases.
             default: Arrays.fill(upper, 2, dimension, 1);
-            case 2:  upper[1] = clipPixels.height;
-            case 1:  upper[0] = clipPixels.width;
+            case 2:  upper[1] = clipPixels.height / Math.max(subsampling.x, 1);
+            case 1:  upper[0] = clipPixels.width  / Math.max(subsampling.y, 1);
             case 0:  break;
         }
         final GeneralGridRange gridRange = new GeneralGridRange(lower, upper);
@@ -648,8 +650,14 @@ class GridCoverageEntry extends Entry implements CoverageReference {
          * GridCoverage2D, on le conserve dans une cache interne puis on le retourne.
          */
         final Map properties = Collections.singletonMap(REFERENCE_KEY, this);
-        GridCoverage2D coverage = GridCoveragePool.DEFAULT.factory.create(
-                filename, image, envelope, bands, null, properties);
+        final GridCoverageFactory factory = GridCoveragePool.DEFAULT.factory;
+        GridCoverage2D coverage; 
+        if (bands != null && bands.length != 0) {
+            coverage = factory.create(filename, image, envelope, bands, null, properties);
+        } else {
+            // No SampleDimension in the database. Lets the factory use default ones.
+            coverage = factory.create(filename, image, envelope, null, null, properties);
+        }
         /*
          * Retourne toujours la version "géophysique" de l'image.
          */

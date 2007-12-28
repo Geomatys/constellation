@@ -326,8 +326,8 @@ public class Synchronizer {
                                 out.write(lineSeparator);
                                 out.write(table);
                                 out.write(lineSeparator);
-                                mismatchs = new TableWriter(out, " \u2502 ");
-                                mismatchs.nextLine('\u2500');
+                                mismatchs = new TableWriter(out, TableWriter.SINGLE_VERTICAL_LINE);
+                                mismatchs.nextLine(TableWriter.SINGLE_HORIZONTAL_LINE);
                                 for (int j=0; j<primaryKeys.length; j++) {
                                     mismatchs.write(primaryKeys[j]);
                                     mismatchs.nextColumn();
@@ -338,7 +338,7 @@ public class Synchronizer {
                                 mismatchs.nextColumn();
                                 mismatchs.write("Valeur existante");
                                 mismatchs.nextLine();
-                                mismatchs.nextLine('\u2500');
+                                mismatchs.nextLine(TableWriter.SINGLE_HORIZONTAL_LINE);
                             } else {
                                 mismatchs.nextLine();
                             }
@@ -385,7 +385,7 @@ public class Synchronizer {
             existing.close();
         }
         if (mismatchs != null) {
-            mismatchs.nextLine('\u2500');
+            mismatchs.nextLine(TableWriter.SINGLE_HORIZONTAL_LINE);
             mismatchs.flush();
         }
     }
