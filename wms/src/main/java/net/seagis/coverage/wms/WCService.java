@@ -20,15 +20,18 @@ import javax.ws.rs.core.UriInfo;
 
 // seagis dependencies
 import javax.xml.bind.Marshaller;
+import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.ows.WGS84BoundingBoxType;
 import net.seagis.wcs.Capabilities;
 import net.seagis.wcs.Contents;
 import net.seagis.wcs.CoverageDescriptionType;
 import net.seagis.wcs.CoverageDescriptions;
 import net.seagis.wcs.CoverageSummaryType;
 import net.seagis.wcs.CoveragesType;
+import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
  *
@@ -48,7 +51,7 @@ public class WCService extends WebService {
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
     public WCService() throws JAXBException, WebServiceException {
-        super("WCS", "1.1.1");
+        super("WCS", "1.1.1", "1.0.0");
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wcs");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -72,17 +75,17 @@ public class WCService extends WebService {
         try {
             
                 String request = (String) getParameter("REQUEST", true);
-                if (request.equals("DescribeCoverage")) {
+                if (request.equalsIgnoreCase("DescribeCoverage")) {
                     
                     return Response.Builder.representation(describeCoverage(), "text/xml").build();
                     
-                } else if (request.equals("GetCapabilities")) {
+                } else if (request.equalsIgnoreCase("GetCapabilities")) {
                     
                     return Response.Builder.representation(getCapabilities(), "text/xml").build();
                     
-                } else if (request.equals("GetCoverage")) {
+                } else if (request.equalsIgnoreCase("GetCoverage")) {
                     
-                    return Response.Builder.representation(getCoverage(), "text/xml").build();
+                    return Response.Builder.representation(getCoverage(), webServiceWorker.getMimeType()).build();
                     
                 } else {
                     throw new WebServiceException("The operation " + request + " is not supported by the service",
@@ -109,21 +112,42 @@ public class WCService extends WebService {
                                          WMSExceptionCode.MISSING_PARAMETER_VALUE, getCurrentVersion());
         }
         
-        //and the the optional attribute
         String inputVersion = getParameter("VERSION", false);
-        setCurrentVersion("1.1.1");
+        
+        setCurrentVersion(inputVersion);
         
         
-        Capabilities response = (Capabilities)unmarshaller.unmarshal(getCapabilitiesFile(false, getCurrentVersion()));
+        Capabilities response = (Capabilities)getCapabilitiesObject(getCurrentVersion());
         Contents contents = new Contents();
         
         //we get the list of layers
-        
-        for (Layer inputLayer: webServiceWorker.getLayers()) {
-            CoverageSummaryType cs = new CoverageSummaryType();
+        net.seagis.wcs.ObjectFactory wcsFactory = new net.seagis.wcs.ObjectFactory();
+        net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
+        try {
+            for (Layer inputLayer: webServiceWorker.getLayers()) {
+                CoverageSummaryType cs = new CoverageSummaryType();
+           
+                cs.getRest().add(wcsFactory.createIdentifier(inputLayer.getName()));
             
-            contents.getCoverageSummary().add(cs);
+                GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
+               
+                if(inputGeoBox != null) {
+                    String crs = "WGS84(DD)";
+                    WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
+                                                 inputGeoBox.getWestBoundLongitude(),
+                                                 inputGeoBox.getEastBoundLongitude(),
+                                                 inputGeoBox.getSouthBoundLatitude(),
+                                                 inputGeoBox.getNorthBoundLatitude());
+                
+                    cs.getRest().add(owsFactory.createWGS84BoundingBox(outputBBox));
+                }
+           
+                contents.getCoverageSummary().add(cs);
+            }
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, getCurrentVersion());
         }
+            
         response.setContents(contents);
         StringWriter sw = new StringWriter();    
         marshaller.marshal(response, sw);
@@ -135,18 +159,20 @@ public class WCService extends WebService {
     /**
      * Web service operation
      */
-    public String getCoverage() throws JAXBException, WebServiceException {
-        CoveragesType response = new CoveragesType();
-        verifyBaseParameter(0);
-        String identifiers  = getParameter("Identifier", true);
-        String domainSubSet = getParameter("DomainSubset", true);
-        String rangeSubset  = getParameter("RangeSubset", false);
-        String outputFormat = getParameter("Output", true);
+    public File getCoverage() throws JAXBException, WebServiceException {
+        logger.info("getCoverage reçu");
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
-        //we marshall the response and return the XML String
-        StringWriter sw = new StringWriter();    
-        marshaller.marshal(response, sw);
-        return sw.toString();
+        verifyBaseParameter(0);
+        
+        webServiceWorker.setFormat(getParameter("format", true));
+        webServiceWorker.setLayer(getParameter("coverage", true));
+        webServiceWorker.setCoordinateReferenceSystem(getParameter("CRS", true));
+        webServiceWorker.setBoundingBox(getParameter("bbox", false));
+        webServiceWorker.setTime(getParameter("time", false));
+        webServiceWorker.setDimension(getParameter("width", true), getParameter("height", true));      
+        
+        return webServiceWorker.getImageFile();
     }
     
     

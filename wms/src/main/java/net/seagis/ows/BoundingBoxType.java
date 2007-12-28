@@ -57,10 +57,10 @@ public class BoundingBoxType {
 
     @XmlList
     @XmlElement(name = "LowerCorner", type = Double.class)
-    protected List<Double> lowerCorner;
+    protected List<Double> lowerCorner  = new ArrayList<Double>();
     @XmlList
     @XmlElement(name = "UpperCorner", type = Double.class)
-    protected List<Double> upperCorner;
+    protected List<Double> upperCorner = new ArrayList<Double>();
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
     protected String crs;
@@ -68,6 +68,27 @@ public class BoundingBoxType {
     @XmlSchemaType(name = "positiveInteger")
     protected BigInteger dimensions;
 
+    BoundingBoxType(){
+    }
+    
+    /**
+     * Build a 2 dimension boundingBox.
+     * 
+     * @param crs
+     * @param maxx
+     * @param maxy
+     * @param minx
+     * @param miny
+     */
+    public BoundingBoxType(String crs, double maxx, double maxy, double minx, double miny){
+        this.dimensions = new BigInteger("2");
+        this.lowerCorner.add(minx);
+        this.lowerCorner.add(miny);
+        this.upperCorner.add(minx);
+        this.upperCorner.add(miny);
+        this.crs = crs;
+    }
+    
     /**
      * Gets the value of the lowerCorner property.
      * 
@@ -91,9 +112,6 @@ public class BoundingBoxType {
      * 
      */
     public List<Double> getLowerCorner() {
-        if (lowerCorner == null) {
-            lowerCorner = new ArrayList<Double>();
-        }
         return this.lowerCorner;
     }
 
@@ -120,9 +138,6 @@ public class BoundingBoxType {
      * 
      */
     public List<Double> getUpperCorner() {
-        if (upperCorner == null) {
-            upperCorner = new ArrayList<Double>();
-        }
         return this.upperCorner;
     }
 

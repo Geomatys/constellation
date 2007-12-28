@@ -39,9 +39,14 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "WGS84BoundingBoxType")
-public class WGS84BoundingBoxType
-    extends BoundingBoxType
-{
-
+public class WGS84BoundingBoxType extends BoundingBoxType {
+    
+    WGS84BoundingBoxType(){
+        
+    }
+    
+    public WGS84BoundingBoxType(String crs, double maxx, double maxy, double minx, double miny){
+        super(crs, maxx, maxy, minx, miny);
+    }
 
 }

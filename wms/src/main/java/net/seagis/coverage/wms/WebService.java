@@ -19,10 +19,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 //geotools dependencies
+import java.util.Map;
 import java.util.logging.Logger;
 import org.geotools.util.Version;
 
@@ -79,6 +81,11 @@ public abstract class WebService {
      * The name of the service (WMS, WCS,...)
      */
     private final String service;
+    
+    /**
+     * A map containing the Capabilities Object already load from file.
+     */
+    private Map<String,Object> capabilities = new HashMap<String,Object>();
     
     /**
      * The object whitch made all the operation on the postgrid database
@@ -295,15 +302,22 @@ public abstract class WebService {
      * @param  create {@code true} if this method is allowed to create the destination directory.
      * @return The configuration file, or {@code null} if none.
      */
-    File getCapabilitiesFile(final boolean create, Version version) {
+    protected Object getCapabilitiesObject(Version version) throws JAXBException {
        String path = System.getenv().get("CATALINA_HOME") + "/webapps" + getContext().getBase().getPath() + "WEB-INF/";
        
-        String fileName = this.service + "Capabilities" + version.toString() + ".xml";
+       String fileName = this.service + "Capabilities" + version.toString() + ".xml";
         
-        if (fileName == null) {
-            return null;
-        } else {
-            return new File(path + fileName);
+       if (fileName == null) {
+           return null;
+       } else {
+           
+           Object response = capabilities.get(fileName);
+           if (response == null) {
+               response = unmarshaller.unmarshal(new File(path + fileName));
+               capabilities.put(fileName, response);
+           }
+           
+           return response;
         }
     }
 }

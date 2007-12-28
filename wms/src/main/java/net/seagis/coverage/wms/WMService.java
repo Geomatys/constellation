@@ -121,7 +121,7 @@ public class WMService extends WebService {
         try {
             
                 String request = (String) getParameter("REQUEST", true);
-                if (request.equals("GetMap")) {
+                if (request.equalsIgnoreCase("GetMap")) {
                     
                     return Response.Builder.representation(getMap(), webServiceWorker.getMimeType()).build();
                     
@@ -129,15 +129,15 @@ public class WMService extends WebService {
                     
                     return getFeatureInfo();
                     
-                } else if (request.equals("GetCapabilities")) {
+                } else if (request.equalsIgnoreCase("GetCapabilities")) {
                     
                     return Response.Builder.representation(getCapabilities(), "text/xml").build();
                     
-                } else if (request.equals("DescribeLayer")) {
+                } else if (request.equalsIgnoreCase("DescribeLayer")) {
                     
                     return Response.Builder.representation(describeLayer(), "text/xml").build();
                     
-                } else if (request.equals("GetLegendGraphic")) {
+                } else if (request.equalsIgnoreCase("GetLegendGraphic")) {
                     
                     return Response.Builder.representation(getLegendGraphic(), webServiceWorker.getMimeType()).build();
                     
@@ -292,7 +292,7 @@ public class WMService extends WebService {
         } 
         
         // the service shall return WMSCapabilities marshalled
-        AbstractWMSCapabilities response = (AbstractWMSCapabilities)unmarshaller.unmarshal(getCapabilitiesFile(false, getCurrentVersion()));
+        AbstractWMSCapabilities response = (AbstractWMSCapabilities)getCapabilitiesObject(getCurrentVersion());
         
         String format = getParameter("FORMAT", false);
         
