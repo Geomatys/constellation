@@ -1,14 +1,14 @@
 #!/bin/sh
 
 # ------------------------------------------------------
-# Affiche la liste des méthodes d'opérations supportées.
+# Prints supported operation methods
 # ------------------------------------------------------
 
-# Initialisation commune à tous les scripts
+# Initialization common to all scripts
 export BASE_DIR=`dirname $0`/..
 source $BASE_DIR/etc/setenv.sh
 
-# Exécution de la commande Java
+# Runs Java commands
 export CLASSPATH=$JARS/gt2-referencing-$GEOTOOLS_VERSION.jar
 java $OPTS org.geotools.referencing.operation.DefaultMathTransformFactory $*
 

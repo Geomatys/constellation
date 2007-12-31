@@ -1,13 +1,14 @@
 #!/bin/sh
 
-# -------------------------------------------------
-# Teste la connexion à la base de données PostGrid.
-# -------------------------------------------------
+# ---------------------------------------------------------------------------
+# Tests the connection to PostGrid database. The ".seagis/config.xml" file
+# must be presents. This script do not expect any argument.
+# ---------------------------------------------------------------------------
 
-# Initialisation commune à tous les scripts
+# Initialization common to all scripts
 export BASE_DIR=`dirname $0`/..
 source $BASE_DIR/etc/setenv.sh
 
-# Exécution de la commande Java
+# Runs Java commands
 export CLASSPATH=$JARS/postgrid-$SEAGIS_VERSION.jar
 java $OPTS -showversion net.seagis.catalog.Database $*

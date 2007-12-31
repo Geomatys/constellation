@@ -1,16 +1,16 @@
 #!/bin/sh
 
-# -----------------------------------------------------------
-# Pour un nombre arbitraire de codes de CRS, affiche les
-# objets correspondants sous forme de "Well Known Text" (WKT)
-# -----------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Prints Coordinate Reference System (CRS) objects in "Well Known Text" (WKT)
+# format. The CRS objects are designed by a "authority:code" tuple.
+# ---------------------------------------------------------------------------
 
 
-# Initialisation commune à tous les scripts
+# Initialization common to all scripts
 export BASE_DIR=`dirname $0`/..
 source $BASE_DIR/etc/setenv.sh
 
-# Exécution de la commande Java
+# Runs Java commands
 export CLASSPATH=.
 export CLASSPATH=$CLASSPATH:$JARS/gt2-epsg-hsql-$GEOTOOLS_VERSION.jar
 export CLASSPATH=$CLASSPATH:$JARS/gt2-epsg-extension-$GEOTOOLS_VERSION.jar

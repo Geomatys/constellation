@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# ---------------------------------------------------------------------------
+# Synchronizes a PostGrid database with an other one. The configuration files
+# for source and target database are specified in "postgrid-sync.properties".
+#
+# Optional arguments:
+#   -delete-before-insert
+#      Empties the tables before to re-insert all entries. Used when table
+#      content need to be replaced, not just updated with new entries.
+#
+#   -pretend
+#      Prints the SQL statements to standard output without executing them.
+# ---------------------------------------------------------------------------
+
+# Initialization common to all scripts
+export BASE_DIR=`dirname $0`/..
+source $BASE_DIR/etc/setenv.sh
+
+# Runs Java commands
+export CLASSPATH=$JARS/postgrid-$SEAGIS_VERSION.jar
+java $OPTS -showversion net.seagis.console.Synchronizer -config "$BASE_DIR/etc/postgrid-sync.properties" $*

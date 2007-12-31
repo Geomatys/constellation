@@ -8,7 +8,7 @@
 #
 
 # Version des bibliothèques à utiliser par défaut
-export GEOTOOLS_VERSION=2.4-SNAPSHOT
+export GEOTOOLS_VERSION=2.5-SNAPSHOT
 export SEAGIS_VERSION=1.0-SNAPSHOT
 
 # Répertoire contenant l'ensemble des fichiers JARS.

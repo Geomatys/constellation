@@ -42,6 +42,22 @@ import org.geotools.resources.Utilities;
  * Copies the content of a table from a database to an other database. This class is used when
  * there is two copies of a database (typically an experimental copy and an operational copy)
  * and we want to copy the content of the experimental database to the operational database.
+ * <p>
+ * <b>Mandatory arguments</b>
+ * <ul>
+ *   <li><p>{@code -config} <var>file</var><br>
+ *     Configuration file containing source and target databases, and the list of tables
+ *     to synchronize. See "{@code postgrid-sync.properties}" for an example.</p></li>
+ * </ul>
+ * <p>
+ * <b>Optional arguments</b>
+ * <ul>
+ *   <li><p>{@code -delete-before-insert}<br>
+ *     Empties the tables before to re-insert all entries. Used when table content need to
+ *     be replaced, not just updated with new entries.</p></li>
+ *   <li><p>{@code -pretend}<br>
+ *     Prints the SQL statements to standard output without executing them.</p></li>
+ * </ul>
  *
  * @version $Id$
  * @author Martin Desruisseaux
