@@ -58,7 +58,7 @@ public class BlueMarbleTest extends DatabaseTest {
 
         CoverageReference entry = entries.iterator().next();
         assertSame("Should be cached", entry, layer.getCoverageReferences().iterator().next());
-        assertEquals("BlueMarble-0", entry.getSeries().getName());
+        assertEquals("BlueMarble", entry.getSeries().getName());
         assertNull(entry.getFile());
         assertNull(entry.getURI());
         assertEquals(GeographicBoundingBoxImpl.WORLD, entry.getGeographicBoundingBox());
@@ -83,9 +83,8 @@ public class BlueMarbleTest extends DatabaseTest {
         assertEquals(1, entries.size());
 
         CoverageReference entry = entries.iterator().next();
-        // todo: set MosaicImageReader logger to INFO level for debugging.
-//        assertSame("Should be cached", entry, layer.getCoverageReferences().iterator().next());
-        assertEquals("BlueMarble-0", entry.getSeries().getName());
+        assertSame("Should be cached", entry, layer.getCoverageReferences().iterator().next());
+        assertEquals("BlueMarble", entry.getSeries().getName());
         assertNull(entry.getFile());
         assertNull(entry.getURI());
         assertEquals(GeographicBoundingBoxImpl.WORLD, entry.getGeographicBoundingBox());

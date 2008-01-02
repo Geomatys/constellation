@@ -721,7 +721,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
      * les deux objets {@code GridCoverageEntry} proviennent de la même base de données.
      */
     @Override
-    public final boolean equals(final Object object) {
+    public boolean equals(final Object object) {
         if (object == this) {
             return true;
         }

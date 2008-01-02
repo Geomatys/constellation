@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.net.URI;
@@ -61,6 +62,7 @@ final class GridCoverageMosaic extends GridCoverageEntry {
                                final GridGeometryEntry geometry, final Tile[] tiles)
     {
         super(name, reference, geometry);
+        Arrays.sort(tiles); // Required since equals(Object) is sensitive to order.
         this.tiles = tiles;
     }
 
@@ -212,7 +214,8 @@ final class GridCoverageMosaic extends GridCoverageEntry {
             }
             readers.put(format, reader);
         }
-        tiles.setImageReader(reader);
+        // TODO: We lost some informations with the above...
+        tiles.setImageReaderSpi(reader.getOriginatingProvider());
         /*
          * Gets the image input (but do not open it yet), the image bounds and builds the tile.
          * Note that we needs the full image bounds, not the clipped ones.
@@ -225,5 +228,17 @@ final class GridCoverageMosaic extends GridCoverageEntry {
         }
         Rectangle region = entry.geometry.getBounds();
         tiles.add(input, entry.imageIndex, region, gridToCRS);
+    }
+
+    /**
+     * Compares this entry with the specified one for equality.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (super.equals(object)) {
+            final GridCoverageMosaic that = (GridCoverageMosaic) object;
+            return Arrays.equals(this.tiles, that.tiles);
+        }
+        return false;
     }
 }
