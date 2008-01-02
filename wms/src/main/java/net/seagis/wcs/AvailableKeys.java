@@ -52,7 +52,7 @@ import javax.xml.bind.annotation.XmlType;
 public class AvailableKeys {
 
     @XmlElement(name = "Key", required = true)
-    protected List<String> key = new ArrayList<String>();
+    private List<String> key = new ArrayList<String>();
 
     /**
      * An empty constructor used by JAXB.

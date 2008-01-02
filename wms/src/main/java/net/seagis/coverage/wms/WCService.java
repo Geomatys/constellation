@@ -1,3 +1,18 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package net.seagis.coverage.wms;
 
 import java.io.File;
@@ -103,16 +118,15 @@ public class WCService extends WebService {
         logger.info("getCapabilities request received");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
-        //we begin by extract the mandatory attribute
+        //we begin by extract the base attribute
         if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
             throw new WebServiceException("The parameters SERVICE=WCS must be specify",
                                          WMSExceptionCode.MISSING_PARAMETER_VALUE, getCurrentVersion());
         }
         
         String inputVersion = getParameter("VERSION", false);
-        
         setCurrentVersion(inputVersion);
-        
+        webServiceWorker.setService("WCS", getCurrentVersion().toString());
         
         Capabilities response = (Capabilities)getCapabilitiesObject(getCurrentVersion());
         Contents contents;
@@ -125,7 +139,7 @@ public class WCService extends WebService {
             for (Layer inputLayer: webServiceWorker.getLayers()) {
                 CoverageSummaryType cs = new CoverageSummaryType();
            
-                cs.getRest().add(wcsFactory.createIdentifier(inputLayer.getName()));
+                cs.addRest(wcsFactory.createIdentifier(inputLayer.getName()));
             
                 GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
                
@@ -137,7 +151,7 @@ public class WCService extends WebService {
                                                  inputGeoBox.getSouthBoundLatitude(),
                                                  inputGeoBox.getNorthBoundLatitude());
                 
-                    cs.getRest().add(owsFactory.createWGS84BoundingBox(outputBBox));
+                    cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
                 }
            
                 summary.add(cs);
@@ -164,7 +178,7 @@ public class WCService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         verifyBaseParameter(0);
-        
+        webServiceWorker.setService("WCS", getCurrentVersion().toString());
         webServiceWorker.setFormat(getParameter("format", true));
         webServiceWorker.setLayer(getParameter("coverage", true));
         webServiceWorker.setCoordinateReferenceSystem(getParameter("CRS", true));
@@ -180,12 +194,12 @@ public class WCService extends WebService {
      * Web service operation
      */
     public String describeCoverage() throws JAXBException, WebServiceException {
-        CoverageDescriptions response = new CoverageDescriptions();
+        CoverageDescriptions response = null;// new CoverageDescriptions();
         verifyBaseParameter(0);
         String identifiers = getParameter("IDENTIFIER", true);
         
         
-        CoverageDescriptionType coverage = new CoverageDescriptionType();
+        CoverageDescriptionType coverage = null;//new CoverageDescriptionType();
         //coverage.
         response.getCoverageDescription().add(coverage);
                

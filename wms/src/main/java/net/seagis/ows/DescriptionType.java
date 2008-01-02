@@ -17,6 +17,7 @@
 package net.seagis.ows;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -72,97 +73,47 @@ import net.seagis.wcs.FieldType;
 public class DescriptionType {
 
     @XmlElement(name = "Title")
-    protected List<LanguageStringType> title;
+    private List<LanguageStringType> title = new ArrayList<LanguageStringType>();
     @XmlElement(name = "Abstract")
-    protected List<LanguageStringType> _abstract;
+    private List<LanguageStringType> _abstract = new ArrayList<LanguageStringType>();;
     @XmlElement(name = "Keywords")
-    protected List<KeywordsType> keywords;
+    private List<KeywordsType> keywords = new ArrayList<KeywordsType>();
 
     /**
+     * An empty constructor used by JAXB.
+     */
+    protected DescriptionType() {
+    }
+    
+    /**
+     * Build a new DescriptionType.
+     */
+    public DescriptionType(List<LanguageStringType> title,  List<LanguageStringType> _abstract,
+            List<KeywordsType> keywords) {
+        this._abstract = _abstract;
+        this.keywords  = keywords;
+        this.title     = title;
+    }
+    
+    /**
      * Gets the value of the title property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the title property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getTitle().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link LanguageStringType }
-     * 
-     * 
      */
     public List<LanguageStringType> getTitle() {
-        if (title == null) {
-            title = new ArrayList<LanguageStringType>();
-        }
-        return this.title;
+        return Collections.unmodifiableList(title);
     }
 
     /**
      * Gets the value of the abstract property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the abstract property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getAbstract().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link LanguageStringType }
-     * 
-     * 
      */
     public List<LanguageStringType> getAbstract() {
-        if (_abstract == null) {
-            _abstract = new ArrayList<LanguageStringType>();
-        }
-        return this._abstract;
+        return Collections.unmodifiableList(_abstract);
     }
 
     /**
      * Gets the value of the keywords property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the keywords property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getKeywords().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link KeywordsType }
-     * 
-     * 
      */
     public List<KeywordsType> getKeywords() {
-        if (keywords == null) {
-            keywords = new ArrayList<KeywordsType>();
-        }
-        return this.keywords;
+        return Collections.unmodifiableList(keywords);
     }
 
 }

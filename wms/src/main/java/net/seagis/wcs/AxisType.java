@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.ows.DescriptionType;
 import net.seagis.ows.DomainMetadataType;
+import net.seagis.ows.KeywordsType;
+import net.seagis.ows.LanguageStringType;
 import net.seagis.ows.MetadataType;
 
 
@@ -63,9 +65,7 @@ import net.seagis.ows.MetadataType;
     "referenceSystem",
     "metadata"
 })
-public class AxisType
-    extends DescriptionType
-{
+public class AxisType extends DescriptionType {
 
     @XmlElement(name = "AvailableKeys", required = true)
     protected AvailableKeys availableKeys;
@@ -82,6 +82,29 @@ public class AxisType
     @XmlAttribute(required = true)
     protected String identifier;
 
+    /**
+     * empty constructor used JAXB
+     */
+    AxisType() {
+        super();
+    }
+    
+    /**
+     * Build a new Axis
+     */
+    public AxisType(List<LanguageStringType> title,  List<LanguageStringType> _abstract,
+            List<KeywordsType> keywords, AvailableKeys availableKeys, DomainMetadataType meaning, DomainMetadataType dataType,
+            DomainMetadataType uom, DomainMetadataType referenceSystem, List<MetadataType> metadata, String identifier ) {
+        super(title, _abstract, keywords);
+        this.availableKeys   = availableKeys;
+        this.dataType        = dataType;
+        this.identifier      = identifier;
+        this.meaning         = meaning;
+        this.metadata        = metadata;
+        this.referenceSystem = referenceSystem;
+        this.uom             = uom;
+    }
+    
     /**
      * Gets the value of the availableKeys property.
      */

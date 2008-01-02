@@ -161,12 +161,11 @@ public class WMService extends WebService {
      */
     private File getMap() throws  WebServiceException {
         logger.info("getMap request received");
-        //debug
-        logger.info(context.getAbsolute().toString());
         verifyBaseParameter(0);
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         //we set the attribute od the webservice worker with the parameters.
+        webServiceWorker.setService("WMS", getCurrentVersion().toString());
         webServiceWorker.setFormat(getParameter("FORMAT", true));
         webServiceWorker.setLayer(getParameter("LAYERS", true));
         webServiceWorker.setColormapRange(getParameter("DIM_RANGE", false));
@@ -209,6 +208,7 @@ public class WMService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         verifyBaseParameter(0);
+        webServiceWorker.setService("WMS", getCurrentVersion().toString());
         String layer = getParameter("QUERY_LAYERS", true);
         webServiceWorker.setLayer(layer);
         
@@ -290,6 +290,7 @@ public class WMService extends WebService {
         } else {
             setCurrentVersion("1.1.1");
         } 
+        webServiceWorker.setService("WMS", getCurrentVersion().toString());
         
         // the service shall return WMSCapabilities marshalled
         AbstractWMSCapabilities response = (AbstractWMSCapabilities)getCapabilitiesObject(getCurrentVersion());
@@ -458,6 +459,7 @@ public class WMService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         verifyBaseParameter(2);
+        webServiceWorker.setService("WMS", getCurrentVersion().toString());
         webServiceWorker.setLayer(getParameter("LAYER", true));
         webServiceWorker.setFormat(getParameter("FORMAT", false));
         webServiceWorker.setDimension(getParameter("WIDTH", false), getParameter("HEIGHT", false));

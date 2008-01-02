@@ -9,6 +9,7 @@
 package net.seagis.wcs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -35,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RangeType", propOrder = {
@@ -44,35 +45,27 @@ import javax.xml.bind.annotation.XmlType;
 public class RangeType {
 
     @XmlElement(name = "Field", required = true)
-    protected List<FieldType> field;
+    private List<FieldType> field = new ArrayList<FieldType>();
 
     /**
+     * An empty constructor used by JAXB.
+     */
+    RangeType() {
+    }
+    
+    /**
+     * build a new range.
+     */
+    public RangeType(List<FieldType> field) {
+        this.field = field;
+    }
+    
+    
+    /**
      * Gets the value of the field property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the field property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getField().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link FieldType }
-     * 
-     * 
      */
     public List<FieldType> getField() {
-        if (field == null) {
-            field = new ArrayList<FieldType>();
-        }
-        return this.field;
+        return Collections.unmodifiableList(field);
     }
 
 }
