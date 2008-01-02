@@ -15,10 +15,7 @@
 
 package net.seagis.coverage.wms;
 
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,7 +24,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.logging.Logger;
 import javax.units.Unit;
 
 // jersey dependencies
@@ -51,6 +47,8 @@ import net.seagis.sld.StyledLayerDescriptor;
 import net.seagis.wms.Layer;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.gml.DirectPositionType;
+import net.seagis.gml.PointType;
 import net.seagis.wms.AbstractWMSCapabilities;
 import net.seagis.wms.BoundingBox;
 import net.seagis.wms.Dimension;
@@ -61,10 +59,7 @@ import net.seagis.wms.Style;
 
 //geotools dependencies
 import org.geotools.util.MeasurementRange;
-import org.geotools.util.Version;
-
-//opengis dependencies
-import org.opengis.coverage.PointOutsideCoverageException;
+import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
@@ -83,10 +78,6 @@ public class WMService extends WebService {
     @HttpContext
     private UriInfo context;
     
-    /**
-     * the service URL (used in getCapabilities document).
-     */
-    private final String serviceURL;
             
     /** 
      * Build a new instance of the webService and initialise the JAXB marshaller. 
@@ -103,7 +94,6 @@ public class WMService extends WebService {
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
-        serviceURL = "http://sensor.geomatys.fr/wms-1.0-SNAPSHOT/wms?";
         
     }
    
@@ -203,7 +193,7 @@ public class WMService extends WebService {
      * @return
      * @throws net.seagis.coverage.web.WebServiceException
      */
-    private Response getFeatureInfo() throws WebServiceException {
+    private Response getFeatureInfo() throws WebServiceException, JAXBException {
         logger.info("getFeatureInfo request received");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
@@ -234,7 +224,19 @@ public class WMService extends WebService {
             j = getParameter("Y", true);
         }
         
-        String info_format  = getParameter("INFO_FORMAT", false); // TODO true);
+        String infoFormat  = getParameter("INFO_FORMAT", false); // TODO true);
+        if (infoFormat != null) {
+            if(!(infoFormat.equals("text/plain") 
+              || infoFormat.equals("text/html") 
+              || infoFormat.equals("application/vnd.ogc.gml") 
+              || infoFormat.equals("text/xml"))){
+                
+                throw new WebServiceException("This MIME type " + infoFormat + " is not accepted by the service",
+                                              WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+            }
+        } else {
+            infoFormat = "text/plain";
+        }
         String feature_count = getParameter("FEATURE_COUNT", false);
         
         String exception = getParameter("EXCEPTIONS", false);
@@ -244,19 +246,49 @@ public class WMService extends WebService {
         double result = webServiceWorker.evaluatePixel(i,j);
         
         // plusieur type de retour possible
-        String response = "result for " + layer + " is:" + result;
-        logger.info("returned:" + response);
-        return Response.Builder.representation(response, "text/plain").build();
+        String response;
         
-        /* si on retourne du html
-        if (info_format.equals("text/html"))
-            return Response.Builder.representation(response, "text/html").build();
-        //si on retourne du xml
-        else if (info_format.equals("text/xml"))
-            return Response.Builder.representation(response, "text/xml").build();
-        //si on retourne du gml
-        else 
-            return Response.Builder.representation(response, "application/vnd.ogc.gml").build();*/
+        // si on retourne du html
+        if (infoFormat.equals("text/html")) {
+            response = "<html>"                                       +
+                       "    <head>"                                   +
+                       "        <title>GetFeatureInfo output</title>" +
+                       "    </head>"                                  +
+                       "    <body>"                                   +
+                       "    <table>"                                  +
+                       "        <tr>"                                 +
+                       "            <th>" + layer + "</th>"           +
+                       "        </tr>"                                +
+                       "        <tr>"                                 +
+                       "            <th>" + result + "</th>"           +
+                       "        </tr>"                                +
+                       "    </table>"                                 +
+                       "    </body>"                                  +
+                       "</html>";
+        }
+        //si on retourne du xml ou du gml
+        else if (infoFormat.equals("text/xml") || infoFormat.equals("application/vnd.ogc.gml")) {
+            DirectPosition inputCoordinate = webServiceWorker.getCoordinates();
+            
+            List<Double> coord = new ArrayList<Double>();
+            for (Double d:inputCoordinate.getCoordinates()) {
+                coord.add(d);
+            }
+            coord.add(result);
+            DirectPositionType pos = new DirectPositionType(crs, 3, coord);
+            PointType pt = new PointType(layer, pos);
+            
+            //we marshall the response and return the XML String
+            StringWriter sw = new StringWriter();    
+            marshaller.marshal(pt, sw);
+            response = sw.toString();
+        }
+        
+        //si on retourne du text
+        else {
+            response = "result for " + layer + " is:" + result;
+        }
+        return Response.Builder.representation(response, infoFormat).build();
     }
     
     /**
@@ -279,14 +311,8 @@ public class WMService extends WebService {
         
         //and the the optional attribute
         String inputVersion = getParameter("VERSION", false);
-        if(inputVersion != null) {
-            if (!(inputVersion.equals("1.3.0") || inputVersion.equals("1.1.1")) 
-                    || inputVersion.equals("1.1.1")) {
-                setCurrentVersion("1.1.1");
-        
-            } else if (inputVersion.equals("1.3.0")){
-                setCurrentVersion("1.3.0");
-            }
+        if(inputVersion != null && inputVersion.equals("1.3.0")) {
+            setCurrentVersion("1.3.0");
         } else {
             setCurrentVersion("1.1.1");
         } 
@@ -296,6 +322,13 @@ public class WMService extends WebService {
         AbstractWMSCapabilities response = (AbstractWMSCapabilities)getCapabilitiesObject(getCurrentVersion());
         
         String format = getParameter("FORMAT", false);
+        
+        //we update the url
+        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetCapabilities");
+        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetFeatureInfo");
+        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetMap");
+        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=DescribeLayer");
+        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetLegendGraphic");
         
         //we build the layers object of the document
         
@@ -380,10 +413,10 @@ public class WMService extends WebService {
                 }
                 
                 // we build a Style Object
-                OnlineResource or = new OnlineResource(this.serviceURL + "REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
+                OnlineResource or = new OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
                 LegendURL legendURL1 = new LegendURL("image/png", or);
 
-                or = new OnlineResource(this.serviceURL + "REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
+                or = new OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
                 LegendURL legendURL2 = new LegendURL("image/gif", or);
                 Style style = new Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
                 

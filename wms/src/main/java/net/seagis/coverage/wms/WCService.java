@@ -22,9 +22,11 @@ import java.io.StringWriter;
 // JAXB xml binding dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+
+// jersey dependencies
+import com.sun.ws.rest.spi.resource.Singleton;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
@@ -179,13 +181,14 @@ public class WCService extends WebService {
         
         verifyBaseParameter(0);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
-        webServiceWorker.setFormat(getParameter("format", true));
-        webServiceWorker.setLayer(getParameter("coverage", true));
-        webServiceWorker.setCoordinateReferenceSystem(getParameter("CRS", true));
-        webServiceWorker.setBoundingBox(getParameter("bbox", false));
-        webServiceWorker.setTime(getParameter("time", false));
-        webServiceWorker.setDimension(getParameter("width", true), getParameter("height", true));      
-        
+        if (getCurrentVersion().toString().equals("1.0.0")) {
+            webServiceWorker.setFormat(getParameter("format", true));
+            webServiceWorker.setLayer(getParameter("coverage", true));
+            webServiceWorker.setCoordinateReferenceSystem(getParameter("CRS", true));
+            webServiceWorker.setBoundingBox(getParameter("bbox", false));
+            webServiceWorker.setTime(getParameter("time", false));
+            webServiceWorker.setDimension(getParameter("width", true), getParameter("height", true));      
+        }
         return webServiceWorker.getImageFile();
     }
     

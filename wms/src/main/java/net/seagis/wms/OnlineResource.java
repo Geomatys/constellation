@@ -97,6 +97,15 @@ public class OnlineResource {
     }
 
     /**
+     * Gets the value of the href property.
+     * 
+     */
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    
+    /**
      * Gets the value of the role property.
      *     
      */

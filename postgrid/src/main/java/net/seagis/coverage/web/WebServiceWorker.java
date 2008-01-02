@@ -292,6 +292,11 @@ public class WebServiceWorker {
     private transient final Map<LayerRequest,Layer> layers;
 
     /**
+     * The current coordinate of the point requested by a getFeatureInfo request
+     */
+    private DirectPosition coordinate;
+    
+    /**
      * Creates a new image producer connected to the specified database.
      *
      * @param database The connection to the database.
@@ -1080,7 +1085,7 @@ public class WebServiceWorker {
     public double evaluatePixel(final double x, final double y) throws WebServiceException {
         final MathTransform gridToCRS = getGridToCRS();
         if (gridToCRS != null) {
-            DirectPosition coordinate = new DirectPosition2D(getCoordinateReferenceSystem(), x, y);
+            this.coordinate = new DirectPosition2D(getCoordinateReferenceSystem(), x, y);
             try {
                 coordinate = gridToCRS.transform(coordinate, coordinate);
             } catch (TransformException exception) {
@@ -1116,6 +1121,14 @@ public class WebServiceWorker {
         return evaluatePixel(xv, yv);
     }
 
+    /**
+     * Return the geographic coordinate of a point.
+     * This method must be call after evaluatePixel(...) in a getFeatureInfo request.
+     */
+    public DirectPosition getCoordinates() {
+        return this.coordinate;
+    }
+            
     /**
      * Clears the cache. This method should be invoked when the database content changed.
      * This {@code WebServiceWorker} instance can still be used, but the first next invocation

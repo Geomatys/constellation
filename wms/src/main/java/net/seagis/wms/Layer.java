@@ -222,6 +222,7 @@ public class Layer {
              final EXGeographicBoundingBox exGeographicBoundingBox, final BoundingBox boundingBox, final boolean queryable,
              final List<Dimension> dimension, final Style style, final Version version) {
          this.name                    = name;
+         this.title                   = name;
          this._abstract               = _abstract;
          this.keywordList             = new KeywordList(new Keyword(keyword));
          this.boundingBox.add(boundingBox);

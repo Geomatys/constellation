@@ -87,6 +87,11 @@ public abstract class WebService {
      */
     private Map<String,Object> capabilities = new HashMap<String,Object>();
     
+     /**
+     * the service URL (used in getCapabilities document).
+     */
+    private final String serviceURL;
+    
     /**
      * The object whitch made all the operation on the postgrid database
      */
@@ -129,6 +134,7 @@ public abstract class WebService {
             this.currentVersion = this.versions.get(0);
         
         unmarshaller = null;
+        serviceURL   = null;
         
        
     }
@@ -319,5 +325,9 @@ public abstract class WebService {
            
            return response;
         }
+    }
+    
+    protected String getServiceURL() {
+        return getContext().getBase().toString();
     }
 }
