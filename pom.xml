@@ -484,7 +484,7 @@
   <modules>
     <module>numeric</module>
     <module>postgrid</module>
-    <module>wms</module>
+    <module>web-services</module>
 <!-- <module>observations</module> -->
 <!-- <module>widgets</module> -->
 <!-- <module>openoffice</module> -->

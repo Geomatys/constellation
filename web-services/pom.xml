@@ -19,7 +19,7 @@
     Module description.
   -->
   <groupId>net.seagis</groupId>
-  <artifactId>wms</artifactId>
+  <artifactId>web-services</artifactId>
   <packaging>war</packaging>
   <name>Web Map Service</name>
   <description>
