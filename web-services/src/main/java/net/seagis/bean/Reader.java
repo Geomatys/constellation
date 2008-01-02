@@ -9,7 +9,7 @@ package net.seagis.bean;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import fr.ifremer.coverage.catalog.Collector;
+// TODO import fr.ifremer.coverage.catalog.Collector;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
@@ -34,7 +34,7 @@ import javax.servlet.jsp.jstl.sql.ResultSupport;
  * @author olivier
  */
 public class Reader {
-    private Collector collector;
+    // TODO private Collector collector;
 
     // public class CustomerBean {
     private Connection conn;
@@ -44,6 +44,7 @@ public class Reader {
             return;
         }
 
+        /* TODO
         if (collector != null) {
             return;
         }
@@ -53,7 +54,7 @@ public class Reader {
         Database db = collector.getDatabase();
 
         conn = db.getConnection();
-        System.out.println("openReader()");
+        System.out.println("openReader()");*/
     }
 
     public Layers[] getAll() throws SQLException, NamingException, CatalogException {

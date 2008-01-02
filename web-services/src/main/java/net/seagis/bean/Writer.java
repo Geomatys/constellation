@@ -9,7 +9,7 @@ package net.seagis.bean;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import fr.ifremer.coverage.catalog.Collector;
+// TODO import fr.ifremer.coverage.catalog.Collector;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
@@ -31,7 +31,7 @@ import net.seagis.catalog.UpdatePolicy;
  */
 public class Writer {
    
-     private   Collector collector2;
+    // TODO  private   Collector collector2;
     // public class CustomerBean {
     private Connection conn;
 
@@ -40,12 +40,15 @@ public class Writer {
             return;
         }
 
+        /* TODO 
         collector2 = new Collector();
 
         Database db = collector2.getDatabase();
 
         conn = db.getConnection();
         System.out.println("openWriter()");
+        
+        */
     }
 
     public void setAll(Layers[] layers) throws SQLException, NamingException, CatalogException {
@@ -81,6 +84,7 @@ public class Writer {
     }
     public void setLayersAndSeries(String ServerPath, String layerName) throws SQLException, NamingException, CatalogException {
         try{
+                                    /*  TODO
                                     Collector collector = new Collector();
                                     Database database = collector.getDatabase();
                                     Connection connection = database.getConnection();     
@@ -112,7 +116,7 @@ public class Writer {
                                     collector.setPolicy(UpdatePolicy.SKIP_EXISTING);
                                     collector.process(layerName);
                                     collector.close();
-                                    connection.close();
+                                    connection.close();*/
             
             
             /* open();
@@ -159,7 +163,7 @@ public class Writer {
 
         System.out.println("closeWriter()");
         conn.close();
-        collector2.close();
+        // TODO collector2.close();
         conn = null;
     }
 }

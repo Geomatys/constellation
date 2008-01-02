@@ -9,13 +9,13 @@
     <application>
       <resource-bundle>
          <var>msgs</var>
-         <base-name>fr.geomatys.bean.messages</base-name>
+         <base-name>net.seagis.bean.messages</base-name>
       </resource-bundle>
    </application>
 
   <managed-bean>
       <managed-bean-name>resultData</managed-bean-name>
-      <managed-bean-class>fr.geomatys.bean.ResultData</managed-bean-class>
+      <managed-bean-class>net.seagis.bean.ResultData</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
    </managed-bean>
    
