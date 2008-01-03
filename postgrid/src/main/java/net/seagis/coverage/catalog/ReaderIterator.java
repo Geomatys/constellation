@@ -16,6 +16,7 @@ package net.seagis.coverage.catalog;
 
 import java.util.Map;
 import java.util.Iterator;
+import java.io.IOException;
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -62,14 +63,14 @@ final class ReaderIterator implements Iterator<ImageReader> {
      * @throws IIOException if the format was not found.
      */
     ReaderIterator(final Series series, final Iterator<Map.Entry<Object,Series>> files, final Object next)
-            throws IIOException
+            throws IOException
     {
         this.series = series;
         this.files  = files;
         this.next   = next;
         final Format format = series.getFormat();
         if (format instanceof FormatEntry) {
-            reader = ((FormatEntry) format).createImageReader();
+            reader = ((FormatEntry) format).getImageReaderSpi().createReaderInstance();
             return;
         }
         // Fallback (should not occurs with our implementation)

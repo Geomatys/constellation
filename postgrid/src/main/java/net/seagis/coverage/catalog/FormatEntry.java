@@ -76,64 +76,63 @@ import net.seagis.resources.i18n.ResourceKeys;
  */
 final class FormatEntry extends Entry implements Format {
     /**
-     * Pour compatibilités entre les enregistrements binaires de différentes versions.
+     * For cross-version compatibility.
      */
     private static final long serialVersionUID = -8790032968708208057L;
 
     /**
-     * {@code true} pour utiliser l'opération {@code "ImageRead"} de JAI, ou {@code false}
-     * pour utiliser directement l'objet {@link ImageReader}.
+     * {@code true} for using JAI {@code "ImageRead"} operation,
+     * or {@code false} for using {@link ImageReader} directly.
      */
     private static final boolean USE_IMAGE_READ_OPERATION = false;
 
     /**
-     * The provider for mosaic image readers.
+     * The input types for mosaic image reader.
      */
-    private static final MosaicImageReader.Spi MOSAIC_SPI = MosaicImageReader.Spi.DEFAULT;
+    private static final Class<?>[] MOSAIC_INPUT_TYPES = MosaicImageReader.Spi.DEFAULT.getInputTypes();
 
     /**
-     * The input types for {@link #MOSAIC_SPI}.
-     */
-    private static final Class<?>[] MOSAIC_INPUT_TYPES = MOSAIC_SPI.getInputTypes();
-
-    /**
-     * Images en cours de lecture. Les clés sont les objets {@link CoverageReference} en attente
-     * d'être lues, tandis que les valeurs sont {@link Boolean#TRUE} si la lecture est en cours,
-     * ou {@link Boolean#FALSE} si elle est en attente.
+     * Image waiting or in process of being read. Keys are {@link CoverageReference} to be read.
+     * Values are {@link Boolean#TRUE} if a read operation is in progress, or {@link Boolean#FALSE}
+     * if a read operation is enqueueded for starting as soon as possible.
      */
     private final transient Map<CoverageReference,Boolean> enqueued =
             new IdentityHashMap<CoverageReference,Boolean>();
 
     /**
-     * Nom MIME du format lisant les images.
+     * Format mime type as declared in the database.
      */
     private final String mimeType;
 
     /**
-     * Liste des bandes appartenant à ce format. Les éléments de ce tableau doivent
-     * correspondre dans l'ordre aux bandes {@code [0,1,2...]} de l'image.
+     * Sample dimensions for coverages encoded with this format.
      */
     private final GridSampleDimension[] bands;
 
     /**
-     * {@code true} si les données lues représenteront déjà les valeurs du paramètre géophysique.
+     * {@code true} if coverage to be read are already geophysics values.
      */
     private final boolean geophysics;
 
     /**
-     * Objet à utiliser pour lire des images de ce format. Cet objet ne sera créé que lors
-     * du premier appel de {@link #read}, puis réutilisé pour tous les appels subséquents.
+     * The reader to use for reading pixel values. Will be created only when first needed,
+     * then reused for all future use.
      */
     private transient ImageReader reader;
 
     /**
-     * Construit une entrée représentant un format.
+     * The {@linkplain #reader} provider. Will be created only when first needed.
+     */
+    private transient ImageReaderSpi provider;
+
+    /**
+     * Creates a new entry for this format.
      *
-     * @param name       Nom du format.
-     * @param mimeType   Nom MIME du format (par exemple "image/png").
-     * @param extension  Extension (sans le point) des noms de fichier (par exemple "png").
-     * @param geophysics {@code true} si les données lues représenteront déjà les valeurs du paramètre géophysique.
-     * @param bands      Listes des bandes apparaissant dans ce format.
+     * @param name       An identifier for this entry.
+     * @param mimeType   Format MIME type (example: {@code "image/png"}).
+     * @param extension  Filename extension, excluding dot separator (example: {@code "png"}).
+     * @param geophysics {@code true} if coverage to be read are already geophysics values.
+     * @param bands      Sample dimensions for coverages encoded with this format.
      */
     protected FormatEntry(final String  name,
                           final String  mimeType,
@@ -150,7 +149,7 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * La langue à utiliser pour le décodeur d'image, ou {@code null} pour la langue par défaut.
+     * Returns the local to be given to the {@link ImageReader}, or {@code null} if none.
      */
     private static Locale getLocale() {
         return null;
@@ -184,14 +183,9 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Retourne les bandes {@link GridSampleDimension} qui permettent de décoder les valeurs des
-     * paramètres géophysiques des images lues par cet objet. Cette méthode peut retourner plusieurs
-     * objets {@link GridSampleDimension}, un par bande. De façon optionnelle, on peut spécifier à
-     * cette méthode les paramètres {@link ImageReadParam} qui ont servit à lire une image
-     * (c'est-à-dire les mêmes paramètres que ceux qui avaient été donnés à {@link #read}). Cette
-     * méthode ne retournera alors que les listes de catégories pertinents pour les bandes lues.
-     *
-     * @param param Paramètres qui ont servit à lire l'image, ou {@code null} pour les paramètres par défaut.
+     * Returns the sample dimensions for coverages encoded with this format. If parameters are
+     * supplied, this method returns only the sample dimensions for supplied source bands list
+     * and returns them in the order inferred from the destination bands list.
      */
     final GridSampleDimension[] getSampleDimensions(final ImageReadParam param) {
         int  bandCount = bands.length;
@@ -205,8 +199,8 @@ final class FormatEntry extends Entry implements Format {
         }
         final GridSampleDimension[] selectedBands = new GridSampleDimension[bandCount];
         /*
-         * Recherche les objets 'GridSampleDimension' qui correspondent aux bandes sources
-         * demandées. Ces objets seront placés aux index des bandes de destination spécifiées.
+         * Searchs for 'GridSampleDimension' from the given source band index and
+         * stores their reference at the position given by destination band index.
          */
         for (int j=0; j<bandCount; j++) {
             final int srcBand = (srcBands!=null) ? srcBands[j] : j;
@@ -217,41 +211,56 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Retourne l'objet à utiliser pour lire des images. Le lecteur retourné ne lira
-     * que des images du format MIME spécifié au constructeur. Les méthodes qui appelent
-     * {@code getImageReader} <u>doivent</u> appeler cette méthode et utiliser l'objet
-     * {@link ImageReader} retourné à l'intérieur d'un bloc synchronisé sur cet objet
-     * {@code FormatEntry} (c'est-à-dire {@code this}).
+     * Returns the image reader provider.
      *
-     * @return Le lecteur à utiliser pour lire les images de ce format.
-     *         Cette méthode ne retourne jamais {@code null}.
-     * @throws IIOException s'il n'y a pas d'objet {@link ImageReader} pour ce format.
+     * @throws IIOException if no suitable image reader provider can been found.
+     */
+    final ImageReaderSpi getImageReaderSpi() throws IIOException {
+        if (provider == null) {
+            // We don't synchronize above this point because it is not a big
+            // deal if two instances are created.
+            synchronized (this) {
+                provider = new ImageReaderSpiDecorator(getImageReader().getOriginatingProvider()) {
+                    @Override
+                    public ImageReader createReaderInstance() throws IOException {
+                        final ImageReader reader = super.createReaderInstance();
+                        handleSpecialCases(reader, null);
+                        return reader;
+                    }
+
+                    @Override
+                    public ImageReader createReaderInstance(final Object extension) throws IOException {
+                        final ImageReader reader = super.createReaderInstance(extension);
+                        handleSpecialCases(reader, null);
+                        return reader;
+                    }
+                };
+            }
+        }
+        return provider;
+    }
+
+    /**
+     * Returns the single image reader. Callers <strong>must</strong> use the returned reader
+     * inside a block synchronized on {@code this} lock.
+     *
+     * @return The single image reader to use (never {@code null}).
+     * @throws IIOException if no suitable {@link ImageReader} has been found.
      */
     private ImageReader getImageReader() throws IIOException {
         assert Thread.holdsLock(this);
         if (reader == null) {
-            reader = createImageReader();
+            final Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(mimeType);
+            if (!readers.hasNext()) {
+                throw new IIOException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_DECODER_$1, mimeType));
+            }
+            reader = readers.next();
+            if (false && readers.hasNext()) { // Check disabled for now.
+                throw new IIOException(Resources.format(
+                        ResourceKeys.ERROR_TOO_MANY_IMAGE_FORMATS_$1, mimeType));
+            }
+            handleSpecialCases(reader, null);
         }
-        return reader;
-    }
-
-    /**
-     * Creates a new image reader for this format.
-     *
-     * @return The image reader for this format.
-     * @throws IIOException if no image reader or too many readers was found for this format.
-     */
-    final ImageReader createImageReader() throws IIOException {
-        final Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(mimeType);
-        if (!readers.hasNext()) {
-            throw new IIOException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_DECODER_$1, mimeType));
-        }
-        final ImageReader reader = readers.next();
-        if (false && readers.hasNext()) { // Check disabled for now.
-            throw new IIOException(Resources.format(
-                    ResourceKeys.ERROR_TOO_MANY_IMAGE_FORMATS_$1, mimeType));
-        }
-        handleSpecialCases(reader, null);
         return reader;
     }
 
@@ -382,7 +391,7 @@ final class FormatEntry extends Entry implements Format {
         final ImageReader reader;
         final ImageReaderSpi spi;
         if (contains(MOSAIC_INPUT_TYPES, file.getClass())) {
-            spi = MOSAIC_SPI;
+            spi = MosaicImageReader.Spi.DEFAULT;
             reader = spi.createReaderInstance();
             inputObject = file;
         } else {
