@@ -15,7 +15,7 @@
     </head>
     <body>        
         <f:view>
-                <f:loadBundle basename="fr.geomatys.bean.messages" var="msgs"/>
+                <f:loadBundle basename="net.seagis.bean.messages" var="msgs"/>
                 <h:form id="form_1" >
                    <t:dataTable id="data" 
                                  value="#{resultData.layers}" 
@@ -71,7 +71,7 @@
                                         paginatorMaxPages="50"
                                         paginatorTableClass="paginator"
                                         paginatorActiveColumnStyle="font-weight:bold;">
-                            <f:actionListener  type="fr.geomatys.bean.DataScrollerActionListener"/>
+                            <f:actionListener  type="net.seagis.bean.DataScrollerActionListener"/>
                             <f:facet name="first" >
                                 <t:graphicImage id="graphicImage_1" url="images/arrow-first.gif" border="1" />
                             </f:facet>
