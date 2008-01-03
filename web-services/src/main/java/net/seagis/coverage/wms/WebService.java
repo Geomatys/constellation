@@ -309,7 +309,10 @@ public abstract class WebService {
      * @return The configuration file, or {@code null} if none.
      */
     protected Object getCapabilitiesObject(Version version) throws JAXBException {
-       String path = System.getenv().get("CATALINA_HOME") + "/webapps" + getContext().getBase().getPath() + "WEB-INF/";
+       String appName = getContext().getBase().getPath();
+       //we delete the /WS
+       appName = appName.substring(0, appName.length()-3);
+       String path = System.getenv().get("CATALINA_HOME") + "/webapps" + appName + "WEB-INF/";
        
        String fileName = this.service + "Capabilities" + version.toString() + ".xml";
         
