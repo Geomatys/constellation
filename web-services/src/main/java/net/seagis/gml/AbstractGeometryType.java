@@ -3,6 +3,7 @@ package net.seagis.gml;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,76 +39,53 @@ import org.geotools.resources.Utilities;
 public abstract class AbstractGeometryType extends AbstractGMLEntry {
 
     @XmlAttribute
-    protected BigInteger srsDimension;
+    private BigInteger srsDimension;
     @XmlAttribute
-    protected String srsName;
+    private String srsName;
     @XmlAttribute
-    protected List<String> axisLabels = new ArrayList<String>();
+    private List<String> axisLabels;
     @XmlAttribute
-    protected List<String> uomLabels  = new ArrayList<String>();
+    private List<String> uomLabels;
 
     /**
+     * empty constructor used by JAXB
+     */
+    AbstractGeometryType(){
+    }
+    
+    public AbstractGeometryType(BigInteger srsDimension, String srsName, List<String> axisLabels, List<String> uomLabels){
+        this.axisLabels   = axisLabels;
+        this.srsDimension = srsDimension;
+        this.srsName      = srsName;
+        this.uomLabels    = uomLabels;
+    }
+    /**
      * Gets the value of the srsDimension property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
      */
     public BigInteger getSrsDimension() {
         return srsDimension;
     }
 
     /**
-     * Sets the value of the srsDimension property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setSrsDimension(BigInteger value) {
-        this.srsDimension = value;
-    }
-
-    /**
      * Gets the value of the srsName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getSrsName() {
         return srsName;
     }
 
     /**
-     * Sets the value of the srsName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setSrsName(String value) {
-        this.srsName = value;
-    }
-
-    /**
-     * Gets the value of the axisLabels property.
-     * 
+     * Gets the value of the axisLabels property (unmodifiable).
      */
     public List<String> getAxisLabels() {
-        return this.axisLabels;
+        return Collections.unmodifiableList(axisLabels);
     }
 
     /**
-     * Gets the value of the uomLabels property.
+     * Gets the value of the uomLabels property (unmodifiable).
      * 
      */
     public List<String> getUomLabels() {
-        return this.uomLabels;
+        return Collections.unmodifiableList(uomLabels);
     }
     
     /**

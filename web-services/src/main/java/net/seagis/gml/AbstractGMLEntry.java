@@ -24,15 +24,15 @@ import org.geotools.resources.Utilities;
 })
 public abstract class AbstractGMLEntry extends Entry{
 
-    //protected List<MetaDataPropertyType> metaDataProperty;
-    //protected CodeWithAuthorityType identifier;
-    protected String description;
-    protected ReferenceEntry descriptionReference;
-    protected String name;
+    //private List<MetaDataPropertyType> metaDataProperty;
+    //private CodeWithAuthorityType identifier;
+    private String description;
+    private ReferenceEntry descriptionReference;
+    private String name;
     @XmlAttribute(namespace = "http://www.opengis.net/gml", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
-    protected String id;
+    private String id;
 
     /**
      *  Constructeur vide utilise par JAXB.
@@ -48,11 +48,6 @@ public abstract class AbstractGMLEntry extends Entry{
     }
     /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link StringOrRefType }
-     *     
      */
     public String getDescription() {
         return description;
@@ -60,11 +55,6 @@ public abstract class AbstractGMLEntry extends Entry{
 
     /**
      * Gets the value of the descriptionReference property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ReferenceType }
-     *     
      */
     public ReferenceEntry getDescriptionReference() {
         return descriptionReference;
@@ -77,11 +67,6 @@ public abstract class AbstractGMLEntry extends Entry{
     }
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getId() {
         return id;

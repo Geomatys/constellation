@@ -15,15 +15,17 @@
 
 package net.seagis.coverage.wms;
 
+//jdk dependencies
 import java.io.File;
 import java.io.StringWriter;
-
+import java.util.ArrayList;
+import java.util.List;
 
 // JAXB xml binding dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.util.ArrayList;
-import java.util.List;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
 
 // jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
@@ -34,17 +36,22 @@ import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
 
 // seagis dependencies
-import javax.xml.bind.Marshaller;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.ows.BoundingBoxType;
+import net.seagis.wcs.RangeType;
 import net.seagis.ows.WGS84BoundingBoxType;
 import net.seagis.wcs.Capabilities;
 import net.seagis.wcs.Contents;
 import net.seagis.wcs.CoverageDescriptionType;
 import net.seagis.wcs.CoverageDescriptions;
+import net.seagis.wcs.CoverageDomainType;
 import net.seagis.wcs.CoverageSummaryType;
+import net.seagis.wcs.SpatialDomainType;
+
+// geoAPI dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
@@ -197,19 +204,54 @@ public class WCService extends WebService {
      * Web service operation
      */
     public String describeCoverage() throws JAXBException, WebServiceException {
-        CoverageDescriptions response = null;// new CoverageDescriptions();
+        logger.info("describeCoverage reçu");
+        try {
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
+        
         verifyBaseParameter(0);
         String identifiers = getParameter("IDENTIFIER", true);
+        webServiceWorker.setLayer(identifiers);
         
+        Layer layer = webServiceWorker.getLayer();
         
-        CoverageDescriptionType coverage = null;//new CoverageDescriptionType();
-        //coverage.
-        response.getCoverageDescription().add(coverage);
+        // TODO
+        net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
+        GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
+        JAXBElement<? extends BoundingBoxType> bbox = null;
+        if(inputGeoBox != null) {
+            String crs = "WGS84(DD)";
+            WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
+                                                 inputGeoBox.getWestBoundLongitude(),
+                                                 inputGeoBox.getEastBoundLongitude(),
+                                                 inputGeoBox.getSouthBoundLatitude(),
+                                                 inputGeoBox.getNorthBoundLatitude());
+            bbox = owsFactory.createWGS84BoundingBox(outputBBox);
+        }
+        SpatialDomainType spatial = new SpatialDomainType(bbox);
+        CoverageDomainType domain = new CoverageDomainType(spatial, null);
+        RangeType range = null;
+        List<String> supportedCRS = new ArrayList<String>();
+        supportedCRS.add("4326");
+        List<String> supportedFormat = new ArrayList<String>();
+        supportedCRS.add("??");
+        CoverageDescriptionType coverage = new CoverageDescriptionType(layer.getName(),
+                                                                       domain,
+                                                                       range,
+                                                                       supportedCRS,
+                                                                       supportedFormat);
+        List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
+        coverages.add(coverage);
+        
+        CoverageDescriptions response = new CoverageDescriptions(coverages);
                
         //we marshall the response and return the XML String
         StringWriter sw = new StringWriter();    
         marshaller.marshal(response, sw);
         return sw.toString();
+        
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, getCurrentVersion());
+        }
     }
 
     /**

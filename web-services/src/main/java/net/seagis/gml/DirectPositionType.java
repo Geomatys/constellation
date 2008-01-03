@@ -23,21 +23,22 @@ import org.geotools.resources.Utilities;
 public class DirectPositionType {
 
     @XmlValue
-    protected List<Double> value;
+    private List<Double> value;
     @XmlAttribute
-    protected int srsDimension;
+    private int srsDimension;
     @XmlAttribute
-    protected String srsName;
+    private String srsName;
     @XmlAttribute
-    protected List<String> axisLabels;
+    private List<String> axisLabels;
     @XmlAttribute
-    protected List<String> uomLabels;
+    private List<String> uomLabels;
 
     public DirectPositionType() {}
     
-    public DirectPositionType(String srsName, int srsDimension, List<Double> value) {
+    public DirectPositionType(String srsName, int srsDimension, List<String> axisLabels, List<Double> value) {
         this.srsName      = srsName;
         this.srsDimension = srsDimension;
+        this.axisLabels   = axisLabels;
         this.value = value;
     }    
     /**

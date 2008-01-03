@@ -22,10 +22,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-//geotools dependencies
 import java.util.Map;
 import java.util.logging.Logger;
+
+//geotools dependencies
 import org.geotools.util.Version;
 
 // jersey dependencies
@@ -297,16 +297,11 @@ public abstract class WebService {
 
    
     /**
-     * @todo this method is duplicate from the database class. it must be fix.
-     *   
-     * Returns the file where to read or write user configuration. If no such file is found,
-     * then this method returns {@code null}. This method is allowed to create the destination
-     * directory if and only if {@code create} is {@code true}.
-     * <p>
-     * Subclasses may override this method in order to search for an other file than the default one.
+     * Returns the file where to read the capabilities document for each service.
+     * If no such file is found, then this method returns {@code null}.
      *
-     * @param  create {@code true} if this method is allowed to create the destination directory.
-     * @return The configuration file, or {@code null} if none.
+     * @param  version the version of the service.
+     * @return The capabilities Object, or {@code null} if none.
      */
     protected Object getCapabilitiesObject(Version version) throws JAXBException {
        String appName = getContext().getBase().getPath();

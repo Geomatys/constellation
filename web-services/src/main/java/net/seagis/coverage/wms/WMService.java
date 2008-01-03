@@ -86,7 +86,7 @@ public class WMService extends WebService {
         super("WMS", "1.3.0","1.1.1");
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wms:net.seagis.sld");
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wms:net.seagis.sld:net.seagis.gml");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wms"));
@@ -260,7 +260,7 @@ public class WMService extends WebService {
                        "            <th>" + layer + "</th>"           +
                        "        </tr>"                                +
                        "        <tr>"                                 +
-                       "            <th>" + result + "</th>"           +
+                       "            <th>" + result + "</th>"          +
                        "        </tr>"                                +
                        "    </table>"                                 +
                        "    </body>"                                  +
@@ -269,13 +269,16 @@ public class WMService extends WebService {
         //si on retourne du xml ou du gml
         else if (infoFormat.equals("text/xml") || infoFormat.equals("application/vnd.ogc.gml")) {
             DirectPosition inputCoordinate = webServiceWorker.getCoordinates();
-            
             List<Double> coord = new ArrayList<Double>();
             for (Double d:inputCoordinate.getCoordinates()) {
                 coord.add(d);
             }
             coord.add(result);
-            DirectPositionType pos = new DirectPositionType(crs, 3, coord);
+            List<String> axisLabels = new ArrayList<String>();
+            axisLabels.add("X");
+            axisLabels.add("Y");
+            axisLabels.add("RESULT");
+            DirectPositionType pos = new DirectPositionType(crs, 3, axisLabels, coord);
             PointType pt = new PointType(layer, pos);
             
             //we marshall the response and return the XML String

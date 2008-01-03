@@ -47,19 +47,19 @@ import org.geotools.resources.Utilities;
 })
 public class EnvelopeEntry extends Entry {
 
-    protected String id;
-    protected DirectPositionType lowerCorner;
-    protected DirectPositionType upperCorner;
-    protected List<DirectPositionType> pos;
-    protected CoordinatesType coordinates;
+    private String id;
+    private DirectPositionType lowerCorner;
+    private DirectPositionType upperCorner;
+    private List<DirectPositionType> pos;
+    private CoordinatesType coordinates;
     @XmlAttribute
-    protected int srsDimension;
+    private int srsDimension;
     @XmlAttribute
-    protected String srsName;
+    private String srsName;
     @XmlAttribute
-    protected List<String> axisLabels;
+    private List<String> axisLabels;
     @XmlAttribute
-    protected List<String> uomLabels;
+    private List<String> uomLabels;
 
     /**
      * Un constructeur vide utilis par JAXB.
@@ -79,55 +79,21 @@ public class EnvelopeEntry extends Entry {
     }
     /**
      * Gets the value of the lowerCorner property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DirectPositionType }
-     *     
      */
     public DirectPositionType getLowerCorner() {
         return lowerCorner;
     }
 
     /**
-     * Sets the value of the lowerCorner property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DirectPositionType }
-     *     
-     */
-    public void setLowerCorner(DirectPositionType value) {
-        this.lowerCorner = value;
-    }
-
-    /**
      * Gets the value of the upperCorner property.
      * 
-     * @return
-     *     possible object is
-     *     {@link DirectPositionType }
-     *     
      */
     public DirectPositionType getUpperCorner() {
         return upperCorner;
     }
 
     /**
-     * Sets the value of the upperCorner property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DirectPositionType }
-     *     
-     */
-    public void setUpperCorner(DirectPositionType value) {
-        this.upperCorner = value;
-    }
-
-    /**
      * Gets the value of the pos property.
-     * 
      */
     public List<DirectPositionType> getPos() {
         if (pos == null) {
@@ -138,74 +104,24 @@ public class EnvelopeEntry extends Entry {
 
     /**
      * Gets the value of the coordinates property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CoordinatesType }
-     *     
      */
     public CoordinatesType getCoordinates() {
         return coordinates;
     }
 
     /**
-     * Sets the value of the coordinates property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CoordinatesType }
-     *     
-     */
-    public void setCoordinates(CoordinatesType value) {
-        this.coordinates = value;
-    }
-
-    /**
      * Gets the value of the srsDimension property.
      * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
      */
     public int getSrsDimension() {
         return srsDimension;
     }
 
     /**
-     * Sets the value of the srsDimension property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setSrsDimension(int value) {
-        this.srsDimension = value;
-    }
-
-    /**
      * Gets the value of the srsName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getSrsName() {
         return srsName;
-    }
-
-    /**
-     * Sets the value of the srsName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setSrsName(String value) {
-        this.srsName = value;
     }
 
     /**

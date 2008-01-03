@@ -2,6 +2,7 @@ package net.seagis.gml;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.resources.Utilities;
 
@@ -16,6 +17,7 @@ import org.geotools.resources.Utilities;
     "pos",
     "coordinates"
 })
+@XmlRootElement(name="PointType")
 public class PointType extends AbstractGeometricPrimitiveType {
 
     private DirectPositionType pos;
@@ -49,7 +51,7 @@ public class PointType extends AbstractGeometricPrimitiveType {
      */
     @Override
     public String toString() {
-        String s = "id = " + this.id + '\n'; 
+        String s = "id = " + this.getId() + '\n'; 
         if(pos != null) {
             s = s + " position : " + pos.toString() + '\n'; 
         }
@@ -79,7 +81,7 @@ public class PointType extends AbstractGeometricPrimitiveType {
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return this.getId().hashCode();
     }
 
 }

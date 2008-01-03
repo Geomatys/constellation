@@ -84,7 +84,14 @@ public class SpatialDomainType {
     }
     
     /**
-     * Build a new Spatial Domain type
+     * Build a new light Spatial Domain type
+     */
+    public SpatialDomainType(JAXBElement<? extends BoundingBoxType> boundingBox) {
+       this.boundingBox.add(boundingBox);
+    }
+    
+    /**
+     * Build a new full Spatial Domain type
      */
     public SpatialDomainType(List<JAXBElement<? extends BoundingBoxType>> boundingBox, GridCrsType gridCRS,
             AbstractCoordinateOperationType transformation, ImageCRSRefType imageCRS, List<PolygonType> polygon) {
