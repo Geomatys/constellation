@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package net.seagis.console;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
+import javax.imageio.ImageReader;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -33,7 +34,6 @@ import ucar.nc2.ncml.NcMLReader;
 
 import org.geotools.resources.Arguments;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
-// TODO import fr.ifremer.image.io.netcdf.IfremerReader;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.UpdatePolicy;
@@ -44,46 +44,46 @@ import static net.seagis.catalog.UpdatePolicy.*;
 
 
 /**
- * Ajoute à la base de données les enregistrements correspondants aux fichiers spécifiés.
+ * Adds new records to the specified database.
  *
  * @version $Id: Collector.java 90 2008-01-02 13:23:18Z cb1ebc7 $
  * @author Martin Desruisseaux
  */
 public class Collector {
     /**
-     * Connexion à la base de données.
+     * Database connection.
      */
     private final Database database;
 
     /**
-     * La table dans laquelle effectuer les insertions.
+     * The table where to write new records.
      */
     private final WritableGridCoverageTable table;
 
     /**
-     * Indique s'il faut écraser les anciennes images avec les nouvelles, ou ignorer
-     * les nouvelles qui existent déjà.
+     * Whatever new records should replace the old ones, or if old records should be keeped as-is.
      */
     private UpdatePolicy updatePolicy = UpdatePolicy.SKIP_EXISTING;
 
     /**
-     * La sortie pour les messages de déboguages, ou {@code null} si elle n'a pas
-     * encore été définie.
+     * An output writer for debugging messages, or {@code null} for the standard output stream.
      */
     private PrintWriter out;
 
     /**
-     * Construit un moissonneur qui ajoutera des entrées dans la base de données par défaut.
+     * Creates a new collector which will adds entries in the default database.
+     *
+     * @throws CatalogException if the connection failed.
      */
     public Collector() throws CatalogException {
         this(null);
     }
 
     /**
-     * Construit un moissonneur qui ajoutera des entrées dans la base de données spécifiée.
+     * Creates a new collector which will adds entries in the specified database.
      *
-     * @param database La base de données à utiliser.
-     * @throws CatalogException si la connexion a échouée.
+     * @param database The database connection.
+     * @throws CatalogException if the connection failed.
      */
     public Collector(final Database database) throws CatalogException {
         if (database != null) {
@@ -99,23 +99,15 @@ public class Collector {
     }
 
     /**
-     * Définit le périphérique de sortie vers lequel écrire d'éventuels messages.
-     * Si cette méthode n'est jamais appelée, alors la valeur par défaut est la
-     * {@linkplain System#out sortie standard}.
-     *
-     * @param out Périphérique de sorties vers lequel écrire des messages, s'il y en a.
-     *            Il s'agira typiquement des instructions {@code INSERT} mémorisées si
-     *            la méthode {@link #pretend} a été appelée.
+     * Returns the database connection.
      */
-    public void setPrinter(final PrintWriter out) {
-        if (out != null) {
-            out.flush();
-        }
-        this.out = out;
+    public Database getDatabase() {
+        return database;
     }
 
     /**
-     * Retourne le périphérique de sortie vers lequel écrire d'éventuels messages.
+     * Returns the output printer for debugging messages.
+     * This method never returns {@code null}.
      */
     public PrintWriter getPrinter() {
         if (out == null) {
@@ -125,35 +117,40 @@ public class Collector {
     }
 
     /**
-     * Retourne l'objet Database utilisé, afin de permettre l'écriture dans la table Series
-     * par l'interface d'upload.
+     * Sets the output writer for debugging messages. If this method is never invoked,
+     * then the default is the {@linkplain System#out standard output stream}.
+     * <p>
+     * Debugging messages are typically the {@code INSERT} SQL instructions that would
+     * be emitted. Those instructions are printed only if {@link #setPretend} has been
+     * invoked with value {@code true}.
      */
-    public Database getDatabase() {
-        return database;
+    public void setPrinter(final PrintWriter out) {
+        if (out != null) {
+            out.flush();
+        }
+        this.out = out;
     }
-    
+
     /**
-     * Fait en sorte que les commandes SQL soit écrites dans un buffer plutôt que exécutées.
-     * Cette méthode sert lors des tests, quand on ne veut pas que la base de données soit
-     * modifiée.
+     * If {@code true}, prints {@code INSERT} statements to the {@linkplain #getPrinter output printer}
+     * rather than executing them. This is useful for testing purpose.
      */
     public void setPretend(final boolean pretend) {
         database.setUpdateSimulator(pretend ? getPrinter() : null);
     }
 
     /**
-     * Indique s'il faut écraser les anciennes images avec les nouvelles, ou ignorer
-     * les nouvelles qui existent déjà.
+     * Whatever new records should replace the old ones, or if old records should be keeped as-is.
      */
     public void setPolicy(final UpdatePolicy policy) {
         updatePolicy = policy;
     }
 
     /**
-     * Procède à l'insertion des nouveaux fichiers pour la couche spécifiée.
+     * Proceed to the insertion of new records for the specified layer.
      *
-     * @param  layer La couche pour laquelle ajouter des données.
-     * @throws CatalogException si l'insertion de données a échouée.
+     * @param  layer The layer to update.
+     * @throws CatalogException If insertion failed.
      */
     public void process(final String layer) throws CatalogException {
         final int count;
@@ -181,19 +178,20 @@ public class Collector {
     }
 
     /**
-     * Insère dans la base de données les informations provenant d'un fichier NcML.
+     * Proceed to the insertion of new records for the specified layer from a NetCDF file.
      *
-     * @param  layer La couche de données choisie.
-     * @param  ncmlPath Le chemin du fichier NcML.
-     * @throws CatalogException si l'insertion de données a échouée.
+     * @param  layer The layer to update.
+     * @param  ncmlPath Path to the NcML file.
+     * @throws CatalogException If insertion failed.
      */
-    public void processNcML(final String layer, final String ncmlPath, 
-                            final boolean allowsNewLayer) throws CatalogException {
+    public void processNcML(final String layer, final String ncmlPath, final boolean allowsNewLayer)
+            throws CatalogException
+    {
+        table.setCanInsertNewLayers(allowsNewLayer);
         try {
-            table.setCanInsertNewLayers(allowsNewLayer);
             table.setLayer(layer);
-            final NetcdfImageReader reader;
-            reader = null;// TODO (NetcdfImageReader) new IfremerReader.Spi().createReaderInstance();
+            final ImageReader reader;
+            reader = new NetcdfImageReader.Spi().createReaderInstance();
             final NetcdfDataset netcdfData = NcMLReader.readNcML(ncmlPath, getNetcdfElement(ncmlPath), null);
             final List<Aggregation.Dataset> data = netcdfData.getAggregation().getNestedDatasets();
             for (final Aggregation.Dataset aggrData: data) {
@@ -218,16 +216,14 @@ public class Collector {
     }
 
     /**
-     * Renvoit la balise XML {@code <netcdf>} ainsi que son contenu pour le fichier NcML se trouvant
-     * à l'adresse passée en paramètre.
+     * Returns the XML {@code <netcdf>} elements for the NetCDF file at the given path.
      *
-     * @param  ncmlPath Le chemin vers le fichier NcML.
-     * @return Le noeud XML {@code <netcdf>}.
-     * @throws CatalogException si l'obtention de la balise a échouée.
+     * @param  ncmlPath Path to the NcML file.
+     * @return The XML {@code <netcdf>} element.
+     * @throws CatalogException If the element can't be obtained.
      */
-    private Element getNetcdfElement(final String ncmlPath) throws CatalogException {
-        final Namespace netcdf = Namespace.getNamespace(
-                "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
+    private static Element getNetcdfElement(final String ncmlPath) throws CatalogException {
+        final Namespace netcdf = Namespace.getNamespace("http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
         final Document doc;
         try {
             SAXBuilder builder = new SAXBuilder();
@@ -247,9 +243,9 @@ public class Collector {
     }
 
     /**
-     * Dispose des ressources allouées.
+     * Dispose collector resources.
      *
-     * @throws CatalogException si la disposition des ressources a échouée.
+     * @throws CatalogException If an error occured while disposing the resources.
      */
     public void close() throws CatalogException {
         try {
@@ -263,7 +259,7 @@ public class Collector {
     }
 
     /**
-     * Lance l'ajout de fichiers à partir de la ligne de commande.
+     * Runs from the command line.
      */
     public static void main(String[] args) throws CatalogException {
         final Arguments arguments = new Arguments(args);
