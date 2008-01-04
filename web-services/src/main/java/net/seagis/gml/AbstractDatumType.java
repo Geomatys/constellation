@@ -110,7 +110,7 @@ public abstract class AbstractDatumType
      *     
      */
     public String getRemarks() {
-        return super.remarks;
+        return super.getRemarks();
     }
 
     /**

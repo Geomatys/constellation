@@ -9,6 +9,7 @@
 package net.seagis.gml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,7 +39,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractReferenceSystemType", propOrder = {
@@ -47,61 +48,44 @@ import javax.xml.bind.annotation.XmlType;
     "validArea",
     "scope"
 })
-/*@XmlSeeAlso({
-    GeographicCRSType.class,
-    TemporalCRSType.class,
-    ImageCRSType.class,
-    VerticalCRSType.class,
-    EngineeringCRSType.class,
-    GeocentricCRSType.class,
-    AbstractGeneralDerivedCRSType.class,
-    CompoundCRSType.class
-})*/
-public abstract class AbstractReferenceSystemType
-    extends AbstractReferenceSystemBaseType
-{
+// GeographicCRSType.class,VerticalCRSType.class,GeocentricCRSType.class,EngineeringCRSType.class, TemporalCRSType.class, AbstractGeneralDerivedCRSType.class, CompoundCRSType.class
+@XmlSeeAlso({
+    ImageCRSType.class
+})
+public abstract class AbstractReferenceSystemType extends AbstractReferenceSystemBaseType {
 
-    protected List<IdentifierType> srsID;
-    protected StringOrRefType remarks;
-    protected ExtentType validArea;
-    protected String scope;
+    private List<IdentifierType> srsID = new ArrayList<IdentifierType>();
+    private StringOrRefType remarks;
+    private ExtentType validArea;
+    private String scope;
 
     /**
+     * Empty constructor used by JAXB
+     */
+    AbstractReferenceSystemType() {
+    }
+    
+    /**
+     * build an abstract reference system.
+     */
+    public AbstractReferenceSystemType(List<IdentifierType> srsID, StringOrRefType remarks,
+            ExtentType validArea, String scope) {
+        
+        this.remarks   = remarks;
+        this.scope     = scope;
+        this.validArea = validArea;
+        this.srsID     = srsID;
+    }
+    
+    /**
      * Set of alterative identifications of this reference system. The first srsID, if any, is normally the primary identification code, and any others are aliases.Gets the value of the srsID property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the srsID property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSrsID().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link IdentifierType }
-     * 
-     * 
      */
     public List<IdentifierType> getSrsID() {
-        if (srsID == null) {
-            srsID = new ArrayList<IdentifierType>();
-        }
-        return this.srsID;
+        return Collections.unmodifiableList(srsID);
     }
 
     /**
      * Comments on or information about this reference system, including source information.
-     * 
-     * @return
-     *     possible object is
-     *     {@link StringOrRefType }
-     *     
      */
     @Override
     public String getRemarks() {
@@ -109,63 +93,16 @@ public abstract class AbstractReferenceSystemType
     }
 
     /**
-     * Sets the value of the remarks property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link StringOrRefType }
-     *     
-     */
-    public void setRemarks(StringOrRefType value) {
-        this.remarks = value;
-    }
-
-    /**
      * Gets the value of the validArea property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ExtentType }
-     *     
      */
     public ExtentType getValidArea() {
         return validArea;
     }
 
     /**
-     * Sets the value of the validArea property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ExtentType }
-     *     
-     */
-    public void setValidArea(ExtentType value) {
-        this.validArea = value;
-    }
-
-    /**
      * Gets the value of the scope property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getScope() {
         return scope;
     }
-
-    /**
-     * Sets the value of the scope property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setScope(String value) {
-        this.scope = value;
-    }
-
 }

@@ -293,7 +293,7 @@ public abstract class WebService {
      * @return an image or xml response.
      * @throw JAXBException
      */
-    public abstract Response treatGETrequest() throws JAXBException;
+    public abstract Response treatIncommingRequest() throws JAXBException;
 
    
     /**

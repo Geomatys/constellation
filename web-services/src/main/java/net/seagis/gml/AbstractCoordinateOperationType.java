@@ -116,7 +116,7 @@ public abstract class AbstractCoordinateOperationType
      */
     @Override
     public String getRemarks() {
-        return  super.remarks;
+        return  super.getRemarks();
     }
 
     /**

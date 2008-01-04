@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import com.sun.ws.rest.spi.resource.Singleton;
 
 // JAXB xml binding dependencies
+import java.util.StringTokenizer;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -99,42 +100,75 @@ public class WMService extends WebService {
    
     
     /**
-     * Treat the incomming GET request and call the right function.
+     * Treat the incomming GET request.
      * 
      * @return an image or xml response.
      * @throw JAXBException
      */
     @HttpMethod("GET")
-    public Response treatGETrequest() throws JAXBException  {
+    public Response doGET() throws JAXBException  {
 
+        return treatIncommingRequest();
+    }
+    
+     /**
+     * Treat the incomming POST request.
+     * 
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @HttpMethod("POST")
+    public Response doPOST(String request) throws JAXBException  {
+        logger.info("request: " + request);
+        final StringTokenizer tokens = new StringTokenizer(request, "&");
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+            String paramName  = token.substring(0, token.indexOf('='));
+            String paramValue = token.substring(token.indexOf('=')+ 1);
+            logger.info("put: " + paramName + "=" + paramValue);
+            context.getQueryParameters().add(paramName, paramValue);
+        }
+        
+        return treatIncommingRequest();
+    }
+    
+    
+    /**
+     * Treat the incomming request and call the right function.
+     * 
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @Override
+    public Response treatIncommingRequest() throws JAXBException {
+        
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
-            
-                String request = (String) getParameter("REQUEST", true);
-                if (request.equalsIgnoreCase("GetMap")) {
+            String request = (String) getParameter("REQUEST", true);
+            if (request.equalsIgnoreCase("GetMap")) {
                     
-                    return Response.Builder.representation(getMap(), webServiceWorker.getMimeType()).build();
+                return Response.Builder.representation(getMap(), webServiceWorker.getMimeType()).build();
                     
-                } else if (request.equals("GetFeatureInfo")) {
+            } else if (request.equals("GetFeatureInfo")) {
                     
-                    return getFeatureInfo();
+                return getFeatureInfo();
                     
-                } else if (request.equalsIgnoreCase("GetCapabilities")) {
+            } else if (request.equalsIgnoreCase("GetCapabilities")) {
                     
-                    return Response.Builder.representation(getCapabilities(), "text/xml").build();
+                return Response.Builder.representation(getCapabilities(), "text/xml").build();
                     
-                } else if (request.equalsIgnoreCase("DescribeLayer")) {
+            } else if (request.equalsIgnoreCase("DescribeLayer")) {
                     
-                    return Response.Builder.representation(describeLayer(), "text/xml").build();
+                return Response.Builder.representation(describeLayer(), "text/xml").build();
                     
-                } else if (request.equalsIgnoreCase("GetLegendGraphic")) {
+            } else if (request.equalsIgnoreCase("GetLegendGraphic")) {
                     
-                    return Response.Builder.representation(getLegendGraphic(), webServiceWorker.getMimeType()).build();
+                return Response.Builder.representation(getLegendGraphic(), webServiceWorker.getMimeType()).build();
                     
-                } else {
-                    throw new WebServiceException("The operation " + request + " is not supported by the service",
-                                                  WMSExceptionCode.OPERATION_NOT_SUPPORTED, getCurrentVersion());
-                }
+            } else {
+                throw new WebServiceException("The operation " + request + " is not supported by the service",
+                                              WMSExceptionCode.OPERATION_NOT_SUPPORTED, getCurrentVersion());
+            }
         } catch (WebServiceException ex) {
             ex.printStackTrace();
             StringWriter sw = new StringWriter();    
@@ -142,7 +176,8 @@ public class WMService extends WebService {
             return Response.Builder.representation(sw.toString(), "text/xml").build();
         }
     }
-
+    
+    
     /**
      * Return a map for the specified parameters in the query.
      * 
@@ -189,8 +224,10 @@ public class WMService extends WebService {
     }
     
     /**
+     * Return the value of a point in a map.
+     *  
+     * @return text, HTML , XML or GML code.
      * 
-     * @return
      * @throws net.seagis.coverage.web.WebServiceException
      */
     private Response getFeatureInfo() throws WebServiceException, JAXBException {
@@ -245,10 +282,10 @@ public class WMService extends WebService {
         
         double result = webServiceWorker.evaluatePixel(i,j);
         
-        // plusieur type de retour possible
+        // there is many return type possible
         String response;
         
-        // si on retourne du html
+        // if we return html
         if (infoFormat.equals("text/html")) {
             response = "<html>"                                       +
                        "    <head>"                                   +
@@ -266,7 +303,7 @@ public class WMService extends WebService {
                        "    </body>"                                  +
                        "</html>";
         }
-        //si on retourne du xml ou du gml
+        //if we return xml or gml
         else if (infoFormat.equals("text/xml") || infoFormat.equals("application/vnd.ogc.gml")) {
             DirectPosition inputCoordinate = webServiceWorker.getCoordinates();
             List<Double> coord = new ArrayList<Double>();
@@ -287,7 +324,7 @@ public class WMService extends WebService {
             response = sw.toString();
         }
         
-        //si on retourne du text
+        //if we return text
         else {
             response = "result for " + layer + " is:" + result;
         }

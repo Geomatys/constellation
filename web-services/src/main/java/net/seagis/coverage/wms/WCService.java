@@ -29,6 +29,7 @@ import javax.xml.bind.Marshaller;
 
 // jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
+import java.util.StringTokenizer;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
@@ -83,42 +84,74 @@ public class WCService extends WebService {
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
     }
     
-     /**
-     * Treat the incomming GET request and call the right function.
+    /**
+     * Treat the incomming GET request.
      * 
      * @return an image or xml response.
      * @throw JAXBException
      */
     @HttpMethod("GET")
-    public Response treatGETrequest() throws JAXBException  {
+    public Response doGET() throws JAXBException  {
+
+        return treatIncommingRequest();
+    }
+    
+     /**
+     * Treat the incomming POST request.
+     * 
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @HttpMethod("POST")
+    public Response doPOST(String request) throws JAXBException  {
+        logger.info("request: " + request);
+        final StringTokenizer tokens = new StringTokenizer(request, "&");
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+            String paramName  = token.substring(0, token.indexOf('='));
+            String paramValue = token.substring(token.indexOf('=')+ 1);
+            logger.info("put: " + paramName + "=" + paramValue);
+            context.getQueryParameters().add(paramName, paramValue);
+        }
+        
+        return treatIncommingRequest();
+    }
+    
+    /**
+     * Treat the incomming request and call the right function.
+     * 
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @Override
+    public Response treatIncommingRequest() throws JAXBException {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
 
         try {
-            
-                String request = (String) getParameter("REQUEST", true);
-                if (request.equalsIgnoreCase("DescribeCoverage")) {
+            String request = (String) getParameter("REQUEST", true);
+            if (request.equalsIgnoreCase("DescribeCoverage")) {
                     
-                    return Response.Builder.representation(describeCoverage(), "text/xml").build();
+                return Response.Builder.representation(describeCoverage(), "text/xml").build();
                     
-                } else if (request.equalsIgnoreCase("GetCapabilities")) {
+            } else if (request.equalsIgnoreCase("GetCapabilities")) {
                     
-                    return Response.Builder.representation(getCapabilities(), "text/xml").build();
+                return Response.Builder.representation(getCapabilities(), "text/xml").build();
                     
-                } else if (request.equalsIgnoreCase("GetCoverage")) {
+            } else if (request.equalsIgnoreCase("GetCoverage")) {
                     
-                    return Response.Builder.representation(getCoverage(), webServiceWorker.getMimeType()).build();
-                    
-                } else {
-                    throw new WebServiceException("The operation " + request + " is not supported by the service",
-                                                  WMSExceptionCode.OPERATION_NOT_SUPPORTED, getCurrentVersion());
-                }
+                return Response.Builder.representation(getCoverage(), webServiceWorker.getMimeType()).build();
+                     
+            } else {
+                throw new WebServiceException("The operation " + request + " is not supported by the service",
+                                              WMSExceptionCode.OPERATION_NOT_SUPPORTED, getCurrentVersion());
+            }
         } catch (WebServiceException ex) {
             ex.printStackTrace();
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
             return Response.Builder.representation(sw.toString(), "text/xml").build();
         }
-    }
+     }
     
     /**
      * Web service operation
@@ -188,14 +221,74 @@ public class WCService extends WebService {
         
         verifyBaseParameter(0);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
-        if (getCurrentVersion().toString().equals("1.0.0")) {
-            webServiceWorker.setFormat(getParameter("format", true));
-            webServiceWorker.setLayer(getParameter("coverage", true));
-            webServiceWorker.setCoordinateReferenceSystem(getParameter("CRS", true));
-            webServiceWorker.setBoundingBox(getParameter("bbox", false));
-            webServiceWorker.setTime(getParameter("time", false));
-            webServiceWorker.setDimension(getParameter("width", true), getParameter("height", true));      
+        String format, coverage, crs, bbox, time, interpolation;
+        String width = null, height = null; 
+        String gridType, gridOrigin, gridOffsets, gridCS;
+        
+       if (getCurrentVersion().toString().equals("1.1.1")){
+            
+            coverage = getParameter("identifier", true);
+            
+            //Domain subset
+            bbox = getParameter("BoundingBox", true);
+            time = getParameter("timeSequence", false);
+            
+            /**
+             * Range subSet not yet used.
+             * contain the sub fields : fieldSubset
+             * FieldSubset: - identifier
+             *              - interpolationMethodType
+             *              - axisSubset
+             * 
+             * AxisSubset:  - identifier
+             *              - key 
+             */
+            getParameter("rangeSubset", false);
+            //output
+            format = getParameter("format", true);
+            
+            /**
+             * grid crs
+             */
+            crs = getParameter("GridBaseCRS", true);
+            gridOffsets = getParameter("GridOffsets", true);
+            
+            gridType = getParameter("GridType", false);
+            if (gridType == null) {
+                gridType = "urn:ogc:def:method:WCS:1.1:2dSimpleGrid";
+            }
+            gridOrigin = getParameter("GridOrigin", false);
+            if (gridType == null) {
+                gridType = "0.0,0.0";
+            }
+            
+            gridCS = getParameter("GridCS", false);
+            if (gridType == null) {
+                gridType = "urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS";
+            }
+            
+            getParameter("store", false);
+            
+        } else {
+            
+            // parameter for 1.0.0 version
+            format        = getParameter("format", true);
+            coverage      = getParameter("coverage", true);
+            crs           = getParameter("CRS", true);
+            bbox          = getParameter("bbox", false);
+            time          = getParameter("time", false);
+            width         = getParameter("width", true);
+            height        = getParameter("height", true);
+            interpolation = getParameter("interpolation", false);
         }
+        
+        webServiceWorker.setFormat(format);
+        webServiceWorker.setLayer(coverage);
+        webServiceWorker.setCoordinateReferenceSystem(crs);
+        webServiceWorker.setBoundingBox(bbox);
+        webServiceWorker.setTime(time);
+        webServiceWorker.setDimension(width, height);
+            
         return webServiceWorker.getImageFile();
     }
     
