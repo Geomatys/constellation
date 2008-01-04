@@ -291,14 +291,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link LocationPropertyType }
-     * 
-     */
-    public LocationPropertyType createLocationPropertyType() {
-        return new LocationPropertyType();
-    }
-
-    /**
      * Create an instance of {@link ImageDatumType }
      * 
      */
@@ -398,23 +390,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link UnitDefinitionType }
-     * 
-     */
-    public UnitDefinitionType createUnitDefinitionType() {
-        return new UnitDefinitionType();
-    }
-
-    /**
-     * Create an instance of {@link UnitOfMeasureType }
-     * 
-     */
-    public UnitOfMeasureType createUnitOfMeasureType() {
-        return new UnitOfMeasureType();
-    }
-
-
-    /**
      * Create an instance of {@link DefinitionType }
      * 
      */
@@ -422,14 +397,6 @@ public class ObjectFactory {
         return new DefinitionType();
     }
 
-
-    /**
-     * Create an instance of {@link BaseUnitType }
-     * 
-     */
-    public BaseUnitType createBaseUnitType() {
-        return new BaseUnitType();
-    }
 
     /**
      * Create an instance of {@link TimeInstantType }
@@ -604,15 +571,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "_TimePrimitive", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_TimeObject")
     public JAXBElement<AbstractTimePrimitiveType> createTimePrimitive(AbstractTimePrimitiveType value) {
         return new JAXBElement<AbstractTimePrimitiveType>(_TimePrimitive_QNAME, AbstractTimePrimitiveType.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link UnitOfMeasureType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "unitOfMeasure")
-    public JAXBElement<UnitOfMeasureType> createUnitOfMeasure(UnitOfMeasureType value) {
-        return new JAXBElement<UnitOfMeasureType>(_UnitOfMeasure_QNAME, UnitOfMeasureType.class, null, value);
     }
 
     /**
@@ -1019,15 +977,6 @@ public class ObjectFactory {
 
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link BaseUnitType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "BaseUnit", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "UnitDefinition")
-    public JAXBElement<BaseUnitType> createBaseUnit(BaseUnitType value) {
-        return new JAXBElement<BaseUnitType>(_BaseUnit_QNAME, BaseUnitType.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AbstractSurfaceType }{@code >}}
      * 
      */
@@ -1079,15 +1028,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "_Operation", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_SingleOperation")
     public JAXBElement<AbstractCoordinateOperationType> createOperation(AbstractCoordinateOperationType value) {
         return new JAXBElement<AbstractCoordinateOperationType>(_Operation_QNAME, AbstractCoordinateOperationType.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link UnitDefinitionType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "UnitDefinition", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "Definition")
-    public JAXBElement<UnitDefinitionType> createUnitDefinition(UnitDefinitionType value) {
-        return new JAXBElement<UnitDefinitionType>(_UnitDefinition_QNAME, UnitDefinitionType.class, null, value);
     }
 
     /**
@@ -1442,15 +1382,6 @@ public class ObjectFactory {
     }
 
    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link LocationPropertyType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "location")
-    public JAXBElement<LocationPropertyType> createLocation(LocationPropertyType value) {
-        return new JAXBElement<LocationPropertyType>(_Location_QNAME, LocationPropertyType.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ObliqueCartesianCSRefType }{@code >}}
      * 
      */
