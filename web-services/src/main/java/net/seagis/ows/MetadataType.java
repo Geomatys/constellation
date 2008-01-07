@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -77,6 +78,8 @@ public class MetadataType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
+    // TODO make constructor
+    
     /**
      * Gets the value of the abstractMetaData property.
      */
@@ -145,5 +148,67 @@ public class MetadataType {
      */
     public String getActuate() {
         return actuate;
+    }
+
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final MetadataType that = (MetadataType) object;
+
+        return Utilities.equals(this.about,            that.about)            &&
+               Utilities.equals(this.abstractMetaData, that.abstractMetaData) &&
+               Utilities.equals(this.actuate,          that.actuate)          &&
+               Utilities.equals(this.arcrole,          that.arcrole)          &&
+               Utilities.equals(this.href,             that.href)             &&
+               Utilities.equals(this.role,             that.role)             &&
+               Utilities.equals(this.show,             that.show)             &&
+               Utilities.equals(this.title,            that.title)            &&
+               Utilities.equals(this.type,             that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 83 * hash + (this.abstractMetaData != null ? this.abstractMetaData.hashCode() : 0);
+        hash = 83 * hash + (this.about != null ? this.about.hashCode() : 0);
+        hash = 83 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 83 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 83 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 83 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 83 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 83 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 83 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("clas: MetadataType").append('\n');
+        if (abstractMetaData != null)
+            s.append("abstractMetadata= ").append(abstractMetaData.toString());
+        if (about != null)
+            s.append("about=").append(about).append('\n');
+        if (actuate != null)
+            s.append("actuate=").append(actuate).append('\n');
+        if (arcrole != null)
+            s.append("arcrole=").append(arcrole).append('\n');
+        if (href != null)
+            s.append("href=").append(href).append('\n');
+        if (role != null)
+            s.append("role=").append(role).append('\n');
+        if (show != null)
+            s.append("show=").append(show).append('\n');
+        if (title != null)
+            s.append("title=").append(title).append('\n');
+        if (type != null)
+            s.append("type=").append(type).append('\n');
+        
+        return s.toString();
     }
 }

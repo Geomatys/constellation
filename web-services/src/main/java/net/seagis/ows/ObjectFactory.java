@@ -67,7 +67,9 @@ public class ObjectFactory {
     private final static QName _AccessConstraints_QNAME = new QName("http://www.opengis.net/ows/1.1", "AccessConstraints");
     private final static QName _HTTPGet_QNAME = new QName("http://www.opengis.net/ows/1.1", "Get");
     private final static QName _HTTPPost_QNAME = new QName("http://www.opengis.net/ows/1.1", "Post");
-
+    private final static QName _Exception_QNAME = new QName("http://www.opengis.net/ows/1.1", "Exception");
+    private final static QName _GetCapabilities_QNAME = new QName("http://www.opengis.net/ows/1.1", "GetCapabilities");
+    
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.ows._1
      * 
@@ -748,6 +750,72 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.opengis.net/ows/1.1", name = "Post", scope = HTTP.class)
     public JAXBElement<RequestMethodType> createHTTPPost(RequestMethodType value) {
         return new JAXBElement<RequestMethodType>(_HTTPPost_QNAME, RequestMethodType.class, HTTP.class, value);
+    }
+    
+     /**
+     * Create an instance of {@link ExceptionReport }
+     * 
+     */
+    public ExceptionReport createExceptionReport() {
+        return new ExceptionReport();
+    }
+
+    /**
+     * Create an instance of {@link ExceptionType }
+     * 
+     */
+    public ExceptionType createExceptionType() {
+        return new ExceptionType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExceptionType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ows/1.1", name = "Exception")
+    public JAXBElement<ExceptionType> createException(ExceptionType value) {
+        return new JAXBElement<ExceptionType>(_Exception_QNAME, ExceptionType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link SectionsType }
+     * 
+     */
+    public SectionsType createSectionsType() {
+        return new SectionsType();
+    }
+
+   /**
+     * Create an instance of {@link GetCapabilitiesType }
+     * 
+     */
+    public GetCapabilitiesType createGetCapabilitiesType() {
+        return new GetCapabilitiesType();
+    }
+
+    /**
+     * Create an instance of {@link AcceptFormatsType }
+     * 
+     */
+    public AcceptFormatsType createAcceptFormatsType() {
+        return new AcceptFormatsType();
+    }
+
+    /**
+     * Create an instance of {@link AcceptVersionsType }
+     * 
+     */
+    public AcceptVersionsType createAcceptVersionsType() {
+        return new AcceptVersionsType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GetCapabilitiesType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ows/1.1", name = "GetCapabilities")
+    public JAXBElement<GetCapabilitiesType> createGetCapabilities(GetCapabilitiesType value) {
+        return new JAXBElement<GetCapabilitiesType>(_GetCapabilities_QNAME, GetCapabilitiesType.class, null, value);
     }
 
 }

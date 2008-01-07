@@ -17,6 +17,7 @@
 package net.seagis.ows;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -44,7 +45,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "KeywordsType", propOrder = {
@@ -54,61 +55,35 @@ import javax.xml.bind.annotation.XmlType;
 public class KeywordsType {
 
     @XmlElement(name = "Keyword", required = true)
-    protected List<LanguageStringType> keyword;
+    private List<LanguageStringType> keyword;
     @XmlElement(name = "Type")
-    protected CodeType type;
+    private CodeType type;
 
     /**
+     * Empty constructor used by JAXB.
+     */
+    KeywordsType(){
+    }
+    
+    /**
+     * Build a new list of keywords.
+     */
+    public KeywordsType(List<LanguageStringType> keyword, CodeType type){
+        this.keyword = keyword;
+        this.type    = type;
+    }
+    /**
      * Gets the value of the keyword property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the keyword property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getKeyword().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link LanguageStringType }
-     * 
-     * 
      */
     public List<LanguageStringType> getKeyword() {
-        if (keyword == null) {
-            keyword = new ArrayList<LanguageStringType>();
-        }
-        return this.keyword;
+        return Collections.unmodifiableList(keyword);
     }
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CodeType }
-     *     
      */
     public CodeType getType() {
         return type;
-    }
-
-    /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CodeType }
-     *     
-     */
-    public void setType(CodeType value) {
-        this.type = value;
     }
 
 }

@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -39,7 +40,7 @@ import javax.xml.bind.annotation.XmlValue;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LanguageStringType", propOrder = {
@@ -48,56 +49,63 @@ import javax.xml.bind.annotation.XmlValue;
 public class LanguageStringType {
 
     @XmlValue
-    protected String value;
+    private String value;
     @XmlAttribute(namespace = "http://www.w3.org/XML/1998/namespace")
-    protected String lang;
+    private String lang;
 
     /**
+     * Empty constructor used by JAXB.
+     */
+    LanguageStringType(){
+    }
+    
+     /**
+     * Build a new String in the specified language.
+     */
+    public LanguageStringType(String value, String lang){
+        this.lang  = lang;
+        this.value = value;
+    }
+    
+    /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getValue() {
         return value;
     }
 
     /**
-     * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    /**
      * Gets the value of the lang property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getLang() {
         return lang;
     }
 
     /**
-     * Sets the value of the lang property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * Verify that this entry is identical to the specified object.
      */
-    public void setLang(String value) {
-        this.lang = value;
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final LanguageStringType that = (LanguageStringType) object;
+
+        return Utilities.equals(this.lang,  that.lang)  &&
+               Utilities.equals(this.value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 97 * hash + (this.lang != null ? this.lang.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        return "class:LanguageStringType  value=" + value + " lang=" + lang;
     }
 
 }

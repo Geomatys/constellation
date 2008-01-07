@@ -28,6 +28,7 @@ import net.seagis.wcs.AxisType;
 import net.seagis.wcs.CoverageDescriptionType;
 import net.seagis.wcs.CoverageSummaryType;
 import net.seagis.wcs.FieldType;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -115,5 +116,47 @@ public class DescriptionType {
     public List<KeywordsType> getKeywords() {
         return Collections.unmodifiableList(keywords);
     }
+    
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final DescriptionType that = (DescriptionType) object;
 
+        return Utilities.equals(this._abstract, that._abstract) &&
+               Utilities.equals(this.keywords, that.keywords) &&
+               Utilities.equals(this.title, that.title);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 59 * hash + (this._abstract != null ? this._abstract.hashCode() : 0);
+        hash = 59 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("class=DescriptionType").append('\n');
+        s.append("title:").append('\n');
+        for (LanguageStringType l:title) {
+             s.append(l).append('\n');
+        }
+        s.append("abstract:").append('\n');
+        for (LanguageStringType l:_abstract) {
+             s.append(l).append('\n');
+        }
+        s.append("keywords:").append('\n');
+        for (KeywordsType l:keywords) {
+             s.append(l).append('\n');
+        }
+        return s.toString();
+    }
 }

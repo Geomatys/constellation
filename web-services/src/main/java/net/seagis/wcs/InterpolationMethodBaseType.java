@@ -48,5 +48,8 @@ import net.seagis.ows.CodeType;
     InterpolationMethodType.class
 })
 public class InterpolationMethodBaseType extends CodeType {
+    
+    InterpolationMethodBaseType(){
+    }
 
 }

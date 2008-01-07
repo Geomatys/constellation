@@ -51,7 +51,7 @@ import net.seagis.ows.CapabilitiesBaseType;
 public class Capabilities extends CapabilitiesBaseType {
 
     @XmlElement(name = "Contents")
-    protected Contents contents;
+    private Contents contents;
 
     /**
      * An empty constructor used by JAXB
@@ -59,7 +59,8 @@ public class Capabilities extends CapabilitiesBaseType {
     Capabilities(){}
     
     /**
-     * Build a new Capabilities document
+     * Build a new Capabilities document.
+     * TODO call super(...)
      */
     public Capabilities(Contents contents) {
         this.contents = contents;

@@ -216,7 +216,7 @@ public class WCService extends WebService {
      * Web service operation
      */
     public File getCoverage() throws JAXBException, WebServiceException {
-        logger.info("getCoverage reçu");
+        logger.info("getCoverage recu");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         verifyBaseParameter(0);
@@ -297,7 +297,7 @@ public class WCService extends WebService {
      * Web service operation
      */
     public String describeCoverage() throws JAXBException, WebServiceException {
-        logger.info("describeCoverage reçu");
+        logger.info("describeCoverage recu");
         try {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
