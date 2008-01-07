@@ -102,8 +102,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     /** The file name.               */ private final String filename;
     /** Image start time, inclusive. */ private final long   startTime;
     /** Image end time, exclusive.   */ private final long   endTime;
-    /** Index in the time dimension. */ private final short  timeIndex;
-    /** Index of image to be read.   */         final short  imageIndex = 0; // TODO
+    /** Index of image to be read.   */ private final short  index;
     /** The band to read, or 0.      */ private final short  band;
 
     /**
@@ -162,25 +161,25 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     protected GridCoverageEntry(final GridCoverageTable table,
                                 final Series            series,
                                 final String            filename,
+                                final short             index,
                                 final Date              startTime,
                                 final Date              endTime,
-                                final short             timeIndex,
                                 final GridGeometryEntry geometry,
                                 final short             band,
                                 final String            remarks)
             throws CatalogException, SQLException
     {
-        super(createName(series.getName(), filename, band, timeIndex), remarks);
+        super(createName(series.getName(), filename, index, band), remarks);
         // TODO: need to include the temporal CRS here.
         CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem();
         this.series     = series;
         this.filename   = filename;
         this.geometry   = geometry;
+        this.index      = index;
         this.band       = band;
         this.parameters = table.getParameters(crs);
         this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
-        this.timeIndex  = timeIndex;
         if (geometry.isEmpty() || this.startTime > this.endTime) {
             // TODO: localize
             throw new IllegalRecordException("L'enveloppe spatio-temporelle est vide.");
@@ -196,11 +195,11 @@ class GridCoverageEntry extends Entry implements CoverageReference {
         this.series     = entry.series;
         this.filename   = entry.filename;
         this.geometry   = geometry;
+        this.index      = entry.index;
         this.band       = entry.band;
         this.parameters = entry.parameters;
         this.startTime  = entry.startTime;
         this.endTime    = entry.endTime;
-        this.timeIndex  = entry.timeIndex;
     }
 
     /**
@@ -208,12 +207,12 @@ class GridCoverageEntry extends Entry implements CoverageReference {
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
     private static String createName(final String series, final String filename,
-                                     final short band, final short timeIndex)
+                                     final short index, final short band)
     {
         final StringBuilder buffer = new StringBuilder(series.trim());
         buffer.append(':').append(filename);
-        if (timeIndex != 0) {
-            buffer.append(':').append(timeIndex);
+        if (index != 0) {
+            buffer.append(':').append(index);
         }
         if (band != 0) {
             buffer.append(':').append(band);
@@ -279,6 +278,15 @@ class GridCoverageEntry extends Entry implements CoverageReference {
         } catch (URISyntaxException e) {
             throw new IIOException(e.getLocalizedMessage(), e);
         }
+    }
+
+    /**
+     * Returns the image index to be given to the image reader. For {@link GridCoverageMosaic}
+     * internal usage only. This number may be wrong if {@link #handleSpecialCases} returns
+     * {@code true} (we need to find a better way to handle special cases).
+     */
+    final int getImageIndex() {
+        return (index != 0) ? index-1 : 0;
     }
 
     /**
@@ -387,16 +395,20 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     }
 
     /**
-     * Handle special cases for some specific image formats.
+     * Handles special cases for some specific image formats.
+     *
+     * @deprecated We need to find a better way to do this stuff.
      */
-    private void handleSpecialCases(final ImageReadParam param) {
+    private boolean handleSpecialCases(final ImageReadParam param) {
         if (param instanceof NetcdfReadParam) {
             final NetcdfReadParam p = (NetcdfReadParam) param;
             p.setBandDimensionTypes(AxisType.Height, AxisType.Pressure);
-            if (timeIndex != 0) {
-                p.setSliceIndice(AxisType.Time, timeIndex - 1);
+            if (index != 0) {
+                p.setSliceIndice(AxisType.Time, index - 1);
             }
+            return true;
         }
+        return false;
     }
 
     /**
@@ -632,7 +644,12 @@ class GridCoverageEntry extends Entry implements CoverageReference {
                     // Selects a particular depth in a 3D coverage.
                     param.setSourceBands(new int[] {band});
                 }
-                handleSpecialCases(param);
+                final int imageIndex;
+                if (handleSpecialCases(param)) {
+                    imageIndex = 0; // The index has been processed by 'handleSpecialCases'.
+                } else {
+                    imageIndex = getImageIndex();
+                }
                 if (image == null) {
                     final Dimension size = geometry.getSize();
                     image = format.read(getInput(), imageIndex, param, listeners, size, this);
@@ -651,7 +668,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
          */
         final Map properties = Collections.singletonMap(REFERENCE_KEY, this);
         final GridCoverageFactory factory = GridCoveragePool.DEFAULT.factory;
-        GridCoverage2D coverage; 
+        GridCoverage2D coverage;
         if (bands != null && bands.length != 0) {
             coverage = factory.create(filename, image, envelope, bands, null, properties);
         } else {
@@ -728,9 +745,9 @@ class GridCoverageEntry extends Entry implements CoverageReference {
         if (super.equals(object)) {
             final GridCoverageEntry that = (GridCoverageEntry) object;
             return this.band      == that.band      &&
+                   this.index     == that.index     &&
                    this.startTime == that.startTime &&
                    this.endTime   == that.endTime   &&
-                   this.timeIndex == that.timeIndex &&
                    Utilities.equals(this.series,     that.series    ) &&
                    Utilities.equals(this.filename,   that.filename  ) &&
                    Utilities.equals(this.geometry,   that.geometry  ) &&

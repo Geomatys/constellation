@@ -672,7 +672,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
         final String filename  = result.getString   (indexOf(query.filename));
         final Date   startTime = result.getTimestamp(indexOf(query.startTime), calendar);
         final Date   endTime   = result.getTimestamp(indexOf(query.endTime),   calendar);
-        final short  timeIndex = result.getShort    (indexOf(query.index)); // We expect 0 if null.
+        final short  index     = result.getShort    (indexOf(query.index)); // We expect 0 if null.
         final String extent    = result.getString   (indexOf(query.spatialExtent));
         /*
          * Gets the SeriesEntry in which this coverage is declared. The entry should be available
@@ -693,7 +693,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
         final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
         final NumberRange  verticalRange = getVerticalRange();
         final short band = geometry.indexOf(0.5*(verticalRange.getMinimum() + verticalRange.getMaximum()));
-        return new GridCoverageEntry(this, series, filename, startTime, endTime, timeIndex,
+        return new GridCoverageEntry(this, series, filename, index, startTime, endTime,
                                      geometry, band, null).unique();
     }
 

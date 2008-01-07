@@ -147,7 +147,7 @@ final class GridCoverageMosaic extends GridCoverageEntry {
                 final TileManager[] managers = TileManagerFactory.DEFAULT.create(tiles);
                 for (final TileManager manager : managers) {
                     GridGeometryEntry geometry = reference.geometry;
-                    final String name = names.get(geometry.getGridToCRS2D()) + " mosaic";
+                    final String name = names.get(geometry.getGridToCRS2D()) + " (mosaic)";
                     geometry = new GridGeometryEntry(name, manager.getGridGeometry(), envelope, bbox, geometry);
                     GridCoverageEntry ref = new GridCoverageMosaic(name, reference, geometry, manager);
                     /*
@@ -196,7 +196,7 @@ final class GridCoverageMosaic extends GridCoverageEntry {
             throw new CatalogException(exception);
         }
         Rectangle region = entry.geometry.getBounds();
-        return new Tile(provider, input, entry.imageIndex, region, gridToCRS);
+        return new Tile(provider, input, entry.getImageIndex(), region, gridToCRS);
     }
 
     /**
