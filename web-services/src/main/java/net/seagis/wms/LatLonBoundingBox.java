@@ -73,4 +73,10 @@ public class LatLonBoundingBox {
     public double getNorthBoundLatitude() {
         return miny;
     }
+    
+    @Override
+    public String toString() {
+        return "Env[" + minx + " : " + maxx + ", " + miny + " : " + maxy + "]";
+    }
+    
 }

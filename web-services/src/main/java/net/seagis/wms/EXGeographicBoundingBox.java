@@ -92,4 +92,11 @@ public class EXGeographicBoundingBox {
     public double getNorthBoundLatitude() {
         return northBoundLatitude;
     }
+    
+    @Override
+    public String toString() {
+        return "Env[" + westBoundLongitude + " : " + eastBoundLongitude + 
+                 ", " + southBoundLatitude + " : " + northBoundLatitude + "]";
+    }
+    
 }
