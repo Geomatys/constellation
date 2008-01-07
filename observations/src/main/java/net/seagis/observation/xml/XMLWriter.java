@@ -22,15 +22,12 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Set;
 import net.seagis.catalog.CatalogException;
-import org.opengis.observation.BaseUnit;
 import net.seagis.observation.PhenomenonEntry;
 import net.seagis.observation.SamplingPointEntry;
 import net.seagis.observation.PhenomenonTable;
 import net.seagis.observation.SamplingPointTable;
-import net.seagis.gml.UnitOfMeasureEntry;
-import net.seagis.gml.UnitOfMeasureTable;
-import org.opengis.observation.Phenomenon;
-import org.opengis.observation.sampling.SamplingPoint;
+import net.seagis.gml32.UnitOfMeasureEntry;
+import net.seagis.gml32.UnitOfMeasureTable;
 
 /**
  * Permet de creer les dictionnaire de données au format XML a partir de la base de données.

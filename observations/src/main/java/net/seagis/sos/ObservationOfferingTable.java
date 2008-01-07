@@ -1,10 +1,16 @@
 /*
- * ObservationOfferingTable.java
- * 
- * Created on 10 oct. 2007, 12:33:53
- * 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General License for more details.
  */
 
 package net.seagis.sos;
@@ -22,9 +28,9 @@ import net.seagis.catalog.Database;
 import net.seagis.catalog.NoSuchTableException;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
-import net.seagis.gml.BoundingShapeEntry;
-import net.seagis.gml.EnvelopeEntry;
-import net.seagis.gml.EnvelopeTable;
+import net.seagis.gml32.BoundingShapeEntry;
+import net.seagis.gml32.EnvelopeEntry;
+import net.seagis.gml32.EnvelopeTable;
 import net.seagis.observation.PhenomenonEntry;
 import net.seagis.observation.ProcessEntry;
 import net.seagis.observation.SamplingFeatureEntry;
@@ -32,7 +38,7 @@ import net.seagis.observation.TemporalObjectEntry;
 
 /**
  *
- * @author legal
+ * @author Guilhem Legal
  */
 public class ObservationOfferingTable extends SingletonTable<ObservationOfferingEntry>{
 

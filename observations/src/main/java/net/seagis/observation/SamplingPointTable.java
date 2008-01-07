@@ -25,8 +25,8 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
-import net.seagis.gml.DirectPositionType;
-import net.seagis.gml.PointType;
+import net.seagis.gml32.DirectPositionType;
+import net.seagis.gml32.PointType;
 
 /**
  *SamplingPointTable.java

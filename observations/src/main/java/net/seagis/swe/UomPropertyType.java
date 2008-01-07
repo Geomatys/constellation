@@ -1,3 +1,19 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General License for more details.
+ */
+
+
 package net.seagis.swe;
 
 import java.util.ArrayList;
@@ -7,8 +23,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.BaseUnitType;
-import net.seagis.gml.UnitDefinitionType;
+import net.seagis.gml32.BaseUnitType;
+import net.seagis.gml32.UnitDefinitionType;
 import org.geotools.resources.Utilities;
 
 /**
@@ -53,29 +69,29 @@ import org.geotools.resources.Utilities;
 public class UomPropertyType {
 
     @XmlElement(name = "UnitDefinition", namespace = "http://www.opengis.net/gml/3.2", nillable = true)
-    protected UnitDefinitionType unitDefinition;
+    private UnitDefinitionType unitDefinition;
     @XmlElement(name = "BaseUnit", namespace = "http://www.opengis.net/gml/3.2", nillable = true)
-    protected BaseUnitType baseUnit;
+    private BaseUnitType baseUnit;
     @XmlAttribute
-    protected String code;
+    private String code;
     @XmlAttribute
-    protected List<String> nilReason = new ArrayList<String>();
+    private List<String> nilReason = new ArrayList<String>();
     @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
-    protected String remoteSchema;
+    private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-    protected String actuate;
+    private String actuate;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-    protected String arcrole;
+    private String arcrole;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-    protected String href;
+    private String href;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-    protected String role;
+    private String role;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-    protected String show;
+    private String show;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-    protected String title;
+    private String title;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
-    protected String type;
+    private String type;
 
     
     public UomPropertyType() {}

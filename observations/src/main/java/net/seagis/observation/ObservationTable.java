@@ -28,7 +28,7 @@ import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 import net.seagis.coverage.model.DistributionEntry;
 import net.seagis.coverage.model.DistributionTable;
-import net.seagis.gml.ReferenceEntry;
+import net.seagis.gml32.ReferenceEntry;
 import net.seagis.metadata.MetadataTable;
 import net.seagis.swe.AnyResultEntry;
 import net.seagis.swe.AnyResultTable;

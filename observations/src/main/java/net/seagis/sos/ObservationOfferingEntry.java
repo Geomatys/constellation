@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.AbstractFeatureEntry;
-import net.seagis.gml.BoundingShapeEntry;
-import net.seagis.gml.ReferenceEntry;
+import net.seagis.gml32.AbstractFeatureEntry;
+import net.seagis.gml32.BoundingShapeEntry;
+import net.seagis.gml32.ReferenceEntry;
 import net.seagis.observation.PhenomenonEntry;
 import net.seagis.observation.ProcessEntry;
 import net.seagis.observation.SamplingFeatureEntry;
@@ -39,20 +39,20 @@ import org.geotools.resources.Utilities;
 public class ObservationOfferingEntry extends AbstractFeatureEntry {
 
     @XmlElementRef(name = "intendedApplication", namespace = "http://www.opengeospatial.net/sos/0", type = JAXBElement.class)
-    protected List<JAXBElement<String>> intendedApplication;
-    protected String srsName;
+    private List<JAXBElement<String>> intendedApplication;
+    private String srsName;
     @XmlElement(required = true)
-    protected TemporalObjectEntry eventTime;
+    private TemporalObjectEntry eventTime;
     @XmlElement(required = true)
-    protected List<ProcessEntry> procedure = new ArrayList<ProcessEntry>();
+    private List<ProcessEntry> procedure = new ArrayList<ProcessEntry>();
     @XmlElement(required = true)
-    protected List<PhenomenonEntry> observedProperty = new ArrayList<PhenomenonEntry>();
+    private List<PhenomenonEntry> observedProperty = new ArrayList<PhenomenonEntry>();
     @XmlElement(required = true)
-    protected List<SamplingFeatureEntry> featureOfInterest = new ArrayList<SamplingFeatureEntry>();
+    private List<SamplingFeatureEntry> featureOfInterest = new ArrayList<SamplingFeatureEntry>();
     @XmlElement(required = true)
-    protected String responseFormat;
-    protected String resultModel;
-    protected List<ResponseMode> responseMode;
+    private String responseFormat;
+    private String resultModel;
+    private List<ResponseMode> responseMode;
 
     
     /**

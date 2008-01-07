@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.PointType;
+import net.seagis.gml32.PointType;
 import org.geotools.resources.Utilities;
 import org.opengis.observation.sampling.SamplingPoint;
 

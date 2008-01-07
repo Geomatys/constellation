@@ -21,8 +21,8 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
-import net.seagis.gml.UnitOfMeasureEntry;
-import net.seagis.gml.UnitOfMeasureTable;
+import net.seagis.gml32.UnitOfMeasureEntry;
+import net.seagis.gml32.UnitOfMeasureTable;
 
 /**
  *
