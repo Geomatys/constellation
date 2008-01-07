@@ -81,7 +81,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
     public synchronized void setAbridged(final boolean abridged) {
         if (abridged != this.abridged) {
             this.abridged = abridged;
-            clearCache();
+            //clearCache();
             fireStateChanged("abridged");
         }
     }

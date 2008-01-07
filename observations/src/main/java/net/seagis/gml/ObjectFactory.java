@@ -15,10 +15,14 @@
 
 package net.seagis.gml;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
+import javax.xml.datatype.Duration;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 /**
@@ -67,6 +71,50 @@ public class ObjectFactory {
     private final static QName _CountExtent_QNAME = new QName("http://www.opengis.net/gml/3.2", "CountExtent");
     private final static QName _EnvelopeWithTimePeriod_QNAME = new QName("http://www.opengis.net/gml/3.2", "EnvelopeWithTimePeriod");
     private final static QName _TimePosition_QNAME = new QName("http://www.opengis.net/gml/3.2", "timePosition");
+     private final static QName _QuantityTypeReference_QNAME = new QName("http://www.opengis.net/gml/3.2", "quantityTypeReference");
+    private final static QName _ModifiedCoordinate_QNAME = new QName("http://www.opengis.net/gml/3.2", "modifiedCoordinate");
+    private final static QName _AbstractReference_QNAME = new QName("http://www.opengis.net/gml/3.2", "abstractReference");
+    private final static QName _TargetElement_QNAME = new QName("http://www.opengis.net/gml/3.2", "targetElement");
+    private final static QName _DataSourceReference_QNAME = new QName("http://www.opengis.net/gml/3.2", "dataSourceReference");
+    private final static QName _Origin_QNAME = new QName("http://www.opengis.net/gml/3.2", "origin");
+    private final static QName _Minutes_QNAME = new QName("http://www.opengis.net/gml/3.2", "minutes");
+    private final static QName _IntegerValue_QNAME = new QName("http://www.opengis.net/gml/3.2", "integerValue");
+    private final static QName _OperationVersion_QNAME = new QName("http://www.opengis.net/gml/3.2", "operationVersion");
+    private final static QName _LocationReference_QNAME = new QName("http://www.opengis.net/gml/3.2", "locationReference");
+    private final static QName _DescriptionReference_QNAME = new QName("http://www.opengis.net/gml/3.2", "descriptionReference");
+    private final static QName _StatusReference_QNAME = new QName("http://www.opengis.net/gml/3.2", "statusReference");
+    private final static QName _SourceDimensions_QNAME = new QName("http://www.opengis.net/gml/3.2", "sourceDimensions");
+    private final static QName _DefinitionRef_QNAME = new QName("http://www.opengis.net/gml/3.2", "definitionRef");
+    private final static QName _AssociationName_QNAME = new QName("http://www.opengis.net/gml/3.2", "associationName");
+    private final static QName _AbstractTimePrimitive_QNAME = new QName("http://www.opengis.net/gml/3.2", "AbstractTimePrimitive");
+    private final static QName _TimeInterval_QNAME = new QName("http://www.opengis.net/gml/3.2", "timeInterval");
+    private final static QName _DoubleOrNilReasonTupleList_QNAME = new QName("http://www.opengis.net/gml/3.2", "doubleOrNilReasonTupleList");
+    private final static QName _DefaultCodeSpace_QNAME = new QName("http://www.opengis.net/gml/3.2", "defaultCodeSpace");
+    private final static QName _Null_QNAME = new QName("http://www.opengis.net/gml/3.2", "Null");
+    private final static QName _TimePeriod_QNAME = new QName("http://www.opengis.net/gml/3.2", "TimePeriod");
+    private final static QName _ReversePropertyName_QNAME = new QName("http://www.opengis.net/gml/3.2", "reversePropertyName");
+    private final static QName _Seconds_QNAME = new QName("http://www.opengis.net/gml/3.2", "seconds");
+    private final static QName _MinimumOccurs_QNAME = new QName("http://www.opengis.net/gml/3.2", "minimumOccurs");
+    private final static QName _DecimalMinutes_QNAME = new QName("http://www.opengis.net/gml/3.2", "decimalMinutes");
+    private final static QName _TargetDimensions_QNAME = new QName("http://www.opengis.net/gml/3.2", "targetDimensions");
+    private final static QName _AbstractTimeObject_QNAME = new QName("http://www.opengis.net/gml/3.2", "AbstractTimeObject");
+    private final static QName _BooleanValue_QNAME = new QName("http://www.opengis.net/gml/3.2", "booleanValue");
+    private final static QName _MinimumValue_QNAME = new QName("http://www.opengis.net/gml/3.2", "minimumValue");
+    private final static QName _Scope_QNAME = new QName("http://www.opengis.net/gml/3.2", "scope");
+    private final static QName _Duration_QNAME = new QName("http://www.opengis.net/gml/3.2", "duration");
+    private final static QName _GmlProfileSchema_QNAME = new QName("http://www.opengis.net/gml/3.2", "gmlProfileSchema");
+    private final static QName _TimeInstant_QNAME = new QName("http://www.opengis.net/gml/3.2", "TimeInstant");
+    private final static QName _AbstractTimeGeometricPrimitive_QNAME = new QName("http://www.opengis.net/gml/3.2", "AbstractTimeGeometricPrimitive");
+    private final static QName _IntegerValueList_QNAME = new QName("http://www.opengis.net/gml/3.2", "integerValueList");
+    private final static QName _StringValue_QNAME = new QName("http://www.opengis.net/gml/3.2", "stringValue");
+    private final static QName _ValidTime_QNAME = new QName("http://www.opengis.net/gml/3.2", "validTime");
+    private final static QName _Remarks_QNAME = new QName("http://www.opengis.net/gml/3.2", "remarks");
+    private final static QName _RealizationEpoch_QNAME = new QName("http://www.opengis.net/gml/3.2", "realizationEpoch");
+    private final static QName _CountList_QNAME = new QName("http://www.opengis.net/gml/3.2", "CountList");
+    private final static QName _MaximumOccurs_QNAME = new QName("http://www.opengis.net/gml/3.2", "maximumOccurs");
+    private final static QName _ValueFile_QNAME = new QName("http://www.opengis.net/gml/3.2", "valueFile");
+    private final static QName _MaximumValue_QNAME = new QName("http://www.opengis.net/gml/3.2", "maximumValue");
+    private final static QName _BooleanList_QNAME = new QName("http://www.opengis.net/gml/3.2", "BooleanList");
     
     
     /**
@@ -554,4 +602,451 @@ public class ObjectFactory {
     public JAXBElement<LocationPropertyType> createLocation(LocationPropertyType value) {
         return new JAXBElement<LocationPropertyType>(_Location_QNAME, LocationPropertyType.class, null, value);
     }
+/**
+     * Create an instance of {@link TimeInstantPropertyType }
+     * 
+     */
+    public TimeInstantPropertyType createTimeInstantPropertyType() {
+        return new TimeInstantPropertyType();
+    }
+
+   /**
+     * Create an instance of {@link TimePrimitivePropertyType }
+     * 
+     */
+    public TimePrimitivePropertyType createTimePrimitivePropertyType() {
+        return new TimePrimitivePropertyType();
+    }
+
+    /**
+     * Create an instance of {@link TimePeriodType }
+     * 
+     */
+    public TimePeriodType createTimePeriodType() {
+        return new TimePeriodType();
+    }
+
+    /**
+     * Create an instance of {@link RelatedTimeType }
+     * 
+     */
+    public RelatedTimeType createRelatedTimeType() {
+        return new RelatedTimeType();
+    }
+
+    /**
+     * Create an instance of {@link TimePeriodPropertyType }
+     * 
+     */
+    public TimePeriodPropertyType createTimePeriodPropertyType() {
+        return new TimePeriodPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link TimeIntervalLengthType }
+     * 
+     */
+    public TimeIntervalLengthType createTimeIntervalLengthType() {
+        return new TimeIntervalLengthType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "quantityTypeReference")
+    public JAXBElement<ReferenceEntry> createQuantityTypeReference(ReferenceEntry value) {
+        return new JAXBElement<ReferenceEntry>(_QuantityTypeReference_QNAME, ReferenceEntry.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "modifiedCoordinate")
+    public JAXBElement<BigInteger> createModifiedCoordinate(BigInteger value) {
+        return new JAXBElement<BigInteger>(_ModifiedCoordinate_QNAME, BigInteger.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "abstractReference")
+    public JAXBElement<ReferenceEntry> createAbstractReference(ReferenceEntry value) {
+        return new JAXBElement<ReferenceEntry>(_AbstractReference_QNAME, ReferenceEntry.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "targetElement")
+    public JAXBElement<String> createTargetElement(String value) {
+        return new JAXBElement<String>(_TargetElement_QNAME, String.class, null, value);
+    }
+
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "dataSourceReference")
+    public JAXBElement<ReferenceEntry> createDataSourceReference(ReferenceEntry value) {
+        return new JAXBElement<ReferenceEntry>(_DataSourceReference_QNAME, ReferenceEntry.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link XMLGregorianCalendar }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "origin")
+    public JAXBElement<XMLGregorianCalendar> createOrigin(XMLGregorianCalendar value) {
+        return new JAXBElement<XMLGregorianCalendar>(_Origin_QNAME, XMLGregorianCalendar.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "minutes")
+    public JAXBElement<Integer> createMinutes(Integer value) {
+        return new JAXBElement<Integer>(_Minutes_QNAME, Integer.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "integerValue")
+    public JAXBElement<BigInteger> createIntegerValue(BigInteger value) {
+        return new JAXBElement<BigInteger>(_IntegerValue_QNAME, BigInteger.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "operationVersion")
+    public JAXBElement<String> createOperationVersion(String value) {
+        return new JAXBElement<String>(_OperationVersion_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "locationReference")
+    public JAXBElement<ReferenceEntry> createLocationReference(ReferenceEntry value) {
+        return new JAXBElement<ReferenceEntry>(_LocationReference_QNAME, ReferenceEntry.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "descriptionReference")
+    public JAXBElement<ReferenceEntry> createDescriptionReference(ReferenceEntry value) {
+        return new JAXBElement<ReferenceEntry>(_DescriptionReference_QNAME, ReferenceEntry.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "statusReference")
+    public JAXBElement<ReferenceEntry> createStatusReference(ReferenceEntry value) {
+        return new JAXBElement<ReferenceEntry>(_StatusReference_QNAME, ReferenceEntry.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "sourceDimensions")
+    public JAXBElement<BigInteger> createSourceDimensions(BigInteger value) {
+        return new JAXBElement<BigInteger>(_SourceDimensions_QNAME, BigInteger.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "definitionRef")
+    public JAXBElement<ReferenceEntry> createDefinitionRef(ReferenceEntry value) {
+        return new JAXBElement<ReferenceEntry>(_DefinitionRef_QNAME, ReferenceEntry.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "associationName")
+    public JAXBElement<String> createAssociationName(String value) {
+        return new JAXBElement<String>(_AssociationName_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractTimePrimitiveType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "AbstractTimePrimitive", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractTimeObject")
+    public JAXBElement<AbstractTimePrimitiveType> createAbstractTimePrimitive(AbstractTimePrimitiveType value) {
+        return new JAXBElement<AbstractTimePrimitiveType>(_AbstractTimePrimitive_QNAME, AbstractTimePrimitiveType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TimeIntervalLengthType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "timeInterval")
+    public JAXBElement<TimeIntervalLengthType> createTimeInterval(TimeIntervalLengthType value) {
+        return new JAXBElement<TimeIntervalLengthType>(_TimeInterval_QNAME, TimeIntervalLengthType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link String }{@code >}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "doubleOrNilReasonTupleList")
+    public JAXBElement<List<String>> createDoubleOrNilReasonTupleList(List<String> value) {
+        return new JAXBElement<List<String>>(_DoubleOrNilReasonTupleList_QNAME, ((Class) List.class), null, ((List<String> ) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "defaultCodeSpace")
+    public JAXBElement<String> createDefaultCodeSpace(String value) {
+        return new JAXBElement<String>(_DefaultCodeSpace_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link String }{@code >}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "Null")
+    public JAXBElement<List<String>> createNull(List<String> value) {
+        return new JAXBElement<List<String>>(_Null_QNAME, ((Class) List.class), null, ((List<String> ) value));
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TimePeriodType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "TimePeriod", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractTimeGeometricPrimitive")
+    public JAXBElement<TimePeriodType> createTimePeriod(TimePeriodType value) {
+        return new JAXBElement<TimePeriodType>(_TimePeriod_QNAME, TimePeriodType.class, null, value);
+    }
+
+   
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "reversePropertyName")
+    public JAXBElement<String> createReversePropertyName(String value) {
+        return new JAXBElement<String>(_ReversePropertyName_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BigDecimal }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "seconds")
+    public JAXBElement<BigDecimal> createSeconds(BigDecimal value) {
+        return new JAXBElement<BigDecimal>(_Seconds_QNAME, BigDecimal.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "minimumOccurs")
+    public JAXBElement<BigInteger> createMinimumOccurs(BigInteger value) {
+        return new JAXBElement<BigInteger>(_MinimumOccurs_QNAME, BigInteger.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BigDecimal }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "decimalMinutes")
+    public JAXBElement<BigDecimal> createDecimalMinutes(BigDecimal value) {
+        return new JAXBElement<BigDecimal>(_DecimalMinutes_QNAME, BigDecimal.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "targetDimensions")
+    public JAXBElement<BigInteger> createTargetDimensions(BigInteger value) {
+        return new JAXBElement<BigInteger>(_TargetDimensions_QNAME, BigInteger.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractTimeObjectType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "AbstractTimeObject", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractGML")
+    public JAXBElement<AbstractTimeObjectType> createAbstractTimeObject(AbstractTimeObjectType value) {
+        return new JAXBElement<AbstractTimeObjectType>(_AbstractTimeObject_QNAME, AbstractTimeObjectType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link java.lang.Boolean }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "booleanValue")
+    public JAXBElement<java.lang.Boolean> createBooleanValue(java.lang.Boolean value) {
+        return new JAXBElement<java.lang.Boolean>(_BooleanValue_QNAME, java.lang.Boolean.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Double }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "minimumValue")
+    public JAXBElement<Double> createMinimumValue(Double value) {
+        return new JAXBElement<Double>(_MinimumValue_QNAME, Double.class, null, value);
+    }
+
+   /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "scope")
+    public JAXBElement<String> createScope(String value) {
+        return new JAXBElement<String>(_Scope_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Duration }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "duration")
+    public JAXBElement<Duration> createDuration(Duration value) {
+        return new JAXBElement<Duration>(_Duration_QNAME, Duration.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "gmlProfileSchema")
+    public JAXBElement<String> createGmlProfileSchema(String value) {
+        return new JAXBElement<String>(_GmlProfileSchema_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TimeInstantType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "TimeInstant", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractTimeGeometricPrimitive")
+    public JAXBElement<TimeInstantType> createTimeInstant(TimeInstantType value) {
+        return new JAXBElement<TimeInstantType>(_TimeInstant_QNAME, TimeInstantType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractTimeGeometricPrimitiveType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "AbstractTimeGeometricPrimitive", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractTimePrimitive")
+    public JAXBElement<AbstractTimeGeometricPrimitiveType> createAbstractTimeGeometricPrimitive(AbstractTimeGeometricPrimitiveType value) {
+        return new JAXBElement<AbstractTimeGeometricPrimitiveType>(_AbstractTimeGeometricPrimitive_QNAME, AbstractTimeGeometricPrimitiveType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link BigInteger }{@code >}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "integerValueList")
+    public JAXBElement<List<BigInteger>> createIntegerValueList(List<BigInteger> value) {
+        return new JAXBElement<List<BigInteger>>(_IntegerValueList_QNAME, ((Class) List.class), null, ((List<BigInteger> ) value));
+    }
+
+   /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "stringValue")
+    public JAXBElement<String> createStringValue(String value) {
+        return new JAXBElement<String>(_StringValue_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TimePrimitivePropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "validTime")
+    public JAXBElement<TimePrimitivePropertyType> createValidTime(TimePrimitivePropertyType value) {
+        return new JAXBElement<TimePrimitivePropertyType>(_ValidTime_QNAME, TimePrimitivePropertyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "remarks")
+    public JAXBElement<String> createRemarks(String value) {
+        return new JAXBElement<String>(_Remarks_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link XMLGregorianCalendar }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "realizationEpoch")
+    public JAXBElement<XMLGregorianCalendar> createRealizationEpoch(XMLGregorianCalendar value) {
+        return new JAXBElement<XMLGregorianCalendar>(_RealizationEpoch_QNAME, XMLGregorianCalendar.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link String }{@code >}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "CountList", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractScalarValueList")
+    public JAXBElement<List<String>> createCountList(List<String> value) {
+        return new JAXBElement<List<String>>(_CountList_QNAME, ((Class) List.class), null, ((List<String> ) value));
+    }
+
+   /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "maximumOccurs")
+    public JAXBElement<BigInteger> createMaximumOccurs(BigInteger value) {
+        return new JAXBElement<BigInteger>(_MaximumOccurs_QNAME, BigInteger.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "valueFile")
+    public JAXBElement<String> createValueFile(String value) {
+        return new JAXBElement<String>(_ValueFile_QNAME, String.class, null, value);
+    }
+
+    
+   /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Double }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "maximumValue")
+    public JAXBElement<Double> createMaximumValue(Double value) {
+        return new JAXBElement<Double>(_MaximumValue_QNAME, Double.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link List }{@code <}{@link String }{@code >}{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml/3.2", name = "BooleanList", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractScalarValueList")
+    public JAXBElement<List<String>> createBooleanList(List<String> value) {
+        return new JAXBElement<List<String>>(_BooleanList_QNAME, ((Class) List.class), null, ((List<String> ) value));
+    }
 }
+
