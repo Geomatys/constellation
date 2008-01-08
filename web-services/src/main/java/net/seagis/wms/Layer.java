@@ -329,12 +329,27 @@ public class Layer {
     public List<String> getCRS() {
         return Collections.unmodifiableList(crs);
     }
+    
+    /**
+     * Gets the value of the srs property.
+     * 
+     */
+    public List<String> getSRS() {
+        return Collections.unmodifiableList(srs);
+    }
 
     /**
      * Gets the value of the exGeographicBoundingBox property.
      */
     public EXGeographicBoundingBox getEXGeographicBoundingBox() {
         return exGeographicBoundingBox;
+    }
+    
+    /**
+     * Gets the value of the LatLonBoundingBox property.
+     */
+    public LatLonBoundingBox getLatLonBoundingBox() {
+        return latLonBoundingBox;
     }
 
     /**
@@ -351,6 +366,14 @@ public class Layer {
      */
     public List<Dimension> getDimension() {
         return Collections.unmodifiableList(dimension);
+    }
+    
+    /**
+     * Gets the value of the extent property.
+     * 
+     */
+    public List<Dimension> getExtent() {
+        return Collections.unmodifiableList(extent);
     }
 
     /**
