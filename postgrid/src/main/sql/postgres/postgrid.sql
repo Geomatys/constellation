@@ -513,8 +513,8 @@ CREATE VIEW "DomainOfSeries" AS
            max("east")  AS "east",
            min("south") AS "south",
            max("north") AS "north",
-           avg(("east"  - "west" ) / "width" ) AS "xResolution",
-           avg(("north" - "south") / "height") AS "yResolution"
+           min(("east"  - "west" ) / "width" ) AS "xResolution",
+           min(("north" - "south") / "height") AS "yResolution"
       FROM (SELECT DISTINCT "series", "extent" FROM "GridCoverages") AS "Extents"
  LEFT JOIN "BoundingBoxes" ON "Extents"."extent" = "BoundingBoxes"."identifier"
   GROUP BY "series") AS "BoundingBoxRanges" ON "TimeRanges".series = "BoundingBoxRanges".series
@@ -537,15 +537,15 @@ COMMENT ON VIEW "DomainOfSeries" IS
 
 CREATE VIEW "DomainOfLayers" AS
  SELECT "layer",
-        sum("count")     AS "count",
-        min("startTime") AS "startTime",
-        max("endTime")   AS "endTime",
-        min("west")      AS "west",
-        max("east")      AS "east",
-        min("south")     AS "south",
-        max("north")     AS "north",
-        sum("xResolution" * "count") / sum("count") AS "xResolution",
-        sum("yResolution" * "count") / sum("count") AS "yResolution",
+        sum("count")       AS "count",
+        min("startTime")   AS "startTime",
+        max("endTime")     AS "endTime",
+        min("west")        AS "west",
+        max("east")        AS "east",
+        min("south")       AS "south",
+        max("north")       AS "north",
+        min("xResolution") AS "xResolution",
+        min("yResolution") AS "yResolution",
         bool_or("visible") AS "visible"
    FROM "DomainOfSeries"
    JOIN "Series" ON "DomainOfSeries"."series" = "Series"."identifier"

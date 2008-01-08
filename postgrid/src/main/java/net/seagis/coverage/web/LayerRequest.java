@@ -45,6 +45,11 @@ final class LayerRequest {
     private static final int TILE_SIZE = 256;
 
     /**
+     * For floating point rounding errors.
+     */
+    private static final double EPS = 1E-6;
+
+    /**
      * The global layer. We keep it by reference in order to prevent too early garbage
      * collection, since {@code LayerTable} cache its entries by weak references.
      */
@@ -111,12 +116,12 @@ final class LayerRequest {
                 if (xResolution > 0 && xResolution < xRange && yResolution > 0 && yResolution < yRange) {
                     final double xOrigin = global.getWestBoundLongitude();
                     final double yOrigin = global.getSouthBoundLatitude();
-                    final double xMin    = Math.floor((west  - xOrigin) / (xResolution * TILE_SIZE)) * TILE_SIZE;
-                    final double xMax    = Math.ceil ((east  - xOrigin) / (xResolution * TILE_SIZE)) * TILE_SIZE;
-                    final double yMin    = Math.floor((south - yOrigin) / (yResolution * TILE_SIZE)) * TILE_SIZE;
-                    final double yMax    = Math.ceil ((north - yOrigin) / (yResolution * TILE_SIZE)) * TILE_SIZE;
-                    west  = Math.max(xMin, 0) * xResolution + xOrigin;
-                    south = Math.max(yMin, 0) * yResolution + yOrigin;
+                    final double xMin    = Math.floor((west  - xOrigin) / (xResolution * TILE_SIZE) + EPS) * TILE_SIZE;
+                    final double xMax    = Math.ceil ((east  - xOrigin) / (xResolution * TILE_SIZE) - EPS) * TILE_SIZE;
+                    final double yMin    = Math.floor((south - yOrigin) / (yResolution * TILE_SIZE) + EPS) * TILE_SIZE;
+                    final double yMax    = Math.ceil ((north - yOrigin) / (yResolution * TILE_SIZE) - EPS) * TILE_SIZE;
+                    west  = Math.max(xMin * xResolution + xOrigin, xOrigin);
+                    south = Math.max(yMin * yResolution + yOrigin, yOrigin);
                     east  = Math.min(xMax * xResolution + xOrigin, global.getEastBoundLongitude());
                     north = Math.min(yMax * yResolution + yOrigin, global.getNorthBoundLatitude());
                     bbox.setBounds(west, east, south, north);
@@ -129,8 +134,8 @@ final class LayerRequest {
              * We allows zero, which means best resolution available.
              */
             if (size != null) {
-                xResolution *= Math.max(0, Math.floor(xRange / (size.getLength(0) * xResolution)));
-                yResolution *= Math.max(0, Math.floor(yRange / (size.getLength(1) * yResolution)));
+                xResolution *= Math.max(0, Math.floor(xRange / (size.getLength(0) * xResolution) + EPS));
+                yResolution *= Math.max(0, Math.floor(yRange / (size.getLength(1) * yResolution) + EPS));
                 resolution = (xResolution != 0 || yResolution != 0) ?
                         new XDimension2D.Double(xResolution, yResolution) : null;
             } else {

@@ -295,7 +295,7 @@ public class WebServiceWorker {
      * The current coordinate of the point requested by a getFeatureInfo request
      */
     private DirectPosition coordinate;
-    
+
     /**
      * Creates a new image producer connected to the specified database.
      *
@@ -369,7 +369,7 @@ public class WebServiceWorker {
         }
         final int versionThreshold;
         if (Service.WMS.equals(service) && version != null) {
-            versionThreshold = version.compareTo(AXIS_SWITCH_THRESHOLD);
+            versionThreshold = version.compareTo(AXIS_SWITCH_THRESHOLD, 2);
         } else {
             versionThreshold = 1;
         }
@@ -1128,7 +1128,7 @@ public class WebServiceWorker {
     public DirectPosition getCoordinates() {
         return this.coordinate;
     }
-            
+
     /**
      * Clears the cache. This method should be invoked when the database content changed.
      * This {@code WebServiceWorker} instance can still be used, but the first next invocation

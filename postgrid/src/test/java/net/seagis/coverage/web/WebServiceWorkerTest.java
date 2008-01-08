@@ -199,4 +199,32 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(499, image.getHeight());
         assertEquals(Transparency.TRANSLUCENT, image.getColorModel().getTransparency());
     }
+
+    /**
+     * Tests with BlueMarble layer.
+     */
+    @Test
+    public void testBlueMarble() throws WebServiceException, IOException {
+        final WebServiceWorker worker = new WebServiceWorker(database);
+        worker.setService("WMS", "1.1.1");
+        worker.setLayer("BlueMarble");
+        worker.setCoordinateReferenceSystem("EPSG:4326");
+        worker.setBoundingBox("-180,-90,180,90");
+        worker.setDimension("360", "180");
+
+        Layer layer = worker.getLayer();
+        assertEquals(layer.getName(), "BlueMarble");
+        assertSame("The layer should be cached.", layer, worker.getLayer());
+
+        GridCoverage2D coverage = worker.getGridCoverage2D(false);
+        assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
+        assertSame("Expected no ressampling.",       coverage, worker.getGridCoverage2D(true ));
+
+        File file = worker.getImageFile();
+        assertTrue(file.getName().endsWith(".png"));
+
+        RenderedImage image = ImageIO.read(file);
+        assertEquals(360, image.getWidth());
+        assertEquals(180, image.getHeight());
+    }
 }
