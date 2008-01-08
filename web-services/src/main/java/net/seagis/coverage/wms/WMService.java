@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import com.sun.ws.rest.spi.resource.Singleton;
 
 // JAXB xml binding dependencies
+import java.util.Set;
 import java.util.StringTokenizer;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -50,6 +51,8 @@ import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.gml.DirectPositionType;
 import net.seagis.gml.PointType;
+import net.seagis.se.OnlineResourceType;
+import net.seagis.sld.TypeNameType;
 import net.seagis.wms.AbstractWMSCapabilities;
 import net.seagis.wms.BoundingBox;
 import net.seagis.wms.Dimension;
@@ -111,8 +114,10 @@ public class WMService extends WebService {
         return treatIncommingRequest();
     }
     
-     /**
+    /**
      * Treat the incomming POST request.
+     * 
+     * @param request The url request.
      * 
      * @return an image or xml response.
      * @throw JAXBException
@@ -155,8 +160,8 @@ public class WMService extends WebService {
                     
             } else if (request.equalsIgnoreCase("GetCapabilities")) {
                     
-                return Response.Builder.representation(getCapabilities(), "text/xml").build();
-                    
+                return getCapabilities();
+                        
             } else if (request.equalsIgnoreCase("DescribeLayer")) {
                     
                 return Response.Builder.representation(describeLayer(), "text/xml").build();
@@ -206,14 +211,12 @@ public class WMService extends WebService {
         webServiceWorker.setElevation(getParameter("ELEVATION", false));
         webServiceWorker.setTime(getParameter("TIME", false));
         webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true));
-
+        webServiceWorker.setBackgroundColor(getParameter("BGCOLOR", false));
+        webServiceWorker.setTransparency(getParameter("TRANSPARENT", false));
+        
+        
         //this parameters are not yet used
         String styles      = getParameter("STYLES", true);
-        String transparent = getParameter("TRANSPARENT", false);
-        
-        String bgColor = getParameter("BGCOLOR", false);
-        if (bgColor == null) 
-            bgColor = "0xFFFFFF";
         
         //extended parameter of the specification SLD
         String sld           = getParameter("SLD", false);
@@ -339,7 +342,7 @@ public class WMService extends WebService {
      * @throws net.seagis.coverage.web.WebServiceException
      * @throws javax.xml.bind.JAXBException
      */
-    private String getCapabilities() throws WebServiceException, JAXBException {
+    private Response getCapabilities() throws WebServiceException, JAXBException {
         logger.info("getCapabilities request received");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
@@ -357,11 +360,16 @@ public class WMService extends WebService {
             setCurrentVersion("1.1.1");
         } 
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
+        String format = getParameter("FORMAT", false);
+        if (format == null ) {
+            format = "text/xml";
+        } else if (!(format.equals("text/xml") || format.equals("application/vnd.ogc.wms_xml"))) {
+            throw new WebServiceException("Allowed format for GetCapabilities are : text/xml or application/vnd.ogc.wms_xml.",
+                      WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+        }
         
         // the service shall return WMSCapabilities marshalled
         AbstractWMSCapabilities response = (AbstractWMSCapabilities)getCapabilitiesObject(getCurrentVersion());
-        
-        String format = getParameter("FORMAT", false);
         
         //we update the url
         response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetCapabilities");
@@ -500,7 +508,8 @@ public class WMService extends WebService {
         //we marshall the response and return the XML String
         StringWriter sw = new StringWriter();    
         marshaller.marshal(response, sw);
-        return sw.toString();
+         
+        return Response.Builder.representation(sw.toString(), format).build();
         
     }
     
@@ -513,13 +522,29 @@ public class WMService extends WebService {
      * @throws javax.xml.bind.JAXBException
      */
     private String describeLayer() throws WebServiceException, JAXBException {
-        
+        logger.info("describeLayer request received");
+        final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         verifyBaseParameter(2);
+        webServiceWorker.setService("WMS", getCurrentVersion().toString());
         
+        OnlineResourceType or = new OnlineResourceType(getServiceURL() + "wcs?");
+        List<LayerDescriptionType> layersDescriptions = new ArrayList<LayerDescriptionType>();
         String layers = getParameter("LAYERS", true);
-        
-        LayerDescriptionType layersDescription = new LayerDescriptionType(null);         
-        DescribeLayerResponseType response = new DescribeLayerResponseType(getSldVersion().toString(), layersDescription);
+        Set<String> registredLayers = webServiceWorker.getLayerNames();
+        final StringTokenizer tokens = new StringTokenizer(layers, ",");
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+            if (registredLayers.contains(token)) {
+                TypeNameType t = new TypeNameType(token);
+                LayerDescriptionType outputLayer = new LayerDescriptionType(or,t);
+                layersDescriptions.add(outputLayer);
+            } else {
+                throw new WebServiceException("This layer is not registred: " + token,
+                      WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+            }
+        }
+                 
+        DescribeLayerResponseType response = new DescribeLayerResponseType(getSldVersion().toString(), layersDescriptions);
        
         //we marshall the response and return the XML String
         StringWriter sw = new StringWriter();    

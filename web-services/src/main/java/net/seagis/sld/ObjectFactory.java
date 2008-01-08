@@ -57,6 +57,14 @@ public class ObjectFactory {
     public UserDefinedSymbolization createUserDefinedSymbolization() {
         return new UserDefinedSymbolization();
     }
+    
+    /**
+     * Create an instance of {@link DescribeLayerResponseType }
+     * 
+     */
+    public DescribeLayerResponseType  createDescribeLayerResponseType() {
+        return new DescribeLayerResponseType();
+    }
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link OperationType }{@code >}}

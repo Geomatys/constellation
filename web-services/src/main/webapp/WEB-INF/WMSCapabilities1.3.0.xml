@@ -45,11 +45,15 @@
   <Request>
     <GetCapabilities>
       <Format>text/xml</Format>
+      <Format>application/vnd.ogc.wms_xml</Format>
       <DCPType>
         <HTTP>
           <Get>
             <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetCapabilities"/>
           </Get>
+          <Post>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetCapabilities"/>
+          </Post>
         </HTTP>
       </DCPType>
     </GetCapabilities>
@@ -57,13 +61,18 @@
       <Format>image/gif</Format>
       <Format>image/png</Format>
       <Format>image/jpeg</Format>
+      <Format>JPEG-LOSSLESS</Format>
+      <Format>image/bmp</Format>
+      <Format>text/x-matrix</Format>
+      <Format>image/x-portable-pixmap</Format>
       <DCPType>
         <HTTP>
           <Get>
-            <!-- The URL here for invoking GetCapabilities using HTTP GET
-            is only a prefix to which a query string is appended. -->
             <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetMap"/>
           </Get>
+          <Post>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetMap"/>
+          </Post>
         </HTTP>
       </DCPType>
     </GetMap>
@@ -76,32 +85,39 @@
           <Get>
             <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetFeatureInfo"/>
           </Get>
+          <Post>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetFeatureInfo"/>
+          </Post>
         </HTTP>
       </DCPType>
     </GetFeatureInfo>
     <sld:DescribeLayer>
-	<Format>text/xml</Format>
-	<Format>text/plain</Format>
-	<Format>text/html</Format>
-	<DCPType>
-	   <HTTP>
-	     <Get>
-	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=DescribeLayer"/>
-	     </Get>
-	   </HTTP>
-	</DCPType>
+      <Format>text/xml</Format>
+      <DCPType>
+        <HTTP>
+          <Get>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=DescribeLayer"/>
+          </Get>
+          <Post>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=DescribeLayer"/>
+          </Post>
+        </HTTP>
+      </DCPType>
     </sld:DescribeLayer>
     <sld:GetLegendGraphic>
-        <Format>image/png</Format>
-        <Format>image/jpeg</Format>
-        <Format>image/gif</Format>
-	<DCPType>
-	   <HTTP>
-	     <Get>
-	       <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetLegendGraphic"/>
-	     </Get>
-	   </HTTP>
-	</DCPType>
+      <Format>image/png</Format>
+      <Format>image/jpeg</Format>
+      <Format>image/gif</Format>
+      <DCPType>
+        <HTTP>
+          <Get>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetLegendGraphic"/>
+          </Get>
+          <Post>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.gematys.fr/wms-1.0-SNAPSHOT/wms?REQUEST=GetLegendGraphic"/>
+          </Post>
+        </HTTP>
+      </DCPType>
     </sld:GetLegendGraphic>
   </Request>
   <Exception>

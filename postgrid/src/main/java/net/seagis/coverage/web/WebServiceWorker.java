@@ -14,6 +14,7 @@
  */
 package net.seagis.coverage.web;
 
+import java.awt.Color;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -297,6 +298,16 @@ public class WebServiceWorker {
     private DirectPosition coordinate;
 
     /**
+     * The background color of the current image (default 0xFFFFFF)
+     */
+    private Color bgColor = Color.WHITE;
+    
+    /**
+     * A flag specifying if the image have to handle transparency.
+     */
+    private boolean transparent;
+    
+    /**
      * Creates a new image producer connected to the specified database.
      *
      * @param database The connection to the database.
@@ -385,6 +396,37 @@ public class WebServiceWorker {
         }
         envelope = new GeneralEnvelope(crs);
         envelope.setToInfinite();
+    }
+    
+    /**
+     * Set the background Color of the requested image.
+     * if not set the default value is 0xFFFFFF
+     * 
+     * @param bgColor an hexadecimal description of a color.
+     */
+    public void setBackgroundColor(String bgColor) throws WebServiceException {
+        if (bgColor!= null) {
+            try {
+                this.bgColor = Color.decode(bgColor);
+            } catch (NumberFormatException exception) {
+                throw new WebServiceException( bgColor + " is not a correct color code for background",
+                          exception, INVALID_PARAMETER_VALUE, version);
+            }
+        }
+    }
+    
+    /**
+     * Set the background transparency of the requested image.
+     * if not set the default value false.
+     * 
+     * @param a string representing a boolean.
+     */
+    public void setTransparency(String transparent) {
+        if (transparent != null) {
+            this.transparent = Boolean.valueOf(transparent);
+        } else {
+            this.transparent = false;
+        }
     }
 
     /**

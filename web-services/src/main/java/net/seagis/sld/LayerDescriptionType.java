@@ -61,6 +61,7 @@ public class LayerDescriptionType {
             this.typeName.add(element);
         }
     }
+    
     /**
      * Gets the value of the owsType property.
      */
