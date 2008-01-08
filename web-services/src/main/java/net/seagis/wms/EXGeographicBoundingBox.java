@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
     "northBoundLatitude"
 })
 @XmlRootElement(name = "EX_GeographicBoundingBox")
-public class EXGeographicBoundingBox {
+public class EXGeographicBoundingBox extends AbstractGeographicBoundingBox {
 
     private double westBoundLongitude;
     private double eastBoundLongitude;

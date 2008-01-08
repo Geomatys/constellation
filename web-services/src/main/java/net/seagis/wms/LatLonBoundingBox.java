@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "LatLonBoundingBox")
-public class LatLonBoundingBox {
+public class LatLonBoundingBox extends AbstractGeographicBoundingBox {
 
     @XmlAttribute
     private double minx;
@@ -47,7 +47,7 @@ public class LatLonBoundingBox {
      * 
      */
     public double getWestBoundLongitude() {
-        return maxy;
+        return minx;
     }
 
     /**
@@ -55,7 +55,7 @@ public class LatLonBoundingBox {
      * 
      */
     public double getEastBoundLongitude() {
-        return minx;
+        return maxx;
     }
 
     /**
@@ -63,7 +63,7 @@ public class LatLonBoundingBox {
      * 
      */
     public double getSouthBoundLatitude() {
-        return maxx;
+        return maxy;
     }
 
     /**

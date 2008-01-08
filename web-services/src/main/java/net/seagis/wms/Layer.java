@@ -341,14 +341,14 @@ public class Layer {
     /**
      * Gets the value of the exGeographicBoundingBox property.
      */
-    public EXGeographicBoundingBox getEXGeographicBoundingBox() {
+    public AbstractGeographicBoundingBox getEXGeographicBoundingBox() {
         return exGeographicBoundingBox;
     }
     
     /**
      * Gets the value of the LatLonBoundingBox property.
      */
-    public LatLonBoundingBox getLatLonBoundingBox() {
+    public AbstractGeographicBoundingBox getLatLonBoundingBox() {
         return latLonBoundingBox;
     }
 
