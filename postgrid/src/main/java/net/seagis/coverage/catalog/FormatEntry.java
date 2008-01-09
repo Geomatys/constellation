@@ -60,6 +60,7 @@ import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.RawBinaryImageReadParam;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
 import org.geotools.image.io.mosaic.MosaicImageReader;
+import org.geotools.image.io.mosaic.MosaicImageReadParam;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Classes;
 
@@ -287,9 +288,13 @@ final class FormatEntry extends Entry implements Format {
      * @return Un bloc de paramètres par défaut. Cette méthode ne retourne jamais {@code null}.
      * @throws IIOException s'il n'y a pas d'objet {@link ImageReader} pour ce format.
      */
-    final ImageReadParam getDefaultReadParam() throws IIOException {
+    final ImageReadParam getDefaultReadParam(final Object input) throws IIOException {
         assert Thread.holdsLock(this);
-        return getImageReader().getDefaultReadParam();
+        if (contains(MOSAIC_INPUT_TYPES, input.getClass())) {
+            return new MosaicImageReadParam();
+        } else {
+            return getImageReader().getDefaultReadParam();
+        }
     }
 
     /**
@@ -357,7 +362,7 @@ final class FormatEntry extends Entry implements Format {
      * Note 2: La méthode {@link #setReading} <strong>doit</strong> être appelée
      *         avant et après cette méthode dans un bloc {@code try...finally}.
      *
-     * @param  file Fichier à lire. Habituellement un objet {@link File}, {@link URL} ou {@link URI}.
+     * @param  input Fichier à lire. Habituellement un objet {@link File}, {@link URL} ou {@link URI}.
      * @param  imageIndex Index (à partir de 0) de l'image à lire.
      * @param  param Bloc de paramètre à utiliser pour la lecture.
      * @param  listeners Objets à informer des progrès de la lecture ainsi que des éventuels
@@ -372,7 +377,7 @@ final class FormatEntry extends Entry implements Format {
      * @return Image lue, ou {@code null} si la lecture de l'image a été annulée.
      * @throws IOException si une erreur est survenue lors de la lecture.
      */
-    final RenderedImage read(final Object         file,
+    final RenderedImage read(final Object         input,
                              final int            imageIndex,
                              final ImageReadParam param,
                              final IIOListeners   listeners,
@@ -390,20 +395,20 @@ final class FormatEntry extends Entry implements Format {
          */
         final ImageReader reader;
         final ImageReaderSpi spi;
-        if (contains(MOSAIC_INPUT_TYPES, file.getClass())) {
+        if (contains(MOSAIC_INPUT_TYPES, input.getClass())) {
             spi = MosaicImageReader.Spi.DEFAULT;
             reader = spi.createReaderInstance();
-            inputObject = file;
+            inputObject = input;
         } else {
             reader = getImageReader();
             spi = reader.getOriginatingProvider();
             final Class<?>[] inputTypes = (spi!=null) ? spi.getInputTypes() : ImageReaderSpi.STANDARD_INPUT_TYPE;
-            inputObject = getInput(file, inputTypes);
+            inputObject = getInput(input, inputTypes);
             if (inputObject == null) {
-                inputObject = inputStream = ImageIO.createImageInputStream(file);
+                inputObject = inputStream = ImageIO.createImageInputStream(input);
                 if (inputObject == null) {
                     throw new FileNotFoundException(Resources.format(
-                            ResourceKeys.ERROR_FILE_NOT_FOUND_$1, getPath(file)));
+                            ResourceKeys.ERROR_FILE_NOT_FOUND_$1, getPath(input)));
                 }
             }
             /*
@@ -474,7 +479,7 @@ final class FormatEntry extends Entry implements Format {
             reader.setLocale(getLocale());
             reader.setInput(inputObject, true, true);
             if (!(param instanceof RawBinaryImageReadParam)) {
-                checkSize(reader.getWidth(imageIndex), reader.getHeight(imageIndex), expected, file);
+                checkSize(reader.getWidth(imageIndex), reader.getHeight(imageIndex), expected, input);
             }
             /*
              * Reads the file, closes it in the "finally" block and returns the image.

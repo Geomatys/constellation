@@ -108,7 +108,7 @@ public class BlueMarbleTest extends DatabaseTest {
         assertEquals(360, range.width);
         assertEquals(180, range.height);
 
-        if (false) {
+        if (true) {
             GridCoverage2D coverage = entry.getCoverage(null);
             RenderedImage image = coverage.geophysics(false).getRenderedImage();
             assertEquals(360, image.getWidth());

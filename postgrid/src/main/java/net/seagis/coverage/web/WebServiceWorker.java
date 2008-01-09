@@ -298,15 +298,15 @@ public class WebServiceWorker {
     private DirectPosition coordinate;
 
     /**
-     * The background color of the current image (default 0xFFFFFF)
+     * The background color of the current image (default {@code 0xFFFFFF}).
      */
     private Color bgColor = Color.WHITE;
-    
+
     /**
      * A flag specifying if the image have to handle transparency.
      */
     private boolean transparent;
-    
+
     /**
      * Creates a new image producer connected to the specified database.
      *
@@ -396,37 +396,6 @@ public class WebServiceWorker {
         }
         envelope = new GeneralEnvelope(crs);
         envelope.setToInfinite();
-    }
-    
-    /**
-     * Set the background Color of the requested image.
-     * if not set the default value is 0xFFFFFF
-     * 
-     * @param bgColor an hexadecimal description of a color.
-     */
-    public void setBackgroundColor(String bgColor) throws WebServiceException {
-        if (bgColor!= null) {
-            try {
-                this.bgColor = Color.decode(bgColor);
-            } catch (NumberFormatException exception) {
-                throw new WebServiceException( bgColor + " is not a correct color code for background",
-                          exception, INVALID_PARAMETER_VALUE, version);
-            }
-        }
-    }
-    
-    /**
-     * Set the background transparency of the requested image.
-     * if not set the default value false.
-     * 
-     * @param a string representing a boolean.
-     */
-    public void setTransparency(String transparent) {
-        if (transparent != null) {
-            this.transparent = Boolean.valueOf(transparent);
-        } else {
-            this.transparent = false;
-        }
     }
 
     /**
@@ -581,27 +550,61 @@ public class WebServiceWorker {
     /**
      * Sets the range on value on which to apply a color ramp.
      */
-    public void setColormapRange(String colormapRange) throws WebServiceException {
-       if (colormapRange == null) {
-           this.colormapRange = null;
+    public void setColormapRange(String range) throws WebServiceException {
+       if (range == null) {
+           colormapRange = null;
        } else {
-           colormapRange = colormapRange.trim();
-           final int split = colormapRange.indexOf(',');
-           if (split < 0 || colormapRange.indexOf(',', split+1) >= 0) {
-               throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$1, "range"),
-                       INVALID_PARAMETER_VALUE, version);
+           range = range.trim();
+           final int split = range.indexOf(',');
+           if (split < 0 || range.indexOf(',', split+1) >= 0) {
+               throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                       "range", range), INVALID_PARAMETER_VALUE, version);
            }
            String n = null;
            final double min, max;
            try {
-               min = Double.parseDouble(n = colormapRange.substring(0,  split).trim());
-               max = Double.parseDouble(n = colormapRange.substring(split + 1).trim());
+               min = Double.parseDouble(n = range.substring(0,  split).trim());
+               max = Double.parseDouble(n = range.substring(split + 1).trim());
            } catch (NumberFormatException exception) {
                throw new WebServiceException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, n),
                        exception, INVALID_PARAMETER_VALUE, version);
            }
-           this.colormapRange = new NumberRange(min, max);
+           colormapRange = new NumberRange(min, max);
        }
+    }
+
+    /**
+     * Sets the background Color of the requested image.
+     * if not set the default value is {@code 0xFFFFFF}.
+     *
+     * @param background an hexadecimal description of a color.
+     */
+    public void setBackgroundColor(String background) throws WebServiceException {
+        if (background == null) {
+            this.bgColor = Color.WHITE;
+        } else {
+            background = background.trim();
+            try {
+                bgColor = Color.decode(background);
+            } catch (NumberFormatException exception) {
+                throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                        "background", background), exception, INVALID_PARAMETER_VALUE, version);
+            }
+        }
+    }
+
+    /**
+     * Sets the background transparency of the requested image.
+     * If not set the default value {@code false}.
+     *
+     * @param a string representing a boolean.
+     */
+    public void setTransparency(String transparent) {
+        if (transparent != null) {
+            transparent = transparent.trim();
+        }
+        // Reminder: 'parseBoolean' accepts null.
+        this.transparent = Boolean.parseBoolean(transparent);
     }
 
     /**

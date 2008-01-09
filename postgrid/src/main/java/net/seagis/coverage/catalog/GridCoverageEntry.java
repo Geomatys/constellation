@@ -630,11 +630,12 @@ class GridCoverageEntry extends Entry implements CoverageReference {
             }
         }
         final FormatEntry format = (FormatEntry) series.getFormat();
+        final Object input = getInput();
         final GridSampleDimension[] bands;
         try {
             format.setReading(this, true);
             synchronized (format) {
-                final ImageReadParam param = format.getDefaultReadParam();
+                final ImageReadParam param = format.getDefaultReadParam(input);
                 if (!clipPixel.isEmpty()) {
                     param.setSourceRegion(clipPixel);
                 }
@@ -652,7 +653,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
                 }
                 if (image == null) {
                     final Dimension size = geometry.getSize();
-                    image = format.read(getInput(), imageIndex, param, listeners, size, this);
+                    image = format.read(input, imageIndex, param, listeners, size, this);
                     if (image == null) {
                         return null;
                     }
