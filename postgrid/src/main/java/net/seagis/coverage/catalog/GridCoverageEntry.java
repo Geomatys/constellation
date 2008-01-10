@@ -48,6 +48,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.netcdf.NetcdfReadParam;
+import org.geotools.image.io.mosaic.MosaicImageReadParam;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -195,7 +196,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
         this.series     = entry.series;
         this.filename   = entry.filename;
         this.geometry   = geometry;
-        this.index      = entry.index;
+        this.index      = 0; // Required to be 0 for proper GridCoverageMosaic working.
         this.band       = entry.band;
         this.parameters = entry.parameters;
         this.startTime  = entry.startTime;
@@ -406,6 +407,9 @@ class GridCoverageEntry extends Entry implements CoverageReference {
             if (index != 0) {
                 p.setSliceIndice(AxisType.Time, index - 1);
             }
+            return true;
+        } else if (param instanceof MosaicImageReadParam) {
+            ((MosaicImageReadParam) param).setSubsamplingChangeAllowed(true);
             return true;
         }
         return false;
