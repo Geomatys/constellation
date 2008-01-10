@@ -42,10 +42,10 @@ import net.seagis.ows.MetadataType;
  *   &lt;complexContent>
  *     &lt;extension base="{http://www.opengis.net/ows/1.1}DescriptionType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}Identifier"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}Identifier"/>
  *         &lt;element ref="{http://www.opengis.net/ows/1.1}Metadata" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="Domain" type="{http://www.opengis.net/wcs/1.1.1}CoverageDomainType"/>
- *         &lt;element name="Range" type="{http://www.opengis.net/wcs/1.1.1}RangeType"/>
+ *         &lt;element name="Domain" type="{http://www.opengis.net/wcs}CoverageDomainType"/>
+ *         &lt;element name="Range" type="{http://www.opengis.net/wcs}RangeType"/>
  *         &lt;element name="SupportedCRS" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded"/>
  *         &lt;element name="SupportedFormat" type="{http://www.opengis.net/ows/1.1}MimeType" maxOccurs="unbounded"/>
  *       &lt;/sequence>

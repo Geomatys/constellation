@@ -40,27 +40,15 @@ public class DirectPositionType {
         this.srsDimension = srsDimension;
         this.axisLabels   = axisLabels;
         this.value = value;
-    }    
+    }
+    
+    public DirectPositionType(List<Double> value) {
+        this.value = value;
+        if (value != null)
+             this.srsDimension = value.size();
+    }  
     /**
      * A type for a list of values of the respective simple type.Gets the value of the value property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the value property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getValue().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Double }
-     * 
      * 
      */
     public List<Double> getValue() {

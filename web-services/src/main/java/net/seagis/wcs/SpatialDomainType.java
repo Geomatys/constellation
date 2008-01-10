@@ -44,9 +44,9 @@ import net.seagis.ows.WGS84BoundingBoxType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element ref="{http://www.opengis.net/ows/1.1}BoundingBox" maxOccurs="unbounded"/>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}GridCRS" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}GridCRS" minOccurs="0"/>
  *         &lt;element name="Transformation" type="{http://www.opengis.net/gml}AbstractCoordinateOperationType" minOccurs="0"/>
- *         &lt;element name="ImageCRS" type="{http://www.opengis.net/wcs/1.1.1}ImageCRSRefType" minOccurs="0"/>
+ *         &lt;element name="ImageCRS" type="{http://www.opengis.net/wcs}ImageCRSRefType" minOccurs="0"/>
  *         &lt;element ref="{http://www.opengis.net/gml}Polygon" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>

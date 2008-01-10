@@ -371,7 +371,7 @@ public class WMService extends WebService {
         // the service shall return WMSCapabilities marshalled
         AbstractWMSCapabilities response = (AbstractWMSCapabilities)getCapabilitiesObject(getCurrentVersion());
         
-        //we update the url
+        //we update the url in the static part.
         response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetCapabilities");
         response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetFeatureInfo");
         response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetMap");

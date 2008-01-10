@@ -48,10 +48,10 @@ import net.seagis.ows.LanguageStringType;
  *         &lt;element name="SupportedFormat" type="{http://www.opengis.net/ows/1.1}MimeType" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;choice>
  *           &lt;sequence>
- *             &lt;element ref="{http://www.opengis.net/wcs/1.1.1}CoverageSummary" maxOccurs="unbounded"/>
- *             &lt;element ref="{http://www.opengis.net/wcs/1.1.1}Identifier" minOccurs="0"/>
+ *             &lt;element ref="{http://www.opengis.net/wcs}CoverageSummary" maxOccurs="unbounded"/>
+ *             &lt;element ref="{http://www.opengis.net/wcs}Identifier" minOccurs="0"/>
  *           &lt;/sequence>
- *           &lt;element ref="{http://www.opengis.net/wcs/1.1.1}Identifier"/>
+ *           &lt;element ref="{http://www.opengis.net/wcs}Identifier"/>
  *         &lt;/choice>
  *       &lt;/sequence>
  *     &lt;/extension>
@@ -68,10 +68,10 @@ import net.seagis.ows.LanguageStringType;
 public class CoverageSummaryType extends DescriptionType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "CoverageSummary", namespace = "http://www.opengis.net/wcs/1.1.1", type = JAXBElement.class),
-        @XmlElementRef(name = "SupportedFormat", namespace = "http://www.opengis.net/wcs/1.1.1", type = JAXBElement.class),
-        @XmlElementRef(name = "Identifier", namespace = "http://www.opengis.net/wcs/1.1.1", type = JAXBElement.class),
-        @XmlElementRef(name = "SupportedCRS", namespace = "http://www.opengis.net/wcs/1.1.1", type = JAXBElement.class),
+        @XmlElementRef(name = "CoverageSummary", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
+        @XmlElementRef(name = "SupportedFormat", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
+        @XmlElementRef(name = "Identifier", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
+        @XmlElementRef(name = "SupportedCRS", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
         @XmlElementRef(name = "WGS84BoundingBox", namespace = "http://www.opengis.net/ows/1.1", type = JAXBElement.class),
         @XmlElementRef(name = "Metadata", namespace = "http://www.opengis.net/ows/1.1", type = JAXBElement.class)
     })

@@ -1,0 +1,75 @@
+<WCS_Capabilities version="1.0.0" xmlns="http://www.opengis.net/wcs" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://demo6.geomatys.fr:80/geoserver/schemas/wcs/1.0.0/wcsCapabilities.xsd">
+	<Service version="1.0.0">
+    <metadataLink about="http://seagis.sourceforge.net/html/index.php" metadataType="other"/>
+    <description>
+      SeaGis Web Coverage Server maintained by geomatys.
+    </description>
+    <name>SeaGis WCS</name>
+    <label>SeaGis WCS</label>
+    <keywords>
+      <keyword>WCS</keyword>
+      <keyword>WMS</keyword>
+      <keyword>SeaGis</keyword>
+    </keywords>
+    <fees>NONE</fees>
+    <accessConstraints>NONE</accessConstraints>
+  </Service>
+	<Capability>
+    <Request>
+      <GetCapabilities>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs?"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+        <DCPType>
+          <HTTP>
+            <Post>
+              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs"/>
+            </Post>
+          </HTTP>
+        </DCPType>
+      </GetCapabilities>
+      <DescribeCoverage>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs?"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+        <DCPType>
+          <HTTP>
+            <Post>
+              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs"/>
+            </Post>
+          </HTTP>
+        </DCPType>
+      </DescribeCoverage>
+      <GetCoverage>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs?"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+        <DCPType>
+          <HTTP>
+            <Post>
+              <OnlineResource xlink:href="http://demo6.geomatys.fr:80/geoserver/wcs"/>
+            </Post>
+          </HTTP>
+        </DCPType>
+      </GetCoverage>
+    </Request>
+    <Exception>
+      <Format>application/vnd.ogc.se_xml</Format>
+      <Format>text/xml</Format>
+    </Exception>
+  </Capability>
+	<ContentMetadata version="1.0.0">
+  </ContentMetadata>
+</WCS_Capabilities>

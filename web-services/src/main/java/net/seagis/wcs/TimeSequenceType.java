@@ -40,7 +40,7 @@ import net.seagis.gml.TimePositionType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice maxOccurs="unbounded">
  *         &lt;element ref="{http://www.opengis.net/gml}timePosition"/>
- *         &lt;element name="TimePeriod" type="{http://www.opengis.net/wcs/1.1.1}TimePeriodType"/>
+ *         &lt;element name="TimePeriod" type="{http://www.opengis.net/wcs}TimePeriodType"/>
  *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>

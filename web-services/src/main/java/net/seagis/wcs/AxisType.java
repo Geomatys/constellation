@@ -42,13 +42,13 @@ import net.seagis.ows.MetadataType;
  *   &lt;complexContent>
  *     &lt;extension base="{http://www.opengis.net/ows/1.1}DescriptionType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}AvailableKeys"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}AvailableKeys"/>
  *         &lt;element ref="{http://www.opengis.net/ows/1.1}Meaning" minOccurs="0"/>
  *         &lt;element ref="{http://www.opengis.net/ows/1.1}DataType" minOccurs="0"/>
  *         &lt;group ref="{http://www.opengis.net/ows/1.1}ValuesUnit" minOccurs="0"/>
  *         &lt;element ref="{http://www.opengis.net/ows/1.1}Metadata" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
- *       &lt;attribute name="identifier" use="required" type="{http://www.opengis.net/wcs/1.1.1}IdentifierType" />
+ *       &lt;attribute name="identifier" use="required" type="{http://www.opengis.net/wcs}IdentifierType" />
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>

@@ -39,7 +39,7 @@ import net.seagis.gml.TimePositionType;
  *       &lt;sequence>
  *         &lt;element name="BeginPosition" type="{http://www.opengis.net/gml}TimePositionType"/>
  *         &lt;element name="EndPosition" type="{http://www.opengis.net/gml}TimePositionType"/>
- *         &lt;element name="TimeResolution" type="{http://www.opengis.net/wcs/1.1.1}TimeDurationType" minOccurs="0"/>
+ *         &lt;element name="TimeResolution" type="{http://www.opengis.net/wcs}TimeDurationType" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="frame" type="{http://www.w3.org/2001/XMLSchema}anyURI" default="#ISO-8601" />
  *     &lt;/restriction>

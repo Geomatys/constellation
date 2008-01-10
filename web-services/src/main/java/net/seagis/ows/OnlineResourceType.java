@@ -99,6 +99,14 @@ public class OnlineResourceType {
     public String getHref() {
         return href;
     }
+    
+    /**
+     * Sets the value of the href property.
+     */
+    public void setHref(String href) {
+        this.href = href;
+    }
+
 
     /**
      * Gets the value of the role property.

@@ -42,11 +42,11 @@ import net.seagis.ows.UnNamedDomainType;
  *   &lt;complexContent>
  *     &lt;extension base="{http://www.opengis.net/ows/1.1}DescriptionType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}Identifier"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}Identifier"/>
  *         &lt;element name="Definition" type="{http://www.opengis.net/ows/1.1}UnNamedDomainType"/>
  *         &lt;element name="NullValue" type="{http://www.opengis.net/ows/1.1}CodeType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}InterpolationMethods"/>
- *         &lt;element name="Axis" type="{http://www.opengis.net/wcs/1.1.1}AxisType" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}InterpolationMethods"/>
+ *         &lt;element name="Axis" type="{http://www.opengis.net/wcs}AxisType" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>

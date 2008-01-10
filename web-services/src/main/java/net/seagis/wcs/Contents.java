@@ -37,7 +37,7 @@ import net.seagis.ows.OnlineResourceType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}CoverageSummary" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}CoverageSummary" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="SupportedCRS" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="SupportedFormat" type="{http://www.opengis.net/ows/1.1}MimeType" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="OtherSource" type="{http://www.opengis.net/ows/1.1}OnlineResourceType" maxOccurs="unbounded" minOccurs="0"/>

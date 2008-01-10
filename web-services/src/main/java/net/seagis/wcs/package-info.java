@@ -5,5 +5,5 @@
 // Generated on: 2007.12.11 at 08:02:10 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/wcs/1.1.1", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/wcs", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package net.seagis.wcs;

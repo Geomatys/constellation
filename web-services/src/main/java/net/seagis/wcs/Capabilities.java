@@ -34,7 +34,7 @@ import net.seagis.ows.CapabilitiesBaseType;
  *   &lt;complexContent>
  *     &lt;extension base="{http://www.opengis.net/ows/1.1}CapabilitiesBaseType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}Contents" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}Contents" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>

@@ -47,11 +47,21 @@ version="1.1.1" updateSequence="ABC123">
 					<ows:Get xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCapabilities"/>
 				</ows:HTTP>
 			</ows:DCP>
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCapabilities"/>
+				</ows:HTTP>
+			</ows:DCP>
 		</ows:Operation>
 		<ows:Operation name="GetCoverage">
 			<ows:DCP>
 				<ows:HTTP>
 					<ows:Get xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCoverage"/>
+				</ows:HTTP>
+			</ows:DCP>
+			ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCoverage"/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="Format">
@@ -65,7 +75,12 @@ version="1.1.1" updateSequence="ABC123">
 		<ows:Operation name="DescribeCoverage">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Get xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCoverage"/>
+					<ows:Get xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=DescribeCoverage"/>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=DescribeCoverage"/>
 				</ows:HTTP>
 			</ows:DCP>
 			<ows:Parameter name="Format">

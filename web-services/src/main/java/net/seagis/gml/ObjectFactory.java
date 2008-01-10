@@ -152,6 +152,7 @@ public class ObjectFactory {
     private final static QName _GroupID_QNAME = new QName("http://www.opengis.net/gml", "groupID");
     private final static QName _TimeInstant_QNAME = new QName("http://www.opengis.net/gml", "TimeInstant");
     private final static QName _AbstractGeometry_QNAME = new QName("http://www.opengis.net/gml", "AbstractGeometry");
+    private final static QName _MetaDataProperty_QNAME = new QName("http://www.opengis.net/gml", "metaDataProperty");
     
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
@@ -160,6 +161,14 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
 
+    /**
+     * Create an instance of {@link MetaDataPropertyType }
+     * 
+     */
+    public MetaDataPropertyType createMetaDataPropertyType() {
+        return new MetaDataPropertyType();
+    }
+    
     /**
      * Create an instance of {@link CRSRefType }
      * 
@@ -439,6 +448,15 @@ public class ObjectFactory {
     }
     
      /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link MetaDataPropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "metaDataProperty")
+    public JAXBElement<MetaDataPropertyType> createMetaDataProperty(MetaDataPropertyType value) {
+        return new JAXBElement<MetaDataPropertyType>(_MetaDataProperty_QNAME, MetaDataPropertyType.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AbstractGMLType }{@code >}}
      * 
      */

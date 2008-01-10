@@ -96,7 +96,7 @@ public class Operation {
      * Gets the value of the dcp property.
      */
     public List<DCP> getDCP() {
-        return Collections.unmodifiableList(dcp);
+        return dcp;
     }
 
     /**

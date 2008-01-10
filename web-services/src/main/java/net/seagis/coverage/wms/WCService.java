@@ -41,18 +41,27 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.gml.DirectPositionType;
 import net.seagis.ows.BoundingBoxType;
+import net.seagis.ows.Operation;
 import net.seagis.wcs.RangeType;
 import net.seagis.ows.WGS84BoundingBoxType;
 import net.seagis.wcs.Capabilities;
+import net.seagis.wcs.ContentMetadata;
 import net.seagis.wcs.Contents;
 import net.seagis.wcs.CoverageDescriptionType;
 import net.seagis.wcs.CoverageDescriptions;
 import net.seagis.wcs.CoverageDomainType;
+import net.seagis.wcs.CoverageOfferingBriefType;
 import net.seagis.wcs.CoverageSummaryType;
+import net.seagis.wcs.DCPTypeType.HTTP.Get;
+import net.seagis.wcs.DCPTypeType.HTTP.Post;
+import net.seagis.wcs.LonLatEnvelopeType;
 import net.seagis.wcs.SpatialDomainType;
+import net.seagis.wcs.ServiceType;
 
 // geoAPI dependencies
+import net.seagis.wcs.WCSCapabilitiesType;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
@@ -170,43 +179,98 @@ public class WCService extends WebService {
         setCurrentVersion(inputVersion);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         
-        Capabilities response = (Capabilities)getCapabilitiesObject(getCurrentVersion());
+        Capabilities        responsev111 = null;
+        WCSCapabilitiesType responsev100 = null;
+        
+        if (inputVersion.equals("1.1.1")) {
+            responsev111 = (Capabilities)getCapabilitiesObject(getCurrentVersion());
+        
+            //we update the url in the static part.
+            for (Operation op:responsev111.getOperationsMetadata().getOperation()) {
+                op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getValue().setHref(getServiceURL() + "wcs?REQUEST=" + op.getName());
+                op.getDCP().get(1).getHTTP().getGetOrPost().get(0).getValue().setHref(getServiceURL() + "wcs?REQUEST=" + op.getName());
+            }
+        } else {
+            responsev100 = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject(getCurrentVersion())).getValue();
+            
+            //we update the url in the static part.
+            ((Get) responsev100.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
+            ((Post)responsev100.getCapability().getRequest().getGetCapabilities().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
+            
+            ((Get)responsev100.getCapability().getRequest().getDescribeCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage");
+            ((Post)responsev100.getCapability().getRequest().getDescribeCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage");
+            
+            ((Get)responsev100.getCapability().getRequest().getGetCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage");
+            ((Post)responsev100.getCapability().getRequest().getGetCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage");
+            
+        }
+        
         Contents contents;
-       
+        ContentMetadata contentMetadata;
+        
         //we get the list of layers
-        List<CoverageSummaryType> summary = new ArrayList<CoverageSummaryType>();
+        List<CoverageSummaryType>        summary = new ArrayList<CoverageSummaryType>();
+        List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
+        
         net.seagis.wcs.ObjectFactory wcsFactory = new net.seagis.wcs.ObjectFactory();
         net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
         try {
             for (Layer inputLayer: webServiceWorker.getLayers()) {
-                CoverageSummaryType cs = new CoverageSummaryType();
-           
+                CoverageSummaryType       cs = new CoverageSummaryType();
+                CoverageOfferingBriefType co = new CoverageOfferingBriefType();
+                
                 cs.addRest(wcsFactory.createIdentifier(inputLayer.getName()));
-            
+                co.addRest(wcsFactory.createName(inputLayer.getName()));
+                
                 GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
                
                 if(inputGeoBox != null) {
-                    String crs = "WGS84(DD)";
-                    WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
-                                                 inputGeoBox.getWestBoundLongitude(),
-                                                 inputGeoBox.getEastBoundLongitude(),
-                                                 inputGeoBox.getSouthBoundLatitude(),
-                                                 inputGeoBox.getNorthBoundLatitude());
+                     String crs = "WGS84(DD)";
+                    if (inputVersion.equals("1.1.1")){
+                        WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
+                                                     inputGeoBox.getWestBoundLongitude(),
+                                                     inputGeoBox.getEastBoundLongitude(),
+                                                     inputGeoBox.getSouthBoundLatitude(),
+                                                     inputGeoBox.getNorthBoundLatitude());
                 
-                    cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
+                        cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
+                    } else {
+                        List<Double> pos1 = new ArrayList<Double>();
+                        pos1.add(inputGeoBox.getWestBoundLongitude());
+                        pos1.add(inputGeoBox.getEastBoundLongitude());
+                        
+                        List<Double> pos2 = new ArrayList<Double>();
+                        pos2.add(inputGeoBox.getNorthBoundLatitude());
+                        pos2.add(inputGeoBox.getSouthBoundLatitude());
+                        
+                        List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+                        pos.add(new DirectPositionType(pos1));
+                        pos.add(new DirectPositionType(pos2));
+                        LonLatEnvelopeType outputBBox = new LonLatEnvelopeType(pos, crs);
+                        co.setLonLatEnvelope(outputBBox);
+                    }
+                    
                 }
            
                 summary.add(cs);
+                offBrief.add(co);
             }
-            contents = new Contents(summary, null, null, null);    
-        
+            contents        = new Contents(summary, null, null, null);    
+            contentMetadata = new ContentMetadata("1.0.0", offBrief); 
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, getCurrentVersion());
         }
             
-        response.setContents(contents);
-        StringWriter sw = new StringWriter();    
-        marshaller.marshal(response, sw);
+        
+        StringWriter sw = new StringWriter();
+        if (inputVersion.equals("1.1.1")) {
+            responsev111.setContents(contents);
+            marshaller.marshal(responsev111, sw);
+        } else {
+            responsev100.setContentMetadata(contentMetadata);
+            marshaller.marshal(responsev100, sw);
+        }
+        
         return sw.toString();
         
     }

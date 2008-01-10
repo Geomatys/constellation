@@ -34,8 +34,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="SpatialDomain" type="{http://www.opengis.net/wcs/1.1.1}SpatialDomainType"/>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}TemporalDomain" minOccurs="0"/>
+ *         &lt;element name="SpatialDomain" type="{http://www.opengis.net/wcs}SpatialDomainType"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}TemporalDomain" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

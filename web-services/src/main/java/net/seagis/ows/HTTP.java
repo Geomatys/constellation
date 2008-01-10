@@ -78,7 +78,7 @@ public class HTTP {
      * Gets the value of the getOrPost property.
      */
     public List<JAXBElement<RequestMethodType>> getGetOrPost() {
-        return Collections.unmodifiableList(getOrPost);
+        return getOrPost;
     }
 
      /**

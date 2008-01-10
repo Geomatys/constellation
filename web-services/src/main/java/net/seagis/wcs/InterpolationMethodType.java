@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType name="InterpolationMethodType">
  *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://www.opengis.net/wcs/1.1.1>InterpolationMethodBaseType">
+ *     &lt;extension base="&lt;http://www.opengis.net/wcs>InterpolationMethodBaseType">
  *       &lt;attribute name="nullResistance" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/extension>
  *   &lt;/simpleContent>

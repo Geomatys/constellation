@@ -92,7 +92,7 @@ public class OperationsMetadata {
      * 
      */
     public List<Operation> getOperation() {
-        return Collections.unmodifiableList(operation);
+        return operation;
     }
 
     /**

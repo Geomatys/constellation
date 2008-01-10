@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="CoverageDescription" type="{http://www.opengis.net/wcs/1.1.1}CoverageDescriptionType" maxOccurs="unbounded"/>
+ *         &lt;element name="CoverageDescription" type="{http://www.opengis.net/wcs}CoverageDescriptionType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

@@ -77,6 +77,16 @@ public class EnvelopeEntry extends Entry {
         this.id          = id;
         this.srsName     = srsName;
     }
+    
+    /**
+     * Construit une nouvelle envelope.  
+     */
+    public EnvelopeEntry(List<DirectPositionType> pos, String srsName) {
+        this.srsName      = srsName;
+        this.pos          = pos;
+        if (pos != null)
+            this.srsDimension = pos.size();
+    }
     /**
      * Gets the value of the lowerCorner property.
      */

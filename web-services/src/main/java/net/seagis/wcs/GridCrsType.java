@@ -45,11 +45,11 @@ import net.seagis.gml.CodeType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element ref="{http://www.opengis.net/gml}srsName" minOccurs="0"/>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}GridBaseCRS"/>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}GridType" minOccurs="0"/>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}GridOrigin" minOccurs="0"/>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}GridOffsets"/>
- *         &lt;element ref="{http://www.opengis.net/wcs/1.1.1}GridCS" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}GridBaseCRS"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}GridType" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}GridOrigin" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}GridOffsets"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}GridCS" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute ref="{http://www.opengis.net/gml}id"/>
  *     &lt;/restriction>
