@@ -35,6 +35,27 @@ import javax.imageio.spi.ImageReaderSpi;
  */
 public class TileGenerator {
     /**
+     * The output folder where tiles will be written.
+     */
+    private final File outputFolder;
+    
+    /**
+     * Generates tiles into the default project folder.
+     */
+    public TileGenerator() {
+        this(null);
+    }
+    
+    /**
+     * Generates tiles into the specified folder.
+     * 
+     * @param outputFolder The folder where tiles will be stored.
+     */
+    public TileGenerator(final File outputFolder) {
+        this.outputFolder = outputFolder;
+    }
+    
+    /**
      * Create tiles which have a constant size, but cover more and more superficy
      * region of the original raster as we progress into overviews level.
      * 
@@ -48,6 +69,7 @@ public class TileGenerator {
          final Dimension tileSize, final Dimension step) 
     {
         List<Tile> tiles = new ArrayList<Tile>();
+        final String extension = spi.getFileSuffixes()[0];
         Rectangle wholeRaster = raster;
         final Rectangle tileRect = new Rectangle(tileSize);
         Dimension subSampling = new Dimension(1,1);
@@ -80,7 +102,12 @@ public class TileGenerator {
                     }
                     Rectangle currentRect = new Rectangle(xMin, yMin, xMax, yMax);
                     // Creates a specific file for this tile.
-                    File inputTile = new File(generateName(overview, x, y) + ".png");
+                    final File inputTile;
+                    if (outputFolder != null) {
+                        inputTile = new File(outputFolder, generateName(overview, x, y, extension));
+                    } else {
+                        inputTile = new File(generateName(overview, x, y, extension));
+                    }
                     Tile tile = new Tile(spi, inputTile, 0, currentRect, subSampling);
                     tiles.add(tile);
                     x++;
@@ -111,14 +138,29 @@ public class TileGenerator {
      * in the raster. For example, a tile at the first level of overview, which
      * is localized on the 5th column and 2nd row will have the name "TileA52".
      * 
-     * @param overview The level of overview.
-     * @param x The index of columns.
-     * @param y The index of rows.
+     * @param overview The level of overview. It should begin with 1.
+     * @param x The index of columns. It should begin with 1.
+     * @param y The index of rows. It should begin with 1.
+     * @param extension The extension used for the tile.
      * @return A name based on the position of the tile in the whole raster.
      */
-    protected String generateName(final int overview, final int x, final int y) {
+    private static String generateName(final int overview, final int x, final int y,
+            final String extension) 
+    {
         final StringBuilder buffer = new StringBuilder("Tile");
-        buffer.append(overview).append('_').append((char) ('A' - 1 + x)).append(y);
+        buffer.append(overview).append('_');
+        // Verify that we have not reached the end of the alphabet.
+        // If it is the case, we add a secund letter.
+        // @TODO: verifying that we do not exceed 26*26 for the x value, otherwise a third letter
+        // would be necessary.
+        if (x > 26) {
+            int firstLetter = x / 26;
+            int secundLetter = x - (26 * firstLetter);
+            buffer.append((char) ('A' + firstLetter - 1)).append((char) ('A' + secundLetter - 1));
+        } else {
+            buffer.append((char) ('A' + x - 1));
+        }
+        buffer.append(y).append(".").append(extension);
         return buffer.toString();
     }
     
