@@ -100,7 +100,7 @@ public class TileGenerator {
                     if (xMax > wholeRaster.width) {
                         xMax = wholeRaster.width;
                     }
-                    Rectangle currentRect = new Rectangle(xMin, yMin, xMax, yMax);
+                    Rectangle currentRect = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
                     // Creates a specific file for this tile.
                     final File inputTile;
                     if (outputFolder != null) {
