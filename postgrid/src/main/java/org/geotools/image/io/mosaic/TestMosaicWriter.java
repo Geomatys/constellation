@@ -1,0 +1,87 @@
+/*
+ * (C) 2008, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+package org.geotools.image.io.mosaic;
+
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+
+/**
+ * Creates tiles for a specific raster, and write them in different output files.
+ * 
+ * @source $URL$
+ * @author Cédric Briançon
+ */
+public class TestMosaicWriter {
+    /**
+     * The raster that we wish to tiled.
+     */
+    private static final File INPUT = new File("C:\\test\\Afrique.png");
+    
+    /**
+     * The output folder where tiles will be written.
+     */
+    private static final File OUTPUT = new File("C:\\test\\output");
+    
+    /**
+     * The wished size for each tile.
+     */
+    private static final Dimension TILESIZE = new Dimension(200,200);
+    
+    /**
+     * The factor between two consecutive overviews.
+     */
+    private static final Dimension STEP = new Dimension(2,2);
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        try {
+            if (!OUTPUT.exists()) {
+                OUTPUT.mkdirs();
+            }
+            TileGenerator tileGenerator = new TileGenerator(OUTPUT);
+            ImageReader reader = null;
+            reader = tileGenerator.findReader(INPUT);
+            if (reader == null) {
+                ImageInputStream stream = ImageIO.createImageInputStream(INPUT);
+                reader = tileGenerator.findReader(stream);
+                reader.setInput(stream);
+            } else {
+                reader.setInput(INPUT);
+            }
+            final int width = reader.getWidth(0);
+            final int height = reader.getHeight(0);
+            TileManager tileManager = tileGenerator.createTiles(reader.getOriginatingProvider(), 
+                    new Rectangle(width, height), TILESIZE, STEP);
+            MosaicImageWriter mosaicWriter = new MosaicImageWriter(null);
+            mosaicWriter.setOutput(tileManager);
+            mosaicWriter.writeTiles(INPUT);
+        } catch (IOException ex) {
+            Logger.getLogger(TestMosaicWriter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+}
