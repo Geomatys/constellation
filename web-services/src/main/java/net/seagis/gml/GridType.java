@@ -1,0 +1,92 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
+package net.seagis.gml;
+
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
+
+
+/**
+ * Implicitly defines an unrectified grid, which is a network composed of two or more sets of equally spaced parallel lines in which the members of each set intersect the members of the other sets at right angles. This profile does not extend AbstractGeometryType, so it defines the srsName attribute.
+ * 
+ * <p>Java class for GridType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="GridType">
+ *   &lt;complexContent>
+ *     &lt;extension base="{http://www.opengis.net/gml}AbstractGeometryType">
+ *       &lt;sequence>
+ *         &lt;element name="limits" type="{http://www.opengis.net/gml}GridLimitsType"/>
+ *         &lt;element name="axisName" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
+ *       &lt;/sequence>
+ *       &lt;attribute name="dimension" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
+ *     &lt;/extension>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "GridType", propOrder = {
+    "limits",
+    "axisName"
+})
+@XmlSeeAlso({
+    RectifiedGridType.class
+})
+public class GridType extends AbstractGeometryType {
+
+    @XmlElement(required = true)
+    private GridLimitsType limits;
+    @XmlElement(required = true)
+    private List<String> axisName;
+    @XmlAttribute(required = true)
+    @XmlSchemaType(name = "positiveInteger")
+    private BigInteger dimension;
+
+    /**
+     * Gets the value of the limits property.
+     */
+    public GridLimitsType getLimits() {
+        return limits;
+    }
+
+    /**
+     * Gets the value of the axisName property (unmodifiable).
+     */
+    public List<String> getAxisName() {
+        return Collections.unmodifiableList(axisName);
+    }
+
+    /**
+     * Gets the value of the dimension property.
+     */
+    public BigInteger getDimension() {
+        return dimension;
+    }
+}

@@ -72,6 +72,18 @@ public class KeywordsType {
         this.keyword = keyword;
         this.type    = type;
     }
+    
+    /**
+     * Build a simple list of keywords without type.
+     * all the element of the list are in the parameters. 
+     */
+    public KeywordsType(LanguageStringType... keywords){
+        this.keyword = new ArrayList<LanguageStringType>();
+        for (LanguageStringType element: keywords){
+            keyword.add(element);
+        }
+    }
+    
     /**
      * Gets the value of the keyword property.
      */

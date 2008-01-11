@@ -14,89 +14,78 @@
  */
 
 
-
 package net.seagis.wcs;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.CodeType;
+import net.seagis.gml.CodeListType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * Unordered list of data transfer formats supported. 
+ * 
+ * <p>Java class for SupportedFormatsType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="SupportedFormatsType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="keyword" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
- *         &lt;element name="type" type="{http://www.opengis.net/gml}CodeType" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}formats" maxOccurs="unbounded"/>
  *       &lt;/sequence>
+ *       &lt;attribute name="nativeFormat" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
  * 
- * @author Guilhem Legal
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "keyword",
-    "type"
+@XmlType(name = "SupportedFormatsType", propOrder = {
+    "formats"
 })
-@XmlRootElement(name = "keywords")
-public class Keywords {
+public class SupportedFormatsType {
 
     @XmlElement(required = true)
-    private List<String> keyword;
-    private CodeType type;
+    private List<CodeListType> formats;
+    @XmlAttribute
+    private String nativeFormat;
 
     /**
-     * Empty constructor used by JAXB.
+     * Empty constructor use by JAXB
      */
-    Keywords(){
+    SupportedFormatsType(){
         
     }
     
     /**
-     * Build a new list of keywords.
+     * Build a new list of supported formats.
      */
-    public Keywords(List<String> keyword) {
-        this.keyword = keyword;
-    }
+     public SupportedFormatsType(String nativeFormat, List<CodeListType> formats){
+         this.nativeFormat = nativeFormat;
+         this.formats      = formats;
+     }
     
     /**
-     * Build a new list of keywords with the element of the list in the parameters.
+     * Gets the value of the formats property (unmodifiable).
+     * 
      */
-    public Keywords(String... keywords) {
-        this.keyword = new ArrayList<String>();
-        for (String word: keywords){
-            keyword.add(word);
-        }
-    }
-    
-    /**
-     * Gets the value of the keyword property.
-     */
-    public List<String> getKeyword() {
-        if (keyword == null) {
-            keyword = new ArrayList<String>();
-        }
-        return this.keyword;
+    public List<CodeListType> getFormats() {
+        return Collections.unmodifiableList(formats);
     }
 
     /**
-     * Gets the value of the type property.
+     * Gets the value of the nativeFormat property.
      */
-    public CodeType getType() {
-        return type;
+    public String getNativeFormat() {
+        return nativeFormat;
     }
 }

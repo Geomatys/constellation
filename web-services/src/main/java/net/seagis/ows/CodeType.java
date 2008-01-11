@@ -75,6 +75,13 @@ public class CodeType {
     }
     
     /**
+     * Build a new code without codespace.
+     */
+    public CodeType(String value) {
+        this.value     = value;
+    }
+    
+    /**
      * Gets the value of the value property.
      */
     public String getValue() {

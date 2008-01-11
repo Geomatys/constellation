@@ -59,11 +59,18 @@ public class LanguageStringType {
     LanguageStringType(){
     }
     
-     /**
+    /**
      * Build a new String in the specified language.
      */
     public LanguageStringType(String value, String lang){
         this.lang  = lang;
+        this.value = value;
+    }
+    
+    /**
+     * Build a new String without specifying the language.
+     */
+    public LanguageStringType(String value){
         this.value = value;
     }
     

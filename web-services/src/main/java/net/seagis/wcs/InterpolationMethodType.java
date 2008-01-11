@@ -48,16 +48,17 @@ public class InterpolationMethodType extends InterpolationMethodBaseType {
     @XmlAttribute
     private String nullResistance;
 
-     /**
+    /**
      * An empty constructor used by JAXB.
      */
      InterpolationMethodType() {
      }
      
-     /**
-     *build a new Interpolation Method.
+    /**
+     * build a new Interpolation Method.
      */
-     public InterpolationMethodType( String nullResistance) {
+     public InterpolationMethodType(String methodName, String nullResistance) {
+         super(methodName);
          this.nullResistance = nullResistance;
      }
      

@@ -92,9 +92,10 @@ public class CoverageDescriptionType extends DescriptionType {
     /**
      * build a light coverage description.
      */
-    public CoverageDescriptionType(String identifier, CoverageDomainType domain, 
+    public CoverageDescriptionType(List<LanguageStringType> title,  List<LanguageStringType> _abstract,
+            List<KeywordsType> keywords, String identifier, CoverageDomainType domain, 
             RangeType range, List<String> supportedCRS, List<String> supportedFormat) {
-        super();
+        super(title, _abstract, keywords);
         this.domain          = domain;
         this.identifier      = identifier;
         this.range           = range;

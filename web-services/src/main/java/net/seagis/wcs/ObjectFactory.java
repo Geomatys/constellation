@@ -41,6 +41,13 @@ import net.seagis.ows.ReferenceGroupType;
 @XmlRegistry
 public class ObjectFactory {
 
+    private final static QName _DomainSet_QNAME = new QName("http://www.opengis.net/wcs", "domainSet");
+    private final static QName _CoverageOffering_QNAME = new QName("http://www.opengis.net/wcs", "CoverageOffering");
+    private final static QName _SpatialDomain_QNAME = new QName("http://www.opengis.net/wcs", "spatialDomain");
+    private final static QName _RangeSet_QNAME = new QName("http://www.opengis.net/wcs", "RangeSet");
+    private final static QName _SupportedCRSs_QNAME = new QName("http://www.opengis.net/wcs", "supportedCRSs");
+    private final static QName _SupportedFormats_QNAME = new QName("http://www.opengis.net/wcs", "supportedFormats");
+    private final static QName _SupportedInterpolations_QNAME = new QName("http://www.opengis.net/wcs", "supportedInterpolations");
     private final static QName _CoverageSummaryTypeSupportedCRS_QNAME = new QName("http://www.opengis.net/wcs", "SupportedCRS");
     private final static QName _CoverageSummaryTypeSupportedFormat_QNAME = new QName("http://www.opengis.net/wcs", "SupportedFormat");
     private final static QName _GridCRS_QNAME = new QName("http://www.opengis.net/wcs", "GridCRS");
@@ -50,7 +57,7 @@ public class ObjectFactory {
     private final static QName _GridOffsets_QNAME = new QName("http://www.opengis.net/wcs", "GridOffsets");
     private final static QName _GridType_QNAME = new QName("http://www.opengis.net/wcs", "GridType");
     private final static QName _CoverageSummary_QNAME = new QName("http://www.opengis.net/wcs", "CoverageSummary");
-    private final static QName _TemporalDomain_QNAME = new QName("http://www.opengis.net/wcs", "TemporalDomain");
+    private final static QName _TemporalDomain_QNAME = new QName("http://www.opengis.net/wcs", "temporalDomain");
     private final static QName _Coverage_QNAME = new QName("http://www.opengis.net/wcs", "Coverage");
     private final static QName _Identifier_QNAME = new QName("http://www.opengis.net/wcs", "Identifier");
     private final static QName _GridOrigin_QNAME = new QName("http://www.opengis.net/wcs", "GridOrigin");
@@ -388,6 +395,126 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link CoverageDescription }
+     * 
+     */
+    public CoverageDescription createCoverageDescription() {
+        return new CoverageDescription();
+    }
+    
+    /**
+     * Create an instance of {@link CoverageOfferingType }
+     * 
+     */
+    public CoverageOfferingType createCoverageOfferingType() {
+        return new CoverageOfferingType();
+    }
+    
+    /**
+     * Create an instance of {@link DomainSetType }
+     * 
+     */
+    public DomainSetType createDomainSetType() {
+        return new DomainSetType();
+    }
+    
+    /**
+     * Create an instance of {@link RangeSetType }
+     * 
+     */
+    public RangeSetType createRangeSetType() {
+        return new RangeSetType();
+    }
+
+    /**
+     * Create an instance of {@link SupportedCRSsType }
+     * 
+     */
+    public SupportedCRSsType createSupportedCRSsType() {
+        return new SupportedCRSsType();
+    }
+
+    /**
+     * Create an instance of {@link SupportedFormatsType }
+     * 
+     */
+    public SupportedFormatsType createSupportedFormatsType() {
+        return new SupportedFormatsType();
+    }
+    
+    /**
+     * Create an instance of {@link SupportedInterpolationsType }
+     * 
+     */
+    public SupportedInterpolationsType createSupportedInterpolationsType() {
+        return new SupportedInterpolationsType();
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SupportedInterpolationsType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "supportedInterpolations")
+    public JAXBElement<SupportedInterpolationsType> createSupportedInterpolations(SupportedInterpolationsType value) {
+        return new JAXBElement<SupportedInterpolationsType>(_SupportedInterpolations_QNAME, SupportedInterpolationsType.class, null, value);
+    }
+
+    
+     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SupportedFormatsType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "supportedFormats")
+    public JAXBElement<SupportedFormatsType> createSupportedFormats(SupportedFormatsType value) {
+        return new JAXBElement<SupportedFormatsType>(_SupportedFormats_QNAME, SupportedFormatsType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SupportedCRSsType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "supportedCRSs")
+    public JAXBElement<SupportedCRSsType> createSupportedCRSs(SupportedCRSsType value) {
+        return new JAXBElement<SupportedCRSsType>(_SupportedCRSs_QNAME, SupportedCRSsType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RangeSetType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "RangeSet", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractGML")
+    public JAXBElement<RangeSetType> createRangeSet(RangeSetType value) {
+        return new JAXBElement<RangeSetType>(_RangeSet_QNAME, RangeSetType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SpatialDomainType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "spatialDomain")
+    public JAXBElement<SpatialDomainType> createSpatialDomain(SpatialDomainType value) {
+        return new JAXBElement<SpatialDomainType>(_SpatialDomain_QNAME, SpatialDomainType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CoverageOfferingType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "CoverageOffering", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractGML")
+    public JAXBElement<CoverageOfferingType> createCoverageOffering(CoverageOfferingType value) {
+        return new JAXBElement<CoverageOfferingType>(_CoverageOffering_QNAME, CoverageOfferingType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DomainSetType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "domainSet")
+    public JAXBElement<DomainSetType> createDomainSet(DomainSetType value) {
+        return new JAXBElement<DomainSetType>(_DomainSet_QNAME, DomainSetType.class, null, value);
+    }
+    
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link MetadataLinkType }{@code >}}
      * 
      */
@@ -588,7 +715,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link TimeSequenceType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "TemporalDomain")
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "temporalDomain")
     public JAXBElement<TimeSequenceType> createTemporalDomain(TimeSequenceType value) {
         return new JAXBElement<TimeSequenceType>(_TemporalDomain_QNAME, TimeSequenceType.class, null, value);
     }

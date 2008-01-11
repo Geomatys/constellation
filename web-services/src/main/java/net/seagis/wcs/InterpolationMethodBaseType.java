@@ -49,7 +49,17 @@ import net.seagis.ows.CodeType;
 })
 public class InterpolationMethodBaseType extends CodeType {
     
+    /**
+     * Empty constructor used by JAXB
+     */
     InterpolationMethodBaseType(){
+    }
+    
+    /**
+     * Build a simple interpolation method
+     */
+    public InterpolationMethodBaseType(String value){
+        super(value);
     }
 
 }

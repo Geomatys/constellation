@@ -1,3 +1,17 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 
 package net.seagis.gml;
 
@@ -153,7 +167,9 @@ public class ObjectFactory {
     private final static QName _TimeInstant_QNAME = new QName("http://www.opengis.net/gml", "TimeInstant");
     private final static QName _AbstractGeometry_QNAME = new QName("http://www.opengis.net/gml", "AbstractGeometry");
     private final static QName _MetaDataProperty_QNAME = new QName("http://www.opengis.net/gml", "metaDataProperty");
-    
+    private final static QName _RectifiedGrid_QNAME = new QName("http://www.opengis.net/gml", "RectifiedGrid");
+    private final static QName _Grid_QNAME = new QName("http://www.opengis.net/gml", "Grid");
+     
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
      * 
@@ -420,6 +436,64 @@ public class ObjectFactory {
         return new ObliqueCartesianCSType();
     }
     
+    /**
+     * Create an instance of {@link CodeListType }
+     * 
+     */
+    public CodeListType createCodeListType() {
+        return new CodeListType();
+    }
+    
+    /**
+     * Create an instance of {@link GridType }
+     * 
+     */
+    public GridType createGridType() {
+        return new GridType();
+    }
+    
+    /**
+     * Create an instance of {@link RectifiedGridType }
+     * 
+     */
+    public RectifiedGridType createRectifiedGridType() {
+        return new RectifiedGridType();
+    }
+    
+     /**
+     * Create an instance of {@link GridLimitsType }
+     * 
+     */
+    public GridLimitsType createGridLimitsType() {
+        return new GridLimitsType();
+    }
+    
+    /**
+     * Create an instance of {@link GridEnvelopeType }
+     * 
+     */
+    public GridEnvelopeType createGridEnvelopeType() {
+        return new GridEnvelopeType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RectifiedGridType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "RectifiedGrid", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "Grid")
+    public JAXBElement<RectifiedGridType> createRectifiedGrid(RectifiedGridType value) {
+        return new JAXBElement<RectifiedGridType>(_RectifiedGrid_QNAME, RectifiedGridType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GridType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "Grid", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_Geometry")
+    public JAXBElement<GridType> createGrid(GridType value) {
+        return new JAXBElement<GridType>(_Grid_QNAME, GridType.class, null, value);
+    }
+
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 

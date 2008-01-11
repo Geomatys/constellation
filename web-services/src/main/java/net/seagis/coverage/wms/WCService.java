@@ -41,27 +41,42 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.gml.CodeListType;
 import net.seagis.gml.DirectPositionType;
 import net.seagis.ows.BoundingBoxType;
+import net.seagis.ows.KeywordsType;
+import net.seagis.ows.LanguageStringType;
 import net.seagis.ows.Operation;
-import net.seagis.wcs.RangeType;
 import net.seagis.ows.WGS84BoundingBoxType;
+import net.seagis.ows.CodeType;
+import net.seagis.wcs.RangeType;
 import net.seagis.wcs.Capabilities;
 import net.seagis.wcs.ContentMetadata;
 import net.seagis.wcs.Contents;
 import net.seagis.wcs.CoverageDescriptionType;
 import net.seagis.wcs.CoverageDescriptions;
+import net.seagis.wcs.CoverageDescription;
 import net.seagis.wcs.CoverageDomainType;
 import net.seagis.wcs.CoverageOfferingBriefType;
+import net.seagis.wcs.CoverageOfferingType;
 import net.seagis.wcs.CoverageSummaryType;
 import net.seagis.wcs.DCPTypeType.HTTP.Get;
 import net.seagis.wcs.DCPTypeType.HTTP.Post;
+import net.seagis.wcs.DomainSetType;
+import net.seagis.wcs.FieldType;
+import net.seagis.wcs.InterpolationMethod;
+import net.seagis.wcs.InterpolationMethodType;
+import net.seagis.wcs.InterpolationMethods;
+import net.seagis.wcs.Keywords;
 import net.seagis.wcs.LonLatEnvelopeType;
+import net.seagis.wcs.RangeSetType;
+import net.seagis.wcs.SupportedCRSsType;
 import net.seagis.wcs.SpatialDomainType;
-import net.seagis.wcs.ServiceType;
+import net.seagis.wcs.SupportedFormatsType;
+import net.seagis.wcs.SupportedInterpolationsType;
+import net.seagis.wcs.WCSCapabilitiesType;
 
 // geoAPI dependencies
-import net.seagis.wcs.WCSCapabilitiesType;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
@@ -86,7 +101,7 @@ public class WCService extends WebService {
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wcs");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wcs/1.1.1"));
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wcs"));
         unmarshaller = jbcontext.createUnmarshaller();
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
@@ -237,11 +252,11 @@ public class WCService extends WebService {
                     } else {
                         List<Double> pos1 = new ArrayList<Double>();
                         pos1.add(inputGeoBox.getWestBoundLongitude());
-                        pos1.add(inputGeoBox.getEastBoundLongitude());
+                        pos1.add(inputGeoBox.getSouthBoundLatitude());
                         
                         List<Double> pos2 = new ArrayList<Double>();
+                        pos2.add(inputGeoBox.getEastBoundLongitude());
                         pos2.add(inputGeoBox.getNorthBoundLatitude());
-                        pos2.add(inputGeoBox.getSouthBoundLatitude());
                         
                         List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
                         pos.add(new DirectPositionType(pos1));
@@ -366,41 +381,152 @@ public class WCService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         verifyBaseParameter(0);
-        String identifiers = getParameter("IDENTIFIER", true);
-        webServiceWorker.setLayer(identifiers);
-        
-        Layer layer = webServiceWorker.getLayer();
-        
-        // TODO
-        net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
-        GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
-        JAXBElement<? extends BoundingBoxType> bbox = null;
-        if(inputGeoBox != null) {
-            String crs = "WGS84(DD)";
-            WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
-                                                 inputGeoBox.getWestBoundLongitude(),
-                                                 inputGeoBox.getEastBoundLongitude(),
-                                                 inputGeoBox.getSouthBoundLatitude(),
-                                                 inputGeoBox.getNorthBoundLatitude());
-            bbox = owsFactory.createWGS84BoundingBox(outputBBox);
+        String identifiers;
+        if (getCurrentVersion().toString().equals("1.0.0")) {
+            identifiers = getParameter("COVERAGE", true);
+        } else {
+            identifiers = getParameter("IDENTIFIER", true);
         }
-        SpatialDomainType spatial = new SpatialDomainType(bbox);
-        CoverageDomainType domain = new CoverageDomainType(spatial, null);
-        RangeType range = null;
-        List<String> supportedCRS = new ArrayList<String>();
-        supportedCRS.add("4326");
-        List<String> supportedFormat = new ArrayList<String>();
-        supportedCRS.add("??");
-        CoverageDescriptionType coverage = new CoverageDescriptionType(layer.getName(),
-                                                                       domain,
-                                                                       range,
-                                                                       supportedCRS,
-                                                                       supportedFormat);
-        List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
-        coverages.add(coverage);
+        List<Layer> layers = webServiceWorker.getLayers(identifiers);
         
-        CoverageDescriptions response = new CoverageDescriptions(coverages);
+        //we prepare the response object to return
+        Object response;
+        
+        if (getCurrentVersion().toString().equals("1.0.0")){
+            
+            List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
+            for (Layer layer: layers){
+                GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
+                LonLatEnvelopeType               llenvelope = null;
+                if(inputGeoBox != null) {
+                    String crs = "WGS84(DD)";
+                    List<Double> pos1 = new ArrayList<Double>();
+                    pos1.add(inputGeoBox.getWestBoundLongitude());
+                    pos1.add(inputGeoBox.getSouthBoundLatitude());
+                       
+                    List<Double> pos2 = new ArrayList<Double>();
+                    pos2.add(inputGeoBox.getEastBoundLongitude());
+                    pos2.add(inputGeoBox.getNorthBoundLatitude());
+                        
+                    List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+                    pos.add(new DirectPositionType(pos1));
+                    pos.add(new DirectPositionType(pos2));
+                    llenvelope = new LonLatEnvelopeType(pos, crs);
+                }
+                Keywords keywords = new Keywords("WCS", layer.getName());
+                
+                //Spatial metadata TODO temporal
+                SpatialDomainType spatialDomain = new SpatialDomainType(llenvelope);
+                DomainSetType domainSet = new DomainSetType(spatialDomain, null);
+                
+                //TODO complete
+                RangeSetType  rangeSet  = new RangeSetType(null, 
+                                                           layer.getName(),
+                                                           layer.getName(),
+                                                           null,
+                                                           null,
+                                                           null,
+                                                           null);
+                //supported CRS
+                SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
+                
+                // supported formats
+                List<CodeListType> formats = new ArrayList<CodeListType>();
+                formats.add(new CodeListType("matrix"));
+                formats.add(new CodeListType("image/jpeg"));
+                formats.add(new CodeListType("image/png"));
+                formats.add(new CodeListType("image/gif"));
+                formats.add(new CodeListType("image/bmp"));
+                SupportedFormatsType supForm = new SupportedFormatsType("??", formats); 
+                
+                //supported interpolations
+                List<InterpolationMethod> interpolations = new ArrayList<InterpolationMethod>();
+                interpolations.add(InterpolationMethod.BILINEAR);
+                interpolations.add(InterpolationMethod.BICUBIC);
+                interpolations.add(InterpolationMethod.NEAREST_NEIGHBOR);
+                SupportedInterpolationsType supInt = new SupportedInterpolationsType(InterpolationMethod.BILINEAR, interpolations);
+                
+                //we build the coverage offering for this layer/coverage
+                CoverageOfferingType coverage = new CoverageOfferingType(null,
+                                                                         layer.getName(),
+                                                                         layer.getName(),
+                                                                         layer.getRemarks(),
+                                                                         llenvelope,
+                                                                         keywords,
+                                                                         domainSet,
+                                                                         rangeSet,
+                                                                         supCRS,
+                                                                         supForm,
+                                                                         supInt);
+        
+                coverages.add(coverage);
+            }
+            response = new CoverageDescription(coverages, "1.0.0"); 
+            
+        } else {
+            net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
+            List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
+            for (Layer layer: layers){
+                GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
+                JAXBElement<? extends BoundingBoxType> bbox = null;
+                if(inputGeoBox != null) {
+                    String crs = "WGS84(DD)";
+                
+                    WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
+                                                         inputGeoBox.getWestBoundLongitude(),
+                                                         inputGeoBox.getEastBoundLongitude(),
+                                                         inputGeoBox.getSouthBoundLatitude(),
+                                                         inputGeoBox.getNorthBoundLatitude());
+                    bbox = owsFactory.createWGS84BoundingBox(outputBBox);
+                }
+                
+                //general metadata
+                List<LanguageStringType> title   = new ArrayList<LanguageStringType>();
+                title.add(new LanguageStringType(layer.getName()));
+                List<LanguageStringType> _abstract   = new ArrayList<LanguageStringType>();
+                _abstract.add(new LanguageStringType(layer.getRemarks()));
+                List<KeywordsType> keywords = new ArrayList<KeywordsType>();
+                keywords.add(new KeywordsType(new LanguageStringType("WCS"),
+                                              new LanguageStringType(layer.getName())
+                                              ));
+                
+                // spatial metadata
+                SpatialDomainType spatial = new SpatialDomainType(bbox);
+                CoverageDomainType domain = new CoverageDomainType(spatial, null);
+                
+                //supported interpolations
+                List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
+                intList.add(new InterpolationMethodType(InterpolationMethod.BILINEAR.value(), null));
+                intList.add(new InterpolationMethodType(InterpolationMethod.BICUBIC.value(), null));
+                intList.add(new InterpolationMethodType(InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
+                InterpolationMethods interpolations = new InterpolationMethods(intList, InterpolationMethod.BILINEAR.value());  
+                RangeType range = new RangeType(new FieldType("??", null, new CodeType("0.0"), interpolations));
                
+                //supported CRS
+                List<String> supportedCRS = new ArrayList<String>();
+                supportedCRS.add("EPSG:4326");
+                
+                //supported formats
+                List<String> supportedFormat = new ArrayList<String>();
+                supportedFormat.add("matrix");
+                supportedFormat.add("image/png");
+                supportedFormat.add("image/jpeg");
+                supportedFormat.add("image/bmp");
+                supportedFormat.add("image/gif");
+                CoverageDescriptionType coverage = new CoverageDescriptionType(title,
+                                                                               _abstract,
+                                                                               keywords,
+                                                                               layer.getName(),
+                                                                               domain,
+                                                                               range,
+                                                                               supportedCRS,
+                                                                               supportedFormat);
+        
+                coverages.add(coverage);
+            }
+            response = new CoverageDescriptions(coverages);
+        }
+       
         //we marshall the response and return the XML String
         StringWriter sw = new StringWriter();    
         marshaller.marshal(response, sw);

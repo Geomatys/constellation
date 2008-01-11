@@ -693,6 +693,29 @@ public class WebServiceWorker {
             throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
     }
+    
+    /**
+     * Parse the list of layerNames and return the specified layers.
+     *
+     * @param  layerNames a list of layer names separated by colon.
+     * @throws WebServiceException if an error occured while fetching the table.
+     */
+    public List<Layer> getLayers(String layerNames) throws WebServiceException {
+        try {
+            final LayerTable table = getLayerTable(true);
+            List<Layer> layers = new ArrayList<Layer>();
+            final StringTokenizer tokens = new StringTokenizer(layerNames, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                layers.add(table.getEntry(token));
+        }
+            return layers;
+        } catch (CatalogException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        } catch (SQLException exception) {
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
+        }
+    }
 
     /**
      * Returns the layer for the current configuration.

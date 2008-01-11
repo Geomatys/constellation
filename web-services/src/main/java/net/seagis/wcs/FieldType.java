@@ -76,10 +76,25 @@ public class FieldType extends DescriptionType {
     @XmlElement(name = "Axis")
     private List<AxisType> axis = new ArrayList<AxisType>();
 
+    /**
+     * Empty constrcutor used by JAXB.
+     */
     FieldType() {
         super();
     }
     
+    /**
+     * Build a full Field.
+     * 
+     * @param title
+     * @param _abstract
+     * @param keywords
+     * @param identifier
+     * @param definition
+     * @param nullValue
+     * @param interpolationMethods
+     * @param axis
+     */
     public FieldType(List<LanguageStringType> title,  List<LanguageStringType> _abstract,
             List<KeywordsType> keywords, String identifier, UnNamedDomainType definition,
             List<CodeType> nullValue, InterpolationMethods interpolationMethods, List<AxisType> axis) {
@@ -88,6 +103,25 @@ public class FieldType extends DescriptionType {
         this.interpolationMethods = interpolationMethods;
         this.axis                 = axis;
         this.nullValue            = nullValue;
+        this.definition           = definition;
+    }
+    
+     /**
+     * Build a Light Field.
+     * 
+     * @param identifier
+     * @param definition
+     * @param nullValue
+     * @param interpolationMethods
+     * @param axis
+     */
+    public FieldType(String identifier, UnNamedDomainType definition,
+            CodeType nullValue, InterpolationMethods interpolationMethods) {
+        super();
+        this.identifier           = identifier;
+        this.interpolationMethods = interpolationMethods;
+        this.nullValue            = new ArrayList<CodeType>();
+        this.nullValue.add(nullValue);
         this.definition           = definition;
     }
     

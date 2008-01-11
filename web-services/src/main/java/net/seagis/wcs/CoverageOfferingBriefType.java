@@ -16,6 +16,7 @@
 
 package net.seagis.wcs;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
@@ -53,6 +54,18 @@ public class CoverageOfferingBriefType extends AbstractDescriptionType {
     
     private Keywords keywords;
     
+    /**
+     * An Empty constructor
+     */
+    public CoverageOfferingBriefType(){
+    }
+    
+    public CoverageOfferingBriefType(List<MetadataLinkType> metadataLink, String name, String label, String description,
+            LonLatEnvelopeType lonLatEnvelope, Keywords keywords) {
+        super(metadataLink, name, label, description);
+        this.lonLatEnvelope = lonLatEnvelope;
+        this.keywords       = keywords;
+    }
     
     public LonLatEnvelopeType getLonLatEnvelope() {
         return this.lonLatEnvelope;

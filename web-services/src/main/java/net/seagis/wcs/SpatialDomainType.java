@@ -28,8 +28,9 @@ import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.AbstractCoordinateOperationType;
 import net.seagis.gml.PolygonType;
 import net.seagis.ows.BoundingBoxType;
-import net.seagis.ows.WGS84BoundingBoxType;
-
+import net.seagis.gml.EnvelopeEntry;
+import net.seagis.gml.GridType;
+import net.seagis.gml.ObjectFactory;
 
 /**
  * Definition of the spatial domain of a coverage. 
@@ -59,13 +60,18 @@ import net.seagis.ows.WGS84BoundingBoxType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SpatialDomainType", propOrder = {
     "boundingBox",
+    "envelope",
     "gridCRS",
+    "grid",
     "transformation",
     "imageCRS",
     "polygon"
 })
 public class SpatialDomainType {
 
+    /**
+     * WCS version 1.1.1 attribute
+     */ 
     @XmlElementRef(name = "BoundingBox", namespace = "http://www.opengis.net/ows/1.1", type = JAXBElement.class)
     private List<JAXBElement<? extends BoundingBoxType>> boundingBox  = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
     @XmlElement(name = "GridCRS")
@@ -74,9 +80,20 @@ public class SpatialDomainType {
     private AbstractCoordinateOperationType transformation;
     @XmlElement(name = "ImageCRS")
     private ImageCRSRefType imageCRS;
+    
+    // for both version 1.0.0 et 1.1.1
     @XmlElement(name = "Polygon", namespace = "http://www.opengis.net/gml")
     private List<PolygonType> polygon = new ArrayList<PolygonType>();
 
+    /**
+     * WCS version 1.0.0 attribute
+     */ 
+    @XmlElementRef(name = "Envelope", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
+    private List<JAXBElement<? extends EnvelopeEntry>> envelope = new ArrayList<JAXBElement<? extends EnvelopeEntry>>();
+    @XmlElementRef(name = "Grid", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
+    private List<JAXBElement<? extends GridType>> grid;
+    
+    
     /**
      * An empty constructor used by JAXB.
      */
@@ -84,14 +101,33 @@ public class SpatialDomainType {
     }
     
     /**
-     * Build a new light Spatial Domain type
+     * Build a new light Spatial Domain type version 1.1.1
      */
     public SpatialDomainType(JAXBElement<? extends BoundingBoxType> boundingBox) {
        this.boundingBox.add(boundingBox);
     }
     
     /**
-     * Build a new full Spatial Domain type
+     * Build a new light Spatial Domain type version 1.0.0
+     */
+    public SpatialDomainType(EnvelopeEntry envelope) {
+        ObjectFactory gmlFactory = new ObjectFactory();
+       this.envelope.add(gmlFactory.createEnvelope(envelope));
+    }
+    
+    /**
+     * Build a new full Spatial Domain type version 1.0.0
+     */
+    public SpatialDomainType(List<JAXBElement<? extends EnvelopeEntry>> envelope, List<JAXBElement<? extends GridType>> grid,
+            List<PolygonType> polygon) {
+       this.envelope = envelope;
+       this.grid     = grid;
+       this.polygon  = polygon;
+       
+    }
+    
+    /**
+     * Build a new full Spatial Domain type version 1.1.1
      */
     public SpatialDomainType(List<JAXBElement<? extends BoundingBoxType>> boundingBox, GridCrsType gridCRS,
             AbstractCoordinateOperationType transformation, ImageCRSRefType imageCRS, List<PolygonType> polygon) {

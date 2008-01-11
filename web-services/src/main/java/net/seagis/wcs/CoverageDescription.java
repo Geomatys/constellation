@@ -14,17 +14,17 @@
  */
 
 
-
 package net.seagis.wcs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.CodeType;
 
 
 /**
@@ -32,14 +32,17 @@ import net.seagis.gml.CodeType;
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
+ * WCS version 1.0.0
+ * 
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="keyword" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded"/>
- *         &lt;element name="type" type="{http://www.opengis.net/gml}CodeType" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/wcs}CoverageOffering" maxOccurs="unbounded"/>
  *       &lt;/sequence>
+ *       &lt;attribute name="version" use="required" type="{http://www.w3.org/2001/XMLSchema}string" fixed="1.0.0" />
+ *       &lt;attribute name="updateSequence" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -49,54 +52,56 @@ import net.seagis.gml.CodeType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "keyword",
-    "type"
+    "coverageOffering"
 })
-@XmlRootElement(name = "keywords")
-public class Keywords {
+@XmlRootElement(name = "CoverageDescription")
+public class CoverageDescription {
 
-    @XmlElement(required = true)
-    private List<String> keyword;
-    private CodeType type;
+    @XmlElement(name = "CoverageOffering", required = true)
+    private List<CoverageOfferingType> coverageOffering;
+    @XmlAttribute(required = true)
+    private String version;
+    @XmlAttribute
+    private String updateSequence;
 
     /**
      * Empty constructor used by JAXB.
      */
-    Keywords(){
+    CoverageDescription() {
         
     }
     
     /**
-     * Build a new list of keywords.
+     * Build a new response for a DescribeCoverage request.
      */
-    public Keywords(List<String> keyword) {
-        this.keyword = keyword;
+    public CoverageDescription(List<CoverageOfferingType> coverageOffering, String version) {
+        this.coverageOffering = coverageOffering;
+        this.version           = version;
     }
     
     /**
-     * Build a new list of keywords with the element of the list in the parameters.
+     * Gets the value of the coverageOffering property.
      */
-    public Keywords(String... keywords) {
-        this.keyword = new ArrayList<String>();
-        for (String word: keywords){
-            keyword.add(word);
-        }
-    }
-    
-    /**
-     * Gets the value of the keyword property.
-     */
-    public List<String> getKeyword() {
-        if (keyword == null) {
-            keyword = new ArrayList<String>();
-        }
-        return this.keyword;
+    public List<CoverageOfferingType> getCoverageOffering() {
+       return Collections.unmodifiableList(coverageOffering);
     }
 
     /**
-     * Gets the value of the type property.
+     * Gets the value of the version property.
+     * 
      */
-    public CodeType getType() {
-        return type;
+    public String getVersion() {
+        if (version == null) {
+            return "1.0.0";
+        } else {
+            return version;
+        }
+    }
+
+   /**
+    * Gets the value of the updateSequence property.
+    */
+    public String getUpdateSequence() {
+        return updateSequence;
     }
 }

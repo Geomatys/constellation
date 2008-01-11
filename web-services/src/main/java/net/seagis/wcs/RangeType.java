@@ -68,6 +68,17 @@ public class RangeType {
         this.field = field;
     }
     
+    /**
+     * build a new range.
+     * The List element are in the parameters.
+     */
+    public RangeType(FieldType... fields) {
+        this.field = new ArrayList<FieldType>();
+        for (FieldType element:fields){
+            field.add(element);
+        }
+    }
+    
     
     /**
      * Gets the value of the field property.
