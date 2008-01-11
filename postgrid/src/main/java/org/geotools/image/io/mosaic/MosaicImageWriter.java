@@ -20,9 +20,8 @@ package org.geotools.image.io.mosaic;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Locale;
@@ -35,8 +34,10 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 
 /**
  * An image writer built from a mosaic of other image readers. The mosaic is specified as a
@@ -53,7 +54,7 @@ public class MosaicImageWriter extends ImageWriter {
     public MosaicImageWriter(final ImageWriterSpi spi) {
         super(spi != null ? spi : Spi.DEFAULT);
     }
-    
+
     @Override
     public IIOMetadata getDefaultStreamMetadata(ImageWriteParam param) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -78,12 +79,12 @@ public class MosaicImageWriter extends ImageWriter {
     public void write(IIOMetadata streamMetadata, IIOImage image, ImageWriteParam param) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
     /**
-     * Write each tile, generated with {@linkplain TileGenerator#createTiles()}, into its 
+     * Write each tile, generated with {@linkplain TileGenerator#createTiles()}, into its
      * input file defined.
      * These tiles are gotten from the file in parameter.
-     * 
+     *
      * @param file The original raster to tiled.
      * @throws IOException
      * @throws IIOException
@@ -95,6 +96,9 @@ public class MosaicImageWriter extends ImageWriter {
         if (reader == null) {
             stream = ImageIO.createImageInputStream(originalInput);
             reader = findReader(stream);
+            reader.setInput(stream);
+        } else {
+            reader.setInput(originalInput);
         }
         final ImageReadParam params = reader.getDefaultReadParam();
         // Launch the tile creation process.
@@ -108,8 +112,18 @@ public class MosaicImageWriter extends ImageWriter {
             params.setSourceSubsampling(subSampling.width, subSampling.height, 0, 0);
             final BufferedImage image = reader.read(0, params);
             final ImageWriter writer = getImageWriter(tile, image);
-            writer.setOutput(input);
             writer.write(image);
+            final Object output = writer.getOutput();
+            if (output != input) {
+                // The output is not the File (or whatever object) given by Tile.
+                // It is probably an ImageOutputStream created by getImageWriter,
+                // so we need to close it.
+                if (output instanceof Closeable) {
+                    ((Closeable) output).close();
+                } else if (output instanceof ImageOutputStream) {
+                    ((ImageOutputStream) output).close();
+                }
+            }
         }
         if (stream != null) {
             stream.close();
@@ -118,7 +132,7 @@ public class MosaicImageWriter extends ImageWriter {
 
     /**
      * Try to find a reader for the specified input file.
-     * 
+     *
      * @param input The whole raster.
      * @return An {@linkplain ImageReader} for the specified raster, or null if no reader
      *         seems to be convenient.
@@ -133,30 +147,66 @@ public class MosaicImageWriter extends ImageWriter {
         }
         return reader;
     }
-    
+
     /**
      * Get an {@linkplain ImageWriter} that can encode the selected image.
-     * 
+     *
      * @param tile The tile to write.
      * @param image The image associated to this tile.
      * @return The image writer that seems to be the most appropriated, or null if
      *         no image writer can be applied.
      * @throws IOException
      */
-    private ImageWriter getImageWriter(final Tile tile, final BufferedImage image) throws IOException {
-        String[] imageWriterSpiNames = tile.getImageReaderSpi().getImageWriterSpiNames();
-        Iterator<ImageWriter> it = ImageIO.getImageWritersByFormatName(imageWriterSpiNames[0]);
-        ImageWriter writer = null;
-        while (it.hasNext()) {
-            writer = it.next();
-            ImageWriterSpi writerSpi = writer.getOriginatingProvider();
-            if (writerSpi.canEncodeImage(image)) {
-                return writerSpi.createWriterInstance();
+    private static ImageWriter getImageWriter(final Tile tile, final BufferedImage image)
+            throws IOException
+    {
+        final Object output = tile.getInput(); // We call that "output" because we want to create it.
+        final Class<?> outputType = output.getClass();
+        final IIORegistry registry = IIORegistry.getDefaultInstance();
+        final String[] spiNames = tile.getImageReaderSpi().getImageWriterSpiNames();
+        final ImageWriterSpi[] providers = new ImageWriterSpi[spiNames.length];
+        int count = 0;
+        for (final String name : spiNames) {
+            final Class<?> spiType;
+            try {
+                spiType = Class.forName(name);
+            } catch (ClassNotFoundException e) {
+                // May be normal.
+                continue;
             }
+            final Object candidate = registry.getServiceProviderByClass(spiType);
+            if (candidate instanceof ImageWriterSpi) {
+                final ImageWriterSpi spi = (ImageWriterSpi) candidate;
+                if (spi.canEncodeImage(image)) {
+                    providers[count++] = spi;
+                    for (final Class legalType : spi.getOutputTypes()) {
+                        if (legalType.isAssignableFrom(outputType)) {
+                            final ImageWriter writer = spi.createWriterInstance();
+                            writer.setOutput(output);
+                            return writer;
+                        }
+                    }
+                }
+            }
+        }
+        if (count != 0) {
+            final ImageOutputStream stream = ImageIO.createImageOutputStream(output);
+            final Class<? extends ImageOutputStream> streamType = stream.getClass();
+            for (int i=0; i<count; i++) {
+                final ImageWriterSpi spi = providers[i];
+                for (final Class legalType : spi.getOutputTypes()) {
+                    if (legalType.isAssignableFrom(streamType)) {
+                        final ImageWriter writer = spi.createWriterInstance();
+                        writer.setOutput(stream);
+                        return writer;
+                    }
+                }
+            }
+            stream.close();
         }
         throw new IIOException("Unable to get a writer for the tiles to write");
     }
-    
+
     /**
      * Service provider for {@link MosaicImageWriter}.
      *
@@ -185,7 +235,7 @@ public class MosaicImageWriter extends ImageWriter {
          * The default instance.
          */
         public static final Spi DEFAULT = new Spi();
-        
+
         /**
          * Creates a default provider.
          */
@@ -211,6 +261,6 @@ public class MosaicImageWriter extends ImageWriter {
         public String getDescription(Locale locale) {
             return "Mosaic Image Writer";
         }
-        
+
     }
 }

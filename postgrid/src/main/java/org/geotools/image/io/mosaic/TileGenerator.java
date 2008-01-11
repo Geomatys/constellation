@@ -21,7 +21,10 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 
 /**
@@ -95,7 +98,11 @@ public class TileGenerator {
             wholeRaster.setSize(wholeRaster.width  / step.width, 
                                 wholeRaster.height / step.height);
         }
-        TileManager tileManager = new TileManagerFactory(null).createGeneric((Tile[]) tiles.toArray());
+        Tile[] arrayTiles = new Tile[tiles.size()];
+        for (int i=0; i<tiles.size(); i++) {
+            arrayTiles[i] = tiles.get(i);
+        }
+        TileManager tileManager = new TileManagerFactory(null).createGeneric(arrayTiles);
         return tileManager;
     }
     
@@ -111,7 +118,25 @@ public class TileGenerator {
      */
     protected String generateName(final int overview, final int x, final int y) {
         final StringBuilder buffer = new StringBuilder("Tile");
-        buffer.append(overview).append('_').append((char) ('A' + x)).append(y);
+        buffer.append(overview).append('_').append((char) ('A' - 1 + x)).append(y);
         return buffer.toString();
+    }
+    
+    /**
+     * Try to find a reader for the specified input file.
+     * 
+     * @param input The whole raster.
+     * @return An {@linkplain ImageReader} for the specified raster, or null if no reader
+     *         seems to be convenient.
+     */
+    public ImageReader findReader(final Object input) {
+        ImageReader reader = null;
+        Iterator<ImageReader> readers = ImageIO.getImageReaders(input);
+        while (readers.hasNext()) {
+            reader = readers.next();
+            // TODO: do more check here in order to detect if it is a suitable reader.
+            break;
+        }
+        return reader;
     }
 }
