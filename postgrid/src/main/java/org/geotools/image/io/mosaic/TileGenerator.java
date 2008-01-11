@@ -115,9 +115,13 @@ public class TileGenerator {
                     xMax += tileSize.height;
                 }
                 y++;
+                // Restart column index from the beginning, since we have change of row index.
+                x = 1;
                 yMin += tileSize.width;
                 yMax += tileSize.width;
             }
+            // Restart row index from the beginning, since we have change of overview index.
+            y = 1;
             // Change to next level of overview.
             overview++;
             subSampling.setSize(subSampling.width  * step.width, 
