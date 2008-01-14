@@ -168,6 +168,18 @@ public interface Layer extends Element {
     Set<CoverageReference> getCoverageReferences() throws CatalogException;
 
     /**
+     * Returns a reference to a single "typical" coverages available in this layer.
+     * This method is especially useful for layer that are expected to contains only
+     * one coverage.
+     * <p>
+     * Note that the coverages is not immediately loaded; only a reference is returned.
+     *
+     * @return A typical coverage in the layer, or {@code null} if none.
+     * @throws CatalogException if an error occured while querying the catalog.
+     */
+    CoverageReference getCoverageReference() throws CatalogException;
+
+    /**
      * Returns a view of this layer as a coverage. This coverage can be evaluated at
      * (<var>x</var>,<var>y</var>,<var>z</var>,<var>t</var>) location, using interpolations
      * if needed. Note that this coverage is less elaborated than {@link Descriptor#getCoverage}:

@@ -218,7 +218,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
 
         GridCoverage2D coverage = worker.getGridCoverage2D(false);
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
-        assertSame("Expected no ressampling.",       coverage, worker.getGridCoverage2D(true ));
 
         File file = worker.getImageFile();
         assertTrue(file.getName().endsWith(".png"));

@@ -95,22 +95,27 @@ public class BlueMarbleTest extends DatabaseTest {
         Set<CoverageReference> entries = layer.getCoverageReferences();
         assertEquals(1, entries.size());
 
-        CoverageReference entry = entries.iterator().next();
-        CoverageReference other = layer.getCoverageReferences().iterator().next();
+        CoverageReference entry = layer.getCoverageReference();
+        CoverageReference other = layer.getCoverageReference();
         assertEquals("Should be cached", entry, other);
         assertSame  ("Should be cached", entry, other);
         assertEquals("BlueMarble", entry.getSeries().getName());
-        assertNull(entry.getFile());
-        assertNull(entry.getURI());
+        assertTrue  (entries.contains(entry));
+        assertNull  (entry.getFile());
+        assertNull  (entry.getURI());
+        for (CoverageReference e : entries) {
+            if (e == entry) System.out.print("*** ");
+            System.out.println(e);
+        }
         assertEquals(GeographicBoundingBoxImpl.WORLD, entry.getGeographicBoundingBox());
 
         Rectangle range = entry.getGridGeometry().getGridRange2D();
         assertEquals(360, range.width);
         assertEquals(180, range.height);
 
+        GridCoverage2D coverage = entry.getCoverage(null);
+        RenderedImage image = coverage.geophysics(false).getRenderedImage();
         if (false) {
-            GridCoverage2D coverage = entry.getCoverage(null);
-            RenderedImage image = coverage.geophysics(false).getRenderedImage();
             ImageIO.write(image, "png", new File("/home/desruisseaux/Test.png"));
         }
     }

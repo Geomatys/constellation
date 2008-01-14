@@ -1026,7 +1026,7 @@ public class WebServiceWorker {
                 final ImageTypeSpecifier type =
                         ImageTypeSpecifier.createFromBufferedImageType(BUFFERED_TYPES[i]);
                 if (opaque && isOpaque(type.getColorModel())) {
-                    // In order to reduce the file size, discarts
+                    // In order to reduce the file size, discards
                     // types with transparency if we don't need it.
                     continue;
                 }

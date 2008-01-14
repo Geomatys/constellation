@@ -410,6 +410,20 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
+    public CoverageReference getCoverageReference() throws CatalogException {
+        final GridCoverageTable data = this.data;   // Protect against concurrent changes.
+        if (data != null) try {
+            return data.getEntry();
+        } catch (SQLException exception) {
+            throw new ServerException(exception);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public synchronized Coverage getCoverage() throws CatalogException {
         Coverage c = null;
         if (coverage != null) {
