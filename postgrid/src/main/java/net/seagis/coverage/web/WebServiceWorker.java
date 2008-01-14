@@ -548,6 +548,29 @@ public class WebServiceWorker {
     }
 
     /**
+     * Sets the interpolation method to use for resampling.
+     * If not set the default value is {@link Interpolation#INTERP_BILINEAR}.
+     *
+     * @param interpolation The name of the requested interpolation method.
+     */
+    public void setInterpolation(String interpolation) {
+        final int code;
+        if (interpolation != null) {
+            interpolation = interpolation.trim();
+            if (interpolation.equalsIgnoreCase("bicubic")) {
+                code = Interpolation.INTERP_BICUBIC;
+            } else if (interpolation.equalsIgnoreCase("nearest neighbor")) {
+                code = Interpolation.INTERP_NEAREST;
+            } else {
+                code = Interpolation.INTERP_BILINEAR;
+            }
+        } else {
+            code = Interpolation.INTERP_BILINEAR;
+        }
+        this.interpolation = Interpolation.getInstance(code);
+    }
+
+    /**
      * Sets the range on value on which to apply a color ramp.
      */
     public void setColormapRange(String range) throws WebServiceException {
@@ -573,27 +596,6 @@ public class WebServiceWorker {
        }
     }
 
-    /**
-     * Sets the interpolation method to use for resampling.
-     * if not set the default value is {@code Interpolation.INTERP_BILINEAR}
-     * 
-     * @param interpolation The name of the requested interpolation method.
-     */
-    public void setInterpolation(String interpolation) {
-        if (interpolation != null) {
-            if (interpolation.equals("bicubic")) {
-                this.interpolation = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
-            } else if (interpolation.equals("nearest neighbor")) {
-                this.interpolation = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
-            } else {
-                this.interpolation = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
-            }
-            
-        } else {
-            this.interpolation = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
-        }
-    }
-    
     /**
      * Sets the background Color of the requested image.
      * if not set the default value is {@code 0xFFFFFF}.
@@ -700,6 +702,34 @@ public class WebServiceWorker {
     }
 
     /**
+     * Parses a list of layer names and return the specified layers. The given string shall
+     * be a comma or semi-colon separated list of name returned by {@link #getLayerNames}.
+     *
+     * @param  layerNames a list of layer names separated by comma or semi-colon.
+     * @throws WebServiceException if an error occured while fetching the table.
+     */
+    public List<Layer> getLayers(final String layerNames) throws WebServiceException {
+        final LayerTable table = getLayerTable(true);
+        final List<Layer> layers = new ArrayList<Layer>();
+        final StringTokenizer tokens = new StringTokenizer(layerNames, ",;");
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+            final Layer layer;
+            try {
+                layer = table.getEntry(token);
+            } catch (NoSuchRecordException exception) {
+                throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
+            } catch (CatalogException exception) {
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            } catch (SQLException exception) {
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            }
+            layers.add(layer);
+        }
+        return layers;
+    }
+
+    /**
      * Returns all available layers.
      *
      * @throws WebServiceException if an error occured while fetching the table.
@@ -708,29 +738,6 @@ public class WebServiceWorker {
         try {
             final LayerTable table = getLayerTable(true);
             return table.getEntries();
-        } catch (CatalogException exception) {
-            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
-        } catch (SQLException exception) {
-            throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
-        }
-    }
-    
-    /**
-     * Parse the list of layerNames and return the specified layers.
-     *
-     * @param  layerNames a list of layer names separated by colon.
-     * @throws WebServiceException if an error occured while fetching the table.
-     */
-    public List<Layer> getLayers(String layerNames) throws WebServiceException {
-        try {
-            final LayerTable table = getLayerTable(true);
-            List<Layer> layers = new ArrayList<Layer>();
-            final StringTokenizer tokens = new StringTokenizer(layerNames, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                layers.add(table.getEntry(token));
-        }
-            return layers;
         } catch (CatalogException exception) {
             throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
