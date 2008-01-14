@@ -63,7 +63,7 @@ public class LatLonBoundingBox extends AbstractGeographicBoundingBox {
      * 
      */
     public double getSouthBoundLatitude() {
-        return maxy;
+        return miny;
     }
 
     /**
@@ -71,7 +71,7 @@ public class LatLonBoundingBox extends AbstractGeographicBoundingBox {
      * 
      */
     public double getNorthBoundLatitude() {
-        return miny;
+        return maxy;
     }
     
     @Override
