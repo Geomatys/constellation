@@ -188,6 +188,11 @@ public class WebServiceWorker {
      * @see #getGridToCRS.
      */
     private MathTransform gridToCRS;
+    
+    /**
+     * 
+     */
+    private AffineTransform gridCRS;
 
     /**
      * The range on value on which to apply a color ramp.
@@ -502,7 +507,57 @@ public class WebServiceWorker {
         }
         gridRange = new GeneralGridRange(new int[upper.length], upper);
     }
-
+    
+    /**
+     * 
+     * @param gridOrigin 
+     * @param gridOffsets
+     */
+    public void setGridCRS(String gridOrigin, String gridOffsets) throws WebServiceException{
+        if (gridOffsets != null && gridOrigin != null) {
+            
+            //we extract the origin parameters
+            double[] origin = new double[2];
+            int i = 0;
+            StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                final double value;
+                try {
+                    value = Double.parseDouble(token);
+                } catch (NumberFormatException exception) {
+                    throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, token),
+                            exception, INVALID_PARAMETER_VALUE, version);
+                }
+                origin[i] = value;
+                i++;
+            }
+            //we extract the offsets parameters
+            double[] offsets = new double[4];
+            i = 0;
+            tokens = new StringTokenizer(gridOffsets, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                final double value;
+                try {
+                    value = Double.parseDouble(token);
+                } catch (NumberFormatException exception) {
+                    throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, token),
+                            exception, INVALID_PARAMETER_VALUE, version);
+                }
+                offsets[i] = value;
+                i++;
+            }
+            /**
+             * we build an affineTransform object like this (origin T, offsets G):
+             * | G(0) G(1) T(0)| 
+             * | G(2) G(3) T(1)|
+             * | 0    0    1   |
+             */
+            gridCRS = new AffineTransform(offsets[0], offsets[2], offsets[1], offsets[3], origin[0], origin[1]);
+        }
+    }
+    
     /**
      * Sets the time, or {@code null} if unknown.
      *
@@ -553,7 +608,7 @@ public class WebServiceWorker {
      *
      * @param interpolation The name of the requested interpolation method.
      */
-    public void setInterpolation(String interpolation) {
+    public void setInterpolation(String interpolation) throws WebServiceException {
         final int code;
         if (interpolation != null) {
             interpolation = interpolation.trim();
@@ -561,8 +616,17 @@ public class WebServiceWorker {
                 code = Interpolation.INTERP_BICUBIC;
             } else if (interpolation.equalsIgnoreCase("nearest neighbor")) {
                 code = Interpolation.INTERP_NEAREST;
-            } else {
+            } else if (interpolation.equalsIgnoreCase("bilinear"))  {
                 code = Interpolation.INTERP_BILINEAR;
+            } else if (interpolation.equalsIgnoreCase("barycentric"))  {
+                 throw new WebServiceException("The service does not handle the barycentric interpolation method", 
+                            INVALID_PARAMETER_VALUE, version);
+            } else if (interpolation.equalsIgnoreCase("lost area"))  {
+                 throw new WebServiceException("The service does not handle the lost area interpolation method", 
+                            INVALID_PARAMETER_VALUE, version);
+            } else {
+                throw new WebServiceException("The service does not handle this interpolation method: " + interpolation, 
+                            INVALID_PARAMETER_VALUE, version);
             }
         } else {
             code = Interpolation.INTERP_BILINEAR;
@@ -717,6 +781,7 @@ public class WebServiceWorker {
             final Layer layer;
             try {
                 layer = table.getEntry(token);
+                LOGGER.info("layer null: " + (layer==null));
             } catch (NoSuchRecordException exception) {
                 throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
             } catch (CatalogException exception) {

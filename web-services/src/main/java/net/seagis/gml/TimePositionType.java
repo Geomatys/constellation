@@ -44,14 +44,30 @@ import org.geotools.resources.Utilities;
 public class TimePositionType {
 
     @XmlValue
-    protected List<String> value;
+    private List<String> value;
     @XmlAttribute
-    protected String calendarEraName;
+    private String calendarEraName;
     @XmlAttribute
-    protected String frame;
+    private String frame;
     @XmlAttribute
-    protected TimeIndeterminateValueType indeterminatePosition;
+    private TimeIndeterminateValueType indeterminatePosition;
 
+    /**
+     * empty constructor used by JAXB.
+     */
+    TimePositionType(){
+        
+    }
+    
+    /**
+     * build a simple Timposition with only a value.
+     * @param value
+     */
+    public TimePositionType(String value){
+        this.value = new ArrayList<String>();
+        this.value.add(value);
+    }
+    
     /**
      * The simple type gml:TimePositionUnion is a union of XML Schema simple types which instantiate the subtypes for temporal position described in ISO 19108.
      *  An ordinal era may be referenced via URI.  A decimal value may be used to indicate the distance from the scale origin .  time is used for a position that recurs daily (see ISO 19108:2002 5.4.4.2).
@@ -78,24 +94,8 @@ public class TimePositionType {
     }
 
     /**
-     * Sets the value of the calendarEraName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCalendarEraName(String value) {
-        this.calendarEraName = value;
-    }
-
-    /**
      * Gets the value of the frame property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getFrame() {
         if (frame == null) {
@@ -106,42 +106,13 @@ public class TimePositionType {
     }
 
     /**
-     * Sets the value of the frame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFrame(String value) {
-        this.frame = value;
-    }
-
-    /**
      * Gets the value of the indeterminatePosition property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TimeIndeterminateValueType }
-     *     
      */
     public TimeIndeterminateValueType getIndeterminatePosition() {
         return indeterminatePosition;
     }
 
     /**
-     * Sets the value of the indeterminatePosition property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TimeIndeterminateValueType }
-     *     
-     */
-    public void setIndeterminatePosition(TimeIndeterminateValueType value) {
-        this.indeterminatePosition = value;
-    }
-    
-     /**
      * Verifie si cette entree est identique l'objet specifie.
      */
     @Override

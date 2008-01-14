@@ -29,7 +29,13 @@ import javax.xml.bind.Marshaller;
 
 // jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
@@ -39,10 +45,12 @@ import javax.ws.rs.core.UriInfo;
 // seagis dependencies
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
+import net.seagis.coverage.catalog.Series;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.gml.CodeListType;
 import net.seagis.gml.DirectPositionType;
+import net.seagis.gml.TimePositionType;
 import net.seagis.ows.BoundingBoxType;
 import net.seagis.ows.KeywordsType;
 import net.seagis.ows.LanguageStringType;
@@ -74,6 +82,7 @@ import net.seagis.wcs.SupportedCRSsType;
 import net.seagis.wcs.SpatialDomainType;
 import net.seagis.wcs.SupportedFormatsType;
 import net.seagis.wcs.SupportedInterpolationsType;
+import net.seagis.wcs.TimeSequenceType;
 import net.seagis.wcs.WCSCapabilitiesType;
 
 // geoAPI dependencies
@@ -302,38 +311,75 @@ public class WCService extends WebService {
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         String format, coverage, crs, bbox, time, interpolation;
         String width = null, height = null; 
-        String gridType, gridOrigin, gridOffsets, gridCS;
+        String gridType, gridOrigin = null, gridOffsets = null, gridCS, gridBaseCrs;
         
        if (getCurrentVersion().toString().equals("1.1.1")){
             
             coverage = getParameter("identifier", true);
             
-            //Domain subset
+            /**
+             * Domain subset: - spatial subSet
+             *                - temporal subset
+             * 
+             * spatial subset: - BoundingBox
+             * here the boundingBox parameter contain the crs.
+             * we must extract it before calling webServiceWorker.setBoundingBox(...)
+             * 
+             * temporal subSet: - timeSequence
+             *  
+             */
             bbox = getParameter("BoundingBox", true);
+            if (bbox.indexOf(',') != -1) {
+                crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
+                bbox = bbox.substring(0, bbox.lastIndexOf(','));
+            } else {
+                throw new WebServiceException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
+                            WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+            } 
             time = getParameter("timeSequence", false);
             
             /**
-             * Range subSet not yet used.
+             * Range subSet.
              * contain the sub fields : fieldSubset
+             * for now we handle only one field to change the interpolation method.
+             * 
              * FieldSubset: - identifier
              *              - interpolationMethodType
-             *              - axisSubset
+             *              - axisSubset (not yet used)
              * 
              * AxisSubset:  - identifier
              *              - key 
              */
-            getParameter("rangeSubset", false);
+            String rangeSubset = getParameter("rangeSubset", false);
+            if (rangeSubset != null && rangeSubset.indexOf(':') != -1) {
+                String fieldId     = rangeSubset.substring(0, rangeSubset.indexOf(':'));
+                Layer currentLayer =  webServiceWorker.getLayers(coverage).get(0);
+                if (fieldId.equalsIgnoreCase(currentLayer.getThematic())){
+                    interpolation = rangeSubset.substring(rangeSubset.indexOf(':')+ 1, rangeSubset.length());
+                } else {
+                    throw new WebServiceException("The field " + fieldId + " is not present in this coverage" , 
+                            WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                }
+            } else {
+                interpolation = null;
+            }
             
-            interpolation = null;
-            
-            //output
+            /** 
+             * output subSet:  - format 
+             *                 - GridCRS (not yet used)
+             * 
+             * Grid CRS: - GridBaseCRS
+             *           - GridOffsets
+             *           - GridType
+             *           - GridOrigin
+             *           - GridCS
+             *  
+             */
+
             format = getParameter("format", true);
             
-            /**
-             * grid crs
-             */
-            crs = getParameter("GridBaseCRS", true);
-            gridOffsets = getParameter("GridOffsets", true);
+            gridBaseCrs = getParameter("GridBaseCRS", false);
+            gridOffsets = getParameter("GridOffsets", false);
             
             gridType = getParameter("GridType", false);
             if (gridType == null) {
@@ -369,8 +415,12 @@ public class WCService extends WebService {
         webServiceWorker.setCoordinateReferenceSystem(crs);
         webServiceWorker.setBoundingBox(bbox);
         webServiceWorker.setTime(time);
-        webServiceWorker.setDimension(width, height);
         webServiceWorker.setInterpolation(interpolation);
+        if (getCurrentVersion().toString().equals("1.1.1")) {
+            webServiceWorker.setGridCRS(gridOrigin, gridOffsets);
+        } else {
+            webServiceWorker.setDimension(width, height);
+        }
             
         return webServiceWorker.getImageFile();
     }
@@ -448,7 +498,13 @@ public class WCService extends WebService {
                 formats.add(new CodeListType("image/png"));
                 formats.add(new CodeListType("image/gif"));
                 formats.add(new CodeListType("image/bmp"));
-                SupportedFormatsType supForm = new SupportedFormatsType("??", formats); 
+                String nativeFormat = "??";
+                Iterator<Series> it = layer.getSeries().iterator();
+                if (it.hasNext()) {
+                    Series s = it.next();
+                    nativeFormat = s.getFormat().getMimeType();
+                }
+                SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, formats); 
                 
                 //supported interpolations
                 List<InterpolationMethod> interpolations = new ArrayList<InterpolationMethod>();
@@ -473,7 +529,8 @@ public class WCService extends WebService {
                 coverages.add(coverage);
             }
             response = new CoverageDescription(coverages, "1.0.0"); 
-            
+        
+        // describeCoverage version 1.1.1    
         } else {
             net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
             List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
@@ -503,7 +560,18 @@ public class WCService extends WebService {
                 
                 // spatial metadata
                 SpatialDomainType spatial = new SpatialDomainType(bbox);
-                CoverageDomainType domain = new CoverageDomainType(spatial, null);
+                
+                // temporal metadata
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                List<Object> times = new ArrayList<Object>();
+                SortedSet<Date> dates = layer.getAvailableTimes();
+                for (Date d:dates){
+                        times.add(new TimePositionType(df.format(d))); 
+                }
+                TimeSequenceType temporalDomain = new TimeSequenceType(times);
+                
+                CoverageDomainType domain       = new CoverageDomainType(spatial, temporalDomain);
                 
                 //supported interpolations
                 List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
