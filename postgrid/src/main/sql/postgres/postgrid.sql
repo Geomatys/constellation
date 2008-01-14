@@ -39,15 +39,15 @@ GRANT ALL ON TABLE "Formats" TO geoadmin;
 GRANT SELECT ON TABLE "Formats" TO PUBLIC;
 
 COMMENT ON TABLE "Formats" IS
-    'Formats des images (PNG, GIF, JPEG, etc...).';
+    'Image formats (PNG, GIF, JPEG, etc...).';
 COMMENT ON COLUMN "Formats"."name" IS
-    'Nom identifiant le format.';
+    'Name of the format.';
 COMMENT ON COLUMN "Formats"."mime" IS
-    'Nom MIME du format.';
+    'Format''s MIME.';
 COMMENT ON COLUMN "Formats"."encoding" IS
-    'Encodage des données de l''image: "geophysics" ou "native".';
+    'Encoding of image data: "geophysics" or "native".';
 COMMENT ON CONSTRAINT "Formats_encoding_check" ON "Formats" IS
-    'Énumération des valeurs acceptables.';
+    'Enumeration of acceptable values.';
 
 
 
@@ -72,21 +72,21 @@ GRANT SELECT ON TABLE "SampleDimensions" TO PUBLIC;
 CREATE INDEX "SampleDimensions_index" ON "SampleDimensions" ("format", "band");
 
 COMMENT ON TABLE "SampleDimensions" IS
-    'Descriptions des bandes comprises dans chaque format d''images.';
+    'Descriptions of the bands included in each image format.';
 COMMENT ON COLUMN "SampleDimensions"."identifier" IS
-    'Nom unique identifiant la bande.';
+    'Unique name identifying the band.';
 COMMENT ON COLUMN "SampleDimensions"."format" IS
-    'Format qui contient cette bande.';
+    'Format containing this band.';
 COMMENT ON COLUMN "SampleDimensions"."band" IS
-    'Numéro de la bande (à partir de 1).';
+    'Band number (starting at 1).';
 COMMENT ON COLUMN "SampleDimensions"."units" IS
-    'Unités des mesures géophysiques. Ce champ peut être blanc s''il ne s''applique pas.';
+    'Geophysical measurement units.  May be left blank if not applicable.';
 COMMENT ON CONSTRAINT "SampleDimensions_format_fkey" ON "SampleDimensions" IS
-    'Chaque bande fait partie de la description d''une image.';
+    'Each band forms part of the description of the image.';
 COMMENT ON CONSTRAINT "SampleDimensions_band_check" ON "SampleDimensions" IS
-    'Le numéro de bande doit être positif.';
+    'The band number must be positive.';
 COMMENT ON INDEX "SampleDimensions_index" IS
-    'Classement des bandes dans leur ordre d''apparition.';
+    'Index of the bands in order of appearance.';
 
 
 
@@ -119,29 +119,29 @@ GRANT SELECT ON TABLE "Categories" TO PUBLIC;
 CREATE INDEX "Categories_index" ON "Categories" ("band", "lower");
 
 COMMENT ON TABLE "Categories" IS
-    'Plage de valeurs des différents thèmes et relation entre les valeurs des pixels et leurs mesures géophysiques.';
+    'Range of values of the different categories and the relation between pixel values and their geophysical measurements.';
 COMMENT ON COLUMN "Categories"."name" IS
-    'Nom du thème représenté par cette plage de valeurs.';
+    'Name of the category represented by this range of values.';
 COMMENT ON COLUMN "Categories"."band" IS
-    'Bande auquel s''applique cette plage de valeurs.';
+    'The band to which this range of values applies.';
 COMMENT ON COLUMN "Categories"."lower" IS
-    'Valeur minimale (inclusive) des pixels de ce thème.';
+    'Minimum pixel value (inclusive) for this category.';
 COMMENT ON COLUMN "Categories"."upper" IS
-    'Valeur maximale (inclusive) des pixels de ce thème.';
+    'Maximum pixel value (inclusive) for this category.';
 COMMENT ON COLUMN "Categories"."c0" IS
-    'Coefficient C0 de l''équation y=C0+C1*x, ou x est la valeur du pixel et y la valeur en mesures géophysiques. Ce champ peut être blanc s''il ne s''applique pas.';
+    'Coefficient C0 of the equation y=C0+C1*x, where x is the pixel value and y is the value of the geophysical measurement.  May be left blank if not applicable.';
 COMMENT ON COLUMN "Categories"."c1" IS
-    'Coefficient C1 de l''équation y=C0+C1*x, ou x est la valeur du pixel et y la valeur en mesures géophysiques. Ce champ peut être blanc s''il ne s''applique pas.';
+    'Coefficient C1 of the equation y=C0+C1*x, where x is the pixel value and y is the value of the geophysical measurement.  May be left blank if not applicable.';
 COMMENT ON COLUMN "Categories"."function" IS
-    'Fonction appliquée sur les valeurs géophysiques. Par exemple la valeur "log" indique que les valeurs sont exprimées sous la forme log(y)=C0+C1*x.';
+    'Function applied to the geophysical values.  For example, the value "log" indicates that the values are expressed in the form log(y)=C0+C1*x.';
 COMMENT ON COLUMN "Categories"."colors" IS
-    'Ce champ peut être soit un code d''une couleur, ou soit une adresse URL vers une palette de couleurs.';
+    'This field can be either a color code or the name of a color pallet.';
 COMMENT ON CONSTRAINT "Categories_band_fkey" ON "Categories" IS
-    'Chaque catégorie est un élément de la description d''une bande.';
+    'Each category is an element of the band description.';
 COMMENT ON CONSTRAINT "Categories_coefficients" ON "Categories" IS
-    'Les coefficients C0 et C1 doivent être nuls ou non-nuls en même temps.';
+    'Both coefficients C0 and C1 must be either null or non-null.';
 COMMENT ON INDEX "Categories_index" IS
-    'Recherche des catégories appartenant à une bande.';
+    'Index of categories belonging to a band.';
 
 
 
@@ -176,7 +176,7 @@ ALTER TABLE "RangeOfFormats" OWNER TO geoadmin;
 GRANT ALL ON TABLE "RangeOfFormats" TO geoadmin;
 GRANT SELECT ON TABLE "RangeOfFormats" TO PUBLIC;
 COMMENT ON VIEW "RangeOfFormats" IS
-    'Plage des valeurs de chaque format d''images.';
+    'Value range of each image format.';
 
 
 
@@ -201,21 +201,21 @@ GRANT SELECT ON TABLE "Layers" TO PUBLIC;
 CREATE INDEX "Layers_index" ON "Layers" ("thematic", "procedure");
 
 COMMENT ON TABLE "Layers" IS
-    'Ensemble de séries d''images appartenant à une même thématique.';
+    'Set of a series of images belonging to the same category.';
 COMMENT ON COLUMN "Layers"."name" IS
-    'Nom identifiant la couche.';
+    'Name of the layer.';
 COMMENT ON COLUMN "Layers"."thematic" IS
-    'Paramètre géophysique (ou thème) de cette couche.';
+    'Geophysical parameter (or category) of this layer.';
 COMMENT ON COLUMN "Layers"."procedure" IS
-    'Procédure appliquée pour produire les images.';
+    'Procedure applied to produce the images.';
 COMMENT ON COLUMN "Layers"."period" IS
-    'Nombre de jours prévus entre deux image. Cette information peut être approximative ou laissée blanc si elle ne s''applique pas.';
+    'Number of days between images.  Can be approximate or left blank if not applicable.';
 COMMENT ON COLUMN "Layers"."fallback" IS
-    'Couche de rechange proposée si aucune donnée n''est disponible pour la couche courante.';
+    'Fallback layer which is suggested if no data is available for the current layer.';
 COMMENT ON CONSTRAINT "Layers_fallback_fkey" ON "Layers" IS
-    'Chaque couche de second recours doit exister.';
+    'Each fallback layer must exist.';
 COMMENT ON INDEX "Layers_index" IS
-    'Recherche des couches appartenant à une thématique.';
+    'Index of layers belonging to a category.';
 
 
 
@@ -242,31 +242,31 @@ GRANT SELECT ON TABLE "Series" TO PUBLIC;
 CREATE INDEX "Series_index" ON "Series" ("layer", "visible");
 
 COMMENT ON TABLE "Series" IS
-    'Séries d''images. Chaque images appartient à une série.';
+    'Series of images.  Each image belongs to a series.';
 COMMENT ON COLUMN "Series"."identifier" IS
-    'Identifiant unique de la séries.';
+    'Unique identifier.';
 COMMENT ON COLUMN "Series"."layer" IS
-    'Couche à laquelle appartiennent les images de cette série.';
+    'The layer to which the images in the series belong.';
 COMMENT ON COLUMN "Series"."pathname" IS
-    'Chemins relatifs des fichiers du groupe. La racine à ces chemins ne doit pas être spécifiée si elle peut varier d''une plateforme à l''autre.';
+    'Relative path to the files in the group.  The root path should not be specified if it varies from platform to platform.';
 COMMENT ON COLUMN "Series"."extension" IS
-    'Extension des fichiers d''images de cette série.';
+    'File extention of the images in the series.';
 COMMENT ON COLUMN "Series"."format" IS
-    'Format des images de ce groupe.';
+    'Format of the images in the series.';
 COMMENT ON COLUMN "Series"."visible" IS
-    'Indique si les images de ce groupe doivent apparaître dans la liste des images proposées à l''utilisateur.';
+    'Indicates if the images should appear in the list of images presented to the user. ';
 COMMENT ON COLUMN "Series"."quicklook" IS
-    'Série dont les images sont des aperçus de cette série.';
+    'Series of overview images.';
 COMMENT ON CONSTRAINT "Series_quicklook_key" ON "Series" IS
-    'Chaque série a une seule autre série d''aperçus.';
+    'Each series has only one overview series.';
 COMMENT ON CONSTRAINT "Series_layer_fkey" ON "Series" IS
-    'Chaque série appartient à une couche.';
+    'Each series belongs to a layer.';
 COMMENT ON CONSTRAINT "Series_format_fkey" ON "Series" IS
-    'Toutes les images d''une même série utilisent un même séries.';
+    'All the images of a series use the same series.';
 COMMENT ON CONSTRAINT "Series_quicklook_fkey" ON "Series" IS
-    'Les aperçus s''appliquent à une autre séries d''images.';
+    'The overviews apply to another series of images.';
 COMMENT ON INDEX "Series_index" IS
-    'Recherche des séries appartenant à une couche.';
+    'Index of series belonging to a layer.';
 
 
 
@@ -312,46 +312,46 @@ ALTER TABLE ONLY "GridGeometries"
 
 CREATE INDEX "HorizontalExtent_index" ON "GridGeometries" USING gist ("horizontalExtent" gist_geometry_ops);
 COMMENT ON INDEX "HorizontalExtent_index" IS
-    'Recherche des geométries interceptant une région géographique.';
+    'Index of geometries intersecting a geographical area.';
 
 COMMENT ON TABLE "GridGeometries" IS
-    'Envelope spatiales des images ainsi que la dimension de leurs grilles. La transformation affine doit représenter le coin supérieur gauche des pixels.';
+    'Spatial envalope of the images, as well as their grid dimensions.';
 COMMENT ON COLUMN "GridGeometries"."identifier" IS
-    'Identifiant unique.';
+    'Unique identifier.';
 COMMENT ON COLUMN "GridGeometries"."width" IS
-    'Nombre de pixels en largeur dans l''image.';
+    'Number of pixels wide.';
 COMMENT ON COLUMN "GridGeometries"."height" IS
-    'Nombre de pixels en hauteur dans l''image.';
+    'Number of pixels high.';
 COMMENT ON COLUMN "GridGeometries"."translateX" IS
-    'Élement (0,2) de la transformation affine. Il correspond habituellement à la coordonnées x du coin supérieur gauche.';
+    'Element (0,2) of the affine transform.  Usually corresponds to the x-coordinate of the top left corner.';
 COMMENT ON COLUMN "GridGeometries"."translateY" IS
-    'Élement (1,2) de la transformation affine. Il correspond habituellement à la coordonnées y du coin supérieur gauche.';
+    'Element (1,2) of the affine transform.  Usually corresponds to the y-coordinate of the top left corner.';
 COMMENT ON COLUMN "GridGeometries"."scaleX" IS
-    'Élement (0,0) de la transformation affine. Il correspond habituellement à la taille selon x des pixels.';
+    'Element (0,0) of the affine transform.  Usually corresponds to the x size of the pixels.';
 COMMENT ON COLUMN "GridGeometries"."scaleY" IS
-    'Élement (1,1) de la transformation affine. Il correspond habituellement à la taille selon y des pixels. Cette valeur est souvent négative puisque la numérotation des lignes d''une image augmente vers le bas.';
+    'Element (1,1) of the affine transform.  Usually corresponds to the y size of the pixels.  This value is often negative since the numbering of the lines of an image increases downwards.';
 COMMENT ON COLUMN "GridGeometries"."shearX" IS
-    'Élement (0,1) de la transformation affine. Toujours à 0 s''il n''y a pas de rotation.';
+    'Element (0,1) of the affine transform.  Always 0 if there is no rotation.';
 COMMENT ON COLUMN "GridGeometries"."shearY" IS
-    'Élement (1,0) de la transformation affine. Toujours à 0 s''il n''y a pas de rotation.';
+    'Element (1,0) of the affine transform.  Always 0 if there is no rotation.';
 COMMENT ON COLUMN "GridGeometries"."horizontalSRID" IS
-    'Code du système de référence des coordonnées horizontales.';
+    'Horizontal coordinate system code.';
 COMMENT ON COLUMN "GridGeometries"."horizontalExtent" IS
-    'Étendue spatiale à l''horizontal.';
+    'Horizontal spatial extent.';
 COMMENT ON COLUMN "GridGeometries"."verticalSRID" IS
-    'Code du système de référence des coordonnées verticales.';
+    'Vertical coordinate system code.';
 COMMENT ON COLUMN "GridGeometries"."verticalOrdinates" IS
-    'Valeurs z de chacunes des couches d''une image 3D.';
+    'Z values of each of the layers of a 3D image.';
 COMMENT ON CONSTRAINT "GridGeometries_size" ON "GridGeometries" IS
-    'Les dimensions des images doivent être positives.';
+    'The dimensions of the images must be positive.';
 COMMENT ON CONSTRAINT "enforce_dims_horizontalExtent" ON "GridGeometries" IS
-    'Vérifie que l''étendue horizontale est à deux dimensions.';
+    'Verify that the horizontal extent has two dimensions.';
 COMMENT ON CONSTRAINT "enforce_geotype_horizontalExtent" ON "GridGeometries" IS
-    'Vérifie que l''étendue horizontale est un polygone.';
+    'Verify that the horizontal extent is a polygon.';
 COMMENT ON CONSTRAINT "enforce_srid_horizontalExtent" ON "GridGeometries" IS
-    'Vérifie que l''étendue horizontale est exprimée selon le CRS attendu.';
+    'Verify that the horizontal extent is expressed according to the expected CRS.';
 COMMENT ON CONSTRAINT "enforce_srid_verticalOrdinates" ON "GridGeometries" IS
-    'Les coordonnées verticales et leur SRID doivent être nul ou non-nul en même temps.';
+    'The vertical coordinates and their SRID must both either be null or non-null.';
 
 
 
@@ -383,7 +383,7 @@ CREATE TRIGGER "addDefaultExtent"
     EXECUTE PROCEDURE "ComputeDefaultExtent"();
 
 COMMENT ON TRIGGER "addDefaultExtent" ON "GridGeometries" IS
-    'Ajoute une enveloppe par défaut si aucune n''était définie explicitement.';
+    'Add an envelope by default if none is explicitly defined.';
 
 
 
@@ -429,7 +429,7 @@ GRANT ALL ON TABLE "BoundingBoxes" TO geoadmin;
 GRANT SELECT ON TABLE "BoundingBoxes" TO PUBLIC;
 
 COMMENT ON VIEW "BoundingBoxes" IS
-    'Comparaison entre les enveloppes calculées et les enveloppes déclarées.';
+    'Comparison between the calculated envelopes and the declared envelopes.';
 
 
 
@@ -462,33 +462,33 @@ CREATE INDEX "GridCoverages_index"        ON "GridCoverages" ("series", "endTime
 CREATE INDEX "GridCoverages_extent_index" ON "GridCoverages" ("series", "extent");
 
 COMMENT ON TABLE "GridCoverages" IS
-    'Liste de toutes les images disponibles. Chaque enregistrement correspond à un fichier d''image.';
+    'List of all the images available.  Each listing corresponds to an image file.';
 COMMENT ON COLUMN "GridCoverages"."series" IS
-    'Série à laquelle appartient l''image.';
+    'Series to which the image belongs.';
 COMMENT ON COLUMN "GridCoverages"."filename" IS
-    'Nom du fichier contenant l''image.';
+    'File name of the image.';
 COMMENT ON COLUMN "GridCoverages"."index" IS
-    'Index de l''image dans les fichiers contenant plusieurs images. Numérotées à partir de 1.';
+    'Index of the image in the files containing several images.  Numbered from 1.';
 COMMENT ON COLUMN "GridCoverages"."startTime" IS
-    'Date et heure du début de l''acquisition de l''image, en heure universelle (UTC). Dans le cas des moyennes, cette date correspond au début de l''intervalle de temps ayant servit à établir la moyenne.';
+    'Date and time of the image acquisition start, in UTC.  In the case of averages, the time corresponds to the beginning of the interval used to calculate the average.';
 COMMENT ON COLUMN "GridCoverages"."endTime" IS
-    'Date et heure de la fin de l''acquisition de l''image, en heure universelle (UTC). Cette date doit être supérieure à la date de début d''acquisition; une valeur égale ne suffit pas.';
+    'Date and time of the image acquisition end, in UTC.  This time must be greater than or equal to the acquisition start time.';
 COMMENT ON COLUMN "GridCoverages"."extent" IS
-    'Coordonnées de la région géographique couverte par l''image, ainsi que sa résolution approximative. ';
+    'Coordinates of the geographical area covered by the image, and approximate resolution';
 COMMENT ON CONSTRAINT "GridCoverages_series_key" ON "GridCoverages" IS
-    'L''envelope de l''image doit être unique dans chaque série.';
+    'The envelope of the image must be unique in each series.';
 COMMENT ON CONSTRAINT "GridCoverages_series_fkey" ON "GridCoverages" IS
-    'Chaque image appartient à une série.';
+    'Each image belongs to a series.';
 COMMENT ON CONSTRAINT "GridCoverages_extent_fkey" ON "GridCoverages" IS
-    'Chaque images doit avoir une étendue spatiale.';
+    'Each image must have a spatial extent.';
 COMMENT ON CONSTRAINT "GridCoverages_check" ON "GridCoverages" IS
-    'Les dates de début et de fin doivent être nulles ou non-nulles en même temps, et la date de début doit être inférieure ou égale à la date de fin.';
+    'The start and end times must be both null or both non-null, and the end time must be greater than or equal to the start time.';
 COMMENT ON CONSTRAINT "GridCoverages_index_check" ON "GridCoverages" IS
-    'L''index de l''image doit être strictement positif.';
+    'The image index must be positive.';
 COMMENT ON INDEX "GridCoverages_index" IS
-    'Recherche de toutes les images à l''intérieur d''une certaine plage de temps.';
+    'Index of all the images within a certain time range.';
 COMMENT ON INDEX "GridCoverages_extent_index" IS
-    'Recherche de toutes les images dans une région géographique.';
+    'Index of all the images in a geographic region.';
 
 
 
@@ -525,7 +525,7 @@ GRANT ALL ON TABLE "DomainOfSeries" TO geoadmin;
 GRANT SELECT ON TABLE "DomainOfSeries" TO PUBLIC;
 
 COMMENT ON VIEW "DomainOfSeries" IS
-    'Liste des régions géographiques utilisées par chaque sous-série.';
+    'List of geographical areas used by each sub-series.';
 
 
 
@@ -557,4 +557,4 @@ GRANT ALL ON TABLE "DomainOfLayers" TO geoadmin;
 GRANT SELECT ON TABLE "DomainOfLayers" TO PUBLIC;
 
 COMMENT ON VIEW "DomainOfLayers" IS
-    'Nombre d''images et région géographique pour chacune des couches utilisées.';
+    'Number of images and geographical area for each layer used.';
