@@ -53,8 +53,8 @@ public class EXGeographicBoundingBox extends AbstractGeographicBoundingBox {
      * Build a new bounding box.
      *
      */
-    public EXGeographicBoundingBox(final double westBoundLongitude, final double eastBoundLongitude,
-            final double southBoundLatitude, final double northBoundLatitude) {
+    public EXGeographicBoundingBox(final double westBoundLongitude, final double southBoundLatitude,
+            final double eastBoundLongitude, final double northBoundLatitude) {
         this.eastBoundLongitude = eastBoundLongitude;
         this.northBoundLatitude = northBoundLatitude;
         this.southBoundLatitude = southBoundLatitude;

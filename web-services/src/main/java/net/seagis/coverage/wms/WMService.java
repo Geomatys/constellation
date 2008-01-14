@@ -403,8 +403,8 @@ public class WMService extends WebService {
                 if(inputGeoBox != null) {
                     outputBBox = new BoundingBox(code.toString(), 
                                                  inputGeoBox.getWestBoundLongitude(),
-                                                 inputGeoBox.getEastBoundLongitude(),
                                                  inputGeoBox.getSouthBoundLatitude(),
+                                                 inputGeoBox.getEastBoundLongitude(),
                                                  inputGeoBox.getNorthBoundLatitude(),
                                                  0.0, 0.0,
                                                  getCurrentVersion());
@@ -474,8 +474,8 @@ public class WMService extends WebService {
                                               inputLayer.getThematic(), 
                                               crs, 
                                               new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(), 
-                                                                          inputGeoBox.getEastBoundLongitude(), 
                                                                           inputGeoBox.getSouthBoundLatitude(), 
+                                                                          inputGeoBox.getEastBoundLongitude(), 
                                                                           inputGeoBox.getNorthBoundLatitude()), 
                                               outputBBox,  
                                               true,

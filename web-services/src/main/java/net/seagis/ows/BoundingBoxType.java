@@ -89,7 +89,7 @@ public class BoundingBoxType {
      * @param minx
      * @param miny
      */
-    public BoundingBoxType(String crs, double maxx, double maxy, double minx, double miny){
+    public BoundingBoxType(String crs, double minx, double miny, double maxx, double maxy){
         this.dimensions = new BigInteger("2");
         this.lowerCorner.add(minx);
         this.lowerCorner.add(maxy);

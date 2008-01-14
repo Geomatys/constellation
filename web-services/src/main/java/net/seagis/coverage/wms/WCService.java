@@ -244,8 +244,8 @@ public class WCService extends WebService {
                     if (inputVersion.equals("1.1.1")){
                         WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
                                                      inputGeoBox.getWestBoundLongitude(),
-                                                     inputGeoBox.getEastBoundLongitude(),
                                                      inputGeoBox.getSouthBoundLatitude(),
+                                                     inputGeoBox.getEastBoundLongitude(),
                                                      inputGeoBox.getNorthBoundLatitude());
                 
                         cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
@@ -323,6 +323,9 @@ public class WCService extends WebService {
              *              - key 
              */
             getParameter("rangeSubset", false);
+            
+            interpolation = null;
+            
             //output
             format = getParameter("format", true);
             
@@ -367,6 +370,7 @@ public class WCService extends WebService {
         webServiceWorker.setBoundingBox(bbox);
         webServiceWorker.setTime(time);
         webServiceWorker.setDimension(width, height);
+        webServiceWorker.setInterpolation(interpolation);
             
         return webServiceWorker.getImageFile();
     }
@@ -388,6 +392,13 @@ public class WCService extends WebService {
             identifiers = getParameter("IDENTIFIER", true);
         }
         List<Layer> layers = webServiceWorker.getLayers(identifiers);
+        
+        //this wcs does not implement "store" mechanism
+        String store = getParameter("STORE", false);
+        if (store!= null && store.equals("true")) {
+             throw new WebServiceException("The service does not implement the store mechanism", 
+                     WMSExceptionCode.NO_APPLICABLE_CODE, getCurrentVersion());
+        }
         
         //we prepare the response object to return
         Object response;
@@ -474,8 +485,8 @@ public class WCService extends WebService {
                 
                     WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
                                                          inputGeoBox.getWestBoundLongitude(),
-                                                         inputGeoBox.getEastBoundLongitude(),
                                                          inputGeoBox.getSouthBoundLatitude(),
+                                                         inputGeoBox.getEastBoundLongitude(),
                                                          inputGeoBox.getNorthBoundLatitude());
                     bbox = owsFactory.createWGS84BoundingBox(outputBBox);
                 }
@@ -500,7 +511,7 @@ public class WCService extends WebService {
                 intList.add(new InterpolationMethodType(InterpolationMethod.BICUBIC.value(), null));
                 intList.add(new InterpolationMethodType(InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
                 InterpolationMethods interpolations = new InterpolationMethods(intList, InterpolationMethod.BILINEAR.value());  
-                RangeType range = new RangeType(new FieldType("??", null, new CodeType("0.0"), interpolations));
+                RangeType range = new RangeType(new FieldType(layer.getThematic(), null, new CodeType("0.0"), interpolations));
                
                 //supported CRS
                 List<String> supportedCRS = new ArrayList<String>();

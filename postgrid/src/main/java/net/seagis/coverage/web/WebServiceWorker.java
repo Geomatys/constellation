@@ -574,6 +574,27 @@ public class WebServiceWorker {
     }
 
     /**
+     * Sets the interpolation method to use for resampling.
+     * if not set the default value is {@code Interpolation.INTERP_BILINEAR}
+     * 
+     * @param interpolation The name of the requested interpolation method.
+     */
+    public void setInterpolation(String interpolation) {
+        if (interpolation != null) {
+            if (interpolation.equals("bicubic")) {
+                this.interpolation = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
+            } else if (interpolation.equals("nearest neighbor")) {
+                this.interpolation = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
+            } else {
+                this.interpolation = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+            }
+            
+        } else {
+            this.interpolation = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+        }
+    }
+    
+    /**
      * Sets the background Color of the requested image.
      * if not set the default value is {@code 0xFFFFFF}.
      *
