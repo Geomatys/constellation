@@ -55,6 +55,11 @@ public class TestMosaicWriter {
     private static final Dimension STEP = new Dimension(2,2);
     
     /**
+     * The minimum tile size that we want to have at the end of the process.
+     */
+    private static final Rectangle MINTILE = new Rectangle(20, 20);
+    
+    /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -74,8 +79,10 @@ public class TestMosaicWriter {
             }
             final int width = reader.getWidth(0);
             final int height = reader.getHeight(0);
-            TileManager tileManager = tileGenerator.createTiles(reader.getOriginatingProvider(), 
-                    new Rectangle(width, height), TILESIZE, STEP);
+            /*TileManager tileManager = tileGenerator.createTilesConstantSize(reader.getOriginatingProvider(), 
+                    new Rectangle(width, height), TILESIZE, STEP);*/
+            TileManager tileManager = tileGenerator.createTilesConstantRegion(reader.getOriginatingProvider(), 
+                    new Rectangle(width, height), MINTILE, STEP);
             MosaicImageWriter mosaicWriter = new MosaicImageWriter(null);
             mosaicWriter.setOutput(tileManager);
             mosaicWriter.writeTiles(INPUT);

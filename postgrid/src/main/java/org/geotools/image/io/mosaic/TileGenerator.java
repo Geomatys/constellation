@@ -65,8 +65,8 @@ public class TileGenerator {
      * @param step The factor by which the size of tiles is multiplicated.
      * @return A {@linkplain TileManager} that contains all tiles generated.
      */
-    public TileManager createTiles(final ImageReaderSpi spi, final Rectangle raster, 
-         final Dimension tileSize, final Dimension step) 
+    public TileManager createTilesConstantSize(final ImageReaderSpi spi, 
+            final Rectangle raster, final Dimension tileSize, final Dimension step) 
     {
         List<Tile> tiles = new ArrayList<Tile>();
         final String extension = spi.getFileSuffixes()[0];
@@ -111,14 +111,14 @@ public class TileGenerator {
                     Tile tile = new Tile(spi, inputTile, 0, currentRect, subSampling);
                     tiles.add(tile);
                     x++;
-                    xMin += tileSize.height;
-                    xMax += tileSize.height;
+                    xMin += tileSize.width;
+                    xMax += tileSize.width;
                 }
                 y++;
                 // Restart column index from the beginning, since we have change of row index.
                 x = 1;
-                yMin += tileSize.width;
-                yMax += tileSize.width;
+                yMin += tileSize.height;
+                yMax += tileSize.height;
             }
             // Restart row index from the beginning, since we have change of overview index.
             y = 1;
@@ -129,12 +129,95 @@ public class TileGenerator {
             wholeRaster.setSize(wholeRaster.width  / step.width, 
                                 wholeRaster.height / step.height);
         }
-        Tile[] arrayTiles = new Tile[tiles.size()];
-        for (int i=0; i<tiles.size(); i++) {
-            arrayTiles[i] = tiles.get(i);
-        }
+        final Tile[] arrayTiles = tiles.toArray(new Tile[tiles.size()]);
         TileManager tileManager = new TileManagerFactory(null).createGeneric(arrayTiles);
         return tileManager;
+    }
+
+    /**
+     * Create tiles which cover a constant region, but have a size that changes
+     * as we progress into overviews levels.
+     * The specified {@code minTileSize} parameter is the size for which we do not want to go 
+     * deeper into overviews.
+     * 
+     * @param spi The image provider.
+     * @param raster The whole raster.
+     * @param minTileSize The size of tiles.
+     * @param step The factor by which the size of tiles is multiplicated.
+     * @return A {@linkplain TileManager} that contains all tiles generated.
+     */
+    public TileManager createTilesConstantRegion(final ImageReaderSpi spi, 
+            final Rectangle raster, final Rectangle minTileSize, final Dimension step) 
+    {
+        List<Tile> tiles = new ArrayList<Tile>();
+        final String extension = spi.getFileSuffixes()[0];
+        //final Rectangle wholeRaster = raster;
+        final Rectangle tileRect = new Rectangle(raster);
+        Dimension subSampling = new Dimension(1,1);
+        // Iterator used for the file name.
+        int overview = 1, x = 1, y = 1;
+        while (tileRect.contains(minTileSize)) {
+            // Current values for the y coordinates
+            int yMin = 0;
+            int yMax = tileRect.height;
+            // Current values for the x coordinates
+            int xMin = 0;
+            int xMax = tileRect.width;
+            Rectangle currentRect = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
+            // Creates a specific file for this tile.
+            final File inputTile;
+            if (outputFolder != null) {
+                inputTile = new File(outputFolder, generateName(overview, x, y, extension));
+            } else {
+                inputTile = new File(generateName(overview, x, y, extension));
+            }
+            Tile tile = new Tile(spi, inputTile, 0, currentRect, subSampling);
+            tiles.add(tile);
+            overview++;
+            subSampling.setSize(subSampling.width * step.width,
+                    subSampling.height * step.height);
+            Dimension newDim = chooseTileSizeForNextOverview(tileRect, step);
+            tileRect.setSize(newDim);
+        }
+        final Tile[] arrayTiles = tiles.toArray(new Tile[tiles.size()]);
+        TileManager tileManager = new TileManagerFactory(null).createGeneric(arrayTiles);
+        return tileManager;
+    }
+
+    /**
+     * Verify that the width of the tile is divisible by the step. If not, we try to add or 
+     * substract 1 to the step, in order to search a right diviser for the size of the tile.
+     * This function is applied on the width and the height.
+     * 
+     * @param tile The size of the tile.
+     * @param step The step is the diviser for the tile size.
+     * @return
+     */
+    private Dimension chooseTileSizeForNextOverview(final Rectangle tile, final Dimension step) {
+        return new Dimension(chooseTileSizeForNextOverview(tile.width,  step.width),
+                             chooseTileSizeForNextOverview(tile.height, step.height));
+    }
+
+    /**
+     * 
+     * @param size A size for the raster. It could be the width or height value.
+     * @param step The step with which we will divide the size.
+     * @return The new size divided by the step.
+     */
+    private static int chooseTileSizeForNextOverview(final int size, final int step) {
+        if (size % step != 0) {
+            for (int i=1; i<=5; i++) {
+                int candidate = step - i;
+                if (candidate > 1 && size % candidate == 0) {
+                    return size / candidate;
+                }
+                candidate = step + i;
+                if (size % candidate == 0) {
+                    return size / candidate;
+                }
+            }
+        }
+        return size / step;
     }
     
     /**
@@ -157,15 +240,17 @@ public class TileGenerator {
         // If it is the case, we add a secund letter.
         // @TODO: verifying that we do not exceed 26*26 for the x value, otherwise a third letter
         // would be necessary.
-        if (x > 26) {
-            int firstLetter = x / 26;
-            int secundLetter = x - (26 * firstLetter);
-            buffer.append((char) ('A' + firstLetter - 1)).append((char) ('A' + secundLetter - 1));
-        } else {
-            buffer.append((char) ('A' + x - 1));
-        }
-        buffer.append(y).append(".").append(extension);
+        toLetters(x, buffer);
+        buffer.append(y).append('.').append(extension);
         return buffer.toString();
+    }
+
+    private static void toLetters(int column, final StringBuilder buffer) {
+        if (column > 26) {
+            toLetters(column / 26, buffer);
+            column %= 26;
+        }
+        buffer.append((char)('A' + (column - 1)));
     }
     
     /**
