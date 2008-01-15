@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Capabilities xmlns="http://www.opengis.net/wcs/" 
+<Capabilities xmlns="http://www.opengis.net/wcs" 
 xmlns:ows="http://www.opengis.net/ows/1.1" 
 xmlns:xlink="http://www.w3.org/1999/xlink" 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xsi:schemaLocation="http://www.opengis.net/wcs/1.1.1 ../wcsGetCapabilities.xsd http://www.opengis.net/ows/1.1 ../../../ows/1.1.0/owsAll.xsd" 
-version="1.1.1" updateSequence="ABC123">
-	<ows:ServiceIdentification>
+version="1.1.1" updateSequence="">
+	<!-- ************************************************************ -->
+  <!-- * SERVICE IDENTIFICATION SECTION                 * -->
+  <!-- ************************************************************ -->
+  <ows:ServiceIdentification>
 		<ows:Title>Web Coverage Server</ows:Title>
 		<ows:Abstract>SeaGis Web Coverage Server maintained by geomatys.</ows:Abstract>
 		<ows:Keywords>
@@ -13,10 +16,14 @@ version="1.1.1" updateSequence="ABC123">
 			<ows:Keyword>geomatys</ows:Keyword>
 		</ows:Keywords>
 		<ows:ServiceType>OGC WCS</ows:ServiceType>
+		<ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
 		<ows:ServiceTypeVersion>1.1.1</ows:ServiceTypeVersion>
 		<ows:Fees>NONE</ows:Fees>
 		<ows:AccessConstraints>NONE</ows:AccessConstraints>
 	</ows:ServiceIdentification>
+	<!-- ************************************************************ -->
+  <!-- * SERVICE PROVIDER SECTION                         * -->
+  <!-- ************************************************************ -->
 	<ows:ServiceProvider>
 		<ows:ProviderName>Geomatys</ows:ProviderName>
 		<ows:ProviderSite xlink:href="http://hostname/"/>
@@ -47,6 +54,17 @@ version="1.1.1" updateSequence="ABC123">
 					<ows:Get xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCapabilities"/>
 				</ows:HTTP>
 			</ows:DCP>
+			<ows:Parameter name="service">
+            <ows:AllowedValues>
+               <ows:Value>WCS</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+         <ows:Parameter name="version">
+            <ows:AllowedValues>
+               <ows:Value>1.0.0</ows:Value>
+               <ows:Value>1.1.1</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
 			<ows:DCP>
 				<ows:HTTP>
 					<ows:Post xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCapabilities"/>
@@ -69,6 +87,7 @@ version="1.1.1" updateSequence="ABC123">
 					<ows:Value>image/gif</ows:Value>
 					<ows:Value>image/png</ows:Value>
 					<ows:Value>image/jpeg</ows:Value>
+					<ows:Value>matrix</ows:Value>
 				</ows:AllowedValues>
 			</ows:Parameter>
 		</ows:Operation>
@@ -88,6 +107,17 @@ version="1.1.1" updateSequence="ABC123">
 					<ows:Value>text/xml</ows:Value>
 				</ows:AllowedValues>
 			</ows:Parameter>
+			<ows:Parameter name="service">
+        <ows:AllowedValues>
+          <ows:Value>WCS</ows:Value>
+        </ows:AllowedValues>
+        </ows:Parameter>
+        <ows:Parameter name="version">
+          <ows:AllowedValues>
+            <ows:Value>1.0.0</ows:Value>
+            <ows:Value>1.1.1</ows:Value>
+          </ows:AllowedValues>
+       </ows:Parameter>
 		</ows:Operation>
 	</ows:OperationsMetadata>
 	<Contents>
