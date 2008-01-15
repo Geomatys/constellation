@@ -57,6 +57,11 @@ import net.seagis.ows.LanguageStringType;
 import net.seagis.ows.Operation;
 import net.seagis.ows.WGS84BoundingBoxType;
 import net.seagis.ows.CodeType;
+import net.seagis.ows.OperationsMetadata;
+import net.seagis.ows.SectionsType;
+import net.seagis.ows.ServiceIdentification;
+import net.seagis.ows.ServiceIdentification;
+import net.seagis.ows.ServiceProvider;
 import net.seagis.wcs.RangeType;
 import net.seagis.wcs.Capabilities;
 import net.seagis.wcs.ContentMetadata;
@@ -168,7 +173,7 @@ public class WCService extends WebService {
                     
             } else if (request.equalsIgnoreCase("GetCapabilities")) {
                     
-                return Response.Builder.representation(getCapabilities(), "text/xml").build();
+                return getCapabilities();
                     
             } else if (request.equalsIgnoreCase("GetCoverage")) {
                     
@@ -189,7 +194,7 @@ public class WCService extends WebService {
     /**
      * Web service operation
      */ 
-    public String getCapabilities() throws JAXBException, WebServiceException {
+    public Response getCapabilities() throws JAXBException, WebServiceException {
         logger.info("getCapabilities request received");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
@@ -203,33 +208,115 @@ public class WCService extends WebService {
         setCurrentVersion(inputVersion);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         
-        
         Capabilities        responsev111 = null;
         WCSCapabilitiesType responsev100 = null;
+        boolean contentMeta              = false;
+        String format                    = "text/xml";
         
         if (inputVersion.equals("1.1.1")) {
-            responsev111 = (Capabilities)getCapabilitiesObject(getCurrentVersion());
-        
-            //we update the url in the static part.
-            for (Operation op:responsev111.getOperationsMetadata().getOperation()) {
-                op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getValue().setHref(getServiceURL() + "wcs?REQUEST=" + op.getName());
-                op.getDCP().get(1).getHTTP().getGetOrPost().get(0).getValue().setHref(getServiceURL() + "wcs?REQUEST=" + op.getName());
+            
+            // if the user have specified one format accepted (only one for now != spec)
+            format = getParameter("AcceptFormats", false);
+            if (format == null) {
+                format = "text/xml";
+            } else {
+                if (!format.equals("text/xml") && !format.equals("application/vnd.ogc.wcs_xml")){
+                    throw new WebServiceException("This format " + format + " is not allowed",
+                                       WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                }
             }
-        } else {
-            responsev100 = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject(getCurrentVersion())).getValue();
             
-            //we update the url in the static part.
-            ((Get) responsev100.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
-            ((Post)responsev100.getCapability().getRequest().getGetCapabilities().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
+            //if the user have requested only some sections
+            String sections = getParameter("Sections", false);
+            List<String> requestedSections = new ArrayList<String>();
+            if (sections != null) {
+                final StringTokenizer tokens = new StringTokenizer(sections, ",;");
+                while (tokens.hasMoreTokens()) {
+                    final String token = tokens.nextToken().trim();
+                    if (SectionsType.getExistingSections("1.1.1").contains(token)){
+                        requestedSections.add(token);
+                    } else {
+                        throw new WebServiceException("The section " + token + " does not exist",
+                                                 WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                    }
+                }
+            } else {
+                requestedSections = SectionsType.getExistingSections("1.1.1");
+            }
             
-            ((Get)responsev100.getCapability().getRequest().getDescribeCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage");
-            ((Post)responsev100.getCapability().getRequest().getDescribeCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage");
-            
-            ((Get)responsev100.getCapability().getRequest().getGetCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage");
-            ((Post)responsev100.getCapability().getRequest().getGetCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage");
-            
-        }
+            // we unmarshall the static capabilities docuement
+            Capabilities staticCapabilities = (Capabilities)getCapabilitiesObject(getCurrentVersion());
+            ServiceIdentification si = null;
+            ServiceProvider       sp = null;
+            OperationsMetadata    om = null;
         
+            //we add the static sections if the are included in the requested sections
+            if (requestedSections.contains("ServiceProvider")) 
+                sp = staticCapabilities.getServiceProvider();
+            if (requestedSections.contains("ServiceIdentification")) 
+                si = staticCapabilities.getServiceIdentification();
+            if (requestedSections.contains("OperationsMetadata")) { 
+                om = staticCapabilities.getOperationsMetadata();
+                //we update the url in the static part.
+                for (Operation op:om.getOperation()) {
+                    op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getValue().setHref(getServiceURL() + "wcs?REQUEST=" + op.getName());
+                    op.getDCP().get(1).getHTTP().getGetOrPost().get(0).getValue().setHref(getServiceURL() + "wcs?REQUEST=" + op.getName());
+                }
+            }
+            responsev111 = new Capabilities(si, sp, om, "1.1.1", null, null);
+            
+            // if the user does not request the contents section we can return the result.
+            if (!requestedSections.contains("Contents")) {
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(responsev111, sw);
+                return Response.Builder.representation(sw.toString(), format).build();
+            }
+                   
+        } else {
+            
+            /*
+             * In WCS 1.0.0 the user can request only one section 
+             * ( or all by ommiting the parameter section)
+             */ 
+            String section = getParameter("SECTION", false);
+            String requestedSection = null;
+            if (section != null) {
+                if (SectionsType.getExistingSections("1.0.0").contains(section)){
+                    requestedSection = section;
+                } else {
+                    throw new WebServiceException("The section " + section + " does not exist",
+                                          WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+               }
+               contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata"); 
+            }
+            WCSCapabilitiesType staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject(getCurrentVersion())).getValue();
+            
+            if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability")) {
+                //we update the url in the static part.
+                ((Get) staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
+                ((Post)staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
+            
+                ((Get) staticCapabilities.getCapability().getRequest().getDescribeCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage");
+                ((Post)staticCapabilities.getCapability().getRequest().getDescribeCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage");
+            
+                ((Get) staticCapabilities.getCapability().getRequest().getGetCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage");
+                ((Post)staticCapabilities.getCapability().getRequest().getGetCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage");
+            }
+            
+            if (requestedSection == null || contentMeta ) {
+                responsev100 = staticCapabilities;
+            } else {
+                if (requestedSection.equals("/WCS_Capabilities/Capability")) {
+                    responsev100 = new WCSCapabilitiesType(staticCapabilities.getCapability());
+                } else if (requestedSection.equals("/WCS_Capabilities/Service")) {
+                    responsev100 = new WCSCapabilitiesType(staticCapabilities.getService());
+                }
+                
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(responsev100, sw);
+                return Response.Builder.representation(sw.toString(), format).build();
+            }
+        }
         Contents contents;
         ContentMetadata contentMetadata;
         
@@ -292,11 +379,15 @@ public class WCService extends WebService {
             responsev111.setContents(contents);
             marshaller.marshal(responsev111, sw);
         } else {
-            responsev100.setContentMetadata(contentMetadata);
+            if (contentMeta) {
+                responsev100 = new WCSCapabilitiesType(contentMetadata);
+            } else { 
+                responsev100.setContentMetadata(contentMetadata);
+            }
             marshaller.marshal(responsev100, sw);
         }
         
-        return sw.toString();
+        return Response.Builder.representation(sw.toString(), format).build();
         
     }
     

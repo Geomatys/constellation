@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.resources.Utilities;
 
@@ -55,6 +56,23 @@ public class SectionsType {
 
     @XmlElement(name = "Section")
     private List<String> section = new ArrayList<String>();
+    
+    @XmlTransient
+    private static List<String> existingSections111 = new ArrayList<String>(4);
+    static {
+        existingSections111.add("ServiceIdentification");
+        existingSections111.add("ServiceProvider");
+        existingSections111.add("OperationsMetadata");
+        existingSections111.add("Contents");
+    }
+    
+    @XmlTransient
+    private static List<String> existingSections100 = new ArrayList<String>(3);
+    static {
+        existingSections100.add("/WCS_Capabilities/Service");
+        existingSections100.add("/WCS_Capabilities/Capability");
+        existingSections100.add("/WCS_Capabilities/ContentMetadata");
+    }
 
     /**
      * Empty constructor used bye JAXB.
@@ -83,6 +101,18 @@ public class SectionsType {
      */
     public void add(String section) {
         this.section.add(section);
+    }
+    
+    /**
+     * Return a List of all the existing sections. 
+     */
+    public static List<String> getExistingSections(String v) {
+        if (v.equals("1.0.0"))
+            return Collections.unmodifiableList(existingSections100);
+        else if (v.equals("1.1.1"))
+            return Collections.unmodifiableList(existingSections111);
+        else
+            return null;
     }
     
     /**

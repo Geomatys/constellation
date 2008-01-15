@@ -22,10 +22,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.ows.CapabilitiesBaseType;
+import net.seagis.ows.OperationsMetadata;
+import net.seagis.ows.ServiceIdentification;
+import net.seagis.ows.ServiceProvider;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Root Document for a response to a getCapabilities request (WCS version 1.1.1).
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
@@ -60,9 +63,10 @@ public class Capabilities extends CapabilitiesBaseType {
     
     /**
      * Build a new Capabilities document.
-     * TODO call super(...)
      */
-    public Capabilities(Contents contents) {
+    public Capabilities(ServiceIdentification serviceIdentification, ServiceProvider serviceProvider,
+            OperationsMetadata operationsMetadata, String version, String updateSequence, Contents contents) {
+        super(serviceIdentification, serviceProvider, operationsMetadata, version, updateSequence);
         this.contents = contents;
     }
     

@@ -49,7 +49,7 @@ import org.geotools.resources.Utilities;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CapabilitiesBaseType", propOrder = {

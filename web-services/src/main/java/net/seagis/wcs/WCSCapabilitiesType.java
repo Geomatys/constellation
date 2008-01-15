@@ -74,19 +74,56 @@ public class WCSCapabilitiesType {
     private String updateSequence;
 
     /**
+     * an empty constructor used by JAXB.
+     */
+    WCSCapabilitiesType(){
+        
+    }
+    
+    /**
+     * build a full new Capabilities document version 1.0.0.
+     */
+    public WCSCapabilitiesType(ServiceType service, WCSCapabilityType capability, 
+            ContentMetadata contentMetadata, String updateSequence) {
+        this.service         = service;
+        this.capability      = capability;
+        this.contentMetadata = contentMetadata;
+        this.version         = "1.0.0";
+        this.updateSequence  = updateSequence;
+    }
+    
+    /**
+     * build a new Capabilities document version 1.0.0 with only the section "service".
+     */
+    public WCSCapabilitiesType(ServiceType service) {
+        this.service = service;
+        this.version = "1.0.0";
+    }
+    
+    /**
+     * build a new Capabilities document version 1.0.0 with only the section "Capability".
+     */
+    public WCSCapabilitiesType(WCSCapabilityType capability) {
+        this.capability = capability;
+        this.version    = "1.0.0";
+    }
+    
+    /**
+     * build a new Capabilities document version 1.0.0 with only the section "ContentMetadata".
+     */
+    public WCSCapabilitiesType(ContentMetadata contentMetadata) {
+        this.contentMetadata = contentMetadata;
+        this.version         = "1.0.0";
+    }
+    
+    
+    /**
      * Gets the value of the service property.
      */
     public ServiceType getService() {
         return service;
     }
     
-    /**
-     * Gets the value of the service property.
-     */
-    public void setService(ServiceType service) {
-        this.service = service;
-    }
-
     /**
      * Gets the value of the capability property.
      * 
