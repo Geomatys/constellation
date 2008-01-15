@@ -41,33 +41,48 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @auhor Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 public class UserDefinedSymbolization {
 
     @XmlAttribute(name = "SupportSLD")
-    protected Boolean supportSLD;
+    private Boolean supportSLD;
     @XmlAttribute(name = "UserLayer")
-    protected Boolean userLayer;
+    private Boolean userLayer;
     @XmlAttribute(name = "UserStyle")
-    protected Boolean userStyle;
+    private Boolean userStyle;
     @XmlAttribute(name = "RemoteWFS")
-    protected Boolean remoteWFS;
+    private Boolean remoteWFS;
     @XmlAttribute(name = "InlineFeature")
-    protected Boolean inlineFeature;
+    private Boolean inlineFeature;
     @XmlAttribute(name = "RemoteWCS")
-    protected Boolean remoteWCS;
+    private Boolean remoteWCS;
 
     /**
-     * Gets the value of the supportSLD property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     * Empty Constructor used by JAXB.
      */
+    UserDefinedSymbolization() {
+        
+    }
+    
+    /**
+     * Build a new User Defined Symbolization.
+     */
+    public UserDefinedSymbolization(Boolean supportSLD, Boolean userLayer, Boolean userStyle,
+            Boolean remoteWFS, Boolean inlineFeature, Boolean remoteWCS) {
+        this.inlineFeature = inlineFeature;
+        this.supportSLD    = supportSLD;
+        this.userLayer     = userLayer;
+        this.userStyle     = userStyle;
+        this.remoteWFS     = remoteWFS;
+        this.remoteWCS     = remoteWCS;
+    }
+    
+   /**
+    * Gets the value of the supportSLD property.
+    */
     public boolean isSupportSLD() {
         if (supportSLD == null) {
             return false;
@@ -77,24 +92,7 @@ public class UserDefinedSymbolization {
     }
 
     /**
-     * Sets the value of the supportSLD property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setSupportSLD(Boolean value) {
-        this.supportSLD = value;
-    }
-
-    /**
      * Gets the value of the userLayer property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public boolean isUserLayer() {
         if (userLayer == null) {
@@ -105,24 +103,7 @@ public class UserDefinedSymbolization {
     }
 
     /**
-     * Sets the value of the userLayer property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setUserLayer(Boolean value) {
-        this.userLayer = value;
-    }
-
-    /**
      * Gets the value of the userStyle property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public boolean isUserStyle() {
         if (userStyle == null) {
@@ -133,24 +114,7 @@ public class UserDefinedSymbolization {
     }
 
     /**
-     * Sets the value of the userStyle property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setUserStyle(Boolean value) {
-        this.userStyle = value;
-    }
-
-    /**
      * Gets the value of the remoteWFS property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public boolean isRemoteWFS() {
         if (remoteWFS == null) {
@@ -161,24 +125,7 @@ public class UserDefinedSymbolization {
     }
 
     /**
-     * Sets the value of the remoteWFS property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setRemoteWFS(Boolean value) {
-        this.remoteWFS = value;
-    }
-
-    /**
      * Gets the value of the inlineFeature property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public boolean isInlineFeature() {
         if (inlineFeature == null) {
@@ -189,24 +136,7 @@ public class UserDefinedSymbolization {
     }
 
     /**
-     * Sets the value of the inlineFeature property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setInlineFeature(Boolean value) {
-        this.inlineFeature = value;
-    }
-
-    /**
      * Gets the value of the remoteWCS property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public boolean isRemoteWCS() {
         if (remoteWCS == null) {
@@ -215,17 +145,4 @@ public class UserDefinedSymbolization {
             return remoteWCS;
         }
     }
-
-    /**
-     * Sets the value of the remoteWCS property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setRemoteWCS(Boolean value) {
-        this.remoteWCS = value;
-    }
-
 }

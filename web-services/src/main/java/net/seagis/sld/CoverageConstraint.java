@@ -1,3 +1,19 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.sld;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -36,56 +52,38 @@ import javax.xml.bind.annotation.XmlType;
 public class CoverageConstraint {
 
     @XmlElement(name = "CoverageName", namespace = "http://www.opengis.net/se", required = true)
-    protected String coverageName;
+    private String coverageName;
     @XmlElement(name = "CoverageExtent")
-    protected CoverageExtent coverageExtent;
+    private CoverageExtent coverageExtent;
 
+    /**
+     * Empty Constructor used by JAXB.
+     */
+    CoverageConstraint() {
+        
+    }
+    
+    /**
+     * Build a new Coverage constraint.
+     */
+    public CoverageConstraint(String coverageName, CoverageExtent coverageExtent) {
+        this.coverageName   = coverageName;
+        this.coverageExtent = coverageExtent;
+    }
+    
     /**
      * Gets the value of the coverageName property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCoverageName() {
         return coverageName;
     }
 
     /**
-     * Sets the value of the coverageName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCoverageName(String value) {
-        this.coverageName = value;
-    }
-
-    /**
      * Gets the value of the coverageExtent property.
      * 
-     * @return
-     *     possible object is
-     *     {@link CoverageExtent }
-     *     
      */
     public CoverageExtent getCoverageExtent() {
         return coverageExtent;
     }
-
-    /**
-     * Sets the value of the coverageExtent property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CoverageExtent }
-     *     
-     */
-    public void setCoverageExtent(CoverageExtent value) {
-        this.coverageExtent = value;
-    }
-
 }

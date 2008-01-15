@@ -1,6 +1,23 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.sld;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,7 +44,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -38,61 +55,45 @@ import javax.xml.bind.annotation.XmlType;
 public class CoverageExtent {
 
     @XmlElement(name = "RangeAxis")
-    protected List<RangeAxis> rangeAxis;
+    private List<RangeAxis> rangeAxis;
     @XmlElement(name = "TimePeriod")
-    protected String timePeriod;
+    private String timePeriod;
 
     /**
+     * Empty Constructor used by JAXB.
+     */
+    CoverageExtent() {
+        
+    }
+    
+    /**
+     * Build a new Coverage extent with the specified range axis.
+     */
+    public CoverageExtent(List<RangeAxis> rangeAxis) {
+        this.rangeAxis = rangeAxis;
+    }
+    
+     /**
+     * Build a new Coverage extent with the specified time period.
+     */
+    public CoverageExtent(String timePeriod) {
+        this.timePeriod = timePeriod;
+    }
+    
+    /**
      * Gets the value of the rangeAxis property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the rangeAxis property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getRangeAxis().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link RangeAxis }
-     * 
-     * 
      */
     public List<RangeAxis> getRangeAxis() {
         if (rangeAxis == null) {
             rangeAxis = new ArrayList<RangeAxis>();
         }
-        return this.rangeAxis;
+        return Collections.unmodifiableList(rangeAxis);
     }
 
     /**
      * Gets the value of the timePeriod property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getTimePeriod() {
         return timePeriod;
     }
-
-    /**
-     * Sets the value of the timePeriod property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTimePeriod(String value) {
-        this.timePeriod = value;
-    }
-
 }

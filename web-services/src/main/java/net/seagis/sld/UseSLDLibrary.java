@@ -50,8 +50,11 @@ import net.seagis.se.OnlineResourceType;
 public class UseSLDLibrary {
 
     @XmlElement(name = "OnlineResource", namespace = "http://www.opengis.net/se", required = true)
-    protected OnlineResourceType onlineResource;
+    private OnlineResourceType onlineResource;
 
+    /**
+     * Empty Constructor used by JAXB.
+     */
     UseSLDLibrary(){
     }
     
