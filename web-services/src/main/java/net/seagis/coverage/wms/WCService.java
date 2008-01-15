@@ -203,6 +203,7 @@ public class WCService extends WebService {
         setCurrentVersion(inputVersion);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         
+        
         Capabilities        responsev111 = null;
         WCSCapabilitiesType responsev100 = null;
         
@@ -476,9 +477,20 @@ public class WCService extends WebService {
                 }
                 Keywords keywords = new Keywords("WCS", layer.getName());
                 
-                //Spatial metadata TODO temporal
+                //Spatial metadata 
                 SpatialDomainType spatialDomain = new SpatialDomainType(llenvelope);
-                DomainSetType domainSet = new DomainSetType(spatialDomain, null);
+                
+                // temporal metadata
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                List<Object> times = new ArrayList<Object>();
+                SortedSet<Date> dates = layer.getAvailableTimes();
+                for (Date d:dates){
+                        times.add(new TimePositionType(df.format(d))); 
+                }
+                TimeSequenceType temporalDomain = new TimeSequenceType(times);
+                
+                DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
                 
                 //TODO complete
                 RangeSetType  rangeSet  = new RangeSetType(null, 

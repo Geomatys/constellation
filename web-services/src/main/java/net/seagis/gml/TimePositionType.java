@@ -1,7 +1,24 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.gml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -61,7 +78,8 @@ public class TimePositionType {
     
     /**
      * build a simple Timposition with only a value.
-     * @param value
+     * 
+     * @param value a date.
      */
     public TimePositionType(String value){
         this.value = new ArrayList<String>();
@@ -69,25 +87,22 @@ public class TimePositionType {
     }
     
     /**
-     * The simple type gml:TimePositionUnion is a union of XML Schema simple types which instantiate the subtypes for temporal position described in ISO 19108.
-     *  An ordinal era may be referenced via URI.  A decimal value may be used to indicate the distance from the scale origin .  time is used for a position that recurs daily (see ISO 19108:2002 5.4.4.2).
-     *  Finally, calendar and clock forms that support the representation of time in systems based on years, months, days, hours, minutes and seconds, in a notation following ISO 8601, are assembled by gml:CalDate Gets the value of the value property.
+     * The simple type gml:TimePositionUnion is a union of XML Schema simple types 
+     * which instantiate the subtypes for temporal position described in ISO 19108.
+     * An ordinal era may be referenced via URI.  
+     * A decimal value may be used to indicate the distance from the scale origin .  
+     * time is used for a position that recurs daily (see ISO 19108:2002 5.4.4.2).
+     * Finally, calendar and clock forms that support the representation of time in systems based on years,
+     * months, days, hours, minutes and seconds, in a notation following ISO 8601, 
+     * are assembled by gml:CalDate Gets the value of the value property.
      * 
      */
     public List<String> getValue() {
-        if (value == null) {
-            value = new ArrayList<String>();
-        }
-        return this.value;
+        return Collections.unmodifiableList(value);
     }
 
     /**
      * Gets the value of the calendarEraName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCalendarEraName() {
         return calendarEraName;

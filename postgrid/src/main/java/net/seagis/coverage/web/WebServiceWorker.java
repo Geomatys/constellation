@@ -51,6 +51,7 @@ import org.opengis.coverage.PointOutsideCoverageException;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -188,11 +189,6 @@ public class WebServiceWorker {
      * @see #getGridToCRS.
      */
     private MathTransform gridToCRS;
-    
-    /**
-     * 
-     */
-    private AffineTransform gridCRS;
 
     /**
      * The range on value on which to apply a color ramp.
@@ -491,6 +487,7 @@ public class WebServiceWorker {
         gridToCRS = null;
         if (width == null && height == null) {
             gridRange = null;
+            gridToCRS = null;
             return;
         }
         final int[] upper = new int[2];
@@ -548,13 +545,15 @@ public class WebServiceWorker {
                 offsets[i] = value;
                 i++;
             }
-            /**
+            /*
              * we build an affineTransform object like this (origin T, offsets G):
              * | G(0) G(1) T(0)| 
              * | G(2) G(3) T(1)|
              * | 0    0    1   |
              */
-            gridCRS = new AffineTransform(offsets[0], offsets[2], offsets[1], offsets[3], origin[0], origin[1]);
+            gridToCRS = new AffineTransform2D(new AffineTransform(offsets[0], offsets[2], offsets[1], offsets[3], origin[0], origin[1]));
+        } else {
+            gridToCRS = null;
         }
     }
     
@@ -781,7 +780,6 @@ public class WebServiceWorker {
             final Layer layer;
             try {
                 layer = table.getEntry(token);
-                LOGGER.info("layer null: " + (layer==null));
             } catch (NoSuchRecordException exception) {
                 throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
             } catch (CatalogException exception) {
@@ -922,19 +920,22 @@ public class WebServiceWorker {
         if (resample && envelope != null) {
             final CoordinateReferenceSystem targetCRS = envelope.getCoordinateReferenceSystem();
             final Operations op = Operations.DEFAULT;
-            if (gridRange != null) {
-                final GridGeometry gridGeometry;
+            final GridGeometry gridGeometry;
+            if (gridToCRS != null) {
+                gridGeometry = new GeneralGridGeometry(gridToCRS, envelope);
+            } else if (gridRange != null) {
                 if (envelope.isInfinite()) {
                     gridGeometry = new GeneralGridGeometry(gridRange, null, targetCRS);
                 } else {
                     gridGeometry = new GeneralGridGeometry(gridRange, envelope);
                 }
-                coverage = (GridCoverage2D) op.resample(coverage, targetCRS, gridGeometry, interpolation);
             } else if (envelope.isInfinite()) {
-                coverage = (GridCoverage2D) op.resample(coverage, targetCRS, null, interpolation);
+                gridGeometry = null;
             } else {
                 coverage = (GridCoverage2D) op.resample(coverage, envelope, interpolation);
+                return coverage;
             }
+            coverage = (GridCoverage2D) op.resample(coverage, targetCRS, gridGeometry, interpolation);
         }
         return coverage;
     }
