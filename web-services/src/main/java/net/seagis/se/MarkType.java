@@ -1,3 +1,19 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.se;
 
 import java.math.BigInteger;
@@ -51,186 +67,89 @@ import javax.xml.bind.annotation.XmlType;
 public class MarkType {
 
     @XmlElement(name = "WellKnownName")
-    protected String wellKnownName;
+    private String wellKnownName;
     @XmlElement(name = "OnlineResource")
-    protected OnlineResourceType onlineResource;
+    private OnlineResourceType onlineResource;
     @XmlElement(name = "InlineContent")
-    protected InlineContentType inlineContent;
+    private InlineContentType inlineContent;
     @XmlElement(name = "Format")
-    protected String format;
+    private String format;
     @XmlElement(name = "MarkIndex")
-    protected BigInteger markIndex;
+    private BigInteger markIndex;
     @XmlElement(name = "Fill")
-    protected FillType fill;
+    private FillType fill;
     @XmlElement(name = "Stroke")
-    protected StrokeType stroke;
+    private StrokeType stroke;
 
     /**
+     * Empty Constructor used by JAXB.
+     */
+    MarkType() {
+        
+    }
+    
+    /**
+     * Build a new Mark.
+     */
+    public MarkType(String wellKnownName, OnlineResourceType onlineResource, InlineContentType inlineContent,
+            String format, BigInteger markIndex, FillType fill, StrokeType stroke) {
+        this.wellKnownName  = wellKnownName;
+        this.onlineResource = onlineResource;
+        this.inlineContent  = inlineContent;
+        this.format         = format;
+        this.fill           = fill;
+        this.stroke         = stroke;
+        this.markIndex      = markIndex;
+    }
+    
+    /**
      * Gets the value of the wellKnownName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getWellKnownName() {
         return wellKnownName;
     }
 
     /**
-     * Sets the value of the wellKnownName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setWellKnownName(String value) {
-        this.wellKnownName = value;
-    }
-
-    /**
      * Gets the value of the onlineResource property.
      * 
-     * @return
-     *     possible object is
-     *     {@link OnlineResourceType }
-     *     
      */
     public OnlineResourceType getOnlineResource() {
         return onlineResource;
     }
 
     /**
-     * Sets the value of the onlineResource property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link OnlineResourceType }
-     *     
-     */
-    public void setOnlineResource(OnlineResourceType value) {
-        this.onlineResource = value;
-    }
-
-    /**
      * Gets the value of the inlineContent property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link InlineContentType }
-     *     
      */
     public InlineContentType getInlineContent() {
         return inlineContent;
     }
 
     /**
-     * Sets the value of the inlineContent property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link InlineContentType }
-     *     
-     */
-    public void setInlineContent(InlineContentType value) {
-        this.inlineContent = value;
-    }
-
-    /**
      * Gets the value of the format property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getFormat() {
         return format;
     }
 
-    /**
-     * Sets the value of the format property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFormat(String value) {
-        this.format = value;
-    }
-
+    
     /**
      * Gets the value of the markIndex property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
      */
     public BigInteger getMarkIndex() {
         return markIndex;
     }
 
     /**
-     * Sets the value of the markIndex property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setMarkIndex(BigInteger value) {
-        this.markIndex = value;
-    }
-
-    /**
      * Gets the value of the fill property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FillType }
-     *     
      */
     public FillType getFill() {
         return fill;
     }
 
     /**
-     * Sets the value of the fill property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FillType }
-     *     
-     */
-    public void setFill(FillType value) {
-        this.fill = value;
-    }
-
-    /**
      * Gets the value of the stroke property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link StrokeType }
-     *     
      */
     public StrokeType getStroke() {
         return stroke;
     }
-
-    /**
-     * Sets the value of the stroke property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link StrokeType }
-     *     
-     */
-    public void setStroke(StrokeType value) {
-        this.stroke = value;
-    }
-
 }

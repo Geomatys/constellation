@@ -409,7 +409,7 @@ public class WCService extends WebService {
             
             coverage = getParameter("identifier", true);
             
-            /**
+            /*
              * Domain subset: - spatial subSet
              *                - temporal subset
              * 
@@ -430,7 +430,7 @@ public class WCService extends WebService {
             } 
             time = getParameter("timeSequence", false);
             
-            /**
+            /*
              * Range subSet.
              * contain the sub fields : fieldSubset
              * for now we handle only one field to change the interpolation method.
@@ -456,15 +456,15 @@ public class WCService extends WebService {
                 interpolation = null;
             }
             
-            /** 
+            /* 
              * output subSet:  - format 
-             *                 - GridCRS (not yet used)
+             *                 - GridCRS 
              * 
-             * Grid CRS: - GridBaseCRS
+             * Grid CRS: - GridBaseCRS (not yet used)
              *           - GridOffsets
-             *           - GridType
+             *           - GridType (not yet used)
              *           - GridOrigin
-             *           - GridCS
+             *           - GridCS (not yet used)
              *  
              */
 

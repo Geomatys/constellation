@@ -1,3 +1,19 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.se;
 
 import java.io.Serializable;
@@ -52,54 +68,29 @@ public class ParameterValueType {
 
     @XmlElementRef(name = "expression", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
     @XmlMixed
-    protected List<Serializable> content;
+    private List<Serializable> content;
 
     /**
+     * Empty Constructor used by JAXB.
+     */
+    ParameterValueType() {
+        
+    }
+    
+    /**
+     * Build a new Parameter value.
+     */
+    public ParameterValueType(List<Serializable> content) {
+        this.content = content;
+    }
+    
+    /**
      * 
-     *         The "ParameterValueType" uses WFS-Filter expressions to give
-     *         values for SE graphic parameters.  A "mixed" element-content
-     *         model is used with textual substitution for values.
-     *       Gets the value of the content property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the content property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getContent().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link net.opengis.ogc.FunctionType }{@code >}
-     * {@link JAXBElement }{@code <}{@link ExpressionType }{@code >}
-     * {@link JAXBElement }{@code <}{@link LiteralType }{@code >}
-     * {@link JAXBElement }{@code <}{@link CategorizeType }{@code >}
-     * {@link JAXBElement }{@code <}{@link BinaryOperatorType }{@code >}
-     * {@link JAXBElement }{@code <}{@link SubstringType }{@code >}
-     * {@link JAXBElement }{@code <}{@link PropertyNameType }{@code >}
-     * {@link JAXBElement }{@code <}{@link BinaryOperatorType }{@code >}
-     * {@link JAXBElement }{@code <}{@link FormatNumberType }{@code >}
-     * {@link JAXBElement }{@code <}{@link net.opengis.se.FunctionType }{@code >}
-     * {@link JAXBElement }{@code <}{@link TrimType }{@code >}
-     * {@link JAXBElement }{@code <}{@link InterpolationPointType }{@code >}
-     * {@link JAXBElement }{@code <}{@link BinaryOperatorType }{@code >}
-     * {@link JAXBElement }{@code <}{@link StringPositionType }{@code >}
-     * {@link JAXBElement }{@code <}{@link StringLengthType }{@code >}
-     * {@link JAXBElement }{@code <}{@link RecodeType }{@code >}
-     * {@link JAXBElement }{@code <}{@link BinaryOperatorType }{@code >}
-     * {@link JAXBElement }{@code <}{@link ChangeCaseType }{@code >}
-     * {@link JAXBElement }{@code <}{@link FormatDateType }{@code >}
-     * {@link JAXBElement }{@code <}{@link ConcatenateType }{@code >}
-     * {@link JAXBElement }{@code <}{@link MapItemType }{@code >}
-     * {@link String }
-     * {@link JAXBElement }{@code <}{@link InterpolateType }{@code >}
-     * 
+     * The "ParameterValueType" uses WFS-Filter expressions to give
+     * values for SE graphic parameters.  A "mixed" element-content
+     * model is used with textual substitution for values.
+     * Gets the value of the content property.
+     * (unmodifiable);
      * 
      */
     public List<Serializable> getContent() {

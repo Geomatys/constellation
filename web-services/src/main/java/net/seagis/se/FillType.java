@@ -1,7 +1,25 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
+
 package net.seagis.se;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -36,61 +54,41 @@ import javax.xml.bind.annotation.XmlType;
 public class FillType {
 
     @XmlElement(name = "GraphicFill")
-    protected GraphicFillType graphicFill;
+    private GraphicFillType graphicFill;
     @XmlElement(name = "SvgParameter")
-    protected List<SvgParameterType> svgParameter;
+    private List<SvgParameterType> svgParameter;
 
     /**
+     * Empty Constructor used by JAXB.
+     */
+    FillType() {
+        
+    }
+    
+    /**
+     * Build a new Fill.
+     */
+    public FillType(GraphicFillType graphicFill, List<SvgParameterType> svgParameter) {
+        this.graphicFill = graphicFill;
+        this.svgParameter = svgParameter;
+    }
+    
+    /**
      * Gets the value of the graphicFill property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link GraphicFillType }
-     *     
      */
     public GraphicFillType getGraphicFill() {
         return graphicFill;
     }
 
     /**
-     * Sets the value of the graphicFill property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link GraphicFillType }
-     *     
-     */
-    public void setGraphicFill(GraphicFillType value) {
-        this.graphicFill = value;
-    }
-
-    /**
      * Gets the value of the svgParameter property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the svgParameter property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSvgParameter().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SvgParameterType }
-     * 
-     * 
+     * (unmodifiable)
      */
     public List<SvgParameterType> getSvgParameter() {
         if (svgParameter == null) {
             svgParameter = new ArrayList<SvgParameterType>();
         }
-        return this.svgParameter;
+        return Collections.unmodifiableList(svgParameter);
     }
 
 }

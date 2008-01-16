@@ -1,3 +1,19 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.se;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -32,30 +48,26 @@ import javax.xml.bind.annotation.XmlType;
 public class LegendGraphicType {
 
     @XmlElement(name = "Graphic", required = true)
-    protected GraphicType graphic;
+    private GraphicType graphic;
 
     /**
+     * Empty Constructor used by JAXB.
+     */
+    LegendGraphicType() {
+        
+    }
+    
+    /**
+     * Build a new Legend graphic.
+     */
+    public LegendGraphicType(GraphicType graphic) {
+        this.graphic = graphic;
+    }
+    
+    /**
      * Gets the value of the graphic property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link GraphicType }
-     *     
      */
     public GraphicType getGraphic() {
         return graphic;
     }
-
-    /**
-     * Sets the value of the graphic property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link GraphicType }
-     *     
-     */
-    public void setGraphic(GraphicType value) {
-        this.graphic = value;
-    }
-
 }

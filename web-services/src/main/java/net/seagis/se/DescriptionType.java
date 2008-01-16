@@ -1,3 +1,19 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.se;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -34,56 +50,36 @@ import javax.xml.bind.annotation.XmlType;
 public class DescriptionType {
 
     @XmlElement(name = "Title")
-    protected String title;
+    private String title;
     @XmlElement(name = "Abstract")
-    protected String _abstract;
+    private String _abstract;
 
     /**
+     * Empty Constructor used by JAXB.
+     */
+    DescriptionType() {
+        
+    }
+    
+    /**
+     * Build a new description.
+     */
+    public DescriptionType(String title, String _abstract) {
+        this.title     = title;
+        this._abstract = _abstract;
+    }
+    
+    /**
      * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTitle(String value) {
-        this.title = value;
-    }
-
-    /**
      * Gets the value of the abstract property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getAbstract() {
         return _abstract;
     }
-
-    /**
-     * Sets the value of the abstract property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setAbstract(String value) {
-        this._abstract = value;
-    }
-
 }

@@ -1,3 +1,18 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package net.seagis.se;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -54,135 +69,68 @@ import javax.xml.bind.annotation.XmlType;
 public abstract class SymbolizerType {
 
     @XmlElement(name = "Name")
-    protected String name;
+    private String name;
     @XmlElement(name = "Description")
-    protected DescriptionType description;
+    private DescriptionType description;
     @XmlElement(name = "BaseSymbolizer")
-    protected BaseSymbolizerType baseSymbolizer;
+    private BaseSymbolizerType baseSymbolizer;
     @XmlAttribute
-    protected String version;
+    private String version;
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
-    protected String uom;
+    private String uom;
 
     /**
+     * Empty Constructor used by JAXB.
+     */
+    SymbolizerType() {
+        
+    }
+    
+    /**
+     * Build a new Symbolizer.
+     */
+    public SymbolizerType(String name, DescriptionType description, BaseSymbolizerType baseSymbolizer,
+            String version, String uom) {
+        this.name           = name;
+        this.description    = description;
+        this.baseSymbolizer = baseSymbolizer;
+        this.version        = version;
+        this.uom            = uom;
+    }
+    
+    /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
-
-    /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DescriptionType }
-     *     
      */
     public DescriptionType getDescription() {
         return description;
     }
 
     /**
-     * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DescriptionType }
-     *     
-     */
-    public void setDescription(DescriptionType value) {
-        this.description = value;
-    }
-
-    /**
      * Gets the value of the baseSymbolizer property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BaseSymbolizerType }
-     *     
      */
     public BaseSymbolizerType getBaseSymbolizer() {
         return baseSymbolizer;
     }
 
     /**
-     * Sets the value of the baseSymbolizer property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BaseSymbolizerType }
-     *     
-     */
-    public void setBaseSymbolizer(BaseSymbolizerType value) {
-        this.baseSymbolizer = value;
-    }
-
-    /**
      * Gets the value of the version property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getVersion() {
         return version;
     }
 
     /**
-     * Sets the value of the version property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setVersion(String value) {
-        this.version = value;
-    }
-
-    /**
      * Gets the value of the uom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getUom() {
         return uom;
     }
-
-    /**
-     * Sets the value of the uom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setUom(String value) {
-        this.uom = value;
-    }
-
 }

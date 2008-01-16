@@ -1,7 +1,25 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
+
 package net.seagis.se;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -48,174 +66,87 @@ import javax.xml.bind.annotation.XmlType;
 public class CoverageStyleType {
 
     @XmlElement(name = "Name")
-    protected String name;
+    private String name;
     @XmlElement(name = "Description")
-    protected DescriptionType description;
+    private DescriptionType description;
     @XmlElement(name = "CoverageName")
-    protected String coverageName;
+    private String coverageName;
     @XmlElement(name = "SemanticTypeIdentifier")
-    protected List<String> semanticTypeIdentifier;
+    private List<String> semanticTypeIdentifier;
     @XmlElements({
         @XmlElement(name = "OnlineResource", type = OnlineResourceType.class),
         @XmlElement(name = "Rule", type = RuleType.class)
     })
-    protected List<Object> ruleOrOnlineResource;
+    private List<Object> ruleOrOnlineResource;
     @XmlAttribute
-    protected String version;
+    private String version;
 
     /**
+     * Empty Constructor used by JAXB.
+     */
+    CoverageStyleType() {
+        
+    }
+    
+    /**
+     * Build a new Coverage Style.
+     */
+    public CoverageStyleType(String name, DescriptionType description, String coverageName, 
+            List<String> semanticTypeIdentifier, List<Object> ruleOrOnlineResource, String version) {
+        this.name                   = name;
+        this.description            = description;
+        this.coverageName           = coverageName;
+        this.semanticTypeIdentifier = semanticTypeIdentifier;
+        this.ruleOrOnlineResource   = ruleOrOnlineResource;
+        this.version                = version;
+    }
+    
+    
+    /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
-
-    /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DescriptionType }
-     *     
      */
     public DescriptionType getDescription() {
         return description;
     }
 
     /**
-     * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DescriptionType }
-     *     
-     */
-    public void setDescription(DescriptionType value) {
-        this.description = value;
-    }
-
-    /**
      * Gets the value of the coverageName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCoverageName() {
         return coverageName;
     }
 
     /**
-     * Sets the value of the coverageName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCoverageName(String value) {
-        this.coverageName = value;
-    }
-
-    /**
      * Gets the value of the semanticTypeIdentifier property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the semanticTypeIdentifier property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSemanticTypeIdentifier().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
      */
     public List<String> getSemanticTypeIdentifier() {
         if (semanticTypeIdentifier == null) {
             semanticTypeIdentifier = new ArrayList<String>();
         }
-        return this.semanticTypeIdentifier;
+        return Collections.unmodifiableList(semanticTypeIdentifier);
     }
 
     /**
      * Gets the value of the ruleOrOnlineResource property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the ruleOrOnlineResource property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getRuleOrOnlineResource().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link OnlineResourceType }
-     * {@link RuleType }
-     * 
-     * 
      */
     public List<Object> getRuleOrOnlineResource() {
         if (ruleOrOnlineResource == null) {
             ruleOrOnlineResource = new ArrayList<Object>();
         }
-        return this.ruleOrOnlineResource;
+        return Collections.unmodifiableList(ruleOrOnlineResource);
     }
 
     /**
      * Gets the value of the version property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getVersion() {
         return version;
     }
-
-    /**
-     * Sets the value of the version property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setVersion(String value) {
-        this.version = value;
-    }
-
 }

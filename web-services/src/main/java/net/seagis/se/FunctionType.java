@@ -1,3 +1,19 @@
+/*
+ * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.se;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -40,35 +56,29 @@ import net.seagis.ogc.ExpressionType;
     ChangeCaseType.class,
     FormatNumberType.class
 })*/
-public abstract class FunctionType
-    extends ExpressionType
-{
+public abstract class FunctionType extends ExpressionType {
 
     @XmlAttribute(required = true)
-    protected String fallbackValue;
+    private String fallbackValue;
 
     /**
+     * Empty Constructor used by JAXB.
+     */
+    FunctionType() {
+        
+    }
+    
+    /**
+     * Build a new Function.
+     */
+    public FunctionType(String fallbackValue) {
+        this.fallbackValue = fallbackValue;
+    }
+    
+    /**
      * Gets the value of the fallbackValue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getFallbackValue() {
         return fallbackValue;
     }
-
-    /**
-     * Sets the value of the fallbackValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFallbackValue(String value) {
-        this.fallbackValue = value;
-    }
-
 }
