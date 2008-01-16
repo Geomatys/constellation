@@ -134,14 +134,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DatasetDescriptionSummaryBaseType }
-     * 
-     */
-    public DatasetDescriptionSummaryBaseType createDatasetDescriptionSummaryBaseType() {
-        return new DatasetDescriptionSummaryBaseType();
-    }
-
-    /**
      * Create an instance of {@link CodeType }
      * 
      */
@@ -678,15 +670,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.opengis.net/ows/1.1", name = "Value")
     public JAXBElement<ValueType> createValue(ValueType value) {
         return new JAXBElement<ValueType>(_Value_QNAME, ValueType.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DatasetDescriptionSummaryBaseType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ows/1.1", name = "DatasetDescriptionSummary")
-    public JAXBElement<DatasetDescriptionSummaryBaseType> createDatasetDescriptionSummary(DatasetDescriptionSummaryBaseType value) {
-        return new JAXBElement<DatasetDescriptionSummaryBaseType>(_DatasetDescriptionSummary_QNAME, DatasetDescriptionSummaryBaseType.class, null, value);
     }
 
     /**

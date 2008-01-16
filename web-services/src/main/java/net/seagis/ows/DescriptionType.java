@@ -67,7 +67,6 @@ import org.geotools.resources.Utilities;
     CoverageDescriptionType.class,
     FieldType.class,
     AxisType.class,
-    DatasetDescriptionSummaryBaseType.class,
     BasicIdentificationType.class,
     ServiceIdentification.class
 })
