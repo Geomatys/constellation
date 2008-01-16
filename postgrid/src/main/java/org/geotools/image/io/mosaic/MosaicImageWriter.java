@@ -105,9 +105,12 @@ public class MosaicImageWriter extends ImageWriter {
         final TileManager tileManager = (TileManager) getOutput();
         final Collection<Tile> tiles = tileManager.getTiles();
         for (final Tile tile : tiles) {
-            final Object input = tile.getInput();
-            final Rectangle region = tile.getAbsoluteRegion();
             final Dimension subSampling = tile.getSubsampling();
+            if (subSampling.width == 1 && subSampling.height == 1) {
+                continue;
+            }
+            final Rectangle region = tile.getAbsoluteRegion();
+            final Object input = tile.getInput();
             params.setSourceRegion(region);
             params.setSourceSubsampling(subSampling.width, subSampling.height, 0, 0);
             final BufferedImage image = reader.read(0, params);

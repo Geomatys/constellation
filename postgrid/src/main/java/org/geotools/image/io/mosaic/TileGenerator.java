@@ -185,13 +185,12 @@ public class TileGenerator {
     }
 
     /**
-     * Verify that the width of the tile is divisible by the step. If not, we try to add or 
-     * substract 1 to the step, in order to search a right diviser for the size of the tile.
-     * This function is applied on the width and the height.
+     * Try to find an integer value for the division between the tile size and 
+     * the step, for both width and height.
      * 
      * @param tile The size of the tile.
      * @param step The step is the diviser for the tile size.
-     * @return
+     * @return The new size for 
      */
     private Dimension chooseTileSizeForNextOverview(final Rectangle tile, final Dimension step) {
         return new Dimension(chooseTileSizeForNextOverview(tile.width,  step.width),
@@ -199,6 +198,9 @@ public class TileGenerator {
     }
 
     /**
+     * Verify that the width of the tile is divisible by the step. If not, we try to add or 
+     * substract 1 to the step, in order to search a right diviser for the size of the tile.
+     * This function is applied on the width and the height.
      * 
      * @param size A size for the raster. It could be the width or height value.
      * @param step The step with which we will divide the size.
@@ -245,6 +247,14 @@ public class TileGenerator {
         return buffer.toString();
     }
 
+    /**
+     * Convert the column index into letter. For example the first column is the 'A'.
+     * If there is more columns that alphabet has letters, then another letter is 
+     * added the same way.
+     * 
+     * @param column The index of the column for the tile in the original raster.
+     * @param buffer The buffer where letter(s) will be added.
+     */
     private static void toLetters(int column, final StringBuilder buffer) {
         if (column > 26) {
             toLetters(column / 26, buffer);
