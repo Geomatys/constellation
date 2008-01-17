@@ -146,10 +146,12 @@ public class WMService extends WebService {
      */
     @Override
     public Response treatIncommingRequest() throws JAXBException {
-        
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
             String request = (String) getParameter("REQUEST", true);
+            logger.info("new request:" + request);
+            writeParameters();
+             
             if (request.equalsIgnoreCase("GetMap")) {
                     
                 return Response.Builder.representation(getMap(), webServiceWorker.getMimeType()).build();
@@ -362,7 +364,7 @@ public class WMService extends WebService {
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         String format = getParameter("FORMAT", false);
         if (format == null ) {
-            format = "text/xml";
+            format = "application/vnd.ogc.wms_xml";
         } else if (!(format.equals("text/xml") || format.equals("application/vnd.ogc.wms_xml"))) {
             throw new WebServiceException("Allowed format for GetCapabilities are : text/xml or application/vnd.ogc.wms_xml.",
                       WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
@@ -372,11 +374,18 @@ public class WMService extends WebService {
         AbstractWMSCapabilities response = (AbstractWMSCapabilities)getCapabilitiesObject(getCurrentVersion());
         
         //we update the url in the static part.
-        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetCapabilities");
-        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetFeatureInfo");
-        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetMap");
-        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=DescribeLayer");
-        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?REQUEST=GetLegendGraphic");
+        response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
+        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetCapabilities");
+        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetFeatureInfo");
+        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetMap");
+        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=DescribeLayer");
+        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetLegendGraphic");
+        
+        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetCapabilities");
+        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetFeatureInfo");
+        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetMap");
+        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=DescribeLayer");
+        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetLegendGraphic");
         
         //we build the layers object of the document
         
@@ -388,10 +397,12 @@ public class WMService extends WebService {
                 List<String> crs = new ArrayList<String>();
                 
                 Integer code = 4326;
-                //code = CRS.lookupEpsgCode(inputLayer.getCoverage().getEnvelope().getCoordinateReferenceSystem(), false);
+                /* 
+                 *  TODO 
+                 * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
+                 */ 
                 
-                if(code != null)
-                    crs.add(code.toString());
+                crs.add("EPSG:" + code.toString());
                 
                 GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
                
@@ -478,7 +489,7 @@ public class WMService extends WebService {
                                                                           inputGeoBox.getEastBoundLongitude(), 
                                                                           inputGeoBox.getNorthBoundLatitude()), 
                                               outputBBox,  
-                                              true,
+                                              1,
                                               dimensions,
                                               style,
                                               getCurrentVersion());

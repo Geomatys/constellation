@@ -48,17 +48,17 @@ import javax.xml.bind.annotation.XmlType;
 public class UserDefinedSymbolization {
 
     @XmlAttribute(name = "SupportSLD")
-    private Boolean supportSLD;
+    private Integer supportSLD;
     @XmlAttribute(name = "UserLayer")
-    private Boolean userLayer;
+    private Integer userLayer;
     @XmlAttribute(name = "UserStyle")
-    private Boolean userStyle;
+    private Integer userStyle;
     @XmlAttribute(name = "RemoteWFS")
-    private Boolean remoteWFS;
+    private Integer remoteWFS;
     @XmlAttribute(name = "InlineFeature")
-    private Boolean inlineFeature;
+    private Integer inlineFeature;
     @XmlAttribute(name = "RemoteWCS")
-    private Boolean remoteWCS;
+    private Integer remoteWCS;
 
     /**
      * Empty Constructor used by JAXB.
@@ -70,8 +70,8 @@ public class UserDefinedSymbolization {
     /**
      * Build a new User Defined Symbolization.
      */
-    public UserDefinedSymbolization(Boolean supportSLD, Boolean userLayer, Boolean userStyle,
-            Boolean remoteWFS, Boolean inlineFeature, Boolean remoteWCS) {
+    public UserDefinedSymbolization(Integer supportSLD, Integer userLayer, Integer userStyle,
+            Integer remoteWFS, Integer inlineFeature, Integer remoteWCS) {
         this.inlineFeature = inlineFeature;
         this.supportSLD    = supportSLD;
         this.userLayer     = userLayer;
@@ -87,7 +87,7 @@ public class UserDefinedSymbolization {
         if (supportSLD == null) {
             return false;
         } else {
-            return supportSLD;
+            return supportSLD == 1;
         }
     }
 
@@ -98,7 +98,7 @@ public class UserDefinedSymbolization {
         if (userLayer == null) {
             return false;
         } else {
-            return userLayer;
+            return userLayer == 1;
         }
     }
 
@@ -109,7 +109,7 @@ public class UserDefinedSymbolization {
         if (userStyle == null) {
             return false;
         } else {
-            return userStyle;
+            return userStyle == 1;
         }
     }
 
@@ -120,7 +120,7 @@ public class UserDefinedSymbolization {
         if (remoteWFS == null) {
             return false;
         } else {
-            return remoteWFS;
+            return remoteWFS == 1;
         }
     }
 
@@ -131,7 +131,7 @@ public class UserDefinedSymbolization {
         if (inlineFeature == null) {
             return false;
         } else {
-            return inlineFeature;
+            return inlineFeature == 1;
         }
     }
 
@@ -142,7 +142,7 @@ public class UserDefinedSymbolization {
         if (remoteWCS == null) {
             return false;
         } else {
-            return remoteWCS;
+            return remoteWCS == 1;
         }
     }
 }

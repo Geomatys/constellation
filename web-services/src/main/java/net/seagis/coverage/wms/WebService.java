@@ -139,14 +139,13 @@ public abstract class WebService {
        
     }
     
-     /**
+    /**
      * Extract The parameter named parameterName from the query.
      * If the parameter is mandatory and if it is null it throw an exception.
      * else it return null.
      * 
      * @param parameterName The name of the parameter.
      * @param mandatory true if this parameter is mandatory, false if its optional. 
-     * @param context The url context of the query
       * 
      * @return the parameter or null if not specified
      * @throw WebServiceException
@@ -179,6 +178,20 @@ public abstract class WebService {
         } 
         
         return list.get(0);
+    }
+    
+    /**
+     * Extract all The parameters from the query and write it in the console.
+     * It is a debug method.
+     * 
+     */
+    protected void writeParameters() throws WebServiceException {
+        
+        UriInfo context = getContext();
+        
+        MultivaluedMap parameters = context.getQueryParameters();
+        logger.info(parameters.toString());
+        
     }
     
      /**

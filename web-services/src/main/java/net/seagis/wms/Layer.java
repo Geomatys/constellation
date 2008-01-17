@@ -152,14 +152,14 @@ public class Layer {
     @XmlElement(name = "Layer")
     private List<Layer> layer = new ArrayList<Layer>();
     @XmlAttribute
-    private Boolean queryable;
+    private Integer queryable;
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
     private BigInteger cascaded;
     @XmlAttribute
-    private Boolean opaque;
+    private Integer opaque;
     @XmlAttribute
-    private Boolean noSubsets;
+    private Integer noSubsets;
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
     private BigInteger fixedWidth;
@@ -219,7 +219,7 @@ public class Layer {
       * @param version    The version of the wms service.
       */
      public Layer(final String name, final String _abstract, final String keyword, final List<String> crs, 
-             final EXGeographicBoundingBox exGeographicBoundingBox, final BoundingBox boundingBox, final boolean queryable,
+             final EXGeographicBoundingBox exGeographicBoundingBox, final BoundingBox boundingBox, final Integer queryable,
              final List<Dimension> dimension, final Style style, final Version version) {
          this.name                    = name;
          this.title                   = name;
@@ -263,8 +263,8 @@ public class Layer {
             final List<BoundingBox> boundingBox, final List<Dimension> dimension, final Attribution attribution,
             final List<AuthorityURL> authorityURL, final List<Identifier> identifier, final List<MetadataURL> metadataURL,
             final List<DataURL> dataURL, final List<FeatureListURL> featureListURL, final List<Style> style, final Double minScaleDenominator,
-            final Double maxScaleDenominator, final List<Layer> layer, final Boolean queryable, final BigInteger cascaded,
-            final Boolean opaque, final Boolean noSubsets, final BigInteger fixedWidth,  final BigInteger fixedHeight) {
+            final Double maxScaleDenominator, final List<Layer> layer, final Integer queryable, final BigInteger cascaded,
+            final Integer opaque, final Integer noSubsets, final BigInteger fixedWidth,  final BigInteger fixedHeight) {
         
         this._abstract               = _abstract;
         this.attribution             = attribution;
@@ -456,7 +456,7 @@ public class Layer {
         if (queryable == null) {
             return false;
         } else {
-            return queryable;
+            return queryable == 1;
         }
     }
 
@@ -474,7 +474,7 @@ public class Layer {
         if (opaque == null) {
             return false;
         } else {
-            return opaque;
+            return opaque == 1;
         }
     }
 
@@ -485,7 +485,7 @@ public class Layer {
         if (noSubsets == null) {
             return false;
         } else {
-            return noSubsets;
+            return noSubsets == 1;
         }
     }
 
