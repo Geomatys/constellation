@@ -157,13 +157,6 @@ public class TileGenerator {
         // Iterator used for the file name.
         int overview = 1, x = 1, y = 1;
         while (tileRect.contains(minTileSize)) {
-            // Current values for the y coordinates
-            int yMin = 0;
-            int yMax = tileRect.height;
-            // Current values for the x coordinates
-            int xMin = 0;
-            int xMax = tileRect.width;
-            Rectangle currentRect = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
             // Creates a specific file for this tile.
             final File inputTile;
             if (outputFolder != null) {
@@ -171,13 +164,13 @@ public class TileGenerator {
             } else {
                 inputTile = new File(generateName(overview, x, y, extension));
             }
-            Tile tile = new Tile(spi, inputTile, 0, currentRect, subSampling);
+            Tile tile = new Tile(spi, inputTile, 0, tileRect, subSampling);
             tiles.add(tile);
             overview++;
-            subSampling.setSize(subSampling.width * step.width,
-                    subSampling.height * step.height);
-            Dimension newDim = chooseTileSizeForNextOverview(tileRect, step);
-            tileRect.setSize(newDim);
+            Dimension newStep = chooseStepForNextOverview(tileRect, step);
+            subSampling.width  *= newStep.width;
+            subSampling.height *= newStep.height;
+            tileRect.setSize(tileRect.width / newStep.width, tileRect.height / newStep.height);
         }
         final Tile[] arrayTiles = tiles.toArray(new Tile[tiles.size()]);
         TileManager tileManager = new TileManagerFactory(null).createGeneric(arrayTiles);
@@ -192,9 +185,9 @@ public class TileGenerator {
      * @param step The step is the diviser for the tile size.
      * @return The new size for 
      */
-    private Dimension chooseTileSizeForNextOverview(final Rectangle tile, final Dimension step) {
-        return new Dimension(chooseTileSizeForNextOverview(tile.width,  step.width),
-                             chooseTileSizeForNextOverview(tile.height, step.height));
+    private Dimension chooseStepForNextOverview(final Rectangle tile, final Dimension step) {
+        return new Dimension(chooseStepForNextOverview(tile.width,  step.width),
+                             chooseStepForNextOverview(tile.height, step.height));
     }
 
     /**
@@ -206,20 +199,20 @@ public class TileGenerator {
      * @param step The step with which we will divide the size.
      * @return The new size divided by the step.
      */
-    private static int chooseTileSizeForNextOverview(final int size, final int step) {
+    private static int chooseStepForNextOverview(final int size, final int step) {
         if (size % step != 0) {
             for (int i=1; i<=5; i++) {
                 int candidate = step - i;
                 if (candidate > 1 && size % candidate == 0) {
-                    return size / candidate;
+                    return candidate;
                 }
                 candidate = step + i;
                 if (size % candidate == 0) {
-                    return size / candidate;
+                    return candidate;
                 }
             }
         }
-        return size / step;
+        return step;
     }
     
     /**
