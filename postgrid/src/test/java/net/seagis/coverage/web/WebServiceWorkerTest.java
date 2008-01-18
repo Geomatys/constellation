@@ -184,7 +184,14 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(4, coverage.getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
         assertEquals(2, worker.getGridCoverage2D(true).getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
-        assertEquals(Transparency.BITMASK, worker.getRenderedImage().getColorModel().getTransparency());
+        RenderedImage image = worker.getRenderedImage();
+        assertEquals(Transparency.BITMASK, image.getColorModel().getTransparency());
+        if (true) try {
+            org.geotools.gui.swing.image.OperationTreeBrowser.show(image);
+            Thread.sleep(50000);
+        } catch (InterruptedException e) {
+            // Ignore and go back to work.
+        }
 
         String format = worker.getMimeType();
         assertEquals("image/png", format);
@@ -194,10 +201,10 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertTrue(file.isFile());
         assertEquals("image/png", format); // Previous value was a default one. Now it has been computed.
 
-        RenderedImage image = ImageIO.read(file);
+        image = ImageIO.read(file);
         assertEquals(720, image.getWidth());
         assertEquals(499, image.getHeight());
-        assertEquals(Transparency.TRANSLUCENT, image.getColorModel().getTransparency());
+        assertEquals(Transparency.BITMASK, image.getColorModel().getTransparency());
     }
 
     /**

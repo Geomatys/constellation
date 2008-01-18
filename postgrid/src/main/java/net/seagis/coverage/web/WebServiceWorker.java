@@ -25,7 +25,9 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Graphics2D;
 import java.awt.Transparency;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.image.DataBuffer;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.BufferedImage;
@@ -37,7 +39,10 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
+import javax.media.jai.operator.DivideByConstDescriptor;
 import javax.media.jai.Interpolation;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
 
 import org.opengis.geometry.DirectPosition;
 import org.opengis.coverage.grid.GridRange;
@@ -54,6 +59,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.Operations;
+import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -69,6 +75,7 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.resources.coverage.CoverageUtilities;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
@@ -955,7 +962,48 @@ public class WebServiceWorker {
             colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange(colormapRange, null));
             coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[] {colorMap});
         }
-        return coverage.getRenderedImage();
+        RenderedImage image = coverage.getRenderedImage();
+        /*
+         * If the image is not geophysics and is indexed on 16 bits, then rescale the image to 8
+         * bits while preserving the colors. TODO: this algorithm is simplist and doesn't consider
+         * the "no data" values, which is a risk of wrong output. We need to find some better way.
+         */
+        ColorModel model = image.getColorModel();
+        if (model instanceof IndexColorModel) {
+            final IndexColorModel icm = (IndexColorModel) model;
+            final int sourceMapSize = icm.getMapSize();
+            final int targetMapSize = 256;
+            if (sourceMapSize > targetMapSize) {
+                final GridSampleDimension dimension = coverage.getSampleDimension(
+                        CoverageUtilities.getVisibleBand(image));
+                if (dimension.geophysics(false) == dimension) {
+                    final NumberRange range = dimension.getRange();
+                    final double scale = (range != null ? range.getMaximum(false) :
+                            dimension.getMaximumValue()) / targetMapSize;
+                    if (scale > 1 && scale < Double.POSITIVE_INFINITY) {
+                        final int[] ARGB = new int[targetMapSize];
+                        for (int i=0; i<targetMapSize; i++) {
+                            final int index = Math.min(sourceMapSize-1, (int) Math.round(i * scale));
+                            ARGB[i] = icm.getRGB(index);
+                        }
+                        int transparent = (int) Math.round(icm.getTransparentPixel() / scale);
+                        if (transparent != (int) Math.round(transparent * scale)) {
+                            transparent = -1;
+                        }
+                        model = new IndexColorModel(8, targetMapSize, ARGB, 0, icm.hasAlpha(), transparent, DataBuffer.TYPE_BYTE);
+                        final ImageLayout layout = new ImageLayout(image);
+                        layout.setColorModel(model);
+                        layout.setSampleModel(model.createCompatibleSampleModel(image.getWidth(), image.getHeight()));
+                        final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
+                        hints.put(JAI.KEY_REPLACE_INDEX_COLOR_MODEL, Boolean.FALSE);
+                        hints.put(JAI.KEY_TRANSFORM_ON_COLORMAP, Boolean.FALSE);
+                        image = DivideByConstDescriptor.create(image, new double[] {scale}, hints);
+                        assert image.getColorModel() == model;
+                    }
+                }
+            }
+        }
+        return image;
     }
 
     /**
