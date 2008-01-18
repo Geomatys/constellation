@@ -333,6 +333,7 @@ public class WCService extends WebService {
                 
                 cs.addRest(wcsFactory.createIdentifier(inputLayer.getName()));
                 co.addRest(wcsFactory.createName(inputLayer.getName()));
+                co.addRest(wcsFactory.createLabel(inputLayer.getName()));
                 
                 GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
                

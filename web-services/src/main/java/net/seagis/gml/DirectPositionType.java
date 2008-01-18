@@ -25,7 +25,7 @@ public class DirectPositionType {
     @XmlValue
     private List<Double> value;
     @XmlAttribute
-    private int srsDimension;
+    private Integer srsDimension;
     @XmlAttribute
     private String srsName;
     @XmlAttribute
@@ -44,8 +44,7 @@ public class DirectPositionType {
     
     public DirectPositionType(List<Double> value) {
         this.value = value;
-        if (value != null)
-             this.srsDimension = value.size();
+        this.srsDimension = null;
     }  
     /**
      * A type for a list of values of the respective simple type.Gets the value of the value property.

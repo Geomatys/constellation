@@ -53,7 +53,7 @@ public class EnvelopeEntry extends Entry {
     private List<DirectPositionType> pos;
     private CoordinatesType coordinates;
     @XmlAttribute
-    private int srsDimension;
+    private Integer srsDimension;
     @XmlAttribute
     private String srsName;
     @XmlAttribute
@@ -84,8 +84,7 @@ public class EnvelopeEntry extends Entry {
     public EnvelopeEntry(List<DirectPositionType> pos, String srsName) {
         this.srsName      = srsName;
         this.pos          = pos;
-        if (pos != null)
-            this.srsDimension = pos.size();
+        this.srsDimension = null;
     }
     /**
      * Gets the value of the lowerCorner property.
