@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.gml.CodeListType;
 
 
 /**
@@ -60,7 +61,16 @@ public class ServiceType extends AbstractDescriptionType {
     private String version;
     @XmlAttribute
     private String updateSequence;
+    
+    private Keywords keywords;
+    
+    private ResponsiblePartyType responsibleParty;
+    
+    private CodeListType fees;
+    
+    private CodeListType accessConstraints;
 
+    
     /**
      * An empty constructor used by JAXB
      */
@@ -88,6 +98,14 @@ public class ServiceType extends AbstractDescriptionType {
             return version;
         }
     }
+    
+    /**
+     * Gets the value of the keywords property.
+     * 
+     */
+    public Keywords getKeywords() {
+        return keywords;
+    }
 
     /**
      * Gets the value of the updateSequence property.
@@ -95,5 +113,29 @@ public class ServiceType extends AbstractDescriptionType {
      */
     public String getUpdateSequence() {
         return updateSequence;
+    }
+    
+    /**
+     * Gets the value of the responsibleParty property.
+     * 
+     */
+    public ResponsiblePartyType getResponsibleParty() {
+        return responsibleParty;
+    }
+    
+    /**
+     * Gets the value of the fees property.
+     * 
+     */
+    public CodeListType getFees() {
+        return fees;
+    }
+    
+    /**
+     * Gets the value of the acces constraint property.
+     * 
+     */
+    public CodeListType getAccessConstraints() {
+        return accessConstraints;
     }
 }

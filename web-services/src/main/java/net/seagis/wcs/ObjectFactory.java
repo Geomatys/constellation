@@ -74,7 +74,10 @@ public class ObjectFactory {
     private final static QName _Capability_QNAME = new QName("http://www.opengis.net/wcs", "Capability");
     private final static QName _Service_QNAME = new QName("http://www.opengis.net/wcs", "Service");
     private final static QName _AbstractDescriptionTypeLabel_QNAME = new QName("http://www.opengis.net/wcs", "label");
-
+    private final static QName _ResponsiblePartyTypePositionName_QNAME = new QName("http://www.opengis.net/wcs", "positionName");
+    private final static QName _ResponsiblePartyTypeContactInfo_QNAME = new QName("http://www.opengis.net/wcs", "contactInfo");
+    private final static QName _ResponsiblePartyTypeOrganisationName_QNAME = new QName("http://www.opengis.net/wcs", "organisationName");
+    private final static QName _ResponsiblePartyTypeIndividualName_QNAME = new QName("http://www.opengis.net/wcs", "individualName");
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.wcs._1_1
      * 
@@ -448,6 +451,74 @@ public class ObjectFactory {
      */
     public SupportedInterpolationsType createSupportedInterpolationsType() {
         return new SupportedInterpolationsType();
+    }
+    
+    /**
+     * Create an instance of {@link ResponsiblePartyType }
+     * 
+     */
+    public ResponsiblePartyType createResponsiblePartyType() {
+        return new ResponsiblePartyType();
+    }
+    
+    /**
+     * Create an instance of {@link ContactType }
+     * 
+     */
+    public ContactType createContactType() {
+        return new ContactType();
+    }
+    
+    /**
+     * Create an instance of {@link TelephoneType }
+     * 
+     */
+    public TelephoneType createTelephoneType() {
+        return new TelephoneType();
+    }
+    
+    /**
+     * Create an instance of {@link AddressType }
+     * 
+     */
+    public AddressType createAddressType() {
+        return new AddressType();
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "positionName", scope = ResponsiblePartyType.class)
+    public JAXBElement<String> createResponsiblePartyTypePositionName(String value) {
+        return new JAXBElement<String>(_ResponsiblePartyTypePositionName_QNAME, String.class, ResponsiblePartyType.class, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ContactType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "contactInfo", scope = ResponsiblePartyType.class)
+    public JAXBElement<ContactType> createResponsiblePartyTypeContactInfo(ContactType value) {
+        return new JAXBElement<ContactType>(_ResponsiblePartyTypeContactInfo_QNAME, ContactType.class, ResponsiblePartyType.class, value);
+    }
+
+     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "organisationName", scope = ResponsiblePartyType.class)
+    public JAXBElement<String> createResponsiblePartyTypeOrganisationName(String value) {
+        return new JAXBElement<String>(_ResponsiblePartyTypeOrganisationName_QNAME, String.class, ResponsiblePartyType.class, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "individualName", scope = ResponsiblePartyType.class)
+    public JAXBElement<String> createResponsiblePartyTypeIndividualName(String value) {
+        return new JAXBElement<String>(_ResponsiblePartyTypeIndividualName_QNAME, String.class, ResponsiblePartyType.class, value);
     }
     
     /**
