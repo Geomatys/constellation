@@ -329,6 +329,43 @@ public class WebServiceWorker {
     }
 
     /**
+     * Parses a value as an integer.
+     *
+     * @param  name  The parameter name.
+     * @param  value The value to be parsed as a string.
+     * @return The value as an integer.
+     * @throws WebServiceException if the value can't be parsed.
+     */
+    private int parseInt(final String name, String value) throws WebServiceException {
+        if (value == null) {
+            throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, name),
+                    MISSING_PARAMETER_VALUE, version);
+        }
+        value = value.trim();
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException exception) {
+            throw new WebServiceException(Errors.format(ErrorKeys.NOT_AN_INTEGER_$1, value),
+                    exception, INVALID_PARAMETER_VALUE, version);
+        }
+    }
+
+    /**
+     * Parses a value as a floating point.
+     *
+     * @throws WebServiceException if the value can't be parsed.
+     */
+    private double parseDouble(String value) throws WebServiceException {
+        value = value.trim();
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException exception) {
+            throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value),
+                    exception, INVALID_PARAMETER_VALUE, version);
+        }
+    }
+
+    /**
      * Sets the version of the web service. This method should be invoked before any other
      * setters in this class, since it may affect the parsing of strings.
      *
@@ -425,14 +462,7 @@ public class WebServiceWorker {
         final double[] coordinates = new double[envelope.getDimension() * 2];
         int index = 0;
         while (tokens.hasMoreTokens()) {
-            final String token = tokens.nextToken().trim();
-            final double value;
-            try {
-                value = Double.parseDouble(token);
-            } catch (NumberFormatException exception) {
-                throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, token),
-                        exception, INVALID_PARAMETER_VALUE, version);
-            }
+            final double value = parseDouble(tokens.nextToken());
             if (index >= coordinates.length) {
                 throw new WebServiceException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3, "envelope",
                         ((index + tokens.countTokens()) >> 1) + 1, envelope.getDimension()),
@@ -487,76 +517,57 @@ public class WebServiceWorker {
         gridToCRS = null;
         if (width == null && height == null) {
             gridRange = null;
-            gridToCRS = null;
             return;
         }
-        final int[] upper = new int[2];
-        String name=null, value=null;
-        try {
-            name = "width";  upper[0] = Integer.parseInt(value = width .trim());
-            name = "height"; upper[1] = Integer.parseInt(value = height.trim());
-        } catch (NullPointerException exception) {
-            throw new WebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, name),
-                    exception, MISSING_PARAMETER_VALUE, version);
-        } catch (NumberFormatException exception) {
-            throw new WebServiceException(Errors.format(ErrorKeys.NOT_AN_INTEGER_$1, value),
-                    exception, INVALID_PARAMETER_VALUE, version);
-        }
+        final int[] upper = new int[] {
+            parseInt("width",  width),
+            parseInt("height", height)
+        };
         gridRange = new GeneralGridRange(new int[upper.length], upper);
     }
-    
+
     /**
-     * 
-     * @param gridOrigin 
-     * @param gridOffsets
+     * Sets the <cite>grid to CRS</cite> transform from a grid origin and offset vectors.
+     *
+     * @param gridOrigin  The origin in "real world" coordinates.
+     * @param gridOffsets The offset vectors in "real world" units.
+     * @throws WebServiceException if the dimension can't be parsed from the given strings.
      */
-    public void setGridCRS(String gridOrigin, String gridOffsets) throws WebServiceException{
+    public void setGridCRS(String gridOrigin, String gridOffsets) throws WebServiceException {
         if (gridOffsets != null && gridOrigin != null) {
-            
-            //we extract the origin parameters
-            double[] origin = new double[2];
+            gridOrigin  = gridOrigin.trim();
+            gridOffsets = gridOffsets.trim();
+            // Extracts the origin parameters
             int i = 0;
             StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
+            final double[] origin = new double[tokens.countTokens()];
             while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                final double value;
-                try {
-                    value = Double.parseDouble(token);
-                } catch (NumberFormatException exception) {
-                    throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, token),
-                            exception, INVALID_PARAMETER_VALUE, version);
-                }
-                origin[i] = value;
-                i++;
+                origin[i++] = parseDouble(tokens.nextToken());
             }
-            //we extract the offsets parameters
-            double[] offsets = new double[4];
+            // Extracts the offsets parameters
+            final double[] offsets = new double[origin.length * 2];
             i = 0;
             tokens = new StringTokenizer(gridOffsets, ",;");
             while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                final double value;
-                try {
-                    value = Double.parseDouble(token);
-                } catch (NumberFormatException exception) {
-                    throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, token),
-                            exception, INVALID_PARAMETER_VALUE, version);
+                if (i >= offsets.length) {
+                    throw new WebServiceException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
+                            "gridOffsets", (int) Math.ceil(Math.sqrt((i + tokens.countTokens()) + 1)),
+                            origin.length), INVALID_DIMENSION_VALUE, version);
                 }
-                offsets[i] = value;
-                i++;
+                offsets[i++] = parseDouble(tokens.nextToken());
             }
             /*
-             * we build an affineTransform object like this (origin T, offsets G):
-             * | G(0) G(1) T(0)| 
+             * builds an AffineTransform object like this (origin=T, offsets=G):
+             * | G(0) G(1) T(0)|
              * | G(2) G(3) T(1)|
              * | 0    0    1   |
              */
-            gridToCRS = new AffineTransform2D(new AffineTransform(offsets[0], offsets[2], offsets[1], offsets[3], origin[0], origin[1]));
+            gridToCRS = new AffineTransform2D(offsets[0], offsets[2], offsets[1], offsets[3], origin[0], origin[1]);
         } else {
             gridToCRS = null;
         }
     }
-    
+
     /**
      * Sets the time, or {@code null} if unknown.
      *
@@ -589,15 +600,11 @@ public class WebServiceWorker {
      * @param  elevation The elevation.
      * @throws WebServiceException if the elevation can't be parsed from the given string.
      */
-    public void setElevation(String elevation) throws WebServiceException {
+    public void setElevation(final String elevation) throws WebServiceException {
         if (elevation == null) {
             this.elevation = null;
-        } else try {
-            elevation = elevation.trim();
-            this.elevation = Double.parseDouble(elevation);
-        } catch (NumberFormatException exception) {
-            throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, elevation),
-                    exception, INVALID_PARAMETER_VALUE, version);
+        } else {
+            this.elevation = parseDouble(elevation);
         }
     }
 
@@ -617,15 +624,11 @@ public class WebServiceWorker {
                 code = Interpolation.INTERP_NEAREST;
             } else if (interpolation.equalsIgnoreCase("bilinear"))  {
                 code = Interpolation.INTERP_BILINEAR;
-            } else if (interpolation.equalsIgnoreCase("barycentric"))  {
-                 throw new WebServiceException("The service does not handle the barycentric interpolation method", 
-                            INVALID_PARAMETER_VALUE, version);
-            } else if (interpolation.equalsIgnoreCase("lost area"))  {
-                 throw new WebServiceException("The service does not handle the lost area interpolation method", 
-                            INVALID_PARAMETER_VALUE, version);
             } else {
-                throw new WebServiceException("The service does not handle this interpolation method: " + interpolation, 
-                            INVALID_PARAMETER_VALUE, version);
+                // Unsupported interpolations include "barycentric" and "lost area".
+                throw new WebServiceException("The service does not handle the \"" +
+                        interpolation.toLowerCase() + "\" interpolation method.",
+                        INVALID_PARAMETER_VALUE, version);
             }
         } else {
             code = Interpolation.INTERP_BILINEAR;
@@ -646,15 +649,8 @@ public class WebServiceWorker {
                throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                        "range", range), INVALID_PARAMETER_VALUE, version);
            }
-           String n = null;
-           final double min, max;
-           try {
-               min = Double.parseDouble(n = range.substring(0,  split).trim());
-               max = Double.parseDouble(n = range.substring(split + 1).trim());
-           } catch (NumberFormatException exception) {
-               throw new WebServiceException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, n),
-                       exception, INVALID_PARAMETER_VALUE, version);
-           }
+           final double min = parseDouble(range.substring(0,  split));
+           final double max = parseDouble(range.substring(split + 1));
            colormapRange = new NumberRange(min, max);
        }
     }
@@ -1274,11 +1270,13 @@ public class WebServiceWorker {
      */
     public double evaluatePixel(final String x, final String y) throws WebServiceException {
         final double xv, yv;
+        String n = null;
         try {
-            xv = Double.parseDouble(x);
-            yv = Double.parseDouble(y);
+            xv = Double.parseDouble(n = x.trim());
+            yv = Double.parseDouble(n = y.trim());
         } catch (NumberFormatException exception) {
-            throw new WebServiceException(exception, INVALID_POINT, version);
+            throw new WebServiceException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, n),
+                    exception, INVALID_POINT, version);
         }
         return evaluatePixel(xv, yv);
     }
