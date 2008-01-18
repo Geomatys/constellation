@@ -15,6 +15,8 @@
  */
 package net.seagis.coverage.catalog;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -177,7 +179,7 @@ final class SeriesTable extends SingletonTable<Series> {
         while (results.next()) {
             final String nextID = results.getString(idIndex);
             String candidate = results.getString(pnIndex);
-            if (candidate == null || !candidate.equals(path)) {
+            if (candidate == null || !comparePaths(candidate, path)) {
                 continue;
             }
             candidate = results.getString(exIndex);
@@ -225,5 +227,66 @@ final class SeriesTable extends SingletonTable<Series> {
             transactionEnd(success);
         }
         return ID;
+    }
+        
+    /**
+     * Compare two paths of files in order to know if they point on same file. The two paths
+     * may be relative or absolute, one can even be relative and the other one absolute.
+     * It will return true if they point on the same file, false otherwise.
+     * 
+     * @param candidate The first path to compare. May be relative or absolute.
+     * @param path The second path to compare. May be relative or absolute.
+     * @return True if it is the same file pointed. False otherwise.
+     */
+    private boolean comparePaths(final String candidate, final String path) {
+        if (candidate.equals(path)) {
+            return true;
+        }
+        File candidateFile  = new File(candidate);
+        File pathFile = new File(path);
+        if (candidateFile == pathFile) {
+            return true;
+        }
+        if (candidateFile.getAbsolutePath().equals(pathFile.getAbsolutePath())) {
+            return true;
+        }
+        try {
+            if (candidateFile.getCanonicalPath().equals(pathFile.getCanonicalPath())) {
+                return true;
+            }
+        } catch (IOException ex) {
+            final LogRecord record = Resources.getResources(getDatabase().getLocale()).
+                    getLogRecord(Level.WARNING, ResourceKeys.ERROR_FILE_NOT_FOUND_$1);
+            record.setSourceClassName("SeriesTable");
+            record.setSourceMethodName("comparePaths");
+            LOGGER.log(record);
+            return false;
+        }
+        if (candidateFile.isAbsolute() && !pathFile.isAbsolute()) {
+            return compareRelativeAndAbsolutePaths(pathFile, candidateFile);
+        }
+        if (!candidateFile.isAbsolute() && pathFile.isAbsolute()) {
+            return compareRelativeAndAbsolutePaths(candidateFile, pathFile);
+        }
+        return false;
+    }
+    
+    /**
+     * Returns true if all parts of two paths are equal. False as soon as one directory
+     * is different.
+     * @param relative The relative path of a file.
+     * @param absolute The absolute path of a file.
+     * @return True if both paths point on the same file.
+     */
+    private boolean compareRelativeAndAbsolutePaths(File relative, File absolute) {
+        while (relative.getName() != null) {
+            if (relative.getName().equals(absolute.getName())) {
+                relative = relative.getParentFile();
+                absolute = absolute.getParentFile();
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 }
