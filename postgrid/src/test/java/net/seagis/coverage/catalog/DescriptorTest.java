@@ -33,7 +33,6 @@ import net.seagis.coverage.model.DescriptorTable;
 
 /**
  * Teste le fonctionnement de {@link net.seagis.observation.coverage.sql.GridCoverageTable#evaluate}.
- * Ce test peut fonctionner avec ou sans serveur RMI disponible.
  *
  * @version $Id$
  * @author Martin Desruisseaux

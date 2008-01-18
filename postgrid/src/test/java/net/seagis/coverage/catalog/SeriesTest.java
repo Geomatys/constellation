@@ -52,7 +52,7 @@ public class SeriesTest extends AbstractTest {
      * souhaite suivre pas à pas). La valeur de ce champ devrait être toujours {@code false} sauf en
      * cas de déboguage d'une méthode bien spécifique.
      */
-    private static final boolean DISABLED = false;
+    private static final boolean DISABLED = true;
 
     /**
      * Connexion vers la table des couches.
@@ -123,11 +123,18 @@ public class SeriesTest extends AbstractTest {
     }
 
     /**
+     * (todo)
+     */
+    public void testLigure() throws Exception {
+        createCoverage3D("Mars3D_Ligure_(Sal)", true);
+    }
+
+    /**
      * Teste l'obtention de la liste des couches, incluant un filtrage par région géographique.
      */
     public void testSeries() throws Exception {
         if (DISABLED) return;
-        final LayerTable table = database.getTable(LayerTable.class);
+        final LayerTable table = new LayerTable(database.getTable(LayerTable.class));
         final Set<Layer> all = table.getEntries();
         assertFalse(all.isEmpty());
         final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(-60, 40, 15, 80);

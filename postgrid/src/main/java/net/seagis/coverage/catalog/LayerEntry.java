@@ -33,6 +33,7 @@ import java.sql.SQLException;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.geotools.util.DateRange;
 import org.geotools.util.MeasurementRange;
@@ -434,7 +435,14 @@ final class LayerEntry extends Entry implements Layer {
             LOGGER.fine("Reconstruit à nouveau la converture de \"" + getName() + "\".");
         }
         if (data != null) try {
-            c = new CoverageStack(getName(), data.getCoordinateReferenceSystem(), getCoverageReferences());
+            final CoordinateReferenceSystem crs;
+            if (false) {
+                // TODO: current version doesn't have enough dimensions.
+                crs = data.getCoordinateReferenceSystem();
+            } else {
+                crs = null; // Lets CoverageStack infers automatically.
+            }
+            c = new CoverageStack(getName(), crs, getCoverageReferences());
             coverage = new SoftReference<Coverage>(c);
         } catch (IOException exception) {
             throw new ServerException(exception);

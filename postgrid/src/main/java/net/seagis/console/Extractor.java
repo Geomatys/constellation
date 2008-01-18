@@ -36,9 +36,13 @@ import org.geotools.resources.Utilities;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.coverage.OrdinateOutsideCoverageException;
 
-import net.seagis.coverage.catalog.Catalog;
+import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.NoSuchRecordException;
+import net.seagis.coverage.catalog.Layer;
+import net.seagis.coverage.catalog.LayerTable;
+import net.seagis.coverage.model.Descriptor;
+import net.seagis.coverage.model.DescriptorTable;
 
 
 /**
@@ -80,7 +84,6 @@ import net.seagis.catalog.NoSuchRecordException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-@Deprecated
 public final class Extractor extends Arguments {
     /**
      * Le nom du fichier en cours de lecture, ou {@code null} pour le périphérique d'entrée standard.
@@ -132,7 +135,7 @@ public final class Extractor extends Arguments {
         precision   = getOptionalInteger("-precision");
         inputFile   = getOptionalString ("-file");
         fromModel   = getFlag           ("-fromModel");
-        this.precision = (precision!=null) ? precision.intValue() : -1;
+        this.precision = (precision != null) ? precision.intValue() : -1;
     }
 
     /**
@@ -156,19 +159,35 @@ public final class Extractor extends Arguments {
         /*
          * Etablit les connexions à la base de données.
          */
+        final Database        database        = new Database();
+        final LayerTable      layerTable      = database.getTable(LayerTable.class);
+        final DescriptorTable descriptorTable = database.getTable(DescriptorTable.class);
         final SpatioTemporalCoverage3D[] coverages = new SpatioTemporalCoverage3D[descriptors.length];
-        final Catalog observations = Catalog.getDefault();
         for (int i=0; i<descriptors.length; i++) {
             final String name = descriptors[i];
-            Coverage coverage = null;
-            if (fromModel) {
-                coverage = observations.getModelCoverage(name);
+            Layer      layer      = null;
+            Descriptor descriptor = null;
+            Coverage   coverage   = null;
+            try {
+                layer = layerTable.getEntry(name);
+            } catch (NoSuchRecordException ignore) {
+                try {
+                    descriptor = descriptorTable.getEntryLenient(name);
+                } catch (NoSuchRecordException exception) {
+                    reportUserError(exception);
+                    return;
+                }
+                layer = descriptor.getLayer();
             }
-            if (coverage == null) try {
-                coverage = observations.getDescriptorCoverage(name);
-            } catch (NoSuchRecordException exception) {
-                reportUserError(exception);
-                return;
+            if (fromModel) {
+                coverage = layer.getModel().asCoverage();
+            }
+            if (coverage == null) {
+                if (descriptor != null) {
+                    coverage = descriptor.getCoverage();
+                } else {
+                    coverage = layer.getCoverage();
+                }
             }
             coverages[i] = new SpatioTemporalCoverage3D(name, coverage);
         }
@@ -243,6 +262,7 @@ public final class Extractor extends Arguments {
         }
         in.close();
         in = null;
+        database.close();
     }
 
     /**

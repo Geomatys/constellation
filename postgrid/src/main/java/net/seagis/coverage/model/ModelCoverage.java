@@ -139,7 +139,7 @@ final class ModelCoverage extends AbstractCoverage {
             }
             envelope = e;
         }
-        return (Envelope) envelope.clone();
+        return envelope.clone();
     }
 
     /**
