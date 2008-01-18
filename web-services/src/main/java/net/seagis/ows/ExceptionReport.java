@@ -61,14 +61,14 @@ import javax.xml.bind.annotation.XmlType;
 public class ExceptionReport {
 
     @XmlElement(name = "Exception", required = true)
-    private List<ExceptionType> exception;
+    private List<ExceptionType> exception = new ArrayList<ExceptionType>();
     @XmlAttribute(required = true)
     private String version;
 
     /**
      * Empty constructor used by JAXB.
      */
-    public ExceptionReport() {}
+    ExceptionReport() {}
     
     /**
      * Build a new simple exception with the specified text and code.

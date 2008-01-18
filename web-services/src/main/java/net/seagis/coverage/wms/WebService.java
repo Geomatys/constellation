@@ -1,6 +1,6 @@
 /*
- * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
- * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ * Sicade - SystÃƒÂ¨mes intÃƒÂ©grÃƒÂ©s de connaissances pour l'aide ÃƒÂ  la dÃƒÂ©cision en environnement
+ * (C) 2005, Institut de Recherche pour le DÃƒÂ©veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 //geotools dependencies
@@ -155,29 +157,28 @@ public abstract class WebService {
         UriInfo context = getContext();
         
         MultivaluedMap parameters = context.getQueryParameters();
-        //we try with the parameter in Upper case.
-        LinkedList<String> list = (LinkedList) parameters.get(parameterName);
-        if (list == null) {
-            //else with the parameter in lower case.
-            list = (LinkedList) parameters.get(parameterName.toLowerCase());
-            if (list == null) {
-                //and finally with the first character in uppercase
-                String s = parameterName.toLowerCase();
-                s = s.substring(1);
-                s = parameterName.charAt(0) + s;
-                list = (LinkedList) parameters.get(s);
-                if (list == null) {
-                    if (!mandatory) {
-                        return null;
-                    } else {
-                        throw new WebServiceException("The parameter " + parameterName + " must be specify",
-                                                      WMSExceptionCode.MISSING_PARAMETER_VALUE, currentVersion);
-                    }
-                }
-            } 
-        } 
         
-        return list.get(0);
+        Set<String> keySet = parameters.keySet();
+        boolean notFound = true;
+        Iterator<String> it = keySet.iterator();
+        String s = null;
+        while (notFound && it.hasNext()) {
+            s = it.next();
+            if (parameterName.equalsIgnoreCase(s)) {
+                notFound = false;
+            }
+        }
+        if (notFound) {
+            if (mandatory) {
+                throw new WebServiceException("The parameter " + parameterName + " must be specify",
+                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, currentVersion);
+            } else {
+                return null;
+            }
+        } else {
+             LinkedList<String> list = (LinkedList) parameters.get(s);
+             return list.get(0);
+        }
     }
     
     /**
@@ -338,7 +339,28 @@ public abstract class WebService {
         }
     }
     
+    /**
+     * Return the service url obtain by the first request made.
+     * 
+     * @return the service url.
+     */
     protected String getServiceURL() {
         return getContext().getBase().toString();
     }
+    
+    /**
+     * A utility method whitch replace the special character.
+     * 
+     * @param s the string to clean.
+     * @return a String without special character.
+     */
+    protected String cleanSpecialCharacter(String s) {
+        if (s != null) {
+            s = s.replace('é', 'e');
+            s = s.replace('è', 'e'); 
+        }
+        return s;
+    }
+    
+    
 }
