@@ -14,7 +14,6 @@
  */
 package net.seagis.observation;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -362,7 +361,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                     id = obs.getName();
                 }
             } else {
-                id = searchFreeIdentifier("urn:BRGM:observation:");
+                id = searchFreeIdentifier("urn:object:observation:BRGM");
             }
             PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.name),         id);
@@ -473,7 +472,6 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
                 statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.TIMESTAMP);
             }
-        
             updateSingleton(statement);
             success = true;
         } finally {

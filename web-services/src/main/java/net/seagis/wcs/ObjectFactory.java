@@ -486,6 +486,14 @@ public class ObjectFactory {
     }
     
     /**
+     * Create an instance of {@link AddressType }
+     * 
+     */
+    public RangeSet createRangeSet() {
+        return new RangeSet();
+    }
+    
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */

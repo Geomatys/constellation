@@ -218,6 +218,11 @@ public class WebServiceWorker {
     private Interpolation interpolation = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
 
     /**
+     * The exceptions format as a MIME type.
+     */
+    private String exceptionFormat;
+    
+    /**
      * The output format as a MIME type.
      */
     private String format;
@@ -726,6 +731,33 @@ public class WebServiceWorker {
         }
     }
 
+    /**
+     * Sets the output format for exception as a MIME type.
+     * 
+     * @param format the output exception format.
+     * @throws WebServiceException if the format is invalid.
+     */
+    public void setExceptionFormat(String format) throws WebServiceException {
+        if (format == null) {
+            exceptionFormat = "application/vnd.ogc.se_xml";
+        } else if (format.equals("text/xml") || format.equals("application/vnd.ogc.se_xml")) {
+            exceptionFormat = format;
+        } else {
+            throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                            "Exception", format), LAYER_NOT_QUERYABLE, version);
+        }
+    }
+    
+    /**
+     * Return the output MIME type for exception
+     */
+    public String getExceptionFormat() {
+        if (exceptionFormat == null)
+            return "application/vnd.ogc.se_xml";
+        else
+            return exceptionFormat;
+    }
+    
     /**
      * Returns the layer table.
      *

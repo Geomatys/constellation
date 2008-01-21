@@ -53,7 +53,7 @@ public class CoverageOfferingType extends CoverageOfferingBriefType {
     
     private DomainSetType domainSet;
     
-    private RangeSetType rangeSet;
+    private RangeSet rangeSet;
     
     private SupportedCRSsType supportedCRSs;
     
@@ -70,7 +70,7 @@ public class CoverageOfferingType extends CoverageOfferingBriefType {
      * build a new CoverageOffering type used in describeCoverage response.
      */
     public CoverageOfferingType(List<MetadataLinkType> metadataLink, String name, String label, String description,
-            LonLatEnvelopeType lonLatEnvelope, Keywords keywords, DomainSetType domainSet, RangeSetType rangeSet,
+            LonLatEnvelopeType lonLatEnvelope, Keywords keywords, DomainSetType domainSet, RangeSet rangeSet,
             SupportedCRSsType supportedCRSs, SupportedFormatsType supportedFormats, SupportedInterpolationsType supportedInterpolations){
         super(metadataLink, name, label, description, lonLatEnvelope, keywords);
         this.domainSet               = domainSet;
@@ -79,6 +79,34 @@ public class CoverageOfferingType extends CoverageOfferingBriefType {
         this.supportedFormats        = supportedFormats;
         this.supportedInterpolations = supportedInterpolations;
         
+    }
+    
+    /**
+     * Return the domainSet property
+     */
+    public RangeSet getRangeSet(){
+        return rangeSet;
+    }
+    
+    /**
+     * Return the domainSet property
+     */
+    public SupportedCRSsType getSupportedCRSs(){
+        return supportedCRSs;
+    }
+    
+    /**
+     * Return the domainSet property
+     */
+    public SupportedFormatsType getSupportedFormats(){
+        return supportedFormats;
+    }
+    
+    /**
+     * Return the domainSet property
+     */
+    public SupportedInterpolationsType getSupportedInterpolations(){
+        return supportedInterpolations;
     }
 
 }

@@ -1,6 +1,6 @@
 /*
- * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
- * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -180,7 +180,7 @@ public class WMService extends WebService {
             ex.printStackTrace();
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
-            return Response.Builder.representation(sw.toString(), "text/xml").build();
+            return Response.Builder.representation(sw.toString(), webServiceWorker.getExceptionFormat()).build();
         }
     }
     
@@ -281,9 +281,7 @@ public class WMService extends WebService {
         }
         String feature_count = getParameter("FEATURE_COUNT", false);
         
-        String exception = getParameter("EXCEPTIONS", false);
-        if ( exception == null)
-            exception = "XML";
+        webServiceWorker.setExceptionFormat(getParameter("EXCEPTIONS", false));
         
         double result = webServiceWorker.evaluatePixel(i,j);
         
@@ -481,8 +479,8 @@ public class WMService extends WebService {
                 
                 //we build and add a layer 
                 Layer outputLayer = new Layer(inputLayer.getName(), 
-                                              inputLayer.getRemarks(),
-                                              inputLayer.getThematic(), 
+                                              cleanSpecialCharacter(inputLayer.getRemarks()),
+                                              cleanSpecialCharacter(inputLayer.getThematic()), 
                                               crs, 
                                               new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(), 
                                                                           inputGeoBox.getSouthBoundLatitude(), 
@@ -517,7 +515,7 @@ public class WMService extends WebService {
         
         response.getCapability().setLayer(layer);
         //we marshall the response and return the XML String
-        StringWriter sw = new StringWriter();    
+        StringWriter sw = new StringWriter();
         marshaller.marshal(response, sw);
          
         return Response.Builder.representation(sw.toString(), format).build();

@@ -82,9 +82,12 @@ public abstract class AbstractDescriptionType extends AbstractDescriptionBaseTyp
     public AbstractDescriptionType(List<MetadataLinkType> metadataLink, String name, String label, String description){
         super(metadataLink);
         ObjectFactory factory = new ObjectFactory();
-        rest.add(factory.createName(name));
-        rest.add(factory.createLabel(label));
-        rest.add(factory.createDescription(description));
+        if (description!= null)
+            rest.add(factory.createDescription(description));
+        if (name != null)
+            rest.add(factory.createName(name));
+        if (label != null)
+            rest.add(factory.createLabel(label));
     }
     
     /**

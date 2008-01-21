@@ -82,6 +82,7 @@ import net.seagis.wcs.InterpolationMethodType;
 import net.seagis.wcs.InterpolationMethods;
 import net.seagis.wcs.Keywords;
 import net.seagis.wcs.LonLatEnvelopeType;
+import net.seagis.wcs.RangeSet;
 import net.seagis.wcs.RangeSetType;
 import net.seagis.wcs.SupportedCRSsType;
 import net.seagis.wcs.SpatialDomainType;
@@ -187,7 +188,7 @@ public class WCService extends WebService {
             ex.printStackTrace();
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
-            return Response.Builder.representation(sw.toString(), "text/xml").build();
+            return Response.Builder.representation(sw.toString(), webServiceWorker.getExceptionFormat()).build();
         }
      }
     
@@ -205,6 +206,11 @@ public class WCService extends WebService {
         }
         
         String inputVersion = getParameter("VERSION", false);
+        if(inputVersion != null && inputVersion.equals("1.1.1")) {
+            setCurrentVersion("1.1.1");
+        } else {
+            setCurrentVersion("1.0.0");
+        } 
         setCurrentVersion(inputVersion);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         
@@ -220,7 +226,7 @@ public class WCService extends WebService {
             if (format == null) {
                 format = "text/xml";
             } else {
-                if (!format.equals("text/xml") && !format.equals("application/vnd.ogc.wcs_xml")){
+                if (!format.equals("text/xml") && !format.equals("application/vnd.ogc.se_xml")){
                     throw new WebServiceException("This format " + format + " is not allowed",
                                        WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
                 }
@@ -291,7 +297,7 @@ public class WCService extends WebService {
             }
             WCSCapabilitiesType staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject(getCurrentVersion())).getValue();
             
-            if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability")) {
+            if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
                 //we update the url in the static part.
                 ((Get) staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
                 ((Post)staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
@@ -303,7 +309,7 @@ public class WCService extends WebService {
                 ((Post)staticCapabilities.getCapability().getRequest().getGetCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage");
             }
             
-            if (requestedSection == null || contentMeta ) {
+            if (requestedSection == null || contentMeta  || requestedSection.equals("/")) {
                 responsev100 = staticCapabilities;
             } else {
                 if (requestedSection.equals("/WCS_Capabilities/Capability")) {
@@ -402,7 +408,7 @@ public class WCService extends WebService {
         
         verifyBaseParameter(0);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
-        String format, coverage, crs, bbox, time, interpolation;
+        String format, coverage, crs, bbox, time, interpolation, exceptions;
         String width = null, height = null; 
         String gridType, gridOrigin = null, gridOffsets = null, gridCS, gridBaseCrs;
         
@@ -489,6 +495,7 @@ public class WCService extends WebService {
             }
             
             getParameter("store", false);
+            exceptions    = getParameter("exceptions", false);
             
         } else {
             
@@ -501,8 +508,9 @@ public class WCService extends WebService {
             width         = getParameter("width", true);
             height        = getParameter("height", true);
             interpolation = getParameter("interpolation", false);
+            exceptions    = getParameter("exceptions", false);
         }
-        
+        webServiceWorker.setExceptionFormat(exceptions);
         webServiceWorker.setFormat(format);
         webServiceWorker.setLayer(coverage);
         webServiceWorker.setCoordinateReferenceSystem(crs);
@@ -567,7 +575,7 @@ public class WCService extends WebService {
                     pos.add(new DirectPositionType(pos2));
                     llenvelope = new LonLatEnvelopeType(pos, crs);
                 }
-                Keywords keywords = new Keywords("WCS", layer.getName());
+                Keywords keywords = new Keywords("WCS", layer.getName(), cleanSpecialCharacter(layer.getThematic()));
                 
                 //Spatial metadata 
                 SpatialDomainType spatialDomain = new SpatialDomainType(llenvelope);
@@ -585,23 +593,24 @@ public class WCService extends WebService {
                 DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
                 
                 //TODO complete
-                RangeSetType  rangeSet  = new RangeSetType(null, 
+                RangeSetType  rangeSetT  = new RangeSetType(null, 
                                                            layer.getName(),
                                                            layer.getName(),
                                                            null,
                                                            null,
                                                            null,
                                                            null);
+                RangeSet rangeSet        = new RangeSet(rangeSetT);
                 //supported CRS
                 SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
                 
                 // supported formats
                 List<CodeListType> formats = new ArrayList<CodeListType>();
                 formats.add(new CodeListType("matrix"));
-                formats.add(new CodeListType("image/jpeg"));
-                formats.add(new CodeListType("image/png"));
-                formats.add(new CodeListType("image/gif"));
-                formats.add(new CodeListType("image/bmp"));
+                formats.add(new CodeListType("jpeg"));
+                formats.add(new CodeListType("png"));
+                formats.add(new CodeListType("gif"));
+                formats.add(new CodeListType("bmp"));
                 String nativeFormat = "??";
                 Iterator<Series> it = layer.getSeries().iterator();
                 if (it.hasNext()) {
@@ -621,7 +630,7 @@ public class WCService extends WebService {
                 CoverageOfferingType coverage = new CoverageOfferingType(null,
                                                                          layer.getName(),
                                                                          layer.getName(),
-                                                                         layer.getRemarks(),
+                                                                         cleanSpecialCharacter(layer.getRemarks()),
                                                                          llenvelope,
                                                                          keywords,
                                                                          domainSet,

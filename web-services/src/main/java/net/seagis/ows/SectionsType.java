@@ -69,6 +69,7 @@ public class SectionsType {
     @XmlTransient
     private static List<String> existingSections100 = new ArrayList<String>(3);
     static {
+        existingSections100.add("/");
         existingSections100.add("/WCS_Capabilities/Service");
         existingSections100.add("/WCS_Capabilities/Capability");
         existingSections100.add("/WCS_Capabilities/ContentMetadata");
