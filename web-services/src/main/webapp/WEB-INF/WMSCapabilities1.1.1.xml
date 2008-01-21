@@ -10,8 +10,6 @@
   <Abstract>Map Server.  Contact: someone@geomatys.fr.  High-quality maps.</Abstract>
   <KeywordList>
     <Keyword>WMS</Keyword>
-    <Keyword>???</Keyword>
-    <Keyword>????</Keyword>
   </KeywordList>
   <!-- Top-level web address of service or service provider.  See also OnlineResource
   elements under <DCPType>. -->
@@ -37,9 +35,6 @@
   <!-- Fees or access constraints imposed. -->
   <Fees>none</Fees>
   <AccessConstraints>none</AccessConstraints>
-  <LayerLimit>16</LayerLimit>
-  <MaxWidth>2048</MaxWidth>
-  <MaxHeight>2048</MaxHeight>
 </Service>
 <Capability>
   <Request>
@@ -123,6 +118,6 @@
   <Exception>
     <Format>XML</Format>
   </Exception>
-<sld:UserDefinedSymbolization SupportSLD="1" UserLayer="1" UserStyle="1" RemoteWCS="1" InlineFeature="1"/>
+<sld:UserDefinedSymbolization SupportSLD="1" UserLayer="1" UserStyle="1" RemoteWFS="1"/>
 </Capability>
 </WMT_MS_Capabilities>

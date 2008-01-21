@@ -65,6 +65,20 @@ version="1.1.1" updateSequence="">
                <ows:Value>1.1.1</ows:Value>
             </ows:AllowedValues>
          </ows:Parameter>
+         <ows:Parameter name="Sections">
+            <ows:AllowedValues>
+               <ows:Value>ServiceIdentification</ows:Value>
+               <ows:Value>ServiceProvider</ows:Value>
+               <ows:Value>OperationsMetadata</ows:Value>
+               <ows:Value>Contents</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
+         <ows:Parameter name="AcceptFormats">
+            <ows:AllowedValues>
+               <ows:Value>text/xml</ows:Value>
+               <ows:Value>application/vnd.ogc.wcs_xml</ows:Value>
+            </ows:AllowedValues>
+         </ows:Parameter>
 			<ows:DCP>
 				<ows:HTTP>
 					<ows:Post xlink:href="http://sensor.geomatys.fr/WCServer/wcs?REQUEST=GetCapabilities"/>
