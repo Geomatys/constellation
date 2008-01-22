@@ -298,14 +298,14 @@ public class WCService extends WebService {
             
             if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
                 //we update the url in the static part.
-                ((Get) staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
-                ((Post)staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities");
+                ((Get) staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities&");
+                ((Post)staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities&");
             
-                ((Get) staticCapabilities.getCapability().getRequest().getDescribeCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage");
-                ((Post)staticCapabilities.getCapability().getRequest().getDescribeCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage");
+                ((Get) staticCapabilities.getCapability().getRequest().getDescribeCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage&");
+                ((Post)staticCapabilities.getCapability().getRequest().getDescribeCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage&");
             
-                ((Get) staticCapabilities.getCapability().getRequest().getGetCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage");
-                ((Post)staticCapabilities.getCapability().getRequest().getGetCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage");
+                ((Get) staticCapabilities.getCapability().getRequest().getGetCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage&");
+                ((Post)staticCapabilities.getCapability().getRequest().getGetCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage&");
             }
             
             if (requestedSection == null || contentMeta  || requestedSection.equals("/")) {
@@ -408,8 +408,10 @@ public class WCService extends WebService {
         verifyBaseParameter(0);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         String format, coverage, crs, bbox, time, interpolation, exceptions;
-        String width = null, height = null; 
+        String width = null, height = null, depth = null;
+        String resx  = null, resy   = null, resz  = null;
         String gridType, gridOrigin = null, gridOffsets = null, gridCS, gridBaseCrs;
+        String responseCRS = null;
         
        if (getCurrentVersion().toString().equals("1.1.1")){
             
@@ -504,11 +506,29 @@ public class WCService extends WebService {
             crs           = getParameter("CRS", true);
             bbox          = getParameter("bbox", false);
             time          = getParameter("time", false);
-            width         = getParameter("width", true);
-            height        = getParameter("height", true);
             interpolation = getParameter("interpolation", false);
             exceptions    = getParameter("exceptions", false);
+            responseCRS   = getParameter("response_crs", false);
+            
+            /* here the parameter width and height (and depth for 3D matrix)
+             *  have to be fill. If not they can be replace by resx and resy 
+             * (resz for 3D grid)
+             */
+            width         = getParameter("width",  false);
+            height        = getParameter("height", false);
+            depth         = getParameter("depth", false);
+            if (width == null || height == null) {
+                resx = getParameter("resx",  false);
+                resy = getParameter("resy",  false);
+                resz = getParameter("resz",  false);
+                
+                if (resx == null || resy == null) {
+                    throw new WebServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
+                              WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                }
+            }
         }
+        
         webServiceWorker.setExceptionFormat(exceptions);
         webServiceWorker.setFormat(format);
         webServiceWorker.setLayer(coverage);
@@ -519,8 +539,13 @@ public class WCService extends WebService {
         if (getCurrentVersion().toString().equals("1.1.1")) {
             webServiceWorker.setGridCRS(gridOrigin, gridOffsets);
         } else {
-            webServiceWorker.setDimension(width, height);
+            if (width == null || height == null) {
+                webServiceWorker.setDimension(width, height, depth);
+            } else {
+                webServiceWorker.setResolution(resx, resy, resz);
+            }
         }
+        webServiceWorker.setResponseCoordinateReferenceSystem(responseCRS);
             
         return webServiceWorker.getImageFile();
     }

@@ -170,8 +170,14 @@ public abstract class WebService {
         }
         if (notFound) {
             if (mandatory) {
+                Version v;
+                if (parameterName.equalsIgnoreCase("version")) {
+                    v = null;
+                } else {
+                    v = currentVersion;
+                }
                 throw new WebServiceException("The parameter " + parameterName + " must be specify",
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, currentVersion);
+                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, v);
             } else {
                 return null;
             }

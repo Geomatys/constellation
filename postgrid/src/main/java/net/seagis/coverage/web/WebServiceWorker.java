@@ -186,6 +186,11 @@ public class WebServiceWorker {
     private GeneralEnvelope envelope;
 
     /**
+     * The CRS of the response.
+     */
+    private CoordinateReferenceSystem responseCRS;
+    
+    /**
      * The dimension of target image.
      */
     private GridRange gridRange;
@@ -444,8 +449,26 @@ public class WebServiceWorker {
             throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM),
                     exception, INVALID_CRS, version);
         }
+        responseCRS = crs;
         envelope = new GeneralEnvelope(crs);
         envelope.setToInfinite();
+    }
+
+    /**
+     * Sets the response coordinate reference system from a code. 
+     *
+     * @param  code The coordinate reference system code, or {@code null} if unknown.
+     * @throws WebServiceException if no CRS object can be built from the given code.
+     */
+    public void setResponseCoordinateReferenceSystem(final String code) throws WebServiceException {
+        if (code != null) {
+            try {
+                responseCRS = CRS.decode(code, false);
+            } catch (FactoryException exception) {
+                throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM),
+                        exception, INVALID_CRS, version);
+            }
+        }
     }
 
     /**
@@ -518,14 +541,39 @@ public class WebServiceWorker {
     }
 
     /**
+     * 
+     * @param  resx  Spatial resolution along axis X of the reply CRS.
+     * @param  resy  Spatial resolution along axis Y of the reply CRS.
+     * @param  resz  Spatial resolution along axis Z of the reply CRS(not yet used).
+     * 
+     * @throws WebServiceException if the resolution can't be parsed from the given strings.
+     */
+    public void setResolution(final String resx, final String resy, final String resz) throws WebServiceException {
+        gridToCRS = null;
+        if (resx == null && resy == null) {
+            gridRange = null;
+            return;
+        }
+        double resolutionX = parseDouble(resx);
+        double resolutionY = parseDouble(resy);
+        int width  = (int)Math.round(this.envelope.toRectangle2D().getWidth()  / resolutionX);
+        int height = (int)Math.round(this.envelope.toRectangle2D().getHeight() / resolutionY);
+        
+        final int[] upper = new int[] { width, height };
+        gridRange = new GeneralGridRange(new int[upper.length], upper);
+    }
+    
+    /**
      * Sets the dimension, or {@code null} if unknown. If a value is null, the other
      * one must be null as well otherwise a {@link WebServiceException} is thrown.
      *
      * @param  width  The image width.
      * @param  height The image height.
+     * @param  depth  The image depth (not yet used).
+     * 
      * @throws WebServiceException if the dimension can't be parsed from the given strings.
      */
-    public void setDimension(final String width, final String height) throws WebServiceException {
+    public void setDimension(final String width, final String height, final String depth) throws WebServiceException {
         gridToCRS = null;
         if (width == null && height == null) {
             gridRange = null;

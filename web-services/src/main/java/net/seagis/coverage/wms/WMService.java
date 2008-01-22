@@ -180,7 +180,7 @@ public class WMService extends WebService {
             ex.printStackTrace();
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
-            return Response.Builder.representation(sw.toString(), webServiceWorker.getExceptionFormat()).build();
+            return Response.Builder.representation(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
         }
     }
     
@@ -212,7 +212,7 @@ public class WMService extends WebService {
         webServiceWorker.setBoundingBox(getParameter("BBOX", true));
         webServiceWorker.setElevation(getParameter("ELEVATION", false));
         webServiceWorker.setTime(getParameter("TIME", false));
-        webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true));
+        webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true), null);
         webServiceWorker.setBackgroundColor(getParameter("BGCOLOR", false));
         webServiceWorker.setTransparency(getParameter("TRANSPARENT", false));
         
@@ -254,7 +254,7 @@ public class WMService extends WebService {
         webServiceWorker.setBoundingBox(getParameter("BBOX", true));
         webServiceWorker.setElevation(getParameter("ELEVATION", false));
         webServiceWorker.setTime(getParameter("TIME", false));
-        webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true));
+        webServiceWorker.setDimension(getParameter("WIDTH", true), getParameter("HEIGHT", true), null);
         
 
         final String i, j;
@@ -373,17 +373,17 @@ public class WMService extends WebService {
         
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
-        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetCapabilities");
-        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetFeatureInfo");
-        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetMap");
-        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=DescribeLayer");
-        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetLegendGraphic");
+        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetCapabilities&");
+        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetFeatureInfo&");
+        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetMap&");
+        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=DescribeLayer&");
+        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetLegendGraphic&");
         
-        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetCapabilities");
-        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetFeatureInfo");
-        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetMap");
-        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=DescribeLayer");
-        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetLegendGraphic");
+        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetCapabilities&");
+        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetFeatureInfo&");
+        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetMap&");
+        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=DescribeLayer&");
+        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetLegendGraphic&");
         
         //we build the layers object of the document
         
@@ -569,7 +569,7 @@ public class WMService extends WebService {
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
         webServiceWorker.setLayer(getParameter("LAYER", true));
         webServiceWorker.setFormat(getParameter("FORMAT", false));
-        webServiceWorker.setDimension(getParameter("WIDTH", false), getParameter("HEIGHT", false));
+        webServiceWorker.setDimension(getParameter("WIDTH", false), getParameter("HEIGHT", false), null);
 
         
         String style = getParameter("STYLE", false);
