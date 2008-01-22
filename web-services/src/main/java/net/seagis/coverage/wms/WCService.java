@@ -188,7 +188,7 @@ public class WCService extends WebService {
             ex.printStackTrace();
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
-            return Response.Builder.representation(sw.toString(), webServiceWorker.getExceptionFormat()).build();
+            return Response.Builder.representation(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
         }
      }
     
@@ -211,7 +211,6 @@ public class WCService extends WebService {
         } else {
             setCurrentVersion("1.0.0");
         } 
-        setCurrentVersion(inputVersion);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         
         Capabilities        responsev111 = null;
