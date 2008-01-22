@@ -166,8 +166,8 @@ public class WCService extends WebService {
     @Override
     public Response treatIncommingRequest() throws JAXBException {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-        writeParameters();
         try {
+            writeParameters();
             String request = (String) getParameter("REQUEST", true);
             if (request.equalsIgnoreCase("DescribeCoverage")) {
                     

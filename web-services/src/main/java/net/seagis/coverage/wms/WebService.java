@@ -363,7 +363,8 @@ public abstract class WebService {
     protected String cleanSpecialCharacter(String s) {
         if (s != null) {
             s = s.replace('é', 'e');
-            s = s.replace('è', 'e'); 
+            s = s.replace('è', 'e');
+            s = s.replace('à', 'a');
         }
         return s;
     }
