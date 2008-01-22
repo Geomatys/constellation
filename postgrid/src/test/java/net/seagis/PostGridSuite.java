@@ -47,7 +47,7 @@ public class PostGridSuite extends TestSuite {
         addTestSuite(net.seagis.coverage.catalog.SeriesEntryTest              .class);
         addTestSuite(net.seagis.coverage.catalog.SeriesTableTest              .class);
         addTestSuite(net.seagis.coverage.catalog.LayerTableTest               .class);
-        addTestSuite(net.seagis.coverage.mosaic .BlueMarbleTest               .class);
+//      addTestSuite(net.seagis.coverage.mosaic .BlueMarbleTest               .class);
         addTestSuite(net.seagis.coverage.model  .RegionOfInterestTableTest    .class);
         addTestSuite(net.seagis.coverage.model  .OperationTableTest           .class);
         addTestSuite(net.seagis.coverage.model  .DistributionTableTest        .class);

@@ -550,7 +550,7 @@ public class WCService extends WebService {
                 webServiceWorker.setResolution(resx, resy, resz);
             }
         }
-        webServiceWorker.setResponseCoordinateReferenceSystem(responseCRS);
+        webServiceWorker.setResponseCRS(responseCRS);
             
         return webServiceWorker.getImageFile();
     }

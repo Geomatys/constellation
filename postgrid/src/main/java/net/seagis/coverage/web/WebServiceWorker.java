@@ -60,8 +60,8 @@ import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.coverage.processing.ColorMap;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.geometry.GeneralEnvelope;
@@ -101,6 +101,9 @@ import static net.seagis.coverage.wms.WMSExceptionCode.*;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Guilhem Legal
+ *
+ * @todo Some table-related fields in this class, together with some caches, should move in a
+ *       more global class and be shared for every instances connected to the same database.
  */
 public class WebServiceWorker {
     /**
@@ -181,24 +184,30 @@ public class WebServiceWorker {
     private String layer;
 
     /**
+     * The grid geometry. This field is computed automatically from other user-supplied values
+     * like {@link #gridCRS}, {@link #gridRange} and {@link #envelope}.
+     *
+     * @see #getGridGeometry
+     */
+    private transient GeneralGridGeometry gridGeometry;
+
+    /**
      * The envelope of current layer, including its CRS.
      */
     private GeneralEnvelope envelope;
 
     /**
-     * The CRS of the response.
+     * The CRS of the response, or {@code null} if not specified.
      */
     private CoordinateReferenceSystem responseCRS;
-    
+
     /**
      * The dimension of target image.
      */
     private GridRange gridRange;
 
     /**
-     * The <cite>grid to CRS</cite> transform, or {@code null} if not yet computed.
-     *
-     * @see #getGridToCRS.
+     * The <cite>grid to CRS</cite> transform specified by the user.
      */
     private MathTransform gridToCRS;
 
@@ -226,7 +235,7 @@ public class WebServiceWorker {
      * The exceptions format as a MIME type.
      */
     private String exceptionFormat;
-    
+
     /**
      * The output format as a MIME type.
      */
@@ -238,11 +247,16 @@ public class WebServiceWorker {
     private transient Set<String> formats;
 
     /**
-     * The temporary file in which a file is written. Will be created when first needed,
+     * The temporary file in which an image is written. Will be created when first needed,
      * overwritten everytime a new request is performed and deleted on JVM exit. Different
      * files are used for different suffix.
      */
-    private transient Map<String,File> files;
+    private transient Map<ImageRequest,File> files;
+
+    /**
+     * The directory for temporary files. Will be computed when first needed.
+     */
+    private transient File temporaryDirectory;
 
     /**
      * The writer used during the last write operation, cached for more efficient reuse.
@@ -311,14 +325,14 @@ public class WebServiceWorker {
     private transient final Map<LayerRequest,Layer> layers;
 
     /**
-     * The current coordinate of the point requested by a getFeatureInfo request
+     * The current coordinate of the point requested by a {@code getFeatureInfo} request.
      */
     private DirectPosition coordinate;
 
     /**
      * The background color of the current image (default {@code 0xFFFFFF}).
      */
-    private Color bgColor = Color.WHITE;
+    private Color background = Color.WHITE;
 
     /**
      * A flag specifying if the image have to handle transparency.
@@ -421,18 +435,13 @@ public class WebServiceWorker {
     }
 
     /**
-     * Sets the coordinate reference system from a code. Invoking this method will erase
-     * any bounding box that may have been previously set.
+     * Parses a coordinate reference system from a code.
      *
-     * @param  code The coordinate reference system code, or {@code null} if unknown.
+     * @param  code The coordinate reference system code. Should never be {@code null}.
+     * @return The parsed coordinate reference system.
      * @throws WebServiceException if no CRS object can be built from the given code.
      */
-    public void setCoordinateReferenceSystem(final String code) throws WebServiceException {
-        gridToCRS = null;
-        if (code == null) {
-            envelope  = null;
-            return;
-        }
+    private CoordinateReferenceSystem decodeCRS(final String code) throws WebServiceException {
         final int versionThreshold;
         if (Service.WMS.equals(service) && version != null) {
             versionThreshold = version.compareTo(AXIS_SWITCH_THRESHOLD, 2);
@@ -449,26 +458,35 @@ public class WebServiceWorker {
             throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM),
                     exception, INVALID_CRS, version);
         }
-        responseCRS = crs;
+        return crs;
+    }
+
+    /**
+     * Sets the coordinate reference system from a code. Invoking this method will erase
+     * any bounding box that may have been previously set.
+     *
+     * @param  code The coordinate reference system code, or {@code null} if unknown.
+     * @throws WebServiceException if no CRS object can be built from the given code.
+     */
+    public void setCoordinateReferenceSystem(final String code) throws WebServiceException {
+        clearGridGeometry();
+        if (code == null) {
+            envelope = null;
+            return;
+        }
+        final CoordinateReferenceSystem crs = decodeCRS(code);
         envelope = new GeneralEnvelope(crs);
         envelope.setToInfinite();
     }
 
     /**
-     * Sets the response coordinate reference system from a code. 
+     * Sets the response coordinate reference system from a code.
      *
-     * @param  code The coordinate reference system code, or {@code null} if unknown.
+     * @param  code The coordinate reference system code, or {@code null} if none.
      * @throws WebServiceException if no CRS object can be built from the given code.
      */
-    public void setResponseCoordinateReferenceSystem(final String code) throws WebServiceException {
-        if (code != null) {
-            try {
-                responseCRS = CRS.decode(code, false);
-            } catch (FactoryException exception) {
-                throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM),
-                        exception, INVALID_CRS, version);
-            }
-        }
+    public void setResponseCRS(final String code) throws WebServiceException {
+        responseCRS = (code != null) ? decodeCRS(code) : null;
     }
 
     /**
@@ -482,7 +500,7 @@ public class WebServiceWorker {
      */
     @SuppressWarnings("fallthrough")
     public void setBoundingBox(final String bbox) throws WebServiceException {
-        gridToCRS = null;
+        clearGridGeometry();
         if (bbox == null) {
             if (envelope != null) {
                 envelope.setToInfinite();
@@ -541,28 +559,30 @@ public class WebServiceWorker {
     }
 
     /**
-     * 
+     * Sets the resolution. This method is exclusive with {@link #setDimension setDimension};
+     * only one of those methods should be invoked.
+     *
      * @param  resx  Spatial resolution along axis X of the reply CRS.
      * @param  resy  Spatial resolution along axis Y of the reply CRS.
-     * @param  resz  Spatial resolution along axis Z of the reply CRS(not yet used).
-     * 
+     * @param  resz  Spatial resolution along axis Z of the reply CRS (not yet used).
+     *
      * @throws WebServiceException if the resolution can't be parsed from the given strings.
      */
     public void setResolution(final String resx, final String resy, final String resz) throws WebServiceException {
-        gridToCRS = null;
+        clearGridGeometry();
         if (resx == null && resy == null) {
             gridRange = null;
             return;
         }
         double resolutionX = parseDouble(resx);
         double resolutionY = parseDouble(resy);
-        int width  = (int)Math.round(this.envelope.toRectangle2D().getWidth()  / resolutionX);
-        int height = (int)Math.round(this.envelope.toRectangle2D().getHeight() / resolutionY);
-        
-        final int[] upper = new int[] { width, height };
+        final int[] upper = new int[] {
+            (int) Math.round(envelope.getLength(0) / resolutionX),
+            (int) Math.round(envelope.getLength(1) / resolutionY)
+        };
         gridRange = new GeneralGridRange(new int[upper.length], upper);
     }
-    
+
     /**
      * Sets the dimension, or {@code null} if unknown. If a value is null, the other
      * one must be null as well otherwise a {@link WebServiceException} is thrown.
@@ -570,11 +590,11 @@ public class WebServiceWorker {
      * @param  width  The image width.
      * @param  height The image height.
      * @param  depth  The image depth (not yet used).
-     * 
+     *
      * @throws WebServiceException if the dimension can't be parsed from the given strings.
      */
     public void setDimension(final String width, final String height, final String depth) throws WebServiceException {
-        gridToCRS = null;
+        clearGridGeometry();
         if (width == null && height == null) {
             gridRange = null;
             return;
@@ -594,7 +614,10 @@ public class WebServiceWorker {
      * @throws WebServiceException if the dimension can't be parsed from the given strings.
      */
     public void setGridCRS(String gridOrigin, String gridOffsets) throws WebServiceException {
-        if (gridOffsets != null && gridOrigin != null) {
+        clearGridGeometry();
+        if (gridOffsets == null || gridOrigin == null) {
+            gridToCRS = null;
+        } else {
             gridOrigin  = gridOrigin.trim();
             gridOffsets = gridOffsets.trim();
             // Extracts the origin parameters
@@ -623,8 +646,6 @@ public class WebServiceWorker {
              * | 0    0    1   |
              */
             gridToCRS = new AffineTransform2D(offsets[0], offsets[2], offsets[1], offsets[3], origin[0], origin[1]);
-        } else {
-            gridToCRS = null;
         }
     }
 
@@ -723,11 +744,11 @@ public class WebServiceWorker {
      */
     public void setBackgroundColor(String background) throws WebServiceException {
         if (background == null) {
-            this.bgColor = Color.WHITE;
+            this.background = Color.WHITE;
         } else {
             background = background.trim();
             try {
-                bgColor = Color.decode(background);
+                this.background = Color.decode(background);
             } catch (NumberFormatException exception) {
                 throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                         "background", background), exception, INVALID_PARAMETER_VALUE, version);
@@ -781,31 +802,35 @@ public class WebServiceWorker {
 
     /**
      * Sets the output format for exception as a MIME type.
-     * 
+     *
      * @param format the output exception format.
      * @throws WebServiceException if the format is invalid.
      */
     public void setExceptionFormat(String format) throws WebServiceException {
         if (format == null) {
             exceptionFormat = "application/vnd.ogc.se_xml";
-        } else if (format.equals("text/xml") || format.equals("application/vnd.ogc.se_xml")) {
+            return;
+        }
+        format = format.trim();
+        if (format.equalsIgnoreCase("text/xml") || format.equalsIgnoreCase("application/vnd.ogc.se_xml")) {
             exceptionFormat = format;
         } else {
             throw new WebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                            "Exception", format), LAYER_NOT_QUERYABLE, version);
+                            "Exception", format), INVALID_PARAMETER_VALUE, version);
         }
     }
-    
+
     /**
-     * Return the output MIME type for exception
+     * Returns the output MIME type for exception
      */
     public String getExceptionFormat() {
-        if (exceptionFormat == null)
+        if (exceptionFormat == null) {
             return "application/vnd.ogc.se_xml";
-        else
+        } else {
             return exceptionFormat;
+        }
     }
-    
+
     /**
      * Returns the layer table.
      *
@@ -929,49 +954,70 @@ public class WebServiceWorker {
     }
 
     /**
-     * Returns the coordinate reference system, or {@code null} if none.
+     * Returns the coordinate reference system, or {@code null} if unknown.
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return (envelope != null) ? envelope.getCoordinateReferenceSystem() : null;
     }
 
     /**
-     * Computes the <cite>grid to CRS</cite> affine transform. Returns {@code null}
-     * if the transform can not be computed.
+     * Returns the response CRS, or {@code null} if unknown.
+     */
+    public CoordinateReferenceSystem getResponseCRS() {
+        return (responseCRS != null) ? responseCRS : getCoordinateReferenceSystem();
+    }
+
+    /**
+     * Computes the grid geometry. Returns {@code null} if the geometry can not be computed.
+     * The geometry CRS is the one returned by {@link #getCoordinateReferenceSystem()},
+     * not the {@linkplain #getResponseCRS response CRS}.
      *
+     * @return The grid geometry, or {@code null}.
      * @throws WebServiceException if an error occured while querying the layer.
      */
-    public MathTransform getGridToCRS() throws WebServiceException {
-        if (gridToCRS == null) {
-            GridRange       gridRange = this.gridRange;
-            GeneralEnvelope envelope  = this.envelope;
-            if (envelope == null || gridRange == null) {
-                // Computes both properties or none, for making sure that we are consistent.
-                if (envelope != null || gridRange != null) {
-                    return null;
+    public GeneralGridGeometry getGridGeometry() throws WebServiceException {
+        if (gridGeometry == null) {
+            if (gridToCRS != null) {
+                if (envelope == null || envelope.isInfinite()) {
+                    final CoordinateReferenceSystem crs = getCoordinateReferenceSystem();
+                    gridGeometry = new GeneralGridGeometry(gridRange, gridToCRS, crs);
+                } else {
+                    gridGeometry = new GeneralGridGeometry(gridToCRS, envelope);
                 }
-                final Rectangle bounds;
-                final GeographicBoundingBox box;
-                final Layer layer = getLayer();
-                try {
-                    bounds = layer.getBounds();
-                    if (bounds == null) {
-                        return null;
+            } else {
+                GeneralEnvelope envelope = this.envelope;
+                GridRange gridRange = this.gridRange;
+                if (envelope == null || gridRange == null) {
+                    final Layer layer = getLayer();
+                    try {
+                        if (gridRange == null) {
+                            final Rectangle bounds = layer.getBounds();
+                            if (bounds != null) {
+                                gridRange = new GeneralGridRange(bounds);
+                            }
+                        }
+                        if (envelope == null) {
+                            final GeographicBoundingBox box = layer.getGeographicBoundingBox();
+                            if (box != null) {
+                                envelope = new GeneralEnvelope(box);
+                            }
+                        }
+                    } catch (CatalogException exception) {
+                        throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
                     }
-                    box = layer.getGeographicBoundingBox();
-                    if (box == null) {
-                        return null;
-                    }
-                } catch (CatalogException exception) {
-                    throw new WebServiceException(exception, NO_APPLICABLE_CODE, version);
                 }
-                gridRange = new GeneralGridRange(bounds);
-                envelope  = new GeneralEnvelope(box);
+                // We know that gridToCRS is null, but we try to select constructors that accept
+                // null arguments. If we are wrong, an IllegalArgumentException will be thrown.
+                if (envelope == null || envelope.isInfinite()) {
+                    gridGeometry = new GeneralGridGeometry(gridRange, gridToCRS, getCoordinateReferenceSystem());
+                } else if (gridRange != null) {
+                    gridGeometry = new GeneralGridGeometry(gridRange, envelope);
+                } else {
+                    gridGeometry = new GeneralGridGeometry(gridToCRS, envelope);
+                }
             }
-            final GridGeometry2D geometry = new GridGeometry2D(gridRange, envelope);
-            gridToCRS = geometry.getGridToCRS2D();
         }
-        return gridToCRS;
+        return gridGeometry;
     }
 
     /**
@@ -991,34 +1037,27 @@ public class WebServiceWorker {
         }
         if (ref == null) {
             // TODO: provides a better message.
-            throw new WebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY), INVALID_PARAMETER_VALUE, version);
+            throw new WebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                    INVALID_PARAMETER_VALUE, version);
         }
         GridCoverage2D coverage;
         try {
             coverage = ref.getCoverage(null);
         } catch (IOException exception) {
-            throw new WebServiceException(Errors.format(ErrorKeys.CANT_READ_$1, ref.getFile()),
+            Object file = ref.getFile();
+            if (file == null) {
+                file = ref.getName();
+            }
+            throw new WebServiceException(Errors.format(ErrorKeys.CANT_READ_$1, file),
                     exception, LAYER_NOT_QUERYABLE, version);
         }
-        if (resample && envelope != null) {
-            final CoordinateReferenceSystem targetCRS = envelope.getCoordinateReferenceSystem();
-            final Operations op = Operations.DEFAULT;
-            final GridGeometry gridGeometry;
-            if (gridToCRS != null) {
-                gridGeometry = new GeneralGridGeometry(gridToCRS, envelope);
-            } else if (gridRange != null) {
-                if (envelope.isInfinite()) {
-                    gridGeometry = new GeneralGridGeometry(gridRange, null, targetCRS);
-                } else {
-                    gridGeometry = new GeneralGridGeometry(gridRange, envelope);
-                }
-            } else if (envelope.isInfinite()) {
-                gridGeometry = null;
-            } else {
-                coverage = (GridCoverage2D) op.resample(coverage, envelope, interpolation);
-                return coverage;
+        if (resample) {
+            final GridGeometry gridGeometry = getGridGeometry();
+            if (gridGeometry != null) {
+                final Operations op = Operations.DEFAULT;
+                final CoordinateReferenceSystem targetCRS = getResponseCRS();
+                coverage = (GridCoverage2D) op.resample(coverage, targetCRS, gridGeometry, interpolation);
             }
-            coverage = (GridCoverage2D) op.resample(coverage, targetCRS, gridGeometry, interpolation);
         }
         return coverage;
     }
@@ -1033,8 +1072,8 @@ public class WebServiceWorker {
         GridCoverage2D coverage = getGridCoverage2D(true);
         if (service != null) {
             switch (service) {
-                case WMS: coverage = coverage.geophysics(false); break;
-                case WCS: coverage = coverage.geophysics(true);  break;
+                case WMS: coverage = coverage.view(ViewType.RENDERED);   break;
+                case WCS: coverage = coverage.view(ViewType.GEOPHYSICS); break;
             }
         }
         if (colormapRange != null) {
@@ -1103,22 +1142,35 @@ public class WebServiceWorker {
     }
 
     /**
+     * Returns a snapshot of current configuration as an {@link ImageRequest} instance.
+     */
+    private ImageRequest getImageRequest(final ImageType type) throws WebServiceException {
+        final GridGeometry geometry = getGridGeometry();
+        return new ImageRequest(type, layer, geometry, responseCRS, colormapRange,
+                time, elevation, interpolation, format, background, transparent);
+    }
+
+    /**
      * Returns the legend as an image. The {@link #setDimension dimension} and {@link #setFormat
      * format} are honored.
      *
      * @throws WebServiceException if an error occured while processing the legend.
-     *
-     * @todo As an optimization, returns the current file if it still valid. May be worth since
-     *       there is typically one legend by layer.
      */
     public File getLegendFile() throws WebServiceException {
+        final ImageRequest request = getImageRequest(ImageType.LEGEND);
+        if (files != null) {
+            final File file = files.get(request);
+            if (file != null) {
+                return file;
+            }
+        }
         final Dimension dimension;
         if (gridRange != null) {
             dimension = new Dimension(gridRange.getUpper(0), gridRange.getUpper(1));
         } else {
             dimension = new Dimension(200, 40);
         }
-        return getImageFile(getLayer().getLegend(dimension));
+        return getImageFile(request, getLayer().getLegend(dimension));
     }
 
     /**
@@ -1128,11 +1180,23 @@ public class WebServiceWorker {
      * be deleted at JVM exit.
      *
      * @throws WebServiceException if an error occured while processing the image.
-     *
-     * @todo As an optimization, returns the current file if it still valid.
      */
     public File getImageFile() throws WebServiceException {
-        return getImageFile(getRenderedImage());
+        ImageType type = ImageType.COVERAGE; // Default value.
+        if (service != null) {
+            switch (service) {
+                case WMS: type = ImageType.IMAGE;    break;
+                case WCS: type = ImageType.COVERAGE; break;
+            }
+        }
+        final ImageRequest request = getImageRequest(type);
+        if (files != null) {
+            final File file = files.get(request);
+            if (file != null) {
+                return file;
+            }
+        }
+        return getImageFile(request, getRenderedImage());
     }
 
     /**
@@ -1140,9 +1204,10 @@ public class WebServiceWorker {
      * The file is created in the temporary directory, may be overwritten during the next
      * invocation of this method and will be deleted at JVM exit.
      *
+     * @param  request A description of the request.
      * @throws WebServiceException if an error occured while processing the image.
      */
-    private File getImageFile(final RenderedImage image) throws WebServiceException {
+    private File getImageFile(final ImageRequest request, final RenderedImage image) throws WebServiceException {
         RenderedImage formated = image;
         try {
             /*
@@ -1151,14 +1216,14 @@ public class WebServiceWorker {
              * RGB or 8 bits indexed), then we will reformat before to try an other writer.
              */
             if (writer != null) {
-                File file = write(image);
+                File file = write(request, image);
                 if (file != null) {
                     return file;
                 }
                 if (writerNeedsReformat) {
                     formated = reformat(image);
                     if (formated != image) {
-                        file = write(formated);
+                        file = write(request, formated);
                         if (file != null) {
                             return file;
                         }
@@ -1171,12 +1236,12 @@ public class WebServiceWorker {
              * remember that we need to reformat the image in order to get that writer to work.
              */
             final String format = getMimeType();
-            File file = write(image, format);
+            File file = write(request, image, format);
             if (file != null) {
                 return file;
             }
             if (formated != image) {
-                file = write(formated, format);
+                file = write(request, formated, format);
                 if (file != null) {
                     writerNeedsReformat = true;
                     return file;
@@ -1187,7 +1252,7 @@ public class WebServiceWorker {
                     writer = it.next();
                     formated = reformat(image);
                     if (formated != image) {
-                        file = write(formated);
+                        file = write(request, formated);
                         if (file != null) {
                             writerNeedsReformat = true;
                             return file;
@@ -1258,17 +1323,18 @@ public class WebServiceWorker {
      * Attempts to write the given image using a writer of the given format.
      * The current {@linkplain #writer}, if any, is disposed.
      *
+     * @param  request A description of the request.
      * @param  image  The image to write.
      * @param  format The format for the writer to use.
      * @return The file, or {@code null} if no writer is suitable.
      * @throws IOException if an error occured while processing the image.
      */
-    private File write(final RenderedImage image, final String format) throws IOException {
+    private File write(final ImageRequest request, final RenderedImage image, final String format) throws IOException {
         final Iterator<ImageWriter> it = getImageWriter(format);
         while (it.hasNext()) {
             disposeWriter();
             writer = it.next();
-            final File file = write(image);
+            final File file = write(request, image);
             if (file != null) {
                 return file;
             }
@@ -1279,11 +1345,12 @@ public class WebServiceWorker {
     /**
      * Attempts to write the given image using the current {@linkplain #writer writer}.
      *
+     * @param  request A description of the request.
      * @param  image The image to write.
      * @return The file, or {@code null} if the current writer is not suitable.
      * @throws IOException if an error occured while processing the image.
      */
-    private File write(final RenderedImage image) throws IOException {
+    private File write(final ImageRequest request, final RenderedImage image) throws IOException {
         final ImageWriterSpi spi = writer.getOriginatingProvider();
         if (spi != null && !spi.canEncodeImage(image)) {
             return null; // Can not encode the image.
@@ -1321,18 +1388,26 @@ public class WebServiceWorker {
         /*
          * Gets a temporary file, different for every WebServiceWorker instance (so
          * different for every thread if the rule given in the javadoc is respected).
-         * This file will be overwritten for every invocation of this method, in order
-         * to avoid a multiplication of temporary file. It will be deleted on JVM exit.
+         * This file may be overwritten at any invocation of this method, in order to
+         * avoid a multiplication of temporary file. It will be deleted on JVM exit.
          */
         if (files == null) {
-            files = new HashMap<String,File>();
+            files = new ImageRequestMap();
+            final String directory = System.getProperty("java.io.tmpdir");
+            if (directory != null) {
+                temporaryDirectory = new File(directory, "seagis");
+                if (!temporaryDirectory.isDirectory() && !temporaryDirectory.mkdir()) {
+                    temporaryDirectory = null; // Fallback on system default.
+                }
+            }
         }
-        File file = files.get(writerSuffix);
-        if (file == null) {
-            file = File.createTempFile("WCS", writerSuffix);
-            file.deleteOnExit();
-            files.put(writerSuffix, file);
+        File file = files.get(request);
+        if (file != null) {
+            return file;
         }
+        file = File.createTempFile(request.type.name(), writerSuffix, temporaryDirectory);
+        file.deleteOnExit();
+        files.put(request, file);
         /*
          * If the image writer accepts directly file output, uses it. Otherwise we
          * will create an image output stream, which should be accepted by all writers
@@ -1369,22 +1444,25 @@ public class WebServiceWorker {
      * value, if possible.
      */
     public double evaluatePixel(final double x, final double y) throws WebServiceException {
-        final MathTransform gridToCRS = getGridToCRS();
-        if (gridToCRS != null) {
-            this.coordinate = new DirectPosition2D(getCoordinateReferenceSystem(), x, y);
-            try {
-                coordinate = gridToCRS.transform(coordinate, coordinate);
-            } catch (TransformException exception) {
-                throw new WebServiceException(exception, INVALID_POINT, version);
-            }
-            double[] values = null;
-            try {
-                values = getGridCoverage2D(false).evaluate(coordinate, values);
-            } catch (PointOutsideCoverageException exception) {
-                throw new WebServiceException(exception, INVALID_POINT, version);
-            }
-            if (values.length != 0) {
-                return values[0];
+        final GridGeometry gridGeometry = getGridGeometry();
+        if (gridGeometry != null) {
+            final MathTransform gridToCRS = gridGeometry.getGridToCRS();
+            if (gridToCRS != null) {
+                this.coordinate = new DirectPosition2D(getCoordinateReferenceSystem(), x, y);
+                try {
+                    coordinate = gridToCRS.transform(coordinate, coordinate);
+                } catch (TransformException exception) {
+                    throw new WebServiceException(exception, INVALID_POINT, version);
+                }
+                double[] values = null;
+                try {
+                    values = getGridCoverage2D(false).evaluate(coordinate, values);
+                } catch (PointOutsideCoverageException exception) {
+                    throw new WebServiceException(exception, INVALID_POINT, version);
+                }
+                if (values.length != 0) {
+                    return values[0];
+                }
             }
         }
         return Double.NaN;
@@ -1413,8 +1491,19 @@ public class WebServiceWorker {
      * Return the geographic coordinate of a point.
      * This method must be call after evaluatePixel(...) in a getFeatureInfo request.
      */
+    @Deprecated
     public DirectPosition getCoordinates() {
         return this.coordinate;
+    }
+
+    /**
+     * Invoked after a change in envelope, resolution, image size, <cite>grid to CRS</cite>
+     * transform or response CRS.
+     *
+     * @see #getGridGeometry
+     */
+    protected void clearGridGeometry() {
+        gridGeometry = null;
     }
 
     /**
@@ -1437,7 +1526,7 @@ public class WebServiceWorker {
         layerNames       = null;
         layerTable       = null;
         globalLayerTable = null;
-        gridToCRS        = null;
+        clearGridGeometry();
         try {
             database.flush();
         } catch (CatalogException exception) {
