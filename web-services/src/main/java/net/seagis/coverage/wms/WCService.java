@@ -188,7 +188,7 @@ public class WCService extends WebService {
         } catch (WebServiceException ex) {
             
             //we don't print the stack trace if the user have forget a mandatory parameter.
-            if (ex.getServiceExceptionReport().getServiceExceptions().get(0).getCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE) {
+            if (ex.getServiceExceptionReport().getServiceExceptions().get(0).getCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE)) {
                 ex.printStackTrace();
             }
             StringWriter sw = new StringWriter();    
