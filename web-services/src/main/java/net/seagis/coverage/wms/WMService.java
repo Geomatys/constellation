@@ -177,7 +177,10 @@ public class WMService extends WebService {
                                               WMSExceptionCode.OPERATION_NOT_SUPPORTED, getCurrentVersion());
             }
         } catch (WebServiceException ex) {
-            ex.printStackTrace();
+            //we don't print the stack trace if the user have forget a mandatory parameter.
+            if (ex.getServiceExceptionReport().getServiceExceptions().get(0).getCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE) {
+                ex.printStackTrace();
+            }
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
             return Response.Builder.representation(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();

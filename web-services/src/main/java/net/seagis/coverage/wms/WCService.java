@@ -1,6 +1,6 @@
 /*
- * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
- * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -145,14 +145,15 @@ public class WCService extends WebService {
     public Response doPOST(String request) throws JAXBException  {
         logger.info("request: " + request);
         final StringTokenizer tokens = new StringTokenizer(request, "&");
+        String log = "";
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
             String paramName  = token.substring(0, token.indexOf('='));
             String paramValue = token.substring(token.indexOf('=')+ 1);
-            logger.info("put: " + paramName + "=" + paramValue);
+            log += "put: " + paramName + "=" + paramValue + '\n';
             context.getQueryParameters().add(paramName, paramValue);
         }
-        
+        logger.info(log);
         return treatIncommingRequest();
     }
     
@@ -165,7 +166,7 @@ public class WCService extends WebService {
     @Override
     public Response treatIncommingRequest() throws JAXBException {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-
+        writeParameters();
         try {
             String request = (String) getParameter("REQUEST", true);
             if (request.equalsIgnoreCase("DescribeCoverage")) {
@@ -185,7 +186,11 @@ public class WCService extends WebService {
                                               WMSExceptionCode.OPERATION_NOT_SUPPORTED, getCurrentVersion());
             }
         } catch (WebServiceException ex) {
-            ex.printStackTrace();
+            
+            //we don't print the stack trace if the user have forget a mandatory parameter.
+            if (ex.getServiceExceptionReport().getServiceExceptions().get(0).getCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE) {
+                ex.printStackTrace();
+            }
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
             return Response.Builder.representation(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();

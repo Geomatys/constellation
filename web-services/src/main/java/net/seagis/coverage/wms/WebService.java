@@ -1,6 +1,6 @@
 /*
- * Sicade - SystÃƒÂ¨mes intÃƒÂ©grÃƒÂ©s de connaissances pour l'aide ÃƒÂ  la dÃƒÂ©cision en environnement
- * (C) 2005, Institut de Recherche pour le DÃƒÂ©veloppement
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -213,7 +213,7 @@ public abstract class WebService {
     protected void verifyBaseParameter(int sld) throws WebServiceException {  
         if (sld == 2) {
             if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
-                throw new WebServiceException("The parameter VERSION=" + sldVersion + "must be specify",
+                throw new WebServiceException("The parameter VERSION=" + sldVersion + " must be specify",
                                               WMSExceptionCode.MISSING_PARAMETER_VALUE, sldVersion);
             } else {
                 return;
@@ -225,19 +225,19 @@ public abstract class WebService {
             
             String message = "The parameter ";
             for (Version vers:versions){
-                message += "VERSION=" + vers + "OR ";
+                message += "VERSION=" + vers + " OR ";
             }
             message = message.substring(0, message.length()-3);
-            message += "must be specify";
+            message += " must be specify";
             throw new WebServiceException(message,
-                                         WMSExceptionCode.VERSION_NEGOTIATION_FAILED, getCurrentVersion());
+                                         WMSExceptionCode.VERSION_NEGOTIATION_FAILED, null);
         
         } else {
             setCurrentVersion(inputVersion);
         }
         if (sld == 1) {
             if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
-                throw new WebServiceException("The parameter SLD_VERSION=" + sldVersion + "must be specify",
+                throw new WebServiceException("The parameter SLD_VERSION=" + sldVersion + " must be specify",
                                               WMSExceptionCode.VERSION_NEGOTIATION_FAILED, versions.get(0));
             }
         }
