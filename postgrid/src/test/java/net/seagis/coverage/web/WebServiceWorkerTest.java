@@ -71,7 +71,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(IndexColorModel.class, image.getColorModel().getClass());
         IndexColorModel model = (IndexColorModel) image.getColorModel();
         assertEquals(256, model.getMapSize());
-
         /*
          * Forces a crop.
          */
@@ -110,7 +109,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(IndexColorModel.class, image.getColorModel().getClass());
         model = (IndexColorModel) image.getColorModel();
         assertEquals(256, model.getMapSize());
-
         /*
          * Adds a size.
          */
@@ -140,7 +138,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(IndexColorModel.class, image.getColorModel().getClass());
         model = (IndexColorModel) image.getColorModel();
         assertEquals(256, model.getMapSize());
-
         /*
          * Changes only a little bit the envelope.
          */
@@ -167,7 +164,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
         Layer layer = worker.getLayer();
         assertEquals(layer.getName(), LayerTableTest.NETCDF_NAME);
         assertSame("The layer should be cached.", layer, worker.getLayer());
-
         worker.setTime(LayerTableTest.NETCDF_TIME_AS_TEXT);
         assertSame("The layer should be cached.", layer, worker.getLayer());
 
@@ -195,7 +191,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
         } catch (InterruptedException e) {
             // Ignore and go back to work.
         }
-
         String format = worker.getMimeType();
         assertEquals("image/png", format);
 
@@ -207,6 +202,13 @@ public class WebServiceWorkerTest extends DatabaseTest {
         image = ImageIO.read(file);
         assertEquals(720, image.getWidth());
         assertEquals(499, image.getHeight());
+        assertEquals(Transparency.BITMASK, image.getColorModel().getTransparency());
+        /*
+         * Sets an envelope intentionnaly bigger. We want to test the background color.
+         */
+        worker.setBoundingBox("-2.5E7,-1.5E7,2.5E7,1.5E7");
+        file = worker.getImageFile();
+        image = ImageIO.read(file);
         assertEquals(Transparency.BITMASK, image.getColorModel().getTransparency());
     }
 

@@ -71,6 +71,13 @@ public class WebServiceWorker extends ImageProducer {
     private static final Integer AXIS_SWITCH_EXCEPTION = 4326;
 
     /**
+     * The suffix for format that allow 16 bits indexed color model. This is used
+     * mostly for debugging purpose and doesn't need to be mentioned in public API.
+     * {@code "nosd"} is for <cite>no scale down</cite> from 16 to 8 bits.
+     */
+    private static final String NO_SCALE_DOWN = "-nosd";
+
+    /**
      * List of valid formats. Will be created only when first needed.
      */
     private transient Set<String> formats;
@@ -511,10 +518,15 @@ public class WebServiceWorker extends ImageProducer {
      * @throws WebServiceException if the format is invalid.
      */
     public void setFormat(String format) throws WebServiceException {
+        indexedShortAllowed = false;
         if (format == null) {
             this.format = null;
         } else {
             format = format.trim();
+            if (format.endsWith(NO_SCALE_DOWN)) {
+                format = format.substring(0, format.length() - NO_SCALE_DOWN.length());
+                indexedShortAllowed = true;
+            }
             if (!format.equals(this.format)) {
                 if (formats == null) {
                     formats = new HashSet<String>(Arrays.asList(ImageIO.getWriterMIMETypes()));

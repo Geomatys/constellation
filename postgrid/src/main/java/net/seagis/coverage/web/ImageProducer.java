@@ -226,6 +226,12 @@ public abstract class ImageProducer {
     protected String format;
 
     /**
+     * {@code true} if {@linkplain IndexColorModel index color model} are allowed to
+     * store sample value with more than 8 bits. The default value is {@code false}.
+     */
+    protected boolean indexedShortAllowed;
+
+    /**
      * The temporary file in which an image is written. Will be created when first needed,
      * overwritten everytime a new request is performed and deleted on JVM exit. Different
      * files are used for different suffix.
@@ -600,6 +606,9 @@ public abstract class ImageProducer {
             coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[] {colorMap});
         }
         RenderedImage image = coverage.getRenderedImage();
+        if (indexedShortAllowed) {
+            return image;
+        }
         /*
          * If the image is not geophysics and is indexed on 16 bits, then rescale the image to 8
          * bits while preserving the colors. TODO: this algorithm is simplist and doesn't consider
