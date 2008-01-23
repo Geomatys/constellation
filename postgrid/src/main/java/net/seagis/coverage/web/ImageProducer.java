@@ -229,7 +229,7 @@ public abstract class ImageProducer {
      * {@code true} if {@linkplain IndexColorModel index color model} are allowed to
      * store sample value with more than 8 bits. The default value is {@code false}.
      */
-    protected boolean indexedShortAllowed;
+    boolean indexedShortAllowed;
 
     /**
      * The temporary file in which an image is written. Will be created when first needed,

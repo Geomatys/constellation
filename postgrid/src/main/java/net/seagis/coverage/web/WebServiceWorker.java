@@ -523,8 +523,12 @@ public class WebServiceWorker extends ImageProducer {
             this.format = null;
         } else {
             format = format.trim();
-            if (format.endsWith(NO_SCALE_DOWN)) {
+            final String formatLC = format.toLowerCase();
+            if (formatLC.endsWith(NO_SCALE_DOWN)) {
                 format = format.substring(0, format.length() - NO_SCALE_DOWN.length());
+                indexedShortAllowed = true;
+            } else if (!formatLC.endsWith("png")) {
+                // Formats like jpeg can work with 16-bits.
                 indexedShortAllowed = true;
             }
             if (!format.equals(this.format)) {
