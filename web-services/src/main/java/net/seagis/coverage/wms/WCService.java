@@ -31,6 +31,7 @@ import javax.xml.bind.UnmarshalException;
 // jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,6 +55,11 @@ import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.gml.CodeListType;
 import net.seagis.gml.DirectPositionType;
+import net.seagis.gml.EnvelopeEntry;
+import net.seagis.gml.GridEnvelopeType;
+import net.seagis.gml.GridLimitsType;
+import net.seagis.gml.GridType;
+import net.seagis.gml.RectifiedGridType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.ows.BoundingBoxType;
 import net.seagis.ows.KeywordsType;
@@ -86,23 +92,34 @@ import net.seagis.wcs.DescribeCoverage;
 import net.seagis.wcs.DescribeCoverage;
 import net.seagis.wcs.DescribeCoverage;
 import net.seagis.wcs.DomainSetType;
+import net.seagis.wcs.DomainSubsetType;
 import net.seagis.wcs.FieldType;
+import net.seagis.wcs.GetCapabilities;
+import net.seagis.wcs.GetCoverage;
 import net.seagis.wcs.InterpolationMethod;
 import net.seagis.wcs.InterpolationMethodType;
 import net.seagis.wcs.InterpolationMethods;
 import net.seagis.wcs.Keywords;
 import net.seagis.wcs.LonLatEnvelopeType;
+import net.seagis.wcs.OutputType;
 import net.seagis.wcs.RangeSet;
 import net.seagis.wcs.RangeSetType;
+import net.seagis.wcs.RangeSubsetType;
 import net.seagis.wcs.SupportedCRSsType;
 import net.seagis.wcs.SpatialDomainType;
+import net.seagis.wcs.SpatialSubsetType;
 import net.seagis.wcs.SupportedFormatsType;
 import net.seagis.wcs.SupportedInterpolationsType;
 import net.seagis.wcs.TimeSequenceType;
 import net.seagis.wcs.WCSCapabilitiesType;
+import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 // geoAPI dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
+
+// geoTools dependencies
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 /**
  *
@@ -186,7 +203,7 @@ public class WCService extends WebService {
         } catch (UnmarshalException e) {
             logger.severe(e.getMessage());
             WebServiceException wse = new WebServiceException("The XML request is not valid",
-                                       WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
             StringWriter sw = new StringWriter(); 
             marshaller.marshal(wse.getServiceExceptionReport(), sw);
             return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
@@ -210,10 +227,18 @@ public class WCService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
             writeParameters();
-            String request = (String) getParameter("REQUEST", true);
+            String request = "";
+            if (objectRequest == null)
+                request = (String) getParameter("REQUEST", true);
+            
             if (request.equalsIgnoreCase("DescribeCoverage") || (objectRequest instanceof DescribeCoverage)) {
+                
                 DescribeCoverage dc = (DescribeCoverage)objectRequest;
                 verifyBaseParameter(0);
+                /*
+                 * if the parameters have been send by GET or POST kvp,
+                 * we build a request object with this parameter.
+                 */ 
                 if (dc == null) {
                     String identifiers;
                     if (getCurrentVersion().toString().equals("1.0.0")) {
@@ -223,24 +248,137 @@ public class WCService extends WebService {
                     }
                     dc = new DescribeCoverage(getCurrentVersion().toString(), identifiers);
                 }
+                
                 return Response.ok(describeCoverage(dc), "text/xml").build();
                     
-            } else if (request.equalsIgnoreCase("GetCapabilities")) {
+            } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
+                
+                GetCapabilities gc = (GetCapabilities)objectRequest;
+                /*
+                 * if the parameters have been send by GET or POST kvp,
+                 * we build a request object with this parameter.
+                 */
+                if (gc == null) {
+                    if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
+                        throw new WebServiceException("The parameters SERVICE=WCS must be specify",
+                                         MISSING_PARAMETER_VALUE, getCurrentVersion());
+                    }
+                    gc = new GetCapabilities(getParameter("VERSION", false),
+                                             getParameter("SECTION", false),
+                                             null);
+                }
+                return getCapabilities(gc);
                     
-                return getCapabilities();
+            } else if (request.equalsIgnoreCase("GetCoverage") || (objectRequest instanceof GetCoverage)) {
+                
+                GetCoverage gc = (GetCoverage)objectRequest;
+                verifyBaseParameter(0);
+                
+                /*
+                 * if the parameters have been send by GET or POST kvp,
+                 * we build a request object with this parameter.
+                 */
+                if (gc == null) {
                     
-            } else if (request.equalsIgnoreCase("GetCoverage")) {
+                    // temporal subset
+                    TimeSequenceType temporal = null;
+                    String timeParameter = getParameter("time", false);
+                    if (timeParameter != null) {
+                        TimePositionType time     = new TimePositionType(timeParameter);
+                        temporal = new TimeSequenceType(time); 
+                    }
                     
-                return Response.ok(getCoverage(), webServiceWorker.getMimeType()).build();
+                    /*
+                     * spatial subset
+                     */
+                    // the boundingBox/envelope
+                    List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+                    String bbox          = getParameter("bbox", false);
+                    if (bbox != null) {
+                        StringTokenizer tokens = new StringTokenizer(bbox, ",;");
+                        Double[] coordinates = new Double[tokens.countTokens()];
+                        int i = 0;
+                        while (tokens.hasMoreTokens()) {
+                            Double value = parseDouble(tokens.nextToken());
+                            coordinates[i] = value;
+                            i++;
+                        }
+                    
+                        pos.add(new DirectPositionType(coordinates[0], coordinates[2]));
+                        pos.add(new DirectPositionType(coordinates[1], coordinates[3]));
+                    }
+                    EnvelopeEntry envelope    = new EnvelopeEntry(pos, getParameter("CRS", true));
+                    
+                    // the grid dimensions.
+                    GridType grid = null;
+                    
+                    String width  = getParameter("width",  false);
+                    String height = getParameter("height", false);
+                    String depth  = getParameter("depth", false);
+                    if (width == null || height == null) {
+                        //TODO
+                        grid = new RectifiedGridType();
+                        String resx = getParameter("resx",  false);
+                        String resy = getParameter("resy",  false);
+                        String resz = getParameter("resz",  false);
+                
+                        if (resx == null || resy == null) {
+                            throw new WebServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
+                                                          INVALID_PARAMETER_VALUE, getCurrentVersion());
+                        }
+                    } else {
+                        List<String> axis         = new ArrayList<String>();
+                        axis.add("width");
+                        axis.add("height");
+                        List<BigInteger> low = new ArrayList<BigInteger>();
+                        low.add(new BigInteger("0"));
+                        low.add(new BigInteger("0"));
+                        List<BigInteger> high = new ArrayList<BigInteger>();
+                        high.add(new BigInteger(width));
+                        high.add(new BigInteger(height));
+                        if (depth != null) {
+                            axis.add("depth");
+                            low.add(new BigInteger("0"));
+                            high.add(new BigInteger(depth));
+                        }
+                        GridLimitsType limits     = new GridLimitsType(low, high);
+                        grid        = new GridType(limits, axis);
+                    }
+                    SpatialSubsetType spatial = new SpatialSubsetType(envelope, grid);
+                    
+                    //domain subset
+                    DomainSubsetType domain   = new DomainSubsetType(temporal, spatial);
+                    
+                    //range subset (not yet used)
+                    RangeSubsetType  range    = null;
+                    
+                    //interpolation method
+                    InterpolationMethodType interpolation = new InterpolationMethodType(getParameter("interpolation", false), null);
+                    
+                    //output
+                    OutputType output         = new OutputType(getParameter("format", true),
+                                                               getParameter("response_crs", false));
+                    
+                    gc = new GetCoverage(getParameter("coverage", true),
+                                         domain,
+                                         range,
+                                         interpolation,
+                                         output,
+                                         getCurrentVersion().toString());
+                }
+                return Response.ok(getCoverage(gc), webServiceWorker.getMimeType()).build();
                      
             } else {
                 throw new WebServiceException("The operation " + request + " is not supported by the service",
-                                              WMSExceptionCode.OPERATION_NOT_SUPPORTED, getCurrentVersion());
+                                              OPERATION_NOT_SUPPORTED, getCurrentVersion());
             }
         } catch (WebServiceException ex) {
-            
-            //we don't print the stack trace if the user have forget a mandatory parameter.
-            if (!ex.getServiceExceptionReport().getServiceExceptions().get(0).getCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE)) {
+            /* We don't print the stack trace:
+             * - if the user have forget a mandatory parameter.
+             * - if the version number is wrong.
+             */
+            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
                 ex.printStackTrace();
             }
             StringWriter sw = new StringWriter();    
@@ -252,17 +390,12 @@ public class WCService extends WebService {
     /**
      * Web service operation
      */ 
-    public Response getCapabilities() throws JAXBException, WebServiceException {
+    public Response getCapabilities(GetCapabilities request) throws JAXBException, WebServiceException {
         logger.info("getCapabilities request received");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         //we begin by extract the base attribute
-        if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
-            throw new WebServiceException("The parameters SERVICE=WCS must be specify",
-                                         WMSExceptionCode.MISSING_PARAMETER_VALUE, getCurrentVersion());
-        }
-        
-        String inputVersion = getParameter("VERSION", false);
+        String inputVersion = request.getVersion();       
         if(inputVersion != null && inputVersion.equals("1.1.1")) {
             setCurrentVersion("1.1.1");
         } else {
@@ -284,7 +417,7 @@ public class WCService extends WebService {
             } else {
                 if (!format.equals("text/xml") && !format.equals("application/vnd.ogc.se_xml")){
                     throw new WebServiceException("This format " + format + " is not allowed",
-                                       WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
                 }
             }
             
@@ -299,7 +432,7 @@ public class WCService extends WebService {
                         requestedSections.add(token);
                     } else {
                         throw new WebServiceException("The section " + token + " does not exist",
-                                                 WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                                 INVALID_PARAMETER_VALUE, getCurrentVersion());
                     }
                 }
             } else {
@@ -340,14 +473,14 @@ public class WCService extends WebService {
              * In WCS 1.0.0 the user can request only one section 
              * ( or all by ommiting the parameter section)
              */ 
-            String section = getParameter("SECTION", false);
+            String section = request.getSection();
             String requestedSection = null;
             if (section != null) {
                 if (SectionsType.getExistingSections("1.0.0").contains(section)){
                     requestedSection = section;
                 } else {
                     throw new WebServiceException("The section " + section + " does not exist",
-                                          WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                          INVALID_PARAMETER_VALUE, getCurrentVersion());
                }
                contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata"); 
             }
@@ -355,10 +488,10 @@ public class WCService extends WebService {
             
             if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
                 //we update the url in the static part.
-                Request request = staticCapabilities.getCapability().getRequest(); 
-                updateURL(request.getGetCapabilities().getDCPType());
-                updateURL(request.getDescribeCoverage().getDCPType());
-                updateURL(request.getGetCoverage().getDCPType());
+                Request req = staticCapabilities.getCapability().getRequest(); 
+                updateURL(req.getGetCapabilities().getDCPType());
+                updateURL(req.getDescribeCoverage().getDCPType());
+                updateURL(req.getGetCoverage().getDCPType());
             }
             
             if (requestedSection == null || contentMeta  || requestedSection.equals("/")) {
@@ -429,7 +562,7 @@ public class WCService extends WebService {
             contents        = new Contents(summary, null, null, null);    
             contentMetadata = new ContentMetadata("1.0.0", offBrief); 
         } catch (CatalogException exception) {
-            throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, getCurrentVersion());
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
         }
             
         
@@ -454,13 +587,12 @@ public class WCService extends WebService {
     /**
      * Web service operation
      */
-    public File getCoverage() throws JAXBException, WebServiceException {
+    public File getCoverage(GetCoverage request) throws JAXBException, WebServiceException {
         logger.info("getCoverage recu");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
-        verifyBaseParameter(0);
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
-        String format, coverage, crs, bbox, time, interpolation, exceptions;
+        String format, coverage, crs, bbox = "", time = null , interpolation, exceptions;
         String width = null, height = null, depth = null;
         String resx  = null, resy   = null, resz  = null;
         String gridType, gridOrigin = null, gridOffsets = null, gridCS, gridBaseCrs;
@@ -487,7 +619,7 @@ public class WCService extends WebService {
                 bbox = bbox.substring(0, bbox.lastIndexOf(','));
             } else {
                 throw new WebServiceException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
-                            WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                            INVALID_PARAMETER_VALUE, getCurrentVersion());
             } 
             time = getParameter("timeSequence", false);
             
@@ -511,7 +643,7 @@ public class WCService extends WebService {
                     interpolation = rangeSubset.substring(rangeSubset.indexOf(':')+ 1, rangeSubset.length());
                 } else {
                     throw new WebServiceException("The field " + fieldId + " is not present in this coverage" , 
-                            WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                            INVALID_PARAMETER_VALUE, getCurrentVersion());
                 }
             } else {
                 interpolation = null;
@@ -554,30 +686,67 @@ public class WCService extends WebService {
         } else {
             
             // parameter for 1.0.0 version
-            format        = getParameter("format", true);
-            coverage      = getParameter("coverage", true);
-            crs           = getParameter("CRS", true);
-            bbox          = getParameter("bbox", false);
-            time          = getParameter("time", false);
-            interpolation = getParameter("interpolation", false);
-            exceptions    = getParameter("exceptions", false);
-            responseCRS   = getParameter("response_crs", false);
+            if (request.getOutput().getFormat()!= null) {
+                format    = request.getOutput().getFormat().getValue();
+            } else {
+                throw new WebServiceException("The parameters Format have to be specified",
+                                              MISSING_PARAMETER_VALUE, getCurrentVersion());
+            }
             
+            coverage      = request.getSourceCoverage();
+            if (coverage == null) {
+                throw new WebServiceException("The parameters sourceCoverage have to be specified",
+                                              MISSING_PARAMETER_VALUE, getCurrentVersion());
+            }
+            interpolation = request.getInterpolationMethod().getValue();
+            exceptions    = getParameter("exceptions", false);
+            responseCRS   = request.getOutput().getCrs().getValue();
+            
+            //for now we only handle one time parameter with timePosition type
+            TimeSequenceType temporalSubset = request.getDomainSubset().getTemporalSubSet(); 
+            if (temporalSubset != null) {
+                for (Object timeObj:temporalSubset.getTimePositionOrTimePeriod()){
+                    if (timeObj instanceof TimePositionType) {
+                        time  = ((TimePositionType)timeObj).getValue().get(0);
+                    }
+                }
+            }
+            SpatialSubsetType spatial = request.getDomainSubset().getSpatialSubSet();
+            EnvelopeEntry env = spatial.getEnvelope();
+            crs               = env.getSrsName();
+            //TODO remplacer les param dans webServiceWorker
+            if (env.getPos().size() > 1) { 
+                bbox  = env.getPos().get(0).getValue().get(0).toString() + ',';
+                bbox += env.getPos().get(1).getValue().get(0).toString() + ',';
+                bbox += env.getPos().get(0).getValue().get(1).toString() + ',';
+                bbox += env.getPos().get(1).getValue().get(1).toString();
+            }
+            
+            if (temporalSubset == null && env.getPos().size() == 0) {
+                        throw new WebServiceException("The parameters BBOX or TIME have to be specified" , 
+                                                      MISSING_PARAMETER_VALUE, getCurrentVersion());
+            }
             /* here the parameter width and height (and depth for 3D matrix)
              *  have to be fill. If not they can be replace by resx and resy 
              * (resz for 3D grid)
              */
-            width         = getParameter("width",  false);
-            height        = getParameter("height", false);
-            depth         = getParameter("depth", false);
-            if (width == null || height == null) {
+            GridType grid = spatial.getGrid();
+            if (grid instanceof RectifiedGridType){
                 resx = getParameter("resx",  false);
                 resy = getParameter("resy",  false);
                 resz = getParameter("resz",  false);
-                
-                if (resx == null || resy == null) {
-                    throw new WebServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
-                              WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+           
+            } else {
+                GridEnvelopeType gridEnv = grid.getLimits().getGridEnvelope();
+                if (gridEnv.getHigh().size() > 0) {
+                    width         = gridEnv.getHigh().get(0).toString();
+                    height        = gridEnv.getHigh().get(1).toString();
+                    if (gridEnv.getHigh().size() == 3) {
+                        depth     = gridEnv.getHigh().get(2).toString();
+                    }
+                } else {
+                     throw new WebServiceException("you must specify grid size or resolution" , 
+                                                   MISSING_PARAMETER_VALUE, getCurrentVersion());
                 }
             }
         }
@@ -619,7 +788,7 @@ public class WCService extends WebService {
         String store = getParameter("STORE", false);
         if (store!= null && store.equals("true")) {
              throw new WebServiceException("The service does not implement the store mechanism", 
-                     WMSExceptionCode.NO_APPLICABLE_CODE, getCurrentVersion());
+                     NO_APPLICABLE_CODE, getCurrentVersion());
         }
         
         //we prepare the response object to return
@@ -796,7 +965,7 @@ public class WCService extends WebService {
         return sw.toString();
         
         } catch (CatalogException exception) {
-            throw new WebServiceException(exception, WMSExceptionCode.NO_APPLICABLE_CODE, getCurrentVersion());
+            throw new WebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
         }
     }
 
@@ -823,6 +992,21 @@ public class WCService extends WebService {
     @Override
     protected UriInfo getContext() {
         return this.context;
+    }
+    
+    /**
+     * Parses a value as a floating point.
+     *
+     * @throws WebServiceException if the value can't be parsed.
+     */
+    private double parseDouble(String value) throws WebServiceException {
+        value = value.trim();
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException exception) {
+            throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value),
+                    exception, INVALID_PARAMETER_VALUE, getCurrentVersion());
+        }
     }
 }
 

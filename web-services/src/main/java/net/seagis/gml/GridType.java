@@ -67,8 +67,25 @@ public class GridType extends AbstractGeometryType {
     private List<String> axisName;
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger dimension;
+    private Integer dimension;
 
+    /**
+     * Empty constructor used by JAXB
+     */
+    GridType() {
+    }
+    
+    /**
+     * Build a new GridType.
+     */
+    public GridType(GridLimitsType limits, List<String> axisName) {
+        this.axisName = axisName;
+        if (axisName != null) {
+            dimension = axisName.size();
+        }
+        this.limits = limits; 
+    }
+    
     /**
      * Gets the value of the limits property.
      */
@@ -86,7 +103,7 @@ public class GridType extends AbstractGeometryType {
     /**
      * Gets the value of the dimension property.
      */
-    public BigInteger getDimension() {
+    public Integer getDimension() {
         return dimension;
     }
 }

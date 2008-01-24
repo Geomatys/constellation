@@ -54,7 +54,7 @@ import net.seagis.gml.DirectPositionType;
 })
 public class LonLatEnvelopeBaseType extends EnvelopeEntry {
     
-    public LonLatEnvelopeBaseType(){
+    LonLatEnvelopeBaseType(){
     }
     
     public LonLatEnvelopeBaseType(List<DirectPositionType> pos, String srsName) {

@@ -45,6 +45,7 @@ import javax.xml.bind.Marshaller;
 import net.seagis.catalog.Database;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 /**
  *
@@ -177,7 +178,7 @@ public abstract class WebService {
                     v = currentVersion;
                 }
                 throw new WebServiceException("The parameter " + parameterName + " must be specify",
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, v);
+                                              MISSING_PARAMETER_VALUE, v);
             } else {
                 return null;
             }
@@ -214,7 +215,7 @@ public abstract class WebService {
         if (sld == 2) {
             if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
                 throw new WebServiceException("The parameter VERSION=" + sldVersion + " must be specify",
-                                              WMSExceptionCode.MISSING_PARAMETER_VALUE, sldVersion);
+                                              MISSING_PARAMETER_VALUE, sldVersion);
             } else {
                 return;
             }
@@ -229,8 +230,7 @@ public abstract class WebService {
             }
             message = message.substring(0, message.length()-3);
             message += " must be specify";
-            throw new WebServiceException(message,
-                                         WMSExceptionCode.VERSION_NEGOTIATION_FAILED, null);
+            throw new WebServiceException(message, VERSION_NEGOTIATION_FAILED, null);
         
         } else {
             setCurrentVersion(inputVersion);
@@ -238,7 +238,7 @@ public abstract class WebService {
         if (sld == 1) {
             if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
                 throw new WebServiceException("The parameter SLD_VERSION=" + sldVersion + " must be specify",
-                                              WMSExceptionCode.VERSION_NEGOTIATION_FAILED, versions.get(0));
+                                              VERSION_NEGOTIATION_FAILED, versions.get(0));
             }
         }
     } 
@@ -266,7 +266,7 @@ public abstract class WebService {
                     if (!mandatory) {
                         return null;
                     } else {
-                        throw new WebServiceException("The parameter " + parameterName + " must be specify", WMSExceptionCode.MISSING_PARAMETER_VALUE, getCurrentVersion());
+                        throw new WebServiceException("The parameter " + parameterName + " must be specify", MISSING_PARAMETER_VALUE, getCurrentVersion());
                     }
                 }
             }
@@ -275,8 +275,7 @@ public abstract class WebService {
             return result;
         } catch (JAXBException ex) {
              throw new WebServiceException("the xml object for parameter" + parameterName + " is not well formed:" + '\n' +
-                                           ex,
-                                           WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                           ex, INVALID_PARAMETER_VALUE, getCurrentVersion());
         }
     }
    
@@ -369,6 +368,7 @@ public abstract class WebService {
             s = s.replace('é', 'e');
             s = s.replace('è', 'e');
             s = s.replace('à', 'a');
+            s = s.replace('É', 'E');
         }
         return s;
     }

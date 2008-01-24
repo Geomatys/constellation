@@ -89,7 +89,7 @@ public class SpatialDomainType {
      * WCS version 1.0.0 attribute
      */ 
     @XmlElementRef(name = "Envelope", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
-    private List<JAXBElement<? extends EnvelopeEntry>> envelope = new ArrayList<JAXBElement<? extends EnvelopeEntry>>();
+    private List<JAXBElement<? extends EnvelopeEntry>> envelope;
     @XmlElementRef(name = "Grid", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     private List<JAXBElement<? extends GridType>> grid;
     
@@ -111,8 +111,20 @@ public class SpatialDomainType {
      * Build a new light Spatial Domain type version 1.0.0
      */
     public SpatialDomainType(EnvelopeEntry envelope) {
-        ObjectFactory gmlFactory = new ObjectFactory();
+       ObjectFactory gmlFactory = new ObjectFactory();
+       this.envelope = new ArrayList<JAXBElement<? extends EnvelopeEntry>>();
        this.envelope.add(gmlFactory.createEnvelope(envelope));
+    }
+    
+    /**
+     * Build a new light Spatial Domain type version 1.0.0
+     */
+    public SpatialDomainType(EnvelopeEntry envelope, GridType grid) {
+       ObjectFactory gmlFactory = new ObjectFactory();
+       this.envelope = new ArrayList<JAXBElement<? extends EnvelopeEntry>>();
+       this.envelope.add(gmlFactory.createEnvelope(envelope));
+       this.grid     = new ArrayList<JAXBElement<? extends GridType>>();
+       this.grid.add(gmlFactory.createGrid(grid));
     }
     
     /**
@@ -181,6 +193,28 @@ public class SpatialDomainType {
      */
     public ImageCRSRefType getImageCRS() {
         return imageCRS;
+    }
+    
+     /**
+     * Gets the value of the envelope.
+     * 
+     */
+    public EnvelopeEntry getEnvelope() {
+        if (envelope != null && envelope.size() >0) {
+            return envelope.get(0).getValue();
+        }
+        return null;
+    }
+    
+    /**
+     * Gets the value of the grid.
+     * 
+     */
+    public GridType getGrid() {
+        if (grid != null && grid.size() >0) {
+            return grid.get(0).getValue();
+        }
+        return null;
     }
 
     /**

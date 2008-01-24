@@ -63,6 +63,26 @@ public class GetCapabilities extends AbstractRequest {
     private String updateSequence;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    GetCapabilities(){
+    }
+    
+    /**
+     * Build a new getCapabilities request.
+     */
+    public GetCapabilities(String version, String section, String updateSequence){
+        this.version        = version;
+        this.updateSequence = updateSequence;
+        if (section == null) {
+            section = "/";
+        } else {
+            this.section        = section;
+        }
+        this.service        = "WCS";
+    }
+    
+    /**
      * return the requested section.
      * 
      * values possible in WCS 1.0.0:
@@ -87,11 +107,7 @@ public class GetCapabilities extends AbstractRequest {
      * Return the version of the service.
      */
     public String getVersion() {
-        if (version == null) {
-            return "1.0.0";
-        } else {
-            return version;
-        }
+        return version;
     }
 
     /**

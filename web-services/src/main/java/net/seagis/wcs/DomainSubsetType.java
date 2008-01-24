@@ -65,6 +65,34 @@ public class DomainSubsetType {
     private List<JAXBElement<?>> content;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    DomainSubsetType() {
+        
+    }
+    
+    /**
+     * Build a new Domain subset with the specified spatial
+     * and temporal subset
+     */
+    public DomainSubsetType(TimeSequenceType temporalSubset, SpatialSubsetType spatialSubset) {
+        this.content = new ArrayList<JAXBElement<?>>();
+        net.seagis.wcs.ObjectFactory factory = new net.seagis.wcs.ObjectFactory();
+        if (temporalSubset != null)
+            content.add(factory.createTemporalSubset(temporalSubset));
+        if (spatialSubset != null)
+        content.add(factory.createSpatialSubset(spatialSubset));
+    }
+    
+    /**
+     * Build a new Domain subset with a list of JAXB element
+     */
+    public DomainSubsetType(List<JAXBElement<?>> content) {
+        this.content = content;
+        
+    }
+    
+    /**
      * Gets the rest of the content model.
      * (unmodifiable) 
      */
@@ -73,6 +101,30 @@ public class DomainSubsetType {
             content = new ArrayList<JAXBElement<?>>();
         }
         return Collections.unmodifiableList(content);
+    }
+    
+    /**
+     * Return the temporal subSet. 
+     */
+    public TimeSequenceType getTemporalSubSet() {
+        for (JAXBElement<?> element: content) {
+            if (element.getName().getLocalPart().equals("temporalSubset")) {
+                return (TimeSequenceType)element.getValue();
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Return the spatial subSet. 
+     */
+    public SpatialSubsetType getSpatialSubSet() {
+        for (JAXBElement<?> element: content) {
+            if (element.getName().getLocalPart().equals("spatialSubset")) {
+                return (SpatialSubsetType)element.getValue();
+            }
+        }
+        return null;
     }
 
 }

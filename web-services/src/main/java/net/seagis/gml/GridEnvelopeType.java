@@ -17,6 +17,7 @@
 package net.seagis.gml;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -63,9 +64,27 @@ public class GridEnvelopeType {
     private List<BigInteger> high;
 
     /**
+     * Empty constructor used by JAXB
+     */
+    GridEnvelopeType(){
+        
+    }
+    
+    /**
+     * Build a new Grid envelope
+     */
+    public GridEnvelopeType(List<BigInteger> low, List<BigInteger> high){
+        this.high = high;
+        this.low  = low;
+    }
+    
+    /**
      * Gets the value of the low property.
      */
     public List<BigInteger> getLow() {
+        if (low == null){
+            low = new ArrayList<BigInteger>();
+        }
         return Collections.unmodifiableList(low);
     }
 
@@ -73,6 +92,9 @@ public class GridEnvelopeType {
      * Gets the value of the high property.
      */
     public List<BigInteger> getHigh() {
+        if (high == null){
+            high = new ArrayList<BigInteger>();
+        }
         return Collections.unmodifiableList(high);
     }
 

@@ -121,10 +121,6 @@ public class DescribeCoverage extends AbstractRequest {
      * Return the version of the service.
      */
     public String getVersion() {
-        if (version == null) {
-            return "1.0.0";
-        } else {
-            return version;
-        }
+        return version;
     }
 }

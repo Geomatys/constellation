@@ -16,6 +16,8 @@
 
 package net.seagis.gml;
 
+import java.math.BigInteger;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -49,7 +51,27 @@ public class GridLimitsType {
 
     @XmlElement(name = "GridEnvelope", required = true)
     private GridEnvelopeType gridEnvelope;
-
+    
+    /**
+     * An empty constructor used by JAXB.
+     */
+    GridLimitsType(){
+    }
+    
+    /**
+     * Build a new Grid limits
+     */
+    public GridLimitsType(GridEnvelopeType gridEnvelope){
+        this.gridEnvelope = gridEnvelope;
+    }
+    
+    /**
+     * Build a new Grid limits
+     */
+    public GridLimitsType(List<BigInteger> low, List<BigInteger> high){
+        this.gridEnvelope = new GridEnvelopeType(low, high);
+    }
+    
     /**
      * Gets the value of the gridEnvelope property.
      */

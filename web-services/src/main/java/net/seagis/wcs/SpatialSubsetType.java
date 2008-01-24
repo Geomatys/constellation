@@ -19,6 +19,8 @@ package net.seagis.wcs;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.gml.EnvelopeEntry;
+import net.seagis.gml.GridType;
 
 
 /**
@@ -42,10 +44,25 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SpatialSubsetType")
 public class SpatialSubsetType extends SpatialDomainType {
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    SpatialSubsetType(){
+    }
+    
+    /**
+     * Build a new Spatial subset.
+     */
+    public SpatialSubsetType(EnvelopeEntry envelope, GridType grid){
+        super(envelope, grid);
+    }
+    
+    
 
 }

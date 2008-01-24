@@ -69,6 +69,8 @@ public class TimeSequenceType {
     
     /**
      * build a new time sequence.
+     * 
+     * @param timePositionOrTimePeriod a list of timePosition and timePeriod
      */
     public TimeSequenceType(List<Object> timePositionOrTimePeriod) {
         this.timePositionOrTimePeriod = timePositionOrTimePeriod;
@@ -76,9 +78,23 @@ public class TimeSequenceType {
     }
     
     /**
+     * build a new time sequence with a simple timePosition.
+     * 
+     * @param timePosition a simple timePosition
+     */
+    public TimeSequenceType(TimePositionType timePosition) {
+        timePositionOrTimePeriod = new ArrayList<Object>();
+        timePositionOrTimePeriod.add(timePosition);
+    }
+    
+    /**
      * Gets the value of the timePositionOrTimePeriod property.
+     * (unmodifable)
      */
     public List<Object> getTimePositionOrTimePeriod() {
+        if (timePositionOrTimePeriod == null) {
+            timePositionOrTimePeriod = new ArrayList<Object>();
+        }
         return Collections.unmodifiableList(timePositionOrTimePeriod);
     }
 

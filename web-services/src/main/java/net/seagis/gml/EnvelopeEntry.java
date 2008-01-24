@@ -62,12 +62,12 @@ public class EnvelopeEntry extends Entry {
     private List<String> uomLabels;
 
     /**
-     * Un constructeur vide utilis par JAXB.
+     * An empty constructor used by JAXB.
      */
-    public EnvelopeEntry(){}
+    protected EnvelopeEntry(){}
     
     /**
-     * Construit une nouvelle envelope.  
+     * build a new envelope.  
      */
     public EnvelopeEntry(String id, DirectPositionType lowerCorner, DirectPositionType upperCorner
             , String srsName) {
@@ -79,7 +79,7 @@ public class EnvelopeEntry extends Entry {
     }
     
     /**
-     * Construit une nouvelle envelope.  
+     * build a new envelope.  
      */
     public EnvelopeEntry(List<DirectPositionType> pos, String srsName) {
         this.srsName      = srsName;

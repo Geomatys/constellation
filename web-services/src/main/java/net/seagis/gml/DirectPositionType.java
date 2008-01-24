@@ -2,6 +2,7 @@
 package net.seagis.gml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -33,8 +34,18 @@ public class DirectPositionType {
     @XmlAttribute
     private List<String> uomLabels;
 
-    public DirectPositionType() {}
+    /**
+     * Empty constructor used by JAXB.
+     */
+    DirectPositionType() {}
     
+    /**
+     * Build a full Direct position.
+     * @param srsName
+     * @param srsDimension
+     * @param axisLabels
+     * @param value
+     */
     public DirectPositionType(String srsName, int srsDimension, List<String> axisLabels, List<Double> value) {
         this.srsName      = srsName;
         this.srsDimension = srsDimension;
@@ -42,129 +53,79 @@ public class DirectPositionType {
         this.value = value;
     }
     
+    /**
+     * Build a light direct position.
+     * 
+     * @param value a List of coordinates.
+     */
     public DirectPositionType(List<Double> value) {
         this.value = value;
         this.srsDimension = null;
-    }  
+    }
+    
     /**
-     * A type for a list of values of the respective simple type.Gets the value of the value property.
+     * Build a light direct position.
      * 
+     * @param values a List of coordinates.
+     */
+    public DirectPositionType(Double... values) {
+        this.value = new ArrayList<Double>();
+        for (Double pt: values) {
+            this.value.add(pt);
+        }
+        this.srsDimension = null;
+    }
+    
+    /**
+     * A type for a list of values of the respective simple type.
+     * Gets the value of the value property.
+     * (unmodifiable)
      */
     public List<Double> getValue() {
         if (value == null) {
             value = new ArrayList<Double>();
         }
-        return this.value;
+        return Collections.unmodifiableList(value);
     }
 
     /**
      * Gets the value of the srsDimension property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
      */
     public int getSrsDimension() {
         return srsDimension;
     }
 
     /**
-     * Sets the value of the srsDimension property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setSrsDimension(int value) {
-        this.srsDimension = value;
-    }
-
-    /**
      * Gets the value of the srsName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getSrsName() {
         return srsName;
     }
 
     /**
-     * Sets the value of the srsName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setSrsName(String value) {
-        this.srsName = value;
-    }
-
-    /**
      * Gets the value of the axisLabels property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the axisLabels property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getAxisLabels().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
+     * (unmodifiable)
      */
     public List<String> getAxisLabels() {
         if (axisLabels == null) {
             axisLabels = new ArrayList<String>();
         }
-        return this.axisLabels;
+        return Collections.unmodifiableList(axisLabels);
     }
 
     /**
      * Gets the value of the uomLabels property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the uomLabels property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getUomLabels().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link String }
-     * 
-     * 
+     * (unmodifiable)
      */
     public List<String> getUomLabels() {
         if (uomLabels == null) {
             uomLabels = new ArrayList<String>();
         }
-        return this.uomLabels;
+        return Collections.unmodifiableList(uomLabels);
     }
 
     /**
-     * Retourne un description de l'objet.
+     * Return a description of the object.
      */
     @Override
     public String toString() {
@@ -178,8 +139,8 @@ public class DirectPositionType {
         return s.toString();
     }
     
-     /**
-     * Vérifie que cette station est identique à l'objet spécifié
+    /**
+     * Verify that this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

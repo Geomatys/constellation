@@ -57,6 +57,21 @@ public class OutputType {
     private CodeType format;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    OutputType(){
+        
+    }
+    
+    /**
+     * Build a new Output Type with the specified format and response CRS
+     */
+    public OutputType(String format, String crs) {
+        this.format = new CodeType(format);
+        this.crs = new CodeType(crs);
+    }
+    
+    /**
      * Gets the value of the crs property.
      */
     public CodeType getCrs() {

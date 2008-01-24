@@ -74,6 +74,28 @@ public class GetCoverage extends AbstractRequest {
     private String version;
 
     /**
+     * Empty constructor used by JAXB.
+     */
+    GetCoverage() {
+    }
+    
+    /**
+     * Build a new GetCoverage request (1.0.0)
+     */
+    public GetCoverage(String sourceCoverage, DomainSubsetType domainSubset, 
+            RangeSubsetType rangeSubset, InterpolationMethodType interpolationMethod,
+            OutputType output, String version) {
+        
+        this.domainSubset        = domainSubset;
+        this.interpolationMethod = interpolationMethod;
+        this.output              = output;
+        this.rangeSubset         = rangeSubset;
+        this.service             = "WCS";
+        this.sourceCoverage      = sourceCoverage;
+        this.version             = version;
+        
+    }
+    /**
      * Gets the value of the sourceCoverage property.
      */
     public String getSourceCoverage() {
@@ -125,10 +147,6 @@ public class GetCoverage extends AbstractRequest {
      * Gets the value of the version property.
      */
     public String getVersion() {
-        if (version == null) {
-            return "1.0.0";
-        } else {
-            return version;
-        }
+        return version;
     }
 }

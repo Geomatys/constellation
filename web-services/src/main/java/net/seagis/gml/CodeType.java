@@ -36,24 +36,37 @@ import org.geotools.resources.Utilities;
 public class CodeType {
 
     @XmlValue
-    protected String value;
+    private String value;
     @XmlAttribute
-    protected String codeSpace;
+    private String codeSpace;
 
+    /**
+     * An empty constructor used by JAXB.
+     */
+    CodeType(){
+    }
+    
+    /**
+     * build a full CodeType.
+     */
+    public CodeType(String value, String codeSpace){
+        this.codeSpace = codeSpace;
+        this.value     = value;
+    }
+    
+    /**
+     * build a CodeType with no codespace.
+     */
+    public CodeType(String value){
+        this.value     = value;
+    }
+    
     /**
      * Gets the value of the value property.
      * 
      */
     public String getValue() {
         return value;
-    }
-
-    /**
-     * Sets the value of the value property.
-     * 
-     */
-    public void setValue(String value) {
-        this.value = value;
     }
 
     /**
@@ -64,13 +77,6 @@ public class CodeType {
         return codeSpace;
     }
 
-    /**
-     * Sets the value of the codeSpace property.
-     */
-    public void setCodeSpace(String value) {
-        this.codeSpace = value;
-    }
-    
     /**
      * Verifie si cette entree est identique l'objet specifie.
      */
