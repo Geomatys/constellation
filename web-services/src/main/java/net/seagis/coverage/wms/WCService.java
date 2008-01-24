@@ -26,9 +26,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.UnmarshalException;
 
 // jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,9 +38,11 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.GET;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
 
@@ -62,6 +66,7 @@ import net.seagis.ows.SectionsType;
 import net.seagis.ows.ServiceIdentification;
 import net.seagis.ows.ServiceIdentification;
 import net.seagis.ows.ServiceProvider;
+import net.seagis.wcs.AbstractRequest;
 import net.seagis.wcs.RangeType;
 import net.seagis.wcs.Capabilities;
 import net.seagis.wcs.ContentMetadata;
@@ -73,8 +78,13 @@ import net.seagis.wcs.CoverageDomainType;
 import net.seagis.wcs.CoverageOfferingBriefType;
 import net.seagis.wcs.CoverageOfferingType;
 import net.seagis.wcs.CoverageSummaryType;
+import net.seagis.wcs.WCSCapabilityType.Request;
+import net.seagis.wcs.DCPTypeType;
 import net.seagis.wcs.DCPTypeType.HTTP.Get;
 import net.seagis.wcs.DCPTypeType.HTTP.Post;
+import net.seagis.wcs.DescribeCoverage;
+import net.seagis.wcs.DescribeCoverage;
+import net.seagis.wcs.DescribeCoverage;
 import net.seagis.wcs.DomainSetType;
 import net.seagis.wcs.FieldType;
 import net.seagis.wcs.InterpolationMethod;
@@ -98,7 +108,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  *
  * @author Guilhem Legal
  */
-@UriTemplate("wcs")
+@Path("wcs")
 @Singleton
 public class WCService extends WebService {
 
@@ -129,21 +139,22 @@ public class WCService extends WebService {
      * @return an image or xml response.
      * @throw JAXBException
      */
-    @HttpMethod("GET")
+    @GET
     public Response doGET() throws JAXBException  {
 
-        return treatIncommingRequest();
+        return treatIncommingRequest(null);
     }
     
-     /**
-     * Treat the incomming POST request.
+    /**
+     * Treat the incomming POST request encoded in kvp.
+     * for each parameters in the request it fill the httpContext.
      * 
      * @return an image or xml response.
      * @throw JAXBException
      */
-    @HttpMethod("POST")
-    public Response doPOST(String request) throws JAXBException  {
-        logger.info("request: " + request);
+    @POST
+    @ConsumeMime("application/x-www-form-urlencoded")
+    public Response doPOSTKvp(String request) throws JAXBException  {
         final StringTokenizer tokens = new StringTokenizer(request, "&");
         String log = "";
         while (tokens.hasMoreTokens()) {
@@ -153,8 +164,39 @@ public class WCService extends WebService {
             log += "put: " + paramName + "=" + paramValue + '\n';
             context.getQueryParameters().add(paramName, paramValue);
         }
-        logger.info(log);
-        return treatIncommingRequest();
+        logger.info("request POST kvp: " + request + '\n' + log);
+        
+        return treatIncommingRequest(null);
+    }
+    
+    /**
+     * Treat the incomming POST request encoded in xml.
+     * 
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @POST
+    @ConsumeMime("text/xml")
+    public Response doPOSTXml(InputStream is) throws JAXBException  {
+        logger.info("request POST xml: ");
+        Object request = null;
+        try {
+            request = unmarshaller.unmarshal(is);
+        
+        } catch (UnmarshalException e) {
+            logger.severe(e.getMessage());
+            WebServiceException wse = new WebServiceException("The XML request is not valid",
+                                       WMSExceptionCode.INVALID_PARAMETER_VALUE, getCurrentVersion());
+            StringWriter sw = new StringWriter(); 
+            marshaller.marshal(wse.getServiceExceptionReport(), sw);
+            return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
+        }
+        
+        if (request != null && request instanceof AbstractRequest) {
+            AbstractRequest ar = (AbstractRequest) request;
+            context.getQueryParameters().add("VERSION", ar.getVersion());
+        }
+        return treatIncommingRequest(request);
     }
     
     /**
@@ -164,14 +206,24 @@ public class WCService extends WebService {
      * @throw JAXBException
      */
     @Override
-    public Response treatIncommingRequest() throws JAXBException {
+    public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
             writeParameters();
             String request = (String) getParameter("REQUEST", true);
-            if (request.equalsIgnoreCase("DescribeCoverage")) {
-                    
-                return Response.Builder.representation(describeCoverage(), "text/xml").build();
+            if (request.equalsIgnoreCase("DescribeCoverage") || (objectRequest instanceof DescribeCoverage)) {
+                DescribeCoverage dc = (DescribeCoverage)objectRequest;
+                verifyBaseParameter(0);
+                if (dc == null) {
+                    String identifiers;
+                    if (getCurrentVersion().toString().equals("1.0.0")) {
+                        identifiers = getParameter("COVERAGE", true);
+                    } else {
+                        identifiers = getParameter("IDENTIFIER", true);
+                    }
+                    dc = new DescribeCoverage(getCurrentVersion().toString(), identifiers);
+                }
+                return Response.ok(describeCoverage(dc), "text/xml").build();
                     
             } else if (request.equalsIgnoreCase("GetCapabilities")) {
                     
@@ -179,7 +231,7 @@ public class WCService extends WebService {
                     
             } else if (request.equalsIgnoreCase("GetCoverage")) {
                     
-                return Response.Builder.representation(getCoverage(), webServiceWorker.getMimeType()).build();
+                return Response.ok(getCoverage(), webServiceWorker.getMimeType()).build();
                      
             } else {
                 throw new WebServiceException("The operation " + request + " is not supported by the service",
@@ -188,12 +240,12 @@ public class WCService extends WebService {
         } catch (WebServiceException ex) {
             
             //we don't print the stack trace if the user have forget a mandatory parameter.
-            if (ex.getServiceExceptionReport().getServiceExceptions().get(0).getCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE)) {
+            if (!ex.getServiceExceptionReport().getServiceExceptions().get(0).getCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE)) {
                 ex.printStackTrace();
             }
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
-            return Response.Builder.representation(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
+            return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
         }
      }
     
@@ -279,7 +331,7 @@ public class WCService extends WebService {
             if (!requestedSections.contains("Contents")) {
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(responsev111, sw);
-                return Response.Builder.representation(sw.toString(), format).build();
+                return Response.ok(sw.toString(), format).build();
             }
                    
         } else {
@@ -303,14 +355,10 @@ public class WCService extends WebService {
             
             if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
                 //we update the url in the static part.
-                ((Get) staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities&");
-                ((Post)staticCapabilities.getCapability().getRequest().getGetCapabilities().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCapabilities&");
-            
-                ((Get) staticCapabilities.getCapability().getRequest().getDescribeCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage&");
-                ((Post)staticCapabilities.getCapability().getRequest().getDescribeCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=DescribeCoverage&");
-            
-                ((Get) staticCapabilities.getCapability().getRequest().getGetCoverage().getDCPType().get(0).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage&");
-                ((Post)staticCapabilities.getCapability().getRequest().getGetCoverage().getDCPType().get(1).getHTTP().getGetOrPost().get(0)).getOnlineResource().setHref(getServiceURL() + "wcs?REQUEST=GetCoverage&");
+                Request request = staticCapabilities.getCapability().getRequest(); 
+                updateURL(request.getGetCapabilities().getDCPType());
+                updateURL(request.getDescribeCoverage().getDCPType());
+                updateURL(request.getGetCoverage().getDCPType());
             }
             
             if (requestedSection == null || contentMeta  || requestedSection.equals("/")) {
@@ -324,7 +372,7 @@ public class WCService extends WebService {
                 
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(responsev100, sw);
-                return Response.Builder.representation(sw.toString(), format).build();
+                return Response.ok(sw.toString(), format).build();
             }
         }
         Contents contents;
@@ -398,7 +446,7 @@ public class WCService extends WebService {
             marshaller.marshal(responsev100, sw);
         }
         
-        return Response.Builder.representation(sw.toString(), format).build();
+        return Response.ok(sw.toString(), format).build();
         
     }
     
@@ -559,19 +607,13 @@ public class WCService extends WebService {
     /**
      * Web service operation
      */
-    public String describeCoverage() throws JAXBException, WebServiceException {
+    public String describeCoverage(DescribeCoverage request) throws JAXBException, WebServiceException {
         logger.info("describeCoverage recu");
         try {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
-        verifyBaseParameter(0);
-        String identifiers;
-        if (getCurrentVersion().toString().equals("1.0.0")) {
-            identifiers = getParameter("COVERAGE", true);
-        } else {
-            identifiers = getParameter("IDENTIFIER", true);
-        }
-        List<Layer> layers = webServiceWorker.getLayers(identifiers);
+        
+        List<Layer> layers = webServiceWorker.getLayers(request.getCoverage());
         
         //this wcs does not implement "store" mechanism
         String store = getParameter("STORE", false);
@@ -758,6 +800,23 @@ public class WCService extends WebService {
         }
     }
 
+    /**
+     * update The URL in capabilities document with the service actual URL.
+     */
+    private void updateURL(List<DCPTypeType> dcpList) {
+        for(DCPTypeType dcp: dcpList) {
+           for (Object obj: dcp.getHTTP().getGetOrPost()){
+               if (obj instanceof Get){
+                   Get getMethod = (Get)obj;
+                   getMethod.getOnlineResource().setHref(getServiceURL() + "wcs?SERVICE=WCS&");
+               } else if (obj instanceof Post){
+                   Post postMethod = (Post)obj;
+                   postMethod.getOnlineResource().setHref(getServiceURL() + "wcs?SERVICE=WCS&");
+               }
+           }
+        }
+    }
+    
     /**
      * Return the current Http context. 
      */

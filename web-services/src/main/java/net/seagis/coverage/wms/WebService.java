@@ -201,7 +201,7 @@ public abstract class WebService {
         
     }
     
-     /**
+    /**
      * Verify the base parameter or each request.
      * 
      * @param sld case 0: no sld.
@@ -310,10 +310,14 @@ public abstract class WebService {
     /**
      * Treat the incomming GET request and call the right function.
      * 
+     * @param objectRequest if the server receive a POST request in XML,
+     *        this object contain the request. Else for a GET or a POST kvp
+     *        request this param is {@code null}
+     * 
      * @return an image or xml response.
      * @throw JAXBException
      */
-    public abstract Response treatIncommingRequest() throws JAXBException;
+    public abstract Response treatIncommingRequest(Object objectRequest) throws JAXBException;
 
    
     /**
@@ -324,7 +328,7 @@ public abstract class WebService {
      * @return The capabilities Object, or {@code null} if none.
      */
     protected Object getCapabilitiesObject(Version version) throws JAXBException {
-       String appName = getContext().getBase().getPath();
+       String appName = getContext().getBaseUri().getPath();
        //we delete the /WS
        appName = appName.substring(0, appName.length()-3);
        String path = System.getenv().get("CATALINA_HOME") + "/webapps" + appName + "WEB-INF/";
@@ -351,7 +355,7 @@ public abstract class WebService {
      * @return the service url.
      */
     protected String getServiceURL() {
-        return getContext().getBase().toString();
+        return getContext().getBaseUri().toString();
     }
     
     /**

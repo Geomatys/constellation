@@ -160,7 +160,7 @@
       <dependency>
         <groupId>jersey</groupId>
         <artifactId>jersey</artifactId>
-        <version>0.4-ea</version>
+        <version>0.5-ea</version>
       </dependency>
       <dependency>
         <groupId>javax.persistence</groupId>
@@ -272,6 +272,11 @@
       <id>java.net.2</id>
       <name>java.net community</name>
       <url>http://download.java.net/maven/2/</url>
+    </repository>
+    <repository>
+      <id>maven object web</id>
+      <name>maven Object web</name>
+      <url>http://maven.objectweb.org/maven2/</url>
     </repository>
     <repository>
       <id>geotools</id>

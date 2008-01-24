@@ -423,6 +423,31 @@ public abstract class ImageProducer {
         }
         return layers;
     }
+    
+    /**
+     * return the specified layers.
+     *
+     * @param  layerNames a list of layer names.
+     * @throws WebServiceException if an error occured while fetching the table.
+     */
+    public List<Layer> getLayers(final List<String> layerNames) throws WebServiceException {
+        final LayerTable table = getLayerTable(true);
+        final List<Layer> layers = new ArrayList<Layer>();
+        for (String layerName: layerNames) {
+            final Layer layer;
+            try {
+                layer = table.getEntry(layerName);
+            } catch (NoSuchRecordException exception) {
+                throw new WebServiceException(exception, LAYER_NOT_DEFINED, version);
+            } catch (CatalogException exception) {
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            } catch (SQLException exception) {
+                throw new WebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            }
+            layers.add(layer);
+        }
+        return layers;
+    }
 
     /**
      * Returns all available layers.

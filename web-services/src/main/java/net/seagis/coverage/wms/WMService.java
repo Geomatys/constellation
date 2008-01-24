@@ -27,7 +27,7 @@ import java.util.TimeZone;
 import javax.units.Unit;
 
 // jersey dependencies
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
@@ -37,7 +37,10 @@ import com.sun.ws.rest.spi.resource.Singleton;
 // JAXB xml binding dependencies
 import java.util.Set;
 import java.util.StringTokenizer;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -55,10 +58,15 @@ import net.seagis.se.OnlineResourceType;
 import net.seagis.sld.TypeNameType;
 import net.seagis.wms.AbstractWMSCapabilities;
 import net.seagis.wms.BoundingBox;
+import net.seagis.wms.DCPType;
 import net.seagis.wms.Dimension;
 import net.seagis.wms.EXGeographicBoundingBox;
+import net.seagis.wms.Get;
 import net.seagis.wms.LegendURL;
 import net.seagis.wms.OnlineResource;
+import net.seagis.wms.OperationType;
+import net.seagis.wms.Post;
+import net.seagis.wms.Request;
 import net.seagis.wms.Style;
 
 //geotools dependencies
@@ -72,7 +80,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @version
  * @author Guilhem Legal
  */
-@UriTemplate("wms")
+@Path("wms")
 @Singleton
 public class WMService extends WebService {
     
@@ -108,10 +116,10 @@ public class WMService extends WebService {
      * @return an image or xml response.
      * @throw JAXBException
      */
-    @HttpMethod("GET")
+    @GET
     public Response doGET() throws JAXBException  {
 
-        return treatIncommingRequest();
+        return treatIncommingRequest(null);
     }
     
     /**
@@ -122,7 +130,7 @@ public class WMService extends WebService {
      * @return an image or xml response.
      * @throw JAXBException
      */
-    @HttpMethod("POST")
+    @POST
     public Response doPOST(String request) throws JAXBException  {
         logger.info("request: " + request);
         final StringTokenizer tokens = new StringTokenizer(request, "&");
@@ -134,7 +142,7 @@ public class WMService extends WebService {
             context.getQueryParameters().add(paramName, paramValue);
         }
         
-        return treatIncommingRequest();
+        return treatIncommingRequest(null);
     }
     
     
@@ -145,7 +153,7 @@ public class WMService extends WebService {
      * @throw JAXBException
      */
     @Override
-    public Response treatIncommingRequest() throws JAXBException {
+    public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
             String request = (String) getParameter("REQUEST", true);
@@ -154,7 +162,7 @@ public class WMService extends WebService {
              
             if (request.equalsIgnoreCase("GetMap")) {
                     
-                return Response.Builder.representation(getMap(), webServiceWorker.getMimeType()).build();
+                return Response.ok(getMap(), webServiceWorker.getMimeType()).build();
                     
             } else if (request.equals("GetFeatureInfo")) {
                     
@@ -166,24 +174,28 @@ public class WMService extends WebService {
                         
             } else if (request.equalsIgnoreCase("DescribeLayer")) {
                     
-                return Response.Builder.representation(describeLayer(), "text/xml").build();
+                return Response.ok(describeLayer(), "text/xml").build();
                     
             } else if (request.equalsIgnoreCase("GetLegendGraphic")) {
                     
-                return Response.Builder.representation(getLegendGraphic(), webServiceWorker.getMimeType()).build();
+                return Response.ok(getLegendGraphic(), webServiceWorker.getMimeType()).build();
                     
             } else {
                 throw new WebServiceException("The operation " + request + " is not supported by the service",
                                               WMSExceptionCode.OPERATION_NOT_SUPPORTED, getCurrentVersion());
             }
         } catch (WebServiceException ex) {
-            //we don't print the stack trace if the user have forget a mandatory parameter.
-            if (ex.getServiceExceptionReport().getServiceExceptions().get(0).getCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE)) {
+            /* We don't print the stack trace:
+             * - if the user have forget a mandatory parameter.
+             * - if the version number is wrong.
+             */
+            if (!ex.getExceptionCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(WMSExceptionCode.VERSION_NEGOTIATION_FAILED)) {
                 ex.printStackTrace();
             }
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
-            return Response.Builder.representation(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
+            return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
         }
     }
     
@@ -334,7 +346,7 @@ public class WMService extends WebService {
         else {
             response = "result for " + layer + " is:" + result;
         }
-        return Response.Builder.representation(response, infoFormat).build();
+        return Response.ok(response, infoFormat).build();
     }
     
     /**
@@ -376,17 +388,12 @@ public class WMService extends WebService {
         
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
-        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetCapabilities&");
-        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetFeatureInfo&");
-        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetMap&");
-        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=DescribeLayer&");
-        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getGet().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetLegendGraphic&");
+        Request request = response.getCapability().getRequest();
         
-        response.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetCapabilities&");
-        response.getCapability().getRequest().getGetFeatureInfo().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetFeatureInfo&");
-        response.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetMap&");
-        response.getCapability().getRequest().getExtendedOperation().get(0).getValue().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=DescribeLayer&");
-        response.getCapability().getRequest().getExtendedOperation().get(1).getValue().getDCPType().get(0).getHTTP().getPost().getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&REQUEST=GetLegendGraphic&");
+        updateURL(request.getGetCapabilities().getDCPType());
+        updateURL(request.getGetFeatureInfo().getDCPType());
+        updateURL(request.getGetMap().getDCPType());
+        updateExtendedOperationURL(request.getExtendedOperation());
         
         //we build the layers object of the document
         
@@ -521,7 +528,7 @@ public class WMService extends WebService {
         StringWriter sw = new StringWriter();
         marshaller.marshal(response, sw);
          
-        return Response.Builder.representation(sw.toString(), format).build();
+        return Response.ok(sw.toString(), format).build();
         
     }
     
@@ -589,6 +596,31 @@ public class WMService extends WebService {
         
         return  webServiceWorker.getLegendFile();
         
+    }
+    
+    /**
+     * update The URL in capabilities document with the service actual URL.
+     */
+    private void updateURL(List<DCPType> dcpList) {
+        for(DCPType dcp: dcpList) {
+            Get getMethod = dcp.getHTTP().getGet();
+            if (getMethod != null) {
+                getMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
+            }
+            Post postMethod = dcp.getHTTP().getPost();
+            if (postMethod != null) {
+                postMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
+            }
+        }
+    }
+    
+    /**
+     * update The URL in capabilities document for the extended operation.
+     */
+    private void updateExtendedOperationURL(List<JAXBElement<OperationType>> extendedOperations) {
+        for(JAXBElement<OperationType> extOp: extendedOperations) {
+            updateURL(extOp.getValue().getDCPType());
+        }
     }
     
     /**

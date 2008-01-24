@@ -78,6 +78,10 @@ public class ObjectFactory {
     private final static QName _ResponsiblePartyTypeContactInfo_QNAME = new QName("http://www.opengis.net/wcs", "contactInfo");
     private final static QName _ResponsiblePartyTypeOrganisationName_QNAME = new QName("http://www.opengis.net/wcs", "organisationName");
     private final static QName _ResponsiblePartyTypeIndividualName_QNAME = new QName("http://www.opengis.net/wcs", "individualName");
+    private final static QName _SpatialSubset_QNAME = new QName("http://www.opengis.net/wcs", "spatialSubset");
+    private final static QName _Interval_QNAME = new QName("http://www.opengis.net/wcs", "interval");
+    private final static QName _SingleValue_QNAME = new QName("http://www.opengis.net/wcs", "singleValue");
+    
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.wcs._1_1
      * 
@@ -494,6 +498,138 @@ public class ObjectFactory {
     }
     
     /**
+     * Create an instance of {@link net.opengis.wcs.GetCapabilities }
+     * 
+     */
+    public net.seagis.wcs.GetCapabilities createGetCapabilities() {
+        return new net.seagis.wcs.GetCapabilities();
+    }
+
+     /**
+     * Create an instance of {@link net.opengis.wcs.GetCoverage }
+     * 
+     */
+    public net.seagis.wcs.GetCoverage createGetCoverage() {
+        return new net.seagis.wcs.GetCoverage();
+    }
+
+    /**
+     * Create an instance of {@link net.opengis.wcs.DescribeCoverage }
+     * 
+     */
+    public net.seagis.wcs.DescribeCoverage createDescribeCoverage() {
+        return new net.seagis.wcs.DescribeCoverage();
+    }
+    
+    /**
+     * Create an instance of {@link DomainSubsetType }
+     * 
+     */
+    public DomainSubsetType createDomainSubsetType() {
+        return new DomainSubsetType();
+    }
+    
+    /**
+     * Create an instance of {@link SpatialSubsetType }
+     * 
+     */
+    public SpatialSubsetType createSpatialSubsetType() {
+        return new SpatialSubsetType();
+    }
+    
+    /**
+     * Create an instance of {@link OutputType }
+     * 
+     */
+    public OutputType createOutputType() {
+        return new OutputType();
+    }
+    
+     /**
+     * Create an instance of {@link RangeSubsetType.AxisSubset }
+     * 
+     */
+    public RangeSubsetType.AxisSubset createRangeSubsetTypeAxisSubset() {
+        return new RangeSubsetType.AxisSubset();
+    }
+
+    /**
+     * Create an instance of {@link RangeSubsetType }
+     * 
+     */
+    public RangeSubsetType createRangeSubsetType() {
+        return new RangeSubsetType();
+    }
+    
+    /**
+     * Create an instance of {@link ValueEnumBaseType }
+     * 
+     */
+    public ValueEnumBaseType createValueEnumBaseType() {
+        return new ValueEnumBaseType();
+    }
+
+    /**
+     * Create an instance of {@link IntervalType }
+     * 
+     */
+    public IntervalType createIntervalType() {
+        return new IntervalType();
+    }
+   
+    /**
+     * Create an instance of {@link ValueRangeType }
+     * 
+     */
+    public ValueRangeType createValueRangeType() {
+        return new ValueRangeType();
+    }
+    
+    /**
+     * Create an instance of {@link TypedLiteralType }
+     * 
+     */
+    public TypedLiteralType createTypedLiteralType() {
+        return new TypedLiteralType();
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link IntervalType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "interval")
+    public JAXBElement<IntervalType> createInterval(IntervalType value) {
+        return new JAXBElement<IntervalType>(_Interval_QNAME, IntervalType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TypedLiteralType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "singleValue")
+    public JAXBElement<TypedLiteralType> createSingleValue(TypedLiteralType value) {
+        return new JAXBElement<TypedLiteralType>(_SingleValue_QNAME, TypedLiteralType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TimeSequenceType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "temporalSubset")
+    public JAXBElement<TimeSequenceType> createTemporalSubset(TimeSequenceType value) {
+        return new JAXBElement<TimeSequenceType>(_TemporalSubset_QNAME, TimeSequenceType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SpatialSubsetType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "spatialSubset")
+    public JAXBElement<SpatialSubsetType> createSpatialSubset(SpatialSubsetType value) {
+        return new JAXBElement<SpatialSubsetType>(_SpatialSubset_QNAME, SpatialSubsetType.class, null, value);
+    }
+    
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
@@ -748,11 +884,11 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link TimeSequenceType }{@code >}}
      * 
-     */
+     
     @XmlElementDecl(namespace = "http://www.opengis.net/wcs", name = "TemporalSubset")
     public JAXBElement<TimeSequenceType> createTemporalSubset(TimeSequenceType value) {
         return new JAXBElement<TimeSequenceType>(_TemporalSubset_QNAME, TimeSequenceType.class, null, value);
-    }
+    }*/
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
