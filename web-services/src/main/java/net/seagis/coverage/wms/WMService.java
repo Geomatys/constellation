@@ -85,13 +85,6 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 @Singleton
 public class WMService extends WebService {
     
-    /**
-     * The http context containing the request parameter
-     */
-    @HttpContext
-    private UriInfo context;
-    
-            
     /** 
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
@@ -110,42 +103,6 @@ public class WMService extends WebService {
         
     }
    
-    
-    /**
-     * Treat the incomming GET request.
-     * 
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @GET
-    public Response doGET() throws JAXBException  {
-
-        return treatIncommingRequest(null);
-    }
-    
-    /**
-     * Treat the incomming POST request.
-     * 
-     * @param request The url request.
-     * 
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @POST
-    public Response doPOST(String request) throws JAXBException  {
-        logger.info("request: " + request);
-        final StringTokenizer tokens = new StringTokenizer(request, "&");
-        while (tokens.hasMoreTokens()) {
-            final String token = tokens.nextToken().trim();
-            String paramName  = token.substring(0, token.indexOf('='));
-            String paramValue = token.substring(token.indexOf('=')+ 1);
-            logger.info("put: " + paramName + "=" + paramValue);
-            context.getQueryParameters().add(paramName, paramValue);
-        }
-        
-        return treatIncommingRequest(null);
-    }
-    
     
     /**
      * Treat the incomming request and call the right function.
@@ -623,13 +580,4 @@ public class WMService extends WebService {
             updateURL(extOp.getValue().getDCPType());
         }
     }
-    
-    /**
-     * Return the current Http context. 
-     */
-    @Override
-    protected UriInfo getContext() {
-        return this.context;
-    }
-   
 }

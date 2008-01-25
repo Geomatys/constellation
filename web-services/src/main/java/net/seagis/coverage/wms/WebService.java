@@ -17,7 +17,9 @@ package net.seagis.coverage.wms;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,9 +27,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 //geotools dependencies
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.GET;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.HttpContext;
 import org.geotools.util.Version;
 
 // jersey dependencies
@@ -42,9 +50,11 @@ import javax.xml.bind.Marshaller;
 
 
 // seagis dependencies
+import javax.xml.bind.UnmarshalException;
 import net.seagis.catalog.Database;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.wcs.AbstractRequest;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 /**
@@ -93,7 +103,13 @@ public abstract class WebService {
      /**
      * the service URL (used in getCapabilities document).
      */
-    private final String serviceURL;
+    private String serviceURL;
+    
+     /**
+     * The http context containing the request parameter
+     */
+    @HttpContext
+    private UriInfo context;
     
     /**
      * The object whitch made all the operation on the postgrid database
@@ -138,11 +154,11 @@ public abstract class WebService {
         
         unmarshaller = null;
         serviceURL   = null;
-        
-       
     }
     
     /**
+     * TODO make it private. 
+     * 
      * Extract The parameter named parameterName from the query.
      * If the parameter is mandatory and if it is null it throw an exception.
      * else it return null.
@@ -154,8 +170,6 @@ public abstract class WebService {
      * @throw WebServiceException
      */
     protected String getParameter(String parameterName, boolean mandatory) throws WebServiceException {
-        
-        UriInfo context = getContext();
         
         MultivaluedMap parameters = context.getQueryParameters();
         
@@ -194,12 +208,8 @@ public abstract class WebService {
      * 
      */
     protected void writeParameters() throws WebServiceException {
-        
-        UriInfo context = getContext();
-        
         MultivaluedMap parameters = context.getQueryParameters();
         logger.info(parameters.toString());
-        
     }
     
     /**
@@ -258,7 +268,7 @@ public abstract class WebService {
     protected Object getComplexParameter(String parameterName, boolean mandatory) throws WebServiceException {
         
         try {
-            MultivaluedMap parameters = getContext().getQueryParameters();
+            MultivaluedMap parameters = context.getQueryParameters();
             LinkedList<String> list = (LinkedList) parameters.get(parameterName);
             if (list == null) {
                 list = (LinkedList) parameters.get(parameterName.toLowerCase());
@@ -302,12 +312,72 @@ public abstract class WebService {
     }
     
     /**
-     * return The current httpContext.
+     * Treat the incomming GET request.
+     * 
+     * @return an image or xml response.
+     * @throw JAXBException
      */
-    protected abstract UriInfo getContext();
+    @GET
+    public Response doGET() throws JAXBException  {
+        return treatIncommingRequest(null);
+    }
     
     /**
-     * Treat the incomming GET request and call the right function.
+     * Treat the incomming POST request encoded in kvp.
+     * for each parameters in the request it fill the httpContext.
+     * 
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @POST
+    @ConsumeMime("application/x-www-form-urlencoded")
+    public Response doPOSTKvp(String request) throws JAXBException  {
+        final StringTokenizer tokens = new StringTokenizer(request, "&");
+        String log = "";
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+            String paramName  = token.substring(0, token.indexOf('='));
+            String paramValue = token.substring(token.indexOf('=')+ 1);
+            log += "put: " + paramName + "=" + paramValue + '\n';
+            context.getQueryParameters().add(paramName, paramValue);
+        }
+        logger.info("request POST kvp: " + request + '\n' + log);
+        
+        return treatIncommingRequest(null);
+    }
+    
+    /**
+     * Treat the incomming POST request encoded in xml.
+     * 
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @POST
+    @ConsumeMime("text/xml")
+    public Response doPOSTXml(InputStream is) throws JAXBException  {
+        logger.info("request POST xml: ");
+        Object request = null;
+        try {
+            request = unmarshaller.unmarshal(is);
+        
+        } catch (UnmarshalException e) {
+            logger.severe(e.getMessage());
+            WebServiceException wse = new WebServiceException("The XML request is not valid",
+                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
+            StringWriter sw = new StringWriter(); 
+            marshaller.marshal(wse.getServiceExceptionReport(), sw);
+            return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
+        }
+        
+        if (request != null && request instanceof AbstractRequest) {
+            AbstractRequest ar = (AbstractRequest) request;
+            context.getQueryParameters().add("VERSION", ar.getVersion());
+        }
+        return treatIncommingRequest(request);
+    }
+    
+    /**
+     * Treat the incomming request and call the right function.
      * 
      * @param objectRequest if the server receive a POST request in XML,
      *        this object contain the request. Else for a GET or a POST kvp
@@ -327,7 +397,7 @@ public abstract class WebService {
      * @return The capabilities Object, or {@code null} if none.
      */
     protected Object getCapabilitiesObject(Version version) throws JAXBException {
-       String appName = getContext().getBaseUri().getPath();
+       String appName = context.getBaseUri().getPath();
        //we delete the /WS
        appName = appName.substring(0, appName.length()-3);
        String path = System.getenv().get("CATALINA_HOME") + "/webapps" + appName + "WEB-INF/";
@@ -354,7 +424,10 @@ public abstract class WebService {
      * @return the service url.
      */
     protected String getServiceURL() {
-        return getContext().getBaseUri().toString();
+        if (serviceURL == null) {
+            serviceURL = context.getBaseUri().toString();
+        }
+        return serviceURL; 
     }
     
     /**

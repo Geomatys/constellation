@@ -129,12 +129,6 @@ import org.geotools.resources.i18n.ErrorKeys;
 @Singleton
 public class WCService extends WebService {
 
-    /**
-     * The http context containing the request parameter
-     */
-    @HttpContext
-    private UriInfo context;
-    
     /** 
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
@@ -148,72 +142,6 @@ public class WCService extends WebService {
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
-    }
-    
-    /**
-     * Treat the incomming GET request.
-     * 
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @GET
-    public Response doGET() throws JAXBException  {
-
-        return treatIncommingRequest(null);
-    }
-    
-    /**
-     * Treat the incomming POST request encoded in kvp.
-     * for each parameters in the request it fill the httpContext.
-     * 
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @POST
-    @ConsumeMime("application/x-www-form-urlencoded")
-    public Response doPOSTKvp(String request) throws JAXBException  {
-        final StringTokenizer tokens = new StringTokenizer(request, "&");
-        String log = "";
-        while (tokens.hasMoreTokens()) {
-            final String token = tokens.nextToken().trim();
-            String paramName  = token.substring(0, token.indexOf('='));
-            String paramValue = token.substring(token.indexOf('=')+ 1);
-            log += "put: " + paramName + "=" + paramValue + '\n';
-            context.getQueryParameters().add(paramName, paramValue);
-        }
-        logger.info("request POST kvp: " + request + '\n' + log);
-        
-        return treatIncommingRequest(null);
-    }
-    
-    /**
-     * Treat the incomming POST request encoded in xml.
-     * 
-     * @return an image or xml response.
-     * @throw JAXBException
-     */
-    @POST
-    @ConsumeMime("text/xml")
-    public Response doPOSTXml(InputStream is) throws JAXBException  {
-        logger.info("request POST xml: ");
-        Object request = null;
-        try {
-            request = unmarshaller.unmarshal(is);
-        
-        } catch (UnmarshalException e) {
-            logger.severe(e.getMessage());
-            WebServiceException wse = new WebServiceException("The XML request is not valid",
-                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
-            StringWriter sw = new StringWriter(); 
-            marshaller.marshal(wse.getServiceExceptionReport(), sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
-        }
-        
-        if (request != null && request instanceof AbstractRequest) {
-            AbstractRequest ar = (AbstractRequest) request;
-            context.getQueryParameters().add("VERSION", ar.getVersion());
-        }
-        return treatIncommingRequest(request);
     }
     
     /**
@@ -592,7 +520,7 @@ public class WCService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
-        String format, coverage, crs, bbox = "", time = null , interpolation, exceptions;
+        String format, coverage, crs, bbox = null, time = null , interpolation = null, exceptions;
         String width = null, height = null, depth = null;
         String resx  = null, resy   = null, resz  = null;
         String gridType, gridOrigin = null, gridOffsets = null, gridCS, gridBaseCrs;
@@ -698,9 +626,13 @@ public class WCService extends WebService {
                 throw new WebServiceException("The parameters sourceCoverage have to be specified",
                                               MISSING_PARAMETER_VALUE, getCurrentVersion());
             }
-            interpolation = request.getInterpolationMethod().getValue();
+            if (request.getInterpolationMethod() != null) {
+                interpolation = request.getInterpolationMethod().getValue();
+            }
             exceptions    = getParameter("exceptions", false);
-            responseCRS   = request.getOutput().getCrs().getValue();
+            if (request.getOutput().getCrs() != null){
+                responseCRS   = request.getOutput().getCrs().getValue();
+            }
             
             //for now we only handle one time parameter with timePosition type
             TimeSequenceType temporalSubset = request.getDomainSubset().getTemporalSubSet(); 
@@ -763,6 +695,7 @@ public class WCService extends WebService {
         } else {
             if (width == null || height == null) {
                 webServiceWorker.setDimension(width, height, depth);
+                logger.info("WIDTHHHHHHHH=== " + width);
             } else {
                 webServiceWorker.setResolution(resx, resy, resz);
             }
@@ -984,14 +917,6 @@ public class WCService extends WebService {
                }
            }
         }
-    }
-    
-    /**
-     * Return the current Http context. 
-     */
-    @Override
-    protected UriInfo getContext() {
-        return this.context;
     }
     
     /**
