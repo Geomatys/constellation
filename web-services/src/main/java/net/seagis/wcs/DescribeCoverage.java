@@ -56,13 +56,24 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "DescribeCoverage")
 public class DescribeCoverage extends AbstractRequest {
 
-    @XmlElement(name = "Coverage")
-    private List<String> coverage;
     @XmlAttribute(required = true)
     private String service;
     @XmlAttribute(required = true)
     private String version;
-
+    
+    /*
+     * WCS 1.0.0
+     */
+    @XmlElement(name = "Coverage")
+    private List<String> coverage;
+    
+    /*
+     * WCS 1.1.1
+     */  
+    @XmlElement(name = "Identifier")
+    private List<String> identifier;
+    
+    
     /**
      * Empty constructor used by JAXB
      */
@@ -78,13 +89,18 @@ public class DescribeCoverage extends AbstractRequest {
     public DescribeCoverage(String version, String listOfCoverage){
         this.service = "WCS";
         this.version = version;
-        this.coverage = new ArrayList<String>();
+        List<String> cov = new ArrayList<String>();
         final StringTokenizer tokens = new StringTokenizer(listOfCoverage, ",;");
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
-            coverage.add(token);
+            cov.add(token);
         }
-        
+            
+        if (version.equals("1.0.0")) {
+            coverage = cov;
+        } else {
+            identifier = cov;
+        }
     }
     
     /**
@@ -108,6 +124,19 @@ public class DescribeCoverage extends AbstractRequest {
             coverage = new ArrayList<String>();
         }
         return Collections.unmodifiableList(coverage);
+    }
+    
+    /**
+     * Unordered list of identifiers of desired coverages.
+     * A client can obtain identifiers by a prior GetCapabilities request, 
+     * or from a third-party source. Gets the value of the identifier property.
+     * (unmodifiable)
+     */
+    public List<String> getIdentifier() {
+        if (identifier == null) {
+            identifier = new ArrayList<String>();
+        }
+        return Collections.unmodifiableList(this.identifier);
     }
 
     /**

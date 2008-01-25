@@ -22,6 +22,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.ows.AcceptFormatsType;
+import net.seagis.ows.AcceptVersionsType;
+import net.seagis.ows.SectionsType;
 
 
 /**
@@ -52,9 +55,26 @@ import javax.xml.bind.annotation.XmlType;
 })
 @XmlRootElement(name = "GetCapabilities")
 public class GetCapabilities extends AbstractRequest {
-
+    
+    /*
+     * 1.0.0 attribute
+     */  
     @XmlElement(defaultValue = "/")
     private String section;
+    
+    /*
+     *  1.1.1 attribute
+     */ 
+    @XmlElement(name = "AcceptVersions")
+    private AcceptVersionsType acceptVersions;
+    @XmlElement(name = "Sections")
+    private SectionsType sections;
+    @XmlElement(name = "AcceptFormats")
+    private AcceptFormatsType acceptFormats;
+    
+    /*
+     * Both version attribute 
+     */
     @XmlAttribute(required = true)
     private String service;
     @XmlAttribute
@@ -69,7 +89,7 @@ public class GetCapabilities extends AbstractRequest {
     }
     
     /**
-     * Build a new getCapabilities request.
+     * Build a new getCapabilities request version 1.0.0.
      */
     public GetCapabilities(String version, String section, String updateSequence){
         this.version        = version;
@@ -79,6 +99,19 @@ public class GetCapabilities extends AbstractRequest {
         } else {
             this.section        = section;
         }
+        this.service        = "WCS";
+    }
+    
+     /**
+     * Build a new getCapabilities request version 1.1.1.
+     */
+    public GetCapabilities(String version, AcceptVersionsType acceptVersions, SectionsType sections,
+            AcceptFormatsType acceptFormats, String updateSequence){
+        this.version        = version;
+        this.updateSequence = updateSequence;
+        this.acceptFormats  = acceptFormats;
+        this.acceptVersions = acceptVersions;
+        this.sections       = sections;
         this.service        = "WCS";
     }
     
@@ -109,7 +142,36 @@ public class GetCapabilities extends AbstractRequest {
     public String getVersion() {
         return version;
     }
+    
+    /**
+     * Return the Accepted version of the service.
+     */
+    public AcceptVersionsType getAcceptVersions() {
+        return acceptVersions;
+    }
+    
+     /**
+     * return the requested section.
+     * 
+     * values possible in WCS 1.1.1:
+     *  - ServiceIdentification
+     *  - ServiceProvider
+     *  - OperationsMetadata
+     *  - Contents
+     * 
+     */
+    public SectionsType geSections() {
+        return sections;
+    }
+    
+    /**
+     * Return the Accepted format of the service.
+     */
+    public AcceptFormatsType getAcceptFormats() {
+        return acceptFormats;
+    }
 
+        
     /**
      * Gets the value of the updateSequence property.
      */

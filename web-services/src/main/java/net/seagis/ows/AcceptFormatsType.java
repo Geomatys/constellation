@@ -1,6 +1,7 @@
 package net.seagis.ows;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -37,13 +38,40 @@ import org.geotools.resources.Utilities;
 public class AcceptFormatsType {
 
     @XmlElement(name = "OutputFormat")
-    protected List<String> outputFormat = new ArrayList<String>();
+    private List<String> outputFormat;
 
     /**
+     * An empty constructor used by JAXB.
+     */
+    AcceptFormatsType() {
+    }
+    
+    /**
+     * Build a new Accepted format.
+     */
+    public AcceptFormatsType(List<String> outputFormat) {
+        this.outputFormat = outputFormat;
+    }
+    
+    /**
+     * Build a new Accepted format.
+     */
+    public AcceptFormatsType(String... outputFormat) {
+         this.outputFormat = new ArrayList<String>();
+        for (String element: outputFormat) {
+            this.outputFormat.add(element);
+        }
+    }
+    
+    /**
      * Gets the value of the outputFormat property.
+     * (unmodifable)
      */
     public List<String> getOutputFormat() {
-        return this.outputFormat;
+        if (outputFormat == null) {
+            outputFormat = new ArrayList<String>();
+        }
+        return Collections.unmodifiableList(outputFormat);
     }
     
     /**
