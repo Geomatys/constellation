@@ -51,7 +51,8 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "coverage"
+    "coverage",
+    "identifier"
 })
 @XmlRootElement(name = "DescribeCoverage")
 public class DescribeCoverage extends AbstractRequest {

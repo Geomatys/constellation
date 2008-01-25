@@ -51,7 +51,10 @@ import net.seagis.ows.SectionsType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "section"
+    "section",
+    "acceptVersions",
+    "sections",
+    "acceptFormats"
 })
 @XmlRootElement(name = "GetCapabilities")
 public class GetCapabilities extends AbstractRequest {
