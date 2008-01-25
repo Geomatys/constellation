@@ -18,34 +18,27 @@ package net.seagis.coverage.wms;
 //jdk dependencies
 import java.io.File;
 import java.io.StringWriter;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 // JAXB xml binding dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.UnmarshalException;
 
 // jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.GET;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
-import javax.ws.rs.core.UriInfo;
 
 // seagis dependencies
 import net.seagis.catalog.CatalogException;
@@ -61,6 +54,7 @@ import net.seagis.gml.GridLimitsType;
 import net.seagis.gml.GridType;
 import net.seagis.gml.RectifiedGridType;
 import net.seagis.gml.TimePositionType;
+import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.BoundingBoxType;
 import net.seagis.ows.KeywordsType;
 import net.seagis.ows.LanguageStringType;
@@ -72,7 +66,6 @@ import net.seagis.ows.SectionsType;
 import net.seagis.ows.ServiceIdentification;
 import net.seagis.ows.ServiceIdentification;
 import net.seagis.ows.ServiceProvider;
-import net.seagis.wcs.AbstractRequest;
 import net.seagis.wcs.RangeType;
 import net.seagis.wcs.Capabilities;
 import net.seagis.wcs.ContentMetadata;
@@ -163,6 +156,14 @@ public class WCService extends WebService {
                 
                 DescribeCoverage dc = (DescribeCoverage)objectRequest;
                 verifyBaseParameter(0);
+                
+                //this wcs does not implement "store" mechanism
+                String store = getParameter("STORE", false);
+                if (store!= null && store.equals("true")) {
+                    throw new WebServiceException("The service does not implement the store mechanism", 
+                                                  NO_APPLICABLE_CODE, getCurrentVersion());
+                }
+                
                 /*
                  * if the parameters have been send by GET or POST kvp,
                  * we build a request object with this parameter.
@@ -191,9 +192,39 @@ public class WCService extends WebService {
                         throw new WebServiceException("The parameters SERVICE=WCS must be specify",
                                          MISSING_PARAMETER_VALUE, getCurrentVersion());
                     }
-                    gc = new GetCapabilities(getParameter("VERSION", false),
-                                             getParameter("SECTION", false),
-                                             null);
+                    if (getCurrentVersion().toString().equals("1.0.0")){
+                        gc = new GetCapabilities(getParameter("VERSION", false),
+                                                 getParameter("SECTION", false),
+                                                 null);
+                    } else {
+                        AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+                        
+                        //We transform the String of sections in a list.
+                        //In the same time we verify that the requested sections are valid. 
+                        String section = getParameter("Sections", false);
+                        List<String> requestedSections = new ArrayList<String>();
+                        if (section != null) {
+                            final StringTokenizer tokens = new StringTokenizer(section, ",;");
+                            while (tokens.hasMoreTokens()) {
+                                final String token = tokens.nextToken().trim();
+                                if (SectionsType.getExistingSections("1.1.1").contains(token)){
+                                    requestedSections.add(token);
+                                } else {
+                                    throw new WebServiceException("The section " + token + " does not exist",
+                                                                INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                }   
+                            }
+                        } else {
+                            //if there is no requested Sections we add all the sections
+                            requestedSections = SectionsType.getExistingSections("1.1.1");
+                        }
+                        SectionsType sections     = new SectionsType(requestedSections);
+                        gc = new GetCapabilities(getParameter("VERSION", false),
+                                                 null,
+                                                 sections,
+                                                 formats,
+                                                 null);
+                    }
                 }
                 return getCapabilities(gc);
                     
@@ -308,6 +339,8 @@ public class WCService extends WebService {
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
                 ex.printStackTrace();
+            } else {
+                logger.info(ex.getMessage());
             }
             StringWriter sw = new StringWriter();    
             marshaller.marshal(ex.getServiceExceptionReport(), sw);
@@ -316,7 +349,7 @@ public class WCService extends WebService {
      }
     
     /**
-     * Web service operation
+     * GetCapabilities operation. 
      */ 
     public Response getCapabilities(GetCapabilities request) throws JAXBException, WebServiceException {
         logger.info("getCapabilities request received");
@@ -339,10 +372,11 @@ public class WCService extends WebService {
         if (inputVersion.equals("1.1.1")) {
             
             // if the user have specified one format accepted (only one for now != spec)
-            format = getParameter("AcceptFormats", false);
-            if (format == null) {
+            AcceptFormatsType formats = request.getAcceptFormats();
+            if (formats == null || formats.getOutputFormat().size() > 0) {
                 format = "text/xml";
             } else {
+                format = formats.getOutputFormat().get(0);
                 if (!format.equals("text/xml") && !format.equals("application/vnd.ogc.se_xml")){
                     throw new WebServiceException("This format " + format + " is not allowed",
                                        INVALID_PARAMETER_VALUE, getCurrentVersion());
@@ -350,19 +384,9 @@ public class WCService extends WebService {
             }
             
             //if the user have requested only some sections
-            String sections = getParameter("Sections", false);
-            List<String> requestedSections = new ArrayList<String>();
-            if (sections != null) {
-                final StringTokenizer tokens = new StringTokenizer(sections, ",;");
-                while (tokens.hasMoreTokens()) {
-                    final String token = tokens.nextToken().trim();
-                    if (SectionsType.getExistingSections("1.1.1").contains(token)){
-                        requestedSections.add(token);
-                    } else {
-                        throw new WebServiceException("The section " + token + " does not exist",
-                                                 INVALID_PARAMETER_VALUE, getCurrentVersion());
-                    }
-                }
+            List<String> requestedSections;
+            if (request.geSections() != null && request.geSections().getSection().size() > 0) {
+                requestedSections = request.geSections().getSection();
             } else {
                 requestedSections = SectionsType.getExistingSections("1.1.1");
             }
@@ -693,9 +717,8 @@ public class WCService extends WebService {
         if (getCurrentVersion().toString().equals("1.1.1")) {
             webServiceWorker.setGridCRS(gridOrigin, gridOffsets);
         } else {
-            if (width == null || height == null) {
+            if (width != null && height != null) {
                 webServiceWorker.setDimension(width, height, depth);
-                logger.info("WIDTHHHHHHHH=== " + width);
             } else {
                 webServiceWorker.setResolution(resx, resy, resz);
             }
@@ -714,21 +737,13 @@ public class WCService extends WebService {
         try {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
-        
-        List<Layer> layers = webServiceWorker.getLayers(request.getCoverage());
-        
-        //this wcs does not implement "store" mechanism
-        String store = getParameter("STORE", false);
-        if (store!= null && store.equals("true")) {
-             throw new WebServiceException("The service does not implement the store mechanism", 
-                     NO_APPLICABLE_CODE, getCurrentVersion());
-        }
-        
         //we prepare the response object to return
         Object response;
         
-        if (getCurrentVersion().toString().equals("1.0.0")){
-            
+        if (getCurrentVersion().toString().equals("1.0.0")) {
+        
+            List<Layer> layers = webServiceWorker.getLayers(request.getCoverage());
+        
             List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
             for (Layer layer: layers){
                 GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
@@ -784,7 +799,7 @@ public class WCService extends WebService {
                 formats.add(new CodeListType("png"));
                 formats.add(new CodeListType("gif"));
                 formats.add(new CodeListType("bmp"));
-                String nativeFormat = "??";
+                String nativeFormat = "unknow";
                 Iterator<Series> it = layer.getSeries().iterator();
                 if (it.hasNext()) {
                     Series s = it.next();
@@ -818,6 +833,9 @@ public class WCService extends WebService {
         
         // describeCoverage version 1.1.1    
         } else {
+        
+            List<Layer> layers = webServiceWorker.getLayers(request.getIdentifier());
+        
             net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
             List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
             for (Layer layer: layers){
@@ -873,7 +891,7 @@ public class WCService extends WebService {
                 
                 //supported formats
                 List<String> supportedFormat = new ArrayList<String>();
-                supportedFormat.add("matrix");
+                supportedFormat.add("application/matrix");
                 supportedFormat.add("image/png");
                 supportedFormat.add("image/jpeg");
                 supportedFormat.add("image/bmp");

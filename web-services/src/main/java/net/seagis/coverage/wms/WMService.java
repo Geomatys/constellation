@@ -28,17 +28,12 @@ import javax.units.Unit;
 
 // jersey dependencies
 import javax.ws.rs.Path;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.HttpContext;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response;
 import com.sun.ws.rest.spi.resource.Singleton;
 
 // JAXB xml binding dependencies
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -76,7 +71,8 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
- * WMS 1.3.0 web service implementing the operation getMap, getFeatureInfo and getCapabilities.
+ * WMS 1.3.0 / 1.1.1 
+ * web service implementing the operation getMap, getFeatureInfo and getCapabilities.
  *
  * @version
  * @author Guilhem Legal

@@ -137,7 +137,7 @@ public abstract class WebService {
     }
     
     /**
-     * Initialiise the basic attribute of a web service.
+     * Initialize the basic attribute of a web service.
      * 
      * @param versions A list of the supported version of this service.
      */
@@ -157,7 +157,6 @@ public abstract class WebService {
     }
     
     /**
-     * TODO make it private. 
      * 
      * Extract The parameter named parameterName from the query.
      * If the parameter is mandatory and if it is null it throw an exception.
