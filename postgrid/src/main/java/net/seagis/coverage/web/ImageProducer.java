@@ -226,6 +226,16 @@ public abstract class ImageProducer {
     protected String format;
 
     /**
+     * The background color of the current image (default {@code 0xFFFFFF}).
+     */
+    protected Color background = Color.WHITE;
+
+    /**
+     * A flag specifying if the image have to handle transparency.
+     */
+    protected boolean transparent;
+
+    /**
      * {@code true} if {@linkplain IndexColorModel index color model} are allowed to
      * store sample value with more than 8 bits. The default value is {@code false}.
      */
@@ -236,7 +246,7 @@ public abstract class ImageProducer {
      * overwritten everytime a new request is performed and deleted on JVM exit. Different
      * files are used for different suffix.
      */
-    private transient Map<ImageRequest,File> files;
+    private transient ImageRequestMap files;
 
     /**
      * The directory for temporary files. Will be computed when first needed.
@@ -310,19 +320,14 @@ public abstract class ImageProducer {
     private transient final Map<LayerRequest,Layer> layers;
 
     /**
+     * The mime types for each format name. Created when first needed.
+     */
+    private transient Map<String,String> mimeTypes;
+
+    /**
      * The current coordinate of the point requested by a {@code getFeatureInfo} request.
      */
     private DirectPosition coordinate;
-
-    /**
-     * The background color of the current image (default {@code 0xFFFFFF}).
-     */
-    protected Color background = Color.WHITE;
-
-    /**
-     * A flag specifying if the image have to handle transparency.
-     */
-    protected boolean transparent;
 
     /**
      * Creates a new image producer connected to the specified database.
@@ -423,17 +428,17 @@ public abstract class ImageProducer {
         }
         return layers;
     }
-    
+
     /**
-     * return the specified layers.
+     * Returns the specified layers.
      *
      * @param  layerNames a list of layer names.
      * @throws WebServiceException if an error occured while fetching the table.
      */
-    public List<Layer> getLayers(final List<String> layerNames) throws WebServiceException {
+    public List<Layer> getLayers(final Collection<String> layerNames) throws WebServiceException {
         final LayerTable table = getLayerTable(true);
-        final List<Layer> layers = new ArrayList<Layer>();
-        for (String layerName: layerNames) {
+        final List<Layer> layers = new ArrayList<Layer>(layerNames.size());
+        for (final String layerName: layerNames) {
             final Layer layer;
             try {
                 layer = table.getEntry(layerName);
@@ -684,6 +689,12 @@ public abstract class ImageProducer {
      */
     public String getMimeType() throws WebServiceException {
         if (format != null) {
+            if (mimeTypes != null) {
+                final String mime = mimeTypes.get(format);
+                if (mime != null) {
+                    return mime;
+                }
+            }
             return format;
         } else if (DEFAULT_FORMAT != null) {
             return DEFAULT_FORMAT;
@@ -983,7 +994,10 @@ public abstract class ImageProducer {
         if ((format == null || format.indexOf('/') < 0) && spi != null) {
             final String[] mimes = spi.getMIMETypes();
             if (mimes != null && mimes.length != 0) {
-                format = mimes[0];
+                if (mimeTypes == null) {
+                    mimeTypes = new HashMap<String,String>();
+                }
+                mimeTypes.put(format, mimes[0]);
             }
         }
         return file;
@@ -1068,10 +1082,7 @@ public abstract class ImageProducer {
     public void flush() throws WebServiceException {
         disposeWriter();
         if (files != null) {
-            for (final File file : files.values()) {
-                file.delete();
-            }
-            files = null;
+            files.run();
         }
         layers.clear();
         layerNames       = null;
@@ -1110,6 +1121,10 @@ public abstract class ImageProducer {
      */
     public void dispose() throws WebServiceException {
         flush();
+        if (files != null) {
+            files.dispose();
+            files = null;
+        }
         // Do not close the database connection, since it may be shared by other instances.
     }
 }

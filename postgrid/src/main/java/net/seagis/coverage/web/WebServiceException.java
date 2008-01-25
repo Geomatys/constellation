@@ -100,13 +100,13 @@ public class WebServiceException extends CatalogException {
     public ServiceExceptionReport getServiceExceptionReport() {
         return exception;
     }
-    
+
     /**
      * Returns the code of the first exception in the report.
      * or {@code null} if there is no exception report.
      */
     public WMSExceptionCode getExceptionCode() {
-        if (exception != null && exception.getServiceExceptions().size() > 0) {
+        if (exception != null && !exception.getServiceExceptions().isEmpty()) {
             return exception.getServiceExceptions().get(0).getCode();
         } else {
             return null;

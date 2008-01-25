@@ -16,27 +16,36 @@ package net.seagis.coverage.web;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 
 /**
- * Files creates for an image request.
+ * Files creates for an image request. This map is automatically registered for cleaning
+ * at shutdown time. Invoke {@link #dispose()} for unregistering it.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
 @SuppressWarnings("serial")
-final class ImageRequestMap extends LinkedHashMap<ImageRequest,File> {
+final class ImageRequestMap extends LinkedHashMap<ImageRequest,File> implements Runnable {
     /**
      * The maximal amount of files to be allowed.
      */
     private static final int MAXIMUM_FILES = 100;
 
     /**
+     * The shutdown hook.
+     */
+    private transient Thread hook;
+
+    /**
      * Creates an initially empty map.
      */
     public ImageRequestMap() {
         super(MAXIMUM_FILES + MAXIMUM_FILES/4, 0.75f, true);
+        hook = new Thread(this, "Delete temporary WCS files");
+        Runtime.getRuntime().addShutdownHook(hook);
     }
 
     /**
@@ -49,5 +58,28 @@ final class ImageRequestMap extends LinkedHashMap<ImageRequest,File> {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Deletes every file. Deleted files are removed from the map.
+     * The files that can't be deleted remain.
+     */
+    public void run() {
+        for (final Iterator<File> it=values().iterator(); it.hasNext();) {
+            if (it.next().delete()) {
+                it.remove();
+            }
+        }
+    }
+
+    /**
+     * Disposes this map and unregister the shutdown hook.
+     */
+    public void dispose() {
+        if (hook != null) {
+            Runtime.getRuntime().removeShutdownHook(hook);
+            hook = null;
+        }
+        run();
     }
 }
