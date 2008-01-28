@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,19 +12,27 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package net.seagis.management;
 
+
 /**
- * An interface declaring the exposed methods on remote jmx.
- * 
+ * An interface declaring the exposed methods on remote JMX.
+ *
  * @author Guilhem Legal
  */
 public interface WebServiceManagerMBean {
-    
-    public void Flush();
-    
-    public int getNumberOfWorkers();
-    
-    public String getImageFileTime();
+    /**
+     * Flush the cache content.
+     */
+    public void flush();
+
+    /**
+     * Returns the number of workers.
+     */
+    public int workerCount();
+
+    /**
+     * Returns the time in seconds required for creating the last image.
+     */
+    public String lastImageCreationDelay();
 }

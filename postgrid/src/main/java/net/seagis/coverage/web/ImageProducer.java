@@ -329,21 +329,22 @@ public abstract class ImageProducer {
      * The current coordinate of the point requested by a {@code getFeatureInfo} request.
      */
     private DirectPosition coordinate;
-    
-     /**
+
+    /**
      * A manager allowing to make some operation remotly with jconsole
      */
     private WebServiceJMXHandler manager;
 
-   /**
+    /**
      * Creates a new image producer connected to the specified database.
      *
      * @param database The connection to the database.
      */
     public ImageProducer(final Database database) {
         this.database = database;
-        this.manager  = new WebServiceJMXHandler(this); 
-        layers = LRULinkedHashMap.createForRecentAccess(12);
+        this.layers   = LRULinkedHashMap.createForRecentAccess(12);
+        this.manager  = new WebServiceJMXHandler();
+        manager.getManager().addWorker(this);
     }
 
     /**
@@ -353,9 +354,9 @@ public abstract class ImageProducer {
      */
     public ImageProducer(final ImageProducer worker) {
         database = worker.database;
+        layers   = worker.layers;
         manager  = worker.manager;
         manager.getManager().addWorker(this);
-        layers   = worker.layers;
     }
 
     /**
@@ -1138,9 +1139,9 @@ public abstract class ImageProducer {
         if (manager != null){
             manager.getManager().removeWorker(this);
         }
-        
+
         //if there no more worker (webService shutting down) we unregister the manager MBean
-        if (manager.getManager().getNumberOfWorkers() == 0) {
+        if (manager.getManager().workerCount() == 0) {
             manager.unregisterMBean();
         }
         if (files != null) {

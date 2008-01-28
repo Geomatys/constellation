@@ -41,7 +41,7 @@ import org.opengis.geometry.MismatchedDimensionException;
 
 import org.geotools.util.logging.Logging;
 import org.geotools.util.SimpleInternationalString;
-import org.geotools.coverage.FactoryFinder;
+import org.geotools.coverage.CoverageFactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GeneralGridGeometry;
@@ -81,7 +81,7 @@ public class TimeSeriesTile {
     /**
      * La fabrique à utiliser pour la création d'objets {@link GridCoverage2D}.
      */
-    private final GridCoverageFactory gridCoverageFactory = FactoryFinder.getGridCoverageFactory(null);
+    private final GridCoverageFactory gridCoverageFactory = CoverageFactoryFinder.getGridCoverageFactory(null);
 
     /**
      * L'enveloppe de la grille de destination. Ce n'est pas nécessairement l'enveloppe de
@@ -192,7 +192,7 @@ public class TimeSeriesTile {
          * que les arguments donnés par l'utilisateur (notamment 'step') sont compatibles.
          */
         this.coverage         = coverage;
-        this.step             = step = (double[]) step.clone();
+        this.step             = step = step.clone();
         this.varyingDimension = varyingDimension;
         final int dimension   = coverage.getCoordinateReferenceSystem().getCoordinateSystem().getDimension();
         if (envelope.getDimension() != dimension) {
@@ -343,7 +343,7 @@ public class TimeSeriesTile {
             fillSeries(listener);
             filled = true;
         }
-        return (TimeSeries[]) layer.clone();
+        return layer.clone();
     }
 
     /**
@@ -436,7 +436,6 @@ public class TimeSeriesTile {
                     gridCoverage.geophysics(false).getRenderedImage(),
                     "png",
                     new File(fileName + j + ".png"));
-
         }
         if (listener != null) {
             listener.complete();

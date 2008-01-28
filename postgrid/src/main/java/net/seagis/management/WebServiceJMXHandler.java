@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,12 +12,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-
 package net.seagis.management;
 
-import java.lang.management.ManagementFactory;
 import java.util.logging.Logger;
+import java.lang.management.ManagementFactory;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
@@ -25,7 +23,6 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
-import net.seagis.coverage.web.ImageProducer;
 
 
 /**
@@ -33,44 +30,42 @@ import net.seagis.coverage.web.ImageProducer;
  * @author Guilhem Legal
  */
 public class WebServiceJMXHandler {
-    
     /**
      * A debugging logger
      */
     private static final Logger LOGGER = Logger.getLogger("net.seagis.management");
-    
+
     /**
      * A MBean managing a list of worker.
      */
-    private WebServiceManager manager;
-    
+    private final WebServiceManager manager;
+
     /**
      * The MBeanserver platform.
      */
-    private MBeanServer mbs;
-    
+    private final MBeanServer mbs;
+
     /**
-     * Build a new JMX handler. 
+     * Build a new JMX handler.
      * It register all the MBean to the MBean server.
-     * 
+     *
      * @param worker a web service worker.
      */
-    public WebServiceJMXHandler(ImageProducer worker){
+    public WebServiceJMXHandler() {
         // Get the platform MBeanServer
         mbs = ManagementFactory.getPlatformMBeanServer();
 
         // Uniquely identify the MBeans and register them with the platform MBeanServer
-        manager = new WebServiceManager(worker);
-        
+        manager = new WebServiceManager();
+
         try {
            // Uniquely identify the MBeans and register them with the platform MBeanServer
-           LOGGER.info("registring MBEAN");
            ObjectName managerName = new ObjectName("WebServiceManager:name=WebServiceManager");
            if (mbs.isRegistered(managerName)) {
                mbs.unregisterMBean(managerName);
            }
            mbs.registerMBean(manager, managerName);
-           
+
         } catch (InstanceNotFoundException ex) {
             LOGGER.severe("Instance to unregister not found");
         } catch (InstanceAlreadyExistsException ex) {
@@ -82,29 +77,26 @@ public class WebServiceJMXHandler {
         } catch (MalformedObjectNameException ex) {
             LOGGER.severe("Malformed ObjectName for MBeans:" + ex.getMessage());
         } catch (NullPointerException ex) {
-            ex.printStackTrace();
             LOGGER.severe("null pointer Exception in WebServiceJMXHandler");
         }
     }
-    
+
     /**
-     * return the MBean manager. 
+     * return the MBean manager.
      */
     public WebServiceManager getManager() {
         return manager;
     }
-    
+
     /**
      * unregister The MBean from the MBean server
      */
     public void unregisterMBean(){
         try {
-            
             ObjectName managerName = new ObjectName("WebServiceManager:name=WebServiceManager");
             if (mbs != null && mbs.isRegistered(managerName)) {
                 mbs.unregisterMBean(managerName);
             }
-            
         } catch (InstanceNotFoundException ex) {
             LOGGER.severe("Instance to unregister not found");
         } catch (MBeanRegistrationException ex) {
@@ -112,7 +104,6 @@ public class WebServiceJMXHandler {
         } catch (MalformedObjectNameException ex) {
             LOGGER.severe("Malformed ObjectName for MBeans:" + ex.getMessage());
         } catch (NullPointerException ex) {
-             ex.printStackTrace();
             LOGGER.severe("null pointer Exception in WebServiceJMXHandler unregister");
         }
     }
