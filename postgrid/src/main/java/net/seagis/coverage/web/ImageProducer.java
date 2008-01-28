@@ -78,6 +78,7 @@ import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTable;
+import net.seagis.management.WebServiceJMXHandler;
 import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.resources.i18n.Resources;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
@@ -328,14 +329,20 @@ public abstract class ImageProducer {
      * The current coordinate of the point requested by a {@code getFeatureInfo} request.
      */
     private DirectPosition coordinate;
+    
+     /**
+     * A manager allowing to make some operation remotly with jconsole
+     */
+    private WebServiceJMXHandler manager;
 
-    /**
+   /**
      * Creates a new image producer connected to the specified database.
      *
      * @param database The connection to the database.
      */
     public ImageProducer(final Database database) {
         this.database = database;
+        this.manager  = new WebServiceJMXHandler(this); 
         layers = LRULinkedHashMap.createForRecentAccess(12);
     }
 
@@ -346,6 +353,8 @@ public abstract class ImageProducer {
      */
     public ImageProducer(final ImageProducer worker) {
         database = worker.database;
+        manager  = worker.manager;
+        manager.addWorker(this);
         layers   = worker.layers;
     }
 
@@ -745,6 +754,7 @@ public abstract class ImageProducer {
      * @throws WebServiceException if an error occured while processing the image.
      */
     public File getImageFile() throws WebServiceException {
+        long start = System.currentTimeMillis();
         ImageType type = ImageType.COVERAGE; // Default value.
         if (service != null) {
             switch (service) {
@@ -759,7 +769,9 @@ public abstract class ImageProducer {
                 return file;
             }
         }
-        return getImageFile(request, getRenderedImage());
+        File f = getImageFile(request, getRenderedImage());
+        manager.setImageFileTime(start, System.currentTimeMillis());
+        return f;
     }
 
     /**
@@ -1080,6 +1092,7 @@ public abstract class ImageProducer {
      * @throws WebServiceException if an error occured while clearing the cache.
      */
     public void flush() throws WebServiceException {
+        LOGGER.info("webserviceWorker is flushing");
         disposeWriter();
         if (files != null) {
             files.run();
