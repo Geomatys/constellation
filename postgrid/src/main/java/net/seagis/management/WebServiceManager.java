@@ -71,7 +71,16 @@ public class WebServiceManager implements WebServiceManagerMBean {
      * Add a new worker to the list.
      */
     public void addWorker(ImageProducer worker){
-        this.workers.add(worker);
+        workers.add(worker);
+    }
+    
+    /**
+     * remove a worker from the list.
+     */
+    public void removeWorker(ImageProducer worker){
+        if (workers.contains(worker)) {
+            workers.remove(worker);
+        }
     }
 
     /**

@@ -19,6 +19,7 @@ package net.seagis.management;
 import java.lang.management.ManagementFactory;
 import java.util.logging.Logger;
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -33,23 +34,45 @@ import net.seagis.coverage.web.ImageProducer;
  */
 public class WebServiceJMXHandler {
     
+    /**
+     * A debugging logger
+     */
     private static final Logger LOGGER = Logger.getLogger("net.seagis.management");
     
+    /**
+     * A MBean managing a list of worker.
+     */
     private WebServiceManager manager;
     
+    /**
+     * The MBeanserver platform.
+     */
+    private MBeanServer mbs;
+    
+    /**
+     * Build a new JMX handler. 
+     * It register all the MBean to the MBean server.
+     * 
+     * @param worker a web service worker.
+     */
     public WebServiceJMXHandler(ImageProducer worker){
         // Get the platform MBeanServer
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        mbs = ManagementFactory.getPlatformMBeanServer();
 
         // Uniquely identify the MBeans and register them with the platform MBeanServer
         manager = new WebServiceManager(worker);
-       
+        
         try {
            // Uniquely identify the MBeans and register them with the platform MBeanServer
            LOGGER.info("registring MBEAN");
            ObjectName managerName = new ObjectName("WebServiceManager:name=WebServiceManager");
+           if (mbs.isRegistered(managerName)) {
+               mbs.unregisterMBean(managerName);
+           }
            mbs.registerMBean(manager, managerName);
            
+        } catch (InstanceNotFoundException ex) {
+            LOGGER.severe("Instance to unregister not found");
         } catch (InstanceAlreadyExistsException ex) {
             LOGGER.severe("The instance of the MBean already exist");
         } catch (MBeanRegistrationException ex) {
@@ -57,17 +80,40 @@ public class WebServiceJMXHandler {
         } catch (NotCompliantMBeanException ex) {
             LOGGER.severe("NotCompliantMBeanException: " + ex.getMessage());
         } catch (MalformedObjectNameException ex) {
-            LOGGER.severe("Malformed ObjectName for MBeans");
+            LOGGER.severe("Malformed ObjectName for MBeans:" + ex.getMessage());
         } catch (NullPointerException ex) {
-            LOGGER.severe("null pointer Exception in WebServiceManager");
+            ex.printStackTrace();
+            LOGGER.severe("null pointer Exception in WebServiceJMXHandler");
         }
     }
     
-    public void addWorker(ImageProducer worker) {
-        manager.addWorker(worker);
+    /**
+     * return the MBean manager. 
+     */
+    public WebServiceManager getManager() {
+        return manager;
     }
     
-    public void setImageFileTime(long start, long end) {
-        manager.setImageFileTime(end - start);
+    /**
+     * unregister The MBean from the MBean server
+     */
+    public void unregisterMBean(){
+        try {
+            
+            ObjectName managerName = new ObjectName("WebServiceManager:name=WebServiceManager");
+            if (mbs != null && mbs.isRegistered(managerName)) {
+                mbs.unregisterMBean(managerName);
+            }
+            
+        } catch (InstanceNotFoundException ex) {
+            LOGGER.severe("Instance to unregister not found");
+        } catch (MBeanRegistrationException ex) {
+            LOGGER.severe("MBeanRegistrationException: " + ex.getMessage());
+        } catch (MalformedObjectNameException ex) {
+            LOGGER.severe("Malformed ObjectName for MBeans:" + ex.getMessage());
+        } catch (NullPointerException ex) {
+             ex.printStackTrace();
+            LOGGER.severe("null pointer Exception in WebServiceJMXHandler unregister");
+        }
     }
 }

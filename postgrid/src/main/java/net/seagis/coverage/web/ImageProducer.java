@@ -354,7 +354,7 @@ public abstract class ImageProducer {
     public ImageProducer(final ImageProducer worker) {
         database = worker.database;
         manager  = worker.manager;
-        manager.addWorker(this);
+        manager.getManager().addWorker(this);
         layers   = worker.layers;
     }
 
@@ -770,7 +770,7 @@ public abstract class ImageProducer {
             }
         }
         File f = getImageFile(request, getRenderedImage());
-        manager.setImageFileTime(start, System.currentTimeMillis());
+        manager.getManager().setImageFileTime(start - System.currentTimeMillis());
         return f;
     }
 
@@ -1134,6 +1134,15 @@ public abstract class ImageProducer {
      */
     public void dispose() throws WebServiceException {
         flush();
+        // we delete the worker of the management MBean
+        if (manager != null){
+            manager.getManager().removeWorker(this);
+        }
+        
+        //if there no more worker (webService shutting down) we unregister the manager MBean
+        if (manager.getManager().getNumberOfWorkers() == 0) {
+            manager.unregisterMBean();
+        }
         if (files != null) {
             files.dispose();
             files = null;

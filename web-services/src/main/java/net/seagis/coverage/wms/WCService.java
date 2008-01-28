@@ -794,11 +794,11 @@ public class WCService extends WebService {
                 
                 // supported formats
                 List<CodeListType> formats = new ArrayList<CodeListType>();
-                formats.add(new CodeListType("application/matrix"));
-                formats.add(new CodeListType("image/jpeg"));
-                formats.add(new CodeListType("image/png"));
-                formats.add(new CodeListType("image/gif"));
-                formats.add(new CodeListType("image/bmp"));
+                formats.add(new CodeListType("matrix"));
+                formats.add(new CodeListType("jpeg"));
+                formats.add(new CodeListType("png"));
+                formats.add(new CodeListType("gif"));
+                formats.add(new CodeListType("bmp"));
                 String nativeFormat = "unknow";
                 Iterator<Series> it = layer.getSeries().iterator();
                 if (it.hasNext()) {
