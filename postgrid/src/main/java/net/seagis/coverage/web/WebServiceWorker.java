@@ -453,7 +453,7 @@ public class WebServiceWorker extends ImageProducer {
                         INVALID_PARAMETER_VALUE, version);
             }
         } else {
-            code = Interpolation.INTERP_BILINEAR;
+            code = Interpolation.INTERP_NEAREST;
         }
         this.interpolation = Interpolation.getInstance(code);
     }
