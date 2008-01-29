@@ -214,7 +214,7 @@ public abstract class ImageProducer {
     /**
      * The interpolation to use for resampling.
      */
-    protected Interpolation interpolation = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+    protected Interpolation interpolation = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
 
     /**
      * The exceptions format as a MIME type.
