@@ -78,7 +78,6 @@ import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTable;
-import net.seagis.management.WebServiceJMXHandler;
 import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.resources.i18n.Resources;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
@@ -333,7 +332,7 @@ public abstract class ImageProducer {
     /**
      * A manager allowing to make some operation remotly with jconsole
      */
-    private WebServiceJMXHandler manager;
+    private final WebServiceManager manager;
 
     /**
      * Creates a new image producer connected to the specified database.
@@ -343,8 +342,8 @@ public abstract class ImageProducer {
     public ImageProducer(final Database database) {
         this.database = database;
         this.layers   = LRULinkedHashMap.createForRecentAccess(12);
-        this.manager  = new WebServiceJMXHandler();
-        manager.getManager().addWorker(this);
+        this.manager  = new WebServiceManager();
+        manager.addWorker(this);
     }
 
     /**
@@ -356,7 +355,7 @@ public abstract class ImageProducer {
         database = worker.database;
         layers   = worker.layers;
         manager  = worker.manager;
-        manager.getManager().addWorker(this);
+        manager.addWorker(this);
     }
 
     /**
@@ -771,7 +770,6 @@ public abstract class ImageProducer {
             }
         }
         File f = getImageFile(request, getRenderedImage());
-        manager.getManager().setImageFileTime(start - System.currentTimeMillis());
         return f;
     }
 
@@ -1137,12 +1135,7 @@ public abstract class ImageProducer {
         flush();
         // we delete the worker of the management MBean
         if (manager != null){
-            manager.getManager().removeWorker(this);
-        }
-
-        //if there no more worker (webService shutting down) we unregister the manager MBean
-        if (manager.getManager().workerCount() == 0) {
-            manager.unregisterMBean();
+            manager.removeWorker(this);
         }
         if (files != null) {
             files.dispose();

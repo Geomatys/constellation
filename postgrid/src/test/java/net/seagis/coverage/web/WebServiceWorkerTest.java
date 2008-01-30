@@ -14,6 +14,7 @@
  */
 package net.seagis.coverage.web;
 
+import java.util.Set;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -23,6 +24,7 @@ import java.awt.image.RenderedImage;
 import java.awt.image.IndexColorModel;
 
 import org.geotools.util.logging.Logging;
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
 
 import net.seagis.coverage.catalog.Layer;
@@ -56,6 +58,12 @@ public class WebServiceWorkerTest extends DatabaseTest {
         GridCoverage2D coverage = worker.getGridCoverage2D(false);
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
         assertSame("Expected no ressampling.",       coverage, worker.getGridCoverage2D(true ));
+
+        Set<ViewType> types = coverage.getViewTypes();
+        assertTrue (types.contains(ViewType.SAME));
+        assertTrue (types.contains(ViewType.GEOPHYSICS));
+        assertFalse(types.contains(ViewType.PACKED));
+        assertFalse(types.contains(ViewType.NATIVE));
 
         String format = worker.getMimeType();
         assertEquals("image/png", format);
@@ -184,7 +192,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(2, worker.getGridCoverage2D(true).getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
         RenderedImage image = worker.getRenderedImage();
         assertEquals(Transparency.BITMASK, image.getColorModel().getTransparency());
-        if (true) try {
+        if (false) try {
             org.geotools.gui.swing.image.OperationTreeBrowser.show(image);
             Thread.sleep(50000);
         } catch (InterruptedException e) {

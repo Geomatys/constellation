@@ -12,27 +12,23 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.management;
+package net.seagis.coverage.web;
 
 
 /**
- * An interface declaring the exposed methods on remote JMX.
+ * Manages {@link WebServiceWorker} on remote JMX.
  *
+ * @version $Id: WebServiceWorker.java 386 2008-01-29 10:47:01Z glegal $
  * @author Guilhem Legal
  */
 public interface WebServiceManagerMBean {
     /**
-     * Flush the cache content.
-     */
-    public void flush();
-
-    /**
      * Returns the number of workers.
      */
-    public int workerCount();
+    int workerCount();
 
     /**
-     * Returns the time in seconds required for creating the last image.
+     * Flush the cache content.
      */
-    public String lastImageCreationDelay();
+    void flush();
 }
