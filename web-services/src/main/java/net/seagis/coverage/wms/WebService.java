@@ -66,6 +66,16 @@ public abstract class WebService {
     protected static final Logger logger = Logger.getLogger("net.seagis.wms");
     
     /**
+     * The user directory where to store the configuration file on Unix platforms.
+     */
+    private static final String UNIX_DIRECTORY = ".sicade";
+
+    /**
+     * The user directory where to store the configuration file on Windows platforms.
+     */
+    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
+
+    /**
      * The supported versions supportd by this web service.
      */
     private final List<Version> versions = new ArrayList<Version>();
@@ -396,20 +406,30 @@ public abstract class WebService {
      * @return The capabilities Object, or {@code null} if none.
      */
     protected Object getCapabilitiesObject(Version version) throws JAXBException {
-       String appName = context.getBaseUri().getPath();
-       //we delete the /WS
-       appName = appName.substring(0, appName.length()-3);
-       String path = System.getenv().get("CATALINA_HOME") + "/webapps" + appName + "WEB-INF/";
-       
        String fileName = this.service + "Capabilities" + version.toString() + ".xml";
-        
+       
        if (fileName == null) {
            return null;
        } else {
-           
            Object response = capabilities.get(fileName);
            if (response == null) {
-               response = unmarshaller.unmarshal(new File(path + fileName));
+           
+               File path;
+               String appName = context.getBaseUri().getPath();
+               //we delete the /WS
+               appName = appName.substring(0, appName.length()-3);
+               String home = System.getenv().get("CATALINA_HOME") + "/webapps" + appName + "WEB-INF/";
+               if (home == null || !(path=new File(home)).isDirectory()) {
+                    home = System.getProperty("user.home");
+                    if (System.getProperty("os.name", "").startsWith("Windows")) {
+                        path = new File(home, WINDOWS_DIRECTORY);
+                    } else {
+                        path = new File(home, UNIX_DIRECTORY);
+                    }
+                } 
+            
+               File f = new File(path, fileName);
+               response = unmarshaller.unmarshal(f);
                capabilities.put(fileName, response);
            }
            
