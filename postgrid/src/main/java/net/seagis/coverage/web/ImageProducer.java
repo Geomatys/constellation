@@ -338,11 +338,12 @@ public abstract class ImageProducer {
      * Creates a new image producer connected to the specified database.
      *
      * @param database The connection to the database.
+     * @param jmx {@code true} for enabling JMX management, or {@code false} otherwise.
      */
-    public ImageProducer(final Database database) {
+    public ImageProducer(final Database database, final boolean jmx) {
         this.database = database;
         this.layers   = LRULinkedHashMap.createForRecentAccess(12);
-        this.manager  = new WebServiceManager();
+        this.manager  = new WebServiceManager(jmx);
         manager.addWorker(this);
     }
 

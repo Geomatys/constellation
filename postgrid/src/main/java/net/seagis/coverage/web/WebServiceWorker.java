@@ -86,9 +86,10 @@ public class WebServiceWorker extends ImageProducer {
      * Creates a new image producer connected to the specified database.
      *
      * @param database The connection to the database.
+     * @param jmx {@code true} for enabling JMX management, or {@code false} otherwise.
      */
-    public WebServiceWorker(final Database database) {
-        super(database);
+    public WebServiceWorker(final Database database, final boolean jmx) {
+        super(database, jmx);
     }
 
     /**

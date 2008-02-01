@@ -57,21 +57,28 @@ final class WebServiceManager implements WebServiceManagerMBean {
 
     /**
      * Creates an initially empty {@code WebServiceManager}.
+     *
+     * @param jmx {@code true} for enabling JMX management, or {@code false} otherwise.
      */
-    public WebServiceManager(){
+    public WebServiceManager(final boolean jmx) {
         workers = new ArrayList<ImageProducer>();
-        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name;
-        try {
-           name = new ObjectName("WebServiceManager:name=WebServiceManager");
-           server.registerMBean(this, name);
-        } catch (JMException exception) {
-            Logging.unexpectedException(LOGGER, WebServiceManager.class, "<init>", exception);
+        if (jmx) {
+            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            ObjectName name;
+            try {
+               name = new ObjectName("WebServiceManager:name=WebServiceManager");
+               server.registerMBean(this, name);
+            } catch (JMException exception) {
+                Logging.unexpectedException(LOGGER, WebServiceManager.class, "<init>", exception);
+                name = null;
+                server = null;
+            }
+            this.name = name;
+            this.server = server;
+        } else {
             name = null;
             server = null;
         }
-        this.name = name;
-        this.server = server;
     }
 
     /**

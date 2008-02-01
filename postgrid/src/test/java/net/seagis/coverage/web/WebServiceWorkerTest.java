@@ -32,6 +32,7 @@ import net.seagis.coverage.catalog.LayerTableTest;
 import net.seagis.catalog.DatabaseTest;
 
 import org.junit.Test;
+import org.junit.runner.JUnitCore;
 
 
 /**
@@ -41,11 +42,18 @@ import org.junit.Test;
  */
 public class WebServiceWorkerTest extends DatabaseTest {
     /**
+     * Runs from the command line.
+     */
+    public static void main(String[] args) {
+        JUnitCore.runClasses(WebServiceWorkerTest.class);
+    }
+
+    /**
      * Tests with the default test layer.
      */
     @Test
     public void testSST() throws WebServiceException, IOException {
-        final WebServiceWorker worker = new WebServiceWorker(database);
+        final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.0");
         worker.setLayer(LayerTableTest.SAMPLE_NAME);
         worker.setCoordinateReferenceSystem("EPSG:4326");
@@ -60,7 +68,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertSame("Expected no ressampling.",       coverage, worker.getGridCoverage2D(true ));
 
         Set<ViewType> types = coverage.getViewTypes();
-        assertTrue (types.contains(ViewType.SAME));
+        assertFalse(types.contains(ViewType.SAME));
         assertTrue (types.contains(ViewType.GEOPHYSICS));
         assertFalse(types.contains(ViewType.PACKED));
         assertFalse(types.contains(ViewType.NATIVE));
@@ -164,7 +172,8 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testNetCDF() throws WebServiceException, IOException {
-        final WebServiceWorker worker = new WebServiceWorker(database);
+        final WebServiceWorker worker = new WebServiceWorker(database, false);
+        worker.setInterpolation("bilinear");
         worker.setService("WMS", "1.0");
         worker.setLayer(LayerTableTest.NETCDF_NAME);
         worker.setCoordinateReferenceSystem("EPSG:3395");
@@ -230,7 +239,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         if (true) {
             return; // TODO
         }
-        final WebServiceWorker worker = new WebServiceWorker(database);
+        final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.1.1");
         worker.setLayer("BlueMarble");
         worker.setCoordinateReferenceSystem("EPSG:4326");
