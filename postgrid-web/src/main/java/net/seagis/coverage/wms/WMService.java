@@ -88,7 +88,7 @@ public class WMService extends WebService {
         super("WMS", "1.3.0","1.1.1");
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wms:net.seagis.sld:net.seagis.gml");
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.coverage.web:net.seagis.wms:net.seagis.sld:net.seagis.gml");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wms"));

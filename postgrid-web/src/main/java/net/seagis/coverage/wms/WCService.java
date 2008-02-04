@@ -127,7 +127,7 @@ public class WCService extends WebService {
      */
     public WCService() throws JAXBException, WebServiceException {
         super("WCS", "1.1.1", "1.0.0");
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.wcs");
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.coverage.web:net.seagis.wcs");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wcs"));
