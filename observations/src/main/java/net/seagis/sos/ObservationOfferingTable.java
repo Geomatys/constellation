@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.namespace.QName;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.NoSuchTableException;
@@ -35,6 +36,8 @@ import net.seagis.observation.PhenomenonEntry;
 import net.seagis.observation.ProcessEntry;
 import net.seagis.observation.SamplingFeatureEntry;
 import net.seagis.observation.TemporalObjectEntry;
+import net.seagis.coverage.wms.NamespacePrefixMapperImpl;
+import net.seagis.gml32.ReferenceEntry;
 
 /**
  *
@@ -43,42 +46,47 @@ import net.seagis.observation.TemporalObjectEntry;
 public class ObservationOfferingTable extends SingletonTable<ObservationOfferingEntry>{
 
     /**
-     * Un lien vers la table des procedure offering
+     * a link to the offering procedure.
      */ 
     private OfferingProcedureTable procedures;
     
-     /**
-     * Un lien vers la table des phenomene offering
+    /**
+     * a link to the offering phenomenon table.
      */ 
     private OfferingPhenomenonTable phenomenons;
     
-     /**
-     * Un lien vers la table des station offering
+    /**
+     * a link to the offering station table. 
      */ 
     private OfferingSamplingFeatureTable stations;
     
-      /**
-     * Un lien vers la table des station offering
+    /**
+     * a link to the offering response mode table
      */ 
     private OfferingResponseModeTable responseModes;
     
     
     /**
-     * Un lien vers la table des envelope.
+     * a link to the envelope table.
      */
     private EnvelopeTable envelopes;
     
     /**
-     * Construit une table des envelope.
+     * A mapper allowing to retrieve the prefix of a namespace.
+     */
+    NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(null);
+    
+    /**
+     * Build a new observation offering table.
      *
-     * @param  database Connexion vers la base de données.
+     * @param  database Connexion to database.
      */
     public ObservationOfferingTable(final Database database) {
         this(new ObservationOfferingQuery(database));
     }
 
     /**
-     * Initialise l'identifiant de la table.
+     * Initialize the table identifier.
      */
     private ObservationOfferingTable(final ObservationOfferingQuery query) {
         super(query);
@@ -161,7 +169,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          getProcedures().setIdOffering(idOffering);
          Collection<OfferingProcedureEntry> entries2 = getProcedures().getEntries();
         
-         List<ProcessEntry> process = new ArrayList<ProcessEntry>();
+         List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
         
          i = entries2.iterator();
          while(i.hasNext()) {
@@ -172,7 +180,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          getStations().setIdOffering(idOffering);
          Collection<OfferingSamplingFeatureEntry> entries3 = stations.getEntries();
         
-         List<SamplingFeatureEntry> sampling = new ArrayList<SamplingFeatureEntry>();
+         List<ReferenceEntry> sampling = new ArrayList<ReferenceEntry>();
         
          i = entries3.iterator();
          while(i.hasNext()) {
@@ -194,26 +202,32 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          
          getResponseModes().setIdOffering(idOffering);
          Collection<OfferingResponseModeEntry> entries4 = getResponseModes().getEntries();
-         List<ResponseMode> modes = new ArrayList<ResponseMode>();
+         List<ResponseModeType> modes = new ArrayList<ResponseModeType>();
          i = entries4.iterator();
          
          while(i.hasNext()) {
             OfferingResponseModeEntry c =(OfferingResponseModeEntry) i.next();
             modes.add(c.getMode());
          }
+         List<String> responseFormat = new ArrayList<String>();
+         responseFormat.add(results.getString(indexOf(query.responseFormat)));
          
+         List<QName> resultModel = new ArrayList<QName>();
+         String namespace        = results.getString(indexOf(query.resultModelNamespace));
+         resultModel.add(new QName(namespace,
+                                   results.getString(indexOf(query.resultModelLocalPart)),
+                                   prefixMapper.getPreferredPrefix(namespace, "", false)));
          return new ObservationOfferingEntry(idOffering,
                                              results.getString(indexOf(query.name)),
                                              results.getString(indexOf(query.description)),
                                              null,
                                              boundedBy,
-                                             results.getString(indexOf(query.srsName)),
                                              eventTime,
                                              process,
                                              phenos,
                                              sampling,
-                                             results.getString(indexOf(query.responseFormat)),
-                                             results.getString(indexOf(query.resultModel)),
+                                             responseFormat,
+                                             resultModel,
                                              modes);
          
     }
@@ -251,21 +265,13 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             } else {
                 statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
             }
-       
-
-            //on insere le srs name
-            if (off.getSrsName() != null) {
-                statement.setString(indexOf(query.srsName), off.getSrsName());
-            } else {
-                statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
-            }
-            
+                   
             // on insere le "eventTime""
-            if (off.getEventTime() != null && ((TemporalObjectEntry)off.getEventTime()).getBeginTime() != null) {
-                Timestamp date = ((TemporalObjectEntry)off.getEventTime()).getBeginTime();
+            if (off.getTime() != null && ((TemporalObjectEntry)off.getTime()).getBeginTime() != null) {
+                Timestamp date = ((TemporalObjectEntry)off.getTime()).getBeginTime();
                 statement.setTimestamp(indexOf(query.eventTimeBegin), date);
-                if (((TemporalObjectEntry)off.getEventTime()).getEndTime() != null) {
-                    date = ((TemporalObjectEntry)off.getEventTime()).getEndTime();           
+                if (((TemporalObjectEntry)off.getTime()).getEndTime() != null) {
+                    date = ((TemporalObjectEntry)off.getTime()).getEndTime();           
                     statement.setTimestamp(indexOf(query.eventTimeEnd), date);
                 } else {
                     statement.setNull(indexOf(query.eventTimeEnd), java.sql.Types.TIMESTAMP);
@@ -284,20 +290,22 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             } else {
                 statement.setNull(indexOf(query.boundedBy), java.sql.Types.VARCHAR);
             }
-            statement.setString(indexOf(query.responseFormat), off.getResponseFormat());
-            statement.setString(indexOf(query.resultModel), off.getResultModel());
+            // TODO transform in list
+            statement.setString(indexOf(query.responseFormat), off.getResponseFormat().get(0));
+            statement.setString(indexOf(query.resultModelNamespace), off.getResultModel().get(0).getNamespaceURI());
+            statement.setString(indexOf(query.resultModelLocalPart), off.getResultModel().get(0).getLocalPart());
         
             updateSingleton(statement);
         
-            // on insere les modes de reponse
+            // we insert the response mode
             if (off.getResponseMode() != null && off.getResponseMode().size() != 0){
-                for (ResponseMode mode:off.getResponseMode()) {
+                for (ResponseModeType mode:off.getResponseMode()) {
                     getResponseModes().getIdentifier(new OfferingResponseModeEntry(off.getId(), mode));
                 } 
             }
             // on insere la liste de station qui a effectué cette observation
             if (off.getFeatureOfInterest() != null && off.getFeatureOfInterest().size() != 0) {
-                for (SamplingFeatureEntry station:off.getFeatureOfInterest()) {
+                for (ReferenceEntry station:off.getFeatureOfInterest()) {
                     getStations().getIdentifier(new OfferingSamplingFeatureEntry(off.getId(), station));
                 }
             }
@@ -311,7 +319,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
         
             //on insere les capteur
             if (off.getProcedure() != null) {
-                for (ProcessEntry process:off.getProcedure()){
+                for (ReferenceEntry process:off.getProcedure()){
                     getProcedures().getIdentifier(new OfferingProcedureEntry(off.getId(), process));
                 }
             }

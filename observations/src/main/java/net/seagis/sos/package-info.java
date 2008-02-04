@@ -5,8 +5,8 @@
 // Generated on: 2007.09.13 at 04:28:10 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengeospatial.net/sos/0", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
-xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "sos", namespaceURI= "http://www.opengeospatial.net/sos/0"),
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/sos/1.0", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
+xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "sos", namespaceURI= "http://www.opengis.net/sos/1.0"),
           @javax.xml.bind.annotation.XmlNs(prefix = "gml", namespaceURI= "http://www.opengis.net/gml/3.2"),
           @javax.xml.bind.annotation.XmlNs(prefix = "ogc", namespaceURI= "http://www.opengis.net/ogc"),
           @javax.xml.bind.annotation.XmlNs(prefix = "swe", namespaceURI= "http://www.opengis.net/swe/1.0"),

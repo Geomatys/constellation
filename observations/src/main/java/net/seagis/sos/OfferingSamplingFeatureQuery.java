@@ -18,12 +18,12 @@ public class OfferingSamplingFeatureQuery extends Query {
      /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column idOffering, samplingFeature, samplingPoint;
+    protected final Column idOffering, samplingFeature;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byOffering, bySamplingFeature, bySamplingPoint;
+    protected final Parameter byOffering, bySamplingFeature;
     
     /**
      * Creates a new query for the specified database.
@@ -37,11 +37,9 @@ public class OfferingSamplingFeatureQuery extends Query {
         
         idOffering      = addColumn("id_offering", SLIE);
         samplingFeature = addColumn("sampling_feature",  SLIE);
-        samplingPoint   = addColumn("sampling_point",  SLIE);
         
         byOffering        = addParameter(idOffering, SELECT, LIST, EXISTS);
         bySamplingFeature = addParameter(samplingFeature,  SELECT, EXISTS);
-        bySamplingPoint   = addParameter(samplingPoint,  SELECT, EXISTS);
     }
 
 }

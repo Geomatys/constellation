@@ -1,10 +1,16 @@
 /*
- * OfferingProcedureTable.java
- * 
- * Created on 10 oct. 2007, 17:07:50
- * 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 
 package net.seagis.sos;
@@ -16,45 +22,47 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
+import net.seagis.gml32.ReferenceEntry;
+import net.seagis.gml32.ReferenceTable;
 import net.seagis.observation.ProcessEntry;
 import net.seagis.observation.ProcessTable;
 import org.geotools.resources.Utilities;
 
 /**
  *
- * @author legal
+ * @author Guilhem Legal
  */
 public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntry>{
 
         
     /**
-     * identifiant secondaire de la table.
+     * identifier secondary of the table.
      */
     private String idOffering;
     
     /**
-     * un lien vers la table des process.
+     * a link to the reference table.
      */
-    private ProcessTable process;
+    private ReferenceTable process;
     
     /**
      * Construit une table des phenomene composé.
      *
-     * @param  database Connexion vers la base de données.
+     * @param  database Connection to the database.
      */
     public OfferingProcedureTable(final Database database) {
         this(new OfferingProcedureQuery(database));
     }
     
     /**
-     * Construit une nouvelle table non partagée
+     * Build a new table not shared.
      */
     public OfferingProcedureTable(final OfferingProcedureTable table) {
         super(table);
     }
     
     /**
-     * Initialise l'identifiant de la table.
+     * Initialize the identifier of the table.
      */
     private OfferingProcedureTable(final OfferingProcedureQuery query) {
         super(query);
@@ -67,9 +75,9 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
         final OfferingProcedureQuery query = (OfferingProcedureQuery) super.query;
         
         if (process == null) {
-            process = getDatabase().getTable(ProcessTable.class);
+            process = getDatabase().getTable(ReferenceTable.class);
         }
-        ProcessEntry procedure = process.getEntry(results.getString(indexOf(query.procedure)));
+        ReferenceEntry procedure = process.getEntry(results.getString(indexOf(query.procedure)));
         
         return new OfferingProcedureEntry(results.getString(indexOf(query.idOffering)), procedure);
     }
@@ -113,7 +121,7 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
             statement.setString(indexOf(query.idOffering), offProc.getIdOffering());
          
             if (process == null) {
-                process = getDatabase().getTable(ProcessTable.class);
+                process = getDatabase().getTable(ReferenceTable.class);
             }
             idProc = process.getIdentifier(offProc.getComponent());
         

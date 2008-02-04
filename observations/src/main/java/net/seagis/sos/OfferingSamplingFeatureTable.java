@@ -1,3 +1,19 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.sos;
 
 import java.sql.PreparedStatement;
@@ -7,6 +23,8 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
+import net.seagis.gml32.ReferenceEntry;
+import net.seagis.gml32.ReferenceTable;
 import net.seagis.observation.SamplingFeatureEntry;
 import net.seagis.observation.SamplingFeatureTable;
 import net.seagis.observation.SamplingPointEntry;
@@ -15,41 +33,48 @@ import org.geotools.resources.Utilities;
 
 /**
  *
- * @author legal
+ * @author Guilhem Legal
  */
 public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplingFeatureEntry> {
 
     /**
-     * identifiant secondaire de la table.
+     * identifier secondary of the table.
      */
     private String idOffering;
-    /**
+    
+    /*
      * un lien vers la table des sampling feature.
-     */
-    private SamplingFeatureTable samplingFeatures;
-    /**
-     * un lien vers la table des sampling point.
-     */
-    private SamplingPointTable samplingPoints;
-
-    /**
-     * Construit une table des phenomene composé.
      *
-     * @param  database Connexion vers la base de données.
+     * private SamplingFeatureTable samplingFeatures;
+     *
+     * un lien vers la table des sampling point.
+     *
+     * private SamplingPointTable samplingPoints;
+     */
+    
+    /**
+     * A lnk to the reference table. 
+     */
+     private ReferenceTable samplingFeatures;
+     
+    /**
+     * Build a new offering sampling feature table.
+     *
+     * @param  database Connection to the database.
      */
     public OfferingSamplingFeatureTable(final Database database) {
         this(new OfferingSamplingFeatureQuery(database));
     }
 
     /**
-     * Construit une nouvelle table non partagée
+     * Build a new table not shared.
      */
     public OfferingSamplingFeatureTable(final OfferingSamplingFeatureTable table) {
         super(table);
     }
 
     /**
-     * Initialise l'identifiant de la table.
+     * Initialize the table identifier.
      */
     private OfferingSamplingFeatureTable(final OfferingSamplingFeatureQuery query) {
         super(query);
@@ -59,20 +84,13 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
     @Override
     protected OfferingSamplingFeatureEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final OfferingSamplingFeatureQuery query = (OfferingSamplingFeatureQuery) super.query;
-        SamplingFeatureEntry samplingFeature;
+        ReferenceEntry samplingFeature;
         
-        if (results.getString(indexOf(query.samplingFeature)) != null) {
-            if (samplingFeatures == null) {
-                samplingFeatures = getDatabase().getTable(SamplingFeatureTable.class);
+        if (samplingFeatures == null) {
+                samplingFeatures = getDatabase().getTable(ReferenceTable.class);
             }
-            samplingFeature = samplingFeatures.getEntry(results.getString(indexOf(query.samplingFeature)));
-        } else {
-          if (samplingPoints == null) {
-                samplingPoints = getDatabase().getTable(SamplingPointTable.class);
-            }
-            samplingFeature = samplingPoints.getEntry(results.getString(indexOf(query.samplingPoint)));
-          
-        }
+        samplingFeature = samplingFeatures.getEntry(results.getString(indexOf(query.samplingFeature)));
+        
 
         return new OfferingSamplingFeatureEntry(results.getString(indexOf(query.idOffering)), samplingFeature);
     }
@@ -112,21 +130,12 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
         try {
             PreparedStatement statement = getStatement(QueryType.EXISTS);
             statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
-            if (offSamplingFeature.getComponent() instanceof SamplingPointEntry) {
-                if (samplingPoints == null) {
-                    samplingPoints = getDatabase().getTable(SamplingPointTable.class);
-                }
-                idSF = samplingPoints.getIdentifier((SamplingPointEntry)offSamplingFeature.getComponent());
-                statement.setString(indexOf(query.samplingPoint), idSF);
-                statement.setNull(indexOf(query.samplingFeature), java.sql.Types.VARCHAR);
-            } else if (offSamplingFeature.getComponent() instanceof SamplingFeatureEntry) {
-                if ( samplingFeatures == null) {
-                    samplingFeatures = getDatabase().getTable(SamplingFeatureTable.class);
-                }
-                idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
-                statement.setString(indexOf(query.samplingFeature), idSF);
-                statement.setNull(indexOf(query.samplingPoint), java.sql.Types.VARCHAR);
-            } 
+            if ( samplingFeatures == null) {
+                samplingFeatures = getDatabase().getTable(ReferenceTable.class);
+            }
+            idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
+            statement.setString(indexOf(query.samplingFeature), idSF);
+ 
             ResultSet result = statement.executeQuery();
             if(result.next()) {
                 success = true;
@@ -134,21 +143,12 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
             }
             PreparedStatement insert    = getStatement(QueryType.INSERT);
             insert.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
-            if (offSamplingFeature.getComponent() instanceof SamplingPointEntry) {
-                if (samplingPoints == null) {
-                    samplingPoints = getDatabase().getTable(SamplingPointTable.class);
-                }
-                idSF = samplingPoints.getIdentifier((SamplingPointEntry)offSamplingFeature.getComponent());
-                insert.setString(indexOf(query.samplingPoint), idSF);
-                insert.setNull(indexOf(query.samplingFeature), java.sql.Types.VARCHAR);
-            } else if (offSamplingFeature.getComponent() instanceof SamplingFeatureEntry) {
-                if ( samplingFeatures == null) {
-                    samplingFeatures = getDatabase().getTable(SamplingFeatureTable.class);
-                }
-                idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
-                insert.setString(indexOf(query.samplingFeature), idSF);
-                insert.setNull(indexOf(query.samplingPoint), java.sql.Types.VARCHAR);
+            if ( samplingFeatures == null) {
+                samplingFeatures = getDatabase().getTable(ReferenceTable.class);
             }
+            idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
+            insert.setString(indexOf(query.samplingFeature), idSF);
+
             updateSingleton(insert);
             success = true;
         } finally {

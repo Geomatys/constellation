@@ -16,8 +16,9 @@ public class ObservationOfferingQuery extends Query {
       /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column id, name, srsName, description, eventTimeBegin, 
-            eventTimeEnd, boundedBy, resultModel, responseFormat;
+    protected final Column id, name, description, eventTimeBegin, 
+            eventTimeEnd, boundedBy, resultModelNamespace, resultModelLocalPart, 
+            responseFormat;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -33,17 +34,17 @@ public class ObservationOfferingQuery extends Query {
         super (database, "observation_offerings");
         final QueryType[] SIL  = {SELECT, INSERT, LIST};
         final QueryType[] SIEL = {SELECT,INSERT, EXISTS, LIST};
-        id                = addColumn("id",                   SIEL);
-        name              = addColumn("name",                 SIL);
-        srsName           = addColumn("srs_name",             SIL);
-        description       = addColumn("description",          SIL);
-        eventTimeBegin    = addColumn("event_time_begin",     SIL);
-        eventTimeEnd      = addColumn("event_time_end",       SIL);
-        boundedBy         = addColumn("bounded_by",           SIL);
-        resultModel       = addColumn("result_model",         SIL);
-        responseFormat    = addColumn("response_format",      SIL);
+        id                   = addColumn("id",                     SIEL);
+        name                 = addColumn("name",                   SIL);
+        description          = addColumn("description",            SIL);
+        eventTimeBegin       = addColumn("event_time_begin",       SIL);
+        eventTimeEnd         = addColumn("event_time_end",         SIL);
+        boundedBy            = addColumn("bounded_by",             SIL);
+        resultModelNamespace = addColumn("result_model_namespace", SIL);
+        resultModelLocalPart = addColumn("result_model_localpart", SIL);
+        responseFormat       = addColumn("response_format",        SIL);
         
-        byId         = addParameter(id, SELECT, EXISTS);
+        byId                 = addParameter(id, SELECT, EXISTS);
     }
 
 

@@ -33,7 +33,7 @@ import org.geotools.resources.Utilities;
 public class ReferenceEntry extends Entry implements Reference{
     
     /**
-     * L'identifiant de la reference.
+     * The identifier of the reference.
      */
     @XmlAttribute
     private String id;
@@ -61,7 +61,7 @@ public class ReferenceEntry extends Entry implements Reference{
     
     
     /**
-     * COnstructeur utilisé par jaxB
+     * enpty constructor used by JAXB
      */
     public ReferenceEntry(){}
     
@@ -74,6 +74,14 @@ public class ReferenceEntry extends Entry implements Reference{
         this.href = href;
     }
 
+    /**
+     * Returns the name for this entry.
+     */
+    @Override
+    public String getName() {
+        return name;
+    }
+    
     /**
      * retourne l'identifiant de la reference.
      */
@@ -171,20 +179,17 @@ public class ReferenceEntry extends Entry implements Reference{
         }
         final ReferenceEntry that = (ReferenceEntry) object;
 
-        if (super.equals(object)) {
-            return Utilities.equals(this.actuate,            that.actuate)          &&
-                   Utilities.equals(this.arcrole,            that.arcrole)          &&  
-                   Utilities.equals(this.type,               that.type)             &&
-                   Utilities.equals(this.href,               that.href)             &&
-                   Utilities.equals(this.nilReason,          that.nilReason)        &&
-                   Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
-                   Utilities.equals(this.show,               that.show)             &&
-                   Utilities.equals(this.role,               that.role)             &&
-                   Utilities.equals(this.title,              that.title)            &&
-                   Utilities.equals(this.id,                 that.id)               &&
-                   Utilities.equals(this.owns,               that.owns);       
-        }
-        return false;
+        return Utilities.equals(this.actuate,            that.actuate)          &&
+               Utilities.equals(this.arcrole,            that.arcrole)          &&  
+               Utilities.equals(this.type,               that.type)             &&
+               Utilities.equals(this.href,               that.href)             &&
+               Utilities.equals(this.nilReason,          that.nilReason)        &&
+               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+               Utilities.equals(this.show,               that.show)             &&
+               Utilities.equals(this.role,               that.role)             &&
+               Utilities.equals(this.title,              that.title)            &&
+               Utilities.equals(this.id,                 that.id)               &&
+               Utilities.equals(this.owns,               that.owns);       
     }
 
     @Override

@@ -1,3 +1,18 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 
 package net.seagis.sos;
 
@@ -16,18 +31,18 @@ import org.geotools.resources.Utilities;
 
 /**
  *
- * @author legal
+ * @author Guilhem Legal
  */
 public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEntry>{
 
         
     /**
-     * identifiant secondaire de la table.
+     * identifier secondary of the table.
      */
     private String idOffering;
     
     /**
-     * un lien vers la table des phenomenes.
+     * a link to the reference table.
      */
     private PhenomenonTable phenomenons;
     
@@ -37,23 +52,23 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
     private CompositePhenomenonTable compositePhenomenons;
     
     /**
-     * Construit une table des phenomene composé.
+     * Build a new offering phenomenon table.
      *
-     * @param  database Connexion vers la base de données.
+     * @param  database Connection to the database.
      */
     public OfferingPhenomenonTable(final Database database) {
         this(new OfferingPhenomenonQuery(database));
     }
     
     /**
-     * Construit une nouvelle table non partagée
+     * Build a new offering phenomenon table not shared.
      */
     public OfferingPhenomenonTable(final OfferingPhenomenonTable table) {
         super(table);
     }
     
     /**
-     * Initialise l'identifiant de la table.
+     * Initialize the table identifier.
      */
     private OfferingPhenomenonTable(final OfferingPhenomenonQuery query) {
         super(query);
@@ -74,7 +89,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
         } else {
             if (compositePhenomenons == null) {
                 compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
-            }
+        } 
             phenomenon = compositePhenomenons.getEntry(results.getString(indexOf(query.compositePhenomenon)));
         }
         return new OfferingPhenomenonEntry(results.getString(indexOf(query.idOffering)), phenomenon);
@@ -123,7 +138,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
             if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
                 if (compositePhenomenons == null) {
                     compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
-                }
+            }
                 idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
                 statement.setString(indexOf(query.compositePhenomenon), idPheno);
                 statement.setNull(indexOf(query.phenomenon), java.sql.Types.VARCHAR);
@@ -132,7 +147,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 if ( phenomenons == null) {
                     phenomenons = getDatabase().getTable(PhenomenonTable.class);
                 }
-                idPheno = phenomenons.getIdentifier(offPheno.getComponent());
+            idPheno = phenomenons.getIdentifier(offPheno.getComponent());
                 statement.setString(indexOf(query.phenomenon), idPheno);
                 statement.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
             
@@ -153,10 +168,10 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 insert.setString(indexOf(query.compositePhenomenon), idPheno);
                 insert.setNull(indexOf(query.phenomenon), java.sql.Types.VARCHAR);
             } else if (offPheno.getComponent() instanceof PhenomenonEntry) {
-                if ( phenomenons == null) {
+            if ( phenomenons == null) {
                     phenomenons = getDatabase().getTable(PhenomenonTable.class);
-                }
-                idPheno = phenomenons.getIdentifier(offPheno.getComponent());
+            }
+            idPheno = phenomenons.getIdentifier(offPheno.getComponent());
                 insert.setString(indexOf(query.phenomenon), idPheno);
                 insert.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
             

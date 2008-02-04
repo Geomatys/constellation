@@ -21,12 +21,12 @@ public class OfferingResponseModeEntry extends Entry{
     /**
      * Le mode de reponse associe a cet offering.
      */
-    private ResponseMode mode;
+    private ResponseModeType mode;
     
     /**
      * Cree une nouveau lien entre une procedure et un offering. 
      */
-    public OfferingResponseModeEntry(String idOffering, ResponseMode mode) {
+    public OfferingResponseModeEntry(String idOffering, ResponseModeType mode) {
         super(mode.value());
         this.idOffering = idOffering;
         this.mode  = mode;
@@ -42,7 +42,7 @@ public class OfferingResponseModeEntry extends Entry{
     /**
      * Retourne le mode de reponse associe.
      */
-    public ResponseMode getMode() {
+    public ResponseModeType getMode() {
         return mode;
     }
 

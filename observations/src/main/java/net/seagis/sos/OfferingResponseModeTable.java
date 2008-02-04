@@ -52,7 +52,7 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
         final OfferingResponseModeQuery query = (OfferingResponseModeQuery) super.query;
         
         
-        ResponseMode mode = ResponseMode.valueOf(results.getString(indexOf(query.mode)));
+        ResponseModeType mode = ResponseModeType.valueOf(results.getString(indexOf(query.mode)));
         return new OfferingResponseModeEntry(results.getString(indexOf(query.idOffering)),
                                           mode);
     }
