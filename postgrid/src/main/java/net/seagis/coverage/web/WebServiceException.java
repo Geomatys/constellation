@@ -17,8 +17,6 @@ package net.seagis.coverage.web;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import net.seagis.ogc.ServiceExceptionReport;
-import net.seagis.ogc.ServiceExceptionType;
 import org.geotools.util.Version;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.wms.WMSExceptionCode;
