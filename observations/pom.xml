@@ -20,9 +20,8 @@
   -->
   <groupId>net.seagis</groupId>
   <artifactId>observations</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>Observations & measurements</name>
+  <packaging>war</packaging>
+  <name>Observations and measurements</name>
   <description>
     Utilitaires dédiés à l'exploitation d'une base de données PostgreSQL contenant un ensemble de mesures.
   </description>
@@ -42,6 +41,17 @@
       <roles>
         <role>Administrateur du projet</role>
         <role>Développeur Java</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>glegal</id>
+      <name>Guilhem Legal</name>
+      <email>guilhem.legal@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
       </roles>
       <timezone>+1</timezone>
     </developer>
@@ -115,7 +125,35 @@
     <dependency>
       <groupId>net.seagis</groupId>
       <artifactId>postgrid</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>persistence-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jersey</groupId>
+      <artifactId>jersey</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
     </dependency>
   </dependencies>
 
