@@ -2,7 +2,7 @@ package net.seagis.coverage.wms;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 
-class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
+public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
     
     /**
      * if set this namespace will be the root of the document with no prefix.
@@ -77,6 +77,18 @@ class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         
         if( "http://www.opengis.net/se".equals(namespaceUri) )
             return "se";
+        
+        if( "http://www.opengis.net/sos/1.0".equals(namespaceUri) )
+            return "sos";
+        
+        if( "http://www.opengis.net/om/1.0".equals(namespaceUri) )
+            return "om";
+        
+        if( "http://www.opengis.net/sensorML/1.0".equals(namespaceUri) )
+            return "sml";
+        
+        if( "http://www.opengis.net/swe/1.0".equals(namespaceUri) )
+            return "swe";
         
         
         return suggestion;

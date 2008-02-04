@@ -96,7 +96,11 @@ public class RequestMethodType extends OnlineResourceType {
     
     @Override
     public String toString() {
-        return super.toString() + "constraint: " + constraint.toString();
+        String s = super.toString();
+        if (constraint!= null) {
+            s += "constraint: " + constraint.toString();
+        }
+        return s;
     }
 
 }

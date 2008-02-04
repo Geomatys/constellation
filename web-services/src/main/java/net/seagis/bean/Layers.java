@@ -7,11 +7,13 @@
 
 package net.seagis.bean;
 
+import java.io.Serializable;
+
 /**
  *
  * @author olivier
  */
-public class Layers {
+public class Layers implements Serializable {
     private boolean markedForDeletion = false;
 
     // private Layers[] layersArray;

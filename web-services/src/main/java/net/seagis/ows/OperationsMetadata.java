@@ -150,16 +150,31 @@ public class OperationsMetadata {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append("Constraint:").append('\n');
-        for (int i = 0; i < constraint.size(); i++) {
-            s.append(constraint.get(i).toString()).append('\n');
+        if (constraint == null) {
+            s.append("null");
+        } else {
+            for (int i = 0; i < constraint.size(); i++) {
+                s.append(constraint.get(i).toString()).append('\n');
+            }
         }
         s.append("Operation:").append('\n');
-        for (int i = 0; i < operation.size(); i++) {
-            s.append(operation.get(i).toString()).append('\n');
+        if (operation == null) {
+            s.append("null");
+        } else {
+            for (int i = 0; i < operation.size(); i++) {
+                if (operation.get(i)!= null)
+                    s.append(operation.get(i).toString()).append('\n');
+                else
+                    s.append("operation n" + i + " is null").append('\n');
+            }
         }
         s.append("Parameter:").append('\n');
-        for (int i = 0; i < parameter.size(); i++) {
-            s.append(parameter.get(i).toString()).append('\n');
+        if (parameter == null) {
+            s.append("null");
+        } else {
+            for (int i = 0; i < parameter.size(); i++) {
+                s.append(parameter.get(i).toString()).append('\n');
+            }
         }
         if (extendedCapabilities != null) {
             s.append(extendedCapabilities.toString());

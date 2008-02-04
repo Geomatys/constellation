@@ -92,6 +92,9 @@ public class SectionsType {
      * Gets the value of the section property.
      */
     public List<String> getSection() {
+        if (section == null){
+            section = new ArrayList<String>();
+        }
        return Collections.unmodifiableList(section);
     }
     

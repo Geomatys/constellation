@@ -16,6 +16,7 @@
 
 package net.seagis.ows;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -103,6 +104,9 @@ public class Operation {
      * Gets the value of the parameter property.
      */
     public List<DomainType> getParameter() {
+        if (parameter == null) {
+            parameter = new ArrayList<DomainType>();
+        }
         return Collections.unmodifiableList(parameter);
     }
 
@@ -110,6 +114,9 @@ public class Operation {
      * Gets the value of the constraint property.
      */
     public List<DomainType> getConstraint() {
+        if (constraint == null) {
+            constraint = new ArrayList<DomainType>();
+        }
         return Collections.unmodifiableList(constraint);
     }
 
@@ -120,6 +127,9 @@ public class Operation {
      * Gets the value of the metadata property.
      */
     public List<MetadataType> getMetadata() {
+        if (metadata == null) {
+            metadata = new ArrayList<MetadataType>();
+        }
         return Collections.unmodifiableList(metadata);
     }
 
@@ -162,20 +172,28 @@ public class Operation {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append("Constraint:").append('\n');
-        for (int i = 0; i < constraint.size(); i++) {
-            s.append(constraint.get(i).toString()).append('\n');
+        if (constraint != null) {
+            for (int i = 0; i < constraint.size(); i++) {
+                s.append(constraint.get(i).toString()).append('\n');
+            }
         }
-        s.append("dcp:").append('\n');
-        for (int i = 0; i < dcp.size(); i++) {
-            s.append(dcp.get(i).toString()).append('\n');
+        if (dcp != null) {
+            s.append("dcp:").append('\n');
+            for (int i = 0; i < dcp.size(); i++) {
+                s.append(dcp.get(i).toString()).append('\n');
+            }
         }
-        s.append("metadata:").append('\n');
-        for (int i = 0; i < metadata.size(); i++) {
-            s.append(metadata.get(i).toString()).append('\n');
+        if (metadata != null) {
+            s.append("metadata:").append('\n');
+            for (int i = 0; i < metadata.size(); i++) {
+                s.append(metadata.get(i).toString()).append('\n');
+            }
         }
-        s.append("parameter:").append('\n');
-        for (int i = 0; i < parameter.size(); i++) {
-            s.append(parameter.get(i).toString()).append('\n');
+        if (parameter != null) {
+            s.append("parameter:").append('\n');
+            for (int i = 0; i < parameter.size(); i++) {
+                s.append(parameter.get(i).toString()).append('\n');
+            }
         }
         if (name == null) {
             s.append("Name is null").append('\n');

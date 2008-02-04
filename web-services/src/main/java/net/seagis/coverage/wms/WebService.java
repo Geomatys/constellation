@@ -132,7 +132,7 @@ public abstract class WebService {
             File configFile = new File(path);
             final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile));*/
         
-            final WebServiceWorker initialValue = new WebServiceWorker(new Database());
+            final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
                 @Override
                 protected WebServiceWorker initialValue() {

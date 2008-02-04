@@ -182,12 +182,16 @@ public class AddressType {
         s.append("city=").append(city).append(" country=").append(country).append(" postalCode=");
         s.append(postalCode).append(" administrativeArea=").append(administrativeArea).append('\n');
         s.append("deliveryPoint:");
-        for (String ss:deliveryPoint) {
-            s.append(ss).append('\n');
+        if (deliveryPoint != null) {
+            for (String ss:deliveryPoint) {
+                s.append(ss).append('\n');
+            }
         }
         s.append("electronicMailAddress:");
-        for (String ss:electronicMailAddress) {
-            s.append(ss).append('\n');
+        if (electronicMailAddress != null) {
+            for (String ss:electronicMailAddress) {
+                s.append(ss).append('\n');
+            }
         }
         return s.toString();
     }

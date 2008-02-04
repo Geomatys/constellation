@@ -192,7 +192,7 @@ public class UnNamedDomainType {
         if (metadata == null) {
             metadata = new ArrayList<MetadataType>();
         }
-        return this.metadata;
+        return metadata;
     }
     
     /**
@@ -262,10 +262,11 @@ public class UnNamedDomainType {
         
         if (referenceSystem != null) 
             s.append(referenceSystem.toString()).append('\n');
-        
-        
-        for (MetadataType m:metadata) {
-            s.append(m.toString()).append('\n');
+       
+        if (metadata != null) {        
+            for (MetadataType m:metadata) {
+                s.append(m.toString()).append('\n');
+            }
         }
         return s.toString();
     }

@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -88,6 +89,9 @@ public class KeywordsType {
      * Gets the value of the keyword property.
      */
     public List<LanguageStringType> getKeyword() {
+        if (keyword == null) {
+            keyword = new ArrayList<LanguageStringType>();
+        }
         return Collections.unmodifiableList(keyword);
     }
 
@@ -97,5 +101,42 @@ public class KeywordsType {
     public CodeType getType() {
         return type;
     }
+    
+    /**
+     * Verify that this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final KeywordsType that = (KeywordsType) object;
+        return Utilities.equals(this.keyword, that.keyword) &&
+               Utilities.equals(this.type,    that.type) ;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + (this.keyword != null ? this.keyword.hashCode() : 0);
+        hash = 43 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("keywords:").append('\n');
+        if (keyword != null) {
+            for (int i = 0; i < keyword.size(); i++) {
+                s.append(keyword.get(i).toString()).append('\n');
+            }
+        }
+        if (type != null) {
+            s.append("type=" + type.toString());
+        }
+        return s.toString();
+    }
+
 
 }

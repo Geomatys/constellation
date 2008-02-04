@@ -856,7 +856,7 @@ public class WCService extends WebService {
                 List<LanguageStringType> title   = new ArrayList<LanguageStringType>();
                 title.add(new LanguageStringType(layer.getName()));
                 List<LanguageStringType> _abstract   = new ArrayList<LanguageStringType>();
-                _abstract.add(new LanguageStringType(layer.getRemarks()));
+                _abstract.add(new LanguageStringType(cleanSpecialCharacter(layer.getRemarks())));
                 List<KeywordsType> keywords = new ArrayList<KeywordsType>();
                 keywords.add(new KeywordsType(new LanguageStringType("WCS"),
                                               new LanguageStringType(layer.getName())

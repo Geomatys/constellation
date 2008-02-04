@@ -16,6 +16,7 @@
 
 package net.seagis.ows;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -102,6 +103,9 @@ public class ServiceIdentification extends DescriptionType {
      * Gets the value of the serviceTypeVersion property.
      */
     public List<String> getServiceTypeVersion() {
+        if (serviceTypeVersion == null) {
+            serviceTypeVersion = new ArrayList<String>();
+        }
         return Collections.unmodifiableList(serviceTypeVersion);
     }
 
@@ -109,6 +113,9 @@ public class ServiceIdentification extends DescriptionType {
      * Gets the value of the profile property.
      */
     public List<String> getProfile() {
+        if (profile == null) {
+            profile = new ArrayList<String>();
+        }
         return Collections.unmodifiableList(profile);
     }
 
@@ -127,6 +134,9 @@ public class ServiceIdentification extends DescriptionType {
      * Gets the value of the accessConstraints property.
      */
     public List<String> getAccessConstraints() {
+        if (accessConstraints == null) {
+            accessConstraints = new ArrayList<String>();
+        }
         return Collections.unmodifiableList(accessConstraints);
     }
     
@@ -171,16 +181,22 @@ public class ServiceIdentification extends DescriptionType {
             s.append(serviceType.toString());
         s.append("fees=").append(fees);
         s.append("ServiceTypeVersion:").append('\n');
-        for (String ss:serviceTypeVersion) {
-            s.append(ss).append('\n');
+        if (serviceTypeVersion != null) {
+            for (String ss:serviceTypeVersion) {
+                s.append(ss).append('\n');
+            }
         }
         s.append("profile:").append('\n');
-        for (String ss:profile) {
-            s.append(ss).append('\n');
+        if (profile != null) {
+            for (String ss:profile) {
+                s.append(ss).append('\n');
+            }
         }
         s.append("accessConstraints:").append('\n');
-        for (String ss:accessConstraints) {
-            s.append(ss).append('\n');
+        if (accessConstraints != null) {
+            for (String ss:accessConstraints) {
+                s.append(ss).append('\n');
+            }
         }
         return s.toString();
     }
