@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
   Configuration of "wms" module from SeaGIS project.
   Version: $Id$
@@ -126,6 +125,16 @@
       <artifactId>commons-collections</artifactId>
       <version>3.2</version>
     </dependency>
+    <!--<dependency>
+      <groupId>javax.el</groupId>
+      <artifactId>el-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.el</groupId>
+      <artifactId>el-ri</artifactId>
+      <version>1.0</version>
+    </dependency>-->
   </dependencies>
 
 </project>
