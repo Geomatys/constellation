@@ -28,14 +28,17 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 // geotools dependencies
+import javax.xml.bind.Marshaller;
 import org.geotools.util.Version;
 
 // seaGIS dependencies
 import net.seagis.catalog.NoSuchTableException;
 import net.seagis.coverage.web.WebServiceException;
+import net.seagis.coverage.wms.NamespacePrefixMapperImpl;
 import net.seagis.coverage.wms.WebService;
 import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.SectionsType;
@@ -56,10 +59,15 @@ public class SOService extends WebService {
     /**
      * Build a new Restfull SOS service.
      */
-    public SOService() throws SQLException, NoSuchTableException, IOException {
+    public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
         super("SOS", "1.0");
         worker = new SOSworker();
         worker.setVersion(new Version("1.0"));
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.gml32:net.seagis.observation:net.seagis.ows:net.seagis.sos:net.seagis.swe:net.seagis.ogc");
+        marshaller = jbcontext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/sos/1.0"));
+        unmarshaller = jbcontext.createUnmarshaller();
     }
 
     @Override
