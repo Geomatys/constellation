@@ -64,10 +64,10 @@ public class SOService extends WebService {
      * Build a new Restfull SOS service.
      */
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
-        super("SOS", "1.0");
+        super("SOS", "1.0.0");
         worker = new SOSworker();
         worker.setVersion(new Version("1.0.0"));
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.gml32:net.seagis.observation:net.seagis.ows:net.seagis.sos:net.seagis.swe:net.seagis.ogc:net.seagis.coverage.web");
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.gml:net.seagis.observation:net.seagis.ows:net.seagis.sos:net.seagis.swe:net.seagis.ogc:net.seagis.coverage.web");
         unmarshaller = jbcontext.createUnmarshaller();
         jbcontext = JAXBContext.newInstance(Capabilities.class,
                                             ServiceExceptionReport.class,

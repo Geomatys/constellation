@@ -81,7 +81,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ObservationEntry }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/om/1.0", name = "Observation", substitutionHeadNamespace = "http://www.opengis.net/gml/3.2", substitutionHeadName = "AbstractFeature")
+    @XmlElementDecl(namespace = "http://www.opengis.net/om/1.0", name = "Observation", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractFeature")
     public JAXBElement<ObservationEntry> createObservation(ObservationEntry value) {
         return new JAXBElement<ObservationEntry>(_Observation_QNAME, ObservationEntry.class, null, value);
     }

@@ -1,4 +1,20 @@
-package net.seagis.gml32;
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+package net.seagis.gml;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -26,16 +42,16 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
 
     @XmlElement(nillable = true)
     private BoundingShapeEntry boundedBy;
-    @XmlElementRef(name = "location", namespace = "http://www.opengis.net/gml/3.2", type = JAXBElement.class)
+    @XmlElementRef(name = "location", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     private JAXBElement<? extends LocationPropertyType> location;
 
     /**
-     *  Constructeur vide utilise par JAXB.
+     *  Empty constructor used by JAXB.
      */
     public AbstractFeatureEntry() {}
     
     /**
-     * cree un nouveau "Feature"
+     * Build a new "Feature"
      */
     public AbstractFeatureEntry(String id, String name, String description, ReferenceEntry descriptionReference,
             BoundingShapeEntry boundedBy) {
@@ -45,56 +61,20 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
         
     /**
      * Gets the value of the boundedBy property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BoundingShapeType }
-     *     
      */
     public BoundingShapeEntry getBoundedBy() {
         return boundedBy;
     }
 
     /**
-     * Sets the value of the boundedBy property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BoundingShapeType }
-     *     
-     */
-    public void setBoundedBy(BoundingShapeEntry value) {
-        this.boundedBy = value;
-    }
-
-    /**
      * Gets the value of the location property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link JAXBElement }{@code <}{@link PriorityLocationPropertyType }{@code >}
-     *     {@link JAXBElement }{@code <}{@link LocationPropertyType }{@code >}
-     *     
      */
     public JAXBElement<? extends LocationPropertyType> getLocation() {
         return location;
     }
 
     /**
-     * Sets the value of the location property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link JAXBElement }{@code <}{@link PriorityLocationPropertyType }{@code >}
-     *     {@link JAXBElement }{@code <}{@link LocationPropertyType }{@code >}
-     *     
-     */
-    public void setLocation(JAXBElement<? extends LocationPropertyType> value) {
-        this.location = ((JAXBElement<? extends LocationPropertyType> ) value);
-    }
-    
-     /**
-     * Verifie si cette entree est identique l'objet specifie.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

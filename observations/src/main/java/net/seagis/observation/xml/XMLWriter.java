@@ -26,8 +26,8 @@ import net.seagis.observation.PhenomenonEntry;
 import net.seagis.observation.SamplingPointEntry;
 import net.seagis.observation.PhenomenonTable;
 import net.seagis.observation.SamplingPointTable;
-import net.seagis.gml32.UnitOfMeasureEntry;
-import net.seagis.gml32.UnitOfMeasureTable;
+import net.seagis.gml.UnitOfMeasureEntry;
+import net.seagis.gml.UnitOfMeasureTable;
 
 /**
  * Permet de creer les dictionnaire de données au format XML a partir de la base de données.

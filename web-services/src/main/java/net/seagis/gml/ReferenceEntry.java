@@ -162,29 +162,26 @@ public class ReferenceEntry extends Entry implements Reference{
     }
     
      /**
-     * Verifie si cette entree est identique l'objet specifie.
+     * Verify if this entry is identical to specified object.
      */
-    
+    @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
         final ReferenceEntry that = (ReferenceEntry) object;
 
-        if (super.equals(object)) {
-            return Utilities.equals(this.actuate,            that.actuate)          &&
-                   Utilities.equals(this.arcrole,            that.arcrole)          &&  
-                   Utilities.equals(this.type,               that.type)             &&
-                   Utilities.equals(this.href,               that.href)             &&
-                   Utilities.equals(this.nilReason,          that.nilReason)        &&
-                   Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
-                   Utilities.equals(this.show,               that.show)             &&
-                   Utilities.equals(this.role,               that.role)             &&
-                   Utilities.equals(this.title,              that.title)            &&
-                   Utilities.equals(this.id,                 that.id)               &&
-                   Utilities.equals(this.owns,               that.owns);       
-        }
-        return false;
+        return Utilities.equals(this.actuate,            that.actuate)          &&
+               Utilities.equals(this.arcrole,            that.arcrole)          &&  
+               Utilities.equals(this.type,               that.type)             &&
+               Utilities.equals(this.href,               that.href)             &&
+               Utilities.equals(this.nilReason,          that.nilReason)        &&
+               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+               Utilities.equals(this.show,               that.show)             &&
+               Utilities.equals(this.role,               that.role)             &&
+               Utilities.equals(this.title,              that.title)            &&
+               Utilities.equals(this.id,                 that.id)               &&
+               Utilities.equals(this.owns,               that.owns);       
     }
 
     
@@ -208,6 +205,7 @@ public class ReferenceEntry extends Entry implements Reference{
      * Retourne une representation de l'objet.
      */
     
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder("id=");
         s.append(id).append('\n');

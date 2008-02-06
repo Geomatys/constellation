@@ -49,7 +49,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
      * L'identifiant du phenomene.
      */
-    @XmlAttribute(required = true, namespace="http://www.opengis.net/gml/3.2")
+    @XmlAttribute(required = true, namespace="http://www.opengis.net/gml")
     private String id;
     
     /**

@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
-import net.seagis.gml32.UnitOfMeasureEntry;
+import net.seagis.gml.UnitOfMeasureEntry;
 
 // GeoTools dependencies
 import org.geotools.resources.Utilities;
@@ -35,7 +35,7 @@ import org.opengis.observation.Measure;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Measure")
-public class MeasureEntry extends Entry implements Measure{
+public class MeasureEntry extends Entry { //implements Measure{
     
     /**
      * Le non de l'unité de mesure.

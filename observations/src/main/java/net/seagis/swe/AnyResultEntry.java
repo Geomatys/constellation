@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
-import net.seagis.gml32.ReferenceEntry;
+import net.seagis.gml.ReferenceEntry;
 
 /**
  * Enregistrement permettant de regrouper plusieur type de resultat en un meme type.

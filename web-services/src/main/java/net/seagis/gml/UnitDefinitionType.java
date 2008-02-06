@@ -14,7 +14,7 @@
  */
 
 
-package net.seagis.gml32;
+package net.seagis.gml;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -31,11 +31,11 @@ import org.geotools.resources.Utilities;
  * <pre>
  * &lt;complexType name="UnitDefinitionType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/gml/3.2}DefinitionType">
+ *     &lt;extension base="{http://www.opengis.net/gml}DefinitionType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}quantityType" minOccurs="0"/>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}quantityTypeReference" minOccurs="0"/>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}catalogSymbol" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}quantityType" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}quantityTypeReference" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}catalogSymbol" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>
@@ -53,84 +53,33 @@ import org.geotools.resources.Utilities;
 @XmlSeeAlso({ BaseUnitType.class }) 
 public class UnitDefinitionType extends DefinitionType {
 
-    protected StringOrRefType quantityType;
-    protected ReferenceEntry quantityTypeReference;
-    protected CodeType catalogSymbol;
+    private StringOrRefType quantityType;
+    private ReferenceEntry quantityTypeReference;
+    private CodeType catalogSymbol;
 
     /**
      * Gets the value of the quantityType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link StringOrRefType }
-     *     
      */
     public StringOrRefType getQuantityType() {
         return quantityType;
     }
 
     /**
-     * Sets the value of the quantityType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link StringOrRefType }
-     *     
-     */
-    public void setQuantityType(StringOrRefType value) {
-        this.quantityType = value;
-    }
-
-    /**
      * Gets the value of the quantityTypeReference property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ReferenceType }
-     *     
      */
     public ReferenceEntry getQuantityTypeReference() {
         return quantityTypeReference;
     }
 
     /**
-     * Sets the value of the quantityTypeReference property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ReferenceType }
-     *     
-     */
-    public void setQuantityTypeReference(ReferenceEntry value) {
-        this.quantityTypeReference = value;
-    }
-
-    /**
      * Gets the value of the catalogSymbol property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CodeType }
-     *     
      */
     public CodeType getCatalogSymbol() {
         return catalogSymbol;
     }
 
     /**
-     * Sets the value of the catalogSymbol property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CodeType }
-     *     
-     */
-    public void setCatalogSymbol(CodeType value) {
-        this.catalogSymbol = value;
-    }
-
-    /**
-     * Vérifie si cette entré est identique à l'objet spécifié.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

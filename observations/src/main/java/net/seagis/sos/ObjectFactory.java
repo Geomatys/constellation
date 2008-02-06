@@ -18,7 +18,7 @@ package net.seagis.sos;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.namespace.QName;
-import net.seagis.gml32.CodeType;
+import net.seagis.gml.CodeType;
 
 /**
  *

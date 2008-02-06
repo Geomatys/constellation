@@ -1,3 +1,19 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.gml;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -37,67 +53,28 @@ import org.geotools.resources.Utilities;
 public class EnvelopeWithTimePeriodType extends EnvelopeEntry {
 
     @XmlElement(required = true)
-    protected TimePositionType beginPosition;
+    private TimePositionType beginPosition;
     @XmlElement(required = true)
-    protected TimePositionType endPosition;
+    private TimePositionType endPosition;
     @XmlAttribute
-    protected String frame;
+    private String frame;
 
     /**
      * Gets the value of the beginPosition property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TimePositionType }
-     *     
      */
     public TimePositionType getBeginPosition() {
         return beginPosition;
     }
 
     /**
-     * Sets the value of the beginPosition property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TimePositionType }
-     *     
-     */
-    public void setBeginPosition(TimePositionType value) {
-        this.beginPosition = value;
-    }
-
-    /**
      * Gets the value of the endPosition property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TimePositionType }
-     *     
      */
     public TimePositionType getEndPosition() {
         return endPosition;
     }
 
     /**
-     * Sets the value of the endPosition property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TimePositionType }
-     *     
-     */
-    public void setEndPosition(TimePositionType value) {
-        this.endPosition = value;
-    }
-
-    /**
      * Gets the value of the frame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getFrame() {
         if (frame == null) {
@@ -108,19 +85,7 @@ public class EnvelopeWithTimePeriodType extends EnvelopeEntry {
     }
 
     /**
-     * Sets the value of the frame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFrame(String value) {
-        this.frame = value;
-    }
-
-     /**
-     * Verifie si cette entree est identique l'objet specifie.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

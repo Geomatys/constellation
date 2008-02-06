@@ -70,14 +70,14 @@ import net.seagis.sos.InsertObservationResponse;
 import net.seagis.sos.RegisterSensor;
 import net.seagis.sos.RegisterSensorResponse;
 import net.seagis.sos.RequestBaseType;
-import net.seagis.gml32.TimeInstantType;
-import net.seagis.gml32.TimePeriodType;
+import net.seagis.gml.TimeInstantType;
+import net.seagis.gml.TimePeriodType;
 import net.seagis.ogc.LiteralType;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.gml32.ReferenceEntry;
-import net.seagis.gml32.ReferenceTable;
+import net.seagis.gml.ReferenceEntry;
+import net.seagis.gml.ReferenceTable;
 import net.seagis.observation.CompositePhenomenonEntry;
 import net.seagis.observation.CompositePhenomenonTable;
 import net.seagis.observation.MeasurementEntry;
@@ -393,7 +393,7 @@ public class SOSworker {
                 
                 cont = new Contents(ool);
             }
-            c = new Capabilities(si, sp, om, "1.0", null, null, cont);
+            c = new Capabilities(si, sp, om, "1.0.0", null, null, cont);
             
         } catch (SQLException ex) {
            ex.printStackTrace();
@@ -972,7 +972,7 @@ public class SOSworker {
             
             //and we write it in the sensorML Database
             Catalog cat  = sensorMLReader.getCatalog("SMLC");
-            User u       = null;//DBreader.getUser(
+            User u       = sensorMLReader.getUser("admin");
             Form f       = XMLReader.readForm(cat, u,"source",id, Standard.SENSORML);
             sensorMLWriter.writeForm(f, false);
             
@@ -1432,8 +1432,8 @@ public class SOSworker {
                                               version);
             }
             if (request.getVersion()!= null) {
-                if (!request.getVersion().equals("1.0")) {
-                    throw new WebServiceException("version must be \"1.0\"!",
+                if (!request.getVersion().equals("1.0.0")) {
+                    throw new WebServiceException("version must be \"1.0.0\"!",
                                                   VERSION_NEGOTIATION_FAILED,
                                                   version);
                 }

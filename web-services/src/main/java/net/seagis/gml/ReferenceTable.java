@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gml32;
+package net.seagis.gml;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

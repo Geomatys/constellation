@@ -4,6 +4,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
+import net.seagis.coverage.web.ExpressionType;
 
 
 /**
@@ -452,11 +453,11 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ExpressionType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "expression")
     public JAXBElement<ExpressionType> createExpression(ExpressionType value) {
         return new JAXBElement<ExpressionType>(_Expression_QNAME, ExpressionType.class, null, value);
-    }*/
+    }
     
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link LiteralType }{@code >}}

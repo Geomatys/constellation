@@ -50,7 +50,7 @@ public abstract class AbstractGMLEntry extends Entry{
     private String id;
 
     /**
-     *  Constructeur vide utilise par JAXB.
+     *  Empty constructor used by JAXB.
      */
     public AbstractGMLEntry() {}
     
@@ -92,7 +92,7 @@ public abstract class AbstractGMLEntry extends Entry{
     }
     
     /**
-     * Verifie si cette entree est identique a l'objet specifie.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

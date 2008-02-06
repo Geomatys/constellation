@@ -23,8 +23,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml32.BaseUnitType;
-import net.seagis.gml32.UnitDefinitionType;
+import net.seagis.gml.BaseUnitType;
+import net.seagis.gml.UnitDefinitionType;
 import org.geotools.resources.Utilities;
 
 /**
@@ -37,8 +37,8 @@ import org.geotools.resources.Utilities;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}UnitDefinition"/>
- *         &lt;element ref="{http://www.opengis.net/gml/3.2}BaseUnit"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}UnitDefinition"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}BaseUnit"/>
  *       &lt;/choice>
  *       &lt;attribute name="code" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="nilReason">
@@ -46,7 +46,7 @@ import org.geotools.resources.Utilities;
  *           &lt;list itemType="{http://www.w3.org/2001/XMLSchema}string" />
  *         &lt;/simpleType>
  *       &lt;/attribute>
- *       &lt;attribute ref="{http://www.opengis.net/gml/3.2}remoteSchema"/>
+ *       &lt;attribute ref="{http://www.opengis.net/gml}remoteSchema"/>
  *       &lt;attribute ref="{http://www.w3.org/1999/xlink}actuate"/>
  *       &lt;attribute ref="{http://www.w3.org/1999/xlink}arcrole"/>
  *       &lt;attribute ref="{http://www.w3.org/1999/xlink}href"/>
@@ -68,15 +68,15 @@ import org.geotools.resources.Utilities;
 })
 public class UomPropertyType {
 
-    @XmlElement(name = "UnitDefinition", namespace = "http://www.opengis.net/gml/3.2", nillable = true)
+    @XmlElement(name = "UnitDefinition", namespace = "http://www.opengis.net/gml", nillable = true)
     private UnitDefinitionType unitDefinition;
-    @XmlElement(name = "BaseUnit", namespace = "http://www.opengis.net/gml/3.2", nillable = true)
+    @XmlElement(name = "BaseUnit", namespace = "http://www.opengis.net/gml", nillable = true)
     private BaseUnitType baseUnit;
     @XmlAttribute
     private String code;
     @XmlAttribute
     private List<String> nilReason = new ArrayList<String>();
-    @XmlAttribute(namespace = "http://www.opengis.net/gml/3.2")
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
@@ -103,74 +103,23 @@ public class UomPropertyType {
     
     /**
      * Gets the value of the unitDefinition property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link UnitDefinitionType }
-     *     
      */
     public UnitDefinitionType getUnitDefinition() {
         return unitDefinition;
     }
 
     /**
-     * Sets the value of the unitDefinition property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link UnitDefinitionType }
-     *     
-     */
-    public void setUnitDefinition(UnitDefinitionType value) {
-        this.unitDefinition = value;
-    }
-
-    /**
      * Gets the value of the baseUnit property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BaseUnitType }
-     *     
      */
     public BaseUnitType getBaseUnit() {
         return baseUnit;
     }
 
     /**
-     * Sets the value of the baseUnit property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BaseUnitType }
-     *     
-     */
-    public void setBaseUnit(BaseUnitType value) {
-        this.baseUnit = value;
-    }
-
-    /**
      * Gets the value of the code property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCode() {
         return code;
-    }
-
-    /**
-     * Sets the value of the code property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCode(String value) {
-        this.code = value;
     }
 
     /**
@@ -183,198 +132,63 @@ public class UomPropertyType {
 
     /**
      * Gets the value of the remoteSchema property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getRemoteSchema() {
         return remoteSchema;
     }
 
     /**
-     * Sets the value of the remoteSchema property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setRemoteSchema(String value) {
-        this.remoteSchema = value;
-    }
-
-    /**
      * Gets the value of the actuate property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getActuate() {
         return actuate;
     }
 
     /**
-     * Sets the value of the actuate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setActuate(String value) {
-        this.actuate = value;
-    }
-
-    /**
      * Gets the value of the arcrole property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getArcrole() {
         return arcrole;
     }
 
     /**
-     * Sets the value of the arcrole property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setArcrole(String value) {
-        this.arcrole = value;
-    }
-
-    /**
      * Gets the value of the href property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getHref() {
         return href;
     }
 
     /**
-     * Sets the value of the href property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setHref(String value) {
-        this.href = value;
-    }
-
-    /**
      * Gets the value of the role property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getRole() {
         return role;
     }
 
     /**
-     * Sets the value of the role property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setRole(String value) {
-        this.role = value;
-    }
-
-    /**
      * Gets the value of the show property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getShow() {
         return show;
     }
 
     /**
-     * Sets the value of the show property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setShow(String value) {
-        this.show = value;
-    }
-
-    /**
      * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getTitle() {
         return title;
     }
 
-    /**
-     * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTitle(String value) {
-        this.title = value;
-    }
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getType() {
         return type;
     }
 
     /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setType(String value) {
-        this.type = value;
-    }
-    
-    /**
-     * Vérifie si cette entré est identique à l'objet spécifié.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

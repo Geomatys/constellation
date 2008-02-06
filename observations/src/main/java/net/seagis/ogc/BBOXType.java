@@ -5,8 +5,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml32.EnvelopeEntry;
-import net.seagis.gml32.EnvelopeWithTimePeriodType;
+import net.seagis.gml.EnvelopeEntry;
+import net.seagis.gml.EnvelopeWithTimePeriodType;
 
 
 /**
@@ -21,8 +21,8 @@ import net.seagis.gml32.EnvelopeWithTimePeriodType;
  *       &lt;sequence>
  *         &lt;element name="PropertyName" type="{http://www.opengis.net/ogc}PropertyNameType" minOccurs="0"/>
  *         &lt;choice>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}Envelope"/>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}EnvelopeWithTimePeriod"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}Envelope"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}EnvelopeWithTimePeriod"/>
  *         &lt;/choice>
  *       &lt;/sequence>
  *     &lt;/extension>
@@ -44,9 +44,9 @@ public class BBOXType
 
     @XmlElement(name = "PropertyName")
     private String propertyName;
-    @XmlElement(name = "Envelope", namespace = "http://www.opengis.net/gml/3.2", nillable = true)
+    @XmlElement(name = "Envelope", namespace = "http://www.opengis.net/gml", nillable = true)
     private EnvelopeEntry envelope;
-    @XmlElement(name = "EnvelopeWithTimePeriod", namespace = "http://www.opengis.net/gml/3.2", nillable = true)
+    @XmlElement(name = "EnvelopeWithTimePeriod", namespace = "http://www.opengis.net/gml", nillable = true)
     private EnvelopeWithTimePeriodType envelopeWithTimePeriod;
 
     /**

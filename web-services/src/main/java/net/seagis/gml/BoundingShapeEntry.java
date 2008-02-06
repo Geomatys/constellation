@@ -13,9 +13,10 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.gml32;
+package net.seagis.gml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -37,11 +38,11 @@ import org.geotools.resources.Utilities;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;choice>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}Envelope"/>
- *           &lt;element ref="{http://www.opengis.net/gml/3.2}Null"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}Envelope"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}Null"/>
  *         &lt;/choice>
  *       &lt;/sequence>
- *       &lt;attribute name="nilReason" type="{http://www.opengis.net/gml/3.2}NilReasonType" />
+ *       &lt;attribute name="nilReason" type="{http://www.opengis.net/gml}NilReasonType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -58,66 +59,33 @@ import org.geotools.resources.Utilities;
 public class BoundingShapeEntry {
 
     @XmlElement(name = "Envelope", nillable = true)
-    protected EnvelopeEntry envelope;
+    private EnvelopeEntry envelope;
     @XmlElement(name = "EnvelopeWithTimePeriod", nillable = true)
-    protected EnvelopeWithTimePeriodType envelopeWithTimePeriod;
+    private EnvelopeWithTimePeriodType envelopeWithTimePeriod;
     @XmlList
     @XmlElement(name = "Null")
-    protected List<String> _null;
+    private List<String> _null;
     @XmlAttribute
-    protected List<String> nilReason;
+    private List<String> nilReason;
 
     public BoundingShapeEntry() {}
     
     public BoundingShapeEntry(EnvelopeEntry envelope) {
         this.envelope = envelope;
     }
+    
     /**
      * Gets the value of the envelope property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EnvelopeType }
-     *     
      */
     public EnvelopeEntry getEnvelope() {
         return envelope;
     }
 
     /**
-     * Sets the value of the envelope property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EnvelopeType }
-     *     
-     */
-    public void setEnvelope(EnvelopeEntry value) {
-        this.envelope = value;
-    }
-
-    /**
      * Gets the value of the envelopeWithTimePeriod property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EnvelopeWithTimePeriodType }
-     *     
      */
     public EnvelopeWithTimePeriodType getEnvelopeWithTimePeriod() {
         return envelopeWithTimePeriod;
-    }
-
-    /**
-     * Sets the value of the envelopeWithTimePeriod property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EnvelopeWithTimePeriodType }
-     *     
-     */
-    public void setEnvelopeWithTimePeriod(EnvelopeWithTimePeriodType value) {
-        this.envelopeWithTimePeriod = value;
     }
 
     /**
@@ -128,7 +96,7 @@ public class BoundingShapeEntry {
         if (_null == null) {
             _null = new ArrayList<String>();
         }
-        return this._null;
+        return Collections.unmodifiableList(_null);
     }
 
     /**
@@ -139,11 +107,11 @@ public class BoundingShapeEntry {
         if (nilReason == null) {
             nilReason = new ArrayList<String>();
         }
-        return this.nilReason;
+        return Collections.unmodifiableList(nilReason);
     }
     
      /**
-     * Verifie si cette entree est identique l'objet specifie.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

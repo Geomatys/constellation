@@ -24,45 +24,23 @@ import javax.xml.bind.annotation.XmlValue;
 public class CoordinatesType {
 
     @XmlValue
-    protected String value;
+    private String value;
     @XmlAttribute
-    protected String cs;
+    private String cs;
     @XmlAttribute
-    protected String decimal;
+    private String decimal;
     @XmlAttribute
-    protected String ts;
+    private String ts;
 
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getValue() {
         return value;
     }
 
     /**
-     * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    /**
      * Gets the value of the cs property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getCs() {
         if (cs == null) {
@@ -73,24 +51,7 @@ public class CoordinatesType {
     }
 
     /**
-     * Sets the value of the cs property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCs(String value) {
-        this.cs = value;
-    }
-
-    /**
      * Gets the value of the decimal property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getDecimal() {
         if (decimal == null) {
@@ -101,24 +62,7 @@ public class CoordinatesType {
     }
 
     /**
-     * Sets the value of the decimal property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDecimal(String value) {
-        this.decimal = value;
-    }
-
-    /**
      * Gets the value of the ts property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getTs() {
         if (ts == null) {
@@ -127,17 +71,4 @@ public class CoordinatesType {
             return ts;
         }
     }
-
-    /**
-     * Sets the value of the ts property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTs(String value) {
-        this.ts = value;
-    }
-
 }

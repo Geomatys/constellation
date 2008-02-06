@@ -89,7 +89,7 @@ public class RequestBaseType {
      */
     public String getVersion() {
         if (version == null) {
-            return "1.0";
+            return "1.0.0";
         } else {
             return version;
         }

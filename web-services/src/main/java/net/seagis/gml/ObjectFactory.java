@@ -169,6 +169,12 @@ public class ObjectFactory {
     private final static QName _MetaDataProperty_QNAME = new QName("http://www.opengis.net/gml", "metaDataProperty");
     private final static QName _RectifiedGrid_QNAME = new QName("http://www.opengis.net/gml", "RectifiedGrid");
     private final static QName _Grid_QNAME = new QName("http://www.opengis.net/gml", "Grid");
+    private final static QName _AbstractFeature_QNAME = new QName("http://www.opengis.net/gml", "AbstractFeature");
+    private final static QName _BaseUnit_QNAME = new QName("http://www.opengis.net/gml", "BaseUnit");
+    private final static QName _BoundedBy_QNAME = new QName("http://www.opengis.net/gml", "boundedBy");
+    private final static QName _Location_QNAME = new QName("http://www.opengis.net/gml", "location");
+    private final static QName _UnitDefinition_QNAME = new QName("http://www.opengis.net/gml", "UnitDefinition");
+    private final static QName _UnitOfMeasure_QNAME = new QName("http://www.opengis.net/gml", "unitOfMeasure");
      
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
@@ -476,6 +482,108 @@ public class ObjectFactory {
         return new GridEnvelopeType();
     }
 
+    /**
+     * Create an instance of {@link BaseUnitType }
+     * 
+     */
+    public BaseUnitType createBaseUnitType() {
+        return new BaseUnitType();
+    }
+    
+    /**
+     * Create an instance of {@link BoundingShapeType }
+     * 
+     */
+    public BoundingShapeEntry createBoundingShapeType() {
+        return new BoundingShapeEntry();
+    }
+    
+    /**
+     * Create an instance of {@link LocationPropertyType }
+     * 
+     */
+    public LocationPropertyType createLocationPropertyType() {
+        return new LocationPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link TimePeriodPropertyType }
+     * 
+     */
+    public TimePeriodPropertyType createTimePeriodPropertyType() {
+        return new TimePeriodPropertyType();
+    }
+
+    /**
+     * Create an instance of {@link UnitDefinitionType }
+     * 
+     */
+    public UnitDefinitionType createUnitDefinitionType() {
+        return new UnitDefinitionType();
+    }
+    
+    /**
+     * Create an instance of {@link UnitOfMeasureType }
+     * 
+     */
+    public UnitOfMeasureType createUnitOfMeasureType() {
+        return new UnitOfMeasureType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link UnitOfMeasureType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "unitOfMeasure")
+    public JAXBElement<UnitOfMeasureType> createUnitOfMeasure(UnitOfMeasureType value) {
+        return new JAXBElement<UnitOfMeasureType>(_UnitOfMeasure_QNAME, UnitOfMeasureType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link UnitDefinitionType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "UnitDefinition", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "Definition")
+    public JAXBElement<UnitDefinitionType> createUnitDefinition(UnitDefinitionType value) {
+        return new JAXBElement<UnitDefinitionType>(_UnitDefinition_QNAME, UnitDefinitionType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LocationPropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "location")
+    public JAXBElement<LocationPropertyType> createLocation(LocationPropertyType value) {
+        return new JAXBElement<LocationPropertyType>(_Location_QNAME, LocationPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BoundingShapeEntry }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "boundedBy")
+    public JAXBElement<BoundingShapeEntry> createBoundedBy(BoundingShapeEntry value) {
+        return new JAXBElement<BoundingShapeEntry>(_BoundedBy_QNAME, BoundingShapeEntry.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BaseUnitType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "BaseUnit", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "UnitDefinition")
+    public JAXBElement<BaseUnitType> createBaseUnit(BaseUnitType value) {
+        return new JAXBElement<BaseUnitType>(_BaseUnit_QNAME, BaseUnitType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractFeatureEntry }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "AbstractFeature", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractGML")
+    public JAXBElement<AbstractFeatureEntry> createAbstractFeature(AbstractFeatureEntry value) {
+        return new JAXBElement<AbstractFeatureEntry>(_AbstractFeature_QNAME, AbstractFeatureEntry.class, null, value);
+    }
+    
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link RectifiedGridType }{@code >}}
      * 

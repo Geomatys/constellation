@@ -54,8 +54,21 @@ public class DirectPositionType {
     }
     
     /**
+     * Build a full Direct position.
+     * @param srsName
+     * @param srsDimension
+     * @param value
+     */
+    public DirectPositionType(String srsName, int srsDimension, List<Double> value) {
+        this.srsName      = srsName;
+        this.srsDimension = srsDimension;
+        this.value = value;
+    }
+    
+    /**
      * Build a light direct position.
      * 
+     * @param 
      * @param value a List of coordinates.
      */
     public DirectPositionType(List<Double> value) {

@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.gml32;
+package net.seagis.gml;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,7 +28,7 @@ import net.seagis.catalog.SingletonTable;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry>{
+public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry> {
     
    /**
     * Construit une table des unites de mesure.

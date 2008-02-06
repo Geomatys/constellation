@@ -103,7 +103,8 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     }
     
     public Measure getElevationAccuracy() {
-        return elevationAccuracy;
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return elevationAccuracy;
     }
     
     public Datum getGeodeticDatum() {
@@ -116,7 +117,8 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     }
     
     public Measure getPositionAccuracy() {
-        return positionAccuracy;
+        throw new UnsupportedOperationException("Not supported yet.");
+        //return positionAccuracy;
     }
     
     public GenericName getProjection() {
