@@ -40,27 +40,22 @@ public class ContactEntry extends Entry implements Contact {
     private InternationalStringEntry hoursOfService;
     private InternationalStringEntry contactInstructions;
 
-    @Override
     public Telephone getPhone() {
         return phone;
     }
 
-    @Override
     public Address getAddress() {
         return address;
     }
 
-    @Override
     public OnLineResource getOnLineResource() {
         return onLineResource;
     }
 
-    @Override
     public InternationalString getHoursOfService() {
         return hoursOfService;
     }
 
-    @Override
     public InternationalString getContactInstructions() {
         return contactInstructions;
     }

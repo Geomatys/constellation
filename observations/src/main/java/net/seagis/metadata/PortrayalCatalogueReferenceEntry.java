@@ -32,7 +32,6 @@ import org.opengis.metadata.citation.Citation;
 @XmlType(name = "PortrayalCatalogueReference")
 public class PortrayalCatalogueReferenceEntry extends Entry implements PortrayalCatalogueReference {
 
-    @Override
     public Collection<? extends Citation> getPortrayalCatalogueCitations() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

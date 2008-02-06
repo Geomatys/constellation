@@ -42,67 +42,54 @@ import org.opengis.util.InternationalString;
 @XmlType(name = "Identification")
 public class IdentificationEntry extends Entry implements Identification{
 
-    @Override
     public Citation getCitation() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public InternationalString getAbstract() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public InternationalString getPurpose() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<String> getCredits() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<Progress> getStatus() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends ResponsibleParty> getPointOfContacts() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends MaintenanceInformation> getResourceMaintenance() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends BrowseGraphic> getGraphicOverviews() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends Format> getResourceFormat() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends Keywords> getDescriptiveKeywords() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends Usage> getResourceSpecificUsages() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends Constraints> getResourceConstraints() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends AggregateInformation> getAggregationInfo() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

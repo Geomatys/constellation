@@ -69,7 +69,6 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
     /**
      * surcharge la methode getName() de Entry pour accepter les valeurs nulles.
      */
-    @Override
     public String getName() {
         return this.name;
     }
@@ -77,7 +76,6 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getTokenSeparator() {
         return tokenSeparator;
     }
@@ -85,7 +83,6 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getBlockSeparator() {
         return blockSeparator;
     }
@@ -93,7 +90,6 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
     /**
      * {@inheritDoc}
      */
-    @Override
     public char getDecimalSeparator() {
         return decimalSeparator;
     }

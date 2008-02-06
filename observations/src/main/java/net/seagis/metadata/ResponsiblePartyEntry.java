@@ -33,27 +33,22 @@ import org.opengis.util.InternationalString;
 @XmlType(name = "ResponsibleParty")
 public class ResponsiblePartyEntry extends Entry implements ResponsibleParty {
 
-    @Override
     public String getIndividualName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public InternationalString getOrganisationName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public InternationalString getPositionName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Contact getContactInfo() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Role getRole() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

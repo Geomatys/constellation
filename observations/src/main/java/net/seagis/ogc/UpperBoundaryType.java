@@ -1,10 +1,26 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
 package net.seagis.ogc;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ogc.ExpressionType;
+import net.seagis.coverage.web.ExpressionType;
 
 
 /**
@@ -37,82 +53,30 @@ import net.seagis.ogc.ExpressionType;
 public class UpperBoundaryType {
 
     @XmlElement(nillable = true)
-    protected ExpressionType expression;
+    private ExpressionType expression;
     @XmlElement(name = "Literal", nillable = true)
-    protected LiteralType literal;
+    private LiteralType literal;
     @XmlElement(name = "PropertyName", nillable = true)
-    protected String propertyName;
+    private String propertyName;
 
     /**
      * Gets the value of the expression property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ExpressionType }
-     *     
      */
     public ExpressionType getExpression() {
         return expression;
     }
 
     /**
-     * Sets the value of the expression property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ExpressionType }
-     *     
-     */
-    public void setExpression(ExpressionType value) {
-        this.expression = value;
-    }
-
-    /**
      * Gets the value of the literal property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link LiteralType }
-     *     
      */
     public LiteralType getLiteral() {
         return literal;
     }
 
     /**
-     * Sets the value of the literal property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link LiteralType }
-     *     
-     */
-    public void setLiteral(LiteralType value) {
-        this.literal = value;
-    }
-
-    /**
      * Gets the value of the propertyName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getPropertyName() {
         return propertyName;
     }
-
-    /**
-     * Sets the value of the propertyName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPropertyName(String value) {
-        this.propertyName = value;
-    }
-
 }

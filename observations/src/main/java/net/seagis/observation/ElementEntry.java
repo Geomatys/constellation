@@ -116,7 +116,6 @@ public class ElementEntry extends Entry implements Element {
     /**
      * Name of the test applied to the data.
      */
-    @Override
     public Collection<InternationalString> getNamesOfMeasure(){ 
         throw new UnsupportedOperationException("Not supported yet.");
         //return  namesOfMeasure;
@@ -125,7 +124,6 @@ public class ElementEntry extends Entry implements Element {
     /**
      * Code identifying a registered standard procedure, or {@code null} if none.
      */
-    @Override
     public Identifier getMeasureIdentification(){ 
         return measureIdentification;
     }
@@ -133,7 +131,6 @@ public class ElementEntry extends Entry implements Element {
     /**
      * Description of the measure being determined.
      */
-    @Override
     public InternationalString getMeasureDescription(){ 
         return measureDescription;
     }
@@ -141,7 +138,6 @@ public class ElementEntry extends Entry implements Element {
     /**
      * Type of method used to evaluate quality of the dataset, or {@code null} if unspecified.
      */
-    @Override
     public EvaluationMethodType getEvaluationMethodType(){ 
         throw new UnsupportedOperationException("Not supported yet.");
        //return evaluationMethodType;
@@ -150,7 +146,6 @@ public class ElementEntry extends Entry implements Element {
     /**
      * Description of the evaluation method.
      */
-    @Override
     public InternationalString getEvaluationMethodDescription(){ 
         return evaluationMethodDescription;
     }
@@ -158,7 +153,6 @@ public class ElementEntry extends Entry implements Element {
     /**
      * Reference to the procedure information, or {@code null} if none.
      */
-    @Override
     public Citation getEvaluationProcedure(){ 
         return evaluationProcedure;
     }
@@ -170,7 +164,6 @@ public class ElementEntry extends Entry implements Element {
      *
      * @deprecated Replaced by {@link #getDates}.
      */
-    @Override
     public Date[] getDate(){ 
         return date;
     }
@@ -182,7 +175,6 @@ public class ElementEntry extends Entry implements Element {
      *
      * @since GeoAPI 2.1
      */
-    @Override
     public Collection<Date> getDates(){ 
         return dates;
     }
@@ -194,7 +186,6 @@ public class ElementEntry extends Entry implements Element {
      *
      * @deprecated Replaced by {@link #getResults}.
      */
-    @Override
     public Result getResult(){ 
         return result;
     }
@@ -206,7 +197,6 @@ public class ElementEntry extends Entry implements Element {
      *
      * @since GeoAPI 2.1
      */
-    @Override
     public Collection<? extends Result> getResults(){ 
         return results;
     }

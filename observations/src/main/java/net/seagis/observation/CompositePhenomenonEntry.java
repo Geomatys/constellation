@@ -74,7 +74,6 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Retourne le phenomene de base.
      */
-    @Override
     public PhenomenonEntry getBase(){
         return base;
     }
@@ -89,7 +88,6 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Retourne les composants.
      */
-    @Override
     public Collection<PhenomenonEntry> getComponent() {
         return component;
     }
@@ -97,7 +95,6 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     /**
      * Retourne le nombre de composant.
      */
-    @Override
     public int getDimension() {
         return dimension;
     }

@@ -34,7 +34,6 @@ public class SamplingFeatureRelationEntry extends Entry implements SamplingFeatu
     /**
      * {@inheritDoc}
      */
-    @Override
     public GenericName getRole(){
         throw new UnsupportedOperationException("Not supported yet.");
         //return role;
@@ -43,7 +42,6 @@ public class SamplingFeatureRelationEntry extends Entry implements SamplingFeatu
     /**
      * {@inheritDoc}
      */
-    @Override
     public SamplingFeatureEntry getTarget(){
         return target;
     }

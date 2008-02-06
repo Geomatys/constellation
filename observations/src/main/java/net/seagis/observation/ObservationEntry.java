@@ -264,7 +264,6 @@ public class ObservationEntry extends Entry implements Observation {
         this.name  = name;
     }
     
-    @Override
     public String getName() {
         return this.name;
     }
@@ -272,7 +271,6 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    @Override
     public SamplingFeature getFeatureOfInterest() {
         return featureOfInterest;
     }
@@ -280,7 +278,6 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Phenomenon getObservedProperty() {
         return observedProperty;
     }
@@ -288,7 +285,6 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Process getProcedure() {
         return procedure;
     }
@@ -317,7 +313,6 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Element getQuality() {
         return resultQuality;
     }
@@ -325,7 +320,6 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Object getResult() {
         return result;
     }
@@ -340,7 +334,6 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Object getResultDefinition() {
         return resultDefinition;
     }
@@ -355,7 +348,6 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    @Override
     public TemporalObject getSamplingTime() {
         return samplingTime;
     }
@@ -370,7 +362,6 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    @Override
     public MetaData getObservationMetadata() {
         return observationMetadata;
     }
@@ -378,15 +369,13 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    @Override
-     public TemporalObject getProcedureTime() {
+    public TemporalObject getProcedureTime() {
         return procedureTime;
     }
     
     /**
      * {@inheritDoc}
      */ 
-    @Override
     public Object getProcedureParameter() {
         return procedureParameter;
     }
@@ -395,7 +384,6 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */ 
-    @Override
     public String getDefinition() {
         return definition;
     }

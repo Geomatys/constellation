@@ -33,12 +33,10 @@ import org.opengis.metadata.citation.OnLineResource;
 @XmlType(name = "MetadataExtensionInformation")
 public class MetadataExtensionInformationEntry extends Entry implements MetadataExtensionInformation {
 
-    @Override
     public OnLineResource getExtensionOnLineResource() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends ExtendedElementInformation> getExtendedElementInformation() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

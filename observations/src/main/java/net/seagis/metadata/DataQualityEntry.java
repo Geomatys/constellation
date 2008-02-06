@@ -34,17 +34,14 @@ import org.opengis.metadata.quality.Scope;
 @XmlType(name = " DataQuality")
 public class DataQualityEntry extends Entry implements DataQuality{
 
-    @Override
     public Scope getScope() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends Element> getReports() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Lineage getLineage() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

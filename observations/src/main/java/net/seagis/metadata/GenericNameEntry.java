@@ -34,57 +34,46 @@ import org.opengis.util.ScopedName;
 @XmlType(name = "GenericName")
 public class GenericNameEntry extends Entry implements GenericName {
 
-    @Override
     public NameSpace scope() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public GenericName getScope() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public int depth() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public List<LocalName> getParsedNames() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public LocalName asLocalName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public LocalName name() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public ScopedName asScopedName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public GenericName toFullyQualifiedName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public ScopedName push(GenericName arg0) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public InternationalString toInternationalString() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public int compareTo(GenericName o) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

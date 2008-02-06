@@ -53,10 +53,8 @@ import org.geotools.resources.Utilities;
     "filterCapabilities",
     "contents"
 })
-@XmlRootElement(name = "Capabilities")
-public class Capabilities
-    extends CapabilitiesBaseType
-{
+@XmlRootElement(name="Capabilities")
+public class Capabilities extends CapabilitiesBaseType {
 
     @XmlElement(name = "Filter_Capabilities")
     private FilterCapabilities filterCapabilities;
@@ -66,7 +64,7 @@ public class Capabilities
     /**
      * An empty constructor used by JAXB
      */
-    Capabilities() {}
+    public Capabilities() {}
     
      /**
      * An empty constructor used by JAXB

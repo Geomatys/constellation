@@ -24,7 +24,7 @@ import org.geotools.resources.Utilities;
 import org.opengis.observation.sampling.SamplingPoint;
 
 /**
- * Description d'une station localisé.
+ * Description of a station localised.
  *
  * @author Guilhem Legal
  */
@@ -35,18 +35,18 @@ propOrder = {"position"})
 public class SamplingPointEntry extends SamplingFeatureEntry implements SamplingPoint{
     
     /**
-     * La position de la station.
+     * the station position.
      */
     @XmlElement
     private PointType position;
     
     /**
-     * Constructeur utilisé par JAXB.
+     * Constructor used by JAXB.
      */
     public SamplingPointEntry(){};
             
     /** 
-     * Créé une nouvelle station localisé.
+     * Build a new station localised.
      */
     public SamplingPointEntry(final String            identifier,
                               final String            name,
@@ -62,8 +62,8 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
     }
     
      /** 
-      * Construit une entrée pour l'identifiant de station spécifié.
-      * adapté au modele de BRGM.
+      * Build an entry to the identifier of the spécified station .
+      * adapted for the BRGM model.
       * 
       */
     public SamplingPointEntry(final String            identifier,
@@ -77,15 +77,14 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
     }
     
     /**
-     * Retourne la position de la station.
+     * Return the station position.
      */
-    @Override
     public PointType getPosition(){
         return position;
     }
     
     /**
-     * Vérifie que cette station est identique à l'objet spécifié
+     * Verify that this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {
@@ -109,7 +108,7 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
     }
     
     /**
-     * Retourne une chaine de charactere representant la station.
+     * Return a String representing the station.
      */
     @Override
     public String toString() {

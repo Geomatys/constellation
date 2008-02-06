@@ -56,7 +56,6 @@ public class ObservationCollectionEntry extends Entry implements ObservationColl
     /**
      * override the getName() method of Entry 
      */
-    @Override
     public String getName() {
         return this.name;
     }
@@ -71,7 +70,6 @@ public class ObservationCollectionEntry extends Entry implements ObservationColl
     /**
      * Return a collection of Observation
      */
-    @Override
     public Collection<ObservationEntry> getMember() {
         return this.member;
     }

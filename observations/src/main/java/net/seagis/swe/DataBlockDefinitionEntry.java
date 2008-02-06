@@ -81,7 +81,6 @@ import org.geotools.resources.Utilities;
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getId() {
         return id;
     }
@@ -89,14 +88,12 @@ import org.geotools.resources.Utilities;
     /**
      * surcharge le getName() de Entry
      */
-    @Override
     public String getName() {
         return this.name;
     }
     /**
      * {@inheritDoc}
      */
-    @Override
     public Collection<? extends AbstractDataComponentEntry> getComponents() {
         return components;
     }
@@ -104,7 +101,6 @@ import org.geotools.resources.Utilities;
     /**
      * {@inheritDoc}
      */
-    @Override
     public AbstractEncoding getEncoding() {
         return encoding;
     }

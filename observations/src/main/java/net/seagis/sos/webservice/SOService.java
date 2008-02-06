@@ -37,11 +37,15 @@ import org.geotools.util.Version;
 
 // seaGIS dependencies
 import net.seagis.catalog.NoSuchTableException;
+import net.seagis.coverage.web.ServiceExceptionReport;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.NamespacePrefixMapperImpl;
 import net.seagis.coverage.wms.WebService;
+import net.seagis.observation.ObservationCollectionEntry;
 import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.SectionsType;
+import net.seagis.sos.Capabilities;
+import net.seagis.sos.DescribeSensor;
 import net.seagis.sos.GetCapabilities;
 import net.seagis.sos.GetObservation;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
@@ -62,12 +66,16 @@ public class SOService extends WebService {
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
         super("SOS", "1.0");
         worker = new SOSworker();
-        worker.setVersion(new Version("1.0"));
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.gml32:net.seagis.observation:net.seagis.ows:net.seagis.sos:net.seagis.swe:net.seagis.ogc");
+        worker.setVersion(new Version("1.0.0"));
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.gml32:net.seagis.observation:net.seagis.ows:net.seagis.sos:net.seagis.swe:net.seagis.ogc:net.seagis.coverage.web");
+        unmarshaller = jbcontext.createUnmarshaller();
+        jbcontext = JAXBContext.newInstance(Capabilities.class,
+                                            ServiceExceptionReport.class,
+                                            ObservationCollectionEntry.class);
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/sos/1.0"));
-        unmarshaller = jbcontext.createUnmarshaller();
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
+        
     }
 
     @Override
@@ -80,8 +88,23 @@ public class SOService extends WebService {
              
              if (request.equalsIgnoreCase("GetObservation") || (objectRequest instanceof GetObservation)) {
                 GetObservation go = (GetObservation)objectRequest;
-                
-                return Response.ok(worker.getObservation(go), "text/xml").build();
+                if (go == null){
+                    throw new WebServiceException("The operation GetObservation is only requestable in XML for now",
+                                         OPERATION_NOT_SUPPORTED, getCurrentVersion());
+                }
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getObservation(go), sw);
+        
+                return Response.ok(sw.toString(), "text/xml").build();
+             
+             } else if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
+                DescribeSensor ds = (DescribeSensor)objectRequest;
+                if (ds == null){
+                    throw new WebServiceException("The operation DescribeSensor is only requestable in XML for now",
+                                         OPERATION_NOT_SUPPORTED, getCurrentVersion());
+                }
+        
+                return Response.ok(worker.describeSensor(ds), "text/xml").build();
              
              } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 
@@ -91,8 +114,8 @@ public class SOService extends WebService {
                  * we build a request object with this parameter.
                  */
                 if (gc == null) {
-                    if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
-                        throw new WebServiceException("The parameters SERVICE=WCS must be specify",
+                    if (!getParameter("SERVICE", true).equalsIgnoreCase("SOS")) {
+                        throw new WebServiceException("The parameters SERVICE=SOS must be specify",
                                          MISSING_PARAMETER_VALUE, getCurrentVersion());
                     }
                     
@@ -124,7 +147,10 @@ public class SOService extends WebService {
                                              null,
                                              "SOS");
                 }
-                return Response.ok(worker.getCapabilities(gc), "text/xml").build();
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getCapabilities(gc), sw);
+        
+                return Response.ok(sw.toString(), "text/xml").build();
                     
             } else {
                 throw new WebServiceException("The operation " + request + " is not supported by the service",

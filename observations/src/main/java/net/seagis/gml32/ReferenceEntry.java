@@ -77,7 +77,6 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * Returns the name for this entry.
      */
-    @Override
     public String getName() {
         return name;
     }
@@ -92,7 +91,6 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
     public List<String> getNilReason() {
         return nilReason;
     }
@@ -100,7 +98,6 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getRemoteSchema() {
         return remoteSchema;
     }
@@ -108,7 +105,6 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getActuate() {
         return actuate;
     }
@@ -116,7 +112,6 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getArcrole() {
         return arcrole;
     }
@@ -124,15 +119,13 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
-    public String getHref() {
+   public String getHref() {
         return href;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getRole() {
         return role;
     }
@@ -140,7 +133,6 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getShow() {
         return show;
     }
@@ -148,7 +140,6 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getTitle() {
         return title;
     }
@@ -156,7 +147,6 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getType() {
         return type;
     }
@@ -164,7 +154,6 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * {@inheritDoc}
      */
-    @Override
     public java.lang.Boolean getOwns() {
         return owns;
     }

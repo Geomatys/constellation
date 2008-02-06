@@ -50,48 +50,52 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
      *      value will be ignored and the system will generate one.
      */
     public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
+        String prefix = null;
         
-        if (namespaceUri.equals(rootNamespace))
-            return "";
+        if (rootNamespace!=null && rootNamespace.equals(namespaceUri))
+            prefix = "";
         
-        if( "http://www.opengis.net/gml".equals(namespaceUri) )
-            return "gml";
+        else if( "http://www.opengis.net/gml".equals(namespaceUri) )
+            prefix = "gml";
         
-        if( "http://www.opengis.net/ogc".equals(namespaceUri) )
-            return "ogc";
+        else if( "http://www.opengis.net/gml/3.2".equals(namespaceUri) )
+            prefix = "gml";
         
-        if( "http://www.opengis.net/ows/1.1".equals(namespaceUri) )
-            return "ows";
+        else if( "http://www.opengis.net/ogc".equals(namespaceUri) )
+            prefix = "ogc";
         
-        if( "http://www.opengis.net/wms".equals(namespaceUri) )
-            return "wms";
+        else if( "http://www.opengis.net/ows/1.1".equals(namespaceUri) )
+            prefix = "ows";
         
-        if( "http://www.w3.org/1999/xlink".equals(namespaceUri) )
-            return "xlink";
+        else if( "http://www.opengis.net/wms".equals(namespaceUri) )
+            prefix = "wms";
         
-        if( "http://www.opengis.net/sld".equals(namespaceUri) )
-            return "sld";
+        else if( "http://www.w3.org/1999/xlink".equals(namespaceUri) )
+            prefix = "xlink";
         
-        if( "http://www.opengis.net/wcs".equals(namespaceUri) )
-            return "wcs";
+        else if( "http://www.opengis.net/sld".equals(namespaceUri) )
+            prefix = "sld";
         
-        if( "http://www.opengis.net/se".equals(namespaceUri) )
-            return "se";
+        else if( "http://www.opengis.net/wcs".equals(namespaceUri) )
+            prefix = "wcs";
         
-        if( "http://www.opengis.net/sos/1.0".equals(namespaceUri) )
-            return "sos";
+        else if( "http://www.opengis.net/se".equals(namespaceUri) )
+            prefix = "se";
         
-        if( "http://www.opengis.net/om/1.0".equals(namespaceUri) )
-            return "om";
+        else if( "http://www.opengis.net/sos/1.0".equals(namespaceUri) )
+            prefix = "sos";
         
-        if( "http://www.opengis.net/sensorML/1.0".equals(namespaceUri) )
-            return "sml";
+        else if( "http://www.opengis.net/om/1.0".equals(namespaceUri) )
+            prefix = "om";
         
-        if( "http://www.opengis.net/swe/1.0".equals(namespaceUri) )
-            return "swe";
+        else if( "http://www.opengis.net/sensorML/1.0".equals(namespaceUri) )
+            prefix = "sml";
         
+        else if( "http://www.opengis.net/swe/1.0".equals(namespaceUri) )
+            prefix = "swe";
         
-        return suggestion;
+        //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
+        return prefix;
     }
     
     

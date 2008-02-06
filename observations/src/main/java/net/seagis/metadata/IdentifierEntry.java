@@ -25,23 +25,20 @@ import org.opengis.metadata.citation.Citation;
 
 /**
  *
- * @author legal
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Identifier")
 public class IdentifierEntry extends Entry implements Identifier{
 
-    @Override
     public String getCode() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Citation getAuthority() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public String getVersion() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

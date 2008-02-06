@@ -1,7 +1,23 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 
 package net.seagis.ogc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -9,7 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ogc.ExpressionType;
+import net.seagis.coverage.web.ExpressionType;
 
 
 /**
@@ -34,78 +50,38 @@ import net.seagis.ogc.ExpressionType;
  * &lt;/complexType>
  * </pre>
  * 
- * 
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BinaryComparisonOpType", propOrder = {
     "expressionOrLiteralOrPropertyName"
 })
-public class BinaryComparisonOpType
-    extends ComparisonOpsType
-{
+public class BinaryComparisonOpType extends ComparisonOpsType {
 
     @XmlElements({
         @XmlElement(name = "expression", type = ExpressionType.class, nillable = true),
         @XmlElement(name = "PropertyName", type = String.class, nillable = true),
         @XmlElement(name = "Literal", type = LiteralType.class, nillable = true)
     })
-    protected List<Object> expressionOrLiteralOrPropertyName;
+    private List<Object> expressionOrLiteralOrPropertyName;
     @XmlAttribute
-    protected Boolean matchCase;
+    private Boolean matchCase;
 
     /**
      * Gets the value of the expressionOrLiteralOrPropertyName property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the expressionOrLiteralOrPropertyName property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getExpressionOrLiteralOrPropertyName().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link ExpressionType }
-     * {@link String }
-     * {@link LiteralType }
-     * 
-     * 
+     * (unmodifiable)
      */
     public List<Object> getExpressionOrLiteralOrPropertyName() {
         if (expressionOrLiteralOrPropertyName == null) {
             expressionOrLiteralOrPropertyName = new ArrayList<Object>();
         }
-        return this.expressionOrLiteralOrPropertyName;
+        return Collections.unmodifiableList(expressionOrLiteralOrPropertyName);
     }
 
     /**
      * Gets the value of the matchCase property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
      */
     public Boolean isMatchCase() {
         return matchCase;
     }
-
-    /**
-     * Sets the value of the matchCase property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setMatchCase(Boolean value) {
-        this.matchCase = value;
-    }
-
 }

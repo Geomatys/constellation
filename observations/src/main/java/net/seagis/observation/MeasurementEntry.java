@@ -104,14 +104,12 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
     /**
      * {@inheritDoc}
      */
-    @Override
     protected String createName() {
         final StringBuilder newName = new StringBuilder(super.createName()).append(" = ");
         
         return newName.toString();
     }
     
-    @Override
     public Measure getResult() {
        return (Measure)super.getResult();
     }

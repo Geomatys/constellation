@@ -25,7 +25,7 @@ import org.geotools.resources.Utilities;
 public class AbstractEncodingEntry extends Entry implements AbstractEncoding{
     
     /**
-     * l'identifiant de l'encodage
+     * The encoding identifier.
      */
     @XmlAttribute
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -33,25 +33,24 @@ public class AbstractEncodingEntry extends Entry implements AbstractEncoding{
     private String id;
     
     /**
-     * constructeur utilisé par jaxB
+     * constructor used by jaxB
      */
     protected AbstractEncodingEntry() {}
 
     /**
-     *  Un encodage abstrait. utilisé comme super constructeur
+     *  An abstract encoding. used like super constructor
      */
     protected AbstractEncodingEntry(String id) {
         super(id);
         this.id = id;
     }
     
-    @Override
     public String getId() {
         return id;
     }
     
     /**
-     * Retourne le code numérique identifiant cette entrée.
+     * Returne the numeric code identifiyng this entry.
      */
     @Override
     public int hashCode() {
@@ -59,7 +58,7 @@ public class AbstractEncodingEntry extends Entry implements AbstractEncoding{
     }
     
     /**
-     * Vérifie que cette station est identique à l'objet spécifié
+     * Verify that this entry is identical to the specified object. 
      */
     @Override
     public boolean equals(final Object object) {

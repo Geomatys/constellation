@@ -40,72 +40,58 @@ import org.opengis.util.InternationalString;
 @XmlType(name = "Citation")
 public class CitationEntry extends Entry implements Citation{
 
-    @Override
     public InternationalString getTitle() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends InternationalString> getAlternateTitles() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends CitationDate> getDates() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public InternationalString getEdition() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Date getEditionDate() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends Identifier> getIdentifiers() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<String> getIdentifierTypes() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends ResponsibleParty> getCitedResponsibleParties() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<PresentationForm> getPresentationForm() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Series getSeries() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public InternationalString getOtherCitationDetails() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public InternationalString getCollectiveTitle() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public String getISBN() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public String getISSN() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

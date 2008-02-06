@@ -194,7 +194,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
      /**
      * Unique identifier for this metadata file, or {@code null} if none.
      */
-    @Override
     public String getFileIdentifier(){
         return fileIdentifier;
     }
@@ -202,7 +201,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Language used for documenting metadata.
      */
-    @Override
     public Locale getLanguage(){
         throw new UnsupportedOperationException("Not supported yet.");
         //return language;
@@ -211,7 +209,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Full name of the character coding standard used for the metadata set.
      */
-    @Override
     public CharacterSet getCharacterSet(){
         throw new UnsupportedOperationException("Not supported yet.");
         //return characterSet;
@@ -220,7 +217,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * File identifier of the metadata to which this metadata is a subset (child).
      */
-    @Override
     public String getParentIdentifier(){         
         return parentIdentifier;     
     }
@@ -228,7 +224,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Scope to which the metadata applies.
      */
-    @Override
     public Collection<ScopeCode> getHierarchyLevels(){ 
         throw new UnsupportedOperationException("Not supported yet.");
         //return hierarchyLevels;
@@ -237,7 +232,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Name of the hierarchy levels for which the metadata is provided.
      */
-    @Override
     public Collection<String> getHierarchyLevelNames(){         
         return hierarchyLevelNames; 
     }
@@ -247,7 +241,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
      *
      * @deprecated Replaced by {@link #getContacts}.
      */
-    @Override
     public ResponsibleParty getContact(){         
         return contact;
     }
@@ -257,7 +250,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
      *
      * @since GeoAPI 2.1
      */
-    @Override
     public Collection<? extends ResponsibleParty> getContacts(){         
         return contacts;     
     }
@@ -265,7 +257,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Date that the metadata was created.
      */
-    @Override
     public Date getDateStamp(){         
         return dateStamp;     
     }
@@ -273,7 +264,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Name of the metadata standard (including profile name) used.
      */
-    @Override
     public String getMetadataStandardName(){         
         return metadataStandardName;     
     }
@@ -281,7 +271,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Version (profile) of the metadata standard used.
      */
-    @Override
     public String getMetadataStandardVersion(){        
         return metadataStandardVersion;    
     }
@@ -291,7 +280,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
      *
      * @since GeoAPI 2.1
      */
-    @Override
     public String getDataSetUri(){         
         return dataSetUri;
     }
@@ -302,7 +290,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
      *
      * @since GeoAPI 2.1
      */
-    @Override
     public Collection<Locale> getLocales(){ 
         throw new UnsupportedOperationException("Not supported yet.");
        //return locales;
@@ -311,7 +298,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Digital representation of spatial information in the dataset.
      */
-    @Override
     public Collection<? extends SpatialRepresentation> getSpatialRepresentationInfo(){         
         return spatialRepresentationInfo;
     }
@@ -319,7 +305,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Description of the spatial and temporal reference systems used in the dataset.
      */
-    @Override
     public Collection<? extends ReferenceSystem> getReferenceSystemInfo(){ 
         throw new UnsupportedOperationException("Not supported yet.");
         //return referenceSystemInfo; 
@@ -328,7 +313,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Information describing metadata extensions.
      */
-    @Override
     public Collection<? extends MetadataExtensionInformation> getMetadataExtensionInfo(){         
         return metadataExtensionInfo;
     }
@@ -336,7 +320,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Basic information about the resource(s) to which the metadata applies.
      */
-    @Override
     public Collection<? extends Identification> getIdentificationInfo(){         
         return identificationInfo;
     }
@@ -345,7 +328,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
      * Provides information about the feature catalogue and describes the coverage and
      * image data characteristics.
      */
-    @Override
     public Collection<? extends ContentInformation> getContentInfo(){         
         return contentInfo;
     }
@@ -353,7 +335,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Provides information about the distributor of and options for obtaining the resource(s).
      */
-    @Override
     public Distribution getDistributionInfo(){ 
         throw new UnsupportedOperationException("Not supported yet.");
         //return distributionInfo;
@@ -362,7 +343,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Provides overall assessment of quality of a resource(s).
      */
-    @Override
     public Collection<? extends DataQuality> getDataQualityInfo(){         
         return dataQualityInfo;
     }
@@ -370,7 +350,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Provides information about the catalogue of rules defined for the portrayal of a resource(s).
      */
-    @Override
     public Collection<? extends PortrayalCatalogueReference> getPortrayalCatalogueInfo(){         
         return portrayalCatalogueInfo;
     }
@@ -378,7 +357,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Provides restrictions on the access and use of data.
      */
-    @Override
     public Collection<? extends Constraints> getMetadataConstraints(){         
         return metadataConstraints;
     }
@@ -386,7 +364,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Provides information about the conceptual schema of a dataset.
      */
-    @Override
     public Collection<? extends ApplicationSchemaInformation> getApplicationSchemaInfo(){  
         throw new UnsupportedOperationException("Not supported yet.");
         //return applicationSchemaInfo;
@@ -395,7 +372,6 @@ JAXB issue private Collection<? extends ApplicationSchemaInformation> applicatio
     /**
      * Provides information about the frequency of metadata updates, and the scope of those updates.
      */
-    @Override
     public MaintenanceInformation getMetadataMaintenance(){         
         return metadataMaintenance;
     }

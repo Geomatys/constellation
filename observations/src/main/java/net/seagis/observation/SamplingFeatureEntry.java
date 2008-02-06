@@ -143,7 +143,6 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
         return id;
     }
     
-    @Override
     public String getName() {
         return this.name;
     }
@@ -157,7 +156,6 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * {@inheritDoc}
      */
-    @Override
     public synchronized Collection<SamplingFeatureRelationEntry> getRelatedSamplingFeatures() {
     
         return relatedSamplingFeature;
@@ -167,7 +165,6 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
     /**
      * {@inheritDoc}
      */
-    @Override
     public synchronized Collection<ObservationEntry> getRelatedObservations() {
        
         return relatedObservation;
@@ -176,13 +173,11 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      /**
      * {@inheritDoc}
      */
-    @Override
     public synchronized Collection<String> getSampledFeatures() {
         
         return sampledFeature;
     }
 
-    @Override
     public SurveyProcedureEntry getSurveyDetail() {
         return this.surveyDetail;
     }

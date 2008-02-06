@@ -89,50 +89,41 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
                 
     }
     
-    @Override
     public ResponsibleParty getOperator() {
         return operator;
     }
         
-    @Override
     public Datum getElevationDatum() {
         throw new UnsupportedOperationException("Not supported yet.");
         //return elevationDatum;
     }
     
-    @Override
     public org.opengis.observation.Process getElevationMethod() {
         return elevationMethod;
     }
     
-    @Override
     public Measure getElevationAccuracy() {
         return elevationAccuracy;
     }
     
-    @Override
     public Datum getGeodeticDatum() {
         throw new UnsupportedOperationException("Not supported yet.");
         //return geodeticDatum;
     }
     
-    @Override
     public org.opengis.observation.Process getPositionMethod() {
     return positionMethod;
     }
     
-    @Override
     public Measure getPositionAccuracy() {
         return positionAccuracy;
     }
     
-    @Override
     public GenericName getProjection() {
         throw new UnsupportedOperationException("Not supported yet.");
         //return projection;
     }
     
-    @Override
     public TemporalObject getSurveyTime() {
         return surveyTime;
     }

@@ -32,7 +32,6 @@ import org.opengis.util.InternationalString;
 @XmlType(name = "Constraints")
 public class ConstraintsEntry extends Entry implements Constraints {
 
-    @Override
     public Collection<? extends InternationalString> getUseLimitation() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

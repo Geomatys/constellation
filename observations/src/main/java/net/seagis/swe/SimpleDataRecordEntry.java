@@ -12,6 +12,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
+
 package net.seagis.swe;
 
 import java.util.Collection;
@@ -44,7 +46,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     private Collection<AnyScalarEntry> field;
    
     /**
-     *  Constructeur utilisé par jaxB.
+     *  Constructor used by jaxB.
      */
     public SimpleDataRecordEntry() {}
     
@@ -61,7 +63,6 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     /**
      * {@inheritDoc}
      */
-    @Override
     public Collection<AnyScalarEntry> getField() {
         return field;
     }

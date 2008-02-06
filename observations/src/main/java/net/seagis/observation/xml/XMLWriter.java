@@ -33,6 +33,7 @@ import net.seagis.gml32.UnitOfMeasureTable;
  * Permet de creer les dictionnaire de données au format XML a partir de la base de données.
  *
  * @author Guilhem Legal
+ * @deprecated
  */
 public class XMLWriter {
     

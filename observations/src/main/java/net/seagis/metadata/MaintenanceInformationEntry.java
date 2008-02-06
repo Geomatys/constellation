@@ -38,52 +38,42 @@ import org.opengis.util.InternationalString;
 @XmlType(name = "MaintenanceInformation")
 public class MaintenanceInformationEntry extends Entry implements MaintenanceInformation{
 
-    @Override
     public MaintenanceFrequency getMaintenanceAndUpdateFrequency() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Date getDateOfNextUpdate() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public PeriodDuration getUserDefinedMaintenanceFrequency() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public ScopeCode getUpdateScope() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public ScopeDescription getUpdateScopeDescription() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<ScopeCode> getUpdateScopes() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends ScopeDescription> getUpdateScopeDescriptions() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public InternationalString getMaintenanceNote() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<InternationalString> getMaintenanceNotes() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
     public Collection<? extends ResponsibleParty> getContacts() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

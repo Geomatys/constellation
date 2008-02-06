@@ -1,3 +1,18 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 
 package net.seagis.swe;
 
@@ -18,7 +33,7 @@ import org.geotools.resources.Utilities;
 public class AbstractDataComponentEntry extends Entry implements AbstractDataComponent{
     
     /**
-     * L'identifiant du composant (normalement herité de abstractGML Type).
+     * The identifier of the component (override from abstractGML Type).
      */
     @XmlAttribute
     private String id;
@@ -27,17 +42,17 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
     private boolean fixed;
     
     /**
-     * definition du record.
+     * definition of the record.
      */
     protected String definition;
     
     /**
-     * Constructeur utilisé par jaxb.
+     * Constructor used by jaxb.
      */
-    public AbstractDataComponentEntry() {}
+    AbstractDataComponentEntry() {}
     
     /**
-     * un simple constructeur utilisé par les sous classes pour initialisé l'Entry.
+     * a simple constructor used by the sub classes to initialize l'Entry.
      */
     public AbstractDataComponentEntry(String id, String definition, boolean fixed) {
         super(id);
@@ -47,24 +62,15 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
     }
     
     /**
-     * Retourne l'identifiant de ce data record.
+     * Return the identifier of this data record.
      */
     public String getId() {
         return id;
     }
     
     /**
-     * Retourne le code numérique identifiant cette entrée.
-     */
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-    
-    /**
      * {@inheritDoc}
      */
-    @Override
     public String getDefinition() {
         return definition;
     }
@@ -72,13 +78,20 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean isFixed() {
         return fixed;
     }
+
+    /**
+     * Return the numeric code identifiyng this entry.
+     */
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
     
     /**
-     * Vérifie que cette station est identique à l'objet spécifié
+     * Verify that this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

@@ -79,7 +79,6 @@ public class MeasureEntry extends Entry implements Measure{
      *
      * @todo Implementer le retour des unites.
      */
-    @Override
     public UnitOfMeasureEntry getUom() {
         return uom;
     }
@@ -87,7 +86,6 @@ public class MeasureEntry extends Entry implements Measure{
     /**
      * {@inheritDoc}
      */
-    @Override
     public float getValue() {
         return value;
     }
