@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<sos:Capabilities xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ns3="http://catalog.seagis.net" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:swe="http://www.opengis.net/swe/1.0" xmlns:ows="http://www.opengis.net/ows/1.1">
+<sos:Capabilities xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ns3="http://catalog.seagis.net" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:swe="http://www.opengis.net/swe/1.0" xmlns:ows="http://www.opengis.net/ows/1.1">
     <ows:ServiceIdentification>
-        <ows:Title xml:lang="français">BRGM SOS</ows:Title>
-        <ows:Abstract xml:lang="français">BRGM SOS Server</ows:Abstract>
-        <ows:Keywords>keyword1</ows:Keywords>
-        <ows:Keywords>keyword2</ows:Keywords>
+        <ows:Title xml:lang="fr">BRGM SOS</ows:Title>
+        <ows:Abstract xml:lang="fr">BRGM SOS Server</ows:Abstract>
+        <ows:Keywords>
+          <ows:Keyword>SOS</ows:Keyword>
+          <ows:Keyword>geomatys</ows:Keyword>
+          <ows:Keyword>BRGM</ows:Keyword>
+        </ows:Keywords>
         <ows:ServiceType codeSpace="http://www.opengeospatial.net">OGC:SOS</ows:ServiceType>
-        <ows:ServiceTypeVersion>1.0</ows:ServiceTypeVersion>
+        <ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
         <ows:Fees>NONE</ows:Fees>
         <ows:AccessConstraints>NONE</ows:AccessConstraints>
     </ows:ServiceIdentification>
@@ -34,14 +37,29 @@
         <ows:Operation name="GetCapabilities">
             <ows:DCP>
                 <ows:HTTP>
+                    <ows:Get xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
                     <ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="service">
-                <ows:DefaultValue>SOS</ows:DefaultValue>
+                <ows:AllowedValues>
+                    <ows:Value>SOS</ows:Value>
+                </ows:AllowedValues>
             </ows:Parameter>
             <ows:Parameter name="version">
-                <ows:DefaultValue>1.0</ows:DefaultValue>
+                <ows:AllowedValues>
+                    <ows:Value>1.0.0</ows:Value>
+                </ows:AllowedValues>
+            </ows:Parameter>
+            <ows:Parameter name="Sections">
+                <ows:AllowedValues>
+                    <ows:Value>ServiceIdentification</ows:Value>
+                    <ows:Value>ServiceProvider</ows:Value>
+                    <ows:Value>OperationsMetadata</ows:Value>
+                    <ows:Value>Contents</ows:Value>
+                    <ows:Value>Filter_Capabilities</ows:Value>
+                    <ows:Value>All</ows:Value>
+                </ows:AllowedValues>
             </ows:Parameter>
         </ows:Operation>
         <ows:Operation name="GetObservation">
@@ -57,17 +75,11 @@
                     <ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
                 </ows:HTTP>
             </ows:DCP>
-            <ows:Constraint>
-                <ows:ReferenceSystem ows:reference="srsName">ESPG:4326</ows:ReferenceSystem>
-            </ows:Constraint>
-            <ows:Constraint>
-                <ows:ReferenceSystem ows:reference="srsName">ESPG:27582</ows:ReferenceSystem>
-            </ows:Constraint>
-            <ows:Constraint>
-                <ows:ReferenceSystem ows:reference="supportedSensorDescription">sml:System</ows:ReferenceSystem>
-            </ows:Constraint>
-            <ows:Constraint>
-                <ows:ReferenceSystem ows:reference="supportedSensorDescription">sml:Component</ows:ReferenceSystem>
+            <ows:Constraint name="supportedSensorDescription">
+                <ows:AllowedValues>
+                   <ows:Value>sml:System</ows:Value>
+                   <ows:Value>sml:Component</ows:Value>
+                </ows:AllowedValues>   
             </ows:Constraint>
         </ows:Operation>
         <ows:Operation name="InsertObservation">
@@ -76,11 +88,11 @@
                     <ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
                 </ows:HTTP>
             </ows:DCP>
-            <ows:Constraint>
-                <ows:ReferenceSystem ows:reference="srsName">ESPG:4326</ows:ReferenceSystem>
-            </ows:Constraint>
-            <ows:Constraint>
-                <ows:ReferenceSystem ows:reference="srsName">ESPG:27582</ows:ReferenceSystem>
+            <ows:Constraint name="srsName">
+                <ows:AllowedValues>
+                   <ows:Value>ESPG:4326</ows:Value>
+                   <ows:Value>ESPG:27582</ows:Value>
+                </ows:AllowedValues>   
             </ows:Constraint>
         </ows:Operation>
         <ows:Operation name="DescribeSensor">
