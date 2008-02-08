@@ -15,11 +15,9 @@
 package net.seagis.observation;
 
 // jaxb import
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
@@ -31,12 +29,15 @@ import net.seagis.coverage.model.DistributionEntry;
 
 // openGis dependencies
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
-import net.seagis.gml.TimeInstantType;
 import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
 import net.seagis.swe.AnyResultEntry;
+import net.seagis.swe.CompositePhenomenonEntry;
+import net.seagis.swe.CompoundPhenomenonEntry;
 import net.seagis.swe.DataBlockDefinitionEntry;
+import net.seagis.swe.PhenomenonEntry;
+import net.seagis.swe.PhenomenonPropertyType;
 import net.seagis.swe.TimeGeometricPrimitivePropertyType;
 import org.opengis.observation.Process;
 import org.opengis.observation.Phenomenon;
@@ -76,10 +77,7 @@ import org.geotools.resources.Utilities;
     "resultDefinition"
 })
 @XmlRootElement(name = "Observation")
-@XmlSeeAlso({ SamplingFeatureEntry.class, SamplingPointEntry.class, 
-              PhenomenonEntry.class, CompositePhenomenonEntry.class,
-              DataBlockDefinitionEntry.class, MeasurementEntry.class,
-              MeasureEntry.class, AnyResultEntry.class})
+@XmlSeeAlso({ MeasurementEntry.class})
 public class ObservationEntry extends Entry implements Observation {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
@@ -106,7 +104,7 @@ public class ObservationEntry extends Entry implements Observation {
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
      */
     @XmlElement(required = true)
-    private PhenomenonEntry observedProperty;
+    private PhenomenonPropertyType observedProperty;
 
     /**
      * Référence vers la {@linkplain Procedure procédure} associée à cet observable.
@@ -158,7 +156,6 @@ public class ObservationEntry extends Entry implements Observation {
      */
     private Object procedureParameter;
     
-    
     /**
      * Construit une observation vide (utilisé pour la serialisation par JAXB)
      */
@@ -191,7 +188,7 @@ public class ObservationEntry extends Entry implements Observation {
         this.name                = name;
         this.definition          = definition;
         this.featureOfInterest   = featureOfInterest;
-        this.observedProperty    = observedProperty;
+        this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
         if (distribution == null)
             this.distribution    = DistributionEntry.NORMAL;
@@ -230,7 +227,7 @@ public class ObservationEntry extends Entry implements Observation {
         this.name                = name;
         this.definition          = definition;
         this.featureOfInterest   = featureOfInterest;
-        this.observedProperty    = observedProperty;
+        this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
         if (distribution == null)
             this.distribution    = DistributionEntry.NORMAL;
@@ -254,10 +251,14 @@ public class ObservationEntry extends Entry implements Observation {
             TimePositionType begin = new  TimePositionType("1900-01-01 00:00:00");
             time = new TimePeriodType(begin);
         }
+        PhenomenonEntry pheno = null;
+        if (this.observedProperty != null) {
+            pheno = this.observedProperty.getPhenomenon();
+        }
         return new ObservationEntry(temporaryName,
                                         this.definition,
                                         this.featureOfInterest, 
-                                        this.observedProperty,
+                                        pheno,
                                         this.procedure,
                                         this.distribution,
                                         null,
@@ -288,7 +289,11 @@ public class ObservationEntry extends Entry implements Observation {
      * {@inheritDoc}
      */
     public Phenomenon getObservedProperty() {
-        return observedProperty;
+        if (observedProperty != null) {
+            return observedProperty.getPhenomenon();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -410,7 +415,9 @@ public class ObservationEntry extends Entry implements Observation {
      * Retourne vrai si l'observation satisfait le template specifie
      */ 
     public boolean matchTemplate(ObservationEntry template) {
-        
+        System.out.println("matchTemplate:" + Utilities.equals(this.observedProperty,    template.observedProperty));
+        System.out.println("this:" + this.observedProperty.toString());
+        System.out.println("template:" + template.observedProperty.toString());
         return Utilities.equals(this.featureOfInterest,   template.featureOfInterest)   &&
                Utilities.equals(this.observedProperty,    template.observedProperty)    &&
                Utilities.equals(this.procedure,           template.procedure)           &&
@@ -432,7 +439,7 @@ public class ObservationEntry extends Entry implements Observation {
     }
 
     /**
-     * Vérifie si cette entré est identique à l'objet spécifié.
+     * Verify if this entry is identical to specified object.
      */
     @Override
     public boolean equals(final Object object) {

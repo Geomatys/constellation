@@ -32,7 +32,7 @@ import net.seagis.catalog.SingletonTable;
 import net.seagis.gml.BoundingShapeEntry;
 import net.seagis.gml.EnvelopeEntry;
 import net.seagis.gml.EnvelopeTable;
-import net.seagis.observation.PhenomenonEntry;
+import net.seagis.swe.PhenomenonEntry;
 import net.seagis.coverage.wms.NamespacePrefixMapperImpl;
 import net.seagis.gml.ReferenceEntry;
 import net.seagis.gml.TimeIndeterminateValueType;
@@ -157,6 +157,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          BoundingShapeEntry boundedBy = new  BoundingShapeEntry(envelope);
          
          getPhenomenons().setIdOffering(idOffering);
+         System.out.println("ID OFERRRRRRRRRRRRRING" + idOffering);
          Collection<OfferingPhenomenonEntry> entries1 = getPhenomenons().getEntries();
         
          List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();

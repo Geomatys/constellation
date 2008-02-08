@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package net.seagis.swe;
 
 //jaxB import
 import javax.xml.bind.annotation.XmlAccessType;
@@ -126,7 +126,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     }
 
     /**
-     * Vérifie si cette entré est identique à l'objet spécifié.
+     * Verify if this entry is identical to specified object.
      */
     @Override
     public boolean equals(final Object object) {

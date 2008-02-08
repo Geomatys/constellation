@@ -13,7 +13,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.observation;
+package net.seagis.swe;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

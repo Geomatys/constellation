@@ -35,11 +35,15 @@ import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetadataTable;
 import net.seagis.swe.AnyResultEntry;
 import net.seagis.swe.AnyResultTable;
+import net.seagis.swe.CompositePhenomenonEntry;
+import net.seagis.swe.CompositePhenomenonTable;
 import net.seagis.swe.DataBlockDefinition;
 import net.seagis.swe.DataBlockDefinitionEntry;
 import net.seagis.swe.DataBlockDefinitionTable;
 
 // OpenGis dependencies
+import net.seagis.swe.PhenomenonEntry;
+import net.seagis.swe.PhenomenonTable;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
 

@@ -72,6 +72,16 @@ public class BoundingShapeEntry {
     
     public BoundingShapeEntry(EnvelopeEntry envelope) {
         this.envelope = envelope;
+        if (envelope == null) {
+            this._null = new ArrayList<String>();
+            this._null.add("not_bounded");
+        }
+        
+    }
+    
+    public BoundingShapeEntry(String nul) {
+        this._null = new ArrayList<String>();
+        this._null.add(nul);
     }
     
     /**
@@ -134,6 +144,30 @@ public class BoundingShapeEntry {
         hash = 47 * hash + (this._null != null ? this._null.hashCode() : 0);
         hash = 47 * hash + (this.nilReason != null ? this.nilReason.hashCode() : 0);
         return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("BoundingShapeEntry:").append('\n');
+        if (envelope != null) {
+            s.append("envelope:").append(envelope.toString());
+        }
+        if (envelopeWithTimePeriod != null) {
+            s.append("envelopeWithTimePeriod:").append(envelopeWithTimePeriod.toString());
+        }
+        if (_null != null) {
+            s.append("null:").append('\n');
+            for (String ss: _null) {
+                s.append(ss).append('\n');
+            }
+        }
+        if (nilReason != null) {
+            s.append("nilReason:").append('\n');
+            for (String ss: nilReason) {
+                s.append(ss).append('\n');
+            }
+        }
+        return s.toString();
     }
 
 }

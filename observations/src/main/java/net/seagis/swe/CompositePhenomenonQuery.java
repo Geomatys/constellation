@@ -13,46 +13,50 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.observation;
+
+package net.seagis.swe;
 
 import net.seagis.catalog.Column;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.Parameter;
 import net.seagis.catalog.Query;
-import net.seagis.catalog.QueryType;
 import static net.seagis.catalog.QueryType.*;
+import net.seagis.catalog.QueryType;
+
 
 /**
- * The query to execute for a {@link PhenomenonTable}.
+ * The query to execute for a {@link CompositePhenomenonTable}.
  *
  * @version $Id:
  * @author Guilhem Legal
  */
-public class PhenomenonQuery extends Query{
+public class CompositePhenomenonQuery extends Query{
     
     /** 
      * Column to appear after the {@code "SELECT"} clause.
+     * we forget the attribute base for now 
      */
-    protected final Column identifier, name, remarks;
-
+    protected final Column identifier, name, remarks, dimension;
+    
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
     protected final Parameter byName;
-
+    
     /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
-    public PhenomenonQuery(final Database database) {
-        super(database, "phenomenons");
-        final QueryType[] SI  = {SELECT, INSERT};
+    public CompositePhenomenonQuery(final Database database) {
+        super(database, "composite_phenomenons");
+        final QueryType[] SI = {SELECT, INSERT};
         final QueryType[] SIE = {SELECT, INSERT, EXISTS};
         
         identifier = addColumn ("id",          SIE);
         name       = addColumn ("name",        SI);
         remarks    = addColumn ("description", SI);
+        dimension  = addColumn ("dimension",   SI);
         
         byName     = addParameter(identifier, SELECT, EXISTS);
     }

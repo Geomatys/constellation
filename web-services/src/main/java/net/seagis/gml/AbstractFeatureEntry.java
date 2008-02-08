@@ -56,7 +56,11 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
     public AbstractFeatureEntry(String id, String name, String description, ReferenceEntry descriptionReference,
             BoundingShapeEntry boundedBy) {
         super(id, name, description, descriptionReference);
-        this.boundedBy = boundedBy;
+        if (boundedBy == null) {
+            this.boundedBy = new BoundingShapeEntry("");
+        } else { 
+            this.boundedBy = boundedBy;
+        }
     }
         
     /**

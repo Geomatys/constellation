@@ -79,7 +79,7 @@ public class ExceptionReport {
     public ExceptionReport(String exceptionText, String exceptionCode) {
         exception = new ArrayList<ExceptionType>();
         this.exception.add(new ExceptionType(exceptionText, exceptionCode));
-        this.version = "0.0.0";
+        this.version = "1.1.0";
     }
     
     /**

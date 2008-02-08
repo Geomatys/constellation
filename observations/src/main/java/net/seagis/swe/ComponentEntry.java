@@ -12,11 +12,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package net.seagis.swe;
 
 import net.seagis.catalog.Entry;
 import org.geotools.resources.Utilities;
-import org.opengis.observation.Phenomenon;
 
 /**
  * Une liste de phénomèmene pour un phenoméne composé.

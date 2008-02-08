@@ -14,7 +14,6 @@
  */
 package net.seagis.observation;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,6 +29,10 @@ import net.seagis.gml.TimeInstantType;
 import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetadataTable;
+import net.seagis.swe.CompositePhenomenonEntry;
+import net.seagis.swe.CompositePhenomenonTable;
+import net.seagis.swe.PhenomenonEntry;
+import net.seagis.swe.PhenomenonTable;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measurement;
 

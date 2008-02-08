@@ -23,10 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 // Sicade dependencies
-import net.seagis.observation.fishery.Species;
 import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
-import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 
 

@@ -69,15 +69,6 @@ public class ObjectFactory {
     }
     
     /**
-     * Create an instance of {@link CompositePhenomenonEntry }
-     * 
-     */
-    public CompositePhenomenonEntry createCompositePhenomenonEntry() {
-        return new CompositePhenomenonEntry();
-    }
-    
-    
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ObservationEntry }{@code >}}
      * 
      */
@@ -85,5 +76,4 @@ public class ObjectFactory {
     public JAXBElement<ObservationEntry> createObservation(ObservationEntry value) {
         return new JAXBElement<ObservationEntry>(_Observation_QNAME, ObservationEntry.class, null, value);
     }
-
 }

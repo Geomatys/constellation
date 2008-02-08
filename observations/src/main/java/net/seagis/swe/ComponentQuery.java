@@ -12,9 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-
-package net.seagis.observation;
+package net.seagis.swe;
 
 import net.seagis.catalog.Column;
 import net.seagis.catalog.Database;
@@ -23,42 +21,38 @@ import net.seagis.catalog.Query;
 import static net.seagis.catalog.QueryType.*;
 import net.seagis.catalog.QueryType;
 
-
 /**
- * The query to execute for a {@link CompositePhenomenonTable}.
  *
  * @version $Id:
  * @author Guilhem Legal
  */
-public class CompositePhenomenonQuery extends Query{
+public class ComponentQuery extends Query{
     
-    /** 
+    /**
      * Column to appear after the {@code "SELECT"} clause.
-     * we forget the attribute base for now 
      */
-    protected final Column identifier, name, remarks, dimension;
+    protected final Column idCompositePhenomenon, idComponent;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName;
+    protected final Parameter byComposite, byComponent;
     
     /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
-    public CompositePhenomenonQuery(final Database database) {
-        super(database, "composite_phenomenons");
-        final QueryType[] SI = {SELECT, INSERT};
-        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
+    public ComponentQuery(final Database database) {
+        super (database, "components");
+        final QueryType[] SLI  = {SELECT, LIST, INSERT};
+        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         
-        identifier = addColumn ("id",          SIE);
-        name       = addColumn ("name",        SI);
-        remarks    = addColumn ("description", SI);
-        dimension  = addColumn ("dimension",   SI);
+        idCompositePhenomenon  = addColumn("composite_phenomenon", SLIE);
+        idComponent            = addColumn("component",  SLIE);
         
-        byName     = addParameter(identifier, SELECT, EXISTS);
+        byComposite = addParameter(idCompositePhenomenon, SELECT, LIST, EXISTS);
+        byComponent = addParameter(idComponent,  SELECT, EXISTS);
     }
     
 }

@@ -13,7 +13,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.observation;
+package net.seagis.swe;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,73 +34,59 @@ import org.geotools.resources.Utilities;
   * @author Guilhem Legal
   */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CompositePhenomenon", propOrder = {"base", "dimension", "component"})
-public class CompositePhenomenonEntry extends PhenomenonEntry implements CompositePhenomenon{
+@XmlType(name = "CompositePhenomenon", propOrder = {"base", "component"})
+public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements CompositePhenomenon{
     
     /**
-     * Le phenomene de base.
+     * The base phenomenon.
      */
     private PhenomenonEntry base;
     
     /**
-     * le nombre de composant
-     */
-    @XmlAttribute
-    private int dimension;
-    
-    /**
-     * Les composants.
+     * The components.
      */
     @XmlElement(name="component")
     private Collection<PhenomenonEntry> component;
    
     /** 
-     * constructeur vide utilisé par JAXB.
+     * Empty constructor used by JAXB.
      */
-    protected CompositePhenomenonEntry(){}
+    CompositePhenomenonEntry(){}
             
     /** 
-     * Crée un nouveau phenomene composé
+     * Build a new composite phenomenon.
      */
     public CompositePhenomenonEntry(final String id, final String name, final String description,
             final PhenomenonEntry base, final Collection<PhenomenonEntry> component) {
-        super(id, name, description);
+        super(id, name, description, component.size());
         this.base = base;
         this.component = component;
-        this.dimension = component.size();
         
     }
     
     /**
-     * Retourne le phenomene de base.
+     * Return the base phenomenone.
      */
     public PhenomenonEntry getBase(){
         return base;
     }
     
     /**
-     * Ajoute un composant a la liste 
+     * Add a component to the list 
      */
     public void addComponent(PhenomenonEntry phenomenon) {
         component.add(phenomenon);
     }
     
     /**
-     * Retourne les composants.
+     * Return the components.
      */
     public Collection<PhenomenonEntry> getComponent() {
         return component;
     }
 
     /**
-     * Retourne le nombre de composant.
-     */
-    public int getDimension() {
-        return dimension;
-    }
-    
-    /**
-     * Retourne un code représentant ce phenomene composé.
+     * Return a code representing this composite phenomenon.
      */
     @Override
     public final int hashCode() {
@@ -108,7 +94,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
     }
 
     /**
-     * Vérifie si cette entré est identique à l'objet spécifié.
+     * Verify if this entry is identical to specified object.
      */
     @Override
     public boolean equals(final Object object) {
@@ -116,7 +102,7 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
             return true;
         }
         
-        if (object instanceof CompositePhenomenonEntry) {
+        if (object instanceof CompositePhenomenonEntry && super.equals(object)) {
             final CompositePhenomenonEntry that = (CompositePhenomenonEntry) object;
             if ((this.component !=null && that.component == null)||(this.component ==null && that.component != null))
                 return false;
@@ -134,9 +120,9 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
             return Utilities.equals(this.getId(),             that.getId()) &&
                    Utilities.equals(this.getDescription(),    that.getDescription()) &&
                    Utilities.equals(this.getPhenomenonName(), that.getPhenomenonName()) &&
-                   Utilities.equals(this.base,                that.base) &&
-                   Utilities.equals(this.dimension,           that.dimension) ; 
-       } else return false;
+                   Utilities.equals(this.base,                that.base);
+       } 
+       return false;
         
         
     }
@@ -152,8 +138,6 @@ public class CompositePhenomenonEntry extends PhenomenonEntry implements Composi
         } else {
             s.append("base is null (relatively normal)");
         }
-        
-        s.append("dimension:").append(dimension).append('\n');
         
         if (component != null) {
             Iterator i =  component.iterator();

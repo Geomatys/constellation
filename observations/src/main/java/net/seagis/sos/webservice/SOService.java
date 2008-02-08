@@ -37,6 +37,7 @@ import org.geotools.util.Version;
 
 // seaGIS dependencies
 import net.seagis.catalog.NoSuchTableException;
+import net.seagis.ows.OWSWebServiceException;
 import net.seagis.coverage.web.ServiceExceptionReport;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.NamespacePrefixMapperImpl;
@@ -64,7 +65,7 @@ public class SOService extends WebService {
      * Build a new Restfull SOS service.
      */
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
-        super("SOS", "1.0.0");
+        super("SOS", true, "1.0.0");
         worker = new SOSworker();
         worker.setVersion(new Version("1.0.0"));
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.gml:net.seagis.observation:net.seagis.ows:net.seagis.sos:net.seagis.swe:net.seagis.ogc:net.seagis.coverage.web");
@@ -89,7 +90,7 @@ public class SOService extends WebService {
              if (request.equalsIgnoreCase("GetObservation") || (objectRequest instanceof GetObservation)) {
                 GetObservation go = (GetObservation)objectRequest;
                 if (go == null){
-                    throw new WebServiceException("The operation GetObservation is only requestable in XML for now",
+                    throw new OWSWebServiceException("The operation GetObservation is only requestable in XML for now",
                                          OPERATION_NOT_SUPPORTED, getCurrentVersion());
                 }
                 StringWriter sw = new StringWriter();
@@ -100,7 +101,7 @@ public class SOService extends WebService {
              } else if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
                 DescribeSensor ds = (DescribeSensor)objectRequest;
                 if (ds == null){
-                    throw new WebServiceException("The operation DescribeSensor is only requestable in XML for now",
+                    throw new OWSWebServiceException("The operation DescribeSensor is only requestable in XML for now",
                                          OPERATION_NOT_SUPPORTED, getCurrentVersion());
                 }
         
@@ -115,7 +116,7 @@ public class SOService extends WebService {
                  */
                 if (gc == null) {
                     if (!getParameter("SERVICE", true).equalsIgnoreCase("SOS")) {
-                        throw new WebServiceException("The parameters SERVICE=SOS must be specify",
+                        throw new OWSWebServiceException("The parameters SERVICE=SOS must be specify",
                                          MISSING_PARAMETER_VALUE, getCurrentVersion());
                     }
                     
@@ -132,7 +133,7 @@ public class SOService extends WebService {
                             if (SectionsType.getExistingSections("1.1.1").contains(token)){
                                 requestedSections.add(token);
                             } else {
-                                throw new WebServiceException("The section " + token + " does not exist",
+                                throw new OWSWebServiceException("The section " + token + " does not exist",
                                                               INVALID_PARAMETER_VALUE, getCurrentVersion());
                             }   
                         }
@@ -153,7 +154,7 @@ public class SOService extends WebService {
                 return Response.ok(sw.toString(), "text/xml").build();
                     
             } else {
-                throw new WebServiceException("The operation " + request + " is not supported by the service",
+                throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
                                               OPERATION_NOT_SUPPORTED, getCurrentVersion());
             }
              
@@ -162,16 +163,20 @@ public class SOService extends WebService {
              * - if the user have forget a mandatory parameter.
              * - if the version number is wrong.
              */
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
-                ex.printStackTrace();
+            if (ex instanceof OWSWebServiceException) {
+                OWSWebServiceException owsex = (OWSWebServiceException)ex;
+                if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                    !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
+                    owsex.printStackTrace();
+                } else {
+                    logger.info(owsex.getMessage());
+                }
+                StringWriter sw = new StringWriter();    
+                marshaller.marshal(owsex.getExceptionReport(), sw);
+                return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
-                logger.info(ex.getMessage());
+                throw new IllegalArgumentException("this service can't return WMS Exception");
             }
-            StringWriter sw = new StringWriter();    
-            marshaller.marshal(ex.getServiceExceptionReport(), sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
         }
     }
-
 }

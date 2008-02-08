@@ -16,7 +16,7 @@
 package net.seagis.sos;
 
 import net.seagis.catalog.Entry;
-import net.seagis.observation.PhenomenonEntry;
+import net.seagis.swe.PhenomenonEntry;
 
 /**
  *

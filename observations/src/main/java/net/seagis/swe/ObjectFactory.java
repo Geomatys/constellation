@@ -17,6 +17,9 @@ public class ObjectFactory {
     private final static QName _AbstractDataRecord_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "AbstractDataRecord");
     private final static QName _SimpleDataRecord_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "SimpleDataRecord");
     private final static QName _Item_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "Item");
+    private final static QName _CompositePhenomenon_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "CompositePhenomenon");
+    private final static QName _Phenomenon_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "Phenomenon");
+    private final static QName _CompoundPhenomenon_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "CompoundPhenomenon");
     
     
     /**
@@ -128,6 +131,49 @@ public class ObjectFactory {
      */
     public TimeGeometricPrimitivePropertyType createTimeGeometricPrimitivePropertyType() {
         return new TimeGeometricPrimitivePropertyType();
+    }
+     
+    /**
+     * Create an instance of {@link CompositePhenomenonEntry }
+     * 
+     */
+    public CompositePhenomenonEntry createCompositePhenomenonEntry() {
+        return new CompositePhenomenonEntry();
+    }
+    
+     /**
+     * Create an instance of {@link CompositePhenomenonEntry }
+     * 
+     */
+    public PhenomenonEntry createPhenomenonEntry() {
+        return new PhenomenonEntry();
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CompoundPhenomenonType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "CompoundPhenomenon", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "Phenomenon")
+    public JAXBElement<CompoundPhenomenonEntry> createCompoundPhenomenon(CompoundPhenomenonEntry value) {
+        return new JAXBElement<CompoundPhenomenonEntry>(_CompoundPhenomenon_QNAME, CompoundPhenomenonEntry.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PhenomenonType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "Phenomenon", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "Definition")
+    public JAXBElement<PhenomenonEntry> createPhenomenon(PhenomenonEntry value) {
+        return new JAXBElement<PhenomenonEntry>(_Phenomenon_QNAME, PhenomenonEntry.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CompositePhenomenonType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "CompositePhenomenon", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "CompoundPhenomenon")
+    public JAXBElement<CompositePhenomenonEntry> createCompositePhenomenon(CompositePhenomenonEntry value) {
+        return new JAXBElement<CompositePhenomenonEntry>(_CompositePhenomenon_QNAME, CompositePhenomenonEntry.class, null, value);
     }
     
     /**

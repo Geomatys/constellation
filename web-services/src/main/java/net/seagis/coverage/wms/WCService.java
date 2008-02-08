@@ -44,6 +44,7 @@ import javax.ws.rs.Path;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.Series;
+import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.gml.CodeListType;
@@ -126,7 +127,8 @@ public class WCService extends WebService {
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
     public WCService() throws JAXBException, WebServiceException {
-        super("WCS", "1.1.1", "1.0.0");
+        super("WCS", false, "1.1.1", "1.0.0");
+        //TODO true for 1.1.1
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.coverage.web:net.seagis.wcs");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -160,7 +162,7 @@ public class WCService extends WebService {
                 //this wcs does not implement "store" mechanism
                 String store = getParameter("STORE", false);
                 if (store!= null && store.equals("true")) {
-                    throw new WebServiceException("The service does not implement the store mechanism", 
+                    throw new WMSWebServiceException("The service does not implement the store mechanism", 
                                                   NO_APPLICABLE_CODE, getCurrentVersion());
                 }
                 
@@ -189,7 +191,7 @@ public class WCService extends WebService {
                  */
                 if (gc == null) {
                     if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
-                        throw new WebServiceException("The parameters SERVICE=WCS must be specify",
+                        throw new WMSWebServiceException("The parameters SERVICE=WCS must be specify",
                                          MISSING_PARAMETER_VALUE, getCurrentVersion());
                     }
                     if (getCurrentVersion().toString().equals("1.0.0")){
@@ -210,7 +212,7 @@ public class WCService extends WebService {
                                 if (SectionsType.getExistingSections("1.1.1").contains(token)){
                                     requestedSections.add(token);
                                 } else {
-                                    throw new WebServiceException("The section " + token + " does not exist",
+                                    throw new WMSWebServiceException("The section " + token + " does not exist",
                                                                 INVALID_PARAMETER_VALUE, getCurrentVersion());
                                 }   
                             }
@@ -282,7 +284,7 @@ public class WCService extends WebService {
                         String resz = getParameter("resz",  false);
                 
                         if (resx == null || resy == null) {
-                            throw new WebServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
+                            throw new WMSWebServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
                                                           INVALID_PARAMETER_VALUE, getCurrentVersion());
                         }
                     } else {
@@ -328,7 +330,7 @@ public class WCService extends WebService {
                 return Response.ok(getCoverage(gc), webServiceWorker.getMimeType()).build();
                      
             } else {
-                throw new WebServiceException("The operation " + request + " is not supported by the service",
+                throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
                                               OPERATION_NOT_SUPPORTED, getCurrentVersion());
             }
         } catch (WebServiceException ex) {
@@ -336,15 +338,18 @@ public class WCService extends WebService {
              * - if the user have forget a mandatory parameter.
              * - if the version number is wrong.
              */
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
-                ex.printStackTrace();
+            if (ex instanceof WMSWebServiceException) {
+                WMSWebServiceException wmsex = (WMSWebServiceException)ex;
+                if (!wmsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                    !wmsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
+                    wmsex.printStackTrace();
+                }
+                StringWriter sw = new StringWriter();    
+                marshaller.marshal(wmsex.getServiceExceptionReport(), sw);
+                return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
             } else {
-                logger.info(ex.getMessage());
+                throw new IllegalArgumentException("this service can't return OWS Exception");
             }
-            StringWriter sw = new StringWriter();    
-            marshaller.marshal(ex.getServiceExceptionReport(), sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
         }
      }
     
@@ -378,7 +383,7 @@ public class WCService extends WebService {
             } else {
                 format = formats.getOutputFormat().get(0);
                 if (!format.equals("text/xml") && !format.equals("application/vnd.ogc.se_xml")){
-                    throw new WebServiceException("This format " + format + " is not allowed",
+                    throw new WMSWebServiceException("This format " + format + " is not allowed",
                                        INVALID_PARAMETER_VALUE, getCurrentVersion());
                 }
             }
@@ -431,7 +436,7 @@ public class WCService extends WebService {
                 if (SectionsType.getExistingSections("1.0.0").contains(section)){
                     requestedSection = section;
                 } else {
-                    throw new WebServiceException("The section " + section + " does not exist",
+                    throw new WMSWebServiceException("The section " + section + " does not exist",
                                           INVALID_PARAMETER_VALUE, getCurrentVersion());
                }
                contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata"); 
@@ -514,7 +519,7 @@ public class WCService extends WebService {
             contents        = new Contents(summary, null, null, null);    
             contentMetadata = new ContentMetadata("1.0.0", offBrief); 
         } catch (CatalogException exception) {
-            throw new WebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
         }
             
         
@@ -570,7 +575,7 @@ public class WCService extends WebService {
                 crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
                 bbox = bbox.substring(0, bbox.lastIndexOf(','));
             } else {
-                throw new WebServiceException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
+                throw new WMSWebServiceException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
                             INVALID_PARAMETER_VALUE, getCurrentVersion());
             } 
             time = getParameter("timeSequence", false);
@@ -594,7 +599,7 @@ public class WCService extends WebService {
                 if (fieldId.equalsIgnoreCase(currentLayer.getThematic())){
                     interpolation = rangeSubset.substring(rangeSubset.indexOf(':')+ 1, rangeSubset.length());
                 } else {
-                    throw new WebServiceException("The field " + fieldId + " is not present in this coverage" , 
+                    throw new WMSWebServiceException("The field " + fieldId + " is not present in this coverage" , 
                             INVALID_PARAMETER_VALUE, getCurrentVersion());
                 }
             } else {
@@ -641,13 +646,13 @@ public class WCService extends WebService {
             if (request.getOutput().getFormat()!= null) {
                 format    = request.getOutput().getFormat().getValue();
             } else {
-                throw new WebServiceException("The parameters Format have to be specified",
+                throw new WMSWebServiceException("The parameters Format have to be specified",
                                               MISSING_PARAMETER_VALUE, getCurrentVersion());
             }
             
             coverage      = request.getSourceCoverage();
             if (coverage == null) {
-                throw new WebServiceException("The parameters sourceCoverage have to be specified",
+                throw new WMSWebServiceException("The parameters sourceCoverage have to be specified",
                                               MISSING_PARAMETER_VALUE, getCurrentVersion());
             }
             if (request.getInterpolationMethod() != null) {
@@ -679,7 +684,7 @@ public class WCService extends WebService {
             }
             
             if (temporalSubset == null && env.getPos().size() == 0) {
-                        throw new WebServiceException("The parameters BBOX or TIME have to be specified" , 
+                        throw new WMSWebServiceException("The parameters BBOX or TIME have to be specified" , 
                                                       MISSING_PARAMETER_VALUE, getCurrentVersion());
             }
             /* here the parameter width and height (and depth for 3D matrix)
@@ -701,7 +706,7 @@ public class WCService extends WebService {
                         depth     = gridEnv.getHigh().get(2).toString();
                     }
                 } else {
-                     throw new WebServiceException("you must specify grid size or resolution" , 
+                     throw new WMSWebServiceException("you must specify grid size or resolution" , 
                                                    MISSING_PARAMETER_VALUE, getCurrentVersion());
                 }
             }
@@ -916,7 +921,7 @@ public class WCService extends WebService {
         return sw.toString();
         
         } catch (CatalogException exception) {
-            throw new WebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
         }
     }
 
@@ -947,7 +952,7 @@ public class WCService extends WebService {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException exception) {
-            throw new WebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value),
+            throw new WMSWebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value),
                     exception, INVALID_PARAMETER_VALUE, getCurrentVersion());
         }
     }

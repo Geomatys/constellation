@@ -52,6 +52,8 @@ import javax.xml.bind.Marshaller;
 // seagis dependencies
 import javax.xml.bind.UnmarshalException;
 import net.seagis.catalog.Database;
+import net.seagis.ows.OWSWebServiceException;
+import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.wcs.AbstractRequest;
@@ -122,6 +124,12 @@ public abstract class WebService {
     private UriInfo context;
     
     /**
+     * A boolean indicating if the web service follow the OWS specification.
+     * TODO different by version
+     */
+    private boolean isOWS;
+    
+    /**
      * The object whitch made all the operation on the postgrid database
      */
     protected static ThreadLocal<WebServiceWorker> webServiceWorker;
@@ -151,7 +159,7 @@ public abstract class WebService {
      * 
      * @param versions A list of the supported version of this service.
      */
-    public WebService(String service, String... versions) {
+    public WebService(String service, boolean isOWS, String... versions) {
         this.service = service;
        
         for (final String element : versions) {
@@ -200,8 +208,10 @@ public abstract class WebService {
                 } else {
                     v = currentVersion;
                 }
-                throw new WebServiceException("The parameter " + parameterName + " must be specify",
-                                              MISSING_PARAMETER_VALUE, v);
+                throwException("The parameter " + parameterName + " must be specify",
+                               MISSING_PARAMETER_VALUE);
+                //never reach;
+                return null;
             } else {
                 return null;
             }
@@ -233,8 +243,8 @@ public abstract class WebService {
     protected void verifyBaseParameter(int sld) throws WebServiceException {  
         if (sld == 2) {
             if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
-                throw new WebServiceException("The parameter VERSION=" + sldVersion + " must be specify",
-                                              MISSING_PARAMETER_VALUE, sldVersion);
+                throwException("The parameter VERSION=" + sldVersion + " must be specify",
+                               MISSING_PARAMETER_VALUE);
             } else {
                 return;
             }
@@ -249,15 +259,15 @@ public abstract class WebService {
             }
             message = message.substring(0, message.length()-3);
             message += " must be specify";
-            throw new WebServiceException(message, VERSION_NEGOTIATION_FAILED, null);
+            throwException(message, VERSION_NEGOTIATION_FAILED);
         
         } else {
             setCurrentVersion(inputVersion);
         }
         if (sld == 1) {
             if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
-                throw new WebServiceException("The parameter SLD_VERSION=" + sldVersion + " must be specify",
-                                              VERSION_NEGOTIATION_FAILED, versions.get(0));
+                throwException("The parameter SLD_VERSION=" + sldVersion + " must be specify",
+                               VERSION_NEGOTIATION_FAILED);
             }
         }
     } 
@@ -285,7 +295,9 @@ public abstract class WebService {
                     if (!mandatory) {
                         return null;
                     } else {
-                        throw new WebServiceException("The parameter " + parameterName + " must be specify", MISSING_PARAMETER_VALUE, getCurrentVersion());
+                        throwException("The parameter " + parameterName + " must be specify", MISSING_PARAMETER_VALUE);
+                        //never reach
+                        return null;
                     }
                 }
             }
@@ -293,8 +305,10 @@ public abstract class WebService {
             Object result = unmarshaller.unmarshal(sr);
             return result;
         } catch (JAXBException ex) {
-             throw new WebServiceException("the xml object for parameter" + parameterName + " is not well formed:" + '\n' +
-                                           ex, INVALID_PARAMETER_VALUE, getCurrentVersion());
+             throwException("the xml object for parameter" + parameterName + " is not well formed:" + '\n' +
+                                           ex, INVALID_PARAMETER_VALUE);
+             //never reach
+             return null;
         }
     }
    
@@ -371,10 +385,19 @@ public abstract class WebService {
         
         } catch (UnmarshalException e) {
             logger.severe(e.getMessage());
-            WebServiceException wse = new WebServiceException("The XML request is not valid",
-                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
             StringWriter sw = new StringWriter(); 
-            marshaller.marshal(wse.getServiceExceptionReport(), sw);
+            if (isOWS) {
+                WMSWebServiceException wse = new WMSWebServiceException("The XML request is not valid",
+                                                                        INVALID_PARAMETER_VALUE, 
+                                                                        getCurrentVersion());
+                marshaller.marshal(wse.getServiceExceptionReport(), sw);
+            } else {
+                OWSWebServiceException wse = new OWSWebServiceException("The XML request is not valid",
+                                                                        INVALID_PARAMETER_VALUE, 
+                                                                        getCurrentVersion());
+                marshaller.marshal(wse.getExceptionReport(), sw);
+            }
+            
             return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
         }
         
@@ -463,6 +486,15 @@ public abstract class WebService {
             s = s.replace('É', 'E');
         }
         return s;
+    }
+    
+    protected void throwException(final String message, final WMSExceptionCode code) throws WebServiceException {
+        if (isOWS) {
+            throw new OWSWebServiceException(message, code, getCurrentVersion());
+        } else {
+            throw new WMSWebServiceException(message, code, getCurrentVersion());
+        }
+        
     }
     
     

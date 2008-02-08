@@ -17,9 +17,10 @@ package net.seagis.coverage.web;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.geotools.util.Version;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.wms.WMSExceptionCode;
+
+
 
 
 /**
@@ -30,84 +31,23 @@ import net.seagis.coverage.wms.WMSExceptionCode;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "WebServiceException", namespace="http://wms.geomatys.fr/")
-public class WebServiceException extends CatalogException {
-    /**
-     * For cross-version compatibility.
-     */
-    private static final long serialVersionUID = 169942429240747383L;
-
-    /**
-     * An OGC Web Service exception report.
-     */
-    private ServiceExceptionReport exception;
-
-    /**
-     * Creates a new exception with the specified details.
-     *
-     * @param message The message for this exception.
-     * @param code    The OGC code that describes the error.
-     * @param version The version of the web service that produced the error.
-     */
-    public WebServiceException(final String message, final WMSExceptionCode code, final Version version) {
+public abstract class WebServiceException extends CatalogException {
+    
+    public WebServiceException() {
+        super();
+    }
+    
+    public WebServiceException(String message) {
         super(message);
-        setServiceExceptionReport(message, code, version);
     }
-
-    /**
-     * Creates a new exception with the specified cause.
-     *
-     * @param cause   The cause for this exception.
-     * @param code    The OGC code that describes the error.
-     * @param version The version of the web service that produced the error.
-     */
-    public WebServiceException(final Exception cause, final WMSExceptionCode code, final Version version) {
+    
+    public WebServiceException(Exception cause) {
         super(cause);
-        setServiceExceptionReport(cause.getLocalizedMessage(), code, version);
     }
-
-    /**
-     * Creates a new exception with the specified details.
-     *
-     * @param message The message for this exception.
-     * @param cause   The cause for this exception.
-     * @param code    The OGC code that describes the error.
-     * @param version The version of the web service that produced the error.
-     */
-    public WebServiceException(final String message, final Exception cause,
-                               final WMSExceptionCode code, final Version version)
-    {
+    
+    public WebServiceException(String message, Exception cause) {
         super(message, cause);
-        setServiceExceptionReport(message, code, version);
     }
 
-    /**
-     * Set the exception. Used by constructors only.
-     *
-     * @param message The message for this exception.
-     * @param code    The OGC code that describes the error.
-     * @param version The version of the web service that produced the error.
-     */
-    private void setServiceExceptionReport(final String message, final WMSExceptionCode code, final Version version) {
-        final ServiceExceptionType details = new ServiceExceptionType(message, code);
-        exception = new ServiceExceptionReport(version, details);
-    }
-
-    /**
-     * Returns the OGC Web Service exception report.
-     */
-    public ServiceExceptionReport getServiceExceptionReport() {
-        return exception;
-    }
-
-    /**
-     * Returns the code of the first exception in the report.
-     * or {@code null} if there is no exception report.
-     */
-    public WMSExceptionCode getExceptionCode() {
-        if (exception != null && !exception.getServiceExceptions().isEmpty()) {
-            return exception.getServiceExceptions().get(0).getCode();
-        } else {
-            return null;
-        }
-    }
+    public abstract WMSExceptionCode getExceptionCode();
 }

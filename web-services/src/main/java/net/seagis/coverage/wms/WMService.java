@@ -41,6 +41,7 @@ import javax.xml.bind.Marshaller;
 
 //seagis dependencies
 import net.seagis.catalog.CatalogException;
+import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.sld.DescribeLayerResponseType;
 import net.seagis.sld.LayerDescriptionType;
 import net.seagis.sld.StyledLayerDescriptor;
@@ -85,7 +86,7 @@ public class WMService extends WebService {
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
     public WMService() throws JAXBException, WebServiceException {
-        super("WMS", "1.3.0","1.1.1");
+        super("WMS", false, "1.3.0","1.1.1");
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.coverage.web:net.seagis.wms:net.seagis.sld:net.seagis.gml");
@@ -135,7 +136,7 @@ public class WMService extends WebService {
                 return Response.ok(getLegendGraphic(), webServiceWorker.getMimeType()).build();
                     
             } else {
-                throw new WebServiceException("The operation " + request + " is not supported by the service",
+                throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
                                               OPERATION_NOT_SUPPORTED, getCurrentVersion());
             }
         } catch (WebServiceException ex) {
@@ -143,13 +144,18 @@ public class WMService extends WebService {
              * - if the user have forget a mandatory parameter.
              * - if the version number is wrong.
              */
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
-                ex.printStackTrace();
+            if (ex instanceof WMSWebServiceException) {
+                WMSWebServiceException wmsex = (WMSWebServiceException)ex;
+                if (!wmsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                    !wmsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
+                    wmsex.printStackTrace();
+                }
+                StringWriter sw = new StringWriter();    
+                marshaller.marshal(wmsex.getServiceExceptionReport(), sw);
+                return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
+            } else {
+                throw new IllegalArgumentException("this service can't return OWS Exception");
             }
-            StringWriter sw = new StringWriter();    
-            marshaller.marshal(ex.getServiceExceptionReport(), sw);
-            return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
         }
     }
     
@@ -242,7 +248,7 @@ public class WMService extends WebService {
               || infoFormat.equals("application/vnd.ogc.gml") 
               || infoFormat.equals("text/xml"))){
                 
-                throw new WebServiceException("This MIME type " + infoFormat + " is not accepted by the service",
+                throw new WMSWebServiceException("This MIME type " + infoFormat + " is not accepted by the service",
                                               INVALID_PARAMETER_VALUE, getCurrentVersion());
             }
         } else {
@@ -317,7 +323,7 @@ public class WMService extends WebService {
         
         //we begin by extract the mandatory attribute
         if (!getParameter("SERVICE", true).equalsIgnoreCase("WMS")) {
-            throw new WebServiceException("The parameters SERVICE=WMS must be specify",
+            throw new WMSWebServiceException("The parameters SERVICE=WMS must be specify",
                                          MISSING_PARAMETER_VALUE, getCurrentVersion());
         }
         
@@ -333,7 +339,7 @@ public class WMService extends WebService {
         if (format == null ) {
             format = "application/vnd.ogc.wms_xml";
         } else if (!(format.equals("text/xml") || format.equals("application/vnd.ogc.wms_xml"))) {
-            throw new WebServiceException("Allowed format for GetCapabilities are : text/xml or application/vnd.ogc.wms_xml.",
+            throw new WMSWebServiceException("Allowed format for GetCapabilities are : text/xml or application/vnd.ogc.wms_xml.",
                       INVALID_PARAMETER_VALUE, getCurrentVersion());
         }
         
@@ -458,7 +464,7 @@ public class WMService extends WebService {
                 layers.add(outputLayer);
                 
             } catch (CatalogException exception) {
-                throw new WebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
+                throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
             }
         }
        
@@ -512,7 +518,7 @@ public class WMService extends WebService {
                 LayerDescriptionType outputLayer = new LayerDescriptionType(or,t);
                 layersDescriptions.add(outputLayer);
             } else {
-                throw new WebServiceException("This layer is not registred: " + token,
+                throw new WMSWebServiceException("This layer is not registred: " + token,
                       INVALID_PARAMETER_VALUE, getCurrentVersion());
             }
         }

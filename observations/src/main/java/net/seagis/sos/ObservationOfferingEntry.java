@@ -31,7 +31,8 @@ import net.seagis.gml.AbstractFeatureEntry;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.BoundingShapeEntry;
 import net.seagis.gml.ReferenceEntry;
-import net.seagis.observation.PhenomenonEntry;
+import net.seagis.swe.PhenomenonEntry;
+import net.seagis.swe.PhenomenonPropertyType;
 import net.seagis.swe.TimeGeometricPrimitivePropertyType;
 import org.geotools.resources.Utilities;
 
@@ -60,7 +61,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
     @XmlElement(required = true)
     private List<ReferenceEntry> procedure;
     @XmlElement(required = true)
-    private List<PhenomenonEntry> observedProperty;
+    private List<PhenomenonPropertyType> observedProperty;
     @XmlElement(required = true)
     private List<ReferenceEntry> featureOfInterest;
     @XmlElement(required = true)
@@ -83,7 +84,10 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
         
         super(id, name, description, descriptionReference, boundedBy);
         this.procedure         = procedure;
-        this.observedProperty  = observedProperty;
+        this.observedProperty  = new ArrayList<PhenomenonPropertyType>();
+        for (PhenomenonEntry p: observedProperty){
+            this.observedProperty.add(new PhenomenonPropertyType(p));
+        }
         this.featureOfInterest = featureOfInterest;
         this.responseFormat    = responseFormat;
         this.resultModel       = resultModel;
@@ -139,9 +143,15 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      */
     public List<PhenomenonEntry> getObservedProperty() {
         if (observedProperty == null){
-            observedProperty = new ArrayList<PhenomenonEntry>();
+           return Collections.unmodifiableList(new ArrayList<PhenomenonEntry>());
+
+        } else {
+            List<PhenomenonEntry> result = new ArrayList<PhenomenonEntry>();
+            for (PhenomenonPropertyType pp:observedProperty){
+                result.add(pp.getPhenomenon());
+            }
+            return Collections.unmodifiableList(result);
         }
-        return Collections.unmodifiableList(observedProperty);
     }
 
     /**
@@ -268,8 +278,8 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
         }
         if (observedProperty != null){
            s.append('\n').append("observedProperty:").append('\n');
-           for (PhenomenonEntry phen:observedProperty){
-                s.append(phen.toString());
+           for (PhenomenonPropertyType phen:observedProperty){
+                s.append(phen.getPhenomenon().toString());
             } 
         }
         return s.toString();

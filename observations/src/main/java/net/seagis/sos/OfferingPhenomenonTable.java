@@ -23,10 +23,10 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
-import net.seagis.observation.CompositePhenomenonEntry;
-import net.seagis.observation.CompositePhenomenonTable;
-import net.seagis.observation.PhenomenonEntry;
-import net.seagis.observation.PhenomenonTable;
+import net.seagis.swe.CompositePhenomenonEntry;
+import net.seagis.swe.CompositePhenomenonTable;
+import net.seagis.swe.PhenomenonEntry;
+import net.seagis.swe.PhenomenonTable;
 import org.geotools.resources.Utilities;
 
 /**
