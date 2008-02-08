@@ -24,6 +24,7 @@ import java.io.File;
 import org.junit.*;
 import static org.junit.Assert.*;
 
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.image.io.mosaic.MosaicImageReader;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -114,7 +115,7 @@ public class BlueMarbleTest extends DatabaseTest {
         assertEquals(180, range.height);
 
         GridCoverage2D coverage = entry.getCoverage(null);
-        RenderedImage image = coverage.geophysics(false).getRenderedImage();
+        RenderedImage image = coverage.view(ViewType.RENDERED).getRenderedImage();
         if (false) {
             ImageIO.write(image, "png", new File("/home/desruisseaux/Test.png"));
         }
