@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.model.DistributionEntry;
+import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.metadata.MetaDataEntry;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measure;
@@ -68,10 +69,10 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final DistributionEntry      distribution,
             final ElementEntry           quality,
             final MeasureEntry           result,
-            final TemporalObjectEntry    samplingTime,
+            final AbstractTimeGeometricPrimitiveType    samplingTime,
             final MetaDataEntry          observationMetadata,
             final String                 resultDefinition,
-            final TemporalObjectEntry    procedureTime,
+            final AbstractTimeGeometricPrimitiveType    procedureTime,
             final Object                 procedureParameter) {
         super(name, definition, station, observedProperty, procedure, distribution, quality, result,
                 samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
@@ -94,7 +95,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final DistributionEntry    distribution,
             //final ElementEntry         quality,
             final MeasureEntry         result,
-            final TemporalObjectEntry  samplingTime,
+            final AbstractTimeGeometricPrimitiveType  samplingTime,
             final String               resultDefinition) {
         super(name, definition, station, observedProperty, procedure, distribution, result,
                 samplingTime, resultDefinition);

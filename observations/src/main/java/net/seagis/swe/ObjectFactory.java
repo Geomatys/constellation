@@ -14,9 +14,9 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
     
-    private final static QName _AbstractDataRecord_QNAME = new QName("http://www.opengis.net/swe/1.0", "AbstractDataRecord");
-    private final static QName _SimpleDataRecord_QNAME = new QName("http://www.opengis.net/swe/1.0", "SimpleDataRecord");
-    private final static QName _Item_QNAME = new QName("http://www.opengis.net/swe/1.0", "Item");
+    private final static QName _AbstractDataRecord_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "AbstractDataRecord");
+    private final static QName _SimpleDataRecord_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "SimpleDataRecord");
+    private final static QName _Item_QNAME = new QName("http://www.opengis.net/swe/1.0.1", "Item");
     
     
     /**
@@ -122,6 +122,13 @@ public class ObjectFactory {
         return new AnyScalarEntry();
     }
     
+    /**
+     * Create an instance of {@link TimeGeometricPrimitivePropertyType }
+     * 
+     */
+    public TimeGeometricPrimitivePropertyType createTimeGeometricPrimitivePropertyType() {
+        return new TimeGeometricPrimitivePropertyType();
+    }
     
     /**
      * 
@@ -129,7 +136,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link SimpleDataRecordType }{@code >}}
      */
      
-    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0", name = "SimpleDataRecord", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0", substitutionHeadName = "AbstractDataRecord")
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "SimpleDataRecord", substitutionHeadNamespace = "http://www.opengis.net/swe/1.0.1", substitutionHeadName = "AbstractDataRecord")
     public JAXBElement<SimpleDataRecordEntry> createSimpleDataRecord(SimpleDataRecordEntry value) {
         return new JAXBElement<SimpleDataRecordEntry>(_SimpleDataRecord_QNAME, SimpleDataRecordEntry.class, null, value);
     }
@@ -138,7 +145,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link AbstractDataRecordType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0", name = "AbstractDataRecord")
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "AbstractDataRecord")
     public JAXBElement<AbstractDataRecordEntry> createAbstractDataRecord(AbstractDataRecordEntry value) {
         return new JAXBElement<AbstractDataRecordEntry>(_AbstractDataRecord_QNAME, AbstractDataRecordEntry.class, null, value);
     }
@@ -147,7 +154,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0", name = "Item")
+    @XmlElementDecl(namespace = "http://www.opengis.net/swe/1.0.1", name = "Item")
     public JAXBElement<Object> createItem(Object value) {
         return new JAXBElement<Object>(_Item_QNAME, Object.class, null, value);
     }

@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
+import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.metadata.ResponsiblePartyEntry;
 import org.geotools.resources.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -57,7 +58,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     
     // JAXB ISSUE private GenericNameEntry projection;
     
-    private TemporalObjectEntry surveyTime;
+    private AbstractTimeGeometricPrimitiveType surveyTime;
     
     /**
      * Constructeur utilisé par JAXB
@@ -74,7 +75,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
             final ProcessEntry positionMethod,
             final MeasureEntry positionAccuracy,
             final GenericName projection,
-            final TemporalObjectEntry surveyTime) 
+            final AbstractTimeGeometricPrimitiveType surveyTime) 
     {
         super(name);
         this.operator = operator;

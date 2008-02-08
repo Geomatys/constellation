@@ -85,11 +85,11 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
             final AbstractFeatureEntry that = (AbstractFeatureEntry) object;
             
             boolean locationEquals = false;
-            if (this.location == null && that.location == null)
-                locationEquals = true;
-            else
+            if (this.location != null && that.location != null) {
                 locationEquals = Utilities.equals(this.location.getValue(), that.location.getValue());
-            
+            } else {
+                locationEquals = (this.location == null && that.location == null);
+            }
             return Utilities.equals(this.boundedBy,           that.boundedBy) &&
                    locationEquals;
         } else System.out.println("ENCORE SUPER NULLLLLLLLLLLLLLLLLLLLLLL");

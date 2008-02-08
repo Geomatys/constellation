@@ -663,7 +663,7 @@ public class WCService extends WebService {
             if (temporalSubset != null) {
                 for (Object timeObj:temporalSubset.getTimePositionOrTimePeriod()){
                     if (timeObj instanceof TimePositionType) {
-                        time  = ((TimePositionType)timeObj).getValue().get(0);
+                        time  = ((TimePositionType)timeObj).getValue();
                     }
                 }
             }

@@ -23,6 +23,7 @@ import org.geotools.resources.Utilities;
 
 // Sicade dependencies
 import net.seagis.coverage.model.Distribution;
+import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.observation.ElementEntry;
 import net.seagis.metadata.MetaDataEntry;
 import net.seagis.observation.fishery.Stage;
@@ -31,7 +32,6 @@ import net.seagis.observation.fishery.Category;
 import net.seagis.observation.fishery.FisheryType;
 import net.seagis.observation.ObservationEntry;
 import net.seagis.observation.SamplingFeatureEntry;
-import net.seagis.observation.TemporalObjectEntry;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Category catégorie}.
@@ -67,10 +67,10 @@ public class CategoryEntry extends ObservationEntry implements Category {
                          final FisheryTypeEntry     procedure,
                          final ElementEntry         quality,
                          final Object               result,
-                         final TemporalObjectEntry  samplingTime,
+                         final AbstractTimeGeometricPrimitiveType  samplingTime,
                          final MetaDataEntry        observationMetadata,
                          final String               resultDefinition,
-                         final TemporalObjectEntry  procedureTime,
+                         final AbstractTimeGeometricPrimitiveType  procedureTime,
                          final Object               procedureParameter)
     {
         super(name, definition, featureOfInterest, species, procedure, Distribution.NORMAL, quality, result, samplingTime,

@@ -33,9 +33,12 @@ import net.seagis.gml.BoundingShapeEntry;
 import net.seagis.gml.EnvelopeEntry;
 import net.seagis.gml.EnvelopeTable;
 import net.seagis.observation.PhenomenonEntry;
-import net.seagis.observation.TemporalObjectEntry;
 import net.seagis.coverage.wms.NamespacePrefixMapperImpl;
 import net.seagis.gml.ReferenceEntry;
+import net.seagis.gml.TimeIndeterminateValueType;
+import net.seagis.gml.TimeInstantType;
+import net.seagis.gml.TimePeriodType;
+import net.seagis.gml.TimePositionType;
 
 /**
  *
@@ -185,18 +188,28 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             OfferingSamplingFeatureEntry c =(OfferingSamplingFeatureEntry) i.next();
             sampling.add(c.getComponent());
          }
-         Timestamp begin = null;
-         Timestamp end   = null;
+         TimePositionType beginPosition = null;
+         TimePositionType endPosition   = null;
          
          if (results.getTimestamp(indexOf(query.eventTimeBegin)) != null) {
-            begin =  results.getTimestamp(indexOf(query.eventTimeBegin));
+            Timestamp begin =  results.getTimestamp(indexOf(query.eventTimeBegin));
+            if (begin != null) {
+                beginPosition = new TimePositionType(begin.toString());
+            }
          }
          
          if (results.getTimestamp(indexOf(query.eventTimeEnd)) != null) {
-            end =  results.getTimestamp(indexOf(query.eventTimeEnd));
+            Timestamp end =  results.getTimestamp(indexOf(query.eventTimeEnd));
+            if (end != null){
+                endPosition = new TimePositionType(end.toString());
+            } else {
+                endPosition = new TimePositionType(TimeIndeterminateValueType.NOW);
+            }
+         } else {
+             endPosition = new TimePositionType(TimeIndeterminateValueType.NOW);
          }
          
-         TemporalObjectEntry eventTime = new TemporalObjectEntry(begin, end);
+         TimePeriodType eventTime = new TimePeriodType(beginPosition, endPosition);
          
          getResponseModes().setIdOffering(idOffering);
          Collection<OfferingResponseModeEntry> entries4 = getResponseModes().getEntries();
@@ -265,14 +278,32 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             }
                    
             // on insere le "eventTime""
-            if (off.getTime() != null && ((TemporalObjectEntry)off.getTime()).getBeginTime() != null) {
-                Timestamp date = ((TemporalObjectEntry)off.getTime()).getBeginTime();
-                statement.setTimestamp(indexOf(query.eventTimeBegin), date);
-                if (((TemporalObjectEntry)off.getTime()).getEndTime() != null) {
-                    date = ((TemporalObjectEntry)off.getTime()).getEndTime();           
-                    statement.setTimestamp(indexOf(query.eventTimeEnd), date);
+            if (off.getTime() != null) {
+                if (off.getTime() instanceof TimePeriodType) {
+                    TimePeriodType time = (TimePeriodType)off.getTime();
+                    String s = time.getBeginPosition().getValue();
+                    Timestamp date = Timestamp.valueOf(s);
+                    statement.setTimestamp(indexOf(query.eventTimeBegin), date);
+                    
+                    if (time.getEndPosition().getIndeterminatePosition() == null) {
+                       
+                        time.getEndPosition().getValue();
+                        date = Timestamp.valueOf(s);
+                        statement.setTimestamp(indexOf(query.eventTimeEnd),  date);
+                   
+                    } else {
+                        statement.setNull(indexOf(query.eventTimeEnd),   java.sql.Types.DATE);
+                    }
+                } else if (off.getTime() instanceof TimeInstantType) {
+                    
+                    TimeInstantType time = (TimeInstantType)off.getTime();
+                    String s = time.getTimePosition().getValue();
+                    Timestamp date = Timestamp.valueOf(s);
+                    statement.setTimestamp(indexOf(query.eventTimeBegin),  date);
+                    statement.setNull(indexOf(query.eventTimeEnd), java.sql.Types.DATE);
+                    
                 } else {
-                    statement.setNull(indexOf(query.eventTimeEnd), java.sql.Types.TIMESTAMP);
+                    throw new IllegalArgumentException("type allowed for sampling time: TimePeriod or TimeInstant");
                 }
             } else {
                 statement.setNull(indexOf(query.eventTimeBegin), java.sql.Types.TIMESTAMP);

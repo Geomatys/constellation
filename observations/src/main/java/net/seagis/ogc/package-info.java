@@ -15,7 +15,7 @@
  */
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/ogc", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
-xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "swe", namespaceURI= "http://www.opengis.net/swe/1.0"),
+xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "swe", namespaceURI= "http://www.opengis.net/swe/1.0.1"),
           @javax.xml.bind.annotation.XmlNs(prefix = "gml", namespaceURI= "http://www.opengis.net/gml"),
           @javax.xml.bind.annotation.XmlNs(prefix = "ogc", namespaceURI= "http://www.opengis.net/ogc"),
           @javax.xml.bind.annotation.XmlNs(prefix = "g", namespaceURI= "http://sos.geomatys.fr/")})

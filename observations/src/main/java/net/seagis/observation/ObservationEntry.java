@@ -15,10 +15,11 @@
 package net.seagis.observation;
 
 // jaxb import
-import java.sql.Timestamp;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
@@ -29,16 +30,20 @@ import net.seagis.catalog.Entry;
 import net.seagis.coverage.model.DistributionEntry;
 
 // openGis dependencies
+import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
+import net.seagis.gml.TimeInstantType;
+import net.seagis.gml.TimePeriodType;
+import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
 import net.seagis.swe.AnyResultEntry;
 import net.seagis.swe.DataBlockDefinitionEntry;
+import net.seagis.swe.TimeGeometricPrimitivePropertyType;
 import org.opengis.observation.Process;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.Observation;
 import org.opengis.metadata.quality.Element;
 import org.opengis.metadata.MetaData;
-import org.opengis.temporal.TemporalObject;
 
 // geotools dependencies
 import org.geotools.resources.Utilities;
@@ -129,8 +134,8 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      *  
      */
-     @XmlElement(required = true)
-     private TemporalObjectEntry samplingTime;
+     private TimeGeometricPrimitivePropertyType samplingTime;
+   
      
      /**
       *
@@ -145,12 +150,14 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * 
      */
-    private TemporalObjectEntry procedureTime;
+    private TimeGeometricPrimitivePropertyType procedureTime;
+   
     
     /**
      *
      */
     private Object procedureParameter;
+    
     
     /**
      * Construit une observation vide (utilisé pour la serialisation par JAXB)
@@ -174,10 +181,10 @@ public class ObservationEntry extends Entry implements Observation {
                             final DistributionEntry    distribution,
                             final ElementEntry         quality,
                             final Object               result,
-                            final TemporalObjectEntry  samplingTime,
+                            final AbstractTimeGeometricPrimitiveType  samplingTime,
                             final MetaDataEntry        observationMetadata,
                             final String               resultDefinition,
-                            final TemporalObjectEntry  procedureTime,
+                            final AbstractTimeGeometricPrimitiveType  procedureTime,
                             final Object               procedureParameter) 
     {
         super(name);
@@ -192,11 +199,11 @@ public class ObservationEntry extends Entry implements Observation {
             this.distribution    = distribution;
         this.resultQuality       = quality;
         this.result              = result;
-        this.samplingTime        = samplingTime;
         this.observationMetadata = observationMetadata;
         this.resultDefinition    = resultDefinition;
-        this.procedureTime       = procedureTime;
         this.procedureParameter  = procedureParameter; 
+        this.samplingTime        = new TimeGeometricPrimitivePropertyType(samplingTime);
+        this.procedureTime       = new TimeGeometricPrimitivePropertyType(procedureTime);
     }
     
     /**
@@ -216,7 +223,7 @@ public class ObservationEntry extends Entry implements Observation {
                             final DistributionEntry     distribution,
                          // final ElementEntry          resultQuality,
                             final Object                result,
-                            final TemporalObjectEntry   samplingTime,
+                            final AbstractTimeGeometricPrimitiveType   samplingTime,
                             final Object                resultDefinition)
     {
         super(name);
@@ -231,20 +238,22 @@ public class ObservationEntry extends Entry implements Observation {
             this.distribution    = distribution;
         this.resultQuality       = null;       //= resultQuality;
         this.result              = result;
-        this.samplingTime        = samplingTime;
         this.observationMetadata = null;
         this.resultDefinition    = resultDefinition;
         this.procedureTime       = null;
-        this.procedureParameter  = null; 
+        this.procedureParameter  = null;
+        this.samplingTime        = new TimeGeometricPrimitivePropertyType(samplingTime);
     }
 
     /**
      * Construit un nouveau template temporaire d'observation a partir d'un template fournit en argument.
      * On y rajoute un samplingTime et un id temporaire. 
      */
-    public ObservationEntry getTemporaryTemplate(String temporaryName, TemporalObjectEntry time) {
-        if (time == null) 
-            time = new TemporalObjectEntry(Timestamp.valueOf("1900-01-01 00:00:00"), null);
+    public ObservationEntry getTemporaryTemplate(String temporaryName, AbstractTimeGeometricPrimitiveType time) {
+        if (time == null) { 
+            TimePositionType begin = new  TimePositionType("1900-01-01 00:00:00");
+            time = new TimePeriodType(begin);
+        }
         return new ObservationEntry(temporaryName,
                                         this.definition,
                                         this.featureOfInterest, 
@@ -348,15 +357,21 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public TemporalObject getSamplingTime() {
-        return samplingTime;
+    public AbstractTimeGeometricPrimitiveType getSamplingTime() {
+       if (samplingTime != null && samplingTime.getTimeGeometricPrimitive() != null)
+            return samplingTime.getTimeGeometricPrimitive().getValue();
+        else 
+            return null;
     }
     
     /**
      * {@inheritDoc}
      */
-    public void setSamplingTime(TemporalObjectEntry samplingTime) {
-        this.samplingTime = samplingTime;
+    public void setSamplingTime(AbstractTimeGeometricPrimitiveType value) {
+        if (samplingTime != null)
+            this.samplingTime.setTimeGeometricPrimitive(value);
+        else
+            this.samplingTime = new TimeGeometricPrimitivePropertyType(value);
     }
 
     /**
@@ -369,8 +384,11 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public TemporalObject getProcedureTime() {
-        return procedureTime;
+    public AbstractTimeGeometricPrimitiveType getProcedureTime() {
+        if (procedureTime != null && procedureTime.getTimeGeometricPrimitive() != null)
+            return procedureTime.getTimeGeometricPrimitive().getValue();
+        else 
+            return null;
     }
     
     /**

@@ -28,10 +28,11 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import net.seagis.gml.AbstractFeatureEntry;
+import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.BoundingShapeEntry;
 import net.seagis.gml.ReferenceEntry;
 import net.seagis.observation.PhenomenonEntry;
-import net.seagis.observation.TemporalObjectEntry;
+import net.seagis.swe.TimeGeometricPrimitivePropertyType;
 import org.geotools.resources.Utilities;
 
 
@@ -55,8 +56,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
     private List<String> intendedApplication;
-    @XmlElement(required = true)
-    private TemporalObjectEntry time;
+    private TimeGeometricPrimitivePropertyType time;
     @XmlElement(required = true)
     private List<ReferenceEntry> procedure;
     @XmlElement(required = true)
@@ -68,7 +68,6 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
     private List<QName> resultModel;
     private List<ResponseModeType> responseMode;
 
-    
     /**
      *  An empty constructor used by jaxB
      */ 
@@ -78,18 +77,18 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      *  Build a new offering.
      */ 
     public ObservationOfferingEntry(String id, String name, String description, ReferenceEntry descriptionReference,
-            BoundingShapeEntry boundedBy, TemporalObjectEntry time, List<ReferenceEntry> procedure,
+            BoundingShapeEntry boundedBy, AbstractTimeGeometricPrimitiveType time, List<ReferenceEntry> procedure,
             List<PhenomenonEntry> observedProperty, List<ReferenceEntry> featureOfInterest,
             List<String> responseFormat, List<QName> resultModel, List<ResponseModeType> responseMode) {
         
         super(id, name, description, descriptionReference, boundedBy);
-        this.time = time;
-        this.procedure = procedure;
-        this.observedProperty = observedProperty;
+        this.procedure         = procedure;
+        this.observedProperty  = observedProperty;
         this.featureOfInterest = featureOfInterest;
-        this.responseFormat = responseFormat;
-        this.resultModel = resultModel;
-        this.responseMode = responseMode;
+        this.responseFormat    = responseFormat;
+        this.resultModel       = resultModel;
+        this.responseMode      = responseMode;
+        this.time              = new TimeGeometricPrimitivePropertyType(time);
     }
     
     /**
@@ -107,15 +106,21 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      * Return the value of the eventTime property.
      * 
      */
-    public TemporalObjectEntry getTime() {
-        return time;
+    public AbstractTimeGeometricPrimitiveType getTime() {
+        if (time != null && time.getTimeGeometricPrimitive() != null)
+            return time.getTimeGeometricPrimitive().getValue();
+        else 
+            return null;
     }
 
     /**
      * Sets the value of the eventTime property.
      */
-    public void setTime(TemporalObjectEntry value) {
-        this.time = value;
+    public void setTime(AbstractTimeGeometricPrimitiveType value) {
+        if (time != null)
+            this.time.setTimeGeometricPrimitive(value);
+        else
+            this.time = new TimeGeometricPrimitivePropertyType(value);
     }
 
     /**
@@ -193,7 +198,9 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
             return true;
         }
         if (super.equals(object)) {
+            
             final ObservationOfferingEntry that = (ObservationOfferingEntry) object;
+            
             return Utilities.equals(this.time,                that.time)                &&
                    Utilities.equals(this.featureOfInterest,   that.featureOfInterest)   &&
                    Utilities.equals(this.intendedApplication, that.intendedApplication) && 
@@ -202,7 +209,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
                    Utilities.equals(this.responseFormat,      that.responseFormat)      &&
                    Utilities.equals(this.responseMode,        that.responseMode)        &&
                    Utilities.equals(this.resultModel,         that.resultModel);
-        } else System.out.println("SUPER NULLLLLLLLLLLLLLLLLLLLLLL");
+        } else System.out.println("obs offering SUPER NOT EQUALSSSSS");
         return false;
     }
 
@@ -221,7 +228,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
     }
     
     public String toString() {
-        StringBuilder s = new StringBuilder("offering: " + this.getName());
+        StringBuilder s = new StringBuilder("offering: " + this.getName()).append('\n');
         s.append("time=" + time ).append('\n');
         if (intendedApplication != null){
             s.append('\n').append("intendedApplication:").append('\n');

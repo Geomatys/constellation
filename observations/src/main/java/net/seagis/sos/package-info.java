@@ -18,7 +18,7 @@
 xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "sos", namespaceURI= "http://www.opengis.net/sos/1.0"),
           @javax.xml.bind.annotation.XmlNs(prefix = "gml", namespaceURI= "http://www.opengis.net/gml"),
           @javax.xml.bind.annotation.XmlNs(prefix = "ogc", namespaceURI= "http://www.opengis.net/ogc"),
-          @javax.xml.bind.annotation.XmlNs(prefix = "swe", namespaceURI= "http://www.opengis.net/swe/1.0"),
+          @javax.xml.bind.annotation.XmlNs(prefix = "swe", namespaceURI= "http://www.opengis.net/swe/1.0.1"),
           @javax.xml.bind.annotation.XmlNs(prefix = "ows", namespaceURI= "http://www.opengis.net/ows/1.1"),
           @javax.xml.bind.annotation.XmlNs(prefix = "om", namespaceURI= "http://www.opengis.net/om/1.0"),
           @javax.xml.bind.annotation.XmlNs(prefix = "sml", namespaceURI= "http://www.opengis.net/sensorML/1.0"),

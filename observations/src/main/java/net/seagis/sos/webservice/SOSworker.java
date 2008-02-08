@@ -48,6 +48,7 @@ import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -76,8 +77,10 @@ import net.seagis.ogc.LiteralType;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.coverage.web.WebServiceException;
+import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.ReferenceEntry;
 import net.seagis.gml.ReferenceTable;
+import net.seagis.gml.TimePositionType;
 import net.seagis.observation.CompositePhenomenonEntry;
 import net.seagis.observation.CompositePhenomenonTable;
 import net.seagis.observation.MeasurementEntry;
@@ -89,7 +92,6 @@ import net.seagis.observation.PhenomenonEntry;
 import net.seagis.observation.PhenomenonTable;
 import net.seagis.observation.ProcessEntry;
 import net.seagis.observation.SamplingFeatureEntry;
-import net.seagis.observation.TemporalObjectEntry;
 import net.seagis.ows.OperationsMetadata;
 import net.seagis.ows.SectionsType;
 import net.seagis.ows.ServiceIdentification;
@@ -629,7 +631,7 @@ public class SOSworker {
             
             //we treat the time restriction
             List<EventTime> times = requestObservation.getEventTime();
-            TemporalObjectEntry templateTime = treatEventTimeRequest(times, SQLrequest, template);
+            AbstractTimeGeometricPrimitiveType templateTime = treatEventTimeRequest(times, SQLrequest, template);
                     
             //we treat the restriction on the feature of interest
             if (requestObservation.getFeatureOfInterest() != null) {
@@ -866,13 +868,19 @@ public class SOSworker {
         //we add to the request the property of the template
         SQLrequest.append("procedure='").append(((ProcessEntry)template.getProcedure()).getHref()).append("'");
         
-        if (((TemporalObjectEntry)template.getSamplingTime()).getBeginTime() != null) {
-            SQLrequest.append("AND sampling_time_begin>'").append(((TemporalObjectEntry)template.getSamplingTime()).getBeginTime().toString()).append("'");
-        }
+        if (template.getSamplingTime() instanceof TimeInstantType) {
+            TimeInstantType ti = (TimeInstantType) template.getSamplingTime();
+            
+            SQLrequest.append("AND sampling_time_begin>'").append(ti.getTimePosition().getValue()).append("'");
         
-        if (((TemporalObjectEntry)template.getSamplingTime()).getEndTime() != null) {
-            SQLrequest.append("AND ( sampling_time_end<'").append(((TemporalObjectEntry)template.getSamplingTime()).getEndTime().toString()).append("'");
-            SQLrequest.append("OR sampling_time_end IS NULL)");
+        } else if (template.getSamplingTime() instanceof TimePeriodType) {
+            TimePeriodType tp = (TimePeriodType) template.getSamplingTime();
+            
+            SQLrequest.append("AND sampling_time_begin>'").append(tp.getBeginPosition().getValue()).append("'");
+            if (tp.getEndPosition()!= null && !tp.getEndPosition().getValue().equals("")) {
+                SQLrequest.append("AND ( sampling_time_end<'").append(tp.getEndPosition().getValue()).append("'");
+                SQLrequest.append("OR sampling_time_end IS NULL)");
+            }
         }
         
         //we treat the time constraint
@@ -1161,19 +1169,17 @@ public class SOSworker {
     }
     
     /**
+     * TODO factoriser
      * 
      * @param times A list of time constraint.
      * @param SQLrequest A stringBuilder building the SQL request.
      * 
      * @return true if there is no errors in the time constraint else return false.
      */
-    private TemporalObjectEntry treatEventTimeRequest(List<EventTime> times, StringBuilder SQLrequest, boolean template) throws WebServiceException {
+    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(List<EventTime> times, StringBuilder SQLrequest, boolean template) throws WebServiceException {
         
         //In mode template this method return a temporal Object.
-        TemporalObjectEntry templateTime = null;
-        if (template) {
-            templateTime = new TemporalObjectEntry();
-        }
+        AbstractTimeGeometricPrimitiveType templateTime = null;
         
         if (times.size() != 0) {
             if (!template)
@@ -1188,8 +1194,8 @@ public class SOSworker {
                     //if the temporal object is a timePeriod
                     if (j instanceof TimePeriodType) {
                         TimePeriodType tp = (TimePeriodType)j;
-                        if (tp.getBeginPosition() != null && tp.getBeginPosition().getValue() != null && tp.getBeginPosition().getValue().size() != 0) {
-                            String value = tp.getBeginPosition().getValue().get(0);
+                        if (tp.getBeginPosition() != null && tp.getBeginPosition().getValue() != null) {
+                            String value = tp.getBeginPosition().getValue();
                             value = value.replace('T', ' ');
                             if (value.indexOf('.') != -1) {
                                 value = value.substring(0, value.indexOf('.'));
@@ -1197,10 +1203,9 @@ public class SOSworker {
                             logger.finer(value);
                             
                             try {
+                                //here t is not used but it allow to verify the syntax of the timestamp
                                 Timestamp t = Timestamp.valueOf(value);
-                                if (template) {
-                                    templateTime.setBeginTime(t);
-                                } else {
+                                if (!template) {
                                      SQLrequest.append(" sampling_time_begin='").append(value).append("' AND ");
                                 }
                             } catch(Exception e) {
@@ -1213,18 +1218,18 @@ public class SOSworker {
                                                           MISSING_PARAMETER_VALUE,
                                                           version);
                         }
-                        if ( tp.getEndPosition() != null && tp.getEndPosition().getValue() != null && tp.getEndPosition().getValue().size() != 0) {
-                            String value = tp.getEndPosition().getValue().get(0);
+                        if ( tp.getEndPosition() != null && tp.getEndPosition().getValue() != null) {
+                            String value = tp.getEndPosition().getValue();
                             value = value.replace('T', ' ');
                             if (value.indexOf('.') != -1) {
                                 value = value.substring(0, value.indexOf('.'));
                             }
                             logger.finer(value);
+                            
                             try {
+                                //here t is not used but it allow to verify the syntax of the timestamp
                                 Timestamp t = Timestamp.valueOf(value);
-                                if (template) {
-                                    templateTime.setEndTime(t);
-                                } else {
+                                if (!template) {
                                     SQLrequest.append(" sampling_time_end='").append(value).append("') ");
                                 }
                             } catch(Exception e) {
@@ -1233,21 +1238,25 @@ public class SOSworker {
                                                                version);
                             }
                         }
+                        if (template) {
+                            templateTime = tp;
+                        }
+                    
                     // if the temporal object is a timeInstant    
                     } else if (j instanceof TimeInstantType) {
                         TimeInstantType ti = (TimeInstantType) j;
-                         if (ti.getTimePosition() != null && ti.getTimePosition().getValue() != null && ti.getTimePosition().getValue().size() != 0) {
-                            String value = ti.getTimePosition().getValue().get(0);
+                         if (ti.getTimePosition() != null && ti.getTimePosition().getValue() != null) {
+                            String value = ti.getTimePosition().getValue();
                             value = value.replace('T', ' ');
                             if (value.indexOf('.') != -1) {
                                 value = value.substring(0, value.indexOf('.'));
                             }
                             logger.finer(value);
+                            
                             try {
+                                //here t is not used but it allow to verify the syntax of the timestamp
                                 Timestamp t = Timestamp.valueOf(value);
-                                if (template) {
-                                    templateTime.setBeginTime(t);
-                                } else {
+                                if (!template) {
                                     SQLrequest.append(" sampling_time_begin='").append(value).append("' AND sampling_time_end=NULL )");
                                 }
                             } catch(Exception e) {
@@ -1260,30 +1269,34 @@ public class SOSworker {
                                                           MISSING_PARAMETER_VALUE,
                                                           version);
                         }
+                        
+                        if (template) {
+                            templateTime = ti;
+                        }
                     } else {
                         throw new WebServiceException("TEquals operation require timeInstant or TimePeriod!",
                                                       INVALID_PARAMETER_VALUE,
                                                       version);
                     }
+                
                 // The operation Time before    
                 } else if (time.getTBefore() != null && time.getTBefore().getRest().size() != 0) {
                     Object j = time.getTBefore().getRest().get(0);
                     
                     // for the operation before the temporal object must be an timeInstant
                     if (j instanceof TimeInstantType) {
-                        TimeInstantType tp = (TimeInstantType)j;
-                        if (tp.getTimePosition() != null) {
-                            String value = tp.getTimePosition().getValue().get(0);
+                        TimeInstantType ti = (TimeInstantType)j;
+                        if (ti.getTimePosition() != null) {
+                            String value = ti.getTimePosition().getValue();
                             value = value.replace('T', ' ');
                             if (value.indexOf('.') != -1) {
                                 value = value.substring(0, value.indexOf('.'));
                             }
                             logger.finer(value);
                             try {
+                                //here t is not used but it allow to verify the syntax of the timestamp
                                 Timestamp t = Timestamp.valueOf(value);
-                                if (template) {
-                                    templateTime.setEndTime(t);
-                                } else { 
+                                if (!template) { 
                                     SQLrequest.append("sampling_time_begin<'").append(value).append("' )");
                                 }
                             } catch(Exception e) {
@@ -1296,21 +1309,25 @@ public class SOSworker {
                                                           MISSING_PARAMETER_VALUE,
                                                           version);
                         }
+                        if (template) {
+                            templateTime = ti;
+                        }
                         
                     } else {
                         throw new WebServiceException("TBefore operation require timeInstant!",
                                                       INVALID_PARAMETER_VALUE,
                                                       version);
                     }
+                    
                 // The operation Time after    
                 } else if (time.getTAfter() != null && time.getTAfter().getRest().size() != 0) {
                     Object j = time.getTAfter().getRest().get(0);
                     
                     // for the operation after the temporal object must be an timeInstant
                     if (j instanceof TimeInstantType) {
-                        TimeInstantType tp = (TimeInstantType)j;
-                        if (tp.getTimePosition() != null) {
-                            String value = tp.getTimePosition().getValue().get(0);
+                        TimeInstantType ti = (TimeInstantType)j;
+                        if (ti.getTimePosition() != null) {
+                            String value = ti.getTimePosition().getValue();
                             value = value.replace('T', ' ');
                             if (value.indexOf('.') != -1) {
                                 value = value.substring(0, value.indexOf('.'));
@@ -1318,10 +1335,9 @@ public class SOSworker {
                             logger.finer(value);
                             
                             try {
+                                //here t is not used but it allow to verify the syntax of the timestamp
                                 Timestamp t = Timestamp.valueOf(value);
-                                if (template) {
-                                    templateTime.setBeginTime(t);
-                                } else {
+                                if (!template) {
                                     SQLrequest.append("sampling_time_begin>'").append(value).append("' )");
                                 }
                             } catch(Exception e) {
@@ -1334,7 +1350,9 @@ public class SOSworker {
                                                           MISSING_PARAMETER_VALUE,
                                                           version);
                         }
-                        
+                        if (template) {
+                            templateTime = ti;
+                        }
                     } else {
                        throw new WebServiceException("TAfter operation require timeInstant!",
                                                      INVALID_PARAMETER_VALUE,
@@ -1347,8 +1365,8 @@ public class SOSworker {
                     
                     if (j instanceof TimePeriodType) {
                         TimePeriodType tp = (TimePeriodType)j;
-                        if (tp.getBeginPosition() != null && tp.getBeginPosition().getValue() != null && tp.getBeginPosition().getValue().size() != 0) {
-                            String value = tp.getBeginPosition().getValue().get(0);
+                        if (tp.getBeginPosition() != null && tp.getBeginPosition().getValue() != null) {
+                            String value = tp.getBeginPosition().getValue();
                             value = value.replace('T', ' ');
                             if (value.indexOf('.') != -1) {
                                 value = value.substring(0, value.indexOf('.'));
@@ -1356,10 +1374,9 @@ public class SOSworker {
                             logger.finer(value);
                             
                             try {
+                                //here t is not used but it allow to verify the syntax of the timestamp
                                 Timestamp t = Timestamp.valueOf(value);
-                                if (template) {
-                                    templateTime.setBeginTime(t);
-                                } else {
+                                if (!template) {
                                     SQLrequest.append(" sampling_time_begin>'").append(value).append("' AND ");
                                 }
                             } catch(Exception e) {
@@ -1372,8 +1389,8 @@ public class SOSworker {
                                                           MISSING_PARAMETER_VALUE,
                                                           version);
                         }
-                        if (tp.getEndPosition() != null && tp.getEndPosition().getValue() != null && tp.getEndPosition().getValue().size() != 0) {
-                            String value = tp.getEndPosition().getValue().get(0);
+                        if (tp.getEndPosition() != null && tp.getEndPosition().getValue() != null) {
+                            String value = tp.getEndPosition().getValue();
                             value = value.replace('T', ' ');
                             if (value.indexOf('.') != -1) {
                                 value = value.substring(0, value.indexOf('.'));
@@ -1381,10 +1398,9 @@ public class SOSworker {
                             logger.finer(value);
                             
                             try {
+                                //here t is not used but it allow to verify the syntax of the timestamp
                                 Timestamp t = Timestamp.valueOf(value);
-                                if (template) {
-                                    templateTime.setEndTime(t);
-                                } else {
+                                if (!template) {
                                     SQLrequest.append(" (sampling_time_end<'").append(value).append("' OR  sampling_time_end IS NULL)) ");
                                 }
                             } catch(Exception e) {
@@ -1393,6 +1409,9 @@ public class SOSworker {
                                                                version);
                             }
                         } 
+                        if (template) {
+                            templateTime = tp;
+                        }
                     } else {
                         throw new WebServiceException("TDuring operation require TimePeriod!",
                                                       INVALID_PARAMETER_VALUE,
@@ -1662,7 +1681,8 @@ public class SOSworker {
                             // for the eventime of the offering we take the time of now.
                             Calendar now = new GregorianCalendar();
                             Timestamp t = new Timestamp(now.getTimeInMillis());
-                        
+                            TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
+                            
                             //we create a new List of process and add the template process to it
                             List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
                             ReferenceEntry ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
@@ -1695,7 +1715,7 @@ public class SOSworker {
                                                                     "",
                                                                     null, 
                                                                     null, //TODO boundedby 
-                                                                    new TemporalObjectEntry(t, null),
+                                                                    time,
                                                                     process,
                                                                     phenos,
                                                                     stations,
@@ -1740,7 +1760,8 @@ public class SOSworker {
                          // for the eventime of the offering we take the time of now.
                             Calendar now = new GregorianCalendar();
                             Timestamp t = new Timestamp(now.getTimeInMillis());
-                        
+                            TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
+                            
                             //we create a new List of process and add the template process to it
                             List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
                             ReferenceEntry ref = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
@@ -1772,7 +1793,7 @@ public class SOSworker {
                                                                     "",
                                                                     null, 
                                                                     null, //TODO boundedby 
-                                                                    new TemporalObjectEntry(t, null),
+                                                                    time,
                                                                     process,
                                                                     phenos,
                                                                     stations,

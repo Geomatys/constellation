@@ -27,7 +27,11 @@ import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 import net.seagis.coverage.model.DistributionEntry;
 import net.seagis.coverage.model.DistributionTable;
+import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.ReferenceEntry;
+import net.seagis.gml.TimeInstantType;
+import net.seagis.gml.TimePeriodType;
+import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetadataTable;
 import net.seagis.swe.AnyResultEntry;
 import net.seagis.swe.AnyResultTable;
@@ -311,15 +315,27 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         if(pheno == null) pheno = compoPheno;
         if(station == null) station =  stationPoint;
         
-        Timestamp tb = result.getTimestamp(indexOf(query.samplingTimeBegin));
-        Timestamp te = result.getTimestamp(indexOf(query.samplingTimeEnd));
-        TemporalObjectEntry samplingTime = null;
-        if (tb != null && te != null) {
-            samplingTime =  new TemporalObjectEntry(tb, te);
-        } else if (tb != null && te == null) {
-            samplingTime =  new TemporalObjectEntry(tb, null);
-        } else if (tb == null && te != null) {
-            samplingTime =  new TemporalObjectEntry(null, te);
+        Timestamp begin = result.getTimestamp(indexOf(query.samplingTimeBegin));
+        Timestamp end = result.getTimestamp(indexOf(query.samplingTimeEnd));
+        AbstractTimeGeometricPrimitiveType samplingTime = null;
+        TimePositionType beginPosition = null;
+        TimePositionType endPosition   = null;
+        if (begin != null) {
+            beginPosition = new TimePositionType(begin.toString());
+        }
+        if (end != null) {
+            endPosition = new TimePositionType(end.toString());
+        }
+        
+        if (beginPosition != null && endPosition != null) {
+            samplingTime = new TimePeriodType(beginPosition, endPosition);
+        
+        } else if (begin != null && end == null) {
+            samplingTime =  new TimeInstantType(beginPosition);
+        
+        //this case will normally never append
+        } else if (begin == null && end != null) {
+            samplingTime =  new TimeInstantType(endPosition);
         } 
         
         
@@ -459,19 +475,39 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 }
             }
             // on insere le "samplingTime""
-            if (obs.getSamplingTime() != null && ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime() != null) {
-                Timestamp date = ((TemporalObjectEntry)obs.getSamplingTime()).getBeginTime();
-                statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
-                if (((TemporalObjectEntry)obs.getSamplingTime()).getEndTime() != null) {
-                    date = ((TemporalObjectEntry)obs.getSamplingTime()).getEndTime();           
-                    statement.setTimestamp(indexOf(query.samplingTimeEnd), date);
+            if (obs.getSamplingTime() != null){
+                if (obs.getSamplingTime() instanceof TimePeriodType) {
+                    
+                    TimePeriodType sampTime = (TimePeriodType)obs.getSamplingTime();
+                    String s = sampTime.getBeginPosition().getValue();
+                    Timestamp date = Timestamp.valueOf(s);
+                    statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
+                    
+                    if (sampTime.getEndPosition().getIndeterminatePosition() == null) {
+                       
+                        sampTime.getEndPosition().getValue();
+                        date = Timestamp.valueOf(s);
+                        statement.setTimestamp(indexOf(query.samplingTimeEnd),  date);
+                   
+                    } else {
+                        statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
+                    }
+                    
+                } else if (obs.getSamplingTime() instanceof TimeInstantType) {
+                    TimeInstantType sampTime = (TimeInstantType)obs.getSamplingTime();
+                    String s = sampTime.getTimePosition().getValue();
+                    Timestamp date = Timestamp.valueOf(s);
+                    statement.setTimestamp(indexOf(query.samplingTimeBegin),  date);
+                    statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
+                    
                 } else {
-                    statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.TIMESTAMP);
+                    throw new IllegalArgumentException("type allowed for sampling time: TimePeriod or TimeInstant");
                 }
             } else {
-                statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
-                statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.TIMESTAMP);
+                statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.DATE);
+                statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
             }
+        
             updateSingleton(statement);
             success = true;
         } finally {

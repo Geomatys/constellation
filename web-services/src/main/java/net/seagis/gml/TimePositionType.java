@@ -16,9 +16,6 @@
 
 package net.seagis.gml;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Collections;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -61,7 +58,7 @@ import org.geotools.resources.Utilities;
 public class TimePositionType {
 
     @XmlValue
-    private List<String> value;
+    private String value;
     @XmlAttribute
     private String calendarEraName;
     @XmlAttribute
@@ -82,8 +79,16 @@ public class TimePositionType {
      * @param value a date.
      */
     public TimePositionType(String value){
-        this.value = new ArrayList<String>();
-        this.value.add(value);
+        this.value = value;
+    }
+    
+    /**
+     * build a simple Timposition with an indeterminate value.
+     * 
+     */
+    public TimePositionType(TimeIndeterminateValueType indeterminatePosition){
+        this.indeterminatePosition = indeterminatePosition;
+        value = "";
     }
     
     /**
@@ -97,8 +102,8 @@ public class TimePositionType {
      * are assembled by gml:CalDate Gets the value of the value property.
      * 
      */
-    public List<String> getValue() {
-        return Collections.unmodifiableList(value);
+    public String getValue() {
+        return value;
     }
 
     /**
@@ -128,19 +133,21 @@ public class TimePositionType {
     }
 
     /**
-     * Verifie si cette entree est identique l'objet specifie.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
-        final TimePositionType that = (TimePositionType) object;
-
-        return Utilities.equals(this.calendarEraName,       that.calendarEraName)       &&
-               Utilities.equals(this.frame,                 that.frame)                 &&
-               Utilities.equals(this.indeterminatePosition, that.indeterminatePosition) &&
-               Utilities.equals(this.value,                 that.value);
+        if (object instanceof TimePositionType) {
+            final TimePositionType that = (TimePositionType) object;
+            return Utilities.equals(this.calendarEraName,       that.calendarEraName)       &&
+                   Utilities.equals(this.frame,                 that.frame)                 &&
+                   Utilities.equals(this.indeterminatePosition, that.indeterminatePosition) &&
+                   Utilities.equals(this.value,                 that.value);
+        }
+        return false;
     }
 
     @Override
@@ -153,5 +160,21 @@ public class TimePositionType {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("TimePosition:").append('\n');
+        if (calendarEraName != null) {
+            s.append("calendarEraName:").append(calendarEraName).append('\n');
+        }
+        if (frame != null) {
+            s.append("frame:").append(frame).append('\n');
+        }
+        if (indeterminatePosition != null) {
+            s.append("indeterminatePosition:").append(indeterminatePosition.value()).append('\n');
+        }
+        s.append("value=" + value);
+               
+        return s.toString();
+    }
 
 }

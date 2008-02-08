@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.Duration;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -82,6 +83,14 @@ public class TimePeriodType extends AbstractTimeGeometricPrimitiveType {
     }
     
     /**
+     * Build a new Time period bounded by the begin and with the end position "now".
+     */
+    public TimePeriodType(TimePositionType beginPosition){
+        this.beginPosition = beginPosition;
+        this.endPosition   = new TimePositionType(TimeIndeterminateValueType.NOW);
+    }
+    
+    /**
      * Gets the value of the beginPosition property.
      */
     public TimePositionType getBeginPosition() {
@@ -122,4 +131,61 @@ public class TimePeriodType extends AbstractTimeGeometricPrimitiveType {
     public TimeIntervalLengthType getTimeInterval() {
         return timeInterval;
     }
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final TimePeriodType that = (TimePeriodType) object;
+       
+        return Utilities.equals(this.begin,         that.begin)         &&
+               Utilities.equals(this.beginPosition, that.beginPosition) &&
+               Utilities.equals(this.duration,      that.duration)      &&
+               Utilities.equals(this.endPosition,   that.endPosition)   &&
+               Utilities.equals(this.timeInterval,  that.timeInterval)  &&
+               Utilities.equals(this.end,           that.end);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 37 * hash + (this.beginPosition != null ? this.beginPosition.hashCode() : 0);
+        hash = 37 * hash + (this.begin != null ? this.begin.hashCode() : 0);
+        hash = 37 * hash + (this.endPosition != null ? this.endPosition.hashCode() : 0);
+        hash = 37 * hash + (this.end != null ? this.end.hashCode() : 0);
+        hash = 37 * hash + (this.duration != null ? this.duration.hashCode() : 0);
+        hash = 37 * hash + (this.timeInterval != null ? this.timeInterval.hashCode() : 0);
+        return hash;
+    }
+
+
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("TimePeriod:").append('\n');
+        if (begin != null) {
+            s.append("begin:").append(begin).append('\n');
+        }
+        if (end != null) {
+            s.append("end:").append(end).append('\n');
+        }
+        if (beginPosition != null) {
+            s.append("beginPosition:").append(beginPosition).append('\n');
+        }
+        if (endPosition != null) {
+            s.append("endPosition:").append(endPosition).append('\n');
+        }
+        if (duration != null) {
+            s.append("duration:").append(duration).append('\n');
+        }
+        if (timeInterval != null) {
+            s.append("timeInterval:").append(timeInterval).append('\n');
+        }
+           
+        return s.toString();
+    }
+
 }

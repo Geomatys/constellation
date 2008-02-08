@@ -173,8 +173,11 @@ public class Contents {
             if (object == this) {
                 return true;
             }
-            final ObservationOfferingList that = (ObservationOfferingList) object;
-            return Utilities.equals(this.observationOffering, that.observationOffering);
+            if (object instanceof ObservationOfferingList) {
+                final ObservationOfferingList that = (ObservationOfferingList) object;
+                return Utilities.equals(this.observationOffering, that.observationOffering);
+            }
+            return false;
         }
 
         @Override

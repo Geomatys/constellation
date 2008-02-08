@@ -53,8 +53,8 @@ public class XMLWriter {
         String codeSpace = "urn:x-ogc:tc:arch:doc-rp(05-010)";
         
         write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n', urlFile);
-        write("<gml:Dictionnary xmlns:gml=\"http://www.opengis.net/gml\" xmlns:swe=\"http://www.opengis.net/swe/1.0\" " +
-                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"   xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.opengis.net/swe/1.0 ./sweCommon/1.0.0/swe.xsd\" " +
+        write("<gml:Dictionnary xmlns:gml=\"http://www.opengis.net/gml\" xmlns:swe=\"http://www.opengis.net/swe/1.0.1\" " +
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"   xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.opengis.net/swe/1.0.1 ./sweCommon/1.0.0/swe.xsd\" " +
                 "gml:id=\"phenomene_swe\">" + '\n', urlFile);
         write( '\t' + "<gml:description>description des phénomène</gml:description>" + '\n', urlFile);
         write( '\t' +"<gml:name>Liste des phénomène</gml:name>" + '\n', urlFile);
@@ -86,8 +86,8 @@ public class XMLWriter {
         String codeSpace = "urn:x-brgm:def:samplingStation:bss";
         
         write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n', urlFile);
-        write("<gml:Dictionnary xmlns:gml=\"http://www.opengis.net/gml\" xmlns:swe=\"http://www.opengis.net/swe/1.0\" " +
-                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"   xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.opengis.net/swe/1.0 ./sweCommon/1.0.0/swe.xsd\" " +
+        write("<gml:Dictionnary xmlns:gml=\"http://www.opengis.net/gml\" xmlns:swe=\"http://www.opengis.net/swe/1.0.1\" " +
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"   xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.opengis.net/swe/1.0.1 ./sweCommon/1.0.0/swe.xsd\" " +
                 "gml:id=\"phenomene_swe\">" + '\n', urlFile);
         write( '\t' + "<gml:description>description des stations</gml:description>" + '\n', urlFile);
         write( '\t' +"<gml:name>Liste des stations</gml:name>" + '\n', urlFile);
@@ -132,8 +132,8 @@ public class XMLWriter {
         String codeSpace = "urn:x-ogc:tc:arch:doc-rp(05-010)";
         
         write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n', urlFile);
-        write("<gml:Dictionnary xmlns:gml=\"http://www.opengis.net/gml\" xmlns:swe=\"http://www.opengis.net/swe/1.0\" " +
-                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"   xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.opengis.net/swe/1.0 ./sweCommon/1.0.0/swe.xsd\" " +
+        write("<gml:Dictionnary xmlns:gml=\"http://www.opengis.net/gml\" xmlns:swe=\"http://www.opengis.net/swe/1.0.1\" " +
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"   xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.opengis.net/swe/1.0.1 ./sweCommon/1.0.0/swe.xsd\" " +
                 "gml:id=\"phenomene_swe\">" + '\n', urlFile);
         write( '\t' + "<gml:description>description des unités de mesure</gml:description>" + '\n', urlFile);
         write( '\t' +"<gml:name>Liste des unité de mesure</gml:name>" + '\n', urlFile);

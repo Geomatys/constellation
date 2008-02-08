@@ -58,9 +58,9 @@ import org.geotools.resources.Utilities;
 })
 public class BoundingShapeEntry {
 
-    @XmlElement(name = "Envelope", nillable = true)
+    @XmlElement(name = "Envelope")
     private EnvelopeEntry envelope;
-    @XmlElement(name = "EnvelopeWithTimePeriod", nillable = true)
+    @XmlElement(name = "EnvelopeWithTimePeriod")
     private EnvelopeWithTimePeriodType envelopeWithTimePeriod;
     @XmlList
     @XmlElement(name = "Null")

@@ -54,6 +54,14 @@ public abstract class AbstractGMLEntry extends Entry{
      */
     public AbstractGMLEntry() {}
     
+    /**
+     *  Simple super constructor to initialise the entry name.
+     */
+    public AbstractGMLEntry(String id) {
+        super(id);
+        this.id = id;
+    }
+    
     public AbstractGMLEntry(String id, String name, String description, ReferenceEntry descriptionReference) {
         super(id);
         this.id = id;

@@ -18,6 +18,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 import org.geotools.resources.Utilities;
@@ -35,7 +36,7 @@ public class ReferenceEntry extends Entry implements Reference{
     /**
      * L'identifiant de la reference.
      */
-    @XmlAttribute
+    @XmlTransient
     private String id;
     
     @XmlAttribute
@@ -180,11 +181,12 @@ public class ReferenceEntry extends Entry implements Reference{
                Utilities.equals(this.show,               that.show)             &&
                Utilities.equals(this.role,               that.role)             &&
                Utilities.equals(this.title,              that.title)            &&
-               Utilities.equals(this.id,                 that.id)               &&
+             //  Utilities.equals(this.id,                 that.id)               && because its transient
                Utilities.equals(this.owns,               that.owns);       
     }
 
     
+    @Override
     public int hashCode() {
         int hash = 5;
         hash = 47 * hash + (this.id != null ? this.id.hashCode() : 0);
@@ -231,8 +233,8 @@ public class ReferenceEntry extends Entry implements Reference{
         if(owns != null) {
             s.append("owns=").append(owns).append('\n');
         }
-        if(title != null) {
-            s.append("title=").append(title).append('\n');
+        if(type != null) {
+            s.append("type=").append(type).append('\n');
         }
         return s.toString();
     }
