@@ -282,7 +282,7 @@ public class Collector {
      * @throws IOException Si la création du reader a échoué.
      */
     private NetcdfImageReader addInputToReader(final String netcdf) throws IOException {
-        final NetcdfImageReader reader = createNetcdfImageReader();
+        final NetcdfImageReader reader = createNetcdfImageReader(netcdf);
         final Object input;
         if (netcdf.indexOf("://") >= 0) {
             try {
@@ -298,12 +298,15 @@ public class Collector {
     }
 
     /**
-     * Creates an instance of NetcdfImageReader, using the default Spi for Netcdf files.
+     * Creates an instance of Netcdf reader for the given file. The default implementation
+     * creates the default NetCDF reader for all files. Subclasses may override this method
+     * for returning specialized readers.
      *
-     * @return An instance of NetcdfImageReader.
-     * @throws IOException
+     * @param  file The NetCDF file to be read.
+     * @return An instance of Netcdf reader.
+     * @throws IOException if the NetCDF reader can not be created.
      */
-    protected NetcdfImageReader createNetcdfImageReader() throws IOException {
+    protected NetcdfImageReader createNetcdfImageReader(final String file) throws IOException {
         return (NetcdfImageReader) new NetcdfImageReader.Spi().createReaderInstance();
     }
 
