@@ -89,11 +89,11 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
             compos.add(c.getComponent());
         }
         
-        return new CompositePhenomenonEntry(results.getString(indexOf(query.name)),
-                                   results.getString(indexOf(query.remarks)),
-                                   idCompositePhenomenon,
-                                   null,
-                                   compos);
+        return new CompositePhenomenonEntry(idCompositePhenomenon,
+                                            results.getString(indexOf(query.name)),
+                                            results.getString(indexOf(query.remarks)),
+                                            null,
+                                            compos);
     }
     
     /**

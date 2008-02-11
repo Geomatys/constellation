@@ -15,8 +15,10 @@
 
 package net.seagis.swe;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -46,7 +48,7 @@ public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements
      * The components.
      */
     @XmlElement(name="component")
-    private Collection<PhenomenonEntry> component;
+    private Collection<PhenomenonPropertyType> component;
    
     /** 
      * Empty constructor used by JAXB.
@@ -60,8 +62,10 @@ public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements
             final PhenomenonEntry base, final Collection<PhenomenonEntry> component) {
         super(id, name, description, component.size());
         this.base = base;
-        this.component = component;
-        
+        this.component = new ArrayList<PhenomenonPropertyType>();
+        for (PhenomenonEntry pheno: component) {
+            this.component.add(new PhenomenonPropertyType(pheno));
+        }
     }
     
     /**
@@ -75,14 +79,18 @@ public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements
      * Add a component to the list 
      */
     public void addComponent(PhenomenonEntry phenomenon) {
-        component.add(phenomenon);
+        component.add(new PhenomenonPropertyType(phenomenon));
     }
     
     /**
      * Return the components.
      */
     public Collection<PhenomenonEntry> getComponent() {
-        return component;
+        List<PhenomenonEntry> result = new ArrayList<PhenomenonEntry>();
+        for (PhenomenonPropertyType phen: component) {
+            result.add(phen.getPhenomenon());
+        }
+        return result;
     }
 
     /**
@@ -104,23 +112,24 @@ public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements
         
         if (object instanceof CompositePhenomenonEntry && super.equals(object)) {
             final CompositePhenomenonEntry that = (CompositePhenomenonEntry) object;
-            if ((this.component !=null && that.component == null)||(this.component ==null && that.component != null))
+           if ((this.component !=null && that.component == null)||(this.component ==null && that.component != null))
                 return false;
         
             if (this.component !=null && that.component != null && this.component.size() != that.component.size())
                 return false;
         
-            if (this.component !=null) {
+             /*if (this.component !=null) {
                 Iterator<PhenomenonEntry> i = component.iterator();
                 while (i.hasNext()) {
                     if (!that.component.contains(i.next()))
                         return false;
                 }
-            }
+            }*/
             return Utilities.equals(this.getId(),             that.getId()) &&
                    Utilities.equals(this.getDescription(),    that.getDescription()) &&
                    Utilities.equals(this.getPhenomenonName(), that.getPhenomenonName()) &&
-                   Utilities.equals(this.base,                that.base);
+                   Utilities.equals(this.base,                that.base) && 
+                   Utilities.equals(this.component,           that.component);
        } 
        return false;
         

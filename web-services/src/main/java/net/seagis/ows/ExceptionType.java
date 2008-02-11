@@ -62,12 +62,22 @@ public class ExceptionType {
     @XmlAttribute
     private String locator;
 
+    /**
+     * Empty constructor used by JAXB.
+     */
     public ExceptionType() {}
     
-    public ExceptionType(String exceptionText, String exceptionCode) {
+    /**
+     *  build a new Exception code.
+     * 
+     * @param exceptionText
+     * @param exceptionCode
+     */
+    public ExceptionType(String exceptionText, String exceptionCode, String locator) {
         this.exceptionText = new ArrayList<String>();
         this.exceptionText.add(exceptionText);
         this.exceptionCode = exceptionCode;
+        this.locator       = locator;
     }
     
     /**

@@ -71,14 +71,14 @@ public class ExceptionReport {
     ExceptionReport() {}
     
     /**
-     * Build a new simple exception with the specified text and code.
+     * Build a new full exception with the specified text, code and locator.
      * 
      * @param exceptionText 
      * @param exceptionCode
      */
-    public ExceptionReport(String exceptionText, String exceptionCode) {
+    public ExceptionReport(String exceptionText, String exceptionCode, String locator) {
         exception = new ArrayList<ExceptionType>();
-        this.exception.add(new ExceptionType(exceptionText, exceptionCode));
+        this.exception.add(new ExceptionType(exceptionText, exceptionCode, locator));
         this.version = "1.1.0";
     }
     

@@ -362,10 +362,10 @@ public class WCService extends WebService {
         
         //we begin by extract the base attribute
         String inputVersion = request.getVersion();       
-        if(inputVersion != null && inputVersion.equals("1.1.1")) {
-            setCurrentVersion("1.1.1");
-        } else {
+        if(inputVersion != null && inputVersion.equals("1.0.0")) {
             setCurrentVersion("1.0.0");
+        } else {
+            setCurrentVersion("1.1.1");
         } 
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         
@@ -374,7 +374,7 @@ public class WCService extends WebService {
         boolean contentMeta              = false;
         String format                    = "text/xml";
         
-        if (inputVersion.equals("1.1.1")) {
+        if (getCurrentVersion().toString().equals("1.1.1")) {
             
             // if the user have specified one format accepted (only one for now != spec)
             AcceptFormatsType formats = request.getAcceptFormats();
@@ -487,8 +487,8 @@ public class WCService extends WebService {
                
                 if(inputGeoBox != null) {
                      String crs = "WGS84(DD)";
-                    if (inputVersion.equals("1.1.1")){
-                        WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
+                    if (getCurrentVersion().toString().equals("1.1.1")){
+                        WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(null, 
                                                      inputGeoBox.getWestBoundLongitude(),
                                                      inputGeoBox.getSouthBoundLatitude(),
                                                      inputGeoBox.getEastBoundLongitude(),
@@ -524,7 +524,7 @@ public class WCService extends WebService {
             
         
         StringWriter sw = new StringWriter();
-        if (inputVersion.equals("1.1.1")) {
+        if (getCurrentVersion().toString().equals("1.1.1")) {
             responsev111.setContents(contents);
             marshaller.marshal(responsev111, sw);
         } else {

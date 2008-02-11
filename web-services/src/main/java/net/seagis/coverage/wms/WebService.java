@@ -57,8 +57,8 @@ import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.wcs.AbstractRequest;
-import static net.seagis.coverage.wms.WMSExceptionCode.*;
-
+import net.seagis.coverage.wms.WMSExceptionCode;
+import net.seagis.ows.OWSExceptionCode;
 /**
  *
  * @author legal
@@ -172,6 +172,7 @@ public abstract class WebService {
         
         unmarshaller = null;
         serviceURL   = null;
+        this.isOWS   = isOWS;
     }
     
     /**
@@ -209,7 +210,7 @@ public abstract class WebService {
                     v = currentVersion;
                 }
                 throwException("The parameter " + parameterName + " must be specify",
-                               MISSING_PARAMETER_VALUE);
+                               "MISSING_PARAMETER_VALUE", parameterName);
                 //never reach;
                 return null;
             } else {
@@ -244,7 +245,7 @@ public abstract class WebService {
         if (sld == 2) {
             if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
                 throwException("The parameter VERSION=" + sldVersion + " must be specify",
-                               MISSING_PARAMETER_VALUE);
+                               "MISSING_PARAMETER_VALUE", "version");
             } else {
                 return;
             }
@@ -259,7 +260,7 @@ public abstract class WebService {
             }
             message = message.substring(0, message.length()-3);
             message += " must be specify";
-            throwException(message, VERSION_NEGOTIATION_FAILED);
+            throwException(message, "VERSION_NEGOTIATION_FAILED", null);
         
         } else {
             setCurrentVersion(inputVersion);
@@ -267,7 +268,7 @@ public abstract class WebService {
         if (sld == 1) {
             if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
                 throwException("The parameter SLD_VERSION=" + sldVersion + " must be specify",
-                               VERSION_NEGOTIATION_FAILED);
+                               "VERSION_NEGOTIATION_FAILED", null);
             }
         }
     } 
@@ -295,7 +296,8 @@ public abstract class WebService {
                     if (!mandatory) {
                         return null;
                     } else {
-                        throwException("The parameter " + parameterName + " must be specify", MISSING_PARAMETER_VALUE);
+                        throwException("The parameter " + parameterName + " must be specify", 
+                                       "MISSING_PARAMETER_VALUE", parameterName);
                         //never reach
                         return null;
                     }
@@ -306,7 +308,7 @@ public abstract class WebService {
             return result;
         } catch (JAXBException ex) {
              throwException("the xml object for parameter" + parameterName + " is not well formed:" + '\n' +
-                                           ex, INVALID_PARAMETER_VALUE);
+                            ex, "INVALID_PARAMETER_VALUE", null);
              //never reach
              return null;
         }
@@ -387,18 +389,19 @@ public abstract class WebService {
             logger.severe(e.getMessage());
             StringWriter sw = new StringWriter(); 
             if (isOWS) {
-                WMSWebServiceException wse = new WMSWebServiceException("The XML request is not valid",
-                                                                        INVALID_PARAMETER_VALUE, 
-                                                                        getCurrentVersion());
-                marshaller.marshal(wse.getServiceExceptionReport(), sw);
-            } else {
                 OWSWebServiceException wse = new OWSWebServiceException("The XML request is not valid",
-                                                                        INVALID_PARAMETER_VALUE, 
+                                                                        OWSExceptionCode.INVALID_PARAMETER_VALUE, 
+                                                                        null,
                                                                         getCurrentVersion());
                 marshaller.marshal(wse.getExceptionReport(), sw);
+            } else {
+                WMSWebServiceException wse = new WMSWebServiceException("The XML request is not valid",
+                                                                        WMSExceptionCode.INVALID_PARAMETER_VALUE, 
+                                                                        getCurrentVersion());
+                marshaller.marshal(wse.getServiceExceptionReport(), sw);
             }
             
-            return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            return Response.ok(sw.toString(), "text/xml").build();
         }
         
         if (request != null && request instanceof AbstractRequest) {
@@ -488,13 +491,30 @@ public abstract class WebService {
         return s;
     }
     
-    protected void throwException(final String message, final WMSExceptionCode code) throws WebServiceException {
+    protected void throwException(final String message, String code, String locator) throws WebServiceException {
         if (isOWS) {
-            throw new OWSWebServiceException(message, code, getCurrentVersion());
+            code = transformCodeName(code);
+            throw new OWSWebServiceException(message, OWSExceptionCode.valueOf(code), locator, getCurrentVersion());
         } else {
-            throw new WMSWebServiceException(message, code, getCurrentVersion());
+            throw new WMSWebServiceException(message, WMSExceptionCode.valueOf(code), getCurrentVersion());
         }
         
+    }
+    
+    private String transformCodeName(String code) {
+        String result = "";
+        while (code.indexOf('_') != -1) {
+            String prefix = code.charAt(0) + "";
+            String tmp = code.substring(0, code.indexOf('_')).toLowerCase();
+            result += tmp.replace(tmp.charAt(0), prefix.charAt(0));
+            code = code.substring(code.indexOf('_') + 1, code.length());
+            System.out.println(code);
+        }
+        String prefix = code.charAt(0) + "";
+        code = code.toLowerCase();
+        result += code.replace(code.charAt(0), prefix.charAt(0));
+        
+        return result;
     }
     
     

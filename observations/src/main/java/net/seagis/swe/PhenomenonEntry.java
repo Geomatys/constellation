@@ -18,6 +18,7 @@ package net.seagis.swe;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 // Sicade dependencies
@@ -32,13 +33,14 @@ import org.opengis.observation.Phenomenon;
 
 
 /**
- * Implémentation d'une entrée représentant un {@linkplain Phenomenon phénomène}.
+ * Implementation of an entry representing a {@linkplain Phenomenon phenomenon}.
  * 
  * @version $Id$
  * @author Antoine Hnawia
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Phenomenon")
+@XmlType(name = "Phenomenon", propOrder = {"description", "name"})
 @XmlSeeAlso({ CompositePhenomenonEntry.class })
 public class PhenomenonEntry extends Entry implements Phenomenon {
     /**
@@ -47,23 +49,25 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     private static final long serialVersionUID = 5140595674231914861L;
 
     /**
-     * L'identifiant du phenomene.
+     * The phenomenon identifier.
      */
     @XmlAttribute(required = true, namespace="http://www.opengis.net/gml")
     private String id;
     
     /**
-     * Le nom du phénomène.
+     * The phenomenon name.
      */
+    @XmlElement(namespace="http://www.opengis.net/gml")
     private String name;
     
     /**
-     * La description du phenomene.
+     * The phenomenon description.
      */
+    @XmlElement(namespace="http://www.opengis.net/gml")
     private String description;
     
     /**
-     * Constructeur vide utilisé par JAXB.
+     * Empty constructor used by JAXB.
      */
     protected PhenomenonEntry(){}
     

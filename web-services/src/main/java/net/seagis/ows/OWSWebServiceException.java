@@ -34,9 +34,9 @@ public class OWSWebServiceException extends WebServiceException {
         super();
     }
             
-    public OWSWebServiceException(String message, WMSExceptionCode code, Version v) {
+    public OWSWebServiceException(String message, OWSExceptionCode code, String locator, Version v) {
         super(message);
-        this.exception = new ExceptionReport(message, code.toString());
+        this.exception = new ExceptionReport(message, code.name(), locator);
     }
     
     public ExceptionReport getExceptionReport() {
@@ -47,10 +47,10 @@ public class OWSWebServiceException extends WebServiceException {
      * Returns the code of the first exception in the report.
      * or {@code null} if there is no exception report.
      */
-    public WMSExceptionCode getExceptionCode() {
+    public OWSExceptionCode getExceptionCode() {
         if (exception != null && !exception.getException().isEmpty()) {
             String code = exception.getException().get(0).getExceptionCode();
-            return WMSExceptionCode.valueOf(code);
+            return OWSExceptionCode.valueOf(code);
         } else {
             return null;
         }

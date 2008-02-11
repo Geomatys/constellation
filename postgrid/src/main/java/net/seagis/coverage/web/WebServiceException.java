@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.wms.WMSExceptionCode;
+import org.opengis.util.CodeList;
 
 
 
@@ -49,5 +50,5 @@ public abstract class WebServiceException extends CatalogException {
         super(message, cause);
     }
 
-    public abstract WMSExceptionCode getExceptionCode();
+    public abstract CodeList getExceptionCode();
 }

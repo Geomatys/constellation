@@ -49,7 +49,7 @@ import net.seagis.sos.Capabilities;
 import net.seagis.sos.DescribeSensor;
 import net.seagis.sos.GetCapabilities;
 import net.seagis.sos.GetObservation;
-import static net.seagis.coverage.wms.WMSExceptionCode.*;
+import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -91,7 +91,7 @@ public class SOService extends WebService {
                 GetObservation go = (GetObservation)objectRequest;
                 if (go == null){
                     throw new OWSWebServiceException("The operation GetObservation is only requestable in XML for now",
-                                         OPERATION_NOT_SUPPORTED, getCurrentVersion());
+                                                     OPERATION_NOT_SUPPORTED, "GetObservation", getCurrentVersion());
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getObservation(go), sw);
@@ -102,7 +102,7 @@ public class SOService extends WebService {
                 DescribeSensor ds = (DescribeSensor)objectRequest;
                 if (ds == null){
                     throw new OWSWebServiceException("The operation DescribeSensor is only requestable in XML for now",
-                                         OPERATION_NOT_SUPPORTED, getCurrentVersion());
+                                                     OPERATION_NOT_SUPPORTED, "DescribeSensor", getCurrentVersion());
                 }
         
                 return Response.ok(worker.describeSensor(ds), "text/xml").build();
@@ -117,7 +117,7 @@ public class SOService extends WebService {
                 if (gc == null) {
                     if (!getParameter("SERVICE", true).equalsIgnoreCase("SOS")) {
                         throw new OWSWebServiceException("The parameters SERVICE=SOS must be specify",
-                                         MISSING_PARAMETER_VALUE, getCurrentVersion());
+                                                         INVALID_PARAMETER_VALUE, "service", getCurrentVersion());
                     }
                     
                     AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
@@ -134,7 +134,7 @@ public class SOService extends WebService {
                                 requestedSections.add(token);
                             } else {
                                 throw new OWSWebServiceException("The section " + token + " does not exist",
-                                                              INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                                                INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion());
                             }   
                         }
                     } else {
@@ -155,7 +155,7 @@ public class SOService extends WebService {
                     
             } else {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
-                                              OPERATION_NOT_SUPPORTED, getCurrentVersion());
+                                                 INVALID_PARAMETER_VALUE, "request", getCurrentVersion());
             }
              
          } catch (WebServiceException ex) {
@@ -165,8 +165,9 @@ public class SOService extends WebService {
              */
             if (ex instanceof OWSWebServiceException) {
                 OWSWebServiceException owsex = (OWSWebServiceException)ex;
-                if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                    !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
+                if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
+                    !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
+                    !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                     owsex.printStackTrace();
                 } else {
                     logger.info(owsex.getMessage());
