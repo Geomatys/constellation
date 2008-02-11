@@ -20,8 +20,8 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +47,7 @@ import ucar.nc2.ncml.AggregationExisting;
  *
  * @version $Id: Collector.java 90 2008-01-02 13:23:18Z cb1ebc7 $
  * @author Martin Desruisseaux
+ * @author Cédric Briançon
  */
 public class Collector {
     /**
@@ -70,21 +71,12 @@ public class Collector {
     private PrintWriter out;
 
     /**
-     * Creates a new collector which will adds entries in the default database.
-     *
-     * @throws CatalogException if the connection failed.
-     */
-    public Collector() throws CatalogException {
-        this(null);
-    }
-
-    /**
      * Creates a new collector which will adds entries in the specified database.
      *
-     * @param database The database connection.
+     * @param database The database connection, or {@code null} for the default.
      * @throws CatalogException if the connection failed.
      */
-    public Collector(final Database database) throws CatalogException {
+    protected Collector(final Database database) throws CatalogException {
         if (database != null) {
             this.database = database;
         } else {
@@ -177,18 +169,19 @@ public class Collector {
     }
 
     /**
-     * Insère dans la base de données les informations provenant d'un fichier NcML.
+     * Proceed to the insertion of new records for the specified layer from a NetCDF file.
      *
-     * @param  layer Le layer.
-     * @param  variable La variable choisie à moisonner.
-     * @param  ncml Le fichier NcML.
-     * @param  allowsNewLayer Autorise le parser à créer une nouvelle couche de données
-     *                        si elle n'est pas déjà présente dans la base.
-     * @throws CatalogException si l'insertion de données a échouée.
+     * @param  layer    The layer to update.
+     * @param  variable The NetCDF variable to collect.
+     * @param  ncml     Path to the NcML file.
+     * @param  allowsNewLayer If {@code true}, the parser is allowed to create a new layer.
+     *         New layers are created only if no suitable later already exists in the database.
+     * @throws CatalogException If insertion failed.
      */
-    public void processNcML(final String layer, final String variable, final File ncml, 
-                            final boolean allowsNewLayer) throws CatalogException 
+    public void processNcML(final String layer, String variable, final File ncml,
+                            final boolean allowsNewLayer) throws CatalogException
     {
+        variable = variable.toLowerCase().trim();
         table.setCanInsertNewLayers(allowsNewLayer);
         final Set<URI> locations = new HashSet<URI>();
         try {
@@ -199,38 +192,33 @@ public class Collector {
             // et on le récupère directement afin de le spécifier au reader.
             // Sinon on doit parcourir l'ensemble des aggregations et leur fils afin de récupérer
             // les paramètres location des sous balises <netcdf>.
-            if (aggregations.get(0).getType().equals(Type.JOIN_EXISTING) &&
-                    aggregations.size() == 1)
-            {
+            if (aggregations.size() == 1 && aggregations.get(0).getType().equals(Type.JOIN_EXISTING)) {
                 final AggregationExisting aggrExist = (AggregationExisting) aggregations.get(0);
+                @SuppressWarnings("unchecked")
                 final List<Aggregation.Dataset> datasets = aggrExist.getNestedDatasets();
                 for (final Aggregation.Dataset dataset : datasets) {
-                    for (Iterator<String> var = aggrExist.getVariables().iterator(); var.hasNext();) {
-                        if (variable.toLowerCase().startsWith(var.next().toLowerCase())) {
+                    @SuppressWarnings("unchecked")
+                    final Collection<String> variables = aggrExist.getVariables();
+                    for (final String var : variables) {
+                        if (variable.startsWith(var.toLowerCase())) {
                             locations.add(new URI(dataset.getLocation()));
                         }
                     }
                 }
             } else {
                 // Parcours l'ensemble des fils <netcdf location="..."> de cette aggregation.
-                for (Iterator<Element> it = 
-                        ncmlParsing.getNestedNetcdfElement().iterator(); it.hasNext();) 
-                {
-                    final Element netcdfWithLocationParam = (Element) it.next();
+                final Collection<Element> nested = ncmlParsing.getNestedNetcdfElement();
+                for (final Element netcdfWithLocationParam : nested) {
                     final Namespace ncmlNamespace = Namespace.getNamespace(
                             "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
-                    // Vérifie que la variable à moissonner, spécifiée par l'utilisateur, est bien 
-                    // présente parmis les variables trouvées dans le fichier NcML pour la balise 
-                    // <netcdf> courante. Si c'est le cas le fichier NetCDF est ajouté à la liste des 
+                    // Vérifie que la variable à moissonner, spécifiée par l'utilisateur, est bien
+                    // présente parmis les variables trouvées dans le fichier NcML pour la balise
+                    // <netcdf> courante. Si c'est le cas le fichier NetCDF est ajouté à la liste des
                     // fichiers à traiter, sinon il est ignoré.
-                    for (Iterator<Element> i = 
-                            netcdfWithLocationParam.getChildren("variable", ncmlNamespace).iterator(); 
-                            i.hasNext();) 
-                    {
-                        Element varNcml = (Element)i.next();
-                        if (variable.toLowerCase().
-                                startsWith(varNcml.getAttributeValue("name").toLowerCase())) 
-                        {
+                    @SuppressWarnings("unchecked")
+                    final Collection<Element> children = netcdfWithLocationParam.getChildren("variable", ncmlNamespace);
+                    for (final Element varNcml : children) {
+                        if (variable.startsWith(varNcml.getAttributeValue("name").toLowerCase())) {
                             locations.add(new URI(netcdfWithLocationParam.getAttributeValue("location")));
                         }
                     }
@@ -247,26 +235,26 @@ public class Collector {
             throw new CatalogException(e);
         } catch (URISyntaxException e) {
             throw new CatalogException(e);
-        } 
+        }
     }
-    
+
     /**
-     * Essaye d'ajouter la donnée lue depuis le fichier NcML pour la couche souhaitée. 
+     * Essaye d'ajouter la donnée lue depuis le fichier NcML pour la couche souhaitée.
      * Si une erreur SQL survient, elle peut provenir d'une tentative d'ajout de données
      * déjà présentes dans la base. A ce moment là, on attrape cette exception et on
      * laisse continuer le processus.
      * Ceci est un contournement temporaire qui devra être remplacé par un vrai test avant
      * ajout de l'enregistrement dans la base.
-     * 
+     *
      * @param layer La couche de données.
      * @param path  Le chemin du fichier NetCDF.
      * @throws CatalogException
-     * @throws SQLException Si une erreur SQL, autre qu'une tentative d'ajout dans la base 
+     * @throws SQLException Si une erreur SQL, autre qu'une tentative d'ajout dans la base
      *                      provoquant un doublon, survient.
      * @throws IOException
      */
-    private void addToLayer(final String layer, final String path) 
-            throws CatalogException, SQLException, IOException 
+    private void addToLayer(final String layer, final String path)
+            throws CatalogException, SQLException, IOException
     {
         table.setLayer(layer);
         NetcdfImageReader reader = addInputToReader(path);
@@ -286,12 +274,12 @@ public class Collector {
 
     /**
      * Créé un {@code ImageReader} pour le fichier NetCDF spécifié, et le retourne.
-     * 
+     *
      * @param netcdf Le chemin du fichier NetCDF lu depuis le NcML. Il peut contenir un
      *               protocole. Dans ce cas il sera considéré comme une URI.
      * @return Le {@code ImageReader} pour le fichier NetCDF spécifié, ou null si une
      *         erreur de génération de l'URI a été renvoyée.
-     * @throws IOException Si la création du reader a échoué. 
+     * @throws IOException Si la création du reader a échoué.
      */
     private NetcdfImageReader addInputToReader(final String netcdf) throws IOException {
         final NetcdfImageReader reader = createNetcdfImageReader();
@@ -308,17 +296,17 @@ public class Collector {
         reader.setInput(input);
         return reader;
     }
-    
+
     /**
      * Creates an instance of NetcdfImageReader, using the default Spi for Netcdf files.
-     * 
+     *
      * @return An instance of NetcdfImageReader.
      * @throws IOException
      */
     protected NetcdfImageReader createNetcdfImageReader() throws IOException {
         return (NetcdfImageReader) new NetcdfImageReader.Spi().createReaderInstance();
     }
-        
+
     /**
      * Dispose collector resources.
      *
@@ -345,7 +333,7 @@ public class Collector {
         final boolean clear   = arguments.getFlag("-clear");
         final String  layer   = arguments.getRequiredString("-layer");
         args = arguments.getRemainingArguments(0);
-        final Collector collector = new Collector();
+        final Collector collector = new Collector(null);
         collector.setPrinter(arguments.out);
         collector.setPretend(pretend);
         collector.setPolicy(clear ? CLEAR_BEFORE_UPDATE : replace ? REPLACE_EXISTING : SKIP_EXISTING);

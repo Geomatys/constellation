@@ -18,6 +18,7 @@ package net.seagis.bean;
 //~--- non-JDK imports --------------------------------------------------------
 
 import net.seagis.console.Collector;
+import net.seagis.console.CollectorFactory;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
@@ -57,7 +58,7 @@ public class Reader {
             return;
         }
 
-        collector = new Collector();
+        collector = CollectorFactory.getInstance(null);
 
         Database db = collector.getDatabase();
 

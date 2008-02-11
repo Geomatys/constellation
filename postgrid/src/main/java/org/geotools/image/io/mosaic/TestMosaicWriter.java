@@ -17,11 +17,8 @@
  */
 package org.geotools.image.io.mosaic;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -31,48 +28,12 @@ import java.util.logging.Logger;
  * @author Cédric Briançon
  */
 public class TestMosaicWriter {
-    /**
-     * The raster that we wish to tiled.
-     */
-    private static final File INPUT = new File("C:\\BlueMarble\\Topo_bathy_png\\world.topo.bathy.200407.3x21600x21600.A1.png");
-
-    /**
-     * The output folder where tiles will be written.
-     */
-    private static final File OUTPUT = new File("C:\\test\\A1");
-
-    /**
-     * The wished size for each tile.
-     */
-    private static final Dimension TILESIZE = new Dimension(200,200);
-
-    /**
-     * The factor between two consecutive overviews.
-     */
-    private static final Dimension STEP = new Dimension(2,2);
-
-    /**
-     * The minimum tile size that we want to have at the end of the process.
-     */
-    private static final Dimension MINTILE = new Dimension(70, 70);
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         org.geotools.resources.image.ImageUtilities.allowNativeCodec("PNG", javax.imageio.spi.ImageReaderSpi.class, false);
-        try {
-            if (!OUTPUT.exists()) {
-                OUTPUT.mkdirs();
-            }
-            TileBuilder builder = new TileBuilder();
-            builder.setTileDirectory(OUTPUT);
-            builder.setTileLayout(TileLayout.CONSTANT_GEOGRAPHIC_AREA);
-            builder.setTileSize(MINTILE);
-            builder.setPreferredSubsampling(STEP);
-            TileManager tileManager = builder.writeFromUntiledImage(INPUT, 0);
-        } catch (IOException ex) {
-            Logger.getLogger(TestMosaicWriter.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        TileBuilder builder = new TileBuilder();
+        builder.setTileDirectory(new File("/home/desruisseaux/Données/PostGRID/Monde/BlueMarble/test"));
+        builder.setTileLayout(TileLayout.CONSTANT_GEOGRAPHIC_AREA);
+        TileManager tileManager = builder.writeFromUntiledImage(new File("/home/desruisseaux/Données/PostGRID/Monde/BlueMarble/Tile1_A1.png"), 0);
+        System.out.println(tileManager);
     }
 }

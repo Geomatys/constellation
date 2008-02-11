@@ -18,6 +18,7 @@ package net.seagis.bean;
 //~--- non-JDK imports --------------------------------------------------------
 
 import net.seagis.console.Collector;
+import net.seagis.console.CollectorFactory;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
@@ -49,7 +50,7 @@ public class Writer {
         }
 
          
-        collector2 = new Collector();
+        collector2 = CollectorFactory.getInstance(null);
 
         Database db = collector2.getDatabase();
 
@@ -93,7 +94,7 @@ public class Writer {
     
     public void setLayersAndSeries(String ServerPath, String layerName) throws SQLException, NamingException, CatalogException {
         try {
-            Collector collector = new Collector();
+            Collector collector = CollectorFactory.getInstance(null);;
             Database database = collector.getDatabase();
             Connection connection = database.getConnection();     
              
