@@ -31,29 +31,29 @@ import ucar.nc2.ncml.NcMLReader;
 
 
 /**
- * Lis un fichier NcML, et récupère les informations stockées dans les balises <netcdf>.
- * Si une aggregation de fichiers NetCDF est présente, il est possible de récupérer celle-ci
- * ainsi que l'ensemble des informations la constituant.
+ * Reads a NcML file, and get back data stored into the <netcdf> tags. 
+ * If an aggregation of NetCDF file is present, it is possible to get it
+ * and the whole data in it.
  *
  * @source $URL$
  * @author Cédric Briançon
  */
 final class NcMLReading {
     /**
-     * Le {@code namespace} pour les balises <netcdf>.
+     * The {@code namespace} for <netcdf> tags.
      */
     private static final Namespace NETCDFNS = Namespace.getNamespace(
             "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
 
     /**
-     * Le fichier NcML à parcourir.
+     * The NcML file to browse.
      */
     private final File ncml;
 
     /**
-     * Prépare la récupération des informations contenues dans un fichier NcML.
+     * Prepare the getting of data stored in the NcML file.
      *
-     * @param ncml Le fichier NcML à traiter.
+     * @param ncml The NcML file to handle.
      */
     public NcMLReading(final File ncml) {
         this.ncml = ncml;
@@ -90,8 +90,8 @@ final class NcMLReading {
     }
 
     /**
-     * Retourne une liste d'éléments JDOM correspondant à l'ensemble des fils <netcdf> de
-     * l'aggregation principale.
+     * Returns a list of {@code JDOM} elements, matching with the whole children <netcdf>
+     * of the main aggregation.
      */
     protected List<Element> getNestedNetcdfElement() throws CatalogException {
         try {
@@ -118,17 +118,16 @@ final class NcMLReading {
     }
 
     /**
-     * Renvoit la balise XML {@code <netcdf>} ainsi que son contenu pour le fichier NcML
-     * se trouvant à l'adresse passée en paramètre.
-     * Cette balise doit contenir l'ensemble des informations du fichier NcML dédiées à
-     * spécifier des méta données concernant les fichiers netCDF. Un fichier NcML peut
-     * contenir plusieurs balises netcdf, cette méthode renverra la première qui englobe
-     * toutes les autres.
+     * Returns the XML tags {@code <netcdf>} with its content for the NcML file specified.
+     * This tags has to contain the whole data of the NcML file dedicated to specified 
+     * meta data for NetCDF files. 
+     * An NcML file can contains several <netcdf> tags, this method will return the first
+     * occurrence.
      *
-     * @param  ncmlPath Le chemin vers le fichier NcML.
-     * @return Le noeud XML {@code <netcdf>}.
-     * @throws JDOMException si l'obtention de la balise a échoué.
-     * @throws IOException si la création du document a échoué.
+     * @param  ncmlPath The path for the NcML path.
+     * @return The XML node {@code <netcdf>}.
+     * @throws JDOMException if the getting of this tags has failed.
+     * @throws IOException if the creation of this document has failed.
      */
     private Element getGlobalNetcdfElement(final File ncml) throws IOException, JDOMException {
         final SAXBuilder builder = new SAXBuilder();

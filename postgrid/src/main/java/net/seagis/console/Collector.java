@@ -187,11 +187,11 @@ public class Collector {
         try {
             NcMLReading ncmlParsing = new NcMLReading(ncml);
             final List<Aggregation> aggregations = ncmlParsing.getNestedAggregations();
-            // Si on a une jointure en début de fichier, et aucune autre aggregation en dessous,
-            // alors on sait que les balises <netcdf> contiendront directement le paramètre location
-            // et on le récupère directement afin de le spécifier au reader.
-            // Sinon on doit parcourir l'ensemble des aggregations et leur fils afin de récupérer
-            // les paramètres location des sous balises <netcdf>.
+            // If we have an aggregation of type "joint" for the whole file, without any other
+            // nested aggregation, then we know that the <netcdf> tags will contain the "location"
+            // parameter, and we get it back directly in order to specify it to the reader.
+            // Otherwise we have to browse all aggregations and their childs in order to get
+            // the "location" parameters of these <netcdf> tags.
             if (aggregations.size() == 1 && aggregations.get(0).getType().equals(Type.JOIN_EXISTING)) {
                 final AggregationExisting aggrExist = (AggregationExisting) aggregations.get(0);
                 @SuppressWarnings("unchecked")
@@ -206,15 +206,15 @@ public class Collector {
                     }
                 }
             } else {
-                // Parcours l'ensemble des fils <netcdf location="..."> de cette aggregation.
+                // Browse all <netcdf location="..."> for this aggregation.
                 final Collection<Element> nested = ncmlParsing.getNestedNetcdfElement();
                 for (final Element netcdfWithLocationParam : nested) {
                     final Namespace ncmlNamespace = Namespace.getNamespace(
                             "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
-                    // Vérifie que la variable à moissonner, spécifiée par l'utilisateur, est bien
-                    // présente parmis les variables trouvées dans le fichier NcML pour la balise
-                    // <netcdf> courante. Si c'est le cas le fichier NetCDF est ajouté à la liste des
-                    // fichiers à traiter, sinon il est ignoré.
+                    // Verify that the variable to collect, specified by user, is really present
+                    // among variables found in the NcML file for the current <netcdf> tags.
+                    // If it is the case, the NetCDF file is added to the list of files to handle,
+                    // otherwise it is skipped.
                     @SuppressWarnings("unchecked")
                     final Collection<Element> children = netcdfWithLocationParam.getChildren("variable", ncmlNamespace);
                     for (final Element varNcml : children) {
@@ -224,7 +224,7 @@ public class Collector {
                     }
                 }
             }
-            // Effectue l'ajout dans la base des fichiers NetCDF sélectionnés.
+            // Do the adding of the selected NetCDF files into the database.
             for (final URI location : locations) {
                 addToLayer(layer, location.toString());
             }
@@ -239,18 +239,16 @@ public class Collector {
     }
 
     /**
-     * Essaye d'ajouter la donnée lue depuis le fichier NcML pour la couche souhaitée.
-     * Si une erreur SQL survient, elle peut provenir d'une tentative d'ajout de données
-     * déjà présentes dans la base. A ce moment là, on attrape cette exception et on
-     * laisse continuer le processus.
-     * Ceci est un contournement temporaire qui devra être remplacé par un vrai test avant
-     * ajout de l'enregistrement dans la base.
+     * Try to add the data red from the NcML file for the wished layer. If an SQL error 
+     * occurs, it could comes from a try to add data already in the database.
+     * At this moment, we catch it and let the process continue.
+     * This a temporary workaround that has to be replaced by a genuine test before the 
+     * adding of this record in the database.
      *
-     * @param layer La couche de données.
-     * @param path  Le chemin du fichier NetCDF.
+     * @param layer The layer to consider.
+     * @param path  The Netcdf path.
      * @throws CatalogException
-     * @throws SQLException Si une erreur SQL, autre qu'une tentative d'ajout dans la base
-     *                      provoquant un doublon, survient.
+     * @throws SQLException If a SQL error occurs, other than a doublon.
      * @throws IOException
      */
     private void addToLayer(final String layer, final String path)
@@ -258,14 +256,14 @@ public class Collector {
     {
         table.setLayer(layer);
         NetcdfImageReader reader = addInputToReader(path);
-        //System.out.println(path);
         try {
             table.addEntry(reader);
         } catch (SQLException sql) {
-            // Si le code d'erreur est 23505, on sait que l'on a obtenu une erreur de postgresql
-            // indiquant un ajout dans une table d'un enregistrement déjà présent.
-            // Dans ce cas, on ne fait rien car l'enregistrement est déjà dans la base.
-            // Sinon on relance l'exception sql, qui pourrait avoir une autre raison.
+            // If the error code is "23505", we know that it is a postgresql error which 
+            // indicates an adding of a record already present into the database.
+            // In this case, we do nothing because the record is already present.
+            // Otherwise we throw this exception, which could have occured for a different
+            // reason.
             if (!sql.getSQLState().equals("23505")) {
                 throw sql;
             }
@@ -273,13 +271,13 @@ public class Collector {
     }
 
     /**
-     * Créé un {@code ImageReader} pour le fichier NetCDF spécifié, et le retourne.
+     * Creates an {@code ImageReader} for the NetCDF file specified, and returns it.
      *
-     * @param netcdf Le chemin du fichier NetCDF lu depuis le NcML. Il peut contenir un
-     *               protocole. Dans ce cas il sera considéré comme une URI.
-     * @return Le {@code ImageReader} pour le fichier NetCDF spécifié, ou null si une
-     *         erreur de génération de l'URI a été renvoyée.
-     * @throws IOException Si la création du reader a échoué.
+     * @param netcdf The path for the NetCDF file red from the NcML file. It could 
+     *               contains a protocol. In this case it will be considered as an URI.
+     * @return The {@code ImageReader} for the NetCDF file specified, or {@code null} if
+     *         an error occurs in the generating process of the URI.
+     * @throws IOException If the creation of the reader has failed.
      */
     private NetcdfImageReader addInputToReader(final String netcdf) throws IOException {
         final NetcdfImageReader reader = createNetcdfImageReader(netcdf);
