@@ -35,8 +35,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.naming.NamingException;
 
-import javax.servlet.jsp.jstl.sql.Result;
-import javax.servlet.jsp.jstl.sql.ResultSupport;
 
 /**
  *
@@ -46,10 +44,10 @@ public class Reader {
     private Collector collector;
 
     // public class CustomerBean {
-    private Connection conn;
+    private Connection connection;
 
     public void open() throws SQLException, NamingException, CatalogException {
-        if (conn != null) {
+        if (connection != null) {
             return;
         }
 
@@ -62,7 +60,7 @@ public class Reader {
 
         Database db = collector.getDatabase();
 
-        conn = db.getConnection();
+        connection = db.getConnection();
         System.out.println("openReader()");
     }
 
@@ -71,7 +69,7 @@ public class Reader {
             open();
 
             // System.out.println("apres open()");
-            Statement stmt = conn.createStatement();
+            Statement stmt = connection.createStatement();
 
             // System.out.println("avan executeQuery()");
             ResultSet result = stmt.executeQuery("SELECT * FROM \"Layers\" ORDER BY name");
@@ -116,12 +114,12 @@ public class Reader {
     }
 
     public void close() throws SQLException {
-        if (conn == null) {
+        if (connection == null) {
             return;
         }
 
         System.out.println("closeReader()");
-        conn.close();
-        conn = null;
+        connection.close();
+        connection = null;
     }
 }

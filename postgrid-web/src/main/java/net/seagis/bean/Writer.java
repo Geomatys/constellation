@@ -40,21 +40,21 @@ import net.seagis.catalog.UpdatePolicy;
  */
 public class Writer {
    
-    private   Collector collector2;
+    private   Collector collector;
     // public class CustomerBean {
-    private Connection conn;
+    private Connection connection;
 
     public void open() throws SQLException, NamingException, CatalogException {
-        if (conn != null) {
+        if (connection != null) {
             return;
         }
 
          
-        collector2 = CollectorFactory.getInstance(null);
+        collector = CollectorFactory.getInstance(null);
 
-        Database db = collector2.getDatabase();
+        Database db = collector.getDatabase();
 
-        conn = db.getConnection();
+        connection = db.getConnection();
         System.out.println("openWriter()");
         
         
@@ -65,9 +65,9 @@ public class Writer {
             open();
 
             // System.out.println("apres open()");
-            conn.setReadOnly(false);
+            connection.setReadOnly(false);
 
-            Statement stmt = conn.createStatement();
+            Statement stmt = connection.createStatement();
 
             // System.out.println("avan executeQuery()");
             for (int i = 0; i < layers.length; i++) {
@@ -94,9 +94,7 @@ public class Writer {
     
     public void setLayersAndSeries(String ServerPath, String layerName) throws SQLException, NamingException, CatalogException {
         try {
-            Collector collector = CollectorFactory.getInstance(null);;
-            Database database = collector.getDatabase();
-            Connection connection = database.getConnection();     
+            open();     
              
             // System.out.println("apres open()");
             connection.setReadOnly(false);
@@ -166,13 +164,13 @@ public class Writer {
         }
     }
     public void close() throws SQLException, CatalogException {
-        if (conn == null) {
+        if (connection == null) {
             return;
         }
 
         System.out.println("closeWriter()");
-        conn.close();
-        collector2.close();
-        conn = null;
+        connection.close();
+        collector.close();
+        connection = null;
     }
 }
