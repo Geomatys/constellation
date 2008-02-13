@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wcs.Capabilities;
+import net.seagis.wcs.v111.Capabilities;
 import org.geotools.resources.Utilities;
 
 

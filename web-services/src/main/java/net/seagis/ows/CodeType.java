@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
-import net.seagis.wcs.InterpolationMethodBaseType;
+import net.seagis.wcs.v111.InterpolationMethodBaseType;
 import org.geotools.resources.Utilities;
 
 

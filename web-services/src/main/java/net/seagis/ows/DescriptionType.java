@@ -24,10 +24,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wcs.AxisType;
-import net.seagis.wcs.CoverageDescriptionType;
-import net.seagis.wcs.CoverageSummaryType;
-import net.seagis.wcs.FieldType;
+import net.seagis.wcs.v111.AxisType;
+import net.seagis.wcs.v111.CoverageDescriptionType;
+import net.seagis.wcs.v111.CoverageSummaryType;
+import net.seagis.wcs.v111.FieldType;
 import org.geotools.resources.Utilities;
 
 

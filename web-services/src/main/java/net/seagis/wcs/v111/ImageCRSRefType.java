@@ -13,34 +13,32 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.gml;
+package net.seagis.wcs.v111;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wcs.v100.MetadataAssociationType;
+import net.seagis.gml.ImageCRSType;
 
 
 /**
- *  Base type for complex metadata property types.
+ * Association to an image coordinate reference system, either referencing or containing the definition of that reference system. 
  * 
- * <p>Java class for MetaDataPropertyType complex type.
+ * <p>Java class for ImageCRSRefType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="MetaDataPropertyType">
+ * &lt;complexType name="ImageCRSRefType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://www.opengis.net/gml}_MetaData" minOccurs="0"/>
+ *         &lt;element ref="{http://www.opengis.net/gml}ImageCRS" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
- *       &lt;attribute name="about" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -49,19 +47,13 @@ import net.seagis.wcs.v100.MetadataAssociationType;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "MetaDataPropertyType", propOrder = {
-    "metaData"
+@XmlType(name = "ImageCRSRefType", propOrder = {
+    "imageCRS"
 })
-@XmlSeeAlso({
-    MetadataAssociationType.class
-})
-public class MetaDataPropertyType {
+public class ImageCRSRefType {
 
-    @XmlElement(name = "_MetaData")
-    private AbstractMetaDataType metaData;
-    @XmlAttribute
-    @XmlSchemaType(name = "anyURI")
-    private String about;
+    @XmlElement(name = "ImageCRS", namespace = "http://www.opengis.net/gml")
+    private ImageCRSType imageCRS;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
     private String remoteSchema;
@@ -84,18 +76,34 @@ public class MetaDataPropertyType {
     private String actuate;
 
     /**
-     * Gets the value of the metaData property.
+     * An empty constructor used by JAXB
      */
-    public AbstractMetaDataType getMetaData() {
-        return metaData;
+    ImageCRSRefType() {
     }
-
+    
+     /**
+     * build a new reference of imageCRS
+     */
+    public ImageCRSRefType(ImageCRSType imageCRS, String remoteSchema, String type, 
+            String href, String role, String arcrole, String title, String show, String actuate) {
+        this.actuate      = actuate;
+        this.arcrole      = arcrole;
+        this.href         = href;
+        this.imageCRS     = imageCRS;
+        this.remoteSchema = remoteSchema;
+        this.role         = role;
+        this.show         = show;
+        this.title        = title;
+        this.type         = type;
+             
+    }
+    
     /**
-     * Gets the value of the about property.
+     * Gets the value of the imageCRS property.
      * 
      */
-    public String getAbout() {
-        return about;
+    public ImageCRSType getImageCRS() {
+        return imageCRS;
     }
 
     /**
@@ -107,9 +115,9 @@ public class MetaDataPropertyType {
     }
 
    /**
-     * Gets the value of the type property.
-     * 
-     */
+    * Gets the value of the type property.
+    * 
+    */
     public String getType() {
         if (type == null) {
             return "simple";
@@ -126,9 +134,9 @@ public class MetaDataPropertyType {
         return href;
     }
 
-    /**
-     * Gets the value of the role property.
-     */
+   /**
+    * Gets the value of the role property.
+    */
     public String getRole() {
         return role;
     }
@@ -150,7 +158,6 @@ public class MetaDataPropertyType {
 
     /**
      * Gets the value of the show property.
-     * 
      */
     public String getShow() {
         return show;

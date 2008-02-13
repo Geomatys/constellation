@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.wcs.AbstractGetCapabilities;
 import org.geotools.resources.Utilities;
 
 
@@ -53,7 +54,7 @@ import org.geotools.resources.Utilities;
     "sections",
     "acceptFormats"
 })
-public class GetCapabilitiesType {
+public class GetCapabilitiesType extends AbstractGetCapabilities {
 
     @XmlElement(name = "AcceptVersions")
     private AcceptVersionsType acceptVersions;
@@ -71,7 +72,7 @@ public class GetCapabilitiesType {
     }
     
     /**
-     * Empty constructor used by JAXB.
+     * Build a new GetCapabilities base request.
      */
     public GetCapabilitiesType(AcceptVersionsType acceptVersions, SectionsType sections,
             AcceptFormatsType acceptFormats, String updateSequence){ 
@@ -109,6 +110,15 @@ public class GetCapabilitiesType {
         return updateSequence;
     }
 
+    /**
+     * inherited method from AbstractGetCapabilties
+     */
+    public String getVersion() {
+        if (acceptVersions!= null && acceptVersions.getVersion().size()!= 0) {
+            return acceptVersions.getVersion().get(0);
+        } return null;
+    }
+    
     /**
      * Verify that this entry is identical to the specified object.
      */

@@ -66,16 +66,16 @@ public class BoundingBoxType {
 
     @XmlList
     @XmlElement(name = "LowerCorner", type = Double.class)
-    protected List<Double> lowerCorner  = new ArrayList<Double>();
+    private List<Double> lowerCorner  = new ArrayList<Double>();
     @XmlList
     @XmlElement(name = "UpperCorner", type = Double.class)
-    protected List<Double> upperCorner = new ArrayList<Double>();
+    private List<Double> upperCorner = new ArrayList<Double>();
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
-    protected String crs;
+    private String crs;
     @XmlAttribute
     @XmlSchemaType(name = "positiveInteger")
-    protected BigInteger dimensions;
+    private BigInteger dimensions;
 
     BoundingBoxType(){
     }

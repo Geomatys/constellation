@@ -37,12 +37,32 @@ import javax.xml.bind.annotation.XmlType;
 public class AcceptVersionsType {
 
     @XmlElement(name = "Version", required = true)
-    private List<String> version = new ArrayList<String>();
+    private List<String> version;
 
+    /**
+     * Empty constructor used by JAXB.
+     */
+    AcceptVersionsType(){
+        
+    }
+    
+    /**
+     * Build a new List of acceptVersion.
+     */
+    public AcceptVersionsType(String... versions){
+        version = new ArrayList<String>();
+        for (String v: versions) {
+            version.add(v);
+        }
+    }
+    
     /**
      * Gets the value of the version property.
      */
     public List<String> getVersion() {
+        if (version == null) {
+            version = new ArrayList<String>();
+        }
         return Collections.unmodifiableList(version);
     }
     
