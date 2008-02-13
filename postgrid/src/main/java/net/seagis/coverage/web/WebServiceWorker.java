@@ -29,7 +29,6 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.util.Version;
 import org.geotools.util.NumberRange;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -62,7 +61,7 @@ public class WebServiceWorker extends ImageProducer {
      * WMS before this version needs longitude before latitude. WMS after this version don't
      * perform axis switch. WMS at this exact version switch axis only for EPSG:4326.
      */
-    private static final Version AXIS_SWITCH_THRESHOLD = new Version("1.1");
+    private static final Version AXIS_SWITCH_THRESHOLD = new Version("1.1", false);
 
     /**
      * The EPSG code for the CRS for which to switch axis in the version
@@ -112,14 +111,14 @@ public class WebServiceWorker extends ImageProducer {
     private int parseInt(final String name, String value) throws WebServiceException {
         if (value == null) {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, name),
-                    MISSING_PARAMETER_VALUE, version);
+                    MISSING_PARAMETER_VALUE, version.getVersionNumber());
         }
         value = value.trim();
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException exception) {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.NOT_AN_INTEGER_$1, value),
-                    exception, INVALID_PARAMETER_VALUE, version);
+                    exception, INVALID_PARAMETER_VALUE, version.getVersionNumber());
         }
     }
 
@@ -134,7 +133,7 @@ public class WebServiceWorker extends ImageProducer {
             return Double.parseDouble(value);
         } catch (NumberFormatException exception) {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value),
-                    exception, INVALID_PARAMETER_VALUE, version);
+                    exception, INVALID_PARAMETER_VALUE, version.getVersionNumber());
         }
     }
 
@@ -147,9 +146,9 @@ public class WebServiceWorker extends ImageProducer {
      *         If null, latest version is assumed.
      * @throws WebServiceException if the version string can't be parsed
      */
-    public void setService(final String service, final String version) throws WebServiceException {
+    public void setService(final String service, final Version version) throws WebServiceException {
         this.service = (service != null) ? Service.valueOf(service.trim().toUpperCase()) : null;
-        this.version = (version != null) ? new Version(version) : null;
+        this.version = (version != null) ? version : null;
     }
 
    /**
@@ -186,7 +185,7 @@ public class WebServiceWorker extends ImageProducer {
     private CoordinateReferenceSystem decodeCRS(final String code) throws WebServiceException {
         final int versionThreshold;
         if (Service.WMS.equals(service) && version != null) {
-            versionThreshold = version.compareTo(AXIS_SWITCH_THRESHOLD, 2);
+            versionThreshold = version.compareTo(AXIS_SWITCH_THRESHOLD);
         } else {
             versionThreshold = 1;
         }
@@ -198,7 +197,7 @@ public class WebServiceWorker extends ImageProducer {
             }
         } catch (FactoryException exception) {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM),
-                    exception, INVALID_CRS, version);
+                    exception, INVALID_CRS, version.getVersionNumber());
         }
         return crs;
     }
@@ -261,13 +260,13 @@ public class WebServiceWorker extends ImageProducer {
             if (index >= coordinates.length) {
                 throw new WMSWebServiceException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3, "envelope",
                         ((index + tokens.countTokens()) >> 1) + 1, envelope.getDimension()),
-                        INVALID_DIMENSION_VALUE, version);
+                        INVALID_DIMENSION_VALUE, version.getVersionNumber());
             }
             coordinates[index++] = value;
         }
         if ((index & 1) != 0) {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.ODD_ARRAY_LENGTH_$1, index),
-                    INVALID_DIMENSION_VALUE, version);
+                    INVALID_DIMENSION_VALUE, version.getVersionNumber());
         }
         // Fallthrough in every cases.
         switch (index) {
@@ -295,7 +294,7 @@ public class WebServiceWorker extends ImageProducer {
             final double maximum = envelope.getMaximum(index);
             if (!(minimum < maximum)) {
                 throw new WMSWebServiceException(Errors.format(ErrorKeys.BAD_RANGE_$2, minimum, maximum),
-                        INVALID_PARAMETER_VALUE, version);
+                        INVALID_PARAMETER_VALUE, version.getVersionNumber());
             }
         }
     }
@@ -377,7 +376,7 @@ public class WebServiceWorker extends ImageProducer {
                 if (i >= offsets.length) {
                     throw new WMSWebServiceException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$3,
                             "gridOffsets", (int) Math.ceil(Math.sqrt((i + tokens.countTokens()) + 1)),
-                            origin.length), INVALID_DIMENSION_VALUE, version);
+                            origin.length), INVALID_DIMENSION_VALUE, version.getVersionNumber());
                 }
                 offsets[i++] = parseDouble(tokens.nextToken());
             }
@@ -408,7 +407,7 @@ public class WebServiceWorker extends ImageProducer {
         try {
             dates = TimeParser.parse(date.trim(), TimeParser.MILLIS_IN_DAY);
         } catch (ParseException exception) {
-            throw new WMSWebServiceException(exception, INVALID_PARAMETER_VALUE, version);
+            throw new WMSWebServiceException(exception, INVALID_PARAMETER_VALUE, version.getVersionNumber());
         }
         if (dates.isEmpty()) {
             time = null;
@@ -451,7 +450,7 @@ public class WebServiceWorker extends ImageProducer {
                 // Unsupported interpolations include "barycentric" and "lost area".
                 throw new WMSWebServiceException("The service does not handle the \"" +
                         interpolation.toLowerCase() + "\" interpolation method.",
-                        INVALID_PARAMETER_VALUE, version);
+                        INVALID_PARAMETER_VALUE, version.getVersionNumber());
             }
         } else {
             code = Interpolation.INTERP_BILINEAR;
@@ -470,7 +469,7 @@ public class WebServiceWorker extends ImageProducer {
            final int split = range.indexOf(',');
            if (split < 0 || range.indexOf(',', split+1) >= 0) {
                throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                       "range", range), INVALID_PARAMETER_VALUE, version);
+                       "range", range), INVALID_PARAMETER_VALUE, version.getVersionNumber());
            }
            final double min = parseDouble(range.substring(0,  split));
            final double max = parseDouble(range.substring(split + 1));
@@ -493,7 +492,7 @@ public class WebServiceWorker extends ImageProducer {
                 this.background = Color.decode(background);
             } catch (NumberFormatException exception) {
                 throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                        "background", background), exception, INVALID_PARAMETER_VALUE, version);
+                        "background", background), exception, INVALID_PARAMETER_VALUE, version.getVersionNumber());
             }
         }
     }
@@ -539,7 +538,7 @@ public class WebServiceWorker extends ImageProducer {
                 }
                 if (!formats.contains(format)) {
                     throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                            "format", format), LAYER_NOT_QUERYABLE, version);
+                            "format", format), LAYER_NOT_QUERYABLE, version.getVersionNumber());
                 }
                 this.format = format;
                 /*
@@ -567,7 +566,7 @@ public class WebServiceWorker extends ImageProducer {
             exceptionFormat = format;
         } else {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
-                            "Exception", format), INVALID_PARAMETER_VALUE, version);
+                            "Exception", format), INVALID_PARAMETER_VALUE, version.getVersionNumber());
         }
     }
 

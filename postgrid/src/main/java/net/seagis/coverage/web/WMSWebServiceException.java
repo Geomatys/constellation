@@ -40,7 +40,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    public WMSWebServiceException(final String message, final WMSExceptionCode code, final Version version) {
+    public WMSWebServiceException(final String message, final WMSExceptionCode code, final String version) {
         super(message);
         setServiceExceptionReport(message, code, version);
     }
@@ -52,7 +52,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    public WMSWebServiceException(final Exception cause, final WMSExceptionCode code, final Version version) {
+    public WMSWebServiceException(final Exception cause, final WMSExceptionCode code, final String version) {
         super(cause);
         setServiceExceptionReport(cause.getLocalizedMessage(), code, version);
     }
@@ -66,7 +66,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param version The version of the web service that produced the error.
      */
     public WMSWebServiceException(final String message, final Exception cause,
-                               final WMSExceptionCode code, final Version version)
+                               final WMSExceptionCode code, final String version)
     {
         super(message, cause);
         setServiceExceptionReport(message, code, version);
@@ -79,7 +79,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    private void setServiceExceptionReport(final String message, final WMSExceptionCode code, final Version version) {
+    private void setServiceExceptionReport(final String message, final WMSExceptionCode code, final String version) {
         final ServiceExceptionType details = new ServiceExceptionType(message, code);
         exception = new ServiceExceptionReport(version, details);
     }

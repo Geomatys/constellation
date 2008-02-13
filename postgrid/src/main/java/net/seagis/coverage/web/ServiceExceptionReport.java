@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.util.Version;
 
 
 /**
@@ -74,13 +73,11 @@ public final class ServiceExceptionReport {
      * @param version The version of the web service in which the error occured.
      * @param details The reasons for the failure.
      */
-    public ServiceExceptionReport(final Version version, final ServiceExceptionType... details) {
+    public ServiceExceptionReport(final String version, final ServiceExceptionType... details) {
         for (final ServiceExceptionType element : details) {
             serviceExceptions.add(element);
         }
-        if (version != null) {
-            this.version = version.toString();
-        }
+        this.version = version;
     }
 
     /**
