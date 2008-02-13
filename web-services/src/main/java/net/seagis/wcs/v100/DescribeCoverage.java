@@ -51,10 +51,7 @@ import net.seagis.wcs.AbstractDescribeCoverage;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "coverage",
-    "identifier"
-})
+@XmlType(name = "", propOrder = {"coverage"})
 @XmlRootElement(name = "DescribeCoverage")
 public class DescribeCoverage extends AbstractDescribeCoverage {
 

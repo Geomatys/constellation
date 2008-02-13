@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Capabilities xmlns="http://www.opengis.net/wcs" 
+<Capabilities xmlns="http://www.opengis.net/wcs/1.1.1" 
 xmlns:ows="http://www.opengis.net/ows/1.1" 
 xmlns:xlink="http://www.w3.org/1999/xlink" 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -16,8 +16,8 @@ version="1.1.1" updateSequence="">
 			<ows:Keyword>geomatys</ows:Keyword>
 		</ows:Keywords>
 		<ows:ServiceType>OGC WCS</ows:ServiceType>
-		<ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
 		<ows:ServiceTypeVersion>1.1.1</ows:ServiceTypeVersion>
+		<ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
 		<ows:Fees>NONE</ows:Fees>
 		<ows:AccessConstraints>NONE</ows:AccessConstraints>
 	</ows:ServiceIdentification>
@@ -102,6 +102,11 @@ version="1.1.1" updateSequence="">
 					<ows:Value>image/png</ows:Value>
 					<ows:Value>image/jpeg</ows:Value>
 					<ows:Value>matrix</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="store">
+				<ows:AllowedValues>
+					<ows:Value>False</ows:Value>
 				</ows:AllowedValues>
 			</ows:Parameter>
 		</ows:Operation>

@@ -84,7 +84,15 @@ public class CoverageSummaryType extends DescriptionType {
     }
     
     /**
-     * An empty constructor used by JAXB.
+     * An light constructor.
+     */
+    public CoverageSummaryType(List<LanguageStringType> title, List<LanguageStringType> _abstract) {
+        super(title, _abstract, null);
+    }
+    
+    
+    /**
+     * An full constructor.
      */
     public CoverageSummaryType(List<LanguageStringType> title,  List<LanguageStringType> _abstract,
             List<KeywordsType> keywords, List<JAXBElement<?>> rest) {

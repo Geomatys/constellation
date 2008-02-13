@@ -55,6 +55,13 @@ public class PhenomenonPropertyType {
 
     @XmlElementRef(name = "Phenomenon", namespace = "http://www.opengis.net/swe/1.0.1", type = JAXBElement.class)
     private JAXBElement<? extends PhenomenonEntry> phenomenon;
+    
+    /**
+     * Allow to record the pehnomenon when its in href mode
+     */
+    @XmlTransient
+    JAXBElement<? extends PhenomenonEntry>  hiddenPhenomenon;
+    
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
     private String remoteSchema;
@@ -98,6 +105,20 @@ public class PhenomenonPropertyType {
             this.phenomenon    = sweFactory.createPhenomenon(observedProperty);
         } else {
             throw new IllegalArgumentException("only phenomenonEntry and CompositePhenomenonEntry are allowed");
+        }
+    }
+    
+    /**
+     * Set the phenomenon into href mode.
+     */
+    public void setToHref(String prefix) {
+        if (prefix == null)
+            prefix = "";
+        
+        if (phenomenon != null) {
+            this.href = prefix + phenomenon.getValue().getId();
+            hiddenPhenomenon = phenomenon;
+            phenomenon = null;
         }
     }
     

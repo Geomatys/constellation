@@ -25,9 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.AbstractCoordinateOperationType;
 import net.seagis.gml.PolygonType;
-import net.seagis.ows.BoundingBoxType;
 import net.seagis.gml.EnvelopeEntry;
 import net.seagis.gml.GridType;
 import net.seagis.gml.ObjectFactory;
@@ -59,12 +57,8 @@ import net.seagis.gml.ObjectFactory;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SpatialDomainType", propOrder = {
-    "boundingBox",
     "envelope",
-    "gridCRS",
     "grid",
-    "transformation",
-    "imageCRS",
     "polygon"
 })
 public class SpatialDomainType {

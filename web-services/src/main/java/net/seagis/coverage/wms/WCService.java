@@ -44,6 +44,7 @@ import javax.ws.rs.Path;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.Series;
+import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
@@ -61,6 +62,7 @@ import net.seagis.ows.AcceptVersionsType;
 import net.seagis.ows.BoundingBoxType;
 import net.seagis.ows.KeywordsType;
 import net.seagis.ows.LanguageStringType;
+import net.seagis.ows.OWSWebServiceException;
 import net.seagis.ows.Operation;
 import net.seagis.ows.WGS84BoundingBoxType;
 import net.seagis.ows.OperationsMetadata;
@@ -122,16 +124,16 @@ public class WCService extends WebService {
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
     public WCService() throws JAXBException, WebServiceException {
-        super("WCS", false, "1.1.1", "1.0.0");
+        super("WCS", new Version("1.1.1", true), new Version("1.0.0", false));
         //TODO true for 1.1.1
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.coverage.web:net.seagis.wcs.v100:net.seagis.wcs.v111");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wcs"));
+        setPrefixMapper("http://www.opengis.net/wcs");
         unmarshaller = jbcontext.createUnmarshaller();
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-        webServiceWorker.setService("WCS", getCurrentVersion().toString());
+        webServiceWorker.setService("WCS", getCurrentVersion());
     }
     
     /**
@@ -157,8 +159,8 @@ public class WCService extends WebService {
                 //this wcs does not implement "store" mechanism
                 String store = getParameter("STORE", false);
                 if (store!= null && store.equals("true")) {
-                    throw new WMSWebServiceException("The service does not implement the store mechanism", 
-                                                  NO_APPLICABLE_CODE, getCurrentVersion());
+                    throwException("The service does not implement the store mechanism", 
+                                   "NO_APPLICABLE_CODE", null);
                 }
                 
                 /*
@@ -184,9 +186,21 @@ public class WCService extends WebService {
                  */
                 if (gc == null) {
                     if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
-                        throw new WMSWebServiceException("The parameters SERVICE=WCS must be specify",
-                                         MISSING_PARAMETER_VALUE, getCurrentVersion());
+                        throwException("The parameters SERVICE=WCS must be specify",
+                                       "MISSING_PARAMETER_VALUE", "service");
                     }
+                    String inputVersion = getParameter("VERSION", false);
+                    if (inputVersion == null) {
+                        inputVersion = getParameter("acceptversions", false);
+                        if (inputVersion == null) {
+                            inputVersion = "1.1.1";
+                        } else {
+                            //we verify that the version id supported
+                            isSupportedVersion(inputVersion);
+                        }
+                    }
+                    this.setCurrentVersion(inputVersion);
+                    
                     if (getCurrentVersion().toString().equals("1.0.0")){
                         gc = new net.seagis.wcs.v100.GetCapabilities(getParameter("SECTION", false),
                                                                      null);
@@ -204,8 +218,8 @@ public class WCService extends WebService {
                                 if (SectionsType.getExistingSections("1.1.1").contains(token)){
                                     requestedSections.add(token);
                                 } else {
-                                    throw new WMSWebServiceException("The section " + token + " does not exist",
-                                                                INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                    throwException("The section " + token + " does not exist",
+                                                   "INVALID_PARAMETER_VALUE", "section");
                                 }   
                             }
                         } else {
@@ -213,7 +227,7 @@ public class WCService extends WebService {
                             requestedSections = SectionsType.getExistingSections("1.1.1");
                         }
                         SectionsType sections       = new SectionsType(requestedSections);
-                        AcceptVersionsType versions = new AcceptVersionsType(getParameter("VERSION", false)); 
+                        AcceptVersionsType versions = new AcceptVersionsType("1.1.1"); 
                         gc = new net.seagis.wcs.v111.GetCapabilities(versions,
                                                                      sections,
                                                                      formats,
@@ -277,8 +291,8 @@ public class WCService extends WebService {
                             String resz = getParameter("resz",  false);
                 
                             if (resx == null || resy == null) {
-                                throw new WMSWebServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
-                                                              INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                throwException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
+                                               "INVALID_PARAMETER_VALUE", null);
                             }
                         } else {
                             List<String> axis         = new ArrayList<String>();
@@ -338,8 +352,8 @@ public class WCService extends WebService {
                             crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
                             bbox = bbox.substring(0, bbox.lastIndexOf(','));
                         } else {
-                            throw new WMSWebServiceException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
-                            INVALID_PARAMETER_VALUE, getCurrentVersion());
+                            throwException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
+                                           "INVALID_PARAMETER_VALUE", "BoundingBox");
                         } 
                         BoundingBoxType envelope = null;
                         
@@ -412,8 +426,10 @@ public class WCService extends WebService {
                 return Response.ok(getCoverage(gc), webServiceWorker.getMimeType()).build();
                      
             } else {
-                throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
-                                              OPERATION_NOT_SUPPORTED, getCurrentVersion());
+                throwException("The operation " + request + " is not supported by the service",
+                               "OPERATION_NOT_SUPPORTED", "request");
+                //never reach
+                return null;
             }
         } catch (WebServiceException ex) {
             /* We don't print the stack trace:
@@ -429,8 +445,21 @@ public class WCService extends WebService {
                 StringWriter sw = new StringWriter();    
                 marshaller.marshal(wmsex.getServiceExceptionReport(), sw);
                 return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
+            } else if (ex instanceof OWSWebServiceException) {
+              
+                OWSWebServiceException owsex = (OWSWebServiceException)ex;
+                if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
+                    !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
+                    !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+                    owsex.printStackTrace();
+                } else {
+                    logger.info(owsex.getMessage());
+                }
+                StringWriter sw = new StringWriter();    
+                marshaller.marshal(owsex.getExceptionReport(), sw);
+                return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
-                throw new IllegalArgumentException("this service can't return OWS Exception");
+                throw new IllegalArgumentException("this service can't return this kind of Exception");
             }
         }
      }
@@ -451,7 +480,7 @@ public class WCService extends WebService {
         } else {
             setCurrentVersion("1.1.1");
         } 
-        webServiceWorker.setService("WCS", getCurrentVersion().toString());
+        webServiceWorker.setService("WCS", getCurrentVersion());
         
         Capabilities        responsev111 = null;
         WCSCapabilitiesType responsev100 = null;
@@ -461,6 +490,7 @@ public class WCService extends WebService {
         if (getCurrentVersion().toString().equals("1.1.1")) {
             
             net.seagis.wcs.v111.GetCapabilities request = (net.seagis.wcs.v111.GetCapabilities) abstractRequest;
+            
             // if the user have specified one format accepted (only one for now != spec)
             AcceptFormatsType formats = request.getAcceptFormats();
             if (formats == null || formats.getOutputFormat().size() > 0) {
@@ -468,8 +498,8 @@ public class WCService extends WebService {
             } else {
                 format = formats.getOutputFormat().get(0);
                 if (!format.equals("text/xml") && !format.equals("application/vnd.ogc.se_xml")){
-                    throw new WMSWebServiceException("This format " + format + " is not allowed",
-                                       INVALID_PARAMETER_VALUE, getCurrentVersion());
+                    throwException("This format " + format + " is not allowed",
+                                   "INVALID_PARAMETER_VALUE", "format");
                 }
             }
             
@@ -523,8 +553,8 @@ public class WCService extends WebService {
                 if (SectionsType.getExistingSections("1.0.0").contains(section)){
                     requestedSection = section;
                 } else {
-                    throw new WMSWebServiceException("The section " + section + " does not exist",
-                                          INVALID_PARAMETER_VALUE, getCurrentVersion());
+                    throwException("The section " + section + " does not exist",
+                                   "INVALID_PARAMETER_VALUE", "section");
                }
                contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata"); 
             }
@@ -552,8 +582,8 @@ public class WCService extends WebService {
                 return Response.ok(sw.toString(), format).build();
             }
         }
-        Contents contents;
-        ContentMetadata contentMetadata;
+        Contents contents = null;
+        ContentMetadata contentMetadata = null;
         
         //we get the list of layers
         List<CoverageSummaryType>        summary = new ArrayList<CoverageSummaryType>();
@@ -564,10 +594,14 @@ public class WCService extends WebService {
         net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
         try {
             for (Layer inputLayer: webServiceWorker.getLayers()) {
-                CoverageSummaryType       cs = new CoverageSummaryType();
+                List<LanguageStringType> title = new ArrayList<LanguageStringType>();
+                title.add(new LanguageStringType(inputLayer.getName()));
+                List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
+                remark.add(new LanguageStringType(inputLayer.getRemarks()));
+                
+                CoverageSummaryType       cs = new CoverageSummaryType(title, remark);
                 CoverageOfferingBriefType co = new CoverageOfferingBriefType();
                 
-                cs.addRest(wcs111Factory.createIdentifier(inputLayer.getName()));
                 co.addRest(wcs100Factory.createName(inputLayer.getName()));
                 co.addRest(wcs100Factory.createLabel(inputLayer.getName()));
                 
@@ -600,14 +634,14 @@ public class WCService extends WebService {
                     }
                     
                 }
-           
+                cs.addRest(wcs111Factory.createIdentifier(inputLayer.getName()));
                 summary.add(cs);
                 offBrief.add(co);
             }
             contents        = new Contents(summary, null, null, null);    
             contentMetadata = new ContentMetadata("1.0.0", offBrief); 
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
+            throwException(exception.getMessage(), "NO_APPLICABLE_CODE", null);
         }
             
         
@@ -636,8 +670,8 @@ public class WCService extends WebService {
         logger.info("getCoverage recu");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
-        webServiceWorker.setService("WCS", getCurrentVersion().toString());
-        String format, coverage, crs, bbox = null, time = null , interpolation = null, exceptions;
+        webServiceWorker.setService("WCS", getCurrentVersion());
+        String format = null, coverage, crs = null, bbox = null, time = null , interpolation = null, exceptions;
         String width = null, height = null, depth = null;
         String resx  = null, resy   = null, resz  = null;
         String gridType, gridOrigin = "", gridOffsets = "", gridCS, gridBaseCrs;
@@ -666,8 +700,8 @@ public class WCService extends WebService {
                 crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
                 bbox = bbox.substring(0, bbox.lastIndexOf(','));
             } else {
-                throw new WMSWebServiceException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
-                            INVALID_PARAMETER_VALUE, getCurrentVersion());
+                throwException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
+                               "INVALID_PARAMETER_VALUE", "BoundingBox");
             } 
             
             if (domain.getTemporalSubset() != null) {
@@ -696,8 +730,8 @@ public class WCService extends WebService {
                 if (fieldId.equalsIgnoreCase(currentLayer.getThematic())){
                     interpolation = rangeSubset.substring(rangeSubset.indexOf(':')+ 1, rangeSubset.length());
                 } else {
-                    throw new WMSWebServiceException("The field " + fieldId + " is not present in this coverage" , 
-                            INVALID_PARAMETER_VALUE, getCurrentVersion());
+                    throwException("The field " + fieldId + " is not present in this coverage" , 
+                                   "INVALID_PARAMETER_VALUE", "RangeSubset");
                 }
             } else {
                 interpolation = null;
@@ -746,14 +780,14 @@ public class WCService extends WebService {
             if (request.getOutput().getFormat()!= null) {
                 format    = request.getOutput().getFormat().getValue();
             } else {
-                throw new WMSWebServiceException("The parameters Format have to be specified",
-                                              MISSING_PARAMETER_VALUE, getCurrentVersion());
+                throwException("The parameters Format have to be specified",
+                                                 "MISSING_PARAMETER_VALUE", "Format");
             }
             
             coverage      = request.getSourceCoverage();
             if (coverage == null) {
-                throw new WMSWebServiceException("The parameters sourceCoverage have to be specified",
-                                              MISSING_PARAMETER_VALUE, getCurrentVersion());
+                throwException("The parameters sourceCoverage have to be specified",
+                                                 "MISSING_PARAMETER_VALUE", "sourceCoverage");
             }
             if (request.getInterpolationMethod() != null) {
                 interpolation = request.getInterpolationMethod().value();
@@ -784,8 +818,8 @@ public class WCService extends WebService {
             }
             
             if (temporalSubset == null && env.getPos().size() == 0) {
-                        throw new WMSWebServiceException("The parameters BBOX or TIME have to be specified" , 
-                                                      MISSING_PARAMETER_VALUE, getCurrentVersion());
+                        throwException("The parameters BBOX or TIME have to be specified" , 
+                                       "MISSING_PARAMETER_VALUE", null);
             }
             /* here the parameter width and height (and depth for 3D matrix)
              *  have to be fill. If not they can be replace by resx and resy 
@@ -806,8 +840,8 @@ public class WCService extends WebService {
                         depth     = gridEnv.getHigh().get(2).toString();
                     }
                 } else {
-                     throw new WMSWebServiceException("you must specify grid size or resolution" , 
-                                                   MISSING_PARAMETER_VALUE, getCurrentVersion());
+                     throwException("you must specify grid size or resolution" , 
+                                                      "MISSING_PARAMETER_VALUE", null);
                 }
             }
         }
@@ -949,7 +983,7 @@ public class WCService extends WebService {
                 if(inputGeoBox != null) {
                     String crs = "WGS84(DD)";
                 
-                    WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(crs, 
+                    WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(null, 
                                                          inputGeoBox.getWestBoundLongitude(),
                                                          inputGeoBox.getSouthBoundLatitude(),
                                                          inputGeoBox.getEastBoundLongitude(),
@@ -1021,7 +1055,9 @@ public class WCService extends WebService {
         return sw.toString();
         
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
+            throwException(exception.getMessage(), "NO_APPLICABLE_CODE", null);
+            //never reach
+            return null;
         }
     }
 
@@ -1052,8 +1088,10 @@ public class WCService extends WebService {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException exception) {
-            throw new WMSWebServiceException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value),
-                    exception, INVALID_PARAMETER_VALUE, getCurrentVersion());
+            throwException(Errors.format(ErrorKeys.NOT_A_NUMBER_$1, value) + "cause:" +
+                           exception.getMessage(), "INVALID_PARAMETER_VALUE", null);
+            //never reach
+            return 0.0;
         }
     }
 }

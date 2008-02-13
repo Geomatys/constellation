@@ -108,7 +108,6 @@ import net.seagis.swe.AnyResultTable;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
-import org.geotools.util.Version;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.schemas.ValuePath;
 import org.mdweb.model.storage.Catalog;
@@ -242,7 +241,7 @@ public class SOSworker {
     /**
      * The version of the service
      */
-    private Version version;
+    private String version;
     
     /**
      * Initialize the database connection.
@@ -333,7 +332,7 @@ public class SOSworker {
     /**
      * Set the current service version
      */
-    public void setVersion(Version version){
+    public void setVersion(String version){
         this.version = version;
     }
     
@@ -1888,6 +1887,11 @@ public class SOSworker {
                 return ref;
         }
         return null;
+    }
+    
+    private Capabilities normalizeDocument(Capabilities capa){
+        
+        return capa;
     }
     
     /**

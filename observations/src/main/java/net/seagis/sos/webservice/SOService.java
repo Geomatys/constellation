@@ -33,12 +33,12 @@ import javax.xml.bind.JAXBException;
 
 // geotools dependencies
 import javax.xml.bind.Marshaller;
-import org.geotools.util.Version;
 
 // seaGIS dependencies
 import net.seagis.catalog.NoSuchTableException;
 import net.seagis.ows.OWSWebServiceException;
 import net.seagis.coverage.web.ServiceExceptionReport;
+import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.NamespacePrefixMapperImpl;
 import net.seagis.coverage.wms.WebService;
@@ -65,9 +65,9 @@ public class SOService extends WebService {
      * Build a new Restfull SOS service.
      */
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
-        super("SOS", true, "1.0.0");
+        super("SOS", new Version("1.0.0", true));
         worker = new SOSworker();
-        worker.setVersion(new Version("1.0.0"));
+        worker.setVersion("1.0.0");
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.gml:net.seagis.observation:net.seagis.ows:net.seagis.sos:net.seagis.swe:net.seagis.ogc:net.seagis.coverage.web");
         unmarshaller = jbcontext.createUnmarshaller();
         jbcontext = JAXBContext.newInstance(Capabilities.class,
@@ -75,7 +75,7 @@ public class SOService extends WebService {
                                             ObservationCollectionEntry.class);
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl(""));
+        setPrefixMapper("");
         
     }
 
@@ -91,7 +91,7 @@ public class SOService extends WebService {
                 GetObservation go = (GetObservation)objectRequest;
                 if (go == null){
                     throw new OWSWebServiceException("The operation GetObservation is only requestable in XML for now",
-                                                     OPERATION_NOT_SUPPORTED, "GetObservation", getCurrentVersion());
+                                                     OPERATION_NOT_SUPPORTED, "GetObservation", getCurrentVersion().getVersionNumber());
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getObservation(go), sw);
@@ -102,7 +102,7 @@ public class SOService extends WebService {
                 DescribeSensor ds = (DescribeSensor)objectRequest;
                 if (ds == null){
                     throw new OWSWebServiceException("The operation DescribeSensor is only requestable in XML for now",
-                                                     OPERATION_NOT_SUPPORTED, "DescribeSensor", getCurrentVersion());
+                                                     OPERATION_NOT_SUPPORTED, "DescribeSensor", getCurrentVersion().getVersionNumber());
                 }
         
                 return Response.ok(worker.describeSensor(ds), "text/xml").build();
@@ -117,7 +117,7 @@ public class SOService extends WebService {
                 if (gc == null) {
                     if (!getParameter("SERVICE", true).equalsIgnoreCase("SOS")) {
                         throw new OWSWebServiceException("The parameters SERVICE=SOS must be specify",
-                                                         INVALID_PARAMETER_VALUE, "service", getCurrentVersion());
+                                                         INVALID_PARAMETER_VALUE, "service", getCurrentVersion().getVersionNumber());
                     }
                     
                     AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
@@ -134,7 +134,7 @@ public class SOService extends WebService {
                                 requestedSections.add(token);
                             } else {
                                 throw new OWSWebServiceException("The section " + token + " does not exist",
-                                                                INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion());
+                                                                INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion().getVersionNumber());
                             }   
                         }
                     } else {
@@ -155,7 +155,7 @@ public class SOService extends WebService {
                     
             } else {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
-                                                 INVALID_PARAMETER_VALUE, "request", getCurrentVersion());
+                                                 INVALID_PARAMETER_VALUE, "request", getCurrentVersion().getVersionNumber());
             }
              
          } catch (WebServiceException ex) {

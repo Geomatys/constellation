@@ -16,8 +16,6 @@
 package net.seagis.ows;
 
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.wms.WMSExceptionCode;
-import org.geotools.util.Version;
 
 /**
  *
@@ -34,9 +32,9 @@ public class OWSWebServiceException extends WebServiceException {
         super();
     }
             
-    public OWSWebServiceException(String message, OWSExceptionCode code, String locator, Version v) {
+    public OWSWebServiceException(String message, OWSExceptionCode code, String locator, String v) {
         super(message);
-        this.exception = new ExceptionReport(message, code.name(), locator);
+        this.exception = new ExceptionReport(message, code.name(), locator, v);
     }
     
     public ExceptionReport getExceptionReport() {

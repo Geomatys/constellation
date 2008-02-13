@@ -36,7 +36,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.HttpContext;
-import org.geotools.util.Version;
 
 // jersey dependencies
 import javax.ws.rs.core.MultivaluedMap;
@@ -44,6 +43,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 // JAXB xml binding dependencies
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -52,6 +52,7 @@ import javax.xml.bind.Marshaller;
 // seagis dependencies
 import javax.xml.bind.UnmarshalException;
 import net.seagis.catalog.Database;
+import net.seagis.coverage.web.Version;
 import net.seagis.ows.OWSWebServiceException;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
@@ -90,7 +91,7 @@ public abstract class WebService {
      /**
      * The version of the SLD profile for the WMS web service. fixed a 1.1.0 for now.
      */
-    private final Version sldVersion = new Version("1.1.0");
+    private final Version sldVersion = new Version("1.1.0", false);
     
      /**
      * A JAXB unmarshaller used to create java object from XML file.
@@ -124,12 +125,6 @@ public abstract class WebService {
     private UriInfo context;
     
     /**
-     * A boolean indicating if the web service follow the OWS specification.
-     * TODO different by version
-     */
-    private boolean isOWS;
-    
-    /**
      * The object whitch made all the operation on the postgrid database
      */
     protected static ThreadLocal<WebServiceWorker> webServiceWorker;
@@ -159,11 +154,11 @@ public abstract class WebService {
      * 
      * @param versions A list of the supported version of this service.
      */
-    public WebService(String service, boolean isOWS, String... versions) {
+    public WebService(String service, Version... versions) {
         this.service = service;
        
-        for (final String element : versions) {
-            this.versions.add(new Version(element));
+        for (final Version element : versions) {
+            this.versions.add(element);
         }
         if (this.versions.size() == 0)
              throw new IllegalArgumentException("A web service must have at least one version");
@@ -172,7 +167,6 @@ public abstract class WebService {
         
         unmarshaller = null;
         serviceURL   = null;
-        this.isOWS   = isOWS;
     }
     
     /**
@@ -252,11 +246,11 @@ public abstract class WebService {
         }
         // if the version is not accepted we send an exception 
         String inputVersion = getParameter("VERSION", true);
-        if (!versions.contains(new Version(inputVersion))) {
+        if (getVersionFromNumber(inputVersion) == null) {
             
             String message = "The parameter ";
             for (Version vers:versions){
-                message += "VERSION=" + vers + " OR ";
+                message += "VERSION=" + vers.getVersionNumber() + " OR ";
             }
             message = message.substring(0, message.length()-3);
             message += " must be specify";
@@ -273,6 +267,24 @@ public abstract class WebService {
         }
     } 
    
+    /**
+     * Verify if the version is supported by the service.
+     * if the version is not accepted we send an exception
+     */
+    protected void isSupportedVersion(String versionNumber) throws WebServiceException {
+        
+        if (getVersionFromNumber(versionNumber) == null) {
+            
+            String message = "The parameter ";
+            for (Version vers:versions){
+                message += "VERSION=" + vers.getVersionNumber() + " OR ";
+            }
+            message = message.substring(0, message.length()-3);
+            message += " must be specify";
+            throwException(message, "VERSION_NEGOTIATION_FAILED", null);
+        
+        }
+    }
     
     /**
      * Extract The complex parameter encoded in XML from the query.
@@ -325,8 +337,8 @@ public abstract class WebService {
     /**
      * Return the current version of the Web Service.
      */
-    protected void setCurrentVersion(String version) {
-        currentVersion = new Version(version);
+    protected void setCurrentVersion(String versionNumber) {
+        currentVersion = getVersionFromNumber(versionNumber);
     }
     
     /**
@@ -388,16 +400,16 @@ public abstract class WebService {
         } catch (UnmarshalException e) {
             logger.severe(e.getMessage());
             StringWriter sw = new StringWriter(); 
-            if (isOWS) {
+            if (getCurrentVersion().isOWS()) {
                 OWSWebServiceException wse = new OWSWebServiceException("The XML request is not valid",
                                                                         OWSExceptionCode.INVALID_PARAMETER_VALUE, 
                                                                         null,
-                                                                        getCurrentVersion());
+                                                                        getCurrentVersion().getVersionNumber());
                 marshaller.marshal(wse.getExceptionReport(), sw);
             } else {
                 WMSWebServiceException wse = new WMSWebServiceException("The XML request is not valid",
-                                                                        WMSExceptionCode.INVALID_PARAMETER_VALUE, 
-                                                                        getCurrentVersion());
+                                                                        WMSExceptionCode.INVALID_PARAMETER_VALUE,
+                                                                        getCurrentVersion().getVersionNumber());
                 marshaller.marshal(wse.getServiceExceptionReport(), sw);
             }
             
@@ -491,16 +503,36 @@ public abstract class WebService {
         return s;
     }
     
+    /**
+     * 
+     * @param rootNamespace
+     */
+    protected void setPrefixMapper(String rootNamespace) throws PropertyException {
+        NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);
+        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", prefixMapper);
+    }
+    
+    /**
+     *  Throw a WebserviceException. 
+     *  If the service and version applies to OWS specification it throw an OWSException.
+     */
     protected void throwException(final String message, String code, String locator) throws WebServiceException {
-        if (isOWS) {
+        if (getCurrentVersion().isOWS()) {
             code = transformCodeName(code);
-            throw new OWSWebServiceException(message, OWSExceptionCode.valueOf(code), locator, getCurrentVersion());
+            throw new OWSWebServiceException(message, OWSExceptionCode.valueOf(code), locator, getCurrentVersion().getVersionNumber());
         } else {
-            throw new WMSWebServiceException(message, WMSExceptionCode.valueOf(code), getCurrentVersion());
+            throw new WMSWebServiceException(message, WMSExceptionCode.valueOf(code), getCurrentVersion().getVersionNumber());
         }
         
     }
     
+    /**
+     * Transform a exception code into the ows specification.
+     * example : MISSING_PARAMETER_VALUE become MissingParameterValue.
+     * 
+     * @param code
+     * @return
+     */
     private String transformCodeName(String code) {
         String result = "";
         while (code.indexOf('_') != -1) {
@@ -517,5 +549,18 @@ public abstract class WebService {
         return result;
     }
     
-    
+    /**
+     * Return a Version Object from the version number.
+     * 
+     * @param number the version number.
+     * @return
+     */
+    private Version getVersionFromNumber(String number) {
+        for (Version v: this.versions) {
+            if (v.getVersionNumber().equals(number)){
+                return v;
+            }
+        }
+        return null;
+    }
 }

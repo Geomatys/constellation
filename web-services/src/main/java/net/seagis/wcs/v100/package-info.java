@@ -14,4 +14,4 @@
  */
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/wcs", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package net.seagis.wcs;
+package net.seagis.wcs.v100;

@@ -48,6 +48,7 @@ import net.seagis.sld.StyledLayerDescriptor;
 import net.seagis.wms.Layer;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.coverage.web.Version;
 import net.seagis.gml.DirectPositionType;
 import net.seagis.gml.PointType;
 import net.seagis.se.OnlineResourceType;
@@ -86,17 +87,17 @@ public class WMService extends WebService {
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
     public WMService() throws JAXBException, WebServiceException {
-        super("WMS", false, "1.3.0","1.1.1");
+        super("WMS", new Version("1.3.0", false) ,new Version("1.1.1",false));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.coverage.web:net.seagis.wms:net.seagis.sld:net.seagis.gml");
         marshaller = jbcontext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl("http://www.opengis.net/wms"));
+        setPrefixMapper("http://www.opengis.net/wms");
         unmarshaller = jbcontext.createUnmarshaller();
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-        webServiceWorker.setService("WMS", getCurrentVersion().toString());
+        webServiceWorker.setService("WMS", getCurrentVersion());
         
     }
    
@@ -137,7 +138,7 @@ public class WMService extends WebService {
                     
             } else {
                 throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
-                                              OPERATION_NOT_SUPPORTED, getCurrentVersion());
+                                              OPERATION_NOT_SUPPORTED, getCurrentVersion().getVersionNumber());
             }
         } catch (WebServiceException ex) {
             /* We don't print the stack trace:
@@ -172,7 +173,7 @@ public class WMService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         //we set the attribute od the webservice worker with the parameters.
-        webServiceWorker.setService("WMS", getCurrentVersion().toString());
+        webServiceWorker.setService("WMS", getCurrentVersion());
         webServiceWorker.setFormat(getParameter("FORMAT", true));
         webServiceWorker.setLayer(getParameter("LAYERS", true));
         webServiceWorker.setColormapRange(getParameter("DIM_RANGE", false));
@@ -215,7 +216,7 @@ public class WMService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         verifyBaseParameter(0);
-        webServiceWorker.setService("WMS", getCurrentVersion().toString());
+        webServiceWorker.setService("WMS", getCurrentVersion());
         String layer = getParameter("QUERY_LAYERS", true);
         webServiceWorker.setLayer(layer);
         
@@ -249,7 +250,7 @@ public class WMService extends WebService {
               || infoFormat.equals("text/xml"))){
                 
                 throw new WMSWebServiceException("This MIME type " + infoFormat + " is not accepted by the service",
-                                              INVALID_PARAMETER_VALUE, getCurrentVersion());
+                                              INVALID_PARAMETER_VALUE, getCurrentVersion().getVersionNumber());
             }
         } else {
             infoFormat = "text/plain";
@@ -324,7 +325,7 @@ public class WMService extends WebService {
         //we begin by extract the mandatory attribute
         if (!getParameter("SERVICE", true).equalsIgnoreCase("WMS")) {
             throw new WMSWebServiceException("The parameters SERVICE=WMS must be specify",
-                                         MISSING_PARAMETER_VALUE, getCurrentVersion());
+                                         MISSING_PARAMETER_VALUE, getCurrentVersion().getVersionNumber());
         }
         
         //and the the optional attribute
@@ -334,13 +335,13 @@ public class WMService extends WebService {
         } else {
             setCurrentVersion("1.1.1");
         } 
-        webServiceWorker.setService("WMS", getCurrentVersion().toString());
+        webServiceWorker.setService("WMS", getCurrentVersion());
         String format = getParameter("FORMAT", false);
         if (format == null ) {
             format = "application/vnd.ogc.wms_xml";
         } else if (!(format.equals("text/xml") || format.equals("application/vnd.ogc.wms_xml"))) {
             throw new WMSWebServiceException("Allowed format for GetCapabilities are : text/xml or application/vnd.ogc.wms_xml.",
-                      INVALID_PARAMETER_VALUE, getCurrentVersion());
+                      INVALID_PARAMETER_VALUE, getCurrentVersion().getVersionNumber());
         }
         
         // the service shall return WMSCapabilities marshalled
@@ -386,7 +387,7 @@ public class WMService extends WebService {
                                                  inputGeoBox.getEastBoundLongitude(),
                                                  inputGeoBox.getNorthBoundLatitude(),
                                                  0.0, 0.0,
-                                                 getCurrentVersion());
+                                                 getCurrentVersion().getVersionNumber());
                 }
                 //we add the list od available date and elevation
                 List<Dimension> dimensions = new ArrayList<Dimension>();
@@ -460,11 +461,11 @@ public class WMService extends WebService {
                                               1,
                                               dimensions,
                                               style,
-                                              getCurrentVersion());
+                                              getCurrentVersion().getVersionNumber());
                 layers.add(outputLayer);
                 
             } catch (CatalogException exception) {
-                throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
+                throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion().getVersionNumber());
             }
         }
        
@@ -481,7 +482,7 @@ public class WMService extends WebService {
                                 crs, 
                                 exGeographicBoundingBox, 
                                 layers,
-                                getCurrentVersion());
+                                getCurrentVersion().getVersionNumber());
         
         response.getCapability().setLayer(layer);
         //we marshall the response and return the XML String
@@ -504,7 +505,7 @@ public class WMService extends WebService {
         logger.info("describeLayer request received");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         verifyBaseParameter(2);
-        webServiceWorker.setService("WMS", getCurrentVersion().toString());
+        webServiceWorker.setService("WMS", getCurrentVersion());
         
         OnlineResourceType or = new OnlineResourceType(getServiceURL() + "wcs?");
         List<LayerDescriptionType> layersDescriptions = new ArrayList<LayerDescriptionType>();
@@ -519,7 +520,7 @@ public class WMService extends WebService {
                 layersDescriptions.add(outputLayer);
             } else {
                 throw new WMSWebServiceException("This layer is not registred: " + token,
-                      INVALID_PARAMETER_VALUE, getCurrentVersion());
+                      INVALID_PARAMETER_VALUE, getCurrentVersion().getVersionNumber());
             }
         }
                  
@@ -536,7 +537,7 @@ public class WMService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         verifyBaseParameter(2);
-        webServiceWorker.setService("WMS", getCurrentVersion().toString());
+        webServiceWorker.setService("WMS", getCurrentVersion());
         webServiceWorker.setLayer(getParameter("LAYER", true));
         webServiceWorker.setFormat(getParameter("FORMAT", false));
         webServiceWorker.setDimension(getParameter("WIDTH", false), getParameter("HEIGHT", false), null);

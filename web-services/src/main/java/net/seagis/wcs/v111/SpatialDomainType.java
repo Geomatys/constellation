@@ -57,9 +57,7 @@ import net.seagis.ows.BoundingBoxType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SpatialDomainType", propOrder = {
     "boundingBox",
-    "envelope",
     "gridCRS",
-    "grid",
     "transformation",
     "imageCRS",
     "polygon"

@@ -5,7 +5,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.util.Version;
 
 
 /**
@@ -71,13 +70,13 @@ public class BoundingBox {
      *
      */
     public BoundingBox(final String crs, final double minx, final double miny,
-            final double maxx, final double maxy, final double resx, final double resy, Version version) {
+            final double maxx, final double maxy, final double resx, final double resy, String version) {
         this.maxx = maxx;
         this.maxy = maxy;
         this.minx = minx;
         this.miny = miny;
        
-        if (version.toString().equals("1.3.0")){
+        if (version.equals("1.3.0")){
             this.crs  = crs;
             this.resx = resx;
             this.resy = resy;

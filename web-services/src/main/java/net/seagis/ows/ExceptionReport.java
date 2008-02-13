@@ -76,10 +76,10 @@ public class ExceptionReport {
      * @param exceptionText 
      * @param exceptionCode
      */
-    public ExceptionReport(String exceptionText, String exceptionCode, String locator) {
+    public ExceptionReport(String exceptionText, String exceptionCode, String locator, String version) {
         exception = new ArrayList<ExceptionType>();
         this.exception.add(new ExceptionType(exceptionText, exceptionCode, locator));
-        this.version = "1.1.0";
+        this.version = version;
     }
     
     /**

@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.util.Version;
 
 
 /**
@@ -182,16 +181,16 @@ public class Layer {
       * @param exGeographicBoundingBox A general bounding box including all the child map.
       */
      public Layer(final String title, final String _abstract, final List<String> crs, 
-             final EXGeographicBoundingBox exGeographicBoundingBox, List<Layer> layer, Version version) {
+             final EXGeographicBoundingBox exGeographicBoundingBox, List<Layer> layer, String version) {
          this.title                   = title;
          this._abstract               = _abstract;
          this.layer                   = layer;
          
-         if (version.toString().equals("1.3.0")) {
+         if (version.equals("1.3.0")) {
             this.crs                     = crs;
             this.exGeographicBoundingBox = exGeographicBoundingBox;
             
-         } else if (version.toString().equals("1.1.1")){
+         } else if (version.equals("1.1.1")){
             this.srs                     = crs;
             if (exGeographicBoundingBox != null)
                 this.latLonBoundingBox = new LatLonBoundingBox(exGeographicBoundingBox.getWestBoundLongitude(),
@@ -220,7 +219,7 @@ public class Layer {
       */
      public Layer(final String name, final String _abstract, final String keyword, final List<String> crs, 
              final EXGeographicBoundingBox exGeographicBoundingBox, final BoundingBox boundingBox, final Integer queryable,
-             final List<Dimension> dimension, final Style style, final Version version) {
+             final List<Dimension> dimension, final Style style, final String version) {
          this.name                    = name;
          this.title                   = name;
          this._abstract               = _abstract;
@@ -230,12 +229,12 @@ public class Layer {
          this.style.add(style);
          
          // the specific attribute for different versions
-         if (version.toString().equals("1.3.0")) {
+         if (version.equals("1.3.0")) {
             this.crs                     = crs;
             this.dimension = dimension;
             this.exGeographicBoundingBox = exGeographicBoundingBox;
             
-         } else if (version.toString().equals("1.1.1")){
+         } else if (version.equals("1.1.1")){
              this.srs = crs;
              for (Dimension d:dimension) {
                  Dimension ext = new Dimension(d.getName(), null, d.getDefault(), d.getValue());
