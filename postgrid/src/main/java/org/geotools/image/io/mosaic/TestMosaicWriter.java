@@ -55,7 +55,8 @@ public class TestMosaicWriter {
         };
         TileBuilder builder = new TileBuilder();
         builder.setTileSize(new Dimension(960,960));
-        builder.setPreferredSubsampling(new Dimension(2,2));
+        builder.setMinimumTileSize(builder.getTileSize());
+        builder.setPreferredSubsampling(new Dimension(3,3));
         builder.setTileDirectory(new File("/home/desruisseaux/Données/PostGRID/Monde/BlueMarble/test"));
         TileManager tileManager = builder.writeFromUntiledImage(tiles, 0);
         System.out.println(tileManager);
