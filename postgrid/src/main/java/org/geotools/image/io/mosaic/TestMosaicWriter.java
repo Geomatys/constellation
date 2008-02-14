@@ -21,6 +21,8 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.spi.ImageReaderSpi;
 
 
@@ -36,7 +38,9 @@ import javax.imageio.spi.ImageReaderSpi;
 @Deprecated
 public class TestMosaicWriter {
     public static void main(String[] args) throws IOException {
+        org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.FINE);
         org.geotools.resources.image.ImageUtilities.allowNativeCodec("PNG", javax.imageio.spi.ImageReaderSpi.class, false);
+        Logger.getLogger("org.geotools.image.io").fine("Lancement...");
         ImageReaderSpi spi = new com.sun.imageio.plugins.png.PNGImageReaderSpi();
         File directory = new File("/home/desruisseaux/Données/PostGRID/Monde/BlueMarble");
         Tile[] tiles = new Tile[] {
@@ -51,7 +55,7 @@ public class TestMosaicWriter {
         };
         TileBuilder builder = new TileBuilder();
         builder.setTileSize(new Dimension(960,960));
-        builder.setPreferredSubsampling(new Dimension(4,4));
+        builder.setPreferredSubsampling(new Dimension(2,2));
         builder.setTileDirectory(new File("/home/desruisseaux/Données/PostGRID/Monde/BlueMarble/test"));
         TileManager tileManager = builder.writeFromUntiledImage(tiles, 0);
         System.out.println(tileManager);
