@@ -40,10 +40,10 @@ import net.seagis.ows.OWSWebServiceException;
 import net.seagis.coverage.web.ServiceExceptionReport;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.wms.NamespacePrefixMapperImpl;
 import net.seagis.coverage.wms.WebService;
 import net.seagis.observation.ObservationCollectionEntry;
 import net.seagis.ows.AcceptFormatsType;
+import net.seagis.ows.AcceptVersionsType;
 import net.seagis.ows.SectionsType;
 import net.seagis.sos.Capabilities;
 import net.seagis.sos.DescribeSensor;
@@ -66,7 +66,7 @@ public class SOService extends WebService {
      */
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
         super("SOS", new Version("1.0.0", true));
-        worker = new SOSworker();
+        worker = new SOSworker(this);
         worker.setVersion("1.0.0");
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.gml:net.seagis.observation:net.seagis.ows:net.seagis.sos:net.seagis.swe:net.seagis.ogc:net.seagis.coverage.web");
         unmarshaller = jbcontext.createUnmarshaller();
@@ -119,7 +119,16 @@ public class SOService extends WebService {
                         throw new OWSWebServiceException("The parameters SERVICE=SOS must be specify",
                                                          INVALID_PARAMETER_VALUE, "service", getCurrentVersion().getVersionNumber());
                     }
-                    
+                    String version = getParameter("acceptVersions", false);
+                    AcceptVersionsType versions;
+                    if (version != null) {
+                        if (version.indexOf(',') != -1) {
+                           version = version.substring(0, version.indexOf(','));
+                        } 
+                        versions = new AcceptVersionsType(version);
+                    } else {
+                        versions = new AcceptVersionsType("1.0.0");
+                    }
                     AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
                         
                     //We transform the String of sections in a list.
@@ -142,7 +151,7 @@ public class SOService extends WebService {
                         requestedSections = SectionsType.getExistingSections("1.1.1");
                     }
                     SectionsType sections     = new SectionsType(requestedSections);
-                    gc = new GetCapabilities(null,
+                    gc = new GetCapabilities(versions,
                                              sections,
                                              formats,
                                              null,
@@ -167,10 +176,11 @@ public class SOService extends WebService {
                 OWSWebServiceException owsex = (OWSWebServiceException)ex;
                 if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
                     !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
+                    !owsex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
                     !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                     owsex.printStackTrace();
                 } else {
-                    logger.info(owsex.getMessage());
+                    logger.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage());
                 }
                 StringWriter sw = new StringWriter();    
                 marshaller.marshal(owsex.getExceptionReport(), sw);

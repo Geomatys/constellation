@@ -98,6 +98,18 @@ public class UnNamedDomainType {
     }
     
     /**
+     * Empty constructor used by JAXB.
+     */
+    public UnNamedDomainType(AnyValue anyValue) {
+        if (anyValue == null) {
+            this.anyValue = new AnyValue();
+        } else {
+            this.anyValue = anyValue;
+        }
+    }
+    
+    
+    /**
      * Build a new Un-named Domain.
      */
     public UnNamedDomainType(AllowedValues allowedValues, AnyValue anyValue, ValuesReference valuesReference, 

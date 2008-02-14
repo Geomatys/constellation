@@ -60,12 +60,15 @@ import net.seagis.gml.TimePositionType;
 import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.AcceptVersionsType;
 import net.seagis.ows.BoundingBoxType;
+import net.seagis.ows.DCP;
 import net.seagis.ows.KeywordsType;
 import net.seagis.ows.LanguageStringType;
+import net.seagis.ows.OWSExceptionCode;
 import net.seagis.ows.OWSWebServiceException;
 import net.seagis.ows.Operation;
 import net.seagis.ows.WGS84BoundingBoxType;
 import net.seagis.ows.OperationsMetadata;
+import net.seagis.ows.RequestMethodType;
 import net.seagis.ows.SectionsType;
 import net.seagis.ows.ServiceIdentification;
 import net.seagis.ows.ServiceIdentification;
@@ -103,7 +106,6 @@ import net.seagis.wcs.v100.SupportedFormatsType;
 import net.seagis.wcs.v100.SupportedInterpolationsType;
 import net.seagis.wcs.v100.WCSCapabilitiesType;
 import net.seagis.wcs.v111.GridCrsType;
-import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 // geoAPI dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -233,7 +235,7 @@ public class WCService extends WebService {
                                                                      formats,
                                                                      null);
                     }
-                }
+                } 
                 return getCapabilities(gc);
                     
             } else if (request.equalsIgnoreCase("GetCoverage") || (objectRequest instanceof AbstractGetCoverage)) {
@@ -438,8 +440,9 @@ public class WCService extends WebService {
              */
             if (ex instanceof WMSWebServiceException) {
                 WMSWebServiceException wmsex = (WMSWebServiceException)ex;
-                if (!wmsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                    !wmsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)) {
+                if (!wmsex.getExceptionCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE) &&
+                    !wmsex.getExceptionCode().equals(WMSExceptionCode.VERSION_NEGOTIATION_FAILED)&&
+                    !wmsex.getExceptionCode().equals(WMSExceptionCode.OPERATION_NOT_SUPPORTED)) {
                     wmsex.printStackTrace();
                 }
                 StringWriter sw = new StringWriter();    
@@ -448,9 +451,9 @@ public class WCService extends WebService {
             } else if (ex instanceof OWSWebServiceException) {
               
                 OWSWebServiceException owsex = (OWSWebServiceException)ex;
-                if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
-                    !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
-                    !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+                if (!owsex.getExceptionCode().equals(OWSExceptionCode.MISSING_PARAMETER_VALUE)   &&
+                    !owsex.getExceptionCode().equals(OWSExceptionCode.VERSION_NEGOTIATION_FAILED)&& 
+                    !owsex.getExceptionCode().equals(OWSExceptionCode.OPERATION_NOT_SUPPORTED)) {
                     owsex.printStackTrace();
                 } else {
                     logger.info(owsex.getMessage());
@@ -470,7 +473,7 @@ public class WCService extends WebService {
      * TODO refaire tte la fonction en separant proprement les versions.
      */ 
     public Response getCapabilities(AbstractGetCapabilities abstractRequest) throws JAXBException, WebServiceException {
-        logger.info("getCapabilities request received");
+        logger.info("getCapabilities request processing");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         //we begin by extract the base attribute
@@ -526,9 +529,11 @@ public class WCService extends WebService {
                 om = staticCapabilities.getOperationsMetadata();
                 //we update the url in the static part.
                 for (Operation op:om.getOperation()) {
-                    op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getValue().setHref(getServiceURL() + "wcs?REQUEST=" + op.getName());
-                    op.getDCP().get(1).getHTTP().getGetOrPost().get(0).getValue().setHref(getServiceURL() + "wcs?REQUEST=" + op.getName());
-                }
+                   for (DCP dcp: op.getDCP()){
+                       for (JAXBElement<RequestMethodType> method:dcp.getHTTP().getGetOrPost())
+                        method.getValue().setHref(getServiceURL()+ "wcs?");
+                   }
+               }
             }
             responsev111 = new Capabilities(si, sp, om, "1.1.1", null, null);
             
@@ -667,7 +672,7 @@ public class WCService extends WebService {
      * Web service operation
      */
     public File getCoverage(AbstractGetCoverage AbstractRequest) throws JAXBException, WebServiceException {
-        logger.info("getCoverage recu");
+        logger.info("getCoverage request processing");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         webServiceWorker.setService("WCS", getCurrentVersion());
@@ -872,7 +877,7 @@ public class WCService extends WebService {
      * Web service operation
      */
     public String describeCoverage(AbstractDescribeCoverage abstractRequest) throws JAXBException, WebServiceException {
-        logger.info("describeCoverage recu");
+        logger.info("describeCoverage request processing");
         try {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         

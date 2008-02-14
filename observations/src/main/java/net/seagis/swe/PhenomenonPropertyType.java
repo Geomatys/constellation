@@ -111,12 +111,9 @@ public class PhenomenonPropertyType {
     /**
      * Set the phenomenon into href mode.
      */
-    public void setToHref(String prefix) {
-        if (prefix == null)
-            prefix = "";
-        
+    public void setToHref() {
         if (phenomenon != null) {
-            this.href = prefix + phenomenon.getValue().getId();
+            this.href = phenomenon.getValue().getPhenomenonName();
             hiddenPhenomenon = phenomenon;
             phenomenon = null;
         }
@@ -204,10 +201,10 @@ public class PhenomenonPropertyType {
         final PhenomenonPropertyType that = (PhenomenonPropertyType) object;
         if (this.phenomenon != null && that.phenomenon != null) {
             pheno = Utilities.equals(this.phenomenon.getValue(), that.phenomenon.getValue());
-            System.out.println("Phenomenon NOT NULL :" + pheno);
+            //System.out.println("Phenomenon NOT NULL :" + pheno);
         } else {
             pheno = (this.phenomenon == null && that.phenomenon == null);
-            System.out.println("Phenomenon NULL :" + pheno);
+            //System.out.println("Phenomenon NULL :" + pheno);
         }
         
         return pheno                                                            &&

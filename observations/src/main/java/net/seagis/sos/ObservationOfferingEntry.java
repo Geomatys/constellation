@@ -153,6 +153,18 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
             return Collections.unmodifiableList(result);
         }
     }
+    
+    /**
+     * Return an unmodifiable list of the observedProperty.
+     */
+    public List<PhenomenonPropertyType> getRealObservedProperty() {
+        if (observedProperty == null){
+           return Collections.unmodifiableList(new ArrayList<PhenomenonPropertyType>());
+
+        } else {
+            return Collections.unmodifiableList(observedProperty);
+        }
+    }
 
     /**
      * Return an unmodifiable list of the featureOfInterest.

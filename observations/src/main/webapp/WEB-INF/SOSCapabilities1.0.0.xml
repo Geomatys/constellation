@@ -62,7 +62,14 @@
                 </ows:AllowedValues>
             </ows:Parameter>
         </ows:Operation>
-        <ows:Operation name="GetObservation">
+        <ows:Operation name="RegisterSensor">
+            <ows:DCP>
+                <ows:HTTP>
+                    <ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
+                </ows:HTTP>
+            </ows:DCP>
+        </ows:Operation>
+        <ows:Operation name="GetResult">
             <ows:DCP>
                 <ows:HTTP>
                     <ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
@@ -88,12 +95,6 @@
                     <ows:Post xlink:href="http://pulsar.geomatys.fr/SOServer/SOService "/>
                 </ows:HTTP>
             </ows:DCP>
-            <ows:Constraint name="srsName">
-                <ows:AllowedValues>
-                   <ows:Value>ESPG:4326</ows:Value>
-                   <ows:Value>ESPG:27582</ows:Value>
-                </ows:AllowedValues>   
-            </ows:Constraint>
         </ows:Operation>
         <ows:Operation name="DescribeSensor">
             <ows:DCP>
@@ -102,5 +103,10 @@
                 </ows:HTTP>
             </ows:DCP>
         </ows:Operation>
+        <ows:Constraint name="PostEncoding">
+          <ows:AllowedValues>
+            <ows:Value>XML</ows:Value>
+          </ows:AllowedValues>
+      </ows:Constraint>
     </ows:OperationsMetadata>
 </sos:Capabilities>

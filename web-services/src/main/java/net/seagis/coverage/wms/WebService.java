@@ -58,7 +58,6 @@ import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.wcs.AbstractRequest;
-import net.seagis.coverage.wms.WMSExceptionCode;
 import net.seagis.ows.OWSExceptionCode;
 /**
  *
@@ -480,7 +479,7 @@ public abstract class WebService {
      * 
      * @return the service url.
      */
-    protected String getServiceURL() {
+    public String getServiceURL() {
         if (serviceURL == null) {
             serviceURL = context.getBaseUri().toString();
         }

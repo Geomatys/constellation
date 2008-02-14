@@ -157,7 +157,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          BoundingShapeEntry boundedBy = new  BoundingShapeEntry(envelope);
          
          getPhenomenons().setIdOffering(idOffering);
-         System.out.println("ID OFERRRRRRRRRRRRRING" + idOffering);
+         //System.out.println("ID OFERRRRRRRRRRRRRING" + idOffering);
          Collection<OfferingPhenomenonEntry> entries1 = getPhenomenons().getEntries();
         
          List<PhenomenonEntry> phenos = new ArrayList<PhenomenonEntry>();
@@ -195,14 +195,18 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          if (results.getTimestamp(indexOf(query.eventTimeBegin)) != null) {
             Timestamp begin =  results.getTimestamp(indexOf(query.eventTimeBegin));
             if (begin != null) {
-                beginPosition = new TimePositionType(begin.toString());
+                //we normalize the timeStamp by replacing the space by 'T'
+                String normalizedBegin = begin.toString().replace(' ', 'T');
+                beginPosition = new TimePositionType(normalizedBegin);
             }
          }
          
          if (results.getTimestamp(indexOf(query.eventTimeEnd)) != null) {
             Timestamp end =  results.getTimestamp(indexOf(query.eventTimeEnd));
             if (end != null){
-                endPosition = new TimePositionType(end.toString());
+                 //we normalize the timeStamp by replacing the space by 'T'
+                String normalizedEnd = end.toString().replace(' ', 'T');
+                endPosition = new TimePositionType(normalizedEnd);
             } else {
                 endPosition = new TimePositionType(TimeIndeterminateValueType.NOW);
             }

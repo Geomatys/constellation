@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.ows.AnyValue;
 import net.seagis.ows.CodeType;
 import net.seagis.ows.DescriptionType;
 import net.seagis.ows.KeywordsType;
@@ -122,7 +123,11 @@ public class FieldType extends DescriptionType {
         this.interpolationMethods = interpolationMethods;
         this.nullValue            = new ArrayList<CodeType>();
         this.nullValue.add(nullValue);
-        this.definition           = definition;
+        if (definition != null) {
+            this.definition       = definition;
+        } else {
+            this. definition = new UnNamedDomainType(new AnyValue());
+        }
     }
     
     /**

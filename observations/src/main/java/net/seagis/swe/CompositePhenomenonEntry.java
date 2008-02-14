@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import org.opengis.observation.CompositePhenomenon;
@@ -48,7 +47,7 @@ public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements
      * The components.
      */
     @XmlElement(name="component")
-    private Collection<PhenomenonPropertyType> component;
+    private List<PhenomenonPropertyType> component;
    
     /** 
      * Empty constructor used by JAXB.
@@ -91,6 +90,16 @@ public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements
             result.add(phen.getPhenomenon());
         }
         return result;
+    }
+    
+    /**
+     * Return the components.
+     */
+    public List<PhenomenonPropertyType> getRealComponent() {
+        if (component == null) {
+            component = new ArrayList<PhenomenonPropertyType>();
+        }
+        return component;
     }
 
     /**

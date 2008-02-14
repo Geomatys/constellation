@@ -48,6 +48,7 @@ import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -92,7 +93,11 @@ import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonTable;
 import net.seagis.observation.ProcessEntry;
 import net.seagis.observation.SamplingFeatureEntry;
+import net.seagis.ows.AcceptVersionsType;
+import net.seagis.ows.DCP;
+import net.seagis.ows.Operation;
 import net.seagis.ows.OperationsMetadata;
+import net.seagis.ows.RequestMethodType;
 import net.seagis.ows.SectionsType;
 import net.seagis.ows.ServiceIdentification;
 import net.seagis.ows.ServiceProvider;
@@ -105,6 +110,7 @@ import net.seagis.sos.OfferingSamplingFeatureEntry;
 import net.seagis.sos.ResponseModeType;
 import net.seagis.swe.AnyResultEntry;
 import net.seagis.swe.AnyResultTable;
+import net.seagis.swe.PhenomenonPropertyType;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -244,10 +250,15 @@ public class SOSworker {
     private String version;
     
     /**
+     * WebService
+     */
+    SOService service;
+    /**
      * Initialize the database connection.
      */
-    public SOSworker() throws SQLException, IOException, NoSuchTableException {
+    public SOSworker(SOService service) throws SQLException, IOException, NoSuchTableException {
        
+        this.service = service;
         //we load the properties files
         Properties prop = new Properties();
         map    = new Properties();
@@ -343,7 +354,7 @@ public class SOSworker {
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
     public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws WebServiceException {
-        logger.info("received getCapabilities request");
+        logger.info("getCapabilities request processing");
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("SOS")) {
@@ -357,6 +368,15 @@ public class SOSworker {
                                              MISSING_PARAMETER_VALUE,
                                              "service",
                                              version);
+        }
+        AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
+        if (versions != null) {
+            if (!versions.getVersion().contains("1.0.0")){
+                 throw new OWSWebServiceException("version available : 1.0.0",
+                                             VERSION_NEGOTIATION_FAILED,
+                                             "acceptVersion",
+                                             version);
+            }
         }
         
         //we prepare the response document
@@ -384,6 +404,13 @@ public class SOSworker {
             if (sections.getSection().contains("OperationsMetadata")) {
                 
                om = capabilities.getOperationsMetadata();
+               //we update the URL
+               for (Operation op:om.getOperation()) {
+                   for (DCP dcp: op.getDCP()){
+                       for (JAXBElement<RequestMethodType> method:dcp.getHTTP().getGetOrPost())
+                        method.getValue().setHref( service.getServiceURL()+ "sos");
+                   }
+               }
             }
             
             
@@ -411,7 +438,7 @@ public class SOSworker {
                                           null,
                                           version);
         }
-        return c;
+        return normalizeDocument(c);
         
     }
     
@@ -421,7 +448,7 @@ public class SOSworker {
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
     public String describeSensor(DescribeSensor requestDescSensor) throws WebServiceException  {
-        logger.info("DescribeSensor request received");
+        logger.info("DescribeSensor request processing");
         
             // we get the form
             verifyBaseRequest(requestDescSensor);
@@ -522,7 +549,7 @@ public class SOSworker {
      * @param requestObservation a document specifying the parameter of the request.
      */
     public ObservationCollectionEntry getObservation(GetObservation requestObservation) throws WebServiceException {
-        logger.info("received getObservation request");
+        logger.info("getObservation request processing");
         //we verify the base request attribute
         verifyBaseRequest(requestObservation);
         
@@ -869,7 +896,7 @@ public class SOSworker {
      * Web service operation
      */
     public GetResultResponse getResult(GetResult requestResult) throws WebServiceException {
-        logger.info("received getResult request");
+        logger.info("getResult request processing");
         //we verify the base request attribute
         verifyBaseRequest(requestResult);
         
@@ -959,7 +986,7 @@ public class SOSworker {
      *                         and an observation template for this sensor.
      */
     public RegisterSensorResponse registerSensor(RegisterSensor requestRegSensor) throws WebServiceException {
-        logger.info("received registerSensor request");
+        logger.info("registerSensor request processing");
         //we verify the base request attribute
         verifyBaseRequest(requestRegSensor);
         
@@ -1114,7 +1141,7 @@ public class SOSworker {
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
      */
     public InsertObservationResponse insertObservation(InsertObservation requestInsObs) throws WebServiceException {
-        logger.info("received InsertObservation request");
+        logger.info("InsertObservation request processing");
         //we verify the base request attribute
        verifyBaseRequest(requestInsObs);
         
@@ -1890,7 +1917,28 @@ public class SOSworker {
     }
     
     private Capabilities normalizeDocument(Capabilities capa){
-        
+        List<PhenomenonPropertyType> alreadySee = new ArrayList<PhenomenonPropertyType>();
+        if (capa.getContents() != null) {
+            for (ObservationOfferingEntry off: capa.getContents().getObservationOfferingList().getObservationOffering()) {
+                for (PhenomenonPropertyType pheno: off.getRealObservedProperty()) {
+                    if (alreadySee.contains(pheno)) {
+                        pheno.setToHref();
+                    } else {
+                        if (pheno.getPhenomenon() instanceof CompositePhenomenonEntry) {
+                            CompositePhenomenonEntry compo = (CompositePhenomenonEntry) pheno.getPhenomenon();
+                            for (PhenomenonPropertyType pheno2: compo.getRealComponent()) {
+                                if (alreadySee.contains(pheno2)) {
+                                    pheno2.setToHref();
+                                } else {
+                                    alreadySee.add(pheno2);
+                                }
+                            }
+                        }
+                        alreadySee.add(pheno);
+                    }
+                }
+            }
+        }
         return capa;
     }
     
