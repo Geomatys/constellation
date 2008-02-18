@@ -57,9 +57,10 @@ public class AcceptFormatsType {
      * Build a new Accepted format.
      */
     public AcceptFormatsType(String... outputFormat) {
-         this.outputFormat = new ArrayList<String>();
+        this.outputFormat = new ArrayList<String>();
         for (String element: outputFormat) {
-            this.outputFormat.add(element);
+            if (element != null)
+                this.outputFormat.add(element);
         }
     }
     

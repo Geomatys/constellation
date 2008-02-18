@@ -47,10 +47,7 @@ import java.util.TimerTask;
 import java.util.logging.Logger;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import net.seagis.catalog.NoSuchTableException;
@@ -92,15 +89,18 @@ import net.seagis.observation.ObservationTable;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonTable;
 import net.seagis.observation.ProcessEntry;
+import net.seagis.observation.ProcessTable;
 import net.seagis.observation.SamplingFeatureEntry;
+import net.seagis.observation.SamplingFeatureTable;
+import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.AcceptVersionsType;
-import net.seagis.ows.DCP;
 import net.seagis.ows.Operation;
 import net.seagis.ows.OperationsMetadata;
-import net.seagis.ows.RequestMethodType;
+import net.seagis.ows.RangeType;
 import net.seagis.ows.SectionsType;
 import net.seagis.ows.ServiceIdentification;
 import net.seagis.ows.ServiceProvider;
+import net.seagis.sos.FilterCapabilities;
 import net.seagis.sos.ObservationOfferingEntry;
 import net.seagis.sos.ObservationOfferingTable;
 import net.seagis.sos.ObservationTemplate;
@@ -183,7 +183,7 @@ public class SOSworker {
      * A database table for insert and get reference object.
      */
     private ReferenceTable refTable;
-    
+   
     /**
      * A simple Connection to the Connection database.
      */
@@ -235,11 +235,6 @@ public class SOSworker {
     private String temporaryFolder;
     
     /**
-     * A capabilities object read from a XML file.
-     */
-    private Capabilities capabilities;
-
-    /**
      * The maximum of observation return in a getObservation request.
      */
     private int maxObservationByRequest;
@@ -278,13 +273,6 @@ public class SOSworker {
             map.load(in);
             in.close();
             
-            // and the Capabilities XML file
-            JAXBContext context= JAXBContext.newInstance(Capabilities.class);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            capabilities = (Capabilities)unmarshaller.unmarshal(new FileReader(env + "/bin/sos_configuration/capabilities.xml"));
-        } catch (JAXBException ex) {
-            ex.printStackTrace();
-            logger.severe("JAXBException in initialization of the service");
         } catch (FileNotFoundException e) {
             if (f != null) {
                 logger.severe(f.getPath());
@@ -322,9 +310,9 @@ public class SOSworker {
         }
         
         //we build the database table frequently used.
-        obsTable = OMDatabase.getTable(ObservationTable.class);
-        offTable = OMDatabase.getTable(ObservationOfferingTable.class);
-        refTable = OMDatabase.getTable(ReferenceTable.class);
+        obsTable  = OMDatabase.getTable(ObservationTable.class);
+        offTable  = OMDatabase.getTable(ObservationOfferingTable.class);
+        refTable  = OMDatabase.getTable(ReferenceTable.class);
         
         //we initailize the properties attribute 
         SOSurl                    = prop.getProperty("SOSurl"); 
@@ -353,8 +341,8 @@ public class SOSworker {
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
-    public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws WebServiceException {
-        logger.info("getCapabilities request processing");
+    public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws WebServiceException, JAXBException {
+        logger.info("getCapabilities request processing" + '\n');
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("SOS")) {
@@ -378,13 +366,23 @@ public class SOSworker {
                                              version);
             }
         }
+        AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
+        if (formats != null && formats.getOutputFormat().contains("text/xml")) {
+            throw new OWSWebServiceException("accepted format : text/xml",
+                                             INVALID_PARAMETER_VALUE,
+                                             "acceptFormats",
+                                             version);
+        }
         
         //we prepare the response document
         Capabilities c = null; 
         try {
+            Capabilities capabilities = (Capabilities) service.getCapabilitiesObject();
+            
             ServiceIdentification si = null;
             ServiceProvider       sp = null;
             OperationsMetadata    om = null;
+            FilterCapabilities    fc = null;
             Contents            cont = null;
             
             SectionsType sections = requestCapabilities.getSections();
@@ -405,12 +403,43 @@ public class SOSworker {
                 
                om = capabilities.getOperationsMetadata();
                //we update the URL
-               for (Operation op:om.getOperation()) {
-                   for (DCP dcp: op.getDCP()){
-                       for (JAXBElement<RequestMethodType> method:dcp.getHTTP().getGetOrPost())
-                        method.getValue().setHref( service.getServiceURL()+ "sos");
-                   }
-               }
+               service.updateOWSURL(om.getOperation());
+               
+               //we update the parameter in operation metadata.
+               Operation go = om.getOperation("GetObservation");
+               
+               // the list of offering names
+               Set<String> offNames = offTable.getIdentifiers();
+               go.updateParameter("offering", offNames);
+               
+               // the event time range
+               RangeType range = new RangeType(getMinimalEventTime(), "now");
+               go.updateParameter("eventTime", range);
+               
+               //the process list
+               ProcessTable procTable = OMDatabase.getTable(ProcessTable.class);
+               Set<String> procNames  = procTable.getIdentifiers();
+               go.updateParameter("procedure", procNames);
+               
+               //the phenomenon list
+               PhenomenonTable phenoTable = OMDatabase.getTable(PhenomenonTable.class);
+               Set<String> phenoNames  = phenoTable.getIdentifiers();
+               go.updateParameter("observedProperty", phenoNames);
+               
+               //the feature of interest list
+               SamplingFeatureTable featureTable = OMDatabase.getTable(SamplingFeatureTable.class);
+               Set<String> featureNames  = featureTable.getIdentifiers();
+               go.updateParameter("featureOfInterest", featureNames);
+               
+               Operation ds = om.getOperation("DescribeSensor");
+               ds.updateParameter("procedure", procNames);
+               
+            }
+            
+            //we enter the information filter capablities.
+            if (sections.getSection().contains("Filter_Capabilities")) {
+            
+                fc = capabilities.getFilterCapabilities();
             }
             
             
@@ -423,7 +452,7 @@ public class SOSworker {
                 
                 cont = new Contents(ool);
             }
-            c = new Capabilities(si, sp, om, "1.0.0", null, null, cont);
+            c = new Capabilities(si, sp, om, "1.0.0", null, fc, cont);
             
         } catch (SQLException ex) {
            ex.printStackTrace();
@@ -448,17 +477,24 @@ public class SOSworker {
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
     public String describeSensor(DescribeSensor requestDescSensor) throws WebServiceException  {
-        logger.info("DescribeSensor request processing");
+        logger.info("DescribeSensor request processing"  + '\n');
         
             // we get the form
             verifyBaseRequest(requestDescSensor);
 
-            //we verify that the output format is good.
-            if (!requestDescSensor.getOutputFormat().equals("text/xml;subtype=\"SensorML/1.0.0\"")) {
-                throw new OWSWebServiceException("only text/xml;subtype=\"SensorML/1.0.0\" is accepted for outputFormat",
-                                             INVALID_PARAMETER_VALUE,
-                                             "outputFormat",
-                                             version);
+            //we verify that the output format is good.     
+            if (requestDescSensor.getOutputFormat()!= null) {
+                if (!requestDescSensor.getOutputFormat().equals("text/xml;subtype=\"SensorML/1.0.0\"")) {
+                    throw new OWSWebServiceException("only text/xml;subtype=\"SensorML/1.0.0\" is accepted for outputFormat",
+                                                     INVALID_PARAMETER_VALUE,
+                                                     "outputFormat",
+                                                     version);
+                }
+            } else {
+                throw new OWSWebServiceException("output format text/xml;subtype=\"SensorML/1.0.0\" must be specify",
+                                                 MISSING_PARAMETER_VALUE,
+                                                 "outputFormat",
+                                                 version);
             }
             //we transform the form into an XML string
             if (requestDescSensor.getProcedure() == null) {
@@ -549,7 +585,7 @@ public class SOSworker {
      * @param requestObservation a document specifying the parameter of the request.
      */
     public ObservationCollectionEntry getObservation(GetObservation requestObservation) throws WebServiceException {
-        logger.info("getObservation request processing");
+        logger.info("getObservation request processing"  + '\n');
         //we verify the base request attribute
         verifyBaseRequest(requestObservation);
         
@@ -558,26 +594,23 @@ public class SOSworker {
         try {
             StringBuilder SQLrequest = new StringBuilder();
             boolean template  = false;
-            if (requestObservation.getResponseMode() != null) {
-                ResponseModeType mode = requestObservation.getResponseMode();
-                
-                if (mode == ResponseModeType.INLINE) {
-                    SQLrequest.append("SELECT name FROM observations WHERE name LIKE '%").append(observationIdBase).append("%' AND ");
-                } else if (mode == ResponseModeType.RESULT_TEMPLATE) {
-                    SQLrequest.append("SELECT name FROM observations WHERE name LIKE '%").append(observationTemplateIdBase).append("%' AND ");
-                    template = true;
-                } else {
-                    throw new OWSWebServiceException(" this response Mode is not supported by the service (inline or template available)!",
-                                                  OPERATION_NOT_SUPPORTED,
-                                                  "responseMode",
-                                                  version);
-                }
-                
+            ResponseModeType mode;
+            if (requestObservation.getResponseMode() == null) {
+                mode = ResponseModeType.INLINE; 
+            } else {    
+                mode = requestObservation.getResponseMode();
+            }
+            
+            if (mode == ResponseModeType.INLINE) {
+                SQLrequest.append("SELECT name FROM observations WHERE name LIKE '%").append(observationIdBase).append("%' AND ");
+            } else if (mode == ResponseModeType.RESULT_TEMPLATE) {
+                SQLrequest.append("SELECT name FROM observations WHERE name LIKE '%").append(observationTemplateIdBase).append("%' AND ");
+                template = true;
             } else {
-                throw new OWSWebServiceException(" response Mode must be specify (inline or template available)!",
-                                              MISSING_PARAMETER_VALUE,
-                                              "responseMode",
-                                              version);
+                throw new OWSWebServiceException(" this response Mode is not supported by the service (inline or template available)!",
+                                                 OPERATION_NOT_SUPPORTED,
+                                                 "responseMode",
+                                                 version);
             }
             
             ObservationOfferingEntry off;
@@ -896,7 +929,7 @@ public class SOSworker {
      * Web service operation
      */
     public GetResultResponse getResult(GetResult requestResult) throws WebServiceException {
-        logger.info("getResult request processing");
+        logger.info("getResult request processing"  + '\n');
         //we verify the base request attribute
         verifyBaseRequest(requestResult);
         
@@ -986,7 +1019,7 @@ public class SOSworker {
      *                         and an observation template for this sensor.
      */
     public RegisterSensorResponse registerSensor(RegisterSensor requestRegSensor) throws WebServiceException {
-        logger.info("registerSensor request processing");
+        logger.info("registerSensor request processing"  + '\n');
         //we verify the base request attribute
         verifyBaseRequest(requestRegSensor);
         
@@ -1141,7 +1174,7 @@ public class SOSworker {
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
      */
     public InsertObservationResponse insertObservation(InsertObservation requestInsObs) throws WebServiceException {
-        logger.info("InsertObservation request processing");
+        logger.info("InsertObservation request processing"  + '\n');
         //we verify the base request attribute
        verifyBaseRequest(requestInsObs);
         
@@ -1916,6 +1949,13 @@ public class SOSworker {
         return null;
     }
     
+    /**
+     * Normailze the capabilities document by replacing the double by reference
+     * 
+     * @param capa the unnormalized document.
+     * 
+     * @return a normalized document
+     */
     private Capabilities normalizeDocument(Capabilities capa){
         List<PhenomenonPropertyType> alreadySee = new ArrayList<PhenomenonPropertyType>();
         if (capa.getContents() != null) {
@@ -1940,6 +1980,23 @@ public class SOSworker {
             }
         }
         return capa;
+    }
+    
+    /**
+     * Return the minimal value for the offering event Time
+     */
+    private String getMinimalEventTime() throws SQLException {
+        PreparedStatement stmt = OMConnection.prepareStatement("select MIN(event_time_begin) from observation_offerings");
+        ResultSet res = stmt.executeQuery();
+        Timestamp t = null;
+        while (res.next()) {
+            t = res.getTimestamp(1);
+        }
+        String ret = null;
+        if (t != null) {
+            ret = t.toString();
+        } 
+        return ret;
     }
     
     /**

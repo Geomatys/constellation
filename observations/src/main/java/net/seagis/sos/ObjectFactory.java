@@ -17,6 +17,7 @@ package net.seagis.sos;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 import net.seagis.gml.CodeType;
 
@@ -37,12 +38,12 @@ import net.seagis.gml.CodeType;
  *
  * @author legal
  */
+@XmlRegistry
 public class ObjectFactory {
     
     private final static QName _SrsName_QNAME = new QName("http://www.opengis.net/sos/1.0", "srsName");
     private final static QName _SupportedSensorDescription_QNAME = new QName("http://www.opengis.net/sos/1.0", "supportedSensorDescription");
     private final static QName _SupportedSRS_QNAME = new QName("http://www.opengis.net/sos/1.0", "supportedSRS");
-    private final static QName _Capabilities_QNAME = new QName("http://www.opengis.net/sos/1.0", "Capabilities");
     
     /**
      * Create an instance of {@link ObservationOfferingType }
@@ -302,15 +303,4 @@ public class ObjectFactory {
     public JAXBElement<CodeType> createSupportedSRS(CodeType value) {
         return new JAXBElement<CodeType>(_SupportedSRS_QNAME, CodeType.class, null, value);
     }
-    
-        /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link WCSCapabilitiesType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.opengis.net/sos/1.0", name = "Capabilities")
-    public JAXBElement<Capabilities> createCapabilities(Capabilities value) {
-        return new JAXBElement<Capabilities>(_Capabilities_QNAME, Capabilities.class, null, value);
-    }
-
-
 }

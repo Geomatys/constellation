@@ -64,6 +64,7 @@ public class SectionsType {
         existingSections111.add("ServiceProvider");
         existingSections111.add("OperationsMetadata");
         existingSections111.add("Contents");
+        existingSections111.add("Filter_Capabilities");
     }
     
     @XmlTransient

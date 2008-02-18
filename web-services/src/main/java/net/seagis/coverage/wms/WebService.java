@@ -43,6 +43,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 // JAXB xml binding dependencies
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
@@ -57,8 +59,11 @@ import net.seagis.ows.OWSWebServiceException;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.ows.DCP;
 import net.seagis.wcs.AbstractRequest;
 import net.seagis.ows.OWSExceptionCode;
+import net.seagis.ows.Operation;
+import net.seagis.ows.RequestMethodType;
 /**
  *
  * @author legal
@@ -95,7 +100,7 @@ public abstract class WebService {
      /**
      * A JAXB unmarshaller used to create java object from XML file.
      */
-    protected Unmarshaller unmarshaller;
+    private Unmarshaller unmarshaller;
     
     /**
      * A JAXB marshaller used to transform the java object in XML String.
@@ -166,6 +171,39 @@ public abstract class WebService {
         
         unmarshaller = null;
         serviceURL   = null;
+    }
+    
+    /**
+     * Initialize the JAXB context and build the unmarshaller/marshaller
+     * 
+     * @param packagesName A list of package containing JAXB annoted classes.
+     * @param rootNamespace The main namespace for all the document.
+     */
+    protected void setXMLContext(String packagesName, String rootNamespace) throws JAXBException {
+        logger.info("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
+                    " packages: " + packagesName);
+        
+        JAXBContext jbcontext = JAXBContext.newInstance(packagesName);
+        unmarshaller = jbcontext.createUnmarshaller();
+        marshaller = jbcontext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        setPrefixMapper(rootNamespace);
+    }
+    
+    /**
+     * Initialize the JAXB context and build the unmarshaller/marshaller
+     * 
+     * @param classesName A list of JAXB annoted classes.
+     * @param rootNamespace The main namespace for all the document.
+     */
+    protected void setXMLContext(String rootNamespace, Class... classes) throws JAXBException {
+        logger.info("SETTING XML CONTEXT: classes version");
+        
+        JAXBContext jbcontext = JAXBContext.newInstance(classes);
+        unmarshaller = jbcontext.createUnmarshaller();
+        marshaller = jbcontext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        setPrefixMapper(rootNamespace);
     }
     
     /**
@@ -389,7 +427,7 @@ public abstract class WebService {
      * @throw JAXBException
      */
     @POST
-    @ConsumeMime("text/xml")
+    @ConsumeMime("*/xml")
     public Response doPOSTXml(InputStream is) throws JAXBException  {
         logger.info("request POST xml: ");
         Object request = null;
@@ -397,11 +435,11 @@ public abstract class WebService {
             request = unmarshaller.unmarshal(is);
         
         } catch (UnmarshalException e) {
-            logger.severe(e.getMessage());
+            logger.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
             StringWriter sw = new StringWriter(); 
             if (getCurrentVersion().isOWS()) {
                 OWSWebServiceException wse = new OWSWebServiceException("The XML request is not valid",
-                                                                        OWSExceptionCode.INVALID_PARAMETER_VALUE, 
+                                                                        OWSExceptionCode.INVALID_REQUEST, 
                                                                         null,
                                                                         getCurrentVersion().getVersionNumber());
                 marshaller.marshal(wse.getExceptionReport(), sw);
@@ -420,6 +458,27 @@ public abstract class WebService {
             context.getQueryParameters().add("VERSION", ar.getVersion());
         }
         return treatIncommingRequest(request);
+    }
+    
+    @POST
+    @ConsumeMime("text/plain")
+    public Response doPOSTPlain(InputStream is) throws JAXBException  {
+        logger.severe("request POST plain sending Exception");
+        StringWriter sw = new StringWriter(); 
+        if (getCurrentVersion().isOWS()) {
+            OWSWebServiceException wse = new OWSWebServiceException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
+                                                                    OWSExceptionCode.INVALID_PARAMETER_VALUE, 
+                                                                    null,
+                                                                    getCurrentVersion().getVersionNumber());
+            marshaller.marshal(wse.getExceptionReport(), sw);
+        } else {
+            WMSWebServiceException wse = new WMSWebServiceException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
+                                                                    WMSExceptionCode.INVALID_PARAMETER_VALUE,
+                                                                    getCurrentVersion().getVersionNumber());
+            marshaller.marshal(wse.getServiceExceptionReport(), sw);
+        }
+            
+        return Response.ok(sw.toString(), "text/xml").build();
     }
     
     /**
@@ -442,8 +501,8 @@ public abstract class WebService {
      * @param  version the version of the service.
      * @return The capabilities Object, or {@code null} if none.
      */
-    protected Object getCapabilitiesObject(Version version) throws JAXBException {
-       String fileName = this.service + "Capabilities" + version.toString() + ".xml";
+    public Object getCapabilitiesObject() throws JAXBException {
+       String fileName = this.service + "Capabilities" + getCurrentVersion().getVersionNumber() + ".xml";
        
        if (fileName == null) {
            return null;
@@ -561,5 +620,19 @@ public abstract class WebService {
             }
         }
         return null;
+    }
+    
+    /**
+     * Update all the url in a OWS capabilities document.
+     * 
+     * @param operations A list of OWS operation.
+     */
+    public void updateOWSURL(List<Operation> operations) {
+        for (Operation op:operations) {
+            for (DCP dcp: op.getDCP()) {
+                for (JAXBElement<RequestMethodType> method:dcp.getHTTP().getGetOrPost())
+                    method.getValue().setHref(getServiceURL()+ this.service.toLowerCase() + "?");
+            }
+       }
     }
 }

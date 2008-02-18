@@ -17,7 +17,9 @@
 package net.seagis.ows;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -73,7 +75,31 @@ public class AllowedValues {
     public AllowedValues(List<Object> valueOrRange){
         
         this.valueOrRange = valueOrRange;
+        
     }
+    
+    /**
+     *  Build an allowed value with the specified list of value.
+     */
+    public AllowedValues(Collection<String> values){
+        
+        this.valueOrRange = new ArrayList<Object>();
+        for (String value: values){
+            valueOrRange.add(new ValueType(value));
+        }
+        
+    }
+    
+    
+    /**
+     *  Build an allowed value with the specified range
+     */
+    public AllowedValues(RangeType range){
+        
+        valueOrRange = new ArrayList<Object>();
+        valueOrRange.add(range);
+    }
+    
     
     /**
      * Gets the value of the valueOrRange property.

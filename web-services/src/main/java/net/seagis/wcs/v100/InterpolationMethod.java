@@ -72,12 +72,13 @@ public enum InterpolationMethod {
     }
 
     public static InterpolationMethod fromValue(String v) {
-        for (InterpolationMethod c: InterpolationMethod.values()) {
-            if (c.value.equals(v)) {
-                return c;
+        if (v!= null) {
+            for (InterpolationMethod c: InterpolationMethod.values()) {
+                if (c.value.equals(v)) {
+                    return c;
+                }
             }
         }
-        throw new IllegalArgumentException(v);
+        return null;
     }
-
 }

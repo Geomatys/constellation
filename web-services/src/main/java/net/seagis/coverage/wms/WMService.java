@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import javax.units.Unit;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 // jersey dependencies
 import javax.ws.rs.Path;
@@ -32,12 +34,8 @@ import javax.ws.rs.core.Response;
 import com.sun.ws.rest.spi.resource.Singleton;
 
 // JAXB xml binding dependencies
-import java.util.Set;
-import java.util.StringTokenizer;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 //seagis dependencies
 import net.seagis.catalog.CatalogException;
@@ -90,12 +88,9 @@ public class WMService extends WebService {
         super("WMS", new Version("1.3.0", false) ,new Version("1.1.1",false));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.coverage.web:net.seagis.wms:net.seagis.sld:net.seagis.gml");
-        marshaller = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        setPrefixMapper("http://www.opengis.net/wms");
-        unmarshaller = jbcontext.createUnmarshaller();
-        
+        setXMLContext("net.seagis.coverage.web:net.seagis.wms:net.seagis.sld:net.seagis.gml",
+                      "http://www.opengis.net/wms");
+                
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WMS", getCurrentVersion());
         
@@ -345,7 +340,7 @@ public class WMService extends WebService {
         }
         
         // the service shall return WMSCapabilities marshalled
-        AbstractWMSCapabilities response = (AbstractWMSCapabilities)getCapabilitiesObject(getCurrentVersion());
+        AbstractWMSCapabilities response = (AbstractWMSCapabilities)getCapabilitiesObject();
         
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");

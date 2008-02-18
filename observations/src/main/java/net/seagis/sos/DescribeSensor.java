@@ -95,11 +95,7 @@ public class DescribeSensor extends RequestBaseType {
      * Return the value of the outputFormat property.
      */
     public String getOutputFormat() {
-        if (outputFormat == null) {
-            return "text/xml;subtype=\"sensorML/1.0.0\"";
-        } else {
             return outputFormat;
-        }
     }
 
     /**

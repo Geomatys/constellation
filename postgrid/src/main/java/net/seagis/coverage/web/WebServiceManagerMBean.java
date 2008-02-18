@@ -31,4 +31,14 @@ public interface WebServiceManagerMBean {
      * Flush the cache content.
      */
     void flush();
+    
+    /**
+     * Scan the plugin used by the jvm.
+     */
+    void scanPlugin();
+    
+    /**
+     *  Display the current wcs formats accepted.
+     */
+    String acceptedFormats();
 }

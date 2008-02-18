@@ -94,6 +94,18 @@ public class OperationsMetadata {
     public List<Operation> getOperation() {
         return operation;
     }
+    
+    /**
+     * Return the operation for the specified name
+     */
+    public Operation getOperation(String operationName) {
+        for (Operation op: operation){
+            if (op.getName().equals(operationName)) {
+                return op;
+            }
+        }
+        return null;
+    }
 
     /**
      * Gets the value of the parameter property.

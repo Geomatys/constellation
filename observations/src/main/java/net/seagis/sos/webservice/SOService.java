@@ -28,27 +28,27 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 // geotools dependencies
-import javax.xml.bind.Marshaller;
 
 // seaGIS dependencies
 import net.seagis.catalog.NoSuchTableException;
 import net.seagis.ows.OWSWebServiceException;
-import net.seagis.coverage.web.ServiceExceptionReport;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.WebService;
 import net.seagis.observation.ObservationCollectionEntry;
 import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.AcceptVersionsType;
+import net.seagis.ows.ExceptionReport;
 import net.seagis.ows.SectionsType;
 import net.seagis.sos.Capabilities;
 import net.seagis.sos.DescribeSensor;
 import net.seagis.sos.GetCapabilities;
 import net.seagis.sos.GetObservation;
+import net.seagis.sos.InsertObservation;
+import net.seagis.sos.RegisterSensor;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
@@ -68,15 +68,15 @@ public class SOService extends WebService {
         super("SOS", new Version("1.0.0", true));
         worker = new SOSworker(this);
         worker.setVersion("1.0.0");
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.gml:net.seagis.observation:net.seagis.ows:net.seagis.sos:net.seagis.swe:net.seagis.ogc:net.seagis.coverage.web");
-        unmarshaller = jbcontext.createUnmarshaller();
-        jbcontext = JAXBContext.newInstance(Capabilities.class,
-                                            ServiceExceptionReport.class,
-                                            ObservationCollectionEntry.class);
-        marshaller = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        setPrefixMapper("");
-        
+        setXMLContext("",
+                      GetCapabilities.class,
+                      GetObservation.class,
+                      RegisterSensor.class,
+                      InsertObservation.class,
+                      ExceptionReport.class,
+                      ObservationCollectionEntry.class,
+                      Capabilities.class,
+                      DescribeSensor.class);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class SOService extends WebService {
                     //In the same time we verify that the requested sections are valid. 
                     String section = getParameter("Sections", false);
                     List<String> requestedSections = new ArrayList<String>();
-                    if (section != null) {
+                    if (section != null && !section.equals("All")) {
                         final StringTokenizer tokens = new StringTokenizer(section, ",;");
                         while (tokens.hasMoreTokens()) {
                             final String token = tokens.nextToken().trim();
@@ -180,7 +180,7 @@ public class SOService extends WebService {
                     !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                     owsex.printStackTrace();
                 } else {
-                    logger.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage());
+                    logger.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
                 }
                 StringWriter sw = new StringWriter();    
                 marshaller.marshal(owsex.getExceptionReport(), sw);

@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.lang.management.ManagementFactory;
+import javax.imageio.ImageIO;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -66,7 +67,11 @@ final class WebServiceManager implements WebServiceManagerMBean {
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();
             ObjectName name;
             try {
+               
                name = new ObjectName("WebServiceManager:name=WebServiceManager");
+               if(server.isRegistered(name)) {
+                   server.unregisterMBean(name);
+               }
                server.registerMBean(this, name);
             } catch (JMException exception) {
                 Logging.unexpectedException(LOGGER, WebServiceManager.class, "<init>", exception);
@@ -115,7 +120,18 @@ final class WebServiceManager implements WebServiceManagerMBean {
             }
         }
     }
+    
+    /**
+     * Scan the plugin used by the jvm and display the current wcs formats accepted.
+     */
+    public void scanPlugin() {
+        ImageIO.scanForPlugins();
+    }
 
+    public String acceptedFormats() {
+        return java.util.Arrays.toString(ImageIO.getReaderFormatNames());
+    }
+    
     /**
      * Disposes every workers and unregister The MBean from the platform server.
      */

@@ -134,6 +134,13 @@ public class UnNamedDomainType {
     public AllowedValues getAllowedValues() {
         return allowedValues;
     }
+    
+    /**
+     * Gets the value of the allowedValues property.
+     */
+    public void setAllowedValues(AllowedValues allowedValues) {
+        this.allowedValues = allowedValues;
+    }
 
     /**
      * Gets the value of the anyValue property.

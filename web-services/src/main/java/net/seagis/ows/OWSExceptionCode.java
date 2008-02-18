@@ -37,12 +37,17 @@ public class OWSExceptionCode extends CodeList<OWSExceptionCode> {
      * List of all enumerations of this type.
      * Must be declared before any enum declaration.
      */
-    private static final List<OWSExceptionCode> VALUES = new ArrayList<OWSExceptionCode>(15);
+    private static final List<OWSExceptionCode> VALUES = new ArrayList<OWSExceptionCode>(16);
 
     /**
      * Invalid format.
      */
     public static final OWSExceptionCode INVALID_FORMAT = new OWSExceptionCode("InvalidFormat");
+    
+    /**
+     * Invalid format.
+     */
+    public static final OWSExceptionCode INVALID_REQUEST = new OWSExceptionCode("InvalidRequest");
 
     /**
      * Current update sequence.

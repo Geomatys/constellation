@@ -30,10 +30,8 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 // JAXB xml binding dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
 
 // jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
@@ -60,15 +58,12 @@ import net.seagis.gml.TimePositionType;
 import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.AcceptVersionsType;
 import net.seagis.ows.BoundingBoxType;
-import net.seagis.ows.DCP;
 import net.seagis.ows.KeywordsType;
 import net.seagis.ows.LanguageStringType;
 import net.seagis.ows.OWSExceptionCode;
 import net.seagis.ows.OWSWebServiceException;
-import net.seagis.ows.Operation;
 import net.seagis.ows.WGS84BoundingBoxType;
 import net.seagis.ows.OperationsMetadata;
-import net.seagis.ows.RequestMethodType;
 import net.seagis.ows.SectionsType;
 import net.seagis.ows.ServiceIdentification;
 import net.seagis.ows.ServiceIdentification;
@@ -127,12 +122,9 @@ public class WCService extends WebService {
      */
     public WCService() throws JAXBException, WebServiceException {
         super("WCS", new Version("1.1.1", true), new Version("1.0.0", false));
-        //TODO true for 1.1.1
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.coverage.web:net.seagis.wcs.v100:net.seagis.wcs.v111");
-        marshaller = jbcontext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        setPrefixMapper("http://www.opengis.net/wcs");
-        unmarshaller = jbcontext.createUnmarshaller();
+        
+        setXMLContext("net.seagis.coverage.web:net.seagis.wcs.v100:net.seagis.wcs.v111",
+                      "http://www.opengis.net/wcs");
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WCS", getCurrentVersion());
@@ -515,7 +507,7 @@ public class WCService extends WebService {
             }
             
             // we unmarshall the static capabilities docuement
-            Capabilities staticCapabilities = (Capabilities)getCapabilitiesObject(getCurrentVersion());
+            Capabilities staticCapabilities = (Capabilities)getCapabilitiesObject();
             ServiceIdentification si = null;
             ServiceProvider       sp = null;
             OperationsMetadata    om = null;
@@ -528,12 +520,7 @@ public class WCService extends WebService {
             if (requestedSections.contains("OperationsMetadata")) { 
                 om = staticCapabilities.getOperationsMetadata();
                 //we update the url in the static part.
-                for (Operation op:om.getOperation()) {
-                   for (DCP dcp: op.getDCP()){
-                       for (JAXBElement<RequestMethodType> method:dcp.getHTTP().getGetOrPost())
-                        method.getValue().setHref(getServiceURL()+ "wcs?");
-                   }
-               }
+                updateOWSURL(om.getOperation());
             }
             responsev111 = new Capabilities(si, sp, om, "1.1.1", null, null);
             
@@ -563,7 +550,7 @@ public class WCService extends WebService {
                }
                contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata"); 
             }
-            WCSCapabilitiesType staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject(getCurrentVersion())).getValue();
+            WCSCapabilitiesType staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject()).getValue();
             
             if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
                 //we update the url in the static part.
@@ -1082,6 +1069,7 @@ public class WCService extends WebService {
            }
         }
     }
+    
     
     /**
      * Parses a value as a floating point.

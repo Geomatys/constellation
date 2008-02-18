@@ -47,8 +47,8 @@ public class PhenomenonQuery extends Query{
      */
     public PhenomenonQuery(final Database database) {
         super(database, "phenomenons");
-        final QueryType[] SI  = {SELECT, INSERT};
-        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
+        final QueryType[] SI  = {SELECT, INSERT, LIST};
+        final QueryType[] SIE = {SELECT, INSERT, EXISTS, LIST};
         
         identifier = addColumn ("id",          SIE);
         name       = addColumn ("name",        SI);

@@ -19,6 +19,7 @@ package net.seagis.ows;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -108,6 +109,30 @@ public class Operation {
             parameter = new ArrayList<DomainType>();
         }
         return Collections.unmodifiableList(parameter);
+    }
+    
+    /**
+     * Update the specified parameter with the list of values.
+     */
+    public void updateParameter(String parameterName, Set<String> values) {
+        for (DomainType dom: parameter) {
+            if (dom.getName().equals(parameterName)) {
+                List<ValueType> valuesTyped = new ArrayList<ValueType>();
+                dom.setAllowedValues(new AllowedValues(values));
+            }
+        }
+    }
+    
+    /**
+     * Update the specified parameter with the specified range.
+     */
+    public void updateParameter(String parameterName, RangeType range) {
+        for (DomainType dom: parameter) {
+            if (dom.getName().equals(parameterName)) {
+                AllowedValues av = dom.getAllowedValues();
+                dom.setAllowedValues(new AllowedValues(range)); 
+            }
+        }
     }
 
     /**
