@@ -54,7 +54,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
     @Test
     public void testSST() throws WebServiceException, IOException {
         final WebServiceWorker worker = new WebServiceWorker(database, false);
-        worker.setService("WMS", "1.0");
+        worker.setService("WMS", new Version("1.0", false));
         worker.setLayer(LayerTableTest.SAMPLE_NAME);
         worker.setCoordinateReferenceSystem("EPSG:4326");
         worker.setTime(LayerTableTest.SAMPLE_TIME_AS_TEXT);
@@ -174,7 +174,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
     public void testNetCDF() throws WebServiceException, IOException {
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setInterpolation("bilinear");
-        worker.setService("WMS", "1.0");
+        worker.setService("WMS", new Version("1.0", false));
         worker.setLayer(LayerTableTest.NETCDF_NAME);
         worker.setCoordinateReferenceSystem("EPSG:3395");
 
@@ -240,7 +240,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
             return; // TODO
         }
         final WebServiceWorker worker = new WebServiceWorker(database, false);
-        worker.setService("WMS", "1.1.1");
+        worker.setService("WMS", new Version("1.1.1", false));
         worker.setLayer("BlueMarble");
         worker.setCoordinateReferenceSystem("EPSG:4326");
         worker.setBoundingBox("-180,-90,180,90");
