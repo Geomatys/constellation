@@ -20,6 +20,6 @@ package net.seagis.wcs;
  *
  * @author Guilhem Legal
  */
-public class AbstractGetCoverage {
+public abstract class AbstractGetCoverage extends AbstractRequest {
 
 }

@@ -22,9 +22,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,6 +45,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -73,9 +75,12 @@ import net.seagis.gml.TimePeriodType;
 import net.seagis.ogc.LiteralType;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
+import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.ows.OWSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
+import net.seagis.coverage.wms.WebService;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
+import net.seagis.gml.EnvelopeEntry;
 import net.seagis.gml.ReferenceEntry;
 import net.seagis.gml.ReferenceTable;
 import net.seagis.gml.TimePositionType;
@@ -92,6 +97,8 @@ import net.seagis.observation.ProcessEntry;
 import net.seagis.observation.ProcessTable;
 import net.seagis.observation.SamplingFeatureEntry;
 import net.seagis.observation.SamplingFeatureTable;
+import net.seagis.observation.SamplingPointEntry;
+import net.seagis.observation.SamplingPointTable;
 import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.AcceptVersionsType;
 import net.seagis.ows.Operation;
@@ -200,11 +207,6 @@ public class SOSworker {
     private Properties map;
     
     /**
-     * The web service url.
-     */
-    private String SOSurl;
-    
-    /**
      * The base for sensor id.
      */ 
     private String sensorIdBase;
@@ -222,7 +224,12 @@ public class SOSworker {
     /**
      * The base for offering id.
      */ 
-    private String offeringIdBase;
+    private final String offeringIdBase = "offering-";
+    
+    /**
+     * The base for phenomenon id.
+     */ 
+    private final String phenomenonIdBase = "urn:ogc:def:phenomenon:BRGM:";
     
     /**
      * The valid time for a getObservation template (in ms).
@@ -245,15 +252,20 @@ public class SOSworker {
     private String version;
     
     /**
-     * WebService
+     * A capabilities object containing the static part of the document.
      */
-    SOService service;
+    private Capabilities staticCapabilities;
+    
+    /**
+     * The service url.
+     */
+    private String serviceURL;
+    
     /**
      * Initialize the database connection.
      */
-    public SOSworker(SOService service) throws SQLException, IOException, NoSuchTableException {
+    public SOSworker() throws SQLException, IOException, NoSuchTableException {
        
-        this.service = service;
         //we load the properties files
         Properties prop = new Properties();
         map    = new Properties();
@@ -315,11 +327,9 @@ public class SOSworker {
         refTable  = OMDatabase.getTable(ReferenceTable.class);
         
         //we initailize the properties attribute 
-        SOSurl                    = prop.getProperty("SOSurl"); 
         sensorIdBase              = prop.getProperty("sensorIdBase");
         observationIdBase         = prop.getProperty("observationIdBase");
         observationTemplateIdBase = prop.getProperty("observationTemplateIdBase");
-        offeringIdBase            = prop.getProperty("offeringIdBase");
         temporaryFolder           = prop.getProperty("temporaryFolder");
         maxObservationByRequest   = Integer.parseInt(prop.getProperty("maxObservationByRequest"));
         String validTime          = prop.getProperty("templateValidTime");
@@ -333,6 +343,20 @@ public class SOSworker {
      */
     public void setVersion(String version){
         this.version = version;
+    }
+    
+    /**
+     * Set the capabilities document.
+     */
+    public void setStaticCapabilities(Capabilities staticCapabilities) {
+        this.staticCapabilities = staticCapabilities;
+    }
+    
+    /**
+     * Set the current service URL
+     */
+    public void setServiceURL(String serviceURL){
+        this.serviceURL = serviceURL;
     }
     
     /**
@@ -377,7 +401,6 @@ public class SOSworker {
         //we prepare the response document
         Capabilities c = null; 
         try {
-            Capabilities capabilities = (Capabilities) service.getCapabilitiesObject();
             
             ServiceIdentification si = null;
             ServiceProvider       sp = null;
@@ -387,23 +410,23 @@ public class SOSworker {
             
             SectionsType sections = requestCapabilities.getSections();
             //we enter the information for service identification.
-            if (sections.getSection().contains("ServiceIdentification")) {
+            if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
                 
-                si = capabilities.getServiceIdentification();
+                si = staticCapabilities.getServiceIdentification();
             }
             
             //we enter the information for service provider.
-            if (sections.getSection().contains("ServiceProvider")) {
+            if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains("All")) {
             
-                sp = capabilities.getServiceProvider();
+                sp = staticCapabilities.getServiceProvider();
             }
             
             //we enter the operation Metadata
-            if (sections.getSection().contains("OperationsMetadata")) {
+            if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains("All")) {
                 
-               om = capabilities.getOperationsMetadata();
+               om = staticCapabilities.getOperationsMetadata();
                //we update the URL
-               service.updateOWSURL(om.getOperation());
+               WebService.updateOWSURL(om.getOperation(), serviceURL, "SOS");
                
                //we update the parameter in operation metadata.
                Operation go = om.getOperation("GetObservation");
@@ -437,13 +460,13 @@ public class SOSworker {
             }
             
             //we enter the information filter capablities.
-            if (sections.getSection().contains("Filter_Capabilities")) {
+            if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All")) {
             
-                fc = capabilities.getFilterCapabilities();
+                fc = staticCapabilities.getFilterCapabilities();
             }
             
             
-             if (sections.getSection().contains("Contents")) {
+             if (sections.getSection().contains("Contents") || sections.getSection().contains("All")) {
                 // we add the list of observation ofeerings 
                 List<ObservationOfferingEntry> loo = new ArrayList<ObservationOfferingEntry>();
                 Set<ObservationOfferingEntry> set = offTable.getEntries();
@@ -481,15 +504,12 @@ public class SOSworker {
         
             // we get the form
             verifyBaseRequest(requestDescSensor);
-
+            
             //we verify that the output format is good.     
             if (requestDescSensor.getOutputFormat()!= null) {
-                if (!requestDescSensor.getOutputFormat().equals("text/xml;subtype=\"SensorML/1.0.0\"")) {
-                    throw new OWSWebServiceException("only text/xml;subtype=\"SensorML/1.0.0\" is accepted for outputFormat",
-                                                     INVALID_PARAMETER_VALUE,
-                                                     "outputFormat",
-                                                     version);
-                }
+                    if (!requestDescSensor.getOutputFormat().equalsIgnoreCase("text/xml;subtype=\"SensorML/1.0.0\"")) {
+                        throw new OWSWebServiceException("only text/xml;subtype=\"SensorML/1.0.0\" is accepted for outputFormat", INVALID_PARAMETER_VALUE, "outputFormat", version);
+                    }
             } else {
                 throw new OWSWebServiceException("output format text/xml;subtype=\"SensorML/1.0.0\" must be specify",
                                                  MISSING_PARAMETER_VALUE,
@@ -589,6 +609,19 @@ public class SOSworker {
         //we verify the base request attribute
         verifyBaseRequest(requestObservation);
         
+         //we verify that the output format is good.     
+         if (requestObservation.getResponseFormat()!= null) {
+            if (!requestObservation.getResponseFormat().equalsIgnoreCase("text/xml;subtype=\"om/1.0\"")) {
+                throw new OWSWebServiceException("only text/xml;subtype=\"om/1.0\" is accepted for responseFormat", 
+                                                 INVALID_PARAMETER_VALUE, "responseFormat", version);
+            }
+         } else {
+            throw new OWSWebServiceException("Response format text/xml;subtype=\"om/1.0\" must be specify",
+                                             MISSING_PARAMETER_VALUE,
+                                             "responseFormat",
+                                             version);
+         }
+        
         //we get the mode of result
         ObservationCollectionEntry response = new ObservationCollectionEntry(new ArrayList<ObservationEntry>());
         try {
@@ -621,10 +654,16 @@ public class SOSworker {
                                               "offering",
                                               version);
             } else {
-                off = offTable.getEntry(requestObservation.getOffering());
-                if (off == null) {
+                try {
+                    off = offTable.getEntry(requestObservation.getOffering());
+                } catch (NoSuchRecordException ex) {
                     throw new OWSWebServiceException("this offering is not registered in the service",
                                                   INVALID_PARAMETER_VALUE,
+                                                  "offering",
+                                                  version);
+                } catch (CatalogException ex) {
+                  throw new OWSWebServiceException("Catalog exception while getting the offering",
+                                                  NO_APPLICABLE_CODE,
                                                   "offering",
                                                   version);
                 }
@@ -642,22 +681,28 @@ public class SOSworker {
                         dbId = s;
                     } 
                     logger.info("process ID: " + dbId);
-                    ReferenceEntry proc = getReferenceFromHRef(dbId); 
-
-                    if (proc == null) {
+                    ReferenceEntry proc = null;
+                    try {
+                        proc = getReferenceFromHRef(dbId); 
+                    } catch (NoSuchRecordException ex) {
                         throw new OWSWebServiceException(" this process is not registred in the table",
                                                       INVALID_PARAMETER_VALUE,
                                                       "procedure",
                                                       version);
+                    } catch (CatalogException ex) {
+                        throw new OWSWebServiceException("Catalog exception while getting the offering",
+                                                         NO_APPLICABLE_CODE,
+                                                         "offering",
+                                                         version);
+                    }
+                     
+                    if (!off.getProcedure().contains(proc)) {
+                       throw new OWSWebServiceException(" this process is not registred in the offering",
+                                                        INVALID_PARAMETER_VALUE,
+                                                        "procedure",
+                                                        version);
                     } else {
-                        if (!off.getProcedure().contains(proc)) {
-                            throw new OWSWebServiceException(" this process is not registred in the offering",
-                                                          INVALID_PARAMETER_VALUE,
-                                                          "procedure",
-                                                          version);
-                        } else {
-                            SQLrequest.append(" procedure='").append(dbId).append("' OR ");
-                        }
+                        SQLrequest.append(" procedure='").append(dbId).append("' OR ");
                     }
                 }
             } else {
@@ -675,21 +720,42 @@ public class SOSworker {
             //TODO verifier que les pheno appartiennent a l'offering
             List<String> observedProperties = requestObservation.getObservedProperty();
             if (observedProperties.size() != 0 ) {
-                PhenomenonTable phenomenons                   = new PhenomenonTable(OMDatabase);
-                CompositePhenomenonTable compositePhenomenons = new CompositePhenomenonTable(OMDatabase);
+                PhenomenonTable phenomenons                   = OMDatabase.getTable(PhenomenonTable.class);
+                CompositePhenomenonTable compositePhenomenons = OMDatabase.getTable(CompositePhenomenonTable.class);
                 SQLrequest.append(" AND( ");
             
                 for (String s: observedProperties) {
-                    CompositePhenomenonEntry cphen = compositePhenomenons.getEntry(s);
-
+                    if (s.indexOf(phenomenonIdBase) != -1){
+                        s = s.replace(phenomenonIdBase, "");
+                    }
+                    CompositePhenomenonEntry cphen = null;
+                    try {
+                        compositePhenomenons.getEntry(s);
+                    } catch (NoSuchRecordException ex) {
+                    } catch (CatalogException ex){
+                        throw new OWSWebServiceException("Catalog exception while getting the phenomenon",
+                                                        NO_APPLICABLE_CODE,
+                                                        "observedProperty",
+                                                        version);
+                    }
+                     
+                        
                     if (cphen == null ) {
-                        PhenomenonEntry phen = (PhenomenonEntry) phenomenons.getEntry(s);
-                        if (phen == null) {
-                            throw new OWSWebServiceException(" this phenomenon is not registred in the database!",
+                        PhenomenonEntry phen = null;
+                        try {
+                            phen = (PhenomenonEntry) phenomenons.getEntry(s);
+                        } catch (NoSuchRecordException ex) {
+                            throw new OWSWebServiceException(" this phenomenon " + s + "is not registred in the database!",
                                                           INVALID_PARAMETER_VALUE,
                                                           "observedProperty",
                                                           version);
-                        } else {
+                        } catch (CatalogException ex){
+                            throw new OWSWebServiceException("Catalog exception while getting the phenomenon",
+                                                             NO_APPLICABLE_CODE,
+                                                             "observedProperty",
+                                                             version);
+                        }
+                        if (phen != null) {
                             SQLrequest.append(" observed_property='").append(s).append("' OR ");
                             
                         }
@@ -710,18 +776,31 @@ public class SOSworker {
             //we treat the restriction on the feature of interest
             if (requestObservation.getFeatureOfInterest() != null) {
                 GetObservation.FeatureOfInterest foi = requestObservation.getFeatureOfInterest();
-            
+                SamplingPointTable foiTable = OMDatabase.getTable(SamplingPointTable.class);
+                
                 // if the request is a list of station
                 if (!foi.getObjectID().isEmpty()) {
                     SQLrequest.append(" AND (");
                     for (final String s : foi.getObjectID()) {
+                        //verify that the station is registred in the DB.
+                        try {
+                            foiTable.getEntry(s);
+                        } catch (NoSuchTableException ex){
+                            throw new OWSWebServiceException("the feature of interest is not registered",
+                                                             INVALID_PARAMETER_VALUE, "", version);
+                        } catch (CatalogException ex){
+                            throw new OWSWebServiceException("Catalog exception while getting the feature of interest",
+                                                             NO_APPLICABLE_CODE,
+                                                             "featureOfInterest",
+                                                             version);
+                        }
                         SQLrequest.append("feature_of_interest_point='").append(s).append("' OR");
                     }
                     SQLrequest.delete(SQLrequest.length() - 2, SQLrequest.length());
                     SQLrequest.append(") ");
             
                 // if the request is a spatial operator    
-                } /*else {
+                } else {
                     // for a BBOX Spatial ops
                     if (foi.getBBOX() != null){
                         
@@ -731,7 +810,19 @@ public class SOSworker {
                             SQLrequest.append(" AND (");
                             boolean add = false;
                             EnvelopeEntry e = foi.getBBOX().getEnvelope();
-                            for (SamplingFeatureEntry station:off.getFeatureOfInterest()) {
+                            for (ReferenceEntry refStation:off.getFeatureOfInterest()) {
+                                SamplingPointEntry station = null;
+                                try {
+                                    station = foiTable.getEntry(refStation.getHref());
+                                } catch (NoSuchTableException ex){
+                                    throw new OWSWebServiceException("the feature of interest is not registered",
+                                                                     INVALID_PARAMETER_VALUE, "", version);
+                                } catch (CatalogException ex){
+                                     throw new OWSWebServiceException("Catalog exception while getting the feature of interest",
+                                                                      NO_APPLICABLE_CODE,
+                                                                      "observedProperty",
+                                                                      version);
+                        }
                                 if (station instanceof SamplingPointEntry) {
                                     SamplingPointEntry sp = (SamplingPointEntry) station;
                                     if(sp.getPosition().getPos().getValue().get(0)>e.getUpperCorner().getValue().get(0) &&
@@ -755,13 +846,13 @@ public class SOSworker {
                         
                         } else {
                             throw new OWSWebServiceException("the envelope is not build correctly",
-                                                         INVALID_PARAMETER_VALUE);
+                                                         INVALID_PARAMETER_VALUE, "", version);
                         }
                     } else {
                         throw new OWSWebServiceException("This operation is not take in charge by the Web Service",
-                                                     OPERATION_NOT_SUPPORTED);
+                                                     OPERATION_NOT_SUPPORTED, "", version);
                     }
-                }*/
+                }
             
             }
         
@@ -880,34 +971,41 @@ public class SOSworker {
             //TODO remplacer par une filteredList ds postgrid
             Statement stmt    = OMConnection.createStatement();
             ResultSet results = stmt.executeQuery(SQLrequest.toString());
-            while (results.next()) {
-                ObservationEntry o = (ObservationEntry) obsTable.getEntry(results.getString(1));
-                if (template) {
+            try {
+                while (results.next()) {
+                    ObservationEntry o = (ObservationEntry) obsTable.getEntry(results.getString(1));
+                    if (template) {
                     
-                    String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
-                    ObservationEntry temporaryTemplate = o.getTemporaryTemplate(temporaryTemplateId, templateTime);
-                    templates.put(temporaryTemplateId, temporaryTemplate);
+                        String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
+                        ObservationEntry temporaryTemplate = o.getTemporaryTemplate(temporaryTemplateId, templateTime);
+                        templates.put(temporaryTemplateId, temporaryTemplate);
                     
-                    // we launch a timer which will destroy the template in one hours
-                    Timer t = new Timer();
-                    //we get the date and time for now
-                    Calendar now = new GregorianCalendar();
-                    long next = now.getTimeInMillis() + templateValidTime;
-                    Date d = new Date(next);
-                    logger.info("this template will be destroyed at:" + d.toString());
-                    t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
-                    response.getMember().add(temporaryTemplate);
-                } else {
-                    response.getMember().add(o);
+                        // we launch a timer which will destroy the template in one hours
+                        Timer t = new Timer();
+                        //we get the date and time for now
+                        Calendar now = new GregorianCalendar();
+                        long next = now.getTimeInMillis() + templateValidTime;
+                        Date d = new Date(next);
+                        logger.info("this template will be destroyed at:" + d.toString());
+                        t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
+                        response.getMember().add(temporaryTemplate);
+                    } else {
+                        response.getMember().add(o);
                     
-                    //we stop the request if its too big
-                    if (response.getMember().size() > maxObservationByRequest) {
-                        throw new OWSWebServiceException("Your request is to voluminous please add filter and try again",
-                                                      NO_APPLICABLE_CODE,
-                                                      null,
-                                                      version);
+                        //we stop the request if its too big
+                        if (response.getMember().size() > maxObservationByRequest) {
+                            throw new OWSWebServiceException("Your request is to voluminous please add filter and try again",
+                                                          NO_APPLICABLE_CODE,
+                                                          null,
+                                                          version);
+                        }
                     }
                 }
+            } catch (CatalogException ex) {
+                  throw new OWSWebServiceException("Catalog exception while getting the offering",
+                                                  NO_APPLICABLE_CODE,
+                                                  "offering",
+                                                  version);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -915,9 +1013,9 @@ public class SOSworker {
                                           NO_APPLICABLE_CODE,
                                           null,
                                           version);
-        } catch (CatalogException e) {
+        } catch (NoSuchTableException e) {
             e.printStackTrace();
-            throw new OWSWebServiceException("the service has throw a Catalog Exception:" + e.getMessage(),
+            throw new OWSWebServiceException("the service has throw a NoSuchTableException:" + e.getMessage(),
                                           NO_APPLICABLE_CODE,
                                           null,
                                           version);
@@ -992,7 +1090,7 @@ public class SOSworker {
                 }
             }
 
-            GetResultResponse.Result r = new GetResultResponse.Result(datablock, SOSurl + '/' + requestResult.getObservationTemplateId());
+            GetResultResponse.Result r = new GetResultResponse.Result(datablock, serviceURL + '/' + requestResult.getObservationTemplateId());
             response = new GetResultResponse(r);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1938,7 +2036,7 @@ public class SOSworker {
     /**
      * Return the referenceEntry with the specified href attribute.
      */
-    private ReferenceEntry getReferenceFromHRef(String href) throws CatalogException, SQLException {
+    private ReferenceEntry getReferenceFromHRef(String href) throws SQLException, CatalogException {
         Set<ReferenceEntry> refs = refTable.getEntries();
         Iterator<ReferenceEntry> it = refs.iterator();
         while (it.hasNext()) {

@@ -346,7 +346,7 @@ public class WCService extends WebService {
                             crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
                             bbox = bbox.substring(0, bbox.lastIndexOf(','));
                         } else {
-                            throwException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
+                            throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" , 
                                            "INVALID_PARAMETER_VALUE", "BoundingBox");
                         } 
                         BoundingBoxType envelope = null;
@@ -359,6 +359,10 @@ public class WCService extends WebService {
                                 Double value = parseDouble(tokens.nextToken());
                                 coordinates[i] = value;
                                 i++;
+                            }
+                            if (i < 4){
+                                throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" , 
+                                           "INVALID_PARAMETER_VALUE", "BoundingBox");
                             }
                             envelope = new BoundingBoxType(crs,coordinates[0], coordinates[2], coordinates[1], coordinates[3]);
                         }
@@ -470,11 +474,12 @@ public class WCService extends WebService {
         
         //we begin by extract the base attribute
         String inputVersion = abstractRequest.getVersion();       
-        if(inputVersion != null && inputVersion.equals("1.0.0")) {
-            setCurrentVersion("1.0.0");
-        } else {
+        if(inputVersion == null) {
             setCurrentVersion("1.1.1");
-        } 
+        } else {
+           isSupportedVersion(inputVersion);
+           setCurrentVersion(inputVersion);
+        }
         webServiceWorker.setService("WCS", getCurrentVersion());
         
         Capabilities        responsev111 = null;
@@ -488,7 +493,7 @@ public class WCService extends WebService {
             
             // if the user have specified one format accepted (only one for now != spec)
             AcceptFormatsType formats = request.getAcceptFormats();
-            if (formats == null || formats.getOutputFormat().size() > 0) {
+            if (formats == null || formats.getOutputFormat().size() == 0) {
                 format = "text/xml";
             } else {
                 format = formats.getOutputFormat().get(0);
@@ -499,12 +504,17 @@ public class WCService extends WebService {
             }
             
             //if the user have requested only some sections
-            List<String> requestedSections;
+            List<String> requestedSections = SectionsType.getExistingSections("1.1.1");
+            
             if (request.getSections() != null && request.getSections().getSection().size() > 0) {
                 requestedSections = request.getSections().getSection();
-            } else {
-                requestedSections = SectionsType.getExistingSections("1.1.1");
-            }
+                for (String sec:requestedSections) {
+                    if (!SectionsType.getExistingSections("1.1.1").contains(sec)){
+                       throwException("This sections " + sec + " is not allowed",
+                                       "INVALID_PARAMETER_VALUE", "sections"); 
+                    }
+                }
+            } 
             
             // we unmarshall the static capabilities docuement
             Capabilities staticCapabilities = (Capabilities)getCapabilitiesObject();
@@ -513,19 +523,19 @@ public class WCService extends WebService {
             OperationsMetadata    om = null;
         
             //we add the static sections if the are included in the requested sections
-            if (requestedSections.contains("ServiceProvider")) 
+            if (requestedSections.contains("ServiceProvider") || requestedSections.contains("All")) 
                 sp = staticCapabilities.getServiceProvider();
-            if (requestedSections.contains("ServiceIdentification")) 
+            if (requestedSections.contains("ServiceIdentification") || requestedSections.contains("All")) 
                 si = staticCapabilities.getServiceIdentification();
-            if (requestedSections.contains("OperationsMetadata")) { 
+            if (requestedSections.contains("OperationsMetadata") || requestedSections.contains("All")) { 
                 om = staticCapabilities.getOperationsMetadata();
                 //we update the url in the static part.
-                updateOWSURL(om.getOperation());
+                WebService.updateOWSURL(om.getOperation(), getServiceURL(), "WCS");
             }
             responsev111 = new Capabilities(si, sp, om, "1.1.1", null, null);
             
             // if the user does not request the contents section we can return the result.
-            if (!requestedSections.contains("Contents")) {
+            if (!requestedSections.contains("Contents") && !requestedSections.contains("All")) {
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(responsev111, sw);
                 return Response.ok(sw.toString(), format).build();
@@ -868,11 +878,24 @@ public class WCService extends WebService {
         try {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
+        //we begin by extract the base attribute
+        String inputVersion = abstractRequest.getVersion();       
+        if(inputVersion == null) {
+            throwException("you must specify the service version" , 
+                           "MISSING_PARAMETER_VALUE", "version");
+        } else {
+           isSupportedVersion(inputVersion);
+           setCurrentVersion(inputVersion);
+        }
+        
         //we prepare the response object to return
         Object response;
         
         if (getCurrentVersion().toString().equals("1.0.0")) {
             net.seagis.wcs.v100.DescribeCoverage request = (net.seagis.wcs.v100.DescribeCoverage) abstractRequest;
+            if (request.getCoverage().size() == 0) {
+                throwException("the parameter COVERAGE must be specified", "MISSING_PARAMETER_VALUE", "coverage");
+            }
             List<Layer> layers = webServiceWorker.getLayers(request.getCoverage());
         
             List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
@@ -965,6 +988,9 @@ public class WCService extends WebService {
         // describeCoverage version 1.1.1    
         } else {
             net.seagis.wcs.v111.DescribeCoverage request = (net.seagis.wcs.v111.DescribeCoverage) abstractRequest;
+            if (request.getIdentifier().size() == 0) {
+                throwException("the parameter IDENTIFIER must be specified", "MISSING_PARAMETER_VALUE", "identifier");
+            }
             List<Layer> layers = webServiceWorker.getLayers(request.getIdentifier());
         
             net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();

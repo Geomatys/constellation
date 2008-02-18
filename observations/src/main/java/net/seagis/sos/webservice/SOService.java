@@ -38,17 +38,13 @@ import net.seagis.ows.OWSWebServiceException;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.WebService;
-import net.seagis.observation.ObservationCollectionEntry;
 import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.AcceptVersionsType;
-import net.seagis.ows.ExceptionReport;
 import net.seagis.ows.SectionsType;
 import net.seagis.sos.Capabilities;
 import net.seagis.sos.DescribeSensor;
 import net.seagis.sos.GetCapabilities;
 import net.seagis.sos.GetObservation;
-import net.seagis.sos.InsertObservation;
-import net.seagis.sos.RegisterSensor;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
@@ -66,22 +62,16 @@ public class SOService extends WebService {
      */
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
         super("SOS", new Version("1.0.0", true));
-        worker = new SOSworker(this);
+        worker = new SOSworker();
         worker.setVersion("1.0.0");
-        setXMLContext("",
-                      GetCapabilities.class,
-                      GetObservation.class,
-                      RegisterSensor.class,
-                      InsertObservation.class,
-                      ExceptionReport.class,
-                      ObservationCollectionEntry.class,
-                      Capabilities.class,
-                      DescribeSensor.class);
+        setXMLContext("net.seagis.sos:net.seagis.gml:net.seagis.swe:net.seagis.gml:net.seagis.observation",
+                      "");
     }
 
     @Override
     public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
          try {
+             worker.setServiceURL(getServiceURL());
              writeParameters();
              String request = "";
              if (objectRequest == null)
@@ -115,10 +105,7 @@ public class SOService extends WebService {
                  * we build a request object with this parameter.
                  */
                 if (gc == null) {
-                    if (!getParameter("SERVICE", true).equalsIgnoreCase("SOS")) {
-                        throw new OWSWebServiceException("The parameters SERVICE=SOS must be specify",
-                                                         INVALID_PARAMETER_VALUE, "service", getCurrentVersion().getVersionNumber());
-                    }
+                    
                     String version = getParameter("acceptVersions", false);
                     AcceptVersionsType versions;
                     if (version != null) {
@@ -129,13 +116,15 @@ public class SOService extends WebService {
                     } else {
                         versions = new AcceptVersionsType("1.0.0");
                     }
+                    
+                    worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
                     AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
                         
                     //We transform the String of sections in a list.
                     //In the same time we verify that the requested sections are valid. 
                     String section = getParameter("Sections", false);
                     List<String> requestedSections = new ArrayList<String>();
-                    if (section != null && !section.equals("All")) {
+                    if (section != null && !section.equalsIgnoreCase("All")) {
                         final StringTokenizer tokens = new StringTokenizer(section, ",;");
                         while (tokens.hasMoreTokens()) {
                             final String token = tokens.nextToken().trim();
@@ -155,7 +144,7 @@ public class SOService extends WebService {
                                              sections,
                                              formats,
                                              null,
-                                             "SOS");
+                                             getParameter("SERVICE", true));
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);

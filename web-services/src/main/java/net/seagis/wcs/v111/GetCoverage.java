@@ -119,4 +119,9 @@ public class GetCoverage extends AbstractGetCoverage {
     public OutputType getOutput() {
         return output;
     }
+
+    @Override
+    public String getVersion() {
+        return version;
+    }
 }

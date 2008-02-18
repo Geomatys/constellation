@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 //geotools dependencies
+import javax.imageio.ImageIO;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.GET;
@@ -171,6 +172,7 @@ public abstract class WebService {
         
         unmarshaller = null;
         serviceURL   = null;
+        ImageIO.scanForPlugins();
     }
     
     /**
@@ -320,7 +322,7 @@ public abstract class WebService {
             message += " must be specify";
             throwException(message, "VERSION_NEGOTIATION_FAILED", null);
         
-        }
+        } 
     }
     
     /**
@@ -627,11 +629,11 @@ public abstract class WebService {
      * 
      * @param operations A list of OWS operation.
      */
-    public void updateOWSURL(List<Operation> operations) {
+    public static void updateOWSURL(List<Operation> operations, String url, String service) {
         for (Operation op:operations) {
             for (DCP dcp: op.getDCP()) {
                 for (JAXBElement<RequestMethodType> method:dcp.getHTTP().getGetOrPost())
-                    method.getValue().setHref(getServiceURL()+ this.service.toLowerCase() + "?");
+                    method.getValue().setHref(url + service.toLowerCase() + "?");
             }
        }
     }

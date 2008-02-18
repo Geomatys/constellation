@@ -118,7 +118,7 @@ public class DescribeCoverage extends AbstractDescribeCoverage {
      * Gets the value of the version property.
      */
     public String getVersion() {
-        return "1.1.1";
+        return version;
     }
 
 }
