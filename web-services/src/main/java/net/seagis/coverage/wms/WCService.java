@@ -22,9 +22,11 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
@@ -947,7 +949,7 @@ public class WCService extends WebService {
                 SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
                 
                 // supported formats
-                List<CodeListType> formats = new ArrayList<CodeListType>();
+                Set<CodeListType> formats = new LinkedHashSet<CodeListType>();
                 formats.add(new CodeListType("matrix"));
                 formats.add(new CodeListType("jpeg"));
                 formats.add(new CodeListType("png"));
@@ -957,9 +959,9 @@ public class WCService extends WebService {
                 Iterator<Series> it = layer.getSeries().iterator();
                 if (it.hasNext()) {
                     Series s = it.next();
-                    nativeFormat = s.getFormat().getMimeType();
+                    nativeFormat = s.getFormat().getImageFormat();
                 }
-                SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, formats); 
+                SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, new ArrayList<CodeListType>(formats));
                 
                 //supported interpolations
                 List<InterpolationMethod> interpolations = new ArrayList<InterpolationMethod>();

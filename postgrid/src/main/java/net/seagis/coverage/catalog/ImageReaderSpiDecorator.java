@@ -23,6 +23,7 @@ import javax.imageio.spi.ImageReaderSpi;
 
 /**
  * Delegates {@link ImageReader} creation to an other provider.
+ * This is subclassed by {@link FormatEntry} for handling special cases.
  *
  * @author Martin Desruisseaux
  */

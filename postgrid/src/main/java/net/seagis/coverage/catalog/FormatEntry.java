@@ -101,9 +101,9 @@ final class FormatEntry extends Entry implements Format {
             new IdentityHashMap<CoverageReference,Boolean>();
 
     /**
-     * Format mime type as declared in the database.
+     * Format name (or, in legacy database, mime type) as declared in the database.
      */
-    private final String mimeType;
+    private final String formatName;
 
     /**
      * Sample dimensions for coverages encoded with this format.
@@ -130,18 +130,18 @@ final class FormatEntry extends Entry implements Format {
      * Creates a new entry for this format.
      *
      * @param name       An identifier for this entry.
-     * @param mimeType   Format MIME type (example: {@code "image/png"}).
+     * @param formatName Format name. May be MIME type in legacy database (example: {@code "image/png"}).
      * @param extension  Filename extension, excluding dot separator (example: {@code "png"}).
      * @param geophysics {@code true} if coverage to be read are already geophysics values.
      * @param bands      Sample dimensions for coverages encoded with this format.
      */
     protected FormatEntry(final String  name,
-                          final String  mimeType,
+                          final String  formatName,
                           final boolean geophysics,
                           final GridSampleDimension[] bands)
     {
         super(name);
-        this.mimeType   = mimeType.trim().intern();
+        this.formatName = formatName.trim().intern();
         this.geophysics = geophysics;
         this.bands      = bands;
         for (int i=0; i<bands.length; i++) {
@@ -159,8 +159,8 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
-    public String getMimeType() {
-        return mimeType;
+    public String getImageFormat() {
+        return formatName;
     }
 
     /**
@@ -251,14 +251,19 @@ final class FormatEntry extends Entry implements Format {
     private ImageReader getImageReader() throws IIOException {
         assert Thread.holdsLock(this);
         if (reader == null) {
-            final Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(mimeType);
+            final Iterator<ImageReader> readers;
+            if (formatName.indexOf('/') >= 0) {
+                readers = ImageIO.getImageReadersByMIMEType(formatName);
+            } else {
+                readers = ImageIO.getImageReadersByFormatName(formatName);
+            }
             if (!readers.hasNext()) {
-                throw new IIOException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_DECODER_$1, mimeType));
+                throw new IIOException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_DECODER_$1, formatName));
             }
             reader = readers.next();
             if (false && readers.hasNext()) { // Check disabled for now.
                 throw new IIOException(Resources.format(
-                        ResourceKeys.ERROR_TOO_MANY_IMAGE_FORMATS_$1, mimeType));
+                        ResourceKeys.ERROR_TOO_MANY_IMAGE_FORMATS_$1, formatName));
             }
             handleSpecialCases(reader, null);
         }
@@ -647,7 +652,7 @@ final class FormatEntry extends Entry implements Format {
      * Retourne une chaîne de caractères représentant cette entrée.
      */
     final StringBuilder toString(final StringBuilder buffer) {
-        return buffer.append(getName()).append(" (").append(mimeType).append(')');
+        return buffer.append(getName()).append(" (").append(formatName).append(')');
     }
 
     /**
@@ -670,8 +675,8 @@ final class FormatEntry extends Entry implements Format {
         }
         if (super.equals(object)) {
             final FormatEntry that = (FormatEntry) object;
-            return Utilities.equals(this.mimeType,     that.mimeType )  &&
-                      Arrays.equals(this.bands,        that.bands    )  &&
+            return Utilities.equals(this.formatName,   that.formatName) &&
+                      Arrays.equals(this.bands,        that.bands     ) &&
                                     this.geophysics == that.geophysics;
         }
         return false;

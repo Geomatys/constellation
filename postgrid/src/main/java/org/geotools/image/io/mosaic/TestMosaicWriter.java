@@ -21,9 +21,14 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ImageReaderSpi;
+
+import net.seagis.catalog.Database;
+import net.seagis.catalog.CatalogException;
+import net.seagis.coverage.catalog.WritableGridCoverageTable;
 
 
 /**
@@ -32,12 +37,12 @@ import javax.imageio.spi.ImageReaderSpi;
  * @source $URL$
  * @author Cédric Briançon
  *
- * @deprecated This is a temporary class to be deleted once {@link TileBuilder} development
+ * @deprecated This is a temporary class to be deleted once {@link MosaicBuilder} development
  * will be finished.
  */
 @Deprecated
 public class TestMosaicWriter {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, CatalogException, SQLException {
         org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.FINE);
         org.geotools.resources.image.ImageUtilities.allowNativeCodec("PNG", javax.imageio.spi.ImageReaderSpi.class, false);
         Logger.getLogger("org.geotools.image.io").fine("Lancement...");
@@ -53,11 +58,17 @@ public class TestMosaicWriter {
             new Tile(spi, new File(directory, "Tile1_C2.png"), 0, new Rectangle(21600*2, 21600*1, 21600, 21600)),
             new Tile(spi, new File(directory, "Tile1_D2.png"), 0, new Rectangle(21600*3, 21600*1, 21600, 21600))
         };
-        TileBuilder builder = new TileBuilder();
+        MosaicBuilder builder = new MosaicBuilder();
         builder.setTileSize(new Dimension(960,960));
-        builder.setTileDirectory(new File("/home/desruisseaux/Données/PostGRID/Monde/BlueMarble/test"));
+        builder.setTileDirectory(new File("/home/desruisseaux/Données/PostGRID/Monde/BlueMarble/S960"));
         TileManager tileManager = builder.createTileManager(tiles, 0, false);
         System.out.println(tileManager);
-        tileManager.printErrors(null);
+
+        final Database database = new Database();
+        final WritableGridCoverageTable table = new WritableGridCoverageTable(database.getTable(WritableGridCoverageTable.class));
+        table.setCanInsertNewLayers(true);
+        table.setLayer("BlueMarble2");
+        table.addEntries(tileManager.getTiles(), 0);
+        database.close();
     }
 }

@@ -217,11 +217,11 @@ final class SeriesTable extends SingletonTable<Series> {
             final String layerName = layerExists ? layer : layers.getIdentifier(layer);
             ID = searchFreeIdentifier(layer);
             statement = getStatement(QueryType.INSERT);
-            statement.setString (indexOf(query.name),      ID);
-            statement.setString (indexOf(query.layer),     layerName);
-            statement.setString (indexOf(query.pathname),  path);
-            statement.setString (indexOf(query.extension), extension);
-            statement.setString (indexOf(query.format),    format);
+            statement.setString(indexOf(query.name),      ID);
+            statement.setString(indexOf(query.layer),     layerName);
+            statement.setString(indexOf(query.pathname),  trimRoot(path));
+            statement.setString(indexOf(query.extension), extension);
+            statement.setString(indexOf(query.format),    format);
             success = updateSingleton(statement);
             // 'success' must be assigned last in this try block.
         } finally {
@@ -242,7 +242,7 @@ final class SeriesTable extends SingletonTable<Series> {
         if (candidate.equals(path)) {
             return true;
         }
-        File candidateFile  = new File(candidate);
+        File candidateFile = new File(candidate);
         File pathFile = new File(path);
         if (candidateFile.equals(pathFile)) {
             return true;
@@ -301,5 +301,29 @@ final class SeriesTable extends SingletonTable<Series> {
             }
         } while ((relative = relative.getParentFile()) != null);
         return true;
+    }
+
+    /**
+     * Trims the root directory (if any) from the given path.
+     */
+    private String trimRoot(String path) {
+        String root = getProperty(ConfigurationKey.ROOT_DIRECTORY);
+        if (root != null) {
+            final File pathFile = new File(path);
+            if (pathFile.isAbsolute()) {
+                final File rootFile = new File(root);
+                if (rootFile.isAbsolute()) {
+                    path = pathFile.getPath(); // For making sure that we use the right name separator.
+                    root = rootFile.getPath();
+                    if (path.startsWith(root)) {
+                        path = path.substring(root.length());
+                        if (path.startsWith(File.separator)) {
+                            path = path.substring(File.separator.length());
+                        }
+                    }
+                }
+            }
+        }
+        return path.replace(File.separatorChar, '/').trim();
     }
 }

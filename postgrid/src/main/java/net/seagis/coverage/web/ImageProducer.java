@@ -754,7 +754,6 @@ public abstract class ImageProducer {
      * @throws WebServiceException if an error occured while processing the image.
      */
     public File getImageFile() throws WebServiceException {
-        long start = System.currentTimeMillis();
         ImageType type = ImageType.COVERAGE; // Default value.
         if (service != null) {
             switch (service) {

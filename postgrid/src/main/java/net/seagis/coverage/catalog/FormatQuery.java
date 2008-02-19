@@ -33,7 +33,7 @@ final class FormatQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, mimeType, encoding;
+    protected final Column name, format, encoding;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -49,7 +49,7 @@ final class FormatQuery extends Query {
         super(database, "Formats");
         final QueryType[] usage = {SELECT, LIST};
         name     = addColumn("name",     usage);
-        mimeType = addColumn("mime",     usage);
+        format   = addColumn("mime",     usage);
         encoding = addColumn("encoding", usage);
         byName   = addParameter(name, SELECT);
         name.setOrdering("ASC", LIST);

@@ -18,8 +18,6 @@ import java.sql.Types;
 import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
-import java.awt.Dimension;
-import java.awt.geom.AffineTransform;
 import java.net.URL;
 import java.net.URI;
 import java.io.File;
@@ -27,21 +25,17 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.imageio.ImageReader;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.units.SI;
+import java.lang.reflect.UndeclaredThrowableException;
 
 import org.geotools.util.DateRange;
-import org.geotools.resources.Classes;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.i18n.ErrorKeys;
-
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.UpdatePolicy;
@@ -134,112 +128,6 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Returns the most appropriate series in which to insert the coverage.
-     * This is heuristic rules used when no series was explicitly defined.
-     *
-     * @param  spi The image reader provider, or {@code null} if unknown.
-     * @param  path The path to the coverage file (not including the filename).
-     * @param  extension The file extension, or {@code null} if it doesn't matter.
-     * @return The series that seems the best match.
-     * @throws CatalogException if there is ambiguity between series.
-     */
-    private Series getSeries(final ImageReaderSpi spi, final File path, final String extension)
-            throws CatalogException
-    {
-        Series series = null;
-        int mimeMatching = 0; // Greater the number, better is the matching of MIME type.
-        int pathMatching = 0; // Greater the number, better is the matching of the file path.
-        for (final Series candidate : getNonNullLayer().getSeries()) {
-            /*
-             * Asks for every files in the Series directory (e.g. "/home/data/foo/*.png"). The
-             * filename contains a wildcard, but we will not use that. It is just a way to get
-             * the path & extension, so we can check if the series have the expected extension.
-             */
-            final File allFiles = candidate.file("*");
-            if (extension != null) {
-                String name = allFiles.getName();
-                final int split = name.indexOf('.');
-                if (split >= 0) {
-                    name = name.substring(split + 1);
-                }
-                if (!extension.equalsIgnoreCase(name)) {
-                    continue;
-                }
-            }
-            /*
-             * Checks if the Series's MIME type matches one of the ImageReader's MIME types. If the
-             * ImageReader declares more generic types than the expected one, for example if the
-             * ImageReader declares "image/x-netcdf" while the Series expects "image/x-netcdf-foo",
-             * we will accept the ImageReader anyway but we will keep a trace of the quality of the
-             * matching, so we can select a better match if we find one later.
-             */
-            if (spi != null) {
-                final String[] mimeTypes = spi.getMIMETypes();
-                if (mimeTypes != null) {
-                    final String format = candidate.getFormat().getMimeType().trim().toLowerCase();
-                    for (String type : mimeTypes) {
-                        type = type.trim().toLowerCase();
-                        final int length = type.length();
-                        if (length > mimeMatching && format.startsWith(type)) {
-                            mimeMatching = length;
-                            pathMatching = 0; // MIME matching has precedence over path matching.
-                        }
-                    }
-                }
-            }
-            /*
-             * The most straightforward properties match (file extension, mime type...).
-             * Now check the path in a more lenient way: we compare the Series path with
-             * the ImageReader input's path starting from the end, and retain the series
-             * with the deepest (in directory tree) match. If more than one series match
-             * with the same deep, we retains the last one assuming that it is the one
-             * for the most recent data.
-             */
-            int depth = 0;
-            File f1 = path;
-            File f2 = allFiles.getParentFile();
-            while (f1.getName().equals(f2.getName())) {
-                depth++;
-                f1 = f1.getParentFile(); if (f1 == null) break;
-                f2 = f2.getParentFile(); if (f2 == null) break;
-            }
-            if (depth >= pathMatching) {
-                pathMatching = depth;
-                series = candidate;
-            }
-        }
-        if (series == null) {
-            throw new CatalogException(Resources.format(ResourceKeys.ERROR_NO_SERIES_SELECTION));
-        }
-        return series;
-    }
-
-    /**
-     * Returns the path for the specified input. The returned file should not be opened
-     * since it may be invalid (especially if built from a URL input). Its only purpose
-     * is to split the name part and the path part.
-     *
-     * @param  input The input.
-     * @return The input as a file.
-     * @throws CatalogException if the input is not recognized.
-     */
-    private static File path(final Object input) throws CatalogException {
-        if (input instanceof File) {
-            return (File) input;
-        }
-        if (input instanceof URL) {
-            return new File(((URL) input).getPath());
-        }
-        if (input instanceof URI) {
-            return new File(((URI) input).getPath());
-        }
-        if (input instanceof CharSequence) {
-            return new File(input.toString());
-        }
-        throw new CatalogException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, Classes.getShortClassName(input)));
-    }
-
-    /**
      * Adds entries (usually only one) inferred from the specified image reader.
      * The {@linkplain ImageReader#getInput reader input} must be set, and its
      * {@linkplain ImageReader#getImageMetadata metadata} shall conforms to the
@@ -247,7 +135,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * <p>
      * This method will typically not read the full image, but only the metadata required.
      *
-     * @param readers The image reader.
+     * @param inputs The image reader.
      * @return The number of images inserted (should be 0 or 1).
      */
     public int addEntry(final ImageReader reader) throws CatalogException, SQLException, IOException {
@@ -255,29 +143,50 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Adds entries inferred from the specified image readers. The {@linkplain ImageReader#getInput
-     * reader input} must be set, and its {@linkplain ImageReader#getImageMetadata metadata} shall
-     * conforms to the Geotools {@linkplain GeographicMetadata geographic metadata}.
-     * <p>
-     * This method will typically not read the full image, but only the metadata required.
+     * Adds entries inferred from the specified image inputs. The default implementation delegates
+     * its work to {@link #addEntries(Iterator,int)}.
      *
-     * @param readers    The image readers. The iterator may recycle the same reader with different
-     *                   {@linkplain ImageReader#getInput input} on each call to {@link Iterator#next}.
+     * @param inputs The image inputs.
      * @param imageIndex The index of the image to insert in the database.
      * @return The number of images inserted.
      */
-    public synchronized int addEntries(final Iterator<ImageReader> readers, final int imageIndex)
+    public int addEntries(final Collection<?> inputs, final int imageIndex)
+            throws CatalogException, SQLException, IOException
+    {
+        return addEntries(inputs.iterator(), imageIndex);
+    }
+
+    /**
+     * Adds entries inferred from the specified image inputs. The inputs shall be
+     * {@link ImageReader} instances with {@linkplain ImageReader#getInput input} set
+     * and {@linkplain ImageReader#getImageMetadata metadata} conform to the Geotools
+     * {@linkplain GeographicMetadata geographic metadata}.
+     *
+     * {@link org.geotools.image.io.mosaic.Tile} input are also accepted, and in some case
+     * {@link File}, {@link URL} or {@link String}.
+     * <p>
+     * This method will typically not read the full image, but only the metadata required.
+     *
+     * @param inputs The image inputs. The iterator may recycle the same reader with different
+     *               {@linkplain ImageReader#getInput input} on each call to {@link Iterator#next}.
+     * @param imageIndex The index of the image to insert in the database.
+     * @return The number of images inserted.
+     */
+    public synchronized int addEntries(final Iterator<?> inputs, final int imageIndex)
             throws CatalogException, SQLException, IOException
     {
         int count = 0;
-        boolean success = false;
-        transactionBegin();
-        try {
-            count = addEntriesUnsafe(readers, imageIndex);
-            success = true; // Must be the very last line in the try block.
-        } finally {
-            series = null;
-            transactionEnd(success);
+        if (inputs.hasNext()) {
+            final Object next = inputs.next();
+            boolean success = false;
+            transactionBegin();
+            try {
+                count = addEntriesUnsafe(new WritableGridCoverageIterator(null, imageIndex, inputs, next));
+                success = true; // Must be the very last line in the try block.
+            } finally {
+                series = null;
+                transactionEnd(success);
+            }
         }
         return count;
     }
@@ -288,7 +197,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      *
      * @return The number of images inserted.
      */
-    private int addEntriesUnsafe(final Iterator<ImageReader> readers, final int imageIndex)
+    private int addEntriesUnsafe(final Iterator<WritableGridCoverageEntry> entries)
             throws CatalogException, SQLException, IOException
     {
         assert Thread.holdsLock(this);
@@ -303,63 +212,60 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         final int byStartTime = indexOf(query.startTime);
         final int byEndTime   = indexOf(query.endTime);
         final int byExtent    = indexOf(query.spatialExtent);
-        while (readers.hasNext()) {
-            final ImageReader reader = readers.next();
-            final File input = path(reader.getInput());
-            final File path = input.getParentFile();
-            final String filename, extension;
-            if (true) {
-                final String name = input.getName();
-                final int split = name.lastIndexOf('.');
-                if (split >= 0) {
-                    filename  = name.substring(0, split);
-                    extension = name.substring(split + 1);
-                } else {
-                    filename  = name;
-                    extension = "";
+        while (entries.hasNext()) {
+            final WritableGridCoverageEntry entry;
+            try {
+                entry = entries.next();
+            } catch (UndeclaredThrowableException exception) {
+                final Throwable cause = exception.getCause();
+                if (cause instanceof IOException) {
+                    throw (IOException) cause;
                 }
+                if (cause instanceof SQLException) {
+                    throw (SQLException) cause;
+                }
+                if (cause instanceof CatalogException) {
+                    throw (CatalogException) cause;
+                }
+                throw exception;
             }
             /*
              * If we are scanning new files for a specific series, gets that series.
              * Otherwise try to guess it from the path name and file extension.
              */
-            if (readers instanceof ReaderIterator) {
-                series = ((ReaderIterator) readers).series;
+            if (entry.series != null) {
+                series = entry.series;
             } else {
-                series = getSeries(reader.getOriginatingProvider(), path, extension);
+                final Layer layer = getNonNullLayer();
+                final Set<Series> candidates = layer.getSeries();
+                if (!candidates.isEmpty()) {
+                    series = entry.choose(candidates);
+                } else {
+                    final SeriesTable table = getDatabase().getTable(SeriesTable.class);
+                    final String ID = table.getIdentifier(layer.getName(),
+                            entry.path.getPath(), entry.extension, entry.getFormatName(true));
+                    series = table.getEntry(ID);
+                }
             }
             /*
              * Gets the metadata of interest.
              */
-            final MetadataParser metadata = new MetadataParser(getDatabase(), reader, imageIndex);
-            final DateRange[] dates = metadata.getDateRanges();
-            final int width  = reader.getWidth (imageIndex);
-            final int height = reader.getHeight(imageIndex);
-            final AffineTransform gridToCRS = metadata.getGridToCRS();
-            final int horizontalSRID = metadata.getHorizontalSRID();
-            final int verticalSRID = metadata.getVerticalSRID();
-            double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
-            if (verticalOrdinates == null) {
-                /*
-                 * We tried to get the vertical coordinates in meters if possible, so conversions
-                 * from other linear units like feet were applied if needed.   If such conversion
-                 * was not possible, gets the coordinates in whatever units they are. It may be a
-                 * pressure unit or a dimensionless unit (e.g. "sigma level").
-                 *
-                 * TODO: We need to revisit that. Maybe a different column for altitudes in meters
-                 *       and altitudes in native units.
-                 */
-                verticalOrdinates = metadata.getVerticalValues(null);
-            }
-            final String extent = gridTable.getIdentifier(new Dimension(width, height),
-                    gridToCRS, horizontalSRID, verticalOrdinates, verticalSRID, series.getName());
+            entry.parseMetadata(getDatabase());
+            final String extent = gridTable.getIdentifier(
+                    entry.getImageSize(),
+                    entry.getGridToCRS(),
+                    entry.getHorizontalSRID(),
+                    entry.getVerticalValues(),
+                    entry.getVerticalSRID(),
+                    series.getName());
             /*
              * Adds the entries for each image found in the file.
              * There is often only one image per file, but not always.
              */
             statement.setString(bySeries, series.getName());
-            statement.setString(byFilename, filename);
+            statement.setString(byFilename, entry.filename);
             statement.setString(byExtent,   extent);
+            final DateRange[] dates = entry.getDateRanges();
             if (dates == null) {
                 statement.setInt (byIndex,     1);
                 statement.setNull(byStartTime, Types.TIMESTAMP);
@@ -373,6 +279,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 statement.setTimestamp(byEndTime,   new Timestamp(endTime  .getTime()), calendar);
                 if (updateSingleton(statement)) count++;
             }
+            entry.close();
         }
         return count;
     }
@@ -486,8 +393,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 series = entry.getValue();
                 final Object next = entry.getKey();
                 it.remove();
-                final Iterator<ImageReader> iterator = new ReaderIterator(series, it, next);
-                count += addEntriesUnsafe(iterator, 0); // TODO: do we have a better value to provide for imageIndex?
+                final int imageIndex = 0; // TODO: Do we have a better value to provide?
+                count += addEntriesUnsafe(new WritableGridCoverageIterator(series, imageIndex, it, next));
             }
             success = true; // Must be the very last line in the try block.
         } finally {

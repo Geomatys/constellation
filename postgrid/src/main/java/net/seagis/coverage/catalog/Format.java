@@ -31,9 +31,15 @@ import org.geotools.gui.swing.tree.MutableTreeNode;
  */
 public interface Format extends Element {
     /**
-     * Returns the MIME type for this format.
+     * Returns the image format name. The returned value should be a name that can be
+     * used in a call to {@link javax.imageio.ImageIO#getImageReadersByFormatName}.
+     * <p>
+     * For compatibility reason, the caller should be prepared to handle MIME type
+     * (as understood by {@link javax.imageio.ImageIO#getImageReadersByMIMEType}).
+     * as well. As a heuristic rule, we can consider the returned value as a MIME
+     * type if it contains the {@code '/'} character.
      */
-    String getMimeType();
+    String getImageFormat();
 
     /**
      * Returns the ranges of valid sample values for each band in this format.

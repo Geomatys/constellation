@@ -67,20 +67,21 @@ public class FormatTable extends SingletonTable<Format> {
     protected Format createEntry(final ResultSet results) throws CatalogException, SQLException {
         final FormatQuery query = (FormatQuery) super.query;
         final String name     = results.getString(indexOf(query.name));
-        final String mimeType = results.getString(indexOf(query.mimeType));
+        final String format   = results.getString(indexOf(query.format));
         final String encoding = results.getString(indexOf(query.encoding));
         if (bands == null) {
             bands = getDatabase().getTable(SampleDimensionTable.class);
         }
         final boolean geophysics;
-        if ("geophysics".equalsIgnoreCase(encoding)) {
+        final String type = String.valueOf(encoding).toLowerCase();
+        if (type.equals("geophysics")) {
             geophysics = true;
-        } else if ("native".equalsIgnoreCase(encoding)) {
+        } else if (type.equals("packed") || type.equals("rendered") || type.equals("native")) {
             geophysics = false;
         } else {
             throw new IllegalRecordException("Type d'image inconnu: " + encoding,
                         this, results, indexOf(query.encoding), name);
         }
-        return new FormatEntry(name, mimeType, geophysics, bands.getSampleDimensions(name));
+        return new FormatEntry(name, format, geophysics, bands.getSampleDimensions(name));
     }
 }
