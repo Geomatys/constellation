@@ -16,6 +16,8 @@
 
 package net.seagis.gml;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -35,11 +37,13 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractFeatureType", propOrder = {
+    "srsName",
     "boundedBy",
     "location"
 })
 public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
 
+    private List<String> srsName;
     @XmlElement(nillable = true)
     private BoundingShapeEntry boundedBy;
     @XmlElementRef(name = "location", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
@@ -54,8 +58,9 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
      * Build a new "Feature"
      */
     public AbstractFeatureEntry(String id, String name, String description, ReferenceEntry descriptionReference,
-            BoundingShapeEntry boundedBy) {
+            BoundingShapeEntry boundedBy, List<String> srsName) {
         super(id, name, description, descriptionReference);
+        this.srsName = srsName;
         if (boundedBy == null) {
             this.boundedBy = new BoundingShapeEntry("");
         } else { 
@@ -75,6 +80,16 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
      */
     public JAXBElement<? extends LocationPropertyType> getLocation() {
         return location;
+    }
+    
+    /**
+     * Get srs name list
+     */
+    public List<String> getSrsName(){
+        if (srsName == null) {
+            srsName = new ArrayList<String>();
+        }
+        return srsName;
     }
 
     /**

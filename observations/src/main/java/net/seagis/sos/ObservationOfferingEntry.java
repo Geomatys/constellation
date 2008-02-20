@@ -78,11 +78,11 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      *  Build a new offering.
      */ 
     public ObservationOfferingEntry(String id, String name, String description, ReferenceEntry descriptionReference,
-            BoundingShapeEntry boundedBy, AbstractTimeGeometricPrimitiveType time, List<ReferenceEntry> procedure,
+            BoundingShapeEntry boundedBy, List<String> srsName, AbstractTimeGeometricPrimitiveType time, List<ReferenceEntry> procedure,
             List<PhenomenonEntry> observedProperty, List<ReferenceEntry> featureOfInterest,
             List<String> responseFormat, List<QName> resultModel, List<ResponseModeType> responseMode) {
         
-        super(id, name, description, descriptionReference, boundedBy);
+        super(id, name, description, descriptionReference, boundedBy, srsName);
         this.procedure         = procedure;
         this.observedProperty  = new ArrayList<PhenomenonPropertyType>();
         for (PhenomenonEntry p: observedProperty){
@@ -249,6 +249,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
         return hash;
     }
     
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder("offering: " + this.getName()).append('\n');
         s.append("time=" + time ).append('\n');
@@ -267,13 +268,13 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
         if (responseMode != null){
             s.append('\n').append("response mode:").append('\n');
             for (ResponseModeType ss:responseMode){
-                s.append(ss.value()).append('\n');;
+                s.append(ss.value()).append('\n');
             }
         }
          if (resultModel != null){
             s.append('\n').append("result model:").append('\n');
             for (QName ss:resultModel){
-                s.append(ss.toString()).append('\n');;
+                s.append(ss.toString()).append('\n');
             }
         }
         if (featureOfInterest != null){

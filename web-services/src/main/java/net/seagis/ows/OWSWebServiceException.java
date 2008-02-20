@@ -53,5 +53,15 @@ public class OWSWebServiceException extends WebServiceException {
             return null;
         }
     }
+    
+    /**
+     * Return the version number
+     */
+    public String getVersion() {
+        if (exception != null) {
+            return exception.getVersion();
+        }
+        return null;
+    }
 
 }

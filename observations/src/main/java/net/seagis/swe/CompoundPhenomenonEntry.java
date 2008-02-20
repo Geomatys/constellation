@@ -112,6 +112,6 @@ public abstract class CompoundPhenomenonEntry extends PhenomenonEntry {
     
     @Override
     public String toString() {
-        return "dimension:" + dimension + '\n';
+        return super.toString() + " dimension:" + dimension + '\n';
     } 
 }

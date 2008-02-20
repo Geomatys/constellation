@@ -86,4 +86,11 @@ public final class ServiceExceptionReport {
     public List<ServiceExceptionType> getServiceExceptions() {
         return Collections.unmodifiableList(serviceExceptions);
     }
+    
+    /**
+     * Return the version number
+     */
+    public String getVersion() {
+        return version;
+    }
 }

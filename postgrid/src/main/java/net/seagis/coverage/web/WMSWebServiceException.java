@@ -14,7 +14,6 @@
  */
 
 package net.seagis.coverage.web;
-import org.geotools.util.Version;
 import net.seagis.coverage.wms.WMSExceptionCode;
 
 /**
@@ -101,5 +100,15 @@ public class WMSWebServiceException extends WebServiceException {
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Return the service version who launch this exception.
+     */
+    public String getVersion(){
+        if (exception != null ) {
+            return exception.getVersion();
+        }
+        return null;
     }
 }

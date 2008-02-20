@@ -233,11 +233,16 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          resultModel.add(new QName(namespace,
                                    results.getString(indexOf(query.resultModelLocalPart)),
                                    prefixMapper.getPreferredPrefix(namespace, "", false)));
+         
+         List<String> srsName = new ArrayList<String>();
+         srsName.add(results.getString(indexOf(query.srsName)));
+         
          return new ObservationOfferingEntry(idOffering,
                                              results.getString(indexOf(query.name)),
                                              results.getString(indexOf(query.description)),
                                              null,
                                              boundedBy,
+                                             srsName,
                                              eventTime,
                                              process,
                                              phenos,

@@ -29,14 +29,14 @@ public class ObjectFactory {
     private final static QName _Intersects_QNAME = new QName("http://www.opengis.net/ogc", "Intersects");
     private final static QName _SpatialOps_QNAME = new QName("http://www.opengis.net/ogc", "spatialOps");
     private final static QName _PropertyIsEqualTo_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsEqualTo");
-    private final static QName _TOveralps_QNAME = new QName("http://www.opengis.net/ogc", "T_Overalps");
-    private final static QName _TEquals_QNAME = new QName("http://www.opengis.net/ogc", "T_Equals");
+    private final static QName _TOveralps_QNAME = new QName("http://www.opengis.net/ogc", "TM_Overalps");
+    private final static QName _TEquals_QNAME = new QName("http://www.opengis.net/ogc", "TM_Equals");
     private final static QName _Touches_QNAME = new QName("http://www.opengis.net/ogc", "Touches");
     private final static QName _Literal_QNAME = new QName("http://www.opengis.net/ogc", "Literal");
-    private final static QName _TMeets_QNAME = new QName("http://www.opengis.net/ogc", "T_Meets");
-    private final static QName _TOverlappedBy_QNAME = new QName("http://www.opengis.net/ogc", "T_OverlappedBy");
+    private final static QName _TMeets_QNAME = new QName("http://www.opengis.net/ogc", "TM_Meets");
+    private final static QName _TOverlappedBy_QNAME = new QName("http://www.opengis.net/ogc", "TM_OverlappedBy");
     private final static QName _TemporalOps_QNAME = new QName("http://www.opengis.net/ogc", "temporalOps");
-    private final static QName _TEndedBy_QNAME = new QName("http://www.opengis.net/ogc", "T_EndedBy");
+    private final static QName _TEndedBy_QNAME = new QName("http://www.opengis.net/ogc", "TM_EndedBy");
     private final static QName _PropertyIsNotEqualTo_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsNotEqualTo");
     private final static QName _PropertyIsLessThanOrEqualTo_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsLessThanOrEqualTo");
     private final static QName _PropertyIsLike_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsLike");
@@ -45,21 +45,21 @@ public class ObjectFactory {
     private final static QName _PropertyName_QNAME = new QName("http://www.opengis.net/ogc", "PropertyName");
     private final static QName _Disjoint_QNAME = new QName("http://www.opengis.net/ogc", "Disjoint");
     private final static QName _Crosses_QNAME = new QName("http://www.opengis.net/ogc", "Crosses");
-    private final static QName _TEnds_QNAME = new QName("http://www.opengis.net/ogc", "T_Ends");
+    private final static QName _TEnds_QNAME = new QName("http://www.opengis.net/ogc", "TM_Ends");
     private final static QName _Contains_QNAME = new QName("http://www.opengis.net/ogc", "Contains");
     private final static QName _Beyond_QNAME = new QName("http://www.opengis.net/ogc", "Beyond");
-    private final static QName _TAfter_QNAME = new QName("http://www.opengis.net/ogc", "T_After");
+    private final static QName _TAfter_QNAME = new QName("http://www.opengis.net/ogc", "TM_After");
     private final static QName _ComparisonOps_QNAME = new QName("http://www.opengis.net/ogc", "comparisonOps");
     private final static QName _Equals_QNAME = new QName("http://www.opengis.net/ogc", "Equals");
     private final static QName _Overlaps_QNAME = new QName("http://www.opengis.net/ogc", "Overlaps");
-    private final static QName _TMetBy_QNAME = new QName("http://www.opengis.net/ogc", "T_MetBy");
-    private final static QName _TBegins_QNAME = new QName("http://www.opengis.net/ogc", "T_Begins");
-    private final static QName _TBefore_QNAME = new QName("http://www.opengis.net/ogc", "T_Before");
+    private final static QName _TMetBy_QNAME = new QName("http://www.opengis.net/ogc", "TM_MetBy");
+    private final static QName _TBegins_QNAME = new QName("http://www.opengis.net/ogc", "TM_Begins");
+    private final static QName _TBefore_QNAME = new QName("http://www.opengis.net/ogc", "TM_Before");
     private final static QName _PropertyIsGreaterThan_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsGreaterThan");
-    private final static QName _TBegunBy_QNAME = new QName("http://www.opengis.net/ogc", "T_BegunBy");
+    private final static QName _TBegunBy_QNAME = new QName("http://www.opengis.net/ogc", "TM_BegunBy");
     private final static QName _BBOX_QNAME = new QName("http://www.opengis.net/ogc", "BBOX");
-    private final static QName _TContains_QNAME = new QName("http://www.opengis.net/ogc", "T_Contains");
-    private final static QName _TDuring_QNAME = new QName("http://www.opengis.net/ogc", "T_During");
+    private final static QName _TContains_QNAME = new QName("http://www.opengis.net/ogc", "TM_Contains");
+    private final static QName _TDuring_QNAME = new QName("http://www.opengis.net/ogc", "TM_During");
     private final static QName _Within_QNAME = new QName("http://www.opengis.net/ogc", "Within");
     private final static QName _PropertyIsNull_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsNull");
     private final static QName _Expression_QNAME = new QName("http://www.opengis.net/ogc", "expression");
@@ -427,7 +427,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_Overalps", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_Overalps", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTOveralps(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TOveralps_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -436,7 +436,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_Equals", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_Equals", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTEquals(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TEquals_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -472,7 +472,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_Meets", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_Meets", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTMeets(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TMeets_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -481,7 +481,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_OverlappedBy", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_OverlappedBy", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTOverlappedBy(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TOverlappedBy_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -499,7 +499,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_EndedBy", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_EndedBy", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTEndedBy(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TEndedBy_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -582,7 +582,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_Ends", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_Ends", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTEnds(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TEnds_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -609,7 +609,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_After", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_After", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTAfter(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TAfter_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -645,7 +645,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_MetBy", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_MetBy", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTMetBy(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TMetBy_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -654,7 +654,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_Begins", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_Begins", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTBegins(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TBegins_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -663,7 +663,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_Before", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_Before", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTBefore(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TBefore_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -681,7 +681,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_BegunBy", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_BegunBy", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTBegunBy(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TBegunBy_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -699,7 +699,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_Contains", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_Contains", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTContains(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TContains_QNAME, BinaryTemporalOpType.class, null, value);
     }
@@ -709,7 +709,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryTemporalOpType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "T_During", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "TM_During", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "temporalOps")
     public JAXBElement<BinaryTemporalOpType> createTDuring(BinaryTemporalOpType value) {
         return new JAXBElement<BinaryTemporalOpType>(_TDuring_QNAME, BinaryTemporalOpType.class, null, value);
     }

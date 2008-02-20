@@ -18,7 +18,7 @@ public class ObservationOfferingQuery extends Query {
      */
     protected final Column id, name, description, eventTimeBegin, 
             eventTimeEnd, boundedBy, resultModelNamespace, resultModelLocalPart, 
-            responseFormat;
+            responseFormat, srsName;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -37,6 +37,7 @@ public class ObservationOfferingQuery extends Query {
         id                   = addColumn("id",                     SIEL);
         name                 = addColumn("name",                   SIL);
         description          = addColumn("description",            SIL);
+        srsName              = addColumn("srs_name",               SIL);
         eventTimeBegin       = addColumn("event_time_begin",       SIL);
         eventTimeEnd         = addColumn("event_time_end",         SIL);
         boundedBy            = addColumn("bounded_by",             SIL);

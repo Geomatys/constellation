@@ -126,6 +126,9 @@ public class PhenomenonPropertyType {
         if (phenomenon != null) {
             return phenomenon.getValue();
         } else {
+            if (hiddenPhenomenon != null) {
+                return hiddenPhenomenon.getValue();
+            }
             return null;
         }
     }
@@ -207,7 +210,17 @@ public class PhenomenonPropertyType {
             //System.out.println("Phenomenon NULL :" + pheno);
         }
         
+        boolean hiddenPheno = false;
+        if (this.hiddenPhenomenon != null && that.hiddenPhenomenon != null) {
+            hiddenPheno = Utilities.equals(this.hiddenPhenomenon.getValue(), that.hiddenPhenomenon.getValue());
+            //System.out.println("Phenomenon NOT NULL :" + pheno);
+        } else {
+            hiddenPheno = (this.hiddenPhenomenon == null && that.hiddenPhenomenon == null);
+            //System.out.println("Phenomenon NULL :" + pheno);
+        }
+        
         return pheno                                                            &&
+               hiddenPheno                                                      &&
                Utilities.equals(this.actuate,            that.actuate)          &&
                Utilities.equals(this.arcrole,            that.arcrole)          &&  
                Utilities.equals(this.type,               that.type)             &&

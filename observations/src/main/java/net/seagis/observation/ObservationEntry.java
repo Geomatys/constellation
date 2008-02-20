@@ -32,10 +32,6 @@ import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
-import net.seagis.swe.AnyResultEntry;
-import net.seagis.swe.CompositePhenomenonEntry;
-import net.seagis.swe.CompoundPhenomenonEntry;
-import net.seagis.swe.DataBlockDefinitionEntry;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonPropertyType;
 import net.seagis.swe.TimeGeometricPrimitivePropertyType;
@@ -416,15 +412,23 @@ public class ObservationEntry extends Entry implements Observation {
      */ 
     public boolean matchTemplate(ObservationEntry template) {
         System.out.println("matchTemplate:" + Utilities.equals(this.observedProperty,    template.observedProperty));
-        System.out.println("this:" + this.observedProperty.toString());
-        System.out.println("template:" + template.observedProperty.toString());
+        
+        boolean obsProperty = false;
+        if (this.observedProperty != null && template.observedProperty != null) {
+            System.out.println("les deux son non null:" + '\n' + this.observedProperty.getPhenomenon().toString() + '\n' + template.observedProperty.getPhenomenon().toString());
+            obsProperty = Utilities.equals(this.observedProperty.getPhenomenon(),    template.observedProperty.getPhenomenon());
+        } else {
+            obsProperty = this.observedProperty == null && template.observedProperty == null;
+        }
         return Utilities.equals(this.featureOfInterest,   template.featureOfInterest)   &&
                Utilities.equals(this.observedProperty,    template.observedProperty)    &&
                Utilities.equals(this.procedure,           template.procedure)           &&
                Utilities.equals(this.resultQuality,       template.resultQuality)       && 
                Utilities.equals(this.observationMetadata, template.observationMetadata) &&
                Utilities.equals(this.procedureTime,       template.procedureTime)       &&
-               Utilities.equals(this.procedureParameter,  template.procedureParameter);
+               Utilities.equals(this.procedureParameter,  template.procedureParameter)  &&
+               obsProperty;
+        
                //TODO corriger ce pb
                //Utilities.equals(this.distribution,        template.distribution)        &&
                //Utilities.equals(this.resultDefinition,    template.resultDefinition)    && 

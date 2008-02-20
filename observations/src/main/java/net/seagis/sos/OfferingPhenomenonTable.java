@@ -147,7 +147,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 if ( phenomenons == null) {
                     phenomenons = getDatabase().getTable(PhenomenonTable.class);
                 }
-            idPheno = phenomenons.getIdentifier(offPheno.getComponent());
+                idPheno = phenomenons.getIdentifier(offPheno.getComponent());
                 statement.setString(indexOf(query.phenomenon), idPheno);
                 statement.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
             

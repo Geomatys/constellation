@@ -24,8 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -45,11 +43,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import net.seagis.catalog.NoSuchTableException;
@@ -356,7 +352,7 @@ public class SOSworker {
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
-    public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws WebServiceException, JAXBException {
+    public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws WebServiceException {
         logger.info("getCapabilities request processing" + '\n');
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
@@ -379,7 +375,7 @@ public class SOSworker {
             }
         }
         AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
-        if (formats != null && formats.getOutputFormat().contains("text/xml")) {
+        if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains("text/xml")) {
             throw new OWSWebServiceException("accepted format : text/xml",
                                              INVALID_PARAMETER_VALUE, "acceptFormats",
                                              version);
@@ -587,8 +583,8 @@ public class SOSworker {
         
          //we verify that the output format is good.     
          if (requestObservation.getResponseFormat()!= null) {
-            if (!requestObservation.getResponseFormat().equalsIgnoreCase("text/xml;subtype=\"om/1.0\"")) {
-                throw new OWSWebServiceException("only text/xml;subtype=\"om/1.0\" is accepted for responseFormat", 
+            if (!requestObservation.getResponseFormat().equalsIgnoreCase("text/xml; subtype=\"om/1.0\"")) {
+                throw new OWSWebServiceException("only text/xml; subtype=\"om/1.0\" is accepted for responseFormat", 
                                                  INVALID_PARAMETER_VALUE, "responseFormat", version);
             }
          } else {
@@ -602,6 +598,7 @@ public class SOSworker {
             boolean template  = false;
             ResponseModeType mode;
             if (requestObservation.getResponseMode() == null) {
+                logger.info("responseMode was null");
                 mode = ResponseModeType.INLINE; 
             } else {    
                 mode = requestObservation.getResponseMode();
@@ -634,6 +631,22 @@ public class SOSworker {
                                                   NO_APPLICABLE_CODE, "offering", version);
                 }
                 
+            }
+            
+            //we verify that the srsName (if there is one) is advertised in the offering
+            if (requestObservation.getSrsName() != null) {
+                if (!off.getSrsName().contains(requestObservation.getSrsName())) {
+                    throw new OWSWebServiceException("This srs name is not advertised in the offering",
+                                                    INVALID_PARAMETER_VALUE, "srsName", version);
+                }
+            }
+            
+            //we verify that the resultModel (if there is one) is advertised in the offering
+            if (requestObservation.getResultModel() != null) {
+                if (!off.getResultModel().contains(requestObservation.getResultModel())) {
+                    throw new OWSWebServiceException("This result model is not advertised in the offering",
+                                                    INVALID_PARAMETER_VALUE, "resultModel", version);
+                }
             }
             
             //we get the list of process
@@ -704,7 +717,7 @@ public class SOSworker {
                         try {
                             phen = (PhenomenonEntry) phenomenons.getEntry(s);
                         } catch (NoSuchRecordException ex) {
-                            throw new OWSWebServiceException(" this phenomenon " + s + "is not registred in the database!",
+                            throw new OWSWebServiceException(" this phenomenon " + s + " is not registred in the database!",
                                                           INVALID_PARAMETER_VALUE, "observedProperty", version);
                         } catch (CatalogException ex){
                             throw new OWSWebServiceException("Catalog exception while getting the phenomenon",
@@ -740,7 +753,7 @@ public class SOSworker {
                         //verify that the station is registred in the DB.
                         try {
                             foiTable.getEntry(s);
-                        } catch (NoSuchTableException ex){
+                        } catch (NoSuchRecordException ex){
                             throw new OWSWebServiceException("the feature of interest is not registered",
                                                              INVALID_PARAMETER_VALUE, "", version);
                         } catch (CatalogException ex){
@@ -1388,7 +1401,7 @@ public class SOSworker {
      * 
      * @param time a GML time position object.
      */
-    private String getTimeValue(TimePositionType time) {
+    private String getTimeValue(TimePositionType time) throws WebServiceException {
         if (time != null && time.getValue() != null) {
             String value = time.getValue();
             value = value.replace('T', ' ');
@@ -1400,6 +1413,7 @@ public class SOSworker {
              try {
                  //here t is not used but it allow to verify the syntax of the timestamp
                  Timestamp t = Timestamp.valueOf(value);
+                 return t.toString();
                  
              } catch(IllegalArgumentException e) {
                 throw new OWSWebServiceException("bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms",
@@ -1681,12 +1695,16 @@ public class SOSworker {
                             List<String> outputFormat = new ArrayList<String>();
                             outputFormat.add("text/xml");
                             
+                            List<String> srsName = new ArrayList<String>();
+                            srsName.add("EPSG:4326");
+                            
                             // we create a the new Offering
                             offering = new ObservationOfferingEntry(offeringName, 
                                                                     offeringIdBase + offeringName,
                                                                     "",
                                                                     null, 
                                                                     null, //TODO boundedby 
+                                                                    srsName,
                                                                     time,
                                                                     process,
                                                                     phenos,
@@ -1759,12 +1777,16 @@ public class SOSworker {
                             List<String> outputFormat = new ArrayList<String>();
                             outputFormat.add("text/xml");
                             
+                            List<String> srsName = new ArrayList<String>();
+                            srsName.add("EPSG:4326");
+                            
                             // we create a the new Offering
-                            offering = new ObservationOfferingEntry(offeringIdBase +allSensor, 
+                            offering = new ObservationOfferingEntry(offeringIdBase + "allSensor", 
                                                                     offeringIdBase + "allSensor",
                                                                     "",
                                                                     null, 
-                                                                    null, //TODO boundedby 
+                                                                    null, //TODO boundedby
+                                                                    srsName,
                                                                     time,
                                                                     process,
                                                                     phenos,
