@@ -263,7 +263,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * @see #getTimeRange
      * @see #trimEnvelope
      */
-    public synchronized Envelope getEnvelope() throws CatalogException, SQLException {
+    public synchronized GeneralEnvelope getEnvelope() throws CatalogException, SQLException {
         if (envelope != null) {
             return envelope.clone();
         }

@@ -186,4 +186,20 @@ final class WritableGridCoverageIterator implements Iterator<WritableGridCoverag
     public void remove() {
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * Returns a string representation for debugging purpose.
+     */
+    @Override
+    public String toString() {
+        final StringBuilder buffer = new StringBuilder(getClass().getSimpleName());
+        buffer.append('[');
+        if (series != null) {
+            buffer.append("series=\"").append(series).append("\", ");
+        }
+        if (reader != null) {
+            buffer.append("reader=").append(reader.getClass().getSimpleName()).append(", ");
+        }
+        return buffer.append("imageIndex=").append(imageIndex).append(']').toString();
+    }
 }

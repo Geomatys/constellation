@@ -44,7 +44,6 @@ import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
@@ -54,10 +53,10 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CannotRedoException;
 
 import org.geotools.util.DateRange;
+import org.geotools.resources.XArray;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.coverage.grid.GridCoverage2D;
 
-import net.seagis.resources.XArray;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.catalog.CatalogException;

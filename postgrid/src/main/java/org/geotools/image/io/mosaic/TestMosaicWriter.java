@@ -29,6 +29,7 @@ import javax.imageio.spi.ImageReaderSpi;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.WritableGridCoverageTable;
+import org.geotools.geometry.Envelope2D;
 
 
 /**
@@ -61,13 +62,14 @@ public class TestMosaicWriter {
         MosaicBuilder builder = new MosaicBuilder();
         builder.setTileSize(new Dimension(960,960));
         builder.setTileDirectory(new File("/home/desruisseaux/Données/PostGRID/Monde/BlueMarble/S960"));
+        builder.setMosaicEnvelope(new Envelope2D(null, -180, -90, 360, 180));
         TileManager tileManager = builder.createTileManager(tiles, 0, false);
         System.out.println(tileManager);
 
         final Database database = new Database();
         final WritableGridCoverageTable table = new WritableGridCoverageTable(database.getTable(WritableGridCoverageTable.class));
         table.setCanInsertNewLayers(true);
-        table.setLayer("BlueMarble2");
+        table.setLayer("BlueMarble");
         table.addEntries(tileManager.getTiles(), 0);
         database.close();
     }

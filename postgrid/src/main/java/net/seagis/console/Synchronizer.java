@@ -32,8 +32,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import net.seagis.resources.XArray;
 import org.geotools.io.TableWriter;
+import org.geotools.resources.XArray;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 

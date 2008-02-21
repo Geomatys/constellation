@@ -37,6 +37,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.geotools.util.DateRange;
 import org.geotools.util.MeasurementRange;
+import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -45,7 +46,6 @@ import net.seagis.catalog.Entry;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.ServerException;
 import net.seagis.coverage.model.Model;
-import net.seagis.resources.XArray;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
 

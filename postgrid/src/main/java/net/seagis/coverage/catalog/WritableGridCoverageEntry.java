@@ -14,7 +14,7 @@
  */
 package net.seagis.coverage.catalog;
 
-import java.sql.SQLException;
+import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
@@ -24,17 +24,26 @@ import java.net.URI;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.sql.SQLException;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.units.SI;
 
+import org.opengis.geometry.Envelope;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.metadata.spatial.PixelOrientation;
+
 import org.geotools.util.DateRange;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.image.io.mosaic.Tile;
+import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.GeneralGridRange;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
@@ -79,6 +88,11 @@ final class WritableGridCoverageEntry {
      * The object to use for parsing image metadata. This is set by {@link #parseMetadata}.
      */
     private MetadataParser metadata;
+
+    /**
+     * A default envelope to be used if none was found in the metadata.
+     */
+    private Envelope envelope;
 
     /**
      * Creates an entry for the given tile.
@@ -273,9 +287,14 @@ final class WritableGridCoverageEntry {
 
     /**
      * Parses metadata using the connection to the given database.
+     *
+     * @param  database The connection to the database.
+     * @param  envelope A default envelope to use if none was found in the metadata.
+     * @throws IOException if an error occured while reading the metadata.
      */
-    final void parseMetadata(final Database database) throws IOException {
+    final void parseMetadata(final Database database, final Envelope envelope) throws IOException {
         metadata = new MetadataParser(database, reader, tile.getImageIndex());
+        this.envelope = envelope;
     }
 
     /**
@@ -302,10 +321,24 @@ final class WritableGridCoverageEntry {
      *
      * @return The affine transform from grid to CRS, or {@code null} if it can't be computed.
      */
-    public AffineTransform getGridToCRS() {
+    public AffineTransform getGridToCRS() throws IOException {
         AffineTransform gridToCRS = tile.getGridToCRS();
-        if (gridToCRS == null) {
+        if (gridToCRS != null) {
+            // The entry to be recorded in the database has its origin to (0,0).
+            // If the tile has an other origin, we need to translate it accordingly.
+            final Point origin = tile.getLocation();
+            if (origin.x != 0 || origin.y != 0) {
+                gridToCRS = new AffineTransform(gridToCRS);
+                gridToCRS.translate(origin.x, origin.y);
+            }
+        } else if (gridToCRS == null) {
+            // No translation to apply here because the 'gridToCRS' transform
+            // doesn't come from the tile.
             gridToCRS = metadata.getGridToCRS();
+            if (gridToCRS == null) {
+                final GeneralGridRange gridRange = new GeneralGridRange(tile.getRegion(), envelope.getDimension());
+                return (AffineTransform) new GridGeometry2D(gridRange, envelope).getGridToCRS2D(PixelOrientation.UPPER_LEFT);
+            }
         }
         return gridToCRS;
     }
@@ -314,7 +347,21 @@ final class WritableGridCoverageEntry {
      * Returns the horizontal CRS identifier, or {@code 0} if unknown.
      */
     public int getHorizontalSRID() throws SQLException, CatalogException {
-        return metadata.getHorizontalSRID();
+        int srid = metadata.getHorizontalSRID();
+        if (srid == 0 && envelope != null) {
+            CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
+            crs = CRS.getHorizontalCRS(crs);
+            final Integer candidate;
+            try {
+                candidate = CRS.lookupEpsgCode(crs, true);
+            } catch (FactoryException e) {
+                throw new CatalogException(e);
+            }
+            if (candidate != null) {
+                srid = candidate;
+            }
+        }
+        return srid;
     }
 
     /**
@@ -357,5 +404,18 @@ final class WritableGridCoverageEntry {
                 ((ImageInputStream) input).close();
             }
         }
+    }
+
+    /**
+     * Returns a string representation for debugging purpose.
+     */
+    @Override
+    public String toString() {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append(tile);
+        if (series != null) {
+            buffer.append(" in ").append(series);
+        }
+        return buffer.toString();
     }
 }

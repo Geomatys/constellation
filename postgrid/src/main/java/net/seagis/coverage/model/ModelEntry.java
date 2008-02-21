@@ -16,11 +16,11 @@ package net.seagis.coverage.model;
 
 import java.util.List;
 import org.opengis.coverage.Coverage;
+import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import net.seagis.catalog.Entry;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
-import net.seagis.resources.XArray;
 
 
 /**

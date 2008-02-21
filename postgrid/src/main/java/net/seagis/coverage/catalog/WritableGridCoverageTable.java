@@ -32,16 +32,20 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import javax.imageio.ImageReader;
 import java.lang.reflect.UndeclaredThrowableException;
 
 import org.geotools.util.DateRange;
+import org.geotools.geometry.GeneralEnvelope;
+
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.UpdatePolicy;
 import net.seagis.catalog.CatalogException;
-import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.resources.i18n.Resources;
+import net.seagis.resources.i18n.ResourceKeys;
 
 
 /**
@@ -55,6 +59,16 @@ import net.seagis.resources.i18n.Resources;
  * @author Antoine Hnawia
  */
 public class WritableGridCoverageTable extends GridCoverageTable {
+    /**
+     * {@code true} if the default extent identifier (when new one need to be created) should
+     * contains the filename. A value of {@code false} create simplier extent name for series
+     * that are expected to contains coverage having uniform geographic extent. But a value
+     * of {@code true} is safer if the series may contains heterogeneous coverage or mosaics,
+     * since it reduce the risk that {@link GridGeometryTable#searchFreeIdentifier} run out
+     * of identifiers.
+     */
+    private static final boolean DEFAULT_EXTENT_CONTAINS_FILENAME = true;
+
     /**
      * The series to be returned by {@link #getSeries}, or {@code null} if unknown.
      * In the later case, the series will be inferred from the layer.
@@ -206,6 +220,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         final Calendar          calendar  = getCalendar();
         final PreparedStatement statement = getStatement(QueryType.INSERT);
         final GridGeometryTable gridTable = getDatabase().getTable(GridGeometryTable.class);
+        final GeneralEnvelope   envelope  = getEnvelope();
+        envelope.validate(false);
         final int bySeries    = indexOf(query.series);
         final int byFilename  = indexOf(query.filename);
         final int byIndex     = indexOf(query.index);
@@ -248,16 +264,35 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 }
             }
             /*
-             * Gets the metadata of interest.
+             * Logs a message about the entry to be created, then suggests a name for the extent
+             * as the concatenation of series name and the file name.  This is not yet the final
+             * name, since it may change as a result of getIdentier(...) call later.
+             *
+             * TODO: localize the log.
              */
-            entry.parseMetadata(getDatabase());
-            final String extent = gridTable.getIdentifier(
+            String extent = series.getName();
+            final LogRecord record = new LogRecord(Level.INFO, "Adding \"" +
+                    entry.filename + "\" to series \"" + extent + "\".");
+            record.setSourceClassName(WritableGridCoverageTable.class.getSimpleName());
+            record.setSourceMethodName("addEntries");
+            LOGGER.log(record);
+            if (DEFAULT_EXTENT_CONTAINS_FILENAME) {
+                extent = extent + ' ' + entry.filename.replace('_','-').replace(' ','_').trim();
+            }
+            /*
+             * Gets the metadata of interest. The metadata should contains at least the image
+             * envelope and CRS. If it doesn't, then we will use the table envelope as a fall
+             * back. It defaults to the whole Earth in WGS 84 geographic coordinates, but the
+             * user can set an other value using {@link #setEnvelope}.
+             */
+            entry.parseMetadata(getDatabase(), envelope);
+            extent = gridTable.getIdentifier(
                     entry.getImageSize(),
                     entry.getGridToCRS(),
                     entry.getHorizontalSRID(),
                     entry.getVerticalValues(),
                     entry.getVerticalSRID(),
-                    series.getName());
+                    extent);
             /*
              * Adds the entries for each image found in the file.
              * There is often only one image per file, but not always.

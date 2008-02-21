@@ -29,8 +29,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import org.geotools.resources.Classes;
+import org.geotools.resources.XArray;
 
-import net.seagis.resources.XArray;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
 

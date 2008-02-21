@@ -19,8 +19,8 @@ import java.awt.geom.Point2D;
 import java.util.Date;
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
 import javax.units.Unit;
 import javax.units.SI;
@@ -62,7 +62,8 @@ final class MetadataParser {
     private final Database database;
 
     /**
-     * The metadata to parse.
+     * The metadata to parse. Never {@code null} but may be empty if the reader given to the
+     * constructor do not know about geographic metadata.
      */
     private final GeographicMetadata metadata;
 
@@ -71,8 +72,7 @@ final class MetadataParser {
      *
      * @param  reader     The reader where to fetch metadata from.
      * @param  imageIndex The index of the image to be read.
-     * @throws IOException if an error occured during metadata reading, or if no metadata
-     *         were found.
+     * @throws IOException if an error occured during metadata reading, or if no metadata were found.
      */
     public MetadataParser(final Database database, final ImageReader reader, final int imageIndex) throws IOException {
         this.database = database;
@@ -82,11 +82,17 @@ final class MetadataParser {
             final IIOMetadata candidate = reader.getImageMetadata(imageIndex);
             if (candidate instanceof GeographicMetadata) {
                 metadata = (GeographicMetadata) candidate;
-            } else if (candidate != null) {
-                metadata = new GeographicMetadata(reader);
-                metadata.mergeTree(candidate);
             } else {
-                throw new IIOException("Aucune métadonnée n'a été trouvée"); // TODO: localize
+                metadata = new GeographicMetadata(reader);
+                if (candidate != null) try {
+                    metadata.mergeTree(candidate);
+                } catch (IIOInvalidTreeException exception) {
+                    // Can not merge. Ignores the exception and keep metadata empty, except if the
+                    // exception occured in a particular node instead than right from the begining.
+                    if (exception.getOffendingNode() != null) {
+                        throw exception;
+                    }
+                }
             }
         }
     }
@@ -296,6 +302,9 @@ final class MetadataParser {
             final int sourceDim, final int targetDim, final double[] flatmatrix,
             final boolean asY, final boolean reverse)
     {
+        if (geometry.getDimension() <= Math.max(sourceDim, targetDim)) {
+            return false;
+        }
         final NumberRange sourceRange = geometry.getGridRange(sourceDim);
         if (sourceRange == null) {
             return false;

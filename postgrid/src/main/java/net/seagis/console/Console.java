@@ -87,9 +87,9 @@ import net.seagis.resources.i18n.ResourceKeys;
  * <p>
  * L'argument {@code -encoding} est surtout utile lorsque ce programme est lancé à partir de la ligne
  * de commande MS-DOS: ce dernier n'utilise pas la même page de code que le reste du système Windows.
- * Il est alors nécessaire de préciser la page de code (souvent 850 ou 437) si on veut obtenir un
- * affichage correct des caractères étendus. La page de code en cours peut être obtenu en tappant
- * {@code chcp} sur la ligne de commande.
+ * Il peut être nécessaire de préciser la page de code (souvent 850 ou 437) pour obtenir un affichage
+ * correct des caractères étendus. La page de code en cours peut être obtenu en tappant {@code chcp}
+ * sur la ligne de commande.
  *
  * @version $Id$
  * @author Martin Desruisseaux
