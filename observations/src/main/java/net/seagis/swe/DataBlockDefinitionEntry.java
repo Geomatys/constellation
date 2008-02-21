@@ -16,10 +16,13 @@ package net.seagis.swe;
 
 import java.util.Collection;
 import java.util.Iterator;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -54,12 +57,12 @@ import org.geotools.resources.Utilities;
     /**
      * Decrit l'encodage des données.
      */
-    private AbstractEncodingEntry encoding;
+    private AbstractEncodingPropertyType encoding;
     
     /**
      * constructeur utilisé par jaxB
      */
-    protected DataBlockDefinitionEntry() {}
+    DataBlockDefinitionEntry() {}
     
     /**
      * créé un nouveau resultat d'observation.
@@ -75,7 +78,7 @@ import org.geotools.resources.Utilities;
         super(id);
         this.id         = id;
         this.components = components;
-        this.encoding   = encoding;
+        this.encoding   = new AbstractEncodingPropertyType(encoding);
     }
     
     /**
@@ -102,7 +105,10 @@ import org.geotools.resources.Utilities;
      * {@inheritDoc}
      */
     public AbstractEncoding getEncoding() {
-        return encoding;
+        if (encoding != null) {
+            return encoding.getencoding();
+        }
+        return null;
     }
     
     /**

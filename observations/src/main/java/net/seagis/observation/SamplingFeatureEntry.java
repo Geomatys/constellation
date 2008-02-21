@@ -20,11 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.catalog.Entry;
+
 // Geotools dependencies
+import net.seagis.gml.AbstractFeatureEntry;
 import org.geotools.resources.Utilities;
 
 // openGis dependencies
@@ -44,19 +44,12 @@ import org.opengis.observation.sampling.SamplingFeature;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SamplingFeature", namespace="http://www.opengis.net/sa/1.0")
 @XmlSeeAlso({ SamplingPointEntry.class})
-public class SamplingFeatureEntry extends Entry implements SamplingFeature {
+public class SamplingFeatureEntry extends AbstractFeatureEntry implements SamplingFeature {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = 8822736167506306189L;
 
-    /**
-     * L'identifiant alphanumérique de la station.
-     */
-    @XmlAttribute(required = true)
-    private String id;
-    
-    
     /**
      * La description de la station.
      */
@@ -110,8 +103,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
                                    final String            description,
                                    final String            sampledFeature)
     {
-        super(name, description);
-        this.id                     = id;
+        super(id, name, description);
         this.name                   = name;
         this.description            = description;
         this.sampledFeature         = new ArrayList<String>();
@@ -127,8 +119,8 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
                                    final List<Object>           sampledFeature,
                                    final SurveyProcedureEntry   surveyDetail)
     {
-        super(name, description);
-        this.id                     = id;
+        super(id, name, description);
+        this.name                   = name;
         this.description            = description;
         this.surveyDetail           = surveyDetail;
         this.relatedSamplingFeature = relatedSamplingFeature;
@@ -136,13 +128,6 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
        // this.sampledFeature         = sampledFeature;
     }
 
-    /**
-     * retourne l'identifiant de la station.
-     */
-    public String getId() {
-        return id;
-    }
-    
     public String getName() {
         return this.name;
     }
@@ -188,7 +173,7 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      */
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return super.hashCode();
     }
 
     /**
@@ -200,13 +185,16 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
             return true;
         }
         
-        final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
-        return Utilities.equals(this.id,                     that.id) &&
-               Utilities.equals(this.surveyDetail,           that.surveyDetail)   &&
-               Utilities.equals(this.description,            that.description)   && 
-               Utilities.equals(this.relatedObservation,     that.relatedObservation) &&
-               Utilities.equals(this.relatedSamplingFeature, that.relatedSamplingFeature) &&
-               Utilities.equals(this.sampledFeature,         that.sampledFeature);
+        if (object instanceof SamplingFeatureEntry && super.equals(object)) {
+            final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
+            return Utilities.equals(this.surveyDetail,           that.surveyDetail)   &&
+                   Utilities.equals(this.description,            that.description)   && 
+                   Utilities.equals(this.relatedObservation,     that.relatedObservation) &&
+                   Utilities.equals(this.relatedSamplingFeature, that.relatedSamplingFeature) &&
+                   Utilities.equals(this.sampledFeature,         that.sampledFeature);
+        }
+        return false;
+        
     }
 
    /**
@@ -214,13 +202,13 @@ public class SamplingFeatureEntry extends Entry implements SamplingFeature {
      */
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder(super.toString());
         Iterator i =  sampledFeature.iterator();
         String sampledFeatures = "";
         while (i.hasNext()) {
             sampledFeatures += i.next() + " ";
         }
-        s.append(" id=").append(id).append(" name=").append(name ).append(" description=")
+        s.append(" name=").append(name ).append(" description=")
                 .append(description).append(" sampledFeature=").append(sampledFeatures);
         return s.toString();
     }

@@ -72,11 +72,10 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final MeasureEntry           result,
             final AbstractTimeGeometricPrimitiveType    samplingTime,
             final MetaDataEntry          observationMetadata,
-            final String                 resultDefinition,
             final AbstractTimeGeometricPrimitiveType    procedureTime,
             final Object                 procedureParameter) {
         super(name, definition, station, observedProperty, procedure, distribution, quality, result,
-                samplingTime, observationMetadata, resultDefinition, procedureTime, procedureParameter);
+                samplingTime, observationMetadata, procedureTime, procedureParameter);
     }
     
     /**
@@ -96,10 +95,9 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final DistributionEntry    distribution,
             //final ElementEntry         quality,
             final MeasureEntry         result,
-            final AbstractTimeGeometricPrimitiveType  samplingTime,
-            final String               resultDefinition) {
+            final AbstractTimeGeometricPrimitiveType  samplingTime) {
         super(name, definition, station, observedProperty, procedure, distribution, result,
-                samplingTime, resultDefinition);
+                samplingTime);
         
     }
     

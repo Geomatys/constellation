@@ -33,6 +33,6 @@ public interface SimpleDataRecord extends AbstractDataRecord {
     /**
      * this field is restricted to AnyScalar value.
      */
-    Collection<AnyScalarEntry> getField();
+    Collection<AnyScalarPropertyType> getField();
     
 }

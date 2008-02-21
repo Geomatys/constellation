@@ -17,12 +17,13 @@ package net.seagis.observation;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.catalog.Entry;
+import net.seagis.gml.AbstractFeatureEntry;
 import org.geotools.resources.Utilities;
 import org.opengis.observation.ObservationCollection;
 
@@ -33,45 +34,41 @@ import org.opengis.observation.ObservationCollection;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ObservationCollection")
 @XmlRootElement(name = "ObservationCollection")
-public class ObservationCollectionEntry extends Entry implements ObservationCollection {
+public class ObservationCollectionEntry extends AbstractFeatureEntry implements ObservationCollection {
 
     /**
      *  The observation collection
      */
     @XmlElement(name="member", namespace="http://www.opengis.net/om/1.0")
-    private Collection<ObservationEntry> member = new ArrayList<ObservationEntry>();
+    private Collection<ObservationPropertyType> member = new ArrayList<ObservationPropertyType>();
     
     /**
      * A JAXB constructor. 
      */
-    public ObservationCollectionEntry() {}
-    
-    /**
-     * Build a new Collection of Observation
-     */
-    public ObservationCollectionEntry(Collection<ObservationEntry> member) {
-        this.member = member;
+    public ObservationCollectionEntry() {
+        super(null, null, null);
     }
     
-    /**
-     * override the getName() method of Entry 
-     */
-    public String getName() {
-        return this.name;
-    }
     
     /**
      * Add a new Observation to the collection. 
      */
     public void add(ObservationEntry observation) {
-        this.member.add(observation);
+        if (observation != null) {
+            this.member.add(new ObservationPropertyType(observation));
+        }
     }
     
     /**
      * Return a collection of Observation
      */
     public Collection<ObservationEntry> getMember() {
-        return this.member;
+        Collection result = new ArrayList<ObservationEntry>();
+        
+        for (ObservationPropertyType obprop: member) {
+            result.add(obprop.getObservation());
+        }
+        return result;
     }
     
      /**
@@ -102,7 +99,7 @@ public class ObservationCollectionEntry extends Entry implements ObservationColl
         s.append("Observation Collection:").append('\n');
         s.append("super:").append(super.toString());
         int i = 1;
-        for (ObservationEntry obs:member) {
+        for (ObservationPropertyType obs:member) {
             s.append("observation n" + i + ":").append('\n').append(obs.toString());
             i++;
         }

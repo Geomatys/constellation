@@ -35,7 +35,7 @@ public class AbstractEncodingEntry extends Entry implements AbstractEncoding{
     /**
      * constructor used by jaxB
      */
-    protected AbstractEncodingEntry() {}
+    AbstractEncodingEntry() {}
 
     /**
      *  An abstract encoding. used like super constructor

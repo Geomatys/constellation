@@ -193,15 +193,14 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         } 
         
         return new MeasurementEntry(result.getString(indexOf(query.name   )),
-                result.getString(indexOf(query.description)),
-                station,
-                pheno,
-                procedure,
-                distrib,
-                //manque quality
-                resultat,
-                samplingTime,
-                result.getString(indexOf(query.resultDefinition)));
+                                    result.getString(indexOf(query.description)),
+                                    station,
+                                    pheno,
+                                    procedure,
+                                    distrib,
+                                    //manque quality
+                                    resultat,
+                                    samplingTime);
     }
     
     
@@ -305,13 +304,6 @@ public class MeasurementTable extends SingletonTable<Measurement> {
                 statement.setString(indexOf(query.result), measures.getIdentifier((MeasureEntry)meas.getResult()));
             } else {
                 statement.setNull(indexOf(query.result), java.sql.Types.VARCHAR);
-            }
-        
-            //on insere la definition du resultat
-            if (meas.getResultDefinition() != null) {
-                statement.setString(indexOf(query.resultDefinition), (String)meas.getResultDefinition());
-            } else {
-                statement.setNull(indexOf(query.resultDefinition), java.sql.Types.VARCHAR);
             }
         
             // on insere le "samplingTime""

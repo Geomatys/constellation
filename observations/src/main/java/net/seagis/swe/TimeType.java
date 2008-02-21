@@ -1,3 +1,18 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package net.seagis.swe;
 
 import java.util.ArrayList;
@@ -18,17 +33,17 @@ import org.geotools.resources.Utilities;
 })
 public class TimeType extends AbstractDataComponentEntry {
 
-    protected UomPropertyType uom;
-    //protected AllowedTimesPropertyType constraint;
-    //protected QualityPropertyType quality;
+    private UomPropertyType uom;
+    //private AllowedTimesPropertyType constraint;
+    //private QualityPropertyType quality;
     @XmlList
-    protected List<String> value = new ArrayList<String>();
+    private List<String> value;
     @XmlAttribute
-    protected String localFrame;
+    private String localFrame;
     @XmlAttribute
-    protected String referenceFrame;
+    private String referenceFrame;
     @XmlAttribute
-    protected String referenceTime;
+    private String referenceTime;
 
     /**
      * A empty contructor used by JAXB
@@ -48,26 +63,9 @@ public class TimeType extends AbstractDataComponentEntry {
     
     /**
      * Gets the value of the uom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link UomPropertyType }
-     *     
      */
     public UomPropertyType getUom() {
         return uom;
-    }
-
-    /**
-     * Sets the value of the uom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link UomPropertyType }
-     *     
-     */
-    public void setUom(UomPropertyType value) {
-        this.uom = value;
     }
 
     /**
@@ -75,83 +73,35 @@ public class TimeType extends AbstractDataComponentEntry {
      * 
      */
     public List<String> getValue() {
+        if (value == null) {
+            value = new ArrayList<String>();
+        }
         return this.value;
     }
 
     /**
      * Gets the value of the localFrame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getLocalFrame() {
         return localFrame;
     }
 
     /**
-     * Sets the value of the localFrame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setLocalFrame(String value) {
-        this.localFrame = value;
-    }
-
-    /**
      * Gets the value of the referenceFrame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getReferenceFrame() {
         return referenceFrame;
     }
 
     /**
-     * Sets the value of the referenceFrame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setReferenceFrame(String value) {
-        this.referenceFrame = value;
-    }
-
-    /**
      * Gets the value of the referenceTime property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getReferenceTime() {
         return referenceTime;
     }
 
     /**
-     * Sets the value of the referenceTime property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setReferenceTime(String value) {
-        this.referenceTime = value;
-    }
-    
-    /**
-     * Vérifie si cette entré est identique à l'objet spécifié.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

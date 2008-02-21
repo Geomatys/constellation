@@ -77,6 +77,7 @@ import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.WebService;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.EnvelopeEntry;
+import net.seagis.gml.FeaturePropertyType;
 import net.seagis.gml.ReferenceEntry;
 import net.seagis.gml.ReferenceTable;
 import net.seagis.gml.TimePositionType;
@@ -583,25 +584,30 @@ public class SOSworker {
         
          //we verify that the output format is good.     
          if (requestObservation.getResponseFormat()!= null) {
-            if (!requestObservation.getResponseFormat().equalsIgnoreCase("text/xml; subtype=\"om/1.0\"")) {
-                throw new OWSWebServiceException("only text/xml; subtype=\"om/1.0\" is accepted for responseFormat", 
+            if (!requestObservation.getResponseFormat().equalsIgnoreCase("text/xml; subtype=\"om/1.0.0\"")) {
+                throw new OWSWebServiceException("only text/xml; subtype=\"om/1.0.0\" is accepted for responseFormat", 
                                                  INVALID_PARAMETER_VALUE, "responseFormat", version);
             }
          } else {
-            throw new OWSWebServiceException("Response format text/xml;subtype=\"om/1.0\" must be specify",
+            throw new OWSWebServiceException("Response format text/xml;subtype=\"om/1.0.0\" must be specify",
                                              MISSING_PARAMETER_VALUE, "responseFormat", version);
          }
         
         //we get the mode of result
-        ObservationCollectionEntry response = new ObservationCollectionEntry(new ArrayList<ObservationEntry>());
+        ObservationCollectionEntry response = new ObservationCollectionEntry();
         try {
             boolean template  = false;
             ResponseModeType mode;
             if (requestObservation.getResponseMode() == null) {
                 logger.info("responseMode was null");
                 mode = ResponseModeType.INLINE; 
-            } else {    
-                mode = requestObservation.getResponseMode();
+            } else {
+                try {
+                    mode = ResponseModeType.fromValue(requestObservation.getResponseMode());
+                } catch (IllegalArgumentException e) {
+                    throw new OWSWebServiceException(" the response Mode: " + requestObservation.getResponseMode() + " is not supported by the service (inline or template available)!",
+                                                     INVALID_PARAMETER_VALUE, "responseMode", version);
+                }
             }
             StringBuilder SQLrequest = new StringBuilder("SELECT name FROM observations WHERE name LIKE '%");
             
@@ -667,7 +673,7 @@ public class SOSworker {
                         throw new OWSWebServiceException(" this process is not registred in the table",
                                                       INVALID_PARAMETER_VALUE, "procedure", version);
                     } catch (CatalogException ex) {
-                        throw new OWSWebServiceException("Catalog exception while getting the offering",
+                        throw new OWSWebServiceException("Catalog exception while getting the procedure",
                                                          NO_APPLICABLE_CODE, "offering", version);
                     }
                      
@@ -755,7 +761,7 @@ public class SOSworker {
                             foiTable.getEntry(s);
                         } catch (NoSuchRecordException ex){
                             throw new OWSWebServiceException("the feature of interest is not registered",
-                                                             INVALID_PARAMETER_VALUE, "", version);
+                                                             INVALID_PARAMETER_VALUE, "featureOfInterest", version);
                         } catch (CatalogException ex){
                             throw new OWSWebServiceException("Catalog exception while getting the feature of interest",
                                                              NO_APPLICABLE_CODE, "featureOfInterest", version);
@@ -934,9 +940,9 @@ public class SOSworker {
                         Date d = new Date(next);
                         logger.info("this template will be destroyed at:" + d.toString());
                         t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
-                        response.getMember().add(temporaryTemplate);
+                        response.add(temporaryTemplate);
                     } else {
-                        response.getMember().add(o);
+                        response.add(o);
                     
                         //we stop the request if its too big
                         if (response.getMember().size() > maxObservationByRequest) {
@@ -946,8 +952,8 @@ public class SOSworker {
                     }
                 }
             } catch (CatalogException ex) {
-                  throw new OWSWebServiceException("Catalog exception while getting the offering",
-                                                  NO_APPLICABLE_CODE, "offering", version);
+                  throw new OWSWebServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
+                                                  NO_APPLICABLE_CODE, "getObservation", version);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1020,7 +1026,11 @@ public class SOSworker {
             while (results.next()) {
                 AnyResultEntry a = resTable.getEntry(results.getString(1));
                 if (a != null) {
-                    datablock += a.getDataBlock() + '\n';
+                    if (a.getArray() != null) {
+                        datablock += a.getArray().getValues() + '\n';
+                    } else {
+                        throw new IllegalArgumentException("Array is null");
+                    }
                 }
             }
 
@@ -1321,8 +1331,8 @@ public class SOSworker {
                             templateTime = ti;
                         }
                     } else {
-                        throw new OWSWebServiceException("TEquals operation require timeInstant or TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, "TEquals", version);
+                        throw new OWSWebServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+                                                      INVALID_PARAMETER_VALUE, "eventTime", version);
                     }
                 
                 // The operation Time before    
@@ -1340,8 +1350,8 @@ public class SOSworker {
                         }
                         
                     } else {
-                        throw new OWSWebServiceException("TBefore operation require timeInstant!",
-                                                      INVALID_PARAMETER_VALUE, "TBefore", version);
+                        throw new OWSWebServiceException("TM_Before operation require timeInstant!",
+                                                      INVALID_PARAMETER_VALUE, "eventTime", version);
                     }
                     
                 // The operation Time after    
@@ -1358,8 +1368,8 @@ public class SOSworker {
                             templateTime = ti;
                         }
                     } else {
-                       throw new OWSWebServiceException("TAfter operation require timeInstant!",
-                                                     INVALID_PARAMETER_VALUE, "TAfter", version);
+                       throw new OWSWebServiceException("TM_After operation require timeInstant!",
+                                                     INVALID_PARAMETER_VALUE, "eventTime", version);
                     }
                     
                 // The time during operation    
@@ -1378,15 +1388,15 @@ public class SOSworker {
                             templateTime = tp;
                         }
                     } else {
-                        throw new OWSWebServiceException("TDuring operation require TimePeriod!",
+                        throw new OWSWebServiceException("TM_During operation require TimePeriod!",
                                                       INVALID_PARAMETER_VALUE, "TDuring", version);
                     }
                 } else if (time.getTBegins() != null || time.getTBegunBy() != null || time.getTContains() != null ||time.getTEndedBy() != null || time.getTEnds() != null || time.getTMeets() != null
                            || time.getTOveralps() != null || time.getTOverlappedBy() != null) {
-                    throw new OWSWebServiceException("This operation is not take in charge by the Web Service, supported one are: TEquals, TAfter, TBefore, TDuring",
+                    throw new OWSWebServiceException("This operation is not take in charge by the Web Service, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
                                                   OPERATION_NOT_SUPPORTED, null, version);
                 } else {
-                    throw new OWSWebServiceException("Unknow time filter operation, supported one are: TEquals, TAfter, TBefore, TDuring",
+                    throw new OWSWebServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
                                                   OPERATION_NOT_SUPPORTED, null, version);
                 }
             }
@@ -1815,7 +1825,7 @@ public class SOSworker {
     }
     
     /**
-     * Normailze the capabilities document by replacing the double by reference
+     * Normalize the capabilities document by replacing the double by reference
      * 
      * @param capa the unnormalized document.
      * 
@@ -1846,6 +1856,27 @@ public class SOSworker {
         }
         return capa;
     }
+    
+    /**
+     * Normalize the capabilities document by replacing the double by reference
+     * 
+     * @param capa the unnormalized document.
+     * 
+     * @return a normalized document
+     */
+    private ObservationCollectionEntry normalizeDocument(ObservationCollectionEntry collection){
+        List<FeaturePropertyType> foiAlreadySee = new ArrayList<FeaturePropertyType> ();
+        for (ObservationEntry observation: collection.getMember()) {
+            FeaturePropertyType foi = observation.getPropertyFeatureOfInterest();
+            if (foiAlreadySee.contains(foi)){
+                foi.setToHref();
+            } else {
+                foiAlreadySee.add(foi);
+            }
+        }
+        return collection;
+    }
+    
     
     /**
      * Return the minimal value for the offering event Time

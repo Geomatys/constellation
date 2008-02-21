@@ -18,7 +18,6 @@ package net.seagis.swe;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.Iterator;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
@@ -26,12 +25,12 @@ import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 
 /**
- * Connexion vers la table des {@linkplain DataBlockDefinition dataBlockDefintion}.
+ * Connexion vers la table des {@linkplain DataArray dataArray}.
  *
  * @version $Id:
  * @author Guilhem Legal
  */
-public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition>{
+public class DataArrayTable extends SingletonTable<DataArrayEntry>{
     
     /**
      * Connexion vers la table des {@linkplain TextBlock text block encoding}.
@@ -40,7 +39,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
     protected TextBlockTable textBlockEncodings;
     
     /**
-     * Connexion vers la table des {@linkplain TextBlock text block encoding}.
+     * Connexion vers la table des {@linkplain DataRecord data record}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected SimpleDataRecordTable dataRecords;
@@ -51,88 +50,92 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
      *
      * @param  database Connexion vers la base de données.
      */
-    public DataBlockDefinitionTable(final Database database) {
-          this(new DataBlockDefinitionQuery(database)); 
+    public DataArrayTable(final Database database) {
+          this(new DataArrayQuery(database)); 
     }
     
     /**
      * Initialise l'identifiant de la table.
      */
-    private DataBlockDefinitionTable(final DataBlockDefinitionQuery query) {
+    private DataArrayTable(final DataArrayQuery query) {
         super(query);
-        setIdentifierParameters(query.byId, null);
+        setIdentifierParameters(query.byIdArray, null);
     }
 
     /**
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected DataBlockDefinition createEntry(final ResultSet results) throws SQLException, CatalogException {
-        final DataBlockDefinitionQuery query = (DataBlockDefinitionQuery) super.query;
-        String idDataBlock = results.getString(indexOf(query.id));
-        
+    protected DataArrayEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
+        final DataArrayQuery query = (DataArrayQuery) super.query;
+        String idArray = results.getString(indexOf(query.idArray));
         if (dataRecords == null) {
             dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
             dataRecords = new SimpleDataRecordTable(dataRecords);
         }
-        dataRecords.setIdDataBlock(idDataBlock);
-        Collection<SimpleDataRecordEntry> entries = dataRecords.getEntries();
+        dataRecords.setIdDataBlock(idArray);
+        //for data array there is only one data record
+        Iterator<SimpleDataRecordEntry> it = dataRecords.getEntries().iterator();
+        SimpleDataRecordEntry entry = null;
+        if (it.hasNext()) {
+            entry = it.next();
+        }
         
         if (textBlockEncodings == null) {
             textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
         }
         
-        TextBlockEntry encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
+        AbstractEncodingPropertyType encoding = new AbstractEncodingPropertyType(textBlockEncodings.getEntry(results.getString(indexOf(query.encoding))));
         
-        return new DataBlockDefinitionEntry(idDataBlock, entries, encoding);
+        return new DataArrayEntry(idArray,
+                                  results.getInt(indexOf(query.elementCount)),
+                                  entry, encoding, null);
     }
     
     /**
-     * Retourne un nouvel identifier (ou l'identifier du datablockDefinition passée en parametre si non-null)
-     * et enregistre le nouveau datablockDefinition dans la base de donnée si il n'y est pas deja.
+     * Retourne un nouvel identifier (ou l'identifier du dataArray passée en parametre si non-null)
+     * et enregistre le nouveau dataArray dans la base de donnée si il n'y est pas deja.
      *
-     * @param databloc le datablockDefinition a inserer dans la base de donnée.
+     * @param databloc le dataArray a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final DataBlockDefinitionEntry databloc) throws SQLException, CatalogException {
-        final DataBlockDefinitionQuery query  = (DataBlockDefinitionQuery) super.query;
+    public synchronized String getIdentifier(final DataArrayEntry array) throws SQLException, CatalogException {
+        final DataArrayQuery query  = (DataArrayQuery) super.query;
         String id;
         boolean success = false;
         transactionBegin();
         try {
-            if (databloc.getId() != null) {
+            if (array.getId() != null) {
                 PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.id), databloc.getId());
+                statement.setString(indexOf(query.idArray), array.getId());
                 ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
-                    return databloc.getId();
+                    return array.getId();
                 } else {
-                    id = databloc.getId();
+                    id = array.getId();
                 }
             } else {
-                id = searchFreeIdentifier("datablockDef");
+                id = searchFreeIdentifier("dataArray");
             }
         
             PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.id), id);
+            statement.setString(indexOf(query.idArray), id);
+            statement.setInt(indexOf(query.elementCount), array.getElementCount().getCount().getValue());
 
             if (textBlockEncodings == null) {
                 textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
             }
-            statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry)databloc.getEncoding()));
-            updateSingleton(statement);
-        
+            statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry)array.getEncoding()));
+            
             if (dataRecords == null) {
                 dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
                 dataRecords = new SimpleDataRecordTable(dataRecords);
-                dataRecords.setIdDataBlock(id);
-            } else {
-                dataRecords.setIdDataBlock(id);
             }
-            Iterator i = databloc.getComponents().iterator();
-            while (i.hasNext()) {
-                dataRecords.getIdentifier((SimpleDataRecordEntry) i.next(), id);
-            }
+            dataRecords.setIdDataBlock(id);
+            statement.setString(indexOf(query.elementType), dataRecords.getIdentifier((SimpleDataRecordEntry)array.getElementType(), id));
+            
+            updateSingleton(statement);
+        
             success = true;
         } finally {
             transactionEnd(success);

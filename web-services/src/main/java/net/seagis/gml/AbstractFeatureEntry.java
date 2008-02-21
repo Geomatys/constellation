@@ -55,6 +55,14 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
     public AbstractFeatureEntry() {}
     
     /**
+     * Build a new light "Feature"
+     */
+    public AbstractFeatureEntry(String id, String name, String description) {
+        super(null, name, description, null);
+        this.boundedBy = new BoundingShapeEntry("not bounded");
+    }
+    
+    /**
      * Build a new "Feature"
      */
     public AbstractFeatureEntry(String id, String name, String description, ReferenceEntry descriptionReference,
@@ -62,7 +70,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
         super(id, name, description, descriptionReference);
         this.srsName = srsName;
         if (boundedBy == null) {
-            this.boundedBy = new BoundingShapeEntry("");
+            this.boundedBy = new BoundingShapeEntry("not bounded");
         } else { 
             this.boundedBy = boundedBy;
         }

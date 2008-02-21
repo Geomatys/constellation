@@ -40,7 +40,7 @@ public class ProcessEntry extends Entry implements Process {
     /**
      * Le nom/identifiant du capteur.
      */
-    @XmlAttribute(required = true)
+    @XmlAttribute(required= true, namespace = "http://www.w3.org/1999/xlink")
     private String href;
     
      /**

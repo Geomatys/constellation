@@ -17,6 +17,7 @@ package net.seagis.swe;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import net.seagis.catalog.CatalogException;
@@ -106,11 +107,12 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
        
         fields.setIdDataBlock(idDataBlock);
         fields.setIdDataRecord(idDataRecord);
-        Collection<AnyScalarEntry> entries = fields.getEntries();
+        Collection<AnyScalarPropertyType> scalars = fields.getEntries();
         
         return new SimpleDataRecordEntry(idDataBlock, idDataRecord,
                 results.getString(indexOf(query.definition)),
-                results.getBoolean(indexOf(query.fixed)),entries);
+                results.getBoolean(indexOf(query.fixed)), 
+                scalars);
         
     }
     
@@ -169,10 +171,10 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
                 fields.setIdDataBlock(dataBlockId);
                 fields.setIdDataRecord(id);
             }
-            Iterator<AnyScalarEntry> i = datarecord.getField().iterator();
+            Iterator<AnyScalarPropertyType> i = datarecord.getField().iterator();
         
             while (i.hasNext()) {
-                fields.getIdentifier(i.next(), dataBlockId, id);
+               fields.getIdentifier(i.next(), dataBlockId, id);
             }
             success = true;
         } finally {

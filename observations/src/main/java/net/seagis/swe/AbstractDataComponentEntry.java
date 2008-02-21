@@ -34,7 +34,7 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
     /**
      * The identifier of the component (override from abstractGML Type).
      */
-    @XmlAttribute
+    @XmlAttribute(namespace="http://www.opengis.net/gml")
     private String id;
     
     @XmlTransient //@XmlAttribute
@@ -43,7 +43,8 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
     /**
      * definition of the record.
      */
-    protected String definition;
+    @XmlAttribute
+    private String definition;
     
     /**
      * Constructor used by jaxb.

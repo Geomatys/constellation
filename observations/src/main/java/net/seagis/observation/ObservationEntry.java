@@ -29,6 +29,7 @@ import net.seagis.coverage.model.DistributionEntry;
 
 // openGis dependencies
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
+import net.seagis.gml.FeaturePropertyType;
 import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
@@ -69,8 +70,7 @@ import org.geotools.resources.Utilities;
     "observedProperty",
     "featureOfInterest",
     "result",
-    "resultQuality",
-    "resultDefinition"
+    "resultQuality"
 })
 @XmlRootElement(name = "Observation")
 @XmlSeeAlso({ MeasurementEntry.class})
@@ -83,6 +83,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * Le nom de l'observation
      */
+    @XmlElement(namespace = "http://www.opengis.net/gml")
     private String name;
     
     /**
@@ -94,7 +95,7 @@ public class ObservationEntry extends Entry implements Observation {
      * La station à laquelle a été pris cet échantillon.
      */
     @XmlElement(required = true)
-    private SamplingFeatureEntry featureOfInterest;
+    private FeaturePropertyType featureOfInterest;
     
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.
@@ -137,11 +138,6 @@ public class ObservationEntry extends Entry implements Observation {
      private MetaDataEntry observationMetadata;
      
     /**
-     * Definition du resultat. 
-     */
-    private Object resultDefinition;
-    
-    /**
      * 
      */
     private TimeGeometricPrimitivePropertyType procedureTime;
@@ -176,14 +172,13 @@ public class ObservationEntry extends Entry implements Observation {
                             final Object               result,
                             final AbstractTimeGeometricPrimitiveType  samplingTime,
                             final MetaDataEntry        observationMetadata,
-                            final String               resultDefinition,
                             final AbstractTimeGeometricPrimitiveType  procedureTime,
                             final Object               procedureParameter) 
     {
         super(name);
         this.name                = name;
         this.definition          = definition;
-        this.featureOfInterest   = featureOfInterest;
+        this.featureOfInterest   = new FeaturePropertyType(featureOfInterest);
         this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
         if (distribution == null)
@@ -193,7 +188,6 @@ public class ObservationEntry extends Entry implements Observation {
         this.resultQuality       = quality;
         this.result              = result;
         this.observationMetadata = observationMetadata;
-        this.resultDefinition    = resultDefinition;
         this.procedureParameter  = procedureParameter; 
         this.samplingTime        = new TimeGeometricPrimitivePropertyType(samplingTime);
         this.procedureTime       = new TimeGeometricPrimitivePropertyType(procedureTime);
@@ -216,13 +210,12 @@ public class ObservationEntry extends Entry implements Observation {
                             final DistributionEntry     distribution,
                          // final ElementEntry          resultQuality,
                             final Object                result,
-                            final AbstractTimeGeometricPrimitiveType   samplingTime,
-                            final Object                resultDefinition)
+                            final AbstractTimeGeometricPrimitiveType   samplingTime)
     {
         super(name);
         this.name                = name;
         this.definition          = definition;
-        this.featureOfInterest   = featureOfInterest;
+        this.featureOfInterest   = new FeaturePropertyType(featureOfInterest);
         this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
         if (distribution == null)
@@ -232,7 +225,6 @@ public class ObservationEntry extends Entry implements Observation {
         this.resultQuality       = null;       //= resultQuality;
         this.result              = result;
         this.observationMetadata = null;
-        this.resultDefinition    = resultDefinition;
         this.procedureTime       = null;
         this.procedureParameter  = null;
         this.samplingTime        = new TimeGeometricPrimitivePropertyType(samplingTime);
@@ -251,15 +243,18 @@ public class ObservationEntry extends Entry implements Observation {
         if (this.observedProperty != null) {
             pheno = this.observedProperty.getPhenomenon();
         }
+        SamplingFeatureEntry foi = null;
+        if (this.featureOfInterest != null) {
+            foi = (SamplingFeatureEntry) this.featureOfInterest.getFeature();
+        }
         return new ObservationEntry(temporaryName,
-                                        this.definition,
-                                        this.featureOfInterest, 
-                                        pheno,
-                                        this.procedure,
-                                        this.distribution,
-                                        null,
-                                        time,
-                                        this.resultDefinition);
+                                    this.definition,
+                                    foi, 
+                                    pheno,
+                                    this.procedure,
+                                    this.distribution,
+                                    null,
+                                    time);
         
     }
     
@@ -278,6 +273,13 @@ public class ObservationEntry extends Entry implements Observation {
      * {@inheritDoc}
      */
     public SamplingFeature getFeatureOfInterest() {
+        if (featureOfInterest != null) {
+            return (SamplingFeature)featureOfInterest.getFeature();
+        }
+        return null;
+    }
+    
+    public FeaturePropertyType getPropertyFeatureOfInterest(){
         return featureOfInterest;
     }
 
@@ -341,20 +343,6 @@ public class ObservationEntry extends Entry implements Observation {
         this.result = result;
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    public Object getResultDefinition() {
-        return resultDefinition;
-    }
-    
-    /**
-     * fixe la definition du resultat.
-     */
-    public void setResultDefinition(Object definition) {
-        this.resultDefinition = definition;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -460,7 +448,6 @@ public class ObservationEntry extends Entry implements Observation {
                    Utilities.equals(this.result,              that.result)              &&
                    Utilities.equals(this.samplingTime,        that.samplingTime)        &&
                    Utilities.equals(this.observationMetadata, that.observationMetadata) &&
-                   Utilities.equals(this.resultDefinition,    that.resultDefinition)    &&
                    Utilities.equals(this.procedureTime,       that.procedureTime)       &&
                    Utilities.equals(this.procedureParameter,  that.procedureParameter);
         }
@@ -503,10 +490,6 @@ public class ObservationEntry extends Entry implements Observation {
             s.append("FEATURE OF INTEREST IS NULL").append(lineSeparator);
         if (result != null)       
             s.append(" result=").append(result.toString()).append(lineSeparator);
-        if (resultDefinition != null)
-            s.append(" resultDefinition=").append(resultDefinition.toString()).append(lineSeparator);
-        else
-            s.append("RESULT DEFINITION IS NULL").append(lineSeparator);
         return s.toString();
     }
 

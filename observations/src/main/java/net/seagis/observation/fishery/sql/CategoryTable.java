@@ -27,7 +27,6 @@ import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.SingletonTable;
 import net.seagis.catalog.CatalogException;
-import net.seagis.observation.fishery.Category;
 import net.seagis.observation.SamplingFeatureTable;
 
 
@@ -115,6 +114,6 @@ public class CategoryTable extends SingletonTable<CategoryEntry> {
                                  stations.getEntry(station), 
                                  species.getEntry(phenomenon),
                                  stages.getEntry(stage),
-                                 fisheryType,null,null,null,null,null,null,null);
+                                 fisheryType,null,null,null,null,null,null);
     }
 }

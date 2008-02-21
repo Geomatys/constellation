@@ -33,10 +33,16 @@ import net.seagis.gml.ReferenceTable;
 public class AnyResultTable extends SingletonTable<AnyResultEntry>{
     
     /**
-     * Connexion vers la table des {@linkplain Reference reference}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
+     * Connection to the table of {@linkplain Reference reference}.
+     * A connection (potentielly shared) will be establish the first time it'll be necesary.
      */
     private ReferenceTable references;
+    
+    /**
+     * Connection to the table of {@linkplain Reference reference}.
+     * A connection (potentielly shared) will be establish the first time it'll be necesary.
+     */
+    private DataArrayTable dataArrays;
     
     /**
      * Construit une table des resultats.
@@ -60,14 +66,22 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
      */
     protected AnyResultEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
          final AnyResultQuery query = (AnyResultQuery) super.query;
-          
-         if(references == null) {
-             references = getDatabase().getTable(ReferenceTable.class);
+         String idRef = results.getString(indexOf(query.reference));
+         if (idRef != null) {
+            if(references == null) {
+                 references = getDatabase().getTable(ReferenceTable.class);
+            }
+            ReferenceEntry ref = references.getEntry(idRef);
+            return new AnyResultEntry(results.getString(indexOf(query.idResult)), ref);
+         } else {
+
+            if(dataArrays == null) {
+                dataArrays = getDatabase().getTable(DataArrayTable.class);
+            }
+            DataArrayEntry array = dataArrays.getEntry(results.getString(indexOf(query.definition)));
+            array.setValues(results.getString(indexOf(query.values)));
+            return new AnyResultEntry(results.getString(indexOf(query.idResult)), array);
          }
-         ReferenceEntry ref = references.getEntry(results.getString(indexOf(query.reference)));
-         
-         return new AnyResultEntry(results.getString(indexOf(query.idResult)), ref, 
-                                   results.getString(indexOf(query.dataBlock)));
     }
     
      /**
@@ -82,10 +96,12 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         boolean success = false;
         transactionBegin();
         try {
-            if (result instanceof AnyResultEntry) {
+            if (result instanceof DataArrayEntry) {
+                DataArrayEntry array = (DataArrayEntry)result;
                 PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-                statement.setString(indexOf(query.dataBlock),((AnyResultEntry)result).getDataBlock());
+                statement.setString(indexOf(query.values),array.getValues());
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+                statement.setString(indexOf(query.definition), array.getId());
                 ResultSet results = statement.executeQuery();
                 if(results.next()){
                     success = true;
@@ -94,21 +110,27 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
             } else if (result instanceof ReferenceEntry) {
                 PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
-                statement.setNull(indexOf(query.dataBlock), java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.values), java.sql.Types.VARCHAR);
                 ResultSet results = statement.executeQuery();
                 if(results.next()) {
                     success = true;
                     return results.getString(1);
                 }
             } else {
-                throw new CatalogException(" ce type de resultat n'est pas accepté");
+                throw new CatalogException(" this kinf of result is not allowed");
             }
         
             PreparedStatement statement = getStatement(QueryType.INSERT);
 
-            if (result instanceof AnyResultEntry) {
-                statement.setString(indexOf(query.dataBlock), ((AnyResultEntry)result).getDataBlock());
+            if (result instanceof DataArrayEntry) {
+                DataArrayEntry array = (DataArrayEntry)result;
+                statement.setString(indexOf(query.values), array.getValues());
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+                if(dataArrays == null) {
+                    dataArrays = getDatabase().getTable(DataArrayTable.class);
+                }
+                String idArray = dataArrays.getIdentifier(array);
+                statement.setString(indexOf(query.definition), idArray);
             } else {
                 if (result instanceof ReferenceEntry) {
                     ReferenceEntry ref = (ReferenceEntry) result;
@@ -120,9 +142,9 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                     idRef = references.getIdentifier(ref);
                 
                     statement.setString(indexOf(query.reference), idRef);
-                    statement.setNull(indexOf(query.dataBlock), java.sql.Types.VARCHAR);
+                    statement.setNull(indexOf(query.values), java.sql.Types.VARCHAR);
                 } else {
-                    throw new CatalogException(" ce type de resultat n'est pas accepté");
+                    throw new CatalogException(" this kinf of result is not allowed");
                 }
             }   
             updateSingleton(statement);

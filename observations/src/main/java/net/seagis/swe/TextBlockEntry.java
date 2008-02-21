@@ -49,7 +49,7 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
      * un caractere pour separer les decimaux.
      */
     @XmlAttribute(required = true)
-    private char decimalSeparator;
+    private String decimalSeparator;
     
     /**
      * Constructeur utilisé par jaxB.
@@ -59,7 +59,7 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
     /**
      * Crée un nouveau encodage de texte.
      */
-    public TextBlockEntry(String id, String tokenSeparator, String blockSeparator, char decimalSeparator) {
+    public TextBlockEntry(String id, String tokenSeparator, String blockSeparator, String decimalSeparator) {
         super(id);
         this.tokenSeparator   = tokenSeparator;
         this.blockSeparator   = blockSeparator;
@@ -90,7 +90,7 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
     /**
      * {@inheritDoc}
      */
-    public char getDecimalSeparator() {
+    public String getDecimalSeparator() {
         return decimalSeparator;
     }
 
@@ -116,7 +116,7 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
         int hash = 5;
         hash = 11 * hash + (this.tokenSeparator != null ? this.tokenSeparator.hashCode() : 0);
         hash = 11 * hash + (this.blockSeparator != null ? this.blockSeparator.hashCode() : 0);
-        hash = 11 * hash + this.decimalSeparator;
+        hash = 11 * hash + (this.decimalSeparator != null? this.decimalSeparator.hashCode() : 0);
         return hash;
     }
     

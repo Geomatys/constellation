@@ -34,7 +34,7 @@ public class ObservationQuery extends Query {
      * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column name, featureOfInterest, featureOfInterestPoint, procedure, observedProperty, observedPropertyComposite,
-            distribution, samplingTimeBegin, samplingTimeEnd, result, resultDefinition, description;
+            distribution, samplingTimeBegin, samplingTimeEnd, result, description;
  // quality, , observationMetadata, procedureTime, procedureParameter,
  
     /**
@@ -63,7 +63,6 @@ public class ObservationQuery extends Query {
         samplingTimeBegin         = addColumn("sampling_time_begin",         SI);
         samplingTimeEnd           = addColumn("sampling_time_end",           SI);
         result                    = addColumn("result",                      SI);
-        resultDefinition          = addColumn("result_definition",           SI);
 /*
         observationMetadata       = addColumn("observationMetadata",         SI);
         quality                   = addColumn("quality",                     SI);

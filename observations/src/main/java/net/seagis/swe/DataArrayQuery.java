@@ -22,43 +22,38 @@ import net.seagis.catalog.QueryType;
 import static net.seagis.catalog.QueryType.*;
 
 /**
- * The query to execute for a {@link AnyResultTable}.
+ * The query to execute for a {@link DataArrayTable}.
  *
  * @version $Id:
  * @author Guilhem Legal
  */
-public class AnyResultQuery extends Query {
+public class DataArrayQuery extends Query{
     
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column idResult, reference, values, definition;
+    protected final Column idArray, encoding, elementCount, elementType;
     
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byIdResult, byValues, byRef, byDefinition;
+    protected final Parameter byIdArray;
     
     /**
      * Creates a new query for the specified database.
      *
      * @param database The database for which this query is created.
      */
-    public AnyResultQuery(final Database database) {
-        super(database, "any_results");
-        final QueryType[] SI  = {SELECT, INSERT, FILTERED_LIST};
+    public DataArrayQuery(final Database database) {
+        super(database, "data_array_definition");
+        final QueryType[] SI = {SELECT, INSERT};
         final QueryType[] SIE = {SELECT, INSERT, EXISTS};
-        final QueryType[] SE   = {SELECT, EXISTS};
-        
-        idResult     = addColumn("id_result",  SE);
-        reference    = addColumn("reference",  SI);
-        values       = addColumn("values",     SI);
-        definition   = addColumn("definition", SI);
-        
-        byIdResult   = addParameter(idResult,  SELECT, EXISTS);
-        byValues     = addParameter(values, FILTERED_LIST);
-        byRef        = addParameter(reference, FILTERED_LIST);
-        byDefinition = addParameter(definition, FILTERED_LIST);
+        idArray        = addColumn ("id_array_definition", SIE);
+        encoding       = addColumn ("encoding"           , SI);
+        elementCount   = addColumn ("element_count"      , SI);
+        elementType    = addColumn ("encoding"           , SI);
+
+        byIdArray      = addParameter(idArray, SELECT, EXISTS);
     }
     
 }

@@ -68,14 +68,14 @@ import org.geotools.resources.Utilities;
 })
 public class UomPropertyType {
 
-    @XmlElement(name = "UnitDefinition", namespace = "http://www.opengis.net/gml", nillable = true)
+    @XmlElement(name = "UnitDefinition", namespace = "http://www.opengis.net/gml")
     private UnitDefinitionType unitDefinition;
-    @XmlElement(name = "BaseUnit", namespace = "http://www.opengis.net/gml", nillable = true)
+    @XmlElement(name = "BaseUnit", namespace = "http://www.opengis.net/gml")
     private BaseUnitType baseUnit;
     @XmlAttribute
     private String code;
     @XmlAttribute
-    private List<String> nilReason = new ArrayList<String>();
+    private List<String> nilReason;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     private String remoteSchema;
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
@@ -127,7 +127,10 @@ public class UomPropertyType {
      * 
      */
     public List<String> getNilReason() {
-        return this.nilReason;
+        if (nilReason == null) {
+             nilReason = new ArrayList<String>();
+        }
+        return nilReason;
     }
 
     /**

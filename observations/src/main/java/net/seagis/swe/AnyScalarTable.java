@@ -30,7 +30,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem Legal
  * @version $Id:
  */
-public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
+public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
     
     /**
      * identifiant secondaire de la table
@@ -111,7 +111,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected AnyScalarEntry createEntry(final ResultSet results) throws SQLException {
+    protected AnyScalarPropertyType createEntry(final ResultSet results) throws SQLException {
         final AnyScalarQuery query = (AnyScalarQuery) super.query;
         AbstractDataComponentEntry component = null;
         if (results.getString(indexOf(query.type)).equals("Quantity")) {
@@ -126,7 +126,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
             component = new BooleanType(results.getString(indexOf(query.definition )), 
                                         results.getBoolean(indexOf(query.value))); 
         } 
-        return new AnyScalarEntry(
+        return new AnyScalarPropertyType(
                 results.getString(indexOf(query.idDataRecord )),
                 results.getString(indexOf(query.name )),
                 component);
@@ -152,7 +152,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarEntry>{
      *
      * @param datarecord le data record a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final AnyScalarEntry field, String blockId, String dataRecordId) throws SQLException, CatalogException {
+    public synchronized String getIdentifier(final AnyScalarPropertyType field, String blockId, String dataRecordId) throws SQLException, CatalogException {
         final AnyScalarQuery query  = (AnyScalarQuery) super.query;
         String id;
         boolean success = false;

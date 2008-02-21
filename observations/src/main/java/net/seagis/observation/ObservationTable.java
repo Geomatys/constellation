@@ -37,9 +37,6 @@ import net.seagis.swe.AnyResultEntry;
 import net.seagis.swe.AnyResultTable;
 import net.seagis.swe.CompositePhenomenonEntry;
 import net.seagis.swe.CompositePhenomenonTable;
-import net.seagis.swe.DataBlockDefinition;
-import net.seagis.swe.DataBlockDefinitionEntry;
-import net.seagis.swe.DataBlockDefinitionTable;
 
 // OpenGis dependencies
 import net.seagis.swe.PhenomenonEntry;
@@ -124,12 +121,6 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected AnyResultTable results;
-    
-    /**
-     * Connexion vers la table des {@linkplain DataBlockDefinition dataBlockdDefinition}.
-     * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
-     */
-    protected DataBlockDefinitionTable dataBlockDefinitions;
     
     /**
      * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
@@ -305,16 +296,12 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         AnyResultEntry any = results.getEntry(result.getString(indexOf(query.result)));
         Object resultat = null;
         if (any != null) {
-            if (any.getReference() == null && any.getDataBlock() != null) {
-                resultat = any.getDataBlock();
-            } else if (any.getReference() != null && any.getDataBlock() == null)  {
+            if (any.getReference() == null && any.getArray() != null) {
+                resultat = any.getArray();
+            } else if (any.getReference() != null && any.getArray() == null)  {
                 resultat = any.getReference();
             }
         }
-        if (dataBlockDefinitions == null) {
-            dataBlockDefinitions = getDatabase().getTable(DataBlockDefinitionTable.class);
-        }
-        DataBlockDefinition dataBlockDef = dataBlockDefinitions.getEntry(result.getString(indexOf(query.resultDefinition)));
         
         if(pheno == null) pheno = compoPheno;
         if(station == null) station =  stationPoint;
@@ -325,10 +312,12 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         TimePositionType beginPosition = null;
         TimePositionType endPosition   = null;
         if (begin != null) {
-            beginPosition = new TimePositionType(begin.toString());
+            String normalizedTime = begin.toString().replace(' ', 'T');
+            beginPosition = new TimePositionType(normalizedTime);
         }
         if (end != null) {
-            endPosition = new TimePositionType(end.toString());
+            String normalizedTime = end.toString().replace(' ', 'T');
+            endPosition = new TimePositionType(normalizedTime);
         }
         
         if (beginPosition != null && endPosition != null) {
@@ -344,15 +333,14 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         
         
         return new ObservationEntry(result.getString(indexOf(query.name)),
-                result.getString(indexOf(query.description)),
-                station,
-                pheno,
-                procedure,
-                distrib,
-                //manque quality
-                resultat,
-                samplingTime,
-                dataBlockDef);
+                                    result.getString(indexOf(query.description)),
+                                    station,
+                                    pheno,
+                                    procedure,
+                                    distrib,
+                                    //manque quality
+                                    resultat,
+                                    samplingTime);
         
         
     }
@@ -464,20 +452,6 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 statement.setNull(indexOf(query.result), java.sql.Types.VARCHAR);
             }
         
-            //on insere la defintion du resultat
-            if (obs.getResultDefinition() instanceof String) {
-                statement.setString(indexOf(query.resultDefinition), (String)obs.getResultDefinition());
-            } else {
-                if (obs.getResultDefinition() instanceof DataBlockDefinitionEntry ){
-                    DataBlockDefinitionEntry block = (DataBlockDefinitionEntry)obs.getResultDefinition(); 
-                    if (dataBlockDefinitions == null) {
-                        dataBlockDefinitions = getDatabase().getTable(DataBlockDefinitionTable.class);
-                    }
-                    statement.setString(indexOf(query.resultDefinition), dataBlockDefinitions.getIdentifier(block));
-                } else {
-                    statement.setNull(indexOf(query.resultDefinition), java.sql.Types.VARCHAR);
-                }
-            }
             // on insere le "samplingTime""
             if (obs.getSamplingTime() != null){
                 if (obs.getSamplingTime() instanceof TimePeriodType) {

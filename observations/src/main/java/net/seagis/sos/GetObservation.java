@@ -111,9 +111,7 @@ import org.geotools.resources.Utilities;
     "responseMode"
 })
 @XmlRootElement(name = "GetObservation")
-public class GetObservation
-    extends RequestBaseType
-{
+public class GetObservation extends RequestBaseType {
 
     @XmlSchemaType(name = "anyURI")
     private String offering;
@@ -126,7 +124,7 @@ public class GetObservation
     private GetObservation.Result result;
     private String responseFormat;
     private QName resultModel;
-    private ResponseModeType responseMode;
+    private String responseMode;
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
     private String srsName;
@@ -152,7 +150,7 @@ public class GetObservation
         this.offering          = offering;
         this.procedure         = procedure;
         this.responseFormat    = responseFormat;
-        this.responseMode      = responseMode;
+        this.responseMode      = responseMode.value();
         this.result            = result;
         this.resultModel       = resultModel;
         this.srsName           = srsName;
@@ -229,7 +227,7 @@ public class GetObservation
     /**
      * Gets the value of the responseMode property.
      */
-    public ResponseModeType getResponseMode() {
+    public String getResponseMode() {
         return responseMode;
     }
 

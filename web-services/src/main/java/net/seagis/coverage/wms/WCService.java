@@ -167,7 +167,7 @@ public class WCService extends WebService {
                     if (getCurrentVersion().toString().equals("1.0.0")) {
                         dc = new net.seagis.wcs.v100.DescribeCoverage(getParameter("COVERAGE", true));
                     } else {
-                        dc = new net.seagis.wcs.v111.DescribeCoverage(getParameter("IDENTIFIER", true));
+                        dc = new net.seagis.wcs.v111.DescribeCoverage(getParameter("IDENTIFIERS", true));
                     }
                 }
                 

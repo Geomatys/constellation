@@ -57,7 +57,7 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
         return new TextBlockEntry(results.getString(indexOf(query.id )),
                                   results.getString(indexOf(query.tokenSeparator )),
                                   results.getString(indexOf(query.blockSeparator )),
-                                  results.getString(indexOf(query.decimalSeparator)).charAt(0));
+                                  results.getString(indexOf(query.decimalSeparator)));
     }
     
     /**

@@ -24,7 +24,7 @@ import net.seagis.gml.ReferenceEntry;
 /**
  * Enregistrement permettant de regrouper plusieur type de resultat en un meme type.
  * (implementation decrivant une classe union) hormis l'identifiant, 
- * il ne doit y avoir qu'un attibut differend de {@code null}. 
+ * il ne doit y avoir qu'un attribut differend de {@code null}. 
  *
  * @version $Id:
  * @author Guilhem Legal
@@ -34,38 +34,48 @@ import net.seagis.gml.ReferenceEntry;
 public class AnyResultEntry extends Entry {
     
     /**
-     * Lidentifiant du resultat.
+     * The result identifier.
      */
     @XmlAttribute
     private String id;
     
     /**
-     * Le resultat peut etre de type Reference.
+     * The result can be a reference.
      */
     private ReferenceEntry reference;
     
     /**
-     * Le resultat peut être un bloc de donnée.
+     * The result can be an array.
      */
-    private String dataBlock;
+    private DataArrayPropertyType array;
     
     /**
-     * Constructeur utilisé par jaxB
+     * Constructor used by jaxB
      */
     public AnyResultEntry(){}
     
     /**
-     * créé un nouveau resultat en specifiant son type.
+     * build a new result with the specified reference.
      *
-     * @param id l'identifiant du resultat.
-     * @param reference l'identifiant de la reference si le resultat en est une, {@code null} sinon.
-     * @param dataBlockDefinition l'identifiant du dataBlock si le resultat en est un, {@code null} sinon.
+     * @param The result identifier.
+     * @param reference The reference identifier.
      */
-    public AnyResultEntry(String id, ReferenceEntry reference, String dataBlock) {
+    public AnyResultEntry(String id, ReferenceEntry reference) {
         super(null);
         this.id = id;
         this.reference = reference;
-        this.dataBlock = dataBlock;
+    }
+    
+    /**
+     * build a new result with the specified array of data.
+     *
+     * @param The result identifier.
+     * @param reference The reference identifier.
+     */
+    public AnyResultEntry(String id, DataArrayEntry array) {
+        super(null);
+        this.id = id;
+        this.array = new DataArrayPropertyType(array);
     }
 
     /**
@@ -83,10 +93,13 @@ public class AnyResultEntry extends Entry {
     }
 
     /**
-     * retourne un resultat de type dataBlockDefinition si s'en est un, {@code null} sinon.
+     * retourne un resultat de type dataBlock si s'en est un, {@code null} sinon.
      */
-    public String getDataBlock() {
-        return dataBlock;
+    public DataArrayEntry getArray() {
+        if (array != null) {
+            return array.getDataArray();
+        }
+        return null;
     }
     
     /**
@@ -97,7 +110,7 @@ public class AnyResultEntry extends Entry {
     public String toString() {
         String res;
         if (reference == null)
-            res = dataBlock;
+            res = array.toString();
         else
             res = reference.toString();
         

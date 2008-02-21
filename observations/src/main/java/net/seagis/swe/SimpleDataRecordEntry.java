@@ -18,6 +18,7 @@ package net.seagis.swe;
 
 import java.util.Collection;
 import java.util.Iterator;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
@@ -43,7 +44,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     /**
      * List de valeur textuelle ou scalaire.
      */
-    private Collection<AnyScalarEntry> field;
+    private Collection<AnyScalarPropertyType> field;
    
     /**
      *  Constructor used by jaxB.
@@ -54,7 +55,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
      * Créé une nouvelle Liste de valeur textuelle ou scalaire.
      */
     public SimpleDataRecordEntry(final String blockId, final String id, final String definition, final boolean fixed,
-            final Collection<AnyScalarEntry> fields) {
+            final Collection<AnyScalarPropertyType> fields) {
         super(id, definition, fixed);
         this.blockId = blockId;
         this.field = fields;
@@ -63,7 +64,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     /**
      * {@inheritDoc}
      */
-    public Collection<AnyScalarEntry> getField() {
+    public Collection<AnyScalarPropertyType> getField() {
         return field;
     }
 
@@ -87,7 +88,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
             if (this.field.size() != that.field.size())
                 return false;
         
-            Iterator<AnyScalarEntry> i = field.iterator();
+            Iterator<AnyScalarPropertyType> i = field.iterator();
             while (i.hasNext()) {
                 if (!that.field.contains(i.next()))
                     return false;
@@ -120,7 +121,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     private void appendTo(final StringBuilder buffer, String margin, final String lineSeparator) {
         buffer.append("fields: ").append(lineSeparator);
         margin += "  ";
-        for (final AnyScalarEntry a : field) {
+        for (final AnyScalarPropertyType a : field) {
             buffer.append(margin).append(a.toString()).append(lineSeparator);
         }
     }

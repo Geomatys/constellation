@@ -69,12 +69,11 @@ public class CategoryEntry extends ObservationEntry implements Category {
                          final Object               result,
                          final AbstractTimeGeometricPrimitiveType  samplingTime,
                          final MetaDataEntry        observationMetadata,
-                         final String               resultDefinition,
                          final AbstractTimeGeometricPrimitiveType  procedureTime,
                          final Object               procedureParameter)
     {
         super(name, definition, featureOfInterest, species, procedure, Distribution.NORMAL, quality, result, samplingTime,
-                observationMetadata, resultDefinition, procedureTime, procedureParameter);
+                observationMetadata, procedureTime, procedureParameter);
         this.stage = stage;
     }
 
