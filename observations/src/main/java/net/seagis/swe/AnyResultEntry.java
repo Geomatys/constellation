@@ -93,13 +93,20 @@ public class AnyResultEntry extends Entry {
     }
 
     /**
-     * retourne un resultat de type dataBlock si s'en est un, {@code null} sinon.
+     * retourne un resultat de type dataArray si s'en est un, {@code null} sinon.
      */
     public DataArrayEntry getArray() {
         if (array != null) {
             return array.getDataArray();
         }
         return null;
+    }
+    
+    /**
+     * retourne un resultat de type dataArray si s'en est un, {@code null} sinon.
+     */
+    public DataArrayPropertyType getPropertyArray() {
+        return array;
     }
     
     /**

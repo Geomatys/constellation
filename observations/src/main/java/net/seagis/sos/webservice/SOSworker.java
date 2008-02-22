@@ -112,8 +112,12 @@ import net.seagis.sos.OfferingPhenomenonEntry;
 import net.seagis.sos.OfferingProcedureEntry;
 import net.seagis.sos.OfferingSamplingFeatureEntry;
 import net.seagis.sos.ResponseModeType;
+import net.seagis.swe.AbstractEncodingPropertyType;
 import net.seagis.swe.AnyResultEntry;
 import net.seagis.swe.AnyResultTable;
+import net.seagis.swe.DataArrayEntry;
+import net.seagis.swe.DataArrayPropertyType;
+import net.seagis.swe.DataComponentPropertyType;
 import net.seagis.swe.PhenomenonPropertyType;
 import static net.seagis.ows.OWSExceptionCode.*;
 
@@ -887,6 +891,7 @@ public class SOSworker {
                         
                         if (j instanceof String) {
                             propertyName = (String)j;
+                            logger.info("j=|" + propertyName + "|" + propertyName.length());
                         } else if (j instanceof LiteralType) {
                             literal = (LiteralType)j;
                         } else {
@@ -964,7 +969,7 @@ public class SOSworker {
             throw new OWSWebServiceException("the service has throw a NoSuchTableException:" + e.getMessage(),
                                           NO_APPLICABLE_CODE, null, version);
         }
-        return response;
+        return normalizeDocument(response);
     }
     
     /**
@@ -1389,7 +1394,7 @@ public class SOSworker {
                         }
                     } else {
                         throw new OWSWebServiceException("TM_During operation require TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, "TDuring", version);
+                                                      INVALID_PARAMETER_VALUE, "eventTime", version);
                     }
                 } else if (time.getTBegins() != null || time.getTBegunBy() != null || time.getTContains() != null ||time.getTEndedBy() != null || time.getTEnds() != null || time.getTMeets() != null
                            || time.getTOveralps() != null || time.getTOverlappedBy() != null) {
@@ -1858,21 +1863,71 @@ public class SOSworker {
     }
     
     /**
-     * Normalize the capabilities document by replacing the double by reference
+     * Normalize the Observation collection document by replacing the double by reference
      * 
      * @param capa the unnormalized document.
      * 
      * @return a normalized document
      */
     private ObservationCollectionEntry normalizeDocument(ObservationCollectionEntry collection){
-        List<FeaturePropertyType> foiAlreadySee = new ArrayList<FeaturePropertyType> ();
+        
+        List<FeaturePropertyType>          foiAlreadySee   = new ArrayList<FeaturePropertyType> ();
+        List<PhenomenonPropertyType>       phenoAlreadySee = new ArrayList<PhenomenonPropertyType>();
+        List<AbstractEncodingPropertyType> encAlreadySee   = new ArrayList<AbstractEncodingPropertyType>();
+        List<DataComponentPropertyType>    dataAlreadySee  = new ArrayList<DataComponentPropertyType>();
+        int index = 0;
         for (ObservationEntry observation: collection.getMember()) {
+            //we do this for the feature of interest
             FeaturePropertyType foi = observation.getPropertyFeatureOfInterest();
             if (foiAlreadySee.contains(foi)){
                 foi.setToHref();
             } else {
                 foiAlreadySee.add(foi);
             }
+            //for the phenomenon
+            PhenomenonPropertyType phenomenon = observation.getPropertyObservedProperty();
+            if (phenoAlreadySee.contains(phenomenon)){
+                phenomenon.setToHref();
+            } else {
+                if (phenomenon.getPhenomenon() instanceof CompositePhenomenonEntry) {
+                    CompositePhenomenonEntry compo = (CompositePhenomenonEntry) phenomenon.getPhenomenon();
+                    for (PhenomenonPropertyType pheno2: compo.getRealComponent()) {
+                        if (phenoAlreadySee.contains(pheno2)) {
+                                    pheno2.setToHref();
+                        } else {
+                            phenoAlreadySee.add(pheno2);
+                        }
+                    }
+                }
+                phenoAlreadySee.add(phenomenon);
+            }
+            //for the result : textBlock encoding and element type
+            if (observation.getResult() instanceof DataArrayPropertyType) {
+                DataArrayEntry array = ((DataArrayPropertyType)observation.getResult()).getDataArray();
+                
+                //element type
+                DataComponentPropertyType elementType = array.getPropertyElementType();
+                if (dataAlreadySee.contains(elementType)){
+                    elementType.setToHref();
+                } else {
+                    dataAlreadySee.add(elementType);
+                }
+                
+                //encoding
+                AbstractEncodingPropertyType encoding = array.getPropertyEncoding();
+                if (encAlreadySee.contains(encoding)){
+                    encoding.setToHref();
+                                        
+                } else {
+                    encAlreadySee.add(encoding);
+                    AbstractEncodingPropertyType clone = new AbstractEncodingPropertyType(encoding);
+                    array.setPropertyEncoding(clone);
+                    logger.info("write for first time n°" + index);
+                }
+            } else {
+                logger.info(observation.getResult().getClass().getSimpleName() + " <<<<<<<<<<<<<");
+            }
+            index++;
         }
         return collection;
     }

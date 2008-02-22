@@ -297,7 +297,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         Object resultat = null;
         if (any != null) {
             if (any.getReference() == null && any.getArray() != null) {
-                resultat = any.getArray();
+                resultat = any.getPropertyArray();
             } else if (any.getReference() != null && any.getArray() == null)  {
                 resultat = any.getReference();
             }

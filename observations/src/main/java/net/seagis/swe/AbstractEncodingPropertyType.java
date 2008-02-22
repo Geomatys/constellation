@@ -42,6 +42,9 @@ public class AbstractEncodingPropertyType {
     @XmlElementRef(name = "Encoding", namespace = "http://www.opengis.net/swe/1.0.1", type = JAXBElement.class)
     private JAXBElement<? extends AbstractEncodingEntry> encoding;
     
+    @XmlTransient
+    private JAXBElement<? extends AbstractEncodingEntry> hiddenEncoding;
+    
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
     private String remoteSchema;
@@ -86,14 +89,53 @@ public class AbstractEncodingPropertyType {
     }
     
     /**
-     * Gets the value of the phenomenon property.
+     * clone Abstract encoding Property.
+     */
+    public AbstractEncodingPropertyType(AbstractEncodingPropertyType clone) {
+        
+        this.actuate        = clone.actuate;
+        this.arcrole        = clone.arcrole;
+        if (clone.encoding != null) {
+            if (clone.encoding.getValue() instanceof TextBlockEntry) {
+                this.encoding = sweFactory.createTextBlock((TextBlockEntry)clone.encoding.getValue());
+            } else {
+                throw new IllegalArgumentException("only TextBlock are allowed");
+            }
+        }
+        if (clone.hiddenEncoding != null) {
+            if (clone.hiddenEncoding.getValue() instanceof TextBlockEntry) {
+                this.hiddenEncoding = sweFactory.createTextBlock((TextBlockEntry)clone.hiddenEncoding.getValue());
+            } else {
+                throw new IllegalArgumentException("only TextBlock are allowed");
+            }
+        }
+        this.href           = clone.href;
+        this.remoteSchema   = clone.remoteSchema;
+        this.role           = clone.role;
+        this.show           = clone.show;
+        this.title          = clone.title;
+        this.type           = clone.type;
+        
+    }
+    
+    public void setToHref(){
+        if (encoding != null) {
+            this.href = encoding.getValue().getId();
+            hiddenEncoding = encoding;
+            encoding = null;
+        }
+    }
+    
+    /**
+     * Gets the value of the encoding property.
      */
     public AbstractEncodingEntry getencoding() {
         if (encoding != null) {
             return encoding.getValue();
-        } else {
-            return null;
+        } else if (hiddenEncoding != null) {
+            return hiddenEncoding.getValue();
         }
+        return null;
     }
 
     /**
@@ -127,7 +169,7 @@ public class AbstractEncodingPropertyType {
     public String getRole() {
         return role;
     }
-
+    
     /**
      * Gets the value of the arcrole property.
      */
@@ -163,17 +205,27 @@ public class AbstractEncodingPropertyType {
         if (object == this) {
             return true;
         }
-        boolean compo = false;
+        boolean enc = false;
         final AbstractEncodingPropertyType that = (AbstractEncodingPropertyType) object;
         if (this.encoding != null && that.encoding != null) {
-            compo = Utilities.equals(this.encoding.getValue(), that.encoding.getValue());
+            enc = Utilities.equals(this.encoding.getValue(), that.encoding.getValue());
             //System.out.println("encoding NOT NULL :" + pheno);
         } else {
-            compo = (this.encoding == null && that.encoding == null);
+            enc = (this.encoding == null && that.encoding == null);
             //System.out.println("encoding NULL :" + pheno);
         }
         
-        return compo                                                            &&
+        boolean hiddenEnc = false;
+        if (this.hiddenEncoding != null && that.hiddenEncoding != null) {
+            hiddenEnc = Utilities.equals(this.hiddenEncoding.getValue(), that.hiddenEncoding.getValue());
+            //System.out.println("feature NOT NULL :" + pheno);
+        } else {
+            hiddenEnc = (this.hiddenEncoding == null && that.hiddenEncoding == null);
+            //System.out.println("feature NULL :" + pheno);
+        }
+        
+        return enc                                                              &&
+               hiddenEnc                                                        &&
                Utilities.equals(this.actuate,            that.actuate)          &&
                Utilities.equals(this.arcrole,            that.arcrole)          &&  
                Utilities.equals(this.type,               that.type)             &&
@@ -189,6 +241,7 @@ public class AbstractEncodingPropertyType {
     public int hashCode() {
         int hash = 5;
         hash = 47 * hash + (this.encoding != null ? this.encoding.hashCode() : 0);
+        hash = 47 * hash + (this.hiddenEncoding != null ? this.hiddenEncoding.hashCode() : 0);
         hash = 47 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
         hash = 47 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
         hash = 47 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);

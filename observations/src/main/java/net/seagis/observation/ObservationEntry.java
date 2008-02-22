@@ -30,9 +30,11 @@ import net.seagis.coverage.model.DistributionEntry;
 // openGis dependencies
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.FeaturePropertyType;
+import net.seagis.gml.ReferenceEntry;
 import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
+import net.seagis.swe.DataArrayPropertyType;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonPropertyType;
 import net.seagis.swe.TimeGeometricPrimitivePropertyType;
@@ -293,6 +295,10 @@ public class ObservationEntry extends Entry implements Observation {
             return null;
         }
     }
+    
+    public PhenomenonPropertyType getPropertyObservedProperty() {
+       return observedProperty;
+    }
 
     /**
      * {@inheritDoc}
@@ -340,6 +346,10 @@ public class ObservationEntry extends Entry implements Observation {
      * fixe le resultat de l'observation
      */
     public void setResult(Object result) {
+        if (!(result instanceof ReferenceEntry) && !(result instanceof DataArrayPropertyType)) {
+            throw new IllegalArgumentException("this type " + result.getClass().getSimpleName() +
+                                           " is not allowed in result");
+        }
         this.result = result;
     }
     

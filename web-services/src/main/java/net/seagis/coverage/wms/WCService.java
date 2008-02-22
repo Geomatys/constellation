@@ -383,8 +383,8 @@ public class WCService extends WebService {
                             gridType = "urn:ogc:def:method:WCS:1.1:2dSimpleGrid";
                         }
                         String gridOrigin = getParameter("GridOrigin", false);
-                        if (gridType == null) {
-                            gridType = "0.0,0.0";
+                        if (gridOrigin == null) {
+                            gridOrigin = "0.0,0.0";
                         }
                         StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
                         List<Double> origin   = new ArrayList<Double>(tokens.countTokens());
@@ -394,11 +394,14 @@ public class WCService extends WebService {
                         }
                         
                         String gridOffsets = getParameter("GridOffsets", false);
-                        tokens = new StringTokenizer(gridOffsets, ",;");
-                        List<Double> offset   = new ArrayList<Double>(tokens.countTokens());
-                        while (tokens.hasMoreTokens()) {
-                            Double value = parseDouble(tokens.nextToken());
-                            offset.add(value);
+                        List<Double> offset = null;
+                        if (gridOffsets != null) {
+                            tokens = new StringTokenizer(gridOffsets, ",;");
+                            offset   = new ArrayList<Double>(tokens.countTokens());
+                            while (tokens.hasMoreTokens()) {
+                                Double value = parseDouble(tokens.nextToken());
+                                offset.add(value);
+                            }
                         }
                         
                         String gridCS = getParameter("GridCS", false);
@@ -675,16 +678,21 @@ public class WCService extends WebService {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         webServiceWorker.setService("WCS", getCurrentVersion());
-        String format = null, coverage, crs = null, bbox = null, time = null , interpolation = null, exceptions;
+        String format = null, coverage = null, crs = null, bbox = null, time = null , interpolation = null, exceptions;
         String width = null, height = null, depth = null;
         String resx  = null, resy   = null, resz  = null;
         String gridType, gridOrigin = "", gridOffsets = "", gridCS, gridBaseCrs;
         String responseCRS = null;
         
-       if (getCurrentVersion().toString().equals("1.1.1")){
+       if (getCurrentVersion().toString().equals("1.1.1")) {
             net.seagis.wcs.v111.GetCoverage request = (net.seagis.wcs.v111.GetCoverage)AbstractRequest;
             
-            coverage = request.getIdentifier().getValue();
+            if (request.getIdentifier() != null) {
+                coverage = request.getIdentifier().getValue();
+            } else {
+                throwException("The parameter identifiers must be specify" , 
+                               "MISSING_PARAMETER_VALUE", "identifier");
+            }
             
             /*
              * Domain subset: - spatial subSet

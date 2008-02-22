@@ -33,6 +33,9 @@ public class DataComponentPropertyType {
     @XmlElementRef(name = "AbstractDataRecord", namespace = "http://www.opengis.net/swe/1.0.1", type = JAXBElement.class)
     private JAXBElement<? extends AbstractDataRecordEntry> abstractDataRecord;
     
+    @XmlTransient
+    private JAXBElement<? extends AbstractDataRecordEntry> hiddenAbstractDataRecord;
+    
     @XmlAttribute(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
@@ -86,10 +89,19 @@ public class DataComponentPropertyType {
     public AbstractDataRecordEntry getAbstractRecord() {
         if (abstractDataRecord != null) {
             return abstractDataRecord.getValue();
+        } else if (hiddenAbstractDataRecord != null){
+            return hiddenAbstractDataRecord.getValue();
         }
         return null;
     }
 
+    public void setToHref() {
+        if (abstractDataRecord != null) {
+            this.href = abstractDataRecord.getValue().getId();
+            hiddenAbstractDataRecord = abstractDataRecord;
+            abstractDataRecord       = null;
+        }
+    }
     /**
      * 
      */

@@ -139,6 +139,9 @@ public class GridCrsType {
      * When this GridOrigin position is omitted, the origin defaults be the most commonly used origin in a GridCRS used in the output part of a GetCapabilities operation request, namely "0 0". Gets the value of the gridOrigin property.
      */
     public List<Double> getGridOrigin() {
+        if (gridOrigin == null) {
+            gridOrigin = new ArrayList<Double>();
+        }
        return Collections.unmodifiableList(gridOrigin);
     }
 
@@ -146,6 +149,9 @@ public class GridCrsType {
      * Gets the value of the gridOffsets property.
      */
     public List<Double> getGridOffsets() {
+       if (gridOffsets == null) {
+           gridOffsets = new ArrayList<Double>();
+       }
        return Collections.unmodifiableList(gridOffsets);
     }
 

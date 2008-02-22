@@ -38,7 +38,7 @@ import org.geotools.coverage.SpatioTemporalCoverage3D;
 // Sicade dependencies
 import net.seagis.coverage.model.DescriptorTable;
 import net.seagis.resources.i18n.Resources;
-import net.seagis.resources.XArray;
+//import net.seagis.resources.XArray;
 
 
 
@@ -227,7 +227,7 @@ public class MeasurementTableFiller implements Runnable {
                     pairs[index++] = new SamplingFeatureDescriptorPair(samplingFeature, descriptor);
                 }
             }
-            pairs = XArray.resize(pairs, index);
+            //pairs = XArray.resize(pairs, index);
             sort(pairs);
             Descriptor.LOGGER.info("Évaluation de " + index + " valeurs.");
             /*

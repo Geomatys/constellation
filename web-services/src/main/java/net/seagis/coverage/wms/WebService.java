@@ -469,7 +469,7 @@ public abstract class WebService {
         StringWriter sw = new StringWriter(); 
         if (getCurrentVersion().isOWS()) {
             OWSWebServiceException wse = new OWSWebServiceException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
-                                                                    OWSExceptionCode.INVALID_PARAMETER_VALUE, 
+                                                                    OWSExceptionCode.INVALID_REQUEST, 
                                                                     null,
                                                                     getCurrentVersion().getVersionNumber());
             marshaller.marshal(wse.getExceptionReport(), sw);
