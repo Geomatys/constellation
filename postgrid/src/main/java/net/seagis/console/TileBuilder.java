@@ -15,7 +15,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geotools.image.io.mosaic;
+package net.seagis.console;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -26,23 +26,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ImageReaderSpi;
 
+import org.geotools.geometry.Envelope2D;
+import org.geotools.image.io.mosaic.Tile;
+import org.geotools.image.io.mosaic.TileManager;
+import org.geotools.image.io.mosaic.MosaicBuilder;
+
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.WritableGridCoverageTable;
-import org.geotools.geometry.Envelope2D;
 
 
 /**
- * Creates tiles for a specific raster, and write them in different output files.
+ * Creates tiles and write the entries in the database.
  *
  * @source $URL$
  * @author Cédric Briançon
- *
- * @deprecated This is a temporary class to be deleted once {@link MosaicBuilder} development
- * will be finished.
- */
-@Deprecated
-public class TestMosaicWriter {
+ * @author Martin Desruisseaux
+  */
+public class TileBuilder {
     public static void main(String[] args) throws IOException, CatalogException, SQLException {
         org.geotools.util.logging.Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.FINE);
         org.geotools.resources.image.ImageUtilities.allowNativeCodec("PNG", javax.imageio.spi.ImageReaderSpi.class, false);

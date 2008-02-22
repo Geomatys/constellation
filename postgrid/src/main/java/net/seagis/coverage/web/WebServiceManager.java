@@ -29,7 +29,7 @@ import org.geotools.util.logging.Logging;
 /**
  * Manages a collection of {@link WebServiceWorker}.
  *
- * @version $Id: WebServiceWorker.java 386 2008-01-29 10:47:01Z glegal $
+ * @version $Id$
  * @author Guilhem Legal
  * @author Martin Desruisseaux
  */

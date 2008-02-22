@@ -45,7 +45,7 @@ import ucar.nc2.ncml.AggregationExisting;
 /**
  * Adds new records to the specified database.
  *
- * @version $Id: Collector.java 90 2008-01-02 13:23:18Z cb1ebc7 $
+ * @version $Id$
  * @author Martin Desruisseaux
  * @author Cédric Briançon
  */

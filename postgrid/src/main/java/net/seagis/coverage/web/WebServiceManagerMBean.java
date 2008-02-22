@@ -18,7 +18,7 @@ package net.seagis.coverage.web;
 /**
  * Manages {@link WebServiceWorker} on remote JMX.
  *
- * @version $Id: WebServiceWorker.java 386 2008-01-29 10:47:01Z glegal $
+ * @version $Id$
  * @author Guilhem Legal
  */
 public interface WebServiceManagerMBean {
