@@ -38,6 +38,7 @@ import javax.imageio.ImageReader;
 import java.lang.reflect.UndeclaredThrowableException;
 
 import org.geotools.util.DateRange;
+import org.geotools.image.io.mosaic.Tile;
 import org.geotools.geometry.GeneralEnvelope;
 
 import net.seagis.catalog.Database;
@@ -193,9 +194,11 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         if (inputs.hasNext()) {
             final Object next = inputs.next();
             boolean success = false;
+            final WritableGridCoverageIterator iterator =
+                    new WritableGridCoverageIterator(this, null, imageIndex, inputs, next);
             transactionBegin();
             try {
-                count = addEntriesUnsafe(new WritableGridCoverageIterator(null, imageIndex, inputs, next));
+                count = addEntriesUnsafe(iterator);
                 success = true; // Must be the very last line in the try block.
             } finally {
                 series = null;
@@ -429,7 +432,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 final Object next = entry.getKey();
                 it.remove();
                 final int imageIndex = 0; // TODO: Do we have a better value to provide?
-                count += addEntriesUnsafe(new WritableGridCoverageIterator(series, imageIndex, it, next));
+                final WritableGridCoverageIterator iterator =
+                        new WritableGridCoverageIterator(this, series, imageIndex, it, next);
+                count += addEntriesUnsafe(iterator);
             }
             success = true; // Must be the very last line in the try block.
         } finally {
@@ -468,5 +473,36 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                 }
             }
         }
+    }
+
+    /**
+     * Creates an entry for the given tile to be inserted in the database. This method is invoked
+     * automatically by {@link #addEntries}. The default implementation returns an instance created
+     * from the {@link WritableGridCoverageEntry#WritableGridCoverageEntry(Tile) constructor with
+     * same signature}. Subclasses can override this method in order to return some entries filled
+     * with different metadata.
+     *
+     * @param  tile The tile to use for the entry.
+     * @throws IOException if an error occured while reading the image.
+     */
+    protected WritableGridCoverageEntry createEntry(final Tile tile) throws IOException {
+        return new WritableGridCoverageEntry(tile);
+    }
+
+    /**
+     * Creates an entry for the given image to be inserted in the database. This method is invoked
+     * automatically by {@link #addEntries}. The default implementation returns an instance created
+     * from the {@link WritableGridCoverageEntry#WritableGridCoverageEntry(ImageReader,int)
+     * constructor with same signature}. Subclasses can override this method in order to return
+     * some entries filled with different metadata.
+     *
+     * @param  reader     The reader where to fetch metadata from.
+     * @param  imageIndex The index of the image to be read.
+     * @throws IOException if an error occured while reading the image.
+     */
+    protected WritableGridCoverageEntry createEntry(final ImageReader reader, final int imageIndex)
+            throws IOException
+    {
+        return new WritableGridCoverageEntry(reader, imageIndex);
     }
 }

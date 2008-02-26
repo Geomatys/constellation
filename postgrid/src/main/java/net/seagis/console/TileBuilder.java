@@ -109,7 +109,9 @@ public class TileBuilder {
             tiles.add(tile);
         }
         MosaicBuilder builder = new MosaicBuilder();
-        builder.setTileSize(new Dimension(tileSize.x, tileSize.y));
+        if (tileSize != null) {
+            builder.setTileSize(new Dimension(tileSize.x, tileSize.y));
+        }
         builder.setTileDirectory(targetDirectory);
         builder.setMosaicEnvelope(envelope);
         try {

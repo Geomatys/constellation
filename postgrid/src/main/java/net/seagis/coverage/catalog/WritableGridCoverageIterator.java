@@ -37,6 +37,11 @@ import net.seagis.resources.i18n.ResourceKeys;
  */
 final class WritableGridCoverageIterator implements Iterator<WritableGridCoverageEntry> {
     /**
+     * The table that created this iterator.
+     */
+    private final WritableGridCoverageTable table;
+
+    /**
      * The series in which the images will be added, or {@code null} if unknown.
      */
     private final Series series;
@@ -74,14 +79,17 @@ final class WritableGridCoverageIterator implements Iterator<WritableGridCoverag
     /**
      * Creates an iterator for the specified files.
      *
+     * @param  table      The table that created this iterator.
      * @param  series     The series in which the images will be added, or {@code null} if unknown.
      * @param  imageIndex Index of images to read. Ignored if the inputs are {@link Tile} instances.
      * @param  files      The files to read. Iteration shall be at the second element.
      * @param  next       The first element from the given iterator.
      */
-    WritableGridCoverageIterator(final Series series, final int imageIndex,
+    WritableGridCoverageIterator(final WritableGridCoverageTable table,
+                                 final Series series, final int imageIndex,
                                  final Iterator<?> files, final Object next)
     {
+        this.table      = table;
         this.series     = series;
         this.imageIndex = imageIndex;
         this.files      = files;
@@ -132,7 +140,7 @@ final class WritableGridCoverageIterator implements Iterator<WritableGridCoverag
      */
     private WritableGridCoverageEntry peek() throws IOException {
         if (next instanceof Tile) {
-            return new WritableGridCoverageEntry((Tile) next);
+            return table.createEntry((Tile) next);
         }
         final ImageReader reader;
         if (next instanceof ImageReader) {
@@ -144,10 +152,10 @@ final class WritableGridCoverageIterator implements Iterator<WritableGridCoverag
             } else {
                 // Lets the Tile constructor figure out the provider by itself.
                 final Tile tile = new Tile(null, next, imageIndex, new Point(0,0), null);
-                return new WritableGridCoverageEntry(tile);
+                return table.createEntry(tile);
             }
         }
-        return new WritableGridCoverageEntry(reader, imageIndex);
+        return table.createEntry(reader, imageIndex);
     }
 
     /**

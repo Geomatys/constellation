@@ -57,7 +57,7 @@ import net.seagis.resources.i18n.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class WritableGridCoverageEntry {
+public class WritableGridCoverageEntry {
     /**
      * The series in which the images will be added, or {@code null} if unknown.
      */
@@ -74,15 +74,22 @@ final class WritableGridCoverageEntry {
     private final ImageReader reader;
 
     /**
-     * The path to the coverage file (not including the filename).
-     * The input splitted as "{@linkplain #path}/{@linkplain #filename}.{@linkplain #extension}".
+     * The path to the coverage file (not including the filename). This is part of the input
+     * splitted as "{@linkplain #path}/{@linkplain #filename}.{@linkplain #extension}".
      */
-    public final File path;
+    protected final File path;
 
     /**
-     * The input splitted as "{@linkplain #path}/{@linkplain #filename}.{@linkplain #extension}".
+     * The filename, not including the path or the extension. This is part of the input
+     * splitted as "{@linkplain #path}/{@linkplain #filename}.{@linkplain #extension}".
      */
-    public final String filename, extension;
+    protected final String filename;
+
+    /**
+     * The filename extension, not including the leading dot. This is part of the input
+     * splitted as "{@linkplain #path}/{@linkplain #filename}.{@linkplain #extension}".
+     */
+    protected final String extension;
 
     /**
      * The object to use for parsing image metadata. This is set by {@link #parseMetadata}.
@@ -163,7 +170,7 @@ final class WritableGridCoverageEntry {
      * @return The series that seems the best match.
      * @throws CatalogException if there is ambiguity between series.
      */
-    public Series choose(final Collection<Series> candidates) throws CatalogException {
+    final Series choose(final Collection<Series> candidates) throws CatalogException {
         series = null;
         int mimeMatching = 0; // Greater the number, better is the matching of MIME type.
         int pathMatching = 0; // Greater the number, better is the matching of the file path.
@@ -244,7 +251,7 @@ final class WritableGridCoverageEntry {
      * @return The format name (neven {@code null} and never empty).
      * @throws IOException if the format can not be obtained.
      */
-    public String getFormatName(final boolean upper) throws IOException {
+    final String getFormatName(final boolean upper) throws IOException {
         String format = "";
         final ImageReaderSpi provider = reader.getOriginatingProvider();
         if (provider != null) {
@@ -300,7 +307,7 @@ final class WritableGridCoverageEntry {
     /**
      * Returns the image size.
      */
-    public Dimension getImageSize() throws IOException {
+    public Dimension getImageSize() throws IOException, CatalogException {
         return tile.getRegion().getSize();
     }
 
@@ -310,7 +317,7 @@ final class WritableGridCoverageEntry {
      *
      * @return The date range for the given metadata, or {@code null} if none.
      */
-    public DateRange[] getDateRanges() {
+    public DateRange[] getDateRanges() throws IOException, CatalogException {
         return metadata.getDateRanges();
     }
 
@@ -321,7 +328,7 @@ final class WritableGridCoverageEntry {
      *
      * @return The affine transform from grid to CRS, or {@code null} if it can't be computed.
      */
-    public AffineTransform getGridToCRS() throws IOException {
+    public AffineTransform getGridToCRS() throws IOException, CatalogException {
         AffineTransform gridToCRS = tile.getGridToCRS();
         if (gridToCRS != null) {
             // The entry to be recorded in the database has its origin to (0,0).
@@ -346,8 +353,13 @@ final class WritableGridCoverageEntry {
     /**
      * Returns the horizontal CRS identifier, or {@code 0} if unknown.
      */
-    public int getHorizontalSRID() throws SQLException, CatalogException {
-        int srid = metadata.getHorizontalSRID();
+    public int getHorizontalSRID() throws IOException, CatalogException {
+        int srid;
+        try {
+            srid = metadata.getHorizontalSRID();
+        } catch (SQLException e) {
+            throw new CatalogException(e);
+        }
         if (srid == 0 && envelope != null) {
             CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
             crs = CRS.getHorizontalCRS(crs);
@@ -367,14 +379,14 @@ final class WritableGridCoverageEntry {
     /**
      * Returns the vertical CRS identifier, or {@code 0} if unknown.
      */
-    public int getVerticalSRID() {
+    public int getVerticalSRID() throws IOException, CatalogException {
         return metadata.getVerticalSRID();
     }
 
     /**
      * Returns the vertical coordinate values, or {@code null} if none.
      */
-    public double[] getVerticalValues() {
+    public double[] getVerticalValues() throws IOException, CatalogException {
         double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
         if (verticalOrdinates == null) {
             /*
@@ -394,7 +406,7 @@ final class WritableGridCoverageEntry {
     /**
      * Closes the reader (but do not dispose it, since it may be used for the next entry).
      */
-    public void close() throws IOException {
+    final void close() throws IOException {
         if (reader != null) {
             final Object input = reader.getInput();
             reader.reset();

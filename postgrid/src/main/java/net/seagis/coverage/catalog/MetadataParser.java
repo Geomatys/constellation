@@ -50,7 +50,9 @@ import net.seagis.catalog.CatalogException;
 
 
 /**
- * Builds objects from coverage metadata.
+ * Parses the metadata from a coverage file and returns them as Java objects.
+ * This class is used by {@link WritableGridCoverageTable} on insertion of new
+ * coverages from an input file or URL.
  *
  * @version $Id$
  * @author Martin Desruisseaux
