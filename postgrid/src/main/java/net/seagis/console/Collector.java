@@ -25,17 +25,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.geotools.resources.Arguments;
-import org.geotools.image.io.netcdf.NetcdfImageReader;
-
 import net.seagis.catalog.Database;
 import net.seagis.catalog.UpdatePolicy;
 import net.seagis.catalog.ServerException;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.WritableGridCoverageTable;
+import net.seagis.ncml.NcmlGridCoverageTable;
+import net.seagis.ncml.NcmlNetcdfElement;
+import net.seagis.ncml.NcmlReading;
+import net.seagis.ncml.NcmlTimeValues;
 import static net.seagis.catalog.UpdatePolicy.*;
+
+import org.geotools.resources.Arguments;
+import org.geotools.image.io.netcdf.NetcdfImageReader;
+import org.jdom.Element;
 
 import ucar.nc2.ncml.Aggregation;
 import ucar.nc2.ncml.Aggregation.Type;
@@ -182,11 +185,11 @@ public class Collector {
                             final boolean allowsNewLayer) throws CatalogException
     {
         variable = variable.toLowerCase().trim();
-        table.setCanInsertNewLayers(allowsNewLayer);
-        final Set<URI> locations = new HashSet<URI>();
+        final NcmlGridCoverageTable ncmlTable = new NcmlGridCoverageTable(database);
+        ncmlTable.setCanInsertNewLayers(allowsNewLayer);
+        final Set<NcmlNetcdfElement> netcdfTags = new HashSet<NcmlNetcdfElement>();
         try {
-            NcMLReading ncmlParsing = new NcMLReading(ncml);
-            final List<Aggregation> aggregations = ncmlParsing.getNestedAggregations();
+            final List<Aggregation> aggregations = NcmlReading.getNestedAggregations(ncml);
             // If we have an aggregation of type "joint" for the whole file, without any other
             // nested aggregation, then we know that the <netcdf> tags will contain the "location"
             // parameter, and we get it back directly in order to specify it to the reader.
@@ -201,32 +204,50 @@ public class Collector {
                     final Collection<String> variables = aggrExist.getVariables();
                     for (final String var : variables) {
                         if (variable.startsWith(var.toLowerCase())) {
-                            locations.add(new URI(dataset.getLocation()));
+                            final NcmlNetcdfElement netcdfElement = new NcmlNetcdfElement(new URI(dataset.getLocation()), null);
+                            netcdfTags.add(netcdfElement);
                         }
                     }
                 }
             } else {
                 // Browse all <netcdf location="..."> for this aggregation.
-                final Collection<Element> nested = ncmlParsing.getNestedNetcdfElement();
+                final Collection<Element> nested = NcmlReading.getNestedNetcdfElement(ncml);
                 for (final Element netcdfWithLocationParam : nested) {
-                    final Namespace ncmlNamespace = Namespace.getNamespace(
-                            "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
                     // Verify that the variable to collect, specified by user, is really present
                     // among variables found in the NcML file for the current <netcdf> tags.
                     // If it is the case, the NetCDF file is added to the list of files to handle,
                     // otherwise it is skipped.
-                    @SuppressWarnings("unchecked")
-                    final Collection<Element> children = netcdfWithLocationParam.getChildren("variable", ncmlNamespace);
-                    for (final Element varNcml : children) {
-                        if (variable.startsWith(varNcml.getAttributeValue("name").toLowerCase())) {
-                            locations.add(new URI(netcdfWithLocationParam.getAttributeValue("location")));
-                        }
+                    if (NcmlReading.getVariableElement(variable, netcdfWithLocationParam) == null) {
+                        continue;
                     }
+                    final URI location = new URI(netcdfWithLocationParam.getAttributeValue("location"));
+                    final Element timeElement = NcmlReading.getVariableElement("time", netcdfWithLocationParam);
+                    if (timeElement == null) {
+                        // TODO: handle NcML definitions with no time variable in a <netcdf> tags
+                        continue;
+                    }
+                    final Element timeValues = timeElement.getChild("values", NcmlReading.NETCDFNS);
+                    if (timeValues == null) {
+                        continue;
+                    }
+                    final long startTime = Math.round(Double.valueOf(timeValues.getAttributeValue("start")));
+                    final long increment = Math.round(Double.valueOf(timeValues.getAttributeValue("increment")));
+                    final int npts = Integer.valueOf(timeValues.getAttributeValue("npts"));
+                    final NcmlTimeValues ncmlValue = new NcmlTimeValues(startTime, increment, npts);
+                    final NcmlNetcdfElement netcdfElement = new NcmlNetcdfElement(location, ncmlValue);
+                    netcdfTags.add(netcdfElement);
                 }
             }
             // Do the adding of the selected NetCDF files into the database.
-            for (final URI location : locations) {
-                addToLayer(layer, location.toString());
+            final int size = netcdfTags.size();
+            final NcmlNetcdfElement[] netcdfTagsArray = new NcmlNetcdfElement[size];
+            netcdfTags.toArray(netcdfTagsArray);
+            for (int i=0; i<size; i++) {
+                if (i + 1 < size) {
+                    addToLayer(layer, netcdfTagsArray[i], ncmlTable, netcdfTagsArray[i + 1]);
+                } else {
+                    addToLayer(layer, netcdfTagsArray[i], ncmlTable, netcdfTagsArray[i - 1]);
+                }
             }
             getDatabase().flush();
         } catch (SQLException e) {
@@ -239,10 +260,10 @@ public class Collector {
     }
 
     /**
-     * Try to add the data red from the NcML file for the wished layer. If an SQL error 
+     * Try to add the data red from the NcML file for the wished layer. If an SQL error
      * occurs, it could comes from a try to add data already in the database.
      * At this moment, we catch it and let the process continue.
-     * This a temporary workaround that has to be replaced by a genuine test before the 
+     * This a temporary workaround that has to be replaced by a genuine test before the
      * adding of this record in the database.
      *
      * @param layer The layer to consider.
@@ -251,15 +272,21 @@ public class Collector {
      * @throws SQLException If a SQL error occurs, other than a doublon.
      * @throws IOException
      */
-    private void addToLayer(final String layer, final String path)
+    private void addToLayer(final String layer, final NcmlNetcdfElement element, 
+            final NcmlGridCoverageTable table, final NcmlNetcdfElement nextElement)
             throws CatalogException, SQLException, IOException
     {
         table.setLayer(layer);
-        NetcdfImageReader reader = addInputToReader(path);
+        final NcmlTimeValues timeValues = element.getTimeValues();
+        NetcdfImageReader reader = addInputToReader(element.getLocation().toString());
         try {
+            table.setIncrement(timeValues.getIncrement());
+            table.setStartTime(timeValues.getStartTime());
+            table.setNpts(timeValues.getNpts());
+            table.setNextItemStart(nextElement.getTimeValues().getStartTime());
             table.addEntry(reader);
         } catch (SQLException sql) {
-            // If the error code is "23505", we know that it is a postgresql error which 
+            // If the error code is "23505", we know that it is a postgresql error which
             // indicates an adding of a record already present into the database.
             // In this case, we do nothing because the record is already present.
             // Otherwise we throw this exception, which could have occured for a different
@@ -273,7 +300,7 @@ public class Collector {
     /**
      * Creates an {@code ImageReader} for the NetCDF file specified, and returns it.
      *
-     * @param netcdf The path for the NetCDF file red from the NcML file. It could 
+     * @param netcdf The path for the NetCDF file red from the NcML file. It could
      *               contains a protocol. In this case it will be considered as an URI.
      * @return The {@code ImageReader} for the NetCDF file specified, or {@code null} if
      *         an error occurs in the generating process of the URI.

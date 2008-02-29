@@ -70,6 +70,20 @@ final class MetadataParser {
     private final GeographicMetadata metadata;
 
     /**
+     * Date origin found during the last invocation of {@link #getDateRanges}.
+     * {@code null} if the later method has not been invoked or didn't
+     * completed successfully.
+     */
+    protected Date timeOrigin;
+
+    /**
+     * Time units found during the last invocation of {@link #getDateRanges}.
+     * {@code null} if the later method has not been invoked or didn't
+     * completed successfully.
+     */
+    protected Unit timeUnit;
+
+    /**
      * Gets the geographic metadata from the specified reader.
      *
      * @param  reader     The reader where to fetch metadata from.
@@ -239,6 +253,8 @@ final class MetadataParser {
                     for (int j=0; j<dates.length; j++) {
                         dates[j] = new DateRange(ranges[j], origin);
                     }
+                    timeOrigin = origin;
+                    timeUnit = getUnits(axis);
                     return dates;
                 }
             }

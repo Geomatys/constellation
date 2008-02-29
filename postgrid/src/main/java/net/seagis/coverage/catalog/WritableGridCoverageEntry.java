@@ -25,10 +25,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.sql.SQLException;
+import java.util.Date;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
+import javax.units.Unit;
 import javax.units.SI;
 
 import org.opengis.geometry.Envelope;
@@ -319,6 +321,24 @@ public class WritableGridCoverageEntry {
      */
     public DateRange[] getDateRanges() throws IOException, CatalogException {
         return metadata.getDateRanges();
+    }
+
+    /**
+     * Returns the date origin found during the last invocation of {@link #getDateRanges}.
+     * Returns {@code null} if the later method has not been invoked or didn't completed
+     * successfully.
+     */
+    protected Date getTimeOrigin() {
+        return metadata.timeOrigin;
+    }
+
+    /**
+     * Returns the time units found during the last invocation of {@link #getDateRanges}.
+     * Returns {@code null} if the later method has not been invoked or didn't completed
+     * successfully.
+     */
+    protected Unit getTimeUnit() {
+        return metadata.timeUnit;
     }
 
     /**

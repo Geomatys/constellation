@@ -12,14 +12,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.console;
+package net.seagis.ncml;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import net.seagis.catalog.CatalogException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -31,40 +30,24 @@ import ucar.nc2.ncml.NcMLReader;
 
 
 /**
- * Reads a NcML file, and get back data stored into the <netcdf> tags. 
- * If an aggregation of NetCDF file is present, it is possible to get it
- * and the whole data in it.
+ * Utilities for parsing NcML files.
  *
  * @source $URL$
  * @author Cédric Briançon
  */
-final class NcMLReading {
+public class NcmlReading {
     /**
      * The {@code namespace} for <netcdf> tags.
      */
-    private static final Namespace NETCDFNS = Namespace.getNamespace(
+    public static final Namespace NETCDFNS = Namespace.getNamespace(
             "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
-
-    /**
-     * The NcML file to browse.
-     */
-    private final File ncml;
-
-    /**
-     * Prepare the getting of data stored in the NcML file.
-     *
-     * @param ncml The NcML file to handle.
-     */
-    public NcMLReading(final File ncml) {
-        this.ncml = ncml;
-    }
 
     /**
      * Returns a list of {@linkplain ucar.nc2.ncml.Aggregation Aggregation}, which should be a
      * list of tags containing one or several <netcdf> tags. If these tags were not found, or
      * an error during the parsing of the NcML file has occured, it will returns {@code null}.
      */
-    protected List<Aggregation> getNestedAggregations() throws CatalogException {
+    public static List<Aggregation> getNestedAggregations(final File ncml) throws IOException {
         try {
             final List<Aggregation> aggregations = new ArrayList<Aggregation>();
             final String  ncmlPath     = ncml.getAbsolutePath();
@@ -82,22 +65,23 @@ final class NcMLReading {
                 aggregations.add(netcdfData.getAggregation());
             }
             return aggregations;
-        } catch (IOException ex) {
-            throw new CatalogException("Unable to read correctly the NcML file.", ex);
-        } catch (JDOMException ex) {
-            throw new CatalogException("The <netcdf> tags was not found in your NcML file.", ex);
+        }  catch (JDOMException ex) {
+            throw new IOException();
         }
     }
 
     /**
      * Returns a list of {@code JDOM} elements, matching with the whole children <netcdf>
      * of the main aggregation.
+     *
+     * @param ncml The NcML file to read.
+     * @throws IOException when an error of reading NcML file has occured.
      */
-    protected List<Element> getNestedNetcdfElement() throws CatalogException {
+    public static List<Element> getNestedNetcdfElement(final File ncml) throws IOException {
         try {
             final List<Element> elements = new ArrayList<Element>();
             final Element globalNetcdf = getGlobalNetcdfElement(ncml);
-            final Element globalAggr   = globalNetcdf.getChild("aggregation", NETCDFNS);
+            final Element globalAggr = globalNetcdf.getChild("aggregation", NETCDFNS);
             if (globalAggr.getChild("netcdf", NETCDFNS).getAttribute("location") == null) {
                 @SuppressWarnings("unchecked")
                 final Collection<Element> children = globalAggr.getChildren("netcdf", NETCDFNS);
@@ -110,26 +94,24 @@ final class NcMLReading {
                 }
             }
             return elements;
-        } catch (IOException ex) {
-            throw new CatalogException("Unable to read correctly the NcML file.", ex);
         } catch (JDOMException ex) {
-            throw new CatalogException("The <netcdf> tags was not found in your NcML file.", ex);
+            throw new IOException("An error to create the JDOM Document has occured.");
         }
     }
 
     /**
      * Returns the XML tags {@code <netcdf>} with its content for the NcML file specified.
-     * This tags has to contain the whole data of the NcML file dedicated to specified 
-     * meta data for NetCDF files. 
+     * This tags has to contain the whole data of the NcML file dedicated to specified
+     * meta data for NetCDF files.
      * An NcML file can contains several <netcdf> tags, this method will return the first
      * occurrence.
      *
-     * @param  ncmlPath The path for the NcML path.
+     * @param  ncml The NcML file to read.
      * @return The XML node {@code <netcdf>}.
      * @throws JDOMException if the getting of this tags has failed.
      * @throws IOException if the creation of this document has failed.
      */
-    private Element getGlobalNetcdfElement(final File ncml) throws IOException, JDOMException {
+    private static Element getGlobalNetcdfElement(final File ncml) throws IOException, JDOMException {
         final SAXBuilder builder = new SAXBuilder();
         final Document doc = builder.build(ncml);
         final Element root = doc.getRootElement();
@@ -139,5 +121,21 @@ final class NcMLReading {
             Element elemDataset = root.getChild("dataset", root.getNamespace());
             return elemDataset.getChild("netcdf", NETCDFNS);
         }
+    }
+
+    /**
+     *
+     * @param variable
+     * @param netcdfTags
+     * @return
+     */
+    public static Element getVariableElement(final String variable, final Element netcdfTags) {
+        final Collection<Element> children = netcdfTags.getChildren("variable", NETCDFNS);
+        for (final Element varNcml : children) {
+            if (variable.startsWith(varNcml.getAttributeValue("name").toLowerCase())) {
+                return varNcml;
+            }
+        }
+        return null;
     }
 }
