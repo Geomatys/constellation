@@ -21,7 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -187,7 +187,7 @@ public class Collector {
         variable = variable.toLowerCase().trim();
         final NcmlGridCoverageTable ncmlTable = new NcmlGridCoverageTable(database);
         ncmlTable.setCanInsertNewLayers(allowsNewLayer);
-        final Set<NcmlNetcdfElement> netcdfTags = new HashSet<NcmlNetcdfElement>();
+        final Set<NcmlNetcdfElement> netcdfTags = new LinkedHashSet<NcmlNetcdfElement>();
         try {
             final List<Aggregation> aggregations = NcmlReading.getNestedAggregations(ncml);
             // If we have an aggregation of type "joint" for the whole file, without any other
