@@ -246,7 +246,12 @@ public class Collector {
                 if (i + 1 < size) {
                     addToLayer(layer, netcdfTagsArray[i], ncmlTable, netcdfTagsArray[i + 1]);
                 } else {
-                    addToLayer(layer, netcdfTagsArray[i], ncmlTable, netcdfTagsArray[i - 1]);
+                    if (size > 1) {
+                        addToLayer(layer, netcdfTagsArray[i], ncmlTable, netcdfTagsArray[i - 1]);
+                    }
+                    else {
+                        addToLayer(layer, netcdfTagsArray[i], ncmlTable, null);
+                    }
                 }
             }
             getDatabase().flush();
@@ -283,7 +288,9 @@ public class Collector {
             table.setIncrement(timeValues.getIncrement());
             table.setStartTime(timeValues.getStartTime());
             table.setNpts(timeValues.getNpts());
-            table.setNextItemStart(nextElement.getTimeValues().getStartTime());
+            if (nextElement != null) {
+                table.setNextItemStart(nextElement.getTimeValues().getStartTime());
+            }
             table.addEntry(reader);
         } catch (SQLException sql) {
             // If the error code is "23505", we know that it is a postgresql error which
