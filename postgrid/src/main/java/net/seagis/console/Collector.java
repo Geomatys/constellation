@@ -223,7 +223,7 @@ public class Collector {
                     final URI location = new URI(netcdfWithLocationParam.getAttributeValue("location"));
                     final Element timeElement = NcmlReading.getVariableElement("time", netcdfWithLocationParam);
                     if (timeElement == null) {
-                        // TODO: handle NcML definitions with no time variable in a <netcdf> tags
+                        addToLayer(layer, location, ncmlTable);
                         continue;
                     }
                     final Element timeValues = timeElement.getChild("values", NcmlReading.NETCDFNS);
@@ -272,18 +272,53 @@ public class Collector {
      * adding of this record in the database.
      *
      * @param layer The layer to consider.
-     * @param path  The Netcdf path.
+     * @param location The Netcdf path.
+     * @param table The table in which the entry will be inserted.
      * @throws CatalogException
      * @throws SQLException If a SQL error occurs, other than a doublon.
      * @throws IOException
      */
-    private void addToLayer(final String layer, final NcmlNetcdfElement element, 
+    private void addToLayer(final String layer, final URI location, final WritableGridCoverageTable table)
+            throws CatalogException, SQLException, IOException
+    {
+        table.setLayer(layer);
+        final NetcdfImageReader reader = addInputToReader(location.toString());
+        try {
+            table.addEntry(reader);
+        } catch (SQLException sql) {
+            // If the error code is "23505", we know that it is a postgresql error which
+            // indicates an adding of a record already present into the database.
+            // In this case, we do nothing because the record is already present.
+            // Otherwise we throw this exception, which could have occured for a different
+            // reason.
+            if (!sql.getSQLState().equals("23505")) {
+                throw sql;
+            }
+        }
+    }
+
+    /**
+     * Try to add the data red from the NcML file for the wished layer. If an SQL error
+     * occurs, it could comes from a try to add data already in the database.
+     * At this moment, we catch it and let the process continue.
+     * This a temporary workaround that has to be replaced by a genuine test before the
+     * adding of this record in the database.
+     *
+     * @param layer The layer to consider.
+     * @param element An element that represents the current <netcdf> tags in the NcML file.
+     * @param table The table in which the entry will be inserted.
+     * @param nextElement An element that represents the next <netcdf> tags in the NcML file.
+     * @throws CatalogException
+     * @throws SQLException If a SQL error occurs, other than a doublon.
+     * @throws IOException
+     */
+    private void addToLayer(final String layer, final NcmlNetcdfElement element,
             final NcmlGridCoverageTable table, final NcmlNetcdfElement nextElement)
             throws CatalogException, SQLException, IOException
     {
         table.setLayer(layer);
         final NcmlTimeValues timeValues = element.getTimeValues();
-        NetcdfImageReader reader = addInputToReader(element.getLocation().toString());
+        final NetcdfImageReader reader = addInputToReader(element.getLocation().toString());
         try {
             table.setIncrement(timeValues.getIncrement());
             table.setStartTime(timeValues.getStartTime());
