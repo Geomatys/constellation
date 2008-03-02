@@ -29,10 +29,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 
-import org.geotools.util.logging.Logging;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.image.io.mosaic.Tile;
 import org.geotools.image.io.mosaic.TileManager;
@@ -56,7 +56,6 @@ public class TileBuilder {
      * Runs from the command line.
      */
     public static void main(String[] args) {
-        Logging.ALL.forceMonolineConsoleOutput();
         ImageUtilities.allowNativeCodec("PNG", ImageReaderSpi.class, false);
         ImageUtilities.allowNativeCodec("PNG", ImageWriterSpi.class, false);
         final Arguments  arguments = new Arguments(args);
@@ -109,6 +108,7 @@ public class TileBuilder {
             tiles.add(tile);
         }
         MosaicBuilder builder = new MosaicBuilder();
+        builder.setLogLevel(Level.INFO);
         if (tileSize != null) {
             builder.setTileSize(new Dimension(tileSize.x, tileSize.y));
         }

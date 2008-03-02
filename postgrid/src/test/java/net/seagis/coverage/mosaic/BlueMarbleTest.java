@@ -24,9 +24,9 @@ import java.io.File;
 import org.junit.*;
 import static org.junit.Assert.*;
 
+import org.geotools.util.logging.Logging;
 import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.image.io.mosaic.MosaicImageReader;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import net.seagis.coverage.catalog.Layer;
@@ -53,7 +53,7 @@ public class BlueMarbleTest extends DatabaseTest {
     @Override @BeforeClass
     protected void setUp() throws Exception {
         super.setUp();
-        MosaicImageReader.Spi.DEFAULT.setLogLevel(Level.INFO);
+        Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.INFO);
     }
 
     /**
