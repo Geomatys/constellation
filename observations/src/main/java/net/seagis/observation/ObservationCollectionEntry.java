@@ -17,7 +17,7 @@ package net.seagis.observation;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -39,14 +39,16 @@ public class ObservationCollectionEntry extends AbstractFeatureEntry implements 
     /**
      *  The observation collection
      */
-    @XmlElement(name="member", namespace="http://www.opengis.net/om/1.0")
-    private Collection<ObservationPropertyType> member = new ArrayList<ObservationPropertyType>();
+    @XmlElement(required=true)
+    private List<ObservationPropertyType> member;
     
     /**
      * A JAXB constructor. 
      */
     public ObservationCollectionEntry() {
         super(null, null, null);
+        member = new ArrayList<ObservationPropertyType>();
+        System.out.println("----------------------------------------------------------------------");
     }
     
     
@@ -79,9 +81,21 @@ public class ObservationCollectionEntry extends AbstractFeatureEntry implements 
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (super.equals(object) && object instanceof ObservationCollectionEntry) {
             final ObservationCollectionEntry that = (ObservationCollectionEntry) object;
-            return Utilities.equals(this.member,   that.member);
+            if (this.member != null && that.member != null) {
+                if (this.member.size() != that.member.size())
+                    return false;
+            } else if (this.member == null && that.member == null) {
+                return true;
+            }
+            int i = 0;
+            for (ObservationPropertyType thisOp: this.member) {
+                if (!Utilities.equals(thisOp.getObservation(), that.member.get(i).getObservation()))
+                     return false ;  
+                i++;        
+            }
+            return true;
         } 
         return false;
     }
@@ -100,7 +114,7 @@ public class ObservationCollectionEntry extends AbstractFeatureEntry implements 
         s.append("super:").append(super.toString());
         int i = 1;
         for (ObservationPropertyType obs:member) {
-            s.append("observation n" + i + ":").append('\n').append(obs.toString());
+            s.append("observation n" + i + ":").append('\n').append(obs.getObservation().toString());
             i++;
         }
         return s.toString();

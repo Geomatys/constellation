@@ -169,7 +169,7 @@ public abstract class WebService {
              throw new IllegalArgumentException("A web service must have at least one version");
         else
             this.currentVersion = this.versions.get(0);
-        
+        logger.info("currentVersion null ? " + (currentVersion == null));
         unmarshaller = null;
         serviceURL   = null;
         ImageIO.scanForPlugins();
@@ -377,6 +377,7 @@ public abstract class WebService {
      * Return the current version of the Web Service.
      */
     protected void setCurrentVersion(String versionNumber) {
+        logger.info("set current version to: " + versionNumber);
         currentVersion = getVersionFromNumber(versionNumber);
     }
     
@@ -611,12 +612,13 @@ public abstract class WebService {
     
     /**
      * Return a Version Object from the version number.
+     * if the version number is not correct return the default version.
      * 
      * @param number the version number.
      * @return
      */
     private Version getVersionFromNumber(String number) {
-        for (Version v: this.versions) {
+        for (Version v: versions) {
             if (v.getVersionNumber().equals(number)){
                 return v;
             }
@@ -624,6 +626,26 @@ public abstract class WebService {
         return null;
     }
     
+    /**
+     * 
+     */
+    public Version getBestVersion(String number) {
+        for (Version v: versions) {
+            if (v.getVersionNumber().equals(number)){
+                return v;
+            }
+        }
+        Version wrongVersion = new Version(number, false);
+        if (wrongVersion.compareTo(versions.get(0)) > 0) {
+            return this.versions.get(0);
+        } else {
+            if (wrongVersion.compareTo(versions.get(versions.size() - 1)) < 0) {
+                return versions.get(versions.size() - 1);
+            }
+        }
+        return versions.get(0);
+    }
+     
     /**
      * Update all the url in a OWS capabilities document.
      * 

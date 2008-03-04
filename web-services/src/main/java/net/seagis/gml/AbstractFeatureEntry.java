@@ -59,7 +59,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
      */
     public AbstractFeatureEntry(String id, String name, String description) {
         super(null, name, description, null);
-        this.boundedBy = new BoundingShapeEntry("not bounded");
+        this.boundedBy = new BoundingShapeEntry("not_bounded");
     }
     
     /**
@@ -70,7 +70,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
         super(id, name, description, descriptionReference);
         this.srsName = srsName;
         if (boundedBy == null) {
-            this.boundedBy = new BoundingShapeEntry("not bounded");
+            this.boundedBy = new BoundingShapeEntry("not_bounded");
         } else { 
             this.boundedBy = boundedBy;
         }
@@ -108,7 +108,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
+        if (super.equals(object) && object instanceof AbstractFeatureEntry) {
             final AbstractFeatureEntry that = (AbstractFeatureEntry) object;
             
             boolean locationEquals = false;
@@ -119,7 +119,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
             }
             return Utilities.equals(this.boundedBy,           that.boundedBy) &&
                    locationEquals;
-        } else System.out.println("ENCORE SUPER NULLLLLLLLLLLLLLLLLLLLLLL");
+        } else System.out.println("abstractGML.equals=false");
         return false;
     }
 
@@ -129,6 +129,17 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
         hash = 23 * hash + (this.boundedBy != null ? this.boundedBy.hashCode() : 0);
         hash = 23 * hash + (this.location != null ? this.location.hashCode() : 0);
         return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (boundedBy != null)
+            s.append("boundedBy:").append(boundedBy.toString());
+        if (location != null && location.getValue() != null)
+            s.append("location:").append(location.getValue().toString());
+        
+        return s.toString();
     }
 
 }

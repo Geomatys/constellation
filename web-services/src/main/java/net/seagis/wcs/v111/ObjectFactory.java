@@ -18,6 +18,7 @@ package net.seagis.wcs.v111;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 import net.seagis.ows.ReferenceGroupType;
 
@@ -25,6 +26,7 @@ import net.seagis.ows.ReferenceGroupType;
  * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.wcs.v111
  * @author Guilhem Legal
  */
+@XmlRegistry
 public class ObjectFactory {
     
     private final static QName _CoverageSummaryTypeSupportedCRS_QNAME    = new QName("http://www.opengis.net/wcs/1.1.1", "SupportedCRS");

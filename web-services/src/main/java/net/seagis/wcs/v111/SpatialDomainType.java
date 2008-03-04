@@ -93,6 +93,13 @@ public class SpatialDomainType {
     public SpatialDomainType(JAXBElement<? extends BoundingBoxType> boundingBox) {
        this.boundingBox.add(boundingBox);
     }
+    
+    /**
+     * Build a new light Spatial Domain type version 1.1.1
+     */
+    public SpatialDomainType(List<JAXBElement<? extends BoundingBoxType>> boundingBoxes) {
+       this.boundingBox = boundingBoxes;
+    }
    
     
     /**

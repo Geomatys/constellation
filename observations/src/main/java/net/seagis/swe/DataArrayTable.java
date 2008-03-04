@@ -85,7 +85,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
             textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
         }
         
-        AbstractEncodingPropertyType encoding = new AbstractEncodingPropertyType(textBlockEncodings.getEntry(results.getString(indexOf(query.encoding))));
+        AbstractEncodingEntry encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
         
         return new DataArrayEntry(idArray,
                                   results.getInt(indexOf(query.elementCount)),

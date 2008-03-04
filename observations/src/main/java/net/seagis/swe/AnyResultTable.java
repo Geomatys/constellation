@@ -78,8 +78,12 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
             if(dataArrays == null) {
                 dataArrays = getDatabase().getTable(DataArrayTable.class);
             }
-            DataArrayEntry array = dataArrays.getEntry(results.getString(indexOf(query.definition)));
-            array.setValues(results.getString(indexOf(query.values)));
+            DataArrayEntry entry = dataArrays.getEntry(results.getString(indexOf(query.definition)));
+            DataArrayEntry array = new DataArrayEntry(entry.getId(),
+                                                      entry.getElementCount().getCount().getValue(),  
+                                                      entry.getElementType(),
+                                                      entry.getEncoding(),
+                                                      results.getString(indexOf(query.values))); 
             return new AnyResultEntry(results.getString(indexOf(query.idResult)), array);
          }
     }
@@ -96,8 +100,8 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         boolean success = false;
         transactionBegin();
         try {
-            if (result instanceof DataArrayEntry) {
-                DataArrayEntry array = (DataArrayEntry)result;
+            if (result instanceof AnyResultEntry) {
+                DataArrayEntry array = ((AnyResultEntry)result).getArray();
                 PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.values),array.getValues());
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
@@ -122,8 +126,8 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         
             PreparedStatement statement = getStatement(QueryType.INSERT);
 
-            if (result instanceof DataArrayEntry) {
-                DataArrayEntry array = (DataArrayEntry)result;
+            if (result instanceof AnyResultEntry) {
+                DataArrayEntry array = ((AnyResultEntry)result).getArray();
                 statement.setString(indexOf(query.values), array.getValues());
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
                 if(dataArrays == null) {

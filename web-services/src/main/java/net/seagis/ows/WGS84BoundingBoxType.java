@@ -53,8 +53,8 @@ public class WGS84BoundingBoxType extends BoundingBoxType {
         
     }
     
-    public WGS84BoundingBoxType(String crs, double minx, double miny, double maxx, double maxy){
-        super(crs, minx, miny, maxx, maxy);
+    public WGS84BoundingBoxType(double minx, double miny, double maxx, double maxy){
+        super(null, minx, miny, maxx, maxy);
     }
 
 }

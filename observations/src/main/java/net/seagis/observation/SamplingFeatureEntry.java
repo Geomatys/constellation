@@ -192,6 +192,8 @@ public class SamplingFeatureEntry extends AbstractFeatureEntry implements Sampli
                    Utilities.equals(this.relatedObservation,     that.relatedObservation) &&
                    Utilities.equals(this.relatedSamplingFeature, that.relatedSamplingFeature) &&
                    Utilities.equals(this.sampledFeature,         that.sampledFeature);
+        } else {
+            System.out.println("AbstractFeatureEntry.equals=false");
         }
         return false;
         

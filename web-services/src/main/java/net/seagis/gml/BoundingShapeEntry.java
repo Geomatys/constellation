@@ -156,7 +156,7 @@ public class BoundingShapeEntry {
             s.append("envelopeWithTimePeriod:").append(envelopeWithTimePeriod.toString());
         }
         if (_null != null) {
-            s.append("null:").append('\n');
+            s.append("_null:").append('\n');
             for (String ss: _null) {
                 s.append(ss).append('\n');
             }

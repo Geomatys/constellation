@@ -34,6 +34,7 @@ import net.seagis.gml.ReferenceEntry;
 import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
+import net.seagis.swe.AnyResultEntry;
 import net.seagis.swe.DataArrayPropertyType;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonPropertyType;
@@ -346,7 +347,7 @@ public class ObservationEntry extends Entry implements Observation {
      * fixe le resultat de l'observation
      */
     public void setResult(Object result) {
-        if (!(result instanceof ReferenceEntry) && !(result instanceof DataArrayPropertyType)) {
+        if (!(result instanceof ReferenceEntry) && !(result instanceof AnyResultEntry)) {
             throw new IllegalArgumentException("this type " + result.getClass().getSimpleName() +
                                            " is not allowed in result");
         }

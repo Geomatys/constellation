@@ -778,7 +778,7 @@ public class SOSworker {
                 // if the request is a spatial operator    
                 } else {
                     // for a BBOX Spatial ops
-                    if (foi.getBBOX() != null){
+                    if (foi.getBBOX() != null) {
                         
                         if (foi.getBBOX().getEnvelope() != null && 
                             foi.getBBOX().getEnvelope().getLowerCorner().getValue().size() == 2 &&
@@ -855,6 +855,11 @@ public class SOSworker {
                                                           INVALID_PARAMETER_VALUE, "lessThan", version);
                         }
                     }
+                    if (propertyName == null || propertyName.equals("") || literal == null) {
+                            throw new OWSWebServiceException("This property name and literal must be specify",
+                                                          INVALID_PARAMETER_VALUE, "result", version);
+                            
+                    }
                 
                 } else if (result.getPropertyIsGreaterThan() != null) {
                     logger.info("PROP IS GREATER");
@@ -875,6 +880,11 @@ public class SOSworker {
                             throw new OWSWebServiceException("This type of parameter is not accepted by the SOS service: " + j.getClass().getSimpleName() + "!",
                                                           INVALID_PARAMETER_VALUE, "greaterThan", version);
                         }
+                    }
+                    if (propertyName == null || propertyName.equals("") || literal == null) {
+                            throw new OWSWebServiceException("This property name and literal must be specify",
+                                                          INVALID_PARAMETER_VALUE, "result", version);
+                            
                     }
                 
                 } else if (result.getPropertyIsEqualTo() != null) {
@@ -899,6 +909,11 @@ public class SOSworker {
                                                           INVALID_PARAMETER_VALUE, "propertyIsEqualTo", version);
                         }
                     }
+                    if (propertyName == null || propertyName.equals("") || literal == null) {
+                            throw new OWSWebServiceException("This property name and literal must be specify",
+                                                          INVALID_PARAMETER_VALUE, "result", version);
+                            
+                    }
                 
                 } else if (result.getPropertyIsLike() != null) {
                     throw new OWSWebServiceException("This operation is not take in charge by the Web Service",
@@ -916,7 +931,11 @@ public class SOSworker {
                     LiteralType LowerLiteral  = result.getPropertyIsBetween().getLowerBoundary().getLiteral();
                     LiteralType UpperLiteral  = result.getPropertyIsBetween().getUpperBoundary().getLiteral();
                     
-                    
+                    if (propertyName == null || propertyName.equals("") || LowerLiteral == null || UpperLiteral == null) {
+                            throw new OWSWebServiceException("This property name, lower and upper literal must be specify",
+                                                          INVALID_PARAMETER_VALUE, "result", version);
+                            
+                    }
                 
                 } else {
                     throw new OWSWebServiceException("This operation is not take in charge by the Web Service",
@@ -1312,7 +1331,16 @@ public class SOSworker {
                 
                 // The operation Time Equals
                 if (time.getTEquals() != null && time.getTEquals().getRest().size() != 0) {
-                    Object j = time.getTEquals().getRest().get(0);
+                    
+                    // we get the property name (not used for now)
+                    Object j;
+                    if(time.getTEquals().getRest().size() == 2) {
+                       String propertyName = (String)time.getTEquals().getRest().get(0);
+                       j = time.getTEquals().getRest().get(1);
+                    } else {
+                       j = time.getTEquals().getRest().get(0);
+                    }
+                    
                     
                     //if the temporal object is a timePeriod
                     if (j instanceof TimePeriodType) {
@@ -1342,7 +1370,15 @@ public class SOSworker {
                 
                 // The operation Time before    
                 } else if (time.getTBefore() != null && time.getTBefore().getRest().size() != 0) {
-                    Object j = time.getTBefore().getRest().get(0);
+
+                    // we get the property name (not used for now)
+                    Object j;
+                    if(time.getTBefore().getRest().size() == 2) {
+                       String propertyName = (String)time.getTBefore().getRest().get(0);
+                       j = time.getTBefore().getRest().get(1);
+                    } else {
+                       j = time.getTBefore().getRest().get(0);
+                    }
                     
                     // for the operation before the temporal object must be an timeInstant
                     if (j instanceof TimeInstantType) {
@@ -1361,7 +1397,15 @@ public class SOSworker {
                     
                 // The operation Time after    
                 } else if (time.getTAfter() != null && time.getTAfter().getRest().size() != 0) {
-                    Object j = time.getTAfter().getRest().get(0);
+                    
+                    // we get the property name (not used for now)
+                    Object j;
+                    if(time.getTAfter().getRest().size() == 2) {
+                       String propertyName = (String)time.getTAfter().getRest().get(0);
+                       j = time.getTAfter().getRest().get(1);
+                    } else {
+                       j = time.getTAfter().getRest().get(0);
+                    }
                     
                     // for the operation after the temporal object must be an timeInstant
                     if (j instanceof TimeInstantType) {
@@ -1379,7 +1423,15 @@ public class SOSworker {
                     
                 // The time during operation    
                 } else if (time.getTDuring() != null && time.getTDuring().getRest().size() != 0) {
-                    Object j = time.getTDuring().getRest().get(0);
+                    
+                    // we get the property name (not used for now)
+                    Object j;
+                    if(time.getTDuring().getRest().size() == 2) {
+                       String propertyName = (String)time.getTDuring().getRest().get(0);
+                       j = time.getTDuring().getRest().get(1);
+                    } else {
+                       j = time.getTDuring().getRest().get(0);
+                    }
                     
                     if (j instanceof TimePeriodType) {
                         TimePeriodType tp = (TimePeriodType)j;
@@ -1432,11 +1484,11 @@ public class SOSworker {
                  
              } catch(IllegalArgumentException e) {
                 throw new OWSWebServiceException("bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms",
-                                                 INVALID_PARAMETER_VALUE, null, version);
+                                                 INVALID_PARAMETER_VALUE, "eventTime", version);
              }
           } else {
             throw new OWSWebServiceException("bad format of time, TimePostion mustn't be null",
-                                              MISSING_PARAMETER_VALUE, null, version);
+                                              MISSING_PARAMETER_VALUE, "eventTime", version);
           }
     }
     
@@ -1667,6 +1719,7 @@ public class SOSworker {
                                 OfferingPhenomenonEntry offPheno= new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry)template.getObservedProperty());
                                 offTable.getPhenomenons().getIdentifier(offPheno);
                             }
+                            
                             // we add the feature of interest (station) to the offering
                             ref = getReferenceFromHRef(((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
                             if (!offering.getFeatureOfInterest().contains(ref)) {
@@ -1823,7 +1876,7 @@ public class SOSworker {
         Iterator<ReferenceEntry> it = refs.iterator();
         while (it.hasNext()) {
             ReferenceEntry ref = it.next();
-            if (ref.getHref().equals(href))
+            if (ref != null && ref.getHref() != null && ref.getHref().equals(href))
                 return ref;
         }
         return null;
@@ -1870,6 +1923,7 @@ public class SOSworker {
      * @return a normalized document
      */
     private ObservationCollectionEntry normalizeDocument(ObservationCollectionEntry collection){
+        //first if the collection is empty
         
         List<FeaturePropertyType>          foiAlreadySee   = new ArrayList<FeaturePropertyType> ();
         List<PhenomenonPropertyType>       phenoAlreadySee = new ArrayList<PhenomenonPropertyType>();
@@ -1920,12 +1974,12 @@ public class SOSworker {
                                         
                 } else {
                     encAlreadySee.add(encoding);
-                    AbstractEncodingPropertyType clone = new AbstractEncodingPropertyType(encoding);
-                    array.setPropertyEncoding(clone);
-                    logger.info("write for first time n°" + index);
                 }
             } else {
-                logger.info(observation.getResult().getClass().getSimpleName() + " <<<<<<<<<<<<<");
+                if (observation.getResult() != null)
+                    logger.severe("NormalizeDocument: Class not recognized for result:" + observation.getResult().getClass().getSimpleName());
+                else
+                    logger.severe("NormalizeDocument: The result is null");
             }
             index++;
         }

@@ -90,7 +90,6 @@ import net.seagis.wcs.v100.DCPTypeType.HTTP.Get;
 import net.seagis.wcs.v100.DCPTypeType.HTTP.Post;
 import net.seagis.wcs.v100.DomainSetType;
 import net.seagis.wcs.v111.FieldType;
-import net.seagis.wcs.v100.InterpolationMethod;
 import net.seagis.wcs.v111.InterpolationMethodType;
 import net.seagis.wcs.v111.InterpolationMethods;
 import net.seagis.wcs.v100.Keywords;
@@ -195,7 +194,8 @@ public class WCService extends WebService {
                             isSupportedVersion(inputVersion);
                         }
                     }
-                    this.setCurrentVersion(inputVersion);
+                    
+                    this.setCurrentVersion(getBestVersion(inputVersion).getVersionNumber());
                     
                     if (getCurrentVersion().toString().equals("1.0.0")){
                         gc = new net.seagis.wcs.v100.GetCapabilities(getParameter("SECTION", false),
@@ -317,7 +317,7 @@ public class WCService extends WebService {
                         net.seagis.wcs.v100.RangeSubsetType  range    = null;
                     
                         //interpolation method
-                        InterpolationMethod interpolation = InterpolationMethod.fromValue(getParameter("interpolation", false));
+                        net.seagis.wcs.v100.InterpolationMethod interpolation = net.seagis.wcs.v100.InterpolationMethod.fromValue(getParameter("interpolation", false));
                     
                         //output
                         net.seagis.wcs.v100.OutputType output         = new net.seagis.wcs.v100.OutputType(getParameter("format", true),
@@ -604,7 +604,7 @@ public class WCService extends WebService {
                 List<LanguageStringType> title = new ArrayList<LanguageStringType>();
                 title.add(new LanguageStringType(inputLayer.getName()));
                 List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
-                remark.add(new LanguageStringType(inputLayer.getRemarks()));
+                remark.add(new LanguageStringType(cleanSpecialCharacter(inputLayer.getRemarks())));
                 
                 CoverageSummaryType       cs = new CoverageSummaryType(title, remark);
                 CoverageOfferingBriefType co = new CoverageOfferingBriefType();
@@ -617,7 +617,7 @@ public class WCService extends WebService {
                 if(inputGeoBox != null) {
                      String crs = "WGS84(DD)";
                     if (getCurrentVersion().toString().equals("1.1.1")){
-                        WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(null, 
+                        WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType( 
                                                      inputGeoBox.getWestBoundLongitude(),
                                                      inputGeoBox.getSouthBoundLatitude(),
                                                      inputGeoBox.getEastBoundLongitude(),
@@ -972,11 +972,11 @@ public class WCService extends WebService {
                 SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, new ArrayList<CodeListType>(formats));
                 
                 //supported interpolations
-                List<InterpolationMethod> interpolations = new ArrayList<InterpolationMethod>();
-                interpolations.add(InterpolationMethod.BILINEAR);
-                interpolations.add(InterpolationMethod.BICUBIC);
-                interpolations.add(InterpolationMethod.NEAREST_NEIGHBOR);
-                SupportedInterpolationsType supInt = new SupportedInterpolationsType(InterpolationMethod.BILINEAR, interpolations);
+                List<net.seagis.wcs.v100.InterpolationMethod> interpolations = new ArrayList<net.seagis.wcs.v100.InterpolationMethod>();
+                interpolations.add(net.seagis.wcs.v100.InterpolationMethod.BILINEAR);
+                interpolations.add(net.seagis.wcs.v100.InterpolationMethod.BICUBIC);
+                interpolations.add(net.seagis.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR);
+                SupportedInterpolationsType supInt = new SupportedInterpolationsType(net.seagis.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
                 
                 //we build the coverage offering for this layer/coverage
                 CoverageOfferingType coverage = new CoverageOfferingType(null,
@@ -1007,16 +1007,25 @@ public class WCService extends WebService {
             List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
             for (Layer layer: layers){
                 GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
-                JAXBElement<? extends BoundingBoxType> bbox = null;
+                List<JAXBElement<? extends BoundingBoxType>> bboxs = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
                 if(inputGeoBox != null) {
-                    String crs = "WGS84(DD)";
-                
-                    WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(null, 
+                    String crs = "urn:ogc:def:crs:OGC:1.3:CRS84";
+                    BoundingBoxType outputBBox = new BoundingBoxType(crs,
+                                                         inputGeoBox.getWestBoundLongitude(),
+                                                         inputGeoBox.getSouthBoundLatitude(),
+                                                         inputGeoBox.getEastBoundLongitude(),
+                                                         inputGeoBox.getNorthBoundLatitude());
+                    
+                    bboxs.add(owsFactory.createBoundingBox(outputBBox));        
+                    /* this second version of bounding box is valid
+                     WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
                                                          inputGeoBox.getWestBoundLongitude(),
                                                          inputGeoBox.getSouthBoundLatitude(),
                                                          inputGeoBox.getEastBoundLongitude(),
                                                          inputGeoBox.getNorthBoundLatitude());
                     bbox = owsFactory.createWGS84BoundingBox(outputBBox);
+                    */
+                    
                 }
                 
                 //general metadata
@@ -1030,7 +1039,7 @@ public class WCService extends WebService {
                                               ));
                 
                 // spatial metadata
-                net.seagis.wcs.v111.SpatialDomainType spatial = new net.seagis.wcs.v111.SpatialDomainType(bbox);
+                net.seagis.wcs.v111.SpatialDomainType spatial = new net.seagis.wcs.v111.SpatialDomainType(bboxs);
                 
                 // temporal metadata
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -1046,11 +1055,14 @@ public class WCService extends WebService {
                 
                 //supported interpolations
                 List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
-                intList.add(new InterpolationMethodType(InterpolationMethod.BILINEAR.value(), null));
-                intList.add(new InterpolationMethodType(InterpolationMethod.BICUBIC.value(), null));
-                intList.add(new InterpolationMethodType(InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
-                InterpolationMethods interpolations = new InterpolationMethods(intList, InterpolationMethod.BILINEAR.value());  
-                RangeType range = new RangeType(new FieldType(layer.getThematic(), null, new net.seagis.ows.CodeType("0.0"), interpolations));
+                intList.add(new InterpolationMethodType(net.seagis.wcs.v111.InterpolationMethod.BILINEAR.value(), null));
+                intList.add(new InterpolationMethodType(net.seagis.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
+                intList.add(new InterpolationMethodType(net.seagis.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
+                InterpolationMethods interpolations = new InterpolationMethods(intList, net.seagis.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());  
+                RangeType range = new RangeType(new FieldType(cleanSpecialCharacter(layer.getThematic()), 
+                                                              null, 
+                                                              new net.seagis.ows.CodeType("0.0"), 
+                                                              interpolations));
                
                 //supported CRS
                 List<String> supportedCRS = new ArrayList<String>();

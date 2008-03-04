@@ -91,14 +91,14 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
         if (object == this) {
             return true;
         }
-        final SamplingPointEntry that = (SamplingPointEntry) object;
-        return  Utilities.equals(this.getId(),                     that.getId()) &&
-                Utilities.equals(this.getSurveyDetail(),           that.getSurveyDetail())   &&
-                Utilities.equals(this.getDescription(),            that.getDescription())   && 
-                Utilities.equals(this.getRelatedObservations(),     that.getRelatedObservations()) &&
-                Utilities.equals(this.getRelatedSamplingFeatures(), that.getRelatedSamplingFeatures()) &&
-                Utilities.equals(this.getSampledFeatures(),         that.getSampledFeatures()) &&
-                Utilities.equals(this.position, that.position);
+        if (object instanceof SamplingFeatureEntry && super.equals(object)) {
+            final SamplingPointEntry that = (SamplingPointEntry) object;
+        
+            return  Utilities.equals(this.position, that.position);
+        } else {
+            System.out.println("samplingFeature.equals=false");
+        }
+        return false;
     }
 
     @Override

@@ -107,15 +107,13 @@ public abstract class AbstractGMLEntry extends Entry{
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
-            final AbstractGMLEntry that = (AbstractGMLEntry) object;
-
-            return Utilities.equals(this.description,          that.description)          &&
-                   Utilities.equals(this.descriptionReference, that.descriptionReference) &&
-                   Utilities.equals(this.id,                   that.id)                   &&
-                   Utilities.equals(this.name,                 that.name);
-        }
-        return false;
+        
+        final AbstractGMLEntry that = (AbstractGMLEntry) object;
+        //TODO fix this problem       
+        return Utilities.equals(this.description,          that.description)          &&
+               Utilities.equals(this.descriptionReference, that.descriptionReference);
+               //Utilities.equals(this.id,                   that.id)                   &&
+               //Utilities.equals(this.name,                 that.name);
     }
 
     @Override
@@ -126,6 +124,19 @@ public abstract class AbstractGMLEntry extends Entry{
         return hash;
     }
     
+     @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("id:").append(id).append('\n');
+        s.append("name:").append(name).append('\n');
+        s.append("description:").append(description).append('\n');
+        
+        if (descriptionReference != null)
+            s.append("description reference:").append(descriptionReference.toString()).append('\n');
+        
+        return s.toString();
+    }
+     
     /**
      * Gets the value of the identifier property.
      * 
