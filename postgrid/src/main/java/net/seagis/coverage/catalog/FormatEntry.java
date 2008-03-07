@@ -85,7 +85,7 @@ final class FormatEntry extends Entry implements Format {
      * {@code true} for using JAI {@code "ImageRead"} operation,
      * or {@code false} for using {@link ImageReader} directly.
      */
-    private static final boolean USE_IMAGE_READ_OPERATION = false;
+    private static final boolean USE_IMAGE_READ_OPERATION = true;
 
     /**
      * The input types for mosaic image reader.
@@ -286,9 +286,9 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Retourne un bloc de paramètres par défaut pour le format courant. Cette méthode n'est
-     * appelée que par {@link GridCoverageEntry#getCoverage}. Note: cette méthode
-     * <strong>doit</strong> être appelée à partir d'un bloc synchronisé sur {@code this}.
+     * Returns a block of default parameters for the current format. This method isn't 
+     * called by {@link GridCoverageEntry#getCoverage}. Note: the method
+     * <strong>doit</strong> is called from a synchronized blok on {@code this}.
      *
      * @return Un bloc de paramètres par défaut. Cette méthode ne retourne jamais {@code null}.
      * @throws IIOException s'il n'y a pas d'objet {@link ImageReader} pour ce format.
@@ -303,8 +303,8 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Indique si le tableau {@code array} contient au moins un
-     * exemplaire de la classe {@code item} ou d'une super-classe.
+     * Indicates if the table {@code array} contains at least an
+     * example of the class {@code item} or of a super-class.
      */
     private static <T> boolean contains(final Class<?>[] array, final Class<T> item) {
         for (final Class<?> c : array) {
@@ -316,9 +316,9 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Convertit l'objet {@code input} spécifié en un des types spécifiés dans le
-     * tableau {@code inputTypes}. Si la conversion ne peut pas être effectuée,
-     * alors cette méthode retourne {@code null}.
+     * Convert the specified {@code input} object to one of the types specified in the
+     * table {@code inputTypes}. If the conversion can not me executed,
+     * then this method returns {@code null}.
      */
     private static Object getInput(final Object file, final Class<?>[] inputTypes) {
         if (contains(inputTypes, file.getClass())) {
@@ -417,22 +417,39 @@ final class FormatEntry extends Entry implements Format {
                 }
             }
             /*
-             * Si l'image à lire est au format "RAW", définit la taille de l'image.  C'est
-             * nécessaire puisque le format binaire RAW ne contient aucune information sur
-             * la taille des images qu'elle contient.
+             * If the image is in "RAW" format, define the size of the imate.  This 
+             * is necessary because the "RAW" format does not contain any information
+             * about the size or data type of the image.
              */
             if (inputStream!=null && contains(inputTypes, RawImageInputStream.class)) {
+                // Patch contributed by Sam Hiatt 
+                // NOTE this fix requires a patched version of jai-imageio.jar 
+                // contact me if you have any questions about that.
+                // Temporary hack for finding data type of raw format
+                // TODO: set up a Format Parameters table or something in the database.
+                
+                final int type;
+                if (this.name.contains("flt32")) 
+                    type = DataBuffer.TYPE_FLOAT;
+                else if (this.name.contains("flt64")) 
+                    type = DataBuffer.TYPE_DOUBLE;
+                else 
+                    type = DataBuffer.TYPE_BYTE;
                 final GridSampleDimension[] bands = getSampleDimensions(param);
-                final ColorModel  cm = bands[0].getColorModel(0, bands.length);
+                final ColorModel  cm = bands[0].getColorModel(0, bands.length, type);
                 final SampleModel sm = cm.createCompatibleSampleModel(expected.width, expected.height);
                 inputObject = inputStream = new RawImageInputStream(inputStream,
                                                                     new ImageTypeSpecifier(cm, sm),
                                                                     new long[]{0},
                                                                     new Dimension[]{expected});
+                inputStream.setByteOrder(inputStream.getByteOrder().nativeOrder());
             }
         }
         // Patch temporaire, en attendant que les décodeurs spéciaux (e.g. "image/raw-msla")
         // soient adaptés à l'architecture du décodeur RAW de Sun.
+        
+        
+        // Can this be trashed now?
         if (param instanceof RawBinaryImageReadParam) {
             final RawBinaryImageReadParam rawParam = (RawBinaryImageReadParam) param;
             if (rawParam.getStreamImageSize() == null) {
@@ -448,18 +465,18 @@ final class FormatEntry extends Entry implements Format {
             }
         }
         /*
-         * Configure maintenant le décodeur et lance la lecture de l'image.
-         * Cette étape existe en deux versions: avec utilisation de l'opération
-         * "ImageRead", ou lecture directe à partir du ImageReader.
+         * Now configure the decoder and launch the image read.  This stage exists
+         * in two versions: With the "ImageRead" operation, or direct reading
+         * through the ImageReader.
          */
         handleSpecialCases(reader, param);
         if (USE_IMAGE_READ_OPERATION) {
             /*
-             * Utilisation de l'opération "ImageRead": cette approche retarde la lecture des
-             * tuiles à un moment indéterminé après l'appel de cette méthode. Elle a l'avantage
-             * de contrôler la mémoire consommée grâce au TileCache de JAI, Mais elle rend plus
-             * difficile la gestion des exceptions et l'annulation de la lecture avec 'abort()',
-             * ce qui rend caduc la queue 'enqueued'.
+             * Use of the "ImageRead" operation: This approach defers reading tiles until
+             * an unspecified time after calling this method. It has the advnatage of better
+             * memory consumption, thanks to JAI's TileCache, but it makes it more difficult
+             * to generate exceptions, or to abort an image read with 'abort()', which makes
+             * 'enqueued' null.
              */
             image = JAI.create("ImageRead", new ParameterBlock()
                 .add(inputObject)                  // Objet à utiliser en entré
@@ -467,16 +484,16 @@ final class FormatEntry extends Entry implements Format {
                 .add(Boolean.FALSE)                // Pas de lecture des méta-données
                 .add(Boolean.FALSE)                // Pas de lecture des "thumbnails"
                 .add(Boolean.TRUE)                 // Vérifier la validité de "input"
-                .add(listeners.getReadListeners()) // Liste des "listener"
+                .add(listeners == null? null: listeners.getReadListeners()) // Liste des "listener"
                 .add(getLocale())                  // Langue du décodeur
                 .add(param)                        // Les paramètres
                 .add(reader));                     // L'objet à utiliser pour la lecture.
             this.reader = null;                    // N'utilise qu'un ImageReader par opération.
         } else try {
             /*
-             * Utilisation direct du 'ImageReader': cette approche lit l'image immédiatement,
-             * ce qui facilite la gestion des exceptions, de l'anulation de la lecture avec
-             * 'abort()' et les synchronisations.
+             * Direct use of 'ImageReader': This approach reads the image immediately, 
+             * which eases managing exceptions, aborting image reading with 'abort()', 
+             * and synchronizations.
              */
             if (listeners != null) {
                 listeners.addListenersTo(reader);
@@ -554,10 +571,10 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Annule la lecture de l'image en appelant {@link ImageReader#abort}.
-     * Cette méthode peut être appelée à partir de n'importe quel thread.
+     * Cancel the image read by calling {@link ImageReader#abort}.
+     * This method can me called from any thread.
      *
-     * @param source Objet qui appelle cette méthode.
+     * @param source Object that called this method.
      */
     final void abort(final CoverageReference source) {
         assert !Thread.holdsLock(this); // The thread must *not* hold the lock.
@@ -582,16 +599,16 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Vérifie que la taille de l'image a bien la taille qui était déclarée
-     * dans la base de données. Cette vérification sert uniquement à tenter
-     * d'intercepter d'éventuelles erreurs qui se serait glissées dans la
-     * base de données et/ou la copie d'images sur le disque.
+     * Check that the size of the image is the same as that declared in the 
+     * database.  This check is only used to catch possible errors 
+     * that would otherwise slip into the database and/or the copy of the 
+     * image on disk.
      *
-     * @param  imageWidth   Largeur de l'image.
-     * @param  imageHeight  Hauteur de l'image.
-     * @param  expected     Largeur et hauteur attendues.
-     * @param  file         Nom du fichier de l'image à lire.
-     * @throws IIOException si l'image n'a pas la largeur et hauteur attendue.
+     * @param  imageWidth   Width (in pixels)
+     * @param  imageHeight  Height (in pixels)
+     * @param  expected     Expected width and height
+     * @param  file         Name of the image file to read
+     * @throws IIOException If the image does not have the expected size
      */
     private static void checkSize(final int imageWidth, final int imageHeight,
                                   final Dimension expected, final Object file)
@@ -649,14 +666,14 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Retourne une chaîne de caractères représentant cette entrée.
+     * Returns a character string representing this entry.
      */
     final StringBuilder toString(final StringBuilder buffer) {
         return buffer.append(getName()).append(" (").append(formatName).append(')');
     }
 
     /**
-     * Retourne une chaîne de caractères représentant cette entrée.
+     * Returns a character string representing this entry.
      */
     @Override
     public String toString() {
@@ -666,7 +683,7 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Indique si cette entrée est identique à l'entrée spécifiée.
+     * Indicates if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {
@@ -681,11 +698,11 @@ final class FormatEntry extends Entry implements Format {
         }
         return false;
     }
-
+    
     /**
-     * Noeud apparaissant dans l'arborescence des formats et de leurs bandes.
-     * Ce noeud redéfinit la méthode {@link #toString} pour retourner une chaîne
-     * adaptée plutôt que <code>{@link #getUserObject}.toString()</code>.
+     * Node appearing as a tree structure of formats and their bands.
+     * This node redefines the method {@link #toString} to return a string
+     * formatted better than <code>{@link #getUserObject}.toString()</code>.
      *
      * @version $Id$
      * @author Martin Desruisseaux
@@ -697,12 +714,12 @@ final class FormatEntry extends Entry implements Format {
         private static final long serialVersionUID = 9030373781984474394L;
 
         /**
-         * Le texte à retourner par {@link #toString}.
+         * The text returned by {@link #toString}.
          */
         private final String text;
 
         /**
-         * Construit un noeud pour l'entrée spécifiée.
+         * Construct a node for the specified entries.
          */
         public TreeNode(final FormatEntry entry) {
             super(entry);
@@ -710,8 +727,8 @@ final class FormatEntry extends Entry implements Format {
         }
 
         /**
-         * Construit un noeud pour la liste spécifiée. Ce constructeur ne
-         * balaie pas les catégories contenues dans la liste spécifiée.
+         * Construct a node for the specified list. The constructor does not
+         * scan the categories containes in the specified list.
          */
         public TreeNode(final GridSampleDimension band, final Locale locale) {
             super(band);
@@ -719,7 +736,7 @@ final class FormatEntry extends Entry implements Format {
         }
 
         /**
-         * Construit un noeud pour la catégorie spécifiée.
+         * Construct a node for the specified category.
          */
         public TreeNode(final Category category, final Locale locale) {
             super(category, false);
@@ -732,7 +749,7 @@ final class FormatEntry extends Entry implements Format {
         }
 
         /**
-         * Ajoute un entier utilisant au moins 3 chiffres (par exemple 007).
+         * Add a whole number using at least 3 digits (for example 007).
          */
         private static void append(final StringBuilder buffer, final Comparable value) {
             final String number = String.valueOf(value);
@@ -743,7 +760,7 @@ final class FormatEntry extends Entry implements Format {
         }
 
         /**
-         * Retourne le texte de ce noeud.
+         * Returns the text of this node.
          */
         @Override
         public String toString() {
