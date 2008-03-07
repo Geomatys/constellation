@@ -650,7 +650,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
                     param.setSourceBands(new int[] {band});
                 }
                 final int imageIndex;
-                if (handleSpecialCases(param)) {
+                if (handleSpecialCases(param) || format.getImageFormat().equalsIgnoreCase("RAW")) {
                     imageIndex = 0; // The index has been processed by 'handleSpecialCases'.
                 } else {
                     imageIndex = getImageIndex();
