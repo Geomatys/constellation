@@ -43,9 +43,9 @@ COMMENT ON TABLE "Formats" IS
 COMMENT ON COLUMN "Formats"."name" IS
     'Name of the format.';
 COMMENT ON COLUMN "Formats"."mime" IS
-    'Format''s MIME.';
+    'Format name or MIME type.';
 COMMENT ON COLUMN "Formats"."encoding" IS
-    'Encoding of image data: "geophysics" or "native".';
+    'Encoding of image data: either "geophysics" or "native".';
 COMMENT ON CONSTRAINT "Formats_encoding_check" ON "Formats" IS
     'Enumeration of acceptable values.';
 
@@ -119,7 +119,7 @@ GRANT SELECT ON TABLE "Categories" TO PUBLIC;
 CREATE INDEX "Categories_index" ON "Categories" ("band", "lower");
 
 COMMENT ON TABLE "Categories" IS
-    'Range of values of the different categories and the relation between pixel values and their geophysical measurements.';
+    'Categories classify the ranges of values and scaling information for interpreting geophysical measurements from pixel values and for rendering (coloring) the image.';
 COMMENT ON COLUMN "Categories"."name" IS
     'Name of the category represented by this range of values.';
 COMMENT ON COLUMN "Categories"."band" IS
@@ -315,7 +315,7 @@ COMMENT ON INDEX "HorizontalExtent_index" IS
     'Index of geometries intersecting a geographical area.';
 
 COMMENT ON TABLE "GridGeometries" IS
-    'Spatial envalope of the images, as well as their grid dimensions.';
+    'Spatial referencing parameters for a Grid Coverage.  Defines the spatial envelope of the images, as well as their grid dimensions.';
 COMMENT ON COLUMN "GridGeometries"."identifier" IS
     'Unique identifier.';
 COMMENT ON COLUMN "GridGeometries"."width" IS
@@ -337,7 +337,7 @@ COMMENT ON COLUMN "GridGeometries"."shearY" IS
 COMMENT ON COLUMN "GridGeometries"."horizontalSRID" IS
     'Horizontal coordinate system code.';
 COMMENT ON COLUMN "GridGeometries"."horizontalExtent" IS
-    'Horizontal spatial extent.';
+    'Horizontal spatial extent. (Computed automatically if none is explicitly defined).';
 COMMENT ON COLUMN "GridGeometries"."verticalSRID" IS
     'Vertical coordinate system code.';
 COMMENT ON COLUMN "GridGeometries"."verticalOrdinates" IS
@@ -468,13 +468,13 @@ COMMENT ON COLUMN "GridCoverages"."series" IS
 COMMENT ON COLUMN "GridCoverages"."filename" IS
     'File name of the image.';
 COMMENT ON COLUMN "GridCoverages"."index" IS
-    'Index of the image in the files containing several images.  Numbered from 1.';
+    'Index of the image in the file (for files containing multipal images).  Numbered from 1.';
 COMMENT ON COLUMN "GridCoverages"."startTime" IS
     'Date and time of the image acquisition start, in UTC.  In the case of averages, the time corresponds to the beginning of the interval used to calculate the average.';
 COMMENT ON COLUMN "GridCoverages"."endTime" IS
     'Date and time of the image acquisition end, in UTC.  This time must be greater than or equal to the acquisition start time.';
 COMMENT ON COLUMN "GridCoverages"."extent" IS
-    'Coordinates of the geographical area covered by the image, and approximate resolution';
+    'Grid Geomerty ID that defines the spatial footprint of this coverage.';
 COMMENT ON CONSTRAINT "GridCoverages_series_key" ON "GridCoverages" IS
     'The envelope of the image must be unique in each series.';
 COMMENT ON CONSTRAINT "GridCoverages_series_fkey" ON "GridCoverages" IS
