@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.IdentityHashMap;
 import java.util.logging.LogRecord;
 import java.util.logging.Level;
+import java.nio.ByteOrder;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -286,7 +287,7 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Returns a block of default parameters for the current format. This method isn't 
+     * Returns a block of default parameters for the current format. This method isn't
      * called by {@link GridCoverageEntry#getCoverage}. Note: the method
      * <strong>doit</strong> is called from a synchronized blok on {@code this}.
      *
@@ -317,7 +318,7 @@ final class FormatEntry extends Entry implements Format {
 
     /**
      * Convert the specified {@code input} object to one of the types specified in the
-     * table {@code inputTypes}. If the conversion can not me executed,
+     * table {@code inputTypes}. If the conversion can not be executed,
      * then this method returns {@code null}.
      */
     private static Object getInput(final Object file, final Class<?>[] inputTypes) {
@@ -417,23 +418,23 @@ final class FormatEntry extends Entry implements Format {
                 }
             }
             /*
-             * If the image is in "RAW" format, define the size of the imate.  This 
+             * If the image is in "RAW" format, define the size of the image.  This
              * is necessary because the "RAW" format does not contain any information
              * about the size or data type of the image.
              */
             if (inputStream!=null && contains(inputTypes, RawImageInputStream.class)) {
-                // Patch contributed by Sam Hiatt 
-                // NOTE this fix requires a patched version of jai-imageio.jar 
+                // Patch contributed by Sam Hiatt
+                // NOTE this fix requires a patched version of jai-imageio.jar
                 // contact me if you have any questions about that.
                 // Temporary hack for finding data type of raw format
                 // TODO: set up a Format Parameters table or something in the database.
-                
+
                 final int type;
-                if (this.name.contains("flt32")) 
+                if (this.name.contains("flt32"))
                     type = DataBuffer.TYPE_FLOAT;
-                else if (this.name.contains("flt64")) 
+                else if (this.name.contains("flt64"))
                     type = DataBuffer.TYPE_DOUBLE;
-                else 
+                else
                     type = DataBuffer.TYPE_BYTE;
                 final GridSampleDimension[] bands = getSampleDimensions(param);
                 final ColorModel  cm = bands[0].getColorModel(0, bands.length, type);
@@ -442,13 +443,13 @@ final class FormatEntry extends Entry implements Format {
                                                                     new ImageTypeSpecifier(cm, sm),
                                                                     new long[]{0},
                                                                     new Dimension[]{expected});
-                inputStream.setByteOrder(inputStream.getByteOrder().nativeOrder());
+                inputStream.setByteOrder(ByteOrder.nativeOrder());
             }
         }
         // Patch temporaire, en attendant que les décodeurs spéciaux (e.g. "image/raw-msla")
         // soient adaptés à l'architecture du décodeur RAW de Sun.
-        
-        
+
+
         // Can this be trashed now?
         if (param instanceof RawBinaryImageReadParam) {
             final RawBinaryImageReadParam rawParam = (RawBinaryImageReadParam) param;
@@ -473,7 +474,7 @@ final class FormatEntry extends Entry implements Format {
         if (USE_IMAGE_READ_OPERATION) {
             /*
              * Use of the "ImageRead" operation: This approach defers reading tiles until
-             * an unspecified time after calling this method. It has the advnatage of better
+             * an unspecified time after calling this method. It has the advantage of better
              * memory consumption, thanks to JAI's TileCache, but it makes it more difficult
              * to generate exceptions, or to abort an image read with 'abort()', which makes
              * 'enqueued' null.
@@ -484,15 +485,15 @@ final class FormatEntry extends Entry implements Format {
                 .add(Boolean.FALSE)                // Pas de lecture des méta-données
                 .add(Boolean.FALSE)                // Pas de lecture des "thumbnails"
                 .add(Boolean.TRUE)                 // Vérifier la validité de "input"
-                .add(listeners == null? null: listeners.getReadListeners()) // Liste des "listener"
+                .add(listeners == null ? null : listeners.getReadListeners()) // Liste des "listener"
                 .add(getLocale())                  // Langue du décodeur
                 .add(param)                        // Les paramètres
                 .add(reader));                     // L'objet à utiliser pour la lecture.
             this.reader = null;                    // N'utilise qu'un ImageReader par opération.
         } else try {
             /*
-             * Direct use of 'ImageReader': This approach reads the image immediately, 
-             * which eases managing exceptions, aborting image reading with 'abort()', 
+             * Direct use of 'ImageReader': This approach reads the image immediately,
+             * which eases managing exceptions, aborting image reading with 'abort()',
              * and synchronizations.
              */
             if (listeners != null) {
@@ -599,9 +600,9 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Check that the size of the image is the same as that declared in the 
-     * database.  This check is only used to catch possible errors 
-     * that would otherwise slip into the database and/or the copy of the 
+     * Check that the size of the image is the same as that declared in the
+     * database.  This check is only used to catch possible errors
+     * that would otherwise slip into the database and/or the copy of the
      * image on disk.
      *
      * @param  imageWidth   Width (in pixels)
@@ -698,7 +699,7 @@ final class FormatEntry extends Entry implements Format {
         }
         return false;
     }
-    
+
     /**
      * Node appearing as a tree structure of formats and their bands.
      * This node redefines the method {@link #toString} to return a string

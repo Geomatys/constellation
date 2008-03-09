@@ -224,7 +224,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         final PreparedStatement statement = getStatement(QueryType.INSERT);
         final GridGeometryTable gridTable = getDatabase().getTable(GridGeometryTable.class);
         final GeneralEnvelope   envelope  = getEnvelope();
-        envelope.validate(false);
+        envelope.normalize(false);
         final int bySeries    = indexOf(query.series);
         final int byFilename  = indexOf(query.filename);
         final int byIndex     = indexOf(query.index);
