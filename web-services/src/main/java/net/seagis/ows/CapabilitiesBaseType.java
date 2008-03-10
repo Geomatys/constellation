@@ -58,7 +58,7 @@ import org.geotools.resources.Utilities;
     "operationsMetadata"
 })
 @XmlSeeAlso({
-    Capabilities.class
+    Capabilities.class             //TODO add sos and csw capabilities
 })
 public class CapabilitiesBaseType {
 

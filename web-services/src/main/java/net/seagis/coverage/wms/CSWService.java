@@ -14,90 +14,57 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.sos.webservice;
+package net.seagis.coverage.wms;
 
-// Jersey dependencies
-import java.io.IOException;
-import java.sql.SQLException;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.io.StringWriter;
-
-//JAXB dependencies
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-
-// geotools dependencies
-
-// seaGIS dependencies
-import net.seagis.catalog.NoSuchTableException;
-import net.seagis.ows.OWSWebServiceException;
+import net.seagis.cat.csw.Capabilities;
+import net.seagis.cat.csw.GetCapabilities;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.wms.WebService;
 import net.seagis.ows.AcceptFormatsType;
 import net.seagis.ows.AcceptVersionsType;
+import net.seagis.ows.OWSWebServiceException;
 import net.seagis.ows.SectionsType;
-import net.seagis.sos.Capabilities;
-import net.seagis.sos.DescribeSensor;
-import net.seagis.sos.GetCapabilities;
-import net.seagis.sos.GetObservation;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
  *
- * @author Guilhem Legal
+ * @author legal
  */
-@Path("sos")
+@Path("csw")
 @Singleton
-public class SOService extends WebService {
-
-    private SOSworker worker;
+public class CSWService extends WebService {
+    
+    private CSWworker worker;
     
     /**
-     * Build a new Restfull SOS service.
+     * Build a new Restfull CSW service.
      */
-    public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
-        super("SOS", new Version("1.0.0", true));
-        worker = new SOSworker();
-        worker.setVersion("1.0.0");
-        setXMLContext("net.seagis.sos:net.seagis.gml:net.seagis.swe:net.seagis.gml:net.seagis.observation",
-                      "");
+    public CSWService() throws JAXBException {
+        super("CSW", new Version("2.0.2", true));
+        worker = new CSWworker();
+        worker.setVersion("2.0.2");
+        setXMLContext("net.seagis.cat.csw:net.seagis.gml:net.seagis.gml","");
     }
 
     @Override
     public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
-         try {
-             worker.setServiceURL(getServiceURL());
-             writeParameters();
-             String request = "";
-             if (objectRequest == null)
+        try {
+            
+            worker.setServiceURL(getServiceURL());
+            writeParameters();
+            String request = "";
+            if (objectRequest == null)
                 request = (String) getParameter("REQUEST", true);
-             
-             if (request.equalsIgnoreCase("GetObservation") || (objectRequest instanceof GetObservation)) {
-                GetObservation go = (GetObservation)objectRequest;
-                if (go == null){
-                    throw new OWSWebServiceException("The operation GetObservation is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "GetObservation", getCurrentVersion().getVersionNumber());
-                }
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getObservation(go), sw);
-        
-                return Response.ok(sw.toString(), "text/xml").build();
-             
-             } else if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
-                DescribeSensor ds = (DescribeSensor)objectRequest;
-                if (ds == null){
-                    throw new OWSWebServiceException("The operation DescribeSensor is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "DescribeSensor", getCurrentVersion().getVersionNumber());
-                }
-        
-                return Response.ok(worker.describeSensor(ds), "text/xml").build();
-             
-             } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
+            
+            if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 
                 GetCapabilities gc = (GetCapabilities)objectRequest;
                 /*
@@ -114,7 +81,7 @@ public class SOService extends WebService {
                         } 
                         versions = new AcceptVersionsType(version);
                     } else {
-                        versions = new AcceptVersionsType("1.0.0");
+                        versions = new AcceptVersionsType("2.0.2");
                     }
                     
                     worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
@@ -155,8 +122,8 @@ public class SOService extends WebService {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
                                                  INVALID_PARAMETER_VALUE, "request", getCurrentVersion().getVersionNumber());
             }
-             
-         } catch (WebServiceException ex) {
+        
+        } catch (WebServiceException ex) {
             /* We don't print the stack trace:
              * - if the user have forget a mandatory parameter.
              * - if the version number is wrong.
@@ -179,4 +146,7 @@ public class SOService extends WebService {
             }
         }
     }
+    
+    
+
 }

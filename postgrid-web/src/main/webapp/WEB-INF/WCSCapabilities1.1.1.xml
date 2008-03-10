@@ -26,7 +26,7 @@ version="1.1.1" updateSequence="">
   <!-- ************************************************************ -->
 	<ows:ServiceProvider>
 		<ows:ProviderName>Geomatys</ows:ProviderName>
-		<ows:ProviderSite xlink:href="http://hostname/"/>
+		<ows:ProviderSite xlink:href="http://www.geomatys.fr/"/>
 		<ows:ServiceContact>
 			<ows:IndividualName>vincent Heurteaux</ows:IndividualName>
 			<ows:PositionName>CTO</ows:PositionName>

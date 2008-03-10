@@ -29,31 +29,31 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 //geotools dependencies
-import javax.imageio.ImageIO;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.GET;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.core.HttpContext;
 
 // jersey dependencies
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.GET;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 
 // JAXB xml binding dependencies
+import javax.ws.rs.core.Context;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.UnmarshalException;
 
 
 // seagis dependencies
-import javax.xml.bind.UnmarshalException;
 import net.seagis.catalog.Database;
 import net.seagis.coverage.web.Version;
 import net.seagis.ows.OWSWebServiceException;
@@ -126,7 +126,7 @@ public abstract class WebService {
      /**
      * The http context containing the request parameter
      */
-    @HttpContext
+    @Context
     private UriInfo context;
     
     /**

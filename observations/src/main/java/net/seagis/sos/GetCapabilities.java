@@ -50,9 +50,7 @@ import org.geotools.resources.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "GetCapabilities")
-public class GetCapabilities
-    extends GetCapabilitiesType
-{
+public class GetCapabilities extends GetCapabilitiesType {
 
     @XmlAttribute(required = true)
     private String service;
@@ -73,6 +71,7 @@ public class GetCapabilities
         super(acceptVersions, sections, acceptFormats, updateSequence);
         this.service = service;
     }
+    
     /**
      * Return the value of the service property (often "SOS").
      * 

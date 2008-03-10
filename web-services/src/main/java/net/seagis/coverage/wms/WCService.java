@@ -104,6 +104,7 @@ import net.seagis.wcs.v100.WCSCapabilitiesType;
 import net.seagis.wcs.v111.GridCrsType;
 
 // geoAPI dependencies
+import net.seagis.wcs.v111.RangeSubsetType.FieldSubset;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 // geoTools dependencies
@@ -334,8 +335,13 @@ public class WCService extends WebService {
                         net.seagis.wcs.v111.TimeSequenceType temporal = null;
                         String timeParameter = getParameter("timeSequence", false);
                         if (timeParameter != null) {
-                            TimePositionType time     = new TimePositionType(timeParameter);
-                            temporal = new net.seagis.wcs.v111.TimeSequenceType(time); 
+                            if (timeParameter.indexOf('/') == -1) {
+                                temporal = new net.seagis.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
+                            } else {
+                                throwException("The service does not handle TimePeriod" , 
+                                               "INVALID_PARAMETER_VALUE", "temporalSubset");
+                            }
+                             
                         }
                     
                         /*
@@ -366,16 +372,40 @@ public class WCService extends WebService {
                                 throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" , 
                                            "INVALID_PARAMETER_VALUE", "BoundingBox");
                             }
-                            envelope = new BoundingBoxType(crs,coordinates[0], coordinates[2], coordinates[1], coordinates[3]);
+                            envelope = new BoundingBoxType(crs,coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
                         }
                         
                         //domain subset
                         net.seagis.wcs.v111.DomainSubsetType domain   = new net.seagis.wcs.v111.DomainSubsetType(temporal, envelope);
                     
-                        //range subset (not yet used) TODO for interpolation
-                        //interpolation method
-                        InterpolationMethodType interpolation = new InterpolationMethodType(getParameter("interpolation", false), null);
-                        net.seagis.wcs.v111.RangeSubsetType  range    = null;
+                        //range subset.
+                        net.seagis.wcs.v111.RangeSubsetType  range = null;
+                        String rangeSubset = getParameter("RangeSubset", false);
+                        if (rangeSubset != null) {
+                            
+                            //for now we don't handle Axis Identifiers
+                            if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
+                                throwException("The service does not handle axis identifiers" , 
+                                               "INVALID_PARAMETER_VALUE", "rangeSubset");
+                            }
+                            
+                            StringTokenizer tokens   = new StringTokenizer(rangeSubset, ";");
+                            List<FieldSubset> fields = new ArrayList<FieldSubset>(tokens.countTokens());
+                            while (tokens.hasMoreTokens()) {
+                                String value = tokens.nextToken();
+                                String interpolation = null;
+                                String rangeIdentifier = null;
+                                if (value.indexOf(':') != -1) {
+                                    rangeIdentifier = value.substring(0, rangeSubset.indexOf(':'));
+                                    interpolation   = value.substring(rangeSubset.indexOf(':') + 1);
+                                } else {
+                                    rangeIdentifier = value;
+                                }
+                                fields.add(new FieldSubset(rangeIdentifier, interpolation));
+                            }
+                            
+                            range = new net.seagis.wcs.v111.RangeSubsetType(fields);
+                        }
                         
                         
                         String gridType = getParameter("GridType", false);
@@ -394,16 +424,14 @@ public class WCService extends WebService {
                         }
                         
                         String gridOffsets = getParameter("GridOffsets", false);
-                        List<Double> offset = null;
+                        List<Double> offset   = new ArrayList<Double>();
                         if (gridOffsets != null) {
                             tokens = new StringTokenizer(gridOffsets, ",;");
-                            offset   = new ArrayList<Double>(tokens.countTokens());
                             while (tokens.hasMoreTokens()) {
                                 Double value = parseDouble(tokens.nextToken());
                                 offset.add(value);
                             }
                         }
-                        
                         String gridCS = getParameter("GridCS", false);
                         if (gridCS == null) {
                             gridCS = "urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS";
@@ -435,11 +463,18 @@ public class WCService extends WebService {
                 return null;
             }
         } catch (WebServiceException ex) {
+            
+            if (ex instanceof WMSWebServiceException && this.getCurrentVersion().isOWS()) {
+                ex = new OWSWebServiceException(ex.getMessage(), 
+                                                OWSExceptionCode.valueOf(ex.getExceptionCode().name()),
+                                                null,
+                                                ex.getVersion());
+            }
             /* We don't print the stack trace:
              * - if the user have forget a mandatory parameter.
              * - if the version number is wrong.
              */
-            if (ex instanceof WMSWebServiceException) {
+            if (ex instanceof WMSWebServiceException && !this.getCurrentVersion().isOWS()) {
                 WMSWebServiceException wmsex = (WMSWebServiceException)ex;
                 if (!wmsex.getExceptionCode().equals(WMSExceptionCode.MISSING_PARAMETER_VALUE) &&
                     !wmsex.getExceptionCode().equals(WMSExceptionCode.VERSION_NEGOTIATION_FAILED)&&
@@ -645,6 +680,15 @@ public class WCService extends WebService {
                 summary.add(cs);
                 offBrief.add(co);
             }
+            
+            /**
+             * FOR CITE TEST we put the first data mars because of ifremer overlapping data
+             * TODO delete when overlapping problem is solved 
+             */
+            CoverageSummaryType temp = summary.get(10);
+            summary.remove(10);
+            summary.add(0, temp);
+                    
             contents        = new Contents(summary, null, null, null);    
             contentMetadata = new ContentMetadata("1.0.0", offBrief); 
         } catch (CatalogException exception) {
@@ -706,21 +750,39 @@ public class WCService extends WebService {
              *  
              */
             net.seagis.wcs.v111.DomainSubsetType domain = request.getDomainSubset();
-            
-            bbox = getParameter("BoundingBox", true);
-            if (bbox.indexOf(',') != -1) {
-                crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
-                bbox = bbox.substring(0, bbox.lastIndexOf(','));
+            if (domain == null) {
+                throwException("The DomainSubset must be specify" , 
+                               "MISSING_PARAMETER_VALUE", "DomainSubset");
+            }
+            BoundingBoxType boundingBox = null;
+            if (domain.getBoundingBox() != null) {
+                boundingBox = domain.getBoundingBox().getValue(); 
+            }
+            if (boundingBox != null && boundingBox.getLowerCorner() != null && 
+                boundingBox.getUpperCorner() != null     &&
+                boundingBox.getLowerCorner().size() == 2 && 
+                boundingBox.getUpperCorner().size() == 2) {
+                
+                
+                crs  = boundingBox.getCrs();
+                bbox = boundingBox.getLowerCorner().get(0) + "," +
+                       boundingBox.getLowerCorner().get(1) + "," +
+                       boundingBox.getUpperCorner().get(0) + "," +
+                       boundingBox.getUpperCorner().get(1);
             } else {
-                throwException("The correct pattern for BoundingBox parameter are minX,minY,maxX,maxY,CRS" , 
+                throwException("The BoundingBox is not well-formed" , 
                                "INVALID_PARAMETER_VALUE", "BoundingBox");
-            } 
-            
+            }
+                        
             if (domain.getTemporalSubset() != null) {
                 List<Object> timeSeq = domain.getTemporalSubset().getTimePositionOrTimePeriod();
                 for (Object obj:timeSeq) {
                     if (obj instanceof TimePositionType)
                         time = ((TimePositionType)obj).getValue();
+                    else if (obj instanceof net.seagis.wcs.v111.TimePeriodType) {
+                        throwException("The service does not handle time Period type" , 
+                                       "INVALID_PARAMETER_VALUE", "temporalSubset");
+                    }
                 }
             }
             /*
@@ -735,16 +797,34 @@ public class WCService extends WebService {
              * AxisSubset:  - identifier
              *              - key 
              */
-            String rangeSubset = getParameter("rangeSubset", false);
-            if (rangeSubset != null && rangeSubset.indexOf(':') != -1) {
-                String fieldId     = rangeSubset.substring(0, rangeSubset.indexOf(':'));
-                Layer currentLayer =  webServiceWorker.getLayers(coverage).get(0);
-                if (fieldId.equalsIgnoreCase(currentLayer.getThematic())){
-                    interpolation = rangeSubset.substring(rangeSubset.indexOf(':')+ 1, rangeSubset.length());
-                } else {
-                    throwException("The field " + fieldId + " is not present in this coverage" , 
-                                   "INVALID_PARAMETER_VALUE", "RangeSubset");
+            net.seagis.wcs.v111.RangeSubsetType rangeSubset = request.getRangeSubset();
+            if (rangeSubset != null) {
+                List<String> requestedField = new ArrayList<String>();
+                for(net.seagis.wcs.v111.RangeSubsetType.FieldSubset field: rangeSubset.getFieldSubset()) {
+                    Layer currentLayer =  webServiceWorker.getLayers(coverage).get(0);
+                    
+                    if (field.getIdentifier().equalsIgnoreCase(currentLayer.getThematic())){
+                        interpolation = field.getInterpolationType();
+                        
+                        //we look that the same field is not requested two times
+                        if (!requestedField.contains(field.getIdentifier())) {
+                            requestedField.add(field.getIdentifier());
+                        } else {
+                            throwException("The field " + field.getIdentifier() + " is already present in the request" , 
+                                       "INVALID_PARAMETER_VALUE", "RangeSubset");
+                        }
+                        
+                        //if there is some AxisSubset we send an exception
+                        if (field.getAxisSubset().size() != 0) {
+                            throwException("The service does not handle AxisSubset" , 
+                                       "INVALID_PARAMETER_VALUE", "RangeSubset");
+                        }
+                    } else {
+                        throwException("The field " + field.getIdentifier() + " is not present in this coverage" , 
+                                       "INVALID_PARAMETER_VALUE", "RangeSubset");
+                    }
                 }
+                
             } else {
                 interpolation = null;
             }
@@ -762,27 +842,42 @@ public class WCService extends WebService {
              */
 
             net.seagis.wcs.v111.OutputType output = request.getOutput();
+            if (output == null) {
+                throwException("The Output must be specify" , 
+                               "MISSING_PARAMETER_VALUE", "output");
+            } 
             format = output.getFormat();
+            if (format == null) {
+                throwException("The format must be specify" , 
+                               "MISSING_PARAMETER_VALUE", "output");
+            }
+            
             GridCrsType grid = output.getGridCRS();
+            if (grid != null) {
+                gridBaseCrs = grid.getGridBaseCRS();
+                gridType = grid.getGridType();
+                gridCS = grid.getGridCS();
             
-            gridBaseCrs = grid.getGridBaseCRS();
-            gridType = grid.getGridType();
-            gridCS = grid.getGridCS();
+                for (Double d: grid.getGridOffsets()) {
+                    gridOffsets += d.toString() + ',';
+                }
+                if (gridOffsets.length() > 0) {
+                    gridOffsets = gridOffsets.substring(0, gridOffsets.length() - 1);
+                } else {
+                    gridOffsets = null;
+                }
             
-            for (Double d: grid.getGridOffsets()) {
-                gridOffsets += d.toString() + ',';
+                for (Double d: grid.getGridOrigin()) {
+                    gridOrigin += d.toString() + ',';
+                }
+                if (gridOrigin.length() > 0) {
+                    gridOrigin = gridOrigin.substring(0, gridOrigin.length() - 1);
+                }
+            } else {
+                // TODO the default value for gridOffsets is temporary until we get the rigth treatment
+                gridOffsets = "1.0,0.0,0.0,1.0"; // = null;
+                gridOrigin  = "0.0,0.0";
             }
-            if (gridOffsets.length() > 0) {
-                gridOffsets = gridOffsets.substring(0, gridOffsets.length() - 1);
-            }
-            
-            for (Double d: grid.getGridOrigin()) {
-                gridOrigin += d.toString() + ',';
-            }
-            if (gridOrigin.length() > 0) {
-                gridOrigin = gridOrigin.substring(0, gridOrigin.length() - 1);
-            }
-            
             exceptions    = getParameter("exceptions", false);
             
         } else {
@@ -1009,23 +1104,21 @@ public class WCService extends WebService {
                 GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
                 List<JAXBElement<? extends BoundingBoxType>> bboxs = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
                 if(inputGeoBox != null) {
-                    String crs = "urn:ogc:def:crs:OGC:1.3:CRS84";
-                    BoundingBoxType outputBBox = new BoundingBoxType(crs,
+                    WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
+                                                         inputGeoBox.getWestBoundLongitude(),
+                                                         inputGeoBox.getSouthBoundLatitude(),
+                                                         inputGeoBox.getEastBoundLongitude(),
+                                                         inputGeoBox.getNorthBoundLatitude());
+                    bboxs.add(owsFactory.createWGS84BoundingBox(outputBBox));
+                    
+                    String crs = "EPSG:4326";
+                    BoundingBoxType outputBBox2 = new BoundingBoxType(crs,
                                                          inputGeoBox.getWestBoundLongitude(),
                                                          inputGeoBox.getSouthBoundLatitude(),
                                                          inputGeoBox.getEastBoundLongitude(),
                                                          inputGeoBox.getNorthBoundLatitude());
                     
-                    bboxs.add(owsFactory.createBoundingBox(outputBBox));        
-                    /* this second version of bounding box is valid
-                     WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
-                                                         inputGeoBox.getWestBoundLongitude(),
-                                                         inputGeoBox.getSouthBoundLatitude(),
-                                                         inputGeoBox.getEastBoundLongitude(),
-                                                         inputGeoBox.getNorthBoundLatitude());
-                    bbox = owsFactory.createWGS84BoundingBox(outputBBox);
-                    */
-                    
+                    bboxs.add(owsFactory.createBoundingBox(outputBBox2));        
                 }
                 
                 //general metadata

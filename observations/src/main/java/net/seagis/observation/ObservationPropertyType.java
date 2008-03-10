@@ -91,6 +91,13 @@ public class ObservationPropertyType {
     public ObservationPropertyType(ObservationEntry observation) {
         this.observation = omFactory.createObservation(observation);
     }
+    
+    /**
+     * A JAXB constructor.
+     */
+    public ObservationPropertyType(String title) {
+        this.title = title;
+    }
             
     /**
      * Gets the value of the observation property.

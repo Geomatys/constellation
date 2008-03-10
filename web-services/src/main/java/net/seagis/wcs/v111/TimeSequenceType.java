@@ -88,6 +88,16 @@ public class TimeSequenceType {
     }
     
     /**
+     * build a new time sequence with a simple timePosition.
+     * 
+     * @param timePosition a simple timePosition
+     */
+    public TimeSequenceType(TimePeriodType timePeriod) {
+        timePositionOrTimePeriod = new ArrayList<Object>();
+        timePositionOrTimePeriod.add(timePeriod);
+    }
+    
+    /**
      * Gets the value of the timePositionOrTimePeriod property.
      * (unmodifable)
      */

@@ -30,6 +30,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.awt.image.RenderedImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
@@ -645,6 +646,7 @@ public abstract class ImageProducer {
             coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[] {colorMap});
         }
         RenderedImage image = coverage.getRenderedImage();
+        LOGGER.info("IMAGE SIZE: width=" + image.getWidth() + " heigth=" + image.getHeight());
         if (indexedShortAllowed) {
             return image;
         }
@@ -902,7 +904,7 @@ public abstract class ImageProducer {
      * @return The file, or {@code null} if no writer is suitable.
      * @throws IOException if an error occured while processing the image.
      */
-    private File write(final ImageRequest request, final RenderedImage image, final String format) throws IOException {
+    private File write(final ImageRequest request, final RenderedImage image, final String format) throws IOException, WebServiceException {
         final Iterator<ImageWriter> it = getImageWriter(format);
         while (it.hasNext()) {
             disposeWriter();
@@ -923,7 +925,7 @@ public abstract class ImageProducer {
      * @return The file, or {@code null} if the current writer is not suitable.
      * @throws IOException if an error occured while processing the image.
      */
-    private File write(final ImageRequest request, final RenderedImage image) throws IOException {
+    private File write(final ImageRequest request, final RenderedImage image) throws IOException, WebServiceException {
         final ImageWriterSpi spi = writer.getOriginatingProvider();
         if (spi != null && !spi.canEncodeImage(image)) {
             return null; // Can not encode the image.
@@ -986,18 +988,25 @@ public abstract class ImageProducer {
          * will create an image output stream, which should be accepted by all writers
          * according Image I/O specification.
          */
-        if (writerAcceptsFile) {
-            writer.setOutput(file);
-            writer.write(image);
-        } else {
-            final ImageOutputStream stream = new MemoryCacheImageOutputStream(new FileOutputStream(file));
-            try {
-                writer.setOutput(stream);
+        try {
+            if (writerAcceptsFile) {
+                writer.setOutput(file);
                 writer.write(image);
-            } finally {
-                stream.close();
+            } else {
+                final ImageOutputStream stream = new MemoryCacheImageOutputStream(new FileOutputStream(file));
+                try {
+                    writer.setOutput(stream);
+                    writer.write(image);
+                } finally {
+                    stream.close();
+                }
             }
+        } catch (RasterFormatException ex) {
+            ex.printStackTrace();
+            throw new WMSWebServiceException(ex, INVALID_PARAMETER_VALUE, version.getVersionNumber());
+                
         }
+        
         /*
          * Retains the MIME type used, if it was not already a MIME type.
          */

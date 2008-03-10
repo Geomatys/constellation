@@ -266,17 +266,17 @@ public class SOSworker {
         Properties prop = new Properties();
         map    = new Properties();
         File f = null;
-        String env = System.getenv("CATALINA_HOME");
+        String env = "/home/tomcat/.sicade" ; //System.getenv("CATALINA_HOME");
         logger.info("CATALINA_HOME=" + env);
         try {
             // we get the configuration file
-            f = new File(env + "/bin/sos_configuration/config.properties");
+            f = new File(env + "/sos_configuration/config.properties");
             FileInputStream in = new FileInputStream(f);
             prop.load(in);
             in.close();
             
             // the file who record the map between phisycal ID and DB ID.
-            f = new File(env + "/bin/sos_configuration/mapping.properties");
+            f = new File(env + "/sos_configuration/mapping.properties");
             in = new FileInputStream(f);
             map.load(in);
             in.close();
@@ -285,7 +285,8 @@ public class SOSworker {
             if (f != null) {
                 logger.severe(f.getPath());
             }
-            logger.severe("The sevice can not load the properties files");
+            logger.severe("The sevice can not load the properties files" + '\n' + 
+                          "cause: " + e.getMessage());
             return;
         }
       
@@ -328,27 +329,6 @@ public class SOSworker {
         int h                     = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
         int m                     = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
         templateValidTime         = (h *  3600000) + (m * 60000);
-    }
-    
-    /**
-     * Set the current service version
-     */
-    public void setVersion(String version){
-        this.version = version;
-    }
-    
-    /**
-     * Set the capabilities document.
-     */
-    public void setStaticCapabilities(Capabilities staticCapabilities) {
-        this.staticCapabilities = staticCapabilities;
-    }
-    
-    /**
-     * Set the current service URL
-     */
-    public void setServiceURL(String serviceURL){
-        this.serviceURL = serviceURL;
     }
     
     /**
@@ -1924,6 +1904,9 @@ public class SOSworker {
      */
     private ObservationCollectionEntry normalizeDocument(ObservationCollectionEntry collection){
         //first if the collection is empty
+        if (collection.getMember().size() == 0) {
+            return new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
+        }
         
         List<FeaturePropertyType>          foiAlreadySee   = new ArrayList<FeaturePropertyType> ();
         List<PhenomenonPropertyType>       phenoAlreadySee = new ArrayList<PhenomenonPropertyType>();
@@ -2002,6 +1985,27 @@ public class SOSworker {
             ret = t.toString();
         } 
         return ret;
+    }
+    
+    /**
+     * Set the current service version
+     */
+    public void setVersion(String version){
+        this.version = version;
+    }
+    
+    /**
+     * Set the capabilities document.
+     */
+    public void setStaticCapabilities(Capabilities staticCapabilities) {
+        this.staticCapabilities = staticCapabilities;
+    }
+    
+    /**
+     * Set the current service URL
+     */
+    public void setServiceURL(String serviceURL){
+        this.serviceURL = serviceURL;
     }
     
     /**

@@ -48,8 +48,18 @@ public class ObservationCollectionEntry extends AbstractFeatureEntry implements 
     public ObservationCollectionEntry() {
         super(null, null, null);
         member = new ArrayList<ObservationPropertyType>();
-        System.out.println("----------------------------------------------------------------------");
     }
+    
+    
+    public ObservationCollectionEntry(String title) {
+        super(null, null, null);
+        member = new ArrayList<ObservationPropertyType>();
+        member.add(new ObservationPropertyType(title));
+        System.out.println("-----------------------------AQUI-----------------------------------");
+    }
+    
+    
+    
     
     
     /**

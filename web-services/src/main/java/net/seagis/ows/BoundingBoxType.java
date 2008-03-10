@@ -92,9 +92,9 @@ public class BoundingBoxType {
     public BoundingBoxType(String crs, double minx, double miny, double maxx, double maxy){
         this.dimensions = new BigInteger("2");
         this.lowerCorner.add(minx);
-        this.lowerCorner.add(maxy);
+        this.lowerCorner.add(miny);
         this.upperCorner.add(maxx);
-        this.upperCorner.add(miny);
+        this.upperCorner.add(maxy);
         this.crs = crs;
     }
     

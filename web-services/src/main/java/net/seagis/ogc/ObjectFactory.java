@@ -1,3 +1,18 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package net.seagis.ogc;
 
 import javax.xml.bind.JAXBElement;
@@ -24,45 +39,59 @@ import net.seagis.coverage.web.ExpressionType;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _PropertyIsLessThan_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsLessThan");
+    private final static QName _PropertyIsLessThan_QNAME             = new QName("http://www.opengis.net/ogc", "PropertyIsLessThan");
     private final static QName _PropertyIsGreaterThanOrEqualTo_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsGreaterThanOrEqualTo");
-    private final static QName _Intersects_QNAME = new QName("http://www.opengis.net/ogc", "Intersects");
-    private final static QName _SpatialOps_QNAME = new QName("http://www.opengis.net/ogc", "spatialOps");
-    private final static QName _PropertyIsEqualTo_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsEqualTo");
-    private final static QName _TOveralps_QNAME = new QName("http://www.opengis.net/ogc", "TM_Overalps");
-    private final static QName _TEquals_QNAME = new QName("http://www.opengis.net/ogc", "TM_Equals");
-    private final static QName _Touches_QNAME = new QName("http://www.opengis.net/ogc", "Touches");
-    private final static QName _Literal_QNAME = new QName("http://www.opengis.net/ogc", "Literal");
-    private final static QName _TMeets_QNAME = new QName("http://www.opengis.net/ogc", "TM_Meets");
-    private final static QName _TOverlappedBy_QNAME = new QName("http://www.opengis.net/ogc", "TM_OverlappedBy");
-    private final static QName _TemporalOps_QNAME = new QName("http://www.opengis.net/ogc", "temporalOps");
-    private final static QName _TEndedBy_QNAME = new QName("http://www.opengis.net/ogc", "TM_EndedBy");
-    private final static QName _PropertyIsNotEqualTo_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsNotEqualTo");
-    private final static QName _PropertyIsLessThanOrEqualTo_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsLessThanOrEqualTo");
-    private final static QName _PropertyIsLike_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsLike");
-    private final static QName _DWithin_QNAME = new QName("http://www.opengis.net/ogc", "DWithin");
-    private final static QName _PropertyIsBetween_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsBetween");
-    private final static QName _PropertyName_QNAME = new QName("http://www.opengis.net/ogc", "PropertyName");
-    private final static QName _Disjoint_QNAME = new QName("http://www.opengis.net/ogc", "Disjoint");
-    private final static QName _Crosses_QNAME = new QName("http://www.opengis.net/ogc", "Crosses");
-    private final static QName _TEnds_QNAME = new QName("http://www.opengis.net/ogc", "TM_Ends");
-    private final static QName _Contains_QNAME = new QName("http://www.opengis.net/ogc", "Contains");
-    private final static QName _Beyond_QNAME = new QName("http://www.opengis.net/ogc", "Beyond");
-    private final static QName _TAfter_QNAME = new QName("http://www.opengis.net/ogc", "TM_After");
-    private final static QName _ComparisonOps_QNAME = new QName("http://www.opengis.net/ogc", "comparisonOps");
-    private final static QName _Equals_QNAME = new QName("http://www.opengis.net/ogc", "Equals");
-    private final static QName _Overlaps_QNAME = new QName("http://www.opengis.net/ogc", "Overlaps");
-    private final static QName _TMetBy_QNAME = new QName("http://www.opengis.net/ogc", "TM_MetBy");
-    private final static QName _TBegins_QNAME = new QName("http://www.opengis.net/ogc", "TM_Begins");
-    private final static QName _TBefore_QNAME = new QName("http://www.opengis.net/ogc", "TM_Before");
-    private final static QName _PropertyIsGreaterThan_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsGreaterThan");
-    private final static QName _TBegunBy_QNAME = new QName("http://www.opengis.net/ogc", "TM_BegunBy");
-    private final static QName _BBOX_QNAME = new QName("http://www.opengis.net/ogc", "BBOX");
-    private final static QName _TContains_QNAME = new QName("http://www.opengis.net/ogc", "TM_Contains");
-    private final static QName _TDuring_QNAME = new QName("http://www.opengis.net/ogc", "TM_During");
-    private final static QName _Within_QNAME = new QName("http://www.opengis.net/ogc", "Within");
-    private final static QName _PropertyIsNull_QNAME = new QName("http://www.opengis.net/ogc", "PropertyIsNull");
-    private final static QName _Expression_QNAME = new QName("http://www.opengis.net/ogc", "expression");
+    private final static QName _Intersects_QNAME                     = new QName("http://www.opengis.net/ogc", "Intersects");
+    private final static QName _SpatialOps_QNAME                     = new QName("http://www.opengis.net/ogc", "spatialOps");
+    private final static QName _PropertyIsEqualTo_QNAME              = new QName("http://www.opengis.net/ogc", "PropertyIsEqualTo");
+    private final static QName _TOveralps_QNAME                      = new QName("http://www.opengis.net/ogc", "TM_Overalps");
+    private final static QName _TEquals_QNAME                        = new QName("http://www.opengis.net/ogc", "TM_Equals");
+    private final static QName _Touches_QNAME                        = new QName("http://www.opengis.net/ogc", "Touches");
+    private final static QName _Literal_QNAME                        = new QName("http://www.opengis.net/ogc", "Literal");
+    private final static QName _TMeets_QNAME                         = new QName("http://www.opengis.net/ogc", "TM_Meets");
+    private final static QName _TOverlappedBy_QNAME                  = new QName("http://www.opengis.net/ogc", "TM_OverlappedBy");
+    private final static QName _TemporalOps_QNAME                    = new QName("http://www.opengis.net/ogc", "temporalOps");
+    private final static QName _TEndedBy_QNAME                       = new QName("http://www.opengis.net/ogc", "TM_EndedBy");
+    private final static QName _PropertyIsNotEqualTo_QNAME           = new QName("http://www.opengis.net/ogc", "PropertyIsNotEqualTo");
+    private final static QName _PropertyIsLessThanOrEqualTo_QNAME    = new QName("http://www.opengis.net/ogc", "PropertyIsLessThanOrEqualTo");
+    private final static QName _PropertyIsLike_QNAME                 = new QName("http://www.opengis.net/ogc", "PropertyIsLike");
+    private final static QName _DWithin_QNAME                        = new QName("http://www.opengis.net/ogc", "DWithin");
+    private final static QName _PropertyIsBetween_QNAME              = new QName("http://www.opengis.net/ogc", "PropertyIsBetween");
+    private final static QName _PropertyName_QNAME                   = new QName("http://www.opengis.net/ogc", "PropertyName");
+    private final static QName _Disjoint_QNAME                       = new QName("http://www.opengis.net/ogc", "Disjoint");
+    private final static QName _Crosses_QNAME                        = new QName("http://www.opengis.net/ogc", "Crosses");
+    private final static QName _TEnds_QNAME                          = new QName("http://www.opengis.net/ogc", "TM_Ends");
+    private final static QName _Contains_QNAME                       = new QName("http://www.opengis.net/ogc", "Contains");
+    private final static QName _Beyond_QNAME                         = new QName("http://www.opengis.net/ogc", "Beyond");
+    private final static QName _TAfter_QNAME                         = new QName("http://www.opengis.net/ogc", "TM_After");
+    private final static QName _ComparisonOps_QNAME                  = new QName("http://www.opengis.net/ogc", "comparisonOps");
+    private final static QName _Equals_QNAME                         = new QName("http://www.opengis.net/ogc", "Equals");
+    private final static QName _Overlaps_QNAME                       = new QName("http://www.opengis.net/ogc", "Overlaps");
+    private final static QName _TMetBy_QNAME                         = new QName("http://www.opengis.net/ogc", "TM_MetBy");
+    private final static QName _TBegins_QNAME                        = new QName("http://www.opengis.net/ogc", "TM_Begins");
+    private final static QName _TBefore_QNAME                        = new QName("http://www.opengis.net/ogc", "TM_Before");
+    private final static QName _PropertyIsGreaterThan_QNAME          = new QName("http://www.opengis.net/ogc", "PropertyIsGreaterThan");
+    private final static QName _TBegunBy_QNAME                       = new QName("http://www.opengis.net/ogc", "TM_BegunBy");
+    private final static QName _BBOX_QNAME                  = new QName("http://www.opengis.net/ogc", "BBOX");
+    private final static QName _TContains_QNAME             = new QName("http://www.opengis.net/ogc", "TM_Contains");
+    private final static QName _TDuring_QNAME               = new QName("http://www.opengis.net/ogc", "TM_During");
+    private final static QName _Within_QNAME                = new QName("http://www.opengis.net/ogc", "Within");
+    private final static QName _PropertyIsNull_QNAME        = new QName("http://www.opengis.net/ogc", "PropertyIsNull");
+    private final static QName _Expression_QNAME            = new QName("http://www.opengis.net/ogc", "expression");
+    private final static QName _Id_QNAME                    = new QName("http://www.opengis.net/ogc", "_Id");
+    private final static QName _And_QNAME                   = new QName("http://www.opengis.net/ogc", "And");
+    private final static QName _Or_QNAME                    = new QName("http://www.opengis.net/ogc", "Or");
+    private final static QName _Add_QNAME                   = new QName("http://www.opengis.net/ogc", "Add");
+    private final static QName _Sub_QNAME                   = new QName("http://www.opengis.net/ogc", "Sub");
+    private final static QName _Div_QNAME                   = new QName("http://www.opengis.net/ogc", "Div");
+    private final static QName _Mul_QNAME                   = new QName("http://www.opengis.net/ogc", "Mul"); 
+    private final static QName _FeatureId_QNAME             = new QName("http://www.opengis.net/ogc", "FeatureId");
+    private final static QName _Filter_QNAME                = new QName("http://www.opengis.net/ogc", "Filter");
+    private final static QName _Function_QNAME              = new QName("http://www.opengis.net/ogc", "Function");
+    private final static QName _GmlObjectId_QNAME           = new QName("http://www.opengis.net/ogc", "GmlObjectId");
+    private final static QName _LogicOps_QNAME              = new QName("http://www.opengis.net/ogc", "logicOps");
+    private final static QName _SortBy_QNAME                = new QName("http://www.opengis.net/ogc", "SortBy");
+    private final static QName _Not_QNAME                   = new QName("http://www.opengis.net/ogc", "Not");
     
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.ogc
@@ -376,7 +405,205 @@ public class ObjectFactory {
     public ClassificationCapabilitiesType createClassificationCapabilitiesType() {
         return new ClassificationCapabilitiesType();
     }
+    
+    /**
+     * Create an instance of {@link BinaryLogicOpType }
+     * 
+     */
+    public BinaryLogicOpType createBinaryLogicOpType() {
+        return new BinaryLogicOpType();
+    }
+    
+    /**
+     * Create an instance of {@link BinaryOperatorType }
+     * 
+     */
+    public BinaryOperatorType createBinaryOperatorType() {
+        return new BinaryOperatorType();
+    }
+    
+    /**
+     * Create an instance of {@link FeatureIdType }
+     * 
+     */
+    public FeatureIdType createFeatureIdType() {
+        return new FeatureIdType();
+    }
+    
+    /**
+     * Create an instance of {@link FilterType }
+     * 
+     */
+    public FilterType createFilterType() {
+        return new FilterType();
+    }
+    
+    /**
+     * Create an instance of {@link FunctionType }
+     * 
+     */
+    public FunctionType createFunctionType() {
+        return new FunctionType();
+    }
+    
+    /**
+     * Create an instance of {@link GmlObjectIdType }
+     * 
+     */
+    public GmlObjectIdType createGmlObjectIdType() {
+        return new GmlObjectIdType();
+    }
+    
+    /**
+     * Create an instance of {@link SortByType }
+     * 
+     */
+    public SortByType createSortByType() {
+        return new SortByType();
+    }
+    
+    /**
+     * Create an instance of {@link SortPropertyType }
+     * 
+     */
+    public SortPropertyType createSortPropertyType() {
+        return new SortPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link UnaryLogicOpType }
+     * 
+     */
+    public UnaryLogicOpType createUnaryLogicOpType() {
+        return new UnaryLogicOpType();
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link UnaryLogicOpType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Not", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "logicOps")
+    public JAXBElement<UnaryLogicOpType> createNot(UnaryLogicOpType value) {
+        return new JAXBElement<UnaryLogicOpType>(_Not_QNAME, UnaryLogicOpType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SortByType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "SortBy")
+    public JAXBElement<SortByType> createSortBy(SortByType value) {
+        return new JAXBElement<SortByType>(_SortBy_QNAME, SortByType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LogicOpsType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "logicOps")
+    public JAXBElement<LogicOpsType> createLogicOps(LogicOpsType value) {
+        return new JAXBElement<LogicOpsType>(_LogicOps_QNAME, LogicOpsType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link GmlObjectIdType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "GmlObjectId", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "_Id")
+    public JAXBElement<GmlObjectIdType> createGmlObjectId(GmlObjectIdType value) {
+        return new JAXBElement<GmlObjectIdType>(_GmlObjectId_QNAME, GmlObjectIdType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link FunctionType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Function", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "expression")
+    public JAXBElement<FunctionType> createFunction(FunctionType value) {
+        return new JAXBElement<FunctionType>(_Function_QNAME, FunctionType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link FilterType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Filter")
+    public JAXBElement<FilterType> createFilter(FilterType value) {
+        return new JAXBElement<FilterType>(_Filter_QNAME, FilterType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link FeatureIdType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "FeatureId", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "_Id")
+    public JAXBElement<FeatureIdType> createFeatureId(FeatureIdType value) {
+        return new JAXBElement<FeatureIdType>(_FeatureId_QNAME, FeatureIdType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BinaryOperatorType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Sub", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "expression")
+    public JAXBElement<BinaryOperatorType> createSub(BinaryOperatorType value) {
+        return new JAXBElement<BinaryOperatorType>(_Sub_QNAME, BinaryOperatorType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BinaryOperatorType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Div", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "expression")
+    public JAXBElement<BinaryOperatorType> createDiv(BinaryOperatorType value) {
+        return new JAXBElement<BinaryOperatorType>(_Div_QNAME, BinaryOperatorType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BinaryOperatorType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Mul", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "expression")
+    public JAXBElement<BinaryOperatorType> createMul(BinaryOperatorType value) {
+        return new JAXBElement<BinaryOperatorType>(_Mul_QNAME, BinaryOperatorType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BinaryOperatorType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Add", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "expression")
+    public JAXBElement<BinaryOperatorType> createAdd(BinaryOperatorType value) {
+        return new JAXBElement<BinaryOperatorType>(_Add_QNAME, BinaryOperatorType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BinaryLogicOpType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "Or", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "logicOps")
+    public JAXBElement<BinaryLogicOpType> createOr(BinaryLogicOpType value) {
+        return new JAXBElement<BinaryLogicOpType>(_Or_QNAME, BinaryLogicOpType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BinaryLogicOpType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "And", substitutionHeadNamespace = "http://www.opengis.net/ogc", substitutionHeadName = "logicOps")
+    public JAXBElement<BinaryLogicOpType> createAnd(BinaryLogicOpType value) {
+        return new JAXBElement<BinaryLogicOpType>(_And_QNAME, BinaryLogicOpType.class, null, value);
+    }
   
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractIdType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/ogc", name = "_Id")
+    public JAXBElement<AbstractIdType> createId(AbstractIdType value) {
+        return new JAXBElement<AbstractIdType>(_Id_QNAME, AbstractIdType.class, null, value);
+    }
+    
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link BinaryComparisonOpType }{@code >}}
      * 

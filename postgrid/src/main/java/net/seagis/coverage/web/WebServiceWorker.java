@@ -184,6 +184,7 @@ public class WebServiceWorker extends ImageProducer {
      */
     private CoordinateReferenceSystem decodeCRS(final String code) throws WebServiceException {
         final int versionThreshold;
+        LOGGER.info("decode CRS :" + code);
         if (Service.WMS.equals(service) && version != null) {
             versionThreshold = version.compareTo(AXIS_SWITCH_THRESHOLD);
         } else {
@@ -241,6 +242,7 @@ public class WebServiceWorker extends ImageProducer {
      */
     @SuppressWarnings("fallthrough")
     public void setBoundingBox(final String bbox) throws WebServiceException {
+        //LOGGER.info("bbox a parser:" + bbox + "|");
         clearGridGeometry();
         if (bbox == null) {
             if (envelope != null) {
@@ -278,8 +280,12 @@ public class WebServiceWorker extends ImageProducer {
                 }
             }
             case 4: envelope.setRange(1, coordinates[1], coordinates[3]);
+                    LOGGER.info("set Range 1:" + coordinates[1] +"," + coordinates[3] + '\n' + 
+                                "            minimum = " + envelope.getMinimum(1) + " maximum = " + envelope.getMaximum(1));
             case 3:
             case 2: envelope.setRange(0, coordinates[0], coordinates[2]);
+                    LOGGER.info("set Range 0:" + coordinates[0] +"," + coordinates[2] + '\n' +
+                                "            minimum = " + envelope.getMinimum(0) + " maximum = " + envelope.getMaximum(0));
             case 1:
             case 0: break;
         }
@@ -440,11 +446,11 @@ public class WebServiceWorker extends ImageProducer {
         final int code;
         if (interpolation != null) {
             interpolation = interpolation.trim();
-            if (interpolation.equalsIgnoreCase("bicubic")) {
+            if (interpolation.equalsIgnoreCase("bicubic") || interpolation.equalsIgnoreCase("cubic")) {
                 code = Interpolation.INTERP_BICUBIC;
-            } else if (interpolation.equalsIgnoreCase("nearest neighbor")) {
+            } else if (interpolation.equalsIgnoreCase("nearest neighbor") || interpolation.equalsIgnoreCase("nearest")) {
                 code = Interpolation.INTERP_NEAREST;
-            } else if (interpolation.equalsIgnoreCase("bilinear"))  {
+            } else if (interpolation.equalsIgnoreCase("bilinear") || interpolation.equalsIgnoreCase("linear"))  {
                 code = Interpolation.INTERP_BILINEAR;
             } else {
                 // Unsupported interpolations include "barycentric" and "lost area".

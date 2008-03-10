@@ -69,7 +69,19 @@ public class RangeSubsetType {
     private List<RangeSubsetType.FieldSubset> fieldSubset;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    RangeSubsetType() {
+        
+    }
+    
+    public RangeSubsetType(List<FieldSubset> fieldSubset) {
+        this.fieldSubset = fieldSubset;
+    }
+    
+    /**
      * Gets the value of the fieldSubset property.
+     * (unmodifable).
      */
     public List<RangeSubsetType.FieldSubset> getFieldSubset() {
         if (fieldSubset == null) {
@@ -116,10 +128,24 @@ public class RangeSubsetType {
         private List<AxisSubset> axisSubset;
 
         /**
+         * an empty constructor used by JAXB
+         */
+        FieldSubset() {
+            
+        }
+        
+        public FieldSubset(String identifier, String interpolationType) {
+            this.identifier        = new CodeType(identifier);
+            this.interpolationType = interpolationType;
+        }
+        /**
          * Identifier of this requested Field. This identifier must be unique for this Coverage. 
          */
-        public CodeType getIdentifier() {
-            return identifier;
+        public String getIdentifier() {
+            if (identifier != null) {
+                return identifier.getValue();
+            }
+            return null;
         }
 
         /**
@@ -132,6 +158,7 @@ public class RangeSubsetType {
         /**
          * Unordered list of zero or more axis subsets for this field. 
          * TBD. Gets the value of the axisSubset property.
+         * (unmodifiable).
          */
         public List<AxisSubset> getAxisSubset() {
             if (axisSubset == null) {
