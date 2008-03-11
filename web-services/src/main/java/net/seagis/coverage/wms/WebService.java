@@ -287,7 +287,7 @@ public abstract class WebService {
         if (getVersionFromNumber(inputVersion) == null) {
             
             String message = "The parameter ";
-            for (Version vers:versions){
+            for (Version vers : versions) {
                 message += "VERSION=" + vers.getVersionNumber() + " OR ";
             }
             message = message.substring(0, message.length()-3);
@@ -314,7 +314,7 @@ public abstract class WebService {
         if (getVersionFromNumber(versionNumber) == null) {
             
             String message = "The parameter ";
-            for (Version vers:versions){
+            for (Version vers : versions) {
                 message += "VERSION=" + vers.getVersionNumber() + " OR ";
             }
             message = message.substring(0, message.length()-3);
@@ -448,7 +448,7 @@ public abstract class WebService {
             } else {
                 WMSWebServiceException wse = new WMSWebServiceException("The XML request is not valid",
                                                                         WMSExceptionCode.INVALID_PARAMETER_VALUE,
-                                                                        getCurrentVersion().getVersionNumber());
+                                                                        getCurrentVersion());
                 marshaller.marshal(wse.getServiceExceptionReport(), sw);
             }
             
@@ -476,7 +476,7 @@ public abstract class WebService {
         } else {
             WMSWebServiceException wse = new WMSWebServiceException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
                                                                     WMSExceptionCode.INVALID_PARAMETER_VALUE,
-                                                                    getCurrentVersion().getVersionNumber());
+                                                                    getCurrentVersion());
             marshaller.marshal(wse.getServiceExceptionReport(), sw);
         }
             
@@ -581,7 +581,7 @@ public abstract class WebService {
             code = transformCodeName(code);
             throw new OWSWebServiceException(message, OWSExceptionCode.valueOf(code), locator, getCurrentVersion().getVersionNumber());
         } else {
-            throw new WMSWebServiceException(message, WMSExceptionCode.valueOf(code), getCurrentVersion().getVersionNumber());
+            throw new WMSWebServiceException(message, WMSExceptionCode.valueOf(code), getCurrentVersion());
         }
         
     }
@@ -617,7 +617,7 @@ public abstract class WebService {
      * @return
      */
     private Version getVersionFromNumber(String number) {
-        for (Version v: versions) {
+        for (Version v : versions) {
             if (v.getVersionNumber().equals(number)){
                 return v;
             }
@@ -629,7 +629,7 @@ public abstract class WebService {
      * 
      */
     public Version getBestVersion(String number) {
-        for (Version v: versions) {
+        for (Version v : versions) {
             if (v.getVersionNumber().equals(number)){
                 return v;
             }

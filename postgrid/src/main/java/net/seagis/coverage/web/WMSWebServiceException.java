@@ -12,12 +12,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package net.seagis.coverage.web;
 import net.seagis.coverage.wms.WMSExceptionCode;
 
+
 /**
+ * An error occuring in Web Map Service.
  *
+ * @version $Id$
  * @author Guilhem Legal
  * @author Martin Desruisseaux
  */
@@ -39,7 +41,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    public WMSWebServiceException(final String message, final WMSExceptionCode code, final String version) {
+    public WMSWebServiceException(final String message, final WMSExceptionCode code, final Version version) {
         super(message);
         setServiceExceptionReport(message, code, version);
     }
@@ -51,7 +53,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    public WMSWebServiceException(final Exception cause, final WMSExceptionCode code, final String version) {
+    public WMSWebServiceException(final Exception cause, final WMSExceptionCode code, final Version version) {
         super(cause);
         setServiceExceptionReport(cause.getLocalizedMessage(), code, version);
     }
@@ -65,7 +67,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param version The version of the web service that produced the error.
      */
     public WMSWebServiceException(final String message, final Exception cause,
-                               final WMSExceptionCode code, final String version)
+                               final WMSExceptionCode code, final Version version)
     {
         super(message, cause);
         setServiceExceptionReport(message, code, version);
@@ -78,7 +80,7 @@ public class WMSWebServiceException extends WebServiceException {
      * @param code    The OGC code that describes the error.
      * @param version The version of the web service that produced the error.
      */
-    private void setServiceExceptionReport(final String message, final WMSExceptionCode code, final String version) {
+    private void setServiceExceptionReport(final String message, final WMSExceptionCode code, final Version version) {
         final ServiceExceptionType details = new ServiceExceptionType(message, code);
         exception = new ServiceExceptionReport(version, details);
     }
@@ -101,7 +103,7 @@ public class WMSWebServiceException extends WebServiceException {
             return null;
         }
     }
-    
+
     /**
      * Return the service version who launch this exception.
      */

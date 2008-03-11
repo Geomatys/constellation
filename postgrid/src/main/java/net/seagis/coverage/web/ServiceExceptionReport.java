@@ -73,11 +73,11 @@ public final class ServiceExceptionReport {
      * @param version The version of the web service in which the error occured.
      * @param details The reasons for the failure.
      */
-    public ServiceExceptionReport(final String version, final ServiceExceptionType... details) {
+    public ServiceExceptionReport(final Version version, final ServiceExceptionType... details) {
         for (final ServiceExceptionType element : details) {
             serviceExceptions.add(element);
         }
-        this.version = version;
+        this.version = version.getVersionNumber();
     }
 
     /**
@@ -86,7 +86,7 @@ public final class ServiceExceptionReport {
     public List<ServiceExceptionType> getServiceExceptions() {
         return Collections.unmodifiableList(serviceExceptions);
     }
-    
+
     /**
      * Return the version number
      */

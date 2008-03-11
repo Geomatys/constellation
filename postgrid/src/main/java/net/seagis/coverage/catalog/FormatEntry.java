@@ -86,7 +86,7 @@ final class FormatEntry extends Entry implements Format {
      * {@code true} for using JAI {@code "ImageRead"} operation,
      * or {@code false} for using {@link ImageReader} directly.
      */
-    private static final boolean USE_IMAGE_READ_OPERATION = true;
+    private static final boolean USE_IMAGE_READ_OPERATION = false;
 
     /**
      * The input types for mosaic image reader.

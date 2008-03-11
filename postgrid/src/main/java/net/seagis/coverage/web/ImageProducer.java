@@ -69,6 +69,8 @@ import org.geotools.util.logging.Logging;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.resources.coverage.CoverageUtilities;
 
@@ -382,7 +384,7 @@ public abstract class ImageProducer {
         if (globalLayerTable == null) try {
             globalLayerTable = database.getTable(LayerTable.class);
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
         if (global) {
             return globalLayerTable;
@@ -404,9 +406,9 @@ public abstract class ImageProducer {
             final LayerTable table = getLayerTable(true);
             layerNames = Collections.unmodifiableSet(table.getIdentifiers());
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
         return layerNames;
     }
@@ -428,11 +430,11 @@ public abstract class ImageProducer {
             try {
                 layer = table.getEntry(token);
             } catch (NoSuchRecordException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version.getVersionNumber());
+                throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
             } catch (CatalogException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version.getVersionNumber());
+                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             } catch (SQLException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version.getVersionNumber());
+                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             }
             layers.add(layer);
         }
@@ -453,11 +455,11 @@ public abstract class ImageProducer {
             try {
                 layer = table.getEntry(layerName);
             } catch (NoSuchRecordException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version.getVersionNumber());
+                throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
             } catch (CatalogException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version.getVersionNumber());
+                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             } catch (SQLException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version.getVersionNumber());
+                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             }
             layers.add(layer);
         }
@@ -474,9 +476,9 @@ public abstract class ImageProducer {
             final LayerTable table = getLayerTable(true);
             return table.getEntries();
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
     }
 
@@ -488,7 +490,7 @@ public abstract class ImageProducer {
     public Layer getLayer() throws WebServiceException {
         if (layer == null) {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_VALUE_$1, "layer"),
-                    LAYER_NOT_DEFINED, version.getVersionNumber());
+                    LAYER_NOT_DEFINED, version);
         }
         Layer candidate;
         boolean change = false;
@@ -505,11 +507,11 @@ public abstract class ImageProducer {
                 }
             }
         } catch (NoSuchRecordException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
         if (change) {
             LOGGER.fine("LayerTable configuration changed.");
@@ -567,7 +569,7 @@ public abstract class ImageProducer {
                             }
                         }
                     } catch (CatalogException exception) {
-                        throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version.getVersionNumber());
+                        throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
                     }
                 }
                 // We know that gridToCRS is null, but we try to select constructors that accept
@@ -597,12 +599,12 @@ public abstract class ImageProducer {
         try {
             ref = layer.getCoverageReference(time, elevation);
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
         if (ref == null) {
             // TODO: provides a better message.
             throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
-                    INVALID_PARAMETER_VALUE, version.getVersionNumber());
+                    INVALID_PARAMETER_VALUE, version);
         }
         GridCoverage2D coverage;
         try {
@@ -613,7 +615,7 @@ public abstract class ImageProducer {
                 file = ref.getName();
             }
             throw new WMSWebServiceException(Errors.format(ErrorKeys.CANT_READ_$1, file),
-                    exception, LAYER_NOT_QUERYABLE, version.getVersionNumber());
+                    exception, LAYER_NOT_QUERYABLE, version);
         }
         if (resample) {
             final GridGeometry gridGeometry = getGridGeometry();
@@ -646,7 +648,11 @@ public abstract class ImageProducer {
             coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[] {colorMap});
         }
         RenderedImage image = coverage.getRenderedImage();
-        LOGGER.info("IMAGE SIZE: width=" + image.getWidth() + " heigth=" + image.getHeight());
+        if (LOGGER.isLoggable(Level.FINE)) {
+            final Vocabulary resources = Vocabulary.getResources(null);
+            LOGGER.fine(resources.getLabel(VocabularyKeys.IMAGE_SIZE) + resources.getString(VocabularyKeys.IMAGE_SIZE_$3,
+                    image.getWidth(), image.getHeight(), image.getSampleModel().getNumBands()));
+        }
         if (indexedShortAllowed) {
             return image;
         }
@@ -711,7 +717,7 @@ public abstract class ImageProducer {
             return DEFAULT_FORMAT;
         } else {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, "format"),
-                    MISSING_PARAMETER_VALUE, version.getVersionNumber());
+                    MISSING_PARAMETER_VALUE, version);
         }
     }
 
@@ -838,10 +844,10 @@ public abstract class ImageProducer {
             }
         } catch (IOException exception) {
             disposeWriter();
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
         disposeWriter();
-        throw new WMSWebServiceException(Errors.format(ErrorKeys.NO_IMAGE_WRITER), LAYER_NOT_QUERYABLE, version.getVersionNumber());
+        throw new WMSWebServiceException(Errors.format(ErrorKeys.NO_IMAGE_WRITER), LAYER_NOT_QUERYABLE, version);
     }
 
     /**
@@ -1002,11 +1008,8 @@ public abstract class ImageProducer {
                 }
             }
         } catch (RasterFormatException ex) {
-            ex.printStackTrace();
-            throw new WMSWebServiceException(ex, INVALID_PARAMETER_VALUE, version.getVersionNumber());
-                
+            throw new WMSWebServiceException(ex, LAYER_NOT_QUERYABLE, version);
         }
-        
         /*
          * Retains the MIME type used, if it was not already a MIME type.
          */
@@ -1037,13 +1040,13 @@ public abstract class ImageProducer {
                 try {
                     coordinate = gridToCRS.transform(coordinate, coordinate);
                 } catch (TransformException exception) {
-                    throw new WMSWebServiceException(exception, INVALID_POINT, version.getVersionNumber());
+                    throw new WMSWebServiceException(exception, INVALID_POINT, version);
                 }
                 double[] values = null;
                 try {
                     values = getGridCoverage2D(false).evaluate(coordinate, values);
                 } catch (PointOutsideCoverageException exception) {
-                    throw new WMSWebServiceException(exception, INVALID_POINT, version.getVersionNumber());
+                    throw new WMSWebServiceException(exception, INVALID_POINT, version);
                 }
                 if (values.length != 0) {
                     return values[0];
@@ -1067,7 +1070,7 @@ public abstract class ImageProducer {
             yv = Double.parseDouble(n = y.trim());
         } catch (NumberFormatException exception) {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, n),
-                    exception, INVALID_POINT, version.getVersionNumber());
+                    exception, INVALID_POINT, version);
         }
         return evaluatePixel(xv, yv);
     }
@@ -1099,7 +1102,7 @@ public abstract class ImageProducer {
      * @throws WebServiceException if an error occured while clearing the cache.
      */
     public void flush() throws WebServiceException {
-        LOGGER.info("webserviceWorker is flushing");
+        LOGGER.info("Web Service Worker is flushing");
         disposeWriter();
         if (files != null) {
             files.run();
@@ -1112,9 +1115,9 @@ public abstract class ImageProducer {
         try {
             database.flush();
         } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
         } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version.getVersionNumber());
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
         }
     }
 

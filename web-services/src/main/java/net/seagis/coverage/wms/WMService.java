@@ -133,7 +133,7 @@ public class WMService extends WebService {
                     
             } else {
                 throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
-                                              OPERATION_NOT_SUPPORTED, getCurrentVersion().getVersionNumber());
+                                              OPERATION_NOT_SUPPORTED, getCurrentVersion());
             }
         } catch (WebServiceException ex) {
             /* We don't print the stack trace:
@@ -245,7 +245,7 @@ public class WMService extends WebService {
               || infoFormat.equals("text/xml"))){
                 
                 throw new WMSWebServiceException("This MIME type " + infoFormat + " is not accepted by the service",
-                                              INVALID_PARAMETER_VALUE, getCurrentVersion().getVersionNumber());
+                                              INVALID_PARAMETER_VALUE, getCurrentVersion());
             }
         } else {
             infoFormat = "text/plain";
@@ -320,7 +320,7 @@ public class WMService extends WebService {
         //we begin by extract the mandatory attribute
         if (!getParameter("SERVICE", true).equalsIgnoreCase("WMS")) {
             throw new WMSWebServiceException("The parameters SERVICE=WMS must be specify",
-                                         MISSING_PARAMETER_VALUE, getCurrentVersion().getVersionNumber());
+                                         MISSING_PARAMETER_VALUE, getCurrentVersion());
         }
         
         //and the the optional attribute
@@ -336,7 +336,7 @@ public class WMService extends WebService {
             format = "application/vnd.ogc.wms_xml";
         } else if (!(format.equals("text/xml") || format.equals("application/vnd.ogc.wms_xml"))) {
             throw new WMSWebServiceException("Allowed format for GetCapabilities are : text/xml or application/vnd.ogc.wms_xml.",
-                      INVALID_PARAMETER_VALUE, getCurrentVersion().getVersionNumber());
+                      INVALID_PARAMETER_VALUE, getCurrentVersion());
         }
         
         // the service shall return WMSCapabilities marshalled
@@ -460,7 +460,7 @@ public class WMService extends WebService {
                 layers.add(outputLayer);
                 
             } catch (CatalogException exception) {
-                throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion().getVersionNumber());
+                throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, getCurrentVersion());
             }
         }
        
@@ -515,7 +515,7 @@ public class WMService extends WebService {
                 layersDescriptions.add(outputLayer);
             } else {
                 throw new WMSWebServiceException("This layer is not registred: " + token,
-                      INVALID_PARAMETER_VALUE, getCurrentVersion().getVersionNumber());
+                      INVALID_PARAMETER_VALUE, getCurrentVersion());
             }
         }
                  
