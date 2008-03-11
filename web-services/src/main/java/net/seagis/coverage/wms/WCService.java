@@ -182,7 +182,7 @@ public class WCService extends WebService {
                  */
                 if (gc == null) {
                     if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
-                        throwException("The parameters SERVICE=WCS must be specify",
+                        throwException("The parameters SERVICE=WCS must be specified",
                                        "MISSING_PARAMETER_VALUE", "service");
                     }
                     String inputVersion = getParameter("VERSION", false);
@@ -734,7 +734,7 @@ public class WCService extends WebService {
             if (request.getIdentifier() != null) {
                 coverage = request.getIdentifier().getValue();
             } else {
-                throwException("The parameter identifiers must be specify" , 
+                throwException("The parameter identifiers must be specified" , 
                                "MISSING_PARAMETER_VALUE", "identifier");
             }
             

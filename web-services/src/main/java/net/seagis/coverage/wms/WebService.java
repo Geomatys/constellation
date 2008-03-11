@@ -135,7 +135,7 @@ public abstract class WebService {
     static {
         try {
             /* only for ifremer configuration
-            String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
+            String path = System.getenv().get("CATALINA_HOME") + "/webapps/web-services/WEB-INF/config.xml";
             File configFile = new File(path);
             final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile));*/
         
@@ -241,7 +241,7 @@ public abstract class WebService {
                 } else {
                     v = currentVersion;
                 }
-                throwException("The parameter " + parameterName + " must be specify",
+                throwException("The parameter " + parameterName + " must be specified",
                                "MISSING_PARAMETER_VALUE", parameterName);
                 //never reach;
                 return null;
@@ -276,7 +276,7 @@ public abstract class WebService {
     protected void verifyBaseParameter(int sld) throws WebServiceException {  
         if (sld == 2) {
             if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
-                throwException("The parameter VERSION=" + sldVersion + " must be specify",
+                throwException("The parameter VERSION=" + sldVersion + " must be specified",
                                "MISSING_PARAMETER_VALUE", "version");
             } else {
                 return;
@@ -291,7 +291,7 @@ public abstract class WebService {
                 message += "VERSION=" + vers.getVersionNumber() + " OR ";
             }
             message = message.substring(0, message.length()-3);
-            message += " must be specify";
+            message += " must be specified";
             throwException(message, "VERSION_NEGOTIATION_FAILED", null);
         
         } else {
@@ -299,7 +299,7 @@ public abstract class WebService {
         }
         if (sld == 1) {
             if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
-                throwException("The parameter SLD_VERSION=" + sldVersion + " must be specify",
+                throwException("The parameter SLD_VERSION=" + sldVersion + " must be specified",
                                "VERSION_NEGOTIATION_FAILED", null);
             }
         }
@@ -318,7 +318,7 @@ public abstract class WebService {
                 message += "VERSION=" + vers.getVersionNumber() + " OR ";
             }
             message = message.substring(0, message.length()-3);
-            message += " must be specify";
+            message += " must be specified";
             throwException(message, "VERSION_NEGOTIATION_FAILED", null);
         
         } 
@@ -346,7 +346,7 @@ public abstract class WebService {
                     if (!mandatory) {
                         return null;
                     } else {
-                        throwException("The parameter " + parameterName + " must be specify", 
+                        throwException("The parameter " + parameterName + " must be specified", 
                                        "MISSING_PARAMETER_VALUE", parameterName);
                         //never reach
                         return null;

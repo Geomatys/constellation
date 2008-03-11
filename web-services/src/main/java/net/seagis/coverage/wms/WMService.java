@@ -319,7 +319,7 @@ public class WMService extends WebService {
         
         //we begin by extract the mandatory attribute
         if (!getParameter("SERVICE", true).equalsIgnoreCase("WMS")) {
-            throw new WMSWebServiceException("The parameters SERVICE=WMS must be specify",
+            throw new WMSWebServiceException("The parameters SERVICE=WMS must be specified",
                                          MISSING_PARAMETER_VALUE, getCurrentVersion());
         }
         
