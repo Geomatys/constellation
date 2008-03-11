@@ -64,24 +64,34 @@ public abstract class RequestBaseType {
     private String version;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    RequestBaseType() {
+        
+    }
+    
+    /**
+     * Super contructor used by thi child classes
+     * 
+     * @param service the name of the service (fixed to "CSW")
+     * @param version the version of the service
+     */
+    protected RequestBaseType(String service, String version) {
+        this.service = service;
+        this.version = version;
+    }
+    
+    /**
      * Gets the value of the service property.
      */
     public String getService() {
-        if (service == null) {
-            return "CSW";
-        } else {
-            return service;
-        }
+        return service;
     }
 
     /**
      * Gets the value of the version property.
      */
     public String getVersion() {
-        if (version == null) {
-            return "2.0.2";
-        } else {
-            return version;
-        }
+        return version;
     }
 }

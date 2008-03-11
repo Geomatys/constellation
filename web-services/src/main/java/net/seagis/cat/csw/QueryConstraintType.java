@@ -63,6 +63,30 @@ public class QueryConstraintType {
     private String version;
 
     /**
+     * Empty constructor used by JAXB
+     */
+    QueryConstraintType(){
+        
+    }
+    
+    /**
+     * Build a new Query constraint with a filter.
+     */
+    public QueryConstraintType(FilterType filter, String version){
+        this.filter  = filter;
+        this.version = version;
+    }
+    
+    /**
+     * Build a new Query constraint with a CQL text.
+     */
+    public QueryConstraintType(String cqlText, String version){
+        this.cqlText = cqlText;
+        this.version = version;
+    }
+    
+    
+    /**
      * Gets the value of the filter property.
      */
     public FilterType getFilter() {

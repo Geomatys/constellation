@@ -100,6 +100,36 @@ public class GetRecordsType extends RequestBaseType {
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
     private BigInteger maxRecords;
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    GetRecordsType() {
+        
+    }
+    
+    /**
+     * Build a new GetRecors request
+     */
+    public GetRecordsType(String service, String version, ResultType resultType, 
+            String requestId, String outputFormat, String outputSchema, BigInteger startPosition,
+            BigInteger maxRecords, JAXBElement<? extends AbstractQueryType> abstractQuery,
+            DistributedSearchType distributedSearch) {
+        
+        super(service, version);
+        this.resultType        = resultType;
+        this.requestId         = requestId;
+        this.outputFormat      = outputFormat;
+        this.outputSchema      = outputSchema;
+        this.startPosition     = startPosition;
+        this.maxRecords        = maxRecords;
+        this.abstractQuery     = abstractQuery;
+        this.distributedSearch = distributedSearch;
+        
+        
+    }
+    
+    
 
     /**
      * Gets the value of the distributedSearch property.
@@ -155,11 +185,7 @@ public class GetRecordsType extends RequestBaseType {
      * Gets the value of the outputFormat property.
      */
     public String getOutputFormat() {
-        if (outputFormat == null) {
-            return "application/xml";
-        } else {
-            return outputFormat;
-        }
+        return outputFormat;
     }
 
     /**

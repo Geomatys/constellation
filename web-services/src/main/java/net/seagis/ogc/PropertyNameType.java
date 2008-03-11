@@ -37,30 +37,26 @@ import javax.xml.bind.annotation.XmlValue;
 public class PropertyNameType {
 
     @XmlValue
-    protected String content;
+    private String content;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    PropertyNameType() {
+        
+    }
+    
+    /**
+     * Build a new propertyName with the specified name.
+     */
+    public PropertyNameType(String content) {
+        this.content = content;
+    }
+    
+    /**
      * Gets the value of the content property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getContent() {
         return content;
     }
-
-    /**
-     * Sets the value of the content property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setContent(String value) {
-        this.content = value;
-    }
-
 }

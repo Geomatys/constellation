@@ -53,6 +53,22 @@ public class SortPropertyType {
     private PropertyNameType propertyName;
     @XmlElement(name = "SortOrder")
     private SortOrderType sortOrder;
+    
+    /**
+     * Empty constructor used by JAXB
+     */
+    SortPropertyType(){
+        
+    }
+    
+    /**
+     * build a new SOrt property object.
+     */
+    public SortPropertyType(String propertyName, SortOrderType sortOrder) {
+        this.propertyName = new PropertyNameType(propertyName);
+        this.sortOrder    = sortOrder;
+        
+    }
 
     /**
      * Gets the value of the propertyName property.

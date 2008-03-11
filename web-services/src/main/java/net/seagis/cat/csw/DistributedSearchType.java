@@ -55,6 +55,20 @@ public class DistributedSearchType {
     private BigInteger hopCount;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    DistributedSearchType(){
+        
+    }
+    
+    /**
+     * Build a new DIstributed search
+     */
+    public DistributedSearchType(BigInteger hopCount){
+        this.hopCount = hopCount;
+    }
+    
+    /**
      */
     public BigInteger getHopCount() {
         if (hopCount == null) {

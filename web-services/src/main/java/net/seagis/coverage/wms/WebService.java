@@ -540,7 +540,7 @@ public abstract class WebService {
      * 
      * @return the service url.
      */
-    public String getServiceURL() {
+    protected String getServiceURL() {
         if (serviceURL == null) {
             serviceURL = context.getBaseUri().toString();
         }
@@ -628,7 +628,7 @@ public abstract class WebService {
     /**
      * 
      */
-    public Version getBestVersion(String number) {
+    protected Version getBestVersion(String number) {
         for (Version v : versions) {
             if (v.getVersionNumber().equals(number)){
                 return v;

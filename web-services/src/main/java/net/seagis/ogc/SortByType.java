@@ -54,6 +54,20 @@ public class SortByType {
     private List<SortPropertyType> sortProperty;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    SortByType() {
+        
+    }
+    
+    /**
+     * Build a new sort by list.
+     */
+    public SortByType(List<SortPropertyType> sortProperty) {
+        this.sortProperty = sortProperty;
+    }
+    
+    /**
      * Gets the value of the sortProperty property.
      * (unmodifiable)
      */
