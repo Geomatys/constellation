@@ -26,6 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import net.seagis.cat.csw.Capabilities;
 import net.seagis.cat.csw.GetCapabilities;
+import net.seagis.cat.csw.GetRecordsType;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ows.v100.AcceptFormatsType;
@@ -118,6 +119,14 @@ public class CSWService extends WebService {
         
                 return Response.ok(sw.toString(), "text/xml").build();
                     
+            } else if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsType)) {
+                
+                GetRecordsType gr = (GetRecordsType)objectRequest;
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getRecords(gr), sw);
+        
+                return Response.ok(sw.toString(), "text/xml").build();
+                
             } else {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
                                                  INVALID_PARAMETER_VALUE, "request", getCurrentVersion().getVersionNumber());

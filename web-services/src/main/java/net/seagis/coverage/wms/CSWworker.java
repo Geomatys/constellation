@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 //seaGIS dependencies
 import net.seagis.cat.csw.Capabilities;
 import net.seagis.cat.csw.GetCapabilities;
+import net.seagis.cat.csw.GetRecordsResponseType;
+import net.seagis.cat.csw.GetRecordsType;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterCapabilities;
 import net.seagis.ows.v100.AcceptFormatsType;
@@ -140,6 +142,17 @@ public class CSWworker {
             
         return c;
         
+    }
+    
+    /**
+     * TODO
+     * 
+     * @param request
+     * @return
+     */
+    public GetRecordsResponseType getRecords(GetRecordsType request){
+        
+        return new GetRecordsResponseType();
     }
     
     /**

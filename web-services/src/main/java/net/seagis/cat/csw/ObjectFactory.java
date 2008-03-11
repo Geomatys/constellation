@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -107,7 +108,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link EmptyType }
      * 
-     
+     */
     public EmptyType createEmptyType() {
         return new EmptyType();
     }
@@ -123,7 +124,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link QueryType }
      * 
-     
+     */
     public QueryType createQueryType() {
         return new QueryType();
     }
@@ -155,7 +156,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link SummaryRecordType }
      * 
-     
+     */
     public SummaryRecordType createSummaryRecordType() {
         return new SummaryRecordType();
     }
@@ -163,7 +164,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link DCMIRecordType }
      * 
-     
+     */
     public DCMIRecordType createDCMIRecordType() {
         return new DCMIRecordType();
     }
@@ -187,7 +188,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link ElementSetNameType }
      * 
-     
+     */
     public ElementSetNameType createElementSetNameType() {
         return new ElementSetNameType();
     }
@@ -219,7 +220,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link DistributedSearchType }
      * 
-     
+     */
     public DistributedSearchType createDistributedSearchType() {
         return new DistributedSearchType();
     }
@@ -235,7 +236,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link QueryConstraintType }
      * 
-     
+     */
     public QueryConstraintType createQueryConstraintType() {
         return new QueryConstraintType();
     }
@@ -251,7 +252,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link RequestStatusType }
      * 
-     
+     */
     public RequestStatusType createRequestStatusType() {
         return new RequestStatusType();
     }
@@ -275,7 +276,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link SearchResultsType }
      * 
-     
+     */
     public SearchResultsType createSearchResultsType() {
         return new SearchResultsType();
     }
@@ -283,7 +284,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link GetRecordsType }
      * 
-     
+     */
     public GetRecordsType createGetRecordsType() {
         return new GetRecordsType();
     }
@@ -299,7 +300,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link BriefRecordType }
      * 
-     
+     */
     public BriefRecordType createBriefRecordType() {
         return new BriefRecordType();
     }
@@ -331,7 +332,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link RecordType }
      * 
-     
+     */
     public RecordType createRecordType() {
         return new RecordType();
     }
@@ -363,7 +364,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link GetRecordsResponseType }
      * 
-     
+     */
     public GetRecordsResponseType createGetRecordsResponseType() {
         return new GetRecordsResponseType();
     }
@@ -379,7 +380,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ElementSetNameType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "ElementSetName", defaultValue = "summary")
     public JAXBElement<ElementSetNameType> createElementSetName(ElementSetNameType value) {
         return new JAXBElement<ElementSetNameType>(_ElementSetName_QNAME, ElementSetNameType.class, null, value);
@@ -406,7 +407,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link QueryType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "Query", substitutionHeadNamespace = "http://www.opengis.net/cat/csw/2.0.2", substitutionHeadName = "AbstractQuery")
     public JAXBElement<QueryType> createQuery(QueryType value) {
         return new JAXBElement<QueryType>(_Query_QNAME, QueryType.class, null, value);
@@ -415,7 +416,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link RecordType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "Record", substitutionHeadNamespace = "http://www.opengis.net/cat/csw/2.0.2", substitutionHeadName = "AbstractRecord")
     public JAXBElement<RecordType> createRecord(RecordType value) {
         return new JAXBElement<RecordType>(_Record_QNAME, RecordType.class, null, value);
@@ -451,7 +452,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link BriefRecordType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "BriefRecord", substitutionHeadNamespace = "http://www.opengis.net/cat/csw/2.0.2", substitutionHeadName = "AbstractRecord")
     public JAXBElement<BriefRecordType> createBriefRecord(BriefRecordType value) {
         return new JAXBElement<BriefRecordType>(_BriefRecord_QNAME, BriefRecordType.class, null, value);
@@ -460,7 +461,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AbstractQueryType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "AbstractQuery")
     public JAXBElement<AbstractQueryType> createAbstractQuery(AbstractQueryType value) {
         return new JAXBElement<AbstractQueryType>(_AbstractQuery_QNAME, AbstractQueryType.class, null, value);
@@ -496,7 +497,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link QueryConstraintType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "Constraint")
     public JAXBElement<QueryConstraintType> createConstraint(QueryConstraintType value) {
         return new JAXBElement<QueryConstraintType>(_Constraint_QNAME, QueryConstraintType.class, null, value);
@@ -505,7 +506,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link SummaryRecordType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "SummaryRecord", substitutionHeadNamespace = "http://www.opengis.net/cat/csw/2.0.2", substitutionHeadName = "AbstractRecord")
     public JAXBElement<SummaryRecordType> createSummaryRecord(SummaryRecordType value) {
         return new JAXBElement<SummaryRecordType>(_SummaryRecord_QNAME, SummaryRecordType.class, null, value);
@@ -514,7 +515,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link DCMIRecordType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "DCMIRecord", substitutionHeadNamespace = "http://www.opengis.net/cat/csw/2.0.2", substitutionHeadName = "AbstractRecord")
     public JAXBElement<DCMIRecordType> createDCMIRecord(DCMIRecordType value) {
         return new JAXBElement<DCMIRecordType>(_DCMIRecord_QNAME, DCMIRecordType.class, null, value);
@@ -532,7 +533,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetRecordsType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "GetRecords")
     public JAXBElement<GetRecordsType> createGetRecords(GetRecordsType value) {
         return new JAXBElement<GetRecordsType>(_GetRecords_QNAME, GetRecordsType.class, null, value);
@@ -550,7 +551,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetRecordsResponseType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "GetRecordsResponse")
     public JAXBElement<GetRecordsResponseType> createGetRecordsResponse(GetRecordsResponseType value) {
         return new JAXBElement<GetRecordsResponseType>(_GetRecordsResponse_QNAME, GetRecordsResponseType.class, null, value);
@@ -568,7 +569,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AbstractRecordType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "AbstractRecord")
     public JAXBElement<AbstractRecordType> createAbstractRecord(AbstractRecordType value) {
         return new JAXBElement<AbstractRecordType>(_AbstractRecord_QNAME, AbstractRecordType.class, null, value);
