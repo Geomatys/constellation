@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ows.OnlineResourceType;
+import net.seagis.ows.v110.OnlineResourceType;
 
 
 /**

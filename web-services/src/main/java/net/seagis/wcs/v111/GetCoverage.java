@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ows.CodeType;
+import net.seagis.ows.v110.CodeType;
 import net.seagis.wcs.AbstractGetCoverage;
 
 

@@ -23,12 +23,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ows.AnyValue;
-import net.seagis.ows.CodeType;
-import net.seagis.ows.DescriptionType;
-import net.seagis.ows.KeywordsType;
-import net.seagis.ows.LanguageStringType;
-import net.seagis.ows.UnNamedDomainType;
+import net.seagis.ows.v110.AnyValue;
+import net.seagis.ows.v110.CodeType;
+import net.seagis.ows.v110.DescriptionType;
+import net.seagis.ows.v110.KeywordsType;
+import net.seagis.ows.v110.LanguageStringType;
+import net.seagis.ows.v110.UnNamedDomainType;
 
 
 /**

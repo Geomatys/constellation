@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ows.BoundingBoxType;
-import net.seagis.ows.WGS84BoundingBoxType;
+import net.seagis.ows.v110.BoundingBoxType;
+import net.seagis.ows.v110.WGS84BoundingBoxType;
 
 
 /**
@@ -72,7 +72,7 @@ public class DomainSubsetType {
       */
      public DomainSubsetType(TimeSequenceType temporal, BoundingBoxType boundingBox){
          this.temporalSubset = temporal;
-         net.seagis.ows.ObjectFactory facto = new net.seagis.ows.ObjectFactory();
+         net.seagis.ows.v110.ObjectFactory facto = new net.seagis.ows.v110.ObjectFactory();
          this.boundingBox = facto.createBoundingBox(boundingBox);
      }
     

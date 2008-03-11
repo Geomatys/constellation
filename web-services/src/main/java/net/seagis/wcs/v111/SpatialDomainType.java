@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.AbstractCoordinateOperationType;
 import net.seagis.gml.PolygonType;
-import net.seagis.ows.BoundingBoxType;
+import net.seagis.ows.v110.BoundingBoxType;
 
 /**
  * Definition of the spatial domain of a coverage. 

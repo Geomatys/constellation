@@ -57,19 +57,19 @@ import net.seagis.gml.GridLimitsType;
 import net.seagis.gml.GridType;
 import net.seagis.gml.RectifiedGridType;
 import net.seagis.gml.TimePositionType;
-import net.seagis.ows.AcceptFormatsType;
-import net.seagis.ows.AcceptVersionsType;
-import net.seagis.ows.BoundingBoxType;
-import net.seagis.ows.KeywordsType;
-import net.seagis.ows.LanguageStringType;
-import net.seagis.ows.OWSExceptionCode;
-import net.seagis.ows.OWSWebServiceException;
-import net.seagis.ows.WGS84BoundingBoxType;
-import net.seagis.ows.OperationsMetadata;
-import net.seagis.ows.SectionsType;
-import net.seagis.ows.ServiceIdentification;
-import net.seagis.ows.ServiceIdentification;
-import net.seagis.ows.ServiceProvider;
+import net.seagis.ows.v110.AcceptFormatsType;
+import net.seagis.ows.v110.AcceptVersionsType;
+import net.seagis.ows.v110.BoundingBoxType;
+import net.seagis.ows.v110.KeywordsType;
+import net.seagis.ows.v110.LanguageStringType;
+import net.seagis.ows.v110.OWSExceptionCode;
+import net.seagis.ows.v110.OWSWebServiceException;
+import net.seagis.ows.v110.WGS84BoundingBoxType;
+import net.seagis.ows.v110.OperationsMetadata;
+import net.seagis.ows.v110.SectionsType;
+import net.seagis.ows.v110.ServiceIdentification;
+import net.seagis.ows.v110.ServiceIdentification;
+import net.seagis.ows.v110.ServiceProvider;
 import net.seagis.wcs.AbstractDescribeCoverage;
 import net.seagis.wcs.AbstractGetCapabilities;
 import net.seagis.wcs.AbstractGetCoverage;
@@ -448,7 +448,7 @@ public class WCService extends WebService {
                                                            "");
                         net.seagis.wcs.v111.OutputType output = new net.seagis.wcs.v111.OutputType(grid, getParameter("format", true));
                     
-                        gc = new net.seagis.wcs.v111.GetCoverage(new net.seagis.ows.CodeType(getParameter("identifier", true)),
+                        gc = new net.seagis.wcs.v111.GetCoverage(new net.seagis.ows.v110.CodeType(getParameter("identifier", true)),
                                                                  domain,
                                                                  range,
                                                                  output); 
@@ -633,7 +633,7 @@ public class WCService extends WebService {
         
         net.seagis.wcs.v111.ObjectFactory wcs111Factory = new net.seagis.wcs.v111.ObjectFactory();
         net.seagis.wcs.v100.ObjectFactory wcs100Factory = new net.seagis.wcs.v100.ObjectFactory();
-        net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
+        net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
         try {
             for (Layer inputLayer: webServiceWorker.getLayers()) {
                 List<LanguageStringType> title = new ArrayList<LanguageStringType>();
@@ -1098,7 +1098,7 @@ public class WCService extends WebService {
             }
             List<Layer> layers = webServiceWorker.getLayers(request.getIdentifier());
         
-            net.seagis.ows.ObjectFactory owsFactory = new net.seagis.ows.ObjectFactory();
+                net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
             List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
             for (Layer layer: layers){
                 GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
@@ -1154,7 +1154,7 @@ public class WCService extends WebService {
                 InterpolationMethods interpolations = new InterpolationMethods(intList, net.seagis.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());  
                 RangeType range = new RangeType(new FieldType(cleanSpecialCharacter(layer.getThematic()), 
                                                               null, 
-                                                              new net.seagis.ows.CodeType("0.0"), 
+                                                              new net.seagis.ows.v110.CodeType("0.0"), 
                                                               interpolations));
                
                 //supported CRS

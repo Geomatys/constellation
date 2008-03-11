@@ -45,7 +45,6 @@ import javax.ws.rs.POST;
 // JAXB xml binding dependencies
 import javax.ws.rs.core.Context;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
@@ -56,15 +55,15 @@ import javax.xml.bind.UnmarshalException;
 // seagis dependencies
 import net.seagis.catalog.Database;
 import net.seagis.coverage.web.Version;
-import net.seagis.ows.OWSWebServiceException;
+import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
-import net.seagis.ows.DCP;
+import net.seagis.ows.AbstractDCP;
+import net.seagis.ows.AbstractOnlineResourceType;
+import net.seagis.ows.AbstractOperation;
 import net.seagis.wcs.AbstractRequest;
-import net.seagis.ows.OWSExceptionCode;
-import net.seagis.ows.Operation;
-import net.seagis.ows.RequestMethodType;
+import net.seagis.ows.v110.OWSExceptionCode;
 /**
  *
  * @author legal
@@ -651,11 +650,11 @@ public abstract class WebService {
      * 
      * @param operations A list of OWS operation.
      */
-    public static void updateOWSURL(List<Operation> operations, String url, String service) {
-        for (Operation op:operations) {
-            for (DCP dcp: op.getDCP()) {
-                for (JAXBElement<RequestMethodType> method:dcp.getHTTP().getGetOrPost())
-                    method.getValue().setHref(url + service.toLowerCase() + "?");
+    public static void updateOWSURL(List<? extends AbstractOperation> operations, String url, String service) {
+        for (AbstractOperation op:operations) {
+            for (AbstractDCP dcp: op.getDCP()) {
+                for (AbstractOnlineResourceType method:dcp.getHTTP().getGetOrPost())
+                    method.setHref(url + service.toLowerCase() + "?");
             }
        }
     }

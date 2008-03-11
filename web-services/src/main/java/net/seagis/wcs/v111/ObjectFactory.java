@@ -20,7 +20,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import net.seagis.ows.ReferenceGroupType;
+import net.seagis.ows.v110.ReferenceGroupType;
 
 /**
  * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.wcs.v111

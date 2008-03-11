@@ -25,9 +25,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ows.DescriptionType;
-import net.seagis.ows.KeywordsType;
-import net.seagis.ows.LanguageStringType;
+import net.seagis.ows.v110.DescriptionType;
+import net.seagis.ows.v110.KeywordsType;
+import net.seagis.ows.v110.LanguageStringType;
 
 
 /**

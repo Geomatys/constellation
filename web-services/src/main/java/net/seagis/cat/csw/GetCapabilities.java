@@ -20,10 +20,10 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ows.AcceptFormatsType;
-import net.seagis.ows.AcceptVersionsType;
-import net.seagis.ows.GetCapabilitiesType;
-import net.seagis.ows.SectionsType;
+import net.seagis.ows.v100.AcceptFormatsType;
+import net.seagis.ows.v100.AcceptVersionsType;
+import net.seagis.ows.v100.GetCapabilitiesType;
+import net.seagis.ows.v100.SectionsType;
 
 
 /**

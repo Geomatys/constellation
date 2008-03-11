@@ -34,18 +34,18 @@ import javax.xml.bind.JAXBException;
 
 // seaGIS dependencies
 import net.seagis.catalog.NoSuchTableException;
-import net.seagis.ows.OWSWebServiceException;
+import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.WebService;
-import net.seagis.ows.AcceptFormatsType;
-import net.seagis.ows.AcceptVersionsType;
-import net.seagis.ows.SectionsType;
+import net.seagis.ows.v110.AcceptFormatsType;
+import net.seagis.ows.v110.AcceptVersionsType;
+import net.seagis.ows.v110.SectionsType;
 import net.seagis.sos.Capabilities;
 import net.seagis.sos.DescribeSensor;
 import net.seagis.sos.GetCapabilities;
 import net.seagis.sos.GetObservation;
-import static net.seagis.ows.OWSExceptionCode.*;
+import static net.seagis.ows.v110.OWSExceptionCode.*;
 
 /**
  *

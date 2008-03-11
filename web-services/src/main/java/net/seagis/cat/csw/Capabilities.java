@@ -22,10 +22,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.ogc.FilterCapabilities;
-import net.seagis.ows.CapabilitiesBaseType;
-import net.seagis.ows.OperationsMetadata;
-import net.seagis.ows.ServiceIdentification;
-import net.seagis.ows.ServiceProvider;
+import net.seagis.ows.v100.CapabilitiesBaseType;
+import net.seagis.ows.v100.OperationsMetadata;
+import net.seagis.ows.v100.ServiceIdentification;
+import net.seagis.ows.v100.ServiceProvider;
 
 
 /**

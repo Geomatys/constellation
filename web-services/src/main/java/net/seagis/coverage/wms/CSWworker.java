@@ -23,14 +23,14 @@ import net.seagis.cat.csw.Capabilities;
 import net.seagis.cat.csw.GetCapabilities;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterCapabilities;
-import net.seagis.ows.AcceptFormatsType;
-import net.seagis.ows.AcceptVersionsType;
-import net.seagis.ows.OWSWebServiceException;
-import net.seagis.ows.OperationsMetadata;
-import net.seagis.ows.SectionsType;
-import net.seagis.ows.ServiceIdentification;
-import net.seagis.ows.ServiceProvider;
-import static net.seagis.ows.OWSExceptionCode.*;
+import net.seagis.ows.v100.AcceptFormatsType;
+import net.seagis.ows.v100.AcceptVersionsType;
+import net.seagis.ows.v100.OWSWebServiceException;
+import net.seagis.ows.v100.OperationsMetadata;
+import net.seagis.ows.v100.SectionsType;
+import net.seagis.ows.v100.ServiceIdentification;
+import net.seagis.ows.v100.ServiceProvider;
+import static net.seagis.ows.v100.OWSExceptionCode.*;
 
 /**
  *
@@ -124,7 +124,8 @@ public class CSWworker {
                 
             om = staticCapabilities.getOperationsMetadata();
             //we update the URL
-            WebService.updateOWSURL(om.getOperation(), serviceURL, "CSW");
+            if (om != null)
+                WebService.updateOWSURL(om.getOperation(), serviceURL, "CSW");
                
         }
             

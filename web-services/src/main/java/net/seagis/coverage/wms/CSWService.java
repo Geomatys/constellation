@@ -28,11 +28,11 @@ import net.seagis.cat.csw.Capabilities;
 import net.seagis.cat.csw.GetCapabilities;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.ows.AcceptFormatsType;
-import net.seagis.ows.AcceptVersionsType;
-import net.seagis.ows.OWSWebServiceException;
-import net.seagis.ows.SectionsType;
-import static net.seagis.ows.OWSExceptionCode.*;
+import net.seagis.ows.v100.AcceptFormatsType;
+import net.seagis.ows.v100.AcceptVersionsType;
+import net.seagis.ows.v100.OWSWebServiceException;
+import net.seagis.ows.v100.SectionsType;
+import static net.seagis.ows.v100.OWSExceptionCode.*;
 
 /**
  *
@@ -95,7 +95,7 @@ public class CSWService extends WebService {
                         final StringTokenizer tokens = new StringTokenizer(section, ",;");
                         while (tokens.hasMoreTokens()) {
                             final String token = tokens.nextToken().trim();
-                            if (SectionsType.getExistingSections("1.1.1").contains(token)){
+                            if (SectionsType.getExistingSections().contains(token)){
                                 requestedSections.add(token);
                             } else {
                                 throw new OWSWebServiceException("The section " + token + " does not exist",
@@ -104,7 +104,7 @@ public class CSWService extends WebService {
                         }
                     } else {
                         //if there is no requested Sections we add all the sections
-                        requestedSections = SectionsType.getExistingSections("1.1.1");
+                        requestedSections = SectionsType.getExistingSections();
                     }
                     SectionsType sections     = new SectionsType(requestedSections);
                     gc = new GetCapabilities(versions,

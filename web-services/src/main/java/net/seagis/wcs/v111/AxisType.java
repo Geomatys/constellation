@@ -23,11 +23,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ows.DescriptionType;
-import net.seagis.ows.DomainMetadataType;
-import net.seagis.ows.KeywordsType;
-import net.seagis.ows.LanguageStringType;
-import net.seagis.ows.MetadataType;
+import net.seagis.ows.v110.DescriptionType;
+import net.seagis.ows.v110.DomainMetadataType;
+import net.seagis.ows.v110.KeywordsType;
+import net.seagis.ows.v110.LanguageStringType;
+import net.seagis.ows.v110.MetadataType;
 
 
 /**

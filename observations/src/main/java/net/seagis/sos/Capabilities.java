@@ -21,10 +21,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.ows.CapabilitiesBaseType;
-import net.seagis.ows.OperationsMetadata;
-import net.seagis.ows.ServiceIdentification;
-import net.seagis.ows.ServiceProvider;
+import net.seagis.ows.v110.CapabilitiesBaseType;
+import net.seagis.ows.v110.OperationsMetadata;
+import net.seagis.ows.v110.ServiceIdentification;
+import net.seagis.ows.v110.ServiceProvider;
 import org.geotools.resources.Utilities;
 
 
