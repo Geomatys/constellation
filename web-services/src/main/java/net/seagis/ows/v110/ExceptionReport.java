@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.coverage.web.Version;
 
 
 /**
@@ -77,10 +78,10 @@ public class ExceptionReport {
      * @param exceptionText 
      * @param exceptionCode
      */
-    public ExceptionReport(String exceptionText, String exceptionCode, String locator, String version) {
+    public ExceptionReport(String exceptionText, String exceptionCode, String locator, Version version) {
         exception = new ArrayList<ExceptionType>();
         this.exception.add(new ExceptionType(exceptionText, exceptionCode, locator));
-        this.version = version;
+        this.version = version.getVersionNumber();
     }
     
     /**

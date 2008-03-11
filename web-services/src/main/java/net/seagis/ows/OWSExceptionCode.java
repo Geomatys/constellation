@@ -13,7 +13,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.ows.v110;
+package net.seagis.ows;
 
 import java.util.ArrayList;
 import java.util.List;

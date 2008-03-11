@@ -72,6 +72,7 @@ import net.seagis.ogc.LiteralType;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.NoSuchRecordException;
+import net.seagis.coverage.web.Version;
 import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.WebService;
@@ -119,7 +120,7 @@ import net.seagis.swe.DataArrayEntry;
 import net.seagis.swe.DataArrayPropertyType;
 import net.seagis.swe.DataComponentPropertyType;
 import net.seagis.swe.PhenomenonPropertyType;
-import static net.seagis.ows.v110.OWSExceptionCode.*;
+import static net.seagis.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
@@ -245,7 +246,7 @@ public class SOSworker {
     /**
      * The version of the service
      */
-    private String version;
+    private Version version;
     
     /**
      * A capabilities object containing the static part of the document.
@@ -1990,7 +1991,7 @@ public class SOSworker {
     /**
      * Set the current service version
      */
-    public void setVersion(String version){
+    public void setVersion(Version version){
         this.version = version;
     }
     

@@ -92,7 +92,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link GetRecordByIdResponseType }
      * 
-     
+     */
     public GetRecordByIdResponseType createGetRecordByIdResponseType() {
         return new GetRecordByIdResponseType();
     }
@@ -140,7 +140,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link DescribeRecordType }
      * 
-     
+     */
     public DescribeRecordType createDescribeRecordType() {
         return new DescribeRecordType();
     }
@@ -196,7 +196,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link DescribeRecordResponseType }
      * 
-     
+     */
     public DescribeRecordResponseType createDescribeRecordResponseType() {
         return new DescribeRecordResponseType();
     }
@@ -268,7 +268,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link SchemaComponentType }
      * 
-     
+     */
     public SchemaComponentType createSchemaComponentType() {
         return new SchemaComponentType();
     }
@@ -316,7 +316,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link GetRecordByIdType }
      * 
-     
+     */
     public GetRecordByIdType createGetRecordByIdType() {
         return new GetRecordByIdType();
     }
@@ -434,7 +434,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetRecordByIdResponseType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "GetRecordByIdResponse")
     public JAXBElement<GetRecordByIdResponseType> createGetRecordByIdResponse(GetRecordByIdResponseType value) {
         return new JAXBElement<GetRecordByIdResponseType>(_GetRecordByIdResponse_QNAME, GetRecordByIdResponseType.class, null, value);
@@ -470,7 +470,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link DescribeRecordResponseType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "DescribeRecordResponse")
     public JAXBElement<DescribeRecordResponseType> createDescribeRecordResponse(DescribeRecordResponseType value) {
         return new JAXBElement<DescribeRecordResponseType>(_DescribeRecordResponse_QNAME, DescribeRecordResponseType.class, null, value);
@@ -524,7 +524,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetRecordByIdType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "GetRecordById")
     public JAXBElement<GetRecordByIdType> createGetRecordById(GetRecordByIdType value) {
         return new JAXBElement<GetRecordByIdType>(_GetRecordById_QNAME, GetRecordByIdType.class, null, value);
@@ -587,7 +587,7 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link DescribeRecordType }{@code >}}
      * 
-     
+     */
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "DescribeRecord")
     public JAXBElement<DescribeRecordType> createDescribeRecord(DescribeRecordType value) {
         return new JAXBElement<DescribeRecordType>(_DescribeRecord_QNAME, DescribeRecordType.class, null, value);

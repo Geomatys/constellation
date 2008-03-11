@@ -33,6 +33,7 @@ import net.seagis.cat.csw.DistributedSearchType;
 import net.seagis.cat.csw.ElementSetNameType;
 import net.seagis.cat.csw.ElementSetType;
 import net.seagis.cat.csw.GetCapabilities;
+import net.seagis.cat.csw.GetRecordByIdType;
 import net.seagis.cat.csw.GetRecordsType;
 import net.seagis.cat.csw.ObjectFactory;
 import net.seagis.cat.csw.QueryConstraintType;
@@ -48,7 +49,7 @@ import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
 import net.seagis.ows.v100.OWSWebServiceException;
 import net.seagis.ows.v100.SectionsType;
-import static net.seagis.ows.v100.OWSExceptionCode.*;
+import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -68,7 +69,7 @@ public class CSWService extends WebService {
     public CSWService() throws JAXBException {
         super("CSW", new Version("2.0.2", true));
         worker = new CSWworker();
-        worker.setVersion("2.0.2");
+        worker.setVersion(getCurrentVersion());
         setXMLContext("net.seagis.cat.csw:net.seagis.gml:net.seagis.gml","");
     }
 
@@ -117,9 +118,26 @@ public class CSWService extends WebService {
         
                 return Response.ok(sw.toString(), "text/xml").build();
                 
+            } if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordByIdType)) {
+                
+                GetRecordByIdType grbi = (GetRecordByIdType)objectRequest;
+                
+                if (grbi == null) {
+                    /*
+                     * if the parameters have been send by GET or POST kvp,
+                     * we build a request object with this parameter.
+                     */
+                    grbi = createNewGetRecordByIdRequest();
+                }
+                
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getRecordById(grbi), sw);
+        
+                return Response.ok(sw.toString(), "text/xml").build();
+                
             } else {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
-                                                 INVALID_PARAMETER_VALUE, "request", getCurrentVersion().getVersionNumber());
+                                                 INVALID_PARAMETER_VALUE, "request", getCurrentVersion());
             }
         
         } catch (WebServiceException ex) {
@@ -177,7 +195,7 @@ public class CSWService extends WebService {
                     requestedSections.add(token);
                 } else {
                     throw new OWSWebServiceException("The section " + token + " does not exist",
-                                                     INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion().getVersionNumber());
+                                                     INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion());
                 }   
             }
         } else {
@@ -210,7 +228,7 @@ public class CSWService extends WebService {
                 resultType = ResultType.fromValue(resultTypeName);
             } catch (IllegalArgumentException e){
                throw new OWSWebServiceException("The resultType " + resultTypeName + " does not exist",
-                                                INVALID_PARAMETER_VALUE, "ResultType", getCurrentVersion().getVersionNumber());        
+                                                INVALID_PARAMETER_VALUE, "ResultType", getCurrentVersion());        
             }
         }
         
@@ -234,7 +252,7 @@ public class CSWService extends WebService {
                 startPosition = new BigInteger(startPos);
             } catch (NumberFormatException e){
                throw new OWSWebServiceException("The positif integer " + startPos + " is malformed",
-                                                INVALID_PARAMETER_VALUE, "startPosition", getCurrentVersion().getVersionNumber());        
+                                                INVALID_PARAMETER_VALUE, "startPosition", getCurrentVersion());        
             }
         } 
         
@@ -246,7 +264,7 @@ public class CSWService extends WebService {
                 maxRecords = new BigInteger(maxRec);
             } catch (NumberFormatException e){
                throw new OWSWebServiceException("The positif integer " + maxRec + " is malformed",
-                                                INVALID_PARAMETER_VALUE, "maxRecords", getCurrentVersion().getVersionNumber());        
+                                                INVALID_PARAMETER_VALUE, "maxRecords", getCurrentVersion());        
             }
         } 
         
@@ -266,7 +284,7 @@ public class CSWService extends WebService {
                     namespaces.put(prefix, url);
                 } else {
                      throw new OWSWebServiceException("The namespace " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion().getVersionNumber());
+                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
                 }
                 
         }
@@ -289,7 +307,7 @@ public class CSWService extends WebService {
                     typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
                 } else {
                      throw new OWSWebServiceException("The QName " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion().getVersionNumber());
+                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
                 }
         }
         
@@ -301,7 +319,7 @@ public class CSWService extends WebService {
             
             } catch (IllegalArgumentException e){
                throw new OWSWebServiceException("The ElementSet Name " + eSetName + " does not exist",
-                                                INVALID_PARAMETER_VALUE, "ElementSetName", getCurrentVersion().getVersionNumber());        
+                                                INVALID_PARAMETER_VALUE, "ElementSetName", getCurrentVersion());        
             }
         }
         
@@ -320,12 +338,12 @@ public class CSWService extends WebService {
                         orderType = SortOrderType.fromValue(order);
                     } catch (IllegalArgumentException e){
                         throw new OWSWebServiceException("The SortOrder Name " + order + " does not exist",
-                                                         INVALID_PARAMETER_VALUE, "SortBy", getCurrentVersion().getVersionNumber());        
+                                                         INVALID_PARAMETER_VALUE, "SortBy", getCurrentVersion());        
                     }
                     sorts.add(new SortPropertyType(propName, orderType));
                 } else {
                      throw new OWSWebServiceException("The expression " + token + " is malformed",
-                                                      INVALID_PARAMETER_VALUE, "SortBy", getCurrentVersion().getVersionNumber());
+                                                      INVALID_PARAMETER_VALUE, "SortBy", getCurrentVersion());
                 }
         }
         SortByType sortBy = new SortByType(sorts);
@@ -349,7 +367,7 @@ public class CSWService extends WebService {
                 
             } else {
                 throw new OWSWebServiceException("The constraint language " + constLanguage + " is not supported",
-                                                 INVALID_PARAMETER_VALUE, "ConstraintLanguage", getCurrentVersion().getVersionNumber());
+                                                 INVALID_PARAMETER_VALUE, "ConstraintLanguage", getCurrentVersion());
             }
         }
         
@@ -371,7 +389,7 @@ public class CSWService extends WebService {
                     hopCount = new BigInteger(count);
                 } catch (NumberFormatException e){
                     throw new OWSWebServiceException("The positif integer " + count + " is malformed",
-                                                INVALID_PARAMETER_VALUE, "HopCount", getCurrentVersion().getVersionNumber());        
+                                                INVALID_PARAMETER_VALUE, "HopCount", getCurrentVersion());        
                 }
             }
             distribSearch = new DistributedSearchType(hopCount);
@@ -391,6 +409,51 @@ public class CSWService extends WebService {
                                   cswFactory.createQuery(query),
                                   distribSearch);
             
+    }
+    
+    private GetRecordByIdType createNewGetRecordByIdRequest() throws WebServiceException {
+    
+        String version    = getParameter("VERSION", true);
+        String service    = getParameter("SERVICE", true);
+        
+        String eSetName           = getParameter("ELEMENTSETNAME", false);
+        ElementSetType elementSet = ElementSetType.SUMMARY;
+        if (eSetName != null) {
+            try {
+                elementSet = ElementSetType.fromValue(eSetName);
+            
+            } catch (IllegalArgumentException e){
+               throw new OWSWebServiceException("The ElementSet Name " + eSetName + " does not exist",
+                                                INVALID_PARAMETER_VALUE, "ElementSetName", getCurrentVersion());        
+            }
+        }
+        
+        String outputFormat = getParameter("OUTPUTFORMAT", false);
+        if (outputFormat == null) {
+            outputFormat = "application/xml";
+        }
+        
+        String outputSchema = getParameter("OUTPUTSCHEMA", false);
+        if (outputSchema == null) {
+            outputSchema = "http://www.opengis.net/cat/csw/2.0.2";
+        }
+        
+        String ids      = getParameter("ID", true);
+        List<String> id = new ArrayList<String>();
+        StringTokenizer tokens = new StringTokenizer(ids, ",;");
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+            id.add(token);
+        }
+        
+        return new GetRecordByIdType(service, 
+                                     version,
+                                     new ElementSetNameType(elementSet),
+                                     outputFormat,
+                                     outputSchema,
+                                     id);
+                                     
+                                     
     }
 
 }

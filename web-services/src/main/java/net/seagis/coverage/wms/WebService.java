@@ -63,7 +63,7 @@ import net.seagis.ows.AbstractDCP;
 import net.seagis.ows.AbstractOnlineResourceType;
 import net.seagis.ows.AbstractOperation;
 import net.seagis.wcs.AbstractRequest;
-import net.seagis.ows.v110.OWSExceptionCode;
+import net.seagis.ows.OWSExceptionCode;
 /**
  *
  * @author legal
@@ -443,7 +443,7 @@ public abstract class WebService {
                 OWSWebServiceException wse = new OWSWebServiceException("The XML request is not valid",
                                                                         OWSExceptionCode.INVALID_REQUEST, 
                                                                         null,
-                                                                        getCurrentVersion().getVersionNumber());
+                                                                        getCurrentVersion());
                 marshaller.marshal(wse.getExceptionReport(), sw);
             } else {
                 WMSWebServiceException wse = new WMSWebServiceException("The XML request is not valid",
@@ -471,7 +471,7 @@ public abstract class WebService {
             OWSWebServiceException wse = new OWSWebServiceException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
                                                                     OWSExceptionCode.INVALID_REQUEST, 
                                                                     null,
-                                                                    getCurrentVersion().getVersionNumber());
+                                                                    getCurrentVersion());
             marshaller.marshal(wse.getExceptionReport(), sw);
         } else {
             WMSWebServiceException wse = new WMSWebServiceException("This content type is not allowed try text/xml or application/x-www-form-urlencoded",
@@ -579,7 +579,7 @@ public abstract class WebService {
     protected void throwException(final String message, String code, String locator) throws WebServiceException {
         if (getCurrentVersion().isOWS()) {
             code = transformCodeName(code);
-            throw new OWSWebServiceException(message, OWSExceptionCode.valueOf(code), locator, getCurrentVersion().getVersionNumber());
+            throw new OWSWebServiceException(message, OWSExceptionCode.valueOf(code), locator, getCurrentVersion());
         } else {
             throw new WMSWebServiceException(message, WMSExceptionCode.valueOf(code), getCurrentVersion());
         }
@@ -616,7 +616,7 @@ public abstract class WebService {
      * @param number the version number.
      * @return
      */
-    private Version getVersionFromNumber(String number) {
+    protected Version getVersionFromNumber(String number) {
         for (Version v : versions) {
             if (v.getVersionNumber().equals(number)){
                 return v;

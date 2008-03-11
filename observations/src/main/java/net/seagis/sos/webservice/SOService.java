@@ -45,7 +45,7 @@ import net.seagis.sos.Capabilities;
 import net.seagis.sos.DescribeSensor;
 import net.seagis.sos.GetCapabilities;
 import net.seagis.sos.GetObservation;
-import static net.seagis.ows.v110.OWSExceptionCode.*;
+import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -63,7 +63,7 @@ public class SOService extends WebService {
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
         super("SOS", new Version("1.0.0", true));
         worker = new SOSworker();
-        worker.setVersion("1.0.0");
+        worker.setVersion(getCurrentVersion());
         setXMLContext("net.seagis.sos:net.seagis.gml:net.seagis.swe:net.seagis.gml:net.seagis.observation",
                       "");
     }
@@ -81,7 +81,7 @@ public class SOService extends WebService {
                 GetObservation go = (GetObservation)objectRequest;
                 if (go == null){
                     throw new OWSWebServiceException("The operation GetObservation is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "GetObservation", getCurrentVersion().getVersionNumber());
+                                                     OPERATION_NOT_SUPPORTED, "GetObservation", getCurrentVersion());
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getObservation(go), sw);
@@ -92,7 +92,7 @@ public class SOService extends WebService {
                 DescribeSensor ds = (DescribeSensor)objectRequest;
                 if (ds == null){
                     throw new OWSWebServiceException("The operation DescribeSensor is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "DescribeSensor", getCurrentVersion().getVersionNumber());
+                                                     OPERATION_NOT_SUPPORTED, "DescribeSensor", getCurrentVersion());
                 }
         
                 return Response.ok(worker.describeSensor(ds), "text/xml").build();
@@ -132,7 +132,7 @@ public class SOService extends WebService {
                                 requestedSections.add(token);
                             } else {
                                 throw new OWSWebServiceException("The section " + token + " does not exist",
-                                                                INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion().getVersionNumber());
+                                                                INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion());
                             }   
                         }
                     } else {
@@ -153,7 +153,7 @@ public class SOService extends WebService {
                     
             } else {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
-                                                 INVALID_PARAMETER_VALUE, "request", getCurrentVersion().getVersionNumber());
+                                                 INVALID_PARAMETER_VALUE, "request", getCurrentVersion());
             }
              
          } catch (WebServiceException ex) {

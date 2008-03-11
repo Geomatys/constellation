@@ -21,8 +21,11 @@ import java.util.logging.Logger;
 //seaGIS dependencies
 import net.seagis.cat.csw.Capabilities;
 import net.seagis.cat.csw.GetCapabilities;
+import net.seagis.cat.csw.GetRecordByIdResponseType;
+import net.seagis.cat.csw.GetRecordByIdType;
 import net.seagis.cat.csw.GetRecordsResponseType;
 import net.seagis.cat.csw.GetRecordsType;
+import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterCapabilities;
 import net.seagis.ows.v100.AcceptFormatsType;
@@ -32,7 +35,7 @@ import net.seagis.ows.v100.OperationsMetadata;
 import net.seagis.ows.v100.SectionsType;
 import net.seagis.ows.v100.ServiceIdentification;
 import net.seagis.ows.v100.ServiceProvider;
-import static net.seagis.ows.v100.OWSExceptionCode.*;
+import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
  *
@@ -48,7 +51,7 @@ public class CSWworker {
     /**
      * The version of the service
      */
-    private String version;
+    private Version version;
     
     /**
      * A capabilities object containing the static part of the document.
@@ -156,9 +159,20 @@ public class CSWworker {
     }
     
     /**
+     * TODO
+     * 
+     * @param request
+     * @return
+     */
+    public GetRecordByIdResponseType getRecordById(GetRecordByIdType request){
+        
+        return new GetRecordByIdResponseType();
+    }
+    
+    /**
      * Set the current service version
      */
-    public void setVersion(String version){
+    public void setVersion(Version version){
         this.version = version;
     }
     

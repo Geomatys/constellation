@@ -62,7 +62,7 @@ import net.seagis.ows.v110.AcceptVersionsType;
 import net.seagis.ows.v110.BoundingBoxType;
 import net.seagis.ows.v110.KeywordsType;
 import net.seagis.ows.v110.LanguageStringType;
-import net.seagis.ows.v110.OWSExceptionCode;
+import net.seagis.ows.OWSExceptionCode;
 import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.ows.v110.WGS84BoundingBoxType;
 import net.seagis.ows.v110.OperationsMetadata;
@@ -468,7 +468,7 @@ public class WCService extends WebService {
                 ex = new OWSWebServiceException(ex.getMessage(), 
                                                 OWSExceptionCode.valueOf(ex.getExceptionCode().name()),
                                                 null,
-                                                ex.getVersion());
+                                                getVersionFromNumber(ex.getVersion()));
             }
             /* We don't print the stack trace:
              * - if the user have forget a mandatory parameter.
