@@ -27,18 +27,25 @@ import java.util.StringTokenizer;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 import net.seagis.cat.csw.Capabilities;
+import net.seagis.cat.csw.DescribeRecordType;
 import net.seagis.cat.csw.DistributedSearchType;
 import net.seagis.cat.csw.ElementSetNameType;
 import net.seagis.cat.csw.ElementSetType;
 import net.seagis.cat.csw.GetCapabilities;
+import net.seagis.cat.csw.GetDomainType;
 import net.seagis.cat.csw.GetRecordByIdType;
 import net.seagis.cat.csw.GetRecordsType;
+import net.seagis.cat.csw.HarvestType;
 import net.seagis.cat.csw.ObjectFactory;
 import net.seagis.cat.csw.QueryConstraintType;
 import net.seagis.cat.csw.QueryType;
 import net.seagis.cat.csw.ResultType;
+import net.seagis.cat.csw.TransactionType;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterType;
@@ -132,6 +139,71 @@ public class CSWService extends WebService {
                 
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getRecordById(grbi), sw);
+        
+                return Response.ok(sw.toString(), "text/xml").build();
+                
+            } if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecordType)) {
+                
+                DescribeRecordType dr = (DescribeRecordType)objectRequest;
+                
+                if (dr == null) {
+                    /*
+                     * if the parameters have been send by GET or POST kvp,
+                     * we build a request object with this parameter.
+                     */
+                    dr = createNewDescribeRecordRequest();
+                }
+                
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.describeRecord(dr), sw);
+        
+                return Response.ok(sw.toString(), "text/xml").build();
+                
+            } if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomainType)) {
+                
+                GetDomainType gd = (GetDomainType)objectRequest;
+                
+                if (gd == null) {
+                    /*
+                     * if the parameters have been send by GET or POST kvp,
+                     * we build a request object with this parameter.
+                     */
+                    gd = createNewGetDomainRequest();
+                }
+                
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getDomain(gd), sw);
+        
+                return Response.ok(sw.toString(), "text/xml").build();
+                
+            } if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof TransactionType)) {
+                
+                TransactionType t = (TransactionType)objectRequest;
+                
+                if (t == null) {
+                     throw new OWSWebServiceException("The Operation transaction is not available in KVP",
+                                                      OPERATION_NOT_SUPPORTED, "transaction", getCurrentVersion());
+                }
+                
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.transaction(t), sw);
+        
+                return Response.ok(sw.toString(), "text/xml").build();
+                
+            } else if (request.equalsIgnoreCase("Harvest") || (objectRequest instanceof HarvestType)) {
+                
+                HarvestType h = (HarvestType)objectRequest;
+                
+                if (h == null) {
+                    /*
+                     * if the parameters have been send by GET or POST kvp,
+                     * we build a request object with this parameter.
+                     */
+                    h = createNewHarvestRequest();
+                }
+                
+                StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.harvest(h), sw);
         
                 return Response.ok(sw.toString(), "text/xml").build();
                 
@@ -411,6 +483,9 @@ public class CSWService extends WebService {
             
     }
     
+    /**
+     * Build a new GetRecordById request object with the url parameters 
+     */
     private GetRecordByIdType createNewGetRecordByIdRequest() throws WebServiceException {
     
         String version    = getParameter("VERSION", true);
@@ -454,6 +529,124 @@ public class CSWService extends WebService {
                                      id);
                                      
                                      
+    }
+    
+    /**
+     * Build a new DescribeRecord request object with the url parameters 
+     */
+    private DescribeRecordType createNewDescribeRecordRequest() throws WebServiceException {
+    
+        String version    = getParameter("VERSION", true);
+        String service    = getParameter("SERVICE", true);
+        
+        String outputFormat = getParameter("OUTPUTFORMAT", false);
+        if (outputFormat == null) {
+            outputFormat = "application/xml";
+        }
+        
+        String schemaLanguage = getParameter("SCHEMALANGUAGE", false);
+        if (schemaLanguage == null) {
+            schemaLanguage = "XMLSCHEMA";
+        }
+        
+         // we get the namespaces.
+        String namespace               = getParameter("NAMESPACE", false);
+        Map<String, String> namespaces = new HashMap<String, String>();
+        StringTokenizer tokens = new StringTokenizer(namespace, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                if (token.indexOf('=') != -1) {
+                    String prefix = token.substring(0, token.indexOf('='));
+                    String url    = token.substring(token.indexOf('=') + 1);
+                    namespaces.put(prefix, url);
+                } else {
+                     throw new OWSWebServiceException("The namespace " + token + " is malformed",
+                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
+                }
+                
+        }
+        
+        //if there is not namespace specified, using the default namespace
+        // TODO add gmd...
+        if (namespaces.size() == 0) {
+            namespaces.put("csw", "http://www.opengis.net/cat/csw/2.0.2");
+        }
+        
+        String names   = getParameter("TYPENAMES", true);
+        List<QName> typeNames = new ArrayList<QName>();
+        tokens = new StringTokenizer(names, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                
+                if (token.indexOf(':') != -1) {
+                    String prefix    = token.substring(0, token.indexOf(':'));
+                    String localPart = token.substring(token.indexOf(':') + 1);
+                    typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
+                } else {
+                     throw new OWSWebServiceException("The QName " + token + " is malformed",
+                                                      INVALID_PARAMETER_VALUE, "namespace", getCurrentVersion());
+                }
+        }
+        
+        
+        return new DescribeRecordType(service, 
+                                     version,
+                                     typeNames,
+                                     outputFormat,
+                                     schemaLanguage);
+                                     
+                                     
+    }
+    
+    /**
+     * Build a new GetDomain request object with the url parameters 
+     */
+    private GetDomainType createNewGetDomainRequest() throws WebServiceException {
+    
+        String version    = getParameter("VERSION", true);
+        String service    = getParameter("SERVICE", true);
+        
+        //not supported by the ISO profile
+        String parameterName = getParameter("PARAMETERNAME", false);
+        
+        String propertyName = getParameter("PROPERTYNAME", false);
+       
+        return new GetDomainType(service, version, propertyName);
+    }
+    
+    /**
+     * Build a new GetDomain request object with the url parameters 
+     */
+    private HarvestType createNewHarvestRequest() throws WebServiceException {
+    
+        String version      = getParameter("VERSION", true);
+        String service      = getParameter("SERVICE", true);
+        String source       = getParameter("SOURCE", true);
+        String resourceType = getParameter("RESOURCETYPE", true);
+        String resourceFormat = getParameter("RESOURCEFORMAT", false);
+        if (resourceFormat == null) {
+            resourceFormat = "application/xml";
+        }
+        String handler           = getParameter("RESPONSEHANDLER", false);
+        String interval          = getParameter("HARVESTINTERVAL", false);
+        Duration harvestInterval = null;
+        if (interval != null) {
+            try {
+                DatatypeFactory factory  = DatatypeFactory.newInstance();
+                harvestInterval          = factory.newDuration(interval) ;
+            } catch (DatatypeConfigurationException ex) {
+                throw new OWSWebServiceException("The Duration " + interval + " is malformed",
+                                              INVALID_PARAMETER_VALUE, "HarvestInsterval", getCurrentVersion());
+            }
+        }
+        
+        return new HarvestType(service, 
+                               version, 
+                               source, 
+                               resourceType, 
+                               resourceFormat, 
+                               handler, 
+                               harvestInterval);
     }
 
 }

@@ -20,11 +20,19 @@ import java.util.logging.Logger;
 
 //seaGIS dependencies
 import net.seagis.cat.csw.Capabilities;
+import net.seagis.cat.csw.DescribeRecordResponseType;
+import net.seagis.cat.csw.DescribeRecordType;
 import net.seagis.cat.csw.GetCapabilities;
+import net.seagis.cat.csw.GetDomainResponseType;
+import net.seagis.cat.csw.GetDomainType;
 import net.seagis.cat.csw.GetRecordByIdResponseType;
 import net.seagis.cat.csw.GetRecordByIdType;
 import net.seagis.cat.csw.GetRecordsResponseType;
 import net.seagis.cat.csw.GetRecordsType;
+import net.seagis.cat.csw.HarvestResponseType;
+import net.seagis.cat.csw.HarvestType;
+import net.seagis.cat.csw.TransactionResponseType;
+import net.seagis.cat.csw.TransactionType;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterCapabilities;
@@ -167,6 +175,50 @@ public class CSWworker {
     public GetRecordByIdResponseType getRecordById(GetRecordByIdType request){
         
         return new GetRecordByIdResponseType();
+    }
+    
+    /**
+     * TODO
+     * 
+     * @param request
+     * @return
+     */
+    public DescribeRecordResponseType describeRecord(DescribeRecordType request){
+        
+        return new DescribeRecordResponseType();
+    }
+    
+    /**
+     * TODO
+     * 
+     * @param request
+     * @return
+     */
+    public GetDomainResponseType getDomain(GetDomainType request){
+        
+        return new GetDomainResponseType();
+    }
+    
+    /**
+     * TODO
+     * 
+     * @param request
+     * @return
+     */
+    public TransactionResponseType transaction(TransactionType request){
+        
+        return new TransactionResponseType();
+    }
+    
+    /**
+     * TODO
+     * 
+     * @param request
+     * @return
+     */
+    public HarvestResponseType harvest(HarvestType request){
+        
+        return new HarvestResponseType();
     }
     
     /**

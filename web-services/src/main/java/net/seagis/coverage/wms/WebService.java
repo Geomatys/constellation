@@ -168,7 +168,6 @@ public abstract class WebService {
              throw new IllegalArgumentException("A web service must have at least one version");
         else
             this.currentVersion = this.versions.get(0);
-        logger.info("currentVersion null ? " + (currentVersion == null));
         unmarshaller = null;
         serviceURL   = null;
         ImageIO.scanForPlugins();

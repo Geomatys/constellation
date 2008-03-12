@@ -73,6 +73,26 @@ public class DescribeRecordType extends RequestBaseType {
     private String schemaLanguage;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    DescribeRecordType() {
+        
+    }
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    public DescribeRecordType(String service, String version, List<QName> typeName,
+            String outputFormat, String schemaLanguage) {
+        super(service, version);
+        this.outputFormat   = outputFormat;
+        this.schemaLanguage = schemaLanguage;
+        this.typeName       = typeName;
+        
+    }
+    
+    
+    /**
      * Gets the value of the typeName property.
      * (unmodifiable)
      */
