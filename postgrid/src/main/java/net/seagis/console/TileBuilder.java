@@ -24,10 +24,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import javax.imageio.spi.ImageReaderSpi;
@@ -37,6 +38,7 @@ import org.geotools.geometry.Envelope2D;
 import org.geotools.image.io.mosaic.Tile;
 import org.geotools.image.io.mosaic.TileManager;
 import org.geotools.image.io.mosaic.MosaicBuilder;
+import org.geotools.util.FrequencySortedSet;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.image.ImageUtilities;
 
@@ -58,15 +60,22 @@ public class TileBuilder {
     public static void main(String[] args) {
         ImageUtilities.allowNativeCodec("PNG", ImageReaderSpi.class, false);
         ImageUtilities.allowNativeCodec("PNG", ImageWriterSpi.class, false);
+        /*
+         * Parses the arguments provided on the command line.
+         */
         final Arguments  arguments = new Arguments(args);
         final boolean writeToDisk  = arguments.getFlag("--write-to-disk");
         final boolean fillDatabase = arguments.getFlag("--fill-database");
-
+        final boolean pretend      = arguments.getFlag("--pretend");
         args = arguments.getRemainingArguments(1);
         if (args.length != 1) {
             arguments.err.println("Missing argument: properties file");
             return;
         }
+        /*
+         * Reads the property file and parses some of its value into File, Envelope
+         * or Point objects. Failure to parse will stop the method immediately.
+         */
         final Properties properties = new Properties();
         try {
             final InputStream in = new FileInputStream(args[0]);
@@ -93,7 +102,12 @@ public class TileBuilder {
             return;
         }
         final String series = (String) properties.remove("Series");
-        final Set<Tile> tiles = new HashSet<Tile>();
+        /*
+         * The remaining property values are understood as tile filenames. Creates those
+         * tiles now. The size of each tiles will be read from the image file on disk.
+         */
+        Collection<Tile> tiles = new HashSet<Tile>();
+        final SortedSet<String> suffixes = new FrequencySortedSet<String>(true);
         for (final Map.Entry<?,?> entry : properties.entrySet()) {
             final String file  = (String) entry.getKey();
             final String value = (String) entry.getValue();
@@ -106,7 +120,16 @@ public class TileBuilder {
             }
             final Tile tile = new Tile(null, new File(sourceDirectory, file), 0, origin, null);
             tiles.add(tile);
+            final int split = file.lastIndexOf('.');
+            if (split >= 0) {
+                suffixes.add(file.substring(split));
+            }
         }
+        /*
+         * From the big tiles declared in the property files, infers a set of smaller tiles at
+         * different overview levels. For example starting with 6 BlueMarble tiles, we can get
+         * 4733 tiles of size 960 x 960 pixels. The result is printed to the standard output.
+         */
         MosaicBuilder builder = new MosaicBuilder();
         builder.setLogLevel(Level.INFO);
         if (tileSize != null) {
@@ -114,28 +137,49 @@ public class TileBuilder {
         }
         builder.setTileDirectory(targetDirectory);
         builder.setMosaicEnvelope(envelope);
+        final TileManager tileManager;
+        final Tile global;
         try {
-            final TileManager tileManager = builder.createTileManager(tiles, 0, writeToDisk);
-            System.out.println(tileManager);
-            if (fillDatabase) try {
-                final Database database = new Database();
-                final WritableGridCoverageTable table = new WritableGridCoverageTable(
-                        database.getTable(WritableGridCoverageTable.class));
-                table.setCanInsertNewLayers(true);
-                table.setLayer(series);
-                table.addEntries(tileManager.getTiles(), 0);
-                database.close();
-            } catch (SQLException e) {
-                arguments.err.println(e);
-                return;
-            } catch (CatalogException e) {
-                arguments.err.println(e);
-                return;
+            tileManager = builder.createTileManager(tiles, 0, writeToDisk && !pretend);
+            String name = series;
+            if (!suffixes.isEmpty()) {
+                name += suffixes.first();
             }
+            global = tileManager.createGlobalTile(null, name, 0);
         } catch (IOException e) {
             arguments.err.println(e);
             return;
         }
+        tiles = tileManager.getTiles();
+        System.out.println(tileManager);
+        /*
+         * Fills the database if requested by the user. The tiles entries will be inserted in the
+         * "Tiles" table while the global entry will be inserted into the "GridCoverages" table.
+         */
+        if (fillDatabase) try {
+            final Database database = new Database();
+            if (pretend) {
+                database.setUpdateSimulator(arguments.out);
+            }
+            final WritableGridCoverageTable table = new WritableGridCoverageTable(
+                    database.getTable(WritableGridCoverageTable.class));
+            table.setCanInsertNewLayers(true);
+            table.setLayer(series);
+            table.addEntry(global);
+            table.addEntries(tiles, 0);
+            database.close();
+        } catch (IOException e) {
+            arguments.err.println(e);
+            return;
+        } catch (SQLException e) {
+            arguments.err.println(e);
+            return;
+        } catch (CatalogException e) {
+            arguments.err.println(e);
+            e.printStackTrace();
+            return;
+        }
+        arguments.out.flush();
     }
 
     /**

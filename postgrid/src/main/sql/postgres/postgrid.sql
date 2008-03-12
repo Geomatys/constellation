@@ -447,7 +447,7 @@ CREATE TABLE "GridCoverages" (
     "endTime"   timestamp without time zone,
     "extent"    character varying NOT NULL REFERENCES "GridGeometries" ON UPDATE CASCADE ON DELETE RESTRICT,
     PRIMARY KEY ("series", "filename", "index"),
-    UNIQUE ("series", "startTime", "endTime", "extent"),
+    UNIQUE ("series", "endTime", "startTime"),  -- Same order than the index.
     CHECK ((("startTime" IS     NULL) AND ("endTime" IS     NULL)) OR
            (("startTime" IS NOT NULL) AND ("endTime" IS NOT NULL) AND ("startTime" <= "endTime")))
 );
@@ -489,6 +489,56 @@ COMMENT ON INDEX "GridCoverages_index" IS
     'Index of all the images within a certain time range.';
 COMMENT ON INDEX "GridCoverages_extent_index" IS
     'Index of all the images in a geographic region.';
+
+
+
+
+--------------------------------------------------------------------------------------------------
+-- Creates the "Tiles" table.                                                                   --
+-- Dependencies: "Series", "GridGeometries", "GridCoverages"                                    --
+--------------------------------------------------------------------------------------------------
+
+CREATE TABLE "Tiles" (
+  PRIMARY KEY ("series", "filename", "index"),
+  FOREIGN KEY ("extent") REFERENCES "GridGeometries" (identifier) ON UPDATE CASCADE ON DELETE RESTRICT,
+  FOREIGN KEY ("series", "startTime", "endTime") REFERENCES "GridCoverages" ("series", "startTime", "endTime") ON UPDATE CASCADE ON DELETE CASCADE
+) INHERITS ("GridCoverages");
+
+ALTER TABLE "Tiles" OWNER TO geoadmin;
+GRANT ALL ON TABLE "Tiles" TO geoadmin;
+GRANT SELECT ON TABLE "Tiles" TO public;
+
+CREATE INDEX "Tiles_index" ON "Tiles" (series, "endTime", "startTime");
+
+
+
+--------------------------------------------------------------------------------------------------
+-- Creates the "Tiling" view.                                                                   --
+-- Dependencies: "Tiles", "GridGeometries", "Series"                                            --
+--------------------------------------------------------------------------------------------------
+
+CREATE VIEW "Tiling" AS
+ SELECT "series",
+        "startTime",
+        "endTime",
+        count("filename") AS "numTiles",
+        max("width") = min("width") AND max("height") = min("height") AS "uniformSize",
+        min("width") AS "width",
+        min("height") AS "height",
+        sqrt("scaleX" * "scaleX" + "shearX" * "shearX") AS "scaleX",
+        sqrt("scaleY" * "scaleY" + "shearY" * "shearY") AS "scaleY",
+        "horizontalSRID"
+   FROM "Tiles"
+   JOIN "GridGeometries" ON "Tiles"."extent" = "GridGeometries".identifier
+  GROUP BY "series", "endTime", "startTime", "horizontalSRID", "scaleX", "scaleY", "shearX", "shearY"
+  ORDER BY "series", "endTime", "scaleX"*"scaleX" + "shearX"*"shearX" + "scaleY"*"scaleY" + "shearY"*"shearY" DESC;
+
+ALTER TABLE "Tiling" OWNER TO geoadmin;
+GRANT ALL ON TABLE "Tiling" TO geoadmin;
+GRANT SELECT ON TABLE "Tiling" TO PUBLIC;
+
+COMMENT ON VIEW "Tiling" IS
+    'Summary of tiling by series inferred from the tiles table content.';
 
 
 

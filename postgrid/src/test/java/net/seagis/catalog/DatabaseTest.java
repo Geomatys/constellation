@@ -27,9 +27,12 @@ import junit.framework.TestCase;
 
 /**
  * The base class for tests that require a {@link Database}.
+ * <p>
+ * Note: While not strictly required, we extends the {@link TestCase} from the old JUnit 3
+ * framework in order to create a suite in {@link net.seagis.PostgridSuite}.
  *
  * @version $Id$
- * @author Marton Desruisseaux
+ * @author Martin Desruisseaux
  */
 public class DatabaseTest extends TestCase {
     /**

@@ -71,7 +71,8 @@ public class WritableGridCoverageEntry {
     private final Tile tile;
 
     /**
-     * The image reader ready for use.
+     * The image reader ready for use, or {@code null} if all information should be fetch
+     * from the {@linkplain #tile}.
      */
     private final ImageReader reader;
 
@@ -90,6 +91,7 @@ public class WritableGridCoverageEntry {
     /**
      * The filename extension, not including the leading dot. This is part of the input
      * splitted as "{@linkplain #path}/{@linkplain #filename}.{@linkplain #extension}".
+     * May be empty but never null.
      */
     protected final String extension;
 
@@ -110,7 +112,7 @@ public class WritableGridCoverageEntry {
      * @throws IOException if an error occured while reading the image.
      */
     public WritableGridCoverageEntry(final Tile tile) throws IOException {
-        this(tile, tile.getImageReader());
+        this(tile, exists(tile.getInput()) ? tile.getImageReader() : null);
     }
 
     /**
@@ -129,7 +131,7 @@ public class WritableGridCoverageEntry {
      * Creates en entry for the given reader.
      *
      * @param  tile Information about the image to be inserted.
-     * @param  reader The image reader.
+     * @param  reader The image reader, or {@code null}.
      * @throws IIOException if the tile input is unknown.
      */
     private WritableGridCoverageEntry(final Tile tile, final ImageReader reader) throws IIOException {
@@ -162,6 +164,13 @@ public class WritableGridCoverageEntry {
     }
 
     /**
+     * Returns {@code true} if the given input is an existing file.
+     */
+    private static boolean exists(final Object input) {
+        return (input instanceof File) && ((File) input).isFile();
+    }
+
+    /**
      * Returns the most appropriate series in which to insert the coverage.
      * This is heuristic rules used when no series was explicitly defined.
      * <p>
@@ -176,7 +185,7 @@ public class WritableGridCoverageEntry {
         series = null;
         int mimeMatching = 0; // Greater the number, better is the matching of MIME type.
         int pathMatching = 0; // Greater the number, better is the matching of the file path.
-        final ImageReaderSpi spi = reader.getOriginatingProvider();
+        final ImageReaderSpi spi = tile.getImageReaderSpi();
         for (final Series candidate : candidates) {
             /*
              * Asks for every files in the Series directory (e.g. "/home/data/foo/*.png"). The
@@ -184,15 +193,13 @@ public class WritableGridCoverageEntry {
              * the path & extension, so we can check if the series have the expected extension.
              */
             final File allFiles = candidate.file("*");
-            if (extension != null) {
-                String name = allFiles.getName();
-                final int split = name.indexOf('.');
-                if (split >= 0) {
-                    name = name.substring(split + 1);
-                }
-                if (!extension.equalsIgnoreCase(name)) {
-                    continue;
-                }
+            String name = allFiles.getName();
+            final int split = name.lastIndexOf('.');
+            if (split >= 0) {
+                name = name.substring(split + 1);
+            }
+            if (!extension.equalsIgnoreCase(name)) {
+                continue;
             }
             /*
              * Checks if the Series's MIME type matches one of the ImageReader's MIME types. If the
@@ -204,16 +211,15 @@ public class WritableGridCoverageEntry {
             if (spi != null) {
                 final String[] mimeTypes = spi.getMIMETypes();
                 final String[] formatNames = spi.getFormatNames();
-                if (mimeTypes != null) {
-                    final String format = candidate.getFormat().getImageFormat().trim().toLowerCase();
-                    final String[] names = format.indexOf('/') >= 0 ? mimeTypes : formatNames;
-                    for (String type : names) {
-                        type = type.trim().toLowerCase();
-                        final int length = type.length();
-                        if (length > mimeMatching && format.startsWith(type)) {
-                            mimeMatching = length;
-                            pathMatching = 0; // Format matching has precedence over path matching.
-                        }
+                final String format = candidate.getFormat().getImageFormat().trim().toLowerCase();
+                final String[] names = (mimeTypes != null && format.indexOf('/') >= 0) ? mimeTypes : formatNames;
+                for (String type : names) {
+                    type = type.trim().toLowerCase();
+                    final int length = type.length();
+                    if (length > mimeMatching && format.startsWith(type)) {
+                        mimeMatching = length;
+                        pathMatching = 0; // Format matching has precedence over path matching.
+                        // Consequence of above, series will be assigned in the check for pathname below.
                     }
                 }
             }
@@ -228,10 +234,10 @@ public class WritableGridCoverageEntry {
             int depth = 0;
             File f1 = path;
             File f2 = allFiles.getParentFile();
-            while (f1.getName().equals(f2.getName())) {
+            while (f1 != null && f2 != null && f1.getName().equals(f2.getName())) {
                 depth++;
-                f1 = f1.getParentFile(); if (f1 == null) break;
-                f2 = f2.getParentFile(); if (f2 == null) break;
+                f1 = f1.getParentFile();
+                f2 = f2.getParentFile();
             }
             if (depth >= pathMatching) {
                 pathMatching = depth;
@@ -255,35 +261,33 @@ public class WritableGridCoverageEntry {
      */
     final String getFormatName(final boolean upper) throws IOException {
         String format = "";
-        final ImageReaderSpi provider = reader.getOriginatingProvider();
-        if (provider != null) {
-            String[] formats = provider.getFormatNames();
-            if (formats != null) {
-                for (final String candidate : formats) {
-                    if (candidate.indexOf('/') < 0) {
-                        final int d = candidate.length() - format.length();
-                        if (d < 0) continue;
-                        if (d == 0) {
-                            if (!upper) continue;
-                            int na=0, nb=0;
-                            for (int i=candidate.length(); --i>=0;) {
-                                if (Character.isUpperCase(candidate.charAt(i))) na++;
-                                if (Character.isUpperCase(format   .charAt(i))) na++;
-                            }
-                            if (na <= nb) continue;
+        final ImageReaderSpi spi = tile.getImageReaderSpi();
+        String[] formats = spi.getFormatNames();
+        if (formats != null) {
+            for (final String candidate : formats) {
+                if (candidate.indexOf('/') < 0) {
+                    final int d = candidate.length() - format.length();
+                    if (d < 0) continue;
+                    if (d == 0) {
+                        if (!upper) continue;
+                        int na=0, nb=0;
+                        for (int i=candidate.length(); --i>=0;) {
+                            if (Character.isUpperCase(candidate.charAt(i))) na++;
+                            if (Character.isUpperCase(format   .charAt(i))) na++;
                         }
-                        format = candidate;
+                        if (na <= nb) continue;
                     }
+                    format = candidate;
                 }
             }
-            if (format.length() == 0) {
-                // No format found - fall back on mime types.
-                formats = provider.getMIMETypes();
-                if (formats != null) {
-                    for (final String candidate : formats) {
-                        if (candidate.indexOf('/') >= 0 && candidate.length() > format.length()) {
-                            format = candidate;
-                        }
+        }
+        if (format.length() == 0) {
+            // No format found - fall back on mime types.
+            formats = spi.getMIMETypes();
+            if (formats != null) {
+                for (final String candidate : formats) {
+                    if (candidate.indexOf('/') >= 0 && candidate.length() > format.length()) {
+                        format = candidate;
                     }
                 }
             }
@@ -302,7 +306,9 @@ public class WritableGridCoverageEntry {
      * @throws IOException if an error occured while reading the metadata.
      */
     final void parseMetadata(final Database database, final Envelope envelope) throws IOException {
-        metadata = new MetadataParser(database, reader, tile.getImageIndex());
+        if (reader != null) {
+            metadata = new MetadataParser(database, reader, tile.getImageIndex());
+        }
         this.envelope = envelope;
     }
 
@@ -320,7 +326,7 @@ public class WritableGridCoverageEntry {
      * @return The date range for the given metadata, or {@code null} if none.
      */
     public DateRange[] getDateRanges() throws IOException, CatalogException {
-        return metadata.getDateRanges();
+        return (metadata != null) ? metadata.getDateRanges() : null;
     }
 
     /**
@@ -329,7 +335,7 @@ public class WritableGridCoverageEntry {
      * successfully.
      */
     protected Date getTimeOrigin() {
-        return metadata.timeOrigin;
+        return (metadata != null) ? metadata.timeOrigin : null;
     }
 
     /**
@@ -338,7 +344,7 @@ public class WritableGridCoverageEntry {
      * successfully.
      */
     protected Unit getTimeUnit() {
-        return metadata.timeUnit;
+        return (metadata != null) ? metadata.timeUnit : null;
     }
 
     /**
@@ -358,7 +364,7 @@ public class WritableGridCoverageEntry {
                 gridToCRS = new AffineTransform(gridToCRS);
                 gridToCRS.translate(origin.x, origin.y);
             }
-        } else if (gridToCRS == null) {
+        } else if (gridToCRS == null && metadata != null) {
             // No translation to apply here because the 'gridToCRS' transform
             // doesn't come from the tile.
             gridToCRS = metadata.getGridToCRS();
@@ -374,8 +380,8 @@ public class WritableGridCoverageEntry {
      * Returns the horizontal CRS identifier, or {@code 0} if unknown.
      */
     public int getHorizontalSRID() throws IOException, CatalogException {
-        int srid;
-        try {
+        int srid = 0;
+        if (metadata != null) try {
             srid = metadata.getHorizontalSRID();
         } catch (SQLException e) {
             throw new CatalogException(e);
@@ -400,13 +406,16 @@ public class WritableGridCoverageEntry {
      * Returns the vertical CRS identifier, or {@code 0} if unknown.
      */
     public int getVerticalSRID() throws IOException, CatalogException {
-        return metadata.getVerticalSRID();
+        return (metadata != null) ? metadata.getVerticalSRID() : 0;
     }
 
     /**
      * Returns the vertical coordinate values, or {@code null} if none.
      */
     public double[] getVerticalValues() throws IOException, CatalogException {
+        if (metadata == null) {
+            return null;
+        }
         double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
         if (verticalOrdinates == null) {
             /*

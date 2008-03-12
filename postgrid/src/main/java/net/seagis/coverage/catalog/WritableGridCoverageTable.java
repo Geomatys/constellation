@@ -73,6 +73,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * The series to be returned by {@link #getSeries}, or {@code null} if unknown.
      * In the later case, the series will be inferred from the layer.
+     * <p>
+     * This field takes a non-null vale only when insertions are under progress.
+     * It is reset to {@code null} once the work is finished.
      */
     private Series series;
 
@@ -97,6 +100,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      */
     public WritableGridCoverageTable(final WritableGridCoverageTable table) {
         super(table);
+        canInsertNewLayers = table.canInsertNewLayers;
     }
 
     /**
@@ -143,10 +147,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Adds entries (usually only one) inferred from the specified image reader.
-     * The {@linkplain ImageReader#getInput reader input} must be set, and its
-     * {@linkplain ImageReader#getImageMetadata metadata} shall conforms to the
-     * Geotools {@linkplain GeographicMetadata geographic metadata}.
+     * Add an entry inferred from the specified image reader. The {@linkplain ImageReader#getInput
+     * reader input} must be set, and its {@linkplain ImageReader#getImageMetadata metadata} shall
+     * conforms to the Geotools {@linkplain GeographicMetadata geographic metadata}.
      * <p>
      * This method will typically not read the full image, but only the metadata required.
      *
@@ -154,7 +157,19 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * @return The number of images inserted (should be 0 or 1).
      */
     public int addEntry(final ImageReader reader) throws CatalogException, SQLException, IOException {
-        return addEntries(Collections.singleton(reader).iterator(), 0);
+        return addEntries(Collections.singleton(reader), 0);
+    }
+
+    /**
+     * Add an entry inferred from the specified tile. Note that even if the argument type is a
+     * {@linkplain Tile}, the entry will be added in the {@code "GridCoverages"} table, not in
+     * the {@code "Tiles"} table. For the later case, use {@link #addTiles} instead.
+     *
+     * @param inputs The image reader.
+     * @return The number of images inserted (should be 0 or 1).
+     */
+    public int addEntry(final Tile tile) throws CatalogException, SQLException, IOException {
+        return addEntries(Collections.singleton(tile), tile.getImageIndex());
     }
 
     /**
@@ -280,7 +295,10 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             record.setSourceMethodName("addEntries");
             LOGGER.log(record);
             if (DEFAULT_EXTENT_CONTAINS_FILENAME) {
-                extent = extent + ' ' + entry.filename.replace('_','-').replace(' ','_').trim();
+                final String name = entry.filename.replace('_','-').replace(' ','_').trim();
+                if (!extent.equalsIgnoreCase(name)) {
+                    extent = extent + ' ' + name;
+                }
             }
             /*
              * Gets the metadata of interest. The metadata should contains at least the image

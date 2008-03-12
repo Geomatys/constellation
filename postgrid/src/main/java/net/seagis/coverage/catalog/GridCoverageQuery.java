@@ -55,7 +55,17 @@ final class GridCoverageQuery extends Query {
      *       columns, which again make the code simplier.
      */
     public GridCoverageQuery(final Database database) {
-        super(database, "GridCoverages");
+        this(database, false);
+    }
+
+    /**
+     * Creates a new query for the specified database.
+     *
+     * @param database The database for which this query is created.
+     * @param tiles {@code true} if this query is for the {@code "Tiles"} table.
+     */
+    GridCoverageQuery(final Database database, final boolean tiles) {
+        super(database, tiles ? "Tiles" : "GridCoverages", tiles);
         final Column layer, horizontalExtent, visibility;
         final QueryType[] ________ = {                                                                        };
         final QueryType[] SE____D_ = {SELECT, EXISTS,                                            DELETE       };

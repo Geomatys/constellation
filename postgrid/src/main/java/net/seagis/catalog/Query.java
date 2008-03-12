@@ -74,6 +74,12 @@ public class Query {
     protected final String table;
 
     /**
+     * {@code true} if {@code "SELECT"} statements should disable inheritance.
+     * This is expressed in SQL with {@code "FROM ONLY"} instead of {@code "FROM"}.
+     */
+    private final boolean disableInheritance;
+
+    /**
      * The columns in this query.
      */
     private Column[] columns = EMPTY_COLUMNS;
@@ -105,6 +111,21 @@ public class Query {
     public Query(final Database database, final String table) {
         this.database = database;
         this.table    = table;
+        disableInheritance = false;
+    }
+
+    /**
+     * Creates an initially empty query with no schema.
+     *
+     * @param database The database for which this query is created, or {@code null}.
+     * @param table    The main table name.
+     * @param includeChildTables {@code true} if the searchs should include the content
+     *        of child tables. The default value is {@code true}.
+     */
+    public Query(final Database database, final String table, final boolean includeChildTables) {
+        this.database = database;
+        this.table    = table;
+        disableInheritance = !includeChildTables;
     }
 
     /**
@@ -400,7 +421,7 @@ scan:       while (!tables.isEmpty()) {
                     final CrossReference ref = entry.getValue();
                     if (ref == null || ordered.containsKey(ref.foreignerKey.table)) {
                         // This table is unreferenced, or is referenced by a table already listed
-                        // in the "FROM" or "JOIN" clause. Copy it to the ordered table list.
+                        // in the "FROM" or "JOIN" clause. Copies it to the ordered table list.
                         ordered.put(table, ref);
                         it.remove();
                         continue scan;
@@ -416,7 +437,7 @@ scan:       while (!tables.isEmpty()) {
         /*
          * Writes the "FROM" and "JOIN" clauses.
          */
-        separator = " FROM ";
+        separator = disableInheritance ? " FROM ONLY " : " FROM ";
         for (final Map.Entry<String,CrossReference> entry : tables.entrySet()) {
             final String table = entry.getKey();
             buffer.append(separator).append(quote).append(table).append(quote);
@@ -631,6 +652,9 @@ scan:       while (!tables.isEmpty()) {
                 final DatabaseMetaData metadata = database.getConnection().getMetaData();
                 final String quote = metadata.getIdentifierQuoteString().trim();
                 final StringBuilder buffer = new StringBuilder("DELETE FROM ");
+                if (disableInheritance) {
+                    buffer.append("ONLY ");
+                }
                 appendTable(buffer, quote);
                 appendParameters(buffer, type, metadata);
                 sql = buffer.toString();

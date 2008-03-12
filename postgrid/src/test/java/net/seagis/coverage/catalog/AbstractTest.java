@@ -26,8 +26,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.awt.geom.Point2D;
-import java.io.IOException;
-import java.sql.SQLException;
 
 import junit.framework.TestCase;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
