@@ -124,16 +124,6 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * For internal usage by {@linl GridCoverageMosaic} only.
-     */
-    GridGeometryEntry(final String name, final ImageGeometry geometry, final GeneralEnvelope envelope,
-                      final GeographicBoundingBox bbox, final GridGeometryEntry reference)
-    {
-        this(name, geometry.getGridToCRS(), geometry.getGridRange(), envelope, bbox, reference.verticalOrdinates);
-        assert canMosaic(reference) : reference;
-    }
-
-    /**
      * Returns {@code true} if the geographic bounding box described by this entry is empty.
      */
     public boolean isEmpty() {
@@ -238,22 +228,13 @@ final class GridGeometryEntry extends Entry {
         return index;
     }
 
-    /**
-     * Returns {@code true} if this grid geometry is compatible with the specified ony for a
-     * mosaic or pyramid. We do not checks the envelope since it will be TileCollection's job.
+     /**
+     * Returns {@code true} if the specified entry has the same envelope than this entry,
+     * regardless the grid size.
      */
-    final boolean canMosaic(final GridGeometryEntry that) {
-        return Arrays.equals(this.verticalOrdinates, that.verticalOrdinates) &&
-            CRS.equalsIgnoreMetadata(this.envelope.getCoordinateReferenceSystem(),
-                                     that.envelope.getCoordinateReferenceSystem());
-    }
-
-    /**
-     * Adds the envelope and geographic bounding box from this entry to the specified object.
-     */
-    final void addTo(final GeneralEnvelope envelope, final GeographicBoundingBoxImpl bbox) {
-        envelope.add(this.envelope);
-        bbox.add(new GeographicBoundingBoxImpl(geographicEnvelope));
+    final boolean sameEnvelope(final GridGeometryEntry that) {
+        return Utilities.equals(this.envelope,          that.envelope) &&
+               Utilities.equals(this.verticalOrdinates, that.verticalOrdinates);
     }
 
     /**

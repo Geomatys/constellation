@@ -84,7 +84,7 @@ import ucar.nc2.dataset.AxisType;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-class GridCoverageEntry extends Entry implements CoverageReference {
+final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * For cross-version compatibility.
      */
@@ -109,9 +109,9 @@ class GridCoverageEntry extends Entry implements CoverageReference {
 
     /**
      * The grid geometry. Include the image size (in pixels), the geographic envelope
-     * and the vertical ordinate values. This field is read by {@link GridCoverageMosaic}.
+     * and the vertical ordinate values.
      */
-    final GridGeometryEntry geometry;
+    private final GridGeometryEntry geometry;
 
     /**
      * The series in which this coverage is declared.
@@ -189,22 +189,6 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     }
 
     /**
-     * Creates an entry with most values from the specified one except name and geometry.
-     * This is for {@link GridCoverageMosaic} constructor only.
-     */
-    GridCoverageEntry(final String name, final GridCoverageEntry entry, final GridGeometryEntry geometry) {
-        super(name, null);
-        this.series     = entry.series;
-        this.filename   = entry.filename;
-        this.geometry   = geometry;
-        this.index      = 0; // Required to be 0 for proper GridCoverageMosaic working.
-        this.band       = entry.band;
-        this.parameters = entry.parameters;
-        this.startTime  = entry.startTime;
-        this.endTime    = entry.endTime;
-    }
-
-    /**
      * Workaround for RFE #4093999
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
@@ -234,14 +218,14 @@ class GridCoverageEntry extends Entry implements CoverageReference {
      * la condition {@code u.unique()==v.unique()} sera vrai si et seulement
      * si {@code u.equals(v)} est vrai.
      */
-    public final GridCoverageEntry unique() {
+    public GridCoverageEntry unique() {
         return GridCoveragePool.DEFAULT.unique(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public final Series getSeries() {
+    public Series getSeries() {
         return series;
     }
 
@@ -267,10 +251,8 @@ class GridCoverageEntry extends Entry implements CoverageReference {
 
     /**
      * Returns the source as a {@link File} or an {@link URI}, in this preference order.
-     * {@link GridCoverageMosaic} subclass will override this method in order to returns
-     * a collection of tiles.
      */
-    protected Object getInput() throws IOException {
+    private Object getInput() throws IOException {
         final File file = series.file(filename);
         if (file.isAbsolute()) {
             return file;
@@ -283,25 +265,16 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     }
 
     /**
-     * Returns the image index to be given to the image reader. For {@link GridCoverageMosaic}
-     * internal usage only. This number may be wrong if {@link #handleSpecialCases} returns
-     * {@code true} (we need to find a better way to handle special cases).
-     */
-    final int getImageIndex() {
-        return (index != 0) ? index-1 : 0;
-    }
-
-    /**
      * {@inheritDoc}
      */
-    public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return parameters.coverageCRS;
     }
 
     /**
      * {@inheritDoc}
      */
-    public final Envelope getEnvelope() {
+    public Envelope getEnvelope() {
         final Rectangle clipPixels = new Rectangle();
         try {
             return computeBounds(clipPixels, null);
@@ -321,7 +294,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
      *
      * @todo Revisit now that we are 4D.
      */
-    public final NumberRange getZRange() {
+    public NumberRange getZRange() {
         final DefaultTemporalCRS temporalCRS = parameters.getTemporalCRS();
         return new NumberRange(temporalCRS.toValue(new Date(startTime)),
                                temporalCRS.toValue(new Date(  endTime)));
@@ -330,7 +303,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
-    public final DateRange getTimeRange() {
+    public DateRange getTimeRange() {
         return new DateRange((startTime!=Long.MIN_VALUE) ? new Date(startTime) : null, true,
                                (endTime!=Long.MAX_VALUE) ? new Date(  endTime) : null, false);
     }
@@ -340,7 +313,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
      *
      * @todo L'implémentation actuelle suppose que le CRS de la table est toujours WGS84.
      */
-    public final GeographicBoundingBox getGeographicBoundingBox() {
+    public GeographicBoundingBox getGeographicBoundingBox() {
         try {
             assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, CRSUtilities.getCRS2D(parameters.tableCRS));
         } catch (TransformException e) {
@@ -358,7 +331,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
      * @todo Should compute the geometry by {@link GridGeometryEntry} instead.
      */
     @SuppressWarnings("fallthrough")
-    public final GridGeometry2D getGridGeometry() {
+    public GridGeometry2D getGridGeometry() {
         final Rectangle clipPixels = new Rectangle();
         final Point subsampling = new Point();
         final Envelope envelope;
@@ -388,7 +361,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
-    public final SampleDimension[] getSampleDimensions() {
+    public SampleDimension[] getSampleDimensions() {
         final GridSampleDimension[] bands = series.getFormat().getSampleDimensions();
         for (int i=0; i<bands.length; i++) {
             bands[i] = bands[i].geophysics(true);
@@ -557,7 +530,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
      * Retourne l'image correspondant à cette entrée. Cette méthode délègue son travail à
      * <code>{@linkplain #getCoverage(IIOListeners) getCoverage}(null)</code>.
      */
-    public final GridCoverage2D getCoverage() throws IOException {
+    public GridCoverage2D getCoverage() throws IOException {
         return getCoverage(null);
     }
 
@@ -575,7 +548,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
      *
      * @todo Current implementation requires a {@link FormatEntry} implementation.
      */
-    public final GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
+    public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
         /*
          * NOTE SUR LES SYNCHRONISATIONS: Cette méthode est synchronisée à plusieurs niveau:
          *
@@ -654,7 +627,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
                 if (handleSpecialCases(param) || format.getImageFormat().equalsIgnoreCase("RAW")) {
                     imageIndex = 0; // The index has been processed by 'handleSpecialCases'.
                 } else {
-                    imageIndex = getImageIndex();
+                    imageIndex = (index != 0) ? index-1 : 0;
                 }
                 if (image == null) {
                     final Dimension size = geometry.getSize();
@@ -727,11 +700,64 @@ class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
-    public final void abort() {
+    public void abort() {
         final Format format = series.getFormat();
         if (format instanceof FormatEntry) {
             ((FormatEntry) format).abort(this);
         }
+    }
+
+    /**
+     * Indique si cette image a au moins la résolution spécifiée.
+     *
+     * @param  resolution Résolution désirée, exprimée selon le CRS de la table d'images.
+     * @return {@code true} si la résolution de cette image est égale ou supérieure à la résolution
+     *         demandée. Cette méthode retourne {@code false} si {@code resolution} était nul.
+      */
+    final boolean hasEnoughResolution(final Dimension2D resolution) {
+        final GridRange gridRange = geometry.getGridRange();
+        final int width  = gridRange.getLength(0);
+        final int height = gridRange.getLength(1);
+        final XRectangle2D boundingBox = geometry.geographicEnvelope;
+        return (resolution != null) &&
+               (1+EPS)*resolution.getWidth()  >= boundingBox.getWidth() /width &&
+               (1+EPS)*resolution.getHeight() >= boundingBox.getHeight()/height;
+    }
+
+    /**
+     * Si les deux images couvrent les mêmes coordonnées spatio-temporelles, retourne celle qui a
+     * la plus basse résolution. Si les deux images ne couvrent pas les mêmes coordonnées ou si
+     * leurs résolutions sont incompatibles, alors cette méthode retourne {@code null}.
+     */
+    final GridCoverageEntry getLowestResolution(final GridCoverageEntry that) {
+        final GridRange gridRange  = this.geometry.getGridRange();
+        final GridRange gridRange2 = that.geometry.getGridRange();
+        final int width   = gridRange .getLength(0);
+        final int height  = gridRange .getLength(1);
+        final int width2  = gridRange2.getLength(0);
+        final int height2 = gridRange2.getLength(1);
+        if (this.startTime == that.startTime &&
+            this.endTime   == that.endTime   &&
+            this.band      == that.band      &&
+            geometry.sameEnvelope(that.geometry) &&
+            Utilities.equals(this.series.getLayer(), that.series.getLayer()) &&
+            CRS.equalsIgnoreMetadata(parameters.tableCRS, that.parameters.tableCRS))
+        {
+            if (width <= width2 && height <= height2) return this;
+            if (width >= width2 && height >= height2) return that;
+        }
+        return null;
+    }
+
+    /**
+     * Compares two entries on the same criterion than the one used in the SQL {@code "ORDER BY"}
+     * statement of {@link GridCoverageTable}). Entries without date are treated as unordered.
+     */
+    final boolean equalsAsSQL(final GridCoverageEntry other) {
+        if (startTime == Long.MIN_VALUE && endTime == Long.MAX_VALUE) {
+            return false;
+        }
+        return endTime == other.endTime;
     }
 
     /**
@@ -766,7 +792,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
      * Returns a string representation of this entry.
      */
     @Override
-    public final String toString() {
+    public String toString() {
         final StringBuilder buffer = new StringBuilder(40);
         buffer.append(Classes.getShortClassName(this)).append('[').append(getName());
         if (startTime!=Long.MIN_VALUE && endTime!=Long.MAX_VALUE) {
