@@ -49,6 +49,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.netcdf.NetcdfReadParam;
 import org.geotools.image.io.mosaic.MosaicImageReadParam;
+import org.geotools.image.io.mosaic.TileManager;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.ViewType;
@@ -108,6 +109,13 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /** The band to read, or 0.      */ private final short  band;
 
     /**
+     * If the image is tiled, the tiles. Otherwise {@code null}. This field is set only after
+     * construction in order to avoid loading thousands of lines from the database when a suitable
+     * entry was already in the cache.
+     */
+    private TileManager tiles;
+
+    /**
      * The grid geometry. Include the image size (in pixels), the geographic envelope
      * and the vertical ordinate values.
      */
@@ -123,7 +131,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * référence directe vers {@link GridCoverageTable} afin de ne pas empêcher le ramasse-miettes
      * de détruire la table et ses connections vers la base de données.
      */
-    private final GridCoverageSettings parameters;
+    private final GridCoverageSettings settings;
 
     /**
      * Référence molle vers l'image {@link GridCoverage2D} qui a été retournée lors du dernier appel
@@ -174,17 +182,17 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         super(createName(series.getName(), filename, index, band), remarks);
         // TODO: need to include the temporal CRS here.
         CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem();
-        this.series     = series;
-        this.filename   = filename;
-        this.geometry   = geometry;
-        this.index      = index;
-        this.band       = band;
-        this.parameters = table.getParameters(crs);
-        this.startTime  = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
-        this.  endTime  = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
+        this.series    = series;
+        this.filename  = filename;
+        this.geometry  = geometry;
+        this.index     = index;
+        this.band      = band;
+        this.settings  = table.getSettings(crs);
+        this.startTime = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
+        this.  endTime = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
         if (geometry.isEmpty() || this.startTime > this.endTime) {
             // TODO: localize
-            throw new IllegalRecordException("L'enveloppe spatio-temporelle est vide.");
+            throw new IllegalRecordException("The spatio-temporal envelope is empty.");
         }
     }
 
@@ -218,8 +226,18 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * la condition {@code u.unique()==v.unique()} sera vrai si et seulement
      * si {@code u.equals(v)} est vrai.
      */
-    public GridCoverageEntry unique() {
+    final GridCoverageEntry unique() {
         return GridCoveragePool.DEFAULT.unique(this);
+    }
+
+    /**
+     * Sets the tiles. Invoked after construction only if no suitable entry was in the cache.
+     */
+    final void setTiles(final TileManager tiles) {
+        if (this.tiles != null) {
+            throw new IllegalStateException();
+        }
+        this.tiles = tiles;
     }
 
     /**
@@ -268,7 +286,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * {@inheritDoc}
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-        return parameters.coverageCRS;
+        return settings.coverageCRS;
     }
 
     /**
@@ -295,7 +313,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * @todo Revisit now that we are 4D.
      */
     public NumberRange getZRange() {
-        final DefaultTemporalCRS temporalCRS = parameters.getTemporalCRS();
+        final DefaultTemporalCRS temporalCRS = settings.getTemporalCRS();
         return new NumberRange(temporalCRS.toValue(new Date(startTime)),
                                temporalCRS.toValue(new Date(  endTime)));
     }
@@ -315,7 +333,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      */
     public GeographicBoundingBox getGeographicBoundingBox() {
         try {
-            assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, CRSUtilities.getCRS2D(parameters.tableCRS));
+            assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, CRSUtilities.getCRS2D(settings.tableCRS));
         } catch (TransformException e) {
             throw new AssertionError(e);
         }
@@ -419,8 +437,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * problématique avec les projections qui n'ont pas un domaine de validité suffisament
          * grand (par exemple jusqu'aux pôles).
          */
-        final Rectangle2D clipArea   = parameters.geographicArea;
-        final Dimension2D resolution = parameters.resolution;
+        final Rectangle2D clipArea   = settings.geographicArea;
+        final Dimension2D resolution = settings.resolution;
         final int xSubsampling;
         final int ySubsampling;
         if (resolution != null) {
@@ -439,7 +457,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         }
         Rectangle2D clipLogical;
         if (clipArea == null) {
-            clipLogical = parameters.tableToCoverageCRS(boundingBox, null);
+            clipLogical = settings.tableToCoverageCRS(boundingBox, null);
             // Ne PAS modifier ce clipLogical; 'boundingBox' n'a peut-être pas été cloné!
         } else {
             /*
@@ -458,9 +476,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             {
                 return null;
             }
-            final Rectangle2D fullArea = parameters.tableToCoverageCRS(boundingBox, null);
+            final Rectangle2D fullArea = settings.tableToCoverageCRS(boundingBox, null);
             Rectangle2D.intersect(boundingBox, clipArea, clipLogical=new Rectangle2D.Double());
-            clipLogical = parameters.tableToCoverageCRS(clipLogical, clipLogical);
+            clipLogical = settings.tableToCoverageCRS(clipLogical, clipLogical);
             /*
              * Conversion [coordonnées logiques] --> [coordonnées pixels].
              */
@@ -507,8 +525,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                                                      clipPixel.getWidth()  / scaleX,
                                                      clipPixel.getHeight() / scaleY);
         }
-        CoordinateReferenceSystem coverageCRS = parameters.coverageCRS;
-        final DefaultTemporalCRS  temporalCRS = parameters.getTemporalCRS();
+        CoordinateReferenceSystem coverageCRS = settings.coverageCRS;
+        final DefaultTemporalCRS  temporalCRS = settings.getTemporalCRS();
         final double tmin = temporalCRS.toValue(new Date(startTime));
         final double tmax = temporalCRS.toValue(new Date(  endTime));
         if (Double.isInfinite(tmin) && Double.isInfinite(tmax)) {
@@ -662,7 +680,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * Si l'utilisateur a spécifié une operation à appliquer
          * sur les images, applique cette opération maintenant.
          */
-        Operation operation = parameters.operation;
+        Operation operation = settings.operation;
         if (operation == null) {
             operation = Operation.DEFAULT;
         }
@@ -741,7 +759,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             this.band      == that.band      &&
             geometry.sameEnvelope(that.geometry) &&
             Utilities.equals(this.series.getLayer(), that.series.getLayer()) &&
-            CRS.equalsIgnoreMetadata(parameters.tableCRS, that.parameters.tableCRS))
+            CRS.equalsIgnoreMetadata(settings.tableCRS, that.settings.tableCRS))
         {
             if (width <= width2 && height <= height2) return this;
             if (width >= width2 && height >= height2) return that;
@@ -780,10 +798,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                    this.index     == that.index     &&
                    this.startTime == that.startTime &&
                    this.endTime   == that.endTime   &&
-                   Utilities.equals(this.series,     that.series    ) &&
-                   Utilities.equals(this.filename,   that.filename  ) &&
-                   Utilities.equals(this.geometry,   that.geometry  ) &&
-                   Utilities.equals(this.parameters, that.parameters);
+                   Utilities.equals(this.series,   that.series    ) &&
+                   Utilities.equals(this.filename, that.filename  ) &&
+                   Utilities.equals(this.geometry, that.geometry  ) &&
+                   Utilities.equals(this.settings, that.settings);
         }
         return false;
     }
@@ -796,7 +814,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         final StringBuilder buffer = new StringBuilder(40);
         buffer.append(Classes.getShortClassName(this)).append('[').append(getName());
         if (startTime!=Long.MIN_VALUE && endTime!=Long.MAX_VALUE) {
-            buffer.append(" (").append(parameters.format(new Date((startTime+endTime)/2))).append(')');
+            buffer.append(" (").append(settings.format(new Date((startTime+endTime)/2))).append(')');
         }
         buffer.append(' ')
               .append(GeographicBoundingBoxImpl.toString(getGeographicBoundingBox(),

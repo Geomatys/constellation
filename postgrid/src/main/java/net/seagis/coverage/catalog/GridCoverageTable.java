@@ -38,6 +38,7 @@ import org.geotools.util.RangeSet;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.image.io.mosaic.TileManager;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.model.Operation;
@@ -104,9 +105,9 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private transient GridGeometryTable gridGeometryTable;
 
     /**
-     * Shared instance of a table of formats. Will be created only when first needed.
+     * Shared instance of a table of tiles. Will be created only when first needed.
      */
-    private transient FormatTable formatTable;
+    private transient TileTable tileTable;
 
     /**
      * Comparator for selecting the "best" image when more than one is available in
@@ -173,7 +174,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
         operation         = table.operation;
         dateFormat        = table.dateFormat;
         gridGeometryTable = table.gridGeometryTable;
-        formatTable       = table.formatTable;
+        tileTable         = table.tileTable;
         comparator        = table.comparator;
         parameters        = table.parameters;
         asCoverage        = table.asCoverage;
@@ -653,7 +654,8 @@ loop:   for (final CoverageReference newReference : entries) {
          * from the layer HashMap. If not, we will query the SeriesTable as a fallback, but there
          * is probably a bug (so it is not worth to keep a reference to the series table).
          */
-        Series series = getNonNullLayer().getSeries(seriesID);
+        final Layer layer = getNonNullLayer();
+        Series series = layer.getSeries(seriesID);
         if (series == null) {
             LOGGER.warning(Resources.format(ResourceKeys.ERROR_WRONG_LAYER_$1, getLayerName()));
             series = getDatabase().getTable(SeriesTable.class).getEntry(seriesID);
@@ -667,8 +669,25 @@ loop:   for (final CoverageReference newReference : entries) {
         final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
         final NumberRange  verticalRange = getVerticalRange();
         final short band = geometry.indexOf(0.5*(verticalRange.getMinimum() + verticalRange.getMaximum()));
-        return new GridCoverageEntry(this, series, filename, index, startTime, endTime,
-                                     geometry, band, null).unique();
+        final GridCoverageEntry entry = new GridCoverageEntry(this,
+                series, filename, index, startTime, endTime, geometry, band, null);
+        final GridCoverageEntry cached = entry.unique();
+        if (cached != entry) {
+            if (tileTable != null) {
+                tileTable = getDatabase().getTable(TileTable.class);
+                final TileManager[] managers;
+                try {
+                    managers = tileTable.getTiles(layer.getName(), startTime, endTime, 0);
+                } catch (IOException e) {
+                    throw new CatalogException(e);
+                }
+                if (managers != null && managers.length != 0) {
+                    cached.setTiles(managers[0]);
+                    // TODO: what to do with other tiles, if there is any?
+                }
+            }
+        }
+        return cached;
     }
 
     /**
@@ -686,7 +705,7 @@ loop:   for (final CoverageReference newReference : entries) {
      *
      * @todo L'implémentation actuelle n'accepte pas d'autres implémentations de Format que FormatEntry.
      */
-    final synchronized GridCoverageSettings getParameters(final CoordinateReferenceSystem coverageCRS)
+    final synchronized GridCoverageSettings getSettings(final CoordinateReferenceSystem coverageCRS)
             throws CatalogException, SQLException
     {
         /*
@@ -704,9 +723,6 @@ loop:   for (final CoverageReference newReference : entries) {
         final Rectangle2D geographicArea = XRectangle2D.createFromExtremums(
                             envelope.getMinimum(xDimension), envelope.getMinimum(yDimension),
                             envelope.getMaximum(xDimension), envelope.getMaximum(yDimension));
-        if (formatTable == null) {
-            formatTable = getDatabase().getTable(FormatTable.class);
-        }
         final Dimension2D resolution = getPreferredResolution();
         parameters = new GridCoverageSettings(operation, getCoordinateReferenceSystem(),
                             coverageCRS, geographicArea, resolution, dateFormat);
