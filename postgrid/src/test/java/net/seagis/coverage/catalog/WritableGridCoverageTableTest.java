@@ -25,7 +25,7 @@ import javax.imageio.ImageReader;
 import org.junit.Test;
 
 import net.seagis.catalog.Element;
-import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.TableTest;
 import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.CatalogException;
 
@@ -37,7 +37,7 @@ import net.seagis.catalog.CatalogException;
  * @author Cédric Briançon
  * @author Martin Desruisseaux
  */
-public class WritableGridCoverageTableTest extends DatabaseTest {
+public class WritableGridCoverageTableTest extends TableTest {
     /**
      * The file to test for inclusion, relative to the data root directory.
      */

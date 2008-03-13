@@ -20,6 +20,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.imageio.spi.ImageReaderSpi;
+import org.geotools.resources.image.ImageUtilities;
 
 import org.junit.*;
 import junit.framework.TestCase;
@@ -35,6 +37,10 @@ import junit.framework.TestCase;
  * @author Martin Desruisseaux
  */
 public class DatabaseTest extends TestCase {
+    static {
+        ImageUtilities.allowNativeCodec("png", ImageReaderSpi.class, false);
+    }
+
     /**
      * The connection to the database.
      */

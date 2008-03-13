@@ -26,11 +26,10 @@ import java.awt.image.BufferedImage;
 import java.sql.SQLException;
 
 import org.geotools.util.NumberRange;
-import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.TableTest;
 import net.seagis.catalog.CatalogException;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**
@@ -39,7 +38,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class LayerTableTest extends DatabaseTest {
+public class LayerTableTest extends TableTest {
     /**
      * The name of the layer to be tested.
      */

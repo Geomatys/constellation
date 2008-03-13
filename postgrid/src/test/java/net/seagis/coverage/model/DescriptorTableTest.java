@@ -16,11 +16,10 @@ package net.seagis.coverage.model;
 
 import java.sql.SQLException;
 import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.TableTest;
 import net.seagis.coverage.catalog.LayerTableTest;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**
@@ -29,7 +28,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class DescriptorTableTest extends DatabaseTest {
+public class DescriptorTableTest extends TableTest {
     /**
      * The name of the descriptor to be tested.
      */

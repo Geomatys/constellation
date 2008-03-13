@@ -17,19 +17,18 @@ package net.seagis.coverage.model;
 import java.util.Set;
 import java.sql.SQLException;
 import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.TableTest;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**
- * Tests {@link CategoryTable}.
+ * Tests {@link RegionOfInterestTable}.
  *
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class RegionOfInterestTableTest extends DatabaseTest {
+public class RegionOfInterestTableTest extends TableTest {
     /**
      * The name of a ROI to be tested.
      */

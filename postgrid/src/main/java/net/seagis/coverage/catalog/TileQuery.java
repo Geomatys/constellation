@@ -33,7 +33,7 @@ final class TileQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column series, filename, index, startTime, endTime, spatialExtent;
+    protected final Column series, filename, index, spatialExtent;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -47,24 +47,23 @@ final class TileQuery extends Query {
      */
     public TileQuery(final Database database) {
         super(database, "Tiles");
-        final Column layer, horizontalSRID, visibility;
-        final QueryType[] __ = {            };
-        final QueryType[] L_ = {LIST        };
-        final QueryType[] LI = {LIST, INSERT};
-        layer          = addForeignerColumn("Series",         "layer",          __);
-        series         = addColumn         (                  "series",         LI);
-        filename       = addColumn         (                  "filename",       LI);
-        index          = addColumn         (                  "index", 1,       LI);
-        startTime      = addColumn         (                  "startTime",      LI);
-        endTime        = addColumn         (                  "endTime",        LI);
-        spatialExtent  = addColumn         (                  "extent",         LI);
-        horizontalSRID = addForeignerColumn("GridGeometries", "horizontalSRID", __);
-        visibility     = addForeignerColumn("Series",         "visible", true,  __);
+        final Column layer, startTime, endTime, horizontalSRID, visibility;
+        final QueryType[] none = {    };
+        final QueryType[] list = {LIST};
+        layer          = addForeignerColumn("Series",         "layer",          none);
+        series         = addColumn         (                  "series",         none);
+        filename       = addColumn         (                  "filename",       list);
+        index          = addColumn         (                  "index", 1,       list);
+        startTime      = addColumn         (                  "startTime",      none);
+        endTime        = addColumn         (                  "endTime",        none);
+        spatialExtent  = addColumn         (                  "extent",         list);
+        horizontalSRID = addForeignerColumn("GridGeometries", "horizontalSRID", none);
+        visibility     = addForeignerColumn("Series",         "visible", true,  none);
 
-        byLayer            = addParameter(layer,          L_);
-        byStartTime        = addParameter(startTime,      L_);
-        byEndTime          = addParameter(endTime,        L_);
-        byHorizontalSRID   = addParameter(horizontalSRID, L_);
-        byVisibility       = addParameter(visibility,     L_);
+        byLayer            = addParameter(layer,          list);
+        byStartTime        = addParameter(startTime,      list);
+        byEndTime          = addParameter(endTime,        list);
+        byHorizontalSRID   = addParameter(horizontalSRID, list);
+        byVisibility       = addParameter(visibility,     list);
     }
 }

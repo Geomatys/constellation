@@ -15,12 +15,12 @@
 package net.seagis.coverage.catalog;
 
 import java.sql.SQLException;
-import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.DatabaseTest;
 import org.geotools.coverage.GridSampleDimension;
 
+import net.seagis.catalog.CatalogException;
+import net.seagis.catalog.TableTest;
+
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**
@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SampleDimensionTableTest extends DatabaseTest {
+public class SampleDimensionTableTest extends TableTest {
     /**
      * The name of the band to be tested.
      */

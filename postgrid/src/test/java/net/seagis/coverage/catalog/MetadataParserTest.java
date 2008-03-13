@@ -18,10 +18,8 @@ import java.io.File;
 import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import junit.framework.TestCase;
 import org.junit.Test;
 
-import org.geotools.util.MeasurementRange;
 import org.geotools.util.DateRange;
 
 import net.seagis.catalog.Element;

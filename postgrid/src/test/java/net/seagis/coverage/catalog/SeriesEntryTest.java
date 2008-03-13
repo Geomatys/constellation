@@ -19,7 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.*;
 import junit.framework.TestCase;
-import static org.junit.Assert.*;
 
 
 /**

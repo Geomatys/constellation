@@ -28,10 +28,9 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.geometry.GeneralEnvelope;
 
 import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.TableTest;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 import static org.geotools.referencing.CRS.getHorizontalCRS;
 
 
@@ -41,7 +40,7 @@ import static org.geotools.referencing.CRS.getHorizontalCRS;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridCoverageTableTest extends DatabaseTest {
+public class GridCoverageTableTest extends TableTest {
     /**
      * The name of the coverage to be tested.
      */
@@ -144,7 +143,7 @@ public class GridCoverageTableTest extends DatabaseTest {
         assertEquals(+200, envelope.getMaximum(0), 0.0);
         assertEquals( -90, envelope.getMinimum(1), 0.0);
         assertEquals( +90, envelope.getMaximum(1), 0.0);
-        
+
         table.trimEnvelope();
         envelope = table.getEnvelope();
         assertEquals(-180, envelope.getMinimum(0), 0.0);

@@ -386,7 +386,8 @@ public class Table {
         if (index > 0) {
             return index;
         } else {
-            throw new SQLException("Le paramètre " + parameter + " ne s'applique pas au type " + queryType);
+            // TODO: localize
+            throw new SQLException("Parameter " + parameter + " is not applicable to query of type " + queryType);
         }
     }
 

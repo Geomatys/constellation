@@ -20,7 +20,6 @@ import java.util.ListIterator;
 import static net.seagis.catalog.QueryType.*;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**

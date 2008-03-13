@@ -22,11 +22,10 @@ import org.opengis.geometry.Envelope;
 import org.opengis.coverage.grid.GridRange;
 
 import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.TableTest;
 import net.seagis.catalog.CRS;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**
@@ -35,7 +34,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GridGeometryTableTest extends DatabaseTest {
+public class GridGeometryTableTest extends TableTest {
     /**
      * The name of the geometry to be tested.
      */

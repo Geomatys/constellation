@@ -51,6 +51,7 @@ import org.geotools.image.io.netcdf.NetcdfReadParam;
 import org.geotools.image.io.mosaic.MosaicImageReadParam;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -683,7 +684,7 @@ class GridCoverageEntry extends Entry implements CoverageReference {
         /*
          * Retourne toujours la version "géophysique" de l'image.
          */
-        coverage = coverage.geophysics(true);
+        coverage = coverage.view(ViewType.GEOPHYSICS);
         /*
          * Si l'utilisateur a spécifié une operation à appliquer
          * sur les images, applique cette opération maintenant.

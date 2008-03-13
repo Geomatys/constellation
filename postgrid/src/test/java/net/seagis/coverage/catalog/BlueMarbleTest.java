@@ -12,26 +12,20 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.mosaic;
+package net.seagis.coverage.catalog;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.RenderedImage;
 import javax.imageio.ImageIO;
-import java.util.logging.Level;
 import java.util.Set;
 import java.io.File;
 import org.junit.*;
-import static org.junit.Assert.*;
 
-import org.geotools.util.logging.Logging;
 import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-import net.seagis.coverage.catalog.Layer;
-import net.seagis.coverage.catalog.LayerTable;
-import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.catalog.DatabaseTest;
 
 
@@ -48,16 +42,7 @@ public class BlueMarbleTest extends DatabaseTest {
     private static final String LAYER = "BlueMarble";
 
     /**
-     * Increases the logging level for debugging purpose.
-     */
-    @Override @BeforeClass
-    protected void setUp() throws Exception {
-        super.setUp();
-        Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.INFO);
-    }
-
-    /**
-     * Tests a query on the full extent (no subarea, no subsamlping).
+     * Tests a query on the full extent (no subarea, no subsampling).
      * We will not try to load this image, since it would be too big.
      */
     @Test

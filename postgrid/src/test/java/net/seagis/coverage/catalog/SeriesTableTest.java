@@ -14,13 +14,12 @@
  */
 package net.seagis.coverage.catalog;
 
+import net.seagis.catalog.TableTest;
 import java.util.Set;
 import java.sql.SQLException;
 import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.DatabaseTest;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**
@@ -29,7 +28,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class SeriesTableTest extends DatabaseTest {
+public class SeriesTableTest extends TableTest {
     /**
      * The name of the series to be tested.
      */

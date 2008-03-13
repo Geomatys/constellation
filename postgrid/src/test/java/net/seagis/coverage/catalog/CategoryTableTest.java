@@ -17,10 +17,9 @@ package net.seagis.coverage.catalog;
 import java.sql.SQLException;
 import org.geotools.coverage.Category;
 import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.TableTest;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**
@@ -29,7 +28,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CategoryTableTest extends DatabaseTest {
+public class CategoryTableTest extends TableTest {
     /**
      * The name of the quantitative category to be tested.
      */

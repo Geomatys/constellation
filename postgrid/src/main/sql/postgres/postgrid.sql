@@ -476,7 +476,7 @@ COMMENT ON COLUMN "GridCoverages"."endTime" IS
 COMMENT ON COLUMN "GridCoverages"."extent" IS
     'Grid Geomerty ID that defines the spatial footprint of this coverage.';
 COMMENT ON CONSTRAINT "GridCoverages_series_key" ON "GridCoverages" IS
-    'The envelope of the image must be unique in each series.';
+    'The time range of the image must be unique in each series.';
 COMMENT ON CONSTRAINT "GridCoverages_series_fkey" ON "GridCoverages" IS
     'Each image belongs to a series.';
 COMMENT ON CONSTRAINT "GridCoverages_extent_fkey" ON "GridCoverages" IS

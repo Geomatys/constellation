@@ -166,7 +166,7 @@ public class TileBuilder {
             table.setCanInsertNewLayers(true);
             table.setLayer(series);
             table.addEntry(global);
-            table.addEntries(tiles, 0);
+            table.addTiles(tiles);
             database.close();
         } catch (IOException e) {
             arguments.err.println(e);

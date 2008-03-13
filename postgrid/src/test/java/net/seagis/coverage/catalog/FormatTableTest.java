@@ -17,10 +17,9 @@ package net.seagis.coverage.catalog;
 import java.util.Set;
 import java.sql.SQLException;
 import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.TableTest;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**
@@ -29,7 +28,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class FormatTableTest extends DatabaseTest {
+public class FormatTableTest extends TableTest {
     /**
      * The name of the format to be tested.
      */

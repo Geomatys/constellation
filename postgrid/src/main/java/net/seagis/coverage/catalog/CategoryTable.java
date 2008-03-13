@@ -30,11 +30,9 @@ import org.opengis.referencing.operation.MathTransform1D;
 import org.opengis.referencing.operation.MathTransformFactory;
 import org.geotools.util.NumberRange;
 import org.geotools.coverage.Category;
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.image.io.PaletteFactory;
 
-import net.seagis.catalog.Element;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.ServerException;
 import net.seagis.catalog.IllegalRecordException;
@@ -46,7 +44,8 @@ import net.seagis.catalog.QueryType;
 /**
  * Connection to a table of {@linkplain Category categories}. This table creates a list of
  * {@link Category} objects for a given sample dimension. Categories are one of the components
- * required for creating a {@link GridCoverage2D}; they are not an {@link Element} subinterface.
+ * required for creating a {@link org.geotools.coverage.grid.GridCoverage2D}; they are not an
+ * {@link net.seagis.catalog.Element} subinterface.
  *
  * @author Martin Desruisseaux
  * @version $Id$
@@ -88,7 +87,7 @@ final class CategoryTable extends Table {
         palettes.setWarningLocale(getDatabase().getLocale());
 
         final CategoryQuery query = (CategoryQuery) this.query;
-        final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+        final PreparedStatement statement = getStatement(QueryType.LIST);
         statement.setString(indexOf(query.byBand), band);
         final int nameIndex     = indexOf(query.name    );
         final int lowerIndex    = indexOf(query.lower   );

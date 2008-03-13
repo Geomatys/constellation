@@ -86,12 +86,24 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     private boolean canInsertNewLayers = false;
 
     /**
+     * The object to use for writting in the {@code "Tiles"} table.
+     */
+    private transient WritableGridCoverageTable tilesTable;
+
+    /**
      * Constructs a new {@code WritableGridCoverageTable}.
      *
      * @param connection The connection to the database.
      */
     public WritableGridCoverageTable(final Database database) {
         super(database);
+    }
+
+    /**
+     * Constructs a new {@code WritableGridCoverageTable} from the specified query.
+     */
+    private WritableGridCoverageTable(final GridCoverageQuery query) {
+        super(query);
     }
 
     /**
@@ -338,6 +350,22 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             entry.close();
         }
         return count;
+    }
+
+    /**
+     * Adds the specified tiles in the {@code "Tiles"} table.
+     *
+     * @param  tiles The tiles to insert.
+     * @return The number of tiles inserted.
+     */
+    public synchronized void addTiles(final Collection<Tile> tiles)
+            throws CatalogException, SQLException, IOException
+    {
+        if (tilesTable == null) {
+            tilesTable = new WritableGridCoverageTable(new GridCoverageQuery(getDatabase(), true));
+        }
+        tilesTable.setLayer(getLayer());
+        tilesTable.addEntries(tiles, 0);
     }
 
     /**

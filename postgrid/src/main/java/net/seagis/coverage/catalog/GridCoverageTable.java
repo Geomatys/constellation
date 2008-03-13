@@ -157,7 +157,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * Constructs a new {@code GridCoverageTable} from the specified query.
      */
-    private GridCoverageTable(final GridCoverageQuery query) {
+    GridCoverageTable(final GridCoverageQuery query) {
         super(query, net.seagis.catalog.CRS.XYT);
         setIdentifierParameters(query.byFilename, null);
         setExtentParameters(query.byStartTime, query.byHorizontalExtent);

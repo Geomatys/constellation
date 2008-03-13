@@ -19,10 +19,9 @@ import java.sql.SQLException;
 import javax.media.jai.KernelJAI;
 import org.opengis.parameter.ParameterValueGroup;
 import net.seagis.catalog.CatalogException;
-import net.seagis.catalog.DatabaseTest;
+import net.seagis.catalog.TableTest;
 
 import org.junit.*;
-import static org.junit.Assert.*;
 
 
 /**
@@ -31,7 +30,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class OperationTableTest extends DatabaseTest {
+public class OperationTableTest extends TableTest {
     /**
      * The name of the operation to be tested.
      */
