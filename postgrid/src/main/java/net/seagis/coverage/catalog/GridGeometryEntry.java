@@ -29,7 +29,6 @@ import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.coverage.grid.ImageGeometry;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
@@ -76,6 +75,12 @@ final class GridGeometryEntry extends Entry {
     final XRectangle2D geographicEnvelope;
 
     /**
+     * The horizontal and vertical SRID declared in the database.
+     * Stored for informative purpose, but not used by this entry.
+     */
+    public final int horizontalSRID, verticalSRID;
+
+    /**
      * The vertical ordinates, or {@code null}.
      */
     private final double[] verticalOrdinates;
@@ -92,14 +97,21 @@ final class GridGeometryEntry extends Entry {
      * @param bbox      Same as the envelope, but as a geographic bounding box.
      * @param verticalOrdinates The vertical ordinate values, or {@code null} if none.
      */
-    GridGeometryEntry(final String name, final AffineTransform gridToCRS,
-                      final GridRange gridRange, final GeneralEnvelope envelope,
-                      final GeographicBoundingBox bbox, final double[] verticalOrdinates)
+    GridGeometryEntry(final String name,
+                      final AffineTransform gridToCRS,
+                      final GridRange gridRange,
+                      final GeneralEnvelope envelope,
+                      final GeographicBoundingBox bbox,
+                      final int horizontalSRID,
+                      final int verticalSRID,
+                      final double[] verticalOrdinates)
     {
         super(name);
         this.gridToCRS         = gridToCRS;
         this.gridRange         = gridRange;
         this.envelope          = envelope;
+        this.horizontalSRID    = horizontalSRID;
+        this.verticalSRID      = verticalSRID;
         this.verticalOrdinates = verticalOrdinates;
         if (verticalOrdinates != null) {
             if (verticalOrdinates.length > Short.MAX_VALUE) {

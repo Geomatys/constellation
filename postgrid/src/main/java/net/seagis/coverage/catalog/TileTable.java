@@ -14,11 +14,11 @@
  */
 package net.seagis.coverage.catalog;
 
+import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Calendar;
-import java.util.Date;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.io.File;
@@ -35,7 +35,9 @@ import javax.imageio.spi.ImageReaderSpi;
 import org.geotools.image.io.mosaic.Tile;
 import org.geotools.image.io.mosaic.TileManager;
 import org.geotools.image.io.mosaic.TileManagerFactory;
+import org.geotools.util.SoftValueHashMap;
 import org.geotools.resources.XArray;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -53,14 +55,14 @@ import net.seagis.catalog.CatalogException;
  */
 final class TileTable extends Table {
     /**
-     * The table of series. A shared instance will be fetched when first needed.
-     */
-    private SeriesTable seriesTable;
-
-    /**
      * Shared instance of a table of grid geometries. Will be created only when first needed.
      */
     private transient GridGeometryTable gridGeometryTable;
+
+    /**
+     * A cache of tile managers created up to date.
+     */
+    private final Map<Request,TileManager[]> cache;
 
     /**
      * Creates a tile table.
@@ -69,6 +71,7 @@ final class TileTable extends Table {
      */
     public TileTable(final Database database) {
         super(new TileQuery(database));
+        cache = new SoftValueHashMap<Request,TileManager[]>();
     }
 
     /**
@@ -76,20 +79,29 @@ final class TileTable extends Table {
      * single tile manager, but more could be returned if the tiles can not fit all in the same
      * instance.
      *
-     * @param  layer The layer name.
+     * @param  layer     The layer.
+     * @param  startTime The start time, or {@code null} if none.
+     * @param  endTime   The end time, or {@code null} if none.
+     * @param  srid      The numeric identifier of the CRS.
      * @return The tile managers for the given series and date range.
      * @throws CatalogException if an inconsistent record is found in the database.
      * @throws SQLException if an error occured while reading the database.
      */
-    public synchronized TileManager[] getTiles(final String layer, final Date startTime, final Date endTime, final int srid)
+    public synchronized TileManager[] getTiles(final Layer layer,
+            final Timestamp startTime, final Timestamp endTime, final int srid)
             throws CatalogException, SQLException, IOException
     {
+        final Request request = new Request(layer, startTime, endTime, srid);
+        TileManager[] managers = cache.get(request);
+        if (managers != null) {
+            return managers;
+        }
         final TileQuery query = (TileQuery) this.query;
         final Calendar calendar = getCalendar();
         final PreparedStatement statement = getStatement(QueryType.LIST);
-        statement.setString   (indexOf(query.byLayer), layer);
-        statement.setTimestamp(indexOf(query.byStartTime), new Timestamp(startTime.getTime()), calendar);
-        statement.setTimestamp(indexOf(query.byEndTime),   new Timestamp(  endTime.getTime()), calendar);
+        statement.setString   (indexOf(query.byLayer), layer.getName());
+        statement.setTimestamp(indexOf(query.byStartTime), startTime, calendar);
+        statement.setTimestamp(indexOf(query.byEndTime),   endTime,   calendar);
         statement.setInt      (indexOf(query.byHorizontalSRID), srid);
         statement.setBoolean  (indexOf(query.byVisibility), true);
         final int seriesIndex   = indexOf(query.series);
@@ -98,33 +110,40 @@ final class TileTable extends Table {
         final int extentIndex   = indexOf(query.spatialExtent);
         final List<Tile> tiles  = new ArrayList<Tile>();
         final ResultSet results = statement.executeQuery();
+        ImageReaderSpi provider = null;
+        Series       lastSeries = null;
         while (results.next()) {
-            final String seriesName = results.getString(seriesIndex);
-            final String   filename = results.getString(filenameIndex);
-            final int         index = results.getInt   (indexIndex);
-            final String     extent = results.getString(extentIndex);
-            if (seriesTable == null) {
-                seriesTable = getDatabase().getTable(SeriesTable.class);
-            }
-            final Series series = seriesTable.getEntry(seriesName);
+            final String seriesID = results.getString(seriesIndex);
+            final String filename = results.getString(filenameIndex);
+            final int       index = results.getInt   (indexIndex);
+            final String   extent = results.getString(extentIndex);
+            final Series   series = layer.getSeries(seriesID);
             Object input = series.file(filename);
             if (!((File) input).isAbsolute()) try {
                 input = series.uri(filename);
             } catch (URISyntaxException e) {
                 throw new IIOException(e.getLocalizedMessage(), e);
             }
-            final ImageReaderSpi spi = getImageReaderSpi(series.getFormat().getImageFormat());
+            if (!series.equals(lastSeries)) {
+                // Computes only if the series changed. Usually it doesn't change.
+                provider = getImageReaderSpi(series.getFormat().getImageFormat());
+                lastSeries = series;
+            }
             if (gridGeometryTable == null) {
                 gridGeometryTable = getDatabase().getTable(GridGeometryTable.class);
             }
             final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
             final Rectangle bounds = geometry.getBounds();
             final AffineTransform gridToCRS = geometry.getGridToCRS2D();
-            final Tile tile = new Tile(spi, input, index, bounds, gridToCRS);
+            final Tile tile = new Tile(provider, input, (index != 0) ? index-1 : 0, bounds, gridToCRS);
             tiles.add(tile);
         }
         results.close();
-        return TileManagerFactory.DEFAULT.create(tiles);
+        if (!tiles.isEmpty()) {
+            managers = TileManagerFactory.DEFAULT.create(tiles);
+            cache.put(request, managers);
+        }
+        return managers;
     }
 
     /**
@@ -156,5 +175,47 @@ final class TileTable extends Table {
             }
         }
         throw new IIOException(Errors.format(ErrorKeys.NO_IMAGE_READER));
+    }
+
+    /**
+     * A request submitted to {@link TileTable}.
+     *
+     * @todo We probably need to refactor this approach in a more generic way so that other
+     *       table can cache their requests in the same way.
+     */
+    private static final class Request {
+        private final String layer;
+        private final long startTime;
+        private final long endTime;
+        private final int srid;
+
+        public Request(final Layer layer, final Timestamp startTime, final Timestamp endTime, final int srid) {
+            this.layer     = layer.getName();
+            this.startTime = (startTime != null) ? startTime.getTime() : Long.MIN_VALUE;
+            this.endTime   =   (endTime != null) ?   endTime.getTime() : Long.MAX_VALUE;
+            this.srid      = srid;
+        }
+
+        @Override
+        public int hashCode() {
+            return layer.hashCode() + srid;
+        }
+
+        @Override
+        public boolean equals(final Object object) {
+            if (object instanceof Request) {
+                final Request that = (Request) object;
+                return Utilities.equals(this.layer, that.layer) &&
+                       this.startTime == that.startTime &&
+                       this.endTime   == that.endTime &&
+                       this.srid      == that.srid;
+            }
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return layer;
+        }
     }
 }

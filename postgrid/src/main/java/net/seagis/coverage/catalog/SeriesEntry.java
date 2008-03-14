@@ -217,7 +217,7 @@ final class SeriesEntry extends Entry implements Series {
     }
 
     /**
-     * Compare this series entry with the specified object for equality.
+     * Compares this series entry with the specified object for equality.
      */
     @Override
     public boolean equals(final Object object) {

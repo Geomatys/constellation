@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.DateFormat;
 import java.util.*;
@@ -643,12 +644,12 @@ loop:   for (final CoverageReference newReference : entries) {
         assert Thread.holdsLock(this);
         final Calendar calendar = getCalendar();
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
-        final String seriesID  = result.getString   (indexOf(query.series));
-        final String filename  = result.getString   (indexOf(query.filename));
-        final Date   startTime = result.getTimestamp(indexOf(query.startTime), calendar);
-        final Date   endTime   = result.getTimestamp(indexOf(query.endTime),   calendar);
-        final short  index     = result.getShort    (indexOf(query.index)); // We expect 0 if null.
-        final String extent    = result.getString   (indexOf(query.spatialExtent));
+        final String    seriesID  = result.getString   (indexOf(query.series));
+        final String    filename  = result.getString   (indexOf(query.filename));
+        final Timestamp startTime = result.getTimestamp(indexOf(query.startTime), calendar);
+        final Timestamp endTime   = result.getTimestamp(indexOf(query.endTime),   calendar);
+        final short     index     = result.getShort    (indexOf(query.index)); // We expect 0 if null.
+        final String    extent    = result.getString   (indexOf(query.spatialExtent));
         /*
          * Gets the SeriesEntry in which this coverage is declared. The entry should be available
          * from the layer HashMap. If not, we will query the SeriesTable as a fallback, but there
@@ -672,19 +673,19 @@ loop:   for (final CoverageReference newReference : entries) {
         final GridCoverageEntry entry = new GridCoverageEntry(this,
                 series, filename, index, startTime, endTime, geometry, band, null);
         final GridCoverageEntry cached = entry.unique();
-        if (cached != entry) {
-            if (tileTable != null) {
+        if (cached == entry) {
+            if (tileTable == null) {
                 tileTable = getDatabase().getTable(TileTable.class);
-                final TileManager[] managers;
-                try {
-                    managers = tileTable.getTiles(layer.getName(), startTime, endTime, 0);
-                } catch (IOException e) {
-                    throw new CatalogException(e);
-                }
-                if (managers != null && managers.length != 0) {
-                    cached.setTiles(managers[0]);
-                    // TODO: what to do with other tiles, if there is any?
-                }
+            }
+            final TileManager[] managers;
+            try {
+                managers = tileTable.getTiles(layer, startTime, endTime, geometry.horizontalSRID);
+            } catch (IOException e) {
+                throw new CatalogException(e);
+            }
+            if (managers != null && managers.length != 0) {
+                cached.setTiles(managers[0]);
+                // TODO: what to do with other tiles, if there is any?
             }
         }
         return cached;

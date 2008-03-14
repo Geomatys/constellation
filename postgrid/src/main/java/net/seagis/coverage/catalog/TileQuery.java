@@ -51,7 +51,7 @@ final class TileQuery extends Query {
         final QueryType[] none = {    };
         final QueryType[] list = {LIST};
         layer          = addForeignerColumn("Series",         "layer",          none);
-        series         = addColumn         (                  "series",         none);
+        series         = addColumn         (                  "series",         list);
         filename       = addColumn         (                  "filename",       list);
         index          = addColumn         (                  "index", 1,       list);
         startTime      = addColumn         (                  "startTime",      none);
@@ -60,10 +60,16 @@ final class TileQuery extends Query {
         horizontalSRID = addForeignerColumn("GridGeometries", "horizontalSRID", none);
         visibility     = addForeignerColumn("Series",         "visible", true,  none);
 
-        byLayer            = addParameter(layer,          list);
-        byStartTime        = addParameter(startTime,      list);
-        byEndTime          = addParameter(endTime,        list);
-        byHorizontalSRID   = addParameter(horizontalSRID, list);
-        byVisibility       = addParameter(visibility,     list);
+        byLayer          = addParameter(layer,          list);
+        byStartTime      = addParameter(startTime,      list);
+        byEndTime        = addParameter(endTime,        list);
+        byHorizontalSRID = addParameter(horizontalSRID, list);
+        byVisibility     = addParameter(visibility,     list);
+        /*
+         * Following conditions are the opposite of GridCoverageQuery because we wants
+         * every tiles included in the range of the coverage, not tiles intercepting.
+         */
+        byStartTime.setComparator("IS NULL OR >=");
+        byEndTime  .setComparator("IS NULL OR <=");
     }
 }

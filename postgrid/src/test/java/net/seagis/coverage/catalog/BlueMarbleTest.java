@@ -58,8 +58,6 @@ public class BlueMarbleTest extends DatabaseTest {
         assertEquals("Should be cached", entry, other);
         assertSame  ("Should be cached", entry, other);
         assertEquals("BlueMarble", entry.getSeries().getName());
-        assertNull(entry.getFile());
-        assertNull(entry.getURI());
         assertEquals(GeographicBoundingBoxImpl.WORLD, entry.getGeographicBoundingBox());
 
         Rectangle range = entry.getGridGeometry().getGridRange2D();
@@ -87,12 +85,6 @@ public class BlueMarbleTest extends DatabaseTest {
         assertSame  ("Should be cached", entry, other);
         assertEquals("BlueMarble", entry.getSeries().getName());
         assertTrue  (entries.contains(entry));
-        assertNull  (entry.getFile());
-        assertNull  (entry.getURI());
-        for (CoverageReference e : entries) {
-            if (e == entry) System.out.print("*** ");
-            System.out.println(e);
-        }
         assertEquals(GeographicBoundingBoxImpl.WORLD, entry.getGeographicBoundingBox());
 
         Rectangle range = entry.getGridGeometry().getGridRange2D();
@@ -102,7 +94,7 @@ public class BlueMarbleTest extends DatabaseTest {
         GridCoverage2D coverage = entry.getCoverage(null);
         RenderedImage image = coverage.view(ViewType.RENDERED).getRenderedImage();
         if (false) {
-            ImageIO.write(image, "png", new File("/home/desruisseaux/Test.png"));
+            ImageIO.write(image, "png", new File("Test.png"));
         }
     }
 }

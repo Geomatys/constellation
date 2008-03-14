@@ -240,7 +240,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
             return; // TODO
         }
         final WebServiceWorker worker = new WebServiceWorker(database, false);
-        worker.setService("WMS", new Version("1.1.1", false));
+        worker.setService("WMS", new Version("1.1", false));
         worker.setLayer("BlueMarble");
         worker.setCoordinateReferenceSystem("EPSG:4326");
         worker.setBoundingBox("-180,-90,180,90");
@@ -252,11 +252,14 @@ public class WebServiceWorkerTest extends DatabaseTest {
 
         GridCoverage2D coverage = worker.getGridCoverage2D(false);
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
+        RenderedImage image = coverage.getRenderedImage();
+        assertEquals(480, image.getWidth());
+        assertEquals(240, image.getHeight());
 
         File file = worker.getImageFile();
         assertTrue(file.getName().endsWith(".png"));
 
-        RenderedImage image = ImageIO.read(file);
+        image = ImageIO.read(file);
         assertEquals(360, image.getWidth());
         assertEquals(180, image.getHeight());
     }

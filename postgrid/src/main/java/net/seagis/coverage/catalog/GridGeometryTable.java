@@ -262,7 +262,8 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
          * Creates the entry and performs some final checks.
          */
         final AffineTransform at = new AffineTransform(scaleX, shearY, shearX, scaleY, translateX, translateY);
-        final GridGeometryEntry entry = new GridGeometryEntry(identifier, at, gridRange, envelope, bbox, altitudes);
+        final GridGeometryEntry entry = new GridGeometryEntry(identifier, at, gridRange, envelope, bbox,
+                horizontalSRID, verticalSRID, altitudes);
         if (entry.isEmpty()) {
             throw new IllegalRecordException("L'enveloppe géographique est vide. Elle a été calculée à partir de \"" +
                     horizontalExtent + "\".", this, results, indexOf(query.horizontalExtent), identifier);

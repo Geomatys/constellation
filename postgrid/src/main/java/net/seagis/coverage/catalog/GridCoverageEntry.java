@@ -271,6 +271,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * Returns the source as a {@link File} or an {@link URI}, in this preference order.
      */
     private Object getInput() throws IOException {
+        if (tiles != null) {
+            return tiles;
+        }
         final File file = series.file(filename);
         if (file.isAbsolute()) {
             return file;

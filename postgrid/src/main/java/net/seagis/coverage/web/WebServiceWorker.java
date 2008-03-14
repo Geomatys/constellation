@@ -242,7 +242,6 @@ public class WebServiceWorker extends ImageProducer {
      */
     @SuppressWarnings("fallthrough")
     public void setBoundingBox(final String bbox) throws WebServiceException {
-        //LOGGER.info("bbox a parser:" + bbox + "|");
         clearGridGeometry();
         if (bbox == null) {
             if (envelope != null) {

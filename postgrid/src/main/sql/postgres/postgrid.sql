@@ -500,15 +500,15 @@ COMMENT ON INDEX "GridCoverages_extent_index" IS
 
 CREATE TABLE "Tiles" (
   PRIMARY KEY ("series", "filename", "index"),
-  FOREIGN KEY ("extent") REFERENCES "GridGeometries" (identifier) ON UPDATE CASCADE ON DELETE RESTRICT,
-  FOREIGN KEY ("series", "startTime", "endTime") REFERENCES "GridCoverages" ("series", "startTime", "endTime") ON UPDATE CASCADE ON DELETE CASCADE
+  FOREIGN KEY ("extent") REFERENCES "GridGeometries" ON UPDATE CASCADE ON DELETE RESTRICT,
+  FOREIGN KEY ("series") REFERENCES "Series" ON UPDATE CASCADE ON DELETE CASCADE
 ) INHERITS ("GridCoverages");
 
 ALTER TABLE "Tiles" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Tiles" TO geoadmin;
 GRANT SELECT ON TABLE "Tiles" TO public;
 
-CREATE INDEX "Tiles_index" ON "Tiles" (series, "endTime", "startTime");
+CREATE INDEX "Tiles_index" ON "Tiles" ("series", "endTime", "startTime");
 
 
 
