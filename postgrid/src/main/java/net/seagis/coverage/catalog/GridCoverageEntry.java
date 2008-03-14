@@ -112,8 +112,11 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * If the image is tiled, the tiles. Otherwise {@code null}. This field is set only after
      * construction in order to avoid loading thousands of lines from the database when a suitable
      * entry was already in the cache.
+     * <p>
+     * Should be the same instance than the one cached in {@link TileTable}
+     * (not a clone, otherwise the caching will not work as expected).
      */
-    private TileManager tiles;
+    private TileManager[] tiles;
 
     /**
      * The grid geometry. Include the image size (in pixels), the geographic envelope
@@ -232,8 +235,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
 
     /**
      * Sets the tiles. Invoked after construction only if no suitable entry was in the cache.
+     * The given array is not and should not be cloned - we need to keep a reference to this
+     * exact instance in order to let the {@link TileTable} cache be effective.
      */
-    final void setTiles(final TileManager tiles) {
+    final void setTiles(final TileManager[] tiles) {
         if (this.tiles != null) {
             throw new IllegalStateException();
         }

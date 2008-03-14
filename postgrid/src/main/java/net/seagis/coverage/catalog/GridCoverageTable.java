@@ -684,8 +684,7 @@ loop:   for (final CoverageReference newReference : entries) {
                 throw new CatalogException(e);
             }
             if (managers != null && managers.length != 0) {
-                cached.setTiles(managers[0]);
-                // TODO: what to do with other tiles, if there is any?
+                cached.setTiles(managers);
             }
         }
         return cached;
