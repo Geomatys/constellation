@@ -449,6 +449,17 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         final Dimension2D resolution = settings.resolution;
         final int xSubsampling;
         final int ySubsampling;
+        
+        /*
+         * Get the bounding box in the coverage CRS
+         */
+        GeneralEnvelope coverageGeom = geometry.getEnvelope();
+        Rectangle2D coverageCrsBBox = (Rectangle2D) clipArea.clone();
+        coverageCrsBBox.setRect(coverageGeom.getMinimum(0), coverageGeom.getMinimum(1), 
+                coverageGeom.getLength(0), coverageGeom.getLength(1));
+        
+        
+        
         if (resolution != null) {
             /*
              * Conversion [résolution logique désirée] --> [fréquence d'échantillonage des pixels].
@@ -465,7 +476,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         }
         Rectangle2D clipLogical;
         if (clipArea == null) {
-            clipLogical = settings.tableToCoverageCRS(boundingBox, null);
+            clipLogical = coverageCrsBBox;
             // Ne PAS modifier ce clipLogical; 'boundingBox' n'a peut-être pas été cloné!
         } else {
             /*
@@ -484,7 +495,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             {
                 return null;
             }
-            final Rectangle2D fullArea = settings.tableToCoverageCRS(boundingBox, null);
+            final Rectangle2D fullArea = coverageCrsBBox;
             Rectangle2D.intersect(boundingBox, clipArea, clipLogical=new Rectangle2D.Double());
             clipLogical = settings.tableToCoverageCRS(clipLogical, clipLogical);
             /*
