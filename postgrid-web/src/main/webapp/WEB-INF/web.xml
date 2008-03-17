@@ -22,6 +22,7 @@
     <!-- Servlet for seagis JSF interface -->
     
     <!-- MyFaces -->
+    <display-name>ifremerWS</display-name>
     <filter>
         <filter-name>MyFacesExtensionsFilter</filter-name>
         <filter-class>
