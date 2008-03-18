@@ -215,9 +215,14 @@ public class TileBuilder {
     }
 
     /**
-     * Creates the target tiles, optionnaly write them to disk and to the database.
+     * Creates the target tiles, optionnaly writes them to disk and to the database.
      */
     private boolean createTargetTiles(Collection<Tile> tiles) {
+        if (!targetDirectory.isDirectory()) {
+            err.print(targetDirectory.getPath());
+            err.println(" is not a directory.");
+            return false;
+        }
         /*
          * From the big tiles declared in the property files, infers a set of smaller tiles at
          * different overview levels. For example starting with 6 BlueMarble tiles, we can get
@@ -314,18 +319,13 @@ public class TileBuilder {
      *
      * @param  key The key to read in the properties.
      * @return The directory, or {@code null} if none.
-     * @throws IllegalArgumentException If the file is not a directory.
      */
-    private File getDirectory(final String key) throws IllegalArgumentException {
+    private File getDirectory(final String key) {
         final String value = (String) properties.remove(key);
         if (value == null) {
             return null;
         }
-        final File directory = new File(value);
-        if (!directory.isDirectory()) {
-            throw new IllegalArgumentException(directory.getPath() + " is not a directory.");
-        }
-        return directory;
+        return new File(value);
     }
 
     /**
