@@ -28,6 +28,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -40,6 +41,10 @@ import net.seagis.catalog.Entry;
  * axis are always for the horizontal component of the CRS (no matter if it is (x,y) or (y,x))
  * and that the vertical component, if any, is the third axis. Some of those assumptions are
  * checked by assertions at construction time.
+ * <p>
+ * This implementation allows direct access to the field for convenience and efficiency, but
+ * those fields should never be modified. We allow this unsafe practice because this class
+ * is not public.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -53,14 +58,14 @@ final class GridGeometryEntry extends Entry {
     /**
      * The immutable grid range, which may be 2D, 3D or 4D.
      */
-    private final GridRange gridRange;
+    protected final GridRange gridRange;
 
     /**
      * The "grid to CRS" affine transform for the horizontal part. The vertical
      * transform is not included because the {@link #verticalOrdinates} may not
      * be regular.
      */
-    private final AffineTransform gridToCRS;
+    protected final AffineTransform gridToCRS;
 
     /**
      * The full envelope, including the vertical and temporal extent if any.
@@ -115,9 +120,9 @@ final class GridGeometryEntry extends Entry {
         this.verticalOrdinates = verticalOrdinates;
         if (verticalOrdinates != null) {
             if (verticalOrdinates.length > Short.MAX_VALUE) {
-                // See 'indexOf' for this limitation.
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(); // See 'indexOf' for this limitation.
             }
+            assert gridRange.getLength(2) == verticalOrdinates.length : gridRange;
         }
         // Checks for assumptions - see class javadoc.
         final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
@@ -150,14 +155,6 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * Returns the affine transform from grid to
-     * {@linkplain #getCoordinateReferenceSystem coordinate reference system}.
-     */
-    public AffineTransform getGridToCRS2D() {
-        return (AffineTransform) gridToCRS.clone();
-    }
-
-    /**
      * Convenience method returning the two first dimension of the
      * {@linkplain #getGridRange grid range}.
      */
@@ -175,13 +172,6 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * Returns the grid range.
-     */
-    public GridRange getGridRange() {
-        return gridRange;
-    }
-
-    /**
      * Returns the coordinate reference system.
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
@@ -196,9 +186,21 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * Returns the envelope with altitude restricted to the specified band.
+     * Returns the two first dimensions of the envelope.
+     */
+    public Envelope2D getEnvelope2D() {
+        return new Envelope2D(CRS.getHorizontalCRS(envelope.getCoordinateReferenceSystem()),
+                envelope.getMinimum(0), envelope.getMinimum(1), envelope.getLength(0), envelope.getLength(1));
+    }
+
+    /**
+     * Returns the envelope with altitude restricted to the specified band. Altitudes are stored
+     * in the database as an array. This method replace the altitude range, which was previously
+     * from the minimum to the maximum value declared in the array, to the value at one specific
+     * element of the altitude array.
      *
-     * @param The band number. Numbering start at 0.
+     * @param The band number, in the range 0 inclusive to
+     *        <code>{@linkplain #getVerticalOrdinates}.length</code> exclusive.
      */
     final Envelope getEnvelope(final int band) {
         final GeneralEnvelope envelope = this.envelope.clone();
@@ -213,10 +215,15 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * Returns the vertical ordinate values, or {@code null} if none.
+     * Returns the vertical ordinate values, or {@code null} if none. If non-null,
+     * then the array length must be equals to the {@code gridRange.getLength(2)}.
      */
     public double[] getVerticalOrdinates() {
-        return (verticalOrdinates != null) ? verticalOrdinates.clone() : null;
+        if (verticalOrdinates != null) {
+            assert gridRange.getLength(2) == verticalOrdinates.length : gridRange;
+            return verticalOrdinates.clone();
+        }
+        return null;
     }
 
     /**
@@ -246,7 +253,7 @@ final class GridGeometryEntry extends Entry {
      */
     final boolean sameEnvelope(final GridGeometryEntry that) {
         return Utilities.equals(this.envelope,          that.envelope) &&
-               Utilities.equals(this.verticalOrdinates, that.verticalOrdinates);
+                  Arrays.equals(this.verticalOrdinates, that.verticalOrdinates);
     }
 
     /**
@@ -262,7 +269,7 @@ final class GridGeometryEntry extends Entry {
             return Utilities.equals(this.gridToCRS,         that.gridToCRS) &&
                    Utilities.equals(this.gridRange,         that.gridRange) &&
                    Utilities.equals(this.envelope,          that.envelope)  &&
-                   Arrays   .equals(this.verticalOrdinates, that.verticalOrdinates);
+                      Arrays.equals(this.verticalOrdinates, that.verticalOrdinates);
         }
         return false;
     }

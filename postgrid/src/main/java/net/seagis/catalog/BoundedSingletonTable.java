@@ -221,7 +221,14 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * @param  crs The new CRS, or {@code null} for restoring the default one.
      * @throws CatalogException if the specified CRS is not compatible with the CRS type
      *         given to the constructor.
+     *
+     * @deprecated Some implementation expects a geographics CRS with (longitude, latitude) axis
+     *             order. For example {@code GridToCoverageEntry.computeBounds} expect the table
+     *             CRS to be the same than the {@code GeographicBoundingBoxes.horizontalExtent}
+     *             column. Assumptions are also sometime required for setting the SQL parameter
+     *             values in the {@code WHERE} clause. Revisit if we should remove this method.
      */
+    @Deprecated
     public synchronized void setCoordinateReferenceSystem(CoordinateReferenceSystem crs)
             throws CatalogException
     {

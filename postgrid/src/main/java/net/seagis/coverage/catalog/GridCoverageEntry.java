@@ -20,6 +20,8 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Dimension2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +71,7 @@ import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 
 import net.seagis.catalog.Entry;
 import net.seagis.coverage.model.Operation;
@@ -416,56 +419,53 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     }
 
     /**
-     * Calcule les limites des pixels à lire, en coordonnées logiques et en coordonnées pixels.
-     * Cette méthode est appelée avant la lecture d'une image, mais peut aussi être appelée par
-     * des methodes telles que {@link #getEnvelope} et {@link #getGridGeometry}. Tous les arguments
-     * de cette méthode sont des arguments de sortie (en écriture seule).
+     * Computes the region to read, in "real world" coordinates and in pixel coordinates. The main
+     * purpose of this method is to be invoked just before an image is read, but it can also be
+     * invoked by some informative methods like {@link #getEnvelope} and {@link #getGridGeometry}.
+     * Every arguments given to this method are output arguments (this method will only write in
+     * them - no information is read from them).
      *
-     * @param  clipPixel Rectangle dans lequel écrire les coordonnées pixels de la région à lire.
-     *         Ce rectangle restera inchangé si tous les pixels sont à lire.
-     * @param  subsampling Objet dans lequel écrire les pas de sous-échantillonage, ou {@code null}
-     *         si cette information n'est pas désirée.
-     * @param  envelope Envelope dans lequel écrire les coordonnées logiques de la région à lire.
-     * @return Les coordonnées logiques de l'image à lire, où {@code null} si l'image ne doit pas
-     *         être lue (par exemple parce que l'envelope est vide).
+     * @param  clipPixel The rectangle in which to write the pixel coordinates of the region to be
+     *         read.
+     * @param  subsampling The objet in which to write the subsampling, or {@code null}
+     *         if this information is not wanted.
+     * @return The "real world" coordinates of the region to read, or {@code null} if the image
+     *         should not be read (for example because the envelope is empty). This envelope may
+     *         have more than 2 dimensions.
      */
     @SuppressWarnings("fallthrough")
     private GeneralEnvelope computeBounds(final Rectangle clipPixel, final Point subsampling)
             throws TransformException
     {
-        final GridRange gridRange = geometry.getGridRange();
+        final GridRange gridRange = geometry.gridRange;
         final int width  = gridRange.getLength(0);
         final int height = gridRange.getLength(1);
         final XRectangle2D boundingBox = geometry.geographicEnvelope;
+        final AffineTransform gridToCRS = geometry.gridToCRS; // DO NOT MODIFY.
+        final AffineTransform crsToGrid;
+        try {
+            crsToGrid = gridToCRS.createInverse();
+        } catch (NoninvertibleTransformException exception) {
+            throw new TransformException(exception.getLocalizedMessage(), exception);
+        }
         /*
-         * Obtient les coordonnées géographiques et la résolution désirées. Notez que ces
-         * rectangles ne sont pas encore exprimées dans le système de coordonnées de l'image.
-         * Cette projection sera effectuée par 'tableToCoverageCRS(...)' seulement après avoir
-         * pris en compte le clip. Ca nous évite d'avoir à projeter le clip, ce qui aurait été
-         * problématique avec les projections qui n'ont pas un domaine de validité suffisament
-         * grand (par exemple jusqu'aux pôles).
+         * Computes the subsampling from the desired resolution. We process by transforming
+         * the ["real world" resolution] to [pixel subsampling] using a sample rectangle in
+         * the center of the geographic bounding box.
          */
-        final Rectangle2D clipArea   = settings.geographicArea;
         final Dimension2D resolution = settings.resolution;
         final int xSubsampling;
         final int ySubsampling;
-        
-        /*
-         * Get the bounding box in the coverage CRS
-         */
-        GeneralEnvelope coverageGeom = geometry.getEnvelope();
-        Rectangle2D coverageCrsBBox = (Rectangle2D) clipArea.clone();
-        coverageCrsBBox.setRect(coverageGeom.getMinimum(0), coverageGeom.getMinimum(1), 
-                coverageGeom.getLength(0), coverageGeom.getLength(1));
-        
-        
-        
         if (resolution != null) {
-            /*
-             * Conversion [résolution logique désirée] --> [fréquence d'échantillonage des pixels].
-             */
-            xSubsampling = max(1, min(width /MIN_SIZE, (int)round(width  * (resolution.getWidth () / boundingBox.getWidth ()))));
-            ySubsampling = max(1, min(height/MIN_SIZE, (int)round(height * (resolution.getHeight() / boundingBox.getHeight()))));
+            final double xResolution = resolution.getWidth();
+            final double yResolution = resolution.getHeight();
+            Rectangle2D sample = new Rectangle2D.Double(
+                    boundingBox.getCenterX() - 0.5 * xResolution,
+                    boundingBox.getCenterY() - 0.5 * yResolution, xResolution, yResolution);
+            sample = settings.tableToCoverageCRS(sample, sample);
+            sample = XAffineTransform.transform(crsToGrid, sample, sample);
+            xSubsampling = max(1, min(width /MIN_SIZE, (int)round(sample.getWidth ())));
+            ySubsampling = max(1, min(height/MIN_SIZE, (int)round(sample.getHeight())));
         } else {
             xSubsampling = 1;
             ySubsampling = 1;
@@ -474,10 +474,17 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             subsampling.x = xSubsampling;
             subsampling.y = ySubsampling;
         }
+        /*
+         * Gets the geographic coordinates of the ROI (region of interest). Those coordinates
+         * are expressed in the table CRS, not in the coverage CRS. If a projection is wanted,
+         * it can be applied using GridCoverageSettings.tableToCoverageCRS(...). Better avoid
+         * to project the clip however, because it often includes the poles which are not
+         * handled by every kind of projection.
+         */
+        final Rectangle2D clipArea = settings.geographicArea;
         Rectangle2D clipLogical;
         if (clipArea == null) {
-            clipLogical = coverageCrsBBox;
-            // Ne PAS modifier ce clipLogical; 'boundingBox' n'a peut-être pas été cloné!
+            clipLogical = geometry.getEnvelope2D();
         } else {
             /*
              * Vérifie si le rectangle demandé (clipArea) intercepte la région géographique
@@ -495,24 +502,24 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             {
                 return null;
             }
-            final Rectangle2D fullArea = coverageCrsBBox;
-            Rectangle2D.intersect(boundingBox, clipArea, clipLogical=new Rectangle2D.Double());
+            clipLogical = new Rectangle2D.Double(); // Will be computed below.
+            Rectangle2D.intersect(boundingBox, clipArea, clipLogical);
             clipLogical = settings.tableToCoverageCRS(clipLogical, clipLogical);
             /*
-             * Conversion [coordonnées logiques] --> [coordonnées pixels].
+             * Transforms ["real world" envelope] --> [region in pixel coordinates].
+             * We temporarily overwrite "clipLogical", but will recompute it later.
              */
-            final double scaleX =  width / fullArea.getWidth();
-            final double scaleY = height / fullArea.getHeight();
-            clipPixel.x      = (int)floor(scaleX * (clipLogical.getMinX() - fullArea.getMinX()) + EPS);
-            clipPixel.y      = (int)floor(scaleY * (fullArea.getMaxY() - clipLogical.getMaxY()) + EPS);
-            clipPixel.width  = (int)ceil (scaleX * clipLogical.getWidth()                       - EPS);
-            clipPixel.height = (int)ceil (scaleY * clipLogical.getHeight()                      - EPS);
+            clipLogical = XAffineTransform.transform(crsToGrid, clipLogical, clipLogical);
+            clipPixel.x      = (int)floor(clipLogical.getX()      + EPS);
+            clipPixel.y      = (int)floor(clipLogical.getY()      + EPS);
+            clipPixel.width  = (int)ceil (clipLogical.getWidth()  - EPS);
+            clipPixel.height = (int)ceil (clipLogical.getHeight() - EPS);
             if (clipPixel.width <  MIN_SIZE) {
-                clipPixel.x    -= (MIN_SIZE-clipPixel.width)/2;
+                clipPixel.x    -= (MIN_SIZE - clipPixel.width)/2;
                 clipPixel.width =  MIN_SIZE;
             }
             if (clipPixel.height < MIN_SIZE) {
-                clipPixel.y     -= (MIN_SIZE-clipPixel.height)/2;
+                clipPixel.y     -= (MIN_SIZE - clipPixel.height)/2;
                 clipPixel.height = MIN_SIZE;
             }
             /*
@@ -535,14 +542,11 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                 return null;
             }
             /*
-             * Conversion [coordonnées pixels] --> [coordonnées logiques].
-             *
-             * 'clipLogical' ne devrait pas beaucoup changer (mais parfois un peu).
+             * Recomputes the "clipLogical" envelope. Typically it doesn't change much
+             * compared to the value it had before to be overwriten. But it may still
+             * change because of rounding error.
              */
-            clipLogical.setRect(fullArea.getMinX() + clipPixel.getMinX()   / scaleX,
-                                fullArea.getMaxY() - clipPixel.getMaxY()   / scaleY,
-                                                     clipPixel.getWidth()  / scaleX,
-                                                     clipPixel.getHeight() / scaleY);
+            clipLogical = XAffineTransform.transform(gridToCRS, clipLogical, clipLogical);
         }
         CoordinateReferenceSystem coverageCRS = settings.coverageCRS;
         final DefaultTemporalCRS  temporalCRS = settings.getTemporalCRS();
@@ -752,7 +756,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      *         demandée. Cette méthode retourne {@code false} si {@code resolution} était nul.
       */
     final boolean hasEnoughResolution(final Dimension2D resolution) {
-        final GridRange gridRange = geometry.getGridRange();
+        final GridRange gridRange = geometry.gridRange;
         final int width  = gridRange.getLength(0);
         final int height = gridRange.getLength(1);
         final XRectangle2D boundingBox = geometry.geographicEnvelope;
@@ -767,8 +771,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * leurs résolutions sont incompatibles, alors cette méthode retourne {@code null}.
      */
     final GridCoverageEntry getLowestResolution(final GridCoverageEntry that) {
-        final GridRange gridRange  = this.geometry.getGridRange();
-        final GridRange gridRange2 = that.geometry.getGridRange();
+        final GridRange gridRange  = this.geometry.gridRange;
+        final GridRange gridRange2 = that.geometry.gridRange;
         final int width   = gridRange .getLength(0);
         final int height  = gridRange .getLength(1);
         final int width2  = gridRange2.getLength(0);

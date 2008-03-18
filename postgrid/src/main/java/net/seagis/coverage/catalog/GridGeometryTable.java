@@ -242,7 +242,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
          */
         final GridRange gridRange = new GeneralGridRange(lower, upper);
         final GeneralEnvelope envelope = new GeneralEnvelope(gridRange, PixelInCell.CELL_CORNER,
-                ProjectiveTransform.create(gridToCRS), crs);
+                                                    ProjectiveTransform.create(gridToCRS), crs);
         if (altitudes != null) {
             envelope.setRange(2, min, max); // For fixing rounding errors.
         }
@@ -265,7 +265,8 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         final GridGeometryEntry entry = new GridGeometryEntry(identifier, at, gridRange, envelope, bbox,
                 horizontalSRID, verticalSRID, altitudes);
         if (entry.isEmpty()) {
-            throw new IllegalRecordException("L'enveloppe géographique est vide. Elle a été calculée à partir de \"" +
+            // TODO: localize
+            throw new IllegalRecordException("The geographic envelope is empty. It was computed from \"" +
                     horizontalExtent + "\".", this, results, indexOf(query.horizontalExtent), identifier);
         }
         return entry;

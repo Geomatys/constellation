@@ -46,6 +46,7 @@ import net.seagis.cat.csw.QueryConstraintType;
 import net.seagis.cat.csw.QueryType;
 import net.seagis.cat.csw.ResultType;
 import net.seagis.cat.csw.TransactionType;
+import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterType;
@@ -74,7 +75,7 @@ public class CSWService extends WebService {
      * Build a new Restfull CSW service.
      */
     public CSWService() throws JAXBException {
-        super("CSW", new Version("2.0.2", true));
+        super("CSW", new Version("2.0.2", true, Service.OWS));
         worker = new CSWworker();
         worker.setVersion(getCurrentVersion());
         setXMLContext("net.seagis.cat.csw:net.seagis.gml:net.seagis.gml","");

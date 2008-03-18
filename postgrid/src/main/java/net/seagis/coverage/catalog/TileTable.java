@@ -134,8 +134,7 @@ final class TileTable extends Table {
             }
             final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
             final Rectangle bounds = geometry.getBounds();
-            final AffineTransform gridToCRS = geometry.getGridToCRS2D();
-            final Tile tile = new Tile(provider, input, (index != 0) ? index-1 : 0, bounds, gridToCRS);
+            final Tile tile = new Tile(provider, input, (index != 0) ? index-1 : 0, bounds, geometry.gridToCRS);
             tiles.add(tile);
         }
         results.close();

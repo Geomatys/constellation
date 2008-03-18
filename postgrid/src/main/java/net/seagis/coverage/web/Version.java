@@ -14,38 +14,39 @@
  */
 package net.seagis.coverage.web;
 
+
+/**
+ * A version applicable to a web {@linkplain Service service}.
+ *
+ * @version $Id$
+ * @author Guilhem Legal
+ */
+@SuppressWarnings("serial") // Not intented to be serialized at this time.
 public class Version extends org.geotools.util.Version {
-    
     /**
-     * the service.
+     * The service.
      */
-    private Service service;
+    private final Service service;
 
     /**
-     * indicate if this version of the service implement the OWS specification.
+     * Indicate if this version of the service implement the OWS specification.
      */
-    private boolean isOWS;
+    private final boolean isOWS;
 
     /**
      * Build a new version.
      */
-    public Version(String versionNumber, boolean isOWS, Service service) {
+    public Version(final String versionNumber, final boolean isOWS, final Service service) {
        super(versionNumber);
         this.isOWS   = isOWS;
-        this.service = service;   
+        this.service = service;
     }
 
     public boolean isOWS() {
         return isOWS;
     }
-    
+
     public Service getService() {
         return service;
     }
-
-    @Override
-    public String toString(){
-        return super.toString();
-    }
-
 }

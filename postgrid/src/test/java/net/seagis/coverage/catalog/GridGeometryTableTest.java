@@ -57,7 +57,7 @@ public class GridGeometryTableTest extends TableTest {
     public void testSelectAndList() throws CatalogException, SQLException {
         final GridGeometryTable table = new GridGeometryTable(database);
         final GridGeometryEntry entry = table.getEntry(SAMPLE_NAME);
-        final GridRange gridRange = entry.getGridRange();
+        final GridRange gridRange = entry.gridRange;
         assertEquals( 720, gridRange.getLength(0));
         assertEquals( 499, gridRange.getLength(1));
         assertEquals(  59, gridRange.getLength(2));
@@ -85,7 +85,7 @@ public class GridGeometryTableTest extends TableTest {
         final int    verticalSRID       = 5714;
         final String name               = entry.getName();
         final Dimension size            = entry.getSize();
-        final AffineTransform gridToCRS = entry.getGridToCRS2D();
+        final AffineTransform gridToCRS = entry.gridToCRS;
         assertFalse(gridToCRS.isIdentity());
         assertFalse(gridToCRS.getDeterminant() == 0);
         assertEquals(name, table.getIdentifier(size, gridToCRS, horizontalSRID, altitudes, verticalSRID, null));
