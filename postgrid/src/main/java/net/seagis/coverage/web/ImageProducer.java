@@ -155,8 +155,9 @@ public abstract class ImageProducer {
 
     /**
      * The kind of service.
-     */
-    protected Service service;
+     * replaced by version
+     * 
+    protected Service service;*/
 
     /**
      * The web service version. This version number need to be interpreted together
@@ -636,8 +637,8 @@ public abstract class ImageProducer {
      */
     public RenderedImage getRenderedImage() throws WebServiceException {
         GridCoverage2D coverage = getGridCoverage2D(true);
-        if (service != null) {
-            switch (service) {
+        if (version.getService() != null) {
+            switch (version.getService()) {
                 case WMS: coverage = coverage.view(ViewType.RENDERED);   break;
                 case WCS: coverage = coverage.view(ViewType.GEOPHYSICS); break;
             }
@@ -763,8 +764,8 @@ public abstract class ImageProducer {
      */
     public File getImageFile() throws WebServiceException {
         ImageType type = ImageType.COVERAGE; // Default value.
-        if (service != null) {
-            switch (service) {
+        if (version.getService() != null) {
+            switch (version.getService()) {
                 case WMS: type = ImageType.IMAGE;    break;
                 case WCS: type = ImageType.COVERAGE; break;
             }

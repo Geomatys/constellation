@@ -61,7 +61,7 @@ public class WebServiceWorker extends ImageProducer {
      * WMS before this version needs longitude before latitude. WMS after this version don't
      * perform axis switch. WMS at this exact version switch axis only for EPSG:4326.
      */
-    private static final Version AXIS_SWITCH_THRESHOLD = new Version("1.1", false);
+    private static final Version AXIS_SWITCH_THRESHOLD = new Version("1.1", false , Service.WMS);
 
     /**
      * The EPSG code for the CRS for which to switch axis in the version
@@ -146,9 +146,9 @@ public class WebServiceWorker extends ImageProducer {
      *         If null, latest version is assumed.
      * @throws WebServiceException if the version string can't be parsed
      */
-    public void setService(final String service, final Version version) throws WebServiceException {
-        this.service = (service != null) ? Service.valueOf(service.trim().toUpperCase()) : null;
-        this.version = (version != null) ? version : null;
+    public void setService(final String service, final String version) throws WebServiceException {
+        Service serv = (service != null) ? Service.valueOf(service.trim().toUpperCase()) : null;
+        this.version = (version != null) ? new Version(version, false, serv) : null;
     }
 
    /**
@@ -184,9 +184,8 @@ public class WebServiceWorker extends ImageProducer {
      */
     private CoordinateReferenceSystem decodeCRS(final String code) throws WebServiceException {
         final int versionThreshold;
-        LOGGER.info("decode CRS :" + code);
-        if (Service.WMS.equals(service) && version != null) {
-            versionThreshold = version.compareTo(AXIS_SWITCH_THRESHOLD);
+        if (version != null && Service.WMS.equals(version.getService())) {
+            versionThreshold = version.compareTo(AXIS_SWITCH_THRESHOLD, 2);
         } else {
             versionThreshold = 1;
         }
@@ -279,12 +278,8 @@ public class WebServiceWorker extends ImageProducer {
                 }
             }
             case 4: envelope.setRange(1, coordinates[1], coordinates[3]);
-                    LOGGER.info("set Range 1:" + coordinates[1] +"," + coordinates[3] + '\n' +
-                                "            minimum = " + envelope.getMinimum(1) + " maximum = " + envelope.getMaximum(1));
             case 3:
             case 2: envelope.setRange(0, coordinates[0], coordinates[2]);
-                    LOGGER.info("set Range 0:" + coordinates[0] +"," + coordinates[2] + '\n' +
-                                "            minimum = " + envelope.getMinimum(0) + " maximum = " + envelope.getMaximum(0));
             case 1:
             case 0: break;
         }

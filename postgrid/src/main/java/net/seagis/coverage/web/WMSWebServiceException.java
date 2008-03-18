@@ -14,6 +14,7 @@
  */
 package net.seagis.coverage.web;
 import net.seagis.coverage.wms.WMSExceptionCode;
+import org.geotools.util.Version;
 
 
 /**

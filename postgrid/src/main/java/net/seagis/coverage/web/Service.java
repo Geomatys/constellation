@@ -30,5 +30,16 @@ public enum Service {
     /**
      * Web Coverage Service.
      */
-    WCS
+    WCS,
+        
+    /**
+     * Catalog Service-Web.
+     */
+    CSW,
+    
+    /**
+     * Sensor Observation Service.
+     */
+    SOS
+            
 }

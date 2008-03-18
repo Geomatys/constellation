@@ -14,11 +14,12 @@
  */
 package net.seagis.coverage.web;
 
-public class Version implements Comparable<Version> {
+public class Version extends org.geotools.util.Version {
+    
     /**
-     * the version number.
+     * the service.
      */
-    private String versionNumber;
+    private Service service;
 
     /**
      * indicate if this version of the service implement the OWS specification.
@@ -28,59 +29,23 @@ public class Version implements Comparable<Version> {
     /**
      * Build a new version.
      */
-    public Version(String versionNumber, boolean isOWS) {
-        this.versionNumber = versionNumber;
-        this.isOWS         = isOWS;
-    }
-
-    public String getVersionNumber() {
-        return versionNumber;
+    public Version(String versionNumber, boolean isOWS, Service service) {
+       super(versionNumber);
+        this.isOWS   = isOWS;
+        this.service = service;   
     }
 
     public boolean isOWS() {
         return isOWS;
     }
+    
+    public Service getService() {
+        return service;
+    }
 
     @Override
     public String toString(){
-        return versionNumber;
+        return super.toString();
     }
 
-    public int compareTo(Version that) {
-        if (this.versionNumber.equals(that.versionNumber)) {
-            return 0;
-        }
-        String thisNumber = this.versionNumber;
-        String thatNumber = that.versionNumber;
-        while (thisNumber.length() != 0) {
-            String temp1 = thisNumber.charAt(0) + "";
-            String temp2 = thatNumber.charAt(0) + "";
-            int i = Integer.parseInt(temp1);
-            int j = Integer.parseInt(temp2);
-            if (i < j) {
-                return -1;
-            } else if (j < i) {
-                return 1;
-            }
-            if (thisNumber.indexOf(".") != -1) {
-                thisNumber = thisNumber.substring(2, thisNumber.length());
-            } else {
-                thisNumber = "";
-            }
-            if (thatNumber.indexOf(".") != -1) {
-                thatNumber = thatNumber.substring(2, thatNumber.length());
-            } else {
-                thatNumber = "";
-            }
-
-            // if one of the number is more longer than the other
-            if ((thatNumber.equals("") && !thisNumber.equals(""))){
-                return 1;
-            }
-            if ((thisNumber.equals("") && !thatNumber.equals(""))){
-                return -1;
-            }
-        }
-        return 0;
-    }
 }

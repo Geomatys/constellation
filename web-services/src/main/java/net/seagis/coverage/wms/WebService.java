@@ -95,7 +95,7 @@ public abstract class WebService {
      /**
      * The version of the SLD profile for the WMS web service. fixed a 1.1.0 for now.
      */
-    private final Version sldVersion = new Version("1.1.0", false);
+    private final Version sldVersion = new Version("1.1.0", false, null);
     
      /**
      * A JAXB unmarshaller used to create java object from XML file.
@@ -287,7 +287,7 @@ public abstract class WebService {
             
             String message = "The parameter ";
             for (Version vers : versions) {
-                message += "VERSION=" + vers.getVersionNumber() + " OR ";
+                message += "VERSION=" + vers.toString() + " OR ";
             }
             message = message.substring(0, message.length()-3);
             message += " must be specified";
@@ -314,7 +314,7 @@ public abstract class WebService {
             
             String message = "The parameter ";
             for (Version vers : versions) {
-                message += "VERSION=" + vers.getVersionNumber() + " OR ";
+                message += "VERSION=" + vers.toString() + " OR ";
             }
             message = message.substring(0, message.length()-3);
             message += " must be specified";
@@ -503,7 +503,7 @@ public abstract class WebService {
      * @return The capabilities Object, or {@code null} if none.
      */
     public Object getCapabilitiesObject() throws JAXBException {
-       String fileName = this.service + "Capabilities" + getCurrentVersion().getVersionNumber() + ".xml";
+       String fileName = this.service + "Capabilities" + getCurrentVersion().toString() + ".xml";
        
        if (fileName == null) {
            return null;
@@ -617,7 +617,7 @@ public abstract class WebService {
      */
     protected Version getVersionFromNumber(String number) {
         for (Version v : versions) {
-            if (v.getVersionNumber().equals(number)){
+            if (v.toString().equals(number)){
                 return v;
             }
         }
@@ -629,11 +629,11 @@ public abstract class WebService {
      */
     protected Version getBestVersion(String number) {
         for (Version v : versions) {
-            if (v.getVersionNumber().equals(number)){
+            if (v.toString().equals(number)){
                 return v;
             }
         }
-        Version wrongVersion = new Version(number, false);
+        Version wrongVersion = new Version(number, false, null);
         if (wrongVersion.compareTo(versions.get(0)) > 0) {
             return this.versions.get(0);
         } else {

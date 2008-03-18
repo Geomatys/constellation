@@ -44,6 +44,7 @@ import javax.ws.rs.Path;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.Series;
+import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.Version;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
@@ -123,13 +124,13 @@ public class WCService extends WebService {
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
     public WCService() throws JAXBException, WebServiceException {
-        super("WCS", new Version("1.1.1", true), new Version("1.0.0", false));
+        super("WCS", new Version("1.1.1", true, Service.WCS), new Version("1.0.0", false, Service.WCS));
         
         setXMLContext("net.seagis.coverage.web:net.seagis.wcs.v100:net.seagis.wcs.v111",
                       "http://www.opengis.net/wcs");
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-        webServiceWorker.setService("WCS", getCurrentVersion());
+        webServiceWorker.setService("WCS", getCurrentVersion().toString());
     }
     
     /**
@@ -196,7 +197,7 @@ public class WCService extends WebService {
                         }
                     }
                     
-                    this.setCurrentVersion(getBestVersion(inputVersion).getVersionNumber());
+                    this.setCurrentVersion(getBestVersion(inputVersion).toString());
                     
                     if (getCurrentVersion().toString().equals("1.0.0")){
                         gc = new net.seagis.wcs.v100.GetCapabilities(getParameter("SECTION", false),
@@ -520,7 +521,7 @@ public class WCService extends WebService {
            isSupportedVersion(inputVersion);
            setCurrentVersion(inputVersion);
         }
-        webServiceWorker.setService("WCS", getCurrentVersion());
+        webServiceWorker.setService("WCS", getCurrentVersion().toString());
         
         Capabilities        responsev111 = null;
         WCSCapabilitiesType responsev100 = null;
@@ -721,7 +722,7 @@ public class WCService extends WebService {
         logger.info("getCoverage request processing");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
-        webServiceWorker.setService("WCS", getCurrentVersion());
+        webServiceWorker.setService("WCS", getCurrentVersion().toString());
         String format = null, coverage = null, crs = null, bbox = null, time = null , interpolation = null, exceptions;
         String width = null, height = null, depth = null;
         String resx  = null, resy   = null, resz  = null;
