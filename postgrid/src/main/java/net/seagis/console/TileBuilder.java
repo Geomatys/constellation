@@ -32,6 +32,7 @@ import java.util.Properties;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import javax.imageio.ImageWriteParam;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 
@@ -89,7 +90,7 @@ public class TileBuilder {
     /**
      * Flags specified on the command lines.
      */
-    private boolean keepLayout, writeToDisk, fillDatabase, pretend;
+    private boolean keepLayout, noCompress, writeToDisk, fillDatabase, pretend;
 
     /**
      * Standard output streams.
@@ -149,6 +150,7 @@ public class TileBuilder {
      */
     protected boolean parseArguments(final Arguments arguments) {
         keepLayout   = arguments.getFlag("--keep-layout");
+        noCompress   = arguments.getFlag("--no-compress");
         writeToDisk  = arguments.getFlag("--write-to-disk");
         fillDatabase = arguments.getFlag("--fill-database");
         pretend      = arguments.getFlag("--pretend");
@@ -216,6 +218,42 @@ public class TileBuilder {
      * Creates the target tiles, optionnaly write them to disk and to the database.
      */
     private boolean createTargetTiles(Collection<Tile> tiles) {
+        /*
+         * From the big tiles declared in the property files, infers a set of smaller tiles at
+         * different overview levels. For example starting with 6 BlueMarble tiles, we can get
+         * 4733 tiles of size 960 x 960 pixels. The result is printed to the standard output.
+         */
+        MosaicBuilder builder = new MosaicBuilder() {
+            @Override
+            protected void onTileWrite(Tile tile, ImageWriteParam parameters) throws IOException {
+                if (noCompress) {
+                    parameters.setCompressionMode(ImageWriteParam.MODE_DISABLED);
+                }
+            }
+        };
+        builder.setLogLevel(Level.INFO);
+        if (tileSize != null) {
+            builder.setTileSize(tileSize);
+        }
+        builder.setTileDirectory(targetDirectory);
+        builder.setMosaicEnvelope(envelope);
+        final TileManager tileManager;
+        if (keepLayout) {
+            tileManager = TileManagerFactory.DEFAULT.create(tiles)[0];
+        } else try {
+            tileManager = builder.createTileManager(tiles, 0, writeToDisk && !pretend);
+        } catch (IOException e) {
+            err.println(e);
+            return false;
+        }
+        tiles = tileManager.getTiles();
+        /*
+         * Creates a global tiles which cover the whole area.
+         * We will use the most frequently used file suffix for this tile.
+         *
+         * TODO: probably a bad idea - WritableGridCoverageTable will no accepts arbitrary suffix,
+         *       but only the suffix expected by the series. We will need to revisit this policy.
+         */
         final SortedSet<String> suffixes = new FrequencySortedSet<String>(true);
         for (final Tile tile : tiles) {
             final Object input = tile.getInput();
@@ -227,41 +265,22 @@ public class TileBuilder {
                 }
             }
         }
-        /*
-         * From the big tiles declared in the property files, infers a set of smaller tiles at
-         * different overview levels. For example starting with 6 BlueMarble tiles, we can get
-         * 4733 tiles of size 960 x 960 pixels. The result is printed to the standard output.
-         */
-        MosaicBuilder builder = new MosaicBuilder();
-        builder.setLogLevel(Level.INFO);
-        if (tileSize != null) {
-            builder.setTileSize(tileSize);
+        String name = series;
+        if (!suffixes.isEmpty()) {
+            name += suffixes.first();
         }
-        builder.setTileDirectory(targetDirectory);
-        builder.setMosaicEnvelope(envelope);
-        final TileManager tileManager;
         final Tile global;
         try {
-            if (keepLayout) {
-                tileManager = TileManagerFactory.DEFAULT.create(tiles)[0];
-            } else {
-                tileManager = builder.createTileManager(tiles, 0, writeToDisk && !pretend);
-            }
-            String name = series;
-            if (!suffixes.isEmpty()) {
-                name += suffixes.first();
-            }
             global = tileManager.createGlobalTile(null, name, 0);
         } catch (IOException e) {
             err.println(e);
             return false;
         }
-        tiles = tileManager.getTiles();
-        out.println(tileManager);
         /*
          * Fills the database if requested by the user. The tiles entries will be inserted in the
          * "Tiles" table while the global entry will be inserted into the "GridCoverages" table.
          */
+        out.println(tileManager);
         if (fillDatabase) try {
             final Database database = new Database();
             if (pretend) {

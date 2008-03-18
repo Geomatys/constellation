@@ -53,6 +53,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testSST() throws WebServiceException, IOException {
+if (true) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", new Version("1.0", false));
         worker.setLayer(LayerTableTest.SAMPLE_NAME);
@@ -172,6 +173,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testNetCDF() throws WebServiceException, IOException {
+if (true) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setInterpolation("bilinear");
         worker.setService("WMS", new Version("1.0", false));
@@ -236,9 +238,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testBlueMarble() throws WebServiceException, IOException {
-        if (true) {
-            return; // TODO
-        }
+if (true) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", new Version("1.1", false));
         worker.setLayer("BlueMarble");

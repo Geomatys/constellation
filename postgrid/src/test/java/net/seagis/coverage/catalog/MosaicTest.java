@@ -35,19 +35,21 @@ import net.seagis.catalog.DatabaseTest;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class BlueMarbleTest extends DatabaseTest {
+public class MosaicTest extends DatabaseTest {
     /**
      * The layer name in the database.
      */
-    private static final String LAYER = "BlueMarble";
+    private static final String BLUEMARBLE = "BlueMarble", ORTHO2000 = "Ortho2000";
 
     /**
-     * Tests a query on the full extent (no subarea, no subsampling).
-     * We will not try to load this image, since it would be too big.
+     * Tests the BlueMarble layer. We try first with a query on the full extent (no subarea, no
+     * subsampling) without trying to load the image since it would be too big. Next we test the
+     * global area with a 1°&times;1° pixel size. The image should be 360&times;180 pixel width.
      */
     @Test
-    public void testGlobal() throws Exception {
-        final Layer layer = database.getTable(LayerTable.class).getEntry(LAYER);
+    public void testBlueMarble() throws Exception {
+        LayerTable table = database.getTable(LayerTable.class);
+        Layer layer = table.getEntry(BLUEMARBLE);
         assertNotNull(layer);
 
         Set<CoverageReference> entries = layer.getCoverageReferences();
@@ -57,44 +59,66 @@ public class BlueMarbleTest extends DatabaseTest {
         CoverageReference other = layer.getCoverageReferences().iterator().next();
         assertEquals("Should be cached", entry, other);
         assertSame  ("Should be cached", entry, other);
-        assertEquals("BlueMarble", entry.getSeries().getName());
+        assertEquals(BLUEMARBLE, entry.getSeries().getName());
         assertEquals(GeographicBoundingBoxImpl.WORLD, entry.getGeographicBoundingBox());
 
         Rectangle range = entry.getGridGeometry().getGridRange2D();
         assertEquals(4*21600, range.width);
         assertEquals(2*21600, range.height);
-    }
-
-    /**
-     * Tests the global area with a 1°&times;1° pixel size.
-     * The image should be 360&times;180 pixel width.
-     */
-    @Test
-    public void testSubsampling() throws Exception {
-        final LayerTable table = new LayerTable(database.getTable(LayerTable.class));
+        /*
+         * Applies subsampling.
+         */
+        table = new LayerTable(table);
         table.setPreferredResolution(new Dimension(1,1));
-        final Layer layer = table.getEntry(LAYER);
+        layer = table.getEntry(BLUEMARBLE);
         assertNotNull(layer);
 
-        Set<CoverageReference> entries = layer.getCoverageReferences();
+        entries = layer.getCoverageReferences();
         assertEquals(1, entries.size());
 
-        CoverageReference entry = layer.getCoverageReference();
-        CoverageReference other = layer.getCoverageReference();
+        entry = layer.getCoverageReference();
+        other = layer.getCoverageReference();
         assertEquals("Should be cached", entry, other);
         assertSame  ("Should be cached", entry, other);
-        assertEquals("BlueMarble", entry.getSeries().getName());
+        assertEquals(BLUEMARBLE, entry.getSeries().getName());
         assertTrue  (entries.contains(entry));
         assertEquals(GeographicBoundingBoxImpl.WORLD, entry.getGeographicBoundingBox());
 
-        Rectangle range = entry.getGridGeometry().getGridRange2D();
+        range = entry.getGridGeometry().getGridRange2D();
         assertEquals(360, range.width);
         assertEquals(180, range.height);
 
         GridCoverage2D coverage = entry.getCoverage(null);
         RenderedImage image = coverage.view(ViewType.RENDERED).getRenderedImage();
+        // The image size is different than the expected one because ImageMosaicImageReader
+        // selected a different subsampling than the requested one for performance reasons.
+        assertEquals(480, image.getWidth());
+        assertEquals(240, image.getHeight());
         if (false) {
-            ImageIO.write(image, "png", new File("Test.png"));
+            ImageIO.write(image, "png", new File("Test-BlueMarble.png"));
+        }
+    }
+
+    /**
+     * Tests loading a mosaic from Ortho Littorale 2000.
+     */
+    @Test
+    public void testOrtho2000() throws Exception {
+        final LayerTable table = new LayerTable(database.getTable(LayerTable.class));
+        Layer layer = table.getEntry(ORTHO2000);
+        assertNotNull(layer);
+        CoverageReference entry = layer.getCoverageReference();
+        Rectangle range = entry.getGridGeometry().getGridRange2D();
+        assertEquals(10000, range.width);
+        assertEquals(20000, range.height);
+
+        table.setPreferredResolution(new Dimension(1,1));
+        layer = table.getEntry(ORTHO2000);
+        entry = layer.getCoverageReference();
+        GridCoverage2D coverage = entry.getCoverage(null);
+        RenderedImage image = coverage.view(ViewType.RENDERED).getRenderedImage();
+        if (false) {
+            ImageIO.write(image, "png", new File("Test-Ortho2000.png"));
         }
     }
 }

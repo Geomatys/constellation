@@ -407,6 +407,8 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
                                             final String newIdentifier)
             throws SQLException, CatalogException
     {
+        ensureNonNull("size",      size);
+        ensureNonNull("gridToCRS", gridToCRS);
         final GridGeometryQuery query = (GridGeometryQuery) super.query;
         PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
         statement.setInt   (indexOf(query.byWidth),          size.width );

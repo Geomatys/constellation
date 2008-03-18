@@ -25,6 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -485,6 +487,21 @@ public class Table {
      * Clears the cache, if any.
      */
     public void flush() {
+    }
+
+    /**
+     * Ensures that the given argument is non-null. This is a convenience method for argument checks.
+     *
+     * @param  name  The argument name.
+     * @param  value The argument value.
+     * @throws IllegalArgumentException if the given value is {@code null}.
+     */
+    protected static void ensureNonNull(final String name, final Object value)
+            throws IllegalArgumentException
+    {
+        if (value == null) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
+        }
     }
 
     /**

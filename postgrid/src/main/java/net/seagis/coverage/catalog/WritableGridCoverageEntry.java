@@ -195,10 +195,8 @@ public class WritableGridCoverageEntry {
             final File allFiles = candidate.file("*");
             String name = allFiles.getName();
             final int split = name.lastIndexOf('.');
-            if (split >= 0) {
-                name = name.substring(split + 1);
-            }
-            if (!extension.equalsIgnoreCase(name)) {
+            final String ext = (split >= 0) ? name.substring(split + 1) : "";
+            if (!extension.equalsIgnoreCase(ext)) {
                 continue;
             }
             /*
@@ -364,7 +362,7 @@ public class WritableGridCoverageEntry {
                 gridToCRS = new AffineTransform(gridToCRS);
                 gridToCRS.translate(origin.x, origin.y);
             }
-        } else if (gridToCRS == null && metadata != null) {
+        } else if (metadata != null) {
             // No translation to apply here because the 'gridToCRS' transform
             // doesn't come from the tile.
             gridToCRS = metadata.getGridToCRS();

@@ -270,7 +270,7 @@ final class CoverageComparator implements Comparator<CoverageReference> {
         private final Envelope source;
 
         /**
-         * Largeur et hauteur de l'image en nombre de pixels, dans l'exe
+         * Largeur et hauteur de l'image en nombre de pixels, dans l'axe
          * Est-Ouest ({@code width}) ou Nord-Sud ({@code height}).
          */
         private final int width, height;
