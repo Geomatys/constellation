@@ -14,6 +14,8 @@
  */
 package net.seagis.coverage.web;
 
+import org.geotools.util.Version;
+
 
 /**
  * A version applicable to a web {@linkplain Service service}.
@@ -22,31 +24,40 @@ package net.seagis.coverage.web;
  * @author Guilhem Legal
  */
 @SuppressWarnings("serial") // Not intented to be serialized at this time.
-public class Version extends org.geotools.util.Version {
+public class ServiceVersion extends Version {
+    /**
+     * The first WCS version to be considered as OWS.
+     */
+    private static ServiceVersion THRESHOLD = new ServiceVersion(Service.WCS, "1.1");
+
     /**
      * The service.
      */
     private final Service service;
 
     /**
-     * Indicate if this version of the service implement the OWS specification.
+     * Builds a new version for the given service.
      */
-    private final boolean isOWS;
-
-    /**
-     * Build a new version.
-     */
-    public Version(final String versionNumber, final boolean isOWS, final Service service) {
-       super(versionNumber);
-        this.isOWS   = isOWS;
+    public ServiceVersion(final Service service, final String version) {
+        super(version);
         this.service = service;
     }
 
-    public boolean isOWS() {
-        return isOWS;
-    }
-
+    /**
+     * Returns the service.
+     */
     public Service getService() {
         return service;
+    }
+
+    /**
+     * Returns {@code true} if the service is a OWS service.
+     */
+    public boolean isOWS() {
+        switch (service) {
+            default:  return false;
+            case OWS: return true;
+            case WCS: return compareTo(THRESHOLD) >= 0;
+        }
     }
 }

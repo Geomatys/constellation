@@ -54,7 +54,8 @@ import javax.xml.bind.UnmarshalException;
 
 // seagis dependencies
 import net.seagis.catalog.Database;
-import net.seagis.coverage.web.Version;
+import net.seagis.coverage.web.Service;
+import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
@@ -85,17 +86,17 @@ public abstract class WebService {
     /**
      * The supported versions supportd by this web service.
      */
-    private final List<Version> versions = new ArrayList<Version>();
+    private final List<ServiceVersion> versions = new ArrayList<ServiceVersion>();
     
     /**
      * The current version used (since the last request)
      */
-    private Version currentVersion;
+    private ServiceVersion currentVersion;
     
      /**
      * The version of the SLD profile for the WMS web service. fixed a 1.1.0 for now.
      */
-    private final Version sldVersion = new Version("1.1.0", false, null);
+    private final ServiceVersion sldVersion = new ServiceVersion(Service.WMS, "1.1.0");
     
      /**
      * A JAXB unmarshaller used to create java object from XML file.
@@ -158,10 +159,10 @@ public abstract class WebService {
      * 
      * @param versions A list of the supported version of this service.
      */
-    public WebService(String service, Version... versions) {
+    public WebService(String service, ServiceVersion... versions) {
         this.service = service;
        
-        for (final Version element : versions) {
+        for (final ServiceVersion element : versions) {
             this.versions.add(element);
         }
         if (this.versions.size() == 0)
@@ -234,7 +235,7 @@ public abstract class WebService {
         }
         if (notFound) {
             if (mandatory) {
-                Version v;
+                ServiceVersion v;
                 if (parameterName.equalsIgnoreCase("version")) {
                     v = null;
                 } else {
@@ -286,7 +287,7 @@ public abstract class WebService {
         if (getVersionFromNumber(inputVersion) == null) {
             
             String message = "The parameter ";
-            for (Version vers : versions) {
+            for (ServiceVersion vers : versions) {
                 message += "VERSION=" + vers.toString() + " OR ";
             }
             message = message.substring(0, message.length()-3);
@@ -313,7 +314,7 @@ public abstract class WebService {
         if (getVersionFromNumber(versionNumber) == null) {
             
             String message = "The parameter ";
-            for (Version vers : versions) {
+            for (ServiceVersion vers : versions) {
                 message += "VERSION=" + vers.toString() + " OR ";
             }
             message = message.substring(0, message.length()-3);
@@ -367,7 +368,7 @@ public abstract class WebService {
     /**
      * Return the current version of the Web Service.
      */
-    protected Version getCurrentVersion() {
+    protected ServiceVersion getCurrentVersion() {
         return this.currentVersion;
     }
     
@@ -382,7 +383,7 @@ public abstract class WebService {
     /**
      * Return the SLD version.
      */
-    protected Version getSldVersion() {
+    protected ServiceVersion getSldVersion() {
         return this.sldVersion;
     }
     
@@ -615,8 +616,8 @@ public abstract class WebService {
      * @param number the version number.
      * @return
      */
-    protected Version getVersionFromNumber(String number) {
-        for (Version v : versions) {
+    protected ServiceVersion getVersionFromNumber(String number) {
+        for (ServiceVersion v : versions) {
             if (v.toString().equals(number)){
                 return v;
             }
@@ -627,13 +628,13 @@ public abstract class WebService {
     /**
      * 
      */
-    protected Version getBestVersion(String number) {
-        for (Version v : versions) {
+    protected ServiceVersion getBestVersion(String number) {
+        for (ServiceVersion v : versions) {
             if (v.toString().equals(number)){
                 return v;
             }
         }
-        Version wrongVersion = new Version(number, false, null);
+        ServiceVersion wrongVersion = new ServiceVersion(null, number);
         if (wrongVersion.compareTo(versions.get(0)) > 0) {
             return this.versions.get(0);
         } else {

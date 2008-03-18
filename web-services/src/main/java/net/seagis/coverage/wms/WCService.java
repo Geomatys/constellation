@@ -45,7 +45,7 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.Series;
 import net.seagis.coverage.web.Service;
-import net.seagis.coverage.web.Version;
+import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
@@ -124,7 +124,7 @@ public class WCService extends WebService {
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
     public WCService() throws JAXBException, WebServiceException {
-        super("WCS", new Version("1.1.1", true, Service.WCS), new Version("1.0.0", false, Service.WCS));
+        super("WCS", new ServiceVersion(Service.WCS, "1.1.1"), new ServiceVersion(Service.WCS, "1.0.0"));
         
         setXMLContext("net.seagis.coverage.web:net.seagis.wcs.v100:net.seagis.wcs.v111",
                       "http://www.opengis.net/wcs");

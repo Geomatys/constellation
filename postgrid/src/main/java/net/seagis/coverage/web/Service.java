@@ -38,6 +38,11 @@ public enum Service {
     CSW,
 
     /**
+     * Observation Web service.
+     */
+    OWS,
+
+    /**
      * Sensor Observation Service.
      */
     SOS

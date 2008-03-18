@@ -33,7 +33,7 @@ import net.seagis.cat.csw.HarvestResponseType;
 import net.seagis.cat.csw.HarvestType;
 import net.seagis.cat.csw.TransactionResponseType;
 import net.seagis.cat.csw.TransactionType;
-import net.seagis.coverage.web.Version;
+import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterCapabilities;
 import net.seagis.ows.v100.AcceptFormatsType;
@@ -59,7 +59,7 @@ public class CSWworker {
     /**
      * The version of the service
      */
-    private Version version;
+    private ServiceVersion version;
     
     /**
      * A capabilities object containing the static part of the document.
@@ -224,7 +224,7 @@ public class CSWworker {
     /**
      * Set the current service version
      */
-    public void setVersion(Version version){
+    public void setVersion(ServiceVersion version){
         this.version = version;
     }
     

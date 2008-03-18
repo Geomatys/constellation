@@ -61,7 +61,7 @@ public class WebServiceWorker extends ImageProducer {
      * WMS before this version needs longitude before latitude. WMS after this version don't
      * perform axis switch. WMS at this exact version switch axis only for EPSG:4326.
      */
-    private static final Version AXIS_SWITCH_THRESHOLD = new Version("1.1", false , Service.WMS);
+    private static final ServiceVersion AXIS_SWITCH_THRESHOLD = new ServiceVersion(Service.WMS, "1.1");
 
     /**
      * The EPSG code for the CRS for which to switch axis in the version
@@ -148,7 +148,7 @@ public class WebServiceWorker extends ImageProducer {
      */
     public void setService(final String service, final String version) throws WebServiceException {
         Service serv = (service != null) ? Service.valueOf(service.trim().toUpperCase()) : null;
-        this.version = (version != null) ? new Version(version, false, serv) : null;
+        this.version = (version != null) ? new ServiceVersion(serv, version) : null;
     }
 
    /**

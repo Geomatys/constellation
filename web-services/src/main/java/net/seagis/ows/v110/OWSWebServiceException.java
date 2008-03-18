@@ -15,7 +15,7 @@
 
 package net.seagis.ows.v110;
 
-import net.seagis.coverage.web.Version;
+import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ows.OWSExceptionCode;
 
@@ -34,7 +34,7 @@ public class OWSWebServiceException extends WebServiceException {
         super();
     }
             
-    public OWSWebServiceException(String message, OWSExceptionCode code, String locator, Version v) {
+    public OWSWebServiceException(String message, OWSExceptionCode code, String locator, ServiceVersion v) {
         super(message);
         this.exception = new ExceptionReport(message, code.name(), locator, v);
     }

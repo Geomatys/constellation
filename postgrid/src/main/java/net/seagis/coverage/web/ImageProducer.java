@@ -156,7 +156,7 @@ public abstract class ImageProducer {
     /**
      * The web service version.
      */
-    protected Version version;
+    protected ServiceVersion version;
 
     /**
      * The layer name.

@@ -47,7 +47,7 @@ import net.seagis.sld.StyledLayerDescriptor;
 import net.seagis.wms.Layer;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
-import net.seagis.coverage.web.Version;
+import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.gml.DirectPositionType;
 import net.seagis.gml.PointType;
 import net.seagis.se.OnlineResourceType;
@@ -86,7 +86,7 @@ public class WMService extends WebService {
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
     public WMService() throws JAXBException, WebServiceException {
-        super("WMS", new Version("1.3.0", false, Service.WMS) ,new Version("1.1.1", false, Service.WMS));
+        super("WMS", new ServiceVersion(Service.WMS, "1.3.0") ,new ServiceVersion(Service.WMS, "1.1.1"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext("net.seagis.coverage.web:net.seagis.wms:net.seagis.sld:net.seagis.gml",
