@@ -35,7 +35,8 @@ import javax.xml.bind.JAXBException;
 // seaGIS dependencies
 import net.seagis.catalog.NoSuchTableException;
 import net.seagis.ows.v110.OWSWebServiceException;
-import net.seagis.coverage.web.Version;
+import net.seagis.coverage.web.Service;
+import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.WebService;
 import net.seagis.ows.v110.AcceptFormatsType;
@@ -61,7 +62,7 @@ public class SOService extends WebService {
      * Build a new Restfull SOS service.
      */
     public SOService() throws SQLException, NoSuchTableException, IOException, JAXBException {
-        super("SOS", new Version("1.0.0", true));
+        super("SOS", new ServiceVersion(Service.OWS, "1.0.0"));
         worker = new SOSworker();
         worker.setVersion(getCurrentVersion());
         setXMLContext("net.seagis.sos:net.seagis.gml:net.seagis.swe:net.seagis.gml:net.seagis.observation",

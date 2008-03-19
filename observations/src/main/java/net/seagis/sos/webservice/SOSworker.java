@@ -72,7 +72,7 @@ import net.seagis.ogc.LiteralType;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.NoSuchRecordException;
-import net.seagis.coverage.web.Version;
+import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.WebService;
@@ -246,7 +246,7 @@ public class SOSworker {
     /**
      * The version of the service
      */
-    private Version version;
+    private ServiceVersion version;
     
     /**
      * A capabilities object containing the static part of the document.
@@ -1991,7 +1991,7 @@ public class SOSworker {
     /**
      * Set the current service version
      */
-    public void setVersion(Version version){
+    public void setVersion(ServiceVersion version){
         this.version = version;
     }
     

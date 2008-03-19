@@ -24,7 +24,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.metadata.iso.MetaDataImpl;
 
 
 /**
@@ -57,13 +59,39 @@ import javax.xml.bind.annotation.XmlType;
     "abstractRecord",
     "any"
 })
+@XmlRootElement(name="GetRecordByIdResponseType")
 public class GetRecordByIdResponseType {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw/2.0.2", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractRecordType>> abstractRecord;
     @XmlAnyElement(lax = true)
-    private List<Object> any;
+    private List<? extends Object> any;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    GetRecordByIdResponseType() {
+        
+    }
+    
+    /**
+     * Build a new response to a getRecordById request.
+     * catalogue version/ISO version
+     * one of the two list must be null
+     */
+    public GetRecordByIdResponseType(List<JAXBElement<? extends AbstractRecordType>> abstractRecord, List<MetaDataImpl> metadatas) {
+        this.abstractRecord = abstractRecord;
+        this.any = metadatas;
+    }
+    
+    /**
+     * Build a new response to a getRecordById request.
+     * ISO version
+     
+    public GetRecordByIdResponseType(List<MetaDataImpl> metadatas) {
+        this.any = metadatas;
+    }*/
+    
     /**
      * Gets the value of the abstractRecord property.
      * (unmodifiable) 

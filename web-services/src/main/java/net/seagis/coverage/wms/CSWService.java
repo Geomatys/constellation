@@ -17,8 +17,10 @@
 package net.seagis.coverage.wms;
 
 import com.sun.ws.rest.spi.resource.Singleton;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +59,7 @@ import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
 import net.seagis.ows.v100.OWSWebServiceException;
 import net.seagis.ows.v100.SectionsType;
+import net.seagis.coverage.web.Service;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
@@ -74,7 +77,7 @@ public class CSWService extends WebService {
     /**
      * Build a new Restfull CSW service.
      */
-    public CSWService() throws JAXBException {
+    public CSWService() throws JAXBException, IOException, SQLException {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
         worker = new CSWworker();
         worker.setVersion(getCurrentVersion());
