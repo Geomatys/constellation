@@ -66,6 +66,7 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.util.DateRange;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
@@ -440,7 +441,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         final GridRange gridRange = geometry.gridRange;
         final int width  = gridRange.getLength(0);
         final int height = gridRange.getLength(1);
-        final XRectangle2D boundingBox = geometry.geographicEnvelope;
         final AffineTransform gridToCRS = geometry.gridToCRS; // DO NOT MODIFY.
         final AffineTransform crsToGrid;
         try {
@@ -457,12 +457,13 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         final int xSubsampling;
         final int ySubsampling;
         if (resolution != null) {
+            final XRectangle2D boundingBox = geometry.geographicEnvelope;
             final double xResolution = resolution.getWidth();
             final double yResolution = resolution.getHeight();
             Rectangle2D sample = new Rectangle2D.Double(
                     boundingBox.getCenterX() - 0.5 * xResolution,
                     boundingBox.getCenterY() - 0.5 * yResolution, xResolution, yResolution);
-            sample = settings.tableToCoverageCRS(sample, sample);
+            sample = settings.tableToCoverageCRS(sample, sample, false);
             sample = XAffineTransform.transform(crsToGrid, sample, sample);
             xSubsampling = max(1, min(width /MIN_SIZE, (int)round(sample.getWidth ())));
             ySubsampling = max(1, min(height/MIN_SIZE, (int)round(sample.getHeight())));
@@ -487,6 +488,15 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             clipLogical = geometry.getEnvelope2D();
         } else {
             /*
+             * Following should produces a result identical to settings.geographicEnvelope. However in
+             * some case the result is different, when the PostGIS "spatial_ref_sys" table contains an
+             * error. By doing the transformation ourself rather than relying on the value computed by
+             * PostGIS, an error (if any) will be canceled later when we will reproject back to the
+             * coverage CRS.
+             */
+            Envelope2D boundingBox = geometry.getEnvelope2D();
+            boundingBox = (Envelope2D) settings.tableToCoverageCRS(boundingBox, boundingBox, true);
+            /*
              * Vérifie si le rectangle demandé (clipArea) intercepte la région géographique
              * couverte par l'image. On utilise un code spécial plutôt que de faire appel à
              * Rectangle2D.intersects(..) parce qu'on veut accepter les cas où le rectangle
@@ -504,7 +514,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             }
             clipLogical = new Rectangle2D.Double(); // Will be computed below.
             Rectangle2D.intersect(boundingBox, clipArea, clipLogical);
-            clipLogical = settings.tableToCoverageCRS(clipLogical, clipLogical);
+            clipLogical = settings.tableToCoverageCRS(clipLogical, clipLogical, false);
             /*
              * Transforms ["real world" envelope] --> [region in pixel coordinates].
              * We temporarily overwrite "clipLogical", but will recompute it later.
@@ -754,7 +764,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * @param  resolution Résolution désirée, exprimée selon le CRS de la table d'images.
      * @return {@code true} si la résolution de cette image est égale ou supérieure à la résolution
      *         demandée. Cette méthode retourne {@code false} si {@code resolution} était nul.
-      */
+     *
+     * @deprecated Current implementation is no longer consistent with {@link #computeBounds}.
+     */
+    @Deprecated
     final boolean hasEnoughResolution(final Dimension2D resolution) {
         final GridRange gridRange = geometry.gridRange;
         final int width  = gridRange.getLength(0);

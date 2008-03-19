@@ -169,7 +169,7 @@ final class GridCoverageSettings implements Serializable {
      *
      * @todo Attention, getCRS2D ne tient pas compte des dimensions des GridCoverages
      */
-    final Rectangle2D tableToCoverageCRS(Rectangle2D area, final Rectangle2D dest)
+    final Rectangle2D tableToCoverageCRS(Rectangle2D area, final Rectangle2D dest, final boolean inverse)
             throws TransformException
     {
         CoordinateReferenceSystem sourceCRS = tableCRS;
@@ -182,7 +182,11 @@ final class GridCoverageSettings implements Serializable {
             } catch (FactoryException exception) {
                 throw new TransformException(exception.getLocalizedMessage(), exception);
             }
-            area = CRS.transform(tableToCoverageCRS, area, dest);
+            MathTransform2D mt = tableToCoverageCRS;
+            if (inverse) {
+                mt = mt.inverse();
+            }
+            area = CRS.transform(mt, area, dest);
         }
         return area;
     }

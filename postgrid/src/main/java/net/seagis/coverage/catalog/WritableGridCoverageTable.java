@@ -288,8 +288,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                     series = entry.choose(candidates);
                 } else {
                     final SeriesTable table = getDatabase().getTable(SeriesTable.class);
-                    final String ID = table.getIdentifier(layer.getName(),
-                            entry.path.getPath(), entry.extension, entry.getFormatName(true));
+                    final String path = (entry.path != null) ? entry.path.getPath() : "";
+                    final String ID = table.getIdentifier(layer.getName(), path,
+                                        entry.extension, entry.getFormatName(true));
                     series = table.getEntry(ID);
                 }
             }

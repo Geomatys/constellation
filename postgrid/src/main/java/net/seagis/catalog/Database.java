@@ -280,6 +280,8 @@ public class Database {
                 properties.loadFromXML(in);
                 in.close();
                 Element.LOGGER.config("PostGrid configuration file is " + file);
+            } else {
+                Element.LOGGER.warning("No " + CONFIG_FILENAME + " file found. Fallback on default.");
             }
         }
         final String ID = getProperty(ConfigurationKey.TIMEZONE);
@@ -319,7 +321,7 @@ public class Database {
             return null;
         }
         /*
-         * Donne priorité au fichier de configuration dans le répertoire courant, s'il existe.
+         * Searchs in current directory first.
          */
         File path = new File(configFilename);
         if (path.isFile()) {
@@ -327,20 +329,20 @@ public class Database {
         }
         if (path.isDirectory()) {
             path = new File(path, CONFIG_FILENAME);
+            if (path.isFile()) {
+                return path;
+            }
         }
         /*
-         * Recherche dans le répertoire de configuration de l'utilisateur,
-         * en commançant par le répertoire de de GeoServer s'il est définit.
+         * If the file is relative and do not exists, replaces what we have computed
+         * so far by a new values inferred from the user home directory.
          */
         if (!path.isAbsolute()) {
-            String home = System.getenv("GEOSERVER_DATA_DIR");
-            if (home == null || !(path=new File(home)).isDirectory()) {
-                home = System.getProperty("user.home");
-                if (System.getProperty("os.name", "").startsWith("Windows")) {
-                    path = new File(home, WINDOWS_DIRECTORY);
-                } else {
-                    path = new File(home, UNIX_DIRECTORY);
-                }
+            final String home = System.getProperty("user.home");
+            if (System.getProperty("os.name", "").startsWith("Windows")) {
+                path = new File(home, WINDOWS_DIRECTORY);
+            } else {
+                path = new File(home, UNIX_DIRECTORY);
             }
         }
         if (!path.exists()) {

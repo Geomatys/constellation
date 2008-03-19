@@ -78,7 +78,8 @@ public class WritableGridCoverageEntry {
 
     /**
      * The path to the coverage file (not including the filename). This is part of the input
-     * splitted as "{@linkplain #path}/{@linkplain #filename}.{@linkplain #extension}".
+     * splitted as "{@linkplain #path}/{@linkplain #filename}.{@linkplain #extension}". May
+     * be {@code null} if the filename has no parent directory.
      */
     protected final File path;
 
