@@ -283,6 +283,11 @@
       <name>Geotools et ses dépendances spécifiques</name>
       <url>http://maven.geotools.fr/repository</url>
     </repository>
+    <repository>
+      <id>geomatys</id>
+      <name>Other projects</name>
+      <url>http://maven.geomatys.fr/repository</url>
+    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
