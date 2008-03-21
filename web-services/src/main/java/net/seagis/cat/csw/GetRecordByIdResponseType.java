@@ -80,6 +80,9 @@ public class GetRecordByIdResponseType {
      * one of the two list must be null
      */
     public GetRecordByIdResponseType(List<JAXBElement<? extends AbstractRecordType>> abstractRecord, List<MetaDataImpl> metadatas) {
+        if (abstractRecord != null && any != null) {
+            throw new IllegalArgumentException("one of abstractRecord or any must be null");
+        }
         this.abstractRecord = abstractRecord;
         this.any = metadatas;
     }

@@ -20,6 +20,7 @@ package net.seagis.cat.csw;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -47,6 +48,14 @@ import javax.xml.bind.annotation.XmlType;
     BriefRecordType.class
 })
 public abstract class AbstractRecordType {
-
+    
+    @XmlTransient
+    protected static net.seagis.ows.v100.ObjectFactory owsFactory = new net.seagis.ows.v100.ObjectFactory();
+    
+    @XmlTransient
+    protected static net.seagis.dublincore.elements.ObjectFactory dublinFactory = new net.seagis.dublincore.elements.ObjectFactory();
+    
+    @XmlTransient
+    protected static net.seagis.dublincore.terms.ObjectFactory dublinTermFactory = new net.seagis.dublincore.terms.ObjectFactory();
 
 }

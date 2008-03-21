@@ -99,6 +99,47 @@ public class SummaryRecordType extends AbstractRecordType {
     @XmlElementRef(name = "BoundingBox", namespace = "http://www.opengis.net/ows", type = JAXBElement.class)
     private List<JAXBElement<? extends BoundingBoxType>> boundingBox;
 
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    SummaryRecordType(){
+        
+    }
+    
+    /**
+     * Build a new Summary record TODO add relation and spatial
+     */
+    public SummaryRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, List<BoundingBoxType> bboxes,
+            List<SimpleLiteral> subject, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract){
+        
+        this.identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.identifier.add(dublinFactory.createIdentifier(identifier));
+        
+        this.title = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.title.add(dublinFactory.createTitle(title));
+        
+        this.type = type;
+        
+        this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+        for (BoundingBoxType bbox: bboxes) {
+            this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+        }
+        this.subject = subject;
+        
+        this.format = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.format.add(dublinFactory.createFormat(format));
+        
+        this.modified = new ArrayList<SimpleLiteral>();
+        this.modified.add(modified);
+        
+        this._abstract = new ArrayList<SimpleLiteral>();
+        this._abstract.add(_abstract);
+        
+        
+    }
+    
+    
     /**
      * Gets the value of the identifier property.
      * (unmodifiable)

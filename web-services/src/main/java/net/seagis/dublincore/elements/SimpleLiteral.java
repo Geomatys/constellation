@@ -68,6 +68,30 @@ public class SimpleLiteral {
     private String scheme;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    SimpleLiteral() {
+        
+    }
+    
+    /**
+     * Build a new Simple literal
+     */
+    public SimpleLiteral(String scheme, String content) {
+        this.scheme  = scheme;
+        this.content = new ArrayList<String>();
+        this.content.add(content);
+    }
+    
+    /**
+     * Build a new Simple literal
+     */
+    public SimpleLiteral(String scheme, List<String> content) {
+        this.scheme  = scheme;
+        this.content = content;
+    }
+    
+    /**
      * This is the default type for all of the DC elements. It defines a 
      *       complexType SimpleLiteral which permits mixed content but disallows 
      *       child elements by use of minOcccurs/maxOccurs. However, this complexType 

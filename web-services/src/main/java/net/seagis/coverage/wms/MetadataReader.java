@@ -15,21 +15,37 @@
  */
 package net.seagis.coverage.wms;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Logger;
+import net.seagis.cat.csw.AbstractRecordType;
+import net.seagis.cat.csw.BriefRecordType;
+import net.seagis.cat.csw.ElementSetType;
+import net.seagis.cat.csw.SummaryRecordType;
+import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.ows.v100.BoundingBoxType;
+import net.seagis.cat.csw.RecordType;
 import org.geotools.metadata.iso.MetadataEntity;
+import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
@@ -70,16 +86,32 @@ public class MetadataReader {
      * TODO remove this property to get all the Catalog (except MDATA)
      */
     private Catalog MDCatalog;
+    
+    /**
+     * 
+     */
+    private List<String> opengisPackage;
+    
+    /**
+     * 
+     */
+    private List<String> geotoolsPackage;
 
+    public final static int DUBLINCORE = 0;
+    public final static int ISO_19115  = 1;
+    
     /**
      * Build a new metadata Reader.
      * 
      * @param MDReader a reader to the MDWeb database.
      */
     public MetadataReader(Reader20 MDReader) throws SQLException {
-        this.MDReader  = MDReader;
-        this.dateFormat        = new SimpleDateFormat("dd-mm-yyyy");
-        this.MDCatalog = MDReader.getCatalog("FR_SY");
+        this.MDReader        = MDReader;
+        this.dateFormat      = new SimpleDateFormat("dd-mm-yyyy");
+        this.MDCatalog       = MDReader.getCatalog("FR_SY");
+        this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing", "net.seagis.temporal");
+        this.opengisPackage  = searchSubPackage("org.opengis.metadata",  "org.opengis.referencing", "org.opengis.temporal");
+        this.metadatas       = new HashMap<String, Object>();
     }
 
     /**
@@ -91,20 +123,213 @@ public class MetadataReader {
      * @return An metadata object.
      * @throws java.sql.SQLException
      */
-    public Object getMetadata(String identifier) throws SQLException {
-        Object result = metadatas.get(identifier);
-        if (result == null) {
-            Form f = MDReader.getForm(MDCatalog, Integer.parseInt(identifier));
-            result = getObjectFromForm(f);
-            if (result != null) {
-                metadatas.put(identifier, result);
+    public Object getMetadata(String identifier, int mode, ElementSetType type) throws SQLException {
+        Object result;
+        if (mode == ISO_19115) {
+            result = metadatas.get(identifier);
+            if (result == null) {
+                Form f = MDReader.getForm(MDCatalog, Integer.parseInt(identifier));
+                result = getObjectFromForm(f);
+                if (result != null) {
+                    metadatas.put(identifier, result);
+                }
             }
+        } else {
+            Form f = MDReader.getForm(MDCatalog, Integer.parseInt(identifier));
+            result = getRecordFromForm(f, type);
         }
         return result;
     }
     
     /**
-     * Return an object an MDWeb formular.
+     * Return a dublinCore record from a MDWeb formular
+     * 
+     * @param form the MDWeb formular.
+     * @return a CSW object representing the metadata.
+     */
+    private AbstractRecordType getRecordFromForm(Form form, ElementSetType type) throws SQLException {
+        
+        // we get the title of the form
+        SimpleLiteral title             = new SimpleLiteral(null, form.getTitle());
+        
+        // we get the file identifier(s)
+        List<Value>   identifierValues  = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:fileIdentifier"));
+        List<String>  identifiers       = new ArrayList<String>();
+        for (Value v: identifierValues) {
+            if (v instanceof TextValue) {
+                identifiers.add(((TextValue)v).getValue());
+            }
+        }
+        SimpleLiteral identifier = new SimpleLiteral(null, identifiers);
+        
+        //we get The boundingBox(es)
+        List<Value>   bboxValues     = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2"));
+        List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
+        for (Value v: bboxValues) {
+            bboxes.add(createBoundingBoxFromValue(v.getOrdinal(), form));
+        }
+        
+        //we get the type of the data
+        List<Value> typeValues  = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:citation:presentationForm"));
+        String dataType         = null;
+        if (typeValues.size() != 0) {
+            TextValue value = (TextValue)typeValues.get(0);
+            int code = Integer.parseInt(value.getValue());
+            org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList)value.getType();
+            CodeListElement element = codelist.getElementByCode(code);
+            dataType = element.getName();        
+        }
+        SimpleLiteral litType = new SimpleLiteral(null, dataType);
+        
+        if (type.equals(ElementSetType.BRIEF)) {
+            return new BriefRecordType(identifier, title, litType , bboxes);
+        }
+        
+        // we get the keywords
+        List<Value> keywordsValues  = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword"));
+        List<SimpleLiteral> keywords = new ArrayList<SimpleLiteral>();
+        for (Value v: keywordsValues) {
+            if (v instanceof TextValue) {
+                keywords.add(new SimpleLiteral(null, ((TextValue)v).getValue()));
+            }
+        }
+        
+        List<Value> formatsValues  = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name"));
+        List<String> formats = new ArrayList<String>();
+        for (Value v: formatsValues) {
+            if (v instanceof TextValue) {
+                formats.add(((TextValue)v).getValue());
+            }
+        }
+        SimpleLiteral format = new SimpleLiteral(null, formats);
+        
+        // the last update date
+        Date lastUp            = form.getUpdateDate();
+        SimpleLiteral modified = new SimpleLiteral(null, lastUp.toString());
+        
+        // the descriptions
+        List<Value>   descriptionValues = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:abstract"));
+        List<String>  descriptions      = new ArrayList<String>();
+        for (Value v: descriptionValues) {
+            if (v instanceof TextValue) {
+                descriptions.add(((TextValue)v).getValue());
+            }
+        }
+        SimpleLiteral description = new SimpleLiteral(null, descriptions);
+        
+        // TODO add spatial
+        
+        if (type.equals(ElementSetType.SUMMARY)) {
+            return new SummaryRecordType(identifier, title, litType , bboxes, keywords, format, modified, description);
+        }
+        
+        // the creator of the data
+        List<Value>   creatorValues = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:credit"));
+        List<String>  creators      = new ArrayList<String>();
+        for (Value v: creatorValues) {
+            if (v instanceof TextValue) {
+                creators.add(((TextValue)v).getValue());
+            }
+        }
+        SimpleLiteral creator = new SimpleLiteral(null, creators);
+        
+        // the publisher of the data
+        List<Value>   publisherValues = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName"));
+        List<String>  publishers      = new ArrayList<String>();
+        for (Value v: publisherValues) {
+            if (v instanceof TextValue) {
+                publishers.add(((TextValue)v).getValue());
+            }
+        }
+        SimpleLiteral publisher = new SimpleLiteral(null, publishers);
+        
+        // TODO the contributors
+        // TODO the source of the data
+        // TODO The rights
+        
+        // the language
+        List<Value>   languageValues = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:language"));
+        List<String>  languages      = new ArrayList<String>();
+        for (Value v: languageValues) {
+            if (v instanceof TextValue) {
+                languages.add(((TextValue)v).getValue());
+            }
+        }
+        SimpleLiteral language = new SimpleLiteral(null, languages);
+        
+        if (keywords.size() != 0) {
+            
+        }
+        return new RecordType(identifier, title, litType , keywords, format, modified, description, bboxes,
+                creator, publisher, language);
+    }
+    
+    /**
+     * Create a bounding box from a geographiqueElement Value
+     */
+    private BoundingBoxType createBoundingBoxFromValue(int ordinal, Form f) throws SQLException {
+        
+        //we get the CRS
+        List<Value> crsValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:code"));
+        String crs  = null;
+        for (Value v: crsValues) {
+            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                crs = ((TextValue)v).getValue();
+                
+            }
+        }
+        
+        //we get the east value
+        List<Value> eastValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude"));
+        Double eastValue  =null;
+        for (Value v: eastValues) {
+            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                eastValue = Double.parseDouble(((TextValue)v).getValue());
+                
+            }
+        }
+        
+        //we get the east value
+        List<Value> westValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude"));
+        Double  westValue  = null;
+        for (Value v: westValues) {
+            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                westValue = Double.parseDouble(((TextValue)v).getValue());
+            }
+        }
+        
+        //we get the north value
+        List<Value> northValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude"));
+        Double northValue  = null;
+        for (Value v: northValues) {
+            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                northValue = Double.parseDouble(((TextValue)v).getValue());
+            }
+        }
+        
+        //we get the south value
+        List<Value> southValues = f.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude"));
+        Double  southValue  = null;
+        for (Value v: southValues) {
+            if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                southValue = Double.parseDouble(((TextValue)v).getValue());
+            }
+        }
+        
+        if (eastValue != null && westValue != null && northValue != null && southValue != null) {
+            BoundingBoxType result = new BoundingBoxType("EPSG:" + crs,
+                                                          eastValue,
+                                                          southValue,
+                                                          westValue,
+                                                          northValue);
+            return result;
+        } else {
+            return null;
+        }
+    } 
+            
+    /**
+     * Return an object from a MDWeb formular.
      * 
      * @param form the MDWeb formular.
      * @return a geotools object representing the metadata.
@@ -236,6 +461,8 @@ public class MetadataReader {
                 //special case due to a bug in mdweb
                 if (attribName.startsWith("geographicElement")) {
                     attribName = "geographicElements";
+                } else if (attribName.equals("transformationParameterAvailability")) {
+                    attribName = "transformationParameterAvailable";
                 }
 
                 int casee = 0;
@@ -315,13 +542,17 @@ public class MetadataReader {
 
         if (className.equals("CharacterString")) {
             return String.class;
-        } else if (className.equals("Date")) {
+        } else if (className.equalsIgnoreCase("Date")) {
             return Date.class;
-        } else if (className.equals("Decimal")) {
+        } else if (className.equalsIgnoreCase("Decimal")) {
             return Double.class;
-        } else if (className.equals("Real")) {
+        } else if (className.equalsIgnoreCase("Real")) {
             return Double.class;
-        } else if (className.equals("URL")) {
+        } else if (className.equalsIgnoreCase("Integer")) {
+            return Integer.class;
+        } else if (className.equalsIgnoreCase("Boolean")) {
+            return Boolean.class;
+        } else if (className.equalsIgnoreCase("URL")) {
             return URI.class;
         //special case for locale codeList.
         } else if (className.equals("LanguageCode")) {
@@ -364,37 +595,19 @@ public class MetadataReader {
 
         List<String> packagesName = new ArrayList<String>();
         if (!className.contains("Code")) {
-            packagesName.add("org.geotools.referencing");
-            packagesName.add("org.geotools.metadata.iso");
-            packagesName.add("org.geotools.metadata.iso.citation");
-            packagesName.add("org.geotools.metadata.iso.constraint");
-            packagesName.add("org.geotools.metadata.iso.content");
-            packagesName.add("org.geotools.metadata.iso.distribution");
-            packagesName.add("org.geotools.metadata.iso.extent");
-            packagesName.add("org.geotools.metadata.iso.identification");
-            packagesName.add("org.geotools.metadata.iso.lineage");
-            packagesName.add("org.geotools.metadata.iso.maintenance");
-            packagesName.add("org.geotools.metadata.iso.quality");
-            packagesName.add("org.geotools.metadata.iso.spatial");
-
+            packagesName = geotoolsPackage;
         } else {
-            packagesName.add("org.opengis.metadata.citation");
-            packagesName.add("org.opengis.metadata.constraint");
-            packagesName.add("org.opengis.metadata.content");
-            packagesName.add("org.opengis.metadata.distribution");
-            packagesName.add("org.opengis.metadata.extent");
-            packagesName.add("org.opengis.metadata.identification");
-            packagesName.add("org.opengis.metadata.lineage");
-            packagesName.add("org.opengis.metadata.maintenance");
-            packagesName.add("org.opengis.metadata.quality");
-            packagesName.add("org.opengis.metadata.spatial");
-            packagesName.add("org.opengis.referencing");
-
+            packagesName = opengisPackage;
         }
 
 
 
         for (String packageName : packagesName) {
+            
+            //TODO remove this special case
+            if (className.equals("RS_Identifier"))
+                packageName = "net.seagis.referencing";
+            
             String name = className;
             int nameType = 0;
             while (nameType < 4) {
@@ -416,9 +629,13 @@ public class MetadataReader {
                             }
                         }
                         //for the code list we delete the "code" suffix
+                        //for the temporal element we remove "Time" prefix
                         case 1: {
                             if (name.indexOf("Code") != -1) {
                                 name = name.substring(0, name.indexOf("Code"));
+                            }
+                            if (name.startsWith("Time")) {
+                                name = name.substring(4);
                             }
                             nameType = 2;
                             break;
@@ -453,7 +670,14 @@ public class MetadataReader {
      */
     private Method getSetterFromName(String propertyName, Class classe, Class rootClass) {
         logger.info("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
-
+        
+        //special case
+        if (propertyName.equals("beginPosition")) {
+            propertyName = "begining";
+        } else if (propertyName.equals("endPosition")) {
+            propertyName = "ending";
+        } 
+        
         String methodName = "set" + firstToUpper(propertyName);
         int occurenceType = 0;
         Class interfacee = null;
@@ -535,6 +759,112 @@ public class MetadataReader {
         String first = s.substring(0, 1);
         String result = s.substring(1);
         result = first.toUpperCase() + result;
+        return result;
+    }
+    
+    /**
+     * Search in the librairies and the classes the child of the specified packages,
+     * and return all of them.
+     * 
+     * @param packages the packages to scan.
+     * 
+     * @return a list of package names.
+     */
+    private List<String> searchSubPackage(String... packages) {
+        List<String> result = new ArrayList<String>();
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        for (String p : packages) {
+            try {
+                String fileP = p.replace('.', '/');
+                Enumeration<URL> urls = classloader.getResources(fileP);
+                while (urls.hasMoreElements()) {
+                    URL url = urls.nextElement();
+                    try {
+                        URI uri = url.toURI();
+                        System.out.println("scanning URI:" + uri);
+                        result.addAll(scan(uri, fileP));
+                    } catch (URISyntaxException e) {
+                        System.out.println("URL, " + url + "cannot be converted to a URI");
+                    }
+                }
+            } catch (IOException ex) {
+                System.out.println("The resources for the package" + p +
+                                   ", could not be obtained");
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Scan a resource file (a JAR or a directory) to find the sub-package names of
+     * the specified "filePackageName"
+     * 
+     * @param u The URI of the file.
+     * @param filePackageName The package to scan.
+     * 
+     * @return a list of package names.
+     * @throws java.io.IOException
+     */
+    private List<String> scan(URI u, String filePackageName) throws IOException {
+        List<String> result = new ArrayList<String>();
+        String scheme = u.getScheme();
+        if (scheme.equals("file")) {
+            File f = new File(u.getPath());
+            if (f.isDirectory()) {
+                result.addAll(scanDirectory(f, filePackageName));
+            }
+        } else if (scheme.equals("jar") || scheme.equals("zip")) {
+            URI jarUri = URI.create(u.getSchemeSpecificPart());
+            String jarFile = jarUri.getPath();
+            jarFile = jarFile.substring(0, jarFile.indexOf('!'));
+            result.addAll(scanJar(new File(jarFile), filePackageName));
+        }
+        return result; 
+    }
+
+    /**
+     * Scan a directory to find the sub-package names of
+     * the specified "parent" package
+     * 
+     * @param root The root file (directory) of the package to scan.
+     * @param parent the package name.
+     * 
+     * @return a list of package names.
+     */
+    private List<String> scanDirectory(File root, String parent) {
+        List<String> result = new ArrayList<String>();
+        for (File child : root.listFiles()) {
+            if (child.isDirectory()) {
+                result.add(parent.replace('/', '.') + '.' + child.getName());
+                result.addAll(scanDirectory(child, parent));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Scan a jar to find the sub-package names of
+     * the specified "parent" package
+     * 
+     * @param file the jar file containing the package to scan
+     * @param parent the package name.
+     * 
+     * @return a list of package names.
+     * @throws java.io.IOException
+     */
+    private static List<String> scanJar(File file, String parent) throws IOException {
+        List<String> result = new ArrayList<String>();
+        final JarFile jar = new JarFile(file);
+        final Enumeration<JarEntry> entries = jar.entries();
+        while (entries.hasMoreElements()) {
+            JarEntry e = entries.nextElement();
+            if (e.isDirectory() && e.getName().startsWith(parent)) {
+                String s = e.getName().replace('/', '.');
+                s = s.substring(0, s.length() - 1);
+                result.add(s);
+            }
+        }
         return result;
     }
 }

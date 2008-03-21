@@ -34,19 +34,25 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 import net.seagis.cat.csw.Capabilities;
+import net.seagis.cat.csw.DescribeRecordResponseType;
 import net.seagis.cat.csw.DescribeRecordType;
 import net.seagis.cat.csw.DistributedSearchType;
 import net.seagis.cat.csw.ElementSetNameType;
 import net.seagis.cat.csw.ElementSetType;
 import net.seagis.cat.csw.GetCapabilities;
+import net.seagis.cat.csw.GetDomainResponseType;
 import net.seagis.cat.csw.GetDomainType;
+import net.seagis.cat.csw.GetRecordByIdResponseType;
 import net.seagis.cat.csw.GetRecordByIdType;
+import net.seagis.cat.csw.GetRecordsResponseType;
 import net.seagis.cat.csw.GetRecordsType;
+import net.seagis.cat.csw.HarvestResponseType;
 import net.seagis.cat.csw.HarvestType;
 import net.seagis.cat.csw.ObjectFactory;
 import net.seagis.cat.csw.QueryConstraintType;
 import net.seagis.cat.csw.QueryType;
 import net.seagis.cat.csw.ResultType;
+import net.seagis.cat.csw.TransactionResponseType;
 import net.seagis.cat.csw.TransactionType;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.ServiceVersion;
@@ -60,6 +66,9 @@ import net.seagis.ows.v100.AcceptVersionsType;
 import net.seagis.ows.v100.OWSWebServiceException;
 import net.seagis.ows.v100.SectionsType;
 import net.seagis.coverage.web.Service;
+import net.seagis.ows.v100.ExceptionReport;
+import org.geotools.metadata.iso.MetaDataImpl;
+import org.geotools.resources.jaxb.code.CharacterSetAdapter;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
@@ -81,7 +90,15 @@ public class CSWService extends WebService {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
         worker = new CSWworker();
         worker.setVersion(getCurrentVersion());
-        setXMLContext("net.seagis.cat.csw:net.seagis.gml:net.seagis.gml","");
+        setXMLContext("", MetaDataImpl.class); /*Capabilities.class, DescribeRecordType.class
+                        ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
+                        ,GetCapabilities.class, GetDomainType.class, GetRecordByIdType.class
+                        ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
+                        ,QueryType.class, ResultType.class, TransactionType.class
+                        ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
+                        ,DescribeRecordResponseType.class, GetDomainResponseType.class
+                        ,TransactionResponseType.class, HarvestResponseType.class
+                        ,ExceptionReport.class);*/
     }
 
     @Override

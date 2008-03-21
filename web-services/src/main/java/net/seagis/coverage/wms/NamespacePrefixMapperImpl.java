@@ -103,6 +103,12 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://www.opengis.net/cat/csw/2.0.2".equals(namespaceUri) )
             prefix = "csw";
         
+        else if( "http://purl.org/dc/elements/1.1/".equals(namespaceUri) )
+            prefix = "dc";
+        
+        else if( "http://purl.org/dc/terms/".equals(namespaceUri) )
+            prefix = "dct";
+        
         //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
         return prefix;
     }

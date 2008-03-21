@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.ows.v100.BoundingBoxType;
+import net.seagis.dublincore.elements.SimpleLiteral;
 
 
 /**
@@ -66,6 +67,29 @@ public class RecordType extends DCMIRecordType {
     @XmlElementRef(name = "BoundingBox", namespace = "http://www.opengis.net/ows", type = JAXBElement.class)
     private List<JAXBElement<? extends BoundingBoxType>> boundingBox;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    RecordType() {
+        
+    }
+    
+    /**
+     * Build a new Record TODO add contributor, source , spatial, right, relation
+     */
+    public RecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
+            List<SimpleLiteral> subject, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract,
+            List<BoundingBoxType> bboxes, SimpleLiteral creator, SimpleLiteral distributor, SimpleLiteral language) {
+        
+        super(identifier, title,type, subject, format, modified, _abstract, creator, distributor, language);
+        
+        this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+        for (BoundingBoxType bbox: bboxes) {
+            this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+        }
+        
+    }
+    
     /**
      * Gets the value of the anyText property.
      * (unmodifiable)

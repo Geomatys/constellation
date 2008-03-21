@@ -76,6 +76,36 @@ public class BriefRecordType extends AbstractRecordType {
     private List<JAXBElement<? extends BoundingBoxType>> boundingBox;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    BriefRecordType() {
+    }
+    
+    /**
+     * Build a new brief record.
+     * 
+     * @param identifier
+     * @param title
+     * @param type
+     * @param bbox
+     */
+    public BriefRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, List<BoundingBoxType> bboxes) {
+        
+        this.identifier = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.identifier.add(dublinFactory.createIdentifier(identifier));
+        
+        this.title = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.title.add(dublinFactory.createTitle(title));
+        
+        this.type = type;
+        
+        this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+        for (BoundingBoxType bbox: bboxes) {
+            this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+        }
+    }
+    
+    /**
      * Gets the value of the identifier property.
      * (unmodifiable)
      */

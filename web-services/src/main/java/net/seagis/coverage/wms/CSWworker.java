@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 //seaGIS dependencies
 import javax.xml.bind.JAXBElement;
 import net.seagis.cat.csw.AbstractRecordType;
+import net.seagis.cat.csw.BriefRecordType;
 import net.seagis.cat.csw.Capabilities;
 import net.seagis.cat.csw.DescribeRecordResponseType;
 import net.seagis.cat.csw.DescribeRecordType;
@@ -42,7 +43,10 @@ import net.seagis.cat.csw.GetRecordsResponseType;
 import net.seagis.cat.csw.GetRecordsType;
 import net.seagis.cat.csw.HarvestResponseType;
 import net.seagis.cat.csw.HarvestType;
+import net.seagis.cat.csw.ObjectFactory;
+import net.seagis.cat.csw.RecordType;
 import net.seagis.cat.csw.RequestBaseType;
+import net.seagis.cat.csw.SummaryRecordType;
 import net.seagis.cat.csw.TransactionResponseType;
 import net.seagis.cat.csw.TransactionType;
 import net.seagis.coverage.web.ServiceVersion;
@@ -56,6 +60,7 @@ import net.seagis.ows.v100.SectionsType;
 import net.seagis.ows.v100.ServiceIdentification;
 import net.seagis.ows.v100.ServiceProvider;
 import static net.seagis.ows.OWSExceptionCode.*;
+import static net.seagis.coverage.wms.MetadataReader.*;
 
 
 //geotols dependencies
@@ -104,6 +109,11 @@ public class CSWworker {
      */
     private MetadataReader MDReader;
     
+    /**
+     * A JAXB factory to csw object 
+     */
+    private ObjectFactory cswFactory;
+    
     public CSWworker() throws IOException, SQLException {
         
         Properties prop = new Properties();
@@ -137,6 +147,7 @@ public class CSWworker {
             logger.severe("THE WEB SERVICE CAN'T CONNECT TO THE METADATA DB!");
         }
         MDReader = new MetadataReader(DatabaseReader);
+        cswFactory = new ObjectFactory();
     }
     
     /**
@@ -267,7 +278,15 @@ public class CSWworker {
             List<JAXBElement<? extends AbstractRecordType>> records = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
             for (String id:request.getId()) {
                 try {
-                    Object o = MDReader.getMetadata(id);
+                    Object o = MDReader.getMetadata(id, DUBLINCORE, set);
+                    if (o instanceof BriefRecordType) {
+                        records.add(cswFactory.createBriefRecord((BriefRecordType)o));
+                    } else if (o instanceof SummaryRecordType) {
+                        records.add(cswFactory.createSummaryRecord((SummaryRecordType)o));
+                    } else if (o instanceof RecordType) {
+                        records.add(cswFactory.createRecord((RecordType)o));
+                    }
+                    
                 } catch (SQLException e) {
                     throw new OWSWebServiceException("This identifier" + id + "does not exist",
                                                       INVALID_PARAMETER_VALUE, "id", version);
@@ -280,14 +299,17 @@ public class CSWworker {
            List<MetaDataImpl> records = new ArrayList<MetaDataImpl>();
            for (String id:request.getId()) {
                 try {
-                    Object o = MDReader.getMetadata(id);
+                    Object o = MDReader.getMetadata(id, ISO_19115, set);
+                    if (o instanceof MetaDataImpl) {
+                        records.add((MetaDataImpl)o);
+                    }
                 } catch (SQLException e) {
                     throw new OWSWebServiceException("This identifier" + id + "does not exist",
                                                       INVALID_PARAMETER_VALUE, "id", version);
                 }
            }
         
-           response = new GetRecordByIdResponseType(null, records);        
+           response = new GetRecordByIdResponseType(null, records);      
         
         // this case must never append
         } else {

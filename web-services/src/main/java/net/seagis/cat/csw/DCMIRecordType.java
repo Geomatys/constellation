@@ -67,6 +67,42 @@ public class DCMIRecordType extends AbstractRecordType {
     private List<JAXBElement<SimpleLiteral>> dcElement;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    DCMIRecordType() {
+        
+    }
+    
+    public DCMIRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
+            List<SimpleLiteral> subjects, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract,
+            SimpleLiteral creator, SimpleLiteral distributor, SimpleLiteral language) {
+        
+        this.dcElement = new ArrayList<JAXBElement<SimpleLiteral>>();
+        this.dcElement.add(dublinFactory.createIdentifier(identifier));
+        
+        this.dcElement.add(dublinFactory.createTitle(title));
+        
+        this.dcElement.add(dublinFactory.createType(type));
+        
+        for (SimpleLiteral subject: subjects) {
+            this.dcElement.add(dublinFactory.createSubject(subject));
+        }
+        
+        this.dcElement.add(dublinFactory.createFormat(format));
+        
+        this.dcElement.add(dublinTermFactory.createModified(modified));
+        
+        this.dcElement.add(dublinTermFactory.createAbstract(_abstract));
+        
+        this.dcElement.add(dublinFactory.createCreator(creator));
+        
+        this.dcElement.add(dublinFactory.createPublisher(distributor));
+        
+        this.dcElement.add(dublinFactory.createLanguage(language));
+        
+    }
+    
+    /**
      * Gets the value of the dcElement property.
      * (unModifiable)
      */

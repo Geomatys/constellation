@@ -20,7 +20,7 @@
   -->
   <groupId>net.seagis</groupId>
   <artifactId>observations</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <name>Observations and measurements</name>
   <description>
     Utilitaires dédiés à l'exploitation d'une base de données PostgreSQL contenant un ensemble de mesures.
