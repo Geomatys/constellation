@@ -132,6 +132,11 @@ public abstract class ImageProducer {
     private static final String DEFAULT_SUFFIX = ".raw";
 
     /**
+     * The default interpolation to use.
+     */
+    static final int DEFAULT_INTERPOLATION = Interpolation.INTERP_BILINEAR;
+
+    /**
      * The buffered image types to try if the native image sample model doesn't fit the current
      * {@linkplain #writer}. Those types will be tried in the order they are declared.
      */
@@ -209,7 +214,7 @@ public abstract class ImageProducer {
     /**
      * The interpolation to use for resampling.
      */
-    protected Interpolation interpolation = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+    protected Interpolation interpolation = Interpolation.getInstance(DEFAULT_INTERPOLATION);
 
     /**
      * The exceptions format as a MIME type.
