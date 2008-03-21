@@ -227,7 +227,9 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
      * @return The set of available codes.
      * @throws FactoryException if an error occured while querying the database.
      */
-    public synchronized Set<String> getAuthorityCodes(final Class category) throws FactoryException {
+    public synchronized Set<String> getAuthorityCodes(final Class<? extends IdentifiedObject> category)
+            throws FactoryException
+    {
         final StringBuilder sql = new StringBuilder("SELECT CASE WHEN ")
                 .append(CODE_COLUMN).append('=').append(PRIMARY_KEY).append(" THEN ")
                 .append(PRIMARY_KEY).append("::text ELSE ").append(AUTHORITY_COLUMN)

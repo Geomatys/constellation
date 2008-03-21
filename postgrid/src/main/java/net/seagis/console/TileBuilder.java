@@ -83,6 +83,11 @@ public class TileBuilder {
     private Dimension tileSize;
 
     /**
+     * The format of the tile to be written, or {@code null} if unspecified.
+     */
+    private String format;
+
+    /**
      * The series for the tiles to be inserted in the database.
      */
     private String series;
@@ -184,6 +189,7 @@ public class TileBuilder {
             err.println(e);
             return false;
         }
+        format = (String) properties.remove("Format");
         series = (String) properties.remove("Series");
         return true;
     }
@@ -242,6 +248,7 @@ public class TileBuilder {
         }
         builder.setTileDirectory(targetDirectory);
         builder.setMosaicEnvelope(envelope);
+        builder.setTileReaderSpi(format);
         final TileManager tileManager;
         if (keepLayout) {
             tileManager = TileManagerFactory.DEFAULT.create(tiles)[0];
