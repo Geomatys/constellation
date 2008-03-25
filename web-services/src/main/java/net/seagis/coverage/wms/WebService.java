@@ -135,13 +135,13 @@ public abstract class WebService {
     protected static ThreadLocal<WebServiceWorker> webServiceWorker;
     static {
         try {
-            /* only for ifremer configuration */
+            /* only for ifremer configuration 
             String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
             logger.info("path to config file:" + path);
             File configFile = new File(path);
             final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true);
-            
-            //final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
+            */
+            final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
                 @Override
                 protected WebServiceWorker initialValue() {

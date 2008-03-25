@@ -469,6 +469,8 @@ public class WMService extends WebService {
         //we build the list of accepted crs
         List<String> crs = new ArrayList<String>();
         crs.add("EPSG:4326");crs.add("EPSG:3395");crs.add("EPSG:27574");
+        crs.add("EPSG:27771");crs.add("EPSG:27772");crs.add("EPSG:27773");
+        crs.add("EPSG:27774");
         
         //we build a general boundingbox
         EXGeographicBoundingBox exGeographicBoundingBox = null;

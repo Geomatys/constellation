@@ -68,7 +68,6 @@ import net.seagis.ows.v100.SectionsType;
 import net.seagis.coverage.web.Service;
 import net.seagis.ows.v100.ExceptionReport;
 import org.geotools.metadata.iso.MetaDataImpl;
-import org.geotools.resources.jaxb.code.CharacterSetAdapter;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
@@ -90,7 +89,7 @@ public class CSWService extends WebService {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
         worker = new CSWworker();
         worker.setVersion(getCurrentVersion());
-        setXMLContext("", MetaDataImpl.class); /*Capabilities.class, DescribeRecordType.class
+        setXMLContext("http://www.isotc211.org/2005/gmd", MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
                         ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
                         ,GetCapabilities.class, GetDomainType.class, GetRecordByIdType.class
                         ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
@@ -98,7 +97,7 @@ public class CSWService extends WebService {
                         ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
                         ,DescribeRecordResponseType.class, GetDomainResponseType.class
                         ,TransactionResponseType.class, HarvestResponseType.class
-                        ,ExceptionReport.class);*/
+                        ,ExceptionReport.class);
     }
 
     @Override

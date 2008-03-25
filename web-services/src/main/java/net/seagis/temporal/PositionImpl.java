@@ -20,42 +20,45 @@
 
 package net.seagis.temporal;
 
-import java.util.Collection;
-import org.opengis.temporal.Instant;
-import org.opengis.temporal.Period;
+import java.sql.Time;
+import java.util.Date;
 import org.opengis.temporal.Position;
+import org.opengis.temporal.TemporalPosition;
+import org.opengis.util.InternationalString;
 
 /**
  *
  * @author Guilhem Legal
  */
-public class InstantImpl extends TemporalGeometricPrimitiveImpl implements Instant {
+public class PositionImpl implements Position{
 
-    private Position position;
+    private Date date;
     
     /**
      * An empty constructor used by JAXB
      */
-    InstantImpl() {
+    PositionImpl() {
         
     }
     
-    public InstantImpl(Position position) {
-        this.position = position;
+    public PositionImpl(Date date) {
+        this.date = date;
     }
     
-    public Position getPosition() {
-        return position;
-    }
-
-    public Collection<Period> getBegunBy() {
+    public TemporalPosition anyOther() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public Collection<Period> getEndedBy() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Date getDate() {
+        return date;
     }
 
-   
+    public Time getTime() {
+        return new Time(date.getTime());
+    }
+
+    public InternationalString getDateTime() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
 }

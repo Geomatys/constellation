@@ -5,6 +5,7 @@
 
 package net.seagis.temporal;
 
+import java.util.Date;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 
@@ -35,6 +36,14 @@ public class PeriodImpl extends TemporalGeometricPrimitiveImpl implements Period
     public void setBegining(Instant begining) {
         this.begining = begining;
     }
+    
+    /**
+     * temporary patch fixing the error of MDWeb
+     * 
+     */
+    public void setBegining(Date date) {
+        this.begining = new InstantImpl(new PositionImpl(date));
+    }
 
     public Instant getEnding() {
         return ending;
@@ -42,5 +51,13 @@ public class PeriodImpl extends TemporalGeometricPrimitiveImpl implements Period
     
     public void setEnding(Instant ending) {
         this.ending = ending;
+    }
+    
+    /**
+     * temporary patch fixing the error of MDWeb
+     * 
+     */
+    public void setEnding(Date date) {
+        this.begining = new InstantImpl(new PositionImpl(date));
     }
 }

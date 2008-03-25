@@ -91,7 +91,7 @@ public class TransactionType extends RequestBaseType {
     /**
      * Gets the value of the verboseResponse property.
      */
-    public boolean isVerboseResponse() {
+    public Boolean isVerboseResponse() {
         if (verboseResponse == null) {
             return false;
         } else {

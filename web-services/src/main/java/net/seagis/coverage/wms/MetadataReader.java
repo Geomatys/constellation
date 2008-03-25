@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -384,18 +385,23 @@ public class MetadataReader {
 
                 // if the value is a codeList element we call the static method valueOf 
                 // instead of a constructor
-                if (classe.getSuperclass().equals(CodeList.class)) {
+                if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
+                    // the textValue of a codelist is the code and not the value
+                    // so we must find the codeList element corrrespounding to this code.
+                    org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList) value.getType();
+                    CodeListElement element = codelist.getElementByCode(Integer.parseInt(textValue));
+                    
                     Method method = classe.getMethod("valueOf", String.class);
-                    result = method.invoke(null, textValue);
+                    result = method.invoke(null, element.getName());
                     return result;
 
 
-                // if the value is a codeList element we call the static method valueOf 
-                // instead of a constructor   
+                // if the value is a date we call the static method parse 
+                // instead of a constructor (temporary patch: createDate method)  
                 } else if (classe.equals(Date.class)) {
-                    Method method = DateFormat.class.getMethod("parse", String.class);
-                    result = method.invoke(dateFormat, textValue);
-                    return result;
+                    /*Method method = DateFormat.class.getMethod("parse", String.class);
+                    result = method.invoke(dateFormat, textValue);*/
+                    return createDate(textValue);
 
                 // else we use a String constructor    
                 } else {
@@ -425,6 +431,9 @@ public class MetadataReader {
             return null;
         } catch (IllegalAccessException e) {
             logger.severe("The class is not accessible");
+            return null;
+        } catch (ParseException e) {
+            logger.severe("The date cannot be parsed");
             return null;
         } catch (java.lang.reflect.InvocationTargetException e) {
             logger.severe("Exception throw in the invokated constructor");
@@ -589,6 +598,8 @@ public class MetadataReader {
             className = "CI_OnLineResource";
         } else if (className.equals("CI_Date")) {
             className = "CitationDate";
+        } else if (className.equals("FRA_DirectReferenceSystem")) {
+            className = "MD_ReferenceSystem";
         }
 
 
@@ -607,6 +618,8 @@ public class MetadataReader {
             //TODO remove this special case
             if (className.equals("RS_Identifier"))
                 packageName = "net.seagis.referencing";
+            else if (className.equals("MD_ScopeCode"))
+                packageName = "org.opengis.metadata.maintenance";
             
             String name = className;
             int nameType = 0;
@@ -685,7 +698,7 @@ public class MetadataReader {
             interfacee = classe.getInterfaces()[0];
         }
 
-        while (occurenceType < 4) {
+        while (occurenceType < 5) {
 
             try {
                 Method setter = null;
@@ -696,14 +709,22 @@ public class MetadataReader {
                         break;
                     }
                     case 1: {
+                        if (classe.equals(Integer.class)) {
+                            setter = rootClass.getDeclaredMethod(methodName, long.class);
+                            break;
+                        } else {
+                            occurenceType = 2;
+                        }
+                    }
+                    case 2: {
                         setter = rootClass.getDeclaredMethod(methodName, interfacee);
                         break;
                     }
-                    case 2: {
+                    case 3: {
                         setter = rootClass.getDeclaredMethod(methodName, Collection.class);
                         break;
                     }
-                    case 3: {
+                    case 4: {
                         setter = rootClass.getDeclaredMethod(methodName + "s", Collection.class);
                         break;
                     }
@@ -716,31 +737,37 @@ public class MetadataReader {
                 switch (occurenceType) {
 
                     case 0: {
-                        logger.info("Le setter " + methodName + "(" + classe.getName() + ") n'existe pas");
+                        logger.info("The setter " + methodName + "(" + classe.getName() + ") does not exist");
                         occurenceType = 1;
                         break;
                     }
 
                     case 1: {
-                        if (interfacee != null) {
-                            logger.info("Le setter " + methodName + "(" + interfacee.getName() + ") n'existe pas");
-                        }
+                        logger.info("The setter " + methodName + "(long) does not exist");
                         occurenceType = 2;
                         break;
                     }
-
+                    
                     case 2: {
-                        logger.info("Le setter " + methodName + "(Collection<" + classe.getName() + ">) n'existe pas");
+                        if (interfacee != null) {
+                            logger.info("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
+                        }
                         occurenceType = 3;
                         break;
                     }
+
                     case 3: {
-                        logger.info("Le setter " + methodName + "s(Collection<" + classe.getName() + ">) n'existe pas");
+                        logger.info("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 4;
                         break;
                     }
+                    case 4: {
+                        logger.info("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
+                        occurenceType = 5;
+                        break;
+                    }
                     default:
-                        occurenceType = 4;
+                        occurenceType = 5;
                 }
             }
         }
@@ -866,5 +893,122 @@ public class MetadataReader {
             }
         }
         return result;
+    }
+    
+    /**
+     * Return a Date by parsing different kind of date format.
+     * 
+     * @param date
+     * @return
+     */
+    private Date createDate(String date) throws ParseException{
+        
+        Map<String, String> POOL = new HashMap<String, String>();
+        POOL.put("janvier",   "01");
+        POOL.put("février",   "02");
+        POOL.put("mars",      "03");
+        POOL.put("avril",     "04");
+        POOL.put("mai",       "05");
+        POOL.put("juin",      "06");
+        POOL.put("juillet",   "07");
+        POOL.put("août",      "08");
+        POOL.put("septembre", "09");
+        POOL.put("octobre",   "10");
+        POOL.put("novembre",  "11");
+        POOL.put("décembre",  "12");
+        
+        Map<String, String> POOLcase = new HashMap<String, String>();
+        POOLcase.put("Janvier",   "01");
+        POOLcase.put("Février",   "02");
+        POOLcase.put("Mars",      "03");
+        POOLcase.put("Avril",     "04");
+        POOLcase.put("Mai",       "05");
+        POOLcase.put("Juin",      "06");
+        POOLcase.put("Juillet",   "07");
+        POOLcase.put("Août",      "08");
+        POOLcase.put("Septembre", "09");
+        POOLcase.put("Octobre",   "10");
+        POOLcase.put("Novembre",  "11");
+        POOLcase.put("Décembre",  "12");
+        
+        String year;
+        String month;
+        String day;
+        Date tmp = dateFormat.parse("01" + "-" + "01" + "-" + "1900");
+        if (date != null){
+            if(date.contains("/")){
+                
+                day   = date.substring(0, date.indexOf("/"));
+                date  = date.substring(date.indexOf("/")+1);
+                month = date.substring(0, date.indexOf("/"));
+                year  = date.substring(date.indexOf("/")+1);
+                                
+                tmp   = dateFormat.parse(day + "-" + month + "-" + year);
+            } else if ( getOccurence(date, " ") == 2 ) {
+                if (! date.contains("?")){
+                               
+                    day    = date.substring(0, date.indexOf(" "));
+                    date   = date.substring(date.indexOf(" ")+1);
+                    month  = POOL.get(date.substring(0, date.indexOf(" ")));
+                    year   = date.substring(date.indexOf(" ")+1);
+
+                    tmp    = dateFormat.parse(day+"-"+month+"-"+year);
+                } else tmp = dateFormat.parse("01" + "-" + "01" + "-" + "2000");
+                
+            } else if ( getOccurence(date, " ") == 1 ) {
+                
+                month = POOLcase.get(date.substring(0, date.indexOf(" ")));
+                year  = date.substring(date.indexOf(" ") + 1);   
+                tmp   = dateFormat.parse("01" + "-" + month + "-" + year);
+                
+            } else if ( getOccurence(date, "-") == 1 ) {
+                
+                month = date.substring(0, date.indexOf("-"));
+                year  = date.substring(date.indexOf("-")+1);
+                                
+                tmp   = dateFormat.parse("01" + "-" + month + "-" + year);
+                
+            } else if ( getOccurence(date, "-") == 2 ) {
+                
+                //if date is in format yyyy-mm-dd
+                if (date.substring(0, date.indexOf("-")).length()==4){
+                    year  = date.substring(0, date.indexOf("-"));
+                    date  = date.substring(date.indexOf("-")+1);
+                    month = date.substring(0, date.indexOf("-"));
+                    day   = date.substring(date.indexOf("-")+1);
+                    
+                    tmp   = dateFormat.parse(day + "-" + month + "-" + year);
+                }
+                else{
+                    day   = date.substring(0, date.indexOf("-"));
+                    date  = date.substring(date.indexOf("-")+1);
+                    month = date.substring(0, date.indexOf("-"));
+                    year  = date.substring(date.indexOf("-")+1);
+                    
+                    tmp =  dateFormat.parse(day + "-" + month + "-" + year);
+                }
+                
+            } else {
+                year = date;
+                tmp  =  dateFormat.parse("01" + "-" + "01" + "-" + year);
+            }
+        }
+        return tmp;
+    }
+    
+    /**
+     * This method returns a number of occurences occ in the string s.
+     */
+    private int getOccurence (String s, String occ){
+        if (! s.contains(occ))
+            return 0;
+        else {
+            int nbocc = 0;
+            while(s.indexOf(occ) != -1){
+                s = s.substring(s.indexOf(occ)+1);
+                nbocc++;
+            }
+            return nbocc;
+        }
     }
 }
