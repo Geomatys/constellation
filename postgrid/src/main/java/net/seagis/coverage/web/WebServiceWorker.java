@@ -16,8 +16,11 @@ package net.seagis.coverage.web;
 
 import java.awt.Color;
 import java.io.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.media.jai.Interpolation;
 
@@ -34,6 +37,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 import net.seagis.catalog.Database;
+import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 
@@ -52,6 +56,7 @@ import static net.seagis.coverage.wms.WMSExceptionCode.*;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Guilhem Legal
+ * @author Sam Hiatt
  *
  * @todo Some table-related fields in this class, together with some caches, should move in a
  *       more global class and be shared for every instances connected to the same database.
@@ -80,7 +85,12 @@ public class WebServiceWorker extends ImageProducer {
      * List of valid formats. Will be created only when first needed.
      */
     private transient Set<String> formats;
-
+    
+    /**
+     * Postgis CRS Factory for use as a fallback if CRS.decode fails.
+     */
+    private static PostgisAuthorityFactory crsFactory;
+    
     /**
      * Creates a new image producer connected to the specified database.
      *
@@ -196,8 +206,21 @@ public class WebServiceWorker extends ImageProducer {
                 crs = DefaultGeographicCRS.WGS84;
             }
         } catch (FactoryException exception) {
-            throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM),
-                    exception, INVALID_CRS, version);
+            try {
+                // Wasn't a normal EPSG code...
+                // Try creating a CRS from a definition in the spatial_ref_sys table
+                if (crsFactory == null){
+                    crsFactory = new PostgisAuthorityFactory(null, super.getDatabase().getConnection());
+                }
+                crs = crsFactory.createCoordinateReferenceSystem(code);
+                
+            } catch (FactoryException ex) {
+                Logger.getLogger(WebServiceWorker.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception, INVALID_CRS, version);
+            } catch (SQLException ex) {
+                Logger.getLogger(WebServiceWorker.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception, INVALID_CRS, version);
+            }
         }
         return crs;
     }
