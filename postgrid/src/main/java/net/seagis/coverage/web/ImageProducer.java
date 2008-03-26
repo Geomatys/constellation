@@ -99,6 +99,7 @@ import static net.seagis.coverage.wms.WMSExceptionCode.*;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Guilhem Legal
+ * @author Sam Hiatt
  *
  * @todo Some table-related fields in this class, together with some caches, should move in a
  *       more global class and be shared for every instances connected to the same database.
@@ -595,6 +596,22 @@ public abstract class ImageProducer {
     public GridCoverage2D getGridCoverage2D(final boolean resample) throws WebServiceException {
         final Layer layer = getLayer();
         final CoverageReference ref;
+         // If the WMS request does not include a TIME parameter, then use the latest time
+         // available.  
+         // NOTE! - this gets the time of the LAYER's latest entry, but not necessarily within 
+         // the requested bounding box.  
+         // TODO: This fix should probably be incorporated as part of the CoverageComparator, 
+         // but this quick hack keeps the Comparator from looking at ALL coverages in the 
+         // layer when no time parameter is given.
+        SortedSet<Date> availTimes;
+        if (time==null) {   
+            try {
+                availTimes = layer.getAvailableTimes();
+                time = availTimes.last();
+            } catch (CatalogException ex) {
+                Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, null, ex);
+            }            
+        }
         try {
             ref = layer.getCoverageReference(time, elevation);
         } catch (CatalogException exception) {
@@ -1154,5 +1171,9 @@ public abstract class ImageProducer {
             files = null;
         }
         // Do not close the database connection, since it may be shared by other instances.
+    }
+    
+    public Database getDatabase(){
+        return database;
     }
 }
