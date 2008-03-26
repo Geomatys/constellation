@@ -32,6 +32,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 import org.geotools.factory.Hints;
 import org.geotools.util.GenericName;
@@ -257,47 +258,52 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
     }
 
     /**
-     * Returns the primary key for the specified authority code.  If the supplied code contains
-     * an <cite>authority</cite> part (as in {@code "EPSG:4326"}), then this method searchs for
-     * a row with {@code "EPSG"} in the <cite>authority name</cite> column and {@code "4326"}
-     * in the <cite>authority SRID</cite> column, and returns the <cite>SRID</cite> for that row.
+     * Returns the primary key for the specified authority code. If the supplied code contains an
+     * <cite>authority</cite> part as in {@code "EPSG:4326"}, then (using the above code as an
+     * example) this method searchs for a row with {@code "EPSG"} string in the <cite>authority
+     * name</cite> column and {@code 4326} integer in the <cite>authority SRID</cite> column, and
+     * returns the <cite>SRID</cite> for that row.
      * <p>
      * If the supplied code do not contains an <cite>authority</cite> part (e.g. {@code "4326"}),
-     * then this method returns the code unchanged. This is consistent with common practice where
-     * the spatial CRS table contains entries from a single authority with primary keys identical
-     * to the authority codes. This is also consistent with the codes returned by
+     * then this method parses the code as an integer. This is consistent with common practice
+     * where the spatial CRS table contains entries from a single authority with primary keys
+     * identical to the authority codes. This is also consistent with the codes returned by
      * {@link #getAuthorityCodes}.
      *
      * @param  code The authority code to convert to primary key value.
-     * @return The primary key for the supplied code. There is no garantee that this key exists
-     *         (this method may or may not query the database).
+     * @return The primary key for the supplied code (never {@code null}). There is no
+     *         garantee that this key exists (this method may or may not query the database).
+     * @throws NoSuchAuthorityCodeException if a code can't be parsed as an integer or can't
+     *         be found in the database.
      * @throws FactoryException if an error occured while querying the database.
      */
-    public synchronized String getPrimaryKey(String code) throws FactoryException {
-        if (code != null) {
-            code = code.trim();
-            final int separator = code.lastIndexOf(GenericName.DEFAULT_SEPARATOR);
-            if (separator >= 0) {
-                final String authority  = code.substring(0, separator).trim();
-                final String identifier = code.substring(separator+1).trim();
-                if (authority.length() == 0 || Boolean.TRUE.equals(getAuthorityNames().get(authority))) {
-                    code = identifier;
-                } else try {
-                    if (selectPK == null) {
-                        final StringBuilder sql = new StringBuilder("SELECT ").append(PRIMARY_KEY);
-                        appendFrom(sql).append(" WHERE ").append(AUTHORITY_COLUMN).append("=?")
-                                .append(" AND ").append(CODE_COLUMN).append("=?");
-                        selectPK = getConnection().prepareStatement(sql.toString());
-                    }
-                    selectPK.setString(1, authority);
-                    selectPK.setString(2, identifier);
-                    code = singleton(selectPK, code, false);
-                } catch (SQLException exception) {
-                    throw databaseFailure(null, code, exception);
-                }
-            }
+    public synchronized Integer getPrimaryKey(String code) throws FactoryException {
+        code = code.trim();
+        final int separator = code.lastIndexOf(GenericName.DEFAULT_SEPARATOR);
+        final String authority  = (separator >= 0) ? code.substring(0, separator).trim() : "";
+        final String identifier = code.substring(separator+1).trim();
+        Integer srid;
+        try {
+            srid = Integer.parseInt(identifier);
+        } catch (NumberFormatException cause) {
+            NoSuchAuthorityCodeException e = noSuchAuthorityCode(IdentifiedObject.class, code);
+            e.initCause(cause);
+            throw e;
         }
-        return code;
+        if (authority.length()!=0 && !Boolean.TRUE.equals(getAuthorityNames().get(authority))) try {
+            if (selectPK == null) {
+                final StringBuilder sql = new StringBuilder("SELECT ").append(PRIMARY_KEY);
+                appendFrom(sql).append(" WHERE ").append(AUTHORITY_COLUMN).append("=?")
+                        .append(" AND ").append(CODE_COLUMN).append("=?");
+                selectPK = getConnection().prepareStatement(sql.toString());
+            }
+            selectPK.setString(1, authority);
+            selectPK.setInt   (2, srid);
+            srid = singleton(selectPK, Integer.class, code, IdentifiedObject.class);
+        } catch (SQLException exception) {
+            throw databaseFailure(null, code, exception);
+        }
+        return srid;
     }
 
     /**
@@ -334,7 +340,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
     public synchronized CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
-        final String key = getPrimaryKey(code);
+        final Integer key = getPrimaryKey(code);
         final String wkt;
         try {
             if (select == null) {
@@ -342,8 +348,8 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
                 appendFrom(sql).append(" WHERE ").append(PRIMARY_KEY).append("=?");
                 select = getConnection().prepareStatement(sql.toString());
             }
-            select.setString(1, key);
-            wkt = singleton(select, code, true);
+            select.setInt(1, key);
+            wkt = singleton(select, String.class, code, CoordinateReferenceSystem.class);
         } catch (SQLException exception) {
             throw databaseFailure(CoordinateReferenceSystem.class, code, exception);
         }
@@ -355,31 +361,37 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
      * contains only one value.
      *
      * @param  statement The statement to execute.
+     * @param  type The type of the value to fetch.
      * @param  code The authority code, for formatting an error message if needed.
-     * @param  crs {@code true} if the search is expected to be restricted to CRS objects.
+     * @param  product The type of the product to be created, for formatting an error message if needed.
      * @return The singleton value found.
      * @throws FactoryException if no value or more than one value were found.
      * @throws SQLException if the query failed for an other reason.
      */
-    private String singleton(final PreparedStatement statement, final String code, final boolean crs)
+    private <T> T singleton(final PreparedStatement statement, final Class<T> type,
+                            final String code, final Class<?> product)
             throws FactoryException, SQLException
     {
-        String value = null;
+        T value = null;
         final ResultSet results = statement.executeQuery();
         while (results.next()) {
-            final String candidate = results.getString(1);
-            if (candidate != null) {
+            final Object candidate;
+            if (Integer.class.isAssignableFrom(type)) {
+                candidate = results.getInt(1);
+            } else {
+                candidate = results.getString(1);
+            }
+            if (!results.wasNull()) {
                 if (value != null && !candidate.equals(value)) {
                     results.close();
                     throw new FactoryException(Errors.format(ErrorKeys.DUPLICATED_VALUES_$1, code));
                 }
-                value = candidate;
+                value = type.cast(candidate);
             }
         }
         results.close();
         if (value == null) {
-            final Class<?> type = crs ? CoordinateReferenceSystem.class : IdentifiedObject.class;
-            throw noSuchAuthorityCode(type, code);
+            throw noSuchAuthorityCode(product, code);
         }
         return value;
     }

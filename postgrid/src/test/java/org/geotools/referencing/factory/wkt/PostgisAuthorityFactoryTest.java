@@ -18,19 +18,18 @@ package org.geotools.referencing.factory.wkt;
 
 import java.util.Set;
 import java.util.Collections;
-
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.citation.Citations;
-
 import net.seagis.catalog.DatabaseTest;
+
+import org.junit.*;
 
 
 /**
@@ -44,14 +43,15 @@ public class PostgisAuthorityFactoryTest extends DatabaseTest {
     /**
      * Every tests grouped in a single method in order to get the connection only once.
      */
+    @Test
     public void testConnected() throws Exception {
         final PostgisAuthorityFactory factory = new PostgisAuthorityFactory(null, database.getConnection());
         assertEquals(Citations.EPSG, factory.getAuthority());
 
-        assertEquals("4326", factory.getPrimaryKey("4326"));
-        assertEquals("4326", factory.getPrimaryKey("EPSG:4326"));
+        assertEquals(4326, factory.getPrimaryKey("4326").intValue());
+        assertEquals(4326, factory.getPrimaryKey("EPSG:4326").intValue());
         try {
-            assertEquals("4326", factory.getPrimaryKey("DUMMY:4326"));
+            assertEquals(4326, factory.getPrimaryKey("DUMMY:4326").intValue());
             fail("Should not find a non-existing authority.");
         } catch (NoSuchAuthorityCodeException e) {
             // This is the expected exception.

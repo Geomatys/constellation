@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import org.geotools.io.TableWriter;
+import org.geotools.resources.Classes;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -199,11 +200,17 @@ public class CommandLine {
 
     /**
      * Gets the arguments for the given class. The arguments are added in the given set.
+     *
+     * @param classe    The class to parse for arguments.
+     * @param mantatory The set where to put mandatory arguments.
+     * @param optional  The set where to put optional arguments.
      */
-    private void getArguments(final Class<?> classe, final Map<String,String> options) {
+    private void getArguments(final Class<?> classe,
+                              final Map<String,String> mandatory,
+                              final Map<String,String> optional) {
         final Class<?> parent = classe.getSuperclass();
         if (!CommandLine.class.equals(parent)) {
-            getArguments(parent, options);
+            getArguments(parent, mandatory, optional);
         }
         for (final Field field : classe.getDeclaredFields()) {
             final Option option = field.getAnnotation(Option.class);
@@ -216,7 +223,17 @@ public class CommandLine {
                 if (name.length() == 0) {
                     name = field.getName();
                 }
-                options.put(name, description);
+                final Class<?> type = Classes.primitiveToWrapper(field.getType());
+                if (Number.class.isAssignableFrom(type)) {
+                    name = name + "=N";
+                } else if (!Boolean.class.isAssignableFrom(type)) {
+                    name = name + "=S";
+                }
+                if (option.mandatory()) {
+                    mandatory.put(name, description);
+                } else {
+                    optional.put(name, description);
+                }
             }
         }
     }
@@ -228,11 +245,24 @@ public class CommandLine {
      * prints a summary before the option list.
      */
     protected void help() {
-        final Map<String,String> options = new TreeMap<String,String>();
-        options.put("encoding", "Set the input and output encoding. Examples: \"UTF-8\", \"ISO-8859-1\".");
-        options.put("help",     "Print this summary.");
-        options.put("locale",   "Set the locale for string, number and date formatting. Examples: \"fr\", \"fr_CA\".");
-        getArguments(getClass(), options);
+        final Map<String,String> mandatory = new TreeMap<String,String>();
+        final Map<String,String> optional  = new TreeMap<String,String>();
+        optional.put("encoding=S", "Set the input and output encoding. Examples: \"UTF-8\", \"ISO-8859-1\".");
+        optional.put("help",       "Print this summary.");
+        optional.put("locale=S",   "Set the locale for string, number and date formatting. Examples: \"fr\", \"fr_CA\".");
+        getArguments(getClass(), mandatory, optional);
+        if (!mandatory.isEmpty()) {
+            out.println("Mandatory arguments:");
+            print(mandatory);
+        }
+        out.println("Optional arguments:");
+        print(optional);
+    }
+
+    /**
+     * Prints the specified options to the standard output stream.
+     */
+    private void print(final Map<String,String> options) {
         final TableWriter table = new TableWriter(out, "  ");
         for (final Map.Entry<String,String> entry : options.entrySet()) {
             table.write("  ");
