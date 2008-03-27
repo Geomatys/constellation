@@ -49,6 +49,7 @@ import net.seagis.cat.csw.RequestBaseType;
 import net.seagis.cat.csw.SummaryRecordType;
 import net.seagis.cat.csw.TransactionResponseType;
 import net.seagis.cat.csw.TransactionType;
+import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterCapabilities;
@@ -112,10 +113,33 @@ public class CSWworker {
     /**
      * A JAXB factory to csw object 
      */
-    private ObjectFactory cswFactory;
+    private final ObjectFactory cswFactory;
+    
+    /**
+     * The current MIME type of return
+     */
+    private String outputFormat;
+    
+    /**
+     * The search engine of MDWeb
+     
+    private Search search;*/
+    
+    /**
+     * A list of supported MIME type 
+     */
+    private final static List<String> acceptedOutputFormats;
+    static {
+        acceptedOutputFormats = new ArrayList<String>();
+        acceptedOutputFormats.add("text/xml");
+        acceptedOutputFormats.add("application/xml");
+        acceptedOutputFormats.add("text/html");
+        acceptedOutputFormats.add("text/plain");
+    }
     
     public CSWworker() throws IOException, SQLException {
         
+        cswFactory = new ObjectFactory();
         Properties prop = new Properties();
         File f = null;
         String env = "/home/tomcat/.sicade" ; //System.getenv("CATALINA_HOME");
@@ -146,8 +170,10 @@ public class CSWworker {
         if (dataSourceMD.getConnection() == null) {
             logger.severe("THE WEB SERVICE CAN'T CONNECT TO THE METADATA DB!");
         }
-        MDReader = new MetadataReader(DatabaseReader);
-        cswFactory = new ObjectFactory();
+        //TODO
+        version = new ServiceVersion(Service.OWS, "2.0.2");
+        MDReader = new MetadataReader(DatabaseReader, dataSourceMD.getConnection(), version);
+        
     }
     
     /**
@@ -249,6 +275,11 @@ public class CSWworker {
     public GetRecordByIdResponseType getRecordById(GetRecordByIdType request) throws WebServiceException {
         verifyBaseRequest(request);
         
+        String format = request.getOutputFormat();
+        if (format != null && isSupportedFormat(format)) {
+            outputFormat = format;
+        }
+        
         // we get the level of the record to return (Brief, summary, full)
         ElementSetType set = ElementSetType.SUMMARY;
         if (request.getElementSetName() != null && request.getElementSetName().getValue() != null) {
@@ -273,7 +304,7 @@ public class CSWworker {
         //we begin to build the result
         GetRecordByIdResponseType response;
         
-        //we build ISO 19139 object
+        //we build dublin core object
         if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
             List<JAXBElement<? extends AbstractRecordType>> records = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
             for (String id:request.getId()) {
@@ -288,13 +319,13 @@ public class CSWworker {
                     }
                     
                 } catch (SQLException e) {
-                    throw new OWSWebServiceException("This identifier" + id + "does not exist",
-                                                      INVALID_PARAMETER_VALUE, "id", version);
+                    throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
+                                                      NO_APPLICABLE_CODE, "id", version);
                 }
             }
         
             response = new GetRecordByIdResponseType(records, null);
-        //we build dublin core object    
+        //we build ISO 19139 object    
         } else if (outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
            List<MetaDataImpl> records = new ArrayList<MetaDataImpl>();
            for (String id:request.getId()) {
@@ -304,8 +335,8 @@ public class CSWworker {
                         records.add((MetaDataImpl)o);
                     }
                 } catch (SQLException e) {
-                    throw new OWSWebServiceException("This identifier" + id + "does not exist",
-                                                      INVALID_PARAMETER_VALUE, "id", version);
+                    throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
+                                                      NO_APPLICABLE_CODE, "id", version);
                 }
            }
         
@@ -337,7 +368,10 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetDomainResponseType getDomain(GetDomainType request){
+    public GetDomainResponseType getDomain(GetDomainType request) throws WebServiceException{
+        verifyBaseRequest(request);
+        
+        
         
         return new GetDomainResponseType();
     }
@@ -362,6 +396,23 @@ public class CSWworker {
     public HarvestResponseType harvest(HarvestType request){
         
         return new HarvestResponseType();
+    }
+    
+    /**
+     * Return the current output format (default: application/xml)
+     */
+    public String getOutputFormat() {
+        if (outputFormat == null) {
+            return "application/xml";
+        }
+        return outputFormat;
+    }
+    
+    /**
+     * Return true if the MIME type is supported.
+     */
+    private boolean isSupportedFormat(String format) {
+        return acceptedOutputFormats.contains(format);
     }
     
     /**

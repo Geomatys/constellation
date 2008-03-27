@@ -37,11 +37,13 @@ import javax.xml.bind.JAXBElement;
 
 // jersey dependencies
 import com.sun.ws.rest.spi.resource.Singleton;
+import java.io.IOException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.Path;
 
 // seagis dependencies
 import net.seagis.catalog.CatalogException;
+import net.seagis.catalog.Database;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.Series;
 import net.seagis.coverage.web.Service;
@@ -120,6 +122,32 @@ import org.geotools.resources.i18n.ErrorKeys;
 @Singleton
 public class WCService extends WebService {
 
+    /**
+     * The object whitch made all the operation on the postgrid database
+     */
+    private static ThreadLocal<WebServiceWorker> webServiceWorker;
+    static {
+        try {
+            /* only for ifremer configuration 
+            String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
+            logger.info("path to config file:" + path);
+            File configFile = new File(path);
+            final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true);
+            */
+            final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
+            webServiceWorker = new ThreadLocal<WebServiceWorker>() {
+                @Override
+                protected WebServiceWorker initialValue() {
+                    return new WebServiceWorker(initialValue);
+                }
+            };
+            
+       }catch (IOException e) {
+            logger.severe("IOException a l'initialisation du webServiceWorker:" + e);
+       }
+        
+    }
+    
     /** 
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */

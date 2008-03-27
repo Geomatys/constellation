@@ -143,7 +143,7 @@ public class CSWService extends WebService {
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getRecords(gr), sw);
         
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
             } if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordByIdType)) {
                 
@@ -160,7 +160,7 @@ public class CSWService extends WebService {
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getRecordById(grbi), sw);
         
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
             } if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecordType)) {
                 

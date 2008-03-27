@@ -34,11 +34,13 @@ import javax.ws.rs.core.Response;
 import com.sun.ws.rest.spi.resource.Singleton;
 
 // JAXB xml binding dependencies
+import java.io.IOException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 //seagis dependencies
 import net.seagis.catalog.CatalogException;
+import net.seagis.catalog.Database;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.sld.DescribeLayerResponseType;
@@ -81,6 +83,32 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 @Path("wms")
 @Singleton
 public class WMService extends WebService {
+    
+    /**
+     * The object whitch made all the operation on the postgrid database
+     */
+    private static ThreadLocal<WebServiceWorker> webServiceWorker;
+    static {
+        try {
+            /* only for ifremer configuration 
+            String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
+            logger.info("path to config file:" + path);
+            File configFile = new File(path);
+            final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true);
+            */
+            final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
+            webServiceWorker = new ThreadLocal<WebServiceWorker>() {
+                @Override
+                protected WebServiceWorker initialValue() {
+                    return new WebServiceWorker(initialValue);
+                }
+            };
+            
+       }catch (IOException e) {
+            logger.severe("IOException a l'initialisation du webServiceWorker:" + e);
+       }
+        
+    }
     
     /** 
      * Build a new instance of the webService and initialise the JAXB marshaller. 

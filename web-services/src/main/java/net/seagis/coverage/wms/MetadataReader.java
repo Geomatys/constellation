@@ -23,6 +23,9 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -45,6 +48,8 @@ import net.seagis.cat.csw.SummaryRecordType;
 import net.seagis.dublincore.elements.SimpleLiteral;
 import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.cat.csw.RecordType;
+import net.seagis.coverage.web.ServiceVersion;
+import net.seagis.ows.v100.OWSWebServiceException;
 import org.geotools.metadata.iso.MetadataEntity;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
@@ -54,6 +59,7 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.sql.v20.Reader20;
 import org.opengis.util.CodeList;
+import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
  * Read The forms in the metadata database and instanciate them into geotools object.
@@ -72,6 +78,11 @@ public class MetadataReader {
      * A reader to the MDWeb database.
      */
     private Reader20 MDReader;
+    
+    /**
+     * A connection to the MDWeb database.
+     */
+    private Connection connection;
     
     /**
      * A map containing the metadata already extract from the database.
@@ -101,13 +112,16 @@ public class MetadataReader {
     public final static int DUBLINCORE = 0;
     public final static int ISO_19115  = 1;
     
+    private ServiceVersion version;
     /**
      * Build a new metadata Reader.
      * 
      * @param MDReader a reader to the MDWeb database.
      */
-    public MetadataReader(Reader20 MDReader) throws SQLException {
+    public MetadataReader(Reader20 MDReader, Connection c, ServiceVersion version) throws SQLException {
         this.MDReader        = MDReader;
+        this.connection      = c;
+        this.version         = version;
         this.dateFormat      = new SimpleDateFormat("dd-mm-yyyy");
         this.MDCatalog       = MDReader.getCatalog("FR_SY");
         this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing", "net.seagis.temporal");
@@ -124,22 +138,44 @@ public class MetadataReader {
      * @return An metadata object.
      * @throws java.sql.SQLException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type) throws SQLException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type) throws SQLException, OWSWebServiceException {
         Object result;
-        if (mode == ISO_19115) {
-            result = metadatas.get(identifier);
-            if (result == null) {
-                Form f = MDReader.getForm(MDCatalog, Integer.parseInt(identifier));
-                result = getObjectFromForm(f);
-                if (result != null) {
-                    metadatas.put(identifier, result);
-                }
-            }
+        int id = getIDFromFileIdentifier(identifier);
+        if (id == -1) {
+            throw new OWSWebServiceException("This identifier " + identifier + " does not exist",
+                                              INVALID_PARAMETER_VALUE, "id", version);
         } else {
-            Form f = MDReader.getForm(MDCatalog, Integer.parseInt(identifier));
-            result = getRecordFromForm(f, type);
+            if (mode == ISO_19115) {
+                result = metadatas.get(identifier);
+                if (result == null) {
+                    Form f = MDReader.getForm(MDCatalog, id);
+                    result = getObjectFromForm(f);
+                    if (result != null) {
+                        metadatas.put(identifier, result);
+                    }
+                }
+            } else {
+                Form f = MDReader.getForm(MDCatalog, id);
+                result = getRecordFromForm(f, type);
+            }
         }
         return result;
+    }
+    
+    /**
+     * Return the MDWeb form ID from the fileIdentifier
+     */
+    public int getIDFromFileIdentifier(String identifier) throws SQLException {
+        
+        PreparedStatement stmt = connection.prepareStatement("Select form from \"Storage\".\"TextValues\" " +
+                                                     "WHERE value=? " +
+                                                     "AND path='ISO 19115:MD_Metadata:fileIdentifier'");
+       stmt.setString(1, identifier);
+       ResultSet queryResult = stmt.executeQuery();
+       if (queryResult.next()) {
+            return queryResult.getInt(1);
+       }
+       return -1;
     }
     
     /**
@@ -317,12 +353,15 @@ public class MetadataReader {
             }
         }
         
-        if (eastValue != null && westValue != null && northValue != null && southValue != null) {
-            BoundingBoxType result = new BoundingBoxType("EPSG:" + crs,
-                                                          eastValue,
-                                                          southValue,
-                                                          westValue,
-                                                          northValue);
+        if (crs != null && eastValue != null && westValue != null && northValue != null && southValue != null) {
+            if (crs.indexOf("EPSG:") != -1) {
+                crs = "EPSG:" + crs;
+            }
+            BoundingBoxType result = new BoundingBoxType(crs,
+                                                         eastValue,
+                                                         southValue,
+                                                         westValue,
+                                                         northValue);
             return result;
         } else {
             return null;
@@ -344,8 +383,7 @@ public class MetadataReader {
         } else {
             if (form == null) {
                 logger.severe("form is null");
-            }
-            if (form.getTopValue() == null) {
+            } else if (form.getTopValue() == null) {
                 logger.severe("Top value is null");
             } else {
                 logger.severe("Top value Type is null");
@@ -408,7 +446,7 @@ public class MetadataReader {
                     temp = "String";
                     // we try to get a constructor(String)
                     Constructor constructor = classe.getConstructor(String.class);
-                    logger.info("constructor:" + '\n' + constructor.toGenericString());
+                    logger.finer("constructor:" + '\n' + constructor.toGenericString());
                     //we execute the constructor
                     result = constructor.newInstance(textValue);
                     return result;
@@ -418,7 +456,7 @@ public class MetadataReader {
 
                 // we get the empty constructor
                 Constructor constructor = classe.getConstructor();
-                logger.info("constructor:" + '\n' + constructor.toGenericString());
+                logger.finer("constructor:" + '\n' + constructor.toGenericString());
                 //we execute the constructor
                 result = constructor.newInstance();
             }
@@ -457,7 +495,7 @@ public class MetadataReader {
             Path parent = path.getParent();
 
             if (parent != null && parent.equals(value.getPath())) {
-                logger.info("new childValue:" + path.getName());
+                logger.finer("new childValue:" + path.getName());
 
                 // we get the object from the child Value
                 Object param = getObjectFromValue(form, childValue);
@@ -478,7 +516,7 @@ public class MetadataReader {
                 while (tryAgain) {
                     try {
 
-                        logger.info("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
+                        logger.finer("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
                         if (isMeta) {
                             metaMap.put(attribName, param);
                         } else {
@@ -487,7 +525,7 @@ public class MetadataReader {
                         }
                         tryAgain = false;
                     } catch (IllegalArgumentException e) {
-                        logger.info(e.getMessage());
+                        logger.finer(e.getMessage());
                         switch (casee) {
 
                             case 0:
@@ -510,7 +548,7 @@ public class MetadataReader {
                     }
                 }
 
-                logger.info("");
+                logger.finer("");
             }
         }
         return result;
@@ -561,6 +599,8 @@ public class MetadataReader {
             return Integer.class;
         } else if (className.equalsIgnoreCase("Boolean")) {
             return Boolean.class;
+        } else if (className.equalsIgnoreCase("Distance")) {
+            return Double.class;
         } else if (className.equalsIgnoreCase("URL")) {
             return URI.class;
         //special case for locale codeList.
@@ -583,7 +623,7 @@ public class MetadataReader {
      * @return a class object corresponding to the specified name.
      */
     private Class getClassFromName(String className) {
-        logger.info("searche for class " + className);
+        logger.finer("searche for class " + className);
 
         //for the primitive type we return java primitive type
         Class result = getPrimitiveTypeFromName(className);
@@ -627,7 +667,7 @@ public class MetadataReader {
                 try {
                     // Récupération de la classe java.awt.Button
                     result = Class.forName(packageName + '.' + name);
-                    logger.info("class found:" + packageName + '.' + name);
+                    logger.finer("class found:" + packageName + '.' + name);
                     return result;
 
                 } catch (ClassNotFoundException e) {
@@ -682,7 +722,7 @@ public class MetadataReader {
      * @return a setter to this attribute.
      */
     private Method getSetterFromName(String propertyName, Class classe, Class rootClass) {
-        logger.info("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
+        logger.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
         
         //special case
         if (propertyName.equals("beginPosition")) {
@@ -729,7 +769,7 @@ public class MetadataReader {
                         break;
                     }
                 }
-                logger.info("setter found: " + setter.toGenericString());
+                logger.finer("setter found: " + setter.toGenericString());
                 return setter;
 
             } catch (NoSuchMethodException e) {
@@ -737,32 +777,32 @@ public class MetadataReader {
                 switch (occurenceType) {
 
                     case 0: {
-                        logger.info("The setter " + methodName + "(" + classe.getName() + ") does not exist");
+                        logger.finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
                         occurenceType = 1;
                         break;
                     }
 
                     case 1: {
-                        logger.info("The setter " + methodName + "(long) does not exist");
+                        logger.finer("The setter " + methodName + "(long) does not exist");
                         occurenceType = 2;
                         break;
                     }
                     
                     case 2: {
                         if (interfacee != null) {
-                            logger.info("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
+                            logger.finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
                         }
                         occurenceType = 3;
                         break;
                     }
 
                     case 3: {
-                        logger.info("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
+                        logger.finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 4;
                         break;
                     }
                     case 4: {
-                        logger.info("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
+                        logger.finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 5;
                         break;
                     }
@@ -771,6 +811,8 @@ public class MetadataReader {
                 }
             }
         }
+        logger.severe("No setter have been found for attribute " + propertyName + 
+                      " of type " + classe.getName() + " in the class " + rootClass.getName());
         return null;
     }
 
@@ -808,15 +850,15 @@ public class MetadataReader {
                     URL url = urls.nextElement();
                     try {
                         URI uri = url.toURI();
-                        System.out.println("scanning URI:" + uri);
+                        logger.info("scanning :" + uri);
                         result.addAll(scan(uri, fileP));
                     } catch (URISyntaxException e) {
-                        System.out.println("URL, " + url + "cannot be converted to a URI");
+                        logger.severe("URL, " + url + "cannot be converted to a URI");
                     }
                 }
             } catch (IOException ex) {
-                System.out.println("The resources for the package" + p +
-                                   ", could not be obtained");
+                logger.severe("The resources for the package" + p +
+                              ", could not be obtained");
             }
         }
 
@@ -898,8 +940,9 @@ public class MetadataReader {
     /**
      * Return a Date by parsing different kind of date format.
      * 
-     * @param date
-     * @return
+     * @param date a date representation (example 2002, 02-2007, 2004-03-04, ...)
+     * 
+     * @return a formated date (example 2002 -> 01-01-2002,  2004-03-04 -> 04-03-2004, ...) 
      */
     private Date createDate(String date) throws ParseException{
         

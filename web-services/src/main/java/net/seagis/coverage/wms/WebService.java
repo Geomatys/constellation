@@ -129,31 +129,6 @@ public abstract class WebService {
     @Context
     private UriInfo context;
     
-    /**
-     * The object whitch made all the operation on the postgrid database
-     */
-    protected static ThreadLocal<WebServiceWorker> webServiceWorker;
-    static {
-        try {
-            /* only for ifremer configuration 
-            String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
-            logger.info("path to config file:" + path);
-            File configFile = new File(path);
-            final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true);
-            */
-            final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
-            webServiceWorker = new ThreadLocal<WebServiceWorker>() {
-                @Override
-                protected WebServiceWorker initialValue() {
-                    return new WebServiceWorker(initialValue);
-                }
-            };
-            
-       }catch (IOException e) {
-            logger.severe("IOException a l'initialisation du webServiceWorker:" + e);
-       }
-        
-    }
     
     /**
      * Initialize the basic attribute of a web service.
