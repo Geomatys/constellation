@@ -15,9 +15,10 @@
 package net.seagis.coverage.catalog;
 
 import java.util.Arrays;
+import java.awt.Shape;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
@@ -28,10 +29,10 @@ import org.opengis.referencing.operation.TransformException;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotools.referencing.operation.transform.AffineTransform2D;
 
 import net.seagis.catalog.Entry;
 
@@ -65,10 +66,11 @@ final class GridGeometryEntry extends Entry {
      * transform is not included because the {@link #verticalOrdinates} may not
      * be regular.
      */
-    protected final AffineTransform gridToCRS;
+    protected final AffineTransform2D gridToCRS;
 
     /**
      * The full envelope, including the vertical and temporal extent if any.
+     * The coordinate reference system is the one declared in the table for that entry.
      * Should not be modified after construction.
      */
     private final GeneralEnvelope envelope;
@@ -83,7 +85,7 @@ final class GridGeometryEntry extends Entry {
      * The horizontal and vertical SRID declared in the database.
      * Stored for informative purpose, but not used by this entry.
      */
-    public final int horizontalSRID, verticalSRID;
+    protected final int horizontalSRID, verticalSRID;
 
     /**
      * The vertical ordinates, or {@code null}.
@@ -103,7 +105,7 @@ final class GridGeometryEntry extends Entry {
      * @param verticalOrdinates The vertical ordinate values, or {@code null} if none.
      */
     GridGeometryEntry(final String name,
-                      final AffineTransform gridToCRS,
+                      final AffineTransform2D gridToCRS,
                       final GridRange gridRange,
                       final GeneralEnvelope envelope,
                       final GeographicBoundingBox bbox,
@@ -172,6 +174,18 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
+     * Returns the coverage shape in coverage CRS (not geographic CRS). The returned shape is likely
+     * (but not garanteed) to be an instance of {@link Rectangle2D}. It can be freely modified.
+     */
+    public Shape getShape() {
+        Shape shape = new Rectangle2D.Double(
+                gridRange.getLower (0), gridRange.getLower (1),
+                gridRange.getLength(0), gridRange.getLength(1));
+        shape = AffineTransform2D.transform(gridToCRS, shape, true);
+        return shape;
+    }
+
+    /**
      * Returns the coordinate reference system.
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
@@ -183,14 +197,6 @@ final class GridGeometryEntry extends Entry {
      */
     public GeneralEnvelope getEnvelope() {
         return envelope.clone();
-    }
-
-    /**
-     * Returns the two first dimensions of the envelope.
-     */
-    public Envelope2D getEnvelope2D() {
-        return new Envelope2D(CRS.getHorizontalCRS(envelope.getCoordinateReferenceSystem()),
-                envelope.getMinimum(0), envelope.getMinimum(1), envelope.getLength(0), envelope.getLength(1));
     }
 
     /**

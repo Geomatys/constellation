@@ -41,6 +41,7 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
+import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
@@ -279,7 +280,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         /*
          * Creates the entry and performs some final checks.
          */
-        final AffineTransform at = new AffineTransform(scaleX, shearY, shearX, scaleY, translateX, translateY);
+        final AffineTransform2D at = new AffineTransform2D(scaleX, shearY, shearX, scaleY, translateX, translateY);
         final GridGeometryEntry entry = new GridGeometryEntry(identifier, at, gridRange, envelope, bbox,
                 horizontalSRID, verticalSRID, altitudes);
         if (entry.isEmpty()) {

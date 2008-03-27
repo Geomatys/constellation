@@ -172,7 +172,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testNetCDF() throws WebServiceException, IOException {
-if (true) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setInterpolation("bilinear");
         worker.setService("WMS", "1.0");
