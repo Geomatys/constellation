@@ -271,18 +271,18 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
      * {@link #getAuthorityCodes}.
      *
      * @param  code The authority code to convert to primary key value.
-     * @return The primary key for the supplied code (never {@code null}). There is no
-     *         garantee that this key exists (this method may or may not query the database).
+     * @return The primary key for the supplied code. There is no garantee that this key exists
+     *         (this method may or may not query the database).
      * @throws NoSuchAuthorityCodeException if a code can't be parsed as an integer or can't
      *         be found in the database.
      * @throws FactoryException if an error occured while querying the database.
      */
-    public synchronized Integer getPrimaryKey(String code) throws FactoryException {
+    public synchronized int getPrimaryKey(String code) throws FactoryException {
         code = code.trim();
         final int separator = code.lastIndexOf(GenericName.DEFAULT_SEPARATOR);
         final String authority  = (separator >= 0) ? code.substring(0, separator).trim() : "";
         final String identifier = code.substring(separator+1).trim();
-        Integer srid;
+        int srid;
         try {
             srid = Integer.parseInt(identifier);
         } catch (NumberFormatException cause) {
@@ -340,7 +340,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
     public synchronized CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
-        final Integer key = getPrimaryKey(code);
+        final int srid = getPrimaryKey(code);
         final String wkt;
         try {
             if (select == null) {
@@ -348,7 +348,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
                 appendFrom(sql).append(" WHERE ").append(PRIMARY_KEY).append("=?");
                 select = getConnection().prepareStatement(sql.toString());
             }
-            select.setInt(1, key);
+            select.setInt(1, srid);
             wkt = singleton(select, String.class, code, CoordinateReferenceSystem.class);
         } catch (SQLException exception) {
             throw databaseFailure(CoordinateReferenceSystem.class, code, exception);

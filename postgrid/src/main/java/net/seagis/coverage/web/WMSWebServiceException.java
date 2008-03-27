@@ -13,6 +13,7 @@
  *    Lesser General Public License for more details.
  */
 package net.seagis.coverage.web;
+
 import net.seagis.coverage.wms.WMSExceptionCode;
 import org.geotools.util.Version;
 

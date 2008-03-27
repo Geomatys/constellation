@@ -16,11 +16,8 @@ package net.seagis.coverage.web;
 
 import java.awt.Color;
 import java.io.*;
-import java.sql.SQLException;
 import java.util.*;
 import java.text.ParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.media.jai.Interpolation;
 
@@ -33,11 +30,11 @@ import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.util.NumberRange;
+import org.geotools.util.logging.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 import net.seagis.catalog.Database;
-import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 
@@ -85,12 +82,7 @@ public class WebServiceWorker extends ImageProducer {
      * List of valid formats. Will be created only when first needed.
      */
     private transient Set<String> formats;
-    
-    /**
-     * Postgis CRS Factory for use as a fallback if CRS.decode fails.
-     */
-    private static PostgisAuthorityFactory crsFactory;
-    
+
     /**
      * Creates a new image producer connected to the specified database.
      *
@@ -207,19 +199,22 @@ public class WebServiceWorker extends ImageProducer {
             }
         } catch (FactoryException exception) {
             try {
-                // Wasn't a normal EPSG code...
-                // Try creating a CRS from a definition in the spatial_ref_sys table
-                if (crsFactory == null){
-                    crsFactory = new PostgisAuthorityFactory(null, super.getDatabase().getConnection());
-                }
-                crs = crsFactory.createCoordinateReferenceSystem(code);
-                
+                /*
+                 * Wasn't a normal EPSG code...
+                 * Try creating a CRS from a definition in the "spatial_ref_sys" table.
+                 */
+                crs = getSpatialReferenceSystem(code);
             } catch (FactoryException ex) {
-                Logger.getLogger(WebServiceWorker.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception, INVALID_CRS, version);
-            } catch (SQLException ex) {
-                Logger.getLogger(WebServiceWorker.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception, INVALID_CRS, version);
+                /*
+                 * Logs the exception at the FINE level rather than the WARNING one because we are
+                 * already throwing an exception and we don't want to duplicate it with logs. This
+                 * exception may be normal - we do not control what the user provides. This is
+                 * different than WARNING which is more often for unexpected errors that are not
+                 * user's fault.
+                 */
+                Logging.recoverableException(LOGGER, WebServiceWorker.class, "decodeCRS", ex);
+                throw new WMSWebServiceException(Errors.format(
+                        ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM), exception, INVALID_CRS, version);
             }
         }
         return crs;

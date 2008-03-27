@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import org.geotools.util.logging.Logging;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import net.seagis.catalog.CRS;
 import net.seagis.catalog.Database;
@@ -89,6 +91,23 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     }
 
     /**
+     * Returns a CRS for the specified code from the {@code "spatial_ref_sys"} table.
+     * This is mostly a convenience method leveraging the current connection for querying
+     * the table. This method does <strong>not</strong> look in other CRS databases like what
+     * {@link org.geotools.referencing.CRS#decode(String)} does.
+     *
+     * @param  code The CRS identifier.
+     * @return The coordinate reference system for the given code.
+     * @throws SQLException if an error occured while querying the database.
+     * @throws FactoryException if the CRS was not found or can not be created.
+     */
+    public CoordinateReferenceSystem getSpatialReferenceSystem(final String code)
+            throws SQLException, CatalogException, FactoryException
+    {
+        return getDatabase().getTable(GridGeometryTable.class).getSpatialReferenceSystem(code);
+    }
+
+    /**
      * Creates a layer from the current row in the specified result set.
      *
      * @param  results The result set to read.
@@ -113,7 +132,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     }
 
     /**
-     * Completes the creation of the specified element. This method add the following piece
+     * Completes the creation of the specified element. This method adds the following piece
      * to the given layer:
      * <p>
      * <ul>

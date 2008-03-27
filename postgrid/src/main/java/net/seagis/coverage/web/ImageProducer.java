@@ -47,6 +47,7 @@ import javax.media.jai.JAI;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -118,7 +119,7 @@ public abstract class ImageProducer {
     }
 
     /**
-     * A logger for every {@link WebServiceWorker} instances.
+     * A logger for every {@link ImageProducer} instances.
      */
     static final Logger LOGGER = Logger.getLogger("net.seagis.coverage.web");
 
@@ -520,6 +521,28 @@ public abstract class ImageProducer {
     }
 
     /**
+     * Returns the CRS from the {@code "spatial_ref_sys"} table for the given code.
+     * This method does <strong>not</strong> look in other CRS databases like what
+     * {@link org.geotools.referencing.CRS#decode(String)} does.
+     *
+     * @param  code The CRS code to look for.
+     * @return The coordinate reference system for the given code.
+     * @throws WebServiceException if an error occured while querying the database.
+     * @throws FactoryException if no CRS can be created for the given code.
+     */
+    public CoordinateReferenceSystem getSpatialReferenceSystem(final String code)
+            throws WebServiceException, FactoryException
+    {
+        try {
+            return getLayerTable(true).getSpatialReferenceSystem(code);
+        } catch (CatalogException exception) {
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+        } catch (SQLException exception) {
+            throw new WMSWebServiceException(exception, NO_APPLICABLE_CODE, version);
+        }
+    }
+
+    /**
      * Returns the coordinate reference system, or {@code null} if unknown.
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
@@ -596,21 +619,23 @@ public abstract class ImageProducer {
     public GridCoverage2D getGridCoverage2D(final boolean resample) throws WebServiceException {
         final Layer layer = getLayer();
         final CoverageReference ref;
-         // If the WMS request does not include a TIME parameter, then use the latest time
-         // available.  
-         // NOTE! - this gets the time of the LAYER's latest entry, but not necessarily within 
-         // the requested bounding box.  
-         // TODO: This fix should probably be incorporated as part of the CoverageComparator, 
-         // but this quick hack keeps the Comparator from looking at ALL coverages in the 
-         // layer when no time parameter is given.
-        SortedSet<Date> availTimes;
-        if (time==null) {   
+        if (time == null) {
+            /*
+             * If the WMS request does not include a TIME parameter, then use the latest time available.
+             *
+             * NOTE! - this gets the time of the LAYER's latest entry, but not necessarily within
+             *         the requested bounding box.
+             * TODO: This fix should probably be incorporated as part of the CoverageComparator,
+             *       the but this quick hack keeps the Comparator from looking at ALL coverages
+             *       in layer when no time parameter is given.
+             */
             try {
-                availTimes = layer.getAvailableTimes();
-                time = availTimes.last();
+                final SortedSet<Date> availableTimes = layer.getAvailableTimes();
+                time = availableTimes.last();
             } catch (CatalogException ex) {
-                Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, null, ex);
-            }            
+                Logging.unexpectedException(LOGGER, ImageProducer.class, "getGridCoverage2D", ex);
+                // 'time' still null, which is a legal value.
+            }
         }
         try {
             ref = layer.getCoverageReference(time, elevation);
@@ -667,8 +692,9 @@ public abstract class ImageProducer {
         RenderedImage image = coverage.getRenderedImage();
         if (LOGGER.isLoggable(Level.FINE)) {
             final Vocabulary resources = Vocabulary.getResources(null);
-            LOGGER.fine(resources.getLabel(VocabularyKeys.IMAGE_SIZE) + resources.getString(VocabularyKeys.IMAGE_SIZE_$3,
-                    image.getWidth(), image.getHeight(), image.getSampleModel().getNumBands()));
+            LOGGER.fine(resources.getLabel (VocabularyKeys.IMAGE_SIZE) +
+                        resources.getString(VocabularyKeys.IMAGE_SIZE_$3,
+                        image.getWidth(), image.getHeight(), image.getSampleModel().getNumBands()));
         }
         if (indexedShortAllowed) {
             return image;
@@ -892,7 +918,6 @@ public abstract class ImageProducer {
                     continue;
                 }
                 if (spi.canEncodeImage(type)) {
-                    LOGGER.fine("Reformat image to type #" + i);
                     final BufferedImage buffered = type.createBufferedImage(image.getWidth(), image.getHeight());
                     final Graphics2D graphics = buffered.createGraphics();
                     graphics.drawRenderedImage(image, new AffineTransform());
@@ -1172,7 +1197,7 @@ public abstract class ImageProducer {
         }
         // Do not close the database connection, since it may be shared by other instances.
     }
-    
+
     public Database getDatabase(){
         return database;
     }

@@ -47,11 +47,10 @@ public class PostgisAuthorityFactoryTest extends DatabaseTest {
     public void testConnected() throws Exception {
         final PostgisAuthorityFactory factory = new PostgisAuthorityFactory(null, database.getConnection());
         assertEquals(Citations.EPSG, factory.getAuthority());
-
-        assertEquals(4326, factory.getPrimaryKey("4326").intValue());
-        assertEquals(4326, factory.getPrimaryKey("EPSG:4326").intValue());
+        assertEquals(4326, factory.getPrimaryKey("4326"));
+        assertEquals(4326, factory.getPrimaryKey("EPSG:4326"));
         try {
-            assertEquals(4326, factory.getPrimaryKey("DUMMY:4326").intValue());
+            assertEquals(4326, factory.getPrimaryKey("DUMMY:4326"));
             fail("Should not find a non-existing authority.");
         } catch (NoSuchAuthorityCodeException e) {
             // This is the expected exception.

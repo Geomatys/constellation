@@ -43,7 +43,6 @@ import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
-import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
@@ -69,7 +68,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * The authority factory connected to the PostGIS {@code "spatial_ref_sys"} table.
      * Will be created when first needed.
      */
-    private transient AbstractAuthorityFactory crsFactory;
+    private transient PostgisAuthorityFactory crsFactory;
 
     /**
      * A map of CRS created up to date.
@@ -94,9 +93,11 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     }
 
     /**
-     * Returns the CRS authority factory.
+     * Returns the CRS authority factory backed by the PostGIS {@code "spatial_ref_sys"} table.
+     *
+     * @throws SQLException if an error occured while querying the database.
      */
-    private AbstractAuthorityFactory getAuthorityFactory() throws SQLException {
+    private PostgisAuthorityFactory getAuthorityFactory() throws SQLException {
         assert Thread.holdsLock(this);
         if (crsFactory == null) {
             crsFactory = new PostgisAuthorityFactory(null, getDatabase().getConnection());
@@ -105,11 +106,28 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     }
 
     /**
+     * Returns a CRS for the specified code from the {@code "spatial_ref_sys"} table.
+     * This method does <strong>not</strong> look in other CRS databases like what
+     * {@link org.geotools.referencing.CRS#decode(String)} does.
+     *
+     * @param  code The CRS identifier.
+     * @return The coordinate reference system for the given code.
+     * @throws SQLException if an error occured while querying the database.
+     * @throws FactoryException if the CRS was not found or can not be created.
+     */
+    public synchronized CoordinateReferenceSystem getSpatialReferenceSystem(final String code)
+            throws SQLException, FactoryException
+    {
+        return getCoordinateReferenceSystem(getAuthorityFactory().getPrimaryKey(code));
+    }
+
+    /**
      * Returns a CRS for the specified identifier. The given identifier should be a primary
      * key in the PostGIS {@code "spatial_ref_sys"} table.
      *
      * @param  srid The CRS identifier.
      * @return The coordinate reference system for the given identifier.
+     * @throws SQLException if an error occured while querying the database.
      * @throws FactoryException if the CRS was not found or can not be created.
      */
     public synchronized CoordinateReferenceSystem getCoordinateReferenceSystem(final int srid)
