@@ -22,6 +22,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +40,8 @@ import java.util.Map;
 import java.util.Date;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import static java.lang.Math.*;
 
 import org.opengis.coverage.SampleDimension;
@@ -88,6 +91,7 @@ import ucar.nc2.dataset.AxisType;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Sam Hiatt
  */
 final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
@@ -482,7 +486,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * to project the clip however, because it often includes the poles which are not
          * handled by every kind of projection.
          */
-        final Rectangle2D clipArea = settings.geographicArea;
+        final List<Point2D> clipArea = settings.geographicArea;
         Rectangle2D clipLogical;
         if (clipArea == null) {
             clipLogical = geometry.getEnvelope2D();
@@ -495,31 +499,35 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
              * coverage CRS.
              */
             Envelope2D boundingBox = geometry.getEnvelope2D();
-            boundingBox = (Envelope2D) settings.tableToCoverageCRS(boundingBox, boundingBox, true);
+            settings.tableToCoverageCRS(boundingBox, boundingBox, true);
             /*
              * Vérifie si le rectangle demandé (clipArea) intercepte la région géographique
              * couverte par l'image. On utilise un code spécial plutôt que de faire appel à
              * Rectangle2D.intersects(..) parce qu'on veut accepter les cas où le rectangle
              * demandé se résume à une ligne ou un point.
              */
-            if (clipArea.getWidth()<0 || clipArea.getHeight()<0 || boundingBox.isEmpty()) {
-                return null;
+//            if (clipArea.getWidth()<0 || clipArea.getHeight()<0 || boundingBox.isEmpty()) {
+//                return null;
+//            }
+//            if (clipArea.getMaxX() < boundingBox.getMinX() ||
+//                clipArea.getMinX() > boundingBox.getMaxX() ||
+//                clipArea.getMaxY() < boundingBox.getMinY() ||
+//                clipArea.getMinY() > boundingBox.getMaxY())
+//            {
+//                return null;
+//            }
+            clipLogical = new Envelope2D(geometry.getCoordinateReferenceSystem(), 
+                    new Rectangle2D.Double()); // Will be computed below.
+            Iterator<Point2D> corners = clipArea.iterator();
+            while (corners.hasNext()){
+                clipLogical.add(corners.next());
             }
-            if (clipArea.getMaxX() < boundingBox.getMinX() ||
-                clipArea.getMinX() > boundingBox.getMaxX() ||
-                clipArea.getMaxY() < boundingBox.getMinY() ||
-                clipArea.getMinY() > boundingBox.getMaxY())
-            {
-                return null;
-            }
-            clipLogical = new Rectangle2D.Double(); // Will be computed below.
-            Rectangle2D.intersect(boundingBox, clipArea, clipLogical);
             clipLogical = settings.tableToCoverageCRS(clipLogical, clipLogical, false);
             /*
              * Transforms ["real world" envelope] --> [region in pixel coordinates].
              * We temporarily overwrite "clipLogical", but will recompute it later.
              */
-            clipLogical = XAffineTransform.transform(crsToGrid, clipLogical, clipLogical);
+            clipLogical = (Envelope2D) XAffineTransform.transform(crsToGrid, clipLogical, clipLogical);
             clipPixel.x      = (int)floor(clipLogical.getX()      + EPS);
             clipPixel.y      = (int)floor(clipLogical.getY()      + EPS);
             clipPixel.width  = (int)ceil (clipLogical.getWidth()  - EPS);
@@ -556,7 +564,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
              * compared to the value it had before to be overwriten. But it may still
              * change because of rounding error.
              */
-            clipLogical = XAffineTransform.transform(gridToCRS, clipLogical, clipLogical);
+            clipLogical = (Envelope2D) XAffineTransform.transform(gridToCRS, clipLogical, clipLogical);
         }
         CoordinateReferenceSystem coverageCRS = settings.coverageCRS;
         final DefaultTemporalCRS  temporalCRS = settings.getTemporalCRS();

@@ -16,7 +16,7 @@
 package net.seagis.coverage.catalog;
 
 import java.awt.geom.Dimension2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,7 +38,6 @@ import org.geotools.util.NumberRange;
 import org.geotools.util.RangeSet;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.image.io.mosaic.TileManager;
 
 import net.seagis.catalog.CatalogException;
@@ -63,6 +62,7 @@ import static net.seagis.catalog.QueryType.*;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Sam Hiatt
  */
 public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> {
     /**
@@ -720,9 +720,11 @@ loop:   for (final CoverageReference newReference : entries) {
          * coordonnées vers le système de coordonnées de l'image.
          */
         final Envelope envelope = getEnvelope();
-        final Rectangle2D geographicArea = XRectangle2D.createFromExtremums(
-                            envelope.getMinimum(xDimension), envelope.getMinimum(yDimension),
-                            envelope.getMaximum(xDimension), envelope.getMaximum(yDimension));
+        List<Point2D> geographicArea = new LinkedList<Point2D>();
+        geographicArea.add(new Point2D.Double(envelope.getMinimum(0),envelope.getMinimum(1)));
+        geographicArea.add(new Point2D.Double(envelope.getMinimum(0),envelope.getMaximum(1)));
+        geographicArea.add(new Point2D.Double(envelope.getMaximum(0),envelope.getMinimum(1)));
+        geographicArea.add(new Point2D.Double(envelope.getMaximum(0),envelope.getMaximum(1)));
         final Dimension2D resolution = getPreferredResolution();
         parameters = new GridCoverageSettings(operation, getCoordinateReferenceSystem(),
                             coverageCRS, geographicArea, resolution, dateFormat);

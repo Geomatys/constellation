@@ -14,12 +14,15 @@
  */
 package net.seagis.coverage.catalog;
 
-import java.util.Date;
 import java.text.DateFormat;
 import java.io.Serializable;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.TransformException;
@@ -29,6 +32,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 import net.seagis.coverage.model.Operation;
+import org.geotools.geometry.Envelope2D;
 
 
 /**
@@ -38,6 +42,7 @@ import net.seagis.coverage.model.Operation;
  * construction.
  *
  * @author Martin Desruisseaux
+ * @author Sam Hiatt
  * @version $Id$
  */
 final class GridCoverageSettings implements Serializable {
@@ -80,7 +85,7 @@ final class GridCoverageSettings implements Serializable {
      * sont exprimées selon la partie horizontale ("head") du système de
      * coordonnées {@link #tableCRS}.
      */
-    public final Rectangle2D geographicArea;
+    public final List<Point2D> geographicArea;
 
     /**
      * Dimension logique désirée des pixels de l'images.   Cette information
@@ -116,7 +121,7 @@ final class GridCoverageSettings implements Serializable {
     public GridCoverageSettings(final Operation                 operation,
                                 final CoordinateReferenceSystem tableCRS,
                                 final CoordinateReferenceSystem coverageCRS,
-                                final Rectangle2D               geographicArea,
+                                final List<Point2D>       geographicArea,
                                 final Dimension2D               resolution,
                                 final DateFormat                dateFormat)
     {
@@ -169,11 +174,11 @@ final class GridCoverageSettings implements Serializable {
      *
      * @todo Attention, getCRS2D ne tient pas compte des dimensions des GridCoverages
      */
-    final Rectangle2D tableToCoverageCRS(Rectangle2D area, final Rectangle2D dest, final boolean inverse)
+    final List<Point2D> tableToCoverageCRS(List<Point2D> area, List<Point2D> dest, final boolean inverse)
             throws TransformException
     {
         CoordinateReferenceSystem sourceCRS = tableCRS;
-        CoordinateReferenceSystem targetCRS = coverageCRS;
+        CoordinateReferenceSystem targetCRS = coverageCRS;  
         if (!CRS.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
             sourceCRS = CRSUtilities.getCRS2D(sourceCRS);
             targetCRS = CRSUtilities.getCRS2D(targetCRS);
@@ -186,10 +191,45 @@ final class GridCoverageSettings implements Serializable {
             if (inverse) {
                 mt = mt.inverse();
             }
-            area = CRS.transform(mt, area, dest);
+            for (Point2D r : area){
+                dest.add( mt.transform(r, null) );
+            }
         }
-        return area;
+        return dest;
     }
+    
+    final Envelope2D tableToCoverageCRS(List<Point2D> area, Envelope2D dest, final boolean inverse)
+            throws TransformException
+    {
+        List<Point2D> points = new LinkedList<Point2D>();
+        points = tableToCoverageCRS(area,points,inverse);
+        // now make a rectangle out of the points
+        Rectangle2D rect = new Rectangle2D.Double();
+        
+        for (Point2D p : area){
+            rect.add(p);
+        }
+        Envelope2D envelope = new Envelope2D(coverageCRS,rect);
+        return envelope;
+    }
+    
+    
+    final Envelope2D tableToCoverageCRS(Envelope2D area, Envelope2D dest, boolean inverse) throws TransformException {
+        List<Point2D> points = new LinkedList<Point2D>();
+        points.add(new Point2D.Double(area.getMinX(),area.getMinY())); 
+        points.add(new Point2D.Double(area.getMaxX(),area.getMaxY())); 
+        points.add(new Point2D.Double(area.getMinX(),area.getMaxY())); 
+        points.add(new Point2D.Double(area.getMaxX(),area.getMinY())); 
+        return tableToCoverageCRS(points,dest,inverse);
+    }
+    
+
+    final Rectangle2D tableToCoverageCRS(Rectangle2D area, Rectangle2D dest, boolean inverse) throws TransformException {
+        Envelope2D areaEnvelope = new Envelope2D(coverageCRS, area);
+        Envelope2D destEnvelope = new Envelope2D(coverageCRS, dest);
+        return (Rectangle2D) tableToCoverageCRS(areaEnvelope, destEnvelope, inverse);
+    }
+    
 
     /**
      * Formats the specified date using a shared formatter.
