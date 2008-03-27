@@ -68,6 +68,7 @@ import org.geotools.resources.Classes;
 import net.seagis.catalog.Entry;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
+import org.geotools.resources.XArray;
 
 
 /**
@@ -317,7 +318,7 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Convert the specified {@code input} object to one of the types specified in the
+     * Converts the specified {@code input} object to one of the types specified in the
      * table {@code inputTypes}. If the conversion can not be executed,
      * then this method returns {@code null}.
      */
@@ -333,7 +334,7 @@ final class FormatEntry extends Entry implements Format {
                 return new File(((URL) file).toURI());
             }
         } catch (Exception exception) {
-            // Ignore... Le code suivant sera un "fallback" raisonable.
+            // Ignore... Following code is a raisonable fallback.
         }
         if (contains(inputTypes, URL.class)) try {
             if (file instanceof File) {
@@ -343,7 +344,7 @@ final class FormatEntry extends Entry implements Format {
                 return ((URI) file).toURL();
             }
         } catch (MalformedURLException exception) {
-            // Ignore... Le code suivant sera un "fallback" raisonable.
+            // Ignore... Following code is a raisonable fallback.
         }
         if (contains(inputTypes, URI.class)) try {
             if (file instanceof File) {
@@ -353,7 +354,7 @@ final class FormatEntry extends Entry implements Format {
                 return ((URL) file).toURI();
             }
         } catch (URISyntaxException exception) {
-            // Ignore... Le code suivant sera un "fallback" raisonable.
+            // Ignore... Following code is a raisonable fallback.
         }
         return null;
     }
@@ -418,11 +419,15 @@ final class FormatEntry extends Entry implements Format {
                 }
             }
             /*
-             * If the image is in "RAW" format, define the size of the image.  This
-             * is necessary because the "RAW" format does not contain any information
-             * about the size or data type of the image.
+             * If the image is in "RAW" format, define the size of the image. This is necessary
+             * because the "RAW" format does not contain any information about the size or data
+             * type of the image.
+             *
+             * Note: We check the format name, not the RawImageInputStream input type, because
+             * the later is a subclass of ImageInputStream which is supported by every readers.
+             * Looking for it cause this code to be executed for every formats, not just RAW.
              */
-            if (inputStream!=null && contains(inputTypes, RawImageInputStream.class)) {
+            if (inputStream != null && XArray.containsIgnoreCase(spi.getFormatNames(), "raw")) {
                 // Patch contributed by Sam Hiatt
                 // NOTE this fix requires a patched version of jai-imageio.jar
                 // contact me if you have any questions about that.

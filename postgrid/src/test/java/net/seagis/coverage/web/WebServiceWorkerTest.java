@@ -53,7 +53,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testSST() throws WebServiceException, IOException {
-if (true) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.0");
         worker.setLayer(LayerTableTest.SAMPLE_NAME);
