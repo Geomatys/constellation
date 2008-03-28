@@ -24,7 +24,6 @@ import org.geotools.util.logging.Logging;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import net.seagis.catalog.CRS;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.BoundedSingletonTable;
 import net.seagis.catalog.NoSuchRecordException;
@@ -79,7 +78,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
      * Constructs a new {@code LayerTable} from the specified query.
      */
     private LayerTable(final LayerQuery query) {
-        super(query, CRS.XYT);
+        super(query);
         setIdentifierParameters(query.byName, null);
     }
 

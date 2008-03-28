@@ -24,7 +24,6 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.TableTest;
-import net.seagis.catalog.CRS;
 
 import org.junit.*;
 
@@ -40,16 +39,6 @@ public class GridGeometryTableTest extends TableTest {
      * The name of the geometry to be tested.
      */
     public static final String SAMPLE_NAME = "Coriolis";
-
-    /**
-     * Tests some CRS definitions.
-     */
-    @Test
-    public void testCRS() {
-        assertEquals(2, CRS.XY  .getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
-        assertEquals(3, CRS.XYT .getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
-        assertEquals(4, CRS.XYZT.getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
-    }
 
     /**
      * Tests the {@link GridGeometryTable#getEntry} and {@link GridGeometryTable#getEntries} methods.

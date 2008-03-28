@@ -85,19 +85,6 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     private Parameter bySpatialExtent;
 
     /**
-     * The type of the CRS used for the {@linkplain #getEnvelope envelope}.
-     */
-    private final CRS crsType;
-
-    /**
-     * The transform from the reference system designated by {@link #crsType} to
-     * {@link #getCoordinateReferenceSystem}. Will be created only when first needed.
-     * If non-null, then the source CRS must be {@link CRS#getCoordinateReferenceSystem}
-     * and the target CRS is the one returned by {@link #getCoordinateReferenceSystem}.
-     */
-    private CoordinateOperation standardToUser;
-
-    /**
      * The bounding box computed by {@link #getEnvelope}, or {@code null}
      * if not yet computed. Cached for performance reasons.
      */
@@ -135,9 +122,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * subclass with {@link Query#addColumn addColumn} and {@link Query#addParameter addParameter}
      * methods invoked in its constructor.
      */
-    protected BoundedSingletonTable(final Query query, final CRS crsType) {
+    protected BoundedSingletonTable(final Query query) {
         super(query);
-        this.crsType = crsType;
         tMin =  Long.MIN_VALUE;
         tMax =  Long.MAX_VALUE;
         xMin = -360;
@@ -159,7 +145,6 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      */
     protected BoundedSingletonTable(final BoundedSingletonTable<E> table) {
         super(table);
-        crsType         = table.crsType;
         envelope        = table.envelope;
         tMin            = table.tMin;
         tMax            = table.tMax;
@@ -172,7 +157,6 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         xResolution     = table.xResolution;
         yResolution     = table.yResolution;
         trimmed         = table.trimmed;
-        standardToUser  = table.standardToUser;
         byTimeRange     = table.byTimeRange;
         bySpatialExtent = table.bySpatialExtent;
     }
@@ -194,9 +178,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
     }
 
     /**
-     * Returns the coordinate reference system used by {@code [get|set]Envelope} methods. The
-     * default CRS is inferred from the {@code crsType} argument given to the constructor. This
-     * CRS may contain the following dimensions:
+     * Returns the coordinate reference system used by {@code [get|set]Envelope} methods.
+     * It may contain any of the following dimensions, in this order:
      * <p>
      * <ul>
      *   <li>The longitude in decimal degrees relative to Greenwich meridian.</li>
@@ -204,53 +187,9 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      *   <li>Altitude in metres above the WGS 84 ellipsoid.</li>
      *   <li>Time in fractional days since epoch.</li>
      * </ul>
-     * <p>
-     * Not all those dimensions need to be present. For example {@link CRS#XYT}
-     * does not contain an altitude axis.
-     *
-     * @see CRS
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
-        final CoordinateOperation standardToUser = this.standardToUser; // Protect from change.
-        return (standardToUser != null) ? standardToUser.getTargetCRS() : crsType.getCoordinateReferenceSystem();
-    }
-
-    /**
-     * Sets the coordinate reference system used by {@code [get|set]Envelope} methods.
-     *
-     * @param  crs The new CRS, or {@code null} for restoring the default one.
-     * @throws CatalogException if the specified CRS is not compatible with the CRS type
-     *         given to the constructor.
-     *
-     * @deprecated Some implementation expects a geographics CRS with (longitude, latitude) axis
-     *             order. For example {@code GridToCoverageEntry.computeBounds} expect the table
-     *             CRS to be the same than the {@code GeographicBoundingBoxes.horizontalExtent}
-     *             column. Assumptions are also sometime required for setting the SQL parameter
-     *             values in the {@code WHERE} clause. Revisit if we should remove this method.
-     */
-    @Deprecated
-    public synchronized void setCoordinateReferenceSystem(CoordinateReferenceSystem crs)
-            throws CatalogException
-    {
-        final CoordinateReferenceSystem sourceCRS = crsType.getCoordinateReferenceSystem();
-        if (crs == null || crs.equals(sourceCRS)) {
-            standardToUser = null;
-            envelope = null;
-            fireStateChanged("CoordinateReferenceSystem");
-            return;
-        }
-        final CoordinateOperationFactory factory = getCoordinateOperationFactory(true);
-        final CoordinateOperation candidate;
-        try {
-            candidate = factory.createOperation(sourceCRS, crs);
-        } catch (FactoryException exception) {
-            throw new ServerException(exception);
-        }
-        if (!candidate.equals(standardToUser)) {
-            standardToUser = candidate;
-            envelope = null;
-            fireStateChanged("CoordinateReferenceSystem");
-        }
+        return getDatabase().getCoordinateReferenceSystem();
     }
 
     /**
@@ -277,6 +216,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
         final GeographicBoundingBox box = getGeographicBoundingBox();
         final NumberRange      altitude = getVerticalRange();
         final DateRange            time = getTimeRange();
+        final CRS               crsType = getDatabase().crsType;
         GeneralEnvelope envelope = new GeneralEnvelope(crsType.getCoordinateReferenceSystem());
         if (crsType.xdim >= 0) {
             envelope.setRange(crsType.xdim, box.getWestBoundLongitude(), box.getEastBoundLongitude());
@@ -293,11 +233,6 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             envelope.setRange(crsType.tdim,
                     startTime!=null ? CRS.TEMPORAL.toValue(startTime) : Double.NEGATIVE_INFINITY,
                       endTime!=null ? CRS.TEMPORAL.toValue(  endTime) : Double.POSITIVE_INFINITY);
-        }
-        if (standardToUser != null) try {
-            envelope = transform(standardToUser, envelope);
-        } catch (TransformException exception) {
-            throw new ServerException(exception);
         }
         this.envelope = envelope;
         return envelope.clone();
@@ -343,6 +278,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             }
         }
         boolean changed = false;
+        final CRS crsType = getDatabase().crsType;
         if (crsType.xdim >= 0 && crsType.ydim >= 0) {
             final GeographicBoundingBox bbox = new GeographicBoundingBoxImpl(
                     envelope.getMinimum(crsType.xdim),

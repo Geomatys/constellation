@@ -169,6 +169,9 @@ public class Table {
      * specified at construction time.
      */
     public final Database getDatabase() {
+        if (query.database == null) {
+            throw new IllegalStateException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
+        }
         return query.database;
     }
 
@@ -184,7 +187,7 @@ public class Table {
         if (key == null) {
             return null;
         }
-        final Database database = getDatabase();
+        final Database database = query.database;
         if (database != null) {
             final String value = database.getProperty(key);
             if (value != null) {
@@ -410,7 +413,7 @@ public class Table {
     protected final Calendar getCalendar() {
         assert Thread.holdsLock(this);
         if (calendar == null) {
-            calendar = Database.getCalendar(getDatabase());
+            calendar = Database.getCalendar(query.database);
         }
         assert query.database==null || calendar.getTimeZone().equals(query.database.getTimeZone());
         return calendar;

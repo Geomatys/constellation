@@ -134,6 +134,11 @@ public enum CRS {
      */
     private static final class Temporal extends DefaultTemporalCRS {
         /**
+         * For cross-version compatibility.
+         */
+        private static final long serialVersionUID = 7828291321005269004L;
+
+        /**
          * Nombre de millisecondes entre le 01/01/1970 00:00 UTC et le 01/01/1950 00:00 UTC.
          * Le 1er janvier 1970 est l'epoch du Java, tandis que le 1er janvier 1950 est celui
          * de la Nasa (son jour julier "0"). La constante {@code EPOCH} sert à faire les

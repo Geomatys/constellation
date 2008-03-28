@@ -30,6 +30,7 @@ import org.opengis.util.InternationalString;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -353,7 +354,16 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
         } catch (SQLException exception) {
             throw databaseFailure(CoordinateReferenceSystem.class, code, exception);
         }
-        return factories.getCRSFactory().createFromWKT(wkt);
+        return getCRSFactory().createFromWKT(wkt);
+    }
+
+    /**
+     * Returns the factory used for parsing <cite>Well Known Text</cite> (WKT).
+     *
+     * @see CRSFactory#createFromWKT
+     */
+    public CRSFactory getCRSFactory() {
+        return factories.getCRSFactory();
     }
 
     /**

@@ -35,10 +35,11 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.datum.PixelInCell;
 
+import org.geotools.resources.XArray;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -116,7 +117,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     public synchronized CoordinateReferenceSystem getSpatialReferenceSystem(final String code)
             throws SQLException, FactoryException
     {
-        return getCoordinateReferenceSystem(getAuthorityFactory().getPrimaryKey(code));
+        return getSpatialReferenceSystem(getAuthorityFactory().getPrimaryKey(code));
     }
 
     /**
@@ -128,7 +129,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * @throws SQLException if an error occured while querying the database.
      * @throws FactoryException if the CRS was not found or can not be created.
      */
-    public synchronized CoordinateReferenceSystem getCoordinateReferenceSystem(final int srid)
+    public synchronized CoordinateReferenceSystem getSpatialReferenceSystem(final int srid)
             throws SQLException, FactoryException
     {
         final Integer key = srid;
@@ -194,7 +195,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
          */
         CoordinateReferenceSystem crs;
         try {
-            crs = getCoordinateReferenceSystem(horizontalSRID);
+            crs = getSpatialReferenceSystem(horizontalSRID);
         } catch (FactoryException exception) {
             throw new IllegalRecordException(exception, this, results, indexOf(query.horizontalSRID), identifier);
         }
@@ -212,20 +213,36 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
                 if (z > max) max = z;
             }
             try {
-                verticalCRS = getCoordinateReferenceSystem(verticalSRID);
+                verticalCRS = getSpatialReferenceSystem(verticalSRID);
             } catch (FactoryException exception) {
                 throw new IllegalRecordException(exception, this, results, indexOf(query.verticalSRID), identifier);
             }
         }
         /*
-         * Adds the temporal axis. TODO: HARD CODED FOR NOW. We need to do something better.
+         * Creates a compound CRS with the vertical and temporal CRS, if any.
          */
-        final CoordinateReferenceSystem temporalCRS = CRS.getTemporalCRS(net.seagis.catalog.CRS.XYT.getCoordinateReferenceSystem());
+        int count = 0;
+        String name = crs.getName().getCode();
+        CoordinateReferenceSystem[] elements = new CoordinateReferenceSystem[3];
+        elements[count++] = crs;
         if (verticalCRS != null) {
-            final String name = crs.getName().getCode() + ", " + verticalCRS.getName().getCode();
-            crs = new DefaultCompoundCRS(name, new CoordinateReferenceSystem[] {crs, verticalCRS, temporalCRS});
-        } else {
-            crs = new DefaultCompoundCRS(crs.getName().getCode(), crs, temporalCRS);
+            elements[count++] = verticalCRS;
+            name = name + ", " + verticalCRS.getName().getCode();
+        }
+        final CoordinateReferenceSystem temporalCRS = CRS.getTemporalCRS(getDatabase().getCoordinateReferenceSystem());
+        if (temporalCRS != null) {
+            elements[count++] = temporalCRS;
+        }
+        if (count > 1) {
+            elements = XArray.resize(elements, count);
+            final Map<String,Object> properties =
+                    new HashMap<String,Object>(AbstractIdentifiedObject.getProperties(crs));
+            properties.put(CoordinateReferenceSystem.NAME_KEY, name);
+            try {
+                crs = getAuthorityFactory().getCRSFactory().createCompoundCRS(properties, elements);
+            } catch (FactoryException exception) {
+                throw new IllegalRecordException(exception, this, results, indexOf(query.identifier), identifier);
+            }
         }
         /*
          * Creates the "grid to CRS" transform as a matrix. The coefficients for the vertical
@@ -323,9 +340,9 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     }
 
     /**
-     * For every values in the specified map, replace the collection of identifiers by a set of
-     * altitudes. On input, the values are usually {@code List<String>}. On output, all values
-     * will be {@code SortedSet<Number>}.
+     * For every values in the specified map, replaces the collection of {@link GridGeometryEntry}
+     * identifiers by a set of altitudes. On input, the values are usually {@code List<String>}.
+     * On output, all values will be {@code SortedSet<Number>}.
      *
      * @param  centroids The date-extents map.
      * @return The same reference than {@code centroids}, but casted as a date-altitudes map.

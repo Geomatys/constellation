@@ -63,4 +63,14 @@ public class SpatialFunctionsTest extends TestCase {
         assertEquals(  30, envelope.getMaximum(2), 0);
         assertEquals("BOX3D(-180.0 -90.0 10.0,180.0 90.0 30.0)", SpatialFunctions.formatBox(envelope));
     }
+
+    /**
+     * Tests some CRS definitions.
+     */
+    @Test
+    public void testCRS() {
+        assertEquals(2, CRS.XY  .getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
+        assertEquals(3, CRS.XYT .getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
+        assertEquals(4, CRS.XYZT.getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
+    }
 }

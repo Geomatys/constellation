@@ -54,6 +54,7 @@ import org.geotools.resources.JDBC;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Arguments;
 import org.geotools.util.logging.Logging;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -165,6 +166,11 @@ public class Database {
      * calendar returned by {@link Table#getCalendar}.
      */
     private final TimeZone timezone;
+
+    /**
+     * The type of CRS. Hard-coded for now but may change in a future version.
+     */
+    final CRS crsType = CRS.XYT;
 
     /**
      * The properties read from the {@link #configFilename} file.
@@ -447,6 +453,14 @@ public class Database {
         } else {
             return new GregorianCalendar(Locale.CANADA);
         }
+    }
+
+    /**
+     * Returns the coordinate reference system to be used for spatial queries in the database.
+     * This is usually the CRS matching the one used in an indexed geometry column.
+     */
+    public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return crsType.getCoordinateReferenceSystem();
     }
 
     /**

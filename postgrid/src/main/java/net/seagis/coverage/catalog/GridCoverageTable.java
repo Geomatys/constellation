@@ -159,7 +159,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * Constructs a new {@code GridCoverageTable} from the specified query.
      */
     GridCoverageTable(final GridCoverageQuery query) {
-        super(query, net.seagis.catalog.CRS.XYT);
+        super(query);
         setIdentifierParameters(query.byFilename, null);
         setExtentParameters(query.byStartTime, query.byHorizontalExtent);
         this.dateFormat = DateFormat.getDateInstance(DateFormat.LONG);

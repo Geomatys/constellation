@@ -41,11 +41,8 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
-import net.seagis.catalog.CRS;
 import net.seagis.catalog.DatabaseTest;
 import net.seagis.catalog.CatalogException;
-import net.seagis.coverage.model.DescriptorTable;
-import net.seagis.coverage.model.OperationTable;
 
 
 /**
@@ -100,7 +97,7 @@ public class IntegrationTest extends DatabaseTest {
             throws ParseException
     {
         final Date d = dateFormat.parse(date);
-        final GeneralDirectPosition position = new GeneralDirectPosition(CRS.XYT.getCoordinateReferenceSystem());
+        final GeneralDirectPosition position = new GeneralDirectPosition(database.getCoordinateReferenceSystem());
         final DefaultTemporalCRS crs = DefaultTemporalCRS.wrap(
                 org.geotools.referencing.CRS.getTemporalCRS(position.getCoordinateReferenceSystem()));
         position.setOrdinate(0, longitude);
