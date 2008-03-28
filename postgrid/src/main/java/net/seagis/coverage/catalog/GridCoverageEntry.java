@@ -781,6 +781,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * compared to the requested one.
      */
     final boolean hasEnoughResolution() {
+        if (settings.resolution == null) {
+            return true;
+        }
         final XDimension2D.Float resolution = new XDimension2D.Float();
         try {
             return computeBounds(null, resolution) && resolution.width <= 1 && resolution.height <= 1;
