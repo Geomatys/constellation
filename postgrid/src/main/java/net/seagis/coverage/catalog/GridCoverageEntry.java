@@ -443,13 +443,13 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             throw new TransformException(exception.getLocalizedMessage(), exception);
         }
         /*
-         * Gets the geographic coordinates of the ROI (region of interest). Those coordinates
-         * are expressed in the table CRS, not in the coverage CRS. If a projection is wanted,
-         * it can be applied using GridCoverageSettings.tableToCoverageCRS(...). Better avoid
-         * to project the clip however, because it often includes the poles which are not
-         * handled by every kind of projection.
+         * Gets the geographic coordinates of the ROI (region of interest). The coordinates of
+         * the ROI are expressed in WGS84 geographic, not in the coverage CRS. If a projection 
+         * is wanted,it can be applied using GridCoverageSettings.tableToCoverageCRS(...). 
+         * Better avoid projecting the clip however, because it often includes the poles which 
+         * are not handled by every kind of projection.
          */
-        final Rectangle2D clipGeographicArea = settings.geographicArea;
+        final Shape clipGeographicArea = geometry.getCRSBoundingBox();
         /*
          * Following should produces a result identical to geometry.geographicEnvelope. However in
          * some case the result is different, when the PostGIS "spatial_ref_sys" table contains an
@@ -457,7 +457,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * PostGIS, an error (if any) will be canceled later when we will reproject back to the
          * coverage CRS.
          */
-        Shape clippedArea = geometry.getShape(); // Will be clipped later.
+        Rectangle2D clippedArea = geometry.getCRSBoundingBox(); // Will be clipped later.
         Shape coverageGeographicArea = settings.tableToCoverageCRS(clippedArea, true);
         Rectangle2D geographicBounds = (coverageGeographicArea instanceof Rectangle2D) ?
                 (Rectangle2D) coverageGeographicArea : coverageGeographicArea.getBounds2D();
@@ -471,19 +471,20 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * rectangle is a line or a point.
          */
         if (clipGeographicArea != null) {
-            if (clipGeographicArea.getWidth() < 0 || clipGeographicArea.getHeight() < 0) {
+            Rectangle2D clipBox = clipGeographicArea.getBounds2D();
+            if (clipBox.getWidth() < 0 || clipBox.getHeight() < 0) {
                 return null;
             }
-            if (clipGeographicArea.getMaxX() < geographicBounds.getMinX() ||
-                clipGeographicArea.getMinX() > geographicBounds.getMaxX() ||
-                clipGeographicArea.getMaxY() < geographicBounds.getMinY() ||
-                clipGeographicArea.getMinY() > geographicBounds.getMaxY())
+            if (clipBox.getMaxX() < geographicBounds.getMinX() ||
+                clipBox.getMinX() > geographicBounds.getMaxX() ||
+                clipBox.getMaxY() < geographicBounds.getMinY() ||
+                clipBox.getMinY() > geographicBounds.getMaxY())
             {
                 return null;
             }
-            if (!clipGeographicArea.contains(geographicBounds)) {
-                if (coverageGeographicArea.contains(clipGeographicArea)) {
-                    coverageGeographicArea = geographicBounds = clipGeographicArea;
+            if (!clipBox.contains(geographicBounds)) {
+                if (coverageGeographicArea.getBounds2D().contains(clipGeographicArea.getBounds2D())) {
+                    coverageGeographicArea = geographicBounds = clipGeographicArea.getBounds2D();
                 } else {
                     final Area area = new Area(coverageGeographicArea);
                     area.intersect(new Area(clipGeographicArea));
@@ -493,14 +494,14 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                         return null;
                     }
                 }
-                clippedArea = settings.tableToCoverageCRS(coverageGeographicArea, false);
+                clippedArea = settings.tableToCoverageCRS(coverageGeographicArea, false).getBounds2D();
             }
         }
         /*
          * Transforms ["real world" envelope] --> [region in pixel coordinates]
          * and computes the subsampling from the desired resolution.
          */
-        clippedArea = XAffineTransform.transform(crsToGrid, clippedArea, clippedArea != clipGeographicArea);
+        clippedArea = XAffineTransform.transform(crsToGrid, clippedArea, null);
         final RectangularShape pixelBounds = (clippedArea instanceof RectangularShape) ?
                 (RectangularShape) clippedArea : clippedArea.getBounds2D();
         final Dimension2D resolution = settings.resolution;
@@ -768,7 +769,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         final GridRange gridRange = geometry.gridRange;
         final int width  = gridRange.getLength(0);
         final int height = gridRange.getLength(1);
-        final XRectangle2D boundingBox = geometry.geographicEnvelope;
+        final XRectangle2D boundingBox = (XRectangle2D)geometry.geographicBoundingShape.getBounds2D();
         return (resolution != null) &&
                (1+EPS)*resolution.getWidth()  >= boundingBox.getWidth() /width &&
                (1+EPS)*resolution.getHeight() >= boundingBox.getHeight()/height;

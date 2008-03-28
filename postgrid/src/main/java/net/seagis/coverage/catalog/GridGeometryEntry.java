@@ -18,11 +18,15 @@ import java.util.Arrays;
 import java.awt.Shape;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
-import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
@@ -30,11 +34,13 @@ import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
 
 import net.seagis.catalog.Entry;
+import org.geotools.geometry.DirectPosition2D;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -49,6 +55,7 @@ import net.seagis.catalog.Entry;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Sam Hiatt
  */
 final class GridGeometryEntry extends Entry {
     /**
@@ -76,10 +83,10 @@ final class GridGeometryEntry extends Entry {
     private final GeneralEnvelope envelope;
 
     /**
-     * Same as the envelope, but in WGS 84 geographic coordinates. This field is read
-     * by {@link GridCoverageEntry} only. It should never be modified.
+     * A shape describing the 4 corners in WGS 84 geographic coordinates. This field 
+     * is read by {@link GridCoverageEntry} only. It should never be modified.
      */
-    final XRectangle2D geographicEnvelope;
+    final GeneralPath geographicBoundingShape;
 
     /**
      * The horizontal and vertical SRID declared in the database.
@@ -108,25 +115,27 @@ final class GridGeometryEntry extends Entry {
                       final AffineTransform2D gridToCRS,
                       final GridRange gridRange,
                       final GeneralEnvelope envelope,
-                      final GeographicBoundingBox bbox,
+                      final GeographicBoundingBox bbox, // try not to use this
                       final int horizontalSRID,
                       final int verticalSRID,
                       final double[] verticalOrdinates)
     {
         super(name);
-        this.gridToCRS         = gridToCRS;
-        this.gridRange         = gridRange;
-        this.envelope          = envelope;
-        this.horizontalSRID    = horizontalSRID;
-        this.verticalSRID      = verticalSRID;
+        
+        this.gridToCRS = gridToCRS;
+        this.gridRange = gridRange;
+        this.envelope = envelope;
+        this.horizontalSRID = horizontalSRID;
+        this.verticalSRID = verticalSRID;
         this.verticalOrdinates = verticalOrdinates;
+        geographicBoundingShape = new GeneralPath();
         if (verticalOrdinates != null) {
             if (verticalOrdinates.length > Short.MAX_VALUE) {
                 throw new IllegalArgumentException(); // See 'indexOf' for this limitation.
             }
             assert gridRange.getLength(2) == verticalOrdinates.length : gridRange;
         }
-        // Checks for assumptions - see class javadoc.
+
         final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
         if (crs == null) {
             throw new AssertionError(envelope);
@@ -137,23 +146,42 @@ final class GridGeometryEntry extends Entry {
         } catch (TransformException e) {
             throw new AssertionError(e);
         }
-        geographicEnvelope = XRectangle2D.createFromExtremums(
-                bbox.getWestBoundLongitude(), bbox.getSouthBoundLatitude(),
-                bbox.getEastBoundLongitude(), bbox.getNorthBoundLatitude());
+        try {
+            System.out.println("Grid Range: " + gridRange.toString());
+            Rectangle2D crsBoundingRect = getCRSBoundingBox();
+            System.out.println("GeographicBoundingRect: " + crsBoundingRect.toString());
+            MathTransform tr = CRS.findMathTransform(getCoordinateReferenceSystem(), CRS.decode("EPSG:4326"));
+            // get the 4 corners
+            geographicBoundingShape.append((Shape) tr.transform(new DirectPosition2D(crsBoundingRect.getMinX(),crsBoundingRect.getMinY()), null), false);
+            geographicBoundingShape.append((Shape) tr.transform(new DirectPosition2D(crsBoundingRect.getMinX(),crsBoundingRect.getMaxY()), null), false);
+            geographicBoundingShape.append((Shape) tr.transform(new DirectPosition2D(crsBoundingRect.getMaxX(),crsBoundingRect.getMinY()), null), false);
+            geographicBoundingShape.append((Shape) tr.transform(new DirectPosition2D(crsBoundingRect.getMaxX(),crsBoundingRect.getMaxY()), null), false);
+            System.out.println("GeographicBoundingShape: " + geographicBoundingShape.toString());
+        } catch (FactoryException ex) {
+            Logger.getLogger(GridGeometryEntry.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (MismatchedDimensionException ex) {
+            Logger.getLogger(GridGeometryEntry.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransformException ex) {
+            Logger.getLogger(GridGeometryEntry.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
     }
 
     /**
      * Returns {@code true} if the geographic bounding box described by this entry is empty.
      */
     public boolean isEmpty() {
-        return geographicEnvelope.isEmpty();
+        return geographicBoundingShape.getBounds2D().isEmpty();
     }
 
     /**
      * Returns a copy of the geographic bounding box. This copy can be freely modified.
      */
     public GeographicBoundingBoxImpl getGeographicBoundingBox() {
-        return new GeographicBoundingBoxImpl(geographicEnvelope);
+        System.out.println("Are these the same?...");
+        System.out.println("Envelope: "+envelope.toString());
+        System.out.println("Geog Bounding Box: "+ (new GeographicBoundingBoxImpl(geographicBoundingShape.getBounds2D())).toString());
+        return new GeographicBoundingBoxImpl(geographicBoundingShape.getBounds2D());
     }
 
     /**
@@ -177,11 +205,11 @@ final class GridGeometryEntry extends Entry {
      * Returns the coverage shape in coverage CRS (not geographic CRS). The returned shape is likely
      * (but not garanteed) to be an instance of {@link Rectangle2D}. It can be freely modified.
      */
-    public Shape getShape() {
-        Shape shape = new Rectangle2D.Double(
+    public Rectangle2D getCRSBoundingBox() {
+        Rectangle2D shape = new Rectangle2D.Double(
                 gridRange.getLower (0), gridRange.getLower (1),
                 gridRange.getLength(0), gridRange.getLength(1));
-        shape = AffineTransform2D.transform(gridToCRS, shape, true);
+        shape = AffineTransform2D.transform(gridToCRS, shape, shape);
         return shape;
     }
 
