@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -59,6 +60,7 @@ import javax.xml.bind.annotation.XmlType;
     "transactionSummary",
     "insertResult"
 })
+@XmlRootElement(name = "TransactionResponse")
 public class TransactionResponseType {
 
     @XmlElement(name = "TransactionSummary", required = true)
@@ -68,6 +70,23 @@ public class TransactionResponseType {
     @XmlAttribute
     private String version;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    TransactionResponseType() {
+        
+    }
+    
+    /**
+     * Build a new response to a transaction
+     */
+    public TransactionResponseType(TransactionSummaryType transactionSummary, List<InsertResultType> insertResult,
+            String version) {
+        this.transactionSummary = transactionSummary;
+        this.insertResult       = insertResult;
+        this.version            = version;
+    }
+    
     /**
      * Gets the value of the transactionSummary property.
      */

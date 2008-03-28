@@ -1111,7 +1111,7 @@ public class SOSworker {
             id = sensorIdBase + num;
             
             //we parse the temporay xmlFile
-            Reader XMLReader = new Reader(sensorMLReader,temporaryFolder + "/temp.xml",sensorMLWriter);
+            Reader XMLReader = new Reader(sensorMLReader, tempFile, sensorMLWriter);
             
             //and we write it in the sensorML Database
             Catalog cat  = sensorMLReader.getCatalog("SMLC");

@@ -159,6 +159,7 @@ public class WCService extends WebService {
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
+        logger.info(" WCS service running");
     }
     
     /**

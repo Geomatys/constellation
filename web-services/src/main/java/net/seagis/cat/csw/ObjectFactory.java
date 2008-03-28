@@ -488,11 +488,11 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link TransactionType }{@code >}}
      * 
-     */
+     
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "Transaction")
     public JAXBElement<TransactionType> createTransaction(TransactionType value) {
         return new JAXBElement<TransactionType>(_Transaction_QNAME, TransactionType.class, null, value);
-    }
+    }*/
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link QueryConstraintType }{@code >}}

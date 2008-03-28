@@ -16,7 +16,6 @@
 
 package net.seagis.cat.csw;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -61,33 +60,50 @@ import javax.xml.bind.annotation.XmlType;
 public class TransactionSummaryType {
 
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger totalInserted;
+    private int totalInserted;
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger totalUpdated;
+    private int totalUpdated;
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger totalDeleted;
+    private int totalDeleted;
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
     private String requestId;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    TransactionSummaryType() {
+        
+    }
+    
+    /**
+     * Build a new Transation summary.
+     */
+    public TransactionSummaryType(int totalInserted, int totalUpdated, int totalDeleted, String requestId) {
+        this.requestId     = requestId;
+        this.totalDeleted  = totalDeleted;
+        this.totalInserted = totalInserted;
+        this.totalUpdated  = totalUpdated;
+    }
+    
+    /**
      * Gets the value of the totalInserted property.
      */
-    public BigInteger getTotalInserted() {
+    public int getTotalInserted() {
         return totalInserted;
     }
 
     /**
      * Gets the value of the totalUpdated property.
      */
-    public BigInteger getTotalUpdated() {
+    public int getTotalUpdated() {
         return totalUpdated;
     }
 
     /**
      * Gets the value of the totalDeleted property.
      */
-    public BigInteger getTotalDeleted() {
+    public int getTotalDeleted() {
         return totalDeleted;
     }
 

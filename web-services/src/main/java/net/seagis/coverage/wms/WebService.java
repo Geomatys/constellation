@@ -157,7 +157,7 @@ public abstract class WebService {
      * @param rootNamespace The main namespace for all the document.
      */
     protected void setXMLContext(String packagesName, String rootNamespace) throws JAXBException {
-        logger.info("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
+        logger.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
                     " packages: " + packagesName);
         
         JAXBContext jbcontext = JAXBContext.newInstance(packagesName);
@@ -174,7 +174,7 @@ public abstract class WebService {
      * @param rootNamespace The main namespace for all the document.
      */
     protected void setXMLContext(String rootNamespace, Class... classes) throws JAXBException {
-        logger.info("SETTING XML CONTEXT: classes version");
+        logger.finer("SETTING XML CONTEXT: classes version");
         
         JAXBContext jbcontext = JAXBContext.newInstance(classes);
         unmarshaller = jbcontext.createUnmarshaller();

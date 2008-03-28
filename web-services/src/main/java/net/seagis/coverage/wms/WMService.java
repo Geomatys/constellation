@@ -122,7 +122,7 @@ public class WMService extends WebService {
                 
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
-        
+        logger.info("WMS service running");
     }
    
     

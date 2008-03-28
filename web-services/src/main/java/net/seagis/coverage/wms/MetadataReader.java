@@ -97,7 +97,7 @@ public class MetadataReader {
     /**
      * TODO remove this property to get all the Catalog (except MDATA)
      */
-    private Catalog MDCatalog;
+    private List<Catalog> MDCatalog;
     
     /**
      * 
@@ -123,7 +123,11 @@ public class MetadataReader {
         this.connection      = c;
         this.version         = version;
         this.dateFormat      = new SimpleDateFormat("dd-mm-yyyy");
-        this.MDCatalog       = MDReader.getCatalog("FR_SY");
+        
+        this.MDCatalog       = new ArrayList<Catalog>();
+        this.MDCatalog.add(MDReader.getCatalog("FR_SY"));
+        this.MDCatalog.add(MDReader.getCatalog("CSWCat"));
+        
         this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing", "net.seagis.temporal");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata",  "org.opengis.referencing", "org.opengis.temporal");
         this.metadatas       = new HashMap<String, Object>();
@@ -148,14 +152,21 @@ public class MetadataReader {
             if (mode == ISO_19115) {
                 result = metadatas.get(identifier);
                 if (result == null) {
-                    Form f = MDReader.getForm(MDCatalog, id);
+                    //TODO gere plusieur catalogue proprement
+                    Form f = MDReader.getForm(MDCatalog.get(0), id);
+                    if (f == null) {
+                        MDReader.getForm(MDCatalog.get(1), id);
+                    }
                     result = getObjectFromForm(f);
                     if (result != null) {
                         metadatas.put(identifier, result);
                     }
                 }
             } else {
-                Form f = MDReader.getForm(MDCatalog, id);
+                Form f = MDReader.getForm(MDCatalog.get(0), id);
+                if (f == null) {
+                    MDReader.getForm(MDCatalog.get(1), id);
+                }
                 result = getRecordFromForm(f, type);
             }
         }

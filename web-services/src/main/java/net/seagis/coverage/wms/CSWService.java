@@ -87,8 +87,6 @@ public class CSWService extends WebService {
      */
     public CSWService() throws JAXBException, IOException, SQLException {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
-        worker = new CSWworker();
-        worker.setVersion(getCurrentVersion());
         setXMLContext("http://www.isotc211.org/2005/gmd", MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
                         ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
                         ,GetCapabilities.class, GetDomainType.class, GetRecordByIdType.class
@@ -97,7 +95,11 @@ public class CSWService extends WebService {
                         ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
                         ,DescribeRecordResponseType.class, GetDomainResponseType.class
                         ,TransactionResponseType.class, HarvestResponseType.class
-                        ,ExceptionReport.class);
+                        ,ExceptionReport.class, net.seagis.ows.v110.ExceptionReport.class);
+                        // TODO remove net.seagis.ows.v110.ExceptionReport.class
+        worker = new CSWworker(marshaller);
+        worker.setVersion(getCurrentVersion());
+        logger.info("CSW service running");
     }
 
     @Override
@@ -228,6 +230,11 @@ public class CSWService extends WebService {
                 return Response.ok(sw.toString(), "text/xml").build();
                 
             } else {
+                if (request.equals("") && objectRequest != null)
+                    request = objectRequest.getClass().getName();
+                else if (request.equals("") && objectRequest == null)
+                    request = "undefined request";
+                
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
                                                  INVALID_PARAMETER_VALUE, "request", getCurrentVersion());
             }

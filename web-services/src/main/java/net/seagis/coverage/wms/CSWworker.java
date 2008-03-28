@@ -16,10 +16,13 @@
 
 package net.seagis.coverage.wms;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +31,13 @@ import java.util.logging.Logger;
 
 //seaGIS dependencies
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.ParserConfigurationException;
 import net.seagis.cat.csw.AbstractRecordType;
 import net.seagis.cat.csw.BriefRecordType;
 import net.seagis.cat.csw.Capabilities;
+import net.seagis.cat.csw.DeleteType;
 import net.seagis.cat.csw.DescribeRecordResponseType;
 import net.seagis.cat.csw.DescribeRecordType;
 import net.seagis.cat.csw.ElementSetType;
@@ -43,12 +50,15 @@ import net.seagis.cat.csw.GetRecordsResponseType;
 import net.seagis.cat.csw.GetRecordsType;
 import net.seagis.cat.csw.HarvestResponseType;
 import net.seagis.cat.csw.HarvestType;
+import net.seagis.cat.csw.InsertType;
 import net.seagis.cat.csw.ObjectFactory;
 import net.seagis.cat.csw.RecordType;
 import net.seagis.cat.csw.RequestBaseType;
 import net.seagis.cat.csw.SummaryRecordType;
 import net.seagis.cat.csw.TransactionResponseType;
+import net.seagis.cat.csw.TransactionSummaryType;
 import net.seagis.cat.csw.TransactionType;
+import net.seagis.cat.csw.UpdateType;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
@@ -69,9 +79,16 @@ import org.geotools.metadata.iso.MetaDataImpl;
 
 //mdweb model dependencies
 import org.mdweb.model.schemas.Standard;
+import org.mdweb.model.storage.Catalog;
+import org.mdweb.model.storage.Form;
+import org.mdweb.model.users.User;
 import org.mdweb.sql.v20.Reader20;
 
+import org.mdweb.sql.v20.Writer20;
+import org.mdweb.xml.MalFormedDocumentException;
+import org.mdweb.xml.Reader;
 import org.postgresql.ds.PGSimpleDataSource;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -103,12 +120,17 @@ public class CSWworker {
     /**
      * A Reader to the Metadata database.
      */
-    private Reader20 DatabaseReader;
+    private final Reader20 databaseReader;
+    
+    /**
+     * A Writer to the Metadata database.
+     */
+    private final Writer20 databaseWriter;
     
     /**
      * An object creator from the MDWeb database.
      */
-    private MetadataReader MDReader;
+    private final MetadataReader MDReader;
     
     /**
      * A JAXB factory to csw object 
@@ -121,9 +143,20 @@ public class CSWworker {
     private String outputFormat;
     
     /**
-     * The search engine of MDWeb
-     
-    private Search search;*/
+     * A marshaller to send xml to mdweb.
+     */
+    private final Marshaller marshaller;
+    
+    /**
+     * The data Catalog on whitch we write the data.
+     */
+    private final Catalog CSWCatalog;
+    
+    /**
+     * The MDWeb user who owe the inserted form.
+     */
+    private final User user;
+    
     
     /**
      * A list of supported MIME type 
@@ -137,13 +170,15 @@ public class CSWworker {
         acceptedOutputFormats.add("text/plain");
     }
     
-    public CSWworker() throws IOException, SQLException {
+    public CSWworker(Marshaller marshaller) throws IOException, SQLException {
         
-        cswFactory = new ObjectFactory();
+        this.marshaller = marshaller;
+        cswFactory      = new ObjectFactory();
         Properties prop = new Properties();
-        File f = null;
-        String env = "/home/tomcat/.sicade" ; //System.getenv("CATALINA_HOME");
+        File f          = null;
+        String env      = "/home/tomcat/.sicade" ; //System.getenv("CATALINA_HOME");
         logger.info("CATALINA_HOME=" + env);
+        boolean start = true;
         try {
             // we get the configuration file
             f = new File(env + "/csw_configuration/config.properties");
@@ -157,22 +192,37 @@ public class CSWworker {
             }
             logger.severe("The sevice can not load the properties files" + '\n' + 
                           "cause: " + e.getMessage());
-            return;
+            start = false;
         }
+        
         //we create a connection to the metadata database
-        PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
-        dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
-        dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
-        dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
-        dataSourceMD.setUser(prop.getProperty("MDDBUser"));
-        dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
-        DatabaseReader  = new Reader20(Standard.ISO_19115,  dataSourceMD.getConnection());
-        if (dataSourceMD.getConnection() == null) {
-            logger.severe("THE WEB SERVICE CAN'T CONNECT TO THE METADATA DB!");
+        if (start) {
+            PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
+            dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
+            dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
+            dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
+            dataSourceMD.setUser(prop.getProperty("MDDBUser"));
+            dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
+            databaseReader  = new Reader20(Standard.ISO_19115,  dataSourceMD.getConnection());
+            databaseWriter  = new Writer20(dataSourceMD.getConnection());
+        
+            if (dataSourceMD.getConnection() == null) {
+                logger.severe("THE WEB SERVICE CAN'T CONNECT TO THE METADATA DB!");
+            }
+            MDReader   = new MetadataReader(databaseReader, dataSourceMD.getConnection(), version);
+            CSWCatalog = databaseReader.getCatalog("CSWCat");
+            user       = databaseReader.getUser("admin");
+        } else {
+            databaseReader  = null;
+            databaseWriter  = null;
+            MDReader        = null;
+            CSWCatalog      = null;
+            user            = null;
+            logger.severe("The CSW service is not working");
         }
-        //TODO
-        version = new ServiceVersion(Service.OWS, "2.0.2");
-        MDReader = new MetadataReader(DatabaseReader, dataSourceMD.getConnection(), version);
+        //TODO inititalize version
+        version    = new ServiceVersion(Service.OWS, "2.0.2");
+        
         
     }
     
@@ -357,7 +407,8 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public DescribeRecordResponseType describeRecord(DescribeRecordType request){
+    public DescribeRecordResponseType describeRecord(DescribeRecordType request) throws WebServiceException{
+        verifyBaseRequest(request);
         
         return new DescribeRecordResponseType();
     }
@@ -382,9 +433,84 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public TransactionResponseType transaction(TransactionType request){
+    public TransactionResponseType transaction(TransactionType request) throws WebServiceException {
+        verifyBaseRequest(request);
+        // we prepare the report
+        int totalInserted = 0;
+        int totalUpdated  = 0;
+        int totalDeleted  = 0;
+        String requestID  = request.getRequestId();
         
-        return new TransactionResponseType();
+        List<Object> transactions = request.getInsertOrUpdateOrDelete();
+        for (Object transaction: transactions) {
+            if (transaction instanceof InsertType) {
+                InsertType insertRequest = (InsertType)transaction;
+                
+                for(Object record: insertRequest.getAny()) {
+                    
+                        OutputStreamWriter outstrR = null;
+                        try {
+                            File tempFile = File.createTempFile("CSWRecord", "xml");
+                            FileOutputStream outstr = new FileOutputStream(tempFile);
+                            outstrR = new OutputStreamWriter(outstr, "UTF-8");
+                            BufferedWriter output = new BufferedWriter(outstrR);
+                            marshaller.marshal(record, output);
+                            output.flush();
+                            output.close();
+
+                            Reader XMLReader = new Reader(databaseReader, tempFile, databaseWriter);
+                            Form f           = XMLReader.readForm(CSWCatalog, 
+                                                                  user, 
+                                                                  "seagis CSW", 
+                                                                  "change me",
+                                                                  databaseReader.getStandard("Catalog Web Service"));
+                            
+                            databaseWriter.writeForm(f, false);
+                            totalInserted++;
+                            
+                        } catch (IOException ex) {
+                           throw new OWSWebServiceException("This service has throw an IOException: " + ex.getMessage(),
+                                                            NO_APPLICABLE_CODE, null, version);
+                        } catch (JAXBException ex) {
+                            throw new OWSWebServiceException("The request is malFormed(JAXB): " + ex.getMessage(),
+                                                             NO_APPLICABLE_CODE, null, version);
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                            throw new OWSWebServiceException("The service has throw an SQLException: " + ex.getMessage(),
+                                                             NO_APPLICABLE_CODE, null, version);
+                            
+                        } catch (ParserConfigurationException ex) {
+                            throw new OWSWebServiceException("The request is malFormed(ParserConfiguration): " + ex.getMessage() ,
+                                                             NO_APPLICABLE_CODE, null, version);
+                        } catch (SAXException ex) {
+                            throw new OWSWebServiceException("The request is malFormed(SAX): " + ex.getMessage(),
+                                                             NO_APPLICABLE_CODE, null, version);
+                        } catch (MalFormedDocumentException ex) {
+                            throw new OWSWebServiceException("The request is malFormed: " + ex.getMessage(),
+                                                             NO_APPLICABLE_CODE, null, version);
+                        }
+                        
+                }
+            } else if (transaction instanceof DeleteType) {
+                DeleteType deleteRequest = (DeleteType)transaction;
+                
+                
+            } else if (transaction instanceof UpdateType) {
+                UpdateType updateRequest = (UpdateType)transaction;
+            
+                
+            } else {
+                throw new OWSWebServiceException("This kind of transaction is not supported by the service.",
+                                                  INVALID_PARAMETER_VALUE, "TransactionType", version);
+            }
+            
+        }
+        TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
+                                                                    totalUpdated,
+                                                                    totalDeleted,
+                                                                    requestID); 
+        TransactionResponseType response = new TransactionResponseType(summary, null, version.toString());
+        return response;
     }
     
     /**
@@ -393,7 +519,8 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public HarvestResponseType harvest(HarvestType request){
+    public HarvestResponseType harvest(HarvestType request) throws WebServiceException {
+        verifyBaseRequest(request);
         
         return new HarvestResponseType();
     }
