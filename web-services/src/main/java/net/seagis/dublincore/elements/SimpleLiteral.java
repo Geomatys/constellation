@@ -70,8 +70,16 @@ public class SimpleLiteral {
     /**
      * An empty constructor used by JAXB
      */
-    SimpleLiteral() {
+    public SimpleLiteral() {
         
+    }
+    
+    /**
+     * Build a new Simple literal
+     */
+    public SimpleLiteral(String content) {
+        this.content = new ArrayList<String>();
+        this.content.add(content);
     }
     
     /**
@@ -113,5 +121,9 @@ public class SimpleLiteral {
      */
     public String getScheme() {
         return scheme;
+    }
+    
+    public void setScheme(String scheme){
+        this.scheme = scheme;
     }
 }

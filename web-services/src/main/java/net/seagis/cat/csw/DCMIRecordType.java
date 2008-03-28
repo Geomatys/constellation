@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.dublincore.elements.SimpleLiteral;
 
@@ -67,11 +68,18 @@ public class DCMIRecordType extends AbstractRecordType {
     private List<JAXBElement<SimpleLiteral>> dcElement;
 
     /**
+     * we record the title in a string to pass it to mdweb.
+     */
+    @XmlTransient
+    private String title;
+    
+    /**
      * An empty constructor used by JAXB
      */
     DCMIRecordType() {
-        
+        this.dcElement = new ArrayList<JAXBElement<SimpleLiteral>>();
     }
+        
     
     public DCMIRecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
             List<SimpleLiteral> subjects, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract,
@@ -81,6 +89,8 @@ public class DCMIRecordType extends AbstractRecordType {
         this.dcElement.add(dublinFactory.createIdentifier(identifier));
         
         this.dcElement.add(dublinFactory.createTitle(title));
+        if (title != null && title.getContent().size() != 0);
+            this.title = title.getContent().get(0);
         
         this.dcElement.add(dublinFactory.createType(type));
         
@@ -112,5 +122,70 @@ public class DCMIRecordType extends AbstractRecordType {
         }
         return Collections.unmodifiableList(dcElement);
     }
-
+    
+    public void setIdentifier(SimpleLiteral identifier) {
+        this.dcElement.add(dublinFactory.createIdentifier(identifier));
+    }
+    
+    public void setTitle(SimpleLiteral title) {
+        this.dcElement.add(dublinFactory.createTitle(title));
+        if (title != null && title.getContent().size() != 0);
+            this.title = title.getContent().get(0);
+    }
+    
+    public String getTitle() {
+        return title;
+    }
+    
+    public void setType(SimpleLiteral type) {
+        this.dcElement.add(dublinFactory.createType(type));
+    }
+    
+    public void setSubject(SimpleLiteral subject) {
+        this.dcElement.add(dublinFactory.createSubject(subject));
+    }
+    
+    public void setFormat(SimpleLiteral format) {
+        this.dcElement.add(dublinFactory.createFormat(format));
+    }
+    
+    public void setModified(SimpleLiteral modified) {
+        this.dcElement.add(dublinTermFactory.createModified(modified));
+    }
+    
+    public void setAbstract(SimpleLiteral _abstract) {
+        this.dcElement.add(dublinTermFactory.createAbstract(_abstract));
+    }
+    
+    public void setCreator(SimpleLiteral creator) {
+        this.dcElement.add(dublinFactory.createCreator(creator));
+    }
+    
+    public void setDistributor(SimpleLiteral distributor) {
+        this.dcElement.add(dublinFactory.createPublisher(distributor));
+    }
+    
+    public void setLanguage(SimpleLiteral language) {
+        this.dcElement.add(dublinFactory.createLanguage(language));
+    }
+    
+    public void setRelation(SimpleLiteral relation) {
+        this.dcElement.add(dublinFactory.createRelation(relation));
+    }
+    
+    public void setSource(SimpleLiteral source) {
+        this.dcElement.add(dublinFactory.createSource(source));
+    }
+    
+    public void setCoverage(SimpleLiteral coverage) {
+        this.dcElement.add(dublinFactory.createCoverage(coverage));
+    }
+    
+    public void setDate(SimpleLiteral date) {
+        this.dcElement.add(dublinFactory.createDate(date));
+    }
+    
+    public void setRights(SimpleLiteral rights) {
+        this.dcElement.add(dublinFactory.createRights(rights));
+    }
 }

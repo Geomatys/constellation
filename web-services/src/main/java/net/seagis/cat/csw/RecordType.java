@@ -70,7 +70,7 @@ public class RecordType extends DCMIRecordType {
     /**
      * An empty constructor used by JAXB
      */
-    RecordType() {
+    public RecordType() {
         
     }
     
@@ -110,6 +110,13 @@ public class RecordType extends DCMIRecordType {
             boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
         }
         return Collections.unmodifiableList(boundingBox);
+    }
+    
+    public void setBoundingBox(BoundingBoxType bbox) {
+        if (boundingBox == null)
+            this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+        
+        this.boundingBox.add(owsFactory.createBoundingBox(bbox));
     }
 
 }

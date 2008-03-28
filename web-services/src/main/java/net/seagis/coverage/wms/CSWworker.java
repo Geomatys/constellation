@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -78,6 +79,7 @@ import static net.seagis.coverage.wms.MetadataReader.*;
 import org.geotools.metadata.iso.MetaDataImpl;
 
 //mdweb model dependencies
+import org.geotools.metadata.iso.identification.IdentificationImpl;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
@@ -87,6 +89,7 @@ import org.mdweb.sql.v20.Reader20;
 import org.mdweb.sql.v20.Writer20;
 import org.mdweb.xml.MalFormedDocumentException;
 import org.mdweb.xml.Reader;
+import org.opengis.metadata.identification.Identification;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.xml.sax.SAXException;
 
@@ -209,7 +212,7 @@ public class CSWworker {
             if (dataSourceMD.getConnection() == null) {
                 logger.severe("THE WEB SERVICE CAN'T CONNECT TO THE METADATA DB!");
             }
-            MDReader   = new MetadataReader(databaseReader, dataSourceMD.getConnection(), version);
+            MDReader   = new MetadataReader(databaseReader, dataSourceMD.getConnection());
             CSWCatalog = databaseReader.getCatalog("CSWCat");
             user       = databaseReader.getUser("admin");
         } else {
@@ -450,6 +453,7 @@ public class CSWworker {
                     
                         OutputStreamWriter outstrR = null;
                         try {
+                            //we build a temporary file to write the xml
                             File tempFile = File.createTempFile("CSWRecord", "xml");
                             FileOutputStream outstr = new FileOutputStream(tempFile);
                             outstrR = new OutputStreamWriter(outstr, "UTF-8");
@@ -457,12 +461,26 @@ public class CSWworker {
                             marshaller.marshal(record, output);
                             output.flush();
                             output.close();
-
+                            
+                            //here we try to get the title
+                            String title = "unknow title";
+                            if (record instanceof RecordType) {
+                                title = ((RecordType) record).getTitle();
+                            
+                            } else if (record instanceof MetaDataImpl) {
+                                Collection<Identification> idents = ((MetaDataImpl) record).getIdentificationInfo();
+                                if (idents.size() != 0) {
+                                    Identification ident = idents.iterator().next();
+                                    if (ident.getCitation() != null && ident.getCitation().getTitle() != null) {
+                                        title = ident.getCitation().getTitle().toString();
+                                    } 
+                                }
+                            } 
                             Reader XMLReader = new Reader(databaseReader, tempFile, databaseWriter);
                             Form f           = XMLReader.readForm(CSWCatalog, 
                                                                   user, 
                                                                   "seagis CSW", 
-                                                                  "change me",
+                                                                  title,
                                                                   databaseReader.getStandard("Catalog Web Service"));
                             
                             databaseWriter.writeForm(f, false);
@@ -547,6 +565,7 @@ public class CSWworker {
      */
     public void setVersion(ServiceVersion version){
         this.version = version;
+        this.MDReader.setVersion(version);
     }
     
     /**

@@ -53,6 +53,8 @@ import net.seagis.ows.v100.OWSWebServiceException;
 import org.geotools.metadata.iso.MetadataEntity;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
+import org.mdweb.model.schemas.Standard;
+import org.mdweb.model.schemas.ValuePath;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
@@ -100,28 +102,46 @@ public class MetadataReader {
     private List<Catalog> MDCatalog;
     
     /**
-     * 
+     * A list of package containing the ISO 19115 interfaces (and the codelist classes)
      */
     private List<String> opengisPackage;
     
     /**
-     * 
+     * A list of package containing the ISO 19115 implementation.
      */
     private List<String> geotoolsPackage;
+    
+    /**
+     * A list of package containing the CSW and dublinCore implementation
+     */
+    private List<String> seagisPackage;
 
     public final static int DUBLINCORE = 0;
     public final static int ISO_19115  = 1;
     
     private ServiceVersion version;
+    
+    private final static Map<Standard, Map<String, String>> DublinCorePathMap;
+    static {
+        DublinCorePathMap          = new HashMap<Standard, Map<String, String>>();
+        
+        Map<String, String> isoMap = new HashMap<String, String>();
+        isoMap.put("identifier", "ISO 19115:MD_Metadata:fileIdentifier");
+        isoMap.put("type",       "ISO 19115:MD_Metadata:identificationInfo:citation:presentationForm");
+        isoMap.put("subject",    "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        isoMap.put("format",     "ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name");
+        isoMap.put("abstract",   "ISO 19115:MD_Metadata:identificationInfo:abstract");
+        DublinCorePathMap.put(Standard.ISO_19115, isoMap);
+    }
+    
     /**
      * Build a new metadata Reader.
      * 
      * @param MDReader a reader to the MDWeb database.
      */
-    public MetadataReader(Reader20 MDReader, Connection c, ServiceVersion version) throws SQLException {
+    public MetadataReader(Reader20 MDReader, Connection c) throws SQLException {
         this.MDReader        = MDReader;
         this.connection      = c;
-        this.version         = version;
         this.dateFormat      = new SimpleDateFormat("dd-mm-yyyy");
         
         this.MDCatalog       = new ArrayList<Catalog>();
@@ -130,6 +150,7 @@ public class MetadataReader {
         
         this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing", "net.seagis.temporal");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata",  "org.opengis.referencing", "org.opengis.temporal");
+        this.seagisPackage   = searchSubPackage("net.seagis.cat.csw",  "net.seagis.dublincore.elements");
         this.metadatas       = new HashMap<String, Object>();
     }
 
@@ -178,9 +199,10 @@ public class MetadataReader {
      */
     public int getIDFromFileIdentifier(String identifier) throws SQLException {
         
-        PreparedStatement stmt = connection.prepareStatement("Select form from \"Storage\".\"TextValues\" " +
-                                                     "WHERE value=? " +
-                                                     "AND path='ISO 19115:MD_Metadata:fileIdentifier'");
+       PreparedStatement stmt = connection.prepareStatement("Select form from \"Storage\".\"TextValues\" " +
+                                                            "WHERE value=? " +
+                                                            "AND path='ISO 19115:MD_Metadata:fileIdentifier' " +
+                                                            "OR  path like '%Catalog Web Service:Record:identifier%'");
        stmt.setString(1, identifier);
        ResultSet queryResult = stmt.executeQuery();
        if (queryResult.next()) {
@@ -196,12 +218,32 @@ public class MetadataReader {
      * @return a CSW object representing the metadata.
      */
     private AbstractRecordType getRecordFromForm(Form form, ElementSetType type) throws SQLException {
+        Value top                   = form.getTopValue();
+        Standard  recordStandard    = top.getType().getStandard();
+        if (recordStandard.equals(Standard.ISO_19115)) {
+            return getRecordFromMDForm(form, type);
+        } else {
+            return (AbstractRecordType) getObjectFromForm(form);
+        }
+        
+    }
+    /**
+     * Return a dublinCore record from a ISO 19115 MDWeb formular
+     * 
+     * @param form the MDWeb formular.
+     * @return a CSW object representing the metadata.
+     */
+    private AbstractRecordType getRecordFromMDForm(Form form, ElementSetType type) throws SQLException {
+        
+        Value top                   = form.getTopValue();
+        Standard  recordStandard    = top.getType().getStandard();
+        Map<String, String> pathMap = DublinCorePathMap.get(recordStandard);
         
         // we get the title of the form
         SimpleLiteral title             = new SimpleLiteral(null, form.getTitle());
         
         // we get the file identifier(s)
-        List<Value>   identifierValues  = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:fileIdentifier"));
+        List<Value>   identifierValues  = form.getValueFromPath(MDReader.getPath(pathMap.get("identifier")));
         List<String>  identifiers       = new ArrayList<String>();
         for (Value v: identifierValues) {
             if (v instanceof TextValue) {
@@ -218,7 +260,7 @@ public class MetadataReader {
         }
         
         //we get the type of the data
-        List<Value> typeValues  = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:citation:presentationForm"));
+        List<Value> typeValues  = form.getValueFromPath(MDReader.getPath(pathMap.get("type")));
         String dataType         = null;
         if (typeValues.size() != 0) {
             TextValue value = (TextValue)typeValues.get(0);
@@ -234,7 +276,7 @@ public class MetadataReader {
         }
         
         // we get the keywords
-        List<Value> keywordsValues  = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword"));
+        List<Value> keywordsValues  = form.getValueFromPath(MDReader.getPath(pathMap.get("subject")));
         List<SimpleLiteral> keywords = new ArrayList<SimpleLiteral>();
         for (Value v: keywordsValues) {
             if (v instanceof TextValue) {
@@ -242,7 +284,7 @@ public class MetadataReader {
             }
         }
         
-        List<Value> formatsValues  = form.getValueFromPath(MDReader.getPath("ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name"));
+        List<Value> formatsValues  = form.getValueFromPath(MDReader.getPath(pathMap.get("format")));
         List<String> formats = new ArrayList<String>();
         for (Value v: formatsValues) {
             if (v instanceof TextValue) {
@@ -414,7 +456,8 @@ public class MetadataReader {
      */
     private Object getObjectFromValue(Form form, Value value) {
 
-        String className = value.getType().getName();
+        String className    = value.getType().getName();
+        String standardName = value.getType().getStandard().getName();
         Class classe = null;
         Object result;
         //@todo remove
@@ -422,7 +465,7 @@ public class MetadataReader {
         
         try {
             // we get the value's class
-            classe = getClassFromName(className);
+            classe = getClassFromName(className, standardName);
 
             // if the value is a leaf => primitive type
             if (value instanceof TextValue) {
@@ -460,7 +503,11 @@ public class MetadataReader {
                     logger.finer("constructor:" + '\n' + constructor.toGenericString());
                     //we execute the constructor
                     result = constructor.newInstance(textValue);
-                    return result;
+                    
+                    //fix a bug in MDWeb with the value attribute TODO remove
+                    if (!asMoreChild(form, value)) {
+                        return result;
+                    } 
                 }
 
             } else {
@@ -500,12 +547,20 @@ public class MetadataReader {
         }
 
         // then we search the setter for all the child value
+        String pathId;
+        if (value.getPath() instanceof ValuePath) {
+            ValuePath vp = (ValuePath)value.getPath();
+            pathId = vp.getId();
+        } else {
+            pathId = value.getPath().getId();
+        }
+        
         for (Value childValue : form.getValues()) {
-
+            
             Path path = childValue.getPath();
             Path parent = path.getParent();
 
-            if (parent != null && parent.equals(value.getPath())) {
+            if (parent != null && parent.getId().equals(pathId)) {
                 logger.finer("new childValue:" + path.getName());
 
                 // we get the object from the child Value
@@ -565,6 +620,29 @@ public class MetadataReader {
         return result;
     }
 
+    /**
+     * Return true if the textValue have child (MDWeb bug)
+     */
+    private boolean asMoreChild(Form f, Value v) {
+        String pathId;
+        if (v.getPath() instanceof ValuePath) {
+            ValuePath vp = (ValuePath)v.getPath();
+            pathId = vp.getId();
+        } else {
+            pathId = v.getPath().getId();
+        }
+        
+        for (Value childValue : f.getValues()) {
+
+            Path path = childValue.getPath();
+            Path parent = path.getParent();
+            if (parent != null && parent.getId().equals(pathId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * Invoke a setter with the specified parameter in the specified object.
      * 
@@ -633,7 +711,7 @@ public class MetadataReader {
      * 
      * @return a class object corresponding to the specified name.
      */
-    private Class getClassFromName(String className) {
+    private Class getClassFromName(String className, String standardName) {
         logger.finer("searche for class " + className);
 
         //for the primitive type we return java primitive type
@@ -656,12 +734,15 @@ public class MetadataReader {
 
 
         List<String> packagesName = new ArrayList<String>();
-        if (!className.contains("Code")) {
-            packagesName = geotoolsPackage;
+        if (standardName.equals("Catalog Web Service") ||standardName.equals("DublinCore")) {
+            packagesName = seagisPackage;
         } else {
-            packagesName = opengisPackage;
+            if (!className.contains("Code")) {
+                packagesName = geotoolsPackage;
+            } else {
+                packagesName = opengisPackage;
+            }
         }
-
 
 
         for (String packageName : packagesName) {
@@ -674,9 +755,9 @@ public class MetadataReader {
             
             String name = className;
             int nameType = 0;
-            while (nameType < 4) {
+            while (nameType < 5) {
                 try {
-                    // Récupération de la classe java.awt.Button
+                    logger.finer("searching: " + packageName + '.' + name);
                     result = Class.forName(packageName + '.' + name);
                     logger.finer("class found:" + packageName + '.' + name);
                     return result;
@@ -710,8 +791,14 @@ public class MetadataReader {
                             nameType = 3;
                             break;
                         }
-                        default:
+                        case 3: {
+                            name = name.substring(0, name.indexOf("Impl"));
+                            name += "Type";
                             nameType = 4;
+                            break;
+                        }
+                        default:
+                            nameType = 5;
                             break;
                     }
 
@@ -756,27 +843,27 @@ public class MetadataReader {
                 switch (occurenceType) {
 
                     case 0: {
-                        setter = rootClass.getDeclaredMethod(methodName, classe);
+                        setter = rootClass.getMethod(methodName, classe);
                         break;
                     }
                     case 1: {
                         if (classe.equals(Integer.class)) {
-                            setter = rootClass.getDeclaredMethod(methodName, long.class);
+                            setter = rootClass.getMethod(methodName, long.class);
                             break;
                         } else {
                             occurenceType = 2;
                         }
                     }
                     case 2: {
-                        setter = rootClass.getDeclaredMethod(methodName, interfacee);
+                        setter = rootClass.getMethod(methodName, interfacee);
                         break;
                     }
                     case 3: {
-                        setter = rootClass.getDeclaredMethod(methodName, Collection.class);
+                        setter = rootClass.getMethod(methodName, Collection.class);
                         break;
                     }
                     case 4: {
-                        setter = rootClass.getDeclaredMethod(methodName + "s", Collection.class);
+                        setter = rootClass.getMethod(methodName + "s", Collection.class);
                         break;
                     }
                 }
@@ -861,7 +948,7 @@ public class MetadataReader {
                     URL url = urls.nextElement();
                     try {
                         URI uri = url.toURI();
-                        logger.info("scanning :" + uri);
+                        logger.finer("scanning :" + uri);
                         result.addAll(scan(uri, fileP));
                     } catch (URISyntaxException e) {
                         logger.severe("URL, " + url + "cannot be converted to a URI");
@@ -1064,5 +1151,12 @@ public class MetadataReader {
             }
             return nbocc;
         }
+    }
+    
+    /**
+     * Set the current service version
+     */
+    public void setVersion(ServiceVersion version){
+        this.version = version;
     }
 }
