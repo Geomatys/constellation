@@ -24,7 +24,7 @@ import org.junit.*;
 
 import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import net.seagis.catalog.DatabaseTest;
 
@@ -40,6 +40,11 @@ public class MosaicTest extends DatabaseTest {
      * The layer name in the database.
      */
     private static final String BLUEMARBLE = "BlueMarble", ORTHO2000 = "Ortho2000";
+
+    /**
+     * Small number for floating point comparaisons.
+     */
+    private static final double EPS = 1E-6;
 
     /**
      * Tests the BlueMarble layer. We try first with a query on the full extent (no subarea, no
@@ -60,7 +65,12 @@ public class MosaicTest extends DatabaseTest {
         assertEquals("Should be cached", entry, other);
         assertSame  ("Should be cached", entry, other);
         assertEquals(BLUEMARBLE, entry.getSeries().getName());
-        assertEquals(GeographicBoundingBoxImpl.WORLD, entry.getGeographicBoundingBox());
+
+        GeographicBoundingBox box = entry.getGeographicBoundingBox();
+        assertEquals(-180, box.getWestBoundLongitude(), EPS);
+        assertEquals(+180, box.getEastBoundLongitude(), EPS);
+        assertEquals( -90, box.getSouthBoundLatitude(), EPS);
+        assertEquals( +90, box.getNorthBoundLatitude(), EPS);
 
         Rectangle range = entry.getGridGeometry().getGridRange2D();
         assertEquals(4*21600, range.width);
@@ -82,7 +92,12 @@ public class MosaicTest extends DatabaseTest {
         assertSame  ("Should be cached", entry, other);
         assertEquals(BLUEMARBLE, entry.getSeries().getName());
         assertTrue  (entries.contains(entry));
-        assertEquals(GeographicBoundingBoxImpl.WORLD, entry.getGeographicBoundingBox());
+
+        box = entry.getGeographicBoundingBox();
+        assertEquals(-180, box.getWestBoundLongitude(), EPS);
+        assertEquals(+180, box.getEastBoundLongitude(), EPS);
+        assertEquals( -90, box.getSouthBoundLatitude(), EPS);
+        assertEquals( +90, box.getNorthBoundLatitude(), EPS);
 
         range = entry.getGridGeometry().getGridRange2D();
         assertEquals(360, range.width);

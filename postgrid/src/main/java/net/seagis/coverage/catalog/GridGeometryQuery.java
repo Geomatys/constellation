@@ -34,7 +34,7 @@ final class GridGeometryQuery extends Query {
      * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column identifier, width, height, scaleX, scaleY, translateX, translateY,
-            shearX, shearY, horizontalSRID, horizontalExtent, verticalSRID, verticalOrdinates;
+            shearX, shearY, horizontalSRID, verticalSRID, verticalOrdinates;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -65,10 +65,8 @@ final class GridGeometryQuery extends Query {
         shearX            = addColumn("shearX",               0,  LSI);
         shearY            = addColumn("shearY",               0,  LSI);
         horizontalSRID    = addColumn("horizontalSRID",           LSI);
-        horizontalExtent  = addColumn("horizontalExtent",         LS ); // Will rely on trigger for insertion.
         verticalSRID      = addColumn("verticalSRID",      null, LFSI);
         verticalOrdinates = addColumn("verticalOrdinates", null, LFSI);
-        horizontalExtent.setFunction("Box2D", LS);
         byIdentifier      = addParameter(identifier,    SE);
         byWidth           = addParameter(width,          F);
         byHeight          = addParameter(height,         F);

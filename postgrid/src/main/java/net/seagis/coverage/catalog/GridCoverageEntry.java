@@ -16,7 +16,6 @@
 package net.seagis.coverage.catalog;
 
 import java.awt.Shape;
-import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
@@ -69,12 +68,11 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.util.DateRange;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
-import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.geometry.XRectangle2D;
+import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 
 import net.seagis.catalog.Entry;
@@ -309,9 +307,13 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * {@inheritDoc}
      */
     public Envelope getEnvelope() {
+        final Rectangle clipPixels = new Rectangle();
         final Envelope envelope;
         try {
-            envelope = computeEnvelope(computeBounds(null));
+            if (!computeBounds(clipPixels, null)) {
+                return null;
+            }
+            envelope = computeEnvelope(clipPixels);
         } catch (TransformException exception) {
             // Should not happen if the coordinate in the database are valids.
             throw new IllegalStateException(exception.getLocalizedMessage(), exception);
@@ -364,12 +366,11 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      */
     @SuppressWarnings("fallthrough")
     public GridGeometry2D getGridGeometry() {
-        final Rectangle clipPixels;
-        final Point subsampling = new Point();
+        final Rectangle clipPixels  = new Rectangle();
+        final Dimension subsampling = new Dimension();
         final Envelope envelope;
         try {
-            clipPixels = computeBounds(subsampling);
-            if (clipPixels == null) {
+            if (!computeBounds(clipPixels, subsampling)) {
                 return null;
             }
             envelope = computeEnvelope(clipPixels);
@@ -383,8 +384,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         switch (dimension) {
             // Fall through in every cases.
             default: Arrays.fill(upper, 2, dimension, 1);
-            case 2:  upper[1] = clipPixels.height / Math.max(subsampling.x, 1);
-            case 1:  upper[0] = clipPixels.width  / Math.max(subsampling.y, 1);
+            case 2:  upper[1] = clipPixels.height / subsampling.width;
+            case 1:  upper[0] = clipPixels.width  / subsampling.height;
             case 0:  break;
         }
         final GeneralGridRange gridRange = new GeneralGridRange(lower, upper);
@@ -426,12 +427,21 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * Computes the region to read, in "real world" coordinates and in pixel coordinates. The main
      * purpose of this method is to be invoked just before an image is read, but it can also be
      * invoked by some informative methods like {@link #getEnvelope} and {@link #getGridGeometry}.
+     * <p>
+     * Every arguments given to this method are <strong>output only</strong>;
+     * none of them are read, so their values are not relevant to this method.
      *
-     * @param  subsampling The objet in which to write the subsampling, or {@code null}
-     *         if this information is not wanted.
-     * @return the pixel coordinates of the region to be read.
+     * @param  clipPixels The rectangle where to stores the region to be read in pixel coordinates,
+     *         or {@code null} if the caller is not interrested by this information.
+     * @param  subsampling The objet in which to write the subsampling in pixel coordinates,
+     *         or {@code null} if this information is not wanted. Usually an instance of
+     *         {@link Dimension} (the floating point type is treated differently...).
+     * @return {@code true} on success, or {@code false} if the coverage can't be read. In the
+     *         later case the {@code clipPixels} and {@code subsampling} values may be invalid.
      */
-    private Rectangle computeBounds(final Point subsampling) throws TransformException {
+    private boolean computeBounds(final Rectangle clipPixels, final Dimension2D subsampling)
+            throws TransformException
+    {
         final GridRange gridRange = geometry.gridRange;
         final int width  = gridRange.getLength(0);
         final int height = gridRange.getLength(1);
@@ -443,13 +453,14 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             throw new TransformException(exception.getLocalizedMessage(), exception);
         }
         /*
-         * Gets the geographic coordinates of the ROI (region of interest). The coordinates of
-         * the ROI are expressed in WGS84 geographic, not in the coverage CRS. If a projection 
-         * is wanted,it can be applied using GridCoverageSettings.tableToCoverageCRS(...). 
-         * Better avoid projecting the clip however, because it often includes the poles which 
-         * are not handled by every kind of projection.
+         * Gets the geographic coordinates of the ROI (region of interest).  The coordinates of
+         * the ROI are expressed in the CRS of GridCoverageTable (usually WGS84 geographic, but
+         * not necessarly), not in the coverage CRS. If a projection is wanted, it can be applied
+         * using GridCoverageSettings.tableToCoverageCRS(...). Better avoid projecting the clip
+         * however, because it often includes the poles which are not handled by every kind of
+         * projection.
          */
-        final Shape clipGeographicArea = geometry.getCRSBoundingBox();
+        final Rectangle2D clipGeographicArea = settings.geographicArea;
         /*
          * Following should produces a result identical to geometry.geographicEnvelope. However in
          * some case the result is different, when the PostGIS "spatial_ref_sys" table contains an
@@ -457,12 +468,12 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * PostGIS, an error (if any) will be canceled later when we will reproject back to the
          * coverage CRS.
          */
-        Rectangle2D clippedArea = geometry.getCRSBoundingBox(); // Will be clipped later.
+        Shape clippedArea = geometry.getShape(); // Will be clipped later.
         Shape coverageGeographicArea = settings.tableToCoverageCRS(clippedArea, true);
         Rectangle2D geographicBounds = (coverageGeographicArea instanceof Rectangle2D) ?
                 (Rectangle2D) coverageGeographicArea : coverageGeographicArea.getBounds2D();
         if (geographicBounds.isEmpty()) {
-            return null;
+            return false;
         }
         /*
          * Cheks if the requested region (clipGeographicArea) intersects the coverage region
@@ -471,45 +482,46 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * rectangle is a line or a point.
          */
         if (clipGeographicArea != null) {
-            Rectangle2D clipBox = clipGeographicArea.getBounds2D();
-            if (clipBox.getWidth() < 0 || clipBox.getHeight() < 0) {
-                return null;
+            if (clipGeographicArea.getWidth() < 0 || clipGeographicArea.getHeight() < 0) {
+                return false;
             }
-            if (clipBox.getMaxX() < geographicBounds.getMinX() ||
-                clipBox.getMinX() > geographicBounds.getMaxX() ||
-                clipBox.getMaxY() < geographicBounds.getMinY() ||
-                clipBox.getMinY() > geographicBounds.getMaxY())
+            if (clipGeographicArea.getMaxX() < geographicBounds.getMinX() ||
+                clipGeographicArea.getMinX() > geographicBounds.getMaxX() ||
+                clipGeographicArea.getMaxY() < geographicBounds.getMinY() ||
+                clipGeographicArea.getMinY() > geographicBounds.getMaxY())
             {
-                return null;
+                return false;
             }
-            if (!clipBox.contains(geographicBounds)) {
-                if (coverageGeographicArea.getBounds2D().contains(clipGeographicArea.getBounds2D())) {
-                    coverageGeographicArea = geographicBounds = clipGeographicArea.getBounds2D();
+            if (!clipGeographicArea.contains(geographicBounds)) {
+                if (coverageGeographicArea.contains(clipGeographicArea)) {
+                    coverageGeographicArea = geographicBounds = clipGeographicArea;
                 } else {
                     final Area area = new Area(coverageGeographicArea);
                     area.intersect(new Area(clipGeographicArea));
                     coverageGeographicArea = area;
                     geographicBounds = coverageGeographicArea.getBounds2D();
                     if (geographicBounds.isEmpty()) {
-                        return null;
+                        return false;
                     }
                 }
-                clippedArea = settings.tableToCoverageCRS(coverageGeographicArea, false).getBounds2D();
+                clippedArea = settings.tableToCoverageCRS(coverageGeographicArea, false);
             }
         }
         /*
          * Transforms ["real world" envelope] --> [region in pixel coordinates]
          * and computes the subsampling from the desired resolution.
          */
-        clippedArea = XAffineTransform.transform(crsToGrid, clippedArea, null);
+        clippedArea = XAffineTransform.transform(crsToGrid, clippedArea, clippedArea != clipGeographicArea);
         final RectangularShape pixelBounds = (clippedArea instanceof RectangularShape) ?
                 (RectangularShape) clippedArea : clippedArea.getBounds2D();
         final Dimension2D resolution = settings.resolution;
         final int xSubsampling;
         final int ySubsampling;
+        double sx = pixelBounds.getWidth()  / geographicBounds.getWidth();
+        double sy = pixelBounds.getHeight() / geographicBounds.getHeight();
         if (resolution != null) {
-            double sx = resolution.getWidth()  * (pixelBounds.getWidth()  / geographicBounds.getWidth());
-            double sy = resolution.getHeight() * (pixelBounds.getHeight() / geographicBounds.getHeight());
+            sx *= resolution.getWidth();
+            sy *= resolution.getHeight();
             xSubsampling = max(1, min(width /MIN_SIZE, (int) (sx + EPS))); // Round toward 0.
             ySubsampling = max(1, min(height/MIN_SIZE, (int) (sy + EPS)));
         } else {
@@ -517,35 +529,47 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             ySubsampling = 1;
         }
         if (subsampling != null) {
-            subsampling.x = xSubsampling;
-            subsampling.y = ySubsampling;
+            if (subsampling instanceof Dimension) {
+                // Do not rely on the Dimension.setSize(double,double) implementation because we
+                // want to round toward 0 rather than higher integer. Furthermore we want values
+                // not smaller than 1.
+                final Dimension sub = (Dimension) subsampling;
+                sub.width  = xSubsampling;
+                sub.height = ySubsampling;
+            } else {
+                subsampling.setSize(sx, sy);
+            }
         }
         /*
          * Casts the pixelBounds in a Rectangle and make sure that it is contained inside the
          * RenderedImage valid bounds. Also ensures that the width is a multible of subsampling.
          */
-        final Rectangle clipPixel = new Rectangle();
-        clipPixel.setRect(pixelBounds.getX()      + EPS,
-                          pixelBounds.getY()      + EPS,
-                          pixelBounds.getWidth()  - EPS,
-                          pixelBounds.getHeight() - EPS);
-        if (clipPixel.width <  MIN_SIZE) {
-            clipPixel.x    -= (MIN_SIZE - clipPixel.width)/2;
-            clipPixel.width =  MIN_SIZE;
+        if (clipPixels != null) {
+            clipPixels.setRect(pixelBounds.getX()      + EPS,
+                               pixelBounds.getY()      + EPS,
+                               pixelBounds.getWidth()  - EPS,
+                               pixelBounds.getHeight() - EPS);
+            if (clipPixels.width <  MIN_SIZE) {
+                clipPixels.x    -= (MIN_SIZE - clipPixels.width)/2;
+                clipPixels.width =  MIN_SIZE;
+            }
+            if (clipPixels.height < MIN_SIZE) {
+                clipPixels.y     -= (MIN_SIZE - clipPixels.height)/2;
+                clipPixels.height = MIN_SIZE;
+            }
+            final int clipX2 = min(width,  clipPixels.width  + clipPixels.x);
+            final int clipY2 = min(height, clipPixels.height + clipPixels.y);
+            if (clipPixels.x < 0) clipPixels.x = 0;
+            if (clipPixels.y < 0) clipPixels.y = 0;
+            clipPixels.width  = clipX2 - clipPixels.x;
+            clipPixels.height = clipY2 - clipPixels.y;
+            clipPixels.width  = (clipPixels.width  / xSubsampling) * xSubsampling; // Round toward 0.
+            clipPixels.height = (clipPixels.height / ySubsampling) * ySubsampling;
+            if (clipPixels.isEmpty()) {
+                return false;
+            }
         }
-        if (clipPixel.height < MIN_SIZE) {
-            clipPixel.y     -= (MIN_SIZE - clipPixel.height)/2;
-            clipPixel.height = MIN_SIZE;
-        }
-        final int clipX2 = min(width,  clipPixel.width  + clipPixel.x);
-        final int clipY2 = min(height, clipPixel.height + clipPixel.y);
-        if (clipPixel.x < 0) clipPixel.x = 0;
-        if (clipPixel.y < 0) clipPixel.y = 0;
-        clipPixel.width  = clipX2 - clipPixel.x;
-        clipPixel.height = clipY2 - clipPixel.y;
-        clipPixel.width  = (clipPixel.width  / xSubsampling) * xSubsampling; // Round toward 0.
-        clipPixel.height = (clipPixel.height / ySubsampling) * ySubsampling;
-        return !clipPixel.isEmpty() ? clipPixel : null;
+        return true;
     }
 
     /**
@@ -630,15 +654,14 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         /*
          * Obtient les coordonnées pixels et les coordonnées logiques de la région à extraire.
          */
-        final Rectangle clipPixel;
-        final Point   subsampling = new Point();
+        final Rectangle clipPixels  = new Rectangle();
+        final Dimension subsampling = new Dimension();
         final GeneralEnvelope envelope;
         try {
-            clipPixel = computeBounds(subsampling);
-            if (clipPixel == null) {
+            if (!computeBounds(clipPixels, subsampling)) {
                 return null;
             }
-            envelope = computeEnvelope(clipPixel);
+            envelope = computeEnvelope(clipPixels);
         } catch (TransformException exception) {
             throw new IIOException(exception.getLocalizedMessage(), exception);
         }
@@ -662,11 +685,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             format.setReading(this, true);
             synchronized (format) {
                 final ImageReadParam param = format.getDefaultReadParam(input);
-                if (!clipPixel.isEmpty()) {
-                    param.setSourceRegion(clipPixel);
-                }
-                param.setSourceSubsampling(subsampling.x,   subsampling.y,
-                                           subsampling.x/2, subsampling.y/2);
+                param.setSourceRegion(clipPixels);
+                param.setSourceSubsampling(subsampling.width,   subsampling.height,
+                                           subsampling.width/2, subsampling.height/2);
                 if (band != 0) {
                     // Selects a particular depth in a 3D coverage.
                     param.setSourceBands(new int[] {band});
@@ -756,23 +777,18 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     }
 
     /**
-     * Indique si cette image a au moins la résolution spécifiée.
-     *
-     * @param  resolution Résolution désirée, exprimée selon le CRS de la table d'images.
-     * @return {@code true} si la résolution de cette image est égale ou supérieure à la résolution
-     *         demandée. Cette méthode retourne {@code false} si {@code resolution} était nul.
-     *
-     * @deprecated Current implementation is no longer consistent with {@link #computeBounds}.
+     * Returns {@code true} if the coverage represented by this entry has enough resolution
+     * compared to the requested one.
      */
-    @Deprecated
-    final boolean hasEnoughResolution(final Dimension2D resolution) {
-        final GridRange gridRange = geometry.gridRange;
-        final int width  = gridRange.getLength(0);
-        final int height = gridRange.getLength(1);
-        final XRectangle2D boundingBox = (XRectangle2D)geometry.geographicBoundingShape.getBounds2D();
-        return (resolution != null) &&
-               (1+EPS)*resolution.getWidth()  >= boundingBox.getWidth() /width &&
-               (1+EPS)*resolution.getHeight() >= boundingBox.getHeight()/height;
+    final boolean hasEnoughResolution() {
+        final XDimension2D.Float resolution = new XDimension2D.Float();
+        try {
+            return computeBounds(null, resolution) && resolution.width <= 1 && resolution.height <= 1;
+        } catch (TransformException exception) {
+            // GridCoverageTable.getEntries() is the public method invoking this one.
+            Logging.unexpectedException(LOGGER, GridCoverageTable.class, "getEntries", exception);
+            return false;
+        }
     }
 
     /**

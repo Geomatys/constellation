@@ -20,6 +20,7 @@ import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import org.opengis.geometry.Envelope;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.TableTest;
@@ -58,13 +59,14 @@ public class GridGeometryTableTest extends TableTest {
         final GridGeometryTable table = new GridGeometryTable(database);
         final GridGeometryEntry entry = table.getEntry(SAMPLE_NAME);
         final GridRange gridRange = entry.gridRange;
+        final GeographicBoundingBox box = entry.getGeographicBoundingBox();
         assertEquals( 720, gridRange.getLength(0));
         assertEquals( 499, gridRange.getLength(1));
         assertEquals(  59, gridRange.getLength(2));
-        assertEquals(-180, entry.geographicEnvelope.getMinX(), 0.0);
-        assertEquals(+180, entry.geographicEnvelope.getMaxX(), 0.0);
-        assertEquals( -77, entry.geographicEnvelope.getMinY(), 0.5);
-        assertEquals( +77, entry.geographicEnvelope.getMaxY(), 0.5);
+        assertEquals(-180, box.getWestBoundLongitude(), 0.0);
+        assertEquals(+180, box.getEastBoundLongitude(), 0.0);
+        assertEquals( -77, box.getSouthBoundLatitude(), 0.5);
+        assertEquals( +77, box.getNorthBoundLatitude(), 0.5);
 
         final Envelope envelope = entry.getEnvelope();
         assertEquals(-2.00E+7, envelope.getMinimum(0), 5E+5);

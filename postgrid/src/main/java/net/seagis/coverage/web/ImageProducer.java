@@ -631,7 +631,9 @@ public abstract class ImageProducer {
              */
             try {
                 final SortedSet<Date> availableTimes = layer.getAvailableTimes();
-                time = availableTimes.last();
+                if (availableTimes != null && !availableTimes.isEmpty()) {
+                    time = availableTimes.last();
+                }
             } catch (CatalogException ex) {
                 Logging.unexpectedException(LOGGER, ImageProducer.class, "getGridCoverage2D", ex);
                 // 'time' still null, which is a legal value.

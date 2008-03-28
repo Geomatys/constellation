@@ -118,9 +118,9 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     private transient CoverageComparator comparator;
 
     /**
-     * Last parameters used for creating {@link CoverageReference} instances.
+     * Last settings used for creating {@link CoverageReference} instances.
      */
-    private transient GridCoverageSettings parameters;
+    private transient GridCoverageSettings settings;
 
     /**
      * The set of available dates. Will be computed by
@@ -178,7 +178,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
         gridGeometryTable = table.gridGeometryTable;
         tileTable         = table.tileTable;
         comparator        = table.comparator;
-        parameters        = table.parameters;
+        settings          = table.settings;
         asCoverage        = table.asCoverage;
     }
 
@@ -353,7 +353,6 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     public Set<CoverageReference> getEntries() throws CatalogException, SQLException {
         final  Set<CoverageReference> entries  = super.getEntries();
         final List<CoverageReference> filtered = new ArrayList<CoverageReference>(entries.size());
-        final Dimension2D resolution = getPreferredResolution();
 loop:   for (final CoverageReference newReference : entries) {
             if (newReference instanceof GridCoverageEntry) {
                 final GridCoverageEntry newEntry = (GridCoverageEntry) newReference;
@@ -374,7 +373,7 @@ loop:   for (final CoverageReference newReference : entries) {
                         final GridCoverageEntry lowestResolution = oldEntry.getLowestResolution(newEntry);
                         if (lowestResolution != null) {
                             // Two entries has the same spatio-temporal coordinates.
-                            if (lowestResolution.hasEnoughResolution(resolution)) {
+                            if (lowestResolution.hasEnoughResolution()) {
                                 // The entry with the lowest resolution is enough.
                                 filtered.set(i, lowestResolution);
                             } else if (lowestResolution == oldEntry) {
@@ -692,8 +691,8 @@ loop:   for (final CoverageReference newReference : entries) {
     }
 
     /**
-     * Returns the current values of some parameters in this table. Those parameters are grouped
-     * in a single object in order to reduce memory usage, because a large amount of coverages may
+     * Returns the current values of some settings in this table. Those settings are grouped in
+     * a single object in order to reduce memory usage, because a large amount of coverages may
      * share a single instance of {@code GridCoverageSettings}. The returned object should be
      * considered immutable - <strong>do not modify</strong>.
      * <p>
@@ -713,8 +712,8 @@ loop:   for (final CoverageReference newReference : entries) {
          * Si les paramètres spécifiés sont identiques à ceux qui avaient été
          * spécifiés la dernière fois, retourne le dernier bloc de paramètres.
          */
-        if (parameters != null && Utilities.equals(parameters.coverageCRS, coverageCRS)) {
-            return parameters;
+        if (settings != null && Utilities.equals(settings.coverageCRS, coverageCRS)) {
+            return settings;
         }
         /*
          * Construit un nouveau bloc de paramètres et projète les
@@ -725,9 +724,9 @@ loop:   for (final CoverageReference newReference : entries) {
                             envelope.getMinimum(xDimension), envelope.getMinimum(yDimension),
                             envelope.getMaximum(xDimension), envelope.getMaximum(yDimension));
         final Dimension2D resolution = getPreferredResolution();
-        parameters = new GridCoverageSettings(operation, getCoordinateReferenceSystem(),
+        settings = new GridCoverageSettings(operation, getCoordinateReferenceSystem(),
                             coverageCRS, geographicArea, resolution, dateFormat);
-        return parameters;
+        return settings;
     }
 
     /**
@@ -778,9 +777,9 @@ loop:   for (final CoverageReference newReference : entries) {
      * de la table a changé, mais que cet état n'affecte pas les prochaines entrées à créer.
      */
     private void flushExceptEntries() {
-        asCoverage = null;
-        parameters = null;
-        comparator = null;
+        asCoverage          = null;
+        settings            = null;
+        comparator          = null;
         availableElevations = null;
         availableTimes      = null;
         availableCentroids  = null;

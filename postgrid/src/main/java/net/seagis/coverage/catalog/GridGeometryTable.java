@@ -29,7 +29,6 @@ import static java.lang.reflect.Array.getLength;
 import static java.lang.reflect.Array.getDouble;
 
 import org.opengis.coverage.grid.GridRange;
-import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -45,11 +44,9 @@ import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.IllegalRecordException;
-import net.seagis.catalog.SpatialFunctions;
 import net.seagis.catalog.SingletonTable;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
@@ -189,7 +186,6 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         final double shearX            = results.getDouble(indexOf(query.shearX));
         final double shearY            = results.getDouble(indexOf(query.shearY));
         final int    horizontalSRID    = results.getInt   (indexOf(query.horizontalSRID));
-        final String horizontalExtent  = results.getString(indexOf(query.horizontalExtent));
         final int    verticalSRID      = results.getInt   (indexOf(query.verticalSRID));
         final Array  verticalOrdinates = results.getArray (indexOf(query.verticalOrdinates));
         /*
@@ -265,28 +261,22 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         if (altitudes != null) {
             envelope.setRange(2, min, max); // For fixing rounding errors.
         }
-        final GeneralEnvelope geographicEnvelope;
-        if (horizontalExtent != null) {
-            geographicEnvelope = SpatialFunctions.parse(horizontalExtent);
-        } else {
-            geographicEnvelope = envelope;
-        }
-        final GeographicBoundingBox bbox;
-        try {
-            bbox = new GeographicBoundingBoxImpl(geographicEnvelope);
-        } catch (TransformException exception) {
-            throw new IllegalRecordException(exception, this, results, indexOf(query.horizontalExtent), identifier);
-        }
         /*
          * Creates the entry and performs some final checks.
          */
         final AffineTransform2D at = new AffineTransform2D(scaleX, shearY, shearX, scaleY, translateX, translateY);
-        final GridGeometryEntry entry = new GridGeometryEntry(identifier, at, gridRange, envelope, bbox,
-                horizontalSRID, verticalSRID, altitudes);
+        final GridGeometryEntry entry;
+        try {
+            entry = new GridGeometryEntry(identifier, at, gridRange, envelope, horizontalSRID, verticalSRID, altitudes);
+        } catch (FactoryException exception) {
+            throw new IllegalRecordException(exception, this, results, indexOf(query.horizontalSRID), identifier);
+        } catch (TransformException exception) {
+            throw new IllegalRecordException(exception, this, results, indexOf(query.horizontalSRID), identifier);
+        }
         if (entry.isEmpty()) {
             // TODO: localize
-            throw new IllegalRecordException("The geographic envelope is empty. It was computed from \"" +
-                    horizontalExtent + "\".", this, results, indexOf(query.horizontalExtent), identifier);
+            throw new IllegalRecordException("The geographic envelope is empty.",
+                    this, results, indexOf(query.horizontalSRID), identifier);
         }
         return entry;
     }
