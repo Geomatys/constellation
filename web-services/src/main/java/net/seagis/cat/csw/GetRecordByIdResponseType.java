@@ -116,5 +116,26 @@ public class GetRecordByIdResponseType {
         }
         return Collections.unmodifiableList(any);
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        if (abstractRecord!= null && abstractRecord.size() != 0) {
+            s.append("records:").append('\n');
+            for (JAXBElement<? extends AbstractRecordType> jb: abstractRecord) {
+                s.append(jb.getValue().toString()).append('\n');
+            }
+        }
+        
+        
+        if (any!= null && any.size() != 0) {
+            s.append("anys:").append('\n');
+            for (Object obj: any) {
+                s.append(obj.toString()).append('\n');
+            }
+        }
+        
+        return s.toString();
+    }
 
 }

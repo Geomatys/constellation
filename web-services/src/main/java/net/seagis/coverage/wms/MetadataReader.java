@@ -150,7 +150,7 @@ public class MetadataReader {
         
         this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing", "net.seagis.temporal");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata",  "org.opengis.referencing", "org.opengis.temporal");
-        this.seagisPackage   = searchSubPackage("net.seagis.cat.csw",  "net.seagis.dublincore.elements");
+        this.seagisPackage   = searchSubPackage("net.seagis.cat.csw",  "net.seagis.dublincore.elements", "net.seagis.ows.v100");
         this.metadatas       = new HashMap<String, Object>();
     }
 
@@ -201,8 +201,8 @@ public class MetadataReader {
         
        PreparedStatement stmt = connection.prepareStatement("Select form from \"Storage\".\"TextValues\" " +
                                                             "WHERE value=? " +
-                                                            "AND path='ISO 19115:MD_Metadata:fileIdentifier' " +
-                                                            "OR  path like '%Catalog Web Service:Record:identifier%'");
+                                                            "AND (path='ISO 19115:MD_Metadata:fileIdentifier' " +
+                                                            "OR  path like '%Catalog Web Service:Record:identifier%')");
        stmt.setString(1, identifier);
        ResultSet queryResult = stmt.executeQuery();
        if (queryResult.next()) {
@@ -501,6 +501,7 @@ public class MetadataReader {
                     // we try to get a constructor(String)
                     Constructor constructor = classe.getConstructor(String.class);
                     logger.finer("constructor:" + '\n' + constructor.toGenericString());
+                    
                     //we execute the constructor
                     result = constructor.newInstance(textValue);
                     
@@ -734,7 +735,8 @@ public class MetadataReader {
 
 
         List<String> packagesName = new ArrayList<String>();
-        if (standardName.equals("Catalog Web Service") ||standardName.equals("DublinCore")) {
+        if (standardName.equals("Catalog Web Service") ||standardName.equals("DublinCore") || 
+            standardName.equals("OGC Web Service")) {
             packagesName = seagisPackage;
         } else {
             if (!className.contains("Code")) {

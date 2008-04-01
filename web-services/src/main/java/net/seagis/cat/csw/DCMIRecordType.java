@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.dublincore.elements.SimpleLiteral;
 
@@ -68,12 +67,6 @@ public class DCMIRecordType extends AbstractRecordType {
     private List<JAXBElement<SimpleLiteral>> dcElement;
 
     /**
-     * we record the title in a string to pass it to mdweb.
-     */
-    @XmlTransient
-    private String title;
-    
-    /**
      * An empty constructor used by JAXB
      */
     DCMIRecordType() {
@@ -89,9 +82,7 @@ public class DCMIRecordType extends AbstractRecordType {
         this.dcElement.add(dublinFactory.createIdentifier(identifier));
         
         this.dcElement.add(dublinFactory.createTitle(title));
-        if (title != null && title.getContent().size() != 0);
-            this.title = title.getContent().get(0);
-        
+              
         this.dcElement.add(dublinFactory.createType(type));
         
         for (SimpleLiteral subject: subjects) {
@@ -127,14 +118,38 @@ public class DCMIRecordType extends AbstractRecordType {
         this.dcElement.add(dublinFactory.createIdentifier(identifier));
     }
     
+    public String getIdentifier() {
+        for (JAXBElement<SimpleLiteral> jb: dcElement) {
+            if (jb.getName().getLocalPart().equals("identifier")) {
+                if (jb.getValue() != null && jb.getValue().getContent()!= null 
+                    && jb.getValue().getContent().size() != 0) {
+                    return jb.getValue().getContent().get(0);
+                } else {
+                    return null;
+                }
+            }
+            
+        }
+        return null;
+    }
+    
     public void setTitle(SimpleLiteral title) {
         this.dcElement.add(dublinFactory.createTitle(title));
-        if (title != null && title.getContent().size() != 0);
-            this.title = title.getContent().get(0);
     }
     
     public String getTitle() {
-        return title;
+        for (JAXBElement<SimpleLiteral> jb: dcElement) {
+            if (jb.getName().getLocalPart().equals("title")) {
+                if (jb.getValue() != null && jb.getValue().getContent()!= null 
+                    && jb.getValue().getContent().size() != 0) {
+                    return jb.getValue().getContent().get(0);
+                } else {
+                    return null;
+                }
+            }
+            
+        }
+        return null;
     }
     
     public void setType(SimpleLiteral type) {
@@ -187,5 +202,20 @@ public class DCMIRecordType extends AbstractRecordType {
     
     public void setRights(SimpleLiteral rights) {
         this.dcElement.add(dublinFactory.createRights(rights));
+    }
+    
+    public void setSpatial(SimpleLiteral spatial) {
+        this.dcElement.add(dublinTermFactory.createSpatial(spatial));
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        if (dcElement != null) {
+            for (JAXBElement<SimpleLiteral> jb: dcElement) {
+                s.append("name=").append(jb.getName()).append(" value=").append(jb.getValue().toString()).append('\n');
+            }
+        }
+        return s.toString();
     }
 }

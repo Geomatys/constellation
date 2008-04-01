@@ -126,4 +126,15 @@ public class SimpleLiteral {
     public void setScheme(String scheme){
         this.scheme = scheme;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        
+        if (scheme != null) {
+            s.append(scheme).append(':');
+        }
+        s.append(content);
+        return s.toString();
+    }
 }

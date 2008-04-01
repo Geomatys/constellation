@@ -79,7 +79,6 @@ import static net.seagis.coverage.wms.MetadataReader.*;
 import org.geotools.metadata.iso.MetaDataImpl;
 
 //mdweb model dependencies
-import org.geotools.metadata.iso.identification.IdentificationImpl;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
@@ -462,10 +461,21 @@ public class CSWworker {
                             output.flush();
                             output.close();
                             
+                            
+                            if (record instanceof JAXBElement) {
+                                record = ((JAXBElement)record).getValue();
+                            }
                             //here we try to get the title
                             String title = "unknow title";
                             if (record instanceof RecordType) {
                                 title = ((RecordType) record).getTitle();
+                                if (title == null) {
+                                    title = ((RecordType) record).getIdentifier();
+                                }
+                                if (title == null) {
+                                    title = "unknow title";
+                                }
+                                
                             
                             } else if (record instanceof MetaDataImpl) {
                                 Collection<Identification> idents = ((MetaDataImpl) record).getIdentificationInfo();
@@ -475,6 +485,8 @@ public class CSWworker {
                                         title = ident.getCitation().getTitle().toString();
                                     } 
                                 }
+                            } else {
+                                logger.severe("unknow type: " + record.getClass().getName() + " unable to find a title");
                             } 
                             Reader XMLReader = new Reader(databaseReader, tempFile, databaseWriter);
                             Form f           = XMLReader.readForm(CSWCatalog, 

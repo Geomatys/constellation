@@ -95,7 +95,8 @@ public class CSWService extends WebService {
                         ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
                         ,DescribeRecordResponseType.class, GetDomainResponseType.class
                         ,TransactionResponseType.class, HarvestResponseType.class
-                        ,ExceptionReport.class, net.seagis.ows.v110.ExceptionReport.class);
+                        ,ExceptionReport.class, net.seagis.ows.v110.ExceptionReport.class
+                        ,net.seagis.dublincore.terms.ObjectFactory.class);
                         // TODO remove net.seagis.ows.v110.ExceptionReport.class
         worker = new CSWworker(marshaller);
         worker.setVersion(getCurrentVersion());

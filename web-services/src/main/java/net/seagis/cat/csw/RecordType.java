@@ -118,5 +118,25 @@ public class RecordType extends DCMIRecordType {
         
         this.boundingBox.add(owsFactory.createBoundingBox(bbox));
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (anyText != null && anyText.size() != 0) {
+            s.append("anyText:");
+            for (EmptyType e :anyText) {
+                s.append(e.toString()).append('\n');
+            }
+        }
+        
+        if (boundingBox != null && boundingBox.size() != 0) {
+            s.append("bounding boxes:");
+            for (JAXBElement<? extends BoundingBoxType> bb: boundingBox) {
+                s.append(bb.getValue().toString()).append('\n');
+            }
+        }
+        
+        return s.toString();
+    }
 
 }

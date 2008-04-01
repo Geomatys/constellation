@@ -78,7 +78,7 @@ public class BoundingBoxType {
     @XmlSchemaType(name = "positiveInteger")
     private BigInteger dimensions;
 
-    BoundingBoxType(){
+    public BoundingBoxType(){
     }
     
     /**
@@ -104,9 +104,37 @@ public class BoundingBoxType {
      * (unmodifiable)
      */
     public List<Double> getLowerCorner() {
-        return Collections.unmodifiableList(lowerCorner);
+       return Collections.unmodifiableList(lowerCorner);
     }
-
+    
+    /**
+     * Set the lower corner list.
+     */
+    public void setLowerCorner(List<Double> lowerCorner) {
+        this.lowerCorner = lowerCorner;
+    }
+    
+    /**
+     * Set the upper corner list.
+     */
+    public void setUpperCorner(List<Double> upperCorner) {
+        this.upperCorner = upperCorner;
+    }
+    
+    /**
+     * add a point to the lower corner list.
+     */
+    public void setLowerCorner(Double point) {
+        this.lowerCorner.add(point);
+    }
+    
+    /**
+     * add a point to the upper corner list.
+     */
+    public void setUpperCorner(Double point) {
+        this.upperCorner.add(point);
+    }
+    
     /**
      * Gets the value of the upperCorner property.
      * (unmodifiable)
@@ -121,6 +149,13 @@ public class BoundingBoxType {
      */
     public String getCrs() {
         return crs;
+    }
+    
+    /**
+     * set the crs value
+     */
+    public void setCrs(String crs) {
+        this.crs = crs;
     }
 
     /**
