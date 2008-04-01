@@ -16,7 +16,6 @@
 package net.seagis.coverage.wms;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -53,13 +52,11 @@ import javax.xml.bind.UnmarshalException;
 
 
 // seagis dependencies
-import net.seagis.catalog.Database;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.ows.AbstractDCP;
 import net.seagis.ows.AbstractOnlineResourceType;
 import net.seagis.ows.AbstractOperation;
@@ -352,7 +349,7 @@ public abstract class WebService {
      * Return the current version of the Web Service.
      */
     protected void setCurrentVersion(String versionNumber) {
-        logger.info("set current version to: " + versionNumber);
+        logger.finer("set current version to: " + versionNumber);
         currentVersion = getVersionFromNumber(versionNumber);
     }
     

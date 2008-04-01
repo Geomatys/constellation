@@ -54,6 +54,7 @@ import net.seagis.gml.DirectPositionType;
 import net.seagis.gml.PointType;
 import net.seagis.se.OnlineResourceType;
 import net.seagis.sld.TypeNameType;
+import net.seagis.util.PeriodUtilities;
 import net.seagis.wms.AbstractWMSCapabilities;
 import net.seagis.wms.BoundingBox;
 import net.seagis.wms.DCPType;
@@ -343,7 +344,7 @@ public class WMService extends WebService {
      * @throws javax.xml.bind.JAXBException
      */
     private Response getCapabilities() throws WebServiceException, JAXBException {
-        logger.info("getCapabilities request received");
+        logger.info("getCapabilities request processing" + '\n');
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         
         //we begin by extract the mandatory attribute
@@ -421,17 +422,16 @@ public class WMService extends WebService {
                 String defaut = null;
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                PeriodUtilities periodFormatter = new PeriodUtilities(df);
                 Dimension dim;
                 String value = "";
                 SortedSet<Date> dates = inputLayer.getAvailableTimes();
                 if (dates.size() > 0) {
                     defaut = df.format(dates.last());
-                
+                    
                 
                     dim = new Dimension("time", "ISO8601", defaut, null);
-                    for (Date d:dates){
-                        value += df.format(d) + ','; 
-                    }
+                    value = periodFormatter.getDatesRespresentation(dates);
                     dim.setValue(value);
                     dimensions.add(dim);
                 }
