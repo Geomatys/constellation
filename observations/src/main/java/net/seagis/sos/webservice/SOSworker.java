@@ -156,42 +156,42 @@ public class SOSworker {
     /**
      * A simple Connection to the SensorML database.
      */
-    private Connection sensorMLConnection;
+    private final Connection sensorMLConnection;
     
     /**
      * A Reader to the SensorML database.
      */
-    private Reader20 sensorMLReader;
+    private final Reader20 sensorMLReader;
     
     /**
      * A Writer to the SensorML database.
      */
-    private Writer20 sensorMLWriter;
+    private final Writer20 sensorMLWriter;
     
     /**
      * the data catalog for SensorML database.
      */
-    private Catalog SMLCatalog;
+    private final Catalog SMLCatalog;
     
     /**
      * A Database object for the O&M dataBase.
      */
-    private Database OMDatabase;
+    private final Database OMDatabase;
     
     /**
      * A database table for insert and get observation
      */
-    private ObservationTable obsTable;
+    private final ObservationTable obsTable;
     
     /**
      * A database table for insert and get observation offerring.
      */
-    private ObservationOfferingTable offTable;
+    private final ObservationOfferingTable offTable;
     
     /**
      * A database table for insert and get reference object.
      */
-    private ReferenceTable refTable;
+    private final ReferenceTable refTable;
    
     /**
      * A list of temporary ObservationTemplate
@@ -201,22 +201,22 @@ public class SOSworker {
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
      */ 
-    private Properties map;
+    private final Properties map;
     
     /**
      * The base for sensor id.
      */ 
-    private String sensorIdBase;
+    private final String sensorIdBase;
     
      /**
      * The base for observation id.
      */ 
-    private String observationIdBase;
+    private final String observationIdBase;
     
     /**
      * The base for observation id.
      */ 
-    private String observationTemplateIdBase;
+    private final String observationTemplateIdBase;
     
     /**
      * The base for offering id.
@@ -231,17 +231,17 @@ public class SOSworker {
     /**
      * The valid time for a getObservation template (in ms).
      */
-    private long templateValidTime;
+    private final long templateValidTime;
     
     /**
      * The temporary folder for describe sensor operation.
      */
-    private String temporaryFolder;
+    private final String temporaryFolder;
     
     /**
      * The maximum of observation return in a getObservation request.
      */
-    private int maxObservationByRequest;
+    private final int maxObservationByRequest;
     
     /**
      * The version of the service
@@ -268,7 +268,8 @@ public class SOSworker {
         map    = new Properties();
         File f = null;
         String env = "/home/tomcat/.sicade" ; //System.getenv("CATALINA_HOME");
-        logger.info("CATALINA_HOME=" + env);
+        logger.info("path to config file=" + env);
+        boolean start = true;
         try {
             // we get the configuration file
             f = new File(env + "/sos_configuration/config.properties");
@@ -286,50 +287,86 @@ public class SOSworker {
             if (f != null) {
                 logger.severe(f.getPath());
             }
-            logger.severe("The sevice can not load the properties files" + '\n' + 
+            logger.severe("The SOS service is not working!"                       + '\n' + 
+                          "cause: The service can not load the properties files!" + '\n' + 
                           "cause: " + e.getMessage());
-            return;
+            start = false;
         }
       
-        //we create a connection to the sensorML database
-        PGSimpleDataSource dataSourceSML = new PGSimpleDataSource();
-        dataSourceSML.setServerName(prop.getProperty("SMLDBServerName"));
-        dataSourceSML.setPortNumber(Integer.parseInt(prop.getProperty("SMLDBServerPort")));
-        dataSourceSML.setDatabaseName(prop.getProperty("SMLDBName"));
-        dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
-        dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
-        sensorMLConnection = dataSourceSML.getConnection();
-        sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection);
-        SMLCatalog         = sensorMLReader.getCatalog("SMLC");
-        sensorMLWriter     = new Writer20(sensorMLConnection);
-        if (sensorMLConnection == null) {
-            logger.severe("THE WEB SERVICE CAN'T CONNECT TO THE SENSORML DB!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        if (start) {
+            //we create a connection to the sensorML database
+            PGSimpleDataSource dataSourceSML = new PGSimpleDataSource();
+            dataSourceSML.setServerName(prop.getProperty("SMLDBServerName"));
+            dataSourceSML.setPortNumber(Integer.parseInt(prop.getProperty("SMLDBServerPort")));
+            dataSourceSML.setDatabaseName(prop.getProperty("SMLDBName"));
+            dataSourceSML.setUser(prop.getProperty("SMLDBUser"));
+            dataSourceSML.setPassword(prop.getProperty("SMLDBUserPassword"));
+            sensorMLConnection = dataSourceSML.getConnection();
+            if (sensorMLConnection == null) {
+                logger.severe("The SOS service is not working!" + '\n' + 
+                              "cause: The web service can't connect to the sensorML database!");
+                sensorMLReader            = null;
+                sensorMLWriter            = null;
+                SMLCatalog                = null;
+                OMDatabase                = null;
+                obsTable                  = null;
+                offTable                  = null;
+                refTable                  = null;
+                sensorIdBase              = null;
+                observationIdBase         = null;
+                observationTemplateIdBase = null;
+                temporaryFolder           = null;
+                maxObservationByRequest   = -1;
+                templateValidTime         = -1;
+                
+                
+            } else {
+                sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection);
+                SMLCatalog         = sensorMLReader.getCatalog("SMLC");
+                sensorMLWriter     = new Writer20(sensorMLConnection);
+                //we create a connection to the O&M database
+                PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
+                dataSourceOM.setServerName(prop.getProperty("OMDBServerName"));
+                dataSourceOM.setPortNumber(Integer.parseInt(prop.getProperty("OMDBServerPort")));
+                dataSourceOM.setDatabaseName(prop.getProperty("OMDBName"));
+                dataSourceOM.setUser(prop.getProperty("OMDBUser"));
+                dataSourceOM.setPassword(prop.getProperty("OMDBUserPassword"));
+                OMDatabase   = new Database(dataSourceOM);
+                
+                //we build the database table frequently used.
+                obsTable  = OMDatabase.getTable(ObservationTable.class);
+                offTable  = OMDatabase.getTable(ObservationOfferingTable.class);
+                refTable  = OMDatabase.getTable(ReferenceTable.class);
+        
+                //we initailize the properties attribute 
+                sensorIdBase              = prop.getProperty("sensorIdBase");
+                observationIdBase         = prop.getProperty("observationIdBase");
+                observationTemplateIdBase = prop.getProperty("observationTemplateIdBase");
+                temporaryFolder           = prop.getProperty("temporaryFolder");
+                maxObservationByRequest   = Integer.parseInt(prop.getProperty("maxObservationByRequest"));
+                String validTime          = prop.getProperty("templateValidTime");
+                int h                     = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
+                int m                     = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
+                templateValidTime         = (h *  3600000) + (m * 60000);
+                logger.info("SOS service running");
+            }
+        } else {
+            sensorMLConnection        = null;
+            sensorMLReader            = null;
+            sensorMLWriter            = null;
+            SMLCatalog                = null;
+            OMDatabase                = null;
+            obsTable                  = null;
+            offTable                  = null;
+            refTable                  = null;
+            sensorIdBase              = null;
+            observationIdBase         = null;
+            observationTemplateIdBase = null;
+            temporaryFolder           = null;
+            maxObservationByRequest   = -1;
+            templateValidTime         = -1;
+            
         }
-        
-        //we create a connection to the O&M database
-        PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
-        dataSourceOM.setServerName(prop.getProperty("OMDBServerName"));
-        dataSourceOM.setPortNumber(Integer.parseInt(prop.getProperty("OMDBServerPort")));
-        dataSourceOM.setDatabaseName(prop.getProperty("OMDBName"));
-        dataSourceOM.setUser(prop.getProperty("OMDBUser"));
-        dataSourceOM.setPassword(prop.getProperty("OMDBUserPassword"));
-        OMDatabase   = new Database(dataSourceOM);
-        
-        //we build the database table frequently used.
-        obsTable  = OMDatabase.getTable(ObservationTable.class);
-        offTable  = OMDatabase.getTable(ObservationOfferingTable.class);
-        refTable  = OMDatabase.getTable(ReferenceTable.class);
-        
-        //we initailize the properties attribute 
-        sensorIdBase              = prop.getProperty("sensorIdBase");
-        observationIdBase         = prop.getProperty("observationIdBase");
-        observationTemplateIdBase = prop.getProperty("observationTemplateIdBase");
-        temporaryFolder           = prop.getProperty("temporaryFolder");
-        maxObservationByRequest   = Integer.parseInt(prop.getProperty("maxObservationByRequest"));
-        String validTime          = prop.getProperty("templateValidTime");
-        int h                     = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
-        int m                     = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
-        templateValidTime         = (h *  3600000) + (m * 60000);
     }
     
     /**
