@@ -27,6 +27,7 @@ import static net.seagis.catalog.QueryType.*;
  * The query to execute for a {@link DistributionTable}.
  *
  * @author Martin Desruisseaux
+ * @author Guilhem Legal
  * @version $Id$
  */
 final class DistributionQuery extends Query {
@@ -46,12 +47,13 @@ final class DistributionQuery extends Query {
      * @param database The database for which this query is created.
      */
     public DistributionQuery(final Database database) {
-        super(database, "Distributions");
-        final QueryType[] usage  = {SELECT, LIST};
-        name   = addColumn   ("name",   usage);
-        scale  = addColumn   ("scale",  usage);
-        offset = addColumn   ("offset", usage);
-        log    = addColumn   ("log",    usage);
-        byName = addParameter(name, SELECT);
+        super(database, "distributions");
+        final QueryType[] SLI  = {SELECT, LIST, INSERT};
+        final QueryType[] SLIE  = {SELECT, LIST, INSERT, EXISTS};
+        name   = addColumn   ("name",   SLIE);
+        scale  = addColumn   ("scale",  SLI);
+        offset = addColumn   ("offset", SLI);
+        log    = addColumn   ("log",    SLI);
+        byName = addParameter(name, SELECT, EXISTS);
     }
 }

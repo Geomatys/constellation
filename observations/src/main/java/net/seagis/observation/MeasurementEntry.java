@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.coverage.model.Distribution;
 import net.seagis.coverage.model.DistributionEntry;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.metadata.MetaDataEntry;
@@ -67,7 +68,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final SamplingFeatureEntry   station,
             final PhenomenonEntry        observedProperty,
             final ProcessEntry           procedure,
-            final DistributionEntry      distribution,
+            final Distribution           distribution,
             final ElementEntry           quality,
             final MeasureEntry           result,
             final AbstractTimeGeometricPrimitiveType    samplingTime,
@@ -92,7 +93,7 @@ public class MeasurementEntry extends ObservationEntry implements Measurement {
             final SamplingFeatureEntry station,
             final PhenomenonEntry      observedProperty,
             final ProcessEntry         procedure,
-            final DistributionEntry    distribution,
+            final Distribution         distribution,
             //final ElementEntry         quality,
             final MeasureEntry         result,
             final AbstractTimeGeometricPrimitiveType  samplingTime) {

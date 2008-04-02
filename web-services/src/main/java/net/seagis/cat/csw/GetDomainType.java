@@ -19,6 +19,7 @@ package net.seagis.cat.csw;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
@@ -53,6 +54,7 @@ import javax.xml.bind.annotation.XmlType;
     "propertyName",
     "parameterName"
 })
+@XmlRootElement(name="GetDomain")
 public class GetDomainType extends RequestBaseType {
 
     @XmlElement(name = "PropertyName")
@@ -69,9 +71,21 @@ public class GetDomainType extends RequestBaseType {
         
     }
     
-    public GetDomainType(String service, String version, String propertyName) {
+    /**
+     * Build a new GetDomain request.
+     * One of propertyName or parameterName must be null
+     * 
+     * @param service
+     * @param version
+     * @param propertyName
+     */
+    public GetDomainType(String service, String version, String propertyName, String parameterName) {
         super(service, version);
-        this.propertyName = propertyName;
+        if (propertyName != null && parameterName != null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be null");
+        }
+        this.propertyName  = propertyName;
+        this.parameterName = parameterName;
     }
     
     /**

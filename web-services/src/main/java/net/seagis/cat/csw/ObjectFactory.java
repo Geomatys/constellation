@@ -398,11 +398,11 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetDomainType }{@code >}}
      * 
-     */
+     
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "GetDomain")
     public JAXBElement<GetDomainType> createGetDomain(GetDomainType value) {
         return new JAXBElement<GetDomainType>(_GetDomain_QNAME, GetDomainType.class, null, value);
-    }
+    }*/
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link QueryType }{@code >}}

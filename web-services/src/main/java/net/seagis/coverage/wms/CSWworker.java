@@ -23,17 +23,24 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 //seaGIS dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import net.seagis.cat.csw.AbstractRecordType;
 import net.seagis.cat.csw.BriefRecordType;
@@ -41,6 +48,7 @@ import net.seagis.cat.csw.Capabilities;
 import net.seagis.cat.csw.DeleteType;
 import net.seagis.cat.csw.DescribeRecordResponseType;
 import net.seagis.cat.csw.DescribeRecordType;
+import net.seagis.cat.csw.DomainValuesType;
 import net.seagis.cat.csw.ElementSetType;
 import net.seagis.cat.csw.GetCapabilities;
 import net.seagis.cat.csw.GetDomainResponseType;
@@ -52,6 +60,7 @@ import net.seagis.cat.csw.GetRecordsType;
 import net.seagis.cat.csw.HarvestResponseType;
 import net.seagis.cat.csw.HarvestType;
 import net.seagis.cat.csw.InsertType;
+import net.seagis.cat.csw.ListOfValuesType;
 import net.seagis.cat.csw.ObjectFactory;
 import net.seagis.cat.csw.RecordType;
 import net.seagis.cat.csw.RequestBaseType;
@@ -66,7 +75,9 @@ import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ogc.FilterCapabilities;
 import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
+import net.seagis.ows.v100.DomainType;
 import net.seagis.ows.v100.OWSWebServiceException;
+import net.seagis.ows.v100.Operation;
 import net.seagis.ows.v100.OperationsMetadata;
 import net.seagis.ows.v100.SectionsType;
 import net.seagis.ows.v100.ServiceIdentification;
@@ -120,6 +131,11 @@ public class CSWworker {
     private String serviceURL;
     
     /**
+     * A connection to the Database
+     */
+    private final Connection MDConnection;
+    
+    /**
      * A Reader to the Metadata database.
      */
     private final Reader20 databaseReader;
@@ -159,19 +175,129 @@ public class CSWworker {
      */
     private final User user;
     
+    /**
+     * The queryable element from ISO 19115 and their path id.
+     */
+    private static Map<String, List<String>> ISO_QUERYABLE;
+    static {
+        ISO_QUERYABLE      = new HashMap<String, List<String>>();
+        List<String> paths = new ArrayList<String>();
+        
+        //TODO not found
+        ISO_QUERYABLE.put("RevisionDate",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:alternateTitle");
+        ISO_QUERYABLE.put("AlternateTitle",   paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:dateStamp");
+        ISO_QUERYABLE.put("CreationDate",     paths);
+        
+        //TODO not found
+        paths = new ArrayList<String>();
+        ISO_QUERYABLE.put("PublicationDate",  paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:contact:organisationName");
+        paths.add("ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:organisationName");
+        ISO_QUERYABLE.put("OrganisationName", paths);
+        
+        //TODO MD_FeatureCatalogueDescription
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:language");
+        ISO_QUERYABLE.put("Language", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:fileIdentifier");
+        ISO_QUERYABLE.put("ResourceIdentifier", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:parentIdentifier");
+        ISO_QUERYABLE.put("ParentIdentifier", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        ISO_QUERYABLE.put("KeywordType", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:topicCategory");
+        ISO_QUERYABLE.put("TopicCategory", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:language");
+        ISO_QUERYABLE.put("ResourceLanguage", paths);
+        
+        //TODO not found
+        paths = new ArrayList<String>();
+        ISO_QUERYABLE.put("GeographicDescriptionCode", paths);
+        
+        //TODO not found
+        ISO_QUERYABLE.put("DistanceValue", paths);
+        //TODO not found
+        ISO_QUERYABLE.put("DistanceUOM", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition");
+        ISO_QUERYABLE.put("TempExtent_begin", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:endPosition");
+        ISO_QUERYABLE.put("TempExtent_end", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:equivalentScale:denominator");
+        ISO_QUERYABLE.put("Denominator", paths);
+        
+        // the following element are described in Service part of ISO 19139 not yet used in MDWeb 
+        paths = new ArrayList<String>();
+        ISO_QUERYABLE.put("ServiceType", paths);
+        ISO_QUERYABLE.put("ServiceTypeVersion", paths);
+        ISO_QUERYABLE.put("Operation", paths);
+        ISO_QUERYABLE.put("CouplingType", paths);
+        ISO_QUERYABLE.put("OperatesOn", paths);
+        ISO_QUERYABLE.put("OperatesOnIdentifier", paths);
+        ISO_QUERYABLE.put("OperatesOnWithOpName", paths);
+    }
+    
     
     /**
      * A list of supported MIME type 
      */
-    private final static List<String> acceptedOutputFormats;
+    private final static List<String> ACCEPTED_OUTPUT_FORMATS;
     static {
-        acceptedOutputFormats = new ArrayList<String>();
-        acceptedOutputFormats.add("text/xml");
-        acceptedOutputFormats.add("application/xml");
-        acceptedOutputFormats.add("text/html");
-        acceptedOutputFormats.add("text/plain");
+        ACCEPTED_OUTPUT_FORMATS = new ArrayList<String>();
+        ACCEPTED_OUTPUT_FORMATS.add("text/xml");
+        ACCEPTED_OUTPUT_FORMATS.add("application/xml");
+        ACCEPTED_OUTPUT_FORMATS.add("text/html");
+        ACCEPTED_OUTPUT_FORMATS.add("text/plain");
     }
     
+    /**
+     * a QName for csw:Record type
+     */
+    private final static QName _Record_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
+    
+    /**
+     * a QName for gmd:MD_Metadata type
+     */
+    private final static QName _Metadata_QNAME = new QName("http://www.isotc211.org/2005/gmd", "MD_Metadata");
+    
+    /**
+     * a QName for gmd:MD_Metadata type
+     */
+    private final static QName _Capabilities_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities");
+    
+    
+    /**
+     * Build a new CSW worker
+     * 
+     * @param marshaller A JAXB marshaller to send xml to MDWeb
+     * 
+     * @throws java.io.IOException
+     * @throws java.sql.SQLException
+     */
     public CSWworker(Marshaller marshaller) throws IOException, SQLException {
         
         this.marshaller = marshaller;
@@ -179,7 +305,7 @@ public class CSWworker {
         Properties prop = new Properties();
         File f          = null;
         String env      = "/home/tomcat/.sicade" ; //System.getenv("CATALINA_HOME");
-        logger.info("CATALINA_HOME=" + env);
+        logger.info("Path to config file=" + env);
         boolean start = true;
         try {
             // we get the configuration file
@@ -192,7 +318,8 @@ public class CSWworker {
             if (f != null) {
                 logger.severe(f.getPath());
             }
-            logger.severe("The sevice can not load the properties files" + '\n' + 
+            logger.severe("The CSW service is not working!"                       + '\n' + 
+                          "cause: The srevice can not load the properties files!" + '\n' + 
                           "cause: " + e.getMessage());
             start = false;
         }
@@ -205,27 +332,32 @@ public class CSWworker {
             dataSourceMD.setDatabaseName(prop.getProperty("MDDBName"));
             dataSourceMD.setUser(prop.getProperty("MDDBUser"));
             dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
-            databaseReader  = new Reader20(Standard.ISO_19115,  dataSourceMD.getConnection());
-            databaseWriter  = new Writer20(dataSourceMD.getConnection());
-        
-            if (dataSourceMD.getConnection() == null) {
-                logger.severe("THE WEB SERVICE CAN'T CONNECT TO THE METADATA DB!");
+            MDConnection    = dataSourceMD.getConnection();
+            if (MDConnection == null) {
+                logger.severe("The CSW service is not working!" + '\n' + 
+                              "cause: The web service can't connect to the metadata database!");
+                databaseReader  = null;
+                databaseWriter  = null;
+                MDReader        = null;
+                CSWCatalog      = null;
+                user            = null;
+            } else {
+                 databaseReader  = new Reader20(Standard.ISO_19115,  MDConnection);
+                 databaseWriter  = new Writer20(MDConnection);
+                 MDReader   = new MetadataReader(databaseReader, dataSourceMD.getConnection());
+                 CSWCatalog = databaseReader.getCatalog("CSWCat");
+                 user       = databaseReader.getUser("admin");
+                 logger.info("CSW service running");
             }
-            MDReader   = new MetadataReader(databaseReader, dataSourceMD.getConnection());
-            CSWCatalog = databaseReader.getCatalog("CSWCat");
-            user       = databaseReader.getUser("admin");
+            
         } else {
             databaseReader  = null;
             databaseWriter  = null;
             MDReader        = null;
             CSWCatalog      = null;
             user            = null;
-            logger.severe("The CSW service is not working");
+            MDConnection    = null;
         }
-        //TODO inititalize version
-        version    = new ServiceVersion(Service.OWS, "2.0.2");
-        
-        
     }
     
     /**
@@ -423,10 +555,98 @@ public class CSWworker {
      */
     public GetDomainResponseType getDomain(GetDomainType request) throws WebServiceException{
         verifyBaseRequest(request);
+        // we prepare the response
+        List<DomainValuesType> responseList = new ArrayList<DomainValuesType>();
         
+        String parameterName = request.getParameterName();
+        String propertyName  = request.getPropertyName();
         
+        // if the two parameter have been filled we launch an exception
+        if (parameterName != null && propertyName != null) {
+            throw new OWSWebServiceException("One of propertyName or parameterName must be null",
+                                             INVALID_PARAMETER_VALUE, "parameterName", version);
+        }
         
-        return new GetDomainResponseType();
+        if (parameterName != null) {
+            final StringTokenizer tokens = new StringTokenizer(parameterName, ",");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                int pointLocation = token.indexOf('.');
+                if (pointLocation != -1) {
+                    String operationName = token.substring(0, pointLocation);
+                    String parameter     = token.substring(pointLocation + 1);
+                    Operation o          = staticCapabilities.getOperationsMetadata().getOperation(operationName);
+                    if (o != null) {
+                        DomainType param        = o.getParameter(parameter);
+                        QName type;
+                        if (operationName.equals("GetCapabilities")) {
+                            type = _Capabilities_QNAME;
+                        } else {
+                            type = _Record_QNAME;
+                        }
+                        if (param != null) {
+                            ListOfValuesType values = new  ListOfValuesType(param.getValue());
+                            DomainValuesType value  = new DomainValuesType(token, null, values, type); 
+                            responseList.add(value);
+                        } else {
+                            throw new OWSWebServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
+                                                             INVALID_PARAMETER_VALUE, "parameterName", version);
+                        }
+                    } else {
+                        throw new OWSWebServiceException("The operation " + operationName + " does not exist",
+                                                          INVALID_PARAMETER_VALUE, "parameterName", version);
+                    }
+                } else {
+                    throw new OWSWebServiceException("ParameterName must be formed like this Operation.parameterName",
+                                                     INVALID_PARAMETER_VALUE, "parameterName", version);
+                }
+            }
+        } else if (propertyName != null) {
+            final StringTokenizer tokens = new StringTokenizer(propertyName, ",");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                List<String> paths = ISO_QUERYABLE.get(token);
+                if (paths != null) {
+                    StringBuilder SQLRequest = new StringBuilder("SELECT distinct(value) FROM \"TextValues\" WHERE ");
+                    for (String path: paths) {
+                        SQLRequest.append("path='").append(path).append("' OR ");
+                    }
+                    if (paths.size() != 0){
+                        // we remove the last "OR "
+                        int length        = SQLRequest.length() ;
+                        SQLRequest.delete(length - 3, length);
+                        
+                        //we build and execute the SQL query
+                        try {
+                            Statement stmt      = MDConnection.createStatement();
+                            ResultSet results   = stmt.executeQuery(SQLRequest.toString());
+                            List<String> values = new ArrayList<String>();
+                            while (results.next()) {
+                                values.add(results.getString(1));
+                            }
+                            ListOfValuesType ListValues = new  ListOfValuesType(values);
+                            DomainValuesType value      = new DomainValuesType(null, token, ListValues, _Metadata_QNAME); 
+                            responseList.add(value);
+                                
+                        } catch (SQLException e) {
+                            throw new OWSWebServiceException("The service has launch an SQL exeption:" + e.getMessage(),
+                                                             NO_APPLICABLE_CODE, null, version);
+                        }
+                    } else {
+                        throw new OWSWebServiceException("The property " + token + " is not queryable for now",
+                                                         INVALID_PARAMETER_VALUE, "propertyName", version);
+                    }
+                } else {
+                    throw new OWSWebServiceException("The property " + token + " is not queryable",
+                                                     INVALID_PARAMETER_VALUE, "propertyName", version);
+                }
+            }
+        // if no parameter have been filled we launch an exception    
+        } else {
+            throw new OWSWebServiceException("One of propertyName or parameterName must be filled",
+                                             MISSING_PARAMETER_VALUE, "parameterName, propertyName", version);
+        }
+        return new GetDomainResponseType(responseList);
     }
     
     /**
@@ -569,7 +789,7 @@ public class CSWworker {
      * Return true if the MIME type is supported.
      */
     private boolean isSupportedFormat(String format) {
-        return acceptedOutputFormats.contains(format);
+        return ACCEPTED_OUTPUT_FORMATS.contains(format);
     }
     
     /**

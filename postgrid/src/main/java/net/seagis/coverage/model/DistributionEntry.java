@@ -1,6 +1,6 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2005, Institut de Recherche pour le Développement
+ * Sicade - Systemes integres de connaissances pour l'aide a la decision en environnement
+ * (C) 2005, Institut de Recherche pour le Developpement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -24,30 +24,36 @@ import static java.lang.Double.doubleToLongBits;
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
+ * @author Guilhem Legal
  */
-final class DistributionEntry extends Entry implements Distribution {
+public class DistributionEntry extends Entry implements Distribution {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
     private static final long serialVersionUID = -9004700774687614563L;
 
     /**
-     * Facteur par lequel on multiplie les données.
+     * Facteur par lequel on multiplie les donnees.
      */
-    private final double scale;
+    private double scale;
     
     /**
-     * Constante à ajouter aux données.
+     * Constante a ajouter aux donnees.
      */
-    private final double offset;
+    private double offset;
     
     /**
      * Indique s'il s'agit d'une distribution log-normale.
      */
-    private final boolean log;
+    private boolean log;
+       
+    /**
+     * Constructeur utilise par JAXB.
+     */
+    DistributionEntry() {}
     
     /** 
-     * Crée une nouvelle distibution.
+     * Cree une nouvelle distibution.
      *
      * @param   name    le nom de la distribution.
      * @param   scale   le facteur multiplicatif.
@@ -58,15 +64,24 @@ final class DistributionEntry extends Entry implements Distribution {
                                 final double offset, final boolean log) 
     {
         super(name);
+        this.name   = name;
         this.scale  = scale;
         this.offset = offset;
         this.log    = log;
     }
 
     /**
-     * Applique un changement de variable. Cette méthode calcule
-     * <code>value&times;scale + offset</code>, et éventuellement
-     * le logarithme naturel du résultat.
+     * surcharge la methode de la superclasse pour garder un name a null.
+     */
+    @Override
+    public String getName() {
+        return name;
+    }
+            
+    /**
+     * Applique un changement de variable. Cette methode calcule
+     * <code>value&times;scale + offset</code>, et eventuellement
+     * le logarithme naturel du resultat.
      */
     public double normalize(double value) {
         value = scale*value + offset;
@@ -83,20 +98,59 @@ final class DistributionEntry extends Entry implements Distribution {
         return !log && scale==1 && offset==0;
     }
 
+     /**
+     * Retourne le facteur par lequel on multiplie les donnees.
+     */
+    public double getScale() {
+        return scale;
+    }
+
     /**
-     * Vérifie que cette distribution est identique à l'objet spécifié
+     * Retourne la constante a ajouter aux donnees.
+     */
+    public double getOffset() {
+        return offset;
+    }
+
+    /**
+     * Retourne un booleen indiquant s'il s'agit d'une distribution log-normale.
+     */
+    public boolean isLog() {
+        return log;
+    }
+    
+    /**
+     * Verifie que cette distribution est identique a l'objet specifie
      */
     @Override
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
         }
-        if (super.equals(object)) {
             final DistributionEntry that = (DistributionEntry) object;
             return doubleToLongBits(this.scale ) == doubleToLongBits(that.scale ) &&
                    doubleToLongBits(this.offset) == doubleToLongBits(that.offset) &&
                                    (this.log)    ==                 (that.log   );
-        }
-        return false;
     }
+
+  
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
+    }
+    
+    /**
+     * Return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        StringBuffer s = new StringBuffer();
+        char ret = '\n';
+        s.append("name:").append(name).append(ret).append("scale:").append(scale).append(ret)
+                .append("offset:").append(offset).append(ret).append("log:").append(log);
+        return s.toString();
+    }
+    
 }

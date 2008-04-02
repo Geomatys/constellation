@@ -100,7 +100,6 @@ public class CSWService extends WebService {
                         // TODO remove net.seagis.ows.v110.ExceptionReport.class
         worker = new CSWworker(marshaller);
         worker.setVersion(getCurrentVersion());
-        logger.info("CSW service running");
     }
 
     @Override
@@ -194,6 +193,7 @@ public class CSWService extends WebService {
                     gd = createNewGetDomainRequest();
                 }
                 
+                worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getDomain(gd), sw);
         
@@ -638,8 +638,12 @@ public class CSWService extends WebService {
         String parameterName = getParameter("PARAMETERNAME", false);
         
         String propertyName = getParameter("PROPERTYNAME", false);
+        if (propertyName != null && parameterName != null) {
+            throw new OWSWebServiceException("One of propertyName or parameterName must be null",
+                                             INVALID_PARAMETER_VALUE, "parameterName", getCurrentVersion());
+        }
        
-        return new GetDomainType(service, version, propertyName);
+        return new GetDomainType(service, version, propertyName, parameterName);
     }
     
     /**

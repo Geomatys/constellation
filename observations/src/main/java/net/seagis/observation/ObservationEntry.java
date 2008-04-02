@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlType;
 
 // Sicade dependencies 
 import net.seagis.catalog.Entry;
+import net.seagis.coverage.model.Distribution;
 import net.seagis.coverage.model.DistributionEntry;
 
 // openGis dependencies
@@ -116,7 +117,7 @@ public class ObservationEntry extends Entry implements Observation {
      * Référence vers la {@linkplain Distribution distribution} associée à cet observable.
      */
     @XmlTransient
-    private DistributionEntry distribution;
+    private Distribution distribution;
     
     /**
      * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
@@ -170,7 +171,7 @@ public class ObservationEntry extends Entry implements Observation {
                             final SamplingFeatureEntry featureOfInterest, 
                             final PhenomenonEntry      observedProperty,
                             final ProcessEntry         procedure,
-                            final DistributionEntry    distribution,
+                            final Distribution         distribution,
                             final ElementEntry         quality,
                             final Object               result,
                             final AbstractTimeGeometricPrimitiveType  samplingTime,
@@ -210,7 +211,7 @@ public class ObservationEntry extends Entry implements Observation {
                             final SamplingFeatureEntry  featureOfInterest, 
                             final PhenomenonEntry       observedProperty,
                             final ProcessEntry          procedure,
-                            final DistributionEntry     distribution,
+                            final Distribution          distribution,
                          // final ElementEntry          resultQuality,
                             final Object                result,
                             final AbstractTimeGeometricPrimitiveType   samplingTime)
@@ -318,14 +319,14 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * {@inheritDoc}
      */
-    public DistributionEntry getDistribution() {
+    public Distribution getDistribution() {
         return distribution;
     }
     
     /**
      * fixe la distribution de cette observation.
      */
-    public void setDistribution(DistributionEntry distrib) {
+    public void setDistribution(Distribution distrib) {
         this.distribution = distrib;
     }
     

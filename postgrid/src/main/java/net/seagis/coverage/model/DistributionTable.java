@@ -14,11 +14,13 @@
  */
 package net.seagis.coverage.model;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.seagis.catalog.CatalogException;
 
 import net.seagis.catalog.Database;
+import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 
 
@@ -28,6 +30,7 @@ import net.seagis.catalog.SingletonTable;
  * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
+ * @author Guilhem Legal
  */
 public class DistributionTable extends SingletonTable<Distribution> {
     /**
@@ -45,11 +48,52 @@ public class DistributionTable extends SingletonTable<Distribution> {
      *
      * @throws SQLException if an error occured while reading the database.
      */
+    @Override
     protected Distribution createEntry(final ResultSet results) throws CatalogException, SQLException {
         final DistributionQuery query = (DistributionQuery) super.query;
         return new DistributionEntry(results.getString (indexOf(query.name  )),
                                      results.getDouble (indexOf(query.scale )),
                                      results.getDouble (indexOf(query.offset)),
                                      results.getBoolean(indexOf(query.log   )));
+    }
+    
+    /**
+     * Retourne un nouvel identifier (ou l'identifier de la distribution passee en parametre si non-null)
+     * et enregistre la nouvelle distribution dans la base de donnee si il n'y est pas deja.
+     *
+     * @param distrib la distribution a inserer dans la base de donnee.
+     */
+    public synchronized String getIdentifier(final Distribution distrib) throws SQLException, CatalogException {
+        final DistributionQuery query  = (DistributionQuery) super.query;
+        String id;
+        boolean success = false;
+        transactionBegin();
+        try {
+            if (distrib.getName() != null) {
+                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.name), distrib.getName());
+                ResultSet result = statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    return distrib.getName();
+                } else {
+                    id = distrib.getName();
+                }
+            } else {
+                id = searchFreeIdentifier("distribution");
+            }
+        
+            PreparedStatement statement = getStatement(QueryType.INSERT);
+        
+            statement.setString(indexOf(query.name),    id);
+            statement.setBoolean(indexOf(query.log),    distrib.isLog());
+            statement.setDouble(indexOf(query.offset) , distrib.getOffset());
+            statement.setDouble(indexOf(query.scale),   distrib.getScale());
+            updateSingleton(statement);
+            success = true;
+        } finally {
+            transactionEnd(success);
+        }
+        return id;
     }
 }

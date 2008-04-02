@@ -82,6 +82,31 @@ public class DomainValuesType {
     private String uom;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    DomainValuesType() {
+        
+    }
+    
+    /**
+     * Build a new Domain values type with the specified list Of Values.
+     * One of parameterName or propertyName must be null.
+     * 
+     */
+    public DomainValuesType(String parameterName, String propertyName, ListOfValuesType listOfValues, QName type) {
+        
+        if (propertyName != null && parameterName != null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be null");
+        } else if (propertyName == null && parameterName == null) {
+            throw new IllegalArgumentException("One of propertyName or parameterName must be filled");
+        }
+        this.propertyName  = propertyName;
+        this.parameterName = parameterName;
+        this.listOfValues  = listOfValues; 
+        this.type          = type; 
+    }
+    
+    /**
      * Gets the value of the propertyName property.
      */
     public String getPropertyName() {

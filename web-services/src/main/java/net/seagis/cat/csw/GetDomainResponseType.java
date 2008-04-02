@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -51,11 +52,26 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "GetDomainResponseType", propOrder = {
     "domainValues"
 })
+@XmlRootElement(name="GetDomainResponse")
 public class GetDomainResponseType {
 
     @XmlElement(name = "DomainValues", required = true)
     private List<DomainValuesType> domainValues;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    GetDomainResponseType() {
+        
+    }
+    
+    /**
+     * build a new respon to a getDomain request
+     */
+    public GetDomainResponseType(List<DomainValuesType> domainValues) {
+        this.domainValues = domainValues;
+    }
+    
     /**
      * Gets the value of the domainValues property.
      * (unmodifiable)

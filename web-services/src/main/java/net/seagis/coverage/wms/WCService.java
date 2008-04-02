@@ -194,11 +194,7 @@ public class WCService extends WebService {
                  * we build a request object with this parameter.
                  */ 
                 if (dc == null) {
-                    if (getCurrentVersion().toString().equals("1.0.0")) {
-                        dc = new net.seagis.wcs.v100.DescribeCoverage(getParameter("COVERAGE", true));
-                    } else {
-                        dc = new net.seagis.wcs.v111.DescribeCoverage(getParameter("IDENTIFIERS", true));
-                    }
+                    dc = createNewDescribeCoverageRequest();
                 }
                 
                 return Response.ok(describeCoverage(dc), "text/xml").build();
@@ -211,55 +207,7 @@ public class WCService extends WebService {
                  * we build a request object with this parameter.
                  */
                 if (gc == null) {
-                    if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
-                        throwException("The parameters SERVICE=WCS must be specified",
-                                       "MISSING_PARAMETER_VALUE", "service");
-                    }
-                    String inputVersion = getParameter("VERSION", false);
-                    if (inputVersion == null) {
-                        inputVersion = getParameter("acceptversions", false);
-                        if (inputVersion == null) {
-                            inputVersion = "1.1.1";
-                        } else {
-                            //we verify that the version id supported
-                            isSupportedVersion(inputVersion);
-                        }
-                    }
-                    
-                    this.setCurrentVersion(getBestVersion(inputVersion).toString());
-                    
-                    if (getCurrentVersion().toString().equals("1.0.0")){
-                        gc = new net.seagis.wcs.v100.GetCapabilities(getParameter("SECTION", false),
-                                                                     null);
-                    } else {
-                        AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
-                        
-                        //We transform the String of sections in a list.
-                        //In the same time we verify that the requested sections are valid. 
-                        String section = getParameter("Sections", false);
-                        List<String> requestedSections = new ArrayList<String>();
-                        if (section != null) {
-                            final StringTokenizer tokens = new StringTokenizer(section, ",;");
-                            while (tokens.hasMoreTokens()) {
-                                final String token = tokens.nextToken().trim();
-                                if (SectionsType.getExistingSections("1.1.1").contains(token)){
-                                    requestedSections.add(token);
-                                } else {
-                                    throwException("The section " + token + " does not exist",
-                                                   "INVALID_PARAMETER_VALUE", "section");
-                                }   
-                            }
-                        } else {
-                            //if there is no requested Sections we add all the sections
-                            requestedSections = SectionsType.getExistingSections("1.1.1");
-                        }
-                        SectionsType sections       = new SectionsType(requestedSections);
-                        AcceptVersionsType versions = new AcceptVersionsType("1.1.1"); 
-                        gc = new net.seagis.wcs.v111.GetCapabilities(versions,
-                                                                     sections,
-                                                                     formats,
-                                                                     null);
-                    }
+                    gc = createNewGetCapabilitiesRequest();
                 } 
                 return getCapabilities(gc);
                     
@@ -274,215 +222,8 @@ public class WCService extends WebService {
                  */
                 if (gc == null) {
                     
-                    if (getCurrentVersion().toString().equals("1.0.0")) {
-                        // temporal subset
-                        net.seagis.wcs.v100.TimeSequenceType temporal = null;
-                        String timeParameter = getParameter("time", false);
-                        if (timeParameter != null) {
-                            TimePositionType time     = new TimePositionType(timeParameter);
-                            temporal = new net.seagis.wcs.v100.TimeSequenceType(time); 
-                        }
-                    
-                        /*
-                        * spatial subset
-                        */
-                        // the boundingBox/envelope
-                        List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
-                        String bbox          = getParameter("bbox", false);
-                        if (bbox != null) {
-                            StringTokenizer tokens = new StringTokenizer(bbox, ",;");
-                            Double[] coordinates = new Double[tokens.countTokens()];
-                            int i = 0;
-                            while (tokens.hasMoreTokens()) {
-                                Double value = parseDouble(tokens.nextToken());
-                                coordinates[i] = value;
-                                i++;
-                            }
-                    
-                            pos.add(new DirectPositionType(coordinates[0], coordinates[2]));
-                            pos.add(new DirectPositionType(coordinates[1], coordinates[3]));
-                        }
-                        EnvelopeEntry envelope    = new EnvelopeEntry(pos, getParameter("CRS", true));
-                    
-                        // the grid dimensions.
-                        GridType grid = null;
-                    
-                        String width  = getParameter("width",  false);
-                        String height = getParameter("height", false);
-                        String depth  = getParameter("depth", false);
-                        if (width == null || height == null) {
-                            //TODO
-                            grid = new RectifiedGridType();
-                            String resx = getParameter("resx",  false);
-                            String resy = getParameter("resy",  false);
-                            String resz = getParameter("resz",  false);
-                
-                            if (resx == null || resy == null) {
-                                throwException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
-                                               "INVALID_PARAMETER_VALUE", null);
-                            }
-                        } else {
-                            List<String> axis         = new ArrayList<String>();
-                            axis.add("width");
-                            axis.add("height");
-                            List<BigInteger> low = new ArrayList<BigInteger>();
-                            low.add(new BigInteger("0"));
-                            low.add(new BigInteger("0"));
-                            List<BigInteger> high = new ArrayList<BigInteger>();
-                            high.add(new BigInteger(width));
-                            high.add(new BigInteger(height));
-                            if (depth != null) {
-                                axis.add("depth");
-                                low.add(new BigInteger("0"));
-                                high.add(new BigInteger(depth));
-                            }
-                            GridLimitsType limits     = new GridLimitsType(low, high);
-                            grid        = new GridType(limits, axis);
-                        }
-                        net.seagis.wcs.v100.SpatialSubsetType spatial = new net.seagis.wcs.v100.SpatialSubsetType(envelope, grid);
-                    
-                        //domain subset
-                        net.seagis.wcs.v100.DomainSubsetType domain   = new net.seagis.wcs.v100.DomainSubsetType(temporal, spatial);
-                    
-                        //range subset (not yet used)
-                        net.seagis.wcs.v100.RangeSubsetType  range    = null;
-                    
-                        //interpolation method
-                        net.seagis.wcs.v100.InterpolationMethod interpolation = net.seagis.wcs.v100.InterpolationMethod.fromValue(getParameter("interpolation", false));
-                    
-                        //output
-                        net.seagis.wcs.v100.OutputType output         = new net.seagis.wcs.v100.OutputType(getParameter("format", true),
-                                                                                                           getParameter("response_crs", false));
-                    
-                        gc = new net.seagis.wcs.v100.GetCoverage(getParameter("coverage", true),
-                                                                 domain,
-                                                                 range,
-                                                                 interpolation,
-                                                                 output);
-                    } else {
-                       
-                        // temporal subset
-                        net.seagis.wcs.v111.TimeSequenceType temporal = null;
-                        String timeParameter = getParameter("timeSequence", false);
-                        if (timeParameter != null) {
-                            if (timeParameter.indexOf('/') == -1) {
-                                temporal = new net.seagis.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
-                            } else {
-                                throwException("The service does not handle TimePeriod" , 
-                                               "INVALID_PARAMETER_VALUE", "temporalSubset");
-                            }
-                             
-                        }
-                    
-                        /*
-                        * spatial subset
-                        */
-                        // the boundingBox/envelope
-                        String bbox          = getParameter("BoundingBox", true);
-                        String crs           = null;
-                        if (bbox.indexOf(',') != -1) {
-                            crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
-                            bbox = bbox.substring(0, bbox.lastIndexOf(','));
-                        } else {
-                            throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" , 
-                                           "INVALID_PARAMETER_VALUE", "BoundingBox");
-                        } 
-                        BoundingBoxType envelope = null;
-                        
-                        if (bbox != null) {
-                            StringTokenizer tokens = new StringTokenizer(bbox, ",;");
-                            Double[] coordinates   = new Double[tokens.countTokens()];
-                            int i = 0;
-                            while (tokens.hasMoreTokens()) {
-                                Double value = parseDouble(tokens.nextToken());
-                                coordinates[i] = value;
-                                i++;
-                            }
-                            if (i < 4){
-                                throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" , 
-                                           "INVALID_PARAMETER_VALUE", "BoundingBox");
-                            }
-                            envelope = new BoundingBoxType(crs,coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
-                        }
-                        
-                        //domain subset
-                        net.seagis.wcs.v111.DomainSubsetType domain   = new net.seagis.wcs.v111.DomainSubsetType(temporal, envelope);
-                    
-                        //range subset.
-                        net.seagis.wcs.v111.RangeSubsetType  range = null;
-                        String rangeSubset = getParameter("RangeSubset", false);
-                        if (rangeSubset != null) {
-                            
-                            //for now we don't handle Axis Identifiers
-                            if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
-                                throwException("The service does not handle axis identifiers" , 
-                                               "INVALID_PARAMETER_VALUE", "rangeSubset");
-                            }
-                            
-                            StringTokenizer tokens   = new StringTokenizer(rangeSubset, ";");
-                            List<FieldSubset> fields = new ArrayList<FieldSubset>(tokens.countTokens());
-                            while (tokens.hasMoreTokens()) {
-                                String value = tokens.nextToken();
-                                String interpolation = null;
-                                String rangeIdentifier = null;
-                                if (value.indexOf(':') != -1) {
-                                    rangeIdentifier = value.substring(0, rangeSubset.indexOf(':'));
-                                    interpolation   = value.substring(rangeSubset.indexOf(':') + 1);
-                                } else {
-                                    rangeIdentifier = value;
-                                }
-                                fields.add(new FieldSubset(rangeIdentifier, interpolation));
-                            }
-                            
-                            range = new net.seagis.wcs.v111.RangeSubsetType(fields);
-                        }
-                        
-                        
-                        String gridType = getParameter("GridType", false);
-                        if (gridType == null) {
-                            gridType = "urn:ogc:def:method:WCS:1.1:2dSimpleGrid";
-                        }
-                        String gridOrigin = getParameter("GridOrigin", false);
-                        if (gridOrigin == null) {
-                            gridOrigin = "0.0,0.0";
-                        }
-                        StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
-                        List<Double> origin   = new ArrayList<Double>(tokens.countTokens());
-                        while (tokens.hasMoreTokens()) {
-                            Double value = parseDouble(tokens.nextToken());
-                            origin.add(value);
-                        }
-                        
-                        String gridOffsets = getParameter("GridOffsets", false);
-                        List<Double> offset   = new ArrayList<Double>();
-                        if (gridOffsets != null) {
-                            tokens = new StringTokenizer(gridOffsets, ",;");
-                            while (tokens.hasMoreTokens()) {
-                                Double value = parseDouble(tokens.nextToken());
-                                offset.add(value);
-                            }
-                        }
-                        String gridCS = getParameter("GridCS", false);
-                        if (gridCS == null) {
-                            gridCS = "urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS";
-                        }
-            
-                        //output
-                        CodeType codeCRS = new CodeType(crs);
-                        GridCrsType grid = new GridCrsType(codeCRS,
-                                                           getParameter("GridBaseCRS", false),
-                                                           gridType,
-                                                           origin,
-                                                           offset,
-                                                           gridCS,
-                                                           "");
-                        net.seagis.wcs.v111.OutputType output = new net.seagis.wcs.v111.OutputType(grid, getParameter("format", true));
-                    
-                        gc = new net.seagis.wcs.v111.GetCoverage(new net.seagis.ows.v110.CodeType(getParameter("identifier", true)),
-                                                                 domain,
-                                                                 range,
-                                                                 output); 
-                    }   
+                    gc = createNewGetCoverageRequest(); 
+                      
                 }
                 return Response.ok(getCoverage(gc), webServiceWorker.getMimeType()).build();
                      
@@ -532,6 +273,289 @@ public class WCService extends WebService {
             }
         }
      }
+    
+    /**
+     * Build a new GetCapabilities request from a kvp request 
+     */
+    private AbstractGetCapabilities createNewGetCapabilitiesRequest() throws WebServiceException {
+        
+        if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
+            throwException("The parameters SERVICE=WCS must be specified",
+                    "MISSING_PARAMETER_VALUE", "service");
+        }
+        String inputVersion = getParameter("VERSION", false);
+        if (inputVersion == null) {
+            inputVersion = getParameter("acceptversions", false);
+            if (inputVersion == null) {
+                inputVersion = "1.1.1";
+            } else {
+                //we verify that the version id supported
+                isSupportedVersion(inputVersion);
+            }
+        }
+
+        this.setCurrentVersion(getBestVersion(inputVersion).toString());
+
+        if (getCurrentVersion().toString().equals("1.0.0")) {
+            return new net.seagis.wcs.v100.GetCapabilities(getParameter("SECTION", false),
+                                                           null);
+        } else {
+            AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+
+            //We transform the String of sections in a list.
+            //In the same time we verify that the requested sections are valid. 
+            String section = getParameter("Sections", false);
+            List<String> requestedSections = new ArrayList<String>();
+            if (section != null) {
+                final StringTokenizer tokens = new StringTokenizer(section, ",;");
+                while (tokens.hasMoreTokens()) {
+                    final String token = tokens.nextToken().trim();
+                    if (SectionsType.getExistingSections("1.1.1").contains(token)) {
+                        requestedSections.add(token);
+                    } else {
+                        throwException("The section " + token + " does not exist",
+                                "INVALID_PARAMETER_VALUE", "section");
+                    }
+                }
+            } else {
+                //if there is no requested Sections we add all the sections
+                requestedSections = SectionsType.getExistingSections("1.1.1");
+            }
+            SectionsType sections = new SectionsType(requestedSections);
+            AcceptVersionsType versions = new AcceptVersionsType("1.1.1");
+            return new net.seagis.wcs.v111.GetCapabilities(versions,
+                                                           sections,
+                                                           formats,
+                                                           null);
+        }
+    }
+    
+    /**
+     * Build a new DescribeCoverage request from a kvp request 
+     */
+    private AbstractDescribeCoverage createNewDescribeCoverageRequest() throws WebServiceException {
+        if (getCurrentVersion().toString().equals("1.0.0")) {
+            return new net.seagis.wcs.v100.DescribeCoverage(getParameter("COVERAGE", true));
+        } else {
+            return new net.seagis.wcs.v111.DescribeCoverage(getParameter("IDENTIFIERS", true));
+        }
+    }
+    
+    /**
+     * Build a new DescribeCoverage request from a kvp request 
+     */
+    private AbstractGetCoverage createNewGetCoverageRequest() throws WebServiceException {
+        
+        if (getCurrentVersion().toString().equals("1.0.0")) {
+            // temporal subset
+            net.seagis.wcs.v100.TimeSequenceType temporal = null;
+            String timeParameter = getParameter("time", false);
+            if (timeParameter != null) {
+                TimePositionType time     = new TimePositionType(timeParameter);
+                temporal = new net.seagis.wcs.v100.TimeSequenceType(time); 
+            }
+                    
+            /*
+             * spatial subset
+             */
+            // the boundingBox/envelope
+            List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+            String bbox          = getParameter("bbox", false);
+            if (bbox != null) {
+                StringTokenizer tokens = new StringTokenizer(bbox, ",;");
+                Double[] coordinates = new Double[tokens.countTokens()];
+                int i = 0;
+                    while (tokens.hasMoreTokens()) {
+                        Double value = parseDouble(tokens.nextToken());
+                        coordinates[i] = value;
+                        i++;
+                    }
+                    
+                    pos.add(new DirectPositionType(coordinates[0], coordinates[2]));
+                    pos.add(new DirectPositionType(coordinates[1], coordinates[3]));
+            }
+            EnvelopeEntry envelope    = new EnvelopeEntry(pos, getParameter("CRS", true));
+                    
+            // the grid dimensions.
+            GridType grid = null;
+                    
+            String width  = getParameter("width",  false);
+            String height = getParameter("height", false);
+            String depth  = getParameter("depth", false);
+            if (width == null || height == null) {
+                //TODO
+                grid = new RectifiedGridType();
+                String resx = getParameter("resx",  false);
+                String resy = getParameter("resy",  false);
+                String resz = getParameter("resz",  false);
+                
+                if (resx == null || resy == null) {
+                    throwException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
+                                   "INVALID_PARAMETER_VALUE", null);
+                }
+            } else {
+                List<String> axis         = new ArrayList<String>();
+                axis.add("width");
+                axis.add("height");
+                List<BigInteger> low = new ArrayList<BigInteger>();
+                low.add(new BigInteger("0"));
+                low.add(new BigInteger("0"));
+                List<BigInteger> high = new ArrayList<BigInteger>();
+                high.add(new BigInteger(width));
+                high.add(new BigInteger(height));
+                if (depth != null) {
+                    axis.add("depth");
+                    low.add(new BigInteger("0"));
+                    high.add(new BigInteger(depth));
+                }
+                GridLimitsType limits     = new GridLimitsType(low, high);
+                grid        = new GridType(limits, axis);
+            }
+            net.seagis.wcs.v100.SpatialSubsetType spatial = new net.seagis.wcs.v100.SpatialSubsetType(envelope, grid);
+                    
+            //domain subset
+            net.seagis.wcs.v100.DomainSubsetType domain   = new net.seagis.wcs.v100.DomainSubsetType(temporal, spatial);
+                    
+            //range subset (not yet used)
+            net.seagis.wcs.v100.RangeSubsetType  range    = null;
+                    
+            //interpolation method
+            net.seagis.wcs.v100.InterpolationMethod interpolation = net.seagis.wcs.v100.InterpolationMethod.fromValue(getParameter("interpolation", false));
+                    
+            //output
+            net.seagis.wcs.v100.OutputType output         = new net.seagis.wcs.v100.OutputType(getParameter("format", true),
+                                                                                                           getParameter("response_crs", false));
+                    
+            return new net.seagis.wcs.v100.GetCoverage(getParameter("coverage", true),
+                                                       domain,
+                                                       range,
+                                                       interpolation,
+                                                       output);
+         } else {
+                       
+            // temporal subset
+            net.seagis.wcs.v111.TimeSequenceType temporal = null;
+            String timeParameter = getParameter("timeSequence", false);
+            if (timeParameter != null) {
+                if (timeParameter.indexOf('/') == -1) {
+                    temporal = new net.seagis.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
+                } else {
+                    throwException("The service does not handle TimePeriod" , 
+                                   "INVALID_PARAMETER_VALUE", "temporalSubset");
+                }
+                             
+            }
+                    
+            /*
+             * spatial subset
+             */
+             // the boundingBox/envelope
+             String bbox          = getParameter("BoundingBox", true);
+             String crs           = null;
+             if (bbox.indexOf(',') != -1) {
+                crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
+                bbox = bbox.substring(0, bbox.lastIndexOf(','));
+             } else {
+                throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" , 
+                                "INVALID_PARAMETER_VALUE", "BoundingBox");
+             } 
+             BoundingBoxType envelope = null;
+                        
+             if (bbox != null) {
+                StringTokenizer tokens = new StringTokenizer(bbox, ",;");
+                Double[] coordinates   = new Double[tokens.countTokens()];
+                int i = 0;
+                while (tokens.hasMoreTokens()) {
+                    Double value = parseDouble(tokens.nextToken());
+                    coordinates[i] = value;
+                    i++;
+                }
+                    if (i < 4){
+                        throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" , 
+                                       "INVALID_PARAMETER_VALUE", "BoundingBox");
+                     }
+                envelope = new BoundingBoxType(crs,coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
+             }
+                        
+             //domain subset
+             net.seagis.wcs.v111.DomainSubsetType domain   = new net.seagis.wcs.v111.DomainSubsetType(temporal, envelope);
+                    
+             //range subset.
+             net.seagis.wcs.v111.RangeSubsetType  range = null;
+             String rangeSubset = getParameter("RangeSubset", false);
+             if (rangeSubset != null) {
+                            
+                //for now we don't handle Axis Identifiers
+                if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
+                    throwException("The service does not handle axis identifiers" , 
+                                   "INVALID_PARAMETER_VALUE", "rangeSubset");
+                }
+                            
+                StringTokenizer tokens   = new StringTokenizer(rangeSubset, ";");
+                List<FieldSubset> fields = new ArrayList<FieldSubset>(tokens.countTokens());
+                while (tokens.hasMoreTokens()) {
+                    String value = tokens.nextToken();
+                    String interpolation = null;
+                    String rangeIdentifier = null;
+                    if (value.indexOf(':') != -1) {
+                        rangeIdentifier = value.substring(0, rangeSubset.indexOf(':'));
+                        interpolation   = value.substring(rangeSubset.indexOf(':') + 1);
+                    } else {
+                        rangeIdentifier = value;
+                    }
+                    fields.add(new FieldSubset(rangeIdentifier, interpolation));
+                }
+                            
+                    range = new net.seagis.wcs.v111.RangeSubsetType(fields);
+                }
+                        
+                        
+                String gridType = getParameter("GridType", false);
+                if (gridType == null) {
+                    gridType = "urn:ogc:def:method:WCS:1.1:2dSimpleGrid";
+                }
+                String gridOrigin = getParameter("GridOrigin", false);
+                if (gridOrigin == null) {
+                    gridOrigin = "0.0,0.0";
+                }
+                StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
+                List<Double> origin   = new ArrayList<Double>(tokens.countTokens());
+                while (tokens.hasMoreTokens()) {
+                    Double value = parseDouble(tokens.nextToken());
+                    origin.add(value);
+                }
+                        
+                String gridOffsets = getParameter("GridOffsets", false);
+                List<Double> offset   = new ArrayList<Double>();
+                if (gridOffsets != null) {
+                    tokens = new StringTokenizer(gridOffsets, ",;");
+                    while (tokens.hasMoreTokens()) {
+                        Double value = parseDouble(tokens.nextToken());
+                        offset.add(value);
+                    }
+                }
+                String gridCS = getParameter("GridCS", false);
+                if (gridCS == null) {
+                    gridCS = "urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS";
+                }
+            
+                //output
+                CodeType codeCRS = new CodeType(crs);
+                GridCrsType grid = new GridCrsType(codeCRS,
+                                                   getParameter("GridBaseCRS", false),
+                                                   gridType,
+                                                   origin,
+                                                   offset,
+                                                   gridCS,
+                                                   "");
+                net.seagis.wcs.v111.OutputType output = new net.seagis.wcs.v111.OutputType(grid, getParameter("format", true));
+                   
+                return new net.seagis.wcs.v111.GetCoverage(new net.seagis.ows.v110.CodeType(getParameter("identifier", true)),
+                                                           domain,
+                                                           range,
+                                                           output);
+         }
+    }
     
     /**
      * GetCapabilities operation. 

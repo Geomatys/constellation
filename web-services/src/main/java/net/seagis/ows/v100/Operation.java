@@ -113,6 +113,20 @@ public class Operation extends AbstractOperation {
     }
     
     /**
+     * Get a parameter from the specified parameter name
+     */
+    public DomainType getParameter(String name) {
+        if (parameter == null) {
+            return null;
+        } else {
+            for (DomainType domain: parameter) {
+                if (domain.getName().equals(name))
+                    return domain;
+            }
+            return null;
+        }
+    }
+    /**
      * Gets the value of the constraint property.
      */
     public List<DomainType> getConstraint() {

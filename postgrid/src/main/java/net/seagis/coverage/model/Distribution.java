@@ -43,6 +43,21 @@ public interface Distribution extends Element {
      * @return The transformed value. May be identical to {@code value} if this distribution is already normal.
      */
     double normalize(double value);
+    
+     /**
+     * Return the factor by whitch we multiply the data.
+     */
+    double getScale();
+
+    /**
+     * Return the constant to add to the data.
+     */
+    double getOffset();
+
+    /**
+     * Return true if its a  log-normal distribution.
+     */
+    boolean isLog();
 
     /**
      * Returns {@code true} if {@link #normalize} do not perform any transformation.

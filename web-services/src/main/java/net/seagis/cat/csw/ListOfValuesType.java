@@ -50,15 +50,29 @@ import javax.xml.bind.annotation.XmlType;
 public class ListOfValuesType {
 
     @XmlElement(name = "Value", required = true)
-    private List<Object> value;
-
+    private List<String> value;
+    
+    /**
+     * An empty constructor used by JAXB 
+     */
+     ListOfValuesType(){
+         
+     }
+     
+     /**
+      * Build a new List of values
+      */
+     public ListOfValuesType(List<String> values){
+         value  = values;
+     }
+     
     /**
      * Gets the value of the value property.
      * (unmodifiable)
      */
-    public List<Object> getValue() {
+    public List<String> getValue() {
         if (value == null) {
-            value = new ArrayList<Object>();
+            value = new ArrayList<String>();
         }
         return Collections.unmodifiableList(value);
     }
