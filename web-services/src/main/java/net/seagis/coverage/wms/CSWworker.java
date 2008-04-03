@@ -445,8 +445,9 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetRecordsResponseType getRecords(GetRecordsType request){
-        
+    public GetRecordsResponseType getRecords(GetRecordsType request) throws OWSWebServiceException{
+        if (true)
+            throw new OWSWebServiceException("not yet available", NO_APPLICABLE_CODE, "request", version);
         return new GetRecordsResponseType();
     }
     
@@ -797,7 +798,9 @@ public class CSWworker {
      */
     public void setVersion(ServiceVersion version){
         this.version = version;
-        this.MDReader.setVersion(version);
+        if (MDReader != null) {
+            this.MDReader.setVersion(version);
+        }
     }
     
     /**
