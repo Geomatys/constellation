@@ -47,7 +47,7 @@ final class DistributionQuery extends Query {
      * @param database The database for which this query is created.
      */
     public DistributionQuery(final Database database) {
-        super(database, "distributions");
+        super(database, "Distributions");
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] SLIE  = {SELECT, LIST, INSERT, EXISTS};
         name   = addColumn   ("name",   SLIE);

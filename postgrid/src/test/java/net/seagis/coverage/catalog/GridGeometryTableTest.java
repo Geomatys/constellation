@@ -47,7 +47,7 @@ public class GridGeometryTableTest extends TableTest {
     public void testSelectAndList() throws CatalogException, SQLException {
         final GridGeometryTable table = new GridGeometryTable(database);
         final GridGeometryEntry entry = table.getEntry(SAMPLE_NAME);
-        final GridRange gridRange = entry.gridRange;
+        final GridRange gridRange = entry.geometry.getGridRange();
         final GeographicBoundingBox box = entry.getGeographicBoundingBox();
         assertEquals( 720, gridRange.getLength(0));
         assertEquals( 499, gridRange.getLength(1));
@@ -57,7 +57,7 @@ public class GridGeometryTableTest extends TableTest {
         assertEquals( -77, box.getSouthBoundLatitude(), 0.5);
         assertEquals( +77, box.getNorthBoundLatitude(), 0.5);
 
-        final Envelope envelope = entry.getEnvelope();
+        final Envelope envelope = entry.geometry.getEnvelope();
         assertEquals(-2.00E+7, envelope.getMinimum(0), 5E+5);
         assertEquals(+2.00E+7, envelope.getMaximum(0), 5E+5);
         assertEquals(-1.38E+7, envelope.getMinimum(1), 5E+5);

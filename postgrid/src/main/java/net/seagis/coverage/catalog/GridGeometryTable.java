@@ -28,27 +28,19 @@ import java.util.logging.LogRecord;
 import static java.lang.reflect.Array.getLength;
 import static java.lang.reflect.Array.getDouble;
 
-import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.datum.PixelInCell;
 
-import org.geotools.resources.XArray;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.util.CanonicalSet;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.referencing.factory.IdentifiedObjectFinder;
 import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.IllegalRecordException;
 import net.seagis.catalog.SingletonTable;
+import net.seagis.catalog.Column;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.resources.i18n.Resources;
@@ -73,6 +65,12 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * A map of CRS created up to date.
      */
     private transient Map<Integer,CoordinateReferenceSystem> cachedCRS;
+
+    /**
+     * A set of CRS created up to date. Cached because we will typically have many grid
+     * geometries using the same set of CRS.
+     */
+    private transient CanonicalSet<SpatialRefSysEntry> gridCRS;
 
     /**
      * Constructs a new {@code GridGeometryTable}.
@@ -190,110 +188,44 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         final int    verticalSRID      = results.getInt   (indexOf(query.verticalSRID));
         final Array  verticalOrdinates = results.getArray (indexOf(query.verticalOrdinates));
         /*
-         * Creates the horizontal CRS. We will append a vertical CRS later if
-         * the vertical ordinates array is non-null, and a temporal CRS last.
+         * Creates the SpatialRefSysEntry object, looking for an existing one in the cache first.
+         * If a new object has been created, it will be completed after insertion in the cache.
          */
-        CoordinateReferenceSystem crs;
-        try {
-            crs = getSpatialReferenceSystem(horizontalSRID);
+        SpatialRefSysEntry srsEntry = new SpatialRefSysEntry(horizontalSRID, verticalSRID,
+                CRS.getTemporalCRS(getDatabase().getCoordinateReferenceSystem()));
+        assert Thread.holdsLock(this);
+        Column column = query.identifier;
+        if (gridCRS == null) {
+            gridCRS = CanonicalSet.newInstance(SpatialRefSysEntry.class);
+        }
+        final SpatialRefSysEntry candidate = gridCRS.unique(srsEntry);
+        if (candidate != srsEntry) {
+            srsEntry = candidate;
+        } else try {
+            column = query.horizontalSRID;
+            srsEntry.createSingleCRS(this, true, false);
+            column = query.verticalSRID;
+            srsEntry.createSingleCRS(this, false, true);
+            column = query.identifier;
+            srsEntry.createCompoundCRS(getAuthorityFactory().getCRSFactory());
         } catch (FactoryException exception) {
-            throw new IllegalRecordException(exception, this, results, indexOf(query.horizontalSRID), identifier);
+            throw new IllegalRecordException(exception, this, results, indexOf(column), identifier);
+        } catch (ClassCastException exception) {
+            throw new IllegalRecordException(exception, this, results, indexOf(column), identifier);
         }
-        /*
-         * Copies the vertical ordinates in an array of type double[].
-         * The array will be 'null' if there is no vertical ordinates.
-         */
-        CoordinateReferenceSystem verticalCRS = null;
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
         final double[] altitudes = asDoubleArray(verticalOrdinates);
-        if (altitudes != null) {
-            for (double z : altitudes) {
-                if (z < min) min = z;
-                if (z > max) max = z;
-            }
-            try {
-                verticalCRS = getSpatialReferenceSystem(verticalSRID);
-            } catch (FactoryException exception) {
-                throw new IllegalRecordException(exception, this, results, indexOf(query.verticalSRID), identifier);
-            }
-        }
-        /*
-         * Creates a compound CRS with the vertical and temporal CRS, if any.
-         */
-        int count = 0;
-        String name = crs.getName().getCode();
-        CoordinateReferenceSystem[] elements = new CoordinateReferenceSystem[3];
-        elements[count++] = crs;
-        if (verticalCRS != null) {
-            elements[count++] = verticalCRS;
-            name = name + ", " + verticalCRS.getName().getCode();
-        }
-        final CoordinateReferenceSystem temporalCRS = CRS.getTemporalCRS(getDatabase().getCoordinateReferenceSystem());
-        if (temporalCRS != null) {
-            elements[count++] = temporalCRS;
-        }
-        if (count > 1) {
-            elements = XArray.resize(elements, count);
-            final Map<String,Object> properties =
-                    new HashMap<String,Object>(AbstractIdentifiedObject.getProperties(crs));
-            properties.put(CoordinateReferenceSystem.NAME_KEY, name);
-            try {
-                crs = getAuthorityFactory().getCRSFactory().createCompoundCRS(properties, elements);
-            } catch (FactoryException exception) {
-                throw new IllegalRecordException(exception, this, results, indexOf(query.identifier), identifier);
-            }
-        }
-        /*
-         * Creates the "grid to CRS" transform as a matrix. The coefficients for the vertical
-         * axis assume that the vertical ordinates are evenly spaced. This is not always true;
-         * a special processing will be performed later.
-         */
-        final int dim = crs.getCoordinateSystem().getDimension();
-        final int[] lower = new int[dim];
-        final int[] upper = new int[dim];
-        final Matrix gridToCRS = MatrixFactory.create(dim + 1);
-        gridToCRS.setElement(0, 0,   scaleX);
-        gridToCRS.setElement(1, 1,   scaleY);
-        gridToCRS.setElement(0, 1,   shearX);
-        gridToCRS.setElement(1, 0,   shearY);
-        gridToCRS.setElement(0, dim, translateX);
-        gridToCRS.setElement(1, dim, translateY);
-        if (altitudes != null) {
-            upper[2] = altitudes.length;
-            switch (altitudes.length) { // Fall through in every cases.
-                default: gridToCRS.setElement(2, 2, (max - min) / altitudes.length);
-                case 1:  gridToCRS.setElement(2, dim, min);
-                case 0:  break;
-            }
-        }
-        upper[1] = height;
-        upper[0] = width;
-        /*
-         * Computes the envelope from the affine transform and creates the entry.
-         */
-        final GridRange gridRange = new GeneralGridRange(lower, upper);
-        final GeneralEnvelope envelope = new GeneralEnvelope(gridRange, PixelInCell.CELL_CORNER,
-                                                    ProjectiveTransform.create(gridToCRS), crs);
-        if (altitudes != null) {
-            envelope.setRange(2, min, max); // For fixing rounding errors.
-        }
-        /*
-         * Creates the entry and performs some final checks.
-         */
         final AffineTransform2D at = new AffineTransform2D(scaleX, shearY, shearX, scaleY, translateX, translateY);
         final GridGeometryEntry entry;
         try {
-            entry = new GridGeometryEntry(identifier, at, gridRange, envelope, horizontalSRID, verticalSRID, altitudes);
-        } catch (FactoryException exception) {
-            throw new IllegalRecordException(exception, this, results, indexOf(query.horizontalSRID), identifier);
-        } catch (TransformException exception) {
-            throw new IllegalRecordException(exception, this, results, indexOf(query.horizontalSRID), identifier);
+            entry = new GridGeometryEntry(identifier, new Dimension(width, height), srsEntry, at, altitudes);
+        } catch (RuntimeException exception) {
+            throw exception;
+        } catch (Exception exception) { // We want to catch only the checked exceptions here.
+            throw new IllegalRecordException(exception, this, results, indexOf(column), identifier);
         }
         if (entry.isEmpty()) {
-            // TODO: localize
-            throw new IllegalRecordException("The geographic envelope is empty.",
-                    this, results, indexOf(query.horizontalSRID), identifier);
+            throw new IllegalRecordException("The geographic envelope is empty.", // TODO: localize
+                    this, results, indexOf(column), identifier);
         }
         return entry;
     }
@@ -574,6 +506,9 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
     public synchronized void flush() {
         if (cachedCRS != null) {
             cachedCRS.clear();
+        }
+        if (gridCRS != null) {
+            gridCRS.clear();
         }
         super.flush();
     }

@@ -19,23 +19,23 @@ import java.util.Map;
 import java.util.HashMap;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.metadata.iso.extent.ExtentImpl;
-import org.geotools.referencing.cs.DefaultTimeCS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.datum.DefaultTemporalDatum;
+import org.opengis.referencing.crs.TemporalCRS;
 
 
 /**
  * Set of predefined coordinate reference systems. They are geographic CRS using
  * (<var>x</var>, <var>y</var>, <var>z</var>, <var>t</var>) axis on WGS&nbsp;84
- * ellipsoid and 01/01/1950 00:00 UTC epoch. More specifically, the axis are:
+ * ellipsoid and 1968-05-24 00:00:00 UTC epoch (the epoch of "Truncated Julian" days).
+ * More specifically, the axis are:
  * <p>
  * <ul>
  *   <li>Longitude in decimal degrees relative to Greenwich meridian</li>
  *   <li>Latitude in decimal degrees</li>
  *   <li>Altitude in metre over the WGS 84 ellipsoid</li>
- *   <li>Time as the amount of day ellapsed since January 1st, 1950.</li>
+ *   <li>Time as the amount of day ellapsed since May 24, 1968.</li>
  * </ul>
  * <p>
  * Not all those axis need to be present; the set of axis is determined from the enumeration
@@ -67,11 +67,9 @@ public enum CRS {
     XYZT(2, 3);
 
     /**
-     * Système de références de coordonnées temporelles en usage chez Aviso. Ce système compte le
-     * nombre de jours écoulés depuis le 01/01/1950 00:00 UTC. Ce système est aussi en usage pour
-     * certaines données de la Nasa.
+     * The temporal CRS for truncated julian days.
      */
-    static final DefaultTemporalCRS TEMPORAL = new Temporal("Nasa");
+    static final DefaultTemporalCRS TEMPORAL = new Temporal(DefaultTemporalCRS.TRUNCATED_JULIAN);
 
     /**
      * Dimension de la longitude.
@@ -130,7 +128,7 @@ public enum CRS {
     }
 
     /**
-     * Système de référence des coordonnées temporelles par défaut.
+     * A temporal CRS with special handling of infinite values.
      */
     private static final class Temporal extends DefaultTemporalCRS {
         /**
@@ -139,18 +137,10 @@ public enum CRS {
         private static final long serialVersionUID = 7828291321005269004L;
 
         /**
-         * Nombre de millisecondes entre le 01/01/1970 00:00 UTC et le 01/01/1950 00:00 UTC.
-         * Le 1er janvier 1970 est l'epoch du Java, tandis que le 1er janvier 1950 est celui
-         * de la Nasa (son jour julier "0"). La constante {@code EPOCH} sert à faire les
-         * conversions d'un système à l'autre.
+         * Creates a new CRS with the same epoch and axis than the given one.
          */
-        private static final long EPOCH = -631152000000L; // Pour 1958, utiliser -378691200000L;
-
-        /**
-         * Construit un système de référence du nom spécifié.
-         */
-        public Temporal(final String name) {
-            super(name, new DefaultTemporalDatum(name, new Date(EPOCH)), DefaultTimeCS.DAYS);
+        public Temporal(final TemporalCRS crs) {
+            super(crs);
         }
 
         /**

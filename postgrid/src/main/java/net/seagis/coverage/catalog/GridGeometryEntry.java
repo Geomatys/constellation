@@ -21,37 +21,30 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
-import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.MathTransform2D;
 
-import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 import net.seagis.catalog.Entry;
 
 
 /**
- * Implementation of a three-dimensional grid geometry. This class assumes that the two first
+ * Implementation of a four-dimensional grid geometry. This class assumes that the two first
  * axis are always for the horizontal component of the CRS (no matter if it is (x,y) or (y,x))
- * and that the vertical component, if any, is the third axis. Some of those assumptions are
- * checked by assertions at construction time.
+ * and that the vertical component, if any, is the third axis. The time dimension is the last
+ * axis.
  * <p>
  * This implementation allows direct access to the field for convenience and efficiency, but
  * those fields should never be modified. We allow this unsafe practice because this class
  * is not public.
- *
- * @todo Actually current implementation may contains a 4D grid range and envelope, with a time
- *       axis. But the information provided in the time axis is invalid. We need to clarify the
- *       role of this class regarding time, and possibly make it purely spatial 3D.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -64,9 +57,19 @@ final class GridGeometryEntry extends Entry {
     private static final long serialVersionUID = -3529884841649813534L;
 
     /**
-     * The immutable grid range, which may be 2D, 3D or 4D.
+     * The spatial reference systems. Typically, many grid geometry will share the same
+     * instance of {@link SpatialRefSysEntry}.
      */
-    protected final GridRange gridRange;
+    final SpatialRefSysEntry srsEntry;
+
+    /**
+     * The immutable grid geometry, which may be 2D, 3D or 4D. The coordinate reference system is
+     * the one declared in the {@link GridCoverageTable} for that entry. The envelope must include
+     * the vertical range if any. If there is a temporal dimension, then the temporal extent must be
+     * presents as well but may be invalid (the exact value will be set on an coverage-by-coverage
+     * basis).
+     */
+    protected final GeneralGridGeometry geometry;
 
     /**
      * The "grid to CRS" affine transform for the horizontal part. The vertical
@@ -74,13 +77,6 @@ final class GridGeometryEntry extends Entry {
      * be regular.
      */
     protected final AffineTransform2D gridToCRS;
-
-    /**
-     * The full envelope, including the vertical and temporal extent if any. The coordinate
-     * reference system is the one declared in the {@link GridCoverageTable} for that entry.
-     * Should not be modified after construction.
-     */
-    private final GeneralEnvelope envelope;
 
     /**
      * A shape describing the coverage outline in WGS 84 geographic coordinates. This is the
@@ -93,68 +89,35 @@ final class GridGeometryEntry extends Entry {
     private final Shape geographicBoundingShape;
 
     /**
-     * The horizontal and vertical SRID declared in the database.
-     * Stored for informative purpose, but not used by this entry.
-     */
-    protected final int horizontalSRID, verticalSRID;
-
-    /**
      * The vertical ordinates, or {@code null}.
      */
     private final double[] verticalOrdinates;
 
     /**
-     * Creates an entry from the given grid range and <cite>grid to CRS</cite> transform.
-     * <strong>Note:</strong> This constructor do not clone any of its arguments.
-     * Do not modify the arguments after construction.
+     * Creates an entry from the given grid geometry.
      *
-     * @param name      The identifier of this grid geometry.
-     * @param gridToCRS The grid to CRS affine transform.
-     * @param gridRange The image dimension. May be 2D or 3D.
-     * @param envelope  The spatio-temporal envelope.
+     * @param name              The identifier of this grid geometry.
+     * @param gridToCRS         The grid to CRS affine transform.
      * @param verticalOrdinates The vertical ordinate values, or {@code null} if none.
      */
-    GridGeometryEntry(final String            name,
-                      final AffineTransform2D gridToCRS,
-                      final GridRange         gridRange,
-                      final GeneralEnvelope   envelope,
-                      final int               horizontalSRID,
-                      final int               verticalSRID,
-                      final double[]          verticalOrdinates)
+    GridGeometryEntry(final String             name,
+                      final Dimension          size,
+                      final SpatialRefSysEntry srsEntry,
+                      final AffineTransform2D  gridToCRS,
+                      final double[] verticalOrdinates)
             throws FactoryException, TransformException
     {
         super(name);
+        this.srsEntry          = srsEntry;
         this.gridToCRS         = gridToCRS;
-        this.gridRange         = gridRange;
-        this.envelope          = envelope;
-        this.horizontalSRID    = horizontalSRID;
-        this.verticalSRID      = verticalSRID;
         this.verticalOrdinates = verticalOrdinates;
         if (verticalOrdinates != null) {
             if (verticalOrdinates.length > Short.MAX_VALUE) {
                 throw new IllegalArgumentException(); // See 'indexOf' for this limitation.
             }
-            assert gridRange.getLength(2) == verticalOrdinates.length : gridRange;
         }
-        CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
-        /*
-         * Checks for assumptions - see class javadoc.
-         */
-        if (crs == null) {
-            throw new AssertionError(envelope);
-        }
-        try {
-            assert CRS.getHorizontalCRS(crs) == CRSUtilities.getCRS2D(crs) : crs;
-            assert (CRS.getVerticalCRS(crs) == null) == (verticalOrdinates == null) : crs;
-        } catch (TransformException e) {
-            throw new AssertionError(e);
-        }
-        /*
-         * Computes the coverage geographic shape.
-         */
-        crs = CRS.getHorizontalCRS(crs);
-        final MathTransform2D tr = (MathTransform2D) CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84);
-        geographicBoundingShape = tr.createTransformedShape(getShape());
+        geometry = srsEntry.getGridGeometry(size, gridToCRS, verticalOrdinates);
+        geographicBoundingShape = srsEntry.getHorizontalToGeographicCRS().createTransformedShape(getShape());
     }
 
     /**
@@ -184,18 +147,18 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * Convenience method returning the two first dimension of the
-     * {@linkplain #getGridRange grid range}.
+     * Convenience method returning the two first dimension of the grid range.
      */
     public Dimension getSize() {
+        final GridRange gridRange = geometry.getGridRange();
         return new Dimension(gridRange.getLength(0), gridRange.getLength(1));
     }
 
     /**
-     * Convenience method returning the two first dimension of the
-     * {@linkplain #getGridRange grid range}.
+     * Convenience method returning the two first dimension of the grid range.
      */
     public Rectangle getBounds() {
+        final GridRange gridRange = geometry.getGridRange();
         return new Rectangle(gridRange.getLower (0), gridRange.getLower (1),
                              gridRange.getLength(0), gridRange.getLength(1));
     }
@@ -205,6 +168,7 @@ final class GridGeometryEntry extends Entry {
      * (but not garanteed) to be an instance of {@link Rectangle2D}. It can be freely modified.
      */
     public Shape getShape() {
+        final GridRange gridRange = geometry.getGridRange();
         Shape shape = new Rectangle2D.Double(
                 gridRange.getLower (0), gridRange.getLower (1),
                 gridRange.getLength(0), gridRange.getLength(1));
@@ -216,14 +180,7 @@ final class GridGeometryEntry extends Entry {
      * Returns the coordinate reference system.
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-        return envelope.getCoordinateReferenceSystem();
-    }
-
-    /**
-     * Returns the a copy of the envelope.
-     */
-    public GeneralEnvelope getEnvelope() {
-        return envelope.clone();
+        return geometry.getCoordinateReferenceSystem();
     }
 
     /**
@@ -236,13 +193,17 @@ final class GridGeometryEntry extends Entry {
      *        <code>{@linkplain #getVerticalOrdinates}.length</code> exclusive.
      */
     final Envelope getEnvelope(final int band) {
-        final GeneralEnvelope envelope = this.envelope.clone();
+        final GeneralEnvelope envelope = (GeneralEnvelope) geometry.getEnvelope();
         if (verticalOrdinates != null && verticalOrdinates.length > 1) {
-            final double z = verticalOrdinates[band];
-            final int floor = Math.max(0, band - 1);
-            final int ceil  = Math.min(band + 1, verticalOrdinates.length - 1);
-            envelope.setRange(2, z - 0.5*Math.abs(verticalOrdinates[floor+1] - verticalOrdinates[floor]),
-                                 z + 0.5*Math.abs(verticalOrdinates[ceil] - verticalOrdinates[ceil-1]));
+            final int zDimension = srsEntry.zDimension();
+            if (zDimension >= 0) {
+                final double z = verticalOrdinates[band];
+                final int floor = Math.max(0, band - 1);
+                final int ceil  = Math.min(band + 1, verticalOrdinates.length - 1);
+                envelope.setRange(zDimension,
+                        z - 0.5*Math.abs(verticalOrdinates[floor+1] - verticalOrdinates[floor]),
+                        z + 0.5*Math.abs(verticalOrdinates[ceil] - verticalOrdinates[ceil-1]));
+            }
         }
         return envelope;
     }
@@ -253,7 +214,7 @@ final class GridGeometryEntry extends Entry {
      */
     public double[] getVerticalOrdinates() {
         if (verticalOrdinates != null) {
-            assert gridRange.getLength(2) == verticalOrdinates.length : gridRange;
+            assert geometry.getGridRange().getLength(2) == verticalOrdinates.length : geometry;
             return verticalOrdinates.clone();
         }
         return null;
@@ -280,13 +241,13 @@ final class GridGeometryEntry extends Entry {
         return index;
     }
 
-     /**
+    /**
      * Returns {@code true} if the specified entry has the same envelope than this entry,
      * regardless the grid size.
      */
     final boolean sameEnvelope(final GridGeometryEntry that) {
-        return Utilities.equals(this.envelope,          that.envelope) &&
-                  Arrays.equals(this.verticalOrdinates, that.verticalOrdinates);
+        return Utilities.equals(this.geometry.getEnvelope(), that.geometry.getEnvelope()) &&
+                  Arrays.equals(this.verticalOrdinates,      that.verticalOrdinates);
     }
 
     /**
@@ -299,9 +260,8 @@ final class GridGeometryEntry extends Entry {
         }
         if (super.equals(object)) {
             final GridGeometryEntry that = (GridGeometryEntry) object;
-            return Utilities.equals(this.gridToCRS,         that.gridToCRS) &&
-                   Utilities.equals(this.gridRange,         that.gridRange) &&
-                   Utilities.equals(this.envelope,          that.envelope)  &&
+            return Utilities.equals(this.srsEntry,          that.srsEntry) &&
+                   Utilities.equals(this.geometry,          that.geometry) &&
                       Arrays.equals(this.verticalOrdinates, that.verticalOrdinates);
         }
         return false;

@@ -442,7 +442,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     private boolean computeBounds(final Rectangle clipPixels, final Dimension2D subsampling)
             throws TransformException
     {
-        final GridRange gridRange = geometry.gridRange;
+        final GridRange gridRange = geometry.geometry.getGridRange();
         final int width  = gridRange.getLength(0);
         final int height = gridRange.getLength(1);
         final AffineTransform gridToCRS = geometry.gridToCRS; // DO NOT MODIFY.
@@ -800,8 +800,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * leurs résolutions sont incompatibles, alors cette méthode retourne {@code null}.
      */
     final GridCoverageEntry getLowestResolution(final GridCoverageEntry that) {
-        final GridRange gridRange  = this.geometry.gridRange;
-        final GridRange gridRange2 = that.geometry.gridRange;
+        final GridRange gridRange  = this.geometry.geometry.getGridRange();
+        final GridRange gridRange2 = that.geometry.geometry.getGridRange();
         final int width   = gridRange .getLength(0);
         final int height  = gridRange .getLength(1);
         final int width2  = gridRange2.getLength(0);

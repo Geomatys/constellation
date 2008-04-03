@@ -35,7 +35,7 @@ import net.seagis.catalog.SingletonTable;
 public class DistributionTable extends SingletonTable<Distribution> {
     /**
      * Creates a distribution table.
-     * 
+     *
      * @param database Connection to the database.
      */
     public DistributionTable(final Database database) {
@@ -56,39 +56,46 @@ public class DistributionTable extends SingletonTable<Distribution> {
                                      results.getDouble (indexOf(query.offset)),
                                      results.getBoolean(indexOf(query.log   )));
     }
-    
+
     /**
-     * Retourne un nouvel identifier (ou l'identifier de la distribution passee en parametre si non-null)
-     * et enregistre la nouvelle distribution dans la base de donnee si il n'y est pas deja.
+     * If the given distribution is presents in the database, return its identifier. Otherwise adds
+     * a new entry in the table and returns its identifier.
      *
-     * @param distrib la distribution a inserer dans la base de donnee.
+     * @param distribution The distribution to search for.
+     *
+     * @todo Current implementation requires a {@code DistributionEntry} implementation.
+     *
+     * @todo Current implementation is not really what we expect. We want to search for an entry
+     *       having the same scale, offset, etc. Not an entry having the same name.
      */
-    public synchronized String getIdentifier(final Distribution distrib) throws SQLException, CatalogException {
+    public synchronized String getIdentifier(final Distribution distribution)
+            throws SQLException, CatalogException
+    {
         final DistributionQuery query  = (DistributionQuery) super.query;
         String id;
         boolean success = false;
         transactionBegin();
         try {
-            if (distrib.getName() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.name), distrib.getName());
-                ResultSet result = statement.executeQuery();
-                if(result.next()) {
+            final String name = distribution.getName();
+            if (name != null) {
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
+                statement.setString(indexOf(query.name), name);
+                final ResultSet result = statement.executeQuery();
+                if (result.next()) {
                     success = true;
-                    return distrib.getName();
+                    return distribution.getName();
                 } else {
-                    id = distrib.getName();
+                    id = distribution.getName();
                 }
             } else {
                 id = searchFreeIdentifier("distribution");
             }
-        
-            PreparedStatement statement = getStatement(QueryType.INSERT);
-        
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
+            final DistributionEntry entry = (DistributionEntry) distribution;
             statement.setString(indexOf(query.name),    id);
-            statement.setBoolean(indexOf(query.log),    distrib.isLog());
-            statement.setDouble(indexOf(query.offset) , distrib.getOffset());
-            statement.setDouble(indexOf(query.scale),   distrib.getScale());
+            statement.setBoolean(indexOf(query.log),    entry.isLog());
+            statement.setDouble(indexOf(query.offset) , entry.getOffset());
+            statement.setDouble(indexOf(query.scale),   entry.getScale());
             updateSingleton(statement);
             success = true;
         } finally {

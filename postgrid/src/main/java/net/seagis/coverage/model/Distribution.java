@@ -24,7 +24,7 @@ import net.seagis.catalog.Element;
  * This interface is used for applying variable changes in order to get a distribution closer
  * to the <A HREF="http://mathworld.wolfram.com/NormalDistribution.html">normal distribution</A>
  * before usage in a {@linkplain LinearModel linear model}.
- * 
+ *
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Antoine Hnawia
@@ -43,21 +43,6 @@ public interface Distribution extends Element {
      * @return The transformed value. May be identical to {@code value} if this distribution is already normal.
      */
     double normalize(double value);
-    
-     /**
-     * Return the factor by whitch we multiply the data.
-     */
-    double getScale();
-
-    /**
-     * Return the constant to add to the data.
-     */
-    double getOffset();
-
-    /**
-     * Return true if its a  log-normal distribution.
-     */
-    boolean isLog();
 
     /**
      * Returns {@code true} if {@link #normalize} do not perform any transformation.

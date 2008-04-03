@@ -679,7 +679,7 @@ loop:   for (final CoverageReference newReference : entries) {
             }
             final TileManager[] managers;
             try {
-                managers = tileTable.getTiles(layer, startTime, endTime, geometry.horizontalSRID);
+                managers = tileTable.getTiles(layer, startTime, endTime, geometry.srsEntry.horizontalSRID);
             } catch (IOException e) {
                 throw new CatalogException(e);
             }
