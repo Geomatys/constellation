@@ -189,16 +189,15 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             throws CatalogException, SQLException
     {
         super(createName(series.getName(), filename, index, band), remarks);
-        // TODO: need to include the temporal CRS here.
-        CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem(true);
         this.series    = series;
         this.filename  = filename;
         this.geometry  = geometry;
         this.index     = index;
         this.band      = band;
         this.settings  = table.getSettings(crs);
-        this.startTime = (startTime!=null) ? startTime.getTime() : Long.MIN_VALUE;
-        this.  endTime = (  endTime!=null) ?   endTime.getTime() : Long.MAX_VALUE;
+        this.startTime = (startTime != null) ? startTime.getTime() : Long.MIN_VALUE;
+        this.  endTime = (  endTime != null) ?   endTime.getTime() : Long.MAX_VALUE;
         if (geometry.isEmpty() || this.startTime > this.endTime) {
             // TODO: localize
             throw new IllegalRecordException("The spatio-temporal envelope is empty.");
@@ -300,7 +299,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * {@inheritDoc}
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-        return geometry.getCoordinateReferenceSystem();
+        return geometry.getCoordinateReferenceSystem(true);
     }
 
     /**
@@ -362,7 +361,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      *
-     * @todo Should compute the geometry by {@link GridGeometryEntry} instead.
+     * @todo Should computes the geometry by {@link GridGeometryEntry} instead.
      */
     @SuppressWarnings("fallthrough")
     public GridGeometry2D getGridGeometry() {
@@ -375,7 +374,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             }
             envelope = computeEnvelope(clipPixels);
         } catch (TransformException exception) {
-            // Should not happen if the coordinate in the database are valids.
+            // Should not happen if the coordinates in the database are valids.
             throw new IllegalStateException(exception.getLocalizedMessage(), exception);
         }
         final int dimension = envelope.getDimension();
@@ -578,14 +577,11 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     @SuppressWarnings("fallthrough")
     private GeneralEnvelope computeEnvelope(final Rectangle clipPixels) throws TransformException {
         final Rectangle2D clipLogical = XAffineTransform.transform(geometry.gridToCRS, clipPixels, null);
-        CoordinateReferenceSystem coverageCRS = geometry.getCoordinateReferenceSystem();
         final DefaultTemporalCRS  temporalCRS = settings.getTemporalCRS();
         final double tmin = temporalCRS.toValue(new Date(startTime));
         final double tmax = temporalCRS.toValue(new Date(  endTime));
-        if (Double.isInfinite(tmin) && Double.isInfinite(tmax)) {
-            // TODO : Attention getCRS2D ne tient pas compte des dimensions des GridCoverages
-            coverageCRS = CRSUtilities.getCRS2D(coverageCRS);
-        }
+        final boolean unbounded = (Double.isInfinite(tmin) && Double.isInfinite(tmax));
+        final CoordinateReferenceSystem coverageCRS = geometry.getCoordinateReferenceSystem(!unbounded);
         final GeneralEnvelope envelope = new GeneralEnvelope(coverageCRS);
         switch (coverageCRS.getCoordinateSystem().getDimension()) {
             default: // Fall through (apply also for all cases below)

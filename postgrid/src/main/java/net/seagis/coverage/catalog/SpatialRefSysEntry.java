@@ -167,6 +167,16 @@ final class SpatialRefSysEntry {
     }
 
     /**
+     * Returns the coordinate reference system, which may be up to 4-dimensional.
+     *
+     * @param time {@code true} if the CRS should include the time component,
+     *        or {@code false} for a spatial-only CRS.
+     */
+    public CoordinateReferenceSystem getCoordinateReferenceSystem(final boolean time) {
+        return time ? crs : timelessCRS;
+    }
+
+    /**
      * Returns a grid geometry for the given horizontal size and transform, and the given vertical
      * ordinate values. The coefficients for the vertical axis assume that the vertical ordinates
      * are evenly spaced. This is not always true; a special processing will be performed later.
@@ -225,6 +235,7 @@ final class SpatialRefSysEntry {
      * Returns the transform to the geographic CRS.
      */
     public MathTransform2D getHorizontalToGeographicCRS() throws FactoryException {
+        // No need to synhronize - this is not a big deal if the transform is searched twice.
         if (toGeographicCRS == null) {
             toGeographicCRS = (MathTransform2D) CRS.findMathTransform(horizontalCRS, DefaultGeographicCRS.WGS84);
         }

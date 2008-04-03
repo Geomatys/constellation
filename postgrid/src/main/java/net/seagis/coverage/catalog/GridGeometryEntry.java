@@ -57,10 +57,10 @@ final class GridGeometryEntry extends Entry {
     private static final long serialVersionUID = -3529884841649813534L;
 
     /**
-     * The spatial reference systems. Typically, many grid geometry will share the same
+     * The spatial reference systems. Typically many grid geometries will share the same
      * instance of {@link SpatialRefSysEntry}.
      */
-    final SpatialRefSysEntry srsEntry;
+    private final SpatialRefSysEntry srsEntry;
 
     /**
      * The immutable grid geometry, which may be 2D, 3D or 4D. The coordinate reference system is
@@ -121,6 +121,26 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
+     * Returns the SRID of the horizontal component of the CRS.
+     * This is a primary key in the {@code "spatial_ref_sys"} table.
+     */
+    public int getHorizontalSRID() {
+        return srsEntry.horizontalSRID;
+    }
+
+    /**
+     * Returns the coordinate reference system. May be up to 4-dimensional.
+     *
+     * @param time {@code true} if the CRS should include the time component,
+     *        or {@code false} for a spatial-only CRS.
+     */
+    public CoordinateReferenceSystem getCoordinateReferenceSystem(final boolean time) {
+        final CoordinateReferenceSystem crs = srsEntry.getCoordinateReferenceSystem(time);
+        assert !time || crs.equals(geometry.getCoordinateReferenceSystem()) : crs;
+        return crs;
+    }
+
+    /**
      * Returns {@code true} if the geographic bounding box described by this entry is empty.
      */
     public boolean isEmpty() {
@@ -174,13 +194,6 @@ final class GridGeometryEntry extends Entry {
                 gridRange.getLength(0), gridRange.getLength(1));
         shape = AffineTransform2D.transform(gridToCRS, shape, true);
         return shape;
-    }
-
-    /**
-     * Returns the coordinate reference system.
-     */
-    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-        return geometry.getCoordinateReferenceSystem();
     }
 
     /**
