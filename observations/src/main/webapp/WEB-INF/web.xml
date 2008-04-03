@@ -1,21 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-    <!-- Servlet for WMS/WCS -->
+    
+    <listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>SOService</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        </servlet>
     <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
         <servlet-class>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</servlet-class>
-        <init-param>
-          <param-name>com.sun.ws.rest.config.property.resourceConfigClass</param-name>
-          <param-value>com.sun.ws.rest.api.core.PackagesResourceConfig</param-value>
-        </init-param>
-        <init-param>
-          <param-name>com.sun.ws.rest.config.property.packages</param-name>
-          <param-value>net.seagis.sos.webservice</param-value>
-        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    <servlet-mapping>
+        <servlet-name>SOService</servlet-name>
+        <url-pattern>/SOService</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ServletAdaptor</servlet-name>
         <url-pattern>/WS/*</url-pattern>
     </servlet-mapping>
-</web-app>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        </welcome-file-list>
+    </web-app>
+
+

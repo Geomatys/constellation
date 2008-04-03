@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.sos.webservice;
+package net.seagis.sos.webservice.rest;
 
 // Jersey dependencies
 import java.io.IOException;
@@ -46,6 +46,10 @@ import net.seagis.sos.Capabilities;
 import net.seagis.sos.DescribeSensor;
 import net.seagis.sos.GetCapabilities;
 import net.seagis.sos.GetObservation;
+import net.seagis.sos.GetResult;
+import net.seagis.sos.InsertObservation;
+import net.seagis.sos.RegisterSensor;
+import net.seagis.sos.webservice.SOSworker;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
@@ -98,6 +102,33 @@ public class SOService extends WebService {
         
                 return Response.ok(worker.describeSensor(ds), "text/xml").build();
              
+             } else if (request.equalsIgnoreCase("InsertObservation") || (objectRequest instanceof InsertObservation)) {
+                InsertObservation is = (InsertObservation)objectRequest;
+                if (is == null){
+                    throw new OWSWebServiceException("The operation InsertObservation is only requestable in XML",
+                                                     OPERATION_NOT_SUPPORTED, "InsertObservation", getCurrentVersion());
+                }
+        
+                return Response.ok(worker.insertObservation(is), "text/xml").build();
+             
+             } else if (request.equalsIgnoreCase("GetResult") || (objectRequest instanceof GetResult)) {
+                GetResult gr = (GetResult)objectRequest;
+                if (gr == null){
+                    throw new OWSWebServiceException("The operation GetResult is only requestable in XML",
+                                                     OPERATION_NOT_SUPPORTED, "GetResult", getCurrentVersion());
+                }
+        
+                return Response.ok(worker.getResult(gr), "text/xml").build();
+             
+             } else if (request.equalsIgnoreCase("RegisterSensor") || (objectRequest instanceof RegisterSensor)) {
+                RegisterSensor rs = (RegisterSensor)objectRequest;
+                if (rs == null){
+                    throw new OWSWebServiceException("The operation RegisterSensor is only requestable in XML",
+                                                     OPERATION_NOT_SUPPORTED, "RegisterSensor", getCurrentVersion());
+                }
+        
+                return Response.ok(worker.registerSensor(rs), "text/xml").build();
+             
              } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 
                 GetCapabilities gc = (GetCapabilities)objectRequest;
@@ -107,45 +138,7 @@ public class SOService extends WebService {
                  */
                 if (gc == null) {
                     
-                    String version = getParameter("acceptVersions", false);
-                    AcceptVersionsType versions;
-                    if (version != null) {
-                        if (version.indexOf(',') != -1) {
-                           version = version.substring(0, version.indexOf(','));
-                        } 
-                        versions = new AcceptVersionsType(version);
-                    } else {
-                        versions = new AcceptVersionsType("1.0.0");
-                    }
-                    
-                    worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
-                    AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
-                        
-                    //We transform the String of sections in a list.
-                    //In the same time we verify that the requested sections are valid. 
-                    String section = getParameter("Sections", false);
-                    List<String> requestedSections = new ArrayList<String>();
-                    if (section != null && !section.equalsIgnoreCase("All")) {
-                        final StringTokenizer tokens = new StringTokenizer(section, ",;");
-                        while (tokens.hasMoreTokens()) {
-                            final String token = tokens.nextToken().trim();
-                            if (SectionsType.getExistingSections("1.1.1").contains(token)){
-                                requestedSections.add(token);
-                            } else {
-                                throw new OWSWebServiceException("The section " + token + " does not exist",
-                                                                INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion());
-                            }   
-                        }
-                    } else {
-                        //if there is no requested Sections we add all the sections
-                        requestedSections = SectionsType.getExistingSections("1.1.1");
-                    }
-                    SectionsType sections     = new SectionsType(requestedSections);
-                    gc = new GetCapabilities(versions,
-                                             sections,
-                                             formats,
-                                             null,
-                                             getParameter("SERVICE", true));
+                    gc = createNewGetCapabilities();
                 }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
@@ -179,5 +172,52 @@ public class SOService extends WebService {
                 throw new IllegalArgumentException("this service can't return WMS Exception");
             }
         }
+    }
+    
+    /**
+     * Build a new getCapabilities request from kvp encoding
+     */
+    private GetCapabilities createNewGetCapabilities() throws WebServiceException, JAXBException {
+        
+        String version = getParameter("acceptVersions", false);
+        AcceptVersionsType versions;
+        if (version != null) {
+            if (version.indexOf(',') != -1) {
+                version = version.substring(0, version.indexOf(','));
+            } 
+            versions = new AcceptVersionsType(version);
+        } else {
+            versions = new AcceptVersionsType("1.0.0");
+        }
+                    
+        worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+        AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+                        
+        //We transform the String of sections in a list.
+        //In the same time we verify that the requested sections are valid. 
+        String section = getParameter("Sections", false);
+        List<String> requestedSections = new ArrayList<String>();
+        if (section != null && !section.equalsIgnoreCase("All")) {
+            final StringTokenizer tokens = new StringTokenizer(section, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                if (SectionsType.getExistingSections("1.1.1").contains(token)){
+                    requestedSections.add(token);
+                } else {
+                    throw new OWSWebServiceException("The section " + token + " does not exist",
+                                                     INVALID_PARAMETER_VALUE, "Sections", getCurrentVersion());
+                }   
+            }
+        } else {
+            //if there is no requested Sections we add all the sections
+            requestedSections = SectionsType.getExistingSections("1.1.1");
+        }
+        SectionsType sections     = new SectionsType(requestedSections);
+        return new GetCapabilities(versions,
+                                   sections,
+                                   formats,
+                                   null,
+                                   getParameter("SERVICE", true));
+        
     }
 }
