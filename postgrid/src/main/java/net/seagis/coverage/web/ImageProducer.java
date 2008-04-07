@@ -48,6 +48,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -571,7 +572,7 @@ public abstract class ImageProducer {
                     final CoordinateReferenceSystem crs = getCoordinateReferenceSystem();
                     gridGeometry = new GeneralGridGeometry(gridRange, gridToCRS, crs);
                 } else {
-                    gridGeometry = new GeneralGridGeometry(gridToCRS, envelope);
+                    gridGeometry = new GeneralGridGeometry(PixelInCell.CELL_CORNER, gridToCRS, envelope);
                 }
             } else {
                 GeneralEnvelope envelope = this.envelope;
@@ -602,7 +603,7 @@ public abstract class ImageProducer {
                 } else if (gridRange != null) {
                     gridGeometry = new GeneralGridGeometry(gridRange, envelope);
                 } else {
-                    gridGeometry = new GeneralGridGeometry(gridToCRS, envelope);
+                    gridGeometry = new GeneralGridGeometry(PixelInCell.CELL_CORNER, gridToCRS, envelope);
                 }
             }
         }
