@@ -16,11 +16,17 @@
 
 package net.seagis.cat.csw;
 
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 
@@ -56,7 +62,41 @@ public class RequestStatusType {
     @XmlAttribute
     @XmlSchemaType(name = "dateTime")
     private XMLGregorianCalendar timestamp;
+    
+    @XmlTransient
+    private Logger logger = Logger.getLogger("net.seagis.cat.csw");
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    RequestStatusType() {
+        
+    }
+    
+    /**
+     * Build a new request statuc with the specified XML gregorian calendar.
+     */
+    public RequestStatusType(XMLGregorianCalendar timestamp) {
+        this.timestamp = timestamp;
+    }
+    
+    /**
+     * Build a new request statuc with the specified .
+     */
+    public RequestStatusType(long time) {
+        Date d = new Date(time);
+        GregorianCalendar cal = new  GregorianCalendar();
+        cal.setTime(d);
+        try {
+            DatatypeFactory factory = DatatypeFactory.newInstance();
+            this.timestamp = factory.newXMLGregorianCalendar(cal);
+        } catch(DatatypeConfigurationException ex) {
+            logger.severe("error at the timestamp initialisation in request status");
+        }
+    }
+    
+    
+    
     /**
      * Gets the value of the timestamp property.
      */

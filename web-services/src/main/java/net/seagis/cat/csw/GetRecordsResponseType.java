@@ -71,6 +71,24 @@ public class GetRecordsResponseType {
     private String version;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    GetRecordsResponseType() {
+        
+    }
+    
+    /**
+     * Build a new response to a getRecords request
+     */
+    public GetRecordsResponseType(String requestId, long time, String version, SearchResultsType searchResults) {
+        this.requestId     = requestId;
+        this.searchStatus  = new RequestStatusType(time);
+        this.version       = version;
+        this.searchResults = searchResults;
+        
+    }
+    
+    /**
      * Gets the value of the requestId property.
      */
     public String getRequestId() {

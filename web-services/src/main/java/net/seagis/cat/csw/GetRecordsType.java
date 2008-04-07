@@ -152,8 +152,11 @@ public class GetRecordsType extends RequestBaseType {
     /**
      * Gets the value of the abstractQuery property.
      */
-    public JAXBElement<? extends AbstractQueryType> getAbstractQuery() {
-        return abstractQuery;
+    public AbstractQueryType getAbstractQuery() {
+        if (abstractQuery!= null) {
+            return abstractQuery.getValue();
+        }
+        return null;
     }
 
     /**

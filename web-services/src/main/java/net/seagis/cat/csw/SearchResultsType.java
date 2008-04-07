@@ -15,7 +15,6 @@
 
 package net.seagis.cat.csw;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -95,17 +94,36 @@ public class SearchResultsType {
     private String recordSchema;
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger numberOfRecordsMatched;
+    private int numberOfRecordsMatched;
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger numberOfRecordsReturned;
+    private int numberOfRecordsReturned;
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger nextRecord;
+    private int nextRecord;
     @XmlAttribute
     @XmlSchemaType(name = "dateTime")
     private XMLGregorianCalendar expires;
 
+    /**
+     * An empty constructor used by JAXB 
+     */
+    SearchResultsType() {
+        
+    }
+    
+    /**
+     * build a new search results.
+     * One of any or abstract record have to be null.
+     */
+    public SearchResultsType(String resultSetId, ElementSetType elementSet) {
+        this.resultSetId = resultSetId;
+        this.elementSet  = elementSet;
+       
+        
+    }
+    
+    
     /**
      * Gets the value of the abstractRecord property.
      * (unModifiable)
@@ -152,21 +170,21 @@ public class SearchResultsType {
     /**
      * Gets the value of the numberOfRecordsMatched property.
      */
-    public BigInteger getNumberOfRecordsMatched() {
+    public int getNumberOfRecordsMatched() {
         return numberOfRecordsMatched;
     }
 
     /**
      * Gets the value of the numberOfRecordsReturned property.
      */
-    public BigInteger getNumberOfRecordsReturned() {
+    public int getNumberOfRecordsReturned() {
         return numberOfRecordsReturned;
     }
 
     /**
      * Gets the value of the nextRecord property.
      */
-    public BigInteger getNextRecord() {
+    public int getNextRecord() {
         return nextRecord;
     }
 

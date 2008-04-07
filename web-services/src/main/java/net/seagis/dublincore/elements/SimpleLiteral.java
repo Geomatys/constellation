@@ -115,6 +115,17 @@ public class SimpleLiteral {
         }
         return Collections.unmodifiableList(content);
     }
+    
+    public void setContent(List<String> content) {
+        this.content = content;
+    }
+    
+    public void setContent(String content) {
+        if (this.content == null) {
+            this.content = new ArrayList<String>();
+        }
+        this.content.add(content);
+    }
 
     /**
      * Gets the value of the scheme property.

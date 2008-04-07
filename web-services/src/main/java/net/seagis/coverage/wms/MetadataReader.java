@@ -15,6 +15,7 @@
  */
 package net.seagis.coverage.wms;
 
+// J2SE dependencies
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -41,6 +42,8 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
+
+// Seagis Dependencies
 import net.seagis.cat.csw.AbstractRecordType;
 import net.seagis.cat.csw.BriefRecordType;
 import net.seagis.cat.csw.ElementSetType;
@@ -50,7 +53,9 @@ import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.cat.csw.RecordType;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.ows.v100.OWSWebServiceException;
-import org.geotools.metadata.iso.MetadataEntity;
+import static net.seagis.ows.OWSExceptionCode.*;
+
+// MDWeb dependencies
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
 import org.mdweb.model.schemas.Standard;
@@ -59,9 +64,12 @@ import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
-import org.mdweb.sql.v20.Reader20;
+import org.mdweb.sql.Reader;
+
+//geotools dependencies
+import org.geotools.metadata.iso.MetadataEntity;
 import org.opengis.util.CodeList;
-import static net.seagis.ows.OWSExceptionCode.*;
+
 
 /**
  * Read The forms in the metadata database and instanciate them into geotools object.
@@ -79,7 +87,7 @@ public class MetadataReader {
     /**
      * A reader to the MDWeb database.
      */
-    private Reader20 MDReader;
+    private Reader MDReader;
     
     /**
      * A connection to the MDWeb database.
@@ -97,9 +105,9 @@ public class MetadataReader {
     private DateFormat dateFormat; 
     
     /**
-     * TODO remove this property to get all the Catalog (except MDATA)
+     * A list of MDWeb catalogs
      */
-    private List<Catalog> MDCatalog;
+    private List<Catalog> MDCatalogs;
     
     /**
      * A list of package containing the ISO 19115 interfaces (and the codelist classes)
@@ -139,14 +147,14 @@ public class MetadataReader {
      * 
      * @param MDReader a reader to the MDWeb database.
      */
-    public MetadataReader(Reader20 MDReader, Connection c) throws SQLException {
+    public MetadataReader(Reader MDReader, Connection c) throws SQLException {
         this.MDReader        = MDReader;
         this.connection      = c;
         this.dateFormat      = new SimpleDateFormat("dd-mm-yyyy");
         
-        this.MDCatalog       = new ArrayList<Catalog>();
-        this.MDCatalog.add(MDReader.getCatalog("FR_SY"));
-        this.MDCatalog.add(MDReader.getCatalog("CSWCat"));
+        this.MDCatalogs       = new ArrayList<Catalog>();
+        this.MDCatalogs.add(MDReader.getCatalog("FR_SY"));
+        this.MDCatalogs.add(MDReader.getCatalog("CSWCat"));
         
         this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing", "net.seagis.temporal");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata",  "org.opengis.referencing", "org.opengis.temporal");
@@ -174,9 +182,9 @@ public class MetadataReader {
                 result = metadatas.get(identifier);
                 if (result == null) {
                     //TODO gere plusieur catalogue proprement
-                    Form f = MDReader.getForm(MDCatalog.get(0), id);
+                    Form f = MDReader.getForm(MDCatalogs.get(0), id);
                     if (f == null) {
-                        MDReader.getForm(MDCatalog.get(1), id);
+                        MDReader.getForm(MDCatalogs.get(1), id);
                     }
                     result = getObjectFromForm(f);
                     if (result != null) {
@@ -184,9 +192,9 @@ public class MetadataReader {
                     }
                 }
             } else {
-                Form f = MDReader.getForm(MDCatalog.get(0), id);
+                Form f = MDReader.getForm(MDCatalogs.get(0), id);
                 if (f == null) {
-                    MDReader.getForm(MDCatalog.get(1), id);
+                    MDReader.getForm(MDCatalogs.get(1), id);
                 }
                 result = getRecordFromForm(f, type);
             }

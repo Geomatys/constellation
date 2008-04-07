@@ -87,7 +87,7 @@ public class CSWService extends WebService {
      */
     public CSWService() throws JAXBException, IOException, SQLException {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
-        setXMLContext("http://www.isotc211.org/2005/gmd", MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
+        setXMLContext("http://www.opengis.net/cat/csw/2.0.2", MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
                         ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
                         ,GetCapabilities.class, GetDomainType.class, GetRecordByIdType.class
                         ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
@@ -244,6 +244,7 @@ public class CSWService extends WebService {
             /* We don't print the stack trace:
              * - if the user have forget a mandatory parameter.
              * - if the version number is wrong.
+             * - if the user have send a wrong request parameter
              */
             if (ex instanceof OWSWebServiceException) {
                 OWSWebServiceException owsex = (OWSWebServiceException)ex;

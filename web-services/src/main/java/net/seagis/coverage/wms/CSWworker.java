@@ -41,7 +41,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
 import net.seagis.cat.csw.AbstractRecordType;
 import net.seagis.cat.csw.BriefRecordType;
 import net.seagis.cat.csw.Capabilities;
@@ -62,16 +61,19 @@ import net.seagis.cat.csw.HarvestType;
 import net.seagis.cat.csw.InsertType;
 import net.seagis.cat.csw.ListOfValuesType;
 import net.seagis.cat.csw.ObjectFactory;
+import net.seagis.cat.csw.QueryType;
 import net.seagis.cat.csw.RecordType;
 import net.seagis.cat.csw.RequestBaseType;
+import net.seagis.cat.csw.ResultType;
+import net.seagis.cat.csw.SearchResultsType;
 import net.seagis.cat.csw.SummaryRecordType;
 import net.seagis.cat.csw.TransactionResponseType;
 import net.seagis.cat.csw.TransactionSummaryType;
 import net.seagis.cat.csw.TransactionType;
 import net.seagis.cat.csw.UpdateType;
-import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
+import net.seagis.dublincore.elements.SimpleLiteral;
 import net.seagis.ogc.FilterCapabilities;
 import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
@@ -97,11 +99,8 @@ import org.mdweb.model.users.User;
 import org.mdweb.sql.v20.Reader20;
 
 import org.mdweb.sql.v20.Writer20;
-import org.mdweb.xml.MalFormedDocumentException;
-import org.mdweb.xml.Reader;
 import org.opengis.metadata.identification.Identification;
 import org.postgresql.ds.PGSimpleDataSource;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -151,6 +150,11 @@ public class CSWworker {
     private final MetadataReader MDReader;
     
     /**
+     * An Form creator from the MDWeb database.
+     */
+    private final MetadataWriter MDWriter;
+    
+    /**
      * A JAXB factory to csw object 
      */
     private final ObjectFactory cswFactory;
@@ -166,36 +170,106 @@ public class CSWworker {
     private final Marshaller marshaller;
     
     /**
-     * The data Catalog on whitch we write the data.
-     */
-    private final Catalog CSWCatalog;
-    
-    /**
-     * The MDWeb user who owe the inserted form.
-     */
-    private final User user;
-    
-    /**
      * The queryable element from ISO 19115 and their path id.
      */
     private static Map<String, List<String>> ISO_QUERYABLE;
     static {
         ISO_QUERYABLE      = new HashMap<String, List<String>>();
-        List<String> paths = new ArrayList<String>();
+        List<String> paths;
         
-        //TODO not found
-        ISO_QUERYABLE.put("RevisionDate",     paths);
+        /*
+         * The core queryable of ISO 19115
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:topicCategory");
+        ISO_QUERYABLE.put("Subject", paths);
         
+        //MANDATORY
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
+        ISO_QUERYABLE.put("Title", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
+        ISO_QUERYABLE.put("Abstract", paths);
+        
+        //MANDATORY TODO tout les valeur
+        paths = new ArrayList<String>();
+        paths.add("*");
+        ISO_QUERYABLE.put("AnyText", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");
+        ISO_QUERYABLE.put("Format", paths);
+        
+        //MANDATORY
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:fileIdentifier");
+        ISO_QUERYABLE.put("Identifier", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:dateStamp");
+        ISO_QUERYABLE.put("Modified", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:hierarchyLevel");
+        ISO_QUERYABLE.put("Type", paths);
+        
+        /*
+         * Bounding box
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude");
+        ISO_QUERYABLE.put("WestBoundLongitude",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude");
+        ISO_QUERYABLE.put("EastBoundLongitude",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLongitude");
+        ISO_QUERYABLE.put("NorthBoundLongitude",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLongitude");
+        ISO_QUERYABLE.put("SouthBoundLongitude",     paths);
+        
+        /*
+         * CRS 
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:codeSpace");
+        ISO_QUERYABLE.put("Authority",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:code");
+        ISO_QUERYABLE.put("ID",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:code");
+        ISO_QUERYABLE.put("Version",     paths);
+        
+        /*
+         * Additional queryable Element
+         */ 
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:alternateTitle");
         ISO_QUERYABLE.put("AlternateTitle",   paths);
         
+        //TODO verify codelist  CI_DateTypeCode=revision
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:dateStamp");
-        ISO_QUERYABLE.put("CreationDate",     paths);
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date");
+        ISO_QUERYABLE.put("RevisionDate",  paths);
         
-        //TODO not found
+        //TODO verify codelist  CI_DateTypeCode=creation
         paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date");
+        ISO_QUERYABLE.put("CreationDate",  paths);
+        
+        //TODO verify codelist  CI_DateTypeCode=publication
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date");
         ISO_QUERYABLE.put("PublicationDate",  paths);
         
         paths = new ArrayList<String>();
@@ -204,13 +278,17 @@ public class CSWworker {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:organisationName");
         ISO_QUERYABLE.put("OrganisationName", paths);
         
+        //TODO If an instance of the class MD_SecurityConstraint exists for a resource, the “HasSecurityConstraints” is “true”, otherwise “false”
+        paths = new ArrayList<String>();
+        ISO_QUERYABLE.put("HasSecurityConstraints", paths);
+        
         //TODO MD_FeatureCatalogueDescription
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:language");
         ISO_QUERYABLE.put("Language", paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:fileIdentifier");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:identifier:code");
         ISO_QUERYABLE.put("ResourceIdentifier", paths);
         
         paths = new ArrayList<String>();
@@ -218,7 +296,7 @@ public class CSWworker {
         ISO_QUERYABLE.put("ParentIdentifier", paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:Type");
         ISO_QUERYABLE.put("KeywordType", paths);
         
         paths = new ArrayList<String>();
@@ -229,15 +307,30 @@ public class CSWworker {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:language");
         ISO_QUERYABLE.put("ResourceLanguage", paths);
         
-        //TODO not found
         paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:code");
         ISO_QUERYABLE.put("GeographicDescriptionCode", paths);
         
-        //TODO not found
+        /*
+         * spatial resolution
+         */
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:equivalentScale:denominator");
+        ISO_QUERYABLE.put("Denominator", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:distance");
         ISO_QUERYABLE.put("DistanceValue", paths);
-        //TODO not found
+        
+        //TODO not existing path in MDWeb or geotools (Distance is treated as a primitive type)
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:distance:uom");
         ISO_QUERYABLE.put("DistanceUOM", paths);
         
+        /*
+         * Temporal Extent
+         */ 
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition");
         ISO_QUERYABLE.put("TempExtent_begin", paths);
@@ -246,9 +339,7 @@ public class CSWworker {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:endPosition");
         ISO_QUERYABLE.put("TempExtent_end", paths);
         
-        paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:equivalentScale:denominator");
-        ISO_QUERYABLE.put("Denominator", paths);
+       
         
         // the following element are described in Service part of ISO 19139 not yet used in MDWeb 
         paths = new ArrayList<String>();
@@ -261,6 +352,113 @@ public class CSWworker {
         ISO_QUERYABLE.put("OperatesOnWithOpName", paths);
     }
     
+    /**
+     * The queryable element from DublinCore and their path id.
+     */
+    private static Map<String, List<String>> DUBLIN_CORE_QUERYABLE;
+    static {
+        DUBLIN_CORE_QUERYABLE = new HashMap<String, List<String>>();
+        List<String> paths;
+        
+        /*
+         * The core queryable of DublinCore
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
+        paths.add("Catalog Web Service:Record:title");
+        DUBLIN_CORE_QUERYABLE.put("title", paths);
+        
+        //TODO verify codelist=originator
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
+        paths.add("Catalog Web Service:Record:creator");
+        DUBLIN_CORE_QUERYABLE.put("creator", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:topicCategory");
+        paths.add("Catalog Web Service:Record:subject");
+        DUBLIN_CORE_QUERYABLE.put("description", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
+        paths.add("Catalog Web Service:Record:abstract");
+        DUBLIN_CORE_QUERYABLE.put("abstract", paths);
+        
+        //TODO verify codelist=publisher
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
+        paths.add("Catalog Web Service:Record:publisher");
+        DUBLIN_CORE_QUERYABLE.put("publisher", paths);
+        
+        //TODO verify codelist=contributor
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
+        paths.add("Catalog Web Service:Record:contributor");
+        DUBLIN_CORE_QUERYABLE.put("contributor", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:dateStamp");
+        paths.add("Catalog Web Service:Record:date");
+        DUBLIN_CORE_QUERYABLE.put("date", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:hierarchyLevel");
+        paths.add("Catalog Web Service:Record:type");
+        DUBLIN_CORE_QUERYABLE.put("type", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");
+        paths.add("Catalog Web Service:Record:format");
+        DUBLIN_CORE_QUERYABLE.put("format", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:fileIdentifier");
+        paths.add("Catalog Web Service:Record:identifier");
+        DUBLIN_CORE_QUERYABLE.put("identifier", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("Catalog Web Service:Record:source");
+        DUBLIN_CORE_QUERYABLE.put("source", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:language");
+        paths.add("Catalog Web Service:Record:language");
+        DUBLIN_CORE_QUERYABLE.put("language", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:aggregationInfo");
+        paths.add("Catalog Web Service:Record:relation");
+        DUBLIN_CORE_QUERYABLE.put("relation", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:accessConstraints");
+        paths.add("Catalog Web Service:Record:rights");
+        DUBLIN_CORE_QUERYABLE.put("rigths", paths);
+        
+        /*
+         * Bounding box
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude");
+        paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner");
+        DUBLIN_CORE_QUERYABLE.put("WestBoundLongitude",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude");
+        paths.add("Catalog Web Service:Record:BoundingBox:UpperCorner");
+        DUBLIN_CORE_QUERYABLE.put("EastBoundLongitude",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLongitude");
+        paths.add("Catalog Web Service:Record:BoundingBox:UpperCorner");
+        DUBLIN_CORE_QUERYABLE.put("NorthBoundLongitude",     paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLongitude");
+        paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner");
+        DUBLIN_CORE_QUERYABLE.put("SouthBoundLongitude",     paths);
+    }
     
     /**
      * A list of supported MIME type 
@@ -289,6 +487,15 @@ public class CSWworker {
      */
     private final static QName _Capabilities_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities");
     
+    /**
+     * A list of the supported Type name 
+     */
+    private final static List<QName> SUPPORTED_TYPE_NAME;
+    static {
+        SUPPORTED_TYPE_NAME = new ArrayList<QName>();
+        SUPPORTED_TYPE_NAME.add(_Record_QNAME);
+        SUPPORTED_TYPE_NAME.add(_Metadata_QNAME);
+    }
     
     /**
      * Build a new CSW worker
@@ -339,14 +546,12 @@ public class CSWworker {
                 databaseReader  = null;
                 databaseWriter  = null;
                 MDReader        = null;
-                CSWCatalog      = null;
-                user            = null;
+                MDWriter        = null;
             } else {
                  databaseReader  = new Reader20(Standard.ISO_19115,  MDConnection);
                  databaseWriter  = new Writer20(MDConnection);
-                 MDReader   = new MetadataReader(databaseReader, dataSourceMD.getConnection());
-                 CSWCatalog = databaseReader.getCatalog("CSWCat");
-                 user       = databaseReader.getUser("admin");
+                 MDReader        = new MetadataReader(databaseReader, dataSourceMD.getConnection());
+                 MDWriter        = new MetadataWriter(databaseReader, databaseWriter);
                  logger.info("CSW service running");
             }
             
@@ -354,8 +559,7 @@ public class CSWworker {
             databaseReader  = null;
             databaseWriter  = null;
             MDReader        = null;
-            CSWCatalog      = null;
-            user            = null;
+            MDWriter        = null;
             MDConnection    = null;
         }
     }
@@ -445,10 +649,74 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetRecordsResponseType getRecords(GetRecordsType request) throws OWSWebServiceException{
-        if (true)
-            throw new OWSWebServiceException("not yet available", NO_APPLICABLE_CODE, "request", version);
-        return new GetRecordsResponseType();
+    public GetRecordsResponseType getRecords(GetRecordsType request) throws WebServiceException{
+        verifyBaseRequest(request);
+        
+        //we prepare the response
+        GetRecordsResponseType response;
+        
+        String ID = request.getRequestId();
+        
+        // we initialize the output format of the response
+        String format = request.getOutputFormat();
+        if (format != null && isSupportedFormat(format)) {
+            outputFormat = format;
+        }
+        
+        //we get the output schema and verify that we handle it
+        String outputSchema = "http://www.opengis.net/cat/csw/2.0.2";
+        if (request.getOutputSchema() != null) {
+            outputSchema = request.getOutputSchema();
+            if (!outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2") && 
+                !outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
+                throw new OWSWebServiceException("The server does not support this output schema: " + outputSchema,
+                                                  INVALID_PARAMETER_VALUE, "outputSchema", version);
+            }
+        }
+        
+        //We get the resultType
+        ResultType resultType = ResultType.HITS;
+        if (request.getResultType() != null) {
+            resultType = request.getResultType();
+        }
+        
+        //We initialize (and verify) the principal attrbute of the query
+        QueryType query;
+        List<QName> typeNames;
+        if (request.getAbstractQuery() != null) {
+            query = (QueryType)request.getAbstractQuery();
+            typeNames =  query.getTypeNames();
+            if (typeNames == null || typeNames.size() == 0) {
+                throw new OWSWebServiceException("The query must specify at least typeName.",
+                                                 INVALID_PARAMETER_VALUE, "TypeNames", version);
+            } else {
+                for (QName type:typeNames) {
+                    if (!SUPPORTED_TYPE_NAME.contains(type)) {
+                        throw new OWSWebServiceException("The typeName " + type.getLocalPart() + " is not supported by the service" ,
+                                                         INVALID_PARAMETER_VALUE, "TypeNames", version);
+                    }
+                }
+            }
+        } else {
+            throw new OWSWebServiceException("The request must contains a query.",
+                                             INVALID_PARAMETER_VALUE, "Query", version);
+        }
+        
+        SearchResultsType searchResults;
+        if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
+            
+            searchResults = new SearchResultsType(ID, query.getElementSetName().getValue());
+        } else if (outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
+            
+            searchResults = new SearchResultsType(ID, query.getElementSetName().getValue());
+        // this case must never append
+        } else {
+            response      = null;
+            searchResults = null;
+        }
+        
+        response = new GetRecordsResponseType(ID, System.currentTimeMillis(), version.toString(), searchResults);
+        return response;
     }
     
     /**
@@ -460,10 +728,12 @@ public class CSWworker {
     public GetRecordByIdResponseType getRecordById(GetRecordByIdType request) throws WebServiceException {
         verifyBaseRequest(request);
         
+        // we initialize the output format of the response
         String format = request.getOutputFormat();
         if (format != null && isSupportedFormat(format)) {
             outputFormat = format;
         }
+        
         
         // we get the level of the record to return (Brief, summary, full)
         ElementSetType set = ElementSetType.SUMMARY;
@@ -687,14 +957,19 @@ public class CSWworker {
                                 record = ((JAXBElement)record).getValue();
                             }
                             //here we try to get the title
+                            SimpleLiteral titleSL = null;
                             String title = "unknow title";
                             if (record instanceof RecordType) {
-                                title = ((RecordType) record).getTitle();
-                                if (title == null) {
-                                    title = ((RecordType) record).getIdentifier();
+                                titleSL = ((RecordType) record).getTitle();
+                                if (titleSL == null) {
+                                    titleSL = ((RecordType) record).getIdentifier();
                                 }
-                                if (title == null) {
+                                
+                                if (titleSL == null) {
                                     title = "unknow title";
+                                } else {
+                                    if (titleSL.getContent() != null && titleSL.getContent().size() > 0)
+                                        title = titleSL.getContent().get(0);
                                 }
                                 
                             
@@ -709,13 +984,7 @@ public class CSWworker {
                             } else {
                                 logger.severe("unknow type: " + record.getClass().getName() + " unable to find a title");
                             } 
-                            Reader XMLReader = new Reader(databaseReader, tempFile, databaseWriter);
-                            Form f           = XMLReader.readForm(CSWCatalog, 
-                                                                  user, 
-                                                                  "seagis CSW", 
-                                                                  title,
-                                                                  databaseReader.getStandard("Catalog Web Service"));
-                            
+                            Form f = MDWriter.getFormFromObject(record, title);
                             databaseWriter.writeForm(f, false);
                             totalInserted++;
                             
@@ -729,29 +998,26 @@ public class CSWworker {
                             ex.printStackTrace();
                             throw new OWSWebServiceException("The service has throw an SQLException: " + ex.getMessage(),
                                                              NO_APPLICABLE_CODE, null, version);
-                            
-                        } catch (ParserConfigurationException ex) {
-                            throw new OWSWebServiceException("The request is malFormed(ParserConfiguration): " + ex.getMessage() ,
-                                                             NO_APPLICABLE_CODE, null, version);
-                        } catch (SAXException ex) {
-                            throw new OWSWebServiceException("The request is malFormed(SAX): " + ex.getMessage(),
-                                                             NO_APPLICABLE_CODE, null, version);
-                        } catch (MalFormedDocumentException ex) {
-                            throw new OWSWebServiceException("The request is malFormed: " + ex.getMessage(),
-                                                             NO_APPLICABLE_CODE, null, version);
-                        }
-                        
+                        } 
                 }
             } else if (transaction instanceof DeleteType) {
                 DeleteType deleteRequest = (DeleteType)transaction;
+                throw new OWSWebServiceException("This kind of transaction (delete) is not yet supported by the service.",
+                                                  NO_APPLICABLE_CODE, "TransactionType", version);
                 
                 
             } else if (transaction instanceof UpdateType) {
                 UpdateType updateRequest = (UpdateType)transaction;
+                throw new OWSWebServiceException("This kind of transaction (update) is not yet supported by the service.",
+                                                  NO_APPLICABLE_CODE, "TransactionType", version);
             
                 
             } else {
-                throw new OWSWebServiceException("This kind of transaction is not supported by the service.",
+                String className = " null object";
+                if (transaction != null) {
+                    className = transaction.getClass().getName();
+                }
+                throw new OWSWebServiceException("This kind of transaction is not supported by the service: " + className,
                                                   INVALID_PARAMETER_VALUE, "TransactionType", version);
             }
             

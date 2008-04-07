@@ -59,7 +59,7 @@ import org.geotools.metadata.iso.MetaDataImpl;
     "abstractRecord",
     "any"
 })
-@XmlRootElement(name="GetRecordByIdResponseType")
+@XmlRootElement(name="GetRecordByIdResponse")
 public class GetRecordByIdResponseType {
 
     @XmlElementRef(name = "AbstractRecord", namespace = "http://www.opengis.net/cat/csw/2.0.2", type = JAXBElement.class)
@@ -87,14 +87,7 @@ public class GetRecordByIdResponseType {
         this.any = metadatas;
     }
     
-    /**
-     * Build a new response to a getRecordById request.
-     * ISO version
-     
-    public GetRecordByIdResponseType(List<MetaDataImpl> metadatas) {
-        this.any = metadatas;
-    }*/
-    
+       
     /**
      * Gets the value of the abstractRecord property.
      * (unmodifiable) 
