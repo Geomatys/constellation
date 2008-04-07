@@ -46,9 +46,12 @@ import static java.lang.Math.*;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.spatial.PixelOrientation;
 
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.netcdf.NetcdfReadParam;
@@ -73,7 +76,9 @@ import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XDimension2D;
+import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
 
 import net.seagis.catalog.Entry;
 import net.seagis.coverage.model.Operation;
@@ -112,7 +117,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /** Image start time, inclusive. */ private final long   startTime;
     /** Image end time, exclusive.   */ private final long   endTime;
     /** Index of image to be read.   */ private final short  index;
-    /** The band to read, or 0.      */ private final short  band;
+    /** The z index (1-based), or 0. */ private final short  zIndice;
 
     /**
      * If the image is tiled, the tiles. Otherwise {@code null}. This field is set only after
@@ -143,6 +148,11 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     private final GridCoverageSettings settings;
 
     /**
+     * The grid geometry. Created by {@link #getGridGeometry} when first needed.
+     */
+    private transient GridGeometry2D gridGeometry;
+
+    /**
      * Référence molle vers l'image {@link GridCoverage2D} qui a été retournée lors du dernier appel
      * de {@link #getCoverage}. Cette référence est retenue afin d'éviter de charger inutilement une
      * autre fois l'image si elle est déjà en mémoire.
@@ -164,18 +174,20 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     private transient int memoryUsage;
 
     /**
-     * Construit une entré contenant des informations sur une image. Un {@linkplain #getName nom unique}
-     * sera construit à partir de la série et du nom de fichiers (les colonnes {@code series} et
-     * {@code filename}, qui constituent habituellement la clé primaire de la table).
-     * <p>
-     * <strong>NOTE:</strong> Les coordonnées {@code xmin}, {@code xmax}, {@code ymin} et {@code ymax}
-     * ne sont <u>pas</u> exprimées selon le système de coordonnées de l'image, mais plutôt selon le
-     * système de coordonnées de la table d'images ({@code table}). La transformation sera effectuée
-     * par {@link #getEnvelope()} à la volé.
+     * Creates an entry containing coverage information (but not yet the coverage itself). A
+     * {@linkplain #getName unique name} is created from some of the provided informations.
      *
-     * @param  table Table d'où proviennent les enregistrements.
-     * @throws CatalogException si des arguments sont invalides.
-     * @throws SQLException si une erreur est survenue lors de l'accès à la base de données.
+     * @param  table     The table which is creating this entry.
+     * @param  series    The series which own this entry.
+     * @param  filename  The name (without path and extension) of the file to be read.
+     * @param  index     The index of the image to be read.
+     * @param  startTime The coverage start time, or {@code null} if none.
+     * @param  endTime   The coverage end time, or {@code null} if none.
+     * @param  geometry  The geometry of the grid, including CRS informations.
+     * @param  zIndice   The altitude as an 1-based indice in the vertical ordinates array, or 0 if none.
+     * @param  remarks   Optional remarks, or {@code null} if none.
+     * @throws CatalogException If some argument are invalid.
+     * @throws SQLException If an error occured while querying the database.
      */
     protected GridCoverageEntry(final GridCoverageTable table,
                                 final Series            series,
@@ -184,17 +196,17 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                                 final Date              startTime,
                                 final Date              endTime,
                                 final GridGeometryEntry geometry,
-                                final short             band,
+                                final short             zIndice,
                                 final String            remarks)
             throws CatalogException, SQLException
     {
-        super(createName(series.getName(), filename, index, band), remarks);
+        super(createName(series.getName(), filename, index, zIndice), remarks);
         final CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem(true);
         this.series    = series;
         this.filename  = filename;
         this.geometry  = geometry;
         this.index     = index;
-        this.band      = band;
+        this.zIndice   = zIndice;
         this.settings  = table.getSettings(crs);
         this.startTime = (startTime != null) ? startTime.getTime() : Long.MIN_VALUE;
         this.  endTime = (  endTime != null) ?   endTime.getTime() : Long.MAX_VALUE;
@@ -306,18 +318,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * {@inheritDoc}
      */
     public Envelope getEnvelope() {
-        final Rectangle clipPixels = new Rectangle();
-        final Envelope envelope;
-        try {
-            if (!computeBounds(clipPixels, null)) {
-                return null;
-            }
-            envelope = computeEnvelope(clipPixels);
-        } catch (TransformException exception) {
-            // Should not happen if the coordinate in the database are valids.
-            throw new IllegalStateException(exception.getLocalizedMessage(), exception);
-        }
-        return envelope;
+        return getGridGeometry().getEnvelope();
     }
 
     /**
@@ -360,35 +361,56 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
 
     /**
      * {@inheritDoc}
-     *
-     * @todo Should computes the geometry by {@link GridGeometryEntry} instead.
      */
     @SuppressWarnings("fallthrough")
     public GridGeometry2D getGridGeometry() {
-        final Rectangle clipPixels  = new Rectangle();
-        final Dimension subsampling = new Dimension();
-        final Envelope envelope;
-        try {
-            if (!computeBounds(clipPixels, subsampling)) {
-                return null;
+        // No need to synchronize - not a big deal if created twice.
+        if (gridGeometry == null) {
+            final Rectangle clipPixels  = new Rectangle();
+            final Dimension subsampling = new Dimension();
+            try {
+                if (!computeBounds(clipPixels, subsampling)) {
+                    return null;
+                }
+            } catch (TransformException exception) {
+                // Should not happen if the coordinates in the database are valids.
+                throw new IllegalStateException(exception.getLocalizedMessage(), exception);
             }
-            envelope = computeEnvelope(clipPixels);
-        } catch (TransformException exception) {
-            // Should not happen if the coordinates in the database are valids.
-            throw new IllegalStateException(exception.getLocalizedMessage(), exception);
+            /*
+             * If the grid coverage has a temporal dimension, we need to set the scale and offset
+             * coefficients for it. Those coefficients need to be set on a coverage-by-coverage
+             * basis since they are typically different for each coverage even if they share the
+             * same GridGeometryEntry.
+             */
+            final DefaultTemporalCRS  temporalCRS = settings.getTemporalCRS();
+            final double tmin = temporalCRS.toValue(new Date(startTime));
+            final double tmax = temporalCRS.toValue(new Date(  endTime));
+            final boolean unbounded = Double.isInfinite(tmin) && Double.isInfinite(tmax);
+            final CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem(!unbounded);
+            final int dimension = crs.getCoordinateSystem().getDimension();
+            final XMatrix matrix = geometry.getGridToCRS(clipPixels, subsampling, dimension, zIndice);
+            if (!unbounded) {
+                matrix.setElement(dimension-1, dimension-1, tmax - tmin);
+                matrix.setElement(dimension-1, dimension, tmin);
+            }
+            final MathTransform gridToCRS = ProjectiveTransform.create(matrix);
+            /*
+             * Creates a GridGeometry2D using the gridToCRS we just computed. We use a custom
+             * DimensionFilter in order to reuse the existing AffineTransform2D rather than
+             * letting GridGeometry2D creates a new one.
+             */
+            final int[] lower = new int[dimension];
+            final int[] upper = new int[dimension];
+            switch (dimension) {
+                default: Arrays.fill(upper, 2, dimension, 1);               // Fall through
+                case 2:  upper[1] = clipPixels.height / subsampling.width;  // Fall through
+                case 1:  upper[0] = clipPixels.width  / subsampling.height; // Fall through
+                case 0:  break;
+            }
+            final GeneralGridRange gridRange = new GeneralGridRange(lower, upper);
+            gridGeometry = new GridGeometry2D(gridRange, PixelInCell.CELL_CORNER, gridToCRS, crs, null);
         }
-        final int dimension = envelope.getDimension();
-        final int[]   lower = new int[dimension];
-        final int[]   upper = new int[dimension];
-        switch (dimension) {
-            // Fall through in every cases.
-            default: Arrays.fill(upper, 2, dimension, 1);
-            case 2:  upper[1] = clipPixels.height / subsampling.width;
-            case 1:  upper[0] = clipPixels.width  / subsampling.height;
-            case 0:  break;
-        }
-        final GeneralGridRange gridRange = new GeneralGridRange(lower, upper);
-        return new GridGeometry2D(gridRange, envelope, new boolean[]{false,true,false}, false);
+        return gridGeometry;
     }
 
     /**
@@ -650,14 +672,13 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         /*
          * Obtient les coordonnées pixels et les coordonnées logiques de la région à extraire.
          */
+        final GridGeometry2D gridGeometry = getGridGeometry();
         final Rectangle clipPixels  = new Rectangle();
         final Dimension subsampling = new Dimension();
-        final GeneralEnvelope envelope;
         try {
             if (!computeBounds(clipPixels, subsampling)) {
                 return null;
             }
-            envelope = computeEnvelope(clipPixels);
         } catch (TransformException exception) {
             throw new IIOException(exception.getLocalizedMessage(), exception);
         }
@@ -684,9 +705,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                 param.setSourceRegion(clipPixels);
                 param.setSourceSubsampling(subsampling.width,   subsampling.height,
                                            subsampling.width/2, subsampling.height/2);
-                if (band != 0) {
+                if (zIndice != 0) {
                     // Selects a particular depth in a 3D coverage.
-                    param.setSourceBands(new int[] {band});
+                    param.setSourceBands(new int[] {zIndice - 1});
                 }
                 final int imageIndex;
                 if (handleSpecialCases(param) || format.getImageFormat().equalsIgnoreCase("RAW")) {
@@ -714,10 +735,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         final GridCoverageFactory factory = GridCoveragePool.DEFAULT.factory;
         GridCoverage2D coverage;
         if (bands != null && bands.length != 0) {
-            coverage = factory.create(filename, image, envelope, bands, null, properties);
+            coverage = factory.create(filename, image, gridGeometry, bands, null, properties);
         } else {
             // No SampleDimension in the database. Lets the factory use default ones.
-            coverage = factory.create(filename, image, envelope, null, null, properties);
+            coverage = factory.create(filename, image, gridGeometry, null, null, properties);
         }
         /*
          * Retourne toujours la version "géophysique" de l'image.
@@ -804,7 +825,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         final int height2 = gridRange2.getLength(1);
         if (this.startTime == that.startTime &&
             this.endTime   == that.endTime   &&
-            this.band      == that.band      &&
+            this.zIndice   == that.zIndice   &&
             geometry.sameEnvelope(that.geometry) &&
             Utilities.equals(this.series.getLayer(), that.series.getLayer()) &&
             CRS.equalsIgnoreMetadata(settings.tableCRS, that.settings.tableCRS))
@@ -842,7 +863,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         }
         if (super.equals(object)) {
             final GridCoverageEntry that = (GridCoverageEntry) object;
-            return this.band      == that.band      &&
+            return this.zIndice   == that.zIndice   &&
                    this.index     == that.index     &&
                    this.startTime == that.startTime &&
                    this.endTime   == that.endTime   &&

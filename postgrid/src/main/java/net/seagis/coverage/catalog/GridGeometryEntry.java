@@ -20,18 +20,20 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
+import java.awt.geom.AffineTransform;
+import static java.lang.Math.abs;
 
-import org.opengis.geometry.Envelope;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
 import org.geotools.resources.Utilities;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
+import org.geotools.referencing.operation.matrix.MatrixFactory;
+import org.geotools.referencing.operation.matrix.XMatrix;
 
 import net.seagis.catalog.Entry;
 
@@ -112,8 +114,8 @@ final class GridGeometryEntry extends Entry {
         this.gridToCRS         = gridToCRS;
         this.verticalOrdinates = verticalOrdinates;
         if (verticalOrdinates != null) {
-            if (verticalOrdinates.length > Short.MAX_VALUE) {
-                throw new IllegalArgumentException(); // See 'indexOf' for this limitation.
+            if (verticalOrdinates.length > Short.MAX_VALUE - 1) {
+                throw new IllegalArgumentException(); // See 'getAltitudeIndex' for this limitation.
             }
         }
         geometry = srsEntry.getGridGeometry(size, gridToCRS, verticalOrdinates);
@@ -138,6 +140,48 @@ final class GridGeometryEntry extends Entry {
         final CoordinateReferenceSystem crs = srsEntry.getCoordinateReferenceSystem(time);
         assert !time || crs.equals(geometry.getCoordinateReferenceSystem()) : crs;
         return crs;
+    }
+
+    /**
+     * Returns a matrix for the <cite>grid to CRS</cite> affine transform.  The coefficients for
+     * the horizontal and vertical (if any) dimensions are initialized. But the coefficients for
+     * the temporal dimension (if any) must be initialized by the caller. The temporal dimension
+     * is assumed the last one.
+     *
+     * @param clip        The source region to be read in pixel coordinates.
+     * @param subsampling The subsampling which is going to be applies during the reading process.
+     * @param dimension   The number of dimensions for the source and target CRS.
+     * @param zIndice     The 1-based indice of the <var>z</var> value, or 0 if none.
+     */
+    final XMatrix getGridToCRS(final Rectangle clip, final Dimension subsampling,
+                               final int dimension, int zIndice)
+    {
+        final XMatrix matrix = MatrixFactory.create(dimension + 1);
+        AffineTransform tr = gridToCRS;
+        if (clip.x != 0 || clip.y != 0 || subsampling.width != 1 || subsampling.height != 1) {
+            tr = new AffineTransform(tr);
+            tr.translate(clip.x, clip.y);
+            tr.scale(subsampling.width, subsampling.height);
+        }
+        SpatialRefSysEntry.copy(tr, matrix);
+        if (verticalOrdinates != null) {
+            final int imax = verticalOrdinates.length - 1;
+            if (--zIndice > imax) {
+                zIndice = imax;
+            }
+            if (zIndice >= 0) {
+                final int zDimension = srsEntry.zDimension();
+                if (zDimension >= 0) {
+                    final double z = verticalOrdinates[zIndice];
+                    final double before = (zIndice != 0)    ? z - verticalOrdinates[zIndice - 1] : 0;
+                    final double after  = (zIndice != imax) ? verticalOrdinates[zIndice + 1] - z : 0;
+                    double interval = (before != 0 && abs(before) <= abs(after)) ? before : after;
+                    matrix.setElement(zDimension, zDimension, interval);
+                    matrix.setElement(zDimension, dimension, z - 0.5*interval);
+                }
+            }
+        }
+        return matrix;
     }
 
     /**
@@ -197,31 +241,6 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * Returns the envelope with altitude restricted to the specified band. Altitudes are stored
-     * in the database as an array. This method replace the altitude range, which was previously
-     * from the minimum to the maximum value declared in the array, to the value at one specific
-     * element of the altitude array.
-     *
-     * @param The band number, in the range 0 inclusive to
-     *        <code>{@linkplain #getVerticalOrdinates}.length</code> exclusive.
-     */
-    final Envelope getEnvelope(final int band) {
-        final GeneralEnvelope envelope = (GeneralEnvelope) geometry.getEnvelope();
-        if (verticalOrdinates != null && verticalOrdinates.length > 1) {
-            final int zDimension = srsEntry.zDimension();
-            if (zDimension >= 0) {
-                final double z = verticalOrdinates[band];
-                final int floor = Math.max(0, band - 1);
-                final int ceil  = Math.min(band + 1, verticalOrdinates.length - 1);
-                envelope.setRange(zDimension,
-                        z - 0.5*Math.abs(verticalOrdinates[floor+1] - verticalOrdinates[floor]),
-                        z + 0.5*Math.abs(verticalOrdinates[ceil] - verticalOrdinates[ceil-1]));
-            }
-        }
-        return envelope;
-    }
-
-    /**
      * Returns the vertical ordinate values, or {@code null} if none. If non-null,
      * then the array length must be equals to the {@code gridRange.getLength(2)}.
      */
@@ -234,19 +253,22 @@ final class GridGeometryEntry extends Entry {
     }
 
     /**
-     * Returns the index of the closest altitude. If this entry contains no altitude, or
-     * if the specified <var>z</var> is not a finite number, then this method returns 0.
+     * Returns the 1-based index of the closest altitude. If this entry contains no altitude,
+     * or if the specified <var>z</var> is not a finite number, then this method returns 0.
+     *
+     * @param z The value to search for.
+     * @return  The 1-based altitude index, or {@code 0} if none.
      */
-    final short indexOf(final double z) {
+    final short getAltitudeIndex(final double z) {
         short index = 0;
         if (!Double.isNaN(z) && !Double.isInfinite(z)) {
             double delta = Double.POSITIVE_INFINITY;
             if (verticalOrdinates != null) {
                 for (int i=0; i<verticalOrdinates.length; i++) {
-                    final double d = Math.abs(verticalOrdinates[i] - z);
+                    final double d = abs(verticalOrdinates[i] - z);
                     if (d < delta) {
                         delta = d;
-                        index = (short) i; // Array length has been checked at construction time.
+                        index = (short) (i + 1); // Array length has been checked at construction time.
                     }
                 }
             }

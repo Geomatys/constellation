@@ -572,7 +572,7 @@ public abstract class ImageProducer {
                     final CoordinateReferenceSystem crs = getCoordinateReferenceSystem();
                     gridGeometry = new GeneralGridGeometry(gridRange, gridToCRS, crs);
                 } else {
-                    gridGeometry = new GeneralGridGeometry(PixelInCell.CELL_CORNER, gridToCRS, envelope);
+                    gridGeometry = new GeneralGridGeometry(PixelInCell.CELL_CENTER, gridToCRS, envelope);
                 }
             } else {
                 GeneralEnvelope envelope = this.envelope;
@@ -603,7 +603,7 @@ public abstract class ImageProducer {
                 } else if (gridRange != null) {
                     gridGeometry = new GeneralGridGeometry(gridRange, envelope);
                 } else {
-                    gridGeometry = new GeneralGridGeometry(PixelInCell.CELL_CORNER, gridToCRS, envelope);
+                    gridGeometry = new GeneralGridGeometry(PixelInCell.CELL_CENTER, gridToCRS, envelope);
                 }
             }
         }

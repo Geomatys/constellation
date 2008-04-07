@@ -223,6 +223,12 @@ public class WebServiceWorkerTest extends DatabaseTest {
          * Sets an envelope intentionnaly bigger. We want to test the background color.
          */
         worker.setBoundingBox("-2.5E7,-1.5E7,2.5E7,1.5E7");
+        if (false) try {
+            org.geotools.gui.swing.image.OperationTreeBrowser.show(worker.getRenderedImage());
+            Thread.sleep(50000);
+        } catch (InterruptedException e) {
+            // Ignore and go back to work.
+        }
         file = worker.getImageFile();
         image = ImageIO.read(file);
 

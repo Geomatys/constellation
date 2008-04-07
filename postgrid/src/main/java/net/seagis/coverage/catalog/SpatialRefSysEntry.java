@@ -29,6 +29,7 @@ import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
+import org.opengis.referencing.datum.PixelInCell;
 
 import org.geotools.referencing.CRS;
 import org.geotools.resources.XArray;
@@ -148,7 +149,7 @@ final class SpatialRefSysEntry {
         Map<String,?> properties = AbstractIdentifiedObject.getProperties(crs);
         if (verticalCRS != null) {
             String name = crs.getName().getCode();
-            name = name + ", " + verticalCRS.getName().getCode();
+            name = name + " + " + verticalCRS.getName().getCode();
             final Map<String,Object> copy = new HashMap<String,Object>(properties);
             copy.put(CoordinateReferenceSystem.NAME_KEY, name);
             properties = copy;
@@ -164,6 +165,8 @@ final class SpatialRefSysEntry {
                 timelessCRS = factory.createCompoundCRS(properties, elements);
             }
         }
+        assert CRS.getHorizontalCRS(crs) == CRS.getHorizontalCRS(timelessCRS);
+        assert CRS.getVerticalCRS  (crs) == CRS.getVerticalCRS  (timelessCRS);
     }
 
     /**
@@ -182,14 +185,14 @@ final class SpatialRefSysEntry {
      * are evenly spaced. This is not always true; a special processing will be performed later.
      * The time dimension, if any, is left to the identity transform.
      */
-    @SuppressWarnings("fallthrough")
     public GeneralGridGeometry getGridGeometry(final Dimension size,
             final AffineTransform transform, final double[] altitudes)
     {
         /*
          * Creates the "grid to CRS" transform as a matrix. The coefficients for the vertical
          * axis assume that the vertical ordinates are evenly spaced. This is not always true;
-         * a special processing will be performed later.
+         * a special processing will be performed by {@link GridCoverageEntry} for computing a
+         * more accurate value.
          */
         final int dim = crs.getCoordinateSystem().getDimension();
         final int[] lower = new int[dim];
@@ -197,38 +200,38 @@ final class SpatialRefSysEntry {
         final Matrix gridToCRS = MatrixFactory.create(dim + 1);
         int verticalDim = 0;
         if (horizontalCRS != null) {
-            gridToCRS.setElement(0, 0,   transform.getScaleX());
-            gridToCRS.setElement(1, 1,   transform.getScaleY());
-            gridToCRS.setElement(0, 1,   transform.getShearX());
-            gridToCRS.setElement(1, 0,   transform.getShearY());
-            gridToCRS.setElement(0, dim, transform.getTranslateX());
-            gridToCRS.setElement(1, dim, transform.getTranslateY());
+            copy(transform, gridToCRS);
             verticalDim = horizontalCRS.getCoordinateSystem().getDimension();
         }
-        if (verticalCRS != null) {
-            double min = Double.POSITIVE_INFINITY;
-            double max = Double.NEGATIVE_INFINITY;
-            final int length;
-            if (altitudes != null) {
-                for (double z : altitudes) {
-                    if (z < min) min = z;
-                    if (z > max) max = z;
-                }
-                length = altitudes.length;
-                upper[verticalDim] = length;
-            } else {
-                length = 0;
-            }
-            switch (length) { // Fall through in every cases.
-                default: gridToCRS.setElement(verticalDim, verticalDim, (max - min) / (length - 1));
-                case 1:  gridToCRS.setElement(verticalDim, dim, min);
-                case 0:  break;
+        if (verticalCRS != null && altitudes != null) {
+            int n = altitudes.length;
+            if (n != 0) {
+                upper[verticalDim] = n;
+                final double offset = altitudes[0];
+                final double scale = (--n == 0) ? 0 : (altitudes[n] - offset) / n;
+                gridToCRS.setElement(verticalDim, verticalDim, scale); // May be negative.
+                gridToCRS.setElement(verticalDim, dim, offset);
             }
         }
         upper[0] = size.width;
         upper[1] = size.height;
         final GridRange gridRange = new GeneralGridRange(lower, upper);
-        return new GeneralGridGeometry(gridRange, ProjectiveTransform.create(gridToCRS), crs);
+        return new GeneralGridGeometry(gridRange, PixelInCell.CELL_CORNER,
+                ProjectiveTransform.create(gridToCRS), crs);
+    }
+
+    /**
+     * Copies the affine transform coefficients into the two first dimensions of the affine
+     * transform represented by the target matrix.
+     */
+    static void copy(final AffineTransform source, final Matrix target) {
+        final int dim = target.getNumCol() - 1;
+        target.setElement(0, 0,   source.getScaleX());
+        target.setElement(1, 1,   source.getScaleY());
+        target.setElement(0, 1,   source.getShearX());
+        target.setElement(1, 0,   source.getShearY());
+        target.setElement(0, dim, source.getTranslateX());
+        target.setElement(1, dim, source.getTranslateY());
     }
 
     /**

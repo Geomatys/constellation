@@ -668,10 +668,10 @@ loop:   for (final CoverageReference newReference : entries) {
             gridGeometryTable = getDatabase().getTable(GridGeometryTable.class);
         }
         final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
-        final NumberRange  verticalRange = getVerticalRange();
-        final short band = geometry.indexOf(0.5*(verticalRange.getMinimum() + verticalRange.getMaximum()));
-        final GridCoverageEntry entry = new GridCoverageEntry(this,
-                series, filename, index, startTime, endTime, geometry, band, null);
+        final NumberRange verticalRange = getVerticalRange();
+        final double z = 0.5*(verticalRange.getMinimum() + verticalRange.getMaximum());
+        final GridCoverageEntry entry = new GridCoverageEntry(this, series, filename, index,
+                startTime, endTime, geometry, geometry.getAltitudeIndex(z), null);
         final GridCoverageEntry cached = entry.unique();
         if (cached == entry) {
             if (tileTable == null) {

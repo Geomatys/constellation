@@ -108,13 +108,12 @@ public class CommandLine {
         out    = arguments.out;
         err    = arguments.err;
         locale = arguments.locale;
-        setArgumentValues(getClass(), arguments);
-        final boolean help = arguments.getFlag("-help");
-        this.arguments = arguments.getRemainingArguments(maximumRemaining, OPTION_PREFIX);
-        if (help) {
+        if (arguments.getFlag("-help")) {
             help();
             System.exit(0);
         }
+        setArgumentValues(getClass(), arguments);
+        this.arguments = arguments.getRemainingArguments(maximumRemaining, OPTION_PREFIX);
     }
 
     /**

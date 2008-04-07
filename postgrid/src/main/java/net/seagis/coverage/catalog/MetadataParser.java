@@ -15,7 +15,6 @@
 package net.seagis.coverage.catalog;
 
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.util.Date;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -31,14 +30,13 @@ import org.opengis.util.CodeList;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.metadata.spatial.PixelOrientation;
-
+import org.geotools.metadata.iso.spatial.PixelTranslation;
 import org.geotools.image.io.GeographicImageReader;
 import org.geotools.image.io.metadata.Axis;
 import org.geotools.image.io.metadata.ImageGeometry;
 import org.geotools.image.io.metadata.ImageReferencing;
 import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.image.io.metadata.GeographicMetadataFormat;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.util.MeasurementRange;
 import org.geotools.util.NumberRange;
 import org.geotools.util.DateRange;
@@ -300,8 +298,8 @@ final class MetadataParser {
         final AffineTransform at = new AffineTransform(flatmatrix);
         final PixelOrientation p = getCode(PixelOrientation.values(), geometry.getPixelOrientation());
         if (p != null) {
-            final Point2D offset = GridGeometry2D.getPixelTranslation(p);
-            at.translate(-0.5 - offset.getX(), -0.5 - offset.getY());
+            final PixelTranslation offset = PixelTranslation.getPixelTranslation(p);
+            at.translate(-0.5 - offset.dx, -0.5 - offset.dy);
         }
         return at;
     }

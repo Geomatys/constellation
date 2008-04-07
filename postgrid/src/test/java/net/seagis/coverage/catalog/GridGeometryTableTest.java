@@ -66,7 +66,7 @@ public class GridGeometryTableTest extends TableTest {
         final double[] altitudes = entry.getVerticalOrdinates();
         assertNotNull(altitudes);
         assertEquals(10, altitudes[1], 0.0);
-        assertEquals(8, entry.indexOf(100));
+        assertEquals(9, entry.getAltitudeIndex(100));
 
         assertSame(entry, table.getEntry(SAMPLE_NAME));
         final Set<GridGeometryEntry> entries = table.getEntries();
