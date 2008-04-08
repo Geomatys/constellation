@@ -85,8 +85,9 @@ public class CSWService extends WebService {
     /**
      * Build a new Restfull CSW service.
      */
-    public CSWService() throws JAXBException, IOException, SQLException {
+    public CSWService() throws IOException, SQLException {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
+        try {
         setXMLContext("http://www.opengis.net/cat/csw/2.0.2", MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
                         ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
                         ,GetCapabilities.class, GetDomainType.class, GetRecordByIdType.class
@@ -98,6 +99,11 @@ public class CSWService extends WebService {
                         ,ExceptionReport.class, net.seagis.ows.v110.ExceptionReport.class
                         ,net.seagis.dublincore.terms.ObjectFactory.class);
                         // TODO remove net.seagis.ows.v110.ExceptionReport.class
+        } catch (JAXBException ex){
+            logger.severe("The CSW serving is not running." + '\n' +
+                          " cause: Error creating XML context." + '\n' +
+                          " error: " + ex.getMessage());
+        }
         worker = new CSWworker(marshaller);
         worker.setVersion(getCurrentVersion());
     }
