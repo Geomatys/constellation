@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlType;
 // Sicade dependencies 
 import net.seagis.catalog.Entry;
 import net.seagis.coverage.model.Distribution;
-import net.seagis.coverage.model.DistributionEntry;
 
 // openGis dependencies
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
@@ -36,7 +35,6 @@ import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
 import net.seagis.swe.AnyResultEntry;
-import net.seagis.swe.DataArrayPropertyType;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonPropertyType;
 import net.seagis.swe.TimeGeometricPrimitivePropertyType;
@@ -186,7 +184,7 @@ public class ObservationEntry extends Entry implements Observation {
         this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
         if (distribution == null)
-            this.distribution    = DistributionEntry.NORMAL;
+            this.distribution    = Distribution.NORMAL;
         else
             this.distribution    = distribution;
         this.resultQuality       = quality;
@@ -223,7 +221,7 @@ public class ObservationEntry extends Entry implements Observation {
         this.observedProperty    = new PhenomenonPropertyType(observedProperty);
         this.procedure           = procedure;
         if (distribution == null)
-            this.distribution    = DistributionEntry.NORMAL;
+            this.distribution    = Distribution.NORMAL;
         else
             this.distribution    = distribution;
         this.resultQuality       = null;       //= resultQuality;

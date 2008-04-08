@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.model.Distribution;
-import net.seagis.coverage.model.DistributionEntry;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.metadata.MetaDataEntry;
 import net.seagis.swe.PhenomenonEntry;

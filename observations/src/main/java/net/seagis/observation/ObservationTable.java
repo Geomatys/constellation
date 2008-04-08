@@ -26,7 +26,6 @@ import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 import net.seagis.coverage.model.Distribution;
-import net.seagis.coverage.model.DistributionEntry;
 import net.seagis.coverage.model.DistributionTable;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.ReferenceEntry;
@@ -378,9 +377,9 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         
             // on insere la distribution
             if (obs.getDistribution() == null) {
-                obs.setDistribution(DistributionEntry.NORMAL);
+                obs.setDistribution(Distribution.NORMAL);
             } else if (obs.getDistribution().getName() == null) {
-                obs.setDistribution(DistributionEntry.NORMAL);
+                obs.setDistribution(Distribution.NORMAL);
             }
             if (distributions == null) {
                 distributions = getDatabase().getTable(DistributionTable.class);

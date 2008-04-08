@@ -23,7 +23,6 @@ import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 import net.seagis.coverage.model.Distribution;
-import net.seagis.coverage.model.DistributionEntry;
 import net.seagis.coverage.model.DistributionTable;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.TimeInstantType;
@@ -235,7 +234,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
             statement.setString(indexOf(query.description),  meas.getDefinition());
             // on insere la distribution
             if (meas.getDistribution() == null) {
-                meas.setDistribution(DistributionEntry.NORMAL);
+                meas.setDistribution(Distribution.NORMAL);
             }
             if (distributions == null) {
                 distributions = getDatabase().getTable(DistributionTable.class);

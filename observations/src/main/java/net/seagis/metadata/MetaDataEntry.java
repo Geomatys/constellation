@@ -20,9 +20,9 @@ import java.util.Date;
 import java.util.Locale;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
-import net.seagis.coverage.model.DistributionEntry;
 import org.opengis.metadata.ApplicationSchemaInformation;
 import org.opengis.metadata.MetaData;
 import org.opengis.metadata.MetadataExtensionInformation;
@@ -157,7 +157,8 @@ JAXB issue     private Collection<ScopeCode> hierarchyLevels;
     /**
      * Provides information about the distributor of and options for obtaining the resource(s).
      */
-    private DistributionEntry distributionInfo;
+    @XmlTransient
+    private Distribution distributionInfo;
 
     /**
      * Provides overall assessment of quality of a resource(s).
