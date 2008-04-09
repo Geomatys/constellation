@@ -21,8 +21,11 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.geotools.coverage.grid.GeneralGridRange;
+
+import org.geotools.resources.Classes;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.InvalidGridGeometryException;
 
 
 /**
@@ -62,9 +65,11 @@ final class GridGeometryIO extends GridGeometry2D {
         y  = sourceRegion.y;
         sx = (short) subsampling.width;
         sy = (short) subsampling.height;
-        // Checks for overflow.
-        if (sx != subsampling.width || sy != subsampling.height) {
+        if (sx != subsampling.width || sy != subsampling.height) {  // Checks for overflow.
             throw new IllegalArgumentException();
+        }
+        if (gridDimensionX != 0 || gridDimensionY != 1) {  // getGridRange(...) is assuming that.
+            throw new InvalidGridGeometryException();
         }
     }
 
@@ -80,8 +85,8 @@ final class GridGeometryIO extends GridGeometry2D {
         final int[] upper = new int[dimension];
         switch (dimension) {
             default: Arrays.fill(upper, 2, dimension, 1);                 // Fall through
-            case 2:  upper[1] = sourceRegion.height / subsampling.width;  // Fall through
-            case 1:  upper[0] = sourceRegion.width  / subsampling.height; // Fall through
+            case 2:  upper[1] = sourceRegion.height / subsampling.height; // Fall through
+            case 1:  upper[0] = sourceRegion.width  / subsampling.width;  // Fall through
             case 0:  break;
         }
         return new GeneralGridRange(lower, upper);
@@ -94,5 +99,16 @@ final class GridGeometryIO extends GridGeometry2D {
         return new Rectangle(x, y,
                 gridRange.getLength(gridDimensionX) * sx,
                 gridRange.getLength(gridDimensionY) * sy);
+    }
+
+    /**
+     * Returns a string representation for debugging purpose.
+     */
+    @Override
+    public String toString() {
+        String sourceRegion = getSourceRegion().toString();
+        sourceRegion = sourceRegion.substring(sourceRegion.indexOf('['));
+        return Classes.getShortClassName(this) + "[sourceRegion" + sourceRegion +
+                ", subsampling[" + sx + ',' + sy + "], " + gridRange + ", " + gridToCRS + ']';
     }
 }
