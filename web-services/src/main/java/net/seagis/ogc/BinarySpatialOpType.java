@@ -79,5 +79,19 @@ public class BinarySpatialOpType extends SpatialOpsType {
         }
         return Collections.unmodifiableList(abstractGeometryOrAbstractGeometricPrimitiveOrPoint);
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (abstractGeometryOrAbstractGeometricPrimitiveOrPoint != null) {
+            int i = 0;
+            for (JAXBElement<?> jb: abstractGeometryOrAbstractGeometricPrimitiveOrPoint) {
+                s.append(i).append(": class:").append(jb.getValue().getClass().getSimpleName()).append('\n');
+                s.append(jb.getValue().toString());
+                i++;        
+            }
+        }
+        return s.toString();
+    }
 
 }

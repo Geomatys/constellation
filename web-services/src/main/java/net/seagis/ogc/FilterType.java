@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -96,6 +97,29 @@ public class FilterType {
             id = new ArrayList<JAXBElement<? extends AbstractIdType>>();
         }
         return Collections.unmodifiableList(id);
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("class:").append(this.getClass().getSimpleName()).append('\n');
+        if (spatialOps != null) {
+            s.append("SpatialOps: ").append(spatialOps.getValue().toString()).append('\n');
+        }
+        if (comparisonOps != null) {
+            s.append("ComparisonOps: ").append(comparisonOps.getValue().toString()).append('\n');
+        }
+        if (logicOps != null) {
+            s.append("LogicOps: ").append(logicOps.getValue().toString()).append('\n');
+        }
+        if (id != null) {
+            s.append("id:").append('\n');
+            int i = 0;
+            for (JAXBElement<? extends AbstractIdType> jb: id) {
+                s.append("id " + i + ": ").append(jb.getValue().toString()).append('\n');
+                i++;
+            }
+        }
+        return s.toString();
     }
 
 }

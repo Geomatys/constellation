@@ -83,4 +83,19 @@ public class UnaryLogicOpType extends LogicOpsType {
     public JAXBElement<? extends LogicOpsType> getLogicOps() {
         return logicOps;
     }
+    
+     @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString()).append('\n');
+        if (spatialOps != null) {
+            s.append("SpatialOps: ").append(spatialOps.getValue().toString()).append('\n');
+        }
+        if (comparisonOps != null) {
+            s.append("ComparisonOps: ").append(comparisonOps.getValue().toString()).append('\n');
+        }
+        if (logicOps != null) {
+            s.append("LogicOps: ").append(logicOps.getValue().toString()).append('\n');
+        }
+        return s.toString();
+    }
 }

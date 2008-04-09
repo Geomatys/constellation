@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -46,5 +47,8 @@ import javax.xml.bind.annotation.XmlType;
 })
 public abstract class LogicOpsType {
 
-
+    @Override
+    public String toString() {
+        return "class: " + this.getClass().getSimpleName() + '\n';
+    }
 }

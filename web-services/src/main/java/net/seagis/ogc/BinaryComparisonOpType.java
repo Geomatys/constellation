@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -83,5 +84,20 @@ public class BinaryComparisonOpType extends ComparisonOpsType {
      */
     public Boolean isMatchCase() {
         return matchCase;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        s.append("MatchCase ? ").append(matchCase).append('\n');
+        int i = 0;
+        if (expressionOrLiteralOrPropertyName != null) {
+            for (Object obj: expressionOrLiteralOrPropertyName) {
+                s.append(i).append(": ").append("class: ").append(obj.getClass().getSimpleName());
+                s.append('\n').append(obj.toString()).append('\n');
+            }
+        }
+        
+        return s.toString();
     }
 }

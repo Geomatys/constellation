@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -104,6 +105,9 @@ public class SearchResultsType {
     @XmlAttribute
     @XmlSchemaType(name = "dateTime")
     private XMLGregorianCalendar expires;
+    
+    @XmlTransient
+    private ObjectFactory factory = new ObjectFactory();
 
     /**
      * An empty constructor used by JAXB 
@@ -113,13 +117,43 @@ public class SearchResultsType {
     }
     
     /**
-     * build a new search results.
+     * build a new search results (HITS MODE).
+     */
+    public SearchResultsType(String resultSetId, ElementSetType elementSet, int numberOfResultMatched) {
+        this.resultSetId            = resultSetId;
+        this.elementSet             = elementSet;
+        this.numberOfRecordsMatched = numberOfResultMatched;
+       
+        
+    }
+    /**
+     * build a new search results. (RESULTS MODE)
      * One of any or abstract record have to be null.
      */
-    public SearchResultsType(String resultSetId, ElementSetType elementSet) {
-        this.resultSetId = resultSetId;
-        this.elementSet  = elementSet;
-       
+    public SearchResultsType(String resultSetId, ElementSetType elementSet, int numberOfResultMatched,
+            List<AbstractRecordType> records, Integer numberOfRecordsReturned) {
+        this.resultSetId             = resultSetId;
+        this.elementSet              = elementSet;
+        this.numberOfRecordsMatched  = numberOfResultMatched;
+        this.numberOfRecordsReturned = numberOfRecordsReturned;
+        
+        abstractRecord = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
+        for (int i = 0; i < numberOfRecordsReturned; i++) {
+            
+            AbstractRecordType record = records.get(i);
+            
+            if (record instanceof BriefRecordType) {
+                abstractRecord.add(factory.createBriefRecord((BriefRecordType)record));
+            } else if (record instanceof SummaryRecordType) {
+                abstractRecord.add(factory.createSummaryRecord((SummaryRecordType)record));
+            } else if (record instanceof DCMIRecordType) {
+                abstractRecord.add(factory.createDCMIRecord((DCMIRecordType)record));
+            } else if (record instanceof RecordType) {
+                abstractRecord.add(factory.createRecord((RecordType)record));
+            } else {
+                throw new IllegalArgumentException(" unknow AbstractRecord subType:" + record.getClass().getSimpleName());
+            }
+        }
         
     }
     

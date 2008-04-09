@@ -1,3 +1,19 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package net.seagis.gml;
 
 import java.util.ArrayList;
@@ -185,6 +201,51 @@ public class EnvelopeEntry extends Entry {
         hash = 67 * hash + (this.srsName != null ? this.srsName.hashCode() : 0);
         return hash;
     }
-
-
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        if (id != null) {
+            s.append("id:").append(id).append(" ");
+        } 
+        if (srsDimension != null) {
+            s.append("srsDImension:").append(srsDimension).append(" ");
+        }
+        if (srsName != null) {
+            s.append("srsName:").append(srsName).append(" ");
+        }
+        if (lowerCorner != null) {
+            s.append('\n').append("lowerCorner:").append(lowerCorner.toString());
+        }
+        if (upperCorner != null) {
+            s.append('\n').append("upperCorner:").append(upperCorner.toString());
+        }
+        if (pos != null) {
+            int i = 0;
+            for (DirectPositionType posi: pos) {
+                s.append('\n').append("pos").append(i).append(":").append(posi.toString());
+            }
+            s.append('\n');
+        }
+        if (coordinates != null) {
+            s.append("coordinates:").append(coordinates.toString());
+        }
+        if (axisLabels != null) {
+            int i = 0;
+            for (String axis: axisLabels) {
+                s.append('\n').append("axis").append(i).append(":").append(axis);
+            }
+            s.append('\n');
+        }
+        if (uomLabels != null) {
+            int i = 0;
+            for (String uom: uomLabels) {
+                s.append('\n').append("uom").append(i).append(":").append(uom);
+            }
+            s.append('\n');
+        }
+        return s.toString();
+    }
+    
+    
 }

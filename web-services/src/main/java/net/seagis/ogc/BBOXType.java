@@ -1,3 +1,18 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 
 package net.seagis.ogc;
 
@@ -38,9 +53,7 @@ import net.seagis.gml.EnvelopeWithTimePeriodType;
     "envelope",
     "envelopeWithTimePeriod"
 })
-public class BBOXType
-    extends SpatialOpsType
-{
+public class BBOXType extends SpatialOpsType {
 
     @XmlElement(name = "PropertyName")
     private String propertyName;
@@ -51,74 +64,39 @@ public class BBOXType
 
     /**
      * Gets the value of the propertyName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getPropertyName() {
         return propertyName;
     }
 
     /**
-     * Sets the value of the propertyName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPropertyName(String value) {
-        this.propertyName = value;
-    }
-
-    /**
      * Gets the value of the envelope property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EnvelopeType }
-     *     
      */
     public EnvelopeEntry getEnvelope() {
         return envelope;
     }
 
     /**
-     * Sets the value of the envelope property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EnvelopeType }
-     *     
-     */
-    public void setEnvelope(EnvelopeEntry value) {
-        this.envelope = value;
-    }
-
-    /**
      * Gets the value of the envelopeWithTimePeriod property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EnvelopeWithTimePeriodType }
-     *     
      */
     public EnvelopeWithTimePeriodType getEnvelopeWithTimePeriod() {
         return envelopeWithTimePeriod;
     }
 
-    /**
-     * Sets the value of the envelopeWithTimePeriod property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EnvelopeWithTimePeriodType }
-     *     
-     */
-    public void setEnvelopeWithTimePeriod(EnvelopeWithTimePeriodType value) {
-        this.envelopeWithTimePeriod = value;
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        s.append("PropertyName=").append(s).append('\n');
+        if (envelope != null) {
+            s.append("envelope= ").append(envelope.toString()).append('\n');
+        } else {
+            s.append("envelope null").append('\n');
+        }
+        if (envelopeWithTimePeriod != null) {
+            s.append("envelope with time period= ").append(envelopeWithTimePeriod.toString()).append('\n');
+        } else {
+            s.append("envelope with time null").append('\n');
+        }
+        return s.toString();
     }
-
 }

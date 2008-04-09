@@ -48,6 +48,7 @@ import net.seagis.cat.csw.DeleteType;
 import net.seagis.cat.csw.DescribeRecordResponseType;
 import net.seagis.cat.csw.DescribeRecordType;
 import net.seagis.cat.csw.DomainValuesType;
+import net.seagis.cat.csw.ElementSetNameType;
 import net.seagis.cat.csw.ElementSetType;
 import net.seagis.cat.csw.GetCapabilities;
 import net.seagis.cat.csw.GetDomainResponseType;
@@ -84,6 +85,8 @@ import net.seagis.ows.v100.OperationsMetadata;
 import net.seagis.ows.v100.SectionsType;
 import net.seagis.ows.v100.ServiceIdentification;
 import net.seagis.ows.v100.ServiceProvider;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.queryParser.ParseException;
 import static net.seagis.ows.OWSExceptionCode.*;
 import static net.seagis.coverage.wms.MetadataReader.*;
 
@@ -92,11 +95,9 @@ import static net.seagis.coverage.wms.MetadataReader.*;
 import org.geotools.metadata.iso.MetaDataImpl;
 
 //mdweb model dependencies
-import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.Catalog;
-import org.mdweb.model.storage.Form;
-import org.mdweb.model.users.User;
-import org.mdweb.sql.v20.Reader20;
+import org.mdweb.model.schemas.Standard; 
+import org.mdweb.model.storage.Form; 
+import org.mdweb.sql.v20.Reader20; 
 
 import org.mdweb.sql.v20.Writer20;
 import org.opengis.metadata.identification.Identification;
@@ -105,7 +106,7 @@ import org.postgresql.ds.PGSimpleDataSource;
 
 /**
  *
- * @author legal
+ * @author Guilhem Legal
  */
 public class CSWworker {
 
@@ -170,9 +171,19 @@ public class CSWworker {
     private final Marshaller marshaller;
     
     /**
+     * A lucene index to make quick search on the metadatas.
+     */
+    private final IndexLucene index;
+    
+    /**
+     * A filter parser whitch create lucene query from OGC filter
+     */
+    private FilterParser filterParser;
+    
+    /**
      * The queryable element from ISO 19115 and their path id.
      */
-    private static Map<String, List<String>> ISO_QUERYABLE;
+    protected static Map<String, List<String>> ISO_QUERYABLE;
     static {
         ISO_QUERYABLE      = new HashMap<String, List<String>>();
         List<String> paths;
@@ -543,13 +554,15 @@ public class CSWworker {
             if (MDConnection == null) {
                 logger.severe("The CSW service is not working!" + '\n' + 
                               "cause: The web service can't connect to the metadata database!");
-                databaseReader  = null;
-                databaseWriter  = null;
-                MDReader        = null;
-                MDWriter        = null;
+                databaseReader   = null;
+                databaseWriter   = null;
+                index            = null;
+                MDReader         = null;
+                MDWriter         = null;
             } else {
                  databaseReader  = new Reader20(Standard.ISO_19115,  MDConnection);
                  databaseWriter  = new Writer20(MDConnection);
+                 index           = new IndexLucene(databaseReader);
                  MDReader        = new MetadataReader(databaseReader, dataSourceMD.getConnection());
                  MDWriter        = new MetadataWriter(databaseReader, databaseWriter);
                  logger.info("CSW service running");
@@ -558,6 +571,7 @@ public class CSWworker {
         } else {
             databaseReader  = null;
             databaseWriter  = null;
+            index           = null;
             MDReader        = null;
             MDWriter        = null;
             MDConnection    = null;
@@ -649,8 +663,13 @@ public class CSWworker {
      * @param request
      * @return
      */
-    public GetRecordsResponseType getRecords(GetRecordsType request) throws WebServiceException{
+    public GetRecordsResponseType getRecords(GetRecordsType request) throws WebServiceException {
         verifyBaseRequest(request);
+        
+        // we initialize the filterParser
+        if (filterParser == null) {
+            filterParser    = new FilterParser(version);
+        }
         
         //we prepare the response
         GetRecordsResponseType response;
@@ -680,7 +699,7 @@ public class CSWworker {
             resultType = request.getResultType();
         }
         
-        //We initialize (and verify) the principal attrbute of the query
+        //We initialize (and verify) the principal attribute of the query
         QueryType query;
         List<QName> typeNames;
         if (request.getAbstractQuery() != null) {
@@ -697,24 +716,90 @@ public class CSWworker {
                     }
                 }
             }
+            
         } else {
             throw new OWSWebServiceException("The request must contains a query.",
                                              INVALID_PARAMETER_VALUE, "Query", version);
         }
         
-        SearchResultsType searchResults;
-        if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
-            
-            searchResults = new SearchResultsType(ID, query.getElementSetName().getValue());
-        } else if (outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
-            
-            searchResults = new SearchResultsType(ID, query.getElementSetName().getValue());
-        // this case must never append
-        } else {
-            response      = null;
-            searchResults = null;
+        // we get the element set type (BRIEF, SUMMARY OR FULL)
+        ElementSetNameType setName = query.getElementSetName();
+        ElementSetType set         = ElementSetType.BRIEF;
+        if (setName == null) {
+            set = setName.getValue();
+        }
+        SearchResultsType searchResults = null;
+        
+        //we get the maxRecords wanted and start position
+        Integer maxRecord = request.getMaxRecords();
+        Integer startPos  = request.getStartPosition();
+        
+        // build the lucene query from the specified filter
+        String luceneQuery = filterParser.getLuceneQuery(query.getConstraint());
+        logger.info("Lucene query=" + luceneQuery);
+        // we try to execute the query
+        List<String> results;
+        try {
+            results = index.doSearch(luceneQuery);
+        
+        } catch (CorruptIndexException ex) {
+            throw new OWSWebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
+                                             NO_APPLICABLE_CODE, null, version);
+        } catch (IOException ex) {
+            throw new OWSWebServiceException("The service has throw an IO exception while making lucene request.",
+                                             NO_APPLICABLE_CODE, null, version);
+        } catch (ParseException ex) {
+            throw new OWSWebServiceException("The service has throw an Parse exception while making lucene request.",
+                                             NO_APPLICABLE_CODE, null, version);
         }
         
+        try {
+            if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
+            
+                // we return only the number of result matching
+                if (resultType.equals(ResultType.HITS)) {
+                    searchResults = new SearchResultsType(ID, query.getElementSetName().getValue(), results.size());
+                
+                // we return a list of Record
+                } else if (resultType.equals(ResultType.RESULTS)) {
+                
+                    List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
+                    for (String id: results) {
+                        records.add((AbstractRecordType)MDReader.getMetadata(id, DUBLINCORE, set));
+                    }
+                    searchResults = new SearchResultsType(ID, 
+                                                          query.getElementSetName().getValue(), 
+                                                          results.size(),
+                                                          records,
+                                                          maxRecord);
+                        
+                // TODO
+                } else if (resultType.equals(ResultType.VALIDATE)) {
+                    throw new OWSWebServiceException("The service does not yet handle the VALIDATE resultType.",
+                                                   NO_APPLICABLE_CODE, "resultType", version);
+                }
+            } else if (outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
+            
+                // we return only the number of result matching
+                if (resultType.equals(ResultType.HITS)) {
+                    searchResults = new SearchResultsType(ID, query.getElementSetName().getValue(), results.size());
+                } else if (resultType.equals(ResultType.RESULTS)) {
+                
+                //TODO
+                } else if (resultType.equals(ResultType.VALIDATE)) {
+                    throw new OWSWebServiceException("The service does not yet handle the VALIDATE resultType.",
+                                                 NO_APPLICABLE_CODE, "resultType", version);
+                }
+        
+                // this case must never append
+            } else {
+                throw new OWSWebServiceException("The service does not accept this outputShema:" + outputSchema,
+                                              NO_APPLICABLE_CODE, null, version);
+            }
+        } catch (SQLException ex) {
+            throw new OWSWebServiceException("The service has throw an SQLException:" + ex.getMessage(),
+                                              NO_APPLICABLE_CODE, null, version);
+        }
         response = new GetRecordsResponseType(ID, System.currentTimeMillis(), version.toString(), searchResults);
         return response;
     }

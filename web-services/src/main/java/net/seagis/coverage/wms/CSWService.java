@@ -88,7 +88,7 @@ public class CSWService extends WebService {
     public CSWService() throws IOException, SQLException {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
         try {
-        setXMLContext("http://www.opengis.net/cat/csw/2.0.2", MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
+            setXMLContext("http://www.opengis.net/cat/csw/2.0.2", MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
                         ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
                         ,GetCapabilities.class, GetDomainType.class, GetRecordByIdType.class
                         ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
@@ -99,13 +99,15 @@ public class CSWService extends WebService {
                         ,ExceptionReport.class, net.seagis.ows.v110.ExceptionReport.class
                         ,net.seagis.dublincore.terms.ObjectFactory.class);
                         // TODO remove net.seagis.ows.v110.ExceptionReport.class
+        
+            worker = new CSWworker(marshaller);
+            worker.setVersion(getCurrentVersion());
         } catch (JAXBException ex){
             logger.severe("The CSW serving is not running." + '\n' +
                           " cause: Error creating XML context." + '\n' +
                           " error: " + ex.getMessage());
         }
-        worker = new CSWworker(marshaller);
-        worker.setVersion(getCurrentVersion());
+        
     }
 
     @Override
@@ -353,10 +355,10 @@ public class CSWService extends WebService {
         
         //we get the value of start position, if not set we put default value "1"
         String startPos = getParameter("STARTPOSITION", false);
-        BigInteger startPosition = new BigInteger("1");
+        Integer startPosition = new Integer("1");
         if (startPos != null) {
             try {
-                startPosition = new BigInteger(startPos);
+                startPosition = new Integer(startPos);
             } catch (NumberFormatException e){
                throw new OWSWebServiceException("The positif integer " + startPos + " is malformed",
                                                 INVALID_PARAMETER_VALUE, "startPosition", getCurrentVersion());        
@@ -365,10 +367,10 @@ public class CSWService extends WebService {
         
         //we get the value of max record, if not set we put default value "10"
         String maxRec = getParameter("MAXRECORDS", false);
-        BigInteger maxRecords= new BigInteger("10");
+        Integer maxRecords= new Integer("10");
         if (maxRec != null) {
             try {
-                maxRecords = new BigInteger(maxRec);
+                maxRecords = new Integer(maxRec);
             } catch (NumberFormatException e){
                throw new OWSWebServiceException("The positif integer " + maxRec + " is malformed",
                                                 INVALID_PARAMETER_VALUE, "maxRecords", getCurrentVersion());        

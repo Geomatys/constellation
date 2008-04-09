@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
@@ -73,6 +74,7 @@ import javax.xml.bind.annotation.XmlType;
     "abstractQuery",
     "any"
 })
+@XmlRootElement(name = "GetRecords")
 public class GetRecordsType extends RequestBaseType {
 
     @XmlElement(name = "DistributedSearch")
@@ -96,10 +98,10 @@ public class GetRecordsType extends RequestBaseType {
     private String outputSchema;
     @XmlAttribute
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger startPosition;
+    private Integer startPosition;
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger maxRecords;
+    private Integer maxRecords;
     
     /**
      * An empty constructor used by JAXB
@@ -112,8 +114,8 @@ public class GetRecordsType extends RequestBaseType {
      * Build a new GetRecors request
      */
     public GetRecordsType(String service, String version, ResultType resultType, 
-            String requestId, String outputFormat, String outputSchema, BigInteger startPosition,
-            BigInteger maxRecords, JAXBElement<? extends AbstractQueryType> abstractQuery,
+            String requestId, String outputFormat, String outputSchema, Integer startPosition,
+            Integer maxRecords, JAXBElement<? extends AbstractQueryType> abstractQuery,
             DistributedSearchType distributedSearch) {
         
         super(service, version);
@@ -201,9 +203,9 @@ public class GetRecordsType extends RequestBaseType {
     /**
      * Gets the value of the startPosition property.
      */
-    public BigInteger getStartPosition() {
+    public Integer getStartPosition() {
         if (startPosition == null) {
-            return new BigInteger("1");
+            return new Integer("1");
         } else {
             return startPosition;
         }
@@ -212,9 +214,9 @@ public class GetRecordsType extends RequestBaseType {
     /**
      * Gets the value of the maxRecords property.
      */
-    public BigInteger getMaxRecords() {
+    public Integer getMaxRecords() {
         if (maxRecords == null) {
-            return new BigInteger("10");
+            return new Integer("10");
         } else {
             return maxRecords;
         }

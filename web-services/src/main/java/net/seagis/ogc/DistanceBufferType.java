@@ -83,4 +83,21 @@ public class DistanceBufferType extends SpatialOpsType {
     public DistanceType getDistance() {
         return distance;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        s.append("PropertyName=").append(s).append('\n');
+        if (abstractGeometry != null) {
+            s.append("abstract Geometry= ").append(abstractGeometry.getValue().toString()).append('\n');
+        } else {
+            s.append("abstract Geometry null").append('\n');
+        }
+        if (distance != null) {
+            s.append("distance= ").append(distance.toString()).append('\n');
+        } else {
+            s.append("distance null").append('\n');
+        }
+        return s.toString();
+    }
 }

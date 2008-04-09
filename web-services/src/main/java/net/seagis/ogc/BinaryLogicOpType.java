@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -70,6 +71,19 @@ public class BinaryLogicOpType extends LogicOpsType {
             comparisonOpsOrSpatialOpsOrLogicOps = new ArrayList<JAXBElement<?>>();
         }
         return Collections.unmodifiableList(comparisonOpsOrSpatialOpsOrLogicOps);
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder(super.toString());
+        if (comparisonOpsOrSpatialOpsOrLogicOps != null) {
+            int i = 0; 
+            for (JAXBElement<?> jb: comparisonOpsOrSpatialOpsOrLogicOps) {
+                s.append(i).append(": ").append(jb.getValue().toString()).append('\n');
+                i++;        
+            }
+        }
+        return s.toString();
     }
 
 }
