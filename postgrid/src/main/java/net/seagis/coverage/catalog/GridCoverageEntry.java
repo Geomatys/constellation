@@ -39,28 +39,23 @@ import java.sql.SQLException;
 
 import java.util.Map;
 import java.util.Date;
-import java.util.Arrays;
 import java.util.Collections;
 import static java.lang.Math.*;
 
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
-import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.metadata.spatial.PixelOrientation;
 
 import org.geotools.image.io.IIOListeners;
 import org.geotools.image.io.netcdf.NetcdfReadParam;
 import org.geotools.image.io.mosaic.MosaicImageReadParam;
 import org.geotools.image.io.mosaic.TileManager;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.ViewType;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -103,9 +98,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     private static final long serialVersionUID = -5725249398707248625L;
 
     /**
-     * Petite valeur utilisée pour contourner les erreurs d'arrondissement.
+     * Small values for rounding errors in floating point calculations.
      */
-    private static final double EPS = 1E-6;
+    private static final double EPS = 1E-5;
 
     /**
      * Largeur et hauteur minimale des images, en pixels. Si l'utilisateur demande une région plus
@@ -148,9 +143,11 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     private final GridCoverageSettings settings;
 
     /**
-     * The grid geometry. Created by {@link #getGridGeometry} when first needed.
+     * The grid geometry. Created by {@link #getGridGeometry} when first needed. The value is
+     * likely to be different for every coverage because the {@code gridToCRS} transform is
+     * adjusted for current clipping and for the coverage time.
      */
-    private transient GridGeometry2D gridGeometry;
+    private transient GridGeometryIO gridGeometry;
 
     /**
      * Référence molle vers l'image {@link GridCoverage2D} qui a été retournée lors du dernier appel
@@ -362,9 +359,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("fallthrough")
-    public GridGeometry2D getGridGeometry() {
-        // No need to synchronize - not a big deal if created twice.
+    public synchronized GridGeometryIO getGridGeometry() {
         if (gridGeometry == null) {
             final Rectangle clipPixels  = new Rectangle();
             final Dimension subsampling = new Dimension();
@@ -394,21 +389,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                 matrix.setElement(dimension-1, dimension, tmin);
             }
             final MathTransform gridToCRS = ProjectiveTransform.create(matrix);
-            /*
-             * Creates a GridGeometry2D using the gridToCRS we just computed. We use a custom
-             * DimensionFilter in order to reuse the existing AffineTransform2D rather than
-             * letting GridGeometry2D creates a new one.
-             */
-            final int[] lower = new int[dimension];
-            final int[] upper = new int[dimension];
-            switch (dimension) {
-                default: Arrays.fill(upper, 2, dimension, 1);               // Fall through
-                case 2:  upper[1] = clipPixels.height / subsampling.width;  // Fall through
-                case 1:  upper[0] = clipPixels.width  / subsampling.height; // Fall through
-                case 0:  break;
-            }
-            final GeneralGridRange gridRange = new GeneralGridRange(lower, upper);
-            gridGeometry = new GridGeometry2D(gridRange, PixelInCell.CELL_CORNER, gridToCRS, crs, null);
+            gridGeometry = new GridGeometryIO(clipPixels, subsampling, gridToCRS, crs);
+            assert clipPixels.equals(gridGeometry.getSourceRegion()) : gridGeometry;
         }
         return gridGeometry;
     }
@@ -568,8 +550,8 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         if (clipPixels != null) {
             clipPixels.setRect(pixelBounds.getX()      + EPS,
                                pixelBounds.getY()      + EPS,
-                               pixelBounds.getWidth()  - EPS,
-                               pixelBounds.getHeight() - EPS);
+                               pixelBounds.getWidth()  - EPS*2,
+                               pixelBounds.getHeight() - EPS*2);
             if (clipPixels.width <  MIN_SIZE) {
                 clipPixels.x    -= (MIN_SIZE - clipPixels.width)/2;
                 clipPixels.width =  MIN_SIZE;
@@ -591,28 +573,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             }
         }
         return true;
-    }
-
-    /**
-     * Computes the envelope from the given result of {@link #computeBounds} calculation.
-     */
-    @SuppressWarnings("fallthrough")
-    private GeneralEnvelope computeEnvelope(final Rectangle clipPixels) throws TransformException {
-        final Rectangle2D clipLogical = XAffineTransform.transform(geometry.gridToCRS, clipPixels, null);
-        final DefaultTemporalCRS  temporalCRS = settings.getTemporalCRS();
-        final double tmin = temporalCRS.toValue(new Date(startTime));
-        final double tmax = temporalCRS.toValue(new Date(  endTime));
-        final boolean unbounded = (Double.isInfinite(tmin) && Double.isInfinite(tmax));
-        final CoordinateReferenceSystem coverageCRS = geometry.getCoordinateReferenceSystem(!unbounded);
-        final GeneralEnvelope envelope = new GeneralEnvelope(coverageCRS);
-        switch (coverageCRS.getCoordinateSystem().getDimension()) {
-            default: // Fall through (apply also for all cases below)
-            case  3: envelope.setRange(2, tmin, tmax);
-            case  2: envelope.setRange(1, clipLogical.getMinY(), clipLogical.getMaxY());
-            case  1: envelope.setRange(0, clipLogical.getMinX(), clipLogical.getMaxX());
-            case  0: break;
-        }
-        return envelope;
     }
 
     /**
@@ -670,19 +630,6 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             gridCoverage = null;
         }
         /*
-         * Obtient les coordonnées pixels et les coordonnées logiques de la région à extraire.
-         */
-        final GridGeometry2D gridGeometry = getGridGeometry();
-        final Rectangle clipPixels  = new Rectangle();
-        final Dimension subsampling = new Dimension();
-        try {
-            if (!computeBounds(clipPixels, subsampling)) {
-                return null;
-            }
-        } catch (TransformException exception) {
-            throw new IIOException(exception.getLocalizedMessage(), exception);
-        }
-        /*
          * Avant d'effectuer la lecture, vérifie si l'image est déjà en mémoire. Une image
          * {@link RenderedGridCoverage} peut être en mémoire même si {@link GridCoverage2D}
          * ne l'est plus si, par exemple, l'image est entrée dans une chaîne d'opérations de JAI.
@@ -695,6 +642,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                 LOGGER.fine("Reloading the \"" + getName() + "\" coverage.");
             }
         }
+        final GridGeometryIO gridGeometry = getGridGeometry();
         final FormatEntry format = (FormatEntry) series.getFormat();
         final Object input = getInput();
         final GridSampleDimension[] bands;
@@ -702,9 +650,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             format.setReading(this, true);
             synchronized (format) {
                 final ImageReadParam param = format.getDefaultReadParam(input);
-                param.setSourceRegion(clipPixels);
-                param.setSourceSubsampling(subsampling.width,   subsampling.height,
-                                           subsampling.width/2, subsampling.height/2);
+                param.setSourceRegion(gridGeometry.getSourceRegion());
+                param.setSourceSubsampling(gridGeometry.sx,   gridGeometry.sy,
+                                           gridGeometry.sx/2, gridGeometry.sy/2);
                 if (zIndice != 0) {
                     // Selects a particular depth in a 3D coverage.
                     param.setSourceBands(new int[] {zIndice - 1});

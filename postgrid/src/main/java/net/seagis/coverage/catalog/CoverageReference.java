@@ -112,9 +112,6 @@ public interface CoverageReference extends Element, CoverageStack.Element {
      * Returns the {@linkplain #getCoverage coverage} grid geometry. <strong>This information may
      * be only approximative</strong>, especially in the case of mosaic image because the reading
      * process may use a different subsampling than the requested one for performance reason.
-     *
-     * @todo We should consider returning {@code null} in the image mosaic case.
-     *       This is allowed by {@code CoverageStack.Element} contract.
      */
     GridGeometry2D getGridGeometry();
 
