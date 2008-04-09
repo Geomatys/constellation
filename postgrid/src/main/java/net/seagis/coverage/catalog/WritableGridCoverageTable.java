@@ -47,6 +47,8 @@ import net.seagis.catalog.UpdatePolicy;
 import net.seagis.catalog.CatalogException;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -73,9 +75,6 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * The series to be returned by {@link #getSeries}, or {@code null} if unknown.
      * In the later case, the series will be inferred from the layer.
-     * <p>
-     * This field takes a non-null vale only when insertions are under progress.
-     * It is reset to {@code null} once the work is finished.
      */
     private Series series;
 
@@ -151,10 +150,30 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Returns the currently selected series.
+     * Sets the series in which to insert the entries. It must be an existing series in the
+     * currently selected layer.
+     *
+     * @param  name The series name.
+     * @throws CatalogException If a logical error occured.
+     * @throws SQLException If the database access failed for an other reason.
+     */
+    public synchronized void setSeries(final String name) throws CatalogException, SQLException {
+        final Layer layer = getNonNullLayer();
+        series = layer.getSeries(name);
+        if (series == null) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "name", name));
+        }
+    }
+
+    /**
+     * Returns the currently selected series. If {@link #setSeries} has been invoked,
+     * the given series is returned. Otherwise if the current layer contains exactly one
+     * series, than this series is returned since there is no ambiguity. Otherwise an
+     * exception is thrown.
      */
     @Override
-    synchronized Series getSeries() throws CatalogException {
+    public synchronized Series getSeries() throws CatalogException {
         return (series != null) ? series : super.getSeries();
     }
 
@@ -223,12 +242,13 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             boolean success = false;
             final WritableGridCoverageIterator iterator =
                     new WritableGridCoverageIterator(this, null, imageIndex, inputs, next);
+            final Series oldSeries = series;
             transactionBegin();
             try {
                 count = addEntriesUnsafe(iterator);
                 success = true; // Must be the very last line in the try block.
             } finally {
-                series = null;
+                series = oldSeries;
                 transactionEnd(success);
             }
         }
@@ -246,6 +266,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     {
         assert Thread.holdsLock(this);
         int count = 0;
+        final Series            oldSeries = series;
         final GridCoverageQuery query     = (GridCoverageQuery) this.query;
         final Calendar          calendar  = getCalendar();
         final PreparedStatement statement = getStatement(QueryType.INSERT);
@@ -279,9 +300,10 @@ public class WritableGridCoverageTable extends GridCoverageTable {
              * If we are scanning new files for a specific series, gets that series.
              * Otherwise try to guess it from the path name and file extension.
              */
+            series = oldSeries;
             if (entry.series != null) {
                 series = entry.series;
-            } else {
+            } else if (series == null) {
                 final Layer layer = getNonNullLayer();
                 final Set<Series> candidates = layer.getSeries();
                 if (!candidates.isEmpty()) {
@@ -350,6 +372,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             }
             entry.close();
         }
+        series = oldSeries;
         return count;
     }
 
@@ -437,6 +460,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
          */
         int count = 0;
         boolean success = false;
+        final Series oldSeries = series;
         transactionBegin();
         try {
             if (UpdatePolicy.CLEAR_BEFORE_UPDATE.equals(policy)) {
@@ -485,7 +509,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             }
             success = true; // Must be the very last line in the try block.
         } finally {
-            series = null;
+            series = oldSeries;
             transactionEnd(success);
         }
         return count;

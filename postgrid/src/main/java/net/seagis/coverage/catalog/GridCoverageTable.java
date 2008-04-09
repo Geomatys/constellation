@@ -229,7 +229,11 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * Sets the layer for the coverages in this table.
      */
     public synchronized void setLayer(final Layer layer) {
-        if (!layer.equals(this.layer)) {
+        /*
+         * Compares references, not using Layer.equals(Layer), because the user may be setting the
+         * same layer with updated informations (e.g. the set of series contained in this layer).
+         */
+        if (layer != this.layer) {
             flushExceptEntries();
             this.layer = layer;
             fireStateChanged("Layer");
