@@ -29,7 +29,6 @@ import org.opengis.referencing.crs.TemporalCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
-import org.opengis.referencing.datum.PixelInCell;
 
 import org.geotools.referencing.CRS;
 import org.geotools.resources.XArray;
@@ -216,7 +215,7 @@ final class SpatialRefSysEntry {
         upper[0] = size.width;
         upper[1] = size.height;
         final GridRange gridRange = new GeneralGridRange(lower, upper);
-        return new GeneralGridGeometry(gridRange, PixelInCell.CELL_CORNER,
+        return new GeneralGridGeometry(gridRange, GridGeometryIO.PIXEL_IN_CELL,
                 ProjectiveTransform.create(gridToCRS), crs);
     }
 

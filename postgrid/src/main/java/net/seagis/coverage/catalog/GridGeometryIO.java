@@ -18,11 +18,15 @@ import java.util.Arrays;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
 import org.geotools.resources.Classes;
+import org.geotools.referencing.operation.matrix.MatrixFactory;
+import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.InvalidGridGeometryException;
@@ -42,6 +46,13 @@ final class GridGeometryIO extends GridGeometry2D {
     private static final long serialVersionUID = -3557138213154730285L;
 
     /**
+     * Whatever default grid range computation should be performed on transform
+     * relative to pixel center or relative to pixel corner.  The former is OGC
+     * convention while the later is Java convention.
+     */
+    static final PixelInCell PIXEL_IN_CELL = PixelInCell.CELL_CORNER;
+
+    /**
      * The origin or the region to be read.
      */
     private final int x,y;
@@ -53,14 +64,28 @@ final class GridGeometryIO extends GridGeometry2D {
 
     /**
      * Creates a new grid geometry.
+     *
+     * @todo Consider rounding the matrix coefficients when close to an integer.
+     *       See the BlueMarble test case in MosaicTest.
      */
     public GridGeometryIO(final Rectangle        sourceRegion,
                           final Dimension         subsampling,
-                          final MathTransform       gridToCRS,
+                          final Matrix              gridToCRS,
                           final CoordinateReferenceSystem crs)
     {
-        super(getGridRange(gridToCRS.getSourceDimensions(), sourceRegion, subsampling),
-                PixelInCell.CELL_CORNER, gridToCRS, crs, null);
+        this(sourceRegion, subsampling, ProjectiveTransform.create(gridToCRS), crs);
+    }
+
+    /**
+     * Creates a new grid geometry.
+     */
+    private GridGeometryIO(final Rectangle        sourceRegion,
+                           final Dimension         subsampling,
+                           final MathTransform       gridToCRS,
+                           final CoordinateReferenceSystem crs)
+    {
+        super(createGridRange(gridToCRS.getSourceDimensions(), sourceRegion, subsampling),
+                PIXEL_IN_CELL, gridToCRS, crs, null);
         x  = sourceRegion.x;
         y  = sourceRegion.y;
         sx = (short) subsampling.width;
@@ -78,7 +103,7 @@ final class GridGeometryIO extends GridGeometry2D {
      * call in constructors").
      */
     @SuppressWarnings("fallthrough")
-    private static GridRange getGridRange(final int dimension,
+    private static GridRange createGridRange(final int dimension,
             final Rectangle sourceRegion, final Dimension subsampling)
     {
         final int[] lower = new int[dimension];
@@ -99,6 +124,34 @@ final class GridGeometryIO extends GridGeometry2D {
         return new Rectangle(x, y,
                 gridRange.getLength(gridDimensionX) * sx,
                 gridRange.getLength(gridDimensionY) * sy);
+    }
+
+    /**
+     * Returns the subsampling to use when reading the source region.
+     */
+    public Dimension getSubsampling() {
+        return new Dimension(sx, sy);
+    }
+
+    /**
+     * Returns a new grid geometry with a {@link #gridToCRS} transform adjusted for the
+     * given subsampling. If the given subsampling is identical to the one in the current
+     * object, then {@code this} is returned.
+     * <p>
+     * This method is necessary when an image has been read from the mosaic image reader,
+     * which may use a different subsampling than the selected one.
+     */
+    public GridGeometry2D scaleForSubsampling(final Dimension subsampling) {
+        if (subsampling.width == sx && subsampling.height == sy) {
+            return this;
+        }
+        final Matrix matrix = MatrixFactory.create(gridToCRS.getTargetDimensions() + 1,
+                                                   gridToCRS.getSourceDimensions() + 1);
+        matrix.setElement(gridDimensionX, gridDimensionX, subsampling.getWidth()  / sx);
+        matrix.setElement(gridDimensionY, gridDimensionY, subsampling.getHeight() / sy);
+        MathTransform gridToCRS = ProjectiveTransform.create(matrix);
+        gridToCRS = ConcatenatedTransform.create(gridToCRS, this.gridToCRS);
+        return new GridGeometry2D(null, PIXEL_IN_CELL, gridToCRS, getCoordinateReferenceSystem(), null);
     }
 
     /**

@@ -45,9 +45,9 @@ import static java.lang.Math.*;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.geotools.image.io.IIOListeners;
@@ -71,9 +71,7 @@ import org.geotools.resources.Classes;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XDimension2D;
-import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
-import org.geotools.referencing.operation.transform.ProjectiveTransform;
 
 import net.seagis.catalog.Entry;
 import net.seagis.coverage.model.Operation;
@@ -98,7 +96,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     private static final long serialVersionUID = -5725249398707248625L;
 
     /**
-     * Small values for rounding errors in floating point calculations.
+     * Small values for rounding errors in floating point calculations. This value shall not be
+     * too small, otherwise {@link #computeBounds} fails to correct for rounding errors and we
+     * get a region to read bigger than necessary. Experience suggests that 1E-6 is too small,
+     * while 1E-5 seems okay.
      */
     private static final double EPS = 1E-5;
 
@@ -383,14 +384,14 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
             final boolean unbounded = Double.isInfinite(tmin) && Double.isInfinite(tmax);
             final CoordinateReferenceSystem crs = geometry.getCoordinateReferenceSystem(!unbounded);
             final int dimension = crs.getCoordinateSystem().getDimension();
-            final XMatrix matrix = geometry.getGridToCRS(clipPixels, subsampling, dimension, zIndice);
+            final Matrix gridToCRS = geometry.getGridToCRS(clipPixels, subsampling, dimension, zIndice);
             if (!unbounded) {
-                matrix.setElement(dimension-1, dimension-1, tmax - tmin);
-                matrix.setElement(dimension-1, dimension, tmin);
+                gridToCRS.setElement(dimension-1, dimension-1, tmax - tmin);
+                gridToCRS.setElement(dimension-1, dimension, tmin);
             }
-            final MathTransform gridToCRS = ProjectiveTransform.create(matrix);
             gridGeometry = new GridGeometryIO(clipPixels, subsampling, gridToCRS, crs);
             assert clipPixels.equals(gridGeometry.getSourceRegion()) : gridGeometry;
+            assert subsampling.equals(gridGeometry.getSubsampling()) : gridGeometry;
         }
         return gridGeometry;
     }
@@ -642,7 +643,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                 LOGGER.fine("Reloading the \"" + getName() + "\" coverage.");
             }
         }
-        final GridGeometryIO gridGeometry = getGridGeometry();
+        GridGeometry2D imageGeometry = gridGeometry = getGridGeometry();
         final FormatEntry format = (FormatEntry) series.getFormat();
         final Object input = getInput();
         final GridSampleDimension[] bands;
@@ -669,6 +670,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                     if (image == null) {
                         return null;
                     }
+                    final Dimension subsampling = new Dimension(
+                            param.getSourceXSubsampling(), param.getSourceYSubsampling());
+                    imageGeometry = gridGeometry.scaleForSubsampling(subsampling);
                 }
                 bands = format.getSampleDimensions(param);
             }
@@ -683,10 +687,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
         final GridCoverageFactory factory = GridCoveragePool.DEFAULT.factory;
         GridCoverage2D coverage;
         if (bands != null && bands.length != 0) {
-            coverage = factory.create(filename, image, gridGeometry, bands, null, properties);
+            coverage = factory.create(filename, image, imageGeometry, bands, null, properties);
         } else {
             // No SampleDimension in the database. Lets the factory use default ones.
-            coverage = factory.create(filename, image, gridGeometry, null, null, properties);
+            coverage = factory.create(filename, image, imageGeometry, null, null, properties);
         }
         /*
          * Retourne toujours la version "géophysique" de l'image.
