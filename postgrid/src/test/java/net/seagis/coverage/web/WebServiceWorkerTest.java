@@ -242,7 +242,6 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testBlueMarble() throws WebServiceException, IOException {
-if (true) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.1");
         worker.setLayer("BlueMarble");
