@@ -50,7 +50,7 @@ import javax.xml.namespace.QName;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "GetObservationById", propOrder = {
     "observationId",
     "responseFormat",
     "resultModel",

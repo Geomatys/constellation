@@ -75,7 +75,7 @@ import org.geotools.resources.Utilities;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "GetFeatureOfInterest", propOrder = {
     "featureOfInterestId",
     "location",
     "eventTime"

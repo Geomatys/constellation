@@ -48,7 +48,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
+@XmlType(name = "GetCapabilities")
 @XmlRootElement(name = "GetCapabilities")
 public class GetCapabilities extends GetCapabilitiesType {
 

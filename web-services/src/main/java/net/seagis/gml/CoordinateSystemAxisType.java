@@ -1,6 +1,6 @@
 /*
- * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
- * (C) 2005, Institut de Recherche pour le DÃ©veloppement
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2008 Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -55,14 +55,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CoordinateSystemAxisType", propOrder = {
     "axisID",
-    "remarks",
     "axisAbbrev",
     "axisDirection"
 })
 public class CoordinateSystemAxisType extends CoordinateSystemAxisBaseType {
 
     private List<IdentifierType> axisID;
-    private StringOrRefType remarks;
     @XmlElement(required = true)
     private CodeType axisAbbrev;
     @XmlElement(required = true)
@@ -72,7 +70,10 @@ public class CoordinateSystemAxisType extends CoordinateSystemAxisBaseType {
     private String uom;
 
     /**
-     * Set of alternative identifications of this coordinate system axis. The first axisID, if any, is normally the primary identification code, and any others are aliases. Gets the value of the axisID property.
+     * Set of alternative identifications of this coordinate system axis. 
+     * The first axisID, if any, is normally the primary identification code, 
+     * and any others are aliases. 
+     * Gets the value of the axisID property.
      * 
      * @return An unmodifiable list of the axis identifier.
      */
@@ -81,13 +82,6 @@ public class CoordinateSystemAxisType extends CoordinateSystemAxisBaseType {
             axisID = new ArrayList<IdentifierType>();
         }
         return Collections.unmodifiableList(axisID);
-    }
-
-    /**
-     * Comments on or information about this coordinate system axis, including data source information. 
-     */
-    public String getRemarks() {
-        return super.getRemarks();
     }
 
     /**

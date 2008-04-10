@@ -27,7 +27,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "EventTime", propOrder = {
     "temporalOps",
     "tOveralps",
     "tEquals",
@@ -45,33 +45,33 @@ import org.geotools.resources.Utilities;
 })
 public class EventTime {
 
-    @XmlElement(namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(namespace = "http://www.opengis.net/ogc")
     private TemporalOpsType temporalOps;
-    @XmlElement(name = "TM_Overalps", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_Overalps", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tOveralps;
-    @XmlElement(name = "TM_Equals", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_Equals", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tEquals;
-    @XmlElement(name = "TM_Meets", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_Meets", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tMeets;
-    @XmlElement(name = "TM_OverlappedBy", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_OverlappedBy", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tOverlappedBy;
-    @XmlElement(name = "TM_EndedBy", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_EndedBy", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tEndedBy;
-    @XmlElement(name = "TM_Ends", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_Ends", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tEnds;
-    @XmlElement(name = "TM_After", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_After", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tAfter;
-    @XmlElement(name = "TM_MetBy", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_MetBy", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tMetBy;
-    @XmlElement(name = "TM_Begins", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_Begins", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tBegins;
-    @XmlElement(name = "TM_Before", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_Before", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tBefore;
-    @XmlElement(name = "TM_BegunBy", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_BegunBy", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tBegunBy;
-    @XmlElement(name = "TM_Contains", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_Contains", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tContains;
-    @XmlElement(name = "TM_During", namespace = "http://www.opengis.net/ogc", nillable = true)
+    @XmlElement(name = "TM_During", namespace = "http://www.opengis.net/ogc")
     private BinaryTemporalOpType tDuring;
 
     /**

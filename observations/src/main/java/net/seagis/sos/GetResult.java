@@ -59,7 +59,7 @@ import org.geotools.resources.Utilities;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "GetResult", propOrder = {
     "observationTemplateId",
     "eventTime"
 })

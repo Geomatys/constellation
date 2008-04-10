@@ -61,17 +61,17 @@ import net.seagis.gml.TimePeriodType;
 public class BinaryTemporalOpType extends TemporalOpsType {
 
     @XmlElements({
-        //@XmlElement(name = "TimeTopologyComplex", namespace = "http://www.opengis.net/gml", type = TimeTopologyComplexType.class, nillable = true),
-        @XmlElement(name = "AbstractTimeGeometricPrimitive", namespace = "http://www.opengis.net/gml", type = AbstractTimeGeometricPrimitiveType.class, nillable = true),
-        //@XmlElement(name = "TimeEdge", namespace = "http://www.opengis.net/gml", type = TimeEdgeType.class, nillable = true),
-        @XmlElement(name = "AbstractTimeObject", namespace = "http://www.opengis.net/gml", type = AbstractTimeObjectType.class, nillable = true),
-        @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml", type = TimePeriodType.class, nillable = true),
-        @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml", type = TimeInstantType.class, nillable = true),
-        @XmlElement(name = "PropertyName", type = String.class, nillable = true)
-        //@XmlElement(name = "AbstractTimeComplex", namespace = "http://www.opengis.net/gml", type = AbstractTimeComplexType.class, nillable = true)
-        //@XmlElement(name = "AbstractTimePrimitive", namespace = "http://www.opengis.net/gml", type = AbstractTimePrimitiveType.class, nillable = true)
-        //@XmlElement(name = "AbstractTimeTopologyPrimitive", namespace = "http://www.opengis.net/gml", type = AbstractTimeTopologyPrimitiveType.class, nillable = true)
-        //@XmlElement(name = "TimeNode", namespace = "http://www.opengis.net/gml", type = TimeNodeType.class, nillable = true)
+        //@XmlElement(name = "TimeTopologyComplex", namespace = "http://www.opengis.net/gml", type = TimeTopologyComplexType.class),
+        @XmlElement(name = "AbstractTimeGeometricPrimitive", namespace = "http://www.opengis.net/gml", type = AbstractTimeGeometricPrimitiveType.class),
+        //@XmlElement(name = "TimeEdge", namespace = "http://www.opengis.net/gml", type = TimeEdgeType.class),
+        @XmlElement(name = "AbstractTimeObject", namespace = "http://www.opengis.net/gml", type = AbstractTimeObjectType.class),
+        @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml", type = TimePeriodType.class),
+        @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml", type = TimeInstantType.class),
+        @XmlElement(name = "PropertyName", type = String.class)
+        //@XmlElement(name = "AbstractTimeComplex", namespace = "http://www.opengis.net/gml", type = AbstractTimeComplexType.class)
+        //@XmlElement(name = "AbstractTimePrimitive", namespace = "http://www.opengis.net/gml", type = AbstractTimePrimitiveType.class)
+        //@XmlElement(name = "AbstractTimeTopologyPrimitive", namespace = "http://www.opengis.net/gml", type = AbstractTimeTopologyPrimitiveType.class)
+        //@XmlElement(name = "TimeNode", namespace = "http://www.opengis.net/gml", type = TimeNodeType.class)
     })
     private List<Object> rest;
 

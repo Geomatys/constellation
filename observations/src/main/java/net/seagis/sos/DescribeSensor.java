@@ -47,7 +47,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "DescribeSensor", propOrder = {
     "procedure"
 })
 @XmlRootElement(name = "DescribeSensor")
@@ -56,7 +56,7 @@ public class DescribeSensor extends RequestBaseType {
     /**
      * Identifier of the sensor, for which detailed metadata is requested.
      */
-    @XmlElement(required = true)
+    @XmlElement(name="procedure", namespace="http://www.opengis.net/sos/1.0", required = true)
     @XmlSchemaType(name = "anyURI")
     private String procedure;
     

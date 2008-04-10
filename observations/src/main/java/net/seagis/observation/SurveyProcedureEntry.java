@@ -17,6 +17,7 @@ package net.seagis.observation;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
@@ -42,6 +43,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
     
     /**
      */
+    @XmlTransient
     private ResponsiblePartyEntry operator;
     
     // JAXB issue  private Datum elevationDatum;

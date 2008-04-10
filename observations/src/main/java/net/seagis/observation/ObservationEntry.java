@@ -64,15 +64,13 @@ import org.geotools.resources.Utilities;
 @XmlType(name = "Observation", propOrder = {
     "name",
     "definition",
-    "observationMetadata",
     "samplingTime",
     "procedure",
     "procedureParameter",
     "procedureTime",
     "observedProperty",
     "featureOfInterest",
-    "result",
-    "resultQuality"
+    "result"
 })
 @XmlRootElement(name = "Observation")
 @XmlSeeAlso({ MeasurementEntry.class})
@@ -120,6 +118,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * La qualité de la donnée. Peut être nul si cette information n'est pas disponible.
      */
+    @XmlTransient
     private ElementEntry resultQuality;
     
     /**
@@ -137,6 +136,7 @@ public class ObservationEntry extends Entry implements Observation {
      /**
       *
       */
+     @XmlTransient
      private MetaDataEntry observationMetadata;
      
     /**

@@ -45,7 +45,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem Legal 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "InsertObservationResponse", propOrder = {
     "assignedObservationId"
 })
 @XmlRootElement(name = "InsertObservationResponse")

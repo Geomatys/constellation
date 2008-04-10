@@ -1,7 +1,6 @@
 /*
- * Sicade - SystÃ¨mes intÃ©grÃ©s de connaissances pour l'aide Ã  la dÃ©cision en environnement
- * (C) 2005, Institut de Recherche pour le DÃ©veloppement
- * (C) 2007, Geomatys
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2008 Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,6 +12,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/sos/1.0", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+ 
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/sos/1.0", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
+xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "sos", namespaceURI= "http://www.opengis.net/sos/1.0"),
+          @javax.xml.bind.annotation.XmlNs(prefix = "gml", namespaceURI= "http://www.opengis.net/gml"),
+          @javax.xml.bind.annotation.XmlNs(prefix = "ogc", namespaceURI= "http://www.opengis.net/ogc"),
+          @javax.xml.bind.annotation.XmlNs(prefix = "swe", namespaceURI= "http://www.opengis.net/swe/1.0.1"),
+          @javax.xml.bind.annotation.XmlNs(prefix = "ows", namespaceURI= "http://www.opengis.net/ows/1.1"),
+          @javax.xml.bind.annotation.XmlNs(prefix = "om", namespaceURI= "http://www.opengis.net/om/1.0"),
+          @javax.xml.bind.annotation.XmlNs(prefix = "sml", namespaceURI= "http://www.opengis.net/sensorML/1.0")})
 package net.seagis.sos;

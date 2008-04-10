@@ -57,9 +57,9 @@ public class BBOXType extends SpatialOpsType {
 
     @XmlElement(name = "PropertyName")
     private String propertyName;
-    @XmlElement(name = "Envelope", namespace = "http://www.opengis.net/gml", nillable = true)
+    @XmlElement(name = "Envelope", namespace = "http://www.opengis.net/gml")
     private EnvelopeEntry envelope;
-    @XmlElement(name = "EnvelopeWithTimePeriod", namespace = "http://www.opengis.net/gml", nillable = true)
+    @XmlElement(name = "EnvelopeWithTimePeriod", namespace = "http://www.opengis.net/gml")
     private EnvelopeWithTimePeriodType envelopeWithTimePeriod;
 
     /**

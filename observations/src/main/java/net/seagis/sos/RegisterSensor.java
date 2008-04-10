@@ -56,7 +56,7 @@ import org.geotools.resources.Utilities;
  *  @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "RegisterSensor", propOrder = {
     "sensorDescription",
     "observationTemplate"
 })

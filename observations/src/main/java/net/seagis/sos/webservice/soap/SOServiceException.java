@@ -28,7 +28,7 @@ import net.seagis.coverage.web.Service;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "SOServiceException", namespace="http://sos.geomatys.fr/")
+@XmlRootElement(name = "SOServiceException", namespace="http://soap.webservice.sos.seagis.net/")
 public class SOServiceException extends Exception {
     
     /**

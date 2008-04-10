@@ -99,7 +99,7 @@ import org.geotools.resources.Utilities;
  *  @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "GetObservation", propOrder = {
     "offering",
     "eventTime",
     "procedure",
@@ -359,29 +359,29 @@ public class GetObservation extends RequestBaseType {
     })
     public static class FeatureOfInterest {
 
-        @XmlElement(namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(namespace = "http://www.opengis.net/ogc")
         private SpatialOpsType spatialOps;
-        @XmlElement(name = "Intersects", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "Intersects", namespace = "http://www.opengis.net/ogc")
         private BinarySpatialOpType intersects;
-        @XmlElement(name = "Touches", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "Touches", namespace = "http://www.opengis.net/ogc")
         private BinarySpatialOpType touches;
-        @XmlElement(name = "DWithin", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "DWithin", namespace = "http://www.opengis.net/ogc")
         private DistanceBufferType dWithin;
-        @XmlElement(name = "Disjoint", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "Disjoint", namespace = "http://www.opengis.net/ogc")
         private BinarySpatialOpType disjoint;
-        @XmlElement(name = "Crosses", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "Crosses", namespace = "http://www.opengis.net/ogc")
         private BinarySpatialOpType crosses;
-        @XmlElement(name = "Contains", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "Contains", namespace = "http://www.opengis.net/ogc")
         private BinarySpatialOpType contains;
-        @XmlElement(name = "Beyond", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "Beyond", namespace = "http://www.opengis.net/ogc")
         private DistanceBufferType beyond;
-        @XmlElement(name = "Equals", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "Equals", namespace = "http://www.opengis.net/ogc")
         private BinarySpatialOpType equals;
-        @XmlElement(name = "Overlaps", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "Overlaps", namespace = "http://www.opengis.net/ogc")
         private BinarySpatialOpType overlaps;
-        @XmlElement(name = "BBOX", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "BBOX", namespace = "http://www.opengis.net/ogc")
         private BBOXType bbox;
-        @XmlElement(name = "Within", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "Within", namespace = "http://www.opengis.net/ogc")
         private BinarySpatialOpType within;
         @XmlElement(name = "ObjectID")
         private List<String> objectID = new ArrayList<String>();
@@ -597,25 +597,25 @@ public class GetObservation extends RequestBaseType {
     })
     public static class Result {
 
-        @XmlElement(namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(namespace = "http://www.opengis.net/ogc")
         private ComparisonOpsType comparisonOps;
-        @XmlElement(name = "PropertyIsLessThan", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "PropertyIsLessThan", namespace = "http://www.opengis.net/ogc")
         private BinaryComparisonOpType propertyIsLessThan;
-        @XmlElement(name = "PropertyIsGreaterThanOrEqualTo", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "PropertyIsGreaterThanOrEqualTo", namespace = "http://www.opengis.net/ogc")
         private BinaryComparisonOpType propertyIsGreaterThanOrEqualTo;
-        @XmlElement(name = "PropertyIsEqualTo", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "PropertyIsEqualTo", namespace = "http://www.opengis.net/ogc")
         private BinaryComparisonOpType propertyIsEqualTo;
-        @XmlElement(name = "PropertyIsNotEqualTo", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "PropertyIsNotEqualTo", namespace = "http://www.opengis.net/ogc")
         private BinaryComparisonOpType propertyIsNotEqualTo;
-        @XmlElement(name = "PropertyIsLessThanOrEqualTo", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "PropertyIsLessThanOrEqualTo", namespace = "http://www.opengis.net/ogc")
         private BinaryComparisonOpType propertyIsLessThanOrEqualTo;
-        @XmlElement(name = "PropertyIsLike", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "PropertyIsLike", namespace = "http://www.opengis.net/ogc")
         private PropertyIsLikeType propertyIsLike;
-        @XmlElement(name = "PropertyIsBetween", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "PropertyIsBetween", namespace = "http://www.opengis.net/ogc")
         private PropertyIsBetweenType propertyIsBetween;
-        @XmlElement(name = "PropertyIsGreaterThan", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "PropertyIsGreaterThan", namespace = "http://www.opengis.net/ogc")
         private BinaryComparisonOpType propertyIsGreaterThan;
-        @XmlElement(name = "PropertyIsNull", namespace = "http://www.opengis.net/ogc", nillable = true)
+        @XmlElement(name = "PropertyIsNull", namespace = "http://www.opengis.net/ogc")
         private PropertyIsNullType propertyIsNull;
 
         /**

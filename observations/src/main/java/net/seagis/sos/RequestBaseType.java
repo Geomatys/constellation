@@ -32,7 +32,7 @@ import org.geotools.resources.Utilities;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "RequestBaseType")
+@XmlType(name = "RequestBaseType", namespace="http://www.opengis.net/sos/1.0")
 @XmlSeeAlso({
     DescribeFeatureType.class,
     DescribeResultModel.class,
