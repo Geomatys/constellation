@@ -248,6 +248,8 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
 
     /**
      * Creates the target tiles, optionnaly writes them to disk and to the database.
+     *
+     * @return {@code true} on success, or {@code false} if aborted.
      */
     private boolean createTargetTiles(Collection<Tile> tiles) {
         if (!targetDirectory.isDirectory()) {
@@ -282,6 +284,10 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
             tileManager = builder.createTileManager(tiles, 0, writeToDisk && !pretend);
         } catch (IOException e) {
             err.println(e);
+            return false;
+        }
+        if (tileManager == null) {
+            err.println("Aborted.");
             return false;
         }
         tiles = tileManager.getTiles();
