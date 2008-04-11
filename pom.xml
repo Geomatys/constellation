@@ -199,52 +199,52 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-referencing</artifactId>
+        <artifactId>referencing</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-coverage</artifactId>
+        <artifactId>coverage</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-coverageio</artifactId>
+        <artifactId>coverageio</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-coverageio-netcdf</artifactId>
+        <artifactId>coverageio-netcdf</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-api</artifactId>
+        <artifactId>api</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-main</artifactId>
+        <artifactId>main</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-widgets-swing</artifactId>
+        <artifactId>widgets-swing</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-go</artifactId>
+        <artifactId>go</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-openoffice</artifactId>
+        <artifactId>openoffice</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-epsg-hsql</artifactId>
+        <artifactId>epsg-hsql</artifactId>
         <version>${geotools.version}</version>
       </dependency>
     </dependencies>
@@ -345,7 +345,7 @@
       </plugin>
       <plugin>
         <groupId>org.geotools.maven</groupId>
-        <artifactId>gt2-jar-collector</artifactId>
+        <artifactId>jar-collector</artifactId>
         <version>${geotools.version}</version>
         <executions>
           <execution>
