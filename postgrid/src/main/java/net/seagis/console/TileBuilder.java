@@ -31,11 +31,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.logging.Level;
-import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 
+import org.opengis.referencing.FactoryException;
+
+import org.geotools.referencing.CRS;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.image.io.mosaic.Tile;
 import org.geotools.image.io.mosaic.TileManager;
@@ -150,14 +152,22 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
      */
     protected TileBuilder(final String[] args) {
         super(args);
+        final String mosaicCRS;
         sourceDirectory = getFile     ("SourceDirectory");
         targetDirectory = getFile     ("TargetDirectory");
         envelope        = getEnvelope ("MosaicEnvelope" );
+        mosaicCRS       = getString   ("MosaicCRS"      );
         tileSize        = getDimension("TileSize"       );
         format          = getString   ("Format"         );
         series          = getString   ("Series"         );
         keepLayout      = getBoolean  ("KeepLayout", false);
         compress        = getBoolean  ("Compress",   true);
+        if (mosaicCRS != null) try {
+            envelope.setCoordinateReferenceSystem(CRS.decode(mosaicCRS));
+        } catch (FactoryException e) {
+            err.println(e);
+            System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
+        }
     }
 
     /**

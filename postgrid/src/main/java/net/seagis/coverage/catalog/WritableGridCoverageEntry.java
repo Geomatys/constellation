@@ -377,6 +377,9 @@ public class WritableGridCoverageEntry {
 
     /**
      * Returns the horizontal CRS identifier, or {@code 0} if unknown.
+     *
+     * @todo Current implementation searchs specifically for the EPSG code. We need to make that
+     *  more robust and look for an "auth_name","auth_srid" entry in the "spatial_ref_sys table".
      */
     public int getHorizontalSRID() throws IOException, CatalogException {
         int srid = 0;

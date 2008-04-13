@@ -23,6 +23,17 @@ SET search_path = postgis, pg_catalog;
 
 
 --
+-- Fixes the Paris prime meridian (see comment above). Value relative to Greenwich is
+-- converted from degrees to gradians everywhere the unit is expected to be gradians.
+--
+UPDATE spatial_ref_sys SET srtext = REPLACE(srtext,
+    'PRIMEM["Paris",2.33722917,',
+    'PRIMEM["Paris",2.5969213,')
+  WHERE srtext LIKE
+    '%PRIMEM["Paris",2.33722917,%UNIT["grad"%';
+
+
+--
 -- Ensures that the SRID of a geometry column is known to PostGIS.
 --
 ALTER TABLE geometry_columns
