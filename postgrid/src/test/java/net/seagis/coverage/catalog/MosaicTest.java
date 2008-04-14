@@ -39,7 +39,7 @@ public class MosaicTest extends DatabaseTest {
     /**
      * The layer name in the database.
      */
-    private static final String BLUEMARBLE = "BlueMarble.test", ORTHO2000 = "Ortho2000";
+    private static final String BLUEMARBLE = "BlueMarble", ORTHO2000 = "Ortho2000";
 
     /**
      * Small number for floating point comparaisons.
@@ -64,7 +64,7 @@ public class MosaicTest extends DatabaseTest {
         CoverageReference other = layer.getCoverageReferences().iterator().next();
         assertEquals("Should be cached", entry, other);
         assertSame  ("Should be cached", entry, other);
-//        assertEquals(BLUEMARBLE, entry.getSeries().getName());
+        assertEquals(BLUEMARBLE, entry.getSeries().getName());
 
         GeographicBoundingBox box = entry.getGeographicBoundingBox();
         assertEquals(-180, box.getWestBoundLongitude(), EPS);
@@ -90,7 +90,7 @@ public class MosaicTest extends DatabaseTest {
         other = layer.getCoverageReference();
         assertEquals("Should be cached", entry, other);
         assertSame  ("Should be cached", entry, other);
-//        assertEquals(BLUEMARBLE, entry.getSeries().getName());
+        assertEquals(BLUEMARBLE, entry.getSeries().getName());
         assertTrue  (entries.contains(entry));
 
         box = entry.getGeographicBoundingBox();
