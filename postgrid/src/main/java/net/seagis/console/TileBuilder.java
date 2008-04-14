@@ -163,7 +163,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
         keepLayout      = getBoolean  ("KeepLayout", false);
         compress        = getBoolean  ("Compress",   true);
         if (mosaicCRS != null) try {
-            envelope.setCoordinateReferenceSystem(CRS.decode(mosaicCRS));
+            envelope.setCoordinateReferenceSystem(CRS.decode(mosaicCRS, true));
         } catch (FactoryException e) {
             err.println(e);
             System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);

@@ -515,14 +515,16 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * Transforms ["real world" envelope] --> [region in pixel coordinates]
          * and computes the subsampling from the desired resolution.
          */
+        double sx = geographicBounds.getWidth();
+        double sy = geographicBounds.getHeight(); // Protect from change in case clippedArea == geographicBounds.
         clippedArea = XAffineTransform.transform(crsToGrid, clippedArea, clippedArea != clipGeographicArea);
         final RectangularShape pixelBounds = (clippedArea instanceof RectangularShape) ?
                 (RectangularShape) clippedArea : clippedArea.getBounds2D();
         final Dimension2D resolution = settings.resolution;
         final int xSubsampling;
         final int ySubsampling;
-        double sx = pixelBounds.getWidth()  / geographicBounds.getWidth();
-        double sy = pixelBounds.getHeight() / geographicBounds.getHeight();
+        sx = pixelBounds.getWidth()  / sx;
+        sy = pixelBounds.getHeight() / sy;
         if (resolution != null) {
             sx *= resolution.getWidth();
             sy *= resolution.getHeight();
