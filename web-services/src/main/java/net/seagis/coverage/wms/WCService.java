@@ -133,11 +133,15 @@ public class WCService extends WebService {
             final File dirCatalina = new File(System.getenv().get("CATALINA_HOME"));
             if (dirCatalina.exists()) {
                 configFile = new File(dirCatalina, "webapps/ifremerWS/WEB-INF/config.xml");
-                logger.info("path to config file:" + configFile);
                 if (!configFile.exists()) {
                     configFile = null;
-                }
+                } 
             } 
+            if (configFile != null) {
+                logger.info("path to config file:" + configFile.getAbsolutePath());
+            } else {
+                logger.info("path to catalina config file using sicade configuration");
+            }
             final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true); 
             
             

@@ -100,7 +100,12 @@ public class WMService extends WebService {
                 if (!configFile.exists()) {
                     configFile = null;
                 }
-            } 
+            }
+            if (configFile != null) {
+                logger.info("path to config file:" + configFile.getAbsolutePath());
+            } else {
+                logger.info("path to catalina config file using sicade configuration");
+            }
             final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true); 
             
             //final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
