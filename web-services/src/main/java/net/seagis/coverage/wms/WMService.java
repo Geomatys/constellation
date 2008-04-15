@@ -91,13 +91,19 @@ public class WMService extends WebService {
     private static ThreadLocal<WebServiceWorker> webServiceWorker;
     static {
         try {
-            /* only for ifremer configuration 
-            String path = System.getenv().get("CATALINA_HOME") + "/webapps/ifremerWS/WEB-INF/config.xml";
-            logger.info("path to config file:" + path);
-            File configFile = new File(path);
-            final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true);
-            */
-            final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
+            /* only for ifremer configuration */
+            File configFile = null;
+            final File dirCatalina = new File(System.getenv().get("CATALINA_HOME"));
+            if (dirCatalina.exists()) {
+                configFile = new File(dirCatalina, "webapps/ifremerWS/WEB-INF/config.xml");
+                logger.info("path to config file:" + configFile);
+                if (!configFile.exists()) {
+                    configFile = null;
+                }
+            } 
+            final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true); 
+            
+            //final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
                 @Override
                 protected WebServiceWorker initialValue() {
