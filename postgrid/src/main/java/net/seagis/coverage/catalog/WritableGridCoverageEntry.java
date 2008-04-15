@@ -33,19 +33,11 @@ import javax.imageio.stream.ImageInputStream;
 import javax.units.Unit;
 import javax.units.SI;
 
-import org.opengis.geometry.Envelope;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.metadata.spatial.PixelOrientation;
-
 import org.geotools.util.DateRange;
-import org.geotools.referencing.CRS;
 import org.geotools.resources.Classes;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.image.io.mosaic.Tile;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.GeneralGridRange;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
@@ -100,11 +92,6 @@ public class WritableGridCoverageEntry {
      * The object to use for parsing image metadata. This is set by {@link #parseMetadata}.
      */
     private MetadataParser metadata;
-
-    /**
-     * A default envelope to be used if none was found in the metadata.
-     */
-    private Envelope envelope;
 
     /**
      * Creates an entry for the given tile.
@@ -301,14 +288,12 @@ public class WritableGridCoverageEntry {
      * Parses metadata using the connection to the given database.
      *
      * @param  database The connection to the database.
-     * @param  envelope A default envelope to use if none was found in the metadata.
      * @throws IOException if an error occured while reading the metadata.
      */
-    final void parseMetadata(final Database database, final Envelope envelope) throws IOException {
+    final void parseMetadata(final Database database) throws IOException {
         if (reader != null) {
             metadata = new MetadataParser(database, reader, tile.getImageIndex());
         }
-        this.envelope = envelope;
     }
 
     /**
@@ -367,19 +352,12 @@ public class WritableGridCoverageEntry {
             // No translation to apply here because the 'gridToCRS' transform
             // doesn't come from the tile.
             gridToCRS = metadata.getGridToCRS();
-            if (gridToCRS == null) {
-                final GeneralGridRange gridRange = new GeneralGridRange(tile.getRegion(), envelope.getDimension());
-                return (AffineTransform) new GridGeometry2D(gridRange, envelope).getGridToCRS2D(PixelOrientation.UPPER_LEFT);
-            }
         }
         return gridToCRS;
     }
 
     /**
      * Returns the horizontal CRS identifier, or {@code 0} if unknown.
-     *
-     * @todo Current implementation searchs specifically for the EPSG code. We need to make that
-     *  more robust and look for an "auth_name","auth_srid" entry in the "spatial_ref_sys table".
      */
     public int getHorizontalSRID() throws IOException, CatalogException {
         int srid = 0;
@@ -387,19 +365,6 @@ public class WritableGridCoverageEntry {
             srid = metadata.getHorizontalSRID();
         } catch (SQLException e) {
             throw new CatalogException(e);
-        }
-        if (srid == 0 && envelope != null) {
-            CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
-            crs = CRS.getHorizontalCRS(crs);
-            final Integer candidate;
-            try {
-                candidate = CRS.lookupEpsgCode(crs, true);
-            } catch (FactoryException e) {
-                throw new CatalogException(e);
-            }
-            if (candidate != null) {
-                srid = candidate;
-            }
         }
         return srid;
     }

@@ -33,6 +33,13 @@ public class NoSuchRecordException extends CatalogException {
     private static final long serialVersionUID = -3105861955682823122L;
 
     /**
+     * Creates an exception with the given message.
+     */
+    public NoSuchRecordException(final String message) {
+        super (message);
+    }
+
+    /**
      * Creates an exception from the specified result set. The table and column names are
      * obtained from the {@code results} argument if non-null. <strong>Note that the result
      * set will be closed</strong>, because this exception is always thrown when an error
@@ -55,6 +62,12 @@ public class NoSuchRecordException extends CatalogException {
      */
     @Override
     public String getLocalizedMessage() {
-        return Resources.format(ResourceKeys.ERROR_KEY_NOT_FOUND_$2, getTableName(), getPrimaryKey());
+        // Do not invoke super.getLocalizedMessage() because
+        // the super-class implementation never returns null.
+        String message = getMessage();
+        if (message == null) {
+            message = Resources.format(ResourceKeys.ERROR_KEY_NOT_FOUND_$2, getTableName(), getPrimaryKey());
+        }
+        return message;
     }
 }

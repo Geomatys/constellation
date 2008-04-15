@@ -39,12 +39,12 @@ import java.lang.reflect.UndeclaredThrowableException;
 
 import org.geotools.util.DateRange;
 import org.geotools.image.io.mosaic.Tile;
-import org.geotools.geometry.GeneralEnvelope;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.UpdatePolicy;
 import net.seagis.catalog.CatalogException;
+import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -150,7 +150,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     }
 
     /**
-     * Sets the series in which to insert the entries. It must be an existing series in the
+     * Sets the series in which to insert the entries. It should be an existing series in the
      * currently selected layer.
      *
      * @param  name The series name.
@@ -158,11 +158,15 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * @throws SQLException If the database access failed for an other reason.
      */
     public synchronized void setSeries(final String name) throws CatalogException, SQLException {
-        final Layer layer = getNonNullLayer();
-        series = layer.getSeries(name);
-        if (series == null) {
-            throw new IllegalArgumentException(Errors.format(
-                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "name", name));
+        final Layer layer = getLayer();
+        if (layer == null) {
+            series = getDatabase().getTable(SeriesTable.class).getEntry(name);
+            // Do not invokes setLayer since it still null for SeriesEntry created that way.
+        } else {
+            series = layer.getSeries(name);
+            if (series == null) {
+                throw new NoSuchRecordException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "name", name));
+            }
         }
     }
 
@@ -271,8 +275,6 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         final Calendar          calendar  = getCalendar();
         final PreparedStatement statement = getStatement(QueryType.INSERT);
         final GridGeometryTable gridTable = getDatabase().getTable(GridGeometryTable.class);
-        final GeneralEnvelope   envelope  = getEnvelope();
-        envelope.normalize(false);
         final int bySeries    = indexOf(query.series);
         final int byFilename  = indexOf(query.filename);
         final int byIndex     = indexOf(query.index);
@@ -312,7 +314,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                     final SeriesTable table = getDatabase().getTable(SeriesTable.class);
                     final String path = (entry.path != null) ? entry.path.getPath() : "";
                     final String ID = table.getIdentifier(layer.getName(), path,
-                                        entry.extension, entry.getFormatName(true));
+                                    entry.extension, entry.getFormatName(true));
                     series = table.getEntry(ID);
                 }
             }
@@ -341,7 +343,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
              * back. It defaults to the whole Earth in WGS 84 geographic coordinates, but the
              * user can set an other value using {@link #setEnvelope}.
              */
-            entry.parseMetadata(getDatabase(), envelope);
+            entry.parseMetadata(getDatabase());
             extent = gridTable.getIdentifier(
                     entry.getImageSize(),
                     entry.getGridToCRS(),
@@ -386,9 +388,20 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             throws CatalogException, SQLException, IOException
     {
         if (tilesTable == null) {
-            tilesTable = new WritableGridCoverageTable(new GridCoverageQuery(getDatabase(), true));
+            tilesTable = new WritableGridCoverageTable(new GridCoverageQuery(getDatabase(), true)) {
+                @Override
+                protected WritableGridCoverageEntry createEntry(Tile tile) throws IOException {
+                    return WritableGridCoverageTable.this.createEntry(tile);
+                }
+
+                @Override
+                protected WritableGridCoverageEntry createEntry(ImageReader reader, int imageIndex) throws IOException {
+                    return WritableGridCoverageTable.this.createEntry(reader, imageIndex);
+                }
+            };
         }
         tilesTable.setLayer(getLayer());
+        tilesTable.series = series;
         tilesTable.addEntries(tiles, 0);
     }
 
@@ -575,5 +588,16 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             throws IOException
     {
         return new WritableGridCoverageEntry(reader, imageIndex);
+    }
+
+    /**
+     * Flushs the cache.
+     */
+    @Override
+    public synchronized void flush() {
+        if (tilesTable != null) {
+            tilesTable.flush();
+        }
+        super.flush();
     }
 }
