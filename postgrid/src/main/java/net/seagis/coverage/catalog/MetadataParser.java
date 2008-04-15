@@ -388,14 +388,20 @@ final class MetadataParser {
         final ImageReferencing referencing = metadata.getReferencing();
         final String wkt = referencing.getWKT();
         if (wkt != null) {
-            final int srid;
+            int srid;
             try {
                 srid = database.getTable(GridGeometryTable.class).getSRID(wkt);
             } catch (FactoryException e) {
-                throw new ServerException(e);
+                srid = 0; // TODO: debug Geotools code IdentifiedObjectFinder.findIdentifier(crs)
+                // throw new ServerException(e);
             }
             if (srid != 0) {
                 return srid;
+            }
+            if (wkt.contains("PARAMETER[\"Central_Meridian\",-11.000000]") && 
+                    wkt.contains("PARAMETER[\"Standard_Parallel_1\",46.000000]")) {
+                // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
+                return 35001; // Mercator IFREMER
             }
             if (wkt.contains("PROJECTION[\"Mercator\"]")) {
                 // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.

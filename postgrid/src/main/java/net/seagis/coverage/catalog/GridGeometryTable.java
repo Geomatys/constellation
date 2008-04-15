@@ -152,16 +152,13 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      */
     public synchronized int getSRID(final String wkt) throws SQLException, FactoryException {
         final CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
-        final IdentifiedObjectFinder finder = getAuthorityFactory().getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
-        final String srid = finder.findIdentifier(crs);
+        final PostgisAuthorityFactory factory = getAuthorityFactory();
+        final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
+        String srid = finder.findIdentifier(crs);
         if (srid == null) {
             return 0;
         }
-        try {
-            return Integer.parseInt(srid);
-        } catch (NumberFormatException e) {
-            throw new FactoryException(e);
-        }
+        return factory.getPrimaryKey(srid);
     }
 
     /**
