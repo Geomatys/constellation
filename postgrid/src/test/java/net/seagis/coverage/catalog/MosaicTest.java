@@ -109,7 +109,7 @@ public class MosaicTest extends DatabaseTest {
         // selected a different subsampling than the requested one for performance reasons.
         assertEquals(480, image.getWidth());
         assertEquals(240, image.getHeight());
-        if (true) {
+        if (false) {
             ImageIO.write(image, "png", new File("Test-BlueMarble.png"));
         }
     }
@@ -132,7 +132,7 @@ public class MosaicTest extends DatabaseTest {
         entry = layer.getCoverageReference();
         GridCoverage2D coverage = entry.getCoverage(null);
         RenderedImage image = coverage.view(ViewType.RENDERED).getRenderedImage();
-        if (true) {
+        if (false) {
             ImageIO.write(image, "png", new File("Test-Ortho2000.png"));
         }
     }
