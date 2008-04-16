@@ -103,7 +103,7 @@ public class MetadataWriter {
             Classe rootClasse = getClasseFromObject(object);
             Path rootPath = new Path(standard, rootClasse);
             
-            addValueFromObject(form, object, rootPath);
+            addValueFromObject(form, object, rootPath, null);
             return form;
         } else {
             logger.severe("unable to create form object is null");
@@ -115,7 +115,7 @@ public class MetadataWriter {
      * Add a MDWeb value to the specified form.
      * 
      */
-    private void addValueFromObject(Form form, Object object, Path path) throws SQLException {
+    private void addValueFromObject(Form form, Object object, Path path, Value parentValue) throws SQLException {
          //if the path is not already in the database we write it
          if (MDReader.getPath(path.getId()) == null) {
             MDWriter.writePath(path);
@@ -128,7 +128,7 @@ public class MetadataWriter {
         if (object instanceof Collection) {
             Collection c = (Collection) object;
             for (Object obj: c) {
-                addValueFromObject(form, obj, path);
+                addValueFromObject(form, obj, path, parentValue);
                 
             }
             return;
@@ -143,14 +143,14 @@ public class MetadataWriter {
         }
         
         //we try to find the good ordinal
-        int ordinal  = form.getNewOrdinal(path);
+        int ordinal  = form.getNewOrdinal(parentValue.getIdValue() + ':' + path.getName());
         
         if (isPrimitive(classe)) {
-            TextValue textValue = new TextValue(path, form , ordinal, object + "", classe);
+            TextValue textValue = new TextValue(path, form , ordinal, object + "", classe, parentValue);
             logger.finer("new TextValue: " + path.toString() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
         } else {
             
-            Value value = new Value(path, form, ordinal, classe);
+            Value value = new Value(path, form, ordinal, classe, parentValue);
             logger.finer("new Value: " + path.toString() + " classe:" + classe.getName() + " ordinal=" + ordinal);
             for (Property prop: classe.getProperties()) {
                 Method getter = getGetterFromName(prop.getName(), object.getClass());
@@ -164,7 +164,7 @@ public class MetadataWriter {
                             if (MDReader.getPath(childPath.getId()) == null) {
                                 MDWriter.writePath(childPath);
                             }
-                            addValueFromObject(form, propertyValue, childPath);
+                            addValueFromObject(form, propertyValue, childPath, value);
                         }
                     
                     } catch (IllegalAccessException e) {

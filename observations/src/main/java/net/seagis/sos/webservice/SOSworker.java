@@ -17,6 +17,7 @@
 package net.seagis.sos.webservice;
 
 // JDK dependencies
+import org.apache.xerces.dom.ElementNSImpl;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -124,7 +125,6 @@ import static net.seagis.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.schemas.ValuePath;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
@@ -141,6 +141,9 @@ import org.opengis.observation.Observation;
 
 // postgres driver
 import org.postgresql.ds.PGSimpleDataSource;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -1091,6 +1094,34 @@ public class SOSworker {
         return response;
     }
     
+    private  String getXMLFromElementNSImpl(ElementNSImpl elt) {
+        Node node = elt.getFirstChild();
+        return this.getXMLFromNode(node).toString();
+    }
+
+    private  StringBuilder getXMLFromNode(Node node) {
+        StringBuilder temp = new StringBuilder();
+        if (!node.getNodeName().equals("#text")){
+            temp.append("<" + node.getNodeName());
+            NamedNodeMap attrs = node.getAttributes();
+            for(int i=0;i<attrs.getLength();i++){
+                temp.append(" "+attrs.item(i).getNodeName()+"=\""+attrs.item(i).getTextContent()+"\" ");
+            }
+            temp.append(">");
+        }
+        if (node.hasChildNodes()) {
+            NodeList nodes = node.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                temp.append(getXMLFromNode(nodes.item(i)));
+            }
+        }
+        else{
+            temp.append(node.getTextContent());
+        }
+        if (!node.getNodeName().equals("#text")) temp.append("</" + node.getNodeName() + ">");
+        return temp;
+    }
+    
     /**
      * Web service operation whitch register a Sensor in the SensorML database, 
      * and initialize its observation by adding an observation template in the O&M database.
@@ -1113,8 +1144,9 @@ public class SOSworker {
             
             //we get the SensorML file who describe the Sensor to insert.
             RegisterSensor.SensorDescription d = requestRegSensor.getSensorDescription();
-            String process  = (String)d.getAny();     
-            
+            //String process  = (String)d.getAny();     
+            String process = this.getXMLFromElementNSImpl((ElementNSImpl)d.getAny());
+             
             //we get the observation template provided with the sensor description.
             ObservationTemplate temp = requestRegSensor.getObservationTemplate();
             ObservationEntry obs = temp.getObservation();
@@ -1549,48 +1581,52 @@ public class SOSworker {
     private String recordMapping(Form form, String dbId) throws SQLException, FileNotFoundException, IOException {
        
         //we search which identifier is the supervisor code
-        int i = 1;
-        boolean found = false;
-        Value v = null;
-        do {
-            ValuePath vp = sensorMLReader.getValuePath("SensorML:SensorML:member.1:identification.1:identifier." + i + ":name.1");
-            logger.info("SensorML:SensorML:member.1:identification.1:identifier." + i + ":name.1");
-            if (vp != null) {
-               v = sensorMLReader.getValue(form, "1", vp, -1);
-            } else {
-                logger.severe("The valuePath is null i=" + i);
-                v = null;
-            } 
-            if (v != null && v instanceof TextValue) {
-                logger.info(((TextValue)v).getValue());
-                if (((TextValue)v).getValue().equals("supervisorCode")){
+        int i                  = 1;
+        boolean found          = false;
+        boolean moreIdentifier = true;
+        while (moreIdentifier && !found) {
+            PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
+                                                                     " WHERE id_value=?" +
+                                                                     " AND form=?");
+            stmt.setString(1, "SensorML:SensorML:member.1:identification.1:identifier." + i + ":name.1");
+            stmt.setInt(2,    form.getId());
+            ResultSet result = stmt.executeQuery();
+            moreIdentifier   = result.next();
+            if (moreIdentifier) {
+                String value = result.getString(1);
+                logger.info(value);
+                if (value.equals("supervisorCode")){
                     found = true;
-                } else {
-                    i++;
-                }
-            } else {
-                logger.info("v pas textValue");
-                i++;
+                } 
             }
-        } while (v != null && !found);
+            result.close();
+            i++;
+        } 
         
         if (!found) {
             logger.severe("There is no supervisor code in that SensorML file");
             return "";
         } else {
-            v = sensorMLReader.getValue(form, "2", 
-                sensorMLReader.getValuePath("SensorML:SensorML:member.1:identification.1:identifier." + i + ":value.1")
-                , -1);
+            PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
+                                                                     " WHERE id_value=?" +
+                                                                     " AND form=?");
+            stmt.setString(1, "SensorML:SensorML:member.1:identification.1:identifier." + (i - 1) + ":value.1");
+            stmt.setInt(2,    form.getId());
+            ResultSet result = stmt.executeQuery();
+            String value = "";
+            if (result.next()) {
+                value = result.getString(1);
+                logger.severe("PhysicalId:" + value);
+                map.setProperty(value, dbId);
+                String env = System.getenv("CATALINA_HOME");
+                FileOutputStream out = new FileOutputStream(env + "/bin/mapping.properties");
+                map.store(out, "");
+            } else {
+                logger.severe("no value for supervisorcode identifier numero " + (i - 1));
+            }
+            result.close();
+            return value;
         }
-        // if we find the value we put it in the mapping properties file and store it.
-        if (v instanceof TextValue) {
-            logger.severe("PhysicalId:" + ((TextValue)v).getValue());
-            map.setProperty(((TextValue)v).getValue(), dbId);
-            String env = System.getenv("CATALINA_HOME");
-            FileOutputStream out = new FileOutputStream(env + "/bin/mapping.properties");
-            map.store(out, "");
-       }
-       return ((TextValue)v).getValue();
     }
     
     /**
@@ -1619,41 +1655,39 @@ public class SOSworker {
     private void recordSensorLocation(Form form, String sensorId) throws SQLException {
         String column      = "";
         String coordinates = "";
-        Value v = null;
         
         //we get the srs name
-        ValuePath vp = sensorMLReader.getValuePath("SensorML:SensorML:member.1:location.1:pos.1:srsName.1");
-        if (vp != null) {
-            v = sensorMLReader.getValue(form, "1", vp, -1);
-        } else {
-            logger.severe("The valuePath is null");
-            v = null;
-        } 
-        if (v != null && v instanceof TextValue) {
-            logger.info(((TextValue)v).getValue());
-            column = ((TextValue)v).getValue();
-            column = column.substring(column.lastIndexOf(':') + 1);
+        PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
+                                                                     " WHERE id_value=?" +
+                                                                     " AND form=?");
+        stmt.setString(1, "SensorML:SensorML:member.1:location.1:pos.1:srsName.1");
+        stmt.setInt(2,    form.getId());
+        ResultSet result = stmt.executeQuery();
+        if (result.next()) {
+            column = result.getString(1);
+            if (column.indexOf(':') != -1) {
+                column = column.substring(column.lastIndexOf(':') + 1);
+            }
+            logger.info("srsName:" + column);
         } else {
             logger.severe("there is no srsName for the piezo location");
             return;
         }
+        result.close();
         
         // we get the coordinates
-        v = null;
-        vp = sensorMLReader.getValuePath("SensorML:SensorML:member.1:location.1:pos.1");
-        if (vp != null) {
-            v = sensorMLReader.getValue(form, "2", vp, -1);
-        } else {
-            logger.severe("The valuePath is null");
-            v = null;
-        } 
-        if (v != null && v instanceof TextValue) {
-            logger.info(((TextValue)v).getValue());
-            coordinates = ((TextValue)v).getValue();
+        stmt.setString(1, "SensorML:SensorML:member.1:location.1:pos.1");
+        stmt.setInt(2,    form.getId());
+        result = stmt.executeQuery();
+        if (result.next()) {
+            
+            coordinates = result.getString(1);
+            logger.info(coordinates);
         } else {
             logger.severe("there is no coordinates for the piezo location");
             return;
         }
+        result.close();
         String x = coordinates.substring(0, coordinates.indexOf(' '));
         String y = coordinates.substring(coordinates.indexOf(' ') + 1 );
         String request = "";
@@ -1662,8 +1696,8 @@ public class SOSworker {
         else
             request = "INSERT INTO geographic_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + column + "))";
         logger.info(request);
-        Statement stmt    = OMDatabase.getConnection().createStatement();
-        stmt.executeUpdate(request);
+        Statement stmt2    = OMDatabase.getConnection().createStatement();
+        stmt2.executeUpdate(request);
     }
     
     /**
@@ -1677,29 +1711,30 @@ public class SOSworker {
      
         //we search which are the classifier describing the networks
         int i = 1;
-        Value v;
         int[] networksIndex = new int[20];
         int size = 0;
-        do {
+        boolean moreClassifier = true;
+        while (moreClassifier) {
             
-            ValuePath vp = sensorMLReader.getValuePath("SensorML:SensorML:member.1:classification.1:classifier." + i + ":name.1");
-            if (vp != null)
-                v = sensorMLReader.getValue(form, "1", vp, -1);
-            else 
-                v = null;
-            if (v != null && v instanceof TextValue) {
-                if (((TextValue)v).getValue().equals("network")){
-                    logger.info(((TextValue)v).getValue());
+            PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
+                                                                         " WHERE id_value=?" +
+                                                                         " AND form=?");
+            stmt.setString(1, "SensorML:SensorML:member.1:classification.1:classifier." + i + ":name.1");
+            stmt.setInt(2,    form.getId());
+            ResultSet result = stmt.executeQuery();
+            moreClassifier   = result.next();
+            if (moreClassifier) {
+                String value = result.getString(1);
+                if (value.equals("network")){
+                    logger.info(value);
                     networksIndex[size] = i;
                     size++;
-                    i++;
-                } else {
-                    i++;
-                }
-            } else {
-                i++;
+                    
+                } 
             }
-        } while (v != null);
+            result.close();
+            i++;
+        } 
         
         if (size == 0) {
             logger.severe("There is no network in that SensorML file");
@@ -1708,12 +1743,15 @@ public class SOSworker {
             // for each network we create (or update) an offering
             for (int j = 0; j < size + 1; j++) {
                 if (j != size) {
-                    v = sensorMLReader.getValue(form, "2", 
-                        sensorMLReader.getValuePath("SensorML:SensorML:member.1:classification.1:classifier." + networksIndex[j] + ":value.1")
-                        , -1);
+                    PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
+                                                                                 " WHERE id_value=?" +
+                                                                                 " AND form=?");
+                    stmt.setString(1, "SensorML:SensorML:member.1:classification.1:classifier." + networksIndex[j] + ":value.1");
+                    stmt.setInt(2,    form.getId());
+                    ResultSet result = stmt.executeQuery();
                 
-                    if (v != null && v instanceof TextValue) {
-                        String offeringName = "offering-" + ((TextValue)v).getValue();
+                    if (result.next()) {
+                        String offeringName = "offering-" + result.getString(1);
                         logger.info("networks:" + offeringName);
                     
                         //we get the offering from the O&M database
@@ -1800,7 +1838,10 @@ public class SOSworker {
                                                                     responses);
                             offTable.getIdentifier(offering);
                         }
+                    } else {
+                        logger.severe("no value for network classifier numero " + networksIndex[j]);
                     }
+                    result.close();
                     
                 // we add the sensor to the global offering containing all the sensor    
                 } else {

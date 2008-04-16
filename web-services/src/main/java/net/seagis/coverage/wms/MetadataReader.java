@@ -59,7 +59,6 @@ import static net.seagis.ows.OWSExceptionCode.*;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
 import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.schemas.ValuePath;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
@@ -556,13 +555,7 @@ public class MetadataReader {
         }
 
         // then we search the setter for all the child value
-        String pathId;
-        if (value.getPath() instanceof ValuePath) {
-            ValuePath vp = (ValuePath)value.getPath();
-            pathId = vp.getId();
-        } else {
-            pathId = value.getPath().getId();
-        }
+        String pathId = value.getPath().getId();
         
         for (Value childValue : form.getValues()) {
             
@@ -633,13 +626,7 @@ public class MetadataReader {
      * Return true if the textValue have child (MDWeb bug)
      */
     private boolean asMoreChild(Form f, Value v) {
-        String pathId;
-        if (v.getPath() instanceof ValuePath) {
-            ValuePath vp = (ValuePath)v.getPath();
-            pathId = vp.getId();
-        } else {
-            pathId = v.getPath().getId();
-        }
+        String pathId = v.getPath().getId();
         
         for (Value childValue : f.getValues()) {
 
