@@ -137,7 +137,7 @@ public abstract class ImageProducer {
     /**
      * The default interpolation to use.
      */
-    static final int DEFAULT_INTERPOLATION = Interpolation.INTERP_BILINEAR;
+    static final int DEFAULT_INTERPOLATION = Interpolation.INTERP_NEAREST;
 
     /**
      * The buffered image types to try if the native image sample model doesn't fit the current
