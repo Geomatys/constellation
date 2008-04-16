@@ -51,6 +51,7 @@ import org.geotools.console.ExternalyConfiguredCommandLine;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
+import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.coverage.catalog.WritableGridCoverageEntry;
 import net.seagis.coverage.catalog.WritableGridCoverageTable;
 
@@ -371,7 +372,11 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
             };
             table.setCanInsertNewLayers(true);
             table.setLayer(series); // TODO: we currently assume the same name than the series.
-            table.setSeries(series);
+            try {
+                table.setSeries(series);
+            } catch (NoSuchRecordException e) {
+                // Ignore... We will let the WritableGridCoverageTable selects a series.
+            }
             table.addEntry(global);
             table.addTiles(tiles);
             database.close();
@@ -404,9 +409,10 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
     }
 
     /**
-     * Creates an affine transform from the coefficients in the given file.
+     * Returns a file with the same path and extension than the given one, and the extension
+     * replaced by {@value #REFERENCING_EXTENSION}.
      */
-    private AffineTransform parseTransform(File file) throws IOException {
+    static File toTFW(File file) {
         if (file != null) {
             String name = file.getName();
             final int separator = name.lastIndexOf('.');
@@ -426,6 +432,14 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
                 }
             }
         }
+        return file;
+    }
+
+    /**
+     * Creates an affine transform from the coefficients in the given file.
+     */
+    private AffineTransform parseTransform(File file) throws IOException {
+        file = toTFW(file);
         final BufferedReader in = new BufferedReader(new FileReader(file));
         final double[] m = new double[6];
         int count = 0;

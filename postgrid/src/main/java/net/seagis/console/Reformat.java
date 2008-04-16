@@ -39,16 +39,28 @@ import org.geotools.resources.image.ImageUtilities;
  */
 public final class Reformat extends CommandLine implements FileFilter {
     /**
-     * The target format.
+     * The target format, or {@code null} if nothing should be written.
      */
-    @Option(description="The target format.")
+    @Option(description="The target format (omitted if nothing should be written).")
     private String format;
 
     /**
-     * The color model as one of RGB or ARGB constants.
+     * The color model as one of RGB or ARGB constants, or {@code null} if no change.
      */
-    @Option(description="The color model. One of RGB or ARGB.")
+    @Option(description="The color model. One of \"RGB\" or \"ARGB\".")
     private String model;
+
+    /**
+     * The target directory. If omitted, will be the same than the source images.
+     */
+    @Option(name="target-directory", description="The flat target directory. Default is same directory than source.")
+    private String targetDirectory;
+
+    /**
+     * A file listing the images to process, or {@code null} if none.
+     */
+    @Option(description="The images to process as a file listing them.")
+    private String file;
 
     /**
      * {@code true} for scanning recursively into directories.
@@ -103,6 +115,17 @@ public final class Reformat extends CommandLine implements FileFilter {
             final String[] suffixes = writer.getOriginatingProvider().getFileSuffixes();
             suffix = (suffixes != null && suffixes.length != 0) ? suffixes[0] : format;
         }
+        if (file != null) {
+            final BufferedReader in = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = in.readLine()) != null) {
+                line = line.trim();
+                if (line.length() != 0 && line.charAt(0) != '#') {
+                    run(new File(line));
+                }
+            }
+            in.close();
+        }
         for (final String filename : arguments) {
             run(new File(filename));
         }
@@ -115,17 +138,21 @@ public final class Reformat extends CommandLine implements FileFilter {
     /**
      * Executes the command for the given file.
      */
-    private void run(final File file) throws IOException {
-        if (file.isDirectory()) {
-            for (final File child : file.listFiles(this)) {
+    private void run(final File sourceFile) throws IOException {
+        if (sourceFile.isDirectory()) {
+            for (final File child : sourceFile.listFiles(this)) {
                 run(child);
             }
         } else {
-            BufferedImage image = ImageIO.read(file);
-            out.print(file);
+            BufferedImage image = ImageIO.read(sourceFile);
+            out.print(sourceFile);
             out.print(": ");
+            if (image == null) {
+                out.println("unrecognized");
+                return;
+            }
             out.print(image.getWidth());
-            out.print(" x ");
+            out.print(" \u00D7 ");
             out.print(image.getHeight());
             switch (image.getColorModel().getTransparency()) {
                 case Transparency.OPAQUE:      out.print(" opaque");       break;
@@ -143,17 +170,44 @@ public final class Reformat extends CommandLine implements FileFilter {
                 graphics.dispose();
                 image = buffer;
             }
-            String name = file.getName();
+            String name = sourceFile.getName();
             int sep = name.lastIndexOf('.');
             if (sep > 0) {
                 name = name.substring(0, sep);
             }
             name = name + '.' + suffix;
-            final ImageOutputStream out = ImageIO.createImageOutputStream(new File(file.getParentFile(), name));
+            final String parent;
+            if (targetDirectory != null) {
+                parent = targetDirectory;
+            } else {
+                parent = sourceFile.getParent();
+            }
+            final File targetFile = new File(parent, name);
+            final ImageOutputStream out = ImageIO.createImageOutputStream(targetFile);
             writer.setOutput(out);
             writer.write(image);
             writer.reset();
             out.close();
+            copyTFW(sourceFile, targetFile);
+        }
+    }
+
+    /**
+     * Copies TFW files, if they exists.
+     */
+    private static void copyTFW(File source, File target) throws IOException {
+        source = TileBuilder.toTFW(source);
+        target = TileBuilder.toTFW(target);
+        if (source.isFile() && !source.equals(target)) {
+            final InputStream  in  = new FileInputStream (source);
+            final OutputStream out = new FileOutputStream(target);
+            final byte[] buffer = new byte[4096];
+            int count;
+            while ((count = in.read(buffer)) >= 0) {
+                out.write(buffer, 0, count);
+            }
+            out.close();
+            in.close();
         }
     }
 
