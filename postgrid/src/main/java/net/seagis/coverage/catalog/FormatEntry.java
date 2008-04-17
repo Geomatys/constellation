@@ -45,12 +45,10 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
-import javax.imageio.event.IIOReadWarningListener;
-import javax.imageio.event.IIOReadProgressListener;
 import javax.media.jai.JAI;
-import javax.media.jai.util.Range;
 import com.sun.media.imageio.stream.RawImageInputStream;
 
+import org.geotools.util.NumberRange;
 import org.geotools.util.MeasurementRange;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
@@ -64,11 +62,11 @@ import org.geotools.image.io.mosaic.MosaicImageReader;
 import org.geotools.image.io.mosaic.MosaicImageReadParam;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.Classes;
+import org.geotools.resources.XArray;
 
 import net.seagis.catalog.Entry;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
-import org.geotools.resources.XArray;
 
 
 /**
@@ -742,12 +740,12 @@ final class FormatEntry extends Entry implements Format {
         }
 
         /**
-         * Construct a node for the specified category.
+         * Constructs a node for the specified category.
          */
         public TreeNode(final Category category, final Locale locale) {
             super(category, false);
             final StringBuilder buffer = new StringBuilder();
-            final Range range = category.geophysics(false).getRange();
+            final NumberRange range = category.geophysics(false).getRange();
             buffer.append('[');  append(buffer, range.getMinValue());
             buffer.append(".."); append(buffer, range.getMaxValue()); // Inclusive
             buffer.append("] ").append(category.getName());
