@@ -556,7 +556,7 @@ CREATE VIEW "DomainOfSeries" AS
            count("extent")  AS "count",
            min("startTime") AS "startTime",
            max("endTime")   AS "endTime"
-      FROM "GridCoverages" GROUP BY "series") AS "TimeRanges"
+      FROM ONLY "GridCoverages" GROUP BY "series") AS "TimeRanges"
       JOIN
    (SELECT "series",
            min("west")  AS "west",
@@ -565,7 +565,7 @@ CREATE VIEW "DomainOfSeries" AS
            max("north") AS "north",
            min(("east"  - "west" ) / "width" ) AS "xResolution",
            min(("north" - "south") / "height") AS "yResolution"
-      FROM (SELECT DISTINCT "series", "extent" FROM "GridCoverages") AS "Extents"
+      FROM (SELECT DISTINCT "series", "extent" FROM ONLY "GridCoverages") AS "Extents"
  LEFT JOIN "BoundingBoxes" ON "Extents"."extent" = "BoundingBoxes"."identifier"
   GROUP BY "series") AS "BoundingBoxRanges" ON "TimeRanges".series = "BoundingBoxRanges".series
   ORDER BY "series";
