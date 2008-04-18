@@ -12,7 +12,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://soap.webservice.sos.seagis.net/", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
 xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "g", namespaceURI= "http://soap.webservice.sos.seagis.net/"),
           @javax.xml.bind.annotation.XmlNs(prefix = "ows", namespaceURI= "http://www.opengis.net/ows/1.1"),

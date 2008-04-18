@@ -131,6 +131,8 @@ public class SOService extends WebService {
              
              } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 
+                worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+                
                 GetCapabilities gc = (GetCapabilities)objectRequest;
                 /*
                  * if the parameters have been send by GET or POST kvp,
@@ -190,7 +192,6 @@ public class SOService extends WebService {
             versions = new AcceptVersionsType("1.0.0");
         }
                     
-        worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
         AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
                         
         //We transform the String of sections in a list.

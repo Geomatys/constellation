@@ -1,5 +1,5 @@
 /*
- * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * Sicade - Systemes integres de connaissances pour l'aide a la decision en environnement
  * (C) 2008 Geomatys
  *
  *    This library is free software; you can redistribute it and/or

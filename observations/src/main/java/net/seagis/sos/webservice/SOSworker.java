@@ -127,8 +127,6 @@ import static net.seagis.ows.OWSExceptionCode.*;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
-import org.mdweb.model.storage.TextValue;
-import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
 import org.mdweb.sql.v20.Reader20;
 import org.mdweb.sql.v20.Writer20;
@@ -418,6 +416,9 @@ public class SOSworker {
             Contents            cont = null;
             
             SectionsType sections = requestCapabilities.getSections();
+            if (sections == null) {
+                sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
+            }
             //we enter the information for service identification.
             if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
                 
@@ -492,6 +493,7 @@ public class SOSworker {
                                          NO_APPLICABLE_CODE, null, version);
            
         } catch (CatalogException ex) {
+            ex.printStackTrace();
             throw new OWSWebServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE, null, version);
         }
