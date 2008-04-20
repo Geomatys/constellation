@@ -54,11 +54,11 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt-referencing</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>openoffice</artifactId>
+      <artifactId>gt-openoffice</artifactId>
     </dependency>
     <dependency>
       <groupId>net.seagis</groupId>
@@ -95,8 +95,8 @@
       <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>         <!-- Evite la dépendence vers la base de données ESPG sur HSQL, -->
-      <artifactId>gt2-epsg-hsql</artifactId>  <!-- car on en utilisera une autre (EPSG sur PostgreSQL).       -->
+      <groupId>org.geotools</groupId>        <!-- Evite la dépendence vers la base de données ESPG sur HSQL, -->
+      <artifactId>gt-epsg-hsql</artifactId>  <!-- car on en utilisera une autre (EPSG sur PostgreSQL).       -->
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -111,8 +111,8 @@
     <plugins>
       <plugin>
         <groupId>org.geotools.maven</groupId>
-        <artifactId>gt2-javamaker</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <artifactId>javamaker</artifactId>
+        <version>${geotools.version}</version>
         <executions>
           <execution>
             <goals>
@@ -136,8 +136,8 @@
       </plugin>
       <plugin>
         <groupId>org.geotools.maven</groupId>
-        <artifactId>gt2-unopkg</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <artifactId>unopkg</artifactId>
+        <version>${geotools.version}</version>
         <configuration>
           <oxtName>${project.version}</oxtName>
         </configuration>

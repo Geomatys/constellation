@@ -199,52 +199,52 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>referencing</artifactId>
+        <artifactId>gt-referencing</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>coverage</artifactId>
+        <artifactId>gt-coverage</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>coverageio</artifactId>
+        <artifactId>gt-coverageio</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>coverageio-netcdf</artifactId>
+        <artifactId>gt-coverageio-netcdf</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>api</artifactId>
+        <artifactId>gt-api</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>main</artifactId>
+        <artifactId>gt-main</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>widgets-swing</artifactId>
+        <artifactId>gt-widgets-swing</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>go</artifactId>
+        <artifactId>gt-go</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>openoffice</artifactId>
+        <artifactId>gt-openoffice</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>epsg-hsql</artifactId>
+        <artifactId>gt-epsg-hsql</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
