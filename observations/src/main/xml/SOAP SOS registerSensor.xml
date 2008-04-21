@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<soap:Envelope 	xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+					soap:encodingStyle="http://www.w3.org/2001/12/soap-encoding">
+		<soap:Header/>
+		<soap:Body>
+<RegisterSensor                xmlns="http://soap.webservice.sos.seagis.net/"
+                               xmlns:sos="http://www.opengis.net/sos/1.0" 
+                               xmlns:ogc="http://www.opengis.net/ogc" 
+                               xmlns:gmd="http://www.isotc211.org/2005/gmd" 
+                               xmlns:gco="http://www.isotc211.org/2005/gco"
+                               xmlns:sa="http://www.opengis.net/sa/1.0" 
+                               xmlns:ows="http://www.opengis.net/ows/1.1" 
+                               xmlns:xlink="http://www.w3.org/1999/xlink" 
+                               xmlns:om="http://www.opengis.net/om/1.0" 
+                               xmlns:gml="http://www.opengis.net/gml" 
+                               xmlns:gts="http://www.isotc211.org/2005/gts" 
+                               xmlns:swe="http://www.opengis.net/swe/1.0.1" 
+                               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                               xmlns:sml="http://www.opengis.net/sml/1.0"
+                               xsi:schemaLocation="http://www.opengis.net/sos/1.0 C:\DOCUME~1\legal\Bureau\SOS1~1.0XS\sos\1.0.0\sosAll.xsd" service="SOS" version="1.0.0">
+	<sos:SensorDescription>
+		<sml:SensorML>
+			<Component>
+				<gml:name>Capteur Profondeur de ARGELES</gml:name>
+				<!-- metadata  -->
+				<keywords>
+					<KeywordList codeSpace="urn:x-brgm:def:gcmd:keywords">
+						<keyword>piezometer</keyword>
+						<keyword>geosciences</keyword>
+						<keyword>point d'eau</keyword>
+					</KeywordList>
+				</keywords>
+				<identification>
+					<IdentifierList>
+						<identifier name="supervisorCode">
+							<Term definition="urn:x-ogc:def:identifier:OGC:modelNumber">
+								<codeSpace xlink:href="urn:x-brgm:def:sensorSystem:hydras"/>
+								<value>00ARGLELES_2000</value>
+							</Term>
+						</identifier>
+						<identifier name="longName">
+							<Term definition="urn:x-ogc:def:identifier:OGC:longname">
+								<value>Madofil II</value>
+							</Term>
+						</identifier>
+					</IdentifierList>
+				</identification>
+				<classification>
+					<ClassifierList>
+						<classifier name="intendedApplication">
+							<Term definition="urn:x-ogc:def:classifier:OGC:application">
+								<value>eaux souterraines</value>
+							</Term>
+						</classifier>
+						<classifier name="sensorType">
+							<Term definition="urn:sensor:classifier:sensorType">
+								<codeSpace xlink:href="urn:x-brgm:def:GeoPoint:bss"/>
+								<value>Profondeur</value>
+							</Term>
+						</classifier>
+					</ClassifierList>
+				</classification>
+				<!-- Période de début / fin du capteur sur le site -->
+				<validTime>
+					<gml:TimePeriod>
+						<gml:beginPosition>2004-06-01</gml:beginPosition>
+						<gml:endPosition indeterminatePosition="now"/>
+					</gml:TimePeriod>
+				</validTime>
+				<!-- Période de données disponible -->
+				<capabilities>
+					<swe:DataRecord definition="urn:x-brgm:def:property:periodOfData">
+						<swe:field name="periodOfData" xlink:role="urn:x-brgm:def:property:periodOfData">
+							<swe:TimeRange>
+								<swe:value>1987-04-23 now</swe:value>
+							</swe:TimeRange>
+						</swe:field>
+					</swe:DataRecord>
+				</capabilities>
+				<contact xlink:role="urn:x-ogc:def:role:manufacturer">
+					<ResponsibleParty>
+						<organizationName>IRIS</organizationName>
+					</ResponsibleParty>
+				</contact>
+				<position name="conductivitePosition" xlink:href="piezometer#piezoPosition"/>
+				<!--~~~~~~~~~~~~~-->
+				<!-- Detector Inputs-->
+				<!--~~~~~~~~~~~~~-->
+				<!-- note: in most cases, a detector’s input will be a phenomenon and its output a measured digital value (e.g. 
+				Quantity)  -->
+				<inputs>
+					<InputList>
+						<input name="level">
+							<swe:ObservableProperty definition="urn:x-ogc:def:phenomenon:OGC:level"/>
+						</input>
+					</InputList>
+				</inputs>
+				<!--~~~~~~~~~~~~~~-->
+				<!-- Detector Outputs-->
+				<!--~~~~~~~~~~~~~~-->
+				<!-- note: in this case, the detector’s output is also a phenomenon (electrical resistance) rather than 
+				measured digital values -->
+				<outputs>
+					<OutputList>
+						<output name="depth">
+							<swe:ObservableProperty definition="urn:x-ogc:def:phenomenon:OGC:depth"/>
+						</output>
+					</OutputList>
+				</outputs>
+				<!-- Fréquence d'acquisition, précision, plage de validité,...  -->
+				<parameters>
+					<ParameterList>
+						<parameter name="frequency" xlink:role="urn:x-ogc:def:property:frequency">
+							<swe:Quantity definition="urn:x-ogc:def:property:frequency">
+								<swe:uom xlink:href="urn:ogc:unit:minuts"/>
+								<swe:value>60</swe:value>
+							</swe:Quantity>
+						</parameter>
+						<parameter name="precision" xlink:role="urn:x-ogc:def:property:precision">
+							<swe:Quantity definition="urn:x-ogc:def:property:precision">
+								<swe:uom code="m"/>
+								<swe:value>0.05</swe:value>
+							</swe:Quantity>
+						</parameter>
+						<parameter name="validity" xlink:role="urn:x-ogc:def:property:validity">
+							<swe:QuantityRange>
+								<swe:uom code="m"/>
+								<swe:value>0.0 10.0</swe:value>
+							</swe:QuantityRange>
+						</parameter>
+					</ParameterList>
+				</parameters>
+			</Component>
+		</sml:SensorML>
+	</sos:SensorDescription>
+	<sos:ObservationTemplate>
+		<om:Observation>
+		<om:samplingTime/>
+			<om:procedure xlink:href="00ARGLELES_2000"/>
+			<om:observedProperty>
+				<swe:Phenomenon gml:id="depth">
+				    <gml:description>profondeur</gml:description>
+					<gml:name>urn:x-ogc:def:phenonmenon:BRGM:depth</gml:name>
+				</swe:Phenomenon>
+			</om:observedProperty>
+			<om:featureOfInterest>
+				<sa:SamplingPoint>
+					<gml:description>Point d'eau BSSS</gml:description>
+					 <gml:name>02442X0111/F</gml:name>
+					 <gml:boundedBy>
+						<gml:Null>not_bounded</gml:Null>
+					  </gml:boundedBy>
+					  <sa:description>Point d'eau BSSS</sa:description>
+					  <sa:name>02442X0111/F</sa:name>
+					  <sa:sampledFeature>urn:-sandre:object:bdrhf:123X</sa:sampledFeature>
+					  <sa:position gml:id="STATION-LOCALISATION">
+							<gml:pos srsName="urn:ogc:crs:EPSG:27582" srsDimension="2">163000.0 2345192.0</gml:pos>
+					  </sa:position>
+				</sa:SamplingPoint>
+			 </om:featureOfInterest>
+			 </om:Observation>
+	</sos:ObservationTemplate>
+</RegisterSensor>
+		<soap:Fault/>
+		</soap:Body>
+</soap:Envelope>

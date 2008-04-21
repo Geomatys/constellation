@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<soap:Envelope 	xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+	soap:encodingStyle="http://www.w3.org/2001/12/soap-encoding">
+	<soap:Header/>
+	<soap:Body>
+		<GetCapabilities xmlns="http://soap.webservice.sos.seagis.net/"
+ 				 xmlns:ogc="http://www.opengis.net/ogc"
+				 xmlns:xlink="http://www.w3.org/1999/xlink"
+				 xmlns:sos="http://www.opengis.net/sos/1.0"
+				 service="SOS">
+		</GetCapabilities>
+		<soap:Fault/>
+	</soap:Body>
+</soap:Envelope>
