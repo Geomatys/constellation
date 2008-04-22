@@ -202,7 +202,7 @@ public abstract class ImageProducer {
     /**
      * The range on value on which to apply a color ramp.
      */
-    protected NumberRange colormapRange;
+    protected NumberRange<Double> colormapRange;
 
     /**
      * The requested time.
@@ -689,7 +689,7 @@ public abstract class ImageProducer {
         }
         if (colormapRange != null) {
             final ColorMap colorMap = new ColorMap();
-            colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange(colormapRange, null));
+            colorMap.setGeophysicsRange(ColorMap.ANY_QUANTITATIVE_CATEGORY, new MeasurementRange<Double>(colormapRange, null));
             coverage = (GridCoverage2D) Operations.DEFAULT.recolor(coverage, new ColorMap[] {colorMap});
         }
         RenderedImage image = coverage.getRenderedImage();

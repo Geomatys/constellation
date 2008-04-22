@@ -114,7 +114,7 @@ public interface Layer extends Element {
      * Returns the ranges of valid sample values for each band.
      * The ranges are always expressed in <cite>geophysics</cite> values.
      */
-    MeasurementRange[] getSampleValueRanges();
+    MeasurementRange<?>[] getSampleValueRanges();
 
     /**
      * Returns a time range encompassing all coverages in this layer.

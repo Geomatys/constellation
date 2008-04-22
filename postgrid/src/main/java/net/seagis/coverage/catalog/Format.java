@@ -45,7 +45,7 @@ public interface Format extends Element {
      * Returns the ranges of valid sample values for each band in this format.
      * The range are always expressed in <cite>geophysics</cite> values.
      */
-    MeasurementRange[] getSampleValueRanges();
+    MeasurementRange<Double>[] getSampleValueRanges();
 
     /**
      * Returns the list of sample dimensions that should be common to every coverage in that format.

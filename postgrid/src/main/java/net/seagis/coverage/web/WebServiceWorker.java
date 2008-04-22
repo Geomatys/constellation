@@ -491,7 +491,7 @@ public class WebServiceWorker extends ImageProducer {
            }
            final double min = parseDouble(range.substring(0,  split));
            final double max = parseDouble(range.substring(split + 1));
-           colormapRange = new NumberRange(min, max);
+           colormapRange = NumberRange.create(min, max);
        }
     }
 

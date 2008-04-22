@@ -571,7 +571,7 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws CatalogException if an illegal record was found.
      * @throws SQLException if an error occured while reading the database.
      */
-    public synchronized RangeSet getAvailableTimeRanges(RangeSet addTo)
+    public synchronized RangeSet<Date> getAvailableTimeRanges(RangeSet<Date> addTo)
             throws CatalogException, SQLException
     {
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
@@ -582,7 +582,7 @@ loop:   for (final CoverageReference newReference : entries) {
         final int   endTimeIndex = indexOf(query.endTime);
         final long timeInterval  = Math.round((layer!=null ? layer.getTimeInterval() : 1) * MILLIS_IN_DAY);
         if (addTo == null) {
-            addTo = new RangeSet(Date.class);
+            addTo = new RangeSet<Date>(Date.class);
         }
         while (result.next()) {
             final Date startTime = result.getTimestamp(startTimeIndex, calendar);

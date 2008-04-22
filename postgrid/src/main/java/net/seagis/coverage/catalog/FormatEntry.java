@@ -166,12 +166,13 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
-    public MeasurementRange[] getSampleValueRanges() {
+    public MeasurementRange<Double>[] getSampleValueRanges() {
         final GridSampleDimension[] bands = getSampleDimensions();
-        final MeasurementRange[] ranges = new MeasurementRange[bands.length];
+        @SuppressWarnings("unchecked")  // Generic array creation.
+        final MeasurementRange<Double>[] ranges = new MeasurementRange[bands.length];
         for (int i=0; i<ranges.length; i++) {
             final GridSampleDimension band = bands[i].geophysics(true);
-            ranges[i] = new MeasurementRange(band.getMinimumValue(), band.getMaximumValue(), band.getUnits());
+            ranges[i] = MeasurementRange.create(band.getMinimumValue(), band.getMaximumValue(), band.getUnits());
         }
         return ranges;
     }

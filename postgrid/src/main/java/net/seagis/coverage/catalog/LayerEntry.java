@@ -261,12 +261,12 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    public MeasurementRange[] getSampleValueRanges() {
+    public MeasurementRange<?>[] getSampleValueRanges() {
         MeasurementRange[] ranges = null;
         for (final Series series : getSeries()) {
             final Format format = series.getFormat();
             if (format != null) {
-                final MeasurementRange[] candidates = format.getSampleValueRanges();
+                final MeasurementRange<Double>[] candidates = format.getSampleValueRanges();
                 if (ranges == null) {
                     ranges = candidates;
                 } else {
@@ -276,7 +276,7 @@ final class LayerEntry extends Entry implements Layer {
                     } else {
                         length = ranges.length;
                         ranges = XArray.resize(ranges, candidates.length);
-                        System.arraycopy(candidates, length, ranges, length, candidates.length-length);
+                        System.arraycopy(candidates, length, ranges, length, candidates.length - length);
                     }
                     for (int i=0; i<length; i++) {
                         ranges[i] = ranges[i].intersect(candidates[i]);

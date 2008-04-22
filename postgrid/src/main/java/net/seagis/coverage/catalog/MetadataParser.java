@@ -201,20 +201,21 @@ final class MetadataParser {
      * @param  dimension The CRS dimension for which we want time ranges.
      * @return The coordinate ranges for the given metadata, or {@code null} if none.
      */
-    private MeasurementRange[] getCoordinateRanges(final int dimension) {
+    private MeasurementRange<Double>[] getCoordinateRanges(final int dimension) {
         final double[] values = getCoordinateValues(dimension);
         if (values == null) {
             return null;
         }
         final Unit units = getUnits(metadata.getReferencing().getAxis(dimension));
-        final MeasurementRange[] ranges = new MeasurementRange[values.length];
+        @SuppressWarnings("unchecked")  // Generic array creation.
+        final MeasurementRange<Double>[] ranges = new MeasurementRange[values.length];
         switch (ranges.length) {
             case 0: {
                 break;
             }
             case 1: {
                 final double value = values[0];
-                ranges[0] = new MeasurementRange(value, value, units);
+                ranges[0] = MeasurementRange.create(value, value, units);
                 break;
             }
             default: {
@@ -224,7 +225,7 @@ final class MetadataParser {
                     final int    before = Math.max(i-1, 0);
                     final int    after  = Math.min(i+1, sorted.length - 1);
                     final double value  = sorted[i];
-                    ranges[ranks[i]] = new MeasurementRange(
+                    ranges[ranks[i]] = MeasurementRange.create(
                             value - 0.5*(sorted[before+1] - sorted[before ]), true,
                             value + 0.5*(sorted[after   ] - sorted[after-1]), false, units);
                 }
@@ -245,7 +246,7 @@ final class MetadataParser {
             final Axis axis = referencing.getAxis(i);
             final Date origin = axis.getTimeOrigin();
             if (origin != null) {
-                final MeasurementRange[] ranges = getCoordinateRanges(i);
+                final MeasurementRange<Double>[] ranges = getCoordinateRanges(i);
                 if (ranges != null) {
                     final DateRange[] dates = new DateRange[ranges.length];
                     for (int j=0; j<dates.length; j++) {
