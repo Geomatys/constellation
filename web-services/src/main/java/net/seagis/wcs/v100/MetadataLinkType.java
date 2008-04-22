@@ -60,6 +60,20 @@ public class MetadataLinkType extends MetadataAssociationType {
     private String metadataType;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    MetadataLinkType() {
+        
+    }
+    
+    /**
+     * Build a new link (with only href attribute fill).
+     */
+    public MetadataLinkType(String href) {
+        super(href);
+    }
+    
+    /**
      * Gets the value of the metadataType property.
      */
     public String getMetadataType() {

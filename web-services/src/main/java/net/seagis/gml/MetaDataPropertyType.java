@@ -84,6 +84,20 @@ public class MetaDataPropertyType {
     private String actuate;
 
     /**
+     * empty constructor used by JAXB
+     */
+    MetaDataPropertyType() {
+        
+    }
+    
+    /**
+     * empty constructor used by JAXB
+     */
+    public MetaDataPropertyType(String href) {
+        this.href = href;
+    }
+    
+    /**
      * Gets the value of the metaData property.
      */
     public AbstractMetaDataType getMetaData() {

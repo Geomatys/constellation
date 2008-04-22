@@ -78,13 +78,18 @@ public class ServiceType extends AbstractDescriptionType {
     }
     
     /**
-     * An empty constructor used by JAXB
+     * Build a new Service Type
      */
     public ServiceType(List<MetadataLinkType> metadataLink, String name, String label, String description,
+            Keywords keywords, ResponsiblePartyType responsibleParty, CodeListType fees, CodeListType accessConstraints,
             String updateSequence){
         super(metadataLink, name, label, description);
-        this.version = "1.0.0";
-        this.updateSequence = updateSequence;
+        this.version           = "1.0.0";
+        this.keywords          = keywords;
+        this.responsibleParty  = responsibleParty;
+        this.fees              = fees;
+        this.accessConstraints = accessConstraints;
+        this.updateSequence    = updateSequence;
         
     }
     

@@ -72,6 +72,10 @@ public class WMSCapabilities extends AbstractWMSCapabilities {
     public Service getService() {
         return service;
     }
+    
+    public void setService(Service service) {
+        this.service = service;
+    }
 
     /**
      * Gets the value of the capability property.

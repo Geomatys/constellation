@@ -99,6 +99,10 @@ public class CapabilitiesBaseType {
     public ServiceIdentification getServiceIdentification() {
         return serviceIdentification;
     }
+    
+    public void setServiceIdentification(ServiceIdentification serviceIdentification) {
+        this.serviceIdentification = serviceIdentification;
+    }
 
     /**
      * Gets the value of the serviceProvider property.
@@ -106,6 +110,10 @@ public class CapabilitiesBaseType {
      */
     public ServiceProvider getServiceProvider() {
         return serviceProvider;
+    }
+    
+    public void setServiceProvider(ServiceProvider serviceProvider) {
+        this.serviceProvider = serviceProvider;
     }
 
     /**

@@ -124,6 +124,9 @@ public class WCSCapabilitiesType {
         return service;
     }
     
+    public void setService(ServiceType service) {
+        this.service = service; 
+    }
     /**
      * Gets the value of the capability property.
      * 

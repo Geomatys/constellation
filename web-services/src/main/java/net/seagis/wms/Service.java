@@ -1,6 +1,5 @@
 package net.seagis.wms;
 
-import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -79,13 +78,13 @@ public class Service {
     private String accessConstraints;
     @XmlElement(name = "LayerLimit")
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger layerLimit;
+    private int layerLimit;
     @XmlElement(name = "MaxWidth")
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger maxWidth;
+    private int maxWidth;
     @XmlElement(name = "MaxHeight")
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger maxHeight;
+    private int maxHeight;
 
     /**
      * An empty constructor used by JAXB.
@@ -99,7 +98,7 @@ public class Service {
     public Service(final String name, final String title, final String _abstract,
             final KeywordList keywordList, final OnlineResource onlineResource, 
             final ContactInformation contactInformation, String fees, String accessConstraints,
-            final BigInteger layerLimit, final BigInteger maxWidth, final BigInteger maxHeight) {
+            final int layerLimit, final int maxWidth, final int maxHeight) {
         
         this._abstract          = _abstract;
         this.name               = name;
@@ -178,14 +177,14 @@ public class Service {
     /**
      * Gets the value of the layerLimit property.
      */
-    public BigInteger getLayerLimit() {
+    public int getLayerLimit() {
         return layerLimit;
     }
 
     /**
      * Gets the value of the maxWidth property.
      */
-    public BigInteger getMaxWidth() {
+    public int getMaxWidth() {
         return maxWidth;
     }
 
@@ -193,7 +192,7 @@ public class Service {
     * Gets the value of the maxHeight property.
     *     
     */
-    public BigInteger getMaxHeight() {
+    public int getMaxHeight() {
         return maxHeight;
     }
 }

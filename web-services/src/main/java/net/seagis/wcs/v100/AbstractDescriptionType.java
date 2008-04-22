@@ -64,8 +64,8 @@ import javax.xml.bind.annotation.XmlType;
 public abstract class AbstractDescriptionType extends AbstractDescriptionBaseType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "label", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
-        @XmlElementRef(name = "name", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
+        @XmlElementRef(name = "label",       namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
+        @XmlElementRef(name = "name",        namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
         @XmlElementRef(name = "description", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class)
     })
     private List<JAXBElement<String>> rest = new ArrayList<JAXBElement<String>>();

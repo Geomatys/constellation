@@ -69,6 +69,41 @@ public class AddressType {
     private List<String> electronicMailAddress;
 
     /**
+     * Empty constructor used by JAXB
+     */
+    AddressType(){
+        
+    }
+    
+    /**
+     * Build a new Adress.
+     */
+    public AddressType(List<String> deliveryPoint, String city, String administrativeArea,
+            String postalCode, String country, List<String> electronicMailAddress){
+        this.administrativeArea    = administrativeArea;
+        this.city                  = city;
+        this.country               = country;
+        this.deliveryPoint         = deliveryPoint;
+        this.electronicMailAddress = electronicMailAddress;
+        this.postalCode            = postalCode;
+    }
+    
+    /**
+     * Build a simple new Adress.
+     */
+    public AddressType(String deliveryPoint, String city, String administrativeArea,
+            String postalCode, String country, String electronicMailAddress){
+        this.administrativeArea    = administrativeArea;
+        this.city                  = city;
+        this.country               = country;
+        this.deliveryPoint         = new ArrayList<String>();
+        this.deliveryPoint.add(deliveryPoint);
+        this.electronicMailAddress = new ArrayList<String>();
+        this.electronicMailAddress.add(electronicMailAddress);
+        this.postalCode            = postalCode;
+    }
+    
+    /**
      * Gets the value of the deliveryPoint property.
      * (unmodifiable)
      */

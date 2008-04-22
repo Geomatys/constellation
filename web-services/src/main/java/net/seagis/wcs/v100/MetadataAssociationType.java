@@ -51,4 +51,19 @@ import net.seagis.gml.MetaDataPropertyType;
     MetadataLinkType.class
 })
 public class MetadataAssociationType extends MetaDataPropertyType {
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    MetadataAssociationType() {
+        super(null);
+    }
+    
+    /**
+     * build a metadata association
+     */
+    public MetadataAssociationType(String href) {
+        super(href);
+    }
+    
 }

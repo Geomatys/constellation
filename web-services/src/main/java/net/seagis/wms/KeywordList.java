@@ -46,6 +46,14 @@ public class KeywordList {
      }
 
     /**
+     * Build a new Keyword list.
+     */
+    public KeywordList(final List<Keyword> keyword) {
+        this.keyword = keyword;
+        
+    }
+    
+    /**
      * Build a new Contact person primary object.
      */
     public KeywordList(final Keyword... keywords) {

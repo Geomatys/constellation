@@ -76,6 +76,16 @@ public class TelephoneType {
     }
     
     /**
+     * Build a single new telephone object.
+     */
+    public TelephoneType(String voice, String facsimile){
+        this.facsimile = new ArrayList<String>();
+        this.facsimile.add(facsimile);
+        this.voice     = new ArrayList<String>();
+        this.voice.add(voice);
+    }
+    
+    /**
      * Gets the value of the voice property.
      */
     public List<String> getVoice() {

@@ -71,6 +71,32 @@ public class DescriptionType {
     private List<KeywordsType> keywords;
 
     /**
+     * An empty constructor used by JAXB
+     */
+     DescriptionType() {
+         
+     }
+     
+     /**
+     * Build a new description
+     */
+     public DescriptionType(String title, String _abstract,  List<KeywordsType> keywords) {
+         this._abstract = _abstract;
+         this.title     = title;
+         this.keywords  = keywords;
+     }
+     
+      /**
+     * Build a new description
+     */
+     public DescriptionType(String title, String _abstract,  KeywordsType keywords) {
+         this._abstract = _abstract;
+         this.title     = title;
+         this.keywords  = new ArrayList<KeywordsType>();
+         this.keywords.add(keywords);
+     }
+     
+    /**
      * Gets the value of the title property.
      */
     public String getTitle() {

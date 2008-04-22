@@ -35,6 +35,7 @@ import com.sun.ws.rest.spi.resource.Singleton;
 
 // JAXB xml binding dependencies
 import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
@@ -119,7 +120,7 @@ public class WMService extends WebService {
        }catch (IOException e) {
             logger.severe("IOException a l'initialisation du webServiceWorker:" + e);
        }
-        
+       
     }
     
     /** 
@@ -437,11 +438,10 @@ public class WMService extends WebService {
                 Dimension dim;
                 String value = "";
                 SortedSet<Date> dates = inputLayer.getAvailableTimes();
-                if (dates.size() > 0) {
+                if (dates != null && dates.size() > 0) {
                     defaut = df.format(dates.last());
                     
-                
-                    dim = new Dimension("time", "ISO8601", defaut, null);
+                dim = new Dimension("time", "ISO8601", defaut, null);
                     value = periodFormatter.getDatesRespresentation(dates);
                     dim.setValue(value);
                     dimensions.add(dim);
@@ -450,7 +450,7 @@ public class WMService extends WebService {
                 //the available elevation
                 defaut = null;
                 SortedSet<Number> elevations = inputLayer.getAvailableElevations();
-                if (elevations.size() > 0) {
+                if (elevations != null && elevations.size() > 0) {
                     defaut = elevations.first().toString();
                 
                     dim = new Dimension("elevation", "EPSG:5030", defaut, null);

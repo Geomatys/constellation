@@ -56,6 +56,30 @@ public class TelephoneType {
     private List<String> voice;
     private List<String> facsimile;
 
+     /**
+     * Empty constructor used by JAXB.
+     */
+    TelephoneType(){
+    }
+    
+    /**
+     * Build a new telephone object.
+     */
+    public TelephoneType(List<String> voice, List<String> facsimile){
+        this.facsimile = facsimile;
+        this.voice     = voice;
+    }
+    
+     /**
+     * Build a single new telephone object.
+     */
+    public TelephoneType(String voice, String facsimile){
+        this.facsimile = new ArrayList<String>();
+        this.facsimile.add(facsimile);
+        this.voice     = new ArrayList<String>();
+        this.voice.add(voice);
+    }
+    
     /**
      * Gets the value of the voice property.
      * (unmodifable)

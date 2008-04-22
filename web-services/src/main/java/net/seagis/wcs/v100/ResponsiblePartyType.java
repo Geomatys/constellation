@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -65,13 +66,33 @@ import javax.xml.bind.annotation.XmlType;
 public class ResponsiblePartyType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "positionName", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
-        @XmlElementRef(name = "individualName", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
+        @XmlElementRef(name = "positionName",     namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
+        @XmlElementRef(name = "individualName",   namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
         @XmlElementRef(name = "organisationName", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class),
-        @XmlElementRef(name = "contactInfo", namespace = "http://www.opengis.net/wcs", type = JAXBElement.class)
+        @XmlElementRef(name = "contactInfo",      namespace = "http://www.opengis.net/wcs", type = JAXBElement.class)
     })
     private List<JAXBElement<?>> content;
 
+    @XmlTransient
+    private ObjectFactory factory = new ObjectFactory();
+    
+    /**
+     * empty construtor used by JAXB
+     */
+    ResponsiblePartyType() {
+        
+    }
+    
+    /**
+     * Build a new Responsible Party
+     */
+    public ResponsiblePartyType(String individualName, String positionName, String organisationName, ContactType contactInfo) {
+         content = new ArrayList<JAXBElement<?>>();
+         content.add(factory.createResponsiblePartyTypeIndividualName(individualName));
+         content.add(factory.createResponsiblePartyTypePositionName(positionName));
+         content.add(factory.createResponsiblePartyTypeOrganisationName(organisationName));
+         content.add(factory.createResponsiblePartyTypeContactInfo(contactInfo));
+    }
     /**
      * Gets the rest of the content model.
      * (unModifiable) 

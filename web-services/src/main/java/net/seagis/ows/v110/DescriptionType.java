@@ -74,11 +74,11 @@ import org.geotools.resources.Utilities;
 public class DescriptionType {
 
     @XmlElement(name = "Title")
-    private List<LanguageStringType> title = new ArrayList<LanguageStringType>();
+    private List<LanguageStringType> title;
     @XmlElement(name = "Abstract")
-    private List<LanguageStringType> _abstract = new ArrayList<LanguageStringType>();;
+    private List<LanguageStringType> _abstract;
     @XmlElement(name = "Keywords")
-    private List<KeywordsType> keywords = new ArrayList<KeywordsType>();
+    private List<KeywordsType> keywords;
 
     /**
      * An empty constructor used by JAXB.
@@ -87,19 +87,34 @@ public class DescriptionType {
     }
     
     /**
-     * Build a new DescriptionType.
+     * Build a new DescriptionType (full version).
      */
     public DescriptionType(List<LanguageStringType> title,  List<LanguageStringType> _abstract,
             List<KeywordsType> keywords) {
-        this._abstract = _abstract;
+        this._abstract =  _abstract;
         this.keywords  = keywords;
         this.title     = title;
+    }
+    
+     /**
+     * Build a new DescriptionType (full version).
+     */
+    public DescriptionType(LanguageStringType title, LanguageStringType _abstract, KeywordsType keywords) {
+        this._abstract = new ArrayList<LanguageStringType>();
+        this._abstract.add(_abstract);
+        this.keywords  = new ArrayList<KeywordsType>();
+        this.keywords.add(keywords);
+        this.title     = new ArrayList<LanguageStringType>();
+        this.title.add(title);
     }
     
     /**
      * Gets the value of the title property.
      */
     public List<LanguageStringType> getTitle() {
+        if (title == null) {
+            title = new ArrayList<LanguageStringType>();
+        }
         return Collections.unmodifiableList(title);
     }
 
@@ -107,6 +122,9 @@ public class DescriptionType {
      * Gets the value of the abstract property.
      */
     public List<LanguageStringType> getAbstract() {
+        if (_abstract == null) {
+            _abstract = new ArrayList<LanguageStringType>();
+        }
         return Collections.unmodifiableList(_abstract);
     }
 
@@ -114,6 +132,9 @@ public class DescriptionType {
      * Gets the value of the keywords property.
      */
     public List<KeywordsType> getKeywords() {
+        if (_abstract == null) {
+            _abstract = new ArrayList<LanguageStringType>();
+        }
         return Collections.unmodifiableList(keywords);
     }
     

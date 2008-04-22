@@ -82,13 +82,28 @@ public class ServiceIdentification extends DescriptionType {
     }
     
     /**
-     * Build a new Service identification.
+     * Build a new Service identification (full version).
      */
-    public ServiceIdentification(CodeType serviceType, List<String> serviceTypeVersion, List<String> profile,
+    public ServiceIdentification(List<LanguageStringType> title,  List<LanguageStringType> _abstract,
+            List<KeywordsType> keywords, CodeType serviceType, List<String> serviceTypeVersion, List<String> profile,
             String fees, List<String> accessConstraints){
+        super(title, _abstract, keywords);
         this.accessConstraints  = accessConstraints;
         this.fees               = fees;
         this.profile            = profile;
+        this.serviceType        = serviceType;
+        this.serviceTypeVersion = serviceTypeVersion;
+    }
+    
+    /**
+     * Build a new Service identification (light version).
+     */
+    public ServiceIdentification(LanguageStringType title,  LanguageStringType _abstract,
+            KeywordsType keywords, CodeType serviceType, List<String> serviceTypeVersion, String fees, String accessConstraints){
+        super(title, _abstract, keywords);
+        this.accessConstraints  = new ArrayList<String>();
+        this.accessConstraints.add(accessConstraints);
+        this.fees               = fees;
         this.serviceType        = serviceType;
         this.serviceTypeVersion = serviceTypeVersion;
     }

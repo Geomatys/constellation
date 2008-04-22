@@ -58,6 +58,31 @@ public class KeywordsType {
     @XmlElement(name = "Type")
     private CodeType type;
 
+    /*
+     * Empty constructor used by JAXB.
+     */
+    KeywordsType(){
+    }
+    
+    /**
+     * Build a new list of keywords.
+     */
+    public KeywordsType(List<String> keyword, CodeType type){
+        this.keyword = keyword;
+        this.type    = type;
+    }
+    
+    /**
+     * Build a simple list of keywords without type.
+     * all the element of the list are in the parameters. 
+     */
+    public KeywordsType(String... keywords){
+        this.keyword = new ArrayList<String>();
+        for (String element: keywords){
+            keyword.add(element);
+        }
+    }
+    
     /**
      * Gets the value of the keyword property.
      */

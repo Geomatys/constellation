@@ -97,6 +97,21 @@ public class AddressType {
     }
     
     /**
+     * Build a simple new Adress.
+     */
+    public AddressType(String deliveryPoint, String city, String administrativeArea,
+            String postalCode, String country, String electronicMailAddress){
+        this.administrativeArea    = administrativeArea;
+        this.city                  = city;
+        this.country               = country;
+        this.deliveryPoint         = new ArrayList<String>();
+        this.deliveryPoint.add(deliveryPoint);
+        this.electronicMailAddress = new ArrayList<String>();
+        this.electronicMailAddress.add(electronicMailAddress);
+        this.postalCode            = postalCode;
+    }
+    
+    /**
      * Gets the value of the deliveryPoint property.
      * 
      */

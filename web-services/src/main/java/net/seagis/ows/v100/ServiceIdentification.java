@@ -67,6 +67,38 @@ public class ServiceIdentification extends DescriptionType {
     @XmlElement(name = "AccessConstraints")
     private List<String> accessConstraints;
 
+     /**
+     * Empty constructor used by JAXB.
+     */
+    ServiceIdentification(){
+    }
+    
+    /**
+     * Build a new Service identification (full version).
+     */
+    public ServiceIdentification(String title, String _abstract,
+            List<KeywordsType> keywords, CodeType serviceType, List<String> serviceTypeVersion, 
+            String fees, List<String> accessConstraints){
+        super(title, _abstract, keywords);
+        this.accessConstraints  = accessConstraints;
+        this.fees               = fees;
+        this.serviceType        = serviceType;
+        this.serviceTypeVersion = serviceTypeVersion;
+    }
+    
+    /**
+     * Build a new Service identification (light version).
+     */
+    public ServiceIdentification(String title, String _abstract,
+            KeywordsType keywords, CodeType serviceType, List<String> serviceTypeVersion, String fees, String accessConstraints){
+        super(title, _abstract, keywords);
+        this.accessConstraints  = new ArrayList<String>();
+        this.accessConstraints.add(accessConstraints);
+        this.fees               = fees;
+        this.serviceType        = serviceType;
+        this.serviceTypeVersion = serviceTypeVersion;
+    }
+    
     /**
      * Gets the value of the serviceType property.
      */

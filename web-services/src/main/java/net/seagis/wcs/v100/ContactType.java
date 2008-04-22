@@ -57,6 +57,22 @@ public class ContactType {
     private OnlineResourceType onlineResource;
 
     /**
+     * Empty constructor used by JAXB
+     */
+     ContactType() {
+         
+     }
+     
+     /**
+      * Build a new Contact 
+      */
+     public ContactType(TelephoneType phone, AddressType address, OnlineResourceType onlineResource) {
+         this.address        = address;
+         this.phone          = phone;
+         this.onlineResource = onlineResource;
+     }
+    
+    /**
      * Gets the value of the phone property.
      */
     public TelephoneType getPhone() {
