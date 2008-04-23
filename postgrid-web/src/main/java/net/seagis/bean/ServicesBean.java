@@ -7,9 +7,12 @@ package net.seagis.bean;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JSF dependencies
@@ -637,10 +640,15 @@ public class ServicesBean {
     }
     
     private void storeCapabilitiesFile() throws JAXBException {
-        int i = 0;
-        for (File f:capabilitiesFile)
-            marshaller.marshal(capabilities[i], f);
+        try {
+            int i = 0;
+            for (File f : capabilitiesFile) {
+                marshaller.marshal(capabilities[i], (OutputStream) new FileOutputStream(f));
+            }
             i++;
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ServicesBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public String setWMSMode() throws JAXBException, FileNotFoundException {
