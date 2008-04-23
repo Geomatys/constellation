@@ -1071,7 +1071,13 @@ public class SOSworker {
             AnyResultTable resTable = OMDatabase.getTable(AnyResultTable.class);
             String datablock = "";
             while (results.next()) {
-                AnyResultEntry a = resTable.getEntry(results.getString(1));
+                AnyResultEntry a = null;
+                try {
+                    a = resTable.getEntry(results.getString(1));
+                } catch (NoSuchRecordException ex) {
+                        
+                        logger.info("nos usch record in result Table");
+                }
                 if (a != null) {
                     if (a.getArray() != null) {
                         datablock += a.getArray().getValues() + '\n';
@@ -1248,6 +1254,7 @@ public class SOSworker {
             try {
                 if (!success && savePoint != null) {
                    sensorMLConnection.rollback(savePoint);
+                   logger.severe("Transaction failed");
                 } else {
                     if (savePoint != null)
                         sensorMLConnection.releaseSavepoint(savePoint); 
@@ -1755,10 +1762,16 @@ public class SOSworker {
                     if (result.next()) {
                         String offeringName = "offering-" + result.getString(1);
                         logger.info("networks:" + offeringName);
+                        ObservationOfferingEntry offering = null;
                     
                         //we get the offering from the O&M database
-                        ObservationOfferingEntry offering = offTable.getEntry(offeringName);
-                    
+                        try {
+                            offering = offTable.getEntry(offeringName);
+                        } catch (NoSuchRecordException ex) {
+                        
+                            logger.info("offering " + offeringName + "not present, first build");
+                        }
+                        
                         //if the offering is already in the database
                         if (offering != null) {
                              
@@ -1849,9 +1862,14 @@ public class SOSworker {
                 } else {
                     
                     //we get the offering from the O&M database
-                    ObservationOfferingEntry offering = offTable.getEntry("offering-allSensor");
-                    
-                   if (offering != null) {
+                    ObservationOfferingEntry offering = null;
+                    try {
+                        offering = offTable.getEntry("offering-allSensor");
+                    } catch (NoSuchRecordException ex) {
+                        
+                        logger.info("offering allSensor not present, first build");
+                    }
+                    if (offering != null) {
                         //we add the new sensor to the offering
                        ReferenceEntry ref = getReferenceFromHRef(((ProcessEntry)template.getProcedure()).getHref());
                        if (!offering.getProcedure().contains(ref)) {

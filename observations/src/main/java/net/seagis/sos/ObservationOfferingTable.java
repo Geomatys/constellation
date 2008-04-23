@@ -286,7 +286,11 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             } else {
                 statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
             }
-                   
+            if (off.getSrsName() != null && off.getSrsName().size() > 0) {
+               statement.setString(indexOf(query.srsName), off.getSrsName().get(0)); 
+            } else {
+               statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR); 
+            }                 
             // on insere le "eventTime""
             if (off.getTime() != null) {
                 if (off.getTime() instanceof TimePeriodType) {
@@ -321,7 +325,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             }
         
             // on insere l'envellope qui borde l'offering
-            if (off.getBoundedBy() != null) {
+            if (off.getBoundedBy() != null && off.getBoundedBy().getEnvelope() != null) {
                 if (envelopes == null) {
                     envelopes = getDatabase().getTable(EnvelopeTable.class);
                 }
