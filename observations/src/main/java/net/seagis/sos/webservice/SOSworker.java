@@ -1103,8 +1103,13 @@ public class SOSworker {
     }
     
     private  String getXMLFromElementNSImpl(ElementNSImpl elt) {
+        StringBuilder s = new StringBuilder();
+        s.append('<').append(elt.getLocalName()).append('>');
         Node node = elt.getFirstChild();
-        return this.getXMLFromNode(node).toString();
+        s.append(getXMLFromNode(node)).toString();
+        
+        s.append("</").append(elt.getLocalName()).append('>');
+        return s.toString();
     }
 
     private  StringBuilder getXMLFromNode(Node node) {
@@ -1152,8 +1157,16 @@ public class SOSworker {
             
             //we get the SensorML file who describe the Sensor to insert.
             RegisterSensor.SensorDescription d = requestRegSensor.getSensorDescription();
-            //String process  = (String)d.getAny();     
-            String process = this.getXMLFromElementNSImpl((ElementNSImpl)d.getAny());
+            String process;
+            if (d.getAny() instanceof ElementNSImpl) {
+                process = this.getXMLFromElementNSImpl((ElementNSImpl)d.getAny());
+                logger.info(process);
+            } else if (d.getAny() instanceof String) {
+                process  = (String)d.getAny();    
+                
+            } else {
+                throw new IllegalArgumentException("unexpected type for process");
+            }
              
             //we get the observation template provided with the sensor description.
             ObservationTemplate temp = requestRegSensor.getObservationTemplate();
