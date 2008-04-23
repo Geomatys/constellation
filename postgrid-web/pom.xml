@@ -2,9 +2,7 @@
 <!--
   Configuration of "wms" module from SeaGIS project.
   Version: $Id:
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>net.seagis</groupId>
@@ -21,9 +19,7 @@
   <artifactId>postgrid-web</artifactId>
   <packaging>war</packaging>
   <name>postgrid web service</name>
-  <description>
-    A Web Map Service producing maps of spatially referenced data dynamically from geographic information.
-  </description>
+  <description>A Web Map Service producing maps of spatially referenced data dynamically from geographic information.</description>
   
    
  
@@ -58,8 +54,8 @@
   
   
   <!--
-    Dépendances requises pour la compilation. Ces dépendances seront incluses
-    dans la liste de JARs que Maven placera dans le répertoire "target/binaries".
+    Dï¿½pendances requises pour la compilation. Ces dï¿½pendances seront incluses
+    dans la liste de JARs que Maven placera dans le rï¿½pertoire "target/binaries".
   -->
   <dependencies>
     <dependency>
@@ -114,6 +110,7 @@
       <groupId>javax.servlet.jsp</groupId>
       <artifactId>jsp-api</artifactId>
       <version>2.0</version>
+      <!--scope>provided</scope-->   <!-- Uncomment if Tomcat already has jsp / servlet APIs in <TOMCAT_HOME>/lib -->
     </dependency>
     <dependency>
       <groupId>javax.faces</groupId>
@@ -139,6 +136,7 @@
    	<groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>2.4</version>
+        <!--scope>provided</scope-->   <!-- Uncomment if Tomcat already has jsp / servlet APIs in <TOMCAT_HOME>/lib -->
     </dependency>
     <!--<dependency>
       <groupId>javax.el</groupId>
@@ -151,4 +149,7 @@
       <version>1.0</version>
     </dependency>-->
    </dependencies>
+    <!--properties>     
+        <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
+    </properties-->       
 </project>
