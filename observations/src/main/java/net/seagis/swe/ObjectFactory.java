@@ -164,6 +164,14 @@ public class ObjectFactory {
     }
     
     /**
+     * Create an instance of {@link DataArrayPropertyType }
+     * 
+     */
+    public DataArrayEntry createDataArrayEntry() {
+        return new DataArrayEntry();
+    }
+    
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link CompoundPhenomenonType }{@code >}}
      * 
      */

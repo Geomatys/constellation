@@ -39,6 +39,7 @@ import net.seagis.swe.CompositePhenomenonEntry;
 import net.seagis.swe.CompositePhenomenonTable;
 
 // OpenGis dependencies
+import net.seagis.swe.DataArrayPropertyType;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonTable;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -443,7 +444,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
             }
         
             // on insere le resultat
-            if (obs.getResult() instanceof ReferenceEntry || obs.getResult() instanceof AnyResultEntry){
+            if (obs.getResult() instanceof ReferenceEntry || obs.getResult() instanceof AnyResultEntry || obs.getResult() instanceof DataArrayPropertyType){
                 if (results == null) {
                     results = getDatabase().getTable(AnyResultTable.class);
                 }

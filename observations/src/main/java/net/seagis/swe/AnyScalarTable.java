@@ -201,12 +201,12 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
                 TimeType t = (TimeType) field.getComponent();
             
                 statement.setString(indexOf(query.type), "Time");
-                if ( t.getUom().getCode() != null)
+                if ( t.getUom() != null && t.getUom().getCode() != null)
                     statement.setString(indexOf(query.uomCode), t.getUom().getCode());
                 else
                     statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
             
-                if ( t.getUom().getHref() != null)
+                if ( t.getUom() != null && t.getUom().getHref() != null)
                     statement.setString(indexOf(query.uomHref), t.getUom().getHref());
                 else
                     statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);

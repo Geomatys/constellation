@@ -111,6 +111,17 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                     success = true;
                     return results.getString(1);
                 }
+            } else if (result instanceof DataArrayPropertyType) {
+                DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
+                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                statement.setString(indexOf(query.values),array.getValues());
+                statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+                statement.setString(indexOf(query.definition), array.getId());
+                ResultSet results = statement.executeQuery();
+                if(results.next()){
+                    success = true;
+                    return results.getString(1);
+                }
             } else if (result instanceof ReferenceEntry) {
                 PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
@@ -135,22 +146,32 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 }
                 String idArray = dataArrays.getIdentifier(array);
                 statement.setString(indexOf(query.definition), idArray);
-            } else {
-                if (result instanceof ReferenceEntry) {
-                    ReferenceEntry ref = (ReferenceEntry) result;
-                    String idRef;
-                
-                    if(references == null) {
-                        references = getDatabase().getTable(ReferenceTable.class);
-                    }
-                    idRef = references.getIdentifier(ref);
-                
-                    statement.setString(indexOf(query.reference), idRef);
-                    statement.setNull(indexOf(query.values), java.sql.Types.VARCHAR);
-                } else {
-                    throw new CatalogException(" this kinf of result is not allowed");
+            
+            } else if (result instanceof DataArrayPropertyType) {
+                DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
+                statement.setString(indexOf(query.values), array.getValues());
+                statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+                if(dataArrays == null) {
+                    dataArrays = getDatabase().getTable(DataArrayTable.class);
                 }
-            }   
+                String idArray = dataArrays.getIdentifier(array);
+                statement.setString(indexOf(query.definition), idArray);
+            
+            } else if (result instanceof ReferenceEntry) {
+                ReferenceEntry ref = (ReferenceEntry) result;
+                String idRef;
+                
+                if(references == null) {
+                    references = getDatabase().getTable(ReferenceTable.class);
+                }
+                idRef = references.getIdentifier(ref);
+                
+                statement.setString(indexOf(query.reference), idRef);
+                statement.setNull(indexOf(query.values), java.sql.Types.VARCHAR);
+            } else {
+                throw new CatalogException(" this kind of result is not allowed");
+            }
+               
             updateSingleton(statement);
             success = true;
         } finally {

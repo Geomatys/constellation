@@ -38,7 +38,12 @@ public class SamplingPointQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byIdentifier;   
+    protected final Parameter byIdentifier;
+    
+    /**
+     * Parameter to appear after the {@code "FROM"} clause.
+     */
+    protected final Parameter byName;  
     
    /**
     * Creates a new query for the specified database.
@@ -51,7 +56,7 @@ public class SamplingPointQuery extends Query {
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
         
         identifier             = addColumn   ("id",                 SLIE);
-        name                   = addColumn   ("name",               SLI);
+        name                   = addColumn   ("name",               SLIE);
         description            = addColumn   ("description",        SLI);
         sampledFeature         = addColumn   ("sampled_feature",    SLI);
         pointIdentifier        = addColumn   ("point_id",           SLI);
@@ -60,7 +65,8 @@ public class SamplingPointQuery extends Query {
         positionValueX         = addColumn   ("x_value",            SLI);
         positionValueY         = addColumn   ("y_value",            SLI);
         
-        byIdentifier  = addParameter(identifier, SELECT, EXISTS);
+        byIdentifier  = addParameter(identifier, SELECT);
+        byName        = addParameter(name, EXISTS);
     }
     
 }

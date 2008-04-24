@@ -88,18 +88,24 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
         boolean success = false;
         transactionBegin();
         try {
-            if (station.getId() != null) {
+            // the station recived by xml have no ID so we use the name as a second primary key
+            if (station.getName() != null) {
                 PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.identifier), station.getId());
+                statement.setString(indexOf(query.byName), station.getName());
                 ResultSet result = statement.executeQuery();
+                System.out.println("EXIST:" + statement.toString());
                 if(result.next()) {
                     success = true;
-                    return station.getId();
+                    return result.getString("id");
                 } else {
-                    id = station.getId(); 
+                    if (station.getId() != null) {
+                        id = station.getId(); 
+                    } else {
+                       id = searchFreeIdentifier("station"); 
+                    }
                 }
             } else {
-                id = searchFreeIdentifier("station");
+               throw new CatalogException("the station must have a name"); 
             }
         
             PreparedStatement statement = getStatement(QueryType.INSERT);

@@ -15,15 +15,19 @@
 package net.seagis.observation;
 
 // jaxb import
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 // Sicade dependencies 
+import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Entry;
 import net.seagis.coverage.model.Distribution;
 
@@ -35,6 +39,7 @@ import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
 import net.seagis.swe.AnyResultEntry;
+import net.seagis.swe.DataArrayPropertyType;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonPropertyType;
 import net.seagis.swe.TimeGeometricPrimitivePropertyType;
@@ -124,7 +129,7 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * le resultat de l'observation de n'importe quel type 
      */
-    @XmlElement(required = true)
+    @XmlElement(required = true, type=DataArrayPropertyType.class)
     private Object result;
     
     /**
@@ -345,9 +350,9 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      * fixe le resultat de l'observation
      */
-    public void setResult(Object result) {
+    public void setResult(Object result) throws CatalogException {
         if (!(result instanceof ReferenceEntry) && !(result instanceof AnyResultEntry)) {
-            throw new IllegalArgumentException("this type " + result.getClass().getSimpleName() +
+            throw new CatalogException("this type " + result.getClass().getSimpleName() +
                                            " is not allowed in result");
         }
         this.result = result;
@@ -429,7 +434,7 @@ public class ObservationEntry extends Entry implements Observation {
         
                //TODO corriger ce pb
                //Utilities.equals(this.distribution,        template.distribution)        &&
-               //Utilities.equals(this.resultDefinition,    template.resultDefinition)    && 
+               
         
     }
     /**
@@ -469,7 +474,7 @@ public class ObservationEntry extends Entry implements Observation {
      */
     public boolean isComplete() {
         //TODO appeler les isCOmplete des attributs
-        return (procedure != null) && (observedProperty != null) && (featureOfInterest != null);
+        return (procedure != null) && (observedProperty != null) && (featureOfInterest != null) && (result != null);
     }
     
     /**

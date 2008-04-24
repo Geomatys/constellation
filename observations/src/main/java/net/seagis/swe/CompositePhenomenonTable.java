@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
+import net.seagis.catalog.NoSuchTableException;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 
@@ -38,7 +39,7 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
      * Connexion vers la table des {@linkplain ComponentTable composants}.
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
-    protected ComponentTable components;
+    private ComponentTable components;
     
     
    /**
@@ -74,10 +75,7 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
         
         String idCompositePhenomenon = results.getString(indexOf(query.identifier));
         
-        if (components == null) {
-            components =  getDatabase().getTable(ComponentTable.class);
-            components =  new ComponentTable(components);
-        }
+        components = getComponentTable();
         components.setIdCompositePhenomenon(idCompositePhenomenon);
         Collection<ComponentEntry> entries = components.getEntries();
         
@@ -129,9 +127,7 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
             statement.setInt(indexOf(query.dimension), pheno.getDimension());
             updateSingleton(statement); 
 
-            if (components == null) {
-                components = getDatabase().getTable(ComponentTable.class);
-            }
+            components = getComponentTable();
             Iterator<PhenomenonEntry> i = pheno.getComponent().iterator();
         
             while(i.hasNext()) {
@@ -143,6 +139,14 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
             transactionEnd(success);
         }
         return id;
+    }
+    
+    public ComponentTable getComponentTable() throws NoSuchTableException {
+        if (components == null) {
+            components =  getDatabase().getTable(ComponentTable.class);
+            components =  new ComponentTable(components);
+        }
+        return components;
     }
     
 }

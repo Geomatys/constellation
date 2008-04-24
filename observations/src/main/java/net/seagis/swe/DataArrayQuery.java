@@ -51,7 +51,7 @@ public class DataArrayQuery extends Query{
         idArray        = addColumn ("id_array_definition", SIE);
         encoding       = addColumn ("encoding"           , SI);
         elementCount   = addColumn ("element_count"      , SI);
-        elementType    = addColumn ("encoding"           , SI);
+        elementType    = addColumn ("elementType"        , SI);
 
         byIdArray      = addParameter(idArray, SELECT, EXISTS);
     }

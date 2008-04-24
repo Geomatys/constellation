@@ -1160,29 +1160,29 @@ public class SOSworker {
             String process;
             if (d.getAny() instanceof ElementNSImpl) {
                 process = this.getXMLFromElementNSImpl((ElementNSImpl)d.getAny());
-                logger.info(process);
             } else if (d.getAny() instanceof String) {
                 process  = (String)d.getAny();    
                 
             } else {
                 throw new IllegalArgumentException("unexpected type for process");
             }
-             
+            
             //we get the observation template provided with the sensor description.
             ObservationTemplate temp = requestRegSensor.getObservationTemplate();
-            ObservationEntry obs = temp.getObservation();
+            ObservationEntry obs     = temp.getObservation();
+            logger.info("Result type =" + obs.getResult().getClass().getSimpleName());
             if(obs == null) {
                 throw new OWSWebServiceException("observation template must be specify",
                                               MISSING_PARAMETER_VALUE,
                                               "observationTemplate",
                                               version);
             } else if (!obs.isComplete()) {
-                throw new OWSWebServiceException("observation template must specify at least the following fields: procedure ,observedProperty ,featureOfInterest",
+                throw new OWSWebServiceException("observation template must specify at least the following fields: procedure ,observedProperty ,featureOfInterest, Result",
                                               INVALID_PARAMETER_VALUE,
                                               "observationTemplate",
                                               version); 
             }
-            
+           
             //we decode the content
             String decodedprocess = java.net.URLDecoder.decode(process, "ISO-8859-1");
             logger.severe("process null = " + (decodedprocess== null));
