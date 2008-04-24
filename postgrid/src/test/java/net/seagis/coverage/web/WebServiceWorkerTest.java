@@ -246,8 +246,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
             CRS.findMathTransform(sourceCRS, targetCRS);
             fail();
         } catch (OperationNotFoundException e) {
-            e.printStackTrace();
-            // Expected exception until the GEOT-1783 is fixed.
+            // Expected exception until GEOT-1783 is fixed.
         }
     }
 
@@ -281,8 +280,8 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertTrue(file.getName().endsWith(".png"));
         assertTrue(file.isFile());
         image = ImageIO.read(file);
-        assertEquals(720, image.getWidth());
-        assertEquals(499, image.getHeight());
+        assertEquals(604, image.getWidth());
+        assertEquals(424, image.getHeight());
         assertEquals(Transparency.BITMASK, image.getColorModel().getTransparency());
         if (false) try {
             org.geotools.gui.swing.image.OperationTreeBrowser.show(worker.getRenderedImage());
