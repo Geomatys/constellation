@@ -23,7 +23,12 @@ import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.IndexColorModel;
 
-import org.geotools.util.logging.Logging;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultCompoundCRS;
+import org.geotools.referencing.crs.DefaultTemporalCRS;
+import org.geotools.referencing.crs.DefaultVerticalCRS;
 import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
 
@@ -31,8 +36,7 @@ import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTableTest;
 import net.seagis.catalog.DatabaseTest;
 
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
+import org.junit.*;
 
 
 /**
@@ -42,17 +46,17 @@ import org.junit.runner.JUnitCore;
  */
 public class WebServiceWorkerTest extends DatabaseTest {
     /**
-     * Runs from the command line.
+     * {@code true} for disabling tests. Useful for disabling every tests except one
+     * during debugging.
      */
-    public static void main(String[] args) {
-        JUnitCore.runClasses(WebServiceWorkerTest.class);
-    }
+    private static final boolean DISABLED = false;
 
     /**
      * Tests with the default test layer.
      */
     @Test
     public void testSST() throws WebServiceException, IOException {
+        if (DISABLED) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.0");
         worker.setLayer(LayerTableTest.SAMPLE_NAME);
@@ -172,6 +176,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testNetCDF() throws WebServiceException, IOException {
+        if (DISABLED) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setInterpolation("bilinear");
         worker.setService("WMS", "1.0");
@@ -184,18 +189,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         worker.setTime(LayerTableTest.NETCDF_TIME_AS_TEXT);
         assertSame("The layer should be cached.", layer, worker.getLayer());
 
-        GridCoverage2D coverage;
-        try {
-            coverage = worker.getGridCoverage2D(false);
-        } catch (WebServiceException exception) {
-            final Throwable cause = exception.getCause();
-            if (cause instanceof IOException) {
-                // The test datafile is not present on every systems.
-                Logging.recoverableException(WebServiceWorkerTest.class, "testNetCDF", cause);
-                return;
-            }
-            throw exception;
-        }
+        GridCoverage2D coverage = worker.getGridCoverage2D(false);
         assertEquals(4, coverage.getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
         assertEquals(2, worker.getGridCoverage2D(true).getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
@@ -238,10 +232,72 @@ public class WebServiceWorkerTest extends DatabaseTest {
     }
 
     /**
+     * A test required for the proper working of {@link #testLambert}.
+     *
+     * @see http://jira.codehaus.org/browse/GEOT-1783
+     */
+    @Test(expected=OperationNotFoundException.class)
+    public void testProjected4D() throws Exception {
+        CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:3395");
+        CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:27572");
+        sourceCRS = new DefaultCompoundCRS("3D", sourceCRS, DefaultVerticalCRS.ELLIPSOIDAL_HEIGHT);
+        sourceCRS = new DefaultCompoundCRS("4D", sourceCRS, DefaultTemporalCRS.JULIAN);
+        try {
+            CRS.findMathTransform(sourceCRS, targetCRS);
+            fail();
+        } catch (OperationNotFoundException e) {
+            e.printStackTrace();
+            // Expected exception until the GEOT-1783 is fixed.
+        }
+    }
+
+    /**
+     * Tests a request in Lambert projection.
+     */
+    @Test
+    @Ignore
+    public void testLambert() throws WebServiceException, IOException {
+        if (true) return; // @Ignore above is not enough...
+        if (DISABLED) return;
+        final WebServiceWorker worker = new WebServiceWorker(database, false);
+        worker.setService("WMS", "1.1.1");
+        worker.setLayer(LayerTableTest.NETCDF_NAME);
+        worker.setCoordinateReferenceSystem("EPSG:27572");
+        worker.setTime(LayerTableTest.NETCDF_TIME_AS_TEXT);
+        worker.setElevation("5.0");
+        worker.setBoundingBox("-742914.357143, 1634430.060549, 855611.357143, 2756573.939451");
+        worker.setDimension("604", "424", null);
+        worker.setColormapRange("-3.0, 40.0");
+        worker.setFormat("image/png");
+        RenderedImage image = worker.getRenderedImage();
+        assertEquals(Transparency.BITMASK, image.getColorModel().getTransparency());
+        if (true) try {
+            org.geotools.gui.swing.image.OperationTreeBrowser.show(image);
+            Thread.sleep(50000);
+        } catch (InterruptedException e) {
+            // Ignore and go back to work.
+        }
+        File file = worker.getImageFile();
+        assertTrue(file.getName().endsWith(".png"));
+        assertTrue(file.isFile());
+        image = ImageIO.read(file);
+        assertEquals(720, image.getWidth());
+        assertEquals(499, image.getHeight());
+        assertEquals(Transparency.BITMASK, image.getColorModel().getTransparency());
+        if (false) try {
+            org.geotools.gui.swing.image.OperationTreeBrowser.show(worker.getRenderedImage());
+            Thread.sleep(50000);
+        } catch (InterruptedException e) {
+            // Ignore and go back to work.
+        }
+    }
+
+    /**
      * Tests with BlueMarble layer.
      */
     @Test
     public void testBlueMarble() throws WebServiceException, IOException {
+        if (DISABLED) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.1");
         worker.setLayer("BlueMarble");

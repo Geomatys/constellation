@@ -288,7 +288,6 @@ final class MetadataParser {
                 }
             }
         }
-
         final double[] flatmatrix = new double[6];
         final ImageGeometry geometry = metadata.getGeometry();
         if (!computeAffineCoefficients(geometry, xAxis, xAxis, flatmatrix, false, reverseX) ||
@@ -401,9 +400,10 @@ final class MetadataParser {
             }
             if (wkt.contains("PROJECTION[\"Mercator\"]")) {
                 if (wkt.contains("PARAMETER[\"Central_Meridian\",-11.000000]") &&
-                        wkt.contains("PARAMETER[\"Standard_Parallel_1\",46.000000]")) {
+                    wkt.contains("PARAMETER[\"Standard_Parallel_1\",46.000000]"))
+                {
                     // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
-                    return 35001; // Mercator IFREMER
+                    return 35010; // Mercator IFREMER
                 }
                 // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
                 return 3395; // World Mercator
@@ -469,7 +469,7 @@ final class MetadataParser {
                     return 5714; // Mean Sea Level
                 }
                 if (units.isCompatible(Unit.ONE)) {
-                    return 35000; // Sigma level
+                    return 35001; // Sigma level
                 }
             }
         }
