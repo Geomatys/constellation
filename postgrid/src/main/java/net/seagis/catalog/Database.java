@@ -618,6 +618,19 @@ public class Database {
     }
 
     /**
+     * Sets the default behaviour of writing access for the connection. If {@true}, the
+     * connection only allows to read data. Otherwise writing permission is granted.
+     *
+     * @throws SQLException if a database access error occurs.
+     */
+    public void setReadOnly(final boolean readOnly) throws SQLException {
+        properties.setProperty(ConfigurationKey.READONLY.getKey(), String.valueOf(readOnly));
+        if (connection != null) {
+            connection.setReadOnly(readOnly);
+        }
+    }
+
+    /**
      * If non-null, SQL {@code INSERT}, {@code UPDATE} or {@code DELETE} statements will not be
      * executed but will rather be printed to this stream. This is used for testing and debugging
      * purpose only.

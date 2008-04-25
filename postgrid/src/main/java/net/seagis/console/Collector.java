@@ -16,11 +16,11 @@ package net.seagis.console;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,15 +34,14 @@ import net.seagis.ncml.NcmlGridCoverageTable;
 import net.seagis.ncml.NcmlNetcdfElement;
 import net.seagis.ncml.NcmlReading;
 import net.seagis.ncml.NcmlTimeValues;
-import static net.seagis.catalog.UpdatePolicy.*;
-
-import org.geotools.resources.Arguments;
+import org.geotools.console.CommandLine;
+import org.geotools.console.Option;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
 import org.jdom.Element;
-
 import ucar.nc2.ncml.Aggregation;
 import ucar.nc2.ncml.Aggregation.Type;
 import ucar.nc2.ncml.AggregationExisting;
+import static net.seagis.catalog.UpdatePolicy.*;
 
 
 /**
@@ -52,16 +51,16 @@ import ucar.nc2.ncml.AggregationExisting;
  * @author Martin Desruisseaux
  * @author Cédric Briançon
  */
-public class Collector {
+public class Collector extends CommandLine {
     /**
      * Database connection.
      */
-    private final Database database;
+    private Database database;
 
     /**
      * The table where to write new records.
      */
-    protected final WritableGridCoverageTable table;
+    protected WritableGridCoverageTable table;
 
     /**
      * Whatever new records should replace the old ones, or if old records should be keeped as-is.
@@ -69,9 +68,89 @@ public class Collector {
     private UpdatePolicy updatePolicy = UpdatePolicy.SKIP_EXISTING;
 
     /**
-     * An output writer for debugging messages, or {@code null} for the standard output stream.
+     * Flag specified on the command lines.
      */
-    private PrintWriter out;
+    @Option(description="Print the SQL statements rather than executing them (for debugging only).")
+    private boolean pretend;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(description="Replace the existing records.")
+    private boolean replace;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(description="Clear records before adding new ones.")
+    private boolean clear;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(description="The layer to consider.", mandatory=true)
+    protected String layer;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(name="newlayer", description="True if the process can add a new layer.")
+    private boolean newLayer = true;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(name="ncmlpath", description="The path to the NcML file.")
+    private String ncmlPath;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(name="var", description="The variable to consider.")
+    private String variable;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(name="type", description="The type of process to launch.", mandatory=true)
+    protected String type;
+
+    /**
+     * Creates a new collector which will adds entries in the specified database.
+     *
+     * @param args An array of arguments.
+     */
+    public Collector(final String[] args) {
+        super(args, 0);
+        updatePolicy = clear ? CLEAR_BEFORE_UPDATE : replace ? REPLACE_EXISTING : SKIP_EXISTING;
+    }
+
+    protected Set<String> getValidTypes() {
+        Set<String> set = new HashSet<String>();
+        set.add("ncml");
+        set.add("opendap");
+        return set;
+    }
+
+    /**
+     *
+     * @param database The database connection, or {@code null} for the default.
+     * @throws CatalogException if the connection failed
+     */
+    public void run(final Database database) throws CatalogException, SQLException {
+        connect(database);
+        database.setReadOnly(false);
+        if (!getValidTypes().contains(type.toLowerCase())) {
+            throw new IllegalArgumentException("Le type de moissonnage spécifié n'est pas" +
+                    " connu : " + type);
+        }
+        if (type.toLowerCase().equals("ncml")) {
+            processNcML();
+        } else {
+            process();
+        }
+        close();
+    }
 
     /**
      * Creates a new collector which will adds entries in the specified database.
@@ -79,17 +158,15 @@ public class Collector {
      * @param database The database connection, or {@code null} for the default.
      * @throws CatalogException if the connection failed.
      */
-    protected Collector(final Database database) throws CatalogException {
-        if (database != null) {
-            this.database = database;
-        } else {
-            try {
-                this.database = new Database();
-            } catch (IOException e) {
-                throw new CatalogException(e);
-            }
+    protected void connect(Database database) throws CatalogException {
+        if (database == null) try {
+            database = new Database();
+        } catch (IOException e) {
+            throw new CatalogException(e);
         }
-        table = new WritableGridCoverageTable(this.database.getTable(WritableGridCoverageTable.class));
+        database.setUpdateSimulator(pretend ? out : null);
+        this.database = database;
+        table = new WritableGridCoverageTable(database.getTable(WritableGridCoverageTable.class));
     }
 
     /**
@@ -100,53 +177,18 @@ public class Collector {
     }
 
     /**
-     * Returns the output printer for debugging messages.
-     * This method never returns {@code null}.
+     * Returns the layer name.
      */
-    public PrintWriter getPrinter() {
-        if (out == null) {
-            out = new PrintWriter(System.out, true);
-        }
-        return out;
-    }
-
-    /**
-     * Sets the output writer for debugging messages. If this method is never invoked,
-     * then the default is the {@linkplain System#out standard output stream}.
-     * <p>
-     * Debugging messages are typically the {@code INSERT} SQL instructions that would
-     * be emitted. Those instructions are printed only if {@link #setPretend} has been
-     * invoked with value {@code true}.
-     */
-    public void setPrinter(final PrintWriter out) {
-        if (out != null) {
-            out.flush();
-        }
-        this.out = out;
-    }
-
-    /**
-     * If {@code true}, prints {@code INSERT} statements to the {@linkplain #getPrinter output printer}
-     * rather than executing them. This is useful for testing purpose.
-     */
-    public void setPretend(final boolean pretend) {
-        database.setUpdateSimulator(pretend ? getPrinter() : null);
-    }
-
-    /**
-     * Whatever new records should replace the old ones, or if old records should be keeped as-is.
-     */
-    public void setPolicy(final UpdatePolicy policy) {
-        updatePolicy = policy;
+    public String getLayer() {
+        return layer;
     }
 
     /**
      * Proceed to the insertion of new records for the specified layer.
      *
-     * @param  layer The layer to update.
      * @throws CatalogException If insertion failed.
      */
-    public void process(final String layer) throws CatalogException {
+    private void process() throws CatalogException {
         final int count;
         try {
             table.setLayer(layer);
@@ -157,7 +199,6 @@ public class Collector {
         } catch (IOException e) {
             throw new CatalogException(e);
         }
-        final PrintWriter out = getPrinter();
         if (out != null) {
             // TODO: localize
             out.print(count);
@@ -174,22 +215,21 @@ public class Collector {
     /**
      * Proceed to the insertion of new records for the specified layer from a NetCDF file.
      *
-     * @param  layer    The layer to update.
-     * @param  variable The NetCDF variable to collect.
-     * @param  ncml     Path to the NcML file.
-     * @param  allowsNewLayer If {@code true}, the parser is allowed to create a new layer.
-     *         New layers are created only if no suitable later already exists in the database.
      * @throws CatalogException If insertion failed.
      */
-    public void processNcML(final String layer, String variable, final File ncml,
-                            final boolean allowsNewLayer) throws CatalogException
+    private void processNcML() throws CatalogException
     {
-        variable = variable.toLowerCase().trim();
+        final File ncml = new File(ncmlPath);
+        if (!ncml.exists()) {
+            err.println("Path invalid to NcML file : " + ncmlPath);
+            System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
+        }
         final NcmlGridCoverageTable ncmlTable = new NcmlGridCoverageTable(database);
-        ncmlTable.setCanInsertNewLayers(allowsNewLayer);
+        ncmlTable.setCanInsertNewLayers(newLayer);
         final Set<NcmlNetcdfElement> netcdfTags = new LinkedHashSet<NcmlNetcdfElement>();
         try {
             final List<Aggregation> aggregations = NcmlReading.getNestedAggregations(ncml);
+            variable = variable.toLowerCase().trim();
             // If we have an aggregation of type "joint" for the whole file, without any other
             // nested aggregation, then we know that the <netcdf> tags will contain the "location"
             // parameter, and we get it back directly in order to specify it to the reader.
@@ -204,7 +244,8 @@ public class Collector {
                     final Collection<String> variables = aggrExist.getVariables();
                     for (final String var : variables) {
                         if (variable.startsWith(var.toLowerCase())) {
-                            final NcmlNetcdfElement netcdfElement = new NcmlNetcdfElement(new URI(dataset.getLocation()), null);
+                            final NcmlNetcdfElement netcdfElement =
+                                    new NcmlNetcdfElement(new URI(dataset.getLocation()), null);
                             netcdfTags.add(netcdfElement);
                         }
                     }
@@ -396,18 +437,8 @@ public class Collector {
     /**
      * Runs from the command line.
      */
-    public static void main(String[] args) throws CatalogException {
-        final Arguments arguments = new Arguments(args);
-        final boolean pretend = arguments.getFlag("-pretend");
-        final boolean replace = arguments.getFlag("-replace");
-        final boolean clear   = arguments.getFlag("-clear");
-        final String  layer   = arguments.getRequiredString("-layer");
-        args = arguments.getRemainingArguments(0);
-        final Collector collector = new Collector(null);
-        collector.setPrinter(arguments.out);
-        collector.setPretend(pretend);
-        collector.setPolicy(clear ? CLEAR_BEFORE_UPDATE : replace ? REPLACE_EXISTING : SKIP_EXISTING);
-        collector.process(layer);
-        collector.close();
+    public static void main(String[] args) throws CatalogException, SQLException {
+        final Collector collector = new Collector(args);
+        collector.run(null);
     }
 }
