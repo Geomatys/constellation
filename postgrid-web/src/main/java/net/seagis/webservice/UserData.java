@@ -17,7 +17,14 @@ package net.seagis.webservice;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.wcs.v100.WCSCapabilitiesType;
+import net.seagis.wcs.v111.Capabilities;
+import net.seagis.wms.WMSCapabilities;
+import net.seagis.wms.WMT_MS_Capabilities;
 
 
 /**
@@ -27,12 +34,22 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "UserData")
+@XmlRootElement(name="UserData")
 public class UserData {
     
+    @XmlElementRefs ({
+        @XmlElementRef(name = "WMSCapabilities", namespace = "http://www.opengis.net/wms", type = WMSCapabilities.class),
+        @XmlElementRef(name = "WMT_MS_Capabilities", namespace = "http://www.opengis.net/wms", type = WMT_MS_Capabilities.class)
+    })
     private Object[] WMSCapabilities;
     
+    @XmlElementRefs ({
+        @XmlElementRef(name = "WCS_Capabilities", namespace = "http://www.opengis.net/wcs", type = WCSCapabilitiesType.class),
+        @XmlElementRef(name = "Capabilities", namespace = "http://www.opengis.net/wcs/1.1.1", type = Capabilities.class)
+    })
     private Object[] WCSCapabilities;
     
+    @XmlElementRef(name= "Capabilities", namespace="http://www.opengis.net/cat/csw/2.0.2", type = net.seagis.cat.csw.Capabilities.class)
     private Object[] CSWCapabilities;
     
     private Object[] SOSCapabilities;
