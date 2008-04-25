@@ -106,13 +106,13 @@ public class Collector extends CommandLine {
     /**
      * Flag specified on the command lines.
      */
-    @Option(name="var", description="The variable to consider.")
+    @Option(description="The variable to consider.")
     private String variable;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(name="type", description="The type of process to launch.", mandatory=true)
+    @Option(description="The type of process to launch.", mandatory=true)
     protected String type;
 
     /**
@@ -125,6 +125,9 @@ public class Collector extends CommandLine {
         updatePolicy = clear ? CLEAR_BEFORE_UPDATE : replace ? REPLACE_EXISTING : SKIP_EXISTING;
     }
 
+    /**
+     * Returns a set of possible choices for the process to launch.
+     */
     protected Set<String> getValidTypes() {
         Set<String> set = new HashSet<String>();
         set.add("ncml");
@@ -139,7 +142,7 @@ public class Collector extends CommandLine {
      */
     public void run(final Database database) throws CatalogException, SQLException {
         connect(database);
-        database.setReadOnly(false);
+        this.database.setReadOnly(false);
         if (!getValidTypes().contains(type.toLowerCase())) {
             throw new IllegalArgumentException("Le type de moissonnage spécifié n'est pas" +
                     " connu : " + type);
@@ -219,6 +222,14 @@ public class Collector extends CommandLine {
      */
     private void processNcML() throws CatalogException
     {
+        if (ncmlPath == null) {
+            err.println("The argument -ncmlpath was not specified.");
+            System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
+        }
+        if (variable == null) {
+            err.println("The argument -variable was not specified.");
+            System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
+        }
         final File ncml = new File(ncmlPath);
         if (!ncml.exists()) {
             err.println("Path invalid to NcML file : " + ncmlPath);
