@@ -32,10 +32,16 @@
                              <t:commandLink styleClass="button" id="open-id" onclick="this.blur();" action="#{servicesBean.switchMode}">
                                             <h:outputText id="label" value="Open metadata form"/>
                              </t:commandLink>
+                             
+                             <t:commandLink styleClass="button" id="export-id" onclick="this.blur();" action="#{servicesBean.storeData}">
+                                            <h:outputText id="label2" value="Export preference"/>
+                             </t:commandLink>
 		            
 		        </h:panelGrid>
 		</div>
+                 <h:outputText value="#{servicesBean.urlPreference}"/>
             </h:form>
+            <iframe style="display: none;" src="" name="target_xml" id="target_xml"/>
         </f:view>
     </body>
 </html>

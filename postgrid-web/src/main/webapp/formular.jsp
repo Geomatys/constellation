@@ -19,9 +19,9 @@
     </head>
     <body>
         <f:view>
-            
-                <div id="content" class="content">
-                    <h:form id="form_1" enctype="multipart/form-data">
+        
+            <div id="content" class="content">
+                <h:form id="form_1" enctype="multipart/form-data">
                     <%-- Upload panel --%>
                     <h:panelGrid id="upload_panel" columns="2">
                         <h:outputText id="upload_label" value="Upload XML file : " />
@@ -35,7 +35,7 @@
                             <f:valueChangeListener type="net.seagis.bean.UploadListener" />
                         </t:inputFileUpload>
                         
-                        <t:commandLink styleClass="button" id="uploadButton" onclick="this.blur();" style="margin:20px;" action="#{servicesBean.processSubmitedFile}">
+                        <t:commandLink styleClass="button" id="uploadButton" onclick="this.blur();" style="margin:20px;" action="#{servicesBean.doUpload}">
                             <h:outputText id="labelUpload" value="Upload"/>
                         </t:commandLink>
                         <f:verbatim><br></f:verbatim>
@@ -53,9 +53,9 @@
                         </s:pprPanelGroup>
                         
                     </h:panelGrid>
-                    </h:form>
-                    
-                    <h:form id="form_2">
+                </h:form>
+                
+                <h:form id="form_2">
                     <%-- formular panel --%>
                     <h:outputText  id="ServiceIdentificationLabel" value="Service Identification Section : " style="font-size:18px;"/>
                     <h:panelGrid id="ServiceIdentificationGrid" columns="2" cellpadding="2" cellspacing="0" width="100%" style="margin-top:20px;">
@@ -178,7 +178,7 @@
                         <h:inputText   id="WMS_MaxWidthInput"   value="#{servicesBean.maxWidth}"/>
                         
                         <t:commandLink styleClass="button" id="StorForm" onclick="this.blur();" action="#{servicesBean.storeForm}" style="margin-top:50px;">
-                            <h:outputText id="label1" value="Store the form"/>
+                            <h:outputText id="label1" value="Save the form"/>
                         </t:commandLink>
                         
                         
@@ -186,9 +186,8 @@
                             <h:outputText id="label2" value="Back"/>
                         </t:commandLink>
                     </h:panelGrid>
-                    </h:form>
-                </div>
-                <iframe style="display: none;" src="" name="target_xml" id="target_xml"/>
+                </h:form>
+            </div>
         </f:view>
     </body>
 </html>

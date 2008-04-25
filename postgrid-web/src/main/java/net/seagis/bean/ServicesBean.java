@@ -209,12 +209,17 @@ public class ServicesBean {
      * The uploaded File.
      */
     private UploadedFile uploadedFile;
+    
+    private String urlPreference = "";
+    
     /**
      * 
      */
     private Logger logger = Logger.getLogger("net.seagis.bean");
 
     public ServicesBean() throws JAXBException, FileNotFoundException {
+        
+        userData = new UserData();
 
         // we get the sevlet context to read the capabilities files in the deployed war
         FacesContext context = FacesContext.getCurrentInstance();
@@ -227,7 +232,7 @@ public class ServicesBean {
         //we create the JAXBContext and read the selected file 
         JAXBContext JBcontext = JAXBContext.newInstance(Capabilities.class, WMSCapabilities.class,
                 WMT_MS_Capabilities.class, WCSCapabilitiesType.class,
-                net.seagis.cat.csw.Capabilities.class);
+                net.seagis.cat.csw.Capabilities.class, UserData.class);
 
         unmarshaller = JBcontext.createUnmarshaller();
         marshaller = JBcontext.createMarshaller();
@@ -463,7 +468,7 @@ public class ServicesBean {
     }
 
     /**
-     * Store the formular int he XML file
+     * Store the formular in the XML file
      */
     public void storeForm() throws JAXBException {
 
@@ -711,8 +716,6 @@ public class ServicesBean {
     private void loadUserData() throws FileNotFoundException, IOException {
         try {
             
-            JAXBContext JBcontext = JAXBContext.newInstance(UserData.class);
-            Unmarshaller unmarshaller = JBcontext.createUnmarshaller();
             File f = processSubmitedFile();
             userData = (UserData) unmarshaller.unmarshal(f);
             
@@ -830,12 +833,12 @@ public class ServicesBean {
         }
     }
     
-    private File storeData() throws JAXBException {
-        File f = new File(servletContext.getRealPath("WEB-INF/preference"));
-        JAXBContext JBcontext = JAXBContext.newInstance(UserData.class);
-        Marshaller marshaller = JBcontext.createMarshaller();
-        marshaller.marshal(userData, f);
-        return f;
+    public void storeData() throws JAXBException {
+        setUrlPreference(servletContext.getRealPath("WEB-INF/preference"));
+        File f = new File(getUrlPreference());
+        
+       marshaller.marshal(userData, f);
+        
     }
     
     
@@ -1052,6 +1055,11 @@ public class ServicesBean {
             return null;
         }
         return f;
+    }
+    
+    public String doUpload() throws IOException{
+        processSubmitedFile();
+        return "ok";
     }
 
     /**
@@ -1299,5 +1307,13 @@ public class ServicesBean {
 
     public void setUploadedFile(UploadedFile uploadedFile) {
         this.uploadedFile = uploadedFile;
+    }
+
+    public String getUrlPreference() {
+        return urlPreference;
+    }
+
+    public void setUrlPreference(String urlPreference) {
+        this.urlPreference = urlPreference;
     }
 }
