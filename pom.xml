@@ -303,6 +303,16 @@
       <name>Other projects</name>
       <url>http://maven.geomatys.fr/repository</url>
     </repository>
+    <repository>
+      <id>refractions</id>
+      <name>Other projects</name>
+      <url>http://lists.refractions.net/m2</url>
+    </repository>
+<repository>
+      <id>apache</id>
+      <name>Other projects</name>
+      <url>http://people.apache.org/maven-snapshot-repository</url>
+    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
@@ -511,7 +521,7 @@
     All SeaGIS modules.
   -->
   <modules>
-    <module>numeric</module>
+   <!-- <module>numeric</module>-->
     <module>postgrid</module>
     <module>web-services</module>
     <module>postgrid-web</module>

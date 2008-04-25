@@ -16,8 +16,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JSF dependencies
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.faces.validator.ValidatorException;
 import javax.servlet.ServletContext;
 
 // JAXB dependencies
@@ -196,6 +199,18 @@ public class ServicesBean {
     private ServletContext servletContext;
     
     /**
+     * This is an attribute that defines the current selected web service mode.
+     * Default is WMS.
+     */
+    private String webServiceMode = "WMS";
+    
+    /**
+     * 
+     * This is the available web services list for the selectOneListbox component.
+     */
+    private List webServices = new ArrayList();
+    
+    /**
      * 
      */
     private Logger logger = Logger.getLogger("net.seagis.bean");
@@ -205,6 +220,10 @@ public class ServicesBean {
         // we get the sevlet context to read the capabilities files in the deployed war
         FacesContext context = FacesContext.getCurrentInstance();
         servletContext       = (ServletContext) context.getExternalContext().getContext();
+        
+        //adding items into the webServices list.
+        addWebServices();      
+        
         
         //we create the JAXBContext and read the selected file 
         JAXBContext JBcontext = JAXBContext.newInstance(Capabilities.class, WMSCapabilities.class,
@@ -653,6 +672,7 @@ public class ServicesBean {
     
     public String setWMSMode() throws JAXBException, FileNotFoundException {
         
+        webServiceMode = "WMS";
         capabilities     = new Object[2];
         capabilitiesFile = new File[2];
         
@@ -685,6 +705,7 @@ public class ServicesBean {
     
     public String setWCSMode() throws FileNotFoundException, JAXBException {
         
+        webServiceMode = "WCS";
         capabilities     = new Object[2];
         capabilitiesFile = new File[2];
         
@@ -717,6 +738,7 @@ public class ServicesBean {
     
     public String setSOSMode() throws FileNotFoundException, JAXBException {
         
+        webServiceMode = "SOS";
         capabilities     = new Object[1];
         capabilitiesFile = new File[1];
         
@@ -737,6 +759,7 @@ public class ServicesBean {
     
     public String setCSWMode() throws FileNotFoundException, JAXBException {
         
+        webServiceMode = "CSW";
         capabilities     = new Object[1];
         capabilitiesFile = new File[1];
         
@@ -749,10 +772,84 @@ public class ServicesBean {
             fillFormFromOWS100((net.seagis.ows.v100.CapabilitiesBaseType)capabilities[0]);
               
         } else {
-            logger.severe("SOS capabilities file version 1.0.0 not found at :" + path);
+            logger.severe("CSW capabilities file version 2.0.2 not found at :" + path);
         }
         
         return "fillForm"; 
+    }
+    
+    /**
+     * this method switch to the appropriate mode and returns the outcome string to proceed the jsf navigation.
+     * @return
+     * @throws java.io.FileNotFoundException
+     * @throws javax.xml.bind.JAXBException
+     */
+    public String switchMode() throws FileNotFoundException, JAXBException {
+        if (webServiceMode.equals("WMS")){
+            setWMSMode();
+        }
+        else if (webServiceMode.equals("WCS")){
+            setWCSMode();
+        }
+        else if (webServiceMode.equals("SOS")){
+            setSOSMode();
+        }
+        else if (webServiceMode.equals("CSW")){
+            setCSWMode();
+        }
+        return "fillForm";
+    }
+    
+    /**
+     * 
+     * This method proceed to validate phase for the selectOneListbox component.
+     * @param context
+     * @param component
+     * @param value
+     * @throws ValidatorException
+     */
+    public void validateWebService(FacesContext context, UIComponent component, Object value) throws ValidatorException
+    {
+        if (! (value instanceof String))
+        {
+            throw new ValidatorException(new FacesMessage("A Validation error was found ! the selected item in selectOneListbox is not a string !!"));
+        }
+    }
+    
+    public void addWebServices(){
+        if (existsCapabilities("CSW")) 
+            webServices.add(new SelectItem("CSW", "CSW metadata", null));
+        if (existsCapabilities("SOS"))
+        webServices.add(new SelectItem("SOS", "SOS metadata", null));
+        if (existsCapabilities("WCS"))
+        webServices.add(new SelectItem("WCS", "WCS metadata", null));
+        if (existsCapabilities("WMS"))
+        webServices.add(new SelectItem("WMS", "WMS metadata", null)); 
+    }
+    
+    public boolean existsCapabilities(String ws){
+        boolean exist = false;
+        File file;
+        String path;
+        if (ws.equals("CSW")){
+            path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
+            file = new File(path);
+            exist = file.exists();
+        }
+        else if (ws.equals("SOS")){
+            path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
+            file = new File(path);
+            exist = file.exists();
+        } else if (ws.equals("WCS")){
+            path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.0.0.xml");
+            file = new File(path);
+            exist = file.exists();
+        } else if (ws.equals("WMS")){
+            path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
+            file = new File(path);
+            exist = file.exists();
+        }
+        return exist;
     }
     
     public String goBack() {
@@ -956,6 +1053,22 @@ public class ServicesBean {
 
     public void setMaxHeight(int maxHeight) {
         this.maxHeight = maxHeight;
+    }
+
+    public String getWebServiceMode() {
+        return webServiceMode;
+    }
+
+    public void setWebServiceMode(String webServiceMode) {
+        this.webServiceMode = webServiceMode;
+    }
+
+    public List getWebServices() {
+        return webServices;
+    }
+
+    public void setWebServices(List webServices) {
+        this.webServices = webServices;
     }
     
 }
