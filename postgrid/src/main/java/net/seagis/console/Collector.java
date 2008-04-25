@@ -88,12 +88,6 @@ public class Collector extends CommandLine {
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="The layer to consider.", mandatory=true)
-    protected String layer;
-
-    /**
-     * Flag specified on the command lines.
-     */
     @Option(name="newlayer", description="True if the process can add a new layer.")
     private boolean newLayer = true;
 
@@ -108,6 +102,12 @@ public class Collector extends CommandLine {
      */
     @Option(description="The variable to consider.")
     private String variable;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(description="The layer to consider.", mandatory=true)
+    protected String layer;
 
     /**
      * Flag specified on the command lines.
@@ -220,8 +220,7 @@ public class Collector extends CommandLine {
      *
      * @throws CatalogException If insertion failed.
      */
-    private void processNcML() throws CatalogException
-    {
+    private void processNcML() throws CatalogException {
         /*
          * Ensures both {@code -ncmlpath} and {@code -variable} arguments have been specified
          * by the user, in order to begin the process.

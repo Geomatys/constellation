@@ -18,7 +18,7 @@
   <groupId>net.seagis</groupId>
   <artifactId>postgrid-web</artifactId>
   <packaging>war</packaging>
-  <name>postgrid web service</name>
+  <name>Postgrid web service</name>
   <description>A Web Map Service producing maps of spatially referenced data dynamically from geographic information.</description>
   
    
@@ -54,8 +54,8 @@
   
   
   <!--
-    D�pendances requises pour la compilation. Ces d�pendances seront incluses
-    dans la liste de JARs que Maven placera dans le r�pertoire "target/binaries".
+    Dependencies required only for compilation. These dependencies will be
+    included in the JARs' list for which Maven will move into "target/binaries".
   -->
   <dependencies>
     <dependency>
