@@ -470,7 +470,7 @@ public class ServicesBean {
     /**
      * Store the formular in the XML file
      */
-    public void storeForm() throws JAXBException {
+    public String storeForm() throws JAXBException {
 
         for (Object capa : capabilities) {
 
@@ -502,7 +502,7 @@ public class ServicesBean {
 
         }
         storeCapabilitiesFile();
-
+        return "goBack";
     }
 
     /**
@@ -834,9 +834,10 @@ public class ServicesBean {
     }
     
     public void storeData() throws JAXBException {
-        setUrlPreference(servletContext.getRealPath("WEB-INF/preference"));
-        File f = new File(getUrlPreference());
-        
+        String url = servletContext.getRealPath("preference.sml");
+        setUrlPreference("preference.sml");
+        File f = new File(url);
+        f.setWritable(true);
        marshaller.marshal(userData, f);
         
     }

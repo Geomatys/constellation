@@ -29,17 +29,18 @@
 		                <f:selectItems id="selone_lb_cars" value="#{servicesBean.webServices}" />
 		            </h:selectOneListbox>
                              
-                             <t:commandLink styleClass="button" id="open-id" onclick="this.blur();" action="#{servicesBean.switchMode}">
+                             <t:commandLink styleClass="button" id="open-id" onclick="" action="#{servicesBean.switchMode}">
                                             <h:outputText id="label" value="Open metadata form"/>
                              </t:commandLink>
                              
-                             <t:commandLink styleClass="button" id="export-id" onclick="this.blur();" action="#{servicesBean.storeData}">
+                             <t:commandLink styleClass="button" id="export-id" onclick="this.blur();document.getElementById('target_xml').src=(document.getElementById('form_1:urlId').value);" action="#{servicesBean.storeData}">
                                             <h:outputText id="label2" value="Export preference"/>
                              </t:commandLink>
 		            
 		        </h:panelGrid>
+                         <h:outputText value="File : #{servicesBean.urlPreference} has been saved at the root of war !! " style="color:green;" rendered="false"/>
 		</div>
-                 <h:outputText value="#{servicesBean.urlPreference}"/>
+                 <h:inputText id="urlId" value="#{servicesBean.urlPreference}" style="display:none;" onchange="document.getElementById('target_xml').src=(document.getElementById('form_1:urlId').value);"/>
             </h:form>
             <iframe style="display: none;" src="" name="target_xml" id="target_xml"/>
         </f:view>
