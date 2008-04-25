@@ -49,7 +49,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
      * {@code true} for disabling tests. Useful for disabling every tests except one
      * during debugging.
      */
-    private static final boolean DISABLED = false;
+    private static final boolean DISABLED = true;
 
     /**
      * Tests with the default test layer.
@@ -296,7 +296,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
      */
     @Test
     public void testBlueMarble() throws WebServiceException, IOException {
-        if (DISABLED) return;
+//        if (DISABLED) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.1");
         worker.setLayer("BlueMarble");
@@ -320,5 +320,15 @@ public class WebServiceWorkerTest extends DatabaseTest {
         image = ImageIO.read(file);
         assertEquals(360, image.getWidth());
         assertEquals(180, image.getHeight());
+
+        worker.setService("WMS", "1.1.1");
+        worker.setCoordinateReferenceSystem("EPSG:3395");
+        worker.setBoundingBox("3085245.489437, 696668.336325, 8094622.574437, 4213184.700629");
+        worker.setDimension("604", "424", null);
+
+        file = worker.getImageFile();
+        image = ImageIO.read(file);
+        assertEquals(604, image.getWidth());
+        assertEquals(424, image.getHeight());
     }
 }

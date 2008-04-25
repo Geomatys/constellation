@@ -23,6 +23,43 @@ SET search_path = postgrid, postgis, pg_catalog;
 
 
 --------------------------------------------------------------------------------------------------
+-- Creates the "Permissions" table.                                                             --
+-- Dependencies: (none)                                                                         --
+--------------------------------------------------------------------------------------------------
+
+CREATE TABLE "Permissions" (
+    "name"        character varying NOT NULL PRIMARY KEY,
+    "include"     character varying DEFAULT 'public' REFERENCES "Permissions" ON UPDATE CASCADE ON DELETE RESTRICT,
+    "WMS"         boolean DEFAULT TRUE,
+    "WCS"         boolean DEFAULT TRUE,
+    "description" character varying
+);
+
+ALTER TABLE "Permissions" OWNER TO geoadmin;
+GRANT ALL ON TABLE "Permissions" TO geoadmin;
+GRANT SELECT ON TABLE "Permissions" TO PUBLIC;
+
+COMMENT ON TABLE "Permissions" IS
+    'Permissions to view and obtain coverage data.';
+COMMENT ON COLUMN "Permissions"."name" IS
+    'Permission name.';
+COMMENT ON COLUMN "Permissions"."include" IS
+    'Additional data that can be obtained with current permission.';
+COMMENT ON COLUMN "Permissions"."WMS" IS
+    'Whatever permission allows Web Map Server (WMS) access.';
+COMMENT ON COLUMN "Permissions"."WCS" IS
+    'Whatever permission allows Web Coverage Server (WCS) access.';
+COMMENT ON COLUMN "Permissions"."description" IS
+    'A description of this permission (scope, etc.).';
+
+INSERT INTO "Permissions" VALUES ('public',     NULL,     TRUE,  TRUE,  'Data accessible to anyone.');
+INSERT INTO "Permissions" VALUES ('hidden',     NULL,     FALSE, FALSE, 'Hidden data (e.g. data reserved for testing purpose only).');
+INSERT INTO "Permissions" VALUES ('restricted', 'public', TRUE,  TRUE,  'Access to public data together with restricted ones.');
+
+
+
+
+--------------------------------------------------------------------------------------------------
 -- Creates the "Formats" table.                                                                 --
 -- Dependencies: (none)                                                                         --
 --------------------------------------------------------------------------------------------------
@@ -231,8 +268,8 @@ CREATE TABLE "Series" (
     "pathname"   character varying NOT NULL,
     "extension"  character varying, -- Accepts NULL since some files has no extension
     "format"     character varying NOT NULL REFERENCES "Formats" ON UPDATE CASCADE ON DELETE RESTRICT,
-    "visible"    boolean           NOT NULL DEFAULT true,
-    "quicklook"  character varying UNIQUE   REFERENCES "Series"  ON UPDATE CASCADE ON DELETE RESTRICT
+    "quicklook"  character varying UNIQUE   REFERENCES "Series"  ON UPDATE CASCADE ON DELETE RESTRICT,
+    "permission" character varying NOT NULL DEFAULT 'public' REFERENCES "Permissions" ON UPDATE CASCADE ON DELETE CASCADE,
 );
 
 ALTER TABLE "Series" OWNER TO geoadmin;
@@ -253,10 +290,10 @@ COMMENT ON COLUMN "Series"."extension" IS
     'File extention of the images in the series.';
 COMMENT ON COLUMN "Series"."format" IS
     'Format of the images in the series.';
-COMMENT ON COLUMN "Series"."visible" IS
-    'Indicates if the images should appear in the list of images presented to the user. ';
 COMMENT ON COLUMN "Series"."quicklook" IS
     'Series of overview images.';
+COMMENT ON COLUMN "Series"."permission" IS
+    'Permissions of images in the series (public, restricted, etc.)';
 COMMENT ON CONSTRAINT "Series_quicklook_key" ON "Series" IS
     'Each series has only one overview series.';
 COMMENT ON CONSTRAINT "Series_layer_fkey" ON "Series" IS
