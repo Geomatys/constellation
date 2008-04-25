@@ -1,6 +1,16 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 package net.seagis.bean;
 
@@ -9,10 +19,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,6 +63,7 @@ import net.seagis.wcs.v100.ResponsiblePartyType;
 import net.seagis.wcs.v100.ServiceType;
 import net.seagis.wcs.v100.WCSCapabilitiesType;
 import net.seagis.wcs.v111.Capabilities;
+import net.seagis.webservice.UserData;
 import net.seagis.wms.ContactAddress;
 import net.seagis.wms.ContactInformation;
 import net.seagis.wms.ContactPersonPrimary;
@@ -64,7 +77,8 @@ import org.apache.myfaces.custom.fileupload.UploadedFile;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal
+ * @author Medhi Sidhoum
  */
 public class ServicesBean {
 
@@ -186,7 +200,12 @@ public class ServicesBean {
      */
     private List webServices = new ArrayList();
     /**
-     * 
+     * This object record the user data.
+     */
+    private UserData userData;
+    
+    /**
+     *  A logger (debugging purpose)
      * The uploaded File.
      */
     private UploadedFile uploadedFile;
@@ -653,18 +672,173 @@ public class ServicesBean {
         return SP;
     }
 
+    /**
+     * Update the capabilities XML file of the webService and store it in a UserData Object.
+     * 
+     * @throws javax.xml.bind.JAXBException
+     */
     private void storeCapabilitiesFile() throws JAXBException {
         try {
             int i = 0;
             for (File f : capabilitiesFile) {
                 marshaller.marshal(capabilities[i], (OutputStream) new FileOutputStream(f));
+                i++;
             }
-            i++;
+            
+            if (webServiceMode.equals("WMS")) {
+                userData.setWMSCapabilities(capabilities);
+            
+            } else if (webServiceMode.equals("WCS")) {
+                userData.setWCSCapabilities(capabilities);
+                
+            } else if (webServiceMode.equals("SOS")) {
+                userData.setSOSCapabilities(capabilities);
+                
+            } else if (webServiceMode.equals("CSW")) {
+                userData.setCSWCapabilities(capabilities);
+                
+            }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ServicesBean.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * Load the user data from an uploaded File
+     * 
+     * @param f the uploaded file.
+     */
+    private void loadUserData() throws FileNotFoundException, IOException {
+        try {
+            
+            JAXBContext JBcontext = JAXBContext.newInstance(UserData.class);
+            Unmarshaller unmarshaller = JBcontext.createUnmarshaller();
+            File f = processSubmitedFile();
+            userData = (UserData) unmarshaller.unmarshal(f);
+            
+            // we extract and update WMS user data
+            if (userData.getWMSCapabilities() != null) {
+                
+                if (userData.getWMSCapabilities().length == 2) {
+                    
+                    //we begin to write the high lvl document
+                    String path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
+                    File file   = new File(path);
+                    if (file.exists()) {
+                    
+                        marshaller.marshal(userData.getWMSCapabilities()[0], (OutputStream) new FileOutputStream(file));
+              
+                    } else {
+                        logger.severe("WMS capabilities file version 1.3.0 not found at :" + path + ". unable to load WMS Data");
+                    }
+        
+                    // the we add to the list of object to update the other sub version
+                    path  = servletContext.getRealPath("WEB-INF/WMSCapabilities1.1.1.xml");
+                    file  = new File(path);
+                    if (file.exists()) {
+                    
+                        marshaller.marshal(userData.getWMSCapabilities()[1], (OutputStream) new FileOutputStream(file));
+              
+                    } else {
+                        logger.severe("WMS capabilities file version 1.1.1 not found at :" + path + ". unable to load WMS Data");
+                    }
+                } else {
+                    // TODO afficher fichier non valide
+                    logger.severe("WMS capabilie file uncomplete (!=2)");               
+                }
+            }
+            
+            // we extract and update WCS user data
+            if (userData.getWCSCapabilities() != null) {
+                
+                if (userData.getWCSCapabilities().length == 2) {
+                    
+                    //we begin to write the high lvl document
+                    String path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.1.1.xml");
+                    File file   = new File(path);
+                    if (file.exists()) {
+                    
+                        marshaller.marshal(userData.getWCSCapabilities()[0], (OutputStream) new FileOutputStream(file));
+              
+                    } else {
+                        logger.severe("WCS capabilities file version 1.1.1 not found at :" + path + ". unable to load WCS Data");
+                    }
+        
+                    // the we add to the list of object to update the other sub version
+                    path  = servletContext.getRealPath("WEB-INF/WCSCapabilities1.0.0.xml");
+                    file  = new File(path);
+                    if (file.exists()) {
+                    
+                        marshaller.marshal(userData.getWCSCapabilities()[1], (OutputStream) new FileOutputStream(file));
+              
+                    } else {
+                        logger.severe("WCS capabilities file version 1.0.0 not found at :" + path + ". unable to load WCS Data");
+                    }
+                } else {
+                    // TODO afficher fichier non valide
+                    logger.severe("WCS capabilies file uncomplete (!=2)");               
+                }
+            }
+            
+             // we extract and update CSW user data
+            if (userData.getCSWCapabilities() != null) {
+                
+                if (userData.getCSWCapabilities().length == 1) {
+                    
+                    //we begin to write the high lvl document
+                    String path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
+                    File file   = new File(path);
+                    if (file.exists()) {
+                    
+                        marshaller.marshal(userData.getCSWCapabilities()[0], (OutputStream) new FileOutputStream(file));
+              
+                    } else {
+                        logger.severe("CSW capabilities file version 2.0.2 not found at :" + path + ". unable to load CSW Data");
+                    }
+                    
+                } else {
+                    // TODO afficher fichier non valide
+                    logger.severe("WCS capabilies file uncomplete (!=1)");               
+                }
+            }
+            
+             // we extract and update SOS user data
+            if (userData.getSOSCapabilities() != null) {
+                
+                if (userData.getSOSCapabilities().length == 1) {
+                    
+                    //we begin to write the high lvl document
+                    String path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
+                    File file   = new File(path);
+                    if (file.exists()) {
+                    
+                        marshaller.marshal(userData.getSOSCapabilities()[0], (OutputStream) new FileOutputStream(file));
+              
+                    } else {
+                        logger.severe("SOS capabilities file version 1.0.0 not found at :" + path + ". unable to load SOS Data");
+                    }
+                    
+                } else {
+                    // TODO afficher fichier non valide
+                    logger.severe("SOS capabilies file uncomplete (!=1)");               
+                }
+            }
+            
+        } catch (JAXBException ex) {
+            Logger.getLogger(ServicesBean.class.getName()).log(Level.SEVERE, null, ex);
+            //TODO afficher quelquechose si le fichier n'est pas valide
+        }
+    }
+    
+    private File storeData() throws JAXBException {
+        File f = new File(servletContext.getRealPath("WEB-INF/preference"));
+        JAXBContext JBcontext = JAXBContext.newInstance(UserData.class);
+        Marshaller marshaller = JBcontext.createMarshaller();
+        marshaller.marshal(userData, f);
+        return f;
+    }
+    
+    
     public String setWMSMode() throws JAXBException, FileNotFoundException {
 
         webServiceMode = "WMS";
@@ -853,31 +1027,21 @@ public class ServicesBean {
      * @return the content string of the uploaded file
      * @throws java.io.IOException
      */
-    public String processSubmitedFile() throws IOException {
-        String myResult  ="";
+    public File processSubmitedFile() throws IOException {
         upload();
-
+        File f = new File("temp");
         try {
-            if (uploadedFile.getName().endsWith(".xml")) {
-                InputStream inputStream = uploadedFile.getInputStream();
-                InputStreamReader infile = new InputStreamReader(inputStream);
-                BufferedReader inbuf = new BufferedReader(infile);
-                StringBuilder stringBuilder = new StringBuilder();
+           
+            InputStream inputStream = uploadedFile.getInputStream();
+            InputStreamReader infile = new InputStreamReader(inputStream);
+            BufferedReader inbuf = new BufferedReader(infile);
+            FileWriter writer = new FileWriter(f);
 
-                String line;
-                while ((line = inbuf.readLine()) != null) {
-                    stringBuilder.append(line);
-                    stringBuilder.append('\n');
-                }
-                
-                myResult = stringBuilder.toString();
+            String line;
+            while ((line = inbuf.readLine()) != null) {
+                writer.append(line);
+                writer.append('\n');
             }
-            else{
-                FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage("Make sure that the file is a text file with the extension .xml"));
-            }
-
-            return myResult;
             
         } catch (Exception x) {
             FacesMessage message = new FacesMessage(
@@ -887,6 +1051,7 @@ public class ServicesBean {
                     null, message);
             return null;
         }
+        return f;
     }
 
     /**
