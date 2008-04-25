@@ -28,7 +28,7 @@ import org.geotools.util.DateRange;
 /**
  * Adds to the {@link WritableGridCoverageEntry} some specifics parameters designed
  * for handling time specified in an NcML file.
- * 
+ *
  * @see net.seagis.coverage.catalog.WritableGridCoverageEntry
  * @source $URL$
  * @author Cédric Briançon

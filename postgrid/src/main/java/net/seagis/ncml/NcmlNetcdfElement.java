@@ -21,7 +21,7 @@ import java.net.URI;
 
 
 /**
- * Representation of the {@code <netcdf>} tags in a NcML file having an aggregation of type
+ * Representation of the {@code &lt;netcdf>} tag in a NcML file having an aggregation of type
  * {@code joinExisting}.
  *
  * @source $URL$
@@ -39,11 +39,10 @@ public class NcmlNetcdfElement {
     private final NcmlTimeValues timeValues;
 
     /**
-     * Constructs an object representation of the <netcdf location ="..."> tags.
+     * Constructs an object which represents the {@code &lt;netcdf location ="...">} tag.
      *
      * @param location The URI of the NetCDF file red from the NcML file.
-     * @param timeValue A representation of the <values> tags that has a name
-     *                  of value "time".
+     * @param timeValue A representation of the {@code &lt;values>} tag that has a name of value "time".
      */
     public NcmlNetcdfElement(final URI location, final NcmlTimeValues timeValue) {
         this.location = location;
@@ -58,7 +57,7 @@ public class NcmlNetcdfElement {
     }
 
     /**
-     * Returns the representation of the <values> tags, for which variable is "time".
+     * Returns the representation of the {@code &lt;values>} tag, for which variable is "time".
      */
     public NcmlTimeValues getTimeValues() {
         return timeValues;

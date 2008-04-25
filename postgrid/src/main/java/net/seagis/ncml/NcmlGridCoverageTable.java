@@ -27,7 +27,7 @@ import net.seagis.coverage.catalog.WritableGridCoverageTable;
 /**
  * Adds to the {@link WritableGridCoverageTable} some specifics parameters designed
  * for handling time specified in an NcML file.
- * 
+ *
  * @see net.seagis.coverage.catalog.WritableGridCoverageTable
  * @source $URL$
  * @author Cédric Briançon

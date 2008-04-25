@@ -37,14 +37,14 @@ import ucar.nc2.ncml.NcMLReader;
  */
 public class NcmlReading {
     /**
-     * The {@code namespace} for <netcdf> tags.
+     * The {@code namespace} for &lt;netcdf> tag.
      */
     public static final Namespace NETCDFNS = Namespace.getNamespace(
             "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
 
     /**
      * Returns a list of {@linkplain ucar.nc2.ncml.Aggregation Aggregation}, which should be a
-     * list of tags containing one or several <netcdf> tags. If these tags were not found, or
+     * list of tags containing one or several &lt;netcdf> tags. If these tags were not found, or
      * an error during the parsing of the NcML file has occured, it will returns {@code null}.
      */
     public static List<Aggregation> getNestedAggregations(final File ncml) throws IOException {
@@ -71,7 +71,7 @@ public class NcmlReading {
     }
 
     /**
-     * Returns a list of {@code JDOM} elements, matching with the whole children <netcdf>
+     * Returns a list of {@code JDOM} elements, matching with the whole children &lt;netcdf>
      * of the main aggregation.
      *
      * @param ncml The NcML file to read.
@@ -100,15 +100,15 @@ public class NcmlReading {
     }
 
     /**
-     * Returns the XML tags {@code <netcdf>} with its content for the NcML file specified.
-     * This tags has to contain the whole data of the NcML file dedicated to specified
+     * Returns the XML tag {@code &lt;netcdf>} with its content for the NcML file specified.
+     * This tag has to contain the whole data of the NcML file dedicated to specified
      * meta data for NetCDF files.
-     * An NcML file can contains several <netcdf> tags, this method will return the first
+     * An NcML file can contains several &lt;netcdf> tag, this method will return the first
      * occurrence.
      *
      * @param  ncml The NcML file to read.
-     * @return The XML node {@code <netcdf>}.
-     * @throws JDOMException if the getting of this tags has failed.
+     * @return The XML node {@code &lt;netcdf>}.
+     * @throws JDOMException if the getting of this tag has failed.
      * @throws IOException if the creation of this document has failed.
      */
     private static Element getGlobalNetcdfElement(final File ncml) throws IOException, JDOMException {
@@ -124,13 +124,16 @@ public class NcmlReading {
     }
 
     /**
+     * Returns the {@code &lt;variable>} tag, which is a child of a {@code &lt;netcdf>} tag in
+     * parameter, and has a variable name specified, or {@code null} if no tag matches.
      *
-     * @param variable
-     * @param netcdfTags
-     * @return
+     * @param variable The variable to check in the
+     * @param netcdfTag The parent {@code &lt;netcdf>} tag.
+     * @return {@code null} if no tag matches. Otherwise the {@code &lt;variable> tag} matching
+     *         with the variable's name specified.
      */
-    public static Element getVariableElement(final String variable, final Element netcdfTags) {
-        final Collection<Element> children = netcdfTags.getChildren("variable", NETCDFNS);
+    public static Element getVariableElement(final String variable, final Element netcdfTag) {
+        final Collection<Element> children = netcdfTag.getChildren("variable", NETCDFNS);
         for (final Element varNcml : children) {
             if (variable.startsWith(varNcml.getAttributeValue("name").toLowerCase())) {
                 return varNcml;

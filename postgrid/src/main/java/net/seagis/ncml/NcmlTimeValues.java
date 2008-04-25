@@ -19,8 +19,8 @@ package net.seagis.ncml;
 
 
 /**
- * Represents the {@code <value>} tags for the {@code time} variable red in a {@code <netcdf location="" ...>
- * tags. It contains a piece of information about the time series.
+ * Represents the {@code &lt;value>} tag for the {@code time} variable red in a
+ * {@code &lt;netcdf location="" ...> tag. It contains a piece of information about the time series.
  *
  * @source $URL$
  * @author Cédric Briançon
@@ -42,7 +42,7 @@ public class NcmlTimeValues {
     private final int npts;
 
     /**
-     * Represents the value tags in a {@code NcML} file.
+     * Represents the {@code &lt;value>} tag in a {@code NcML} file.
      *
      * @param startTime The starting time expressed in a long value since the origin defined in
      *                  the Netcdf file's header.

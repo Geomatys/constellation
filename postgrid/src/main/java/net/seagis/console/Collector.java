@@ -222,13 +222,15 @@ public class Collector extends CommandLine {
      */
     private void processNcML() throws CatalogException
     {
+        /*
+         * Ensures both {@code -ncmlpath} and {@code -variable} arguments have been specified
+         * by the user, in order to begin the process.
+         */
         if (ncmlPath == null) {
-            err.println("The argument -ncmlpath was not specified.");
-            System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
+            throw new IllegalArgumentException("The argument -ncmlpath was not specified.");
         }
         if (variable == null) {
-            err.println("The argument -variable was not specified.");
-            System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
+            throw new IllegalArgumentException("The argument -variable was not specified.");
         }
         final File ncml = new File(ncmlPath);
         if (!ncml.exists()) {
@@ -273,7 +275,8 @@ public class Collector extends CommandLine {
                         continue;
                     }
                     final URI location = new URI(netcdfWithLocationParam.getAttributeValue("location"));
-                    final Element timeElement = NcmlReading.getVariableElement("time", netcdfWithLocationParam);
+                    final Element timeElement = 
+                            NcmlReading.getVariableElement("time", netcdfWithLocationParam);
                     if (timeElement == null) {
                         addToLayer(layer, location, ncmlTable);
                         continue;
@@ -282,8 +285,10 @@ public class Collector extends CommandLine {
                     if (timeValues == null) {
                         continue;
                     }
-                    final long startTime = Math.round(Double.valueOf(timeValues.getAttributeValue("start")));
-                    final long increment = Math.round(Double.valueOf(timeValues.getAttributeValue("increment")));
+                    final long startTime = 
+                            Math.round(Double.valueOf(timeValues.getAttributeValue("start")));
+                    final long increment = 
+                            Math.round(Double.valueOf(timeValues.getAttributeValue("increment")));
                     final int npts = Integer.valueOf(timeValues.getAttributeValue("npts"));
                     final NcmlTimeValues ncmlValue = new NcmlTimeValues(startTime, increment, npts);
                     final NcmlNetcdfElement netcdfElement = new NcmlNetcdfElement(location, ncmlValue);
@@ -330,8 +335,9 @@ public class Collector extends CommandLine {
      * @throws SQLException If a SQL error occurs, other than a doublon.
      * @throws IOException
      */
-    private void addToLayer(final String layer, final URI location, final WritableGridCoverageTable table)
-            throws CatalogException, SQLException, IOException
+    private void addToLayer(final String layer, final URI location,
+                            final WritableGridCoverageTable table)
+                            throws CatalogException, SQLException, IOException
     {
         table.setLayer(layer);
         final NetcdfImageReader reader = addInputToReader(location.toString());
@@ -357,9 +363,9 @@ public class Collector extends CommandLine {
      * adding of this record in the database.
      *
      * @param layer The layer to consider.
-     * @param element An element that represents the current <netcdf> tags in the NcML file.
+     * @param element An element that represents the current {@code &lt;netcdf>} tags in the NcML file.
      * @param table The table in which the entry will be inserted.
-     * @param nextElement An element that represents the next <netcdf> tags in the NcML file.
+     * @param nextElement An element that represents the next {@code &lt;netcdf>} tags in the NcML file.
      * @throws CatalogException
      * @throws SQLException If a SQL error occurs, other than a doublon.
      * @throws IOException
