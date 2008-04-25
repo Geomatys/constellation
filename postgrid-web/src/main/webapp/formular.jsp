@@ -6,6 +6,7 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://myfaces.apache.org/tomahawk" prefix="t"%>
+<%@ taglib uri="http://myfaces.apache.org/sandbox" prefix="s"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -18,24 +19,44 @@
     </head>
     <body>
         <f:view>
-            <h:form id="form_1" enctype="multipart/form-data">
-                <div id="content" class="content">
-                    <!-- a panel for Service Identification Section -->
-                    
-                <h:panelGrid id="upload_panel" columns="2">
-                    <h:outputText id="upload_label" value="Upload XML file : " />
-                    <t:inputFileUpload id="fileupload"
-                                       accept="temp/*"
-                                       storage="file"
-                                       maxlength="200000"/>
             
-                    
-                    <t:commandLink styleClass="button" id="uploadButton" onclick="this.blur();" style="margin:20px;">
+                <div id="content" class="content">
+                    <h:form id="form_1" enctype="multipart/form-data">
+                    <%-- Upload panel --%>
+                    <h:panelGrid id="upload_panel" columns="2">
+                        <h:outputText id="upload_label" value="Upload XML file : " />
+                        <t:inputFileUpload id="fileupload"
+                                           accept="temp/*"
+                                           storage="memory"
+                                           maxlength="200000"
+                                           value="#{servicesBean.uploadedFile}"
+                                           immediate="true"
+                                           required="true">
+                            <f:valueChangeListener type="net.seagis.bean.UploadListener" />
+                        </t:inputFileUpload>
+                        
+                        <t:commandLink styleClass="button" id="uploadButton" onclick="this.blur();" style="margin:20px;" action="#{servicesBean.processSubmitedFile}">
                             <h:outputText id="labelUpload" value="Upload"/>
                         </t:commandLink>
                         <f:verbatim><br></f:verbatim>
+                        
+                        <s:pprPanelGroup id="statepanel" partialTriggerPattern="form_1:.*">
+                            <h:panelGrid id="fileinfos_panel" columns="2" border="0" cellspacing="5">
+                                
+                                <h:outputText value="FileName:"/>
+                                <h:outputText value="#{servicesBean.uploadedFile.name}"/>
+                                
+                                <h:outputText value="FileSize:"/>
+                                <h:outputText value="#{servicesBean.uploadedFile.size}"/>
+                                
+                            </h:panelGrid>
+                        </s:pprPanelGroup>
+                        
                     </h:panelGrid>
+                    </h:form>
                     
+                    <h:form id="form_2">
+                    <%-- formular panel --%>
                     <h:outputText  id="ServiceIdentificationLabel" value="Service Identification Section : " style="font-size:18px;"/>
                     <h:panelGrid id="ServiceIdentificationGrid" columns="2" cellpadding="2" cellspacing="0" width="100%" style="margin-top:20px;">
                         
@@ -165,8 +186,9 @@
                             <h:outputText id="label2" value="Back"/>
                         </t:commandLink>
                     </h:panelGrid>
+                    </h:form>
                 </div>
-            </h:form>
+                <iframe style="display: none;" src="" name="target_xml" id="target_xml"/>
         </f:view>
     </body>
 </html>

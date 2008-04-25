@@ -2,13 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package net.seagis.bean;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +60,7 @@ import net.seagis.wms.OnlineResource;
 import net.seagis.wms.Service;
 import net.seagis.wms.WMSCapabilities;
 import net.seagis.wms.WMT_MS_Capabilities;
+import org.apache.myfaces.custom.fileupload.UploadedFile;
 
 /**
  *
@@ -68,103 +72,82 @@ public class ServicesBean {
      * The service Identification title
      */
     private String title;
-    
     /**
      * The service Identification description
      */
     private String _abstract;
-
     /**
      * The  service Identification List of keywords 
      */
     private List<SelectItem> keywords;
-    
-     /**
+    /**
      * The service Identification type
      */
     private String serviceType;
-    
     /**
      * The  service Identification List of implemented versions. 
      */
     private List<SelectItem> versions;
-    
-     /**
+    /**
      * The service Identification fees
      */
     private String fees;
-    
     /**
      * The service Identification access constraints
      */
     private String accessConstraints;
-    
-    
     /**
      * The service Provider name
      */
     private String providerName;
-    
     /**
      * The service Provider site
      */
     private String providerSite;
-    
     /**
      * The service Provider Contact individual name
      */
     private String individualName;
-    
     /**
      * The service Provider Contact position name
      */
     private String positionName;
-    
     /**
      * The service Provider Contact phone number (voice)
      */
     private String phoneVoice;
-    
-     /**
+    /**
      * The service Provider Contact phone number (facsimile)
      */
     private String phoneFacsimile;
-    
-     /**
+    /**
      * The service Provider Contact delivery point.
      */
     private String deliveryPoint;
-    
-     /**
+    /**
      * The service Provider City
      */
     private String city;
-    
     /**
      * The service Provider administrative area
      */
     private String administrativeArea;
-    
-     /**
+    /**
      * The service Provider Postal Code
      */
     private String postalCode;
-    
-     /**
+    /**
      * The service Provider Country
      */
     private String country;
-    
-     /**
+    /**
      * The service Provider Electronic address
      */
     private String electronicAddress;
-    
-     /**
+    /**
      * The service Provider Role
      */
     private String role;
-    
     /**
      * Specifics term for WMS
      */
@@ -172,217 +155,231 @@ public class ServicesBean {
     private int layerLimit;
     private int maxWidth;
     private int maxHeight;
-        
     /**
      * The capabilities object to update.
      */
     private Object[] capabilities;
-    
     /**
      * The current capabilities file to update
      */
     private File[] capabilitiesFile;
-    
     /**
      * The marshaller to store the updates
      */
     private Marshaller marshaller;
-    
     /**
      * The a unmarshaller to read the bases capabilities files.
      */
     private Unmarshaller unmarshaller;
-    
     /**
      * A servlet context allowing to find the path to deployed file.
      */
     private ServletContext servletContext;
-    
     /**
      * This is an attribute that defines the current selected web service mode.
      * Default is WMS.
      */
     private String webServiceMode = "WMS";
-    
     /**
      * 
      * This is the available web services list for the selectOneListbox component.
      */
     private List webServices = new ArrayList();
-    
+    /**
+     * 
+     * The uploaded File.
+     */
+    private UploadedFile uploadedFile;
     /**
      * 
      */
     private Logger logger = Logger.getLogger("net.seagis.bean");
-    
+
     public ServicesBean() throws JAXBException, FileNotFoundException {
-        
+
         // we get the sevlet context to read the capabilities files in the deployed war
         FacesContext context = FacesContext.getCurrentInstance();
-        servletContext       = (ServletContext) context.getExternalContext().getContext();
-        
+        servletContext = (ServletContext) context.getExternalContext().getContext();
+
         //adding items into the webServices list.
-        addWebServices();      
-        
-        
+        addWebServices();
+
+
         //we create the JAXBContext and read the selected file 
         JAXBContext JBcontext = JAXBContext.newInstance(Capabilities.class, WMSCapabilities.class,
-                                                        WMT_MS_Capabilities.class, WCSCapabilitiesType.class,
-                                                        net.seagis.cat.csw.Capabilities.class);
-                                                        
-        unmarshaller          = JBcontext.createUnmarshaller();
-        marshaller            = JBcontext.createMarshaller();   
-        
-          
+                WMT_MS_Capabilities.class, WCSCapabilitiesType.class,
+                net.seagis.cat.csw.Capabilities.class);
+
+        unmarshaller = JBcontext.createUnmarshaller();
+        marshaller = JBcontext.createMarshaller();
+
+
     }
-    
+
     /**
      * fill The formular with OWS 1.1.0 Object
      */
     private void fillFormFromOWS110(CapabilitiesBaseType cap) {
-        
+
         //we fill the default value of Service Identification
-        ServiceIdentification SI = cap.getServiceIdentification(); 
-        if (SI.getTitle().size() > 0)
-            this.title           = SI.getTitle().get(0).getValue();
-        if (SI.getAbstract().size() > 0)
-            this._abstract       = SI.getAbstract().get(0).getValue();
-        if (SI.getKeywords().size() > 0)
-            this.keywords        = keywordsToSelectItem(SI.getKeywords().get(0));  
-        this.serviceType         = SI.getServiceType().getValue();
-        this.versions            = stringToSelectItem(SI.getServiceTypeVersion());
-        this.fees                = SI.getFees();
-        if (SI.getAccessConstraints().size() > 0)
-            this.accessConstraints    = SI.getAccessConstraints().get(0);
-        
+        ServiceIdentification SI = cap.getServiceIdentification();
+        if (SI.getTitle().size() > 0) {
+            this.title = SI.getTitle().get(0).getValue();
+        }
+        if (SI.getAbstract().size() > 0) {
+            this._abstract = SI.getAbstract().get(0).getValue();
+        }
+        if (SI.getKeywords().size() > 0) {
+            this.keywords = keywordsToSelectItem(SI.getKeywords().get(0));
+        }
+        this.serviceType = SI.getServiceType().getValue();
+        this.versions = stringToSelectItem(SI.getServiceTypeVersion());
+        this.fees = SI.getFees();
+        if (SI.getAccessConstraints().size() > 0) {
+            this.accessConstraints = SI.getAccessConstraints().get(0);
+        }
+
         //we fill the value of ServiceProvider
-        ServiceProvider SP       = cap.getServiceProvider();
+        ServiceProvider SP = cap.getServiceProvider();
         ResponsiblePartySubsetType SC = SP.getServiceContact();
-        ContactType CI           = SC.getContactInfo();
-        TelephoneType T          = CI.getPhone();
-        AddressType A            = CI.getAddress();
-        this.providerName        = SP.getProviderName();
-        this.providerSite        = SP.getProviderSite().getHref();
-        this.individualName      = SC.getIndividualName();
-        this.positionName        = SC.getPositionName();
-        
+        ContactType CI = SC.getContactInfo();
+        TelephoneType T = CI.getPhone();
+        AddressType A = CI.getAddress();
+        this.providerName = SP.getProviderName();
+        this.providerSite = SP.getProviderSite().getHref();
+        this.individualName = SC.getIndividualName();
+        this.positionName = SC.getPositionName();
+
         // Phone party
-        if (T.getVoice().size() > 0)
-            this.phoneVoice      = T.getVoice().get(0);
-        if (T.getFacsimile().size() > 0)
-            this.phoneFacsimile  = T.getFacsimile().get(0);
-        
-         //address party
-         if (A.getDeliveryPoint().size() > 0)
-            this.deliveryPoint   = A.getDeliveryPoint().get(0);
-         this.city                = A.getCity();
-         this.administrativeArea  = A.getAdministrativeArea();
-         this.postalCode          = A.getPostalCode();
-         this.country             = A.getCountry();
-         if (A.getElectronicMailAddress().size() > 0)
-            this.electronicAddress   = A.getElectronicMailAddress().get(0);
-         if (SC.getRole() != null)
-            this.role            = SC.getRole().getValue(); 
+        if (T.getVoice().size() > 0) {
+            this.phoneVoice = T.getVoice().get(0);
+        }
+        if (T.getFacsimile().size() > 0) {
+            this.phoneFacsimile = T.getFacsimile().get(0);
+        }
+
+        //address party
+        if (A.getDeliveryPoint().size() > 0) {
+            this.deliveryPoint = A.getDeliveryPoint().get(0);
+        }
+        this.city = A.getCity();
+        this.administrativeArea = A.getAdministrativeArea();
+        this.postalCode = A.getPostalCode();
+        this.country = A.getCountry();
+        if (A.getElectronicMailAddress().size() > 0) {
+            this.electronicAddress = A.getElectronicMailAddress().get(0);
+        }
+        if (SC.getRole() != null) {
+            this.role = SC.getRole().getValue();
+        }
     }
-    
-     /**
+
+    /**
      * fill The formular with OWS 1.0.0 Object
      */
     private void fillFormFromOWS100(net.seagis.ows.v100.CapabilitiesBaseType cap) {
-        
+
         //we fill the default value of Service Identification
-        net.seagis.ows.v100.ServiceIdentification SI = cap.getServiceIdentification(); 
-        this.title               = SI.getTitle();
-        this._abstract           = SI.getAbstract();
-        if (SI.getKeywords().size() > 0)
-            this.keywords        = keywordsToSelectItem(SI.getKeywords().get(0));  
-        
-        this.serviceType         = SI.getServiceType().getValue();
-        this.versions            = stringToSelectItem(SI.getServiceTypeVersion());
-        this.fees                = SI.getFees();
-        if (SI.getAccessConstraints().size() > 0)
-            this.accessConstraints    = SI.getAccessConstraints().get(0);
-        
+        net.seagis.ows.v100.ServiceIdentification SI = cap.getServiceIdentification();
+        this.title = SI.getTitle();
+        this._abstract = SI.getAbstract();
+        if (SI.getKeywords().size() > 0) {
+            this.keywords = keywordsToSelectItem(SI.getKeywords().get(0));
+        }
+
+        this.serviceType = SI.getServiceType().getValue();
+        this.versions = stringToSelectItem(SI.getServiceTypeVersion());
+        this.fees = SI.getFees();
+        if (SI.getAccessConstraints().size() > 0) {
+            this.accessConstraints = SI.getAccessConstraints().get(0);
+        }
+
         //we fill the value of ServiceProvider
-        net.seagis.ows.v100.ServiceProvider            SP = cap.getServiceProvider();
+        net.seagis.ows.v100.ServiceProvider SP = cap.getServiceProvider();
         net.seagis.ows.v100.ResponsiblePartySubsetType SC = SP.getServiceContact();
-        net.seagis.ows.v100.ContactType                CI = SC.getContactInfo();
-        net.seagis.ows.v100.TelephoneType              T  = CI.getPhone();
-        net.seagis.ows.v100.AddressType                A  = CI.getAddress();
-        this.providerName        = SP.getProviderName();
-        this.providerSite        = SP.getProviderSite().getHref();
-        this.individualName      = SC.getIndividualName();
-        this.positionName        = SC.getPositionName();
-        
+        net.seagis.ows.v100.ContactType CI = SC.getContactInfo();
+        net.seagis.ows.v100.TelephoneType T = CI.getPhone();
+        net.seagis.ows.v100.AddressType A = CI.getAddress();
+        this.providerName = SP.getProviderName();
+        this.providerSite = SP.getProviderSite().getHref();
+        this.individualName = SC.getIndividualName();
+        this.positionName = SC.getPositionName();
+
         // Phone party
-        if (T.getVoice().size() > 0)
-            this.phoneVoice      = T.getVoice().get(0);
-        if (T.getFacsimile().size() > 0)
-            this.phoneFacsimile  = T.getFacsimile().get(0);
-        
-         //address party
-         if (A.getDeliveryPoint().size() > 0)
-            this.deliveryPoint   = A.getDeliveryPoint().get(0);
-         this.city                = A.getCity();
-         this.administrativeArea  = A.getAdministrativeArea();
-         this.postalCode          = A.getPostalCode();
-         this.country             = A.getCountry();
-         if (A.getElectronicMailAddress().size() > 0)
-            this.electronicAddress   = A.getElectronicMailAddress().get(0);
-         if (SC.getRole() != null)
-            this.role            = SC.getRole().getValue(); 
+        if (T.getVoice().size() > 0) {
+            this.phoneVoice = T.getVoice().get(0);
+        }
+        if (T.getFacsimile().size() > 0) {
+            this.phoneFacsimile = T.getFacsimile().get(0);
+        }
+
+        //address party
+        if (A.getDeliveryPoint().size() > 0) {
+            this.deliveryPoint = A.getDeliveryPoint().get(0);
+        }
+        this.city = A.getCity();
+        this.administrativeArea = A.getAdministrativeArea();
+        this.postalCode = A.getPostalCode();
+        this.country = A.getCountry();
+        if (A.getElectronicMailAddress().size() > 0) {
+            this.electronicAddress = A.getElectronicMailAddress().get(0);
+        }
+        if (SC.getRole() != null) {
+            this.role = SC.getRole().getValue();
+        }
     }
-    
+
     /**
      * fill The formular with WMS 1.3.0 Object
      */
     private void fillFormFromWMS(WMSCapabilities cap) {
-        
+
         //we fill the default value of Service Identification
-        Service S         = cap.getService();
-        this.title        = S.getTitle();
-        this._abstract    = S.getAbstract();
+        Service S = cap.getService();
+        this.title = S.getTitle();
+        this._abstract = S.getAbstract();
         KeywordList klist = S.getKeywordList();
-        if (klist != null)
-            this.keywords        = keywordsToSelectItem(klist);
-        
-        this.versions            = new ArrayList<SelectItem>();
+        if (klist != null) {
+            this.keywords = keywordsToSelectItem(klist);
+        }
+
+        this.versions = new ArrayList<SelectItem>();
         this.versions.add(new SelectItem("1.3.0"));
         this.versions.add(new SelectItem("1.1.1"));
-        
-        this.fees                = S.getFees();
-        this.accessConstraints   = S.getAccessConstraints();
-        
+
+        this.fees = S.getFees();
+        this.accessConstraints = S.getAccessConstraints();
+
         //we fill the value of ServiceProvider
-        ContactInformation    CI = S.getContactInformation();
-        ContactAddress        A  = CI.getContactAddress();
+        ContactInformation CI = S.getContactInformation();
+        ContactAddress A = CI.getContactAddress();
         ContactPersonPrimary CPP = CI.getContactPersonPrimary();
-        this.providerName        = CPP.getContactOrganization();
-        this.providerSite        = S.getOnlineResource().getHref();
-        this.individualName      = CPP.getContactPerson();
-        this.positionName        = CI.getContactPosition();
-        
+        this.providerName = CPP.getContactOrganization();
+        this.providerSite = S.getOnlineResource().getHref();
+        this.individualName = CPP.getContactPerson();
+        this.positionName = CI.getContactPosition();
+
         // Phone party
-        this.phoneVoice          = CI.getContactVoiceTelephone();
-        this.phoneFacsimile      = CI.getContactFacsimileTelephone();
-        
-         //address party
-         this.deliveryPoint       = A.getAddress();
-         this.city                = A.getCity();
-         this.administrativeArea  = A.getStateOrProvince();
-         this.postalCode          = A.getPostCode();
-         this.country             = A.getCountry();
-         this.electronicAddress   = CI.getContactElectronicMailAddress();
-         
-         /*
-          * The extras attribute for WMS 
-          */
-         this.addressType         = A.getAddressType();
-         this.layerLimit          = S.getLayerLimit();
-         this.maxHeight           = S.getMaxHeight();
-         this.maxWidth            = S.getMaxWidth();
+        this.phoneVoice = CI.getContactVoiceTelephone();
+        this.phoneFacsimile = CI.getContactFacsimileTelephone();
+
+        //address party
+        this.deliveryPoint = A.getAddress();
+        this.city = A.getCity();
+        this.administrativeArea = A.getStateOrProvince();
+        this.postalCode = A.getPostCode();
+        this.country = A.getCountry();
+        this.electronicAddress = CI.getContactElectronicMailAddress();
+
+        /*
+         * The extras attribute for WMS 
+         */
+        this.addressType = A.getAddressType();
+        this.layerLimit = S.getLayerLimit();
+        this.maxHeight = S.getMaxHeight();
+        this.maxWidth = S.getMaxWidth();
     }
-    
+
     /**
      * Transform a list of languageString in a Keyword Object into a list of SelectItem.
      * 
@@ -391,14 +388,14 @@ public class ServicesBean {
      */
     private List<SelectItem> keywordsToSelectItem(KeywordsType keywords) {
         List<SelectItem> results = new ArrayList<SelectItem>();
-        
-        for (LanguageStringType keyword:keywords.getKeyword()) {
+
+        for (LanguageStringType keyword : keywords.getKeyword()) {
             results.add(new SelectItem(keyword.getValue()));
         }
-        
+
         return results;
     }
-    
+
     /**
      * Transform a list of String in a Keyword Object into a list of SelectItem.
      * 
@@ -407,14 +404,14 @@ public class ServicesBean {
      */
     private List<SelectItem> keywordsToSelectItem(net.seagis.ows.v100.KeywordsType keywords) {
         List<SelectItem> results = new ArrayList<SelectItem>();
-        
-        for (String keyword:keywords.getKeyword()) {
+
+        for (String keyword : keywords.getKeyword()) {
             results.add(new SelectItem(keyword));
         }
-        
+
         return results;
     }
-    
+
     /**
      * Transform a list of String in a Keyword Object into a list of SelectItem.
      * 
@@ -423,14 +420,14 @@ public class ServicesBean {
      */
     private List<SelectItem> keywordsToSelectItem(KeywordList keywords) {
         List<SelectItem> results = new ArrayList<SelectItem>();
-        
-        for (Keyword keyword:keywords.getKeyword()) {
+
+        for (Keyword keyword : keywords.getKeyword()) {
             results.add(new SelectItem(keyword.getValue()));
         }
-        
+
         return results;
     }
-    
+
     /**
      * Transform a list of string into a list of SelectItem
      * @param list
@@ -438,226 +435,224 @@ public class ServicesBean {
      */
     private List<SelectItem> stringToSelectItem(List<String> list) {
         List<SelectItem> results = new ArrayList<SelectItem>();
-        
-        for (String item:list) {
+
+        for (String item : list) {
             results.add(new SelectItem(item));
         }
-        
+
         return results;
     }
-    
+
     /**
      * Store the formular int he XML file
      */
     public void storeForm() throws JAXBException {
-        
-        for (Object capa: capabilities) {
-            
+
+        for (Object capa : capabilities) {
+
             //for OWS 1.1.0
             if (capa instanceof net.seagis.ows.v110.CapabilitiesBaseType) {
                 ServiceIdentification SI = getServiceIdentification110();
-                ServiceProvider       SP = getServiceProvider110();
-                ((CapabilitiesBaseType)capa).setServiceProvider(SP);
-                ((CapabilitiesBaseType)capa).setServiceIdentification(SI);
-        
+                ServiceProvider SP = getServiceProvider110();
+                ((CapabilitiesBaseType) capa).setServiceProvider(SP);
+                ((CapabilitiesBaseType) capa).setServiceIdentification(SI);
+
             // for OWS 1.0.0
             } else if (capa instanceof net.seagis.ows.v100.CapabilitiesBaseType) {
                 net.seagis.ows.v100.ServiceIdentification SI = getServiceIdentification100();
-                net.seagis.ows.v100.ServiceProvider       SP = getServiceProvider100();
-                ((net.seagis.ows.v100.CapabilitiesBaseType)capa).setServiceProvider(SP);
-                ((net.seagis.ows.v100.CapabilitiesBaseType)capa).setServiceIdentification(SI);
-            
-                    
+                net.seagis.ows.v100.ServiceProvider SP = getServiceProvider100();
+                ((net.seagis.ows.v100.CapabilitiesBaseType) capa).setServiceProvider(SP);
+                ((net.seagis.ows.v100.CapabilitiesBaseType) capa).setServiceIdentification(SI);
+
+
             // for WCS 1.0.0
             } else if (capa instanceof WCSCapabilitiesType) {
                 ServiceType S = getWCSService();
-                ((WCSCapabilitiesType)capa).setService(S);
-        
+                ((WCSCapabilitiesType) capa).setService(S);
+
             // for WMS 1.3.0/1.1.1
             } else if (capa instanceof WMSCapabilities) {
                 Service S = getWMSService();
-                ((WMSCapabilities)capa).setService(S);
+                ((WMSCapabilities) capa).setService(S);
             }
-        
+
         }
         storeCapabilitiesFile();
-            
+
     }
-    
+
     /**
      * Build the Service Identification object of an OWS 1.1 service.
      */
-    public ServiceIdentification getServiceIdentification110()  {
-        
+    public ServiceIdentification getServiceIdentification110() {
+
         List<LanguageStringType> listKey = new ArrayList<LanguageStringType>();
-        for (SelectItem k: keywords) {
-            listKey.add(new LanguageStringType((String)k.getValue()));  
+        for (SelectItem k : keywords) {
+            listKey.add(new LanguageStringType((String) k.getValue()));
         }
-        
+
         List<String> listVers = new ArrayList<String>();
-        for (SelectItem v: versions) {
-            listVers.add((String)v.getValue());  
+        for (SelectItem v : versions) {
+            listVers.add((String) v.getValue());
         }
 
         ServiceIdentification SI = new ServiceIdentification(new LanguageStringType(title),
-                                                             new LanguageStringType(_abstract),
-                                                             new KeywordsType(listKey, null),
-                                                             new CodeType(serviceType),
-                                                             listVers,
-                                                             fees,
-                                                             accessConstraints);
+                new LanguageStringType(_abstract),
+                new KeywordsType(listKey, null),
+                new CodeType(serviceType),
+                listVers,
+                fees,
+                accessConstraints);
         return SI;
     }
-    
-     /**
+
+    /**
      * Build the Service Identification object of an OWS 1.0 service.
      */
-    public net.seagis.ows.v100.ServiceIdentification getServiceIdentification100()  {
-        
+    public net.seagis.ows.v100.ServiceIdentification getServiceIdentification100() {
+
         List<String> listKey = new ArrayList<String>();
-        for (SelectItem k: keywords) {
-            listKey.add((String)k.getValue());  
-        }
-        
-        List<String> listVers = new ArrayList<String>();
-        for (SelectItem v: versions) {
-            listVers.add((String)v.getValue());  
+        for (SelectItem k : keywords) {
+            listKey.add((String) k.getValue());
         }
 
-        net.seagis.ows.v100.ServiceIdentification SI 
-                = new net.seagis.ows.v100.ServiceIdentification(title,
-                                                                _abstract,
-                                                                new net.seagis.ows.v100.KeywordsType(listKey, null),
-                                                                new net.seagis.ows.v100.CodeType(serviceType),
-                                                                listVers,
-                                                                fees,
-                                                                accessConstraints);
+        List<String> listVers = new ArrayList<String>();
+        for (SelectItem v : versions) {
+            listVers.add((String) v.getValue());
+        }
+
+        net.seagis.ows.v100.ServiceIdentification SI = new net.seagis.ows.v100.ServiceIdentification(title,
+                _abstract,
+                new net.seagis.ows.v100.KeywordsType(listKey, null),
+                new net.seagis.ows.v100.CodeType(serviceType),
+                listVers,
+                fees,
+                accessConstraints);
         return SI;
     }
-    
+
     /**
      * Build a service object for a  WCS 1.0.0 service.
      */
     private ServiceType getWCSService() {
-        
-         List<MetadataLinkType> links = new ArrayList<MetadataLinkType>();
-         links.add(new MetadataLinkType(providerSite));            
-           
-         List<String> listKey = new ArrayList<String>();
-         for (SelectItem k: keywords) {
-            listKey.add((String)k.getValue());  
-         }
-         
-         net.seagis.wcs.v100.TelephoneType tel = new net.seagis.wcs.v100.TelephoneType(phoneVoice, phoneFacsimile);
-         
-         net.seagis.wcs.v100.AddressType adr = new net.seagis.wcs.v100.AddressType(deliveryPoint,
-                                          city,
-                                          administrativeArea,
-                                          postalCode,
-                                          country,
-                                          electronicAddress);
-         
-         net.seagis.wcs.v100.ContactType CI = new net.seagis.wcs.v100.ContactType(tel, adr, null);
-         
-         ResponsiblePartyType resp = new ResponsiblePartyType(individualName,
-                                                              positionName,
-                                                              providerName,
-                                                              CI);
-         
-         ServiceType service = new ServiceType(links,
-                                               title,
-                                               title,
-                                               _abstract,
-                                               new Keywords(listKey),
-                                               resp,
-                                               new CodeListType(fees),
-                                               new CodeListType(accessConstraints),
-                                               null);
-         return service;
+
+        List<MetadataLinkType> links = new ArrayList<MetadataLinkType>();
+        links.add(new MetadataLinkType(providerSite));
+
+        List<String> listKey = new ArrayList<String>();
+        for (SelectItem k : keywords) {
+            listKey.add((String) k.getValue());
+        }
+
+        net.seagis.wcs.v100.TelephoneType tel = new net.seagis.wcs.v100.TelephoneType(phoneVoice, phoneFacsimile);
+
+        net.seagis.wcs.v100.AddressType adr = new net.seagis.wcs.v100.AddressType(deliveryPoint,
+                city,
+                administrativeArea,
+                postalCode,
+                country,
+                electronicAddress);
+
+        net.seagis.wcs.v100.ContactType CI = new net.seagis.wcs.v100.ContactType(tel, adr, null);
+
+        ResponsiblePartyType resp = new ResponsiblePartyType(individualName,
+                positionName,
+                providerName,
+                CI);
+
+        ServiceType service = new ServiceType(links,
+                title,
+                title,
+                _abstract,
+                new Keywords(listKey),
+                resp,
+                new CodeListType(fees),
+                new CodeListType(accessConstraints),
+                null);
+        return service;
     }
-    
+
     /**
      * Build a service object for a  WMS 1.3.0/1.1.1 Service.
      */
     private Service getWMSService() {
-        
+
         List<Keyword> listKey = new ArrayList<Keyword>();
-        for (SelectItem k: keywords) {
-            listKey.add(new Keyword((String)k.getValue()));  
+        for (SelectItem k : keywords) {
+            listKey.add(new Keyword((String) k.getValue()));
         }
-        KeywordList keywordList  = new KeywordList(listKey);
+        KeywordList keywordList = new KeywordList(listKey);
         ContactPersonPrimary CPP = new ContactPersonPrimary(individualName, providerName);
-        ContactAddress       CA  = new  ContactAddress(getAddressType(),deliveryPoint, city, administrativeArea,
-                                                       postalCode, country); 
-        
-        ContactInformation CI = new ContactInformation( CPP, positionName,
-                                                        CA,  phoneVoice,  phoneFacsimile, electronicAddress);
-        
+        ContactAddress CA = new ContactAddress(getAddressType(), deliveryPoint, city, administrativeArea,
+                postalCode, country);
+
+        ContactInformation CI = new ContactInformation(CPP, positionName,
+                CA, phoneVoice, phoneFacsimile, electronicAddress);
+
         Service service = new Service(title, title, _abstract,
-                                      keywordList, 
-                                      new OnlineResource(providerSite), 
-                                      CI, fees, accessConstraints,getLayerLimit(),
-                                      getMaxWidth(),getMaxHeight());
+                keywordList,
+                new OnlineResource(providerSite),
+                CI, fees, accessConstraints, getLayerLimit(),
+                getMaxWidth(), getMaxHeight());
         return service;
     }
-    
+
     /**
      * Build the Service Provider object of an OWS 1.1 service.
      */
-    public ServiceProvider getServiceProvider110()  {
-        
-        AddressType adr = new AddressType(deliveryPoint,
-                                          city,
-                                          administrativeArea,
-                                          postalCode,
-                                          country,
-                                         electronicAddress);
-        
-        ContactType CI = new ContactType( new TelephoneType(phoneVoice, phoneFacsimile),
-                                          adr,
-                                          null, null, null);
-        
-        ResponsiblePartySubsetType SC = new ResponsiblePartySubsetType(individualName,
-                                                                       positionName,
-                                                                       CI,
-                                                                       new CodeType(role));
+    public ServiceProvider getServiceProvider110() {
 
-         ServiceProvider SP = new ServiceProvider(providerName,
-                                                  new OnlineResourceType(providerSite),
-                                                  SC);
+        AddressType adr = new AddressType(deliveryPoint,
+                city,
+                administrativeArea,
+                postalCode,
+                country,
+                electronicAddress);
+
+        ContactType CI = new ContactType(new TelephoneType(phoneVoice, phoneFacsimile),
+                adr,
+                null, null, null);
+
+        ResponsiblePartySubsetType SC = new ResponsiblePartySubsetType(individualName,
+                positionName,
+                CI,
+                new CodeType(role));
+
+        ServiceProvider SP = new ServiceProvider(providerName,
+                new OnlineResourceType(providerSite),
+                SC);
         return SP;
     }
-    
+
     /**
      * Build the Service Provider object of an OWS 1.0 service.
      */
-    public net.seagis.ows.v100.ServiceProvider getServiceProvider100()  {
-        
-        net.seagis.ows.v100.AddressType adr = new net.seagis.ows.v100.AddressType(deliveryPoint,
-                                          city,
-                                          administrativeArea,
-                                          postalCode,
-                                          country,
-                                          electronicAddress);
-        
-        net.seagis.ows.v100.ContactType CI 
-                = new net.seagis.ows.v100.ContactType( new net.seagis.ows.v100.TelephoneType(phoneVoice, phoneFacsimile),
-                                                       adr,
-                                                       null, null, null);
-        
-        net.seagis.ows.v100.ResponsiblePartySubsetType SC = new net.seagis.ows.v100.ResponsiblePartySubsetType(
-                                                                       individualName,
-                                                                       positionName,
-                                                                       CI,
-                                                                       new net.seagis.ows.v100.CodeType(role));
+    public net.seagis.ows.v100.ServiceProvider getServiceProvider100() {
 
-         net.seagis.ows.v100.ServiceProvider SP = new net.seagis.ows.v100.ServiceProvider(
-                                                    providerName,
-                                                    new net.seagis.ows.v100.OnlineResourceType(providerSite),
-                                                    SC);
+        net.seagis.ows.v100.AddressType adr = new net.seagis.ows.v100.AddressType(deliveryPoint,
+                city,
+                administrativeArea,
+                postalCode,
+                country,
+                electronicAddress);
+
+        net.seagis.ows.v100.ContactType CI = new net.seagis.ows.v100.ContactType(new net.seagis.ows.v100.TelephoneType(phoneVoice, phoneFacsimile),
+                adr,
+                null, null, null);
+
+        net.seagis.ows.v100.ResponsiblePartySubsetType SC = new net.seagis.ows.v100.ResponsiblePartySubsetType(
+                individualName,
+                positionName,
+                CI,
+                new net.seagis.ows.v100.CodeType(role));
+
+        net.seagis.ows.v100.ServiceProvider SP = new net.seagis.ows.v100.ServiceProvider(
+                providerName,
+                new net.seagis.ows.v100.OnlineResourceType(providerSite),
+                SC);
         return SP;
     }
-    
+
     private void storeCapabilitiesFile() throws JAXBException {
         try {
             int i = 0;
@@ -669,115 +664,115 @@ public class ServicesBean {
             Logger.getLogger(ServicesBean.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public String setWMSMode() throws JAXBException, FileNotFoundException {
-        
+
         webServiceMode = "WMS";
-        capabilities     = new Object[2];
+        capabilities = new Object[2];
         capabilitiesFile = new File[2];
-        
+
         //we begin to read the high lvl document
-        String path          = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
-        capabilitiesFile[0]  = new File(path);
+        String path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
+        capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-                    
-            capabilities[0] =  unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
-            fillFormFromWMS((WMSCapabilities)capabilities[0]);
-              
+
+            capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
+            fillFormFromWMS((WMSCapabilities) capabilities[0]);
+
         } else {
             logger.severe("WMS capabilities file version 1.3.0 not found at :" + path);
         }
-        
+
         // the we add to the list of object to update the other sub version
-        path                 = servletContext.getRealPath("WEB-INF/WMSCapabilities1.1.1.xml");
-        capabilitiesFile[1]  = new File(path);
+        path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.1.1.xml");
+        capabilitiesFile[1] = new File(path);
         if (capabilitiesFile[1].exists()) {
-                    
-            capabilities[1] =  unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
-              
+
+            capabilities[1] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
+
         } else {
             logger.severe("WMS capabilities file version 1.1.1 not found at :" + path);
         }
-        
+
         return "fillForm";
-        
+
     }
-    
+
     public String setWCSMode() throws FileNotFoundException, JAXBException {
-        
+
         webServiceMode = "WCS";
-        capabilities     = new Object[2];
+        capabilities = new Object[2];
         capabilitiesFile = new File[2];
-        
+
         //we begin to read the high lvl document
-        String path          = servletContext.getRealPath("WEB-INF/WCSCapabilities1.1.1.xml");
-        capabilitiesFile[0]  = new File(path);
+        String path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.1.1.xml");
+        capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-                    
-            capabilities[0] =  unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
-            fillFormFromOWS110((Capabilities)capabilities[0]);
-              
+
+            capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
+            fillFormFromOWS110((Capabilities) capabilities[0]);
+
         } else {
             logger.severe("WCS capabilities file version 1.1.1 not found at :" + path);
         }
-        
+
         // the we add to the list of object to update the other sub version
-        path                 = servletContext.getRealPath("WEB-INF/WCSCapabilities1.0.0.xml");
-        capabilitiesFile[1]  = new File(path);
+        path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.0.0.xml");
+        capabilitiesFile[1] = new File(path);
         if (capabilitiesFile[1].exists()) {
-                    
-            capabilities[1] =  unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
-              
+
+            capabilities[1] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
+
         } else {
             logger.severe("WCS capabilities file version 1.0.0 not found at :" + path);
         }
-        
+
         return "fillForm";
-        
+
     }
-    
+
     public String setSOSMode() throws FileNotFoundException, JAXBException {
-        
+
         webServiceMode = "SOS";
-        capabilities     = new Object[1];
+        capabilities = new Object[1];
         capabilitiesFile = new File[1];
-        
+
         //we begin to read the high lvl document
-        String path          = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
-        capabilitiesFile[0]     = new File(path);
+        String path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
+        capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-                    
-            capabilities[0] =  unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
-            fillFormFromOWS110((CapabilitiesBaseType)capabilities[0]);
-              
+
+            capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
+            fillFormFromOWS110((CapabilitiesBaseType) capabilities[0]);
+
         } else {
             logger.severe("SOS capabilities file version 1.0.0 not found at :" + path);
         }
-        
+
         return "fillForm";
     }
-    
+
     public String setCSWMode() throws FileNotFoundException, JAXBException {
-        
+
         webServiceMode = "CSW";
-        capabilities     = new Object[1];
+        capabilities = new Object[1];
         capabilitiesFile = new File[1];
-        
+
         //we begin to read the high lvl document
-        String path          = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
-        capabilitiesFile[0]     = new File(path);
+        String path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
+        capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-                    
-            capabilities[0] =  unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
-            fillFormFromOWS100((net.seagis.ows.v100.CapabilitiesBaseType)capabilities[0]);
-              
+
+            capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
+            fillFormFromOWS100((net.seagis.ows.v100.CapabilitiesBaseType) capabilities[0]);
+
         } else {
             logger.severe("CSW capabilities file version 2.0.2 not found at :" + path);
         }
-        
-        return "fillForm"; 
+
+        return "fillForm";
     }
-    
+
     /**
      * this method switch to the appropriate mode and returns the outcome string to proceed the jsf navigation.
      * @return
@@ -785,21 +780,18 @@ public class ServicesBean {
      * @throws javax.xml.bind.JAXBException
      */
     public String switchMode() throws FileNotFoundException, JAXBException {
-        if (webServiceMode.equals("WMS")){
+        if (webServiceMode.equals("WMS")) {
             setWMSMode();
-        }
-        else if (webServiceMode.equals("WCS")){
+        } else if (webServiceMode.equals("WCS")) {
             setWCSMode();
-        }
-        else if (webServiceMode.equals("SOS")){
+        } else if (webServiceMode.equals("SOS")) {
             setSOSMode();
-        }
-        else if (webServiceMode.equals("CSW")){
+        } else if (webServiceMode.equals("CSW")) {
             setCSWMode();
         }
         return "fillForm";
     }
-    
+
     /**
      * 
      * This method proceed to validate phase for the selectOneListbox component.
@@ -808,55 +800,120 @@ public class ServicesBean {
      * @param value
      * @throws ValidatorException
      */
-    public void validateWebService(FacesContext context, UIComponent component, Object value) throws ValidatorException
-    {
-        if (! (value instanceof String))
-        {
+    public void validateWebService(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+        if (!(value instanceof String)) {
             throw new ValidatorException(new FacesMessage("A Validation error was found ! the selected item in selectOneListbox is not a string !!"));
         }
     }
-    
-    public void addWebServices(){
-        if (existsCapabilities("CSW")) 
+
+    /**
+     * this method adds the available web services into the jsf component.
+     */
+    public void addWebServices() {
+        if (existsCapabilities("CSW")) {
             webServices.add(new SelectItem("CSW", "CSW metadata", null));
-        if (existsCapabilities("SOS"))
-        webServices.add(new SelectItem("SOS", "SOS metadata", null));
-        if (existsCapabilities("WCS"))
-        webServices.add(new SelectItem("WCS", "WCS metadata", null));
-        if (existsCapabilities("WMS"))
-        webServices.add(new SelectItem("WMS", "WMS metadata", null)); 
+        }
+        if (existsCapabilities("SOS")) {
+            webServices.add(new SelectItem("SOS", "SOS metadata", null));
+        }
+        if (existsCapabilities("WCS")) {
+            webServices.add(new SelectItem("WCS", "WCS metadata", null));
+        }
+        if (existsCapabilities("WMS")) {
+            webServices.add(new SelectItem("WMS", "WMS metadata", null));
+        }
     }
-    
-    public boolean existsCapabilities(String ws){
+
+    public boolean existsCapabilities(String ws) {
         boolean exist = false;
         File file;
         String path;
-        if (ws.equals("CSW")){
+        if (ws.equals("CSW")) {
             path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
             file = new File(path);
             exist = file.exists();
-        }
-        else if (ws.equals("SOS")){
+        } else if (ws.equals("SOS")) {
             path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
             file = new File(path);
             exist = file.exists();
-        } else if (ws.equals("WCS")){
+        } else if (ws.equals("WCS")) {
             path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.0.0.xml");
             file = new File(path);
             exist = file.exists();
-        } else if (ws.equals("WMS")){
+        } else if (ws.equals("WMS")) {
             path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
             file = new File(path);
             exist = file.exists();
         }
         return exist;
     }
-    
+
+    /**
+     * This method proceed to upload and get informations about the uploaded file.
+     * @return the content string of the uploaded file
+     * @throws java.io.IOException
+     */
+    public String processSubmitedFile() throws IOException {
+        String myResult  ="";
+        upload();
+
+        try {
+            if (uploadedFile.getName().endsWith(".xml")) {
+                InputStream inputStream = uploadedFile.getInputStream();
+                InputStreamReader infile = new InputStreamReader(inputStream);
+                BufferedReader inbuf = new BufferedReader(infile);
+                StringBuilder stringBuilder = new StringBuilder();
+
+                String line;
+                while ((line = inbuf.readLine()) != null) {
+                    stringBuilder.append(line);
+                    stringBuilder.append('\n');
+                }
+                
+                myResult = stringBuilder.toString();
+            }
+            else{
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage("Make sure that the file is a text file with the extension .xml"));
+            }
+
+            return myResult;
+            
+        } catch (Exception x) {
+            FacesMessage message = new FacesMessage(
+                    FacesMessage.SEVERITY_FATAL,
+                    x.getClass().getName(), x.getMessage());
+            FacesContext.getCurrentInstance().addMessage(
+                    null, message);
+            return null;
+        }
+    }
+
+    /**
+     * this method put in the application map some parameters.
+     * @throws java.io.IOException
+     */
+    public void upload() throws IOException {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.getExternalContext().getApplicationMap().put("fileupload_bytes", uploadedFile.getBytes());
+        facesContext.getExternalContext().getApplicationMap().put("fileupload_type", uploadedFile.getContentType());
+        facesContext.getExternalContext().getApplicationMap().put("fileupload_name", uploadedFile.getName());
+    }
+
+    /**
+     * this method return a flag that indicates if a file was upladed.
+     * 
+     * @return boolean
+     */
+    public boolean isUploaded() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        return facesContext.getExternalContext().getApplicationMap().get("fileupload_bytes") != null;
+    }
+
     public String goBack() {
         return "goBack";
     }
-            
-    
+
     public String getTitle() {
         return title;
     }
@@ -1070,5 +1127,12 @@ public class ServicesBean {
     public void setWebServices(List webServices) {
         this.webServices = webServices;
     }
-    
+
+    public UploadedFile getUploadedFile() {
+        return uploadedFile;
+    }
+
+    public void setUploadedFile(UploadedFile uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
 }
