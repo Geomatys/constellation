@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,7 +54,7 @@ public class Collector extends CommandLine {
     /**
      * Database connection.
      */
-    private Database database;
+    protected Database database;
 
     /**
      * The table where to write new records.
@@ -112,8 +111,8 @@ public class Collector extends CommandLine {
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="The type of process to launch.", mandatory=true)
-    protected String type;
+    @Option(description="The type of process to launch.")
+    private String type;
 
     /**
      * Creates a new collector which will adds entries in the specified database.
@@ -126,72 +125,57 @@ public class Collector extends CommandLine {
     }
 
     /**
-     * Returns a set of possible choices for the process to launch.
-     */
-    protected Set<String> getValidTypes() {
-        Set<String> set = new HashSet<String>();
-        set.add("ncml");
-        set.add("opendap");
-        return set;
-    }
-
-    /**
+     * Connects to the given database and invokes {@link #process(String)} for the
+     * type given on the command line.
      *
      * @param database The database connection, or {@code null} for the default.
      * @throws CatalogException if the connection failed
      */
-    public void run(final Database database) throws CatalogException, SQLException {
-        connect(database);
-        this.database.setReadOnly(false);
-        if (!getValidTypes().contains(type.toLowerCase())) {
-            throw new IllegalArgumentException("Le type de moissonnage spécifié n'est pas" +
-                    " connu : " + type);
-        }
-        if (type.toLowerCase().equals("ncml")) {
-            processNcML();
-        } else {
-            process();
-        }
-        close();
-    }
-
-    /**
-     * Creates a new collector which will adds entries in the specified database.
-     *
-     * @param database The database connection, or {@code null} for the default.
-     * @throws CatalogException if the connection failed.
-     */
-    protected void connect(Database database) throws CatalogException {
+    public void run(Database database) throws CatalogException {
         if (database == null) try {
             database = new Database();
         } catch (IOException e) {
             throw new CatalogException(e);
         }
+        try {
+            database.setReadOnly(false);
+        } catch (SQLException e) {
+            throw new CatalogException(e);
+        }
         database.setUpdateSimulator(pretend ? out : null);
-        this.database = database;
+        this.database = database; // Set only after success.
         table = new WritableGridCoverageTable(database.getTable(WritableGridCoverageTable.class));
+        if (!process(type)) {
+            close();
+            throw new IllegalArgumentException("Le type de moissonnage spécifié n'est pas connu : " + type);
+        }
+        close();
     }
 
     /**
-     * Returns the database connection.
-     */
-    public Database getDatabase() {
-        return database;
-    }
-
-    /**
-     * Returns the layer name.
-     */
-    public String getLayer() {
-        return layer;
-    }
-
-    /**
-     * Proceed to the insertion of new records for the specified layer.
+     * If this method knows the given type, executes the process for this type and
+     * returns {@code true}. Otherwise returns {@code false}.
      *
-     * @throws CatalogException If insertion failed.
+     * @throws CatalogException
      */
-    private void process() throws CatalogException {
+    protected boolean process(final String type) throws CatalogException {
+        if (type == null) {
+            processLayer();
+            return true;
+        }
+        if (type.equalsIgnoreCase("ncml")) {
+            processNcML();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Proceed with the insert of new records for the specified layer.
+     *
+     * @throws CatalogException If insertion fails.
+     */
+    private void processLayer() throws CatalogException {
         final int count;
         try {
             table.setLayer(layer);
@@ -216,9 +200,9 @@ public class Collector extends CommandLine {
     }
 
     /**
-     * Proceed to the insertion of new records for the specified layer from a NetCDF file.
+     * Proceed with the insert of new records defined in an NcML file.
      *
-     * @throws CatalogException If insertion failed.
+     * @throws CatalogException If insertion fails.
      */
     private void processNcML() throws CatalogException {
         /*
@@ -310,7 +294,7 @@ public class Collector extends CommandLine {
                     }
                 }
             }
-            getDatabase().flush();
+            database.flush();
         } catch (SQLException e) {
             throw new ServerException(e);
         } catch (IOException e) {
@@ -439,7 +423,7 @@ public class Collector extends CommandLine {
      *
      * @throws CatalogException If an error occured while disposing the resources.
      */
-    public void close() throws CatalogException {
+    private void close() throws CatalogException {
         try {
             database.close();
         } catch (SQLException e) {
