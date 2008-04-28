@@ -337,7 +337,7 @@ public abstract class ImageProducer {
      * A manager allowing to make some operation remotly with jconsole
      */
     private final WebServiceManager manager;
-
+    
     /**
      * Creates a new image producer connected to the specified database.
      *
@@ -382,7 +382,7 @@ public abstract class ImageProducer {
      * @return The layer table.
      * @throws WebServiceException if the layer table can not be created.
      */
-    private LayerTable getLayerTable(final boolean global) throws WebServiceException {
+    protected LayerTable getLayerTable(final boolean global) throws WebServiceException {
         if (globalLayerTable == null) try {
             globalLayerTable = database.getTable(LayerTable.class);
         } catch (CatalogException exception) {
@@ -394,9 +394,11 @@ public abstract class ImageProducer {
         if (layerTable == null) {
             layerTable = new LayerTable(globalLayerTable);
         }
+        Service service = (version != null) ? version.getService() : Service.WCS;
+        layerTable.setService(service);
         return layerTable;
     }
-
+    
     /**
      * Returns only the name of all available layers. This method is much cheaper than
      * {@link #getLayers} when only the names are wanted.
@@ -429,16 +431,16 @@ public abstract class ImageProducer {
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
             final Layer layer;
-            try {
+        try {
                 layer = table.getEntry(token);
-            } catch (NoSuchRecordException exception) {
+        } catch (NoSuchRecordException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
-            } catch (CatalogException exception) {
+        } catch (CatalogException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-            } catch (SQLException exception) {
+        } catch (SQLException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-            }
-            layers.add(layer);
+        }
+                layers.add(layer);
         }
         return layers;
     }
@@ -454,16 +456,16 @@ public abstract class ImageProducer {
         final List<Layer> layers = new ArrayList<Layer>(layerNames.size());
         for (final String layerName: layerNames) {
             final Layer layer;
-            try {
+        try {
                 layer = table.getEntry(layerName);
-            } catch (NoSuchRecordException exception) {
+        } catch (NoSuchRecordException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
-            } catch (CatalogException exception) {
+        } catch (CatalogException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-            } catch (SQLException exception) {
+        } catch (SQLException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-            }
-            layers.add(layer);
+        }
+                layers.add(layer);
         }
         return layers;
     }

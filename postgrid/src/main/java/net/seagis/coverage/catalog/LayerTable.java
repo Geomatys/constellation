@@ -25,6 +25,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import net.seagis.catalog.Database;
+import net.seagis.coverage.web.Service;
 import net.seagis.catalog.BoundedSingletonTable;
 import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.catalog.CatalogException;
@@ -66,6 +67,11 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
     private SeriesTable series;
 
     /**
+     * The service to be requested.
+     */
+    private Service service = Service.WCS;
+
+    /**
      * Creates a layer table.
      *
      * @param database Connection to the database.
@@ -87,6 +93,18 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
      */
     public LayerTable(final LayerTable table) {
         super(table);
+    }
+
+    /**
+     * Sets the service for the layers to be returned.
+     */
+    public synchronized void setService(final Service service) {
+        ensureNonNull("service", service);
+        if (!service.equals(this.service)) {
+            this.service = service;
+            flush();
+            fireStateChanged("service");
+        }
     }
 
     /**
@@ -149,6 +167,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
             series = new SeriesTable(getDatabase().getTable(SeriesTable.class));
         }
         series.setLayer(entry);
+        series.setService(service);
         entry.setSeries(series.getEntries());
         if (entry.fallback instanceof String) {
             entry.fallback = getEntry((String) entry.fallback);

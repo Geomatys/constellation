@@ -29,6 +29,7 @@ import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
+import net.seagis.coverage.web.Service;
 import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.resources.i18n.Resources;
 
@@ -49,9 +50,20 @@ final class SeriesTable extends SingletonTable<Series> {
     private FormatTable formats;
 
     /**
+     * Connection to the permission table. This connection will be etablished
+     * when first needed and may be shared by many series tables.
+     */
+    private PermissionTable permissions;
+
+    /**
      * The layer for which we want the series, {@code null} for fetching all series.
      */
     private Layer layer;
+
+    /**
+     * The service to be requested.
+     */
+    private Service service = Service.WCS;
 
     /**
      * Creates a series table.
@@ -102,6 +114,19 @@ final class SeriesTable extends SingletonTable<Series> {
     }
 
     /**
+     * Sets the service for the series to be returned. Next call to {@link #getEntries() getEntries()}
+     * will filters the series in order to returns only the ones allowed to access the given service.
+     */
+    public synchronized void setService(final Service service) {
+        ensureNonNull("service", service);
+        if (!service.equals(this.service)) {
+            this.service = service;
+            flush();
+            fireStateChanged("service");
+        }
+    }
+
+    /**
      * Returns the series available in the database. If {@link #getLayer} has been invoked with
      * a non-null value, then only the series for that layer are returned.
      *
@@ -138,15 +163,24 @@ final class SeriesTable extends SingletonTable<Series> {
     protected Series createEntry(final ResultSet results) throws CatalogException, SQLException {
         final SeriesQuery query     = (SeriesQuery) super.query;
         final String  name          = results.getString (indexOf(query.name));
+        final String  formatID      = results.getString (indexOf(query.format));
         final String  pathname      = results.getString (indexOf(query.pathname));
         final String  extension     = results.getString (indexOf(query.extension));
-        final boolean visible       = results.getBoolean(indexOf(query.visible));
+        final String  permissionID  = results.getString (indexOf(query.permission));
         final String  rootDirectory = getProperty(ConfigurationKey.ROOT_DIRECTORY);
         final String  rootURL       = getProperty(ConfigurationKey.ROOT_URL);
         if (formats == null) {
             formats = getDatabase().getTable(FormatTable.class);
         }
-        final Format format = formats.getEntry(results.getString(indexOf(query.format)));
+        final Format format = formats.getEntry(formatID);
+        if (permissions == null) {
+            permissions = getDatabase().getTable(PermissionTable.class);
+        }
+        final String user = getProperty(ConfigurationKey.PERMISSION);
+        final PermissionEntry permission = permissions.getEntry(user);
+        final boolean visible = permission.isAccessibleService(service, permissionID);
+        System.out.println("new SeriesEntry: visible=" + visible + " user=" + user + " service=" + service
+                + " name=" + name + " permission = " + permission);
         return new SeriesEntry(name, layer, rootDirectory != null ? rootDirectory : rootURL,
                                pathname, extension, format, visible, null);
     }

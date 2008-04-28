@@ -33,7 +33,7 @@ final class SeriesQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, layer, pathname, extension, format, visible, remarks;
+    protected final Column name, layer, pathname, extension, format, permission, remarks;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -50,15 +50,15 @@ final class SeriesQuery extends Query {
         final QueryType[] SLF   = {SELECT, LIST, FILTERED_LIST};
         final QueryType[] SLFI  = {SELECT, LIST, FILTERED_LIST, INSERT};
         final QueryType[] SLFIE = {SELECT, LIST, FILTERED_LIST, INSERT, EXISTS};
-        name      = addColumn("identifier",      SLFIE);
-        layer     = addColumn("layer",           SLFI );
-        pathname  = addColumn("pathname",        SLFI );
-        extension = addColumn("extension",       SLFI );
-        format    = addColumn("format",          SLFI );
-        visible   = addColumn("visible",   true, SLF  );
-        remarks   = addColumn("remarks",   null, SLF  );
-        byName    = addParameter(name,  SELECT, EXISTS);
-        byLayer   = addParameter(layer, FILTERED_LIST);
+        name       = addColumn("identifier",           SLFIE);
+        layer      = addColumn("layer",                SLFI );
+        pathname   = addColumn("pathname",             SLFI );
+        extension  = addColumn("extension",            SLFI );
+        format     = addColumn("format",               SLFI );
+        permission = addColumn("permission", "public", SLF  );
+        remarks    = addColumn("remarks",    null,     SLF  );
+        byName     = addParameter(name,  SELECT, EXISTS);
+        byLayer    = addParameter(layer, FILTERED_LIST);
         name.setOrdering("ASC", LIST, FILTERED_LIST);
     }
 }
