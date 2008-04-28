@@ -16,6 +16,7 @@ package net.seagis.bean;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -24,9 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -472,8 +473,19 @@ public class ServicesBean {
     /**
      * Store the formular in the XML file
      */
-    public String storeForm() throws JAXBException {
+    public String storeForm() throws JAXBException, IOException, FileNotFoundException {
 
+        //we signal to the webService to update is capabilities
+        File f = new File(servletContext.getRealPath("WEB-INF/change.properties"));
+        Properties p = new Properties();
+        FileInputStream in = new FileInputStream(f);
+        p.load(in);
+        in.close();
+        p.put("update", "true");
+        FileOutputStream out = new FileOutputStream(f);
+        p.store(out, "updated from JSF interface");
+        out.close();
+        int i = 0;
         for (Object capa : capabilities) {
 
             //for OWS 1.1.0
@@ -497,11 +509,12 @@ public class ServicesBean {
                 ((WCSCapabilitiesType) capa).setService(S);
 
             // for WMS 1.3.0/1.1.1
-            } else if (capa instanceof WMSCapabilities) {
+            } else if (capa instanceof WMSCapabilities || capa instanceof WMT_MS_Capabilities) {
                 Service S = getWMSService();
                 ((WMSCapabilities) capa).setService(S);
+                logger.info("update WMS version" + i);
             }
-
+            i++;
         }
         storeCapabilitiesFile();
         return "goBack";
@@ -688,7 +701,10 @@ public class ServicesBean {
         try {
             int i = 0;
             for (File f : capabilitiesFile) {
-                marshaller.marshal(capabilities[i], (OutputStream) new FileOutputStream(f));
+                OutputStream out = new FileOutputStream(f);
+                marshaller.marshal(capabilities[i],out);
+                out.close();
+                logger.info("store " + f.getAbsolutePath());
                 i++;
             }
             
@@ -705,7 +721,7 @@ public class ServicesBean {
                 userData.setCSWCapabilities(capabilities);
                 
             }
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(ServicesBean.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -846,9 +862,9 @@ public class ServicesBean {
     
     
     public String setWMSMode() throws JAXBException, FileNotFoundException {
-
-        webServiceMode = "WMS";
-        capabilities = new Object[2];
+        logger.info("set WMS mode");
+        webServiceMode    = "WMS";
+        capabilities     = new Object[2];
         capabilitiesFile = new File[2];
 
         //we begin to read the high lvl document
