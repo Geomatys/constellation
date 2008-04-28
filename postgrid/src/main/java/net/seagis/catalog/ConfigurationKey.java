@@ -83,6 +83,13 @@ public enum ConfigurationKey {
     READONLY("ReadOnly", "true"),
 
     /**
+     * Key for the user permissions.
+     * <p>
+     * The default value is {@code "public"}.
+     */
+    PERMISSION("Permission", "public"),
+
+    /**
      * Key for user name connecting to the {@linkplain #DATABASE database}.
      */
     USER("User", null),
