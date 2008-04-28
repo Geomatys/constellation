@@ -837,7 +837,7 @@ public class ServicesBean {
         String url = servletContext.getRealPath("preference.sml");
         setUrlPreference("preference.sml");
         File f = new File(url);
-        f.setWritable(true);
+        //f.setWritable(true);
        marshaller.marshal(userData, f);
         
     }
