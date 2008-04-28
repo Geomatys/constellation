@@ -34,6 +34,17 @@ UPDATE spatial_ref_sys SET srtext = REPLACE(srtext,
 
 
 --
+-- Adds an optional column for specifying whatever or not a PostGIS
+-- definition should have precedence over the EPSG definition.
+--
+ALTER TABLE spatial_ref_sys ADD COLUMN "override" boolean DEFAULT FALSE;
+UPDATE spatial_ref_sys SET "override" = FALSE;
+ALTER TABLE spatial_ref_sys ALTER COLUMN "override" SET NOT NULL;
+COMMENT ON COLUMN spatial_ref_sys."override" IS
+    'Set to TRUE if the definition in the "srtext" column should override the definition found in the EPSG database.';
+
+
+--
 -- Ensures that the SRID of a geometry column is known to PostGIS.
 --
 ALTER TABLE geometry_columns

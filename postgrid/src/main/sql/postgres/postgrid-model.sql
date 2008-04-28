@@ -82,10 +82,10 @@ COMMENT ON COLUMN "OperationParameters"."value" IS
 
 CREATE TABLE "RegionOfInterests" (
     "name" character varying NOT NULL PRIMARY KEY,
-    "dx"   double precision  NOT NULL,
-    "dy"   double precision  NOT NULL,
-    "dz"   double precision  NOT NULL,
-    "dt"   double precision  NOT NULL
+    "dx"   double precision  NOT NULL DEFAULT 0,
+    "dy"   double precision  NOT NULL DEFAULT 0,
+    "dz"   double precision  NOT NULL DEFAULT 0,
+    "dt"   double precision  NOT NULL DEFAULT 0
 );
 
 ALTER TABLE "RegionOfInterests" OWNER TO geoadmin;
@@ -148,11 +148,11 @@ COMMENT ON COLUMN "Distributions"."log" IS
 CREATE TABLE "Descriptors" (
     "identifier"   smallint          NOT NULL UNIQUE,
     "symbol"       character varying NOT NULL PRIMARY KEY,
-    "layer"        character varying NOT NULL                   REFERENCES "Layers"            ON UPDATE CASCADE ON DELETE CASCADE,
-    "operation"    character varying NOT NULL DEFAULT 'Valeur'  REFERENCES "Operations"        ON UPDATE CASCADE ON DELETE CASCADE,
-    "region"       character varying NOT NULL DEFAULT '+00'     REFERENCES "RegionOfInterests" ON UPDATE CASCADE ON DELETE CASCADE,
+    "layer"        character varying NOT NULL                  REFERENCES "Layers"            ON UPDATE CASCADE ON DELETE CASCADE,
+    "operation"    character varying NOT NULL DEFAULT 'Value'  REFERENCES "Operations"        ON UPDATE CASCADE ON DELETE CASCADE,
+    "region"       character varying NOT NULL DEFAULT '+00'    REFERENCES "RegionOfInterests" ON UPDATE CASCADE ON DELETE CASCADE,
     "band"         smallint          NOT NULL DEFAULT 1 CHECK ("band" >= 1),
-    "distribution" character varying NOT NULL DEFAULT 'normale' REFERENCES "Distributions"     ON UPDATE CASCADE ON DELETE RESTRICT,
+    "distribution" character varying NOT NULL DEFAULT 'Normal' REFERENCES "Distributions"     ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT "Descriptor_uniqueness" UNIQUE ("layer", "region", "band", "operation")
 );
 

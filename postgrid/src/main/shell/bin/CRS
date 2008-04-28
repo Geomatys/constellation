@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # ---------------------------------------------------------------------------
 # Prints Coordinate Reference System (CRS) objects in "Well Known Text" (WKT)

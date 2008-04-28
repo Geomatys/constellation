@@ -22,36 +22,35 @@ import net.seagis.catalog.SingletonTable;
 
 
 /**
+ * Connection to a table of {@linkplain PermissionEntry permissions}.
  *
- * @author guilhem
+ * @author Guilhem Legal
+ * @author Martin Desruisseaux
+ * @version $Id: CategoryTable.java 455 2008-03-13 15:21:44Z desruisseaux $
  */
 final class PermissionTable extends SingletonTable<PermissionEntry> {
     /**
-     * Construit une table des permissions.
-     *
-     * @param  database Connexion vers la base de données.
+     * Creates a new table for the given database.
      */
     public PermissionTable(final Database database) {
         this(new PermissionQuery(database));
     }
 
     /**
-     * Construit une nouvelle table non partagée
-     */
-    public PermissionTable(final PermissionTable table) {
-        super(table);
-    }
-
-    /**
-     *
+     * Creates a permission table using the given query.
      */
     private PermissionTable(final PermissionQuery query) {
         super(query);
         setIdentifierParameters(query.byName, null);
     }
 
+    /**
+     * Creates a new entry for the current row in the given result set.
+     */
     @Override
-    protected PermissionEntry createEntry(ResultSet results) throws CatalogException, SQLException {
+    protected PermissionEntry createEntry(final ResultSet results)
+            throws CatalogException, SQLException
+    {
         final PermissionQuery query = (PermissionQuery) super.query;
         return new PermissionEntry(results.getString (indexOf(query.name)),
                                    results.getString (indexOf(query.include)),
@@ -60,8 +59,11 @@ final class PermissionTable extends SingletonTable<PermissionEntry> {
                                    results.getString (indexOf(query.description)));
     }
 
+    /**
+     * Completes the {@link PermissionEntry} creation after the {@link ResultSet} has been closed.
+     */
     @Override
-    protected void postCreateEntry(PermissionEntry entry)
+    protected void postCreateEntry(final PermissionEntry entry)
             throws CatalogException, SQLException
     {
         entry.postCreateEntry(this);

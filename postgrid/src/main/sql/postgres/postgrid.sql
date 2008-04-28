@@ -29,7 +29,7 @@ SET search_path = postgrid, postgis, pg_catalog;
 
 CREATE TABLE "Permissions" (
     "name"        character varying NOT NULL PRIMARY KEY,
-    "include"     character varying DEFAULT 'public' REFERENCES "Permissions" ON UPDATE CASCADE ON DELETE RESTRICT,
+    "include"     character varying DEFAULT 'Public' REFERENCES "Permissions" ON UPDATE CASCADE ON DELETE RESTRICT,
     "WMS"         boolean DEFAULT TRUE,
     "WCS"         boolean DEFAULT TRUE,
     "description" character varying
@@ -51,10 +51,6 @@ COMMENT ON COLUMN "Permissions"."WCS" IS
     'Whatever permission allows Web Coverage Server (WCS) access.';
 COMMENT ON COLUMN "Permissions"."description" IS
     'A description of this permission (scope, etc.).';
-
-INSERT INTO "Permissions" VALUES ('public',     NULL,     TRUE,  TRUE,  'Data accessible to anyone.');
-INSERT INTO "Permissions" VALUES ('hidden',     NULL,     FALSE, FALSE, 'Hidden data (e.g. data reserved for testing purpose only).');
-INSERT INTO "Permissions" VALUES ('restricted', 'public', TRUE,  TRUE,  'Access to public data together with restricted ones.');
 
 
 
@@ -269,14 +265,14 @@ CREATE TABLE "Series" (
     "extension"  character varying, -- Accepts NULL since some files has no extension
     "format"     character varying NOT NULL REFERENCES "Formats" ON UPDATE CASCADE ON DELETE RESTRICT,
     "quicklook"  character varying UNIQUE   REFERENCES "Series"  ON UPDATE CASCADE ON DELETE RESTRICT,
-    "permission" character varying NOT NULL DEFAULT 'public' REFERENCES "Permissions" ON UPDATE CASCADE ON DELETE CASCADE,
+    "permission" character varying NOT NULL DEFAULT 'Public' REFERENCES "Permissions" ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 ALTER TABLE "Series" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Series" TO geoadmin;
 GRANT SELECT ON TABLE "Series" TO PUBLIC;
 
-CREATE INDEX "Series_index" ON "Series" ("layer", "visible");
+CREATE INDEX "Series_index" ON "Series" ("layer", "permission");
 
 COMMENT ON TABLE "Series" IS
     'Series of images.  Each image belongs to a series.';
@@ -543,7 +539,7 @@ CREATE TABLE "Tiles" (
 
 ALTER TABLE "Tiles" OWNER TO geoadmin;
 GRANT ALL ON TABLE "Tiles" TO geoadmin;
-GRANT SELECT ON TABLE "Tiles" TO public;
+GRANT SELECT ON TABLE "Tiles" TO PUBLIC;
 
 CREATE INDEX "Tiles_index" ON "Tiles" ("series", "endTime", "startTime");
 
@@ -632,8 +628,7 @@ CREATE VIEW "DomainOfLayers" AS
         min("south")       AS "south",
         max("north")       AS "north",
         min("xResolution") AS "xResolution",
-        min("yResolution") AS "yResolution",
-        bool_or("visible") AS "visible"
+        min("yResolution") AS "yResolution"
    FROM "DomainOfSeries"
    JOIN "Series" ON "DomainOfSeries"."series" = "Series"."identifier"
   GROUP BY "layer"

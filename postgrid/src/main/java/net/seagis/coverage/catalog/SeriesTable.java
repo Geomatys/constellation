@@ -166,7 +166,7 @@ final class SeriesTable extends SingletonTable<Series> {
         final String  formatID      = results.getString (indexOf(query.format));
         final String  pathname      = results.getString (indexOf(query.pathname));
         final String  extension     = results.getString (indexOf(query.extension));
-        final String  permissionID  = results.getString (indexOf(query.permission));
+        final String  permission    = results.getString (indexOf(query.permission));
         final String  rootDirectory = getProperty(ConfigurationKey.ROOT_DIRECTORY);
         final String  rootURL       = getProperty(ConfigurationKey.ROOT_URL);
         if (formats == null) {
@@ -177,10 +177,8 @@ final class SeriesTable extends SingletonTable<Series> {
             permissions = getDatabase().getTable(PermissionTable.class);
         }
         final String user = getProperty(ConfigurationKey.PERMISSION);
-        final PermissionEntry permission = permissions.getEntry(user);
-        final boolean visible = permission.isAccessibleService(service, permissionID);
-        System.out.println("new SeriesEntry: visible=" + visible + " user=" + user + " service=" + service
-                + " name=" + name + " permission = " + permission);
+        final PermissionEntry userCredential = permissions.getEntry(user);
+        final boolean visible = userCredential.isAccessibleService(service, permission);
         return new SeriesEntry(name, layer, rootDirectory != null ? rootDirectory : rootURL,
                                pathname, extension, format, visible, null);
     }

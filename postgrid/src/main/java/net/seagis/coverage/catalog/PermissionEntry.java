@@ -21,17 +21,38 @@ import net.seagis.coverage.web.Service;
 
 
 /**
+ * The restrictions to be applied on coverage data.
  *
- * @author guilhem
+ * @author Guilhem Legal
+ * @author Martin Desruisseaux
+ * @version $Id: FormatEntry.java 538 2008-04-22 20:05:01Z desruisseaux $
  */
 final class PermissionEntry extends Entry {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = -8336985120346671214L;
 
+    /**
+     * {@code true} if the data can be displayed in a Web Map Server (WMS).
+     */
     protected final boolean WMS;
 
+    /**
+     * {@code true} if the data can be displayed in a Web Coverage Server (WCS).
+     */
     protected final boolean WCS;
 
+    /**
+     * If this permission includes the data of an other permission, the other permission.
+     * Otherwise {@code null}. This field is a {@link String} on construction and changed
+     * to a {@link PermissionEntry} on {@link #postCreateEntry}.
+     */
     private Object include;
 
+    /**
+     * Creates a new entry.
+     */
     public PermissionEntry(final String name, final String include,
             final boolean WCS, final boolean WMS, final String remarks)
     {
@@ -42,7 +63,7 @@ final class PermissionEntry extends Entry {
     }
 
     /**
-     * Update the {@link #include} field using the given table.
+     * Updates the {@link #include} field using the given table.
      */
     final void postCreateEntry(final PermissionTable table)
             throws CatalogException, SQLException
@@ -53,7 +74,7 @@ final class PermissionEntry extends Entry {
     }
 
     /**
-     *
+     * Returns {@code true} if the given user is allowed to obtain data through the given service.
      */
     public boolean isAccessibleService(final Service service, final String user) {
         if (user.equalsIgnoreCase(getName())) {

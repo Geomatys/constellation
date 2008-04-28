@@ -23,8 +23,11 @@ import static net.seagis.catalog.QueryType.*;
 
 
 /**
+ * The query to execute for a {@link PermissionTable}.
  *
- * @author guilhem
+ * @author Guilhem Legal
+ * @author Martin Desruisseaux
+ * @version $Id: CategoryQuery.java 455 2008-03-13 15:21:44Z desruisseaux $
  */
 final class PermissionQuery extends Query {
     /**
@@ -45,12 +48,11 @@ final class PermissionQuery extends Query {
     public PermissionQuery(final Database database) {
         super(database, "Permissions");
         final QueryType[] SL = {SELECT, LIST};
-
-        name        = addColumn("name",                      SL);
-        include     = addColumn("include",     "public",     SL);
-        WMS         = addColumn("WMS",         Boolean.TRUE, SL);
-        WCS         = addColumn("WCS",         Boolean.TRUE, SL);
-        description = addColumn("description",               SL);
+        name        = addColumn("name",                  SL);
+        include     = addColumn("include", "public",     SL);
+        WMS         = addColumn("WMS",     Boolean.TRUE, SL);
+        WCS         = addColumn("WCS",     Boolean.TRUE, SL);
+        description = addColumn("description",           SL);
         byName      = addParameter(name, SL);
     }
 }

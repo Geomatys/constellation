@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # ---------------------------------------------------------------------------
 # Synchronizes a PostGrid database with an other one. The configuration files

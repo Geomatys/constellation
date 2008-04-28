@@ -129,7 +129,7 @@ public class Collector extends CommandLine {
      * type given on the command line.
      *
      * @param database The database connection, or {@code null} for the default.
-     * @throws CatalogException if the connection failed
+     * @throws CatalogException if an error occured while inserting the data.
      */
     public void run(Database database) throws CatalogException {
         if (database == null) try {
@@ -156,7 +156,7 @@ public class Collector extends CommandLine {
      * If this method knows the given type, executes the process for this type and
      * returns {@code true}. Otherwise returns {@code false}.
      *
-     * @throws CatalogException
+     * @throws CatalogException if an error occured while inserting the data.
      */
     protected boolean process(final String type) throws CatalogException {
         if (type == null) {
@@ -258,7 +258,7 @@ public class Collector extends CommandLine {
                         continue;
                     }
                     final URI location = new URI(netcdfWithLocationParam.getAttributeValue("location"));
-                    final Element timeElement = 
+                    final Element timeElement =
                             NcmlReading.getVariableElement("time", netcdfWithLocationParam);
                     if (timeElement == null) {
                         addToLayer(layer, location, ncmlTable);
@@ -268,9 +268,9 @@ public class Collector extends CommandLine {
                     if (timeValues == null) {
                         continue;
                     }
-                    final long startTime = 
+                    final long startTime =
                             Math.round(Double.valueOf(timeValues.getAttributeValue("start")));
-                    final long increment = 
+                    final long increment =
                             Math.round(Double.valueOf(timeValues.getAttributeValue("increment")));
                     final int npts = Integer.valueOf(timeValues.getAttributeValue("npts"));
                     final NcmlTimeValues ncmlValue = new NcmlTimeValues(startTime, increment, npts);
@@ -314,9 +314,9 @@ public class Collector extends CommandLine {
      * @param layer The layer to consider.
      * @param location The Netcdf path.
      * @param table The table in which the entry will be inserted.
-     * @throws CatalogException
-     * @throws SQLException If a SQL error occurs, other than a doublon.
-     * @throws IOException
+     * @throws CatalogException if an error occured while inserting the data.
+     * @throws SQLException If a SQL error occurs, other than a duplicated value.
+     * @throws IOException If an I/O error occured.
      */
     private void addToLayer(final String layer, final URI location,
                             final WritableGridCoverageTable table)

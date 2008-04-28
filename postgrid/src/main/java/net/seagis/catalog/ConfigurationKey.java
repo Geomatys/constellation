@@ -14,13 +14,11 @@
  */
 package net.seagis.catalog;
 
-import java.util.Properties;
-
 
 /**
  * A key for a configurable aspect of a {@linkplain Database database}. They are typically keys
- * in a {@linkplain Properties properties map}. A key may be used in order to specify the JDBC
- * driver to use.
+ * in a {@linkplain java.util.Properties properties map}. A key may be used in order to specify
+ * the JDBC driver to use.
  *
  * @version $Id$
  * @author Remi Eve
@@ -139,7 +137,7 @@ public enum ConfigurationKey {
     }
 
     /**
-     * Returns the key to be used in {@link Properties} map.
+     * Returns the key to be used in {@link java.util.Properties} map.
      */
     public String getKey() {
         return name;

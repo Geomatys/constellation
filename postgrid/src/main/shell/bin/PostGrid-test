@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # ---------------------------------------------------------------------------
 # Tests the connection to PostGrid database. The ".seagis/config.xml" file

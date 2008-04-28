@@ -20,6 +20,8 @@ import java.net.URISyntaxException;
 
 import org.geotools.resources.Utilities;
 import net.seagis.catalog.Entry;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.VocabularyKeys;
 
 
 /**
@@ -235,10 +237,16 @@ final class SeriesEntry extends Entry implements Series {
         }
         return false;
     }
-    
+
+    /**
+     * Returns a string representation of this entry.
+     */
+    @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("SeriesEntry:");
-        s.append(name).append("visible:").append(visible);
-        return s.toString();
+        String name = super.toString();
+        if (!visible) {
+            name = name + " (" + Vocabulary.format(VocabularyKeys.HIDEN) + ')';
+        }
+        return name;
     }
 }

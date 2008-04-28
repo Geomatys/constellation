@@ -95,7 +95,7 @@ COMMENT ON COLUMN "Series"."extension" IS
     'Extension des fichiers d''images de cette série.';
 COMMENT ON COLUMN "Series"."format" IS
     'Format des images de ce groupe.';
-COMMENT ON COLUMN "Series"."visible" IS
+COMMENT ON COLUMN "Series"."permission" IS
     'Indique si les images de ce groupe doivent apparaître dans la liste des images proposées à l''utilisateur.';
 COMMENT ON COLUMN "Series"."quicklook" IS
     'Série dont les images sont des aperçus de cette série.';

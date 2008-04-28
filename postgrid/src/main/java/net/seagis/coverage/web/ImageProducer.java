@@ -334,10 +334,10 @@ public abstract class ImageProducer {
     private DirectPosition coordinate;
 
     /**
-     * A manager allowing to make some operation remotly with jconsole
+     * A manager allowing to make some operation remotly with JConsole.
      */
     private final WebServiceManager manager;
-    
+
     /**
      * Creates a new image producer connected to the specified database.
      *
@@ -398,7 +398,7 @@ public abstract class ImageProducer {
         layerTable.setService(service);
         return layerTable;
     }
-    
+
     /**
      * Returns only the name of all available layers. This method is much cheaper than
      * {@link #getLayers} when only the names are wanted.
@@ -440,11 +440,11 @@ public abstract class ImageProducer {
             } catch (SQLException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             }
-            System.out.println("layer " + layer.getName() + " size" + layer.getSeries().size());
-            if (layer.getSeries().size() != 0)
-                layers.add(layer);
-            else
-                throw new WMSWebServiceException("This layer is not defined", LAYER_NOT_DEFINED, version);
+            if (layer.getSeries().isEmpty()) {
+                throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                        LAYER_NOT_DEFINED, version);
+            }
+            layers.add(layer);
         }
         return layers;
     }
@@ -461,15 +461,15 @@ public abstract class ImageProducer {
         for (final String layerName: layerNames) {
             final Layer layer;
         try {
-                layer = table.getEntry(layerName);
+            layer = table.getEntry(layerName);
         } catch (NoSuchRecordException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
+            throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
         } catch (CatalogException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         } catch (SQLException exception) {
-                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
-                layers.add(layer);
+            layers.add(layer);
         }
         return layers;
     }
@@ -503,12 +503,12 @@ public abstract class ImageProducer {
         Layer candidate;
         boolean change = false;
         try {
-            Layer layerObject = getLayerTable(true).getEntry(layer);
-            if (layerObject.getSeries().size() == 0)
-                throw new WMSWebServiceException("The layer " + layer + "is not defined",
-                    LAYER_NOT_DEFINED, version);
-            
-            final LayerRequest request = new LayerRequest(layerObject, envelope, gridRange);
+            final Layer entry = getLayerTable(true).getEntry(layer);
+            if (entry.getSeries().isEmpty()) {
+                throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                        LAYER_NOT_DEFINED, version);
+            }
+            final LayerRequest request = new LayerRequest(entry, envelope, gridRange);
             synchronized (layers) {
                 candidate = layers.get(request);
                 if (candidate == null) {
