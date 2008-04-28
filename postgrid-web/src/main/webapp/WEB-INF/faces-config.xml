@@ -17,7 +17,7 @@
     </navigation-case>
     <navigation-case>
       <from-outcome>goBack</from-outcome>
-      <to-view-id>/index.jsp</to-view-id>
+      <to-view-id>/metadata.jsp</to-view-id>
     </navigation-case>
   </navigation-rule>
   
