@@ -212,6 +212,8 @@ public class ServicesBean {
     
     private String urlPreference = "";
     
+    private boolean existPrefrence = false;
+    
     /**
      * 
      */
@@ -838,8 +840,8 @@ public class ServicesBean {
         setUrlPreference("preference.sml");
         File f = new File(url);
         //f.setWritable(true);
+        setExistPrefrence(true);
        marshaller.marshal(userData, f);
-        
     }
     
     
@@ -1316,5 +1318,13 @@ public class ServicesBean {
 
     public void setUrlPreference(String urlPreference) {
         this.urlPreference = urlPreference;
+    }
+
+    public boolean isExistPrefrence() {
+        return existPrefrence;
+    }
+
+    public void setExistPrefrence(boolean existPrefrence) {
+        this.existPrefrence = existPrefrence;
     }
 }

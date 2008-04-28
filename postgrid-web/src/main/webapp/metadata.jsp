@@ -38,9 +38,12 @@
                              </t:commandLink>
 		            
 		        </h:panelGrid>
-                         <h:outputText value="File : #{servicesBean.urlPreference} has been saved at the root of war !! " style="color:green;" rendered="false"/>
-                         <h:outputLink value="#{servicesBean.urlPreference}">After you have exported your preference file, download it </h:outputLink>
-                         <a id="link" href="preference.sml">here</a>
+                         
+                         <h:panelGrid id="downloadPanel" columns="1" cellpadding="2" cellspacing="30">
+                            <h:outputLink value="#{servicesBean.urlPreference}" rendered="#{servicesBean.existPrefrence}">
+				<h:outputText value="Click to download your preference file."/>
+			    </h:outputLink>
+                        </h:panelGrid>
 		</div>
                  <h:inputText id="urlId" value="#{servicesBean.urlPreference}" style="display:none;" onchange="document.getElementById('target_xml').src=(document.getElementById('form_1:urlId').value);"/>
             </h:form>
