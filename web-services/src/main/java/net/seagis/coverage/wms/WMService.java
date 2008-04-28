@@ -16,6 +16,7 @@
 package net.seagis.coverage.wms;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -88,6 +89,10 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 public class WMService extends WebService {
     
     /**
+     * A list of layer initialized a begining;
+     */
+    private Set<net.seagis.coverage.catalog.Layer> layerList;
+    /**
      * The object whitch made all the operation on the postgrid database
      */
     private static ThreadLocal<WebServiceWorker> webServiceWorker;
@@ -127,7 +132,7 @@ public class WMService extends WebService {
     /** 
      * Build a new instance of the webService and initialise the JAXB marshaller. 
      */
-    public WMService() throws JAXBException, WebServiceException {
+    public WMService() throws JAXBException, WebServiceException, FileNotFoundException, IOException {
         super("WMS", new ServiceVersion(Service.WMS, "1.3.0") ,new ServiceVersion(Service.WMS, "1.1.1"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
@@ -136,6 +141,8 @@ public class WMService extends WebService {
                 
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WMS", getCurrentVersion().toString());
+        logger.info("Loading layers please wait...");
+        layerList = webServiceWorker.getLayers();
         logger.info("WMS service running");
     }
    
@@ -382,9 +389,17 @@ public class WMService extends WebService {
                       INVALID_PARAMETER_VALUE, getCurrentVersion());
         }
         
+        AbstractWMSCapabilities response;
+        String updateSequence = getParameter("UPDATESEQUENCE", false);
+                
         // the service shall return WMSCapabilities marshalled
-        AbstractWMSCapabilities response = (AbstractWMSCapabilities)getCapabilitiesObject();
-        
+        try {
+            response = (AbstractWMSCapabilities)getCapabilitiesObject();
+        } catch(IOException e)   {
+            throw new WMSWebServiceException("IO exception while getting Services Metadata.",
+                      INVALID_PARAMETER_VALUE, getCurrentVersion());
+            
+        } 
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
         Request request = response.getCapability().getRequest();
@@ -398,7 +413,7 @@ public class WMService extends WebService {
         
         //we get the list of layers
         List<Layer> layers = new ArrayList<Layer>();
-        for (net.seagis.coverage.catalog.Layer inputLayer: webServiceWorker.getLayers()) {
+        for (net.seagis.coverage.catalog.Layer inputLayer: layerList) {
             try {
                 if (inputLayer.getSeries().size() == 0) {
                     logger.info("layer" + inputLayer.getName() + " no series");

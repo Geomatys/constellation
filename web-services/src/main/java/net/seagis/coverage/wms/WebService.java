@@ -16,6 +16,10 @@
 package net.seagis.coverage.wms;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -25,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -125,6 +130,11 @@ public abstract class WebService {
      */
     @Context
     private UriInfo context;
+    
+    /**
+     * The last update sequence
+     */
+    private long lastUpdateSequence;
     
     
     /**
@@ -473,41 +483,53 @@ public abstract class WebService {
      * Returns the file where to read the capabilities document for each service.
      * If no such file is found, then this method returns {@code null}.
      *
-     * @param  version the version of the service.
      * @return The capabilities Object, or {@code null} if none.
      */
-    public Object getCapabilitiesObject() throws JAXBException {
+    public Object getCapabilitiesObject() throws JAXBException, FileNotFoundException, IOException {
        String fileName = this.service + "Capabilities" + getCurrentVersion().toString() + ".xml";
+       File changeFile = getFile("change.properties");
+       Properties p = new Properties();
+       FileInputStream in    = new FileInputStream(changeFile);
+       p.load(in);
+       in.close();
        
        if (fileName == null) {
            return null;
        } else {
            Object response = capabilities.get(fileName);
-           if (response == null) {
            
-               File path;
-               String appName = context.getBaseUri().getPath();
-               //we delete the /WS
-               appName = appName.substring(0, appName.length()-3);
-               String home = System.getenv().get("CATALINA_HOME") + "/webapps" + appName + "WEB-INF/";
-               if (home == null || !(path=new File(home)).isDirectory()) {
-                    home = System.getProperty("user.home");
-                    if (System.getProperty("os.name", "").startsWith("Windows")) {
-                        path = new File(home, WINDOWS_DIRECTORY);
-                    } else {
-                        path = new File(home, UNIX_DIRECTORY);
-                    }
-                } 
-            
-               File f = new File(path, fileName);
+           if (response == null || p.getProperty("update").equals("true")) {
+               logger.info("updating metadata");
+               File f = getFile(fileName);
                response = unmarshaller.unmarshal(f);
                capabilities.put(fileName, response);
+               this.setLastUpdateSequence(System.currentTimeMillis());
+               FileOutputStream out = new FileOutputStream(changeFile);
+               p.put("update", "false");
+               p.store(out, "updated from WebService");
+               out.close();
            }
            
            return response;
         }
     }
     
+    public File getFile(String fileName) {
+         File path;
+         String appName = context.getBaseUri().getPath();
+         //we delete the /WS
+         appName = appName.substring(0, appName.length()-3);
+         String home = System.getenv().get("CATALINA_HOME") + "/webapps" + appName + "WEB-INF/";
+         if (home == null || !(path=new File(home)).isDirectory()) {
+            home = System.getProperty("user.home");
+            if (System.getProperty("os.name", "").startsWith("Windows")) {
+                path = new File(home, WINDOWS_DIRECTORY);
+            } else {
+                path = new File(home, UNIX_DIRECTORY);
+            }
+         } 
+         return new File(path, fileName);
+    }
     /**
      * Return the service url obtain by the first request made.
      * 
@@ -630,5 +652,13 @@ public abstract class WebService {
                     method.setHref(url + service.toLowerCase() + "?");
             }
        }
+    }
+
+    public long getLastUpdateSequence() {
+        return lastUpdateSequence;
+    }
+
+    public void setLastUpdateSequence(long lastUpdateSequence) {
+        this.lastUpdateSequence = lastUpdateSequence;
     }
 }

@@ -622,7 +622,14 @@ public class WCService extends WebService {
             } 
             
             // we unmarshall the static capabilities docuement
-            Capabilities staticCapabilities = (Capabilities)getCapabilitiesObject();
+            Capabilities staticCapabilities = null;
+            try {
+                staticCapabilities = (Capabilities)getCapabilitiesObject();
+            } catch(IOException e)   {
+                throwException("IO exception while getting Services Metadata.",
+                               "INVALID_PARAMETER_VALUE", null);
+            
+            } 
             ServiceIdentification si = null;
             ServiceProvider       sp = null;
             OperationsMetadata    om = null;
@@ -665,8 +672,14 @@ public class WCService extends WebService {
                }
                contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata"); 
             }
-            WCSCapabilitiesType staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject()).getValue();
+            WCSCapabilitiesType staticCapabilities = null;
+            try {
+                staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject()).getValue();
+            } catch(IOException e)   {
+                throwException("IO exception while getting Services Metadata.",
+                               "INVALID_PARAMETER_VALUE", null);
             
+            }    
             if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
                 //we update the url in the static part.
                 Request req = staticCapabilities.getCapability().getRequest(); 

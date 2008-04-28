@@ -131,8 +131,14 @@ public class CSWService extends WebService {
                       */
                     gc = createNewGetCapabilitiesRequest();
                 }
+                try {
+                    worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+                } catch(IOException e)   {
+                    throw new OWSWebServiceException("IO exception while getting Services Metadata.",
+                      INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
+            
+                }
                 
-                worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
         
@@ -200,8 +206,13 @@ public class CSWService extends WebService {
                      */
                     gd = createNewGetDomainRequest();
                 }
-                
-                worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+                try {
+                    worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+                } catch(IOException e)   {
+                    throw new OWSWebServiceException("IO exception while getting Services Metadata.",
+                      INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
+            
+                }
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getDomain(gd), sw);
         
