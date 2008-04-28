@@ -431,16 +431,20 @@ public abstract class ImageProducer {
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
             final Layer layer;
-        try {
+            try {
                 layer = table.getEntry(token);
-        } catch (NoSuchRecordException exception) {
+            } catch (NoSuchRecordException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
-        } catch (CatalogException exception) {
+            } catch (CatalogException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-        } catch (SQLException exception) {
+            } catch (SQLException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-        }
+            }
+            System.out.println("layer " + layer.getName() + " size" + layer.getSeries().size());
+            if (layer.getSeries().size() != 0)
                 layers.add(layer);
+            else
+                throw new WMSWebServiceException("This layer is not defined", LAYER_NOT_DEFINED, version);
         }
         return layers;
     }
@@ -499,7 +503,12 @@ public abstract class ImageProducer {
         Layer candidate;
         boolean change = false;
         try {
-            final LayerRequest request = new LayerRequest(getLayerTable(true).getEntry(layer), envelope, gridRange);
+            Layer layerObject = getLayerTable(true).getEntry(layer);
+            if (layerObject.getSeries().size() == 0)
+                throw new WMSWebServiceException("The layer " + layer + "is not defined",
+                    LAYER_NOT_DEFINED, version);
+            
+            final LayerRequest request = new LayerRequest(layerObject, envelope, gridRange);
             synchronized (layers) {
                 candidate = layers.get(request);
                 if (candidate == null) {

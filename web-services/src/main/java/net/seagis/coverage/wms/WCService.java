@@ -701,6 +701,9 @@ public class WCService extends WebService {
         net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
         try {
             for (Layer inputLayer: webServiceWorker.getLayers()) {
+                if (inputLayer.getSeries().size() == 0)
+                    continue;
+                
                 List<LanguageStringType> title = new ArrayList<LanguageStringType>();
                 title.add(new LanguageStringType(inputLayer.getName()));
                 List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
@@ -867,7 +870,10 @@ public class WCService extends WebService {
                 List<String> requestedField = new ArrayList<String>();
                 for(net.seagis.wcs.v111.RangeSubsetType.FieldSubset field: rangeSubset.getFieldSubset()) {
                     Layer currentLayer =  webServiceWorker.getLayers(coverage).get(0);
-                    
+                    if (currentLayer.getSeries().size() == 0) {
+                        throwException("The layer " + coverage + " is not available" , 
+                                       "LAYER_NOT_DEFINED", "Coverage");
+                    }                    
                     if (field.getIdentifier().equalsIgnoreCase(currentLayer.getThematic())){
                         interpolation = field.getInterpolationType();
                         
@@ -1069,7 +1075,11 @@ public class WCService extends WebService {
             List<Layer> layers = webServiceWorker.getLayers(request.getCoverage());
         
             List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
-            for (Layer layer: layers){
+            for (Layer layer: layers) {
+                if (layer.getSeries().size() == 0) {
+                    throwException("the coverage " + layer.getName() + " is not defined", "LAYER_NOT_DEFINED", "coverage");
+                }
+                
                 GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
                 LonLatEnvelopeType               llenvelope = null;
                 if(inputGeoBox != null) {
@@ -1162,10 +1172,13 @@ public class WCService extends WebService {
                 throwException("the parameter IDENTIFIER must be specified", "MISSING_PARAMETER_VALUE", "identifier");
             }
             List<Layer> layers = webServiceWorker.getLayers(request.getIdentifier());
-        
-                net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
+            
+            net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
             List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
-            for (Layer layer: layers){
+            for (Layer layer: layers) {
+                if (layer.getSeries().size() == 0) {
+                    throwException("the coverage " + layer.getName() + " is not defined", "LAYER_NOT_DEFINED", "coverage");
+                }
                 GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
                 List<JAXBElement<? extends BoundingBoxType>> bboxs = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
                 if(inputGeoBox != null) {

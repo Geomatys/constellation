@@ -42,6 +42,7 @@ import javax.xml.bind.JAXBException;
 //seagis dependencies
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
+import net.seagis.coverage.catalog.Series;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.sld.DescribeLayerResponseType;
@@ -231,7 +232,7 @@ public class WMService extends WebService {
         
         
         //this parameters are not yet used
-        String styles      = getParameter("STYLES", true);
+        String styles        = getParameter("STYLES", true);
         
         //extended parameter of the specification SLD
         String sld           = getParameter("SLD", false);
@@ -399,6 +400,10 @@ public class WMService extends WebService {
         List<Layer> layers = new ArrayList<Layer>();
         for (net.seagis.coverage.catalog.Layer inputLayer: webServiceWorker.getLayers()) {
             try {
+                if (inputLayer.getSeries().size() == 0) {
+                    logger.info("layer" + inputLayer.getName() + " no series");
+                    continue;
+                } 
                 
                 List<String> crs = new ArrayList<String>();
                 

@@ -235,4 +235,10 @@ final class SeriesEntry extends Entry implements Series {
         }
         return false;
     }
+    
+    public String toString() {
+        StringBuilder s = new StringBuilder("SeriesEntry:");
+        s.append(name).append("visible:").append(visible);
+        return s.toString();
+    }
 }
