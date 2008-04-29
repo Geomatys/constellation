@@ -130,9 +130,12 @@ public class SOService extends WebService {
                 return Response.ok(worker.registerSensor(rs), "text/xml").build();
              
              } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
-                
-                worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
-                
+                try {
+                    worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+                } catch (IOException ex) {
+                    throw new OWSWebServiceException("Unable to find change.properties",
+                                                     NO_APPLICABLE_CODE, null, getCurrentVersion());  
+                }
                 GetCapabilities gc = (GetCapabilities)objectRequest;
                 /*
                  * if the parameters have been send by GET or POST kvp,

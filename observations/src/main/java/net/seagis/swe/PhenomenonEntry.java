@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 
 // geotools dependencies
+import net.seagis.gml.DefinitionType;
 import org.geotools.resources.Utilities;
 
 // GeoAPI dependencies 
@@ -40,9 +41,9 @@ import org.opengis.observation.Phenomenon;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Phenomenon", propOrder = {"description", "name"})
-@XmlSeeAlso({ CompositePhenomenonEntry.class })
-public class PhenomenonEntry extends Entry implements Phenomenon {
+@XmlType(name = "Phenomenon")
+@XmlSeeAlso({ CompoundPhenomenonEntry.class })
+public class PhenomenonEntry extends DefinitionType implements Phenomenon {
     /**
      * Pour compatibilités entre les enregistrements binaires de différentes versions.
      */
@@ -50,21 +51,23 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
 
     /**
      * The phenomenon identifier.
-     */
+     
     @XmlAttribute(required = true, namespace="http://www.opengis.net/gml")
     private String id;
-    
+    */
     /**
      * The phenomenon name.
-     */
-    @XmlElement(namespace="http://www.opengis.net/gml")
+     
+    @XmlElement(name="name", namespace="http://www.opengis.net/gml", type = String.class)
     private String name;
+    */
     
     /**
      * The phenomenon description.
-     */
-    @XmlElement(namespace="http://www.opengis.net/gml")
+     
+    @XmlElement(name="description", namespace="http://www.opengis.net/gml", type = String.class)
     private String description;
+    */
     
     /**
      * Empty constructor used by JAXB.
@@ -78,10 +81,8 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      * @param name Le nom du phénomène.
      */
     public PhenomenonEntry(final String id, final String name) {
-        super(id);
-        this.id          = id;
-        this.name        = name;
-        this.description = null;
+        super(id, name, null);
+        
     }
 
     /**
@@ -94,29 +95,26 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      * @param description La description de ce phénomène, ou {@code null}.
      */
     public PhenomenonEntry(final String id, final String name, final String description ) {
-        super(id, description);
-        this.id          = id;
-        this.name        = name;
-        this.description = description;
+        super(id, name, description);
     }
 
     /**
      * Retourne l'identifiant du phénomène.
-     */
+    
     public String getId() {
         return id;
     }
 
     /**
      * Retoune la description du phénomène.
-     */
+     
     public String getDescription() {
         return description;
     }
     
     /**
      * Retourne le nom du phenomene (une URN le plus souvent).
-     */
+     
     public String getPhenomenonName(){
         return name;
     } 
@@ -126,7 +124,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      */
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return super.hashCode();
     }
 
     /**
@@ -136,11 +134,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
     public boolean equals(final Object object) {
         if (object == this) {
             return true;
-        }
-        final PhenomenonEntry that = (PhenomenonEntry) object;
-        return Utilities.equals(this.id,          that.id) &&
-               Utilities.equals(this.name,        that.name) && 
-               Utilities.equals(this.description, that.description);
+        } else return super.equals(object);
     }
     
     /**
@@ -148,9 +142,7 @@ public class PhenomenonEntry extends Entry implements Phenomenon {
      */
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
-        
-        s.append(" id=").append(id).append(" name=").append(name).append(" description=").append(description);
+        StringBuilder s = new StringBuilder(super.toString());
         return s.toString();
     }
 }

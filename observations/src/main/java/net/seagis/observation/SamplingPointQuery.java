@@ -54,9 +54,11 @@ public class SamplingPointQuery extends Query {
         super(database, "sampling_points");
         final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
+        final QueryType[] SLIF = {SELECT, LIST, INSERT, FILTERED_LIST};
+        final QueryType[] SLIEF = {SELECT, LIST, INSERT, EXISTS, FILTERED_LIST};
         
-        identifier             = addColumn   ("id",                 SLIE);
-        name                   = addColumn   ("name",               SLIE);
+        identifier             = addColumn   ("id",                 SLIEF);
+        name                   = addColumn   ("name",               SLIF);
         description            = addColumn   ("description",        SLI);
         sampledFeature         = addColumn   ("sampled_feature",    SLI);
         pointIdentifier        = addColumn   ("point_id",           SLI);
@@ -65,8 +67,8 @@ public class SamplingPointQuery extends Query {
         positionValueX         = addColumn   ("x_value",            SLI);
         positionValueY         = addColumn   ("y_value",            SLI);
         
-        byIdentifier  = addParameter(identifier, SELECT);
-        byName        = addParameter(name, EXISTS);
+        byIdentifier  = addParameter(identifier, SELECT, EXISTS);
+        byName        = addParameter(name, FILTERED_LIST);
     }
     
 }

@@ -1312,14 +1312,20 @@ public class SOSworker {
             
             //we get the observation and we assign to it the sensor
             ObservationEntry obs = requestInsObs.getObservation();
-            obs.setProcedure(proc);
-            obs.setName(getObservationId());
-            
+            if (obs != null) {
+                obs.setProcedure(proc);
+                obs.setName(getObservationId());
+                logger.info("template received:" + '\n' + obs.toString());
+            } else {
+                throw new OWSWebServiceException("The observation template must be specified",
+                                                 MISSING_PARAMETER_VALUE, "observationTemplate", version);
+            }
+                
             //we record the observation in the O&M database
            if (obs instanceof MeasurementEntry) {
                MeasurementEntry meas = (MeasurementEntry)obs;
-                MeasurementTable measTable = OMDatabase.getTable(MeasurementTable.class);
-                id = measTable.getIdentifier(meas);
+               MeasurementTable measTable = OMDatabase.getTable(MeasurementTable.class);
+               id = measTable.getIdentifier(meas);
             } else if (obs instanceof ObservationEntry) {
                 
                 //in first we verify that the observation is conform to the template

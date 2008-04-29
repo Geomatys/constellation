@@ -15,12 +15,10 @@
 package net.seagis.observation;
 
 // jaxb import
-import javax.xml.bind.JAXBElement;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
@@ -86,7 +84,13 @@ public class ObservationEntry extends Entry implements Observation {
     private static final long serialVersionUID = 3269639171560208276L;
     
     /**
-     * Le nom de l'observation
+     * A logger (debugging purpose)
+     */
+    @XmlTransient
+    Logger logger = Logger.getLogger("observationEntry");
+    
+    /**
+     *The observation name
      */
     @XmlElement(namespace = "http://www.opengis.net/gml")
     private String name;
@@ -260,7 +264,7 @@ public class ObservationEntry extends Entry implements Observation {
                                     pheno,
                                     this.procedure,
                                     this.distribution,
-                                    null,
+                                    this.result,
                                     time);
         
     }
@@ -414,26 +418,43 @@ public class ObservationEntry extends Entry implements Observation {
      * Retourne vrai si l'observation satisfait le template specifie
      */ 
     public boolean matchTemplate(ObservationEntry template) {
-        System.out.println("matchTemplate:" + Utilities.equals(this.observedProperty,    template.observedProperty));
         
         boolean obsProperty = false;
         if (this.observedProperty != null && template.observedProperty != null) {
-            System.out.println("les deux son non null:" + '\n' + this.observedProperty.getPhenomenon().toString() + '\n' + template.observedProperty.getPhenomenon().toString());
+            System.out.println('\n' + "comparing observed property:" + '\n' + "THIS     => "+  this.observedProperty.getPhenomenon() + '\n' + "TEMPLATE => " + template.observedProperty.getPhenomenon() + '\n');
             obsProperty = Utilities.equals(this.observedProperty.getPhenomenon(),    template.observedProperty.getPhenomenon());
         } else {
             obsProperty = this.observedProperty == null && template.observedProperty == null;
         }
-        return Utilities.equals(this.featureOfInterest,   template.featureOfInterest)   &&
-               Utilities.equals(this.observedProperty,    template.observedProperty)    &&
-               Utilities.equals(this.procedure,           template.procedure)           &&
-               Utilities.equals(this.resultQuality,       template.resultQuality)       && 
-               Utilities.equals(this.observationMetadata, template.observationMetadata) &&
-               Utilities.equals(this.procedureTime,       template.procedureTime)       &&
-               Utilities.equals(this.procedureParameter,  template.procedureParameter)  &&
-               obsProperty;
         
-               //TODO corriger ce pb
-               //Utilities.equals(this.distribution,        template.distribution)        &&
+        boolean obsFoi = false;
+        if (this.featureOfInterest != null && template.featureOfInterest != null) {
+            System.out.println('\n' + "comparing feature of interest:" + '\n' + "THIS    => "+  this.featureOfInterest.getFeature() + '\n' + "TEMPLATE => " + template.featureOfInterest.getFeature() + '\n');
+            obsFoi = Utilities.equals(this.featureOfInterest.getFeature(),    template.featureOfInterest.getFeature());
+        } else {
+            obsFoi = this.featureOfInterest == null && template.featureOfInterest == null;
+        }
+        
+        boolean match = obsFoi                                                                   &&
+                        Utilities.equals(this.procedure,           template.procedure)           &&
+                        Utilities.equals(this.resultQuality,       template.resultQuality)       && 
+                        Utilities.equals(this.observationMetadata, template.observationMetadata) &&
+                        Utilities.equals(this.procedureTime,       template.procedureTime)       &&
+                        Utilities.equals(this.procedureParameter,  template.procedureParameter)  &&
+                        obsProperty;
+        if (!match) {
+            logger.severe("error matching template report:" + '\n' +
+                   "FOI  =>" + obsFoi                                                                   + '\n' +
+                   "PROC =>" + Utilities.equals(this.procedure,           template.procedure)           + '\n' +
+                   "QUAL =>" + Utilities.equals(this.resultQuality,       template.resultQuality)       + '\n' + 
+                   "META =>" + Utilities.equals(this.observationMetadata, template.observationMetadata) + '\n' +
+                   "PTI  =>" + Utilities.equals(this.procedureTime,       template.procedureTime)       + '\n' +
+                   "PPAM =>" + Utilities.equals(this.procedureParameter,  template.procedureParameter)  + '\n' +
+                   "PHEN =>" + obsProperty);
+        }
+        return match;
+        
+             
                
         
     }
@@ -489,9 +510,7 @@ public class ObservationEntry extends Entry implements Observation {
             s.append(" samplingTime=").append(samplingTime.toString()).append(lineSeparator);
         if (distribution != null)
             s.append(" distribution:").append(distribution.toString()).append(lineSeparator);
-        else 
-            s.append("DISTRIBUTION IS NULL").append(lineSeparator);
-        if (procedure != null)
+       if (procedure != null)
             s.append("procedure=").append(procedure.toString()).append(lineSeparator);
         else
             s.append("PROCEDURE IS NULL").append(lineSeparator);

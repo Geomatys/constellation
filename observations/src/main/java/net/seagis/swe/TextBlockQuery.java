@@ -36,7 +36,7 @@ public class TextBlockQuery extends Query{
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byId;
+    protected final Parameter byId, byTokenSeparator, byBlockSeparator, byDecimalSeparator;
     
     /**
      * Creates a new query for the specified database.
@@ -46,13 +46,16 @@ public class TextBlockQuery extends Query{
     public TextBlockQuery(final Database database) {
         super(database, "text_block_encodings");
         final QueryType[] SI  = {SELECT, INSERT};
-        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
-        id               = addColumn("id_encoding",       SIE);
+        final QueryType[] SIEF = {SELECT, INSERT, EXISTS,  FILTERED_LIST};
+        id               = addColumn("id_encoding",       SIEF);
         tokenSeparator   = addColumn("token_separator",   SI);
         blockSeparator   = addColumn("block_separator",   SI);
         decimalSeparator = addColumn("decimal_separator", SI);
 
-        byId  = addParameter(id, SELECT, EXISTS);
+        byId               = addParameter(id, SELECT, EXISTS);
+        byBlockSeparator   = addParameter(blockSeparator,   FILTERED_LIST);
+        byDecimalSeparator = addParameter(decimalSeparator, FILTERED_LIST);
+        byTokenSeparator   = addParameter(tokenSeparator,   FILTERED_LIST);
     }
     
 }

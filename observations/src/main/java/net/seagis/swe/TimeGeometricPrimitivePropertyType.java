@@ -233,7 +233,7 @@ public class TimeGeometricPrimitivePropertyType {
     public String toString() {
         StringBuilder s = new StringBuilder();
         if (timeGeometricPrimitive != null)
-            s.append(timeGeometricPrimitive.getValue().toString()).append('\n');
+            s.append(timeGeometricPrimitive.getValue()).append('\n');
         
         if(actuate != null) {
             s.append("actuate=").append(actuate).append('\n');

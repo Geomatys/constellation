@@ -111,8 +111,10 @@ public class DataArrayPropertyType {
     public String toString() {
         StringBuilder s    = new StringBuilder();
         char lineSeparator = '\n';
-        if (dataArray != null)
-            s.append("dataArray").append(dataArray.toString()).append(lineSeparator);
+        if (dataArray != null)  {
+            s.append("[DataArrayPropertyType] array:");
+            s.append(dataArray.getValue()).append(lineSeparator);
+        }
         return s.toString();
     }
 }

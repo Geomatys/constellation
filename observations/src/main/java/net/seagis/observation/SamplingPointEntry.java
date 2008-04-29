@@ -37,7 +37,7 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
     /**
      * the station position.
      */
-    @XmlElement
+    @XmlElement(required = true)
     private PointType position;
     
     /**
@@ -113,7 +113,7 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(super.toString());
-        s.append('\n').append("Position: ").append(position.toString()) ;
+        s.append('\n').append("Position: ").append(position) ;
         return s.toString();
     }
 

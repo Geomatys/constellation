@@ -245,9 +245,11 @@ public class UomPropertyType {
             s.append("code:").append(code).append('\n');
         if(href != null && !href.equals("")) 
             s.append("href:").append(href).append('\n');
-        s.append("nilReason:").append('\n');
-        for (String ss:nilReason) {
-            s.append(ss).append('\n');
+        if (nilReason != null) {
+            s.append("nilReason:").append('\n');
+            for (String ss:nilReason) {
+                s.append(ss).append('\n');
+            }
         }
         if(remoteSchema != null && !remoteSchema.equals("")) 
             s.append("remoteSchema:").append(remoteSchema).append('\n');

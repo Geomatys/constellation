@@ -20,6 +20,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
@@ -49,18 +50,24 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "PhenomenonPropertyType", propOrder = {
-    "phenomenon"
+   "phenomenon",
+   "compoundPhenomenon",
+   "compositePhenomenon"
 })
 public class PhenomenonPropertyType {
 
-    @XmlElementRef(name = "Phenomenon", namespace = "http://www.opengis.net/swe/1.0.1", type = JAXBElement.class)
-    private JAXBElement<? extends PhenomenonEntry> phenomenon;
+    @XmlElement(name = "Phenomenon", nillable = true)
+    private PhenomenonEntry phenomenon;
+    @XmlElement(name = "CompoundPhenomenon", nillable = true)
+    private CompoundPhenomenonEntry compoundPhenomenon;
+    @XmlElement(name = "CompositePhenomenon", nillable = true)
+    private CompositePhenomenonEntry compositePhenomenon;
     
     /**
      * Allow to record the pehnomenon when its in href mode
      */
     @XmlTransient
-    JAXBElement<? extends PhenomenonEntry>  hiddenPhenomenon;
+    PhenomenonEntry hiddenPhenomenon;
     
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
@@ -83,9 +90,6 @@ public class PhenomenonPropertyType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
-    @XmlTransient
-    private static ObjectFactory sweFactory = new ObjectFactory();
-    
     /**
      * An empty constructor used by JAXB.
      */
@@ -99,12 +103,13 @@ public class PhenomenonPropertyType {
     public PhenomenonPropertyType(PhenomenonEntry observedProperty) {
         
         if (observedProperty instanceof CompositePhenomenonEntry) {
-            CompositePhenomenonEntry compo = (CompositePhenomenonEntry)observedProperty;
-            this.phenomenon    = sweFactory.createCompositePhenomenon(compo);
+            this.compositePhenomenon       = (CompositePhenomenonEntry)observedProperty;
+        } else if (observedProperty instanceof CompoundPhenomenonEntry) {
+            this.compoundPhenomenon        = (CompoundPhenomenonEntry)observedProperty;
         } else if (observedProperty instanceof PhenomenonEntry) {
-            this.phenomenon    = sweFactory.createPhenomenon(observedProperty);
+            this.phenomenon    =  observedProperty;
         } else {
-            throw new IllegalArgumentException("only phenomenonEntry and CompositePhenomenonEntry are allowed");
+            throw new IllegalArgumentException("only phenomenonEntry, CompositePhenomenonEntry and compoundPhenomenonEntry are allowed");
         }
     }
     
@@ -112,10 +117,11 @@ public class PhenomenonPropertyType {
      * Set the phenomenon into href mode.
      */
     public void setToHref() {
-        if (phenomenon != null) {
-            this.href = phenomenon.getValue().getPhenomenonName();
-            hiddenPhenomenon = phenomenon;
-            phenomenon = null;
+        PhenomenonEntry pheno = getPhenomenon();
+        if (pheno != null) {
+            this.href = pheno.getName();
+            hiddenPhenomenon = pheno;
+            setPhenomenon(null);
         }
     }
     
@@ -124,12 +130,36 @@ public class PhenomenonPropertyType {
      */
     public PhenomenonEntry getPhenomenon() {
         if (phenomenon != null) {
-            return phenomenon.getValue();
-        } else {
-            if (hiddenPhenomenon != null) {
-                return hiddenPhenomenon.getValue();
-            }
+            return phenomenon;
+        } else if (compositePhenomenon != null) {
+            return compositePhenomenon;
+        } else if (compoundPhenomenon != null) {
+            return compoundPhenomenon;
+        } else if (hiddenPhenomenon != null) {
+            return hiddenPhenomenon;
+        }
             return null;
+    }
+
+    public void setPhenomenon(PhenomenonEntry pheno) {
+        
+        if (pheno instanceof CompositePhenomenonEntry) {
+            this.compositePhenomenon   = (CompositePhenomenonEntry)pheno;
+            this.phenomenon            = null;
+            this.compoundPhenomenon    = null;
+        } else if (pheno instanceof CompoundPhenomenonEntry) {
+            this.compoundPhenomenon    = (CompoundPhenomenonEntry)pheno;
+            this.phenomenon            = null;
+            this.compositePhenomenon   = null;
+            
+        } else if (pheno instanceof PhenomenonEntry) {
+            this.phenomenon           =  pheno;
+            this.compositePhenomenon   = null;
+            this.compoundPhenomenon    = null;
+        } else {
+            this.phenomenon           =  null;
+            this.compositePhenomenon   = null;
+            this.compoundPhenomenon    = null;
         }
     }
 
@@ -201,35 +231,20 @@ public class PhenomenonPropertyType {
         if (object == this) {
             return true;
         }
-        boolean pheno = false;
         final PhenomenonPropertyType that = (PhenomenonPropertyType) object;
-        if (this.phenomenon != null && that.phenomenon != null) {
-            pheno = Utilities.equals(this.phenomenon.getValue(), that.phenomenon.getValue());
-            //System.out.println("Phenomenon NOT NULL :" + pheno);
-        } else {
-            pheno = (this.phenomenon == null && that.phenomenon == null);
-            //System.out.println("Phenomenon NULL :" + pheno);
-        }
         
-        boolean hiddenPheno = false;
-        if (this.hiddenPhenomenon != null && that.hiddenPhenomenon != null) {
-            hiddenPheno = Utilities.equals(this.hiddenPhenomenon.getValue(), that.hiddenPhenomenon.getValue());
-            //System.out.println("Phenomenon NOT NULL :" + pheno);
-        } else {
-            hiddenPheno = (this.hiddenPhenomenon == null && that.hiddenPhenomenon == null);
-            //System.out.println("Phenomenon NULL :" + pheno);
-        }
-        
-        return pheno                                                            &&
-               hiddenPheno                                                      &&
-               Utilities.equals(this.actuate,            that.actuate)          &&
-               Utilities.equals(this.arcrole,            that.arcrole)          &&  
-               Utilities.equals(this.type,               that.type)             &&
-               Utilities.equals(this.href,               that.href)             &&
-               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
-               Utilities.equals(this.show,               that.show)             &&
-               Utilities.equals(this.role,               that.role)             &&
-               Utilities.equals(this.title,              that.title);
+        return Utilities.equals(this.hiddenPhenomenon,    that.hiddenPhenomenon)    &&
+               Utilities.equals(this.phenomenon,          that.phenomenon)          &&
+               Utilities.equals(this.compoundPhenomenon,  that.compoundPhenomenon)  &&
+               Utilities.equals(this.compositePhenomenon, that.compositePhenomenon) &&
+               Utilities.equals(this.actuate,             that.actuate)             &&
+               Utilities.equals(this.arcrole,             that.arcrole)             &&  
+               Utilities.equals(this.type,                that.type)                &&
+               Utilities.equals(this.href,                that.href)                &&
+               Utilities.equals(this.remoteSchema,        that.remoteSchema)        &&
+               Utilities.equals(this.show,                that.show)                &&
+               Utilities.equals(this.role,                that.role)                &&
+               Utilities.equals(this.title,               that.title);
     }
 
     
@@ -254,9 +269,13 @@ public class PhenomenonPropertyType {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder("PhenomenonPropertyType]");
         if (phenomenon != null)
-            s.append(phenomenon.getValue().toString()).append('\n');
+            s.append(phenomenon).append('\n');
+        if (compositePhenomenon != null)
+            s.append(compositePhenomenon).append('\n');
+        if (compoundPhenomenon != null)
+            s.append(compoundPhenomenon).append('\n');
         
         if(actuate != null) {
             s.append("actuate=").append(actuate).append('\n');

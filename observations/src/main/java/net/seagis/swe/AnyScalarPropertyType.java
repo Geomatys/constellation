@@ -50,7 +50,8 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AnyScalarPropertyType", propOrder = {
-    "component"
+    "component",
+    "name"
 })
 public class AnyScalarPropertyType extends Entry {
 
@@ -248,7 +249,7 @@ public class AnyScalarPropertyType extends Entry {
     public String toString() {
         StringBuilder s = new StringBuilder();
         if (component != null)
-            s.append(component.getValue().toString()).append('\n');
+            s.append(component.getValue()).append('\n');
         
         if(actuate != null) {
             s.append("actuate=").append(actuate).append('\n');

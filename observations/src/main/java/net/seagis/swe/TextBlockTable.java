@@ -17,6 +17,7 @@ package net.seagis.swe;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
@@ -72,24 +73,28 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
         boolean success = false;
         transactionBegin();
         try {
-            if (textbloc.getId() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.id), textbloc.getId());
+            if (textbloc.getId() == null) {
+                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                statement.setString(indexOf(query.byBlockSeparator), textbloc.getBlockSeparator());
+                statement.setString(indexOf(query.byDecimalSeparator), textbloc.getDecimalSeparator());
+                statement.setString(indexOf(query.byTokenSeparator), textbloc.getTokenSeparator());
                 ResultSet result = statement.executeQuery();
+                Logger.getLogger("TextBlockTable").info("FILT LIST:" + statement.toString());
                 if(result.next()) {
                     success = true;
-                    return textbloc.getId();
+                     return result.getString("id_encoding");
                 } else {
-                    id = textbloc.getId();
+                    id = searchFreeIdentifier("textblock");
                 }
             } else {
-                id = searchFreeIdentifier("textblock");
+                id = textbloc.getId();
             }
+             
             PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.id), id);
-            statement.setString(indexOf(query.decimalSeparator), textbloc.getDecimalSeparator() + "");
-            statement.setString(indexOf(query.blockSeparator), textbloc.getBlockSeparator());
-            statement.setString(indexOf(query.tokenSeparator), textbloc.getTokenSeparator());
+            statement.setString(indexOf(query.decimalSeparator), textbloc.getDecimalSeparator());
+            statement.setString(indexOf(query.blockSeparator)  , textbloc.getBlockSeparator());
+            statement.setString(indexOf(query.tokenSeparator)  , textbloc.getTokenSeparator());
         
             updateSingleton(statement);
             success = true;

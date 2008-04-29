@@ -18,6 +18,7 @@ package net.seagis.observation;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -90,10 +91,10 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
         try {
             // the station recived by xml have no ID so we use the name as a second primary key
             if (station.getName() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.byName), station.getName());
                 ResultSet result = statement.executeQuery();
-                System.out.println("EXIST:" + statement.toString());
+                System.out.println("FILTRED LIST:" + statement.toString());
                 if(result.next()) {
                     success = true;
                     return result.getString("id");
@@ -141,5 +142,18 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
         }
         return id;
     }
+    
+    /**
+     * patch
+     
+    private String freeIdentifier(String racine) throws SQLException {
+        Statement stmt = this.getDatabase().getConnection().createStatement();
+        ResultSet res = stmt.executeQuery("select id from sampling_points where id like '%" + racine + "%'");
+        int i = 0;
+        while (res.next()) {
+            i++;
+        }
+        return racine + "-" + i;
+    }*/
     
 }
