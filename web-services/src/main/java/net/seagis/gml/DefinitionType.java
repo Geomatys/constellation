@@ -50,6 +50,20 @@ public class DefinitionType extends DefinitionBaseType {
     private String remarks;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    protected DefinitionType()  {
+        
+    }
+    
+    /**
+     * super constructor to access to Entry constructor
+     */
+    public DefinitionType(final String id, final String name, final String description )  {
+        super(id, name, description);
+    }
+    
+    /**
      * Gets the value of the remarks property.
      */
     @Override

@@ -46,8 +46,8 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
     private List<String> srsName;
     @XmlElement(nillable = true)
     private BoundingShapeEntry boundedBy;
-    @XmlElementRef(name = "location", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
-    private JAXBElement<? extends LocationPropertyType> location;
+    @XmlElement
+    LocationPropertyType location;
 
     /**
      *  Empty constructor used by JAXB.
@@ -86,7 +86,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
     /**
      * Gets the value of the location property.
      */
-    public JAXBElement<? extends LocationPropertyType> getLocation() {
+    public LocationPropertyType getLocation() {
         return location;
     }
     
@@ -113,7 +113,7 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
             
             boolean locationEquals = false;
             if (this.location != null && that.location != null) {
-                locationEquals = Utilities.equals(this.location.getValue(), that.location.getValue());
+                locationEquals = Utilities.equals(this.location, that.location);
             } else {
                 locationEquals = (this.location == null && that.location == null);
             }
@@ -136,8 +136,8 @@ public abstract class AbstractFeatureEntry extends AbstractGMLEntry {
         StringBuilder s = new StringBuilder(super.toString());
         if (boundedBy != null)
             s.append("boundedBy:").append(boundedBy.toString());
-        if (location != null && location.getValue() != null)
-            s.append("location:").append(location.getValue().toString());
+        if (location != null)
+            s.append("location:").append(location);
         
         return s.toString();
     }

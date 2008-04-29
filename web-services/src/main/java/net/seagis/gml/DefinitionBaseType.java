@@ -47,6 +47,19 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DefinitionBaseType")
 public class DefinitionBaseType extends AbstractGMLEntry {
+    /**
+     * An empty constructor used by JAXB
+     */
+    DefinitionBaseType()  {
+        
+    }
+    
+    /**
+     * super constructor to access to Entry constructor
+     */
+    public DefinitionBaseType(final String id, final String name, final String description )  {
+        super(id, name, description, null);
+    }
 
 
 }
