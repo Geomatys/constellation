@@ -21,6 +21,8 @@ INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
   VALUES ('Hidden', NULL, FALSE, FALSE, 'Hidden data (e.g. data reserved for testing purpose only).');
 INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
   VALUES ('Restricted', 'Public', TRUE, TRUE, 'Access to public data together with restricted ones.');
+INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
+  VALUES ('Private', NULL, TRUE, TRUE, 'Access to private data.');
 
 
 --------------------------------------------------------------------------------------------------
