@@ -165,4 +165,37 @@ public class TimePeriodPropertyType {
             return type;
         }
     }
+    
+    /**
+     * Return an object representation.
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        if (timePeriod != null)
+            s.append(timePeriod).append('\n');
+        
+        if(actuate != null) {
+            s.append("actuate=").append(actuate).append('\n');
+        }
+        if(arcrole != null) {
+            s.append("arcrole=").append(arcrole).append('\n');
+        }
+        if(href != null) {
+            s.append("href=").append(href).append('\n');
+        }
+        if(role != null) {
+            s.append("role=").append(role).append('\n');
+        }
+        if(show != null) {
+            s.append("show=").append(show).append('\n');
+        }
+        if(title != null) {
+            s.append("title=").append(title).append('\n');
+        }
+        if(title != null) {
+            s.append("title=").append(title).append('\n');
+        }
+        return s.toString();
+    }
 }
