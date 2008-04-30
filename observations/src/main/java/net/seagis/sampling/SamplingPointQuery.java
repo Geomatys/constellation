@@ -14,7 +14,7 @@
  */
 
 
-package net.seagis.observation;
+package net.seagis.sampling;
 
 import net.seagis.catalog.Column;
 import net.seagis.catalog.Database;

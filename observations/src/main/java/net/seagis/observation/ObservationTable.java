@@ -33,6 +33,10 @@ import net.seagis.gml.TimeInstantType;
 import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetadataTable;
+import net.seagis.sampling.SamplingFeatureEntry;
+import net.seagis.sampling.SamplingFeatureTable;
+import net.seagis.sampling.SamplingPointEntry;
+import net.seagis.sampling.SamplingPointTable;
 import net.seagis.swe.AnyResultEntry;
 import net.seagis.swe.AnyResultTable;
 import net.seagis.swe.CompositePhenomenonEntry;
@@ -458,14 +462,18 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 if (obs.getSamplingTime() instanceof TimePeriodType) {
                     
                     TimePeriodType sampTime = (TimePeriodType)obs.getSamplingTime();
-                    String s = sampTime.getBeginPosition().getValue();
-                    Timestamp date = Timestamp.valueOf(s);
-                    statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
+                    if (sampTime.getBeginPosition()!= null) {
+                        String s = sampTime.getBeginPosition().getValue();
+                        Timestamp date = Timestamp.valueOf(s);
+                        statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
+                    } else {
+                        statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
+                    }
                     
-                    if (sampTime.getEndPosition().getIndeterminatePosition() == null) {
+                    if (sampTime.getEndPosition() == null) {
                        
-                        sampTime.getEndPosition().getValue();
-                        date = Timestamp.valueOf(s);
+                        String s = sampTime.getEndPosition().getValue();
+                        Timestamp date = Timestamp.valueOf(s);
                         statement.setTimestamp(indexOf(query.samplingTimeEnd),  date);
                    
                     } else {

@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package net.seagis.sampling;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,7 +26,7 @@ import net.seagis.catalog.SingletonTable;
 /**
  * Connexion vers la table des {@linkplain Station stations}.
  *
- * @version $Id$
+ * @version $Id: SamplingFeatureTable.java 317 2008-01-07 10:33:02Z glegal $
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  * @author Guilhem Legal

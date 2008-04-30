@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.observation;
+package net.seagis.sampling;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlType;
 
 // Geotools dependencies
 import net.seagis.gml.AbstractFeatureEntry;
+import net.seagis.observation.ObservationEntry;
+import net.seagis.observation.SurveyProcedureEntry;
 import org.geotools.resources.Utilities;
 
 // openGis dependencies
@@ -33,7 +35,7 @@ import org.opengis.observation.sampling.SamplingFeature;
 /**
  * Implémentation d'une entrée représentant une {@link SamplingFeature station}.
  *
- * @version $Id$
+ * @version $Id: SamplingFeatureEntry.java 440 2008-03-04 10:11:55Z glegal $
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  *

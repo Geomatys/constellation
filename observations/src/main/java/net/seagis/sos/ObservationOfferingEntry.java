@@ -111,10 +111,7 @@ public class ObservationOfferingEntry extends AbstractFeatureEntry {
      * 
      */
     public AbstractTimeGeometricPrimitiveType getTime() {
-        if (time != null && time.getTimeGeometricPrimitive() != null)
-            return time.getTimeGeometricPrimitive().getValue();
-        else 
-            return null;
+       return time.getTimeGeometricPrimitive();
     }
 
     /**

@@ -19,12 +19,16 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.observation.ObjectFactory;
-import net.seagis.observation.SamplingPointEntry;
+import net.seagis.observation.ObservationEntry;
+import net.seagis.sampling.ObjectFactory;
+import net.seagis.sampling.SamplingFeatureEntry;
+import net.seagis.sampling.SamplingPointEntry;
 import org.geotools.resources.Utilities;
 
 
@@ -52,18 +56,22 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "FeaturePropertyType", propOrder = {
-    "feature"
+    "abstractFeature",
+    "samplingPoint"
 })
+@XmlSeeAlso({SamplingFeatureEntry.class,SamplingPointEntry.class})
 public class FeaturePropertyType {
 
-    @XmlElementRef(name = "AbstractFeature", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
-    private JAXBElement<? extends AbstractFeatureEntry> feature;
+    @XmlElement(name = "AbstractFeature", nillable = true)
+    private AbstractFeatureEntry abstractFeature;
+    @XmlElement(name = "SamplingPoint", namespace = "http://www.opengis.net/sa/1.0", nillable = true)
+    private SamplingPointEntry samplingPoint;
     
     /**
      * Allow to record the feature when its in href mode
      */
     @XmlTransient
-    JAXBElement<? extends AbstractFeatureEntry>  hiddenFeature;
+    AbstractFeatureEntry  hiddenFeature;
     
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
@@ -86,9 +94,6 @@ public class FeaturePropertyType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
-    @XmlTransient
-    private static ObjectFactory omFactory = new ObjectFactory();
-     
     /**
      * An empty constructor used by JAXB.
      */
@@ -101,9 +106,9 @@ public class FeaturePropertyType {
      */
     public FeaturePropertyType(AbstractFeatureEntry feature) {
         if (feature instanceof SamplingPointEntry) {
-            this.feature = omFactory.createSamplingPoint((SamplingPointEntry)feature);
+            this.samplingPoint = (SamplingPointEntry)feature;
         } else {
-            throw new IllegalArgumentException("only phenomenonPoint are allowed in featurePropertyType");
+            this.abstractFeature = feature;
         }
         
     }
@@ -112,10 +117,15 @@ public class FeaturePropertyType {
      * Set the feature into href mode.
      */
     public void setToHref() {
-        if (feature != null) {
-            this.href = feature.getValue().getName();
-            hiddenFeature= feature;
-            feature = null;
+        if (abstractFeature != null) {
+            this.href       = abstractFeature.getName();
+            hiddenFeature   = abstractFeature;
+            abstractFeature = null;
+            
+        } else if (samplingPoint != null) {
+            this.href      = samplingPoint.getName();
+            hiddenFeature  = samplingPoint;
+            samplingPoint  = null;
         }
     }
     
@@ -123,10 +133,12 @@ public class FeaturePropertyType {
      * Gets the value of the feature property.
      */
     public AbstractFeatureEntry getFeature() {
-        if (feature != null) {
-            return feature.getValue();
+        if (abstractFeature != null) {
+            return abstractFeature;
+        } else if (samplingPoint != null) {
+            return samplingPoint;     
         } else if (hiddenFeature != null) {
-            return hiddenFeature.getValue();     
+            return hiddenFeature;     
         }
         return null;
     }
@@ -201,25 +213,10 @@ public class FeaturePropertyType {
         }
         boolean feat = false;
         final FeaturePropertyType that = (FeaturePropertyType) object;
-        if (this.feature != null && that.feature != null) {
-            feat = Utilities.equals(this.feature.getValue(), that.feature.getValue());
-            //System.out.println("feature NOT NULL :" + pheno);
-        } else {
-            feat = (this.feature == null && that.feature == null);
-            //System.out.println("feature NULL :" + pheno);
-        }
         
-        boolean hiddenFeat = false;
-        if (this.hiddenFeature != null && that.hiddenFeature != null) {
-            hiddenFeat = Utilities.equals(this.hiddenFeature.getValue(), that.hiddenFeature.getValue());
-            //System.out.println("feature NOT NULL :" + pheno);
-        } else {
-            hiddenFeat = (this.hiddenFeature == null && that.hiddenFeature == null);
-            //System.out.println("feature NULL :" + pheno);
-        }
-        
-        return feat                                                            &&
-               hiddenFeat                                                      &&
+        return Utilities.equals(this.abstractFeature,    that.abstractFeature)  && 
+               Utilities.equals(this.samplingPoint,      that.samplingPoint)    && 
+               Utilities.equals(this.hiddenFeature,      that.hiddenFeature)    &&
                Utilities.equals(this.actuate,            that.actuate)          &&
                Utilities.equals(this.arcrole,            that.arcrole)          &&  
                Utilities.equals(this.type,               that.type)             &&
@@ -234,7 +231,8 @@ public class FeaturePropertyType {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 47 * hash + (this.feature != null ? this.feature.hashCode() : 0);
+        hash = 47 * hash + (this.abstractFeature != null ? this.abstractFeature.hashCode() : 0);
+        hash = 47 * hash + (this.samplingPoint != null ? this.samplingPoint.hashCode() : 0);
         hash = 47 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
         hash = 47 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
         hash = 47 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
@@ -252,9 +250,11 @@ public class FeaturePropertyType {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
-        if (feature != null)
-            s.append(feature.getValue().toString()).append('\n');
+        StringBuilder s = new StringBuilder("[featurePropertyType]");
+        if (abstractFeature != null)
+            s.append(abstractFeature.toString()).append('\n');
+        if (samplingPoint != null)
+            s.append(samplingPoint.toString()).append('\n');
         
         if(actuate != null) {
             s.append("actuate=").append(actuate).append('\n');

@@ -86,8 +86,10 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
                 } else {
                     id = searchFreeIdentifier("textblock");
                 }
+            //if the id is not null we assume that the textBlock is already recorded int the database    
             } else {
                 id = textbloc.getId();
+                return id;
             }
              
             PreparedStatement statement = getStatement(QueryType.INSERT);

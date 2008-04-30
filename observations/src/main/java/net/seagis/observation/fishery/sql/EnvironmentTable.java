@@ -23,8 +23,8 @@ import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.NoSuchTableException;
 import net.seagis.observation.MeasurementQuery;
-import net.seagis.observation.SamplingFeatureTable;
 import net.seagis.observation.MeasurementTable;
+import net.seagis.sampling.SamplingFeatureTable;
 
 
 /**

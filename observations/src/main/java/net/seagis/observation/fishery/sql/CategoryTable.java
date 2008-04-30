@@ -27,7 +27,7 @@ import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.SingletonTable;
 import net.seagis.catalog.CatalogException;
-import net.seagis.observation.SamplingFeatureTable;
+import net.seagis.sampling.SamplingFeatureTable;
 
 
 /**

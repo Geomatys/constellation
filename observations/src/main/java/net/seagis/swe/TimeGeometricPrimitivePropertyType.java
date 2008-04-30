@@ -16,13 +16,11 @@
 
 package net.seagis.swe;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.TimeInstantType;
@@ -54,12 +52,18 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TimeGeometricPrimitivePropertyType", propOrder = {
-    "timeGeometricPrimitive"
+    "timeGeometricPrimitive",
+    "timePeriod",
+    "timeInstant"
 })
 public class TimeGeometricPrimitivePropertyType {
 
-    @XmlElementRef(name = "_TimeGeometricPrimitive", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
-    private JAXBElement<? extends AbstractTimeGeometricPrimitiveType> timeGeometricPrimitive;
+    @XmlElement(name = "_TimeGeometricPrimitive", namespace = "http://www.opengis.net/gml", nillable = true)
+    private AbstractTimeGeometricPrimitiveType timeGeometricPrimitive;
+    @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml", nillable = true)
+    private TimePeriodType timePeriod;
+    @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml", nillable = true)
+    private TimeInstantType timeInstant;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
     private String remoteSchema;
@@ -81,9 +85,6 @@ public class TimeGeometricPrimitivePropertyType {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
-    @XmlTransient
-    private final static net.seagis.gml.ObjectFactory gmlFactory = new net.seagis.gml.ObjectFactory();
-    
     /**
      * An empty constructor used by JAXB
      */
@@ -97,16 +98,24 @@ public class TimeGeometricPrimitivePropertyType {
     public TimeGeometricPrimitivePropertyType(AbstractTimeGeometricPrimitiveType time) {
         
         if (time instanceof TimePeriodType) {
-            this.timeGeometricPrimitive = gmlFactory.createTimePeriod((TimePeriodType) time);
+            this.timePeriod = (TimePeriodType) time;
         } else if (time instanceof TimeInstantType) {
-            this.timeGeometricPrimitive = gmlFactory.createTimeInstant((TimeInstantType) time);
+            this.timeInstant = (TimeInstantType) time;
+        } else {
+            this.timeGeometricPrimitive = time;
         }
     }
     /**
      * Gets the value of the timeGeometricPrimitive property.
       */
-    public JAXBElement<? extends AbstractTimeGeometricPrimitiveType> getTimeGeometricPrimitive() {
-        return timeGeometricPrimitive;
+    public AbstractTimeGeometricPrimitiveType getTimeGeometricPrimitive() {
+        if (timeGeometricPrimitive != null)
+            return timeGeometricPrimitive;
+        else if (timeInstant != null)
+            return timeInstant;
+        else if (timePeriod != null)
+            return timePeriod;
+        return null;
     }
 
     /**
@@ -114,10 +123,12 @@ public class TimeGeometricPrimitivePropertyType {
      */
     public void setTimeGeometricPrimitive(AbstractTimeGeometricPrimitiveType value) {
         if (value instanceof TimePeriodType) {
-            this.timeGeometricPrimitive = gmlFactory.createTimePeriod((TimePeriodType) value);
+            this.timePeriod = (TimePeriodType) value;
         } else if (value instanceof TimeInstantType) {
-            this.timeGeometricPrimitive = gmlFactory.createTimeInstant((TimeInstantType) value);
-        } 
+            this.timeInstant = (TimeInstantType) value;
+        } else {
+            this.timeGeometricPrimitive = value;
+        }
     }
 
     /**
@@ -190,23 +201,17 @@ public class TimeGeometricPrimitivePropertyType {
         }
         boolean time = false;
         final TimeGeometricPrimitivePropertyType that = (TimeGeometricPrimitivePropertyType) object;
-        if (this.timeGeometricPrimitive != null && that.timeGeometricPrimitive != null) {
-            time = Utilities.equals(this.timeGeometricPrimitive.getValue(),that.timeGeometricPrimitive.getValue());
-            System.out.println("TIME NOT NULL :" + time);
-        } else {
-            time = (this.timeGeometricPrimitive == null && that.timeGeometricPrimitive == null);
-            System.out.println("TIME NULL :" + time);
-        }
-        
-        return time                                                             &&
-               Utilities.equals(this.actuate,            that.actuate)          &&
-               Utilities.equals(this.arcrole,            that.arcrole)          &&  
-               Utilities.equals(this.type,               that.type)             &&
-               Utilities.equals(this.href,               that.href)             &&
-               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
-               Utilities.equals(this.show,               that.show)             &&
-               Utilities.equals(this.role,               that.role)             &&
-               Utilities.equals(this.title,              that.title);
+        return Utilities.equals(this.timeGeometricPrimitive, that.timeGeometricPrimitive) &&
+               Utilities.equals(this.timeInstant,            that.timeInstant)            &&
+               Utilities.equals(this.timePeriod,             that.timePeriod)             &&
+               Utilities.equals(this.actuate,                that.actuate)                &&
+               Utilities.equals(this.arcrole,                that.arcrole)                &&  
+               Utilities.equals(this.type,                   that.type)                   &&
+               Utilities.equals(this.href,                   that.href)                   &&
+               Utilities.equals(this.remoteSchema,           that.remoteSchema)           &&
+               Utilities.equals(this.show,                   that.show)                   &&
+               Utilities.equals(this.role,                   that.role)                   &&
+               Utilities.equals(this.title,                  that.title);
     }
 
     
@@ -233,7 +238,11 @@ public class TimeGeometricPrimitivePropertyType {
     public String toString() {
         StringBuilder s = new StringBuilder();
         if (timeGeometricPrimitive != null)
-            s.append(timeGeometricPrimitive.getValue()).append('\n');
+            s.append(timeGeometricPrimitive).append('\n');
+        if (timeInstant != null)
+            s.append(timeInstant).append('\n');
+        if (timePeriod != null)
+            s.append(timePeriod).append('\n');
         
         if(actuate != null) {
             s.append("actuate=").append(actuate).append('\n');

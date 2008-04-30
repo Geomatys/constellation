@@ -31,7 +31,7 @@ import net.seagis.observation.fishery.Species;
 import net.seagis.observation.fishery.Category;
 import net.seagis.observation.fishery.FisheryType;
 import net.seagis.observation.ObservationEntry;
-import net.seagis.observation.SamplingFeatureEntry;
+import net.seagis.sampling.SamplingFeatureEntry;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Category catégorie}.

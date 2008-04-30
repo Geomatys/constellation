@@ -138,8 +138,10 @@ public class TimeType extends AbstractDataComponentEntry {
         s.append("referenceFrame:").append(referenceFrame).append('\n');
         s.append("referenceTime:").append(referenceTime).append('\n');
         s.append("value:").append('\n');
-        for (String ss:value){
-            s.append(ss).append('\n');
+        if (value != null) {
+            for (String ss:value){
+                s.append(ss).append('\n');
+            }
         }
         if (uom != null) {
             s.append("uom: ").append(uom.toString());

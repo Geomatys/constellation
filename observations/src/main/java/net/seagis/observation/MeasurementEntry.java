@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.model.Distribution;
 import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
 import net.seagis.metadata.MetaDataEntry;
+import net.seagis.sampling.SamplingFeatureEntry;
 import net.seagis.swe.PhenomenonEntry;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Measure;

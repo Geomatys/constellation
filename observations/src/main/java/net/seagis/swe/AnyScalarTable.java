@@ -17,6 +17,7 @@ package net.seagis.swe;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
@@ -31,6 +32,11 @@ import org.geotools.resources.Utilities;
  * @version $Id:
  */
 public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
+    
+    /**
+     * A logger (debugging purpose)
+     */
+    private Logger logger = Logger.getLogger("anyScalarTable");
     
     /**
      * identifiant secondaire de la table
@@ -182,7 +188,8 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
             if (field.getComponent() != null)
                 statement.setString(indexOf(query.definition),   field.getComponent().getDefinition());
             else
-                statement.setNull(indexOf(query.definition), java.sql.Types.VARCHAR);        
+                statement.setNull(indexOf(query.definition), java.sql.Types.VARCHAR);   
+            
             if (field.getComponent() instanceof QuantityType) {
                 QuantityType q = (QuantityType) field.getComponent();
             
@@ -227,7 +234,10 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
                 statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
                 statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
             
+            } else {
+                throw new CatalogException("Unexpected scalar Type:" + field.getComponent());            
             }
+            logger.info(statement.toString());
             updateSingleton(statement);
             success = true;
         } finally {

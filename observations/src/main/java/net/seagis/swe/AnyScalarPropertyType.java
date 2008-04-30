@@ -20,6 +20,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
@@ -50,7 +51,10 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AnyScalarPropertyType", propOrder = {
-    "component",
+    "abstractDataComponent",
+    "time",
+    "_boolean",
+    "quantity",
     "name"
 })
 public class AnyScalarPropertyType extends Entry {
@@ -61,8 +65,14 @@ public class AnyScalarPropertyType extends Entry {
     @XmlAttribute
     private String name;
     
-    @XmlElementRef(name = "AbstractDataComponent", namespace = "http://www.opengis.net/swe/1.0.1", type = JAXBElement.class)
-    private JAXBElement<? extends AbstractDataComponentEntry> component;
+    @XmlElement(name = "AbstractDataComponent", nillable = true)
+    protected AbstractDataComponentEntry abstractDataComponent;
+    @XmlElement(name = "Time", nillable = true)
+    protected TimeType time;
+    @XmlElement(name = "Boolean", nillable = true)
+    protected BooleanType _boolean;
+    @XmlElement(name = "Quantity", nillable = true)
+    protected QuantityType quantity;
     
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")
@@ -85,9 +95,7 @@ public class AnyScalarPropertyType extends Entry {
     @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
     private String actuate;
 
-    @XmlTransient
-    private static ObjectFactory sweFactory = new ObjectFactory();
-    
+        
     /**
      * An empty constructor used by JAXB.
      */
@@ -103,13 +111,13 @@ public class AnyScalarPropertyType extends Entry {
         this.name         = name;
         this.idDataRecord = idDataRecord;
         if (component instanceof TimeType) {
-            this.component = sweFactory.createTime((TimeType)component);
+            this.time = (TimeType)component;
         } else if (component instanceof QuantityType) {
-            this.component = sweFactory.createQuantity((QuantityType)component);
+            this.quantity = (QuantityType)component;
         } else if (component instanceof BooleanType) {
-            this.component = sweFactory.createBoolean((BooleanType)component);
+            this._boolean = (BooleanType)component;
         } else {
-            throw new IllegalArgumentException("only TimeType, QuantityType and BooleanType are allowed");
+            abstractDataComponent = component;
         }
     }
     
@@ -130,11 +138,15 @@ public class AnyScalarPropertyType extends Entry {
      * Gets the value of the phenomenon property.
      */
     public AbstractDataComponentEntry getComponent() {
-        if (component != null) {
-            return component.getValue();
-        } else {
-            return null;
-        }
+        if (abstractDataComponent != null) {
+            return abstractDataComponent;
+        } else if (time != null){
+            return time;
+        } else if (_boolean != null){
+            return _boolean;
+        } else if (quantity != null){
+            return quantity;
+        } return null;
     }
 
     /**
@@ -204,17 +216,12 @@ public class AnyScalarPropertyType extends Entry {
         if (object == this) {
             return true;
         }
-        boolean compo = false;
         final AnyScalarPropertyType that = (AnyScalarPropertyType) object;
-        if (this.component != null && that.component != null) {
-            compo = Utilities.equals(this.component.getValue(), that.component.getValue());
-            //System.out.println("component NOT NULL :" + pheno);
-        } else {
-            compo = (this.component == null && that.component == null);
-            //System.out.println("component NULL :" + pheno);
-        }
         
-        return compo                                                            &&
+        return Utilities.equals(this._boolean,           that._boolean)         &&
+               Utilities.equals(this.abstractDataComponent, that.abstractDataComponent)          &&
+               Utilities.equals(this.quantity,           that.quantity)         &&
+               Utilities.equals(this.time,               that.time)             &&
                Utilities.equals(this.actuate,            that.actuate)          &&
                Utilities.equals(this.arcrole,            that.arcrole)          &&  
                Utilities.equals(this.type,               that.type)             &&
@@ -229,7 +236,10 @@ public class AnyScalarPropertyType extends Entry {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 47 * hash + (this.component != null ? this.component.hashCode() : 0);
+        hash = 47 * hash + (this.abstractDataComponent != null ? this.abstractDataComponent.hashCode() : 0);
+        hash = 47 * hash + (this._boolean != null ? this._boolean.hashCode() : 0);
+        hash = 47 * hash + (this.quantity != null ? this.quantity.hashCode() : 0);
+        hash = 47 * hash + (this.time != null ? this.time.hashCode() : 0);
         hash = 47 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
         hash = 47 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
         hash = 47 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
@@ -248,8 +258,14 @@ public class AnyScalarPropertyType extends Entry {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        if (component != null)
-            s.append(component.getValue()).append('\n');
+        if (abstractDataComponent != null)
+            s.append(abstractDataComponent).append('\n');
+        if (_boolean != null)
+            s.append(_boolean).append('\n');
+        if (quantity != null)
+            s.append(quantity).append('\n');
+        if (time != null)
+            s.append(time).append('\n');
         
         if(actuate != null) {
             s.append("actuate=").append(actuate).append('\n');

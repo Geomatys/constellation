@@ -36,7 +36,9 @@ import net.seagis.gml.ReferenceEntry;
 import net.seagis.gml.TimePeriodType;
 import net.seagis.gml.TimePositionType;
 import net.seagis.metadata.MetaDataEntry;
+import net.seagis.sampling.SamplingFeatureEntry;
 import net.seagis.swe.AnyResultEntry;
+import net.seagis.swe.DataArrayEntry;
 import net.seagis.swe.DataArrayPropertyType;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonPropertyType;
@@ -258,6 +260,12 @@ public class ObservationEntry extends Entry implements Observation {
         if (this.featureOfInterest != null) {
             foi = (SamplingFeatureEntry) this.featureOfInterest.getFeature();
         }
+        //debugging purpose
+        if (this.result instanceof DataArrayPropertyType) {
+            DataArrayEntry d = ((DataArrayPropertyType)this.result).getDataArray();
+            
+            logger.info("encoding sent:" + d.getEncoding());     
+        }
         return new ObservationEntry(temporaryName,
                                     this.definition,
                                     foi, 
@@ -366,10 +374,8 @@ public class ObservationEntry extends Entry implements Observation {
      * {@inheritDoc}
      */
     public AbstractTimeGeometricPrimitiveType getSamplingTime() {
-       if (samplingTime != null && samplingTime.getTimeGeometricPrimitive() != null)
-            return samplingTime.getTimeGeometricPrimitive().getValue();
-        else 
-            return null;
+        return samplingTime.getTimeGeometricPrimitive();
+        
     }
     
     /**
@@ -393,10 +399,8 @@ public class ObservationEntry extends Entry implements Observation {
      * {@inheritDoc}
      */
     public AbstractTimeGeometricPrimitiveType getProcedureTime() {
-        if (procedureTime != null && procedureTime.getTimeGeometricPrimitive() != null)
-            return procedureTime.getTimeGeometricPrimitive().getValue();
-        else 
-            return null;
+        return procedureTime.getTimeGeometricPrimitive();
+        
     }
     
     /**
@@ -421,16 +425,20 @@ public class ObservationEntry extends Entry implements Observation {
         
         boolean obsProperty = false;
         if (this.observedProperty != null && template.observedProperty != null) {
-            System.out.println('\n' + "comparing observed property:" + '\n' + "THIS     => "+  this.observedProperty.getPhenomenon() + '\n' + "TEMPLATE => " + template.observedProperty.getPhenomenon() + '\n');
             obsProperty = Utilities.equals(this.observedProperty.getPhenomenon(),    template.observedProperty.getPhenomenon());
+            if (!obsProperty) {
+                System.out.println('\n' + "comparing observed property:" + '\n' + "THIS     => "+  this.observedProperty.getPhenomenon() + '\n' + "TEMPLATE => " + template.observedProperty.getPhenomenon() + '\n');
+            }
         } else {
             obsProperty = this.observedProperty == null && template.observedProperty == null;
         }
         
         boolean obsFoi = false;
         if (this.featureOfInterest != null && template.featureOfInterest != null) {
-            System.out.println('\n' + "comparing feature of interest:" + '\n' + "THIS    => "+  this.featureOfInterest.getFeature() + '\n' + "TEMPLATE => " + template.featureOfInterest.getFeature() + '\n');
             obsFoi = Utilities.equals(this.featureOfInterest.getFeature(),    template.featureOfInterest.getFeature());
+            if (!obsFoi) {
+                System.out.println('\n' + "comparing feature of interest:" + '\n' + "THIS    => "+  this.featureOfInterest.getFeature() + '\n' + "TEMPLATE => " + template.featureOfInterest.getFeature() + '\n');
+            }
         } else {
             obsFoi = this.featureOfInterest == null && template.featureOfInterest == null;
         }

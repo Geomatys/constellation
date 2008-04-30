@@ -23,11 +23,11 @@ import java.util.Iterator;
 import java.util.Set;
 import net.seagis.catalog.CatalogException;
 import net.seagis.swe.PhenomenonEntry;
-import net.seagis.observation.SamplingPointEntry;
 import net.seagis.swe.PhenomenonTable;
-import net.seagis.observation.SamplingPointTable;
 import net.seagis.gml.UnitOfMeasureEntry;
 import net.seagis.gml.UnitOfMeasureTable;
+import net.seagis.sampling.SamplingPointEntry;
+import net.seagis.sampling.SamplingPointTable;
 
 /**
  * Permet de creer les dictionnaire de données au format XML a partir de la base de données.

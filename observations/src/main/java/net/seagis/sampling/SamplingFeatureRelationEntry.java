@@ -1,5 +1,5 @@
 
-package net.seagis.observation;
+package net.seagis.sampling;
 
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
