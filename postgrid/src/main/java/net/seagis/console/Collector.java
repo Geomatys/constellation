@@ -93,8 +93,8 @@ public class Collector extends CommandLine {
     /**
      * Flag specified on the command lines.
      */
-    @Option(name="ncmlpath", description="The path to the NcML file.")
-    private String ncmlPath;
+    @Option(description="The server path to collect.")
+    private String path;
 
     /**
      * Flag specified on the command lines.
@@ -159,7 +159,8 @@ public class Collector extends CommandLine {
      * @throws CatalogException if an error occured while inserting the data.
      */
     protected boolean process(final String type) throws CatalogException {
-        if (type == null) {
+        // By default if not precised.
+        if (type == null || type.equals("opendap")) {
             processLayer();
             return true;
         }
@@ -206,18 +207,18 @@ public class Collector extends CommandLine {
      */
     private void processNcML() throws CatalogException {
         /*
-         * Ensures both {@code -ncmlpath} and {@code -variable} arguments have been specified
+         * Ensures both {@code -path} and {@code -variable} arguments have been specified
          * by the user, in order to begin the process.
          */
-        if (ncmlPath == null) {
-            throw new IllegalArgumentException("The argument -ncmlpath was not specified.");
+        if (path == null) {
+            throw new IllegalArgumentException("The argument -path was not specified.");
         }
         if (variable == null) {
             throw new IllegalArgumentException("The argument -variable was not specified.");
         }
-        final File ncml = new File(ncmlPath);
+        final File ncml = new File(path);
         if (!ncml.exists()) {
-            err.println("Path invalid to NcML file : " + ncmlPath);
+            err.println("Path invalid to NcML file : " + path);
             System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
         }
         final NcmlGridCoverageTable ncmlTable = new NcmlGridCoverageTable(database);
