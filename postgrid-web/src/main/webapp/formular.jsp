@@ -21,39 +21,6 @@
         <f:view>
         
             <div id="content" class="content">
-                <h:form id="form_1" enctype="multipart/form-data">
-                    <%-- Upload panel --%>
-                    <h:panelGrid id="upload_panel" columns="2">
-                        <h:outputText id="upload_label" value="Upload XML file : " />
-                        <t:inputFileUpload id="fileupload"
-                                           accept="temp/*"
-                                           storage="memory"
-                                           maxlength="200000"
-                                           value="#{servicesBean.uploadedFile}"
-                                           immediate="true"
-                                           required="true">
-                            <f:valueChangeListener type="net.seagis.bean.UploadListener" />
-                        </t:inputFileUpload>
-                        
-                        <t:commandLink styleClass="button" id="uploadButton" onclick="this.blur();" style="margin:20px;" action="#{servicesBean.doUpload}">
-                            <h:outputText id="labelUpload" value="Upload"/>
-                        </t:commandLink>
-                        <f:verbatim><br></f:verbatim>
-                        
-                        <s:pprPanelGroup id="statepanel" partialTriggerPattern="form_1:.*">
-                            <h:panelGrid id="fileinfos_panel" columns="2" border="0" cellspacing="5">
-                                
-                                <h:outputText value="FileName:"/>
-                                <h:outputText value="#{servicesBean.uploadedFile.name}"/>
-                                
-                                <h:outputText value="FileSize:"/>
-                                <h:outputText value="#{servicesBean.uploadedFile.size}"/>
-                                
-                            </h:panelGrid>
-                        </s:pprPanelGroup>
-                        
-                    </h:panelGrid>
-                </h:form>
                 
                 <h:form id="form_2">
                     <%-- formular panel --%>
