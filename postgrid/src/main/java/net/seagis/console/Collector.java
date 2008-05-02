@@ -87,14 +87,8 @@ public class Collector extends CommandLine {
     /**
      * Flag specified on the command lines.
      */
-    @Option(name="newlayer", description="True if the process can add a new layer.")
-    private boolean newLayer = true;
-
-    /**
-     * Flag specified on the command lines.
-     */
-    @Option(description="The server path to collect.")
-    private String path;
+    @Option(description="The path where to find data to collect.")
+    protected String path;
 
     /**
      * Flag specified on the command lines.
@@ -112,7 +106,7 @@ public class Collector extends CommandLine {
      * Flag specified on the command lines.
      */
     @Option(description="The type of process to launch.")
-    private String type;
+    protected String type;
 
     /**
      * Creates a new collector which will adds entries in the specified database.
@@ -222,7 +216,7 @@ public class Collector extends CommandLine {
             System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
         }
         final NcmlGridCoverageTable ncmlTable = new NcmlGridCoverageTable(database);
-        ncmlTable.setCanInsertNewLayers(newLayer);
+        ncmlTable.setCanInsertNewLayers(true);
         final Set<NcmlNetcdfElement> netcdfTags = new LinkedHashSet<NcmlNetcdfElement>();
         try {
             final List<Aggregation> aggregations = NcmlReading.getNestedAggregations(ncml);
