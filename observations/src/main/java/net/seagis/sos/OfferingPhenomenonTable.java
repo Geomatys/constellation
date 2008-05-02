@@ -19,6 +19,7 @@ package net.seagis.sos;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
@@ -35,7 +36,10 @@ import org.geotools.resources.Utilities;
  */
 public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEntry>{
 
-        
+    /**
+     * A logger debugging purpose
+     */    
+    private Logger logger = Logger.getLogger("OfferingPhenomenonTable");
     /**
      * identifier secondary of the table.
      */
@@ -81,7 +85,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
         final OfferingPhenomenonQuery query = (OfferingPhenomenonQuery) super.query;
         PhenomenonEntry phenomenon;
         
-        if (results.getString(indexOf(query.phenomenon)) != null) {
+        if (!results.getString(indexOf(query.phenomenon)).equals("")) {
             if (phenomenons == null) {
                 phenomenons = getDatabase().getTable(PhenomenonTable.class);
             }
@@ -141,7 +145,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 }
                 idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
                 statement.setString(indexOf(query.compositePhenomenon), idPheno);
-                statement.setNull(indexOf(query.phenomenon), java.sql.Types.VARCHAR);
+                statement.setString(indexOf(query.phenomenon), "");
         
             } else if (offPheno.getComponent() instanceof PhenomenonEntry) {
                 if ( phenomenons == null) {
@@ -149,9 +153,9 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 }
                 idPheno = phenomenons.getIdentifier(offPheno.getComponent());
                 statement.setString(indexOf(query.phenomenon), idPheno);
-                statement.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
+                statement.setString(indexOf(query.compositePhenomenon), "");
             
-            } 
+            }
             ResultSet result = statement.executeQuery();
             if(result.next()) {
                 success = true;
@@ -166,14 +170,14 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 }
                 idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
                 insert.setString(indexOf(query.compositePhenomenon), idPheno);
-                insert.setNull(indexOf(query.phenomenon), java.sql.Types.VARCHAR);
+                insert.setString(indexOf(query.phenomenon), "");
             } else if (offPheno.getComponent() instanceof PhenomenonEntry) {
             if ( phenomenons == null) {
                     phenomenons = getDatabase().getTable(PhenomenonTable.class);
             }
             idPheno = phenomenons.getIdentifier(offPheno.getComponent());
                 insert.setString(indexOf(query.phenomenon), idPheno);
-                insert.setNull(indexOf(query.compositePhenomenon), java.sql.Types.VARCHAR);
+                insert.setString(indexOf(query.compositePhenomenon), "");
             
             }
             updateSingleton(insert);

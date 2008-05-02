@@ -94,10 +94,11 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
                 PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.byName), station.getName());
                 ResultSet result = statement.executeQuery();
-                System.out.println("FILTRED LIST:" + statement.toString());
                 if(result.next()) {
                     success = true;
-                    return result.getString("id");
+                    id = result.getString("id");
+                    station.setId(id);
+                    return id;
                 } else {
                     if (station.getId() != null) {
                         id = station.getId(); 
@@ -108,7 +109,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
             } else {
                throw new CatalogException("the station must have a name"); 
             }
-        
+            station.setId(id);
             PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.identifier), id);
         

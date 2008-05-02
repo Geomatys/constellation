@@ -16,12 +16,10 @@
 
 package net.seagis.swe;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
@@ -56,11 +54,11 @@ import org.geotools.resources.Utilities;
 })
 public class PhenomenonPropertyType {
 
-    @XmlElement(name = "Phenomenon", nillable = true)
+    @XmlElement(name = "Phenomenon")
     private PhenomenonEntry phenomenon;
-    @XmlElement(name = "CompoundPhenomenon", nillable = true)
+    @XmlElement(name = "CompoundPhenomenon")
     private CompoundPhenomenonEntry compoundPhenomenon;
-    @XmlElement(name = "CompositePhenomenon", nillable = true)
+    @XmlElement(name = "CompositePhenomenon")
     private CompositePhenomenonEntry compositePhenomenon;
     
     /**

@@ -37,7 +37,7 @@ public class DataArrayQuery extends Query{
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byIdArray;
+    protected final Parameter byIdArray, byElementCount, byEncoding, byElementType;
     
     /**
      * Creates a new query for the specified database.
@@ -47,13 +47,16 @@ public class DataArrayQuery extends Query{
     public DataArrayQuery(final Database database) {
         super(database, "data_array_definition");
         final QueryType[] SI = {SELECT, INSERT};
-        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
-        idArray        = addColumn ("id_array_definition", SIE);
+        final QueryType[] SIEF = {SELECT, INSERT, EXISTS, FILTERED_LIST};
+        idArray        = addColumn ("id_array_definition", SIEF);
         encoding       = addColumn ("encoding"           , SI);
         elementCount   = addColumn ("element_count"      , SI);
         elementType    = addColumn ("elementType"        , SI);
 
-        byIdArray      = addParameter(idArray, SELECT, EXISTS);
+        byIdArray      = addParameter(idArray,      SELECT, EXISTS);
+        byElementCount = addParameter(elementCount, FILTERED_LIST);
+        byElementType  = addParameter(elementType,  FILTERED_LIST);
+        byEncoding     = addParameter(encoding,     FILTERED_LIST);
     }
     
 }

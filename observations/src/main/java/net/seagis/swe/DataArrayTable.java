@@ -103,6 +103,17 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
         String id;
         boolean success = false;
         transactionBegin();
+        //first we get the identifier form sub object
+        int count = 0;
+        if (array.getElementCount() != null && array.getElementCount().getCount() != null) {
+            count = array.getElementCount().getCount().getValue();
+        }
+        
+        if (textBlockEncodings == null) {
+                textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
+        }
+        String textBlockIdentifier = textBlockEncodings.getIdentifier((TextBlockEntry)array.getEncoding());
+            
         try {
             if (array.getId() != null) {
                 PreparedStatement statement = getStatement(QueryType.EXISTS);
@@ -120,12 +131,9 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
         
             PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.idArray), id);
-            statement.setInt(indexOf(query.elementCount), array.getElementCount().getCount().getValue());
+            statement.setInt(indexOf(query.elementCount), count);
 
-            if (textBlockEncodings == null) {
-                textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
-            }
-            statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry)array.getEncoding()));
+           statement.setString(indexOf(query.encoding), textBlockIdentifier);
             
             if (dataRecords == null) {
                 dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);

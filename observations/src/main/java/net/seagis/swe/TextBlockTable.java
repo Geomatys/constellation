@@ -79,7 +79,6 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
                 statement.setString(indexOf(query.byDecimalSeparator), textbloc.getDecimalSeparator());
                 statement.setString(indexOf(query.byTokenSeparator), textbloc.getTokenSeparator());
                 ResultSet result = statement.executeQuery();
-                Logger.getLogger("TextBlockTable").info("FILT LIST:" + statement.toString());
                 if(result.next()) {
                     success = true;
                      return result.getString("id_encoding");

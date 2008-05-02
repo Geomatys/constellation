@@ -178,7 +178,6 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
                 }
             } else {
                 id = searchFreeIdentifier("field");
-                System.out.println("Id choisi:" + id);
             }
         
             PreparedStatement statement = getStatement(QueryType.INSERT);
@@ -237,7 +236,6 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
             } else {
                 throw new CatalogException("Unexpected scalar Type:" + field.getComponent());            
             }
-            logger.info(statement.toString());
             updateSingleton(statement);
             success = true;
         } finally {

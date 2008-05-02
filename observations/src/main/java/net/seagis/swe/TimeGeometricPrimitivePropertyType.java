@@ -58,11 +58,11 @@ import org.geotools.resources.Utilities;
 })
 public class TimeGeometricPrimitivePropertyType {
 
-    @XmlElement(name = "_TimeGeometricPrimitive", namespace = "http://www.opengis.net/gml", nillable = true)
+    @XmlElement(name = "_TimeGeometricPrimitive", namespace = "http://www.opengis.net/gml")
     private AbstractTimeGeometricPrimitiveType timeGeometricPrimitive;
-    @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml", nillable = true)
+    @XmlElement(name = "TimePeriod", namespace = "http://www.opengis.net/gml")
     private TimePeriodType timePeriod;
-    @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml", nillable = true)
+    @XmlElement(name = "TimeInstant", namespace = "http://www.opengis.net/gml")
     private TimeInstantType timeInstant;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")

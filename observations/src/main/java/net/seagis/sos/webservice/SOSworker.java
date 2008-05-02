@@ -1170,7 +1170,6 @@ public class SOSworker {
             //we get the observation template provided with the sensor description.
             ObservationTemplate temp = requestRegSensor.getObservationTemplate();
             ObservationEntry obs     = temp.getObservation();
-            logger.info("Result type =" + obs.getResult().getClass().getSimpleName());
             if(obs == null) {
                 throw new OWSWebServiceException("observation template must be specify",
                                               MISSING_PARAMETER_VALUE,
@@ -1185,7 +1184,8 @@ public class SOSworker {
            
             //we decode the content
             String decodedprocess = java.net.URLDecoder.decode(process, "ISO-8859-1");
-            logger.severe("process null = " + (decodedprocess== null));
+            if (decodedprocess == null)
+                logger.severe("decoded process is null");
             
             //we create a new Tempory File SensorML
             File tempFile = new File(temporaryFolder + "/temp.xml");
@@ -1221,7 +1221,7 @@ public class SOSworker {
             ProcessEntry p = new ProcessEntry(id);
             obs.setProcedure(p);
             obs.setName(observationTemplateIdBase + num);
-            logger.info(obs.toString());
+            logger.finer(obs.toString());
             if (obsTable != null) {
                 obsTable.getIdentifier(obs);
                    
@@ -1616,13 +1616,12 @@ public class SOSworker {
             PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
                                                                      " WHERE id_value=?" +
                                                                      " AND form=?");
-            stmt.setString(1, "SensorML:SensorML:member.1:identification.1:identifier." + i + ":name.1");
+            stmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + i + ":name.1");
             stmt.setInt(2,    form.getId());
             ResultSet result = stmt.executeQuery();
             moreIdentifier   = result.next();
             if (moreIdentifier) {
                 String value = result.getString(1);
-                logger.info(value);
                 if (value.equals("supervisorCode")){
                     found = true;
                 } 
@@ -1638,7 +1637,7 @@ public class SOSworker {
             PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
                                                                      " WHERE id_value=?" +
                                                                      " AND form=?");
-            stmt.setString(1, "SensorML:SensorML:member.1:identification.1:identifier." + (i - 1) + ":value.1");
+            stmt.setString(1, "SensorML:SensorML.1:member.1:identification.1:identifier." + (i - 1) + ":value.1");
             stmt.setInt(2,    form.getId());
             ResultSet result = stmt.executeQuery();
             String value = "";
@@ -1680,7 +1679,7 @@ public class SOSworker {
      * 
      *  @param form The "form" containing the sensorML data.
      */
-    private void recordSensorLocation(Form form, String sensorId) throws SQLException {
+    private void recordSensorLocation(Form form, String sensorId) throws SQLException, WebServiceException {
         String column      = "";
         String coordinates = "";
         
@@ -1688,7 +1687,7 @@ public class SOSworker {
         PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
                                                                      " WHERE id_value=?" +
                                                                      " AND form=?");
-        stmt.setString(1, "SensorML:SensorML:member.1:location.1:pos.1:srsName.1");
+        stmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1:srsName.1");
         stmt.setInt(2,    form.getId());
         ResultSet result = stmt.executeQuery();
         if (result.next()) {
@@ -1704,7 +1703,7 @@ public class SOSworker {
         result.close();
         
         // we get the coordinates
-        stmt.setString(1, "SensorML:SensorML:member.1:location.1:pos.1");
+        stmt.setString(1, "SensorML:SensorML.1:member.1:location.1:pos.1");
         stmt.setInt(2,    form.getId());
         result = stmt.executeQuery();
         if (result.next()) {
@@ -1718,13 +1717,32 @@ public class SOSworker {
         result.close();
         String x = coordinates.substring(0, coordinates.indexOf(' '));
         String y = coordinates.substring(coordinates.indexOf(' ') + 1 );
-        String request = "";
-        if (column.equals("27582"))
-            request = "INSERT INTO projected_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + column + "))";
-        else
-            request = "INSERT INTO geographic_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + column + "))";
-        logger.info(request);
         Statement stmt2    = OMDatabase.getConnection().createStatement();
+        final ResultSet result2;
+        String request = "SELECT * FROM ";
+        
+        if (column.equals("27582")) {
+            request = request + " projected_localisations WHERE id='" + sensorId + "'";
+            result2 = stmt2.executeQuery(request);
+            if (!result2.next()) {
+                request = "INSERT INTO projected_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + column + "))";
+            } else {
+                logger.severe("Projected sensor location already registred for " + sensorId + " keeping old location");
+            }
+        } else if (column.equals("4326")) {
+            request = request + " geographic_localisations WHERE id='" + sensorId + "'";
+            result2 = stmt2.executeQuery(request);
+            if (!result2.next()) {
+                request = "INSERT INTO geographic_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + column + "))";
+            } else {
+                logger.severe("Geographic sensor location already registred for " + sensorId + " keeping old location");
+            }
+        } else {
+            throw new OWSWebServiceException("This CRS " + column + " is not supported",
+                                              INVALID_PARAMETER_VALUE, null, version);
+        }
+        logger.info(request);
+        
         stmt2.executeUpdate(request);
     }
     
@@ -1747,14 +1765,13 @@ public class SOSworker {
             PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
                                                                          " WHERE id_value=?" +
                                                                          " AND form=?");
-            stmt.setString(1, "SensorML:SensorML:member.1:classification.1:classifier." + i + ":name.1");
+            stmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + i + ":name.1");
             stmt.setInt(2,    form.getId());
             ResultSet result = stmt.executeQuery();
             moreClassifier   = result.next();
             if (moreClassifier) {
                 String value = result.getString(1);
                 if (value.equals("network")){
-                    logger.info(value);
                     networksIndex[size] = i;
                     size++;
                     
@@ -1774,7 +1791,7 @@ public class SOSworker {
                     PreparedStatement stmt = sensorMLConnection.prepareStatement(" SELECT value FROM \"TextValues\" " +
                                                                                  " WHERE id_value=?" +
                                                                                  " AND form=?");
-                    stmt.setString(1, "SensorML:SensorML:member.1:classification.1:classifier." + networksIndex[j] + ":value.1");
+                    stmt.setString(1, "SensorML:SensorML.1:member.1:classification.1:classifier." + networksIndex[j] + ":value.1");
                     stmt.setInt(2,    form.getId());
                     ResultSet result = stmt.executeQuery();
                 
@@ -1788,7 +1805,7 @@ public class SOSworker {
                             offering = offTable.getEntry(offeringName);
                         } catch (NoSuchRecordException ex) {
                         
-                            logger.info("offering " + offeringName + "not present, first build");
+                            logger.info("offering " + offeringName + " not present, first build");
                         }
                         
                         //if the offering is already in the database
@@ -1819,6 +1836,7 @@ public class SOSworker {
                                 OfferingSamplingFeatureEntry offSF= new OfferingSamplingFeatureEntry(offering.getId(), ref);
                                 offTable.getStations().getIdentifier(offSF);
                             }
+                       
                         // we build a new offering
                         // TODO bounded by??? station?    
                         } else {
@@ -1839,6 +1857,7 @@ public class SOSworker {
                             //we create a new List of process and add the template process to it
                             List<ReferenceEntry> stations = new ArrayList<ReferenceEntry>();
                             ref = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
+                            logger.info(ref.toString());
                             stations.add(ref);
                         
                             //we create a list of accepted responseMode (fixed)
@@ -1935,6 +1954,7 @@ public class SOSworker {
                             //we create a list of accepted responseMode (fixed)
                             List<ResponseModeType> responses = new ArrayList<ResponseModeType>();
                             responses.add(ResponseModeType.RESULT_TEMPLATE);
+                            responses.add(ResponseModeType.INLINE);
                         
                             List<QName> resultModel = new ArrayList<QName>();
                             resultModel.add(new QName("http://www.opengis.net/om/1.0",
