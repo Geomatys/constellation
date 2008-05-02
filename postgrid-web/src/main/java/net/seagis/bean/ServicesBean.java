@@ -731,10 +731,14 @@ public class ServicesBean {
      * 
      * @param f the uploaded file.
      */
-    private void loadUserData() throws FileNotFoundException, IOException {
+    private void loadUserData(File f) throws FileNotFoundException, IOException {
         try {
-            
-            File f = processSubmitedFile();
+            if (f != null) {
+            	userData = (UserData) unmarshaller.unmarshal(f);
+            } else {
+		logger.severe("File uploaded null");
+	        return;
+	    }
             userData = (UserData) unmarshaller.unmarshal(f);
             
             // we extract and update WMS user data
@@ -844,6 +848,17 @@ public class ServicesBean {
                     logger.severe("SOS capabilies file uncomplete (!=1)");               
                 }
             }
+            
+            //we signal to the webService to update is capabilities
+            File change        = new File(servletContext.getRealPath("WEB-INF/change.properties"));
+            Properties p       = new Properties();
+            FileInputStream in = new FileInputStream(change);
+            p.load(in);
+            in.close();
+            p.put("update", "true");
+            FileOutputStream out = new FileOutputStream(change);
+            p.store(out, "updated from JSF interface");
+            out.close();
             
         } catch (JAXBException ex) {
             Logger.getLogger(ServicesBean.class.getName()).log(Level.SEVERE, null, ex);
@@ -1051,7 +1066,7 @@ public class ServicesBean {
      */
     public File processSubmitedFile() throws IOException {
         upload();
-        File f = new File("temp");
+        File f = File.createTempFile("userData", "geomatys");
         try {
            
             InputStream inputStream = uploadedFile.getInputStream();
@@ -1064,6 +1079,9 @@ public class ServicesBean {
                 writer.append(line);
                 writer.append('\n');
             }
+            inputStream.close();
+            infile.close();
+            writer.close();
             
         } catch (Exception x) {
             FacesMessage message = new FacesMessage(
@@ -1071,13 +1089,21 @@ public class ServicesBean {
                     x.getClass().getName(), x.getMessage());
             FacesContext.getCurrentInstance().addMessage(
                     null, message);
+            logger.severe("Exception in proccesSubmitFile " + x.getMessage());
             return null;
+        }
+        if (f == null) {
+            logger.severe("process uploaded file null");
         }
         return f;
     }
     
     public String doUpload() throws IOException{
-        processSubmitedFile();
+        File f = processSubmitedFile();
+        if (f == null) {
+            logger.severe("[doUpload]process uploaded file null");
+        }
+        loadUserData(f);
         return "ok";
     }
 
