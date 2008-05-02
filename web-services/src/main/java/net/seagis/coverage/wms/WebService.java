@@ -520,7 +520,7 @@ public abstract class WebService {
          //we delete the /WS
          appName = appName.substring(0, appName.length()-3);
          String home = System.getenv().get("CATALINA_HOME") + "/webapps" + appName + "WEB-INF/";
-         if (home == null || !(path=new File(home)).isDirectory()) {
+         if (home == null || !(path = new File(home)).isDirectory()) {
             home = System.getProperty("user.home");
             if (System.getProperty("os.name", "").startsWith("Windows")) {
                 path = new File(home, WINDOWS_DIRECTORY);

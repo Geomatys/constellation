@@ -134,7 +134,7 @@ public class CSWService extends WebService {
                 try {
                     worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
                 } catch(IOException e)   {
-                    throw new OWSWebServiceException("IO exception while getting Services Metadata.",
+                    throw new OWSWebServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
                       INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
             
                 }
@@ -209,7 +209,7 @@ public class CSWService extends WebService {
                 try {
                     worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
                 } catch(IOException e)   {
-                    throw new OWSWebServiceException("IO exception while getting Services Metadata.",
+                    throw new OWSWebServiceException("IO exception while getting Services Metadata:" + e.getMessage(),
                       INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
             
                 }

@@ -107,13 +107,15 @@ public abstract class AbstractGMLEntry extends Entry{
         if (object == this) {
             return true;
         }
-        
+        if (object instanceof AbstractGMLEntry) {
         final AbstractGMLEntry that = (AbstractGMLEntry) object;
-        //TODO fix this problem       
-        return Utilities.equals(this.description,          that.description)          &&
-               Utilities.equals(this.descriptionReference, that.descriptionReference);
-               //Utilities.equals(this.id,                   that.id)                   &&
-               //Utilities.equals(this.name,                 that.name);
+            //TODO fix this problem       
+            return Utilities.equals(this.description,          that.description)          &&
+                   Utilities.equals(this.descriptionReference, that.descriptionReference);
+                   //Utilities.equals(this.id,                   that.id)                   &&
+                   //Utilities.equals(this.name,                 that.name);
+        }
+        return false;
     }
 
     @Override

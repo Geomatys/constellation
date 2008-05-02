@@ -121,6 +121,11 @@ import org.geotools.resources.i18n.ErrorKeys;
 @Path("wcs")
 @Singleton
 public class WCService extends WebService {
+    
+    /**
+     * A list of layer initialized a begining;
+     */
+    private Set<net.seagis.coverage.catalog.Layer> layerList;
 
     /**
      * The object whitch made all the operation on the postgrid database
@@ -173,6 +178,8 @@ public class WCService extends WebService {
         
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
+        logger.info("Loading layers please wait...");
+        layerList = webServiceWorker.getLayers();
         logger.info("WCS service running");
     }
     
@@ -624,12 +631,12 @@ public class WCService extends WebService {
                 }
             } 
             
-            // we unmarshall the static capabilities docuement
+            // we unmarshall the static capabilities document
             Capabilities staticCapabilities = null;
             try {
                 staticCapabilities = (Capabilities)getCapabilitiesObject();
             } catch(IOException e)   {
-                throwException("IO exception while getting Services Metadata.",
+                throwException("IO exception while getting Services Metadata: " + e.getMessage(),
                                "INVALID_PARAMETER_VALUE", null);
             
             } 
@@ -679,7 +686,7 @@ public class WCService extends WebService {
             try {
                 staticCapabilities = (WCSCapabilitiesType)((JAXBElement)getCapabilitiesObject()).getValue();
             } catch(IOException e)   {
-                throwException("IO exception while getting Services Metadata.",
+                throwException("IO exception while getting Services Metadata: " + e.getMessage(),
                                "INVALID_PARAMETER_VALUE", null);
             
             }    
@@ -716,7 +723,7 @@ public class WCService extends WebService {
         net.seagis.wcs.v100.ObjectFactory wcs100Factory = new net.seagis.wcs.v100.ObjectFactory();
         net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
         try {
-            for (Layer inputLayer: webServiceWorker.getLayers()) {
+            for (Layer inputLayer:layerList) {
                 if (inputLayer.getSeries().size() == 0)
                     continue;
                 

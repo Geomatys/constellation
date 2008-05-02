@@ -400,7 +400,7 @@ public class WMService extends WebService {
         try {
             response = (AbstractWMSCapabilities)getCapabilitiesObject();
         } catch(IOException e)   {
-            throw new WMSWebServiceException("IO exception while getting Services Metadata.",
+            throw new WMSWebServiceException("IO exception while getting Services Metadata:" + e.getMessage(),
                       INVALID_PARAMETER_VALUE, getCurrentVersion());
             
         } 

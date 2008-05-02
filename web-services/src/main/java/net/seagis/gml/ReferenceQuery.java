@@ -36,7 +36,7 @@ public class ReferenceQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byIdReference;
+    protected final Parameter byIdReference, byActuate, byArcrole, byHref, byRole, byShow, byTitle, byType, byOwns;
     
     /**
      * Creates a new query for the specified database.
@@ -46,8 +46,8 @@ public class ReferenceQuery extends Query {
     public ReferenceQuery(final Database database) {
         super(database, "references");
         final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE = {SELECT, INSERT, LIST, EXISTS};
-        idReference = addColumn("id_reference", SLIE);
+        final QueryType[] SLIEF = {SELECT, INSERT, LIST, EXISTS, FILTERED_LIST};
+        idReference = addColumn("id_reference", SLIEF);
         actuate     = addColumn("actuate"     , SLI);
         arcrole     = addColumn("arcrole"     , SLI);
         href        = addColumn("href"        , SLI);
@@ -57,7 +57,16 @@ public class ReferenceQuery extends Query {
         type        = addColumn("type"        , SLI);
         owns        = addColumn("owns"        , SLI);
         
-        byIdReference          = addParameter(idReference, SELECT, EXISTS);
+        byIdReference = addParameter(idReference, SELECT, EXISTS);
+        byActuate     = addParameter(actuate,     FILTERED_LIST);
+        byArcrole     = addParameter(arcrole,     FILTERED_LIST);
+        byHref        = addParameter(href,        FILTERED_LIST);
+        byRole        = addParameter(role,        FILTERED_LIST);
+        byShow        = addParameter(show,        FILTERED_LIST);
+        byTitle       = addParameter(title,       FILTERED_LIST);
+        byType        = addParameter(type,        FILTERED_LIST);
+        byOwns        = addParameter(owns,        FILTERED_LIST);
+        
     }
     
 }
