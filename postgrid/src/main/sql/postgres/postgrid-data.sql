@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------------------------
---  Inserts data in the "postgrid" schema     .                                                 --
+--  Inserts data in the "postgrid" schema.                                                      --
 --------------------------------------------------------------------------------------------------
 
 SET client_encoding = 'UTF8';
@@ -16,14 +16,14 @@ SET search_path = postgrid, postgis, pg_catalog;
 -- Fills the "Permissions" table.                                                               --
 --------------------------------------------------------------------------------------------------
 
-INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
-  VALUES ('Public', NULL, TRUE, TRUE, 'Data accessible to anyone.');
-INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
-  VALUES ('Hidden', NULL, FALSE, FALSE, 'Hidden data (e.g. data reserved for testing purpose only).');
-INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
-  VALUES ('Restricted', 'Public', TRUE, TRUE, 'Access to public data together with restricted ones.');
-INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
-  VALUES ('Private', NULL, TRUE, TRUE, 'Access to private data.');
+INSERT INTO "Permissions" ("name", "WMS", "WCS", "description")
+  VALUES ('Public', TRUE, TRUE, 'Data accessible to anyone.');
+INSERT INTO "Permissions" ("name", "WMS", "WCS", "description")
+  VALUES ('Display', TRUE, FALSE, 'Data to be available for display only.');
+INSERT INTO "Permissions" ("name", "WMS", "WCS", "description")
+  VALUES ('Download', FALSE, TRUE, 'Data available for download only.');
+INSERT INTO "Permissions" ("name", "WMS", "WCS", "description")
+  VALUES ('Hidden', FALSE, FALSE, 'Hidden data (e.g. data reserved for testing purpose only).');
 
 
 --------------------------------------------------------------------------------------------------

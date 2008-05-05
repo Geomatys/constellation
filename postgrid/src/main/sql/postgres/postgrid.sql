@@ -28,11 +28,12 @@ SET search_path = postgrid, postgis, pg_catalog;
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Permissions" (
-    "name"        character varying NOT NULL PRIMARY KEY,
-    "include"     character varying DEFAULT 'Public' REFERENCES "Permissions" ON UPDATE CASCADE ON DELETE RESTRICT,
-    "WMS"         boolean DEFAULT TRUE,
-    "WCS"         boolean DEFAULT TRUE,
-    "description" character varying
+    "name"        character varying NOT NULL DEFAULT 'Public',
+    "user"        character varying NOT NULL DEFAULT 'Anonymous',
+    "WMS"         boolean NOT NULL DEFAULT TRUE,
+    "WCS"         boolean NOT NULL DEFAULT TRUE,
+    "description" character varying,
+    PRIMARY KEY ("name", "user")
 );
 
 ALTER TABLE "Permissions" OWNER TO geoadmin;
