@@ -55,7 +55,7 @@ final class SeriesQuery extends Query {
         pathname   = addColumn("pathname",             SLFI );
         extension  = addColumn("extension",            SLFI );
         format     = addColumn("format",               SLFI );
-        permission = addColumn("permission", "public", SLF  );
+        permission = addColumn("permission", "Public", SLF  );
         remarks    = addColumn("remarks",    null,     SLF  );
         byName     = addParameter(name,  SELECT, EXISTS);
         byLayer    = addParameter(layer, FILTERED_LIST);

@@ -85,7 +85,7 @@ public enum ConfigurationKey {
      * <p>
      * The default value is {@code "public"}.
      */
-    PERMISSION("Permission", "public"),
+    PERMISSION("Permission", "Public"),
 
     /**
      * Key for user name connecting to the {@linkplain #DATABASE database}.

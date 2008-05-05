@@ -336,13 +336,13 @@ public class Query {
                 final boolean needQuotes = (column.defaultValue instanceof CharSequence);
                 String defaultValue = String.valueOf(column.defaultValue); // May be "null"
                 if (needQuotes) {
-                    buffer.append(quote);
+                    buffer.append('\'');
                 } else {
                     defaultValue = defaultValue.toUpperCase(Locale.ENGLISH);
                 }
                 buffer.append(defaultValue);
                 if (needQuotes) {
-                    buffer.append(quote);
+                    buffer.append('\'');
                 }
             }
             /*

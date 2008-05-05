@@ -414,7 +414,7 @@ public class Collector extends CommandLine {
     }
 
     /**
-     * Dispose collector resources.
+     * Disposes collector resources.
      *
      * @throws CatalogException If an error occured while disposing the resources.
      */

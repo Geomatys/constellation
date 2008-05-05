@@ -9,6 +9,7 @@ SET client_min_messages = warning;
 SET escape_string_warning = off;
 SET default_tablespace = '';
 SET default_with_oids = false;
+SET search_path = postgrid, postgis, pg_catalog;
 
 
 --------------------------------------------------------------------------------------------------
@@ -16,13 +17,13 @@ SET default_with_oids = false;
 --------------------------------------------------------------------------------------------------
 
 INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
-  VALUES ('public', NULL, TRUE, TRUE, 'Data accessible to anyone.');
+  VALUES ('Public', NULL, TRUE, TRUE, 'Data accessible to anyone.');
 INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
-  VALUES ('hidden', NULL, FALSE, FALSE, 'Hidden data (e.g. data reserved for testing purpose only).');
+  VALUES ('Hidden', NULL, FALSE, FALSE, 'Hidden data (e.g. data reserved for testing purpose only).');
 INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
-  VALUES ('restricted', 'public', TRUE, TRUE, 'Access to public data together with restricted ones.');
+  VALUES ('Restricted', 'Public', TRUE, TRUE, 'Access to public data together with restricted ones.');
 INSERT INTO "Permissions" ("name", "include", "WMS", "WCS", "description")
-  VALUES ('private', NULL, TRUE, TRUE, 'Access to private data.');
+  VALUES ('Private', NULL, TRUE, TRUE, 'Access to private data.');
 
 
 --------------------------------------------------------------------------------------------------
