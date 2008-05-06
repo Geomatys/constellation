@@ -86,6 +86,9 @@ public class PropertyIsLikeType extends ComparisonOpsType {
      * Gets the value of the escapeChar property.
      */
     public String getEscapeChar() {
+        if (escapeChar == null)
+            escapeChar = "\\";
+        
         return escapeChar;
     }
 

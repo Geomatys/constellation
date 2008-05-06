@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //seaGIS dependencies
@@ -75,6 +76,7 @@ import net.seagis.cat.csw.UpdateType;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.filter.FilterParser;
 import net.seagis.ogc.FilterCapabilities;
 import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
@@ -668,7 +670,12 @@ public class CSWworker {
         
         // we initialize the filterParser
         if (filterParser == null) {
-            filterParser    = new FilterParser(version);
+            try {
+                filterParser = new FilterParser(version);
+            } catch (JAXBException ex) {
+                 throw new OWSWebServiceException("The server can't build the Filter JAXB Context: " + ex.getMessage(),
+                                                   NO_APPLICABLE_CODE, null, version);
+            }
         }
         
         //we prepare the response

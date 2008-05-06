@@ -116,13 +116,10 @@ public class MetadataWriter {
      * 
      */
     private void addValueFromObject(Form form, Object object, Path path, Value parentValue) throws SQLException {
-         //if the path is not already in the database we write it
-         if (MDReader.getPath(path.getId()) == null) {
-            MDWriter.writePath(path);
-            logger.info("write:" + path.getId());
-         } else {
-             logger.info(" already written:" + path.getId());
-         }
+        //if the path is not already in the database we write it
+        if (MDReader.getPath(path.getId()) == null) {
+           MDWriter.writePath(path);
+        } 
                             
         Classe classe;
         if (object instanceof Collection) {
@@ -143,7 +140,12 @@ public class MetadataWriter {
         }
         
         //we try to find the good ordinal
-        int ordinal  = form.getNewOrdinal(parentValue.getIdValue() + ':' + path.getName());
+        int ordinal;
+        if (parentValue == null) {
+            ordinal = 1;
+        } else {
+            ordinal  = form.getNewOrdinal(parentValue.getIdValue() + ':' + path.getName());
+        }
         
         if (isPrimitive(classe)) {
             TextValue textValue = new TextValue(path, form , ordinal, object + "", classe, parentValue);

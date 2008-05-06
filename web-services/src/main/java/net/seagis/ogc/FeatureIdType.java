@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.opengis.feature.Feature;
+import org.opengis.filter.identity.FeatureId;
 
 
 /**
@@ -45,7 +47,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "FeatureIdType")
-public class FeatureIdType extends AbstractIdType {
+public class FeatureIdType extends AbstractIdType implements FeatureId {
 
     @XmlAttribute(required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -54,9 +56,31 @@ public class FeatureIdType extends AbstractIdType {
     private String fid;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    FeatureIdType() {
+        
+    }
+    
+    /**
+     * Build a new FeaturId with the specified ID
+     */
+    public FeatureIdType(String fid) {
+        this.fid = fid;
+    }
+    
+    /**
      * Gets the value of the fid property.
      */
     public String getFid() {
+        return fid;
+    }
+
+    public boolean matches(Feature feature) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String getID() {
         return fid;
     }
 }
