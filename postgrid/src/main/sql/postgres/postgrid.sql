@@ -44,8 +44,8 @@ COMMENT ON TABLE "Permissions" IS
     'Permissions to view and obtain coverage data.';
 COMMENT ON COLUMN "Permissions"."name" IS
     'Permission name.';
-COMMENT ON COLUMN "Permissions"."include" IS
-    'Additional data that can be obtained with current permission.';
+COMMENT ON COLUMN "Permissions"."user" IS
+    'User for who the permission is applied';
 COMMENT ON COLUMN "Permissions"."WMS" IS
     'Whatever permission allows Web Map Server (WMS) access.';
 COMMENT ON COLUMN "Permissions"."WCS" IS
@@ -266,7 +266,7 @@ CREATE TABLE "Series" (
     "extension"  character varying, -- Accepts NULL since some files has no extension
     "format"     character varying NOT NULL REFERENCES "Formats" ON UPDATE CASCADE ON DELETE RESTRICT,
     "quicklook"  character varying UNIQUE   REFERENCES "Series"  ON UPDATE CASCADE ON DELETE RESTRICT,
-    "permission" character varying NOT NULL DEFAULT 'Public' REFERENCES "Permissions" ON UPDATE CASCADE ON DELETE CASCADE
+    "permission" character varying NOT NULL DEFAULT 'Public'
 );
 
 ALTER TABLE "Series" OWNER TO geoadmin;
