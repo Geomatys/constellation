@@ -14,8 +14,6 @@
  */
 package net.seagis.coverage.catalog;
 
-import java.sql.SQLException;
-import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Entry;
 import net.seagis.coverage.web.Service;
 
@@ -25,6 +23,7 @@ import net.seagis.coverage.web.Service;
  *
  * @author Guilhem Legal
  * @author Martin Desruisseaux
+ * @author Cédric Briançon
  * @version $Id: FormatEntry.java 538 2008-04-22 20:05:01Z desruisseaux $
  */
 final class PermissionEntry extends Entry {
@@ -44,33 +43,20 @@ final class PermissionEntry extends Entry {
     protected final boolean WCS;
 
     /**
-     * If this permission includes the data of an other permission, the other permission.
-     * Otherwise {@code null}. This field is a {@link String} on construction and changed
-     * to a {@link PermissionEntry} on {@link #postCreateEntry}.
+     * User for who the permission will apply. By default the user is {@code Anonymous}.
      */
-    private Object include;
+    protected final String user;
 
     /**
      * Creates a new entry.
      */
-    public PermissionEntry(final String name, final String include,
+    public PermissionEntry(final String name, final String user,
             final boolean WCS, final boolean WMS, final String remarks)
     {
         super(name, remarks);
-        this.WCS     = WCS;
-        this.WMS     = WMS;
-        this.include = include;
-    }
-
-    /**
-     * Updates the {@link #include} field using the given table.
-     */
-    final void postCreateEntry(final PermissionTable table)
-            throws CatalogException, SQLException
-    {
-        if (include != null) {
-            include = table.getEntry((String) include);
-        }
+        this.WCS  = WCS;
+        this.WMS  = WMS;
+        this.user = user;
     }
 
     /**
@@ -82,9 +68,6 @@ final class PermissionEntry extends Entry {
                 case WMS: return WMS;
                 case WCS: return WCS;
             }
-        }
-        if (include != null) {
-            return ((PermissionEntry) include).isAccessibleService(service, user);
         }
         return false;
     }

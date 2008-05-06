@@ -27,13 +27,14 @@ import static net.seagis.catalog.QueryType.*;
  *
  * @author Guilhem Legal
  * @author Martin Desruisseaux
+ * @author Cédric Briançon
  * @version $Id: CategoryQuery.java 455 2008-03-13 15:21:44Z desruisseaux $
  */
 final class PermissionQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, include, WMS, WCS, description;
+    protected final Column name, user, WMS, WCS, description;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -49,7 +50,7 @@ final class PermissionQuery extends Query {
         super(database, "Permissions");
         final QueryType[] SL = {SELECT, LIST};
         name        = addColumn("name",                  SL);
-        include     = addColumn("include", "public",     SL);
+        user        = addColumn("user",    "Anonymous",  SL);
         WMS         = addColumn("WMS",     Boolean.TRUE, SL);
         WCS         = addColumn("WCS",     Boolean.TRUE, SL);
         description = addColumn("description",           SL);

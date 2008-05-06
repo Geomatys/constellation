@@ -26,6 +26,7 @@ import net.seagis.catalog.SingletonTable;
  *
  * @author Guilhem Legal
  * @author Martin Desruisseaux
+ * @author Cédric Briançon
  * @version $Id: CategoryTable.java 455 2008-03-13 15:21:44Z desruisseaux $
  */
 final class PermissionTable extends SingletonTable<PermissionEntry> {
@@ -53,19 +54,9 @@ final class PermissionTable extends SingletonTable<PermissionEntry> {
     {
         final PermissionQuery query = (PermissionQuery) super.query;
         return new PermissionEntry(results.getString (indexOf(query.name)),
-                                   results.getString (indexOf(query.include)),
+                                   results.getString (indexOf(query.user)),
                                    results.getBoolean(indexOf(query.WCS)),
                                    results.getBoolean(indexOf(query.WMS)),
                                    results.getString (indexOf(query.description)));
-    }
-
-    /**
-     * Completes the {@link PermissionEntry} creation after the {@link ResultSet} has been closed.
-     */
-    @Override
-    protected void postCreateEntry(final PermissionEntry entry)
-            throws CatalogException, SQLException
-    {
-        entry.postCreateEntry(this);
     }
 }
