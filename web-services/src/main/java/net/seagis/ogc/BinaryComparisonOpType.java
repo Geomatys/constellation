@@ -27,6 +27,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -69,6 +73,24 @@ public class BinaryComparisonOpType extends ComparisonOpsType {
     private Boolean matchCase;
 
     /**
+     * Empty constructor used by JAXB
+     */
+    BinaryComparisonOpType() {
+        
+    }
+    
+    /**
+     * Build a new Binary comparison operator
+     */
+    public BinaryComparisonOpType(LiteralType literal, PropertyNameType propertyName, Boolean matchCase) {
+        expressionOrLiteralOrPropertyName = new ArrayList<Object>();
+        expressionOrLiteralOrPropertyName.add(literal);
+        if (propertyName != null)
+        expressionOrLiteralOrPropertyName.add(propertyName.getPropertyName());
+        this.matchCase = matchCase;
+    }
+    
+    /**
      * Gets the value of the expressionOrLiteralOrPropertyName property.
      * (unmodifiable)
      */
@@ -82,7 +104,7 @@ public class BinaryComparisonOpType extends ComparisonOpsType {
     /**
      * Gets the value of the matchCase property.
      */
-    public Boolean isMatchCase() {
+    public boolean isMatchingCase() {
         return matchCase;
     }
     
@@ -99,5 +121,35 @@ public class BinaryComparisonOpType extends ComparisonOpsType {
         }
         
         return s.toString();
+    }
+
+    public boolean evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(FilterVisitor visitor, Object extraData) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Expression getExpression1() {
+        String propertyName = null;
+        for (Object obj : getExpressionOrLiteralOrPropertyName()) {
+            if (obj instanceof String ) {
+                propertyName = (String) obj;
+            } else if (obj instanceof PropertyNameType) {
+                return (PropertyNameType)obj;
+            }
+        }
+        return new PropertyNameType(propertyName);
+    }
+
+    public Expression getExpression2() {
+        LiteralType literal = null;
+        for (Object obj : getExpressionOrLiteralOrPropertyName()) {
+            if (obj instanceof LiteralType) {
+                literal = (LiteralType) obj;
+            } 
+        }
+        return literal;
     }
 }

@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.opengis.filter.FilterVisitor;
 
 
 /**
@@ -92,6 +93,14 @@ public class BinarySpatialOpType extends SpatialOpsType {
             }
         }
         return s.toString();
+    }
+
+    public boolean evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(FilterVisitor visitor, Object extraData) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

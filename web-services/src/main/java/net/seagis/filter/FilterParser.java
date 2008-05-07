@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.TransformerException;
 import net.seagis.cat.csw.QueryConstraintType;
@@ -78,7 +79,7 @@ public class FilterParser {
     /**
      * A temporary marshaller whitch will be replaced by FilterFactoryImpl
      */
-    private Unmarshaller filterUnMarshaller;
+    private Marshaller filterMarshaller;
     
     /**
      * Build a new FilterParser with the specified version.
@@ -86,7 +87,8 @@ public class FilterParser {
     public FilterParser(ServiceVersion version) throws JAXBException {
         this.version = version;
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.gml");
-        filterUnMarshaller = jbcontext.createUnmarshaller();
+        filterMarshaller = jbcontext.createMarshaller();
+        filterMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
     }
     
     /**
@@ -103,28 +105,38 @@ public class FilterParser {
         if (constraint.getCqlText() != null) {
             try {
                 String query = constraint.getCqlText();
+                Object newFilter = CQL.toFilter(query, new FilterFactoryImpl());
                 /*
                  * here we put a temporary patch consisting in using the geotools filterFactory implementation
                  * instead of our own implementation.
                  * The we unmarshaller the xml to get a seagis Filter object.
+                 *
+                 *
+                 * File f = File.createTempFile("CQL", "query");
+                 * FileWriter fw = new FileWriter(f);
+                 * new FilterTransformer().transform(newFilter, fw);
+                 * fw.close();
+                 * JAXBElement jb = (JAXBElement) filterUnMarshaller.unmarshal(f);
                  */
-                Object newFilter = CQL.toFilter(query);
-                File f = File.createTempFile("CQL", "query");
-                FileWriter fw = new FileWriter(f);
-                new FilterTransformer().transform(newFilter, fw);
-                fw.close();
-                JAXBElement jb = (JAXBElement) filterUnMarshaller.unmarshal(f);
-                filter = (FilterType) jb.getValue();
-                
+               
+                if (!(newFilter instanceof FilterType)) {
+                    filter = new FilterType(newFilter);
+                } else {
+                    filter = (FilterType) newFilter;
+                }
+                filterMarshaller.marshal(filter, System.out);
+                 
             } catch (JAXBException ex) {
+                ex.printStackTrace();
                 throw new OWSWebServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE, "QueryConstraint", version);
-            } catch (TransformerException ex) {
+                
+            /*} catch (TransformerException ex) {
                 throw new OWSWebServiceException("TransformerException while parsing CQL query: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE, "QueryConstraint", version);
             } catch (IOException ex) {
                 throw new OWSWebServiceException("IO exception while parsing CQL query: " + ex.getMessage(),
-                                                 NO_APPLICABLE_CODE, "QueryConstraint", version);
+                                                 NO_APPLICABLE_CODE, "QueryConstraint", version);*/
             } catch (CQLException ex) {
                 throw new OWSWebServiceException("The CQL query is malformed: " + ex.getMessage() + '\n' 
                                                  + "syntax Error: " + ex.getSyntaxError(),
@@ -181,7 +193,7 @@ public class FilterParser {
         if (logicOps instanceof BinaryLogicOpType) {
             BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
             response.append('(');
-            for (JAXBElement<?> jb: binary.getComparisonOpsOrSpatialOpsOrLogicOps()) {
+            for (JAXBElement<?> jb: binary.getOperators()) {
                 
                 if (jb.getValue() instanceof LogicOpsType) {
                     
@@ -238,10 +250,10 @@ public class FilterParser {
             }
             
             //we get the value of the field
-            if (pil.getLiteral() != null && pil.getLiteral().getStringValue() != null) {
+            if (pil.getLiteral() != null && pil.getLiteral() != null) {
                 
                 //we format the value by replacing the specified special char by the lucene special char
-                String brutValue = pil.getLiteral().getStringValue();
+                String brutValue = pil.getLiteral();
                 brutValue = brutValue.replace(pil.getWildCard(),    "*");
                 brutValue = brutValue.replace(pil.getSingleChar(),  "?");
                 brutValue = brutValue.replace(pil.getEscapeChar(),  "\\");
@@ -282,6 +294,8 @@ public class FilterParser {
                     literal      = (LiteralType) obj;
                 } else if (obj instanceof String) {
                     propertyName = (String) obj;
+                } else  if (obj instanceof PropertyNameType) {
+                    propertyName = ((PropertyNameType) obj).getPropertyName();
                 } else {
                     throw new IllegalArgumentException("BinaryComparisonOpType parameter not known: " + obj.getClass().getSimpleName());
                 }
@@ -363,7 +377,7 @@ public class FilterParser {
                         throw new IllegalArgumentException("not supported yet no date range");
                     }
                 } else {
-                    throw new OWSWebServiceException("Unkwnow operator: " + operator,
+                    throw new OWSWebServiceException("Unkwnow comparison operator: " + operator,
                                                      INVALID_PARAMETER_VALUE, "QueryConstraint", version);
                 }
             }

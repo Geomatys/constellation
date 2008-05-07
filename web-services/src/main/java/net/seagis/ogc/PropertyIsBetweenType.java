@@ -23,6 +23,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.PropertyIsBetween;
 
 
 /**
@@ -55,7 +57,7 @@ import net.seagis.coverage.web.ExpressionType;
     "lowerBoundary",
     "upperBoundary"
 })
-public class PropertyIsBetweenType extends ComparisonOpsType {
+public class PropertyIsBetweenType extends ComparisonOpsType implements PropertyIsBetween {
 
     @XmlElement(nillable = true)
     private ExpressionType expression;
@@ -68,6 +70,23 @@ public class PropertyIsBetweenType extends ComparisonOpsType {
     @XmlElement(name = "UpperBoundary", required = true)
     private UpperBoundaryType upperBoundary;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    PropertyIsBetweenType() {
+        
+    }
+    
+    /**
+     * build a new Property is Between
+     */
+    public PropertyIsBetweenType(ExpressionType expression, LowerBoundaryType lowerBoundary, UpperBoundaryType upperBoundary) {
+        this.expression    = expression;
+        this.lowerBoundary = lowerBoundary;
+        this.upperBoundary = upperBoundary;
+        
+    }
+    
     /**
      * Gets the value of the expression property.
      */
@@ -101,5 +120,13 @@ public class PropertyIsBetweenType extends ComparisonOpsType {
      */
     public UpperBoundaryType getUpperBoundary() {
         return upperBoundary;
+    }
+
+    public boolean evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(FilterVisitor visitor, Object extraData) {
+        return visitor.visit(this,extraData);
     }
 }

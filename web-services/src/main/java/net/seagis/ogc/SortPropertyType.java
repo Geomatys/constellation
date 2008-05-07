@@ -20,6 +20,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 
 
 /**
@@ -47,7 +49,7 @@ import javax.xml.bind.annotation.XmlType;
     "propertyName",
     "sortOrder"
 })
-public class SortPropertyType {
+public class SortPropertyType implements SortBy {
 
     @XmlElement(name = "PropertyName", required = true)
     private PropertyNameType propertyName;
@@ -64,10 +66,20 @@ public class SortPropertyType {
     /**
      * build a new SOrt property object.
      */
+    public SortPropertyType(String propertyName, SortOrder sortOrder) {
+        this.propertyName = new PropertyNameType(propertyName);
+        if (sortOrder != null && sortOrder.equals(SortOrder.ASCENDING))
+            this.sortOrder = SortOrderType.ASC;
+        else if (sortOrder != null && sortOrder.equals(SortOrder.DESCENDING))
+            this.sortOrder = SortOrderType.DESC;
+    }
+    
+    /**
+     * build a new SOrt property object.
+     */
     public SortPropertyType(String propertyName, SortOrderType sortOrder) {
         this.propertyName = new PropertyNameType(propertyName);
         this.sortOrder    = sortOrder;
-        
     }
 
     /**
@@ -80,7 +92,12 @@ public class SortPropertyType {
     /**
      * Gets the value of the sortOrder property.
      */
-    public SortOrderType getSortOrder() {
-        return sortOrder;
+    public SortOrder getSortOrder() {
+        if (sortOrder != null && sortOrder.equals(SortOrderType.ASC))
+            return SortOrder.ASCENDING;
+        else if (sortOrder != null && sortOrder.equals(SortOrderType.DESC))
+            return SortOrder.DESCENDING;
+        else
+            return null;
     }
 }

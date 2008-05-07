@@ -24,7 +24,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.expression.Add;
 
 
 /**
@@ -56,7 +61,8 @@ import javax.xml.bind.annotation.XmlType;
     "logicOps",
     "id"
 })
-public class FilterType {
+@XmlRootElement(name = "Filter")
+public class FilterType implements Filter {
 
     @XmlElementRef(name = "spatialOps", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
     private JAXBElement<? extends SpatialOpsType> spatialOps;
@@ -67,6 +73,56 @@ public class FilterType {
     @XmlElementRef(name = "_Id", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractIdType>> id;
 
+    /**
+     * a transient factory to build JAXBelement
+     */
+    @XmlTransient
+    private ObjectFactory factory = new ObjectFactory();
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    public FilterType() {
+        
+    }
+    
+    /**
+     * build a new FilterType with the specified logical operator
+     */
+    public FilterType(Object obj) {
+        if (obj instanceof PropertyIsLessThanOrEqualToType) {
+            this.comparisonOps = (factory.createPropertyIsLessThanOrEqualTo((PropertyIsLessThanOrEqualToType) obj));
+        } else if (obj instanceof PropertyIsLessThanType) {
+            this.comparisonOps = (factory.createPropertyIsLessThan((PropertyIsLessThanType) obj));
+        } else if (obj instanceof PropertyIsGreaterThanOrEqualToType) {
+            this.comparisonOps = (factory.createPropertyIsGreaterThanOrEqualTo((PropertyIsGreaterThanOrEqualToType) obj));
+        } else if (obj instanceof PropertyIsNotEqualToType) {
+            this.comparisonOps = (factory.createPropertyIsNotEqualTo((PropertyIsNotEqualToType) obj));
+        } else if (obj instanceof PropertyIsGreaterThanType) {
+            this.comparisonOps = (factory.createPropertyIsGreaterThan((PropertyIsGreaterThanType) obj));
+        } else if (obj instanceof PropertyIsEqualToType) {
+            this.comparisonOps = (factory.createPropertyIsEqualTo((PropertyIsEqualToType) obj));
+        } else if (obj instanceof OrType) {
+            this.logicOps = (factory.createOr((OrType) obj));
+        } else if (obj instanceof AndType) {
+            this.logicOps = (factory.createAnd((AndType) obj));
+        } else if (obj instanceof PropertyIsNullType) {
+            this.comparisonOps =  (factory.createPropertyIsNull((PropertyIsNullType) obj));
+        } else if (obj instanceof PropertyIsBetweenType) {
+            this.comparisonOps = (factory.createPropertyIsBetween((PropertyIsBetweenType) obj));
+        } else if (obj instanceof PropertyIsLikeType) {
+            this.comparisonOps = (factory.createPropertyIsLike((PropertyIsLikeType) obj));
+        } else if (obj instanceof ComparisonOpsType) {
+            this.comparisonOps = (factory.createComparisonOps((ComparisonOpsType) obj));
+        } else if (obj instanceof SpatialOpsType) {
+            this.spatialOps = (factory.createSpatialOps((SpatialOpsType) obj));
+        } else if (obj instanceof LogicOpsType) {
+            this.logicOps = (factory.createLogicOps((LogicOpsType) obj));
+        } else {
+            throw new IllegalArgumentException("This kind of object is not allowed:" + obj.getClass().getSimpleName());
+        }
+    }
+    
     /**
      * Gets the value of the spatialOps property.
      */
@@ -120,6 +176,14 @@ public class FilterType {
             }
         }
         return s.toString();
+    }
+
+    public boolean evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(FilterVisitor visitor, Object extraData) {
+        return extraData;
     }
 
 }

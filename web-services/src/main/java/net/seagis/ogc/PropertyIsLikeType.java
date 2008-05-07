@@ -22,6 +22,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -53,7 +56,7 @@ import javax.xml.bind.annotation.XmlType;
     "propertyName",
     "literal"
 })
-public class PropertyIsLikeType extends ComparisonOpsType {
+public class PropertyIsLikeType extends ComparisonOpsType implements PropertyIsLike {
 
     @XmlElement(name = "PropertyName", required = true)
     private PropertyNameType propertyName;
@@ -69,6 +72,24 @@ public class PropertyIsLikeType extends ComparisonOpsType {
     private String wildCard;
 
     /**
+     * An empty constructor used by JAXB.
+     */
+    PropertyIsLikeType() {
+        
+    }
+    
+    /**
+     *Build a new Property is like operator
+     */
+    public PropertyIsLikeType(Expression expr, String pattern, String wildcard, String singleChar, String escape) {
+        this.escapeChar   = escape;
+        this.propertyName = (PropertyNameType) expr;
+        this.singleChar   = singleChar;
+        this.wildCard     = wildcard;
+        this.literal      = new LiteralType(pattern);
+    }
+    
+    /**
      * Gets the value of the propertyName property.
      */
     public PropertyNameType getPropertyName() {
@@ -78,8 +99,8 @@ public class PropertyIsLikeType extends ComparisonOpsType {
     /**
      * Gets the value of the literal property.
      */
-    public LiteralType getLiteral() {
-        return literal;
+    public String getLiteral() {
+        return literal.getStringValue();
     }
 
     /**
@@ -132,5 +153,21 @@ public class PropertyIsLikeType extends ComparisonOpsType {
         s.append(" single=").append(singleChar).append(" wildCard=").append(wildCard);
         
         return s.toString();
+    }
+
+    public Expression getExpression() {
+        return propertyName;
+    }
+
+    public String getEscape() {
+        return escapeChar;
+    }
+
+    public boolean evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(FilterVisitor visitor, Object extraData) {
+        return visitor.visit(this,extraData);
     }
 }

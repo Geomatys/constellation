@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
@@ -64,6 +65,18 @@ public class BinaryOperatorType extends ExpressionType {
             expression = new ArrayList<JAXBElement<?>>();
         }
         return Collections.unmodifiableList(expression);
+    }
+
+    public Object evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public <T> T evaluate(Object object, Class<T> context) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(ExpressionVisitor visitor, Object extraData) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

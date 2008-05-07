@@ -25,7 +25,11 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.Or;
 
 
 /**
@@ -51,7 +55,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BinaryLogicOpType", propOrder = {
-    "comparisonOpsOrSpatialOpsOrLogicOps"
+    "operators"
 })
 public class BinaryLogicOpType extends LogicOpsType {
 
@@ -60,30 +64,101 @@ public class BinaryLogicOpType extends LogicOpsType {
         @XmlElementRef(name = "spatialOps", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
         @XmlElementRef(name = "logicOps", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
     })
-    private List<JAXBElement<?>> comparisonOpsOrSpatialOpsOrLogicOps;
+    private List<JAXBElement<?>> operators;
 
+    /**
+     * an transient ogc factory to build JAXBelement
+     */
+    @XmlTransient
+    private ObjectFactory factory = new ObjectFactory();
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+     BinaryLogicOpType() {
+         
+     }
+     
+     /**
+      * Build a new Binary logic operator 
+      */
+     public BinaryLogicOpType(Object... operators) {
+         this.operators = new ArrayList<JAXBElement<?>>();
+         for (Object obj: operators) {
+             
+             if (obj instanceof PropertyIsLessThanOrEqualToType) {
+                 this.operators.add(factory.createPropertyIsLessThanOrEqualTo((PropertyIsLessThanOrEqualToType)obj));
+             } else if (obj instanceof PropertyIsLessThanType) {
+                 this.operators.add(factory.createPropertyIsLessThan((PropertyIsLessThanType)obj));
+             } else if (obj instanceof PropertyIsGreaterThanOrEqualToType) {
+                 this.operators.add(factory.createPropertyIsGreaterThanOrEqualTo((PropertyIsGreaterThanOrEqualToType)obj));
+             } else if (obj instanceof PropertyIsNotEqualToType) {
+                 this.operators.add(factory.createPropertyIsNotEqualTo((PropertyIsNotEqualToType)obj));
+             } else if (obj instanceof PropertyIsGreaterThanType) {
+                 this.operators.add(factory.createPropertyIsGreaterThan((PropertyIsGreaterThanType)obj));
+             } else if (obj instanceof PropertyIsEqualToType) {
+                 this.operators.add(factory.createPropertyIsEqualTo((PropertyIsEqualToType)obj));
+             } else if (obj instanceof OrType) {
+                 this.operators.add(factory.createOr((OrType)obj));
+             } else if (obj instanceof AndType) {
+                 this.operators.add(factory.createAnd((AndType)obj));
+             } else if (obj instanceof PropertyIsNullType) {
+                 this.operators.add(factory.createPropertyIsNull((PropertyIsNullType)obj));
+             } else if (obj instanceof PropertyIsBetweenType) {
+                 this.operators.add(factory.createPropertyIsBetween((PropertyIsBetweenType)obj));
+             } else if (obj instanceof PropertyIsLikeType) {
+                 this.operators.add(factory.createPropertyIsLike((PropertyIsLikeType)obj));
+             } else if (obj instanceof ComparisonOpsType) {
+                 this.operators.add(factory.createComparisonOps((ComparisonOpsType)obj));
+             } else if (obj instanceof SpatialOpsType) {
+                 this.operators.add(factory.createSpatialOps((SpatialOpsType)obj));
+             } else if (obj instanceof LogicOpsType) {
+                 this.operators.add(factory.createLogicOps((LogicOpsType)obj));
+             } else {
+                 throw new IllegalArgumentException("This kind of object is not allowed:" + obj.getClass().getSimpleName());
+             }
+         }
+         
+     }
+     
     /**
      * Gets the value of the comparisonOpsOrSpatialOpsOrLogicOps property.
      * (unmodifable)
      */
-    public List<JAXBElement<?>> getComparisonOpsOrSpatialOpsOrLogicOps() {
-        if (comparisonOpsOrSpatialOpsOrLogicOps == null) {
-            comparisonOpsOrSpatialOpsOrLogicOps = new ArrayList<JAXBElement<?>>();
+    public List<JAXBElement<?>> getOperators() {
+        if (operators == null) {
+            operators = new ArrayList<JAXBElement<?>>();
         }
-        return Collections.unmodifiableList(comparisonOpsOrSpatialOpsOrLogicOps);
+        return Collections.unmodifiableList(operators);
     }
     
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(super.toString());
-        if (comparisonOpsOrSpatialOpsOrLogicOps != null) {
+        if (operators != null) {
             int i = 0; 
-            for (JAXBElement<?> jb: comparisonOpsOrSpatialOpsOrLogicOps) {
+            for (JAXBElement<?> jb: operators) {
                 s.append(i).append(": ").append(jb.getValue().toString()).append('\n');
                 i++;        
             }
         }
         return s.toString();
+    }
+
+    public List<Filter> getChildren() {
+        List<Filter> result = new ArrayList<Filter>();
+        for (JAXBElement jb: operators) {
+            result.add((Filter)jb.getValue());
+        }
+        return result;
+    }
+
+    public boolean evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(FilterVisitor visitor, Object extraData) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

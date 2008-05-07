@@ -20,8 +20,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.gml.DirectPositionType;
 import net.seagis.gml.EnvelopeEntry;
 import net.seagis.gml.EnvelopeWithTimePeriodType;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.spatial.BBOX;
 
 
 /**
@@ -53,7 +57,7 @@ import net.seagis.gml.EnvelopeWithTimePeriodType;
     "envelope",
     "envelopeWithTimePeriod"
 })
-public class BBOXType extends SpatialOpsType {
+public class BBOXType extends SpatialOpsType implements BBOX {
 
     @XmlElement(name = "PropertyName")
     private String propertyName;
@@ -62,6 +66,23 @@ public class BBOXType extends SpatialOpsType {
     @XmlElement(name = "EnvelopeWithTimePeriod", namespace = "http://www.opengis.net/gml")
     private EnvelopeWithTimePeriodType envelopeWithTimePeriod;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    BBOXType() {
+        
+    }
+    
+    /**
+     * build a new BBox with an envelope.
+     */
+    public BBOXType(String propertyName, double minx, double miny, double maxx, double maxy, String srs) {
+        this.propertyName = propertyName;
+        DirectPositionType lower = new DirectPositionType(minx, miny);
+        DirectPositionType upper = new DirectPositionType(maxx, maxy);
+        this.envelope = new EnvelopeEntry(null, lower, upper, srs);
+        
+    }
     /**
      * Gets the value of the propertyName property.
      */
@@ -98,5 +119,82 @@ public class BBOXType extends SpatialOpsType {
             s.append("envelope with time null").append('\n');
         }
         return s.toString();
+    }
+
+    public String getSRS() {
+        if (envelope != null) {
+            return envelope.getSrsName();
+        } else if (envelopeWithTimePeriod != null) {
+            return envelopeWithTimePeriod.getSrsName();
+        }
+        return null;
+    }
+
+    public double getMinX() {
+        DirectPositionType pos = null;
+        if (envelope != null) {
+             pos = envelope.getLowerCorner();
+        } else if (envelopeWithTimePeriod != null) {
+            pos = envelopeWithTimePeriod.getLowerCorner();
+        }
+        if (pos != null && pos.getValue() != null && pos.getValue().size() > 1) {
+            return pos.getValue().get(0);
+        }
+        return -1;
+    }
+
+    public double getMinY() {
+       DirectPositionType pos = null;
+        if (envelope != null) {
+             pos = envelope.getLowerCorner();
+        } else if (envelopeWithTimePeriod != null) {
+            pos = envelopeWithTimePeriod.getLowerCorner();
+        }
+        if (pos != null && pos.getValue() != null && pos.getValue().size() > 1) {
+            return pos.getValue().get(1);
+        }
+        return -1;
+    }
+
+    public double getMaxX() {
+        DirectPositionType pos = null;
+        if (envelope != null) {
+            pos = envelope.getUpperCorner();
+        } else if (envelopeWithTimePeriod != null) {
+            pos = envelopeWithTimePeriod.getUpperCorner();
+        }
+        if (pos != null && pos.getValue() != null && pos.getValue().size() > 1) {
+            return pos.getValue().get(0);
+        }
+        return -1;
+    }
+
+    public double getMaxY() {
+        DirectPositionType pos = null;
+        if (envelope != null) {
+            pos = envelope.getUpperCorner();
+        } else if (envelopeWithTimePeriod != null) {
+            pos = envelopeWithTimePeriod.getUpperCorner();
+        }
+        if (pos != null && pos.getValue() != null && pos.getValue().size() > 1) {
+            return pos.getValue().get(1);
+        }
+        return -1;
+    }
+
+    public Expression getExpression1() {
+        return new PropertyNameType(propertyName);
+    }
+
+    public Expression getExpression2() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public boolean evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(FilterVisitor visitor, Object extraData) {
+        return visitor.visit(this,extraData);
     }
 }

@@ -14,41 +14,34 @@
  *    Lesser General Public License for more details.
  */
 
-
 package net.seagis.ogc;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import org.opengis.filter.Filter;
-
+import org.opengis.filter.Or;
 
 /**
- * <p>Java class for ComparisonOpsType complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="ComparisonOpsType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
- * </pre>
- * 
- * 
+ *
+ * @author guilhem
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ComparisonOpsType")
-@XmlSeeAlso({PropertyIsNullType.class, BinaryComparisonOpType.class, PropertyIsLikeType.class,
-             PropertyIsBetweenType.class})
-public abstract class ComparisonOpsType implements Filter {
+@XmlType(name = "Or")
+public class OrType extends  BinaryLogicOpType implements Or  {
     
-    @Override
-    public String toString() {
-        return "class: " + this.getClass().getSimpleName() + '\n';
-    }
+     /**
+     * An empty constructor used by JAXB
+     */
+     OrType() {
+         
+     }
+     
+     /**
+      * Build a new Binary logic operator 
+      */
+     public OrType(Object... operators) {
+         super(operators);
+         
+     }
 
 }

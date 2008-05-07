@@ -14,41 +14,33 @@
  *    Lesser General Public License for more details.
  */
 
-
 package net.seagis.ogc;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import org.opengis.filter.Filter;
-
+import org.opengis.filter.PropertyIsGreaterThan;
 
 /**
- * <p>Java class for ComparisonOpsType complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
- * <pre>
- * &lt;complexType name="ComparisonOpsType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
- * </pre>
- * 
- * 
+ *
+ * @author Guilhem Legal 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ComparisonOpsType")
-@XmlSeeAlso({PropertyIsNullType.class, BinaryComparisonOpType.class, PropertyIsLikeType.class,
-             PropertyIsBetweenType.class})
-public abstract class ComparisonOpsType implements Filter {
+@XmlType(name = "PropertyIsGreaterThan")
+public class PropertyIsGreaterThanType extends BinaryComparisonOpType implements PropertyIsGreaterThan {
     
-    @Override
-    public String toString() {
-        return "class: " + this.getClass().getSimpleName() + '\n';
+    /**
+     * Empty constructor used by JAXB
+     */
+    PropertyIsGreaterThanType() {
+        
+    }
+    
+    /**
+     * Build a new Binary comparison operator
+     */
+    public PropertyIsGreaterThanType(LiteralType literal, PropertyNameType propertyName, Boolean matchCase) {
+        super(literal, propertyName, matchCase);
     }
 
 }

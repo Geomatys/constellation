@@ -25,6 +25,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.filter.expression.Value;
+import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Literal;
 
 
 /**
@@ -50,7 +53,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "LiteralType", propOrder = {
     "content"
 })
-public class LiteralType {
+public class LiteralType implements Literal {
 
     @XmlMixed
     @XmlAnyElement(lax = true)
@@ -68,6 +71,14 @@ public class LiteralType {
      */
     public LiteralType(List<Object> content) {
         this.content = content;
+    }
+    
+     /**
+     * build a new Literal with the specified Object.
+     */
+    public LiteralType(Object content) {
+        this.content = new ArrayList<Object>(); 
+        this.content.add(content);
     }
     
     /**
@@ -104,11 +115,48 @@ public class LiteralType {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("literal:");
+        StringBuilder s = new StringBuilder();
         for (Object obj: content) {
-            s.append(obj.toString()).append(" - ");
+            s.append(obj.toString()).append(" ");
         }
         return s.toString();
+    }
+
+    /**
+     * We assume that the list have only One Value.
+     */
+    public Object getValue() {
+        if (content != null && content.size() != 0) {
+            return content.get(0);
+        }
+        return null;
+    }
+
+    public Object evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object evaluate(Object object, Class context) {
+       Object literal = null;
+       if (content != null && content.size() != 0) {
+            literal = content.get(0);
+        }
+       Value v = new Value( literal );
+       return v.value(context);
+    }
+
+    /**
+     * Used by FilterVisitors to perform some action on this filter instance.
+     * Typicaly used by Filter decoders, but may also be used by any thing
+     * which needs infomration from filter structure. Implementations should
+     * always call: visitor.visit(this); It is importatant that this is not
+     * left to a parent class unless the parents API is identical.
+     *
+     * @param visitor The visitor which requires access to this filter, the
+     *        method must call visitor.visit(this);
+     */
+    public Object accept(ExpressionVisitor visitor, Object extraData) {
+    	return visitor.visit(this,extraData);
     }
 
 }

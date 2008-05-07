@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
@@ -82,5 +83,17 @@ public class MapItemType extends ExpressionType {
      */
     public ParameterValueType getValue() {
         return value;
+    }
+
+    public Object evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public <T> T evaluate(Object object, Class<T> context) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(ExpressionVisitor visitor, Object extraData) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
  * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,13 +17,12 @@
 
 package net.seagis.ogc;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
+import org.opengis.filter.capability.ArithmeticOperators;
+import org.opengis.filter.capability.Functions;
 
 
 /**
@@ -47,44 +47,48 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ArithmeticOperatorsType", propOrder = {
-    "simpleArithmeticOrFunctions"
+    "simpleArithmetic",
+    "functions"
 })
-public class ArithmeticOperatorsType {
+public class ArithmeticOperatorsType implements ArithmeticOperators {
 
-    @XmlElements({
-        @XmlElement(name = "Functions", type = FunctionsType.class),
-        @XmlElement(name = "SimpleArithmetic", type = SimpleArithmetic.class)
-    })
-    protected List<Object> simpleArithmeticOrFunctions;
-
+    @XmlElement(name = "Functions")
+    private FunctionType functions;     
+    @XmlElement(name = "SimpleArithmetic")
+    private SimpleArithmetic simpleArithmetic;
+    
     /**
-     * Gets the value of the simpleArithmeticOrFunctions property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the simpleArithmeticOrFunctions property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSimpleArithmeticOrFunctions().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link FunctionsType }
-     * {@link SimpleArithmetic }
-     * 
-     * 
+     * An empty constructor used by JAXB
      */
-    public List<Object> getSimpleArithmeticOrFunctions() {
-        if (simpleArithmeticOrFunctions == null) {
-            simpleArithmeticOrFunctions = new ArrayList<Object>();
+    ArithmeticOperatorsType() {
+        
+    }
+    
+    /**
+     * Build a new Arithmetic Operators
+     */
+    public ArithmeticOperatorsType(boolean simple, Functions functions) {
+        if (simple) {
+            this.simpleArithmetic = new SimpleArithmetic();
         }
-        return this.simpleArithmeticOrFunctions;
+        this.functions = new FunctionType(functions);
     }
 
+    /**
+     * Gets the value of the simpleArithmetic.
+     */
+    public SimpleArithmetic getSimpleArithmetic() {
+        return simpleArithmetic;
+    }
+    
+    /**
+     * Gets the value of the simpleArithmetic.
+     */
+    public Functions getFunctions() {
+        return functions;
+    }
+
+    public boolean hasSimpleArithmetic() {
+        return simpleArithmetic != null;
+    }
 }

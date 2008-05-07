@@ -17,12 +17,9 @@
 
 package net.seagis.ogc;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 import org.opengis.filter.capability.IdCapabilities;
 
@@ -60,6 +57,23 @@ public class IdCapabilitiesType implements IdCapabilities {
     @XmlElement(name = "FID")
     private FID fid;
 
+    /**
+     * Empty constructor used By JAXB
+     */
+     IdCapabilitiesType() {
+        
+     }
+     
+    /**
+     * Build a new ID capabilities
+     */
+     public IdCapabilitiesType(boolean eid, boolean fid) {
+        if (eid)
+            this.eid = new EID();
+        if (fid)
+            this.fid = new FID();
+     }
+     
     /**
      * Gets the value of the eid property.
      */

@@ -17,6 +17,7 @@
 package net.seagis.ogc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
@@ -24,8 +25,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
+import org.opengis.filter.capability.FunctionName;
+import org.opengis.filter.capability.Functions;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
@@ -52,13 +58,44 @@ import net.seagis.coverage.web.ExpressionType;
 @XmlType(name = "FunctionType", propOrder = {
     "expression"
 })
-public class FunctionType extends ExpressionType {
+public class FunctionType extends ExpressionType implements Functions {
 
-    @XmlElementRef(name = "expression", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
+    @XmlElementRefs({
+        @XmlElementRef(name = "Add", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
+        @XmlElementRef(name = "PropertyName", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
+        @XmlElementRef(name = "Function", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
+        @XmlElementRef(name = "Sub", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
+        @XmlElementRef(name = "expression", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
+        @XmlElementRef(name = "Literal", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
+        @XmlElementRef(name = "Div", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
+        @XmlElementRef(name = "Mul", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
+    })
     private List<JAXBElement<?>> expression;
+   
     @XmlAttribute(required = true)
     private String name;
 
+    /**
+     * A transient factory to rebuild the expressions
+     */
+    @XmlTransient
+    ObjectFactory factory = new ObjectFactory();
+    
+    /**
+     * An empty constructor used by JAXB 
+     */
+     FunctionType() {
+         
+     }
+     
+    /**
+     * Build a new Function  TODO
+     */
+     public FunctionType(Functions functions) {
+         expression = new ArrayList<JAXBElement<?>>();
+         throw new UnsupportedOperationException("TODO Not supported yet.");
+     }
+     
     /**
      * Gets the value of the expression property.
      * (unmodifiable)
@@ -75,5 +112,30 @@ public class FunctionType extends ExpressionType {
      */
     public String getName() {
         return name;
+    }
+
+    public Collection<FunctionName> getFunctionNames() {
+        List<FunctionName> result = new ArrayList<FunctionName>();
+        /* TODO
+         for (JAXBElement jb: expression) {
+            if (jb.getValue() instanceof FunctionNameType)
+        }*/
+        return result;
+    }
+
+    public FunctionName getFunctionName(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public <T> T evaluate(Object object, Class<T> context) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(ExpressionVisitor visitor, Object extraData) {
+        return extraData;
     }
 }

@@ -21,6 +21,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
@@ -50,7 +52,7 @@ import net.seagis.coverage.web.ExpressionType;
     "literal",
     "propertyName"
 })
-public class UpperBoundaryType {
+public class UpperBoundaryType implements Expression {
 
     @XmlElement(nillable = true)
     private ExpressionType expression;
@@ -78,5 +80,17 @@ public class UpperBoundaryType {
      */
     public String getPropertyName() {
         return propertyName;
+    }
+
+    public Object evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public <T> T evaluate(Object object, Class<T> context) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(ExpressionVisitor visitor, Object extraData) {
+        return extraData;
     }
 }

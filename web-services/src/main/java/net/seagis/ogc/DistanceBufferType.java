@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.AbstractGeometryType;
+import org.opengis.filter.FilterVisitor;
 
 
 /**
@@ -99,5 +100,13 @@ public class DistanceBufferType extends SpatialOpsType {
             s.append("distance null").append('\n');
         }
         return s.toString();
+    }
+
+    public boolean evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(FilterVisitor visitor, Object extraData) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

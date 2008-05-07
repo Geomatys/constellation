@@ -22,6 +22,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -47,11 +50,25 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "PropertyIsNullType", propOrder = {
     "propertyName"
 })
-public class PropertyIsNullType extends ComparisonOpsType {
+public class PropertyIsNullType extends ComparisonOpsType implements PropertyIsNull {
 
     @XmlElement(name = "PropertyName", required = true)
     private PropertyNameType propertyName;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+     PropertyIsNullType() {
+         
+     }
+     
+     /**
+     * Build a new Property is null operator.
+     */
+     public PropertyIsNullType(PropertyNameType prop) {
+         this.propertyName = prop;
+     }
+     
     /**
      * Gets the value of the propertyName property.
      */
@@ -67,5 +84,20 @@ public class PropertyIsNullType extends ComparisonOpsType {
         } else s.append(" PropertyName is null");
         
         return s.toString();
+    }
+
+    /**
+     * implements PropertyIsNull GeoAPI interface
+     */
+    public Expression getExpression() {
+        return propertyName;
+    }
+
+    public boolean evaluate(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object accept(FilterVisitor visitor, Object extraData) {
+        return visitor.visit( this, extraData );
     }
 }
