@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # ---------------------------------------------------------------------------
 # Synchronizes a PostGrid database with an other one. The configuration files
@@ -15,7 +15,7 @@
 
 # Initialization common to all scripts
 export BASE_DIR=`dirname $0`/..
-source $BASE_DIR/etc/setenv.sh
+. $BASE_DIR/etc/setenv.sh
 
 # Runs Java commands
 export CLASSPATH=$JARS/postgrid-$SEAGIS_VERSION.jar
