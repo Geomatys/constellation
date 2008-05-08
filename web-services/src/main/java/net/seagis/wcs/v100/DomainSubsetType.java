@@ -108,7 +108,7 @@ public class DomainSubsetType {
      */
     public TimeSequenceType getTemporalSubSet() {
         for (JAXBElement<?> element: content) {
-            if (element.getName().getLocalPart().equals("temporalSubset")) {
+            if (element.getName().getLocalPart().equalsIgnoreCase("temporalSubset")) {
                 return (TimeSequenceType)element.getValue();
             }
         }
@@ -120,7 +120,7 @@ public class DomainSubsetType {
      */
     public SpatialSubsetType getSpatialSubSet() {
         for (JAXBElement<?> element: content) {
-            if (element.getName().getLocalPart().equals("spatialSubset")) {
+            if (element.getName().getLocalPart().equalsIgnoreCase("spatialSubset")) {
                 return (SpatialSubsetType)element.getValue();
             }
         }
