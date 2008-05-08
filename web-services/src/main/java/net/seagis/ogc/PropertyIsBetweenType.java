@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
+import org.geotools.filter.Expression;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsBetween;
 
@@ -90,8 +91,8 @@ public class PropertyIsBetweenType extends ComparisonOpsType implements Property
     /**
      * Gets the value of the expression property.
      */
-    public ExpressionType getExpression() {
-        return expression;
+    public Expression getExpression() {
+        return (Expression) expression;
     }
 
     /**
