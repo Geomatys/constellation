@@ -43,6 +43,7 @@ import javax.xml.bind.JAXBException;
 //seagis dependencies
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
+import net.seagis.coverage.catalog.CoverageReference;
 import net.seagis.coverage.catalog.Series;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.WMSWebServiceException;
@@ -99,27 +100,25 @@ public class WMService extends WebService {
     static {
         try {
             /* only for ifremer configuration */
-            File configFile = null;
-            File dirCatalina = null;
-            if(System.getenv().get("CATALINA_HOME") != null)
-                dirCatalina = new File(System.getenv().get("CATALINA_HOME"));
+            //File configFile = null;
+            //configFile = new File("/home/share/postgrid/config.xml");
+//            final File dirCatalina = new File(System.getenv().get("CATALINA_HOME"));
+//            if (dirCatalina.exists()) {
+//                configFile = new File(dirCatalina, "/home/share/postgrid/config.xml");
+//                logger.info("path to config file:" + configFile);
+//                if (!configFile.exists()) {
+//                    configFile = null;
+//                }
+//            }
+//            if (configFile != null) {
+//                logger.info("path to config file:" + configFile.getAbsolutePath());
+//            } else {
+//                logger.info("path to catalina config file using sicade configuration");
+//            }
+            //System.out.println("Config file is: "+configFile.toString());
+            //final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true); 
             
-            if (dirCatalina!= null && dirCatalina.exists()) {
-                configFile = new File(dirCatalina, "webapps/ifremerWS/WEB-INF/config.xml");
-                logger.info("path to config file:" + configFile);
-                if (!configFile.exists()) {
-                    configFile = null;
-                }
-            }
-            final WebServiceWorker initialValue;
-            if (configFile != null) {
-                logger.info("path to config file:" + configFile.getAbsolutePath());
-               initialValue = new WebServiceWorker(new Database(configFile), true); 
-            } else {
-                logger.info("path to catalina config file using sicade configuration");
-                initialValue = new WebServiceWorker(new Database(), true);
-            }
-            
+            final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
                 @Override
                 protected WebServiceWorker initialValue() {
@@ -309,6 +308,9 @@ public class WMService extends WebService {
         webServiceWorker.setExceptionFormat(getParameter("EXCEPTIONS", false));
         
         double result = webServiceWorker.evaluatePixel(i,j);
+        
+        // TODO: report requested properties (like filename, date range) of the specified coverage
+        CoverageReference ref = webServiceWorker.getCoverageReference();        
         
         // there is many return type possible
         String response;
@@ -584,7 +586,7 @@ public class WMService extends WebService {
                       INVALID_PARAMETER_VALUE, getCurrentVersion());
             }
         }
-                 
+                
         DescribeLayerResponseType response = new DescribeLayerResponseType(getSldVersion().toString(), layersDescriptions);
        
         //we marshall the response and return the XML String

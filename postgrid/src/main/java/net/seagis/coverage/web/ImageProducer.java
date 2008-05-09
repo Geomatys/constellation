@@ -620,6 +620,32 @@ public abstract class ImageProducer {
         }
         return gridGeometry;
     }
+    
+    /**
+     * Gets the coverage referred to by the web service request params
+     * 
+     * This is used in WMS GetFeatureInfo to provide information about the original data source.
+     * 
+     * @return CoverageReference for the requested time
+     */
+    public CoverageReference getCoverageReference() throws WebServiceException {
+        final Layer layer = getLayer();
+        final CoverageReference ref;
+        if (time == null) {
+            throw new WMSWebServiceException("Must specify TIME.", INVALID_PARAMETER_VALUE, version);
+        }
+        try {
+            ref = layer.getCoverageReference(time, elevation);
+        } catch (CatalogException exception) {
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+        }
+        if (ref == null) {
+            // TODO: provides a better message.
+            throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                    INVALID_PARAMETER_VALUE, version);
+        }
+        return ref;
+    }
 
     /**
      * Gets the grid coverage for the current layer, time, elevation, <cite>etc.</cite>
