@@ -17,6 +17,7 @@ package net.seagis.coverage.web;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -37,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ExpressionType")
-public abstract class ExpressionType {
+public abstract class ExpressionType implements Expression {
 
 
 }
