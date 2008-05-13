@@ -149,7 +149,14 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
             
             } else if (result instanceof DataArrayPropertyType) {
                 DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
-                statement.setString(indexOf(query.values), array.getValues());
+                //we cleanup a little the values
+                String values = array.getValues();
+                values = values.replace("\n", " ");
+                values = values.replace("\t", " ");
+                while (values.indexOf("  ") != -1) {
+                    values = values.replaceAll("  ", "");
+                }
+                statement.setString(indexOf(query.values), values);
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
                 if(dataArrays == null) {
                     dataArrays = getDatabase().getTable(DataArrayTable.class);

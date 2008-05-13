@@ -235,11 +235,6 @@ public class SOSworker {
     private final long templateValidTime;
     
     /**
-     * The temporary folder for describe sensor operation.
-     */
-    private final String temporaryFolder;
-    
-    /**
      * The maximum of observation return in a getObservation request.
      */
     private final int maxObservationByRequest;
@@ -316,7 +311,6 @@ public class SOSworker {
                 sensorIdBase              = null;
                 observationIdBase         = null;
                 observationTemplateIdBase = null;
-                temporaryFolder           = null;
                 maxObservationByRequest   = -1;
                 templateValidTime         = -1;
                 
@@ -343,7 +337,6 @@ public class SOSworker {
                 sensorIdBase              = prop.getProperty("sensorIdBase");
                 observationIdBase         = prop.getProperty("observationIdBase");
                 observationTemplateIdBase = prop.getProperty("observationTemplateIdBase");
-                temporaryFolder           = prop.getProperty("temporaryFolder");
                 maxObservationByRequest   = Integer.parseInt(prop.getProperty("maxObservationByRequest"));
                 String validTime          = prop.getProperty("templateValidTime");
                 int h                     = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
@@ -363,7 +356,6 @@ public class SOSworker {
             sensorIdBase              = null;
             observationIdBase         = null;
             observationTemplateIdBase = null;
-            temporaryFolder           = null;
             maxObservationByRequest   = -1;
             templateValidTime         = -1;
             
@@ -626,7 +618,6 @@ public class SOSworker {
             boolean template  = false;
             ResponseModeType mode;
             if (requestObservation.getResponseMode() == null) {
-                logger.info("responseMode was null");
                 mode = ResponseModeType.INLINE; 
             } else {
                 try {
@@ -1166,7 +1157,6 @@ public class SOSworker {
             } else {
                 throw new IllegalArgumentException("unexpected type for process");
             }
-            
             //we get the observation template provided with the sensor description.
             ObservationTemplate temp = requestRegSensor.getObservationTemplate();
             ObservationEntry obs     = temp.getObservation();
@@ -1188,7 +1178,7 @@ public class SOSworker {
                 logger.severe("decoded process is null");
             
             //we create a new Tempory File SensorML
-            File tempFile = new File(temporaryFolder + "/temp.xml");
+            File tempFile = File.createTempFile("sml", "xml");
             FileOutputStream outstr = new FileOutputStream(tempFile);
             OutputStreamWriter outstrR = new OutputStreamWriter(outstr,"UTF-8");
             BufferedWriter output = new BufferedWriter(outstrR);
@@ -1239,7 +1229,7 @@ public class SOSworker {
                                              NO_APPLICABLE_CODE, null, version);
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
-            throw new OWSWebServiceException("The service cannot find the temporary file " + temporaryFolder + "/temp.xml",
+            throw new OWSWebServiceException("The service cannot build the temporary file",
                                           NO_APPLICABLE_CODE, null, version);
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -1720,6 +1710,7 @@ public class SOSworker {
         Statement stmt2    = OMDatabase.getConnection().createStatement();
         final ResultSet result2;
         String request = "SELECT * FROM ";
+        boolean insert = true;
         
         if (column.equals("27582")) {
             request = request + " projected_localisations WHERE id='" + sensorId + "'";
@@ -1727,6 +1718,7 @@ public class SOSworker {
             if (!result2.next()) {
                 request = "INSERT INTO projected_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + column + "))";
             } else {
+                insert = false;
                 logger.severe("Projected sensor location already registred for " + sensorId + " keeping old location");
             }
         } else if (column.equals("4326")) {
@@ -1735,6 +1727,7 @@ public class SOSworker {
             if (!result2.next()) {
                 request = "INSERT INTO geographic_localisations VALUES ('" + sensorId + "', GeometryFromText( 'POINT(" + x + ' ' + y + ")', " + column + "))";
             } else {
+                insert = false;
                 logger.severe("Geographic sensor location already registred for " + sensorId + " keeping old location");
             }
         } else {
@@ -1742,8 +1735,8 @@ public class SOSworker {
                                               INVALID_PARAMETER_VALUE, null, version);
         }
         logger.info(request);
-        
-        stmt2.executeUpdate(request);
+        if (insert)
+            stmt2.executeUpdate(request);
     }
     
     /**

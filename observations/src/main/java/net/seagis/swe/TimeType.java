@@ -134,11 +134,15 @@ public class TimeType extends AbstractDataComponentEntry {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append("[TimeType]").append('\n').append("super:").append(super.toString()).append('\n');
-        s.append("localFrame:").append(localFrame).append('\n');
-        s.append("referenceFrame:").append(referenceFrame).append('\n');
-        s.append("referenceTime:").append(referenceTime).append('\n');
-        s.append("value:").append('\n');
+        if (localFrame != null)
+            s.append("localFrame:").append(localFrame).append('\n');
+        if (referenceFrame != null)
+            s.append("referenceFrame:").append(referenceFrame).append('\n');
+        if (referenceTime != null)
+            s.append("referenceTime:").append(referenceTime).append('\n');
+        
         if (value != null) {
+            s.append("value:").append('\n');
             for (String ss:value){
                 s.append(ss).append('\n');
             }

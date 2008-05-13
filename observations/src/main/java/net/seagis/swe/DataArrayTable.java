@@ -18,6 +18,7 @@ package net.seagis.swe;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Iterator;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
@@ -149,5 +150,20 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
             transactionEnd(success);
         }
         return id;
+    }
+    
+    /**
+     * We ovveride this method because it will probably have a very large number af dataArray
+     * and the super method is bounded.
+     * @param base the base for identifier (base
+     * @return a new id for the dataArray
+     */
+    @Override
+    public String searchFreeIdentifier(String base) throws CatalogException, SQLException {
+        PreparedStatement stmt = this.getStatement("SELECT COUNT(id_array_definition) FROM data_array_definition");
+        ResultSet result = stmt.executeQuery();
+        result.next();
+        int nbLine = result.getInt(1);
+        return base + '-' + nbLine;
     }
 }

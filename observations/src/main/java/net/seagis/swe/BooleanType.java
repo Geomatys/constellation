@@ -1,3 +1,19 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
 package net.seagis.swe;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -40,78 +56,27 @@ public class BooleanType extends AbstractDataComponentEntry {
     
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link java.lang.Boolean }
-     *     
      */
     public java.lang.Boolean isValue() {
         return value;
     }
 
     /**
-     * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link java.lang.Boolean }
-     *     
-     */
-    public void setValue(java.lang.Boolean value) {
-        this.value = value;
-    }
-
-    /**
      * Gets the value of the axisID property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getAxisID() {
         return axisID;
     }
 
     /**
-     * Sets the value of the axisID property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setAxisID(String value) {
-        this.axisID = value;
-    }
-
-    /**
      * Gets the value of the referenceFrame property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
     public String getReferenceFrame() {
         return referenceFrame;
     }
 
     /**
-     * Sets the value of the referenceFrame property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setReferenceFrame(String value) {
-        this.referenceFrame = value;
-    }
-    
-      /**
-     * Vérifie si cette entré est identique à l'objet spécifié.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {
@@ -138,7 +103,16 @@ public class BooleanType extends AbstractDataComponentEntry {
     
     @Override
     public String toString(){
-        return "AxisId: " + axisID + " referenceFrame: " + referenceFrame + " value=" + value;
+        StringBuilder s = new StringBuilder();
+        s.append("[BooleanType]").append('\n').append("super:").append(super.toString()).append('\n');
+        if (axisID != null)
+            s.append("axisId:").append(axisID).append('\n');
+        if (referenceFrame != null)
+            s.append("referenceFrame:").append(referenceFrame).append('\n');
+        if (value != null)
+            s.append("value:").append(value).append('\n');
+        
+        return s.toString();
     }
 
 }

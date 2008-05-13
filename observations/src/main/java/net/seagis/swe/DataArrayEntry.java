@@ -171,8 +171,15 @@ public class DataArrayEntry extends AbstractDataArrayEntry {
             s.append(" elementType=").append(elementType.toString()).append(lineSeparator);
         if (encoding != null)
             s.append(" encoding:").append(encoding.toString()).append(lineSeparator);
-        if (values != null)
-            s.append("values=").append(values).append(lineSeparator);
+        if (values != null) {
+            //we format a little the result
+            String formatedValues = values;
+            while (formatedValues.indexOf("  ") != -1) {
+                formatedValues    = formatedValues.replace("  ", "");
+            }
+            formatedValues        = formatedValues.replace("\n", " "); 
+            s.append("values=").append(formatedValues).append(lineSeparator);
+        }
         return s.toString();
     }
 
