@@ -85,7 +85,7 @@ public class ArithmeticOperatorsType implements ArithmeticOperators {
      * Gets the value of the simpleArithmetic.
      */
     public Functions getFunctions() {
-        return functions;
+        throw new UnsupportedOperationException("Operation Not supported yet");
     }
 
     public boolean hasSimpleArithmetic() {

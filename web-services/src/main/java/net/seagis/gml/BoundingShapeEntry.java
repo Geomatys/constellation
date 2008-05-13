@@ -148,7 +148,7 @@ public class BoundingShapeEntry {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("BoundingShapeEntry:").append('\n');
+        StringBuilder s = new StringBuilder();
         if (envelope != null) {
             s.append("envelope:").append(envelope.toString());
         }
@@ -156,9 +156,9 @@ public class BoundingShapeEntry {
             s.append("envelopeWithTimePeriod:").append(envelopeWithTimePeriod.toString());
         }
         if (_null != null) {
-            s.append("_null:").append('\n');
+            s.append("_null: ");
             for (String ss: _null) {
-                s.append(ss).append('\n');
+                s.append("       ").append(ss).append('\n');
             }
         }
         if (nilReason != null) {

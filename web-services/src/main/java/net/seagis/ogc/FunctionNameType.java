@@ -17,11 +17,16 @@
 
 package net.seagis.ogc;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import org.opengis.filter.capability.FunctionName;
 
 
 /**
@@ -45,13 +50,33 @@ import javax.xml.bind.annotation.XmlValue;
 @XmlType(name = "FunctionNameType", propOrder = {
     "value"
 })
-public class FunctionNameType {
+public class FunctionNameType implements FunctionName {
 
     @XmlValue
     private String value;
     @XmlAttribute(required = true)
     private String nArgs;
+    
+    @XmlTransient
+    private List<String> argumentNames;
+    @XmlTransient
+    private Logger logger = Logger.getAnonymousLogger();
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    FunctionNameType() {
+        
+    }
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    public FunctionNameType(String name, int nArgs) {
+        this.value = name;
+        this.nArgs = nArgs + "";
+    }
+    
     /**
      * Gets the value of the value property.
      */
@@ -64,5 +89,34 @@ public class FunctionNameType {
      */
     public String getNArgs() {
         return nArgs;
+    }
+
+    public int getArgumentCount() {
+        int result = 0;
+        try {
+            result = Integer.parseInt(nArgs);
+        } catch (NumberFormatException e) {
+            logger.severe("unable To parse number of argument in function " + value + " the value " + nArgs + " is not a number" );
+        }
+        return result;
+    }
+
+    public List<String> getArgumentNames() {
+        if( argumentNames == null ){
+            argumentNames = generateArgumentNames(getArgumentCount());
+        }
+        return argumentNames;
+    }
+
+    private static List<String> generateArgumentNames( int count ){
+        List<String> names = Arrays.asList( new String[count]);
+        for( int i=0; i < count; i++){
+            names.set(i, "arg"+i );
+        }
+        return names;
+    }
+
+    public String getName() {
+        return value;
     }
 }

@@ -31,7 +31,9 @@ import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
 import org.opengis.filter.capability.FunctionName;
 import org.opengis.filter.capability.Functions;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Function;
 
 
 /**
@@ -58,7 +60,7 @@ import org.opengis.filter.expression.ExpressionVisitor;
 @XmlType(name = "FunctionType", propOrder = {
     "expression"
 })
-public class FunctionType extends ExpressionType implements Functions {
+public class FunctionType extends ExpressionType implements Function {
 
     @XmlElementRefs({
         @XmlElementRef(name = "Add", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class),
@@ -91,9 +93,22 @@ public class FunctionType extends ExpressionType implements Functions {
     /**
      * Build a new Function  TODO
      */
+     public FunctionType(String name, Expression... expression) {
+         this.expression = new ArrayList<JAXBElement<?>>();
+         StringBuilder report = new StringBuilder();
+         for (Expression e:expression)  {
+             report.append(e.getClass().getSimpleName() + " "); 
+         }
+         throw new UnsupportedOperationException("TODO Not supported yet real type of arg1:" + report.toString());
+     }
+     
+     /**
+     * Build a new Function  TODO
+     */
      public FunctionType(Functions functions) {
-         expression = new ArrayList<JAXBElement<?>>();
-         throw new UnsupportedOperationException("TODO Not supported yet.");
+         this.expression = new ArrayList<JAXBElement<?>>();
+         
+         throw new UnsupportedOperationException("Operation Not supported yet");
      }
      
     /**
@@ -114,19 +129,6 @@ public class FunctionType extends ExpressionType implements Functions {
         return name;
     }
 
-    public Collection<FunctionName> getFunctionNames() {
-        List<FunctionName> result = new ArrayList<FunctionName>();
-        /* TODO
-         for (JAXBElement jb: expression) {
-            if (jb.getValue() instanceof FunctionNameType)
-        }*/
-        return result;
-    }
-
-    public FunctionName getFunctionName(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     public Object evaluate(Object object) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -136,6 +138,11 @@ public class FunctionType extends ExpressionType implements Functions {
     }
 
     public Object accept(ExpressionVisitor visitor, Object extraData) {
-        return extraData;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public List<Expression> getParameters() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

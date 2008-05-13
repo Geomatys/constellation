@@ -104,6 +104,8 @@ public class FilterType implements Filter {
             this.comparisonOps = (factory.createPropertyIsEqualTo((PropertyIsEqualToType) obj));
         } else if (obj instanceof OrType) {
             this.logicOps = (factory.createOr((OrType) obj));
+        } else if (obj instanceof NotType) {
+            this.logicOps = (factory.createNot((NotType) obj));
         } else if (obj instanceof AndType) {
             this.logicOps = (factory.createAnd((AndType) obj));
         } else if (obj instanceof PropertyIsNullType) {

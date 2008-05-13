@@ -165,7 +165,6 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
             } else {
                 statement.setString(indexOf(query.type), "");
             }
-            System.out.println("INSERT:" + statement.toString());
             updateSingleton(statement);
             success = true;
         } finally {

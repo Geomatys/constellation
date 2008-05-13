@@ -331,7 +331,7 @@ public class ObjectFactory {
     public AbstractRingPropertyType createAbstractRingPropertyType() {
         return new AbstractRingPropertyType();
     }
-
+    
     /**
      * Create an instance of {@link PointType }
      * 

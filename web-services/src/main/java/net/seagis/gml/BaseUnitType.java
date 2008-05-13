@@ -82,7 +82,10 @@ public class BaseUnitType extends UnitDefinitionType {
     
     @Override
     public String toString() {
-        return "BaseUnit unitSystem:" + unitsSystem;
+        String s = "";
+        if (unitsSystem != null)
+            s =  unitsSystem.toString();
+        return "[BaseUnitType]:" + s;
     }
 
 

@@ -18,6 +18,7 @@ package net.seagis.filter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -28,10 +29,14 @@ import net.seagis.ogc.ArithmeticOperatorsType;
 import net.seagis.ogc.BBOXType;
 import net.seagis.ogc.ComparisonOperatorsType;
 import net.seagis.ogc.FeatureIdType;
+import net.seagis.ogc.FunctionNameType;
+import net.seagis.ogc.FunctionNamesType;
+import net.seagis.ogc.FunctionType;
 import net.seagis.ogc.GmlObjectIdType;
 import net.seagis.ogc.IdCapabilitiesType;
 import net.seagis.ogc.LiteralType;
 import net.seagis.ogc.LowerBoundaryType;
+import net.seagis.ogc.NotType;
 import net.seagis.ogc.OrType;
 import net.seagis.ogc.PropertyIsBetweenType;
 import net.seagis.ogc.PropertyIsEqualToType;
@@ -140,7 +145,7 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public Not not(Filter f) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new NotType(f);
     }
 
     public Id id(Set<? extends Identifier> ids) {
@@ -258,19 +263,19 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public Function function(String name, Expression[] args) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new FunctionType(name, args);
     }
 
     public Function function(String name, Expression arg1) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new FunctionType(name, arg1);
     }
 
     public Function function(String name, Expression arg1, Expression arg2) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new FunctionType(name, arg1, arg2);
     }
 
     public Function function(String name, Expression arg1, Expression arg2, Expression arg3) {
-        throw new UnsupportedOperationException("Not supported yet.");
+         return new FunctionType(name, arg1, arg2, arg3);
     }
 
     public Literal literal(Object obj) {
@@ -326,11 +331,12 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public FunctionName functionName(String name, int nargs) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new FunctionNameType(name, nargs);
     }
 
     public Functions functions(FunctionName[] functionNames) {
-        throw new UnsupportedOperationException("Not supported yet.");
+       
+        return new FunctionNamesType(Arrays.asList((FunctionNameType[])functionNames));
     }
 
     public SpatialOperators spatialOperators(SpatialOperator[] spatialOperators) {

@@ -100,6 +100,8 @@ public class BinaryLogicOpType extends LogicOpsType {
                  this.operators.add(factory.createPropertyIsEqualTo((PropertyIsEqualToType)obj));
              } else if (obj instanceof OrType) {
                  this.operators.add(factory.createOr((OrType)obj));
+             } else if (obj instanceof NotType) {
+                 this.operators.add(factory.createNot((NotType)obj));
              } else if (obj instanceof AndType) {
                  this.operators.add(factory.createAnd((AndType)obj));
              } else if (obj instanceof PropertyIsNullType) {

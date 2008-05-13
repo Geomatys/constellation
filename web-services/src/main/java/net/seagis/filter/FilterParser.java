@@ -16,12 +16,7 @@
 
 package net.seagis.filter;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +25,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.TransformerException;
 import net.seagis.cat.csw.QueryConstraintType;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
@@ -54,7 +47,6 @@ import net.seagis.ogc.PropertyNameType;
 import net.seagis.ogc.SpatialOpsType;
 import net.seagis.ogc.UnaryLogicOpType;
 import net.seagis.ows.v100.OWSWebServiceException;
-import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.text.cql2.CQL;
 import static net.seagis.ows.OWSExceptionCode.*;
 import org.geotools.filter.text.cql2.CQLException;
@@ -162,11 +154,11 @@ public class FilterParser {
         if (filter.getLogicOps() != null) {
             query.append(treatLogicalOperator(filter.getLogicOps()));
             
-        // we treat directly comparison operator: PropertyIsLike, IsNull, ISBetween,...    
+        // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
         } else if (filter.getComparisonOps() != null) {
             query.append(treatComparisonOperator(filter.getComparisonOps()));
                 
-        // we treat spatial constraint    
+        // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
         } else if (filter.getSpatialOps() != null) {
             query.append(treatSpatialOperator(filter.getSpatialOps()));
                 
@@ -215,7 +207,7 @@ public class FilterParser {
                 response.append(" ").append(operator.toUpperCase()).append(" ");
             }
           
-          // we remove the last Operator and add a )  
+          // we remove the last Operator and add a ') ' 
           response.delete(response.length()- (operator.length() + 2), response.length());
           response.append(')');
                 

@@ -91,8 +91,8 @@ public class PropertyIsBetweenType extends ComparisonOpsType implements Property
     /**
      * Gets the value of the expression property.
      */
-    public Expression getExpression() {
-        return (Expression) expression;
+    public ExpressionType getExpression() {
+        return expression;
     }
 
     /**
