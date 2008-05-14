@@ -59,9 +59,10 @@ final class NcmlGridCoverageTable extends WritableGridCoverageTable {
     private final String format;
 
     /**
-     * Constructs a new {@code WritableGridCoverageTable}.
+     * Constructs a new {@link WritableGridCoverageTable}.
      *
-     * @param connection The connection to the database.
+     * @param database The database.
+     * @param format The format to use for the serie.
      * @see net.seagis.coverage.catalog.WritableGridCoverageTable
      */
     public NcmlGridCoverageTable(final Database database, final String format) {
@@ -74,10 +75,10 @@ final class NcmlGridCoverageTable extends WritableGridCoverageTable {
      * #setStartTime(Long), #setNpts(Integer) and #setNextItemStart(Long) have been called previously.
      * Otherwise the default value for these variables is 0.
      *
-     * @param reader
-     * @param imageIndex
-     * @return
-     * @throws java.io.IOException
+     * @param reader The {@linkplain ImageReader reader} to use.
+     * @param imageIndex The index of the image to read.
+     * @return An entry for the {@code GridCoverages} table.
+     * @throws IOException
      */
     @Override
     protected WritableGridCoverageEntry createEntry(final ImageReader reader, final int imageIndex)

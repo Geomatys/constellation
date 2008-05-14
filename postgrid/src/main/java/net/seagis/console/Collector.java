@@ -186,9 +186,9 @@ public class Collector extends CommandLine {
         if (out != null) {
             // TODO: localize
             out.print(count);
-            out.print(" images ajoutées");
+            out.print(" image(s) ajoutée(s)");
             if (!SKIP_EXISTING.equals(updatePolicy)) {
-                out.print(" ou remplacées");
+                out.print(" ou remplacée(s)");
             }
             out.print(" pour la couche \"");
             out.print(layer);
@@ -412,7 +412,12 @@ public class Collector extends CommandLine {
      * @throws IOException if the NetCDF reader can not be created.
      */
     protected NetcdfImageReader createNetcdfImageReader(final String file) throws IOException {
-        return (NetcdfImageReader) new NetcdfImageReader.Spi().createReaderInstance();
+        final NetcdfImageReader reader = 
+                (NetcdfImageReader) new NetcdfImageReader.Spi().createReaderInstance();
+        if (variable != null) {
+            reader.setVariables(new String[] {variable});
+        }
+        return reader;
     }
 
     /**
