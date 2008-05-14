@@ -60,6 +60,11 @@ public class DefinitionBaseType extends AbstractGMLEntry {
     public DefinitionBaseType(final String id, final String name, final String description )  {
         super(id, name, description, null);
     }
+    
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 
 
 }

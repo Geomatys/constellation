@@ -51,16 +51,16 @@ public class PointType extends AbstractGeometricPrimitiveType {
      */
     @Override
     public String toString() {
-        String s = "id = " + this.getId() + '\n'; 
+        StringBuilder s =new StringBuilder("id = ").append(this.getId()).append('\n'); 
         if(pos != null) {
-            s = s + " position : " + pos.toString() + '\n'; 
+            s.append("position : ").append(pos.toString()).append('\n'); 
         }
         
         if( coordinates != null) {
-            s = s + " coordinates : " + coordinates.toString() + '\n'; 
+            s.append(" coordinates : ").append(coordinates.toString()).append('\n'); 
         }
         
-        return s;
+        return s.toString();
     }
     
     /**

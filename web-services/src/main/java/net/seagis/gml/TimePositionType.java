@@ -162,7 +162,7 @@ public class TimePositionType {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("TimePosition:").append('\n');
+        StringBuilder s = new StringBuilder("[TimePositionType] ");
         if (calendarEraName != null) {
             s.append("calendarEraName:").append(calendarEraName).append('\n');
         }
@@ -172,7 +172,7 @@ public class TimePositionType {
         if (indeterminatePosition != null) {
             s.append("indeterminatePosition:").append(indeterminatePosition.value()).append('\n');
         }
-        s.append("value=" + value);
+        s.append("value = " + value);
                
         return s.toString();
     }

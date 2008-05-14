@@ -95,7 +95,10 @@ public class DefinitionType extends DefinitionBaseType {
     
     @Override
     public String toString() {
-        return "remarks:" + remarks;
+        StringBuilder s = new StringBuilder(super.toString());
+        if (remarks != null)
+            s.append("remarks:").append(remarks);
+        return  s.toString();
     }
 
 }

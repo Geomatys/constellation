@@ -107,7 +107,7 @@ public class UnitDefinitionType extends DefinitionType {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("[UnitdefinitionType]").append('\n');
+        s.append("[UnitDefinitionType]");
         if (catalogSymbol != null)
             s.append("CatalogSymbol=").append(catalogSymbol.toString()).append('\n');
         if (quantityType != null)

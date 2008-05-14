@@ -165,24 +165,25 @@ public class TimePeriodType extends AbstractTimeGeometricPrimitiveType {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("TimePeriod:").append('\n');
+        char lineSeparator = '\n';
+        StringBuilder s = new StringBuilder("TimePeriod:").append(lineSeparator);
         if (begin != null) {
-            s.append("begin:").append(begin).append('\n');
+            s.append("begin:").append(begin).append(lineSeparator);
         }
         if (end != null) {
-            s.append("end:").append(end).append('\n');
+            s.append("end  :").append(end).append(lineSeparator);
         }
         if (beginPosition != null) {
-            s.append("beginPosition:").append(beginPosition).append('\n');
+            s.append("beginPosition :").append(beginPosition).append(lineSeparator);
         }
         if (endPosition != null) {
-            s.append("endPosition:").append(endPosition).append('\n');
+            s.append("endPosition   :").append(endPosition);
         }
         if (duration != null) {
-            s.append("duration:").append(duration).append('\n');
+            s.append(lineSeparator).append("duration:").append(duration);
         }
         if (timeInterval != null) {
-            s.append("timeInterval:").append(timeInterval).append('\n');
+            s.append(lineSeparator).append("timeInterval:").append(timeInterval).append(lineSeparator);
         }
            
         return s.toString();
