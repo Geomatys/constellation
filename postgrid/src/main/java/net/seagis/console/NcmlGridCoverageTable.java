@@ -15,7 +15,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package net.seagis.ncml;
+package net.seagis.console;
 
 import java.io.IOException;
 import javax.imageio.ImageReader;
@@ -32,7 +32,7 @@ import net.seagis.coverage.catalog.WritableGridCoverageTable;
  * @source $URL$
  * @author Cédric Briançon
  */
-public class NcmlGridCoverageTable extends WritableGridCoverageTable {
+final class NcmlGridCoverageTable extends WritableGridCoverageTable {
     /**
      * The increment step between two consecutive dates in the list.
      */

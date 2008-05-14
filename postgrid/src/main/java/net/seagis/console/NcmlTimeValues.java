@@ -15,7 +15,7 @@
  *    License along with this library; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package net.seagis.ncml;
+package net.seagis.console;
 
 
 /**
@@ -25,7 +25,7 @@ package net.seagis.ncml;
  * @source $URL$
  * @author Cédric Briançon
  */
-public class NcmlTimeValues {
+final class NcmlTimeValues {
     /**
      * The starting time of this netcdf file.
      */

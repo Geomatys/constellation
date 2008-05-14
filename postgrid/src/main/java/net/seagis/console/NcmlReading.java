@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.ncml;
+package net.seagis.console;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import ucar.nc2.ncml.NcMLReader;
  * @source $URL$
  * @author Cédric Briançon
  */
-public class NcmlReading {
+final class NcmlReading {
     /**
      * The {@code namespace} for &lt;netcdf> tag.
      */
