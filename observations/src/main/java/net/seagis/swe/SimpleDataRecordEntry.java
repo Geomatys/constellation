@@ -18,7 +18,6 @@ package net.seagis.swe;
 
 import java.util.Collection;
 import java.util.Iterator;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
@@ -110,7 +109,7 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
     public String toString() {
         final StringBuilder buffer = new StringBuilder();
         final String lineSeparator = System.getProperty("line.separator", "\n");
-        buffer.append('[').append(this.getClass().getSimpleName()).append("]:").append("blockId").append(blockId).append(lineSeparator);
+        buffer.append('[').append(this.getClass().getSimpleName()).append("]:").append("blockId = ").append(blockId).append(lineSeparator);
         appendTo(buffer, "", lineSeparator);
         return buffer.toString();
     }
@@ -120,10 +119,9 @@ public class SimpleDataRecordEntry extends AbstractDataRecordEntry implements Si
      */
     private void appendTo(final StringBuilder buffer, String margin, final String lineSeparator) {
         buffer.append("nb fields ").append(field.size()).append(" :").append(lineSeparator);
-        margin += "  ";
-        int i=0;
+        int i = 0;
         for (final AnyScalarPropertyType a : field) {
-            buffer.append(margin).append("field[").append(i).append(']').append(a.toString()).append(lineSeparator);
+            buffer.append(margin).append("field[").append(i).append(']').append(a.toString());
             i++;
         }
     }

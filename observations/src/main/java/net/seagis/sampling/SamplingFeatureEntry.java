@@ -53,16 +53,6 @@ public class SamplingFeatureEntry extends AbstractFeatureEntry implements Sampli
     private static final long serialVersionUID = 8822736167506306189L;
 
     /**
-     * La description de la station.
-     */
-    private String description;
-    
-    /**
-     * Le nom de la station (un code alphanumerique)
-     */
-    private String name;
-    
-    /**
      * 
      */
     private Collection<SamplingFeatureRelationEntry> relatedSamplingFeature;
@@ -106,8 +96,6 @@ public class SamplingFeatureEntry extends AbstractFeatureEntry implements Sampli
                                    final String            sampledFeature)
     {
         super(id, name, description);
-        this.name                   = name;
-        this.description            = description;
         this.sampledFeature         = new ArrayList<String>();
         this.sampledFeature.add(sampledFeature);
         
@@ -118,28 +106,15 @@ public class SamplingFeatureEntry extends AbstractFeatureEntry implements Sampli
                                    final String                 description,
                                    final List<SamplingFeatureRelationEntry> relatedSamplingFeature,
                                    final List<ObservationEntry> relatedObservation,
-                                   final List<Object>           sampledFeature,
+                                   final List<String>           sampledFeature,
                                    final SurveyProcedureEntry   surveyDetail)
     {
         super(id, name, description);
-        this.name                   = name;
-        this.description            = description;
         this.surveyDetail           = surveyDetail;
         this.relatedSamplingFeature = relatedSamplingFeature;
-        this.relatedObservation     = relatedObservation;
-       // this.sampledFeature         = sampledFeature;
+        this.sampledFeature         = sampledFeature;
     }
 
-    public String getName() {
-        return this.name;
-    }
-    /**
-     * retourne la description de la station.
-     */
-    public String getDescription() {
-        return description;
-    }
-    
     /**
      * {@inheritDoc}
      */
@@ -190,7 +165,6 @@ public class SamplingFeatureEntry extends AbstractFeatureEntry implements Sampli
         if (object instanceof SamplingFeatureEntry && super.equals(object)) {
             final SamplingFeatureEntry that = (SamplingFeatureEntry) object;
             return Utilities.equals(this.surveyDetail,           that.surveyDetail)   &&
-                   Utilities.equals(this.description,            that.description)   && 
                    Utilities.equals(this.relatedObservation,     that.relatedObservation) &&
                    Utilities.equals(this.relatedSamplingFeature, that.relatedSamplingFeature) &&
                    Utilities.equals(this.sampledFeature,         that.sampledFeature);
@@ -212,8 +186,7 @@ public class SamplingFeatureEntry extends AbstractFeatureEntry implements Sampli
         while (i.hasNext()) {
             sampledFeatures += i.next() + " ";
         }
-        s.append(" name=").append(name ).append(" description=")
-                .append(description).append(" sampledFeature=").append(sampledFeatures);
+        s.append("sampledFeature = ").append(sampledFeatures);
         return s.toString();
     }
    

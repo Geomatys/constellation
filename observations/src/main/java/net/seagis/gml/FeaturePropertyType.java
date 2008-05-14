@@ -62,9 +62,9 @@ import org.geotools.resources.Utilities;
 @XmlSeeAlso({SamplingFeatureEntry.class,SamplingPointEntry.class})
 public class FeaturePropertyType {
 
-    @XmlElement(name = "AbstractFeature", nillable = true)
+    @XmlElement(name = "AbstractFeature")
     private AbstractFeatureEntry abstractFeature;
-    @XmlElement(name = "SamplingPoint", namespace = "http://www.opengis.net/sa/1.0", nillable = true)
+    @XmlElement(name = "SamplingPoint", namespace = "http://www.opengis.net/sa/1.0")
     private SamplingPointEntry samplingPoint;
     
     /**

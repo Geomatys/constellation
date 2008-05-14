@@ -52,9 +52,6 @@ import org.geotools.resources.Utilities;
 })
 public class DataArrayEntry extends AbstractDataArrayEntry {
 
-    @XmlTransient
-    private String id;
-    
     @XmlElement(required = true)
     private DataComponentPropertyType elementType;
     private AbstractEncodingPropertyType encoding;
@@ -72,17 +69,11 @@ public class DataArrayEntry extends AbstractDataArrayEntry {
      */
     public DataArrayEntry(String id, int count, AbstractDataRecordEntry elementType,
             AbstractEncodingEntry encoding, String values) {
-        super(null, count);
-        this.id          = id;
+        super(id, count);
         this.elementType = new DataComponentPropertyType(elementType, id);
         this.encoding    = new AbstractEncodingPropertyType(encoding);
         this.values      = values;
         
-    }
-    
-    @Override
-    public String getId() {
-        return this.id;
     }
     
     /**
@@ -143,7 +134,6 @@ public class DataArrayEntry extends AbstractDataArrayEntry {
             final DataArrayEntry that = (DataArrayEntry) object;
             return Utilities.equals(this.elementType,   that.elementType)   &&
                    Utilities.equals(this.encoding,    that.encoding)    &&
-                   Utilities.equals(this.id,           that.id)           &&
                    Utilities.equals(this.values,       that.values);
         }
         return false;
@@ -152,7 +142,6 @@ public class DataArrayEntry extends AbstractDataArrayEntry {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
         hash = 29 * hash + (this.elementType != null ? this.elementType.hashCode() : 0);
         hash = 29 * hash + (this.encoding != null ? this.encoding.hashCode() : 0);
         hash = 29 * hash + (this.values != null ? this.values.hashCode() : 0);
@@ -166,7 +155,6 @@ public class DataArrayEntry extends AbstractDataArrayEntry {
     public String toString() {
         StringBuilder s    = new StringBuilder(super.toString());
         char lineSeparator = '\n';
-        s.append("id=").append(id).append(lineSeparator);
         if (elementType != null)
             s.append(" elementType=").append(elementType.toString()).append(lineSeparator);
         if (encoding != null)
@@ -174,10 +162,11 @@ public class DataArrayEntry extends AbstractDataArrayEntry {
         if (values != null) {
             //we format a little the result
             String formatedValues = values;
+            formatedValues        = formatedValues.replace("\t", " ");
+            formatedValues        = formatedValues.replace("\n", " "); 
             while (formatedValues.indexOf("  ") != -1) {
                 formatedValues    = formatedValues.replace("  ", "");
             }
-            formatedValues        = formatedValues.replace("\n", " "); 
             s.append("values=").append(formatedValues).append(lineSeparator);
         }
         return s.toString();

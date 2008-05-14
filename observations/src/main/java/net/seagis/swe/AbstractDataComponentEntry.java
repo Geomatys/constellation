@@ -106,11 +106,11 @@ public class AbstractDataComponentEntry extends Entry implements AbstractDataCom
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("id=").append(id);
+        StringBuilder s = new StringBuilder("id =").append(id);
         if (definition != null)
-            s.append(" definition=").append(definition);
+            s.append(" definition = ").append(definition);
         
-        s.append(" fixed=").append(fixed);
+        s.append(" fixed = ").append(fixed).append('\n');
         return s.toString();
     }
     

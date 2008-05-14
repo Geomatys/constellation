@@ -513,25 +513,28 @@ public class ObservationEntry extends Entry implements Observation {
     public String toString() {
         StringBuilder s    = new StringBuilder();
         char lineSeparator = '\n';
-        s.append("name=").append(name).append(lineSeparator).append("definition=").append(definition);
+        s.append("name = ").append(name);
+        if (definition != null)
+            s.append("definition = ").append(definition);
+        s.append(lineSeparator);
         if (samplingTime != null)
-            s.append(" samplingTime=").append(samplingTime.toString()).append(lineSeparator);
+            s.append("samplingTime = ").append(samplingTime.toString()).append(lineSeparator);
         if (distribution != null)
-            s.append(" distribution:").append(distribution.toString()).append(lineSeparator);
+            s.append(" distribution = ").append(distribution.toString()).append(lineSeparator);
        if (procedure != null)
-            s.append("procedure=").append(procedure.toString()).append(lineSeparator);
+            s.append("procedure = ").append(procedure.toString()).append(lineSeparator);
         else
-            s.append("PROCEDURE IS NULL").append(lineSeparator);
+            s.append("procedure is null!").append(lineSeparator);
         
         if (observedProperty != null)
-            s.append("observedProperty=").append(observedProperty.toString()).append(lineSeparator);
-        else s.append("OBSERVED PROPERTY IS NULL").append(lineSeparator);
+            s.append("observedProperty = ").append(observedProperty.toString()).append(lineSeparator);
+        else s.append("observed property is null!").append(lineSeparator);
         if (featureOfInterest != null)
-            s.append("featureOfInterest=").append(featureOfInterest.toString()).append(lineSeparator); 
+            s.append("feature Of Interest = ").append(featureOfInterest.toString()).append(lineSeparator); 
         else
-            s.append("FEATURE OF INTEREST IS NULL").append(lineSeparator);
+            s.append("feature Of Interest is null!").append(lineSeparator);
         if (result != null)       
-            s.append(" result=").append(result.toString()).append(lineSeparator);
+            s.append(" result = ").append(result.toString()).append(lineSeparator);
         return s.toString();
     }
 

@@ -470,7 +470,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                         statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
                     }
                     
-                    if (sampTime.getEndPosition() == null) {
+                    if (sampTime.getEndPosition() != null) {
                        
                         String s = sampTime.getEndPosition().getValue();
                         Timestamp date = Timestamp.valueOf(s);

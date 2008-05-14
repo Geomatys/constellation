@@ -65,13 +65,13 @@ public class AnyScalarPropertyType extends Entry {
     @XmlAttribute
     private String name;
     
-    @XmlElement(name = "AbstractDataComponent", nillable = true)
+    @XmlElement(name = "AbstractDataComponent")
     protected AbstractDataComponentEntry abstractDataComponent;
-    @XmlElement(name = "Time", nillable = true)
+    @XmlElement(name = "Time")
     protected TimeType time;
-    @XmlElement(name = "Boolean", nillable = true)
+    @XmlElement(name = "Boolean")
     protected BooleanType _boolean;
-    @XmlElement(name = "Quantity", nillable = true)
+    @XmlElement(name = "Quantity")
     protected QuantityType quantity;
     
     @XmlAttribute(namespace = "http://www.opengis.net/gml")

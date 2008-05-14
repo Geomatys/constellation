@@ -46,18 +46,19 @@ public class SamplingPointEntry extends SamplingFeatureEntry implements Sampling
     /**
      * Constructor used by JAXB.
      */
-    public SamplingPointEntry(){};
+    SamplingPointEntry(){
+    }
             
     /** 
      * Build a new station localised.
      */
-    public SamplingPointEntry(final String            identifier,
-                              final String            name,
-                              final String            remarks,
+    public SamplingPointEntry(final String                              identifier,
+                              final String                              name,
+                              final String                              remarks,
                               final List<SamplingFeatureRelationEntry > relatedSamplingFeature,
-                              final List<ObservationEntry > relatedObservation,
-                              final List<Object>      sampledFeature,
-                              final SurveyProcedureEntry   surveyDetail,
+                              final List<ObservationEntry >             relatedObservation,
+                              final List<String>                        sampledFeature,
+                              final SurveyProcedureEntry                surveyDetail,
                               final PointType location) 
     {
         super(identifier, name, remarks, relatedSamplingFeature, relatedObservation, sampledFeature, surveyDetail);

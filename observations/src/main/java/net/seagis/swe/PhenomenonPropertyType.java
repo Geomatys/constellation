@@ -267,7 +267,7 @@ public class PhenomenonPropertyType {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("PhenomenonPropertyType]");
+        StringBuilder s = new StringBuilder("[PhenomenonPropertyType]");
         if (phenomenon != null)
             s.append(phenomenon).append('\n');
         if (compositePhenomenon != null)

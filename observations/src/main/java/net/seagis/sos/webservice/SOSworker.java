@@ -391,8 +391,8 @@ public class SOSworker {
             }
         }
         AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
-        if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains("text/xml")) {
-            throw new OWSWebServiceException("accepted format : text/xml",
+        if (formats != null && formats.getOutputFormat().size() > 0 && (!formats.getOutputFormat().contains("text/xml") || !formats.getOutputFormat().contains("application/xml"))) {
+            throw new OWSWebServiceException("accepted format : text/xml, application/xml",
                                              INVALID_PARAMETER_VALUE, "acceptFormats",
                                              version);
         }
@@ -449,11 +449,15 @@ public class SOSworker {
                //the phenomenon list
                PhenomenonTable phenoTable = OMDatabase.getTable(PhenomenonTable.class);
                Set<String> phenoNames  = phenoTable.getIdentifiers();
+               phenoNames.remove("");
                go.updateParameter("observedProperty", phenoNames);
                
                //the feature of interest list
                SamplingFeatureTable featureTable = OMDatabase.getTable(SamplingFeatureTable.class);
                Set<String> featureNames  = featureTable.getIdentifiers();
+               SamplingPointTable pointTable = OMDatabase.getTable(SamplingPointTable.class);
+               Set<String> pointNames  = pointTable.getIdentifiers();
+               featureNames.addAll(pointNames);
                go.updateParameter("featureOfInterest", featureNames);
                
                Operation ds = om.getOperation("DescribeSensor");
@@ -1305,7 +1309,7 @@ public class SOSworker {
             if (obs != null) {
                 obs.setProcedure(proc);
                 obs.setName(getObservationId());
-                logger.info("template received:" + '\n' + obs.toString());
+                logger.finer("template received:" + '\n' + obs.toString());
             } else {
                 throw new OWSWebServiceException("The observation template must be specified",
                                                  MISSING_PARAMETER_VALUE, "observationTemplate", version);
@@ -1324,7 +1328,7 @@ public class SOSworker {
                 if (obs.matchTemplate(template)) {
                     if (obs.getSamplingTime() != null && obs.getResult() != null) {
                         id = obsTable.getIdentifier(obs);
-                        logger.info("new observation inserted:"+ "id = " + id + '\n' + obs.getSamplingTime().toString() + '\n' + obs.getResult().toString());
+                        logger.info("new observation inserted:"+ "id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
                     } else {
                         throw new OWSWebServiceException("The observation sampling time and the result must be specify",
                                                       MISSING_PARAMETER_VALUE, "samplingTime", version);
@@ -1374,7 +1378,17 @@ public class SOSworker {
         while (res.next()) {
             id = res.getInt(1);
         }
-        return observationIdBase + (id + 1);
+        res.close();
+        //there is a possibility that someone delete some observation manually.
+        // so we must verify that this id is not already assigned. if it is we must find a free identifier
+        stmt = OMDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
+        do {
+            id ++;
+            stmt.setString(1, observationIdBase + id);
+            res = stmt.executeQuery();
+        } while (res.next());
+        
+        return observationIdBase + id;
         
     }
     
