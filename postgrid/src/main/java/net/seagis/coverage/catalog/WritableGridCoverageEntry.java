@@ -242,10 +242,10 @@ public class WritableGridCoverageEntry {
      * we use {@code '/'} as an heuristic way to differentiate MIME type from format name.
      *
      * @param  upper {@code true} for the upper-case flavor (if available).
-     * @return The format name (neven {@code null} and never empty).
+     * @return The format name (never {@code null} and never empty).
      * @throws IOException if the format can not be obtained.
      */
-    final String getFormatName(final boolean upper) throws IOException {
+    protected String getFormatName(final boolean upper) throws IOException {
         String format = "";
         final ImageReaderSpi spi = tile.getImageReaderSpi();
         String[] formats = spi.getFormatNames();

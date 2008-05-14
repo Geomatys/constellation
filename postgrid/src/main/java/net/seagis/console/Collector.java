@@ -105,6 +105,12 @@ public class Collector extends CommandLine {
     /**
      * Flag specified on the command lines.
      */
+    @Option(description="The serie format.", mandatory=true)
+    protected String format;
+
+    /**
+     * Flag specified on the command lines.
+     */
     @Option(description="The type of process to launch.")
     protected String type;
 
@@ -215,7 +221,7 @@ public class Collector extends CommandLine {
             err.println("Path invalid to NcML file : " + path);
             System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
         }
-        final NcmlGridCoverageTable ncmlTable = new NcmlGridCoverageTable(database);
+        final NcmlGridCoverageTable ncmlTable = new NcmlGridCoverageTable(database, format);
         ncmlTable.setCanInsertNewLayers(true);
         final Set<NcmlNetcdfElement> netcdfTags = new LinkedHashSet<NcmlNetcdfElement>();
         try {

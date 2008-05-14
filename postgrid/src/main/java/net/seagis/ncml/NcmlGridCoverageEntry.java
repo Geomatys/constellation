@@ -33,7 +33,7 @@ import org.geotools.util.DateRange;
  * @source $URL$
  * @author Cédric Briançon
  */
-public class NcmlGridCoverageEntry extends WritableGridCoverageEntry {
+final class NcmlGridCoverageEntry extends WritableGridCoverageEntry {
     /**
      * The increment between to consecutives entries.
      */
@@ -56,6 +56,11 @@ public class NcmlGridCoverageEntry extends WritableGridCoverageEntry {
     private final long nextItemStart;
 
     /**
+     * The format to use for the serie.
+     */
+    private final String format;
+
+    /**
      *
      *
      * @param reader The Netcdf image reader to use. A call to javax.imageio.ImageReader#setInput(Object)
@@ -69,13 +74,20 @@ public class NcmlGridCoverageEntry extends WritableGridCoverageEntry {
      * @throws IOException
      */
     public NcmlGridCoverageEntry(final ImageReader reader, final int imageIndex, final long startTime,
-            final long increment, final int npts, final long nextItemStart) throws IOException
+            final long increment, final int npts, final long nextItemStart, final String format)
+            throws IOException
     {
         super(reader, imageIndex);
         this.startTime     = startTime;
         this.increment     = increment;
         this.npts          = npts;
         this.nextItemStart = nextItemStart;
+        this.format        = format;
+    }
+
+    @Override
+    public String getFormatName(final boolean upper) throws IOException {
+        return (format == null) ? super.getFormatName(upper) : format;
     }
 
     @Override

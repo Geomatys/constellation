@@ -54,13 +54,19 @@ public class NcmlGridCoverageTable extends WritableGridCoverageTable {
     private long nextItemStart = 0L;
 
     /**
+     * The format to use for the serie.
+     */
+    private final String format;
+
+    /**
      * Constructs a new {@code WritableGridCoverageTable}.
      *
      * @param connection The connection to the database.
      * @see net.seagis.coverage.catalog.WritableGridCoverageTable
      */
-    public NcmlGridCoverageTable(final Database database) {
+    public NcmlGridCoverageTable(final Database database, final String format) {
         super(database);
+        this.format = format;
     }
 
     /**
@@ -77,7 +83,8 @@ public class NcmlGridCoverageTable extends WritableGridCoverageTable {
     protected WritableGridCoverageEntry createEntry(final ImageReader reader, final int imageIndex)
             throws IOException
     {
-        return new NcmlGridCoverageEntry(reader, imageIndex, startTime, increment, npts, nextItemStart);
+        return new NcmlGridCoverageEntry(reader, imageIndex, startTime, increment, npts,
+                nextItemStart, format);
     }
 
     /**
