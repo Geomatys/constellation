@@ -148,7 +148,7 @@ public class SOService extends WebService {
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
         
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                     
             } else {
                 throw new OWSWebServiceException("The operation " + request + " is not supported by the service",

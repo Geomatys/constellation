@@ -33,7 +33,7 @@ import net.seagis.sampling.SamplingPointTable;
  * Permet de creer les dictionnaire de données au format XML a partir de la base de données.
  *
  * @author Guilhem Legal
- * @deprecated
+ * @deprecated use JAXB
  */
 public class XMLWriter {
     
@@ -107,7 +107,7 @@ public class XMLWriter {
             decalage += '\t';
             write(decalage + "<gml:Point gml:id=\"" + sp.getPosition().getId() + "\">" + '\n', urlFile);
             decalage += '\t';
-            write(decalage + "<gml:pos srsName=\"" + sp.getPosition().getPos().getSrsName() + "\" srsDimension=\"" + sp.getPosition().getPos().getSrsDimension() +
+            write(decalage + "<gml:pos srsName=\"" + sp.getPosition().getPos().getSrsName() + "\" srsDimension=\"" + sp.getPosition().getPos().getDimension() +
                     "\">" + sp.getPosition().getPos().getValue() + "</gml:pos>" + '\n', urlFile);
             decalage = decalage.substring(0, decalage.length()-1);
             

@@ -128,7 +128,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
                 statement.setString(indexOf(query.srsName), station.getPosition().getPos().getSrsName());
                 statement.setDouble(indexOf(query.positionValueX), station.getPosition().getPos().getValue().get(0));
                 statement.setDouble(indexOf(query.positionValueY), station.getPosition().getPos().getValue().get(1));
-                statement.setInt(indexOf(query.srsDimension), station.getPosition().getPos().getSrsDimension());
+                statement.setInt(indexOf(query.srsDimension), station.getPosition().getPos().getDimension());
             } else {
                 statement.setNull(indexOf(query.pointIdentifier), java.sql.Types.VARCHAR);
                 statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);

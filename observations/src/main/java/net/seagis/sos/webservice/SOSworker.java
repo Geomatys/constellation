@@ -254,6 +254,22 @@ public class SOSworker {
      */
     private String serviceURL;
     
+     /**
+     * The current MIME type of return
+     */
+    private String outputFormat;
+    
+    /**
+     * A list of supported MIME type 
+     */
+    private final static List<String> ACCEPTED_OUTPUT_FORMATS;
+    static {
+        ACCEPTED_OUTPUT_FORMATS = new ArrayList<String>();
+        ACCEPTED_OUTPUT_FORMATS.add("text/xml");
+        ACCEPTED_OUTPUT_FORMATS.add("application/xml");
+        ACCEPTED_OUTPUT_FORMATS.add("text/plain");
+    }
+    
     /**
      * Initialize the database connection.
      */
@@ -391,10 +407,22 @@ public class SOSworker {
             }
         }
         AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
-        if (formats != null && formats.getOutputFormat().size() > 0 && (!formats.getOutputFormat().contains("text/xml") || !formats.getOutputFormat().contains("application/xml"))) {
-            throw new OWSWebServiceException("accepted format : text/xml, application/xml",
-                                             INVALID_PARAMETER_VALUE, "acceptFormats",
-                                             version);
+        if (formats != null && formats.getOutputFormat().size() > 0 ) {
+            boolean found = false;
+            for (String form: formats.getOutputFormat()) {
+                if (ACCEPTED_OUTPUT_FORMATS.contains(form)) {
+                    outputFormat = form;
+                    found = true;
+                }
+            }
+            if (!found) {
+                throw new OWSWebServiceException("accepted format : text/xml, application/xml",
+                                                 INVALID_PARAMETER_VALUE, "acceptFormats",
+                                                 version);
+            }
+            
+        } else {
+            this.outputFormat = "application/xml";
         }
         
         //we prepare the response document
@@ -447,16 +475,19 @@ public class SOSworker {
                go.updateParameter("procedure", procNames);
                
                //the phenomenon list
-               PhenomenonTable phenoTable = OMDatabase.getTable(PhenomenonTable.class);
-               Set<String> phenoNames  = phenoTable.getIdentifiers();
+               PhenomenonTable phenoTable               = OMDatabase.getTable(PhenomenonTable.class);
+               Set<String> phenoNames                   = phenoTable.getIdentifiers();
+               CompositePhenomenonTable compoPhenoTable = OMDatabase.getTable(CompositePhenomenonTable.class);
+               Set<String> compoPhenoNames              = compoPhenoTable.getIdentifiers();
+               phenoNames.addAll(compoPhenoNames);
                phenoNames.remove("");
                go.updateParameter("observedProperty", phenoNames);
                
                //the feature of interest list
                SamplingFeatureTable featureTable = OMDatabase.getTable(SamplingFeatureTable.class);
-               Set<String> featureNames  = featureTable.getIdentifiers();
-               SamplingPointTable pointTable = OMDatabase.getTable(SamplingPointTable.class);
-               Set<String> pointNames  = pointTable.getIdentifiers();
+               Set<String> featureNames          = featureTable.getIdentifiers();
+               SamplingPointTable pointTable     = OMDatabase.getTable(SamplingPointTable.class);
+               Set<String> pointNames            = pointTable.getIdentifiers();
                featureNames.addAll(pointNames);
                go.updateParameter("featureOfInterest", featureNames);
                
@@ -552,47 +583,10 @@ public class SOSworker {
                                              NO_APPLICABLE_CODE, null, version);
             }
 
-            /* the following code avoid the replacement of the mark by their ASCII code
-             * it has been removed for a namespace issue 
-             
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder constructor = factory.newDocumentBuilder();
             
-            File tempFile = new File(temporaryFolder + "/temp.xml");
-            FileOutputStream outstr = new FileOutputStream(tempFile);
-            OutputStreamWriter outstrR = new OutputStreamWriter(outstr,"UTF-8");
-            BufferedWriter output = new BufferedWriter(outstrR);
-            output.write(result);
-            output.flush();
-            output.close();
-            File tempFile = new File(temporaryFolder + "/notemp.xml");
-            Document d = constructor.parse(tempFile);
-            
-            Element e = d.getDocumentElement();
-            
-            
-            DescribeSensorResponse response = new DescribeSensorResponse();
-            response.setContent(e);*/
             return result;
        
     }
-    
-    /*
-    public static class DescribeSensorResponse {
-    
-        @XmlAnyElement
-        private Element content;
-
-        @XmlTransient
-        public Element getContent() {
-            return content;
-        }
-
-        public void setContent(Element value) {
-            this.content = value;
-        }
-    } */
-    
     
     /**
      * Web service operation whitch respond a collection of observation satisfying 
@@ -2130,6 +2124,13 @@ public class SOSworker {
             ret = t.toString();
         } 
         return ret;
+    }
+    
+    public String getOutputFormat() {
+        if (outputFormat == null) {
+            return "application/xml";
+        }
+        return outputFormat;
     }
     
     /**
