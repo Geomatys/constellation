@@ -412,7 +412,7 @@ public class FilterParser {
         } else if (spatialOps instanceof BinarySpatialOpType) {
             
             BinarySpatialOpType binSpatial = (BinarySpatialOpType) spatialOps;
-            List<JAXBElement<?>> objects   = binSpatial.getAbstractGeometryOrAbstractGeometricPrimitiveOrPoint();
+            List<JAXBElement<?>> objects   = binSpatial.getRest();
             
             String propertyName    = null;
             String operator        = JBSpatialOps.getName().getLocalPart();

@@ -53,6 +53,21 @@ public class DistanceType {
     private String units;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    DistanceType() {
+        
+    }
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    public DistanceType(double value, String units) {
+        this.value = value;
+        this.units = units;
+    }
+    
+    /**
      * Gets the value of the value property.
      * 
      */

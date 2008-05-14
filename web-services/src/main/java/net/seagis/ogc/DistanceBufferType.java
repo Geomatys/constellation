@@ -22,9 +22,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.AbstractGeometryType;
 import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.expression.Expression;
+import net.seagis.gml.ObjectFactory;
 
 
 /**
@@ -63,6 +66,26 @@ public class DistanceBufferType extends SpatialOpsType {
     @XmlElement(name = "Distance", required = true)
     private DistanceType distance;
 
+    @XmlTransient
+    private ObjectFactory factory = new ObjectFactory();
+    /**
+     * An empty constructor used by JAXB
+     */
+    DistanceBufferType() {
+        
+    }
+    
+    /**
+     * build a new Distance buffer
+     */
+    public DistanceBufferType(String propertyName, AbstractGeometryType geometry, double distance, String unit) {
+        this.propertyName = new PropertyNameType(propertyName);
+        this.distance     = new DistanceType(distance, unit);
+        
+        //TODO gerer en fonction du type
+        this.abstractGeometry = factory.createAbstractGeometry(geometry);
+    }
+    
     /**
      * Gets the value of the propertyName property.
      */
@@ -81,9 +104,32 @@ public class DistanceBufferType extends SpatialOpsType {
     /**
      * Gets the value of the distance property.
      */
-    public DistanceType getDistance() {
+    public DistanceType getDistanceType() {
         return distance;
     }
+    
+    public double getDistance() {
+        if (distance != null)
+            return distance.getValue();
+        return 0.0;
+    }
+
+    public String getDistanceUnits() {
+        if (distance != null)
+            return distance.getUnits();
+        return null;
+    }
+    
+    public Expression getExpression1() {
+        return propertyName;
+    }
+
+    public Expression getExpression2() {
+        if (abstractGeometry != null)
+            return abstractGeometry.getValue();
+        return null;
+    }
+    
     
     @Override
     public String toString() {

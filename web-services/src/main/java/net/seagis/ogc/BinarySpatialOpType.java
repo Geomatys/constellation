@@ -26,8 +26,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.gml.AbstractGeometryType;
 import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -59,7 +62,7 @@ import org.opengis.filter.FilterVisitor;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "BinarySpatialOpType", propOrder = {
-    "abstractGeometryOrAbstractGeometricPrimitiveOrPoint"
+    "rest"
 })
 @XmlSeeAlso({PropertyNameType.class})
 public class BinarySpatialOpType extends SpatialOpsType {
@@ -69,24 +72,48 @@ public class BinarySpatialOpType extends SpatialOpsType {
         @XmlElementRef(name = "AbstractGeometry", namespace = "http://www.opengis.net/gml", type = JAXBElement.class),
         @XmlElementRef(name = "PropertyName", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
     })
-    private List<JAXBElement<?>> abstractGeometryOrAbstractGeometricPrimitiveOrPoint;
+    private List<JAXBElement<?>> rest;
 
+    @XmlTransient
+    private ObjectFactory ogcFactory = new ObjectFactory();
+    
+    @XmlTransient
+    private net.seagis.gml.ObjectFactory gmlFactory = new net.seagis.gml.ObjectFactory();
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    BinarySpatialOpType() {
+        
+    }
+    
+    /**
+     * Build a new Binary spatial operator
+     */
+    public BinarySpatialOpType(String propertyName, AbstractGeometryType geometry) {
+        rest = new ArrayList<JAXBElement<?>>();
+        rest.add(ogcFactory.createPropertyName(new PropertyNameType(propertyName)));
+        //TODO specialize
+        rest.add(gmlFactory.createAbstractGeometry(geometry));
+        
+    }
+    
     /**
      * Gets the value of the abstractGeometryOrAbstractGeometricPrimitiveOrPoint property.
      */
-    public List<JAXBElement<?>> getAbstractGeometryOrAbstractGeometricPrimitiveOrPoint() {
-        if (abstractGeometryOrAbstractGeometricPrimitiveOrPoint == null) {
-            abstractGeometryOrAbstractGeometricPrimitiveOrPoint = new ArrayList<JAXBElement<?>>();
+    public List<JAXBElement<?>> getRest() {
+        if (rest == null) {
+            rest = new ArrayList<JAXBElement<?>>();
         }
-        return Collections.unmodifiableList(abstractGeometryOrAbstractGeometricPrimitiveOrPoint);
+        return Collections.unmodifiableList(rest);
     }
     
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(super.toString());
-        if (abstractGeometryOrAbstractGeometricPrimitiveOrPoint != null) {
+        if (rest != null) {
             int i = 0;
-            for (JAXBElement<?> jb: abstractGeometryOrAbstractGeometricPrimitiveOrPoint) {
+            for (JAXBElement<?> jb: rest) {
                 s.append(i).append(": class:").append(jb.getValue().getClass().getSimpleName()).append('\n');
                 s.append(jb.getValue().toString());
                 i++;        
@@ -95,6 +122,14 @@ public class BinarySpatialOpType extends SpatialOpsType {
         return s.toString();
     }
 
+    public Expression getExpression1() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Expression getExpression2() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
     public boolean evaluate(Object object) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

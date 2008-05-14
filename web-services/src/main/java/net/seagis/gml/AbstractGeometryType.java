@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import org.geotools.resources.Utilities;
+import org.opengis.filter.expression.Expression;
+import org.opengis.geometry.Geometry;
 
 
 /**
@@ -51,7 +53,7 @@ import org.geotools.resources.Utilities;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractGeometryType")
-public abstract class AbstractGeometryType extends AbstractGMLEntry {
+public abstract class AbstractGeometryType extends AbstractGMLEntry implements Expression {
 
     @XmlAttribute
     private BigInteger srsDimension;
@@ -138,5 +140,9 @@ public abstract class AbstractGeometryType extends AbstractGMLEntry {
         return hash;
     }
 
+    @Override
+    public AbstractGeometryType clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException();
+    }
 
 }

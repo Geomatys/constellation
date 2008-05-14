@@ -104,7 +104,7 @@ public class DirectPositionType {
     /**
      * Gets the value of the srsDimension property.
      */
-    public int getSrsDimension() {
+    public int getDimension() {
         return srsDimension;
     }
 
@@ -136,7 +136,7 @@ public class DirectPositionType {
         }
         return Collections.unmodifiableList(uomLabels);
     }
-
+    
     /**
      * Return a description of the object.
      */

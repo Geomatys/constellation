@@ -24,20 +24,29 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import net.seagis.coverage.web.ExpressionType;
+import net.seagis.gml.AbstractGeometryType;
 import net.seagis.ogc.AndType;
 import net.seagis.ogc.ArithmeticOperatorsType;
 import net.seagis.ogc.BBOXType;
+import net.seagis.ogc.BeyondType;
 import net.seagis.ogc.ComparisonOperatorsType;
+import net.seagis.ogc.ContainsType;
+import net.seagis.ogc.CrossesType;
+import net.seagis.ogc.DWithinType;
+import net.seagis.ogc.DisjointType;
+import net.seagis.ogc.EqualsType;
 import net.seagis.ogc.FeatureIdType;
 import net.seagis.ogc.FunctionNameType;
 import net.seagis.ogc.FunctionNamesType;
 import net.seagis.ogc.FunctionType;
 import net.seagis.ogc.GmlObjectIdType;
 import net.seagis.ogc.IdCapabilitiesType;
+import net.seagis.ogc.IntersectsType;
 import net.seagis.ogc.LiteralType;
 import net.seagis.ogc.LowerBoundaryType;
 import net.seagis.ogc.NotType;
 import net.seagis.ogc.OrType;
+import net.seagis.ogc.OverlapsType;
 import net.seagis.ogc.PropertyIsBetweenType;
 import net.seagis.ogc.PropertyIsEqualToType;
 import net.seagis.ogc.PropertyIsGreaterThanOrEqualToType;
@@ -53,7 +62,9 @@ import net.seagis.ogc.SortPropertyType;
 import net.seagis.ogc.SpatialCapabilitiesType;
 import net.seagis.ogc.SpatialOperatorType;
 import net.seagis.ogc.SpatialOperatorsType;
+import net.seagis.ogc.TouchesType;
 import net.seagis.ogc.UpperBoundaryType;
+import net.seagis.ogc.WithinType;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -207,43 +218,44 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public Beyond beyond(String propertyName, Geometry geometry, double distance, String units) {
-        throw new UnsupportedOperationException("Not supported yet.");
+       
+        return new BeyondType(propertyName, (AbstractGeometryType) geometry, distance, units);
     }
 
     public Contains contains(String propertyName, Geometry geometry) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new ContainsType(propertyName, (AbstractGeometryType) geometry);
     }
 
     public Crosses crosses(String propertyName, Geometry geometry) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new CrossesType(propertyName, (AbstractGeometryType) geometry);
     }
 
     public Disjoint disjoint(String propertyName, Geometry geometry) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DisjointType(propertyName, (AbstractGeometryType) geometry);
     }
 
     public DWithin dwithin(String propertyName, Geometry geometry, double distance, String units) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new DWithinType(propertyName, (AbstractGeometryType) geometry, distance, units);
     }
 
     public Equals equals(String propertyName, Geometry geometry) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new EqualsType(propertyName, (AbstractGeometryType) geometry);
     }
 
     public Intersects intersects(String propertyName, Geometry geometry) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new IntersectsType(propertyName, (AbstractGeometryType) geometry);
     }
 
     public Overlaps overlaps(String propertyName, Geometry geometry) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new OverlapsType(propertyName, (AbstractGeometryType) geometry);
     }
 
     public Touches touches(String propertyName, Geometry geometry) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new TouchesType(propertyName, (AbstractGeometryType) geometry);
     }
 
     public Within within(String propertyName, Geometry geometry) {
-        throw new UnsupportedOperationException("Not supported yet.");
+       return new WithinType(propertyName, (AbstractGeometryType) geometry);
     }
 
     public Add add(Expression expr1, Expression expr2) {
