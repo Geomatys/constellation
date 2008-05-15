@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.ows.v100.WGS84BoundingBoxType;
 
 
 /**
@@ -113,10 +114,14 @@ public class RecordType extends DCMIRecordType {
     }
     
     public void setBoundingBox(BoundingBoxType bbox) {
-        if (boundingBox == null)
+        if (boundingBox == null) {
             this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
-        
-        this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+        }
+        if (bbox instanceof WGS84BoundingBoxType) {
+            this.boundingBox.add(owsFactory.createWGS84BoundingBox((WGS84BoundingBoxType)bbox));
+        } else {
+            this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+        }
     }
     
     @Override

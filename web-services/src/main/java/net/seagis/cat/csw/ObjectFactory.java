@@ -389,12 +389,12 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link HarvestType }{@code >}}
      * 
-     */
+     
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "Harvest")
     public JAXBElement<HarvestType> createHarvest(HarvestType value) {
         return new JAXBElement<HarvestType>(_Harvest_QNAME, HarvestType.class, null, value);
     }
-
+     
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetDomainType }{@code >}}
      * 

@@ -100,7 +100,7 @@ public class CSWService extends WebService {
                         ,net.seagis.dublincore.terms.ObjectFactory.class);
                         // TODO remove net.seagis.ows.v110.ExceptionReport.class
         
-            worker = new CSWworker(marshaller);
+            worker = new CSWworker(unmarshaller);
             worker.setVersion(getCurrentVersion());
         } catch (JAXBException ex){
             logger.severe("The CSW serving is not running." + '\n' +
@@ -267,6 +267,21 @@ public class CSWService extends WebService {
              */
             if (ex instanceof OWSWebServiceException) {
                 OWSWebServiceException owsex = (OWSWebServiceException)ex;
+                if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
+                    !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
+                    !owsex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 
+                    !owsex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+                    owsex.printStackTrace();
+                } else {
+                    logger.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
+                }
+                StringWriter sw = new StringWriter();    
+                marshaller.marshal(owsex.getExceptionReport(), sw);
+                return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            
+            //TODO remove this part
+            } else if (ex instanceof net.seagis.ows.v110.OWSWebServiceException) {
+                net.seagis.ows.v110.OWSWebServiceException owsex = (net.seagis.ows.v110.OWSWebServiceException)ex;
                 if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
                     !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
                     !owsex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 

@@ -79,7 +79,7 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://www.opengis.net/wcs".equals(namespaceUri) )
             prefix = "wcs";
         
-         else if( "http://www.opengis.net/wcs/1.1.1".equals(namespaceUri) )
+        else if( "http://www.opengis.net/wcs/1.1.1".equals(namespaceUri) )
             prefix = "wcs";
         
         else if( "http://www.opengis.net/se".equals(namespaceUri) )

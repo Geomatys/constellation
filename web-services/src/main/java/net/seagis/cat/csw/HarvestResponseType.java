@@ -19,6 +19,7 @@ package net.seagis.cat.csw;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -47,12 +48,35 @@ import javax.xml.bind.annotation.XmlType;
     "acknowledgement",
     "transactionResponse"
 })
+@XmlRootElement(name = "HarvestResponse")        
 public class HarvestResponseType {
 
     @XmlElement(name = "Acknowledgement")
     private AcknowledgementType acknowledgement;
     @XmlElement(name = "TransactionResponse")
     private TransactionResponseType transactionResponse;
+    
+    /**
+     * An empty constructor used by JAXB
+     */
+    HarvestResponseType() {
+        
+    }
+    
+    /**
+     * Build a new Response to an harvest request (synchronous mode)
+     */
+    public HarvestResponseType(TransactionResponseType transactionResponse) {
+        this.transactionResponse = transactionResponse;
+    }
+    
+    /**
+     * Build a new Response to an harvest request (synchronous mode)
+     */
+    public HarvestResponseType(AcknowledgementType acknowledgement) {
+        this.acknowledgement = acknowledgement;
+    }
+    
 
     /**
      * Gets the value of the acknowledgement property.

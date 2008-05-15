@@ -16,13 +16,15 @@
 
 package net.seagis.coverage.wms;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,14 +36,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //seaGIS dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import net.seagis.cat.csw.AbstractRecordType;
+import net.seagis.cat.csw.AcknowledgementType;
 import net.seagis.cat.csw.BriefRecordType;
 import net.seagis.cat.csw.Capabilities;
 import net.seagis.cat.csw.DeleteType;
@@ -114,7 +118,7 @@ public class CSWworker {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("net.seagis.covrage.wms");
+    Logger logger = Logger.getLogger("net.seagis.coverage.wms");
     
     /**
      * The version of the service
@@ -167,9 +171,9 @@ public class CSWworker {
     private String outputFormat;
     
     /**
-     * A marshaller to send xml to mdweb.
+     * A unMarshaller to get object from harvested resource.
      */
-    private final Marshaller marshaller;
+    private final Unmarshaller unmarshaller;
     
     /**
      * A lucene index to make quick search on the metadatas.
@@ -473,18 +477,6 @@ public class CSWworker {
     }
     
     /**
-     * A list of supported MIME type 
-     */
-    private final static List<String> ACCEPTED_OUTPUT_FORMATS;
-    static {
-        ACCEPTED_OUTPUT_FORMATS = new ArrayList<String>();
-        ACCEPTED_OUTPUT_FORMATS.add("text/xml");
-        ACCEPTED_OUTPUT_FORMATS.add("application/xml");
-        ACCEPTED_OUTPUT_FORMATS.add("text/html");
-        ACCEPTED_OUTPUT_FORMATS.add("text/plain");
-    }
-    
-    /**
      * a QName for csw:Record type
      */
     private final static QName _Record_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
@@ -495,7 +487,7 @@ public class CSWworker {
     private final static QName _Metadata_QNAME = new QName("http://www.isotc211.org/2005/gmd", "MD_Metadata");
     
     /**
-     * a QName for gmd:MD_Metadata type
+     * a QName for csw:Capabilities type
      */
     private final static QName _Capabilities_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities");
     
@@ -510,6 +502,28 @@ public class CSWworker {
     }
     
     /**
+     * A list of supported MIME type. 
+     */
+    private final static List<String> ACCEPTED_OUTPUT_FORMATS;
+    static {
+        ACCEPTED_OUTPUT_FORMATS = new ArrayList<String>();
+        ACCEPTED_OUTPUT_FORMATS.add("text/xml");
+        ACCEPTED_OUTPUT_FORMATS.add("application/xml");
+        ACCEPTED_OUTPUT_FORMATS.add("text/html");
+        ACCEPTED_OUTPUT_FORMATS.add("text/plain");
+    }
+    
+    /**
+     * A list of supported resource type. 
+     */
+    private final static List<String> ACCEPTED_RESOURCE_TYPE;
+    static {
+        ACCEPTED_RESOURCE_TYPE = new ArrayList<String>();
+        ACCEPTED_RESOURCE_TYPE.add("http://www.isotc211.org/2005/gmd");
+        ACCEPTED_RESOURCE_TYPE.add("http://www.opengis.net/cat/csw/2.0.2");
+    }
+    
+    /**
      * Build a new CSW worker
      * 
      * @param marshaller A JAXB marshaller to send xml to MDWeb
@@ -517,9 +531,9 @@ public class CSWworker {
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
-    public CSWworker(Marshaller marshaller) throws IOException, SQLException {
+    public CSWworker(Unmarshaller unmarshaller) throws IOException, SQLException {
         
-        this.marshaller = marshaller;
+        this.unmarshaller = unmarshaller;
         cswFactory      = new ObjectFactory();
         Properties prop = new Properties();
         File f          = null;
@@ -1032,59 +1046,11 @@ public class CSWworker {
                 
                 for(Object record: insertRequest.getAny()) {
                     
-                        OutputStreamWriter outstrR = null;
                         try {
-                            //we build a temporary file to write the xml
-                            File tempFile = File.createTempFile("CSWRecord", "xml");
-                            FileOutputStream outstr = new FileOutputStream(tempFile);
-                            outstrR = new OutputStreamWriter(outstr, "UTF-8");
-                            BufferedWriter output = new BufferedWriter(outstrR);
-                            marshaller.marshal(record, output);
-                            output.flush();
-                            output.close();
-                            
-                            
-                            if (record instanceof JAXBElement) {
-                                record = ((JAXBElement)record).getValue();
-                            }
-                            //here we try to get the title
-                            SimpleLiteral titleSL = null;
-                            String title = "unknow title";
-                            if (record instanceof RecordType) {
-                                titleSL = ((RecordType) record).getTitle();
-                                if (titleSL == null) {
-                                    titleSL = ((RecordType) record).getIdentifier();
-                                }
-                                
-                                if (titleSL == null) {
-                                    title = "unknow title";
-                                } else {
-                                    if (titleSL.getContent() != null && titleSL.getContent().size() > 0)
-                                        title = titleSL.getContent().get(0);
-                                }
-                                
-                            
-                            } else if (record instanceof MetaDataImpl) {
-                                Collection<Identification> idents = ((MetaDataImpl) record).getIdentificationInfo();
-                                if (idents.size() != 0) {
-                                    Identification ident = idents.iterator().next();
-                                    if (ident.getCitation() != null && ident.getCitation().getTitle() != null) {
-                                        title = ident.getCitation().getTitle().toString();
-                                    } 
-                                }
-                            } else {
-                                logger.severe("unknow type: " + record.getClass().getName() + " unable to find a title");
-                            } 
-                            Form f = MDWriter.getFormFromObject(record, title);
-                            databaseWriter.writeForm(f, false);
+
+                            storeMetadata(record);
                             totalInserted++;
-                            
-                        } catch (IOException ex) {
-                           throw new OWSWebServiceException("This service has throw an IOException: " + ex.getMessage(),
-                                                            NO_APPLICABLE_CODE, null, version);
-                        } catch (JAXBException ex) {
-                            throw new OWSWebServiceException("The request is malFormed(JAXB): " + ex.getMessage(),
-                                                             NO_APPLICABLE_CODE, null, version);
+                        
                         } catch (SQLException ex) {
                             ex.printStackTrace();
                             throw new OWSWebServiceException("The service has throw an SQLException: " + ex.getMessage(),
@@ -1122,6 +1088,50 @@ public class CSWworker {
     }
     
     /**
+     * Record an object in the metadata database.
+     * 
+     * @param obj The object to store in the database.
+     */
+    private void storeMetadata(Object obj) throws SQLException {
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
+        }
+        
+        //here we try to get the title
+        SimpleLiteral titleSL = null;
+        String title = "unknow title";
+        if (obj instanceof RecordType) {
+            titleSL = ((RecordType) obj).getTitle();
+            if (titleSL == null) {
+                titleSL = ((RecordType) obj).getIdentifier();
+            }
+                               
+            if (titleSL == null) {
+                title = "unknow title";
+            } else {
+                if (titleSL.getContent() != null && titleSL.getContent().size() > 0)
+                    title = titleSL.getContent().get(0);
+            }
+                            
+        } else if (obj instanceof MetaDataImpl) {
+            Collection<Identification> idents = ((MetaDataImpl) obj).getIdentificationInfo();
+            if (idents.size() != 0) {
+                Identification ident = idents.iterator().next();
+                if (ident.getCitation() != null && ident.getCitation().getTitle() != null) {
+                    title = ident.getCitation().getTitle().toString();
+                } 
+            }
+        } else {
+            logger.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
+        }
+        // we create a MDWeb form form the object
+        Form f = MDWriter.getFormFromObject(obj, title);
+        
+        // and we store it in the database
+        databaseWriter.writeForm(f, false);
+    }
+    
+    /**
      * TODO
      * 
      * @param request
@@ -1129,8 +1139,83 @@ public class CSWworker {
      */
     public HarvestResponseType harvest(HarvestType request) throws WebServiceException {
         verifyBaseRequest(request);
+        HarvestResponseType response;
+        // we prepare the report
+        int totalInserted = 0;
+        int totalUpdated  = 0;
         
-        return new HarvestResponseType();
+        //we verify the resource Type
+        String resourceType = request.getResourceType();
+        if (resourceType == null) {
+            throw new OWSWebServiceException("The resource type to harvest must be specified",
+                                             MISSING_PARAMETER_VALUE, "resourceType", version);
+        } else {
+            if (!ACCEPTED_RESOURCE_TYPE.contains(resourceType)) {
+                throw new OWSWebServiceException("This resource type is not allowed. ",
+                                             MISSING_PARAMETER_VALUE, "resourceType", version);
+            }
+        }
+        
+        if (request.getSource() != null) {
+            
+            try {
+                URL source          = new URL(request.getSource());
+                URLConnection conec = source.openConnection();
+                
+                // we get the source document
+                File fileToHarvest = File.createTempFile("harvested", "xml");
+                InputStream in = conec.getInputStream();
+                FileOutputStream out = new FileOutputStream(fileToHarvest);
+                byte[] buffer = new byte[1024];
+                int size;
+
+                while ((size = in.read(buffer, 0, 1024)) > 0) {
+                    out.write(buffer, 0, size);
+                }
+                
+                //TODO find a way to know if the source is another csw or directly the resource (resourceType?)
+                // for now we consider that is directly the resource to harvest
+                if (resourceType.equals("http://www.isotc211.org/2005/gmd") || resourceType.equals("http://www.opengis.net/cat/csw/2.0.2")) {
+                    Object harvested = unmarshaller.unmarshal(fileToHarvest);
+                    storeMetadata(harvested);
+                    totalInserted++;
+                }
+                
+            } catch (SQLException ex) {
+                throw new OWSWebServiceException("The service has throw an SQLException: " + ex.getMessage(),
+                                                  NO_APPLICABLE_CODE, null, version);
+            } catch (JAXBException ex) {
+                throw new OWSWebServiceException("The resource can not be parsed: " + ex.getMessage(),
+                                                  INVALID_PARAMETER_VALUE, "Source", version);
+            } catch (MalformedURLException ex) {
+                throw new OWSWebServiceException("The source URL is malformed",
+                                                  INVALID_PARAMETER_VALUE, "Source", version);
+            } catch (IOException ex) {
+                throw new OWSWebServiceException("The service can't open the connection to the source",
+                                                  INVALID_PARAMETER_VALUE, "Source", version);
+            } 
+            
+        }
+        
+        //mode synchronous
+        if (request.getResponseHandler().size() == 0) {
+           
+            TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
+                                                                        totalUpdated,
+                                                                        0,
+                                                                        null);
+            TransactionResponseType transactionResponse = new TransactionResponseType(summary, null, version.toString());
+            response = new HarvestResponseType(transactionResponse);
+        
+        //mode asynchronous    
+        } else {
+            AcknowledgementType acknowledgement = null;
+            response = new HarvestResponseType(acknowledgement);
+            throw new OWSWebServiceException("This asynchronous mode for harvest is not yet supported by the service.",
+                                                  OPERATION_NOT_SUPPORTED, "ResponseHandler", version);
+        }
+        
+        return response;
     }
     
     /**
@@ -1145,6 +1230,8 @@ public class CSWworker {
     
     /**
      * Return true if the MIME type is supported.
+     * 
+     * @param format a MIME type represented by a String.
      */
     private boolean isSupportedFormat(String format) {
         return ACCEPTED_OUTPUT_FORMATS.contains(format);
@@ -1152,6 +1239,8 @@ public class CSWworker {
     
     /**
      * Set the current service version
+     * 
+     * @param version The current version.
      */
     public void setVersion(ServiceVersion version){
         this.version = version;
@@ -1162,6 +1251,8 @@ public class CSWworker {
     
     /**
      * Set the capabilities document.
+     * 
+     * @param staticCapabilities An OWS 1.0.0 capabilities object.
      */
     public void setStaticCapabilities(Capabilities staticCapabilities) {
         this.staticCapabilities = staticCapabilities;

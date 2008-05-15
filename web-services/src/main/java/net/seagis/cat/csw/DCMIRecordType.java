@@ -18,6 +18,7 @@
 package net.seagis.cat.csw;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
@@ -156,17 +157,24 @@ public class DCMIRecordType extends AbstractRecordType {
         return null;
     }
     
+    public void setSubject(Collection<SimpleLiteral> subjects) {
+        for (SimpleLiteral subject: subjects) {
+            this.dcElement.add(dublinFactory.createSubject(subject));
+        }
+    }
+    
     public void setSubject(SimpleLiteral subject) {
         this.dcElement.add(dublinFactory.createSubject(subject));
     }
     
-    public SimpleLiteral getSubject() {
+    public List<SimpleLiteral> getSubject() {
+        List<SimpleLiteral> result = new ArrayList<SimpleLiteral>();
         for (JAXBElement<SimpleLiteral> jb: dcElement) {
             if (jb.getName().getLocalPart().equals("subject")) {
-                return jb.getValue();
+                result.add(jb.getValue());
             }
         }
-        return null;
+        return result;
     }
     
     public void setFormat(SimpleLiteral format) {
@@ -321,6 +329,45 @@ public class DCMIRecordType extends AbstractRecordType {
     public SimpleLiteral getSpatial() {
         for (JAXBElement<SimpleLiteral> jb: dcElement) {
             if (jb.getName().getLocalPart().equals("spatial")) {
+                return jb.getValue();
+            }
+        }
+        return null;
+    }
+    
+    public void setPublisher(SimpleLiteral publisher) {
+        this.dcElement.add(dublinFactory.createPublisher(publisher));
+    }
+    
+    public SimpleLiteral getPublisher() {
+        for (JAXBElement<SimpleLiteral> jb: dcElement) {
+            if (jb.getName().getLocalPart().equals("publisher")) {
+                return jb.getValue();
+            }
+        }
+        return null;
+    }
+    
+    public void setContributor(SimpleLiteral contributor) {
+        this.dcElement.add(dublinFactory.createContributor(contributor));
+    }
+    
+    public SimpleLiteral getContributor() {
+        for (JAXBElement<SimpleLiteral> jb: dcElement) {
+            if (jb.getName().getLocalPart().equals("contributor")) {
+                return jb.getValue();
+            }
+        }
+        return null;
+    }
+    
+    public void setDescription(SimpleLiteral description) {
+        this.dcElement.add(dublinFactory.createDescription(description));
+    }
+    
+    public SimpleLiteral getDescription() {
+        for (JAXBElement<SimpleLiteral> jb: dcElement) {
+            if (jb.getName().getLocalPart().equals("description")) {
                 return jb.getValue();
             }
         }

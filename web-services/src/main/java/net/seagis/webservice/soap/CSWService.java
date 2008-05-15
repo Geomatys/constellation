@@ -114,7 +114,7 @@ public class CSWService {
                         ,net.seagis.dublincore.terms.ObjectFactory.class);
        
        unmarshaller = jbcontext.createUnmarshaller();
-       worker = new CSWworker(jbcontext.createMarshaller());
+       worker = new CSWworker(unmarshaller);
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");
        worker.setVersion(new ServiceVersion(Service.OWS, "1.0.0"));

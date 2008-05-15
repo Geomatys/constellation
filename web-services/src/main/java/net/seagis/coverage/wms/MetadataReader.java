@@ -555,19 +555,16 @@ public class MetadataReader {
         }
 
         // then we search the setter for all the child value
-        String pathId = value.getPath().getId();
-        
         for (Value childValue : form.getValues()) {
             
             Path path = childValue.getPath();
-            Path parent = path.getParent();
 
-            if (parent != null && parent.getId().equals(pathId)) {
+            if (childValue.getParent()!= null && childValue.getParent().equals(value)) {
                 logger.finer("new childValue:" + path.getName());
 
                 // we get the object from the child Value
                 Object param = getObjectFromValue(form, childValue);
-
+                
                 //we try to put the parameter in the parent object
                 // by searching for the good attribute name
                 boolean tryAgain = true;
@@ -641,6 +638,7 @@ public class MetadataReader {
     
     /**
      * Invoke a setter with the specified parameter in the specified object.
+     * If the setter is null nothing happen.
      * 
      * @param setter     The method to invoke
      * @param object     The object on witch the method is invoked.
@@ -649,8 +647,10 @@ public class MetadataReader {
     private void invokeSetter(Method setter, Object object, Object parameter) {
         String baseMessage = "unable to invoke setter: "; 
         try {
-
-            setter.invoke(object, parameter);
+            if (setter != null)
+                setter.invoke(object, parameter); 
+            else
+                logger.severe(baseMessage + "The setter is null");
 
         } catch (IllegalAccessException ex) {
             logger.severe(baseMessage + "The class is not accessible");
@@ -832,8 +832,14 @@ public class MetadataReader {
         if (classe.getInterfaces().length != 0) {
             interfacee = classe.getInterfaces()[0];
         }
+        
+        //TODO make it recursivly
+        Class superC = null;
+        if (classe.getSuperclass() != null) {
+            superC = classe.getSuperclass();
+        }
 
-        while (occurenceType < 5) {
+        while (occurenceType < 6) {
 
             try {
                 Method setter = null;
@@ -861,6 +867,10 @@ public class MetadataReader {
                     }
                     case 4: {
                         setter = rootClass.getMethod(methodName + "s", Collection.class);
+                        break;
+                    }
+                    case 5: {
+                        setter = rootClass.getMethod(methodName , superC);
                         break;
                     }
                 }
@@ -901,8 +911,15 @@ public class MetadataReader {
                         occurenceType = 5;
                         break;
                     }
+                    case 5: {
+                        if (superC != null) {
+                            logger.finer("The setter " + methodName + "(" + superC.getName() + ") does not exist");
+                        }
+                        occurenceType = 6;
+                        break;
+                    }
                     default:
-                        occurenceType = 5;
+                        occurenceType = 6;
                 }
             }
         }

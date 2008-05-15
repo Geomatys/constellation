@@ -103,7 +103,7 @@ public abstract class WebService {
      /**
      * A JAXB unmarshaller used to create java object from XML file.
      */
-    private Unmarshaller unmarshaller;
+    protected Unmarshaller unmarshaller;
     
     /**
      * A JAXB marshaller used to transform the java object in XML String.
@@ -489,9 +489,15 @@ public abstract class WebService {
        String fileName = this.service + "Capabilities" + getCurrentVersion().toString() + ".xml";
        File changeFile = getFile("change.properties");
        Properties p = new Properties();
-       FileInputStream in    = new FileInputStream(changeFile);
-       p.load(in);
-       in.close();
+       
+       // if the flag file is present we load the properties
+       if (changeFile != null && changeFile.exists()) {
+           FileInputStream in    = new FileInputStream(changeFile);
+           p.load(in);
+           in.close();
+       } else {
+           p.put("update", "false");
+       }
        
        if (fileName == null) {
            return null;
@@ -504,10 +510,14 @@ public abstract class WebService {
                response = unmarshaller.unmarshal(f);
                capabilities.put(fileName, response);
                this.setLastUpdateSequence(System.currentTimeMillis());
-               FileOutputStream out = new FileOutputStream(changeFile);
                p.put("update", "false");
-               p.store(out, "updated from WebService");
-               out.close();
+               
+               // if the flag file is present we store the properties
+               if (changeFile != null && changeFile.exists()) {
+                   FileOutputStream out = new FileOutputStream(changeFile);
+                   p.store(out, "updated from WebService");
+                   out.close();
+               }
            }
            
            return response;

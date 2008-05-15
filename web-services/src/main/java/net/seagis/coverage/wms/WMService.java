@@ -99,26 +99,28 @@ public class WMService extends WebService {
     private static ThreadLocal<WebServiceWorker> webServiceWorker;
     static {
         try {
-            /* only for ifremer configuration */
-            //File configFile = null;
-            //configFile = new File("/home/share/postgrid/config.xml");
-//            final File dirCatalina = new File(System.getenv().get("CATALINA_HOME"));
-//            if (dirCatalina.exists()) {
-//                configFile = new File(dirCatalina, "/home/share/postgrid/config.xml");
-//                logger.info("path to config file:" + configFile);
-//                if (!configFile.exists()) {
-//                    configFile = null;
-//                }
-//            }
-//            if (configFile != null) {
-//                logger.info("path to config file:" + configFile.getAbsolutePath());
-//            } else {
-//                logger.info("path to catalina config file using sicade configuration");
-//            }
-            //System.out.println("Config file is: "+configFile.toString());
-            //final WebServiceWorker initialValue = new WebServiceWorker(new Database(configFile), true); 
+           /* only for ifremer configuration */
+            File configFile = null;
+            File dirCatalina = null;
+            if(System.getenv().get("CATALINA_HOME") != null)
+                dirCatalina = new File(System.getenv().get("CATALINA_HOME"));
             
-            final WebServiceWorker initialValue = new WebServiceWorker(new Database(), true);
+            if (dirCatalina!= null && dirCatalina.exists()) {
+                configFile = new File(dirCatalina, "webapps/ifremerWS/WEB-INF/config.xml");
+                logger.info("path to config file:" + configFile);
+                if (!configFile.exists()) {
+                    configFile = null;
+                }
+            }
+            final WebServiceWorker initialValue;
+            if (configFile != null) {
+                logger.info("path to config file:" + configFile.getAbsolutePath());
+               initialValue = new WebServiceWorker(new Database(configFile), true); 
+            } else {
+                logger.info("path to catalina config file using sicade configuration");
+                initialValue = new WebServiceWorker(new Database(), true);
+            }
+            
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
                 @Override
                 protected WebServiceWorker initialValue() {
