@@ -43,7 +43,6 @@ import org.geotools.util.DateRange;
 import org.geotools.util.Ranks;
 
 import net.seagis.catalog.Database;
-import net.seagis.catalog.ServerException;
 import net.seagis.catalog.CatalogException;
 
 

@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
-import org.geotools.filter.Expression;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsBetween;
 

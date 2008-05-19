@@ -43,6 +43,23 @@ final class NcmlReading {
             "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
 
     /**
+     * Gets the {@code start, increment and npts} parameters found in the NcML file for
+     * the {@code netcdf} tag.
+     *
+     * @param timeElement
+     * @return
+     */
+    public static NcmlTimeValues createNcmlTimeValues(final Element timeElement) {
+        final Element timeValues = timeElement.getChild("values", NETCDFNS);
+        final long startTime =
+                Math.round(Double.valueOf(timeValues.getAttributeValue("start")));
+        final long increment =
+                Math.round(Double.valueOf(timeValues.getAttributeValue("increment")));
+        final int npts = Integer.valueOf(timeValues.getAttributeValue("npts"));
+        return new NcmlTimeValues(startTime, increment, npts);
+    }
+
+    /**
      * Returns a list of {@linkplain ucar.nc2.ncml.Aggregation Aggregation}, which should be a
      * list of tags containing one or several &lt;netcdf> tags. If these tags were not found, or
      * an error during the parsing of the NcML file has occured, it will returns {@code null}.
@@ -92,6 +109,11 @@ final class NcmlReading {
                         elements.add(element);
                     }
                 }
+            } else {
+                List<Element> children = globalAggr.getChildren("netcdf", NETCDFNS);
+                for (final Element elem : children) {
+                    elements.add(elem);
+                }
             }
             return elements;
         } catch (JDOMException ex) {
@@ -125,16 +147,26 @@ final class NcmlReading {
 
     /**
      * Returns the {@code &lt;variable>} tag, which is a child of a {@code &lt;netcdf>} tag in
-     * parameter, and has a variable name specified, or {@code null} if no tag matches.
+     * parameter, and has a variable name specified or its only variable is {@code time}, or
+     * {@code null} if no tag matches.
      *
-     * @param variable The variable to check in the
+     * @param variable The variable to check in the {@code &lt;netcdf>} tag.
      * @param netcdfTag The parent {@code &lt;netcdf>} tag.
      * @return {@code null} if no tag matches. Otherwise the {@code &lt;variable> tag} matching
      *         with the variable's name specified.
      */
     public static Element getVariableElement(final String variable, final Element netcdfTag) {
-        final Collection<Element> children = netcdfTag.getChildren("variable", NETCDFNS);
-        for (final Element varNcml : children) {
+        final Collection<Element> variables = netcdfTag.getChildren("variable", NETCDFNS);
+        for (final Element varNcml : variables) {
+            // If the only variable for this netcdf tag is {@code time}, then we select this tag
+            // as valid.
+            if (varNcml.getAttributeValue("name").equalsIgnoreCase("time") && 
+                    variables.size() == 1) 
+            {
+                return varNcml;
+            }
+            // If there are several variables and the variable specified by the user is found among
+            // them, then we can return this tag.
             if (variable.startsWith(varNcml.getAttributeValue("name").toLowerCase())) {
                 return varNcml;
             }

@@ -96,4 +96,9 @@ final class NcmlNetcdfElement {
         hash = 11 * hash + (timeValues != null ? timeValues.hashCode() : 0);
         return hash;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "[location=" + location + ", timeValues=" + timeValues + "]";
+    }
 }

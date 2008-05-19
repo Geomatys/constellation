@@ -18,6 +18,7 @@
 package net.seagis.console;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import javax.imageio.ImageReader;
 import net.seagis.catalog.CatalogException;
@@ -92,35 +93,28 @@ final class NcmlGridCoverageEntry extends WritableGridCoverageEntry {
 
     @Override
     public DateRange[] getDateRanges() throws IOException, CatalogException {
-        final DateRange[] originalDates = super.getDateRanges();
-        final int size = originalDates.length;
-        if (size == 0) {
-            return null;
+        // Just to initialize time units for the metadata reader.
+        // Time values will be recalculated from the ncml entries.
+        super.getDateRanges();
+        if (npts == 1 || increment == 0) {
+            final long startTimeInMillis = convertInMillis(startTime);
+            final long nextItemStartInMillis = convertInMillis(nextItemStart);
+            final long halfRange = Math.abs((nextItemStartInMillis - startTimeInMillis) / 2);
+            final Date newStartTime = new Date(startTimeInMillis - halfRange);
+            final Date newEndTime = new Date(startTimeInMillis + halfRange);
+            return new DateRange[] {new DateRange(newStartTime, newEndTime)};
         }
-        final long origin = getTimeOrigin().getTime();
-        final long startTimeInMillis = convertInMillis(startTime);
+        final DateRange[] ncmlDates = new DateRange[npts];
         final long incrementInMillis = convertInMillis(increment);
-        for (int i = 0; i < size; i++) {
-            // If the starting time for the next has been given, then one uses it in order to
-            // calculate the range between two consecutive dates.
-            // Otherwise one uses the increment variable found in the NcML file.
-            if (nextItemStart != 0L) {
-                final long nextItemStartInMillis = convertInMillis(nextItemStart);
-                // If the starting time of the next item is lower than the starting time for the current
-                // item, it signifies that we have reached the end of the list.
-                // In this case, because there is no other element, we take the previous element as
-                // the nextOne, and we apply an absolute calculation in order to have a valid range.
-                final long halfRange = Math.abs((nextItemStartInMillis - startTimeInMillis) / 2);
-                final Date newStartTime = new Date(origin + startTimeInMillis - halfRange);
-                final Date newEndTime = new Date(origin + startTimeInMillis + halfRange);
-                originalDates[i] = new DateRange(newStartTime, newEndTime);
-            } else {
-                final Date newStartTime = new Date(origin + startTimeInMillis);
-                final Date newEndTime = new Date(origin + startTimeInMillis + incrementInMillis * npts);
-                originalDates[i] = new DateRange(newStartTime, newEndTime);
-            }
+        final long origin = getTimeOrigin().getTime();
+        for (int i = 0; i < ncmlDates.length; i++) {
+            final long startTimeInMillis = (i == 0) ? 
+                convertInMillis(startTime) + origin : ncmlDates[i-1].getMaxValue().getTime();
+            final Date newStartTime = new Date(startTimeInMillis);
+            final Date newEndTime = new Date(startTimeInMillis + incrementInMillis);
+            ncmlDates[i] = new DateRange(newStartTime, newEndTime);
         }
-        return originalDates;
+        return ncmlDates;
     }
 
     /**
@@ -139,7 +133,13 @@ final class NcmlGridCoverageEntry extends WritableGridCoverageEntry {
         } else {
             // It assumes that the units is the second, if it is not the day,
             // since {@code jsr108} only allows seconds or days as a unit.
-            return time * 60 * 60 * 1000L;
+            return time * 1000L;
         }
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "[format=" + format + ", startTime=" + startTime +
+                ", increment=" + increment + ", npts=" + npts + "]";
     }
 }

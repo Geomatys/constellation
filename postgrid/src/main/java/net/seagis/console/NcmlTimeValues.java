@@ -114,4 +114,10 @@ final class NcmlTimeValues {
         hash = 67 * hash + this.npts;
         return hash;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "[startTime=" + startTime + ", increment=" + increment +
+                ", npts=" + npts + "]";
+    }
 }

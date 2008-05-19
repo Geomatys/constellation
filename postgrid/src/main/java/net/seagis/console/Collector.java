@@ -21,9 +21,9 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
+import java.util.logging.Logger;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.UpdatePolicy;
 import net.seagis.catalog.ServerException;
@@ -33,9 +33,6 @@ import org.geotools.console.CommandLine;
 import org.geotools.console.Option;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
 import org.jdom.Element;
-import ucar.nc2.ncml.Aggregation;
-import ucar.nc2.ncml.Aggregation.Type;
-import ucar.nc2.ncml.AggregationExisting;
 import static net.seagis.catalog.UpdatePolicy.*;
 
 
@@ -47,6 +44,11 @@ import static net.seagis.catalog.UpdatePolicy.*;
  * @author Cédric Briançon
  */
 public class Collector extends CommandLine {
+    /**
+     * The default logger.
+     */
+    private static final Logger LOGGER = Logger.getLogger("net.seagis.console");
+    
     /**
      * Database connection.
      */
@@ -221,59 +223,26 @@ public class Collector extends CommandLine {
         ncmlTable.setCanInsertNewLayers(true);
         final Set<NcmlNetcdfElement> netcdfTags = new LinkedHashSet<NcmlNetcdfElement>();
         try {
-            final List<Aggregation> aggregations = NcmlReading.getNestedAggregations(ncml);
             variable = variable.toLowerCase().trim();
-            // If we have an aggregation of type "joint" for the whole file, without any other
-            // nested aggregation, then we know that the <netcdf> tags will contain the "location"
-            // parameter, and we get it back directly in order to specify it to the reader.
-            // Otherwise we have to browse all aggregations and their childs in order to get
-            // the "location" parameters of these <netcdf> tags.
-            if (aggregations.size() == 1 && aggregations.get(0).getType().equals(Type.JOIN_EXISTING)) {
-                final AggregationExisting aggrExist = (AggregationExisting) aggregations.get(0);
-                @SuppressWarnings("unchecked")
-                final List<Aggregation.Dataset> datasets = aggrExist.getNestedDatasets();
-                for (final Aggregation.Dataset dataset : datasets) {
-                    @SuppressWarnings("unchecked")
-                    final Collection<String> variables = aggrExist.getVariables();
-                    for (final String var : variables) {
-                        if (variable.startsWith(var.toLowerCase())) {
-                            final NcmlNetcdfElement netcdfElement =
-                                    new NcmlNetcdfElement(new URI(dataset.getLocation()), null);
-                            netcdfTags.add(netcdfElement);
-                        }
-                    }
+            final Collection<Element> nested = NcmlReading.getNestedNetcdfElement(ncml);
+            for (final Element netcdfWithLocationParam : nested) {
+                // Verify that the variable to collect, specified by user, is really present
+                // among variables found in the NcML file for the current <netcdf> tags.
+                // If it is the case, the NetCDF file is added to the list of files to handle,
+                // otherwise it is skipped.
+                if (NcmlReading.getVariableElement(variable, netcdfWithLocationParam) == null) {
+                    continue;
                 }
-            } else {
-                // Browse all <netcdf location="..."> for this aggregation.
-                final Collection<Element> nested = NcmlReading.getNestedNetcdfElement(ncml);
-                for (final Element netcdfWithLocationParam : nested) {
-                    // Verify that the variable to collect, specified by user, is really present
-                    // among variables found in the NcML file for the current <netcdf> tags.
-                    // If it is the case, the NetCDF file is added to the list of files to handle,
-                    // otherwise it is skipped.
-                    if (NcmlReading.getVariableElement(variable, netcdfWithLocationParam) == null) {
-                        continue;
-                    }
-                    final URI location = new URI(netcdfWithLocationParam.getAttributeValue("location"));
-                    final Element timeElement =
-                            NcmlReading.getVariableElement("time", netcdfWithLocationParam);
-                    if (timeElement == null) {
-                        addToLayer(layer, location, ncmlTable);
-                        continue;
-                    }
-                    final Element timeValues = timeElement.getChild("values", NcmlReading.NETCDFNS);
-                    if (timeValues == null) {
-                        continue;
-                    }
-                    final long startTime =
-                            Math.round(Double.valueOf(timeValues.getAttributeValue("start")));
-                    final long increment =
-                            Math.round(Double.valueOf(timeValues.getAttributeValue("increment")));
-                    final int npts = Integer.valueOf(timeValues.getAttributeValue("npts"));
-                    final NcmlTimeValues ncmlValue = new NcmlTimeValues(startTime, increment, npts);
-                    final NcmlNetcdfElement netcdfElement = new NcmlNetcdfElement(location, ncmlValue);
-                    netcdfTags.add(netcdfElement);
+                final URI location = new URI(netcdfWithLocationParam.getAttributeValue("location"));
+                final Element timeElement =
+                        NcmlReading.getVariableElement("time", netcdfWithLocationParam);
+                if (timeElement == null) {
+                    addToLayer(layer, location, ncmlTable);
+                    continue;
                 }
+                final NcmlTimeValues ncmlValue = NcmlReading.createNcmlTimeValues(timeElement);
+                final NcmlNetcdfElement netcdfElement = new NcmlNetcdfElement(location, ncmlValue);
+                netcdfTags.add(netcdfElement);
             }
             // Do the adding of the selected NetCDF files into the database.
             final int size = netcdfTags.size();
@@ -321,6 +290,7 @@ public class Collector extends CommandLine {
     {
         table.setLayer(layer);
         final NetcdfImageReader reader = addInputToReader(location.toString());
+        reader.setVariables(new String[] {variable});
         try {
             table.addEntry(reader);
         } catch (SQLException sql) {
@@ -332,6 +302,7 @@ public class Collector extends CommandLine {
             if (!sql.getSQLState().equals("23505")) {
                 throw sql;
             }
+            LOGGER.warning(sql.getLocalizedMessage());
         }
     }
 
@@ -364,16 +335,18 @@ public class Collector extends CommandLine {
             if (nextElement != null) {
                 table.setNextItemStart(nextElement.getTimeValues().getStartTime());
             }
+            reader.setVariables(new String[] {variable});
             table.addEntry(reader);
         } catch (SQLException sql) {
             // If the error code is "23505", we know that it is a postgresql error which
-            // indicates an adding of a record already present into the database.
+            // indicates the addition of a record already present into the database.
             // In this case, we do nothing because the record is already present.
             // Otherwise we throw this exception, which could have occured for a different
             // reason.
             if (!sql.getSQLState().equals("23505")) {
                 throw sql;
             }
+            LOGGER.warning(sql.getLocalizedMessage());
         }
     }
 
