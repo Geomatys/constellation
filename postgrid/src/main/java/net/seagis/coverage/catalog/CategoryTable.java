@@ -16,17 +16,14 @@
 package net.seagis.coverage.catalog;
 
 import java.awt.Color;
-import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 
-import java.util.Locale;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform1D;
@@ -86,19 +83,6 @@ final class CategoryTable extends Table {
      * @throws SQLException if an error occured while reading the database.
      */
     public synchronized Category[] getCategories(final String band) throws CatalogException, SQLException {
-//        final File colorDir = new File(System.getProperty("user.home") + "/.sicade/colors");
-//        System.out.println("Color dir is: "+colorDir.getAbsolutePath());
-//        System.out.println("Color dir exists:     "+colorDir.exists());
-//        System.out.println("Color dir is readable:"+colorDir.canRead());
-//        File temps = new File(colorDir.getAbsolutePath() +"/temperature.pal");
-//        System.out.println("Can read temperature.pal: "+temps.canRead());
-//        final PaletteFactory palettes = new PaletteFactory(
-//            /* fallback factory */ null,
-//            /* class loader     */ PaletteFactory.class,
-//            /* root directory   */ colorDir,
-//            /* extension        */ ".pal",
-//            /* character set    */ Charset.forName("ISO-8859-1"),
-//            /* locale           */ getDatabase().getLocale());
         final PaletteFactory palettes = PaletteFactory.getDefault();
         palettes.setWarningLocale(getDatabase().getLocale());
 
@@ -149,29 +133,25 @@ final class CategoryTable extends Table {
                 category = new Category(name, colors, range, (MathTransform1D) null);
             } else {
                 // Catégorie quantitative
-                if (c0 == 0 && c1 == 1) {       // Is geophysics and quantitative
-                    category = new Category(name, colors, new NumberRange(1,255), range);
-                } else {
-                    category = new Category(name, colors, range, c1, c0);
-                    if (function != null) {
-                        if (function.equalsIgnoreCase("log")) try {
-                            // Catégorie quantitative et logarithmique.
-                            final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
-                            if (exponential == null) {
-                                final ParameterValueGroup param = factory.getDefaultParameters("Exponential");
-                                param.parameter("base").setValue(10.0); // Must be a 'double'
-                                exponential = (MathTransform1D) factory.createParameterizedTransform(param);
-                            }
-                            MathTransform1D tr = category.getSampleToGeophysics();
-                            tr = (MathTransform1D) factory.createConcatenatedTransform(tr, exponential);
-                            category = new Category(name, colors, range, tr);
-                        } catch (FactoryException exception) {
-                            results.close();
-                            throw new ServerException(exception);
-                        } else {
-                            throw new IllegalRecordException("Fonction inconnue: " + function,
-                                        this, results, functionIndex, name);
+                category = new Category(name, colors, range, c1, c0);
+                if (function != null) {
+                    if (function.equalsIgnoreCase("log")) try {
+                        // Catégorie quantitative et logarithmique.
+                        final MathTransformFactory factory = ReferencingFactoryFinder.getMathTransformFactory(null);
+                        if (exponential == null) {
+                            final ParameterValueGroup param = factory.getDefaultParameters("Exponential");
+                            param.parameter("base").setValue(10.0); // Must be a 'double'
+                            exponential = (MathTransform1D) factory.createParameterizedTransform(param);
                         }
+                        MathTransform1D tr = category.getSampleToGeophysics();
+                        tr = (MathTransform1D) factory.createConcatenatedTransform(tr, exponential);
+                        category = new Category(name, colors, range, tr);
+                    } catch (FactoryException exception) {
+                        results.close();
+                        throw new ServerException(exception);
+                    } else {
+                        throw new IllegalRecordException("Fonction inconnue: " + function,
+                                    this, results, functionIndex, name);
                     }
                 }
             }
