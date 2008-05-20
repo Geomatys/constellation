@@ -34,9 +34,9 @@ import javax.imageio.spi.ImageReaderSpi;
 import org.geotools.image.io.mosaic.Tile;
 import org.geotools.image.io.mosaic.TileManager;
 import org.geotools.image.io.mosaic.TileManagerFactory;
+import org.geotools.util.Utilities;
 import org.geotools.util.SoftValueHashMap;
 import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 

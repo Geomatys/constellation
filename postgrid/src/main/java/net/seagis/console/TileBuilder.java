@@ -311,10 +311,12 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
         builder.setMosaicEnvelope(envelope);
         builder.setTileReaderSpi(format);
         final TileManager tileManager;
-        if (keepLayout) {
-            tileManager = TileManagerFactory.DEFAULT.create(tiles)[0];
-        } else try {
-            tileManager = builder.createTileManager(tiles, 0, writeToDisk && !pretend);
+        try {
+            if (keepLayout) {
+                tileManager = TileManagerFactory.DEFAULT.create(tiles)[0];
+            } else {
+                tileManager = builder.createTileManager(tiles, 0, writeToDisk && !pretend);
+            }
         } catch (IOException e) {
             err.println(e);
             return false;
@@ -323,7 +325,12 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
             err.println("Aborted.");
             return false;
         }
-        tiles = tileManager.getTiles();
+        try {
+            tiles = tileManager.getTiles();
+        } catch (IOException e) {
+            err.println(e);
+            return false;
+        }
         /*
          * Creates a global tiles which cover the whole area.
          * We will use the most frequent file suffix for this tile.
@@ -475,6 +482,8 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
 
     /**
      * Runs from the command line.
+     *
+     * @param args The command line arguments.
      */
     public static void main(String[] args) {
         final TileBuilder builder = new TileBuilder(args);
