@@ -124,16 +124,16 @@ public class CompositePhenomenonEntry extends CompoundPhenomenonEntry implements
            if ((this.component !=null && that.component == null)||(this.component ==null && that.component != null))
                 return false;
         
-            if (this.component !=null && that.component != null && this.component.size() != that.component.size())
-                return false;
+            if (this.component !=null && that.component != null) {
+                if (this.component.size() == that.component.size()) {
+                    Iterator<PhenomenonPropertyType> i = this.component.iterator();
+                    while (i.hasNext()) {
+                        if (!that.component.contains(i.next()))
+                            return false;
+                    }
+                } else return false;
+            } 
         
-             /*if (this.component !=null) {
-                Iterator<PhenomenonEntry> i = component.iterator();
-                while (i.hasNext()) {
-                    if (!that.component.contains(i.next()))
-                        return false;
-                }
-            }*/
             return Utilities.equals(this.getId(),             that.getId()) &&
                    Utilities.equals(this.getDescription(),    that.getDescription()) &&
                    Utilities.equals(this.getName(),           that.getName()) &&

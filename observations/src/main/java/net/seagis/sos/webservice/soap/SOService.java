@@ -224,7 +224,7 @@ public class SOService {
            
                String home;
                     
-               String env = "/home/tomcat/.sicade"; //System.getenv("CATALINA_HOME");
+               String env = System.getenv("CATALINA_HOME");
                 // we get the configuration file
                File path = new File(env + "/sos_configuration/");     
                //we delete the /WS

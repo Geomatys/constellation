@@ -279,7 +279,7 @@ public class SOSworker {
         Properties prop = new Properties();
         map    = new Properties();
         File f = null;
-        String env = "/home/tomcat/.sicade" ; //System.getenv("CATALINA_HOME");
+        String env = System.getenv("CATALINA_HOME");
         logger.info("path to config file=" + env);
         boolean start = true;
         try {
@@ -725,7 +725,7 @@ public class SOSworker {
                     }
                     CompositePhenomenonEntry cphen = null;
                     try {
-                        compositePhenomenons.getEntry(s);
+                        cphen = compositePhenomenons.getEntry(s);
                     } catch (NoSuchRecordException ex) {
                         //we let continue to look if it is a phenomenon (simple)
                     } catch (CatalogException ex){
@@ -1644,7 +1644,7 @@ public class SOSworker {
                 logger.severe("PhysicalId:" + value);
                 map.setProperty(value, dbId);
                 String env = System.getenv("CATALINA_HOME");
-                FileOutputStream out = new FileOutputStream(env + "/bin/mapping.properties");
+                FileOutputStream out = new FileOutputStream(env + "/sos_configuration/mapping.properties");
                 map.store(out, "");
             } else {
                 logger.severe("no value for supervisorcode identifier numero " + (i - 1));
