@@ -12,14 +12,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package net.seagis.coverage.metadata;
 
 
 import net.seagis.catalog.Element;
 
 
 /**
- * Interface for {@linkplain LayerMetadataEntry layer metadata entries}.
+ * Interface for {@linkplain CoverageMetadataEntry coverage metadata entries}.
  *
  * @author Sam Hiatt
  * @version $Id: LayerMetadaa.java  $
@@ -27,9 +27,9 @@ import net.seagis.catalog.Element;
  * TODO: implement methods for grabbing specific metadats
  *
  */
-public interface LayerMetadata extends Element {
+public interface CoverageMetadata extends Element {
     /**
-     * Returns the metadata for this layer. 
+     * Returns the metadata for this coverage. 
      * 
      * For starters, just dump all the metadata to a string.
      * 

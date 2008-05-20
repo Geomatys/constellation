@@ -12,8 +12,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package net.seagis.coverage.metadata;
 
+import net.seagis.coverage.catalog.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -31,10 +32,6 @@ import net.seagis.catalog.CatalogException;
  * @version $Id: LayerMetadaaTable.java  $
  */
 public class LayerMetadataTable extends BoundedSingletonTable<LayerMetadata> {
-    /**
-     * Connection to the table of layers. Will be created when first needed.
-     */
-    private Layer layer;
     
     /**
      * Creates a layer metadata table.
@@ -70,25 +67,25 @@ public class LayerMetadataTable extends BoundedSingletonTable<LayerMetadata> {
      */
     protected LayerMetadata createEntry(final ResultSet results) throws CatalogException, SQLException {
         final LayerMetadataQuery query = (LayerMetadataQuery) super.query;
-        final String layer_meta_name =   results.getString(indexOf(query.layer_meta_name ));
-        final String layer_name =        results.getString(indexOf(query.layer_name ));
-        final String abbr_title =        results.getString(indexOf(query.abbr_title ));
-        final String short_title =       results.getString(indexOf(query.short_title ));
-        final String long_title =        results.getString(indexOf(query.long_title ));
-        final String parameter_name =    results.getString(indexOf(query.parameter_name ));
-        final String parameter_type =    results.getString(indexOf(query.parameter_type ));
+        final String layerMetaName =   results.getString(indexOf(query.layerMetaName  ));
+        final String layerName =        results.getString(indexOf(query.layerName  ));
+        final String abbrTitle =        results.getString(indexOf(query.abbrTitle  ));
+        final String shortTitle =       results.getString(indexOf(query.shortTitle  ));
+        final String longTitle =        results.getString(indexOf(query.longTitle  ));
+        final String parameterName =    results.getString(indexOf(query.parameterName  ));
+        final String parameterType =    results.getString(indexOf(query.parameterType  ));
         final String description =       results.getString(indexOf(query.description ));
-        final String long_description =  results.getString(indexOf(query.long_description ));
-        final String data_source =       results.getString(indexOf(query.data_source ));
+        final String longDescription =  results.getString(indexOf(query.longDescription  ));
+        final String dataSource =       results.getString(indexOf(query.dataSource  ));
         final String purpose =           results.getString(indexOf(query.purpose ));
-        final String supplemental_info = results.getString(indexOf(query.supplemental_info ));
-        final String update_frequency =  results.getString(indexOf(query.update_frequency ));
-        final String use_constraint =    results.getString(indexOf(query.use_constraint ));
+        final String supplementalInfo = results.getString(indexOf(query.supplementalInfo  ));
+        final String updateFrequency =  results.getString(indexOf(query.updateFrequency  ));
+        final String useConstraint =    results.getString(indexOf(query.useConstraint  ));
         
         final LayerMetadataEntry entry = new LayerMetadataEntry(
-                layer_meta_name, layer_name, abbr_title, short_title, long_title, 
-                parameter_name, parameter_type, description, long_description, data_source, 
-                purpose, supplemental_info, update_frequency, use_constraint);
+                layerMetaName, layerName, abbrTitle, shortTitle, longTitle, 
+                parameterName, parameterType, description, longDescription, dataSource, 
+                purpose, supplementalInfo, updateFrequency, useConstraint);
         return entry;
     }
 

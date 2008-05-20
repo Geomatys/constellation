@@ -12,7 +12,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package net.seagis.coverage.catalog;
+package net.seagis.coverage.metadata;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.Column;
@@ -34,9 +34,9 @@ final class LayerMetadataQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column layer_meta_name, layer_name, abbr_title, short_title, 
-            long_title, parameter_name, parameter_type, description, long_description,
-            data_source, purpose, supplemental_info, update_frequency, use_constraint;
+    protected final Column layerMetaName, layerName, abbrTitle, shortTitle, 
+            longTitle, parameterName, parameterType, description, longDescription,
+            dataSource, purpose, supplementalInfo, updateFrequency, useConstraint;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -49,23 +49,23 @@ final class LayerMetadataQuery extends Query {
      * @param database The database for which this query is created.
      */
     public LayerMetadataQuery(final Database database) {
-        super(database, "layermetadata");
+        super(database, "LayerMetadata");
         final QueryType[] SL   = {SELECT, LIST};
         final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
-        layer_meta_name =   addColumn("layer_meta_name",        SLEI);
-        layer_name =        addColumn("layer_name",       null,   SL  );
-        abbr_title =        addColumn("abbr_title",       null,   SL  );
-        short_title =       addColumn("short_title",      null,   SL  );
-        long_title =        addColumn("long_title",       null,   SL  );
-        parameter_name =    addColumn("parameter_name",   null,   SL  );
-        parameter_type =    addColumn("parameter_type",   null,   SL  );
+        layerMetaName =   addColumn("id",        SLEI);
+        layerName =        addColumn("layerName",       null,   SL  );
+        abbrTitle =        addColumn("abbrTitle",       null,   SL  );
+        shortTitle =       addColumn("shortTitle",      null,   SL  );
+        longTitle =        addColumn("longTitle",       null,   SL  );
+        parameterName =    addColumn("parameterName",   null,   SL  );
+        parameterType =    addColumn("parameterType",   null,   SL  );
         description =       addColumn("description",      null,   SL  );
-        long_description =  addColumn("long_description", null,   SL  );
-        data_source =       addColumn("data_source",      null,   SL  );
+        longDescription =  addColumn("longDescription", null,   SL  );
+        dataSource =       addColumn("dataSource",      null,   SL  );
         purpose =           addColumn("purpose",          null,   SL  );
-        supplemental_info = addColumn("supplemental_info",null,   SL  );
-        update_frequency =  addColumn("update_frequency", null,   SL  );
-        use_constraint =    addColumn("use_constraint",   null,   SL  );
-        byName    = addParameter(layer_meta_name, SELECT, EXISTS);
+        supplementalInfo = addColumn("supplementalInfo",null,   SL  );
+        updateFrequency =  addColumn("updateFrequency", null,   SL  );
+        useConstraint =    addColumn("useConstraint",   null,   SL  );
+        byName    = addParameter(layerMetaName, SELECT, EXISTS);
     }
 }

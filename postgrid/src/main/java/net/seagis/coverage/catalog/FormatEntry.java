@@ -85,7 +85,7 @@ final class FormatEntry extends Entry implements Format {
      * {@code true} for using JAI {@code "ImageRead"} operation,
      * or {@code false} for using {@link ImageReader} directly.
      */
-    private static final boolean USE_IMAGE_READ_OPERATION = Boolean.getBoolean("net.seagis.usejai");
+    private static final boolean USE_IMAGE_READ_OPERATION = true;
 
     /**
      * The input types for mosaic image reader.
@@ -483,6 +483,7 @@ final class FormatEntry extends Entry implements Format {
              * to generate exceptions, or to abort an image read with 'abort()', which makes
              * 'enqueued' null.
              */
+            System.out.println("NOTE: About to use JAI ImageRead operation on: "+input.toString());
             image = JAI.create("ImageRead", new ParameterBlock()
                 .add(inputObject)                  // Objet à utiliser en entré
                 .add(imageIndex)                   // Index de l'image à lire
