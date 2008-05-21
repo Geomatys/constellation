@@ -37,5 +37,6 @@ public interface SeriesMetadata extends Element {
      * 
      */
     String getMetadata();
+    String getPointOfContactID();
 
 }

@@ -61,7 +61,7 @@ final class SeriesMetadataEntry extends Entry implements SeriesMetadata {
         final String themekey8 )
 
     {
-        super(id);
+        super(seriesName);
         this.id = id;
         this.seriesName = seriesName;
         this.legendURI = legendURI;
@@ -98,5 +98,8 @@ final class SeriesMetadataEntry extends Entry implements SeriesMetadata {
                 "themekey8:         " + themekey8 + "\n" ;
                 
         return res;
+    }
+    public String getPointOfContactID() {
+        return pocId;
     }
 }
