@@ -29,6 +29,7 @@ import java.util.logging.Logger;
  * 
  * 
  * @author Guilhem Legal
+ * @author Mehdi Sidhoum
  */
 public class PeriodUtilities {
     
@@ -314,29 +315,30 @@ public class PeriodUtilities {
         if (periodDescription.indexOf('Y') != -1) {
             int nbYear = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('Y')));
             time += nbYear * yearMS;
+            periodDescription = periodDescription.substring(periodDescription.indexOf('Y') + 1);
         }
-        periodDescription = periodDescription.substring(periodDescription.indexOf('Y') + 1);
 
         //we look if the period contains months (2628000000 ms)
-        if (periodDescription.indexOf('M') != -1) {
+        if (    periodDescription.indexOf('M') != -1 && 
+                (periodDescription.indexOf("T") == -1 || periodDescription.indexOf("T") > periodDescription.indexOf('M')) ) {
             int nbMonth = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('M')));
             time += nbMonth * monthMS;
+            periodDescription = periodDescription.substring(periodDescription.indexOf('M') + 1);
         }
-        periodDescription = periodDescription.substring(periodDescription.indexOf('M') + 1);
-
+        
         //we look if the period contains weeks (604800000 ms)
         if (periodDescription.indexOf('W') != -1) {
             int nbWeek = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('W')));
             time += nbWeek * weekMS;
+            periodDescription = periodDescription.substring(periodDescription.indexOf('W') + 1);
         }
-        periodDescription = periodDescription.substring(periodDescription.indexOf('W') + 1);
 
         //we look if the period contains days (86400000 ms)
         if (periodDescription.indexOf('D') != -1) {
             int nbDay = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('D')));
             time += nbDay * dayMS;
+            periodDescription = periodDescription.substring(periodDescription.indexOf('D') + 1);
         }
-        periodDescription = periodDescription.substring(periodDescription.indexOf('D') + 1);
 
         //if the periodDescription is not over we pass to the hours by removing 'T'
         if (periodDescription.indexOf('T') != -1) {
@@ -347,22 +349,22 @@ public class PeriodUtilities {
         if (periodDescription.indexOf('H') != -1) {
             int nbHour = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('H')));
             time += nbHour * hourMS;
+            periodDescription = periodDescription.substring(periodDescription.indexOf('H') + 1);
         }
-        periodDescription = periodDescription.substring(periodDescription.indexOf('H') + 1);
 
         //we look if the period contains minutes (60000 ms)
         if (periodDescription.indexOf('M') != -1) {
             int nbMin = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('M')));
             time += nbMin * minMS;
+            periodDescription = periodDescription.substring(periodDescription.indexOf('M') + 1);
         }
-        periodDescription = periodDescription.substring(periodDescription.indexOf('M') + 1);
 
-        //we look if the period contains weeks (1000 ms)
+        //we look if the period contains seconds (1000 ms)
         if (periodDescription.indexOf('S') != -1) {
             int nbSec = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('S')));
             time += nbSec * secondMS;
+            periodDescription = periodDescription.substring(periodDescription.indexOf('S') + 1);
         }
-        periodDescription = periodDescription.substring(periodDescription.indexOf('S') + 1);
 
         if (periodDescription.length() != 0) {
             throw new IllegalArgumentException("The period descritpion is malformed");
