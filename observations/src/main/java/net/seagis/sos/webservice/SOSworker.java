@@ -1536,6 +1536,7 @@ public class SOSworker {
         } else {
             return null;
         }
+        
         return templateTime;
     }
     
@@ -1641,11 +1642,12 @@ public class SOSworker {
             String value = "";
             if (result.next()) {
                 value = result.getString(1);
-                logger.severe("PhysicalId:" + value);
+                logger.info("PhysicalId:" + value);
                 map.setProperty(value, dbId);
                 String env = System.getenv("CATALINA_HOME");
                 FileOutputStream out = new FileOutputStream(env + "/sos_configuration/mapping.properties");
                 map.store(out, "");
+                out.close();
             } else {
                 logger.severe("no value for supervisorcode identifier numero " + (i - 1));
             }
