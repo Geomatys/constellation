@@ -50,11 +50,12 @@ final class CoverageMetadataQuery extends Query {
         super(database, "CoverageMetadata");
         final QueryType[] SL   = {SELECT, LIST};
         final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
-        id =               addColumn("id",        SLEI);
-        coverageId =       addColumn("coverageId",       null,   SL  );
+        
+        coverageId =       addColumn("coverageId",               SLEI);
+        id =               addColumn("id",               null,   SL  );
         uri =              addColumn("uri",              null,   SL  );
         creationDate =     addColumn("creationDate",     null,   SL  );
         seriesName =       addColumn("seriesName",       null,   SL  );
-        byName    = addParameter(id, SELECT, EXISTS);
+        byName    = addParameter(coverageId, SELECT, EXISTS);
     }
 }

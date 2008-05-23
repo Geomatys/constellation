@@ -52,8 +52,9 @@ final class LayerMetadataQuery extends Query {
         super(database, "LayerMetadata");
         final QueryType[] SL   = {SELECT, LIST};
         final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
-        layerMetaName =   addColumn("id",        SLEI);
-        layerName =        addColumn("layerName",       null,   SL  );
+
+        layerName =        addColumn("layerName",               SLEI);
+        layerMetaName =    addColumn("id",              null,   SL  );
         abbrTitle =        addColumn("abbrTitle",       null,   SL  );
         shortTitle =       addColumn("shortTitle",      null,   SL  );
         longTitle =        addColumn("longTitle",       null,   SL  );
@@ -66,6 +67,6 @@ final class LayerMetadataQuery extends Query {
         supplementalInfo = addColumn("supplementalInfo",null,   SL  );
         updateFrequency =  addColumn("updateFrequency", null,   SL  );
         useConstraint =    addColumn("useConstraint",   null,   SL  );
-        byName    = addParameter(layerMetaName, SELECT, EXISTS);
+        byName    = addParameter(layerName, SELECT, EXISTS);
     }
 }

@@ -51,8 +51,9 @@ final class SeriesMetadataQuery extends Query {
         super(database, "SeriesMetadata");
         final QueryType[] SL   = {SELECT, LIST};
         final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
-        id =               addColumn("id",               null,   SL  );
+
         seriesName =       addColumn("seriesName",               SLEI);
+        id =               addColumn("id",               null,   SL  );
         legendURI =        addColumn("legendURI",        null,   SL  );
         pubDate =          addColumn("pubDate",          null,   SL  );
         pocId =            addColumn("pocId",            null,   SL  );
@@ -66,6 +67,6 @@ final class SeriesMetadataQuery extends Query {
         themekey6 =        addColumn("themekey6",        null,   SL  );
         themekey7 =        addColumn("themekey7",        null,   SL  );
         themekey8 =        addColumn("themekey8",        null,   SL  );
-        byName    = addParameter(seriesName, SELECT, EXISTS);
+        byName    =        addParameter(seriesName, SELECT);
     }
 }
