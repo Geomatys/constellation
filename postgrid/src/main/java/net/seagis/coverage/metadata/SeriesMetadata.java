@@ -22,7 +22,7 @@ import net.seagis.catalog.Element;
  * Interface for {@linkplain SeriesMetadataEntry layer metadata entries}.
  *
  * @author Sam Hiatt
- * @version $Id: SeriesMetadta.java  $
+ * @version $Id$
  * 
  * TODO: implement methods for grabbing specific metadats
  *

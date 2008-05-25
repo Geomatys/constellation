@@ -22,7 +22,7 @@ import net.seagis.catalog.Entry;
  * Implementation of a {@linkplain PointOfContact layer metadata entry}.
  *
  * @author Sam Hiatt
- * @version $Id: PointOfContactEntry.java  $
+ * @version $Id$
  */
 final class PointOfContactEntry extends Entry implements PointOfContact {
 

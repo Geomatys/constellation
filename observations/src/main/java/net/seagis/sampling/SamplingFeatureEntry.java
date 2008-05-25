@@ -35,7 +35,7 @@ import org.opengis.observation.sampling.SamplingFeature;
 /**
  * Implémentation d'une entrée représentant une {@link SamplingFeature station}.
  *
- * @version $Id: SamplingFeatureEntry.java 440 2008-03-04 10:11:55Z glegal $
+ * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  *

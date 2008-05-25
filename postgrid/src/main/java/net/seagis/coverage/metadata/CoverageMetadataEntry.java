@@ -22,7 +22,7 @@ import net.seagis.catalog.Entry;
  * Implementation of a {@linkplain CoverageMetadata layer metadata entry}.
  *
  * @author Sam Hiatt
- * @version $Id: CoverageMetadataEntry.java  $
+ * @version $Id$
  */
 final class CoverageMetadataEntry extends Entry implements CoverageMetadata {
 

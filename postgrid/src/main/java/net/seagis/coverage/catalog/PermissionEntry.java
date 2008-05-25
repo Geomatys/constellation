@@ -24,7 +24,7 @@ import net.seagis.coverage.web.Service;
  * @author Guilhem Legal
  * @author Martin Desruisseaux
  * @author Cédric Briançon
- * @version $Id: FormatEntry.java 538 2008-04-22 20:05:01Z desruisseaux $
+ * @version $Id$
  */
 final class PermissionEntry extends Entry {
     /**

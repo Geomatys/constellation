@@ -29,7 +29,7 @@ import net.seagis.catalog.CatalogException;
  * Metadata specific to the {@linkplain Layer layer}.
  *
  * @author Sam Hiatt
- * @version $Id: LayerMetadaaTable.java  $
+ * @version $Id$
  */
 public class SeriesMetadataTable extends BoundedSingletonTable<SeriesMetadata> {
     

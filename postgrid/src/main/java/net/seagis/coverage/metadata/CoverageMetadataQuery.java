@@ -28,7 +28,7 @@ import static net.seagis.catalog.QueryType.*;
  * This implementation is specific to FGDC metadata standards.
  *
  * @author Sam Hiatt
- * @version $Id: LayerMetadaaQuery.java  $
+ * @version $Id$
  */
 final class CoverageMetadataQuery extends Query {
     /**

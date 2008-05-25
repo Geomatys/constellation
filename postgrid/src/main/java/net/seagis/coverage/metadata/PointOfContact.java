@@ -22,7 +22,7 @@ import net.seagis.catalog.Element;
  * Interface for {@linkplain PointOfContactEntry layer metadata entries}.
  *
  * @author Sam Hiatt
- * @version $Id: PointOfContact.java  $
+ * @version $Id$
  * 
  * TODO: implement methods for grabbing specific metadats
  *

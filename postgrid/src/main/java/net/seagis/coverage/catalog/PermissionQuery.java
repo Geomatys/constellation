@@ -28,7 +28,7 @@ import static net.seagis.catalog.QueryType.*;
  * @author Guilhem Legal
  * @author Martin Desruisseaux
  * @author Cédric Briançon
- * @version $Id: CategoryQuery.java 455 2008-03-13 15:21:44Z desruisseaux $
+ * @version $Id$
  */
 final class PermissionQuery extends Query {
     /**

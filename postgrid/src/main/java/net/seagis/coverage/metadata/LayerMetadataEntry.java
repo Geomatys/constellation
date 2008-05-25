@@ -22,7 +22,7 @@ import net.seagis.catalog.Entry;
  * Implementation of a {@linkplain LayerMetadata layer metadata entry}.
  *
  * @author Sam Hiatt
- * @version $Id: LayerMetadataEntry.java  $
+ * @version $Id$
  */
 final class LayerMetadataEntry extends Entry implements LayerMetadata {
 

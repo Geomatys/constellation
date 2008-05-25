@@ -30,7 +30,7 @@ import org.opengis.observation.sampling.SamplingFeature;
  * Utilisée par {@link MeasurementTableFiller} pour déterminer un ordre optimal
  * dans lequel ces éléments devraient être évalués.
  *
- * @version $Id: SamplingFeatureDescriptorPair.java 162 2007-11-06 15:05:54Z desruisseaux $
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 final class SamplingFeatureDescriptorPair implements Comparable<SamplingFeatureDescriptorPair> {

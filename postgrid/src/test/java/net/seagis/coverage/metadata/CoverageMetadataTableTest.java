@@ -14,8 +14,6 @@
  */
 package net.seagis.coverage.metadata;
 
-import net.seagis.coverage.metadata.CoverageMetadataTable;
-import net.seagis.coverage.metadata.CoverageMetadata;
 import java.util.Set;
 import java.util.Date;
 import java.sql.SQLException;
@@ -30,7 +28,7 @@ import org.junit.*;
 /**
  * Tests {@link CoverageMetadataTable}.
  *
- * @version $Id: CoverageMetadataTableTest.java  $
+ * @version $Id$
  * @author Sam Hiatt
  */
 public class CoverageMetadataTableTest extends TableTest {

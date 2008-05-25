@@ -27,7 +27,7 @@ import net.seagis.catalog.SingletonTable;
  * @author Guilhem Legal
  * @author Martin Desruisseaux
  * @author Cédric Briançon
- * @version $Id: CategoryTable.java 455 2008-03-13 15:21:44Z desruisseaux $
+ * @version $Id$
  */
 final class PermissionTable extends SingletonTable<PermissionEntry> {
     /**

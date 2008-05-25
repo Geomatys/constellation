@@ -14,8 +14,6 @@
  */
 package net.seagis.coverage.metadata;
 
-import net.seagis.coverage.metadata.PointOfContactTable;
-import net.seagis.coverage.metadata.PointOfContact;
 import java.util.Set;
 import java.util.Date;
 import java.sql.SQLException;
@@ -30,7 +28,7 @@ import org.junit.*;
 /**
  * Tests {@link PointOfContactTable}.
  *
- * @version $Id: PointOfContactTableTest.java  $
+ * @version $Id$
  * @author Sam Hiatt
  */
 public class PointOfContactTableTest extends TableTest {

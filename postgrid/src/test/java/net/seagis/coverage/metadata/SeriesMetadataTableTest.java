@@ -14,8 +14,6 @@
  */
 package net.seagis.coverage.metadata;
 
-import net.seagis.coverage.metadata.SeriesMetadataTable;
-import net.seagis.coverage.metadata.SeriesMetadata;
 import java.util.Set;
 import java.util.Date;
 import java.sql.SQLException;
@@ -30,7 +28,7 @@ import org.junit.*;
 /**
  * Tests {@link SeriesMetadataTable}.
  *
- * @version $Id: SeriesMetadataTableTest.java  $
+ * @version $Id$
  * @author Sam Hiatt
  */
 public class SeriesMetadataTableTest extends TableTest {

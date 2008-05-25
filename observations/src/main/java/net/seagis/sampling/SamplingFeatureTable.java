@@ -26,7 +26,7 @@ import net.seagis.catalog.SingletonTable;
 /**
  * Connexion vers la table des {@linkplain Station stations}.
  *
- * @version $Id: SamplingFeatureTable.java 317 2008-01-07 10:33:02Z glegal $
+ * @version $Id$
  * @author Antoine Hnawia
  * @author Martin Desruisseaux
  * @author Guilhem Legal
