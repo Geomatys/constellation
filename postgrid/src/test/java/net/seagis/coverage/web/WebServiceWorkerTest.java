@@ -49,10 +49,13 @@ public class WebServiceWorkerTest extends DatabaseTest {
      * {@code true} for disabling tests. Useful for disabling every tests except one
      * during debugging.
      */
-    private static final boolean DISABLED = true;
+    private static final boolean DISABLED = false;
 
     /**
      * Tests with the default test layer.
+     *
+     * @throws WebServiceException If a WMS parameter is illegal.
+     * @throws IOException If an error occured while reading an image.
      */
     @Test
     public void testSST() throws WebServiceException, IOException {
@@ -173,6 +176,9 @@ public class WebServiceWorkerTest extends DatabaseTest {
 
     /**
      * Tests with the NetCDF test layer.
+     *
+     * @throws WebServiceException If a WMS parameter is illegal.
+     * @throws IOException If an error occured while reading an image.
      */
     @Test
     public void testNetCDF() throws WebServiceException, IOException {
@@ -234,6 +240,8 @@ public class WebServiceWorkerTest extends DatabaseTest {
     /**
      * A test required for the proper working of {@link #testLambert}.
      *
+     * @throws Exception If factory or transform exception occured.
+     *
      * @see http://jira.codehaus.org/browse/GEOT-1783
      */
     @Test(expected=OperationNotFoundException.class)
@@ -252,6 +260,9 @@ public class WebServiceWorkerTest extends DatabaseTest {
 
     /**
      * Tests a request in Lambert projection.
+     *
+     * @throws WebServiceException If a WMS parameter is illegal.
+     * @throws IOException If an error occured while reading an image.
      */
     @Test
     @Ignore
@@ -293,10 +304,13 @@ public class WebServiceWorkerTest extends DatabaseTest {
 
     /**
      * Tests with BlueMarble layer.
+     *
+     * @throws WebServiceException If a WMS parameter is illegal.
+     * @throws IOException If an error occured while reading an image.
      */
     @Test
     public void testBlueMarble() throws WebServiceException, IOException {
-//        if (DISABLED) return;
+        if (DISABLED) return;
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.1");
         worker.setLayer("BlueMarble");
