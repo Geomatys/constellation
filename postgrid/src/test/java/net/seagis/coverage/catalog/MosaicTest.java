@@ -50,6 +50,8 @@ public class MosaicTest extends DatabaseTest {
      * Tests the BlueMarble layer. We try first with a query on the full extent (no subarea, no
      * subsampling) without trying to load the image since it would be too big. Next we test the
      * global area with a 1°&times;1° pixel size. The image should be 360&times;180 pixel width.
+     *
+     * @throws Exception If an I/O, SQL or catalog exception occured.
      */
     @Test
     public void testBlueMarble() throws Exception {
@@ -116,6 +118,8 @@ public class MosaicTest extends DatabaseTest {
 
     /**
      * Tests loading a mosaic from Ortho Littorale 2000.
+     *
+     * @throws Exception If an I/O, SQL or catalog exception occured.
      */
     @Test
     public void testOrtho2000() throws Exception {

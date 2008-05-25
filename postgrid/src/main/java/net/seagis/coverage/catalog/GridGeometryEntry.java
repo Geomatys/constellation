@@ -28,7 +28,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.referencing.operation.transform.AffineTransform2D;

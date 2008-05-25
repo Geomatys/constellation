@@ -48,6 +48,8 @@ import net.seagis.resources.i18n.ResourceKeys;
  * The elements created by this class are cached for faster access the next time a
  * {@code getEntry(...)} method is invoked again.
  *
+ * @param <E> The kind of element to be created by this table.
+ *
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -101,6 +103,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * Creates a new table using the specified query. The query given in argument should be some
      * subclass with {@link Query#addColumn addColumn} and {@link Query#addParameter addParameter}
      * methods invoked in its constructor.
+     *
+     * @param query The query to use for this table.
      */
     protected SingletonTable(final Query query) {
         super(query);
@@ -110,6 +114,8 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * Creates a new table connected to the same {@linkplain #getDatabase database} and using
      * the same {@linkplain #query query} than the specified table. Subclass constructors should
      * not modify the query, since it is shared.
+     *
+     * @param table The table to use as a template.
      */
     protected SingletonTable(final SingletonTable<E> table) {
         super(table);
@@ -336,7 +342,9 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from the database.
      */
-    public synchronized E getEntry(final int identifier) throws CatalogException, SQLException {
+    public synchronized E getEntry(final int identifier)
+            throws NoSuchRecordException, CatalogException, SQLException
+    {
         final Integer key = identifier; // Autoboxing
         E entry = pool.get(key);
         if (entry != null) {
@@ -359,7 +367,9 @@ public abstract class SingletonTable<E extends Element> extends Table {
      * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from the database.
      */
-    public synchronized E getEntry(String name) throws CatalogException, SQLException {
+    public synchronized E getEntry(String name)
+            throws NoSuchRecordException, CatalogException, SQLException
+    {
         if (name == null) {
             return null;
         }
@@ -392,7 +402,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
     /**
      * Returns all entries available in the database using the specified query type.
      *
-     * @param  The query type, usually {@link QueryType#LIST}.
+     * @param  type The query type, usually {@link QueryType#LIST}.
      * @return The set of entries. May be empty, but neven {@code null}.
      * @throws CatalogException if a logical error has been detected in the database content.
      * @throws SQLException if an error occured will reading from the database.

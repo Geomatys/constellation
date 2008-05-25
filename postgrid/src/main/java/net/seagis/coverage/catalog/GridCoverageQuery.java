@@ -37,10 +37,16 @@ final class GridCoverageQuery extends Query {
     protected final Column series, filename, index, startTime, endTime, spatialExtent;
 
     /**
+     * For insertion of new entries in the {@code Tiles} table only.
+     * Null otherwise.
+     */
+    protected final Column dx, dy;
+
+    /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
     protected final Parameter byFilename, byLayer, bySeries,
-            byStartTime, byEndTime, byHorizontalExtent, byVisibility;
+            byStartTime, byEndTime, byHorizontalExtent;
 
     /**
      * Creates a new query for the specified database.
@@ -63,10 +69,12 @@ final class GridCoverageQuery extends Query {
      *
      * @param database The database for which this query is created.
      * @param tiles {@code true} if this query is for the {@code "Tiles"} table.
+     *        This is used for insertion of new entries only, not for reading.
+     *        In the later case, {@code TileQuery} is used instead.
      */
     GridCoverageQuery(final Database database, final boolean tiles) {
         super(database, tiles ? "Tiles" : "GridCoverages", tiles);
-        final Column layer, horizontalExtent, visibility;
+        final Column layer, horizontalExtent;
         final QueryType[] ________ = {                                                                        };
         final QueryType[] SE____D_ = {SELECT, EXISTS,                                            DELETE       };
         final QueryType[] _E____DC = {        EXISTS,                                            DELETE, CLEAR};
@@ -86,8 +94,13 @@ final class GridCoverageQuery extends Query {
         endTime          = addColumn         (                  "endTime",          S_LABI__);
         spatialExtent    = addColumn         (                  "extent",           S_LA_I__);
         horizontalExtent = addForeignerColumn("GridGeometries", "horizontalExtent", ____B___);
-        visibility       = addForeignerColumn("Series",         "visible", true,    ________);
-
+        if (tiles) {
+            dx = addColumn("dx", INSERT);
+            dy = addColumn("dy", INSERT);
+        } else {
+            dx = null;
+            dy = null;
+        }
         startTime.setFunction("MIN",  ____B___);
         endTime  .setFunction("MAX",  ____B___);
         endTime  .setOrdering("DESC", S_L_____); // Sort by date is mandatory.
@@ -99,7 +112,6 @@ final class GridCoverageQuery extends Query {
         byStartTime        = addParameter(startTime,          SELAB_DC);
         byEndTime          = addParameter(endTime,            SELAB_DC);
         byHorizontalExtent = addParameter(horizontalExtent,   S_LAB___);
-        byVisibility       = addParameter(visibility,         S_LAB___);
         byHorizontalExtent.setComparator("&&");
         byHorizontalExtent.setFunction("GeometryFromText(?,4326)", S_LAB___);
         horizontalExtent  .setFunction("EXTENT",                   ____B___);

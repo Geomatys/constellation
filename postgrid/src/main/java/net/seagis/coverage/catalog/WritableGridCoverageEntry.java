@@ -298,6 +298,10 @@ public class WritableGridCoverageEntry {
 
     /**
      * Returns the image size.
+     *
+     * @return The image size.
+     * @throws IOException if an error occured while reading the image metadata.
+     * @throws CatalogException if a logical error occured.
      */
     public Dimension getImageSize() throws IOException, CatalogException {
         return tile.getRegion().getSize();
@@ -308,6 +312,8 @@ public class WritableGridCoverageEntry {
      * but more than one time range could be returned if the image reader contains data at many times.
      *
      * @return The date range for the given metadata, or {@code null} if none.
+     * @throws IOException if an error occured while reading the image metadata.
+     * @throws CatalogException if a logical error occured.
      */
     public DateRange[] getDateRanges() throws IOException, CatalogException {
         return (metadata != null) ? metadata.getDateRanges() : null;
@@ -317,6 +323,8 @@ public class WritableGridCoverageEntry {
      * Returns the date origin found during the last invocation of {@link #getDateRanges}.
      * Returns {@code null} if the later method has not been invoked or didn't completed
      * successfully.
+     *
+     * @return The date origin, or {@code null} if none.
      */
     protected Date getTimeOrigin() {
         return (metadata != null) ? metadata.timeOrigin : null;
@@ -326,9 +334,22 @@ public class WritableGridCoverageEntry {
      * Returns the time units found during the last invocation of {@link #getDateRanges}.
      * Returns {@code null} if the later method has not been invoked or didn't completed
      * successfully.
+     *
+     * @return The time unit, or {@code null} if none.
      */
     protected Unit getTimeUnit() {
         return (metadata != null) ? metadata.timeUnit : null;
+    }
+
+    /**
+     * Returns the translation to apply on the grid before to apply the <cite>grid to CRS</cite>
+     * transform. This is usually the {@linkplain Tile#getLocation location of a tile} in tiled
+     * images.
+     *
+     * @return The grid offset.
+     */
+    public Point getGridOffset() {
+        return (tile != null) ? tile.getLocation() : new Point();
     }
 
     /**
@@ -336,14 +357,23 @@ public class WritableGridCoverageEntry {
      * transform maps always the pixel {@linkplain PixelOrientation#UPPER_LEFT upper left}
      * corner.
      *
+     * @param  translate
+     *          {@code true} if the transform should be {@linkplain AffineTransform#translate translated}
+     *          by the {@linkplain #getGridOffset grid offset}. This argument is typically {@code false}
+     *          if the entry will be inserted in a table with explicit (<var>dx</var>,<var>dy</var>)
+     *          translation terms like the {@code Tiles} table, or {@code true} otherwise.
      * @return The affine transform from grid to CRS, or {@code null} if it can't be computed.
+     * @throws IOException if an error occured while reading the image metadata.
+     * @throws CatalogException if a logical error occured.
      */
-    public AffineTransform getGridToCRS() throws IOException, CatalogException {
+    public AffineTransform getGridToCRS(final boolean translate)
+            throws IOException, CatalogException
+    {
         AffineTransform gridToCRS = tile.getGridToCRS();
-        if (gridToCRS != null) {
+        if (gridToCRS != null && translate) {
             // The entry to be recorded in the database has its origin to (0,0).
             // If the tile has an other origin, we need to translate it accordingly.
-            final Point origin = tile.getLocation();
+            final Point origin = getGridOffset();
             if (origin.x != 0 || origin.y != 0) {
                 gridToCRS = new AffineTransform(gridToCRS);
                 gridToCRS.translate(origin.x, origin.y);
@@ -358,6 +388,10 @@ public class WritableGridCoverageEntry {
 
     /**
      * Returns the horizontal CRS identifier, or {@code 0} if unknown.
+     *
+     * @return The horizontal CRS identifier, or {@code 0} if unknown.
+     * @throws IOException if an error occured while reading the image metadata.
+     * @throws CatalogException if a logical error occured.
      */
     public int getHorizontalSRID() throws IOException, CatalogException {
         int srid = 0;
@@ -371,6 +405,10 @@ public class WritableGridCoverageEntry {
 
     /**
      * Returns the vertical CRS identifier, or {@code 0} if unknown.
+     *
+     * @return The vertical CRS identifier, or {@code 0} if unknown.
+     * @throws IOException if an error occured while reading the image metadata.
+     * @throws CatalogException if a logical error occured.
      */
     public int getVerticalSRID() throws IOException, CatalogException {
         return (metadata != null) ? metadata.getVerticalSRID() : 0;
@@ -378,6 +416,10 @@ public class WritableGridCoverageEntry {
 
     /**
      * Returns the vertical coordinate values, or {@code null} if none.
+     *
+     * @return The vertical values, or {@code null} if unknown.
+     * @throws IOException if an error occured while reading the image metadata.
+     * @throws CatalogException if a logical error occured.
      */
     public double[] getVerticalValues() throws IOException, CatalogException {
         if (metadata == null) {

@@ -24,7 +24,7 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -148,6 +148,8 @@ public class Table {
      * Creates a new table using the specified query. The query given in argument should be some
      * subclass with {@link Query#addColumn addColumn} and {@link Query#addParameter addParameter}
      * methods invoked in its constructor.
+     *
+     * @param query The query to use for this table.
      */
     protected Table(final Query query) {
         this.query = query;
@@ -158,6 +160,8 @@ public class Table {
      * Creates a new table connected to the same {@linkplain #getDatabase database} and using
      * the same {@linkplain #query} than the specified table. Subclass constructors should
      * not modify the query, since it is shared.
+     *
+     * @param table The table to use as a template.
      */
     protected Table(final Table table) {
         query      = table.query;
@@ -167,8 +171,11 @@ public class Table {
     /**
      * Returns the database that contains this table. This is the database
      * specified at construction time.
+     *
+     * @return The database (never {@code null}).
+     * @throws IllegalStateException If this table is not connected to a database.
      */
-    public final Database getDatabase() {
+    public final Database getDatabase() throws IllegalStateException {
         if (query.database == null) {
             throw new IllegalStateException(Errors.format(ErrorKeys.NO_DATA_SOURCE));
         }
@@ -409,6 +416,8 @@ public class Table {
      *
      * This calendar should be used for storing dates as well. The caller must holds the lock
      * on {@code this} table.
+     *
+     * @return The calendar for date calculation in this table.
      */
     protected final Calendar getCalendar() {
         assert Thread.holdsLock(this);
@@ -438,6 +447,8 @@ public class Table {
 
     /**
      * Returns {@code true} if this table is modifiable.
+     *
+     * @return {@code true} if this table is modifiable.
      */
     protected final boolean isModifiable() {
         return !unmodifiable;

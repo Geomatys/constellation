@@ -533,6 +533,8 @@ COMMENT ON INDEX "GridCoverages_extent_index" IS
 --------------------------------------------------------------------------------------------------
 
 CREATE TABLE "Tiles" (
+  "dx" INTEGER NOT NULL DEFAULT 0,
+  "dy" INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY ("series", "filename", "index"),
   FOREIGN KEY ("extent") REFERENCES "GridGeometries" ON UPDATE CASCADE ON DELETE RESTRICT,
   FOREIGN KEY ("series") REFERENCES "Series" ON UPDATE CASCADE ON DELETE CASCADE
@@ -543,6 +545,9 @@ GRANT ALL ON TABLE "Tiles" TO geoadmin;
 GRANT SELECT ON TABLE "Tiles" TO PUBLIC;
 
 CREATE INDEX "Tiles_index" ON "Tiles" ("series", "endTime", "startTime");
+
+COMMENT ON COLUMN "Tiles"."dx" IS 'Amount of pixels to translate along the x axis before to apply the affine transform.';
+COMMENT ON COLUMN "Tiles"."dy" IS 'Amount of pixels to translate along the y axis before to apply the affine transform.';
 
 
 

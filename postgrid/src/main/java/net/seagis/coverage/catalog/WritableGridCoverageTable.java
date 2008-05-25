@@ -14,6 +14,7 @@
  */
 package net.seagis.coverage.catalog;
 
+import java.awt.Point;
 import java.sql.Types;
 import java.sql.Timestamp;
 import java.sql.SQLException;
@@ -92,7 +93,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Constructs a new {@code WritableGridCoverageTable}.
      *
-     * @param connection The connection to the database.
+     * @param database The connection to the database.
      */
     public WritableGridCoverageTable(final Database database) {
         super(database);
@@ -108,6 +109,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Constructs a new {@code WritableGridCoverageTable} with the same initial configuration
      * than the specified table.
+     *
+     * @param table The table to use as a template.
      */
     public WritableGridCoverageTable(final WritableGridCoverageTable table) {
         super(table);
@@ -117,6 +120,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Returns {@code true} if this table is allowed to insert new {@link Layer} rows.
      * The default value is {@code false}.
+     *
+     * @return {@code true} if this table is allowed to insert new layers.
      */
     public boolean canInsertNewLayers() {
         return canInsertNewLayers;
@@ -125,6 +130,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
     /**
      * Specifies whatever this table is allowed to insert new {@link Layer} rows.
      * The default value is {@code false}.
+     *
+     * @param allowed {@code true} for allowing this table to insert new layers.
      */
     public void setCanInsertNewLayers(final boolean allowed) {
         canInsertNewLayers = allowed;
@@ -175,6 +182,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * the given series is returned. Otherwise if the current layer contains exactly one
      * series, than this series is returned since there is no ambiguity. Otherwise an
      * exception is thrown.
+     *
+     * @return The series for the {@linkplain #getLayer current layer}.
+     * @throws CatalogException if no series can be inferred from the current layer.
      */
     @Override
     public synchronized Series getSeries() throws CatalogException {
@@ -188,8 +198,11 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * <p>
      * This method will typically not read the full image, but only the metadata required.
      *
-     * @param inputs The image reader.
+     * @param  reader The image reader.
      * @return The number of images inserted (should be 0 or 1).
+     * @throws CatalogException If a logical error occured.
+     * @throws SQLException If an error occured while querying the database.
+     * @throws IOException If an I/O operation was required and failed.
      */
     public int addEntry(final ImageReader reader) throws CatalogException, SQLException, IOException {
         return addEntries(Collections.singleton(reader), 0);
@@ -200,8 +213,11 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * {@linkplain Tile}, the entry will be added in the {@code "GridCoverages"} table, not in
      * the {@code "Tiles"} table. For the later case, use {@link #addTiles} instead.
      *
-     * @param inputs The image reader.
+     * @param  tile The tile to add.
      * @return The number of images inserted (should be 0 or 1).
+     * @throws CatalogException If a logical error occured.
+     * @throws SQLException If an error occured while querying the database.
+     * @throws IOException If an I/O operation was required and failed.
      */
     public int addEntry(final Tile tile) throws CatalogException, SQLException, IOException {
         return addEntries(Collections.singleton(tile), tile.getImageIndex());
@@ -211,9 +227,12 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * Adds entries inferred from the specified image inputs. The default implementation delegates
      * its work to {@link #addEntries(Iterator,int)}.
      *
-     * @param inputs The image inputs.
-     * @param imageIndex The index of the image to insert in the database.
+     * @param  inputs The image inputs.
+     * @param  imageIndex The index of the image to insert in the database.
      * @return The number of images inserted.
+     * @throws CatalogException If a logical error occured.
+     * @throws SQLException If an error occured while querying the database.
+     * @throws IOException If an I/O operation was required and failed.
      */
     public int addEntries(final Collection<?> inputs, final int imageIndex)
             throws CatalogException, SQLException, IOException
@@ -232,10 +251,13 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * <p>
      * This method will typically not read the full image, but only the metadata required.
      *
-     * @param inputs The image inputs. The iterator may recycle the same reader with different
-     *               {@linkplain ImageReader#getInput input} on each call to {@link Iterator#next}.
-     * @param imageIndex The index of the image to insert in the database.
+     * @param  inputs The image inputs. The iterator may recycle the same reader with different
+     *                {@linkplain ImageReader#getInput input} on each call to {@link Iterator#next}.
+     * @param  imageIndex The index of the image to insert in the database.
      * @return The number of images inserted.
+     * @throws CatalogException If a logical error occured.
+     * @throws SQLException If an error occured while querying the database.
+     * @throws IOException If an I/O operation was required and failed.
      */
     public synchronized int addEntries(final Iterator<?> inputs, final int imageIndex)
             throws CatalogException, SQLException, IOException
@@ -281,6 +303,9 @@ public class WritableGridCoverageTable extends GridCoverageTable {
         final int byStartTime = indexOf(query.startTime);
         final int byEndTime   = indexOf(query.endTime);
         final int byExtent    = indexOf(query.spatialExtent);
+        final int byDx = (query.dx != null) ? query.dx.indexOf(QueryType.INSERT) : 0;
+        final int byDy = (query.dy != null) ? query.dy.indexOf(QueryType.INSERT) : 0;
+        final boolean explicitTranslate = (byDx != 0 && byDy != 0);
         while (entries.hasNext()) {
             final WritableGridCoverageEntry entry;
             try {
@@ -346,7 +371,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             entry.parseMetadata(getDatabase());
             extent = gridTable.getIdentifier(
                     entry.getImageSize(),
-                    entry.getGridToCRS(),
+                    entry.getGridToCRS(!explicitTranslate),
                     entry.getHorizontalSRID(),
                     entry.getVerticalValues(),
                     entry.getVerticalSRID(),
@@ -358,6 +383,11 @@ public class WritableGridCoverageTable extends GridCoverageTable {
             statement.setString(bySeries, series.getName());
             statement.setString(byFilename, entry.filename);
             statement.setString(byExtent,   extent);
+            if (explicitTranslate) {
+                final Point translate = entry.getGridOffset();
+                statement.setInt(byDx, translate.x);
+                statement.setInt(byDy, translate.y);
+            }
             final DateRange[] dates = entry.getDateRanges();
             if (dates == null) {
                 statement.setInt (byIndex,     1);
@@ -382,12 +412,15 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * Adds the specified tiles in the {@code "Tiles"} table.
      *
      * @param  tiles The tiles to insert.
-     * @return The number of tiles inserted.
+     * @throws CatalogException If a logical error occured.
+     * @throws SQLException If an error occured while querying the database.
+     * @throws IOException If an I/O operation was required and failed.
      */
     public synchronized void addTiles(final Collection<Tile> tiles)
             throws CatalogException, SQLException, IOException
     {
         if (tilesTable == null) {
+            // Uses the special GridCoverageQuery constructor for insertions in "Tiles" table.
             tilesTable = new WritableGridCoverageTable(new GridCoverageQuery(getDatabase(), true)) {
                 @Override
                 protected WritableGridCoverageEntry createEntry(Tile tile) throws IOException {
@@ -412,7 +445,11 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      *
      * @param  includeSubdirectories If {@code true}, then sub-directories will be included
      *         in the scan. New series may be created if subdirectories are found.
+     * @param  policy The action to take for existing entries.
      * @return The number of images inserted.
+     * @throws CatalogException If a logical error occured.
+     * @throws SQLException If an error occured while querying the database.
+     * @throws IOException If an I/O operation was required and failed.
      */
     public synchronized int updateLayer(final boolean includeSubdirectories, final UpdatePolicy policy)
             throws CatalogException, SQLException, IOException
@@ -567,6 +604,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * with different metadata.
      *
      * @param  tile The tile to use for the entry.
+     * @return The entry to be inserted into the database.
      * @throws IOException if an error occured while reading the image.
      */
     protected WritableGridCoverageEntry createEntry(final Tile tile) throws IOException {
@@ -582,6 +620,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      *
      * @param  reader     The reader where to fetch metadata from.
      * @param  imageIndex The index of the image to be read.
+     * @return The entry to be inserted into the database.
      * @throws IOException if an error occured while reading the image.
      */
     protected WritableGridCoverageEntry createEntry(final ImageReader reader, final int imageIndex)

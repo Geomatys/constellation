@@ -418,6 +418,8 @@ public class Database {
 
     /**
      * Returns the locale for international message formatting.
+     *
+     * @return The locale for message formatting.
      */
     public Locale getLocale() {
         return Locale.getDefault();
@@ -427,6 +429,8 @@ public class Database {
      * Returns the timezone in which the dates in the database are expressed. This information
      * can be specified through the {@link ConfigurationKey#TIMEZONE} property. It is used in
      * order to convert the dates from the database timezone to UTC.
+     *
+     * @return The time zone for dates to appear in database records.
      *
      * @see Table#getCalendar
      */
@@ -458,6 +462,8 @@ public class Database {
     /**
      * Returns the coordinate reference system to be used for spatial queries in the database.
      * This is usually the CRS matching the one used in an indexed geometry column.
+     *
+     * @return The coordinate reference system for spatial queries.
      */
     public final CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return crsType.getCoordinateReferenceSystem();
@@ -505,6 +511,7 @@ public class Database {
     /**
      * Returns a table of the specified type.
      *
+     * @param  <T> The table class.
      * @param  type The table class.
      * @return An instance of a table of the specified type.
      * @throws NoSuchTableException if the specified type is unknown to this database.
@@ -621,6 +628,7 @@ public class Database {
      * Sets the default behaviour of writing access for the connection. If {@true}, the
      * connection only allows to read data. Otherwise writing permission is granted.
      *
+     * @param readOnly {@code true} if the database connection should be read-only.
      * @throws SQLException if a database access error occurs.
      */
     public void setReadOnly(final boolean readOnly) throws SQLException {
@@ -634,6 +642,8 @@ public class Database {
      * If non-null, SQL {@code INSERT}, {@code UPDATE} or {@code DELETE} statements will not be
      * executed but will rather be printed to this stream. This is used for testing and debugging
      * purpose only.
+     *
+     * @param out Where to print SQL statements that perform changes in database content.
      */
     public void setUpdateSimulator(final PrintWriter out) {
         updateSimulator = out;
@@ -653,6 +663,7 @@ public class Database {
      *
      * @param statement The SQL statement to format.
      * @param query     The SQL query used for preparing the statement.
+     * @return A string representation of the given statement.
      */
     public String format(final Statement statement, final String query) {
         if (isStatementFormatted) {
@@ -906,6 +917,10 @@ public class Database {
 
     /**
      * Tries the connection to the database.
+     *
+     * @param args Command-line arguments.
+     * @throws SQLException If an error occured while connecting to the database.
+     * @throws IOException If an error occured while reading the configuration file.
      */
     public static void main(String[] args) throws SQLException, IOException {
         final Arguments arguments = new Arguments(args);

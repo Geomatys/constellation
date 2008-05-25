@@ -36,8 +36,8 @@ import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.util.NumberRange;
 import org.geotools.util.RangeSet;
+import org.geotools.util.Utilities;
 import org.geotools.resources.Classes;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.image.io.mosaic.TileManager;
 
@@ -149,7 +149,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * Constructs a new {@code GridCoverageTable}.
      *
-     * @param connection The connection to the database.
+     * @param database The connection to the database.
      */
     public GridCoverageTable(final Database database) {
         this(new GridCoverageQuery(database));
@@ -169,6 +169,8 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * Constructs a new {@code GridCoverageTable} with the same initial configuration
      * than the specified table.
+     *
+     * @param table The table to use as a template.
      */
     public GridCoverageTable(final GridCoverageTable table) {
         super(table);
@@ -186,6 +188,9 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * Returns the series for the current layer. The default implementation expects a layer
      * with only one series. The {@link WritableGridCoverageTable} will override this method
      * with a more appropriate value.
+     *
+     * @return The series for the {@linkplain #getLayer current layer}.
+     * @throws CatalogException if no series can be inferred from the current layer.
      */
     synchronized Series getSeries() throws CatalogException {
         final Iterator<Series> iterator = getNonNullLayer().getSeries().iterator();
@@ -200,6 +205,8 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
 
     /**
      * Returns the layer for the coverages in this table, or {@code null} if not yet set.
+     *
+     * @return The layer current, or {@code null} if none.
      */
     public Layer getLayer() {
         return layer;
@@ -227,6 +234,8 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
 
     /**
      * Sets the layer for the coverages in this table.
+     *
+     * @param layer The new layer.
      */
     public synchronized void setLayer(final Layer layer) {
         /*
@@ -319,6 +328,8 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
     /**
      * Returns the operation to apply on rasters. It may be for example a gradient magnitude.
      * If no operation are applied, then this method returns {@code null}.
+     *
+     * @return The current operation, or {@code null} if none.
      */
     public Operation getOperation() {
         return operation;
@@ -326,6 +337,8 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
 
     /**
      * Sets the operation to apply on rasters, or {@code null} if none.
+     *
+     * @param operation The new operation, or {@code null} if none.
      */
     public synchronized void setOperation(final Operation operation) {
         if (!Utilities.equals(operation, this.operation)) {
@@ -632,10 +645,6 @@ loop:   for (final CoverageReference newReference : entries) {
             assert getNonNullLayer().getSeries().contains(series) : series;
             statement.setString(index, series.getName());
         }
-        index = query.byVisibility.indexOf(type);
-        if (index != 0) {
-            statement.setBoolean(index, true);
-        }
     }
 
     /**
@@ -644,16 +653,16 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws CatalogException if an illegal record was found.
      * @throws SQLException if an error occured while reading the database.
      */
-    protected CoverageReference createEntry(final ResultSet result) throws CatalogException, SQLException {
+    protected CoverageReference createEntry(final ResultSet results) throws CatalogException, SQLException {
         assert Thread.holdsLock(this);
         final Calendar calendar = getCalendar();
         final GridCoverageQuery query = (GridCoverageQuery) super.query;
-        final String    seriesID  = result.getString   (indexOf(query.series));
-        final String    filename  = result.getString   (indexOf(query.filename));
-        final Timestamp startTime = result.getTimestamp(indexOf(query.startTime), calendar);
-        final Timestamp endTime   = result.getTimestamp(indexOf(query.endTime),   calendar);
-        final short     index     = result.getShort    (indexOf(query.index)); // We expect 0 if null.
-        final String    extent    = result.getString   (indexOf(query.spatialExtent));
+        final String    seriesID  = results.getString   (indexOf(query.series));
+        final String    filename  = results.getString   (indexOf(query.filename));
+        final Timestamp startTime = results.getTimestamp(indexOf(query.startTime), calendar);
+        final Timestamp endTime   = results.getTimestamp(indexOf(query.endTime),   calendar);
+        final short     index     = results.getShort    (indexOf(query.index)); // We expect 0 if null.
+        final String    extent    = results.getString   (indexOf(query.spatialExtent));
         /*
          * Gets the SeriesEntry in which this coverage is declared. The entry should be available
          * from the layer HashMap. If not, we will query the SeriesTable as a fallback, but there

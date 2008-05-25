@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Calendar;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -102,38 +103,63 @@ final class TileTable extends Table {
         statement.setTimestamp(indexOf(query.byStartTime), startTime, calendar);
         statement.setTimestamp(indexOf(query.byEndTime),   endTime,   calendar);
         statement.setInt      (indexOf(query.byHorizontalSRID), srid);
-        statement.setBoolean  (indexOf(query.byVisibility), true);
         final int seriesIndex   = indexOf(query.series);
         final int filenameIndex = indexOf(query.filename);
         final int indexIndex    = indexOf(query.index);
         final int extentIndex   = indexOf(query.spatialExtent);
+        final int dxIndex       = indexOf(query.dx);
+        final int dyIndex       = indexOf(query.dy);
         final List<Tile> tiles  = new ArrayList<Tile>();
         final ResultSet results = statement.executeQuery();
-        ImageReaderSpi provider = null;
-        Series       lastSeries = null;
+        Series            series       = null;
+        ImageReaderSpi    provider     = null;
+        GridGeometryEntry geometry     = null;
+        String            lastSeriesID = null;
+        String            lastExtentID = null;
         while (results.next()) {
             final String seriesID = results.getString(seriesIndex);
             final String filename = results.getString(filenameIndex);
             final int       index = results.getInt   (indexIndex);
             final String   extent = results.getString(extentIndex);
-            final Series   series = layer.getSeries(seriesID);
+            final int          dx = results.getInt   (dxIndex); // '0' if null, which is fine.
+            final int          dy = results.getInt   (dyIndex); // '0' if null, which is fine.
+            /*
+             * Gets the series, which usually never change for the whole mosaic (but this is not
+             * mandatory - the real thing that can't change is the layer).  The series is needed
+             * in order to build the absolute pathname from the relative one.
+             */
+            if (!seriesID.equals(lastSeriesID)) {
+                // Computes only if the series changed. Usually it doesn't change.
+                series       = layer.getSeries(seriesID);
+                provider     = getImageReaderSpi(series.getFormat().getImageFormat());
+                lastSeriesID = seriesID;
+            }
             Object input = series.file(filename);
             if (!((File) input).isAbsolute()) try {
                 input = series.uri(filename);
             } catch (URISyntaxException e) {
                 throw new IIOException(e.getLocalizedMessage(), e);
             }
-            if (!series.equals(lastSeries)) {
-                // Computes only if the series changed. Usually it doesn't change.
-                provider = getImageReaderSpi(series.getFormat().getImageFormat());
-                lastSeries = series;
+            /*
+             * Gets the geometry, which usually don't change often.  The same geometry can be shared
+             * by all tiles at the same level, given that the only change is the (dx,dy) translation
+             * term defined explicitly in the "Tiles" table. Doing so avoid the creation a thousands
+             * of new "GridGeometries" entries.
+             */
+            if (!extent.equals(lastExtentID)) {
+                if (gridGeometryTable == null) {
+                    gridGeometryTable = getDatabase().getTable(GridGeometryTable.class);
+                }
+                geometry = gridGeometryTable.getEntry(extent);
+                lastExtentID = extent;
             }
-            if (gridGeometryTable == null) {
-                gridGeometryTable = getDatabase().getTable(GridGeometryTable.class);
+            AffineTransform gridToCRS = geometry.gridToCRS;
+            if (dx != 0 || dy != 0) {
+                gridToCRS = new AffineTransform(gridToCRS);
+                gridToCRS.translate(dx, dy);
             }
-            final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
             final Rectangle bounds = geometry.getBounds();
-            final Tile tile = new Tile(provider, input, (index != 0) ? index-1 : 0, bounds, geometry.gridToCRS);
+            final Tile tile = new Tile(provider, input, (index != 0) ? index-1 : 0, bounds, gridToCRS);
             tiles.add(tile);
         }
         results.close();

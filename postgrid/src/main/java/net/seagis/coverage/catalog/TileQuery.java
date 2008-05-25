@@ -33,12 +33,12 @@ final class TileQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column series, filename, index, spatialExtent;
+    protected final Column series, filename, index, spatialExtent, dx, dy;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byLayer, byStartTime, byEndTime, byHorizontalSRID, byVisibility;
+    protected final Parameter byLayer, byStartTime, byEndTime, byHorizontalSRID;
 
     /**
      * Creates a new query for the specified database.
@@ -47,7 +47,7 @@ final class TileQuery extends Query {
      */
     public TileQuery(final Database database) {
         super(database, "Tiles");
-        final Column layer, startTime, endTime, horizontalSRID, visibility;
+        final Column layer, startTime, endTime, horizontalSRID;
         final QueryType[] none = {    };
         final QueryType[] list = {LIST};
         layer          = addForeignerColumn("Series",         "layer",          none);
@@ -57,14 +57,14 @@ final class TileQuery extends Query {
         startTime      = addColumn         (                  "startTime",      none);
         endTime        = addColumn         (                  "endTime",        none);
         spatialExtent  = addColumn         (                  "extent",         list);
+        dx             = addColumn         (                  "dx", 0,          list);
+        dy             = addColumn         (                  "dy", 0,          list);
         horizontalSRID = addForeignerColumn("GridGeometries", "horizontalSRID", none);
-        visibility     = addForeignerColumn("Series",         "visible", true,  none);
 
         byLayer          = addParameter(layer,          list);
         byStartTime      = addParameter(startTime,      list);
         byEndTime        = addParameter(endTime,        list);
         byHorizontalSRID = addParameter(horizontalSRID, list);
-        byVisibility     = addParameter(visibility,     list);
         /*
          * Following conditions are the opposite of GridCoverageQuery because we wants
          * every tiles included in the range of the coverage, not tiles intercepting.
