@@ -336,6 +336,13 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(180, image.getHeight());
 
         worker.setService("WMS", "1.1.1");
+        worker.setBoundingBox("-28.5375, 26.5875, -6.0375, 42.3375");
+        worker.setDimension("600", "420", null);
+        file = worker.getImageFile();
+        image = ImageIO.read(file);
+        assertEquals(600, image.getWidth());
+        assertEquals(420, image.getHeight());
+
         worker.setCoordinateReferenceSystem("EPSG:3395");
         worker.setBoundingBox("3085245.489437, 696668.336325, 8094622.574437, 4213184.700629");
         worker.setDimension("604", "424", null);

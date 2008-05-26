@@ -30,9 +30,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
 
+import org.geotools.util.Utilities;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.referencing.AbstractIdentifiedObject;

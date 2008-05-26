@@ -5,4 +5,4 @@
 # format. The CRS objects are designed by their EPSG code.
 # ---------------------------------------------------------------------------
 
-`dirname $0`/CRS -colors -authority=EPSG $*
+`dirname $0`/CRS -colors -authority=EPSG "$@"
