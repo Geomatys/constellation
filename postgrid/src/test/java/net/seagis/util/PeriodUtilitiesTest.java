@@ -52,6 +52,7 @@ public class PeriodUtilitiesTest {
         PeriodUtilities instance = new PeriodUtilities(df);
         SortedSet<Date> dates;
         
+        
         /**
          * Test 1: isolated Date
          */
@@ -190,7 +191,25 @@ public class PeriodUtilitiesTest {
         SortedSet<Date> dates;
         
         /**
-         * Test 1: one week period
+         * Test 1: one hour period
+         */
+        dates    = new TreeSet<Date>();
+        dates.add(df.parse("2004-01-28T00:00:00Z"));
+        dates.add(df.parse("2004-01-28T01:00:00Z"));
+        dates.add(df.parse("2004-01-28T02:00:00Z"));
+        dates.add(df.parse("2004-01-28T03:00:00Z"));
+        dates.add(df.parse("2004-01-28T04:00:00Z"));
+        dates.add(df.parse("2004-01-28T05:00:00Z"));
+        dates.add(df.parse("2004-01-28T06:00:00Z"));
+        dates.add(df.parse("2004-01-28T07:00:00Z"));
+        long gap =3600000L;
+        
+        String expResult = "2004-01-28T00:00:00Z/2004-01-28T07:00:00Z/PT1H";
+        String result = instance.getPeriodDescription(dates, gap);
+        assertEquals(expResult, result);
+        
+        /**
+         * Test 2: one week period
          */
         dates    = new TreeSet<Date>();
         dates.add(df.parse("2004-01-28T00:00:00Z"));
@@ -201,14 +220,14 @@ public class PeriodUtilitiesTest {
         dates.add(df.parse("2004-03-03T00:00:00Z"));
         dates.add(df.parse("2004-03-10T00:00:00Z"));
         dates.add(df.parse("2004-03-17T00:00:00Z"));
-        long gap = 604800000L;
+        gap = 604800000L;
         
-        String expResult = "2004-01-28T00:00:00Z/2004-03-17T00:00:00Z/P1W";
-        String result = instance.getPeriodDescription(dates, gap);
+        expResult = "2004-01-28T00:00:00Z/2004-03-17T00:00:00Z/P1W";
+        result = instance.getPeriodDescription(dates, gap);
         assertEquals(expResult, result);
         
         /**
-         * Test 2: one week and one day period
+         * Test 3: one week and one day period
          */
         dates    = new TreeSet<Date>();
                

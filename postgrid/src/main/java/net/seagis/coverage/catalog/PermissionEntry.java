@@ -62,13 +62,11 @@ final class PermissionEntry extends Entry {
     /**
      * Returns {@code true} if the given user is allowed to obtain data through the given service.
      */
-    public boolean isAccessibleService(final Service service, final String user) {
-        if (user.equalsIgnoreCase(getName())) {
+    public boolean isAccessibleService(final Service service) {
             switch (service) {
                 case WMS: return WMS;
                 case WCS: return WCS;
             }
-        }
-        return false;
+            return false;
     }
 }

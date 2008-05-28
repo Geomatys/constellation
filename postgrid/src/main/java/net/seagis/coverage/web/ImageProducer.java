@@ -440,7 +440,7 @@ public abstract class ImageProducer {
             } catch (SQLException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             }
-            if (layer.getSeries().isEmpty()) {
+            if (layer.getSeries().isEmpty() || !layer.isQueryable(version.getService())) {
                 throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
                         LAYER_NOT_DEFINED, version);
             }
@@ -458,17 +458,22 @@ public abstract class ImageProducer {
     public List<Layer> getLayers(final Collection<String> layerNames) throws WebServiceException {
         final LayerTable table = getLayerTable(true);
         final List<Layer> layers = new ArrayList<Layer>(layerNames.size());
-        for (final String layerName: layerNames) {
+        for (final String layerName : layerNames) {
             final Layer layer;
-        try {
-            layer = table.getEntry(layerName);
-        } catch (NoSuchRecordException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
-        } catch (CatalogException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-        } catch (SQLException exception) {
-            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
-        }
+            try {
+                layer = table.getEntry(layerName);
+            } catch (NoSuchRecordException exception) {
+                throw new WMSWebServiceException(exception, LAYER_NOT_DEFINED, version);
+            } catch (CatalogException exception) {
+                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            } catch (SQLException exception) {
+                throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+            }
+
+            if (layer.getSeries().isEmpty() || !layer.isQueryable(version.getService())) {
+                throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
+                        LAYER_NOT_DEFINED, version);
+            }
             layers.add(layer);
         }
         return layers;
@@ -504,7 +509,7 @@ public abstract class ImageProducer {
         boolean change = false;
         try {
             final Layer entry = getLayerTable(true).getEntry(layer);
-            if (entry.getSeries().isEmpty()) {
+            if (entry.getSeries().isEmpty() || !entry.isQueryable(version.getService())) {
                 throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
                         LAYER_NOT_DEFINED, version);
             }
@@ -516,6 +521,7 @@ public abstract class ImageProducer {
                     change   |= table.setGeographicBoundingBox(request.bbox);
                     change   |= table.setPreferredResolution(request.resolution);
                     candidate = table.getEntry(layer);
+                    
                     layers.put(request, candidate);
                 }
             }

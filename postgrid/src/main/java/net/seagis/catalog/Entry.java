@@ -17,10 +17,7 @@ package net.seagis.catalog;
 
 import java.util.UUID;
 import java.io.Serializable;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 import org.geotools.resources.Utilities;
 
 
@@ -32,8 +29,7 @@ import org.geotools.resources.Utilities;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Entry")
+@XmlTransient
 public class Entry implements Element, Serializable {
     /**
      * For cross-platform compatibility.

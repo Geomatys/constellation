@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 
 import org.geotools.resources.Utilities;
 import net.seagis.catalog.Entry;
+import net.seagis.coverage.web.Service;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
@@ -70,8 +71,15 @@ final class SeriesEntry extends Entry implements Series {
 
     /**
      * {@code true} if this series should be included in {@link Layer#getSeries}.
+     * use permission instead.
      */
+    @Deprecated 
     final boolean visible;
+    
+    /**
+     * The restrictions to be applied on coverage data.
+     */
+    final PermissionEntry permission;
 
     /**
      * Creates a new series entry.
@@ -87,13 +95,14 @@ final class SeriesEntry extends Entry implements Series {
      */
     protected SeriesEntry(final String name, final Layer layer, final String root,
                           final String pathname, final String extension, final Format format,
-                          final boolean visible, final String remarks)
+                          final PermissionEntry permission, final String remarks)
 {
         super(name, remarks);
-        this.layer     = layer;
-        this.extension = extension;
-        this.format    = format;
-        this.visible   = visible;
+        this.layer      = layer;
+        this.extension  = extension;
+        this.format     = format;
+        this.visible    = true;
+        this.permission = permission;
         /*
          * Checks if the pathname contains a URL host.  If it does, then this URL will have
          * precedence over the root parameter. The following section make this check, which
@@ -216,6 +225,15 @@ final class SeriesEntry extends Entry implements Series {
             buffer.append('.').append(extension);
         }
         return new URI(protocol, host, buffer.toString(), null);
+    }
+    
+    /**
+     * Return true if the Series is visible par the specified service.
+     * 
+     * @param service The web service requesting the series (WMS or WCS)
+     */
+    public boolean isQueryable(Service service) {
+        return permission.isAccessibleService(service);
     }
 
     /**

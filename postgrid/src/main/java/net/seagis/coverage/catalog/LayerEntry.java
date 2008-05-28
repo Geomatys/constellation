@@ -46,6 +46,7 @@ import net.seagis.catalog.Entry;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.ServerException;
 import net.seagis.coverage.model.Model;
+import net.seagis.coverage.web.Service;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
 
@@ -499,6 +500,17 @@ final class LayerEntry extends Entry implements Layer {
         this.domain = domain;
     }
 
+    /**
+     * Return true if all the Series are queryable for the specified service.
+     */
+    public boolean isQueryable(Service service) {
+        for (Series s: series) {
+            if (!s.isQueryable(service))
+                return false;
+        }
+        return true;
+    }
+    
     /**
      * Compares this layer with the specified object for equality.
      */

@@ -30,6 +30,7 @@ import org.geotools.util.DateRange;
 import net.seagis.catalog.Element;
 import net.seagis.catalog.CatalogException;
 import net.seagis.coverage.model.Model;
+import net.seagis.coverage.web.Service;
 
 
 /**
@@ -213,4 +214,11 @@ public interface Layer extends Element {
      * @throws CatalogException if an error occured while querying the catalog.
      */
     Model getModel() throws CatalogException;
+    
+    /**
+     * Return true if all the series are queryable by the specified service.
+     * 
+     * @param service The web service trying to request this layer.(WMS or WCS)
+     */
+    boolean isQueryable(Service service);
 }

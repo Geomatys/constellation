@@ -18,6 +18,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.seagis.catalog.Element;
+import net.seagis.coverage.web.Service;
 
 
 /**
@@ -79,4 +80,11 @@ public interface Series extends Element {
      *         provided in the database.
      */
     URI uri(String filename) throws URISyntaxException;
+    
+    /**
+     * Returns true if the Series is queryable by the specified service
+     * 
+     * @param service The web service trying to request this series.
+     */
+    boolean isQueryable(Service service);
 }

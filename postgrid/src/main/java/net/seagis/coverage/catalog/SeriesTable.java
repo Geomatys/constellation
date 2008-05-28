@@ -175,12 +175,13 @@ final class SeriesTable extends SingletonTable<Series> {
         final Format format = formats.getEntry(formatID);
         if (permissions == null) {
             permissions = getDatabase().getTable(PermissionTable.class);
+            permissions =  new PermissionTable(permissions);
+            permissions.setUser(getProperty(ConfigurationKey.PERMISSION));
         }
-        final String user = getProperty(ConfigurationKey.PERMISSION);
-        final PermissionEntry userCredential = permissions.getEntry(user);
-        final boolean visible = userCredential.isAccessibleService(service, permission);
+        
+        final PermissionEntry userCredential = permissions.getEntry(permission);
         return new SeriesEntry(name, layer, rootDirectory != null ? rootDirectory : rootURL,
-                               pathname, extension, format, visible, null);
+                               pathname, extension, format, userCredential, null);
     }
 
     /**

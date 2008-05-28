@@ -14,11 +14,14 @@
  */
 package net.seagis.coverage.catalog;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
+import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -31,10 +34,22 @@ import net.seagis.catalog.SingletonTable;
  */
 final class PermissionTable extends SingletonTable<PermissionEntry> {
     /**
+     * identifier secondary of the table.
+     */
+    private String user;
+    
+    /**
      * Creates a new table for the given database.
      */
     public PermissionTable(final Database database) {
         this(new PermissionQuery(database));
+    }
+    
+     /**
+     * Creates a shared table.
+     */
+    public PermissionTable(final PermissionTable table) {
+        super(table);
     }
 
     /**
@@ -45,6 +60,30 @@ final class PermissionTable extends SingletonTable<PermissionEntry> {
         setIdentifierParameters(query.byName, null);
     }
 
+    public String getUser() {
+        return user;
+    }
+    
+    public void setUser(String user) {
+        if (!Utilities.equals(this.user, user)) {
+            this.user = user;
+            fireStateChanged("user");
+        }
+        
+    }
+    
+    /**
+     * Specifie les parametres a utiliser dans la requetes de type "type".
+     */
+    @Override
+    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
+        super.configure(type, statement);
+        final PermissionQuery query = (PermissionQuery) super.query;
+        if (! type.equals(QueryType.INSERT))
+            statement.setString(indexOf(query.byUser), user);
+        
+    }
+    
     /**
      * Creates a new entry for the current row in the given result set.
      */

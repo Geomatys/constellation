@@ -39,7 +39,7 @@ final class PermissionQuery extends Query {
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName;
+    protected final Parameter byName, byUser;
 
     /**
      * Creates a new query for the specified database.
@@ -55,5 +55,6 @@ final class PermissionQuery extends Query {
         WCS         = addColumn("WCS",     Boolean.TRUE, SL);
         description = addColumn("description",           SL);
         byName      = addParameter(name, SL);
+        byUser      = addParameter(user, SL);
     }
 }
