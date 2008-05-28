@@ -57,7 +57,7 @@ final class TimeParser {
     /**
      * The date format for each pattern.
      */
-    private static final Map<TimeParser,DateFormat> PARSERS = new HashMap<TimeParser,DateFormat>(12);
+    private static final Map<TimeParser,DateFormat> PARSERS = new HashMap<TimeParser,DateFormat>(16);
     static {
         final TimeZone timezone = TimeZone.getTimeZone("UTC");
         for (int i=0; i<PATTERNS.length; i++) {
@@ -85,22 +85,30 @@ final class TimeParser {
     private final int numTimeFields;
 
     /**
+     * {@code true} if there is a time zone.
+     */
+    private final boolean hasTimeZone;
+
+    /**
      * Creates the parser for the given pattern (which may be a formatted date).
      */
     private TimeParser(final String pattern) {
         final int length = pattern.length();
         int numDateFields = 1;
         int numTimeFields = 0;
+        boolean hasTimeZone = false;
         for (int i=0; i<length; i++) {
             switch (pattern.charAt(i)) {
-                case '-': if (numTimeFields == 0) numDateFields++; break;
-                case 'T': if (numTimeFields == 0) numTimeFields=1; break;
-                case ':': if (numTimeFields != 0) numTimeFields++; break;
-                case '.': if (numTimeFields >= 3) numTimeFields++; break;
+                case '-': if (numTimeFields == 0) numDateFields++;  break;
+                case 'T': if (numTimeFields == 0) numTimeFields=1;  break;
+                case ':': if (numTimeFields != 0) numTimeFields++;  break;
+                case '.': if (numTimeFields >= 3) numTimeFields++;  break;
+                case 'Z': if (numTimeFields != 0) hasTimeZone=true; break;
             }
         }
         this.numDateFields = numDateFields;
         this.numTimeFields = numTimeFields;
+        this.hasTimeZone   = hasTimeZone;
     }
 
     /**
@@ -267,7 +275,8 @@ final class TimeParser {
         if (other instanceof TimeParser) {
             final TimeParser that = (TimeParser) other;
             return this.numDateFields == that.numDateFields &&
-                   this.numTimeFields == that.numTimeFields;
+                   this.numTimeFields == that.numTimeFields &&
+                   this.hasTimeZone   == that.hasTimeZone;
         }
         return false;
     }
@@ -277,7 +286,8 @@ final class TimeParser {
      */
     @Override
     public int hashCode() {
-        return numDateFields + 37*numTimeFields;
+        return numDateFields + 37*numTimeFields +
+                (hasTimeZone ? 31 : 37);
     }
 
     /**
