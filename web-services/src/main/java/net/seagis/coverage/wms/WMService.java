@@ -472,7 +472,7 @@ public class WMService extends WebService {
         List<Layer> layers = new ArrayList<Layer>();
         for (net.seagis.coverage.catalog.Layer inputLayer: layerList) {
             try {
-                if (inputLayer.isQueryable(Service.WMS)) {
+                if (!inputLayer.isQueryable(Service.WMS)) {
                     logger.info("layer" + inputLayer.getName() + " not queryable by WMS");
                     continue;
                 } 
