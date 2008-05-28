@@ -32,7 +32,7 @@ public class SeriesEntryTest extends TestCase {
      * Returns a dummy series for the given root and path.
      */
     private static SeriesEntry series(final String root, final String path) {
-        return new SeriesEntry("Some entry", null, root, path, "png", null, true, null);
+        return new SeriesEntry("Some entry", null, root, path, "png", null, null, null);
     }
 
     /**
