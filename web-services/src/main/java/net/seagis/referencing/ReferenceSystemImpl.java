@@ -22,6 +22,7 @@ package net.seagis.referencing;
 
 import java.util.Collection;
 import java.util.Set;
+import javax.xml.bind.annotation.XmlType;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.ReferenceSystem;
@@ -33,6 +34,7 @@ import org.opengis.util.InternationalString;
  *
  * @author legal
  */
+@XmlType(name = "RS_ReferenceSystem")
 public class ReferenceSystemImpl implements ReferenceSystem {
                                 
     private ReferenceIdentifier referenceSystemIdentifier;

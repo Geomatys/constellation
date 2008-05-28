@@ -115,6 +115,9 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://www.isotc211.org/2005/gco".equals(namespaceUri) )
             prefix = "gco";
         
+        else if( "http://www.isotc211.org/2005/srv".equals(namespaceUri) )
+            prefix = "srv";
+        
         //System.out.println("namespace received:" + namespaceUri + "prefix mapped:" + prefix);
         return prefix;
     }

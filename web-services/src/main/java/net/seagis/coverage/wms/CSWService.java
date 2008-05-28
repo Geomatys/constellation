@@ -114,149 +114,155 @@ public class CSWService extends WebService {
     public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
         try {
             
-            worker.setServiceURL(getServiceURL());
-            writeParameters();
-            String request = "";
-            if (objectRequest == null)
-                request = (String) getParameter("REQUEST", true);
+            if (worker != null) {
             
-            if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
-                
-                GetCapabilities gc = (GetCapabilities)objectRequest;
-                
-                if (gc == null) {
-                     /*
-                      * if the parameters have been send by GET or POST kvp,
-                      * we build a request object with this parameter.
-                      */
-                    gc = createNewGetCapabilitiesRequest();
-                }
-                try {
-                    worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
-                } catch(IOException e)   {
-                    throw new OWSWebServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                      INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
+                worker.setServiceURL(getServiceURL());
+                writeParameters();
+                String request = "";
+                if (objectRequest == null)
+                    request = (String) getParameter("REQUEST", true);
             
-                }
+                if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getCapabilities(gc), sw);
+                    GetCapabilities gc = (GetCapabilities)objectRequest;
+                
+                    if (gc == null) {
+                         /*
+                          * if the parameters have been send by GET or POST kvp,
+                          * we build a request object with this parameter.
+                          */
+                        gc = createNewGetCapabilitiesRequest();
+                    }
+                    try {
+                        worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+                    } catch(IOException e)   {
+                        throw new OWSWebServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
+                                                         INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
+            
+                    }
+                
+                    StringWriter sw = new StringWriter();
+                    marshaller.marshal(worker.getCapabilities(gc), sw);
         
-                return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), "text/xml").build();
                     
-            } else if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsType)) {
+                } else if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsType)) {
                 
-                GetRecordsType gr = (GetRecordsType)objectRequest;
+                    GetRecordsType gr = (GetRecordsType)objectRequest;
                 
-                if (gr == null) {
-                    /*
-                     * if the parameters have been send by GET or POST kvp,
-                     * we build a request object with this parameter.
-                     */
-                    gr = createNewGetRecordsRequest();
-                }
+                    if (gr == null) {
+                        /*
+                        * if the parameters have been send by GET or POST kvp,
+                        * we build a request object with this parameter.
+                        */
+                        gr = createNewGetRecordsRequest();
+                    }
                 
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getRecords(gr), sw);
+                    StringWriter sw = new StringWriter();
+                    marshaller.marshal(worker.getRecords(gr), sw);
         
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-            } if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordByIdType)) {
+                } if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordByIdType)) {
                 
-                GetRecordByIdType grbi = (GetRecordByIdType)objectRequest;
+                    GetRecordByIdType grbi = (GetRecordByIdType)objectRequest;
                 
-                if (grbi == null) {
-                    /*
-                     * if the parameters have been send by GET or POST kvp,
-                     * we build a request object with this parameter.
-                     */
-                    grbi = createNewGetRecordByIdRequest();
-                }
+                    if (grbi == null) {
+                        /*
+                        * if the parameters have been send by GET or POST kvp,
+                        * we build a request object with this parameter.
+                        */
+                        grbi = createNewGetRecordByIdRequest();
+                    }
                 
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getRecordById(grbi), sw);
+                    StringWriter sw = new StringWriter();
+                    marshaller.marshal(worker.getRecordById(grbi), sw);
         
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
                 
-            } if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecordType)) {
+                } if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecordType)) {
                 
-                DescribeRecordType dr = (DescribeRecordType)objectRequest;
+                    DescribeRecordType dr = (DescribeRecordType)objectRequest;
                 
-                if (dr == null) {
-                    /*
-                     * if the parameters have been send by GET or POST kvp,
-                     * we build a request object with this parameter.
-                     */
-                    dr = createNewDescribeRecordRequest();
-                }
+                    if (dr == null) {
+                        /*
+                         * if the parameters have been send by GET or POST kvp,
+                         * we build a request object with this parameter.
+                         */
+                        dr = createNewDescribeRecordRequest();
+                    }
                 
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.describeRecord(dr), sw);
+                    StringWriter sw = new StringWriter();
+                    marshaller.marshal(worker.describeRecord(dr), sw);
         
-                return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), "text/xml").build();
                 
-            } if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomainType)) {
+                } if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomainType)) {
                 
-                GetDomainType gd = (GetDomainType)objectRequest;
+                    GetDomainType gd = (GetDomainType)objectRequest;
                 
-                if (gd == null) {
-                    /*
-                     * if the parameters have been send by GET or POST kvp,
-                     * we build a request object with this parameter.
-                     */
-                    gd = createNewGetDomainRequest();
-                }
-                try {
-                    worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
-                } catch(IOException e)   {
-                    throw new OWSWebServiceException("IO exception while getting Services Metadata:" + e.getMessage(),
-                      INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
+                    if (gd == null) {
+                        /*
+                        * if the parameters have been send by GET or POST kvp,
+                        * we build a request object with this parameter.
+                        */
+                        gd = createNewGetDomainRequest();
+                    }
+                    try {
+                        worker.setStaticCapabilities((Capabilities)getCapabilitiesObject());
+                    } catch(IOException e)   {
+                        throw new OWSWebServiceException("IO exception while getting Services Metadata:" + e.getMessage(),
+                                                         INVALID_PARAMETER_VALUE, null ,getCurrentVersion());
             
-                }
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getDomain(gd), sw);
+                    }
+                    StringWriter sw = new StringWriter();
+                    marshaller.marshal(worker.getDomain(gd), sw);
         
-                return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), "text/xml").build();
                 
-            } if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof TransactionType)) {
+                } if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof TransactionType)) {
                 
-                TransactionType t = (TransactionType)objectRequest;
+                    TransactionType t = (TransactionType)objectRequest;
                 
-                if (t == null) {
-                     throw new OWSWebServiceException("The Operation transaction is not available in KVP",
-                                                      OPERATION_NOT_SUPPORTED, "transaction", getCurrentVersion());
-                }
+                    if (t == null) {
+                         throw new OWSWebServiceException("The Operation transaction is not available in KVP",
+                                                       OPERATION_NOT_SUPPORTED, "transaction", getCurrentVersion());
+                    }
                 
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.transaction(t), sw);
+                    StringWriter sw = new StringWriter();
+                    marshaller.marshal(worker.transaction(t), sw);
         
-                return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), "text/xml").build();
                 
-            } else if (request.equalsIgnoreCase("Harvest") || (objectRequest instanceof HarvestType)) {
+                } else if (request.equalsIgnoreCase("Harvest") || (objectRequest instanceof HarvestType)) {
                 
-                HarvestType h = (HarvestType)objectRequest;
+                    HarvestType h = (HarvestType)objectRequest;
                 
-                if (h == null) {
-                    /*
-                     * if the parameters have been send by GET or POST kvp,
-                     * we build a request object with this parameter.
-                     */
-                    h = createNewHarvestRequest();
-                }
+                    if (h == null) {
+                        /*
+                         * if the parameters have been send by GET or POST kvp,
+                         * we build a request object with this parameter.
+                         */
+                        h = createNewHarvestRequest();
+                    }
                 
-                StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.harvest(h), sw);
+                    StringWriter sw = new StringWriter();
+                    marshaller.marshal(worker.harvest(h), sw);
         
-                return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), "text/xml").build();
                 
+                } else {
+                    if (request.equals("") && objectRequest != null)
+                        request = objectRequest.getClass().getName();
+                    else if (request.equals("") && objectRequest == null)
+                        request = "undefined request";
+                
+                    throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
+                                                     INVALID_PARAMETER_VALUE, "request", getCurrentVersion());
+                }
             } else {
-                if (request.equals("") && objectRequest != null)
-                    request = objectRequest.getClass().getName();
-                else if (request.equals("") && objectRequest == null)
-                    request = "undefined request";
-                
-                throw new OWSWebServiceException("The operation " + request + " is not supported by the service",
-                                                 INVALID_PARAMETER_VALUE, "request", getCurrentVersion());
+                throw new OWSWebServiceException("The CSW service is not running",
+                                                     NO_APPLICABLE_CODE, null, getCurrentVersion());
             }
         
         } catch (WebServiceException ex) {

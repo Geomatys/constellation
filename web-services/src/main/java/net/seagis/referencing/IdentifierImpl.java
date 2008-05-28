@@ -21,6 +21,7 @@ package net.seagis.referencing;
 
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlType;
 import org.geotools.metadata.iso.MetadataEntity;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.ReferenceIdentifier;
@@ -33,6 +34,7 @@ import org.geotools.resources.Utilities;
 
 /**
  */
+@XmlType(name = "RS_Identifier")
 public class IdentifierImpl extends MetadataEntity implements ReferenceIdentifier {
     /**
      * Serial number for interoperability with different versions.

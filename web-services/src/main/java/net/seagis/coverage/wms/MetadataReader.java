@@ -467,7 +467,7 @@ public class MetadataReader {
         String standardName = value.getType().getStandard().getName();
         Class classe = null;
         Object result;
-        //@todo remove
+        //debug purpose
         String temp = "";
         
         try {
@@ -528,7 +528,11 @@ public class MetadataReader {
             }
 
         } catch (NoSuchMethodException e) {
-            logger.severe("The class " + classe.getName() + " does not have a constructor(" + temp + ")");
+            if (temp.equals("valueOf")) {
+                logger.severe("The class " + classe.getName() + " does not have a method valueOf(String code)");
+            } else {
+                logger.severe("The class " + classe.getName() + " does not have a constructor(" + temp + ")");
+            }
             return null;
         } catch (InstantiationException e) {
             logger.severe("The class is abstract or is an interface");

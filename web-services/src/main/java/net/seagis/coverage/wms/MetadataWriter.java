@@ -22,9 +22,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import org.mdweb.model.schemas.Classe;
+import org.mdweb.model.schemas.CodeList;
+import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
 import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
@@ -68,6 +71,11 @@ public class MetadataWriter {
     private Writer20 MDWriter;
     
     /**
+     * The current main standard of the Object to create
+     */
+    private Standard mainStandard;
+    
+    /**
      * Build a new metadata writer.
      * 
      * @param MDReader an MDWeb database reader.
@@ -91,17 +99,17 @@ public class MetadataWriter {
         if (object != null) {
             Date creationDate = new Date(System.currentTimeMillis());
             Form form = new Form(-1, MDCatalog, title, user, null, null, creationDate);
+
             String className = object.getClass().getSimpleName();
-            Standard standard;
             if (className.equals("MetaDataImpl")) {
-                standard   = Standard.ISO_19115;
+                mainStandard   = Standard.ISO_19115;
             } else if (className.equals("RecordType")) {
-                standard = MDReader.getStandard("Catalog Web Service");
+                mainStandard = MDReader.getStandard("Catalog Web Service");
             } else {
                 throw new IllegalArgumentException("Can't register ths kind of object:" + className);
             }
             Classe rootClasse = getClasseFromObject(object);
-            Path rootPath = new Path(standard, rootClasse);
+            Path rootPath = new Path(mainStandard, rootClasse);
             
             addValueFromObject(form, object, rootPath, null);
             return form;
@@ -112,7 +120,9 @@ public class MetadataWriter {
     }
     
     /**
-     * Add a MDWeb value to the specified form.
+     * Add a MDWeb value (and his children)to the specified form.
+     * 
+     * @param form The created form.
      * 
      */
     private void addValueFromObject(Form form, Object object, Path path, Value parentValue) throws SQLException {
@@ -148,6 +158,21 @@ public class MetadataWriter {
         }
         
         if (isPrimitive(classe)) {
+            if (classe instanceof CodeList) {
+                CodeList cl = (CodeList) classe;
+                String codelistElement;
+                if (classe.getName().equals("LanguageCode")) {
+                    codelistElement =  ((Locale) object).getISO3Language();
+                } else {
+                    codelistElement =  ((org.opengis.util.CodeList) object).identifier();
+                }
+                CodeListElement cle = (CodeListElement) cl.getPropertyByName(codelistElement);
+                if (cle != null) {
+                    object = cle.getCode();
+                } else {
+                    logger.severe("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName());
+                }
+            }
             TextValue textValue = new TextValue(path, form , ordinal, object + "", classe, parentValue);
             logger.finer("new TextValue: " + path.toString() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
         } else {
@@ -167,7 +192,7 @@ public class MetadataWriter {
                                 MDWriter.writePath(childPath);
                             }
                             addValueFromObject(form, propertyValue, childPath, value);
-                        }
+                        } 
                     
                     } catch (IllegalAccessException e) {
                         logger.severe("The class is not accessible");
@@ -265,13 +290,20 @@ public class MetadataWriter {
     /**
      * Return true if the MDWeb classe is primitive.
      * 
-     * @param classe
-     * @return
+     * @param classe an MDWeb classe Object
      */
     private boolean isPrimitive(Classe classe) {
-        return classe.getProperties().size() == 0;
+        return (classe.getProperties().size() == 0 || classe instanceof CodeList);
     }
     
+    /**
+     * Return an MDWeb classe object for the specified java object.
+     * 
+     * @param object the object to identify
+     * @param mainStandard A standard indicating in witch specification search.
+     *
+     * @throws java.sql.SQLException
+     */
     private Classe getClasseFromObject(Object object) throws SQLException {
         Classe result;
         String className;
@@ -293,11 +325,11 @@ public class MetadataWriter {
             className = "Metadata";
         } else if (className.equals("OnLineResourceImpl")) {
             className = "OnlineResource";
-        } else if (className.equals("CitationDate")) {
+        } else if (className.equals("CitationDate") || className.equals("CitationDateImpl")) {
             className = "CI_Date";
         } else if (className.equals("FRA_DirectReferenceSystem")) {
             className = "MD_ReferenceSystem";
-        }
+        } 
         
         //we remove the Impl suffix
         int i = className.indexOf("Impl");
@@ -311,17 +343,22 @@ public class MetadataWriter {
         }
         
         List<Standard> availableStandards = new ArrayList<Standard>();
-        availableStandards.add(MDReader.getStandard("Catalog Web Service"));
-        availableStandards.add(MDReader.getStandard("DublinCore"));
-        availableStandards.add(MDReader.getStandard("DublinCore-terms"));
-        availableStandards.add(MDReader.getStandard("OGC Web Service"));
-
+        if (mainStandard.equals(Standard.ISO_19115)) {
+            availableStandards.add(mainStandard);
+            availableStandards.add(Standard.ISO_19108);
+            availableStandards.add(Standard.ISO_19103);
+        } else {
+            availableStandards.add(MDReader.getStandard("Catalog Web Service"));
+            availableStandards.add(MDReader.getStandard("DublinCore"));
+            availableStandards.add(MDReader.getStandard("DublinCore-terms"));
+            availableStandards.add(MDReader.getStandard("OGC Web Service"));
+        }
         for (Standard standard : availableStandards) {
             
                 
             String name = className;
             int nameType = 0;
-            while (nameType < 3) {
+            while (nameType < 5) {
                 
                 logger.finer("searching: " + standard.getName() + ":" + name);
                 result = MDReader.getClasse(name, standard);
@@ -338,23 +375,35 @@ public class MetadataWriter {
                             name = "MD_" + className;    
                             break;
                         }
-                        //for the code list we add the "code" suffix
+                        //we add the prefix CI_
                         case 1: {
+                            nameType = 2;
+                            name = "CI_" + className;    
+                            break;
+                        }
+                        //we add the prefix EX_
+                        case 2: {
+                            nameType = 3;
+                            name = "EX_" + className;    
+                            break;
+                        }
+                        //for the code list we add the "code" suffix
+                        case 3: {
                             if (name.indexOf("Code") != -1) {
                                 name += "Code";
                             }
-                            nameType = 2;
+                            nameType = 4;
                             break;
                         }
                          //for the code list we add the "code" suffix
                         //for the temporal element we remove add prefix
-                        case 2: {
+                        case 4: {
                             name = "Time" + name;
-                            nameType = 3;
+                            nameType = 5;
                             break;
                         }
                         default:
-                            nameType = 3;
+                            nameType = 5;
                             break;
                     }
 
@@ -373,7 +422,7 @@ public class MetadataWriter {
      */
     private Classe getPrimitiveTypeFromName(String className) throws SQLException {
         
-        if (className.equals("String")) {
+        if (className.equals("String") || className.equals("SimpleInternationalString")) {
             return MDReader.getClasse("CharacterString", Standard.ISO_19103);
         } else if (className.equalsIgnoreCase("Date")) {
             return MDReader.getClasse(className, Standard.ISO_19103);
@@ -386,6 +435,9 @@ public class MetadataWriter {
         //special case for locale codeList.
         } else if (className.equals("Locale")) {
             return MDReader.getClasse("LanguageCode", Standard.ISO_19115);
+        //special case for Role codeList.
+        } else if (className.equals("Role")) {
+            return MDReader.getClasse("CI_RoleCode", Standard.ISO_19115);
         } else if (className.equals("Double")) {
             return MDReader.getClasse("Real", Standard.ISO_19103);
         } else {

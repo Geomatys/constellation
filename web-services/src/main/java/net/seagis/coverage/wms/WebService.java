@@ -569,8 +569,10 @@ public abstract class WebService {
     }
     
     /**
+     * Set the prefixMapper for the marshaller. 
+     * The root namespace specified will have no prefix.
      * 
-     * @param rootNamespace
+     * @param rootNamespace The main namespace of all the produced XML document (xmlns = rootNamespace)
      */
     protected void setPrefixMapper(String rootNamespace) throws PropertyException {
         NamespacePrefixMapperImpl prefixMapper = new NamespacePrefixMapperImpl(rootNamespace);

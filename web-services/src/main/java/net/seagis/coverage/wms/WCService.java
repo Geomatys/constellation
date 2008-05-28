@@ -724,7 +724,7 @@ public class WCService extends WebService {
         net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
         try {
             for (Layer inputLayer:layerList) {
-                if (inputLayer.getSeries().size() == 0)
+                if (inputLayer.isQueryable(Service.WCS))
                     continue;
                 
                 List<LanguageStringType> title = new ArrayList<LanguageStringType>();
