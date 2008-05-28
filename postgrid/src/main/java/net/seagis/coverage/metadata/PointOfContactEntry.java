@@ -91,26 +91,31 @@ final class PointOfContactEntry extends Entry implements PointOfContact {
     }    
 
     public String getMetadata() {
-        String res = 
-                "poc id:            " + pocId + "\n" +
-                "last name:         " + lastName + "\n" +
-                "first name:        " + firstName + "\n" +
-                "address1:          " + address1 + "\n" +
-                "address2:          " + address2 + "\n" +
-                "city:              " + city + "\n" +
-                "state:             " + state + "\n" +
-                "country:           " + country + "\n" +
-                "zip:               " + zip + "\n" +
-                "phone:             " + phone + "\n" +
-                "email:             " + email + "\n" +
-                "org:               " + org + "\n" +
-                "org address1:      " + orgAddress1 + "\n" +
-                "org address2:      " + orgAddress2 + "\n" +
-                "org city:          " + orgCity + "\n" +
-                "org state:         " + orgState + "\n" +
-                "org country:       " + orgCountry + "\n" +
-                "org zip:           " + orgZip + "\n" +
-                "org contact:       " + orgContact + "\n" ;
+        String res = "<table border=1>" +
+                //"<tr><td>poc id:</td><td>           " + pocId + "</td></tr>" +
+                "<th colspan=2>Point Of Contact</th>" +
+                "<tr><td>Last Name:</td><td>        " + lastName + "</td></tr>" +
+                "<tr><td>First Name:</td><td>       " + firstName + "</td></tr>" +
+                "<tr><td>Address Line 1:</td><td>   " + address1 + "</td></tr>" +
+                "<tr><td>Address Line 2:</td><td>   " + address2 + "</td></tr>" +
+                "<tr><td>City:</td><td>             " + city + "</td></tr>" +
+                "<tr><td>State:</td><td>            " + state + "</td></tr>" +
+                "<tr><td>Country:</td><td>          " + country + "</td></tr>" +
+                "<tr><td>Zip:</td><td>              " + zip + "</td></tr>" +
+                "<tr><td>Phone:</td><td>            " + phone + "</td></tr>" +
+                "<tr><td>Email:</td><td>            " + email + "</td></tr>" +
+                "</table>" +
+                "<table border=1>" +
+                //"<tr><td>Organization:</td><td>     " + org + "</td></tr>" +
+                "<th colspan=2>" + org + "</th>" +
+                "<tr><td>Address Line 1:</td><td>   " + orgAddress1 + "</td></tr>" +
+                "<tr><td>Address Line 2:</td><td>   " + orgAddress2 + "</td></tr>" +
+                "<tr><td>City:</td><td>             " + orgCity + "</td></tr>" +
+                "<tr><td>State:</td><td>            " + orgState + "</td></tr>" +
+                "<tr><td>Country:</td><td>          " + orgCountry + "</td></tr>" +
+                "<tr><td>Zip:</td><td>              " + orgZip + "</td></tr>" +
+                "<tr><td>Contact:</td><td>          " + orgContact + "</td></tr>" +
+                "</table>";
                 
         return res;
     }

@@ -76,21 +76,23 @@ final class LayerMetadataEntry extends Entry implements LayerMetadata {
     }    
 
     public String getMetadata() {
-        String res = 
-                "layer meta name:   " + layerMetaName + "\n" +
-                "layer name:        " + layerName + "\n" +
-                "abbr title:        " + abbrTitle + "\n" +
-                "short title:       " + shortTitle + "\n" +
-                "long title:        " + longTitle + "\n" +
-                "parameter name:    " + parameterName + "\n" +
-                "parameter type:    "+ parameterType + "\n" +
-                "description:       " + description + "\n" +
-                "long description:  " + longDescription + "\n" +
-                "data source:       " + dataSource + "\n" +
-                "purpose            " + purpose + "\n" +
-                "supplemental info: " + supplementalInfo + "\n" +
-                "update frequency:  " + updateFrequency + "\n" +
-                "use constraint:    " + useConstraint +"\n" ;
+        String res = "<table border=1>" +
+                //"<tr><td>layer meta name:   " + layerMetaName + "</td></tr>" +
+                //"<tr><td>Layer Name:</td><td>        " + layerName + "</td></tr>" +
+                "<th colspan=2>" + shortTitle + "</th>" +
+                "<tr><td>Abbrev. Title:</td><td>        " + abbrTitle + "</td></tr>" +
+                "<tr><td>Short Title:</td><td>       " + shortTitle + "</td></tr>" +
+                "<tr><td>Long Title:</td><td>        " + longTitle + "</td></tr>" +
+                "<tr><td>Parameter Pame:</td><td>    " + parameterName + "</td></tr>" +
+                "<tr><td>Parameter Type:</td><td>    "+ parameterType + "</td></tr>" +
+                "<tr><td>Description:</td><td>       " + description + "</td></tr>" +
+                "<tr><td>Long Description:</td><td>  " + longDescription + "</td></tr>" +
+                "<tr><td>Data Source:</td><td>       " + dataSource + "</td></tr>" +
+                "<tr><td>Purpose:</td><td>            " + purpose + "</td></tr>" +
+                "<tr><td>Supplemental Info:</td><td> " + supplementalInfo + "</td></tr>" +
+                "<tr><td>Update Frequency:</td><td>  " + updateFrequency + "</td></tr>" +
+                "<tr><td>Use Constraint:</td><td>    " + useConstraint +"</td></tr>" +
+                "</table>" ;
         return res;
     }
 }

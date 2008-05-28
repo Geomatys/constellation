@@ -49,13 +49,18 @@ final class CoverageMetadataEntry extends Entry implements CoverageMetadata {
     }    
 
     public String getMetadata() {
-        String res = 
-                "id:                " + id + "\n" +
-                "coverage id:       " + coverageId + "\n" +
-                "uri:               " + uri + "\n" +
-                "creation date:     " + creationDate + "\n" +
-                "series name:       " + seriesName + "\n" ;
+        String res = "<table border=1>" +
+                //"<tr><td>ID:</td><td>                " + id             + "</td></tr>" +
+                //"<tr><td>Coverage ID:</td><td>       " + coverageId     + "</td></tr>" +
+                "<tr><td>URI:</td><td>               " + uri            + "</td></tr>" +
+                "<tr><td>Creation Date:</td><td>     " + creationDate   + "</td></tr>" +
+                //"<tr><td>Series Name:</td><td>       " + seriesName     + "</td></tr>" +
+                "</table>";
                 
         return res;
+    }
+    
+    public String getCreationDate() {
+        return this.creationDate;
     }
 }

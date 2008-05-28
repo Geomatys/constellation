@@ -18,6 +18,7 @@ package net.seagis.coverage.wms;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.units.Unit;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -72,6 +75,15 @@ import net.seagis.wms.Post;
 import net.seagis.wms.Request;
 import net.seagis.wms.Style;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
+
+import net.seagis.coverage.metadata.CoverageMetadata;
+import net.seagis.coverage.metadata.LayerMetadata;
+import net.seagis.coverage.metadata.SeriesMetadata;
+import net.seagis.coverage.metadata.CoverageMetadataTable;
+import net.seagis.coverage.metadata.LayerMetadataTable;
+import net.seagis.coverage.metadata.PointOfContact;
+import net.seagis.coverage.metadata.PointOfContactTable;
+import net.seagis.coverage.metadata.SeriesMetadataTable;
 
 //geotools dependencies
 import org.geotools.util.MeasurementRange;
@@ -310,9 +322,7 @@ public class WMService extends WebService {
         webServiceWorker.setExceptionFormat(getParameter("EXCEPTIONS", false));
         
         double result = webServiceWorker.evaluatePixel(i,j);
-        
-        // TODO: report requested properties (like filename, date range) of the specified coverage
-        CoverageReference ref = webServiceWorker.getCoverageReference();        
+ 
         
         // there is many return type possible
         String response;
@@ -354,6 +364,45 @@ public class WMService extends WebService {
             StringWriter sw = new StringWriter();    
             marshaller.marshal(pt, sw);
             response = sw.toString();
+        }
+        
+        // HTML Response with all metadata for the 
+        // TODO: This is only temporary! Get metadata via CSW request instead.
+        Boolean getMetadata = false;
+        String getMetadataParam = getParameter("GetMetadata",false);
+        if (getMetadataParam != null && getMetadataParam.equalsIgnoreCase("TRUE")) {
+                getMetadata = true;
+        }
+        if (infoFormat.equals("text/html") && getMetadata == true )  {
+            try {
+                CoverageReference coverageRef = webServiceWorker.getCoverageReference();
+                String filename = coverageRef.getFile().getAbsolutePath();
+                
+                // TODO:  move all of this to CoverageReference so we just need:
+                // return coverageRef.getMetadataAsHTML();
+
+                final LayerMetadataTable layerMetaTable = new LayerMetadataTable(webServiceWorker.getDatabase());
+                final LayerMetadata layerMetaEntry = layerMetaTable.getEntry(layer);
+                
+                final SeriesMetadataTable seriesMetaTable = new SeriesMetadataTable(webServiceWorker.getDatabase());
+                final SeriesMetadata seriesMetaEntry = seriesMetaTable.getEntry(coverageRef.getSeries().toString());
+                                
+                final PointOfContactTable pocTable = new PointOfContactTable(webServiceWorker.getDatabase());
+                final PointOfContact pocEntry = pocTable.getEntry(seriesMetaEntry.getPointOfContactID());
+                
+                response =  "<table border=1>" +
+                            "<tr><td>URI:</td><td>" + filename + "</td></tr>" +
+                            "<tr><td>Time Period:</td><td>" + coverageRef.getTimeRange().toString() + "</td></tr>" +
+                            "</table>" +
+                            layerMetaEntry.getMetadata() + seriesMetaEntry.getMetadata() + pocEntry.getMetadata();
+                
+            } catch (CatalogException ex) {
+                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+                response = "Could not find any matching records.";
+            } catch (SQLException ex) {
+                Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);
+                response = "SQL error.";
+            }
         }
         
         //if we return text

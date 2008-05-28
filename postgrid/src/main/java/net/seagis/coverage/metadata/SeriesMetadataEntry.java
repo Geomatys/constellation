@@ -80,23 +80,24 @@ final class SeriesMetadataEntry extends Entry implements SeriesMetadata {
     }    
 
     public String getMetadata() {
-        String res = 
-                "id:                " + id + "\n" +
-                "series name:       " + seriesName + "\n" +
-                "legend URI:        " + legendURI + "\n" +
-                "pub date:          " + pubDate + "\n" +
-                "POC id:            " + pocId + "\n" +
-                "version:           " + version + "\n" +
-                "forecast:          " + forecast + "\n" +
-                "themekey1:         " + themekey1 + "\n" +
-                "themekey2:         " + themekey2 + "\n" +
-                "themekey3:         " + themekey3 + "\n" +
-                "themekey4:         " + themekey4 + "\n" +
-                "themekey5:         " + themekey5 + "\n" +
-                "themekey6:         " + themekey6 + "\n" +
-                "themekey7:         " + themekey7 + "\n" +
-                "themekey8:         " + themekey8 + "\n" ;
-                
+        String res = "<table border=1>" +
+                //"<tr><td>id:</td><td>                " + id + "</td></tr>" +
+                //"<tr><td>Series Name:</td><td>       " + seriesName + "</td></tr>" +
+                "<th colspan=2>" + seriesName + "</th>" +
+                "<tr><td>Legend URI:</td><td>        " + legendURI + "</td></tr>" +
+                "<tr><td>Publication Date:</td><td>          " + pubDate + "</td></tr>" +
+                //"<tr><td>POC ID:</td><td>            " + pocId + "</td></tr>" +
+                "<tr><td>Version:</td><td>           " + version + "</td></tr>" +
+                "<tr><td>Forecast:</td><td>          " + forecast + "</td></tr>" +
+                "<tr><td>Themekey1:</td><td>         " + themekey1 + "</td></tr>" +
+                "<tr><td>Themekey2:</td><td>         " + themekey2 + "</td></tr>" +
+                "<tr><td>Themekey3:</td><td>         " + themekey3 + "</td></tr>" +
+                "<tr><td>Themekey4:</td><td>         " + themekey4 + "</td></tr>" +
+                "<tr><td>Themekey5:</td><td>         " + themekey5 + "</td></tr>" +
+                "<tr><td>Themekey6:</td><td>         " + themekey6 + "</td></tr>" +
+                "<tr><td>Themekey7:</td><td>         " + themekey7 + "</td></tr>" +
+                "<tr><td>Themekey8:</td><td>         " + themekey8 + "</td></tr>" +
+                "</table>" ;
         return res;
     }
     public String getPointOfContactID() {
