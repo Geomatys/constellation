@@ -222,9 +222,12 @@ COMMENT ON VIEW "RangeOfFormats" IS
 
 CREATE TABLE "Layers" (
     "name"      character varying NOT NULL PRIMARY KEY,
+    "title"     character varying,
     "thematic"  character varying,
     "procedure" character varying,
     "period"    double precision,
+    "minScale"  double precision,
+    "maxScale"  double precision,
     "fallback"  character varying REFERENCES "Layers" ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
@@ -238,12 +241,18 @@ COMMENT ON TABLE "Layers" IS
     'Set of a series of images belonging to the same category.';
 COMMENT ON COLUMN "Layers"."name" IS
     'Name of the layer.';
+COMMENT ON COLUMN "Layers"."title" IS
+    'Title of the layer.';
 COMMENT ON COLUMN "Layers"."thematic" IS
     'Geophysical parameter (or category) of this layer.';
 COMMENT ON COLUMN "Layers"."procedure" IS
     'Procedure applied to produce the images.';
 COMMENT ON COLUMN "Layers"."period" IS
     'Number of days between images.  Can be approximate or left blank if not applicable.';
+COMMENT ON COLUMN "Layers"."minScale" IS
+    'Minimum scale to request this Layer in WMS. Should contain only values greater than 1.';
+COMMENT ON COLUMN "Layers"."maxScale" IS
+    'Maximum scale to request this Layer in WMS. Should contain only values greater than 1.';
 COMMENT ON COLUMN "Layers"."fallback" IS
     'Fallback layer which is suggested if no data is available for the current layer.';
 COMMENT ON CONSTRAINT "Layers_fallback_fkey" ON "Layers" IS

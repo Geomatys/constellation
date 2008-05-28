@@ -44,8 +44,11 @@ final class TimeParser {
     private static final String[] PATTERNS = {
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
         "yyyy-MM-dd'T'HH:mm:ss'Z'",
+        "yyyy-MM-dd'T'HH:mm:ss",
         "yyyy-MM-dd'T'HH:mm'Z'",
+        "yyyy-MM-dd'T'HH:mm",
         "yyyy-MM-dd'T'HH'Z'",
+        "yyyy-MM-dd'T'HH",
         "yyyy-MM-dd",
         "yyyy-MM",
         "yyyy"
