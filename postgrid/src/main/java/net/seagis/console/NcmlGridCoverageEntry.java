@@ -18,7 +18,6 @@
 package net.seagis.console;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import javax.imageio.ImageReader;
 import net.seagis.catalog.CatalogException;

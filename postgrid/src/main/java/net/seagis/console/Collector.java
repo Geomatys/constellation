@@ -67,13 +67,13 @@ public class Collector extends CommandLine {
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Print the SQL statements rather than executing them (for debugging only).")
+    @Option(description="Print SQL statements rather than executing them (for debugging only).")
     private boolean pretend;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="Replace the existing records.")
+    @Option(description="Replace existing records.")
     private boolean replace;
 
     /**
@@ -85,31 +85,31 @@ public class Collector extends CommandLine {
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="The path where to find data to collect.")
+    @Option(description="Path where to collect data.")
     protected String path;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="The variable to consider.")
+    @Option(description="Variable in Netcdf files to consider.")
     private String variable;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="The layer to consider.", mandatory=true)
+    @Option(description="Layer to consider.", mandatory=true)
     protected String layer;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="The serie format.", mandatory=true)
+    @Option(description="Serie's format.", mandatory=true)
     protected String format;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(description="The type of process to launch.")
+    @Option(description="Type of process to launch. Should be : \"ncml\", \"opendap\" or \"caraibes\".")
     protected String type;
 
     /**
@@ -145,7 +145,8 @@ public class Collector extends CommandLine {
         table = new WritableGridCoverageTable(database.getTable(WritableGridCoverageTable.class));
         if (!process(type)) {
             close();
-            throw new IllegalArgumentException("Le type de moissonnage spécifié n'est pas connu : " + type);
+            throw new IllegalArgumentException("Le type de moissonnage spécifié n'est pas connu : "
+                    + type);
         }
         close();
     }
@@ -222,8 +223,8 @@ public class Collector extends CommandLine {
         final NcmlGridCoverageTable ncmlTable = new NcmlGridCoverageTable(database, format);
         ncmlTable.setCanInsertNewLayers(true);
         final Set<NcmlNetcdfElement> netcdfTags = new LinkedHashSet<NcmlNetcdfElement>();
+        variable = variable.toLowerCase().trim();
         try {
-            variable = variable.toLowerCase().trim();
             final Collection<Element> nested = NcmlReading.getNestedNetcdfElement(ncml);
             for (final Element netcdfWithLocationParam : nested) {
                 // Verify that the variable to collect, specified by user, is really present
