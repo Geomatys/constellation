@@ -54,6 +54,7 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.coverage.catalog.WritableGridCoverageEntry;
 import net.seagis.coverage.catalog.WritableGridCoverageTable;
+import org.geotools.image.io.mosaic.TileWritingPolicy;
 
 
 /**
@@ -315,7 +316,8 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
             if (keepLayout) {
                 tileManager = TileManagerFactory.DEFAULT.create(tiles)[0];
             } else {
-                tileManager = builder.createTileManager(tiles, 0, writeToDisk && !pretend);
+                tileManager = builder.createTileManager(tiles, 0, (writeToDisk && !pretend) ?
+                    TileWritingPolicy.OVERWRITE : TileWritingPolicy.NO_WRITE);
             }
         } catch (IOException e) {
             err.println(e);
