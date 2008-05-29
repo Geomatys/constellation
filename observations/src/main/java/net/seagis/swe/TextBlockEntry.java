@@ -67,10 +67,11 @@ public class TextBlockEntry extends AbstractEncodingEntry implements TextBlock {
     }
 
     /**
-     * surcharge la methode getName() de Entry pour accepter les valeurs nulles.
+     * surcharge la methode createName() de Entry pour accepter les valeurs nulles.
      */
-    public String getName() {
-        return this.name;
+    @Override
+    protected String createName() {
+        return null;
     }
     
     /**

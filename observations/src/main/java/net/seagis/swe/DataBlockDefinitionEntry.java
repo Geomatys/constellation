@@ -89,10 +89,11 @@ import org.geotools.resources.Utilities;
     }
     
     /**
-     * surcharge le getName() de Entry
+     * surcharge la methode createName() de Entry pour accepter les valeurs nulles.
      */
-    public String getName() {
-        return this.name;
+    @Override
+    protected String createName() {
+        return null;
     }
     /**
      * {@inheritDoc}

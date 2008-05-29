@@ -70,12 +70,12 @@ public class ProcessEntry extends Entry implements Process {
         this.href = name;
     }
     
-    /**
-     * surcharge le getName de entry
+     /**
+     * surcharge la methode createName() de Entry pour accepter les valeurs nulles.
      */
     @Override
-    public String getName() {
-        return this.name;
+    protected String createName() {
+        return null;
     }
     
     /**

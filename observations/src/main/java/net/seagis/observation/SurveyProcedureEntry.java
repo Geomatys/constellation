@@ -138,7 +138,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
      */
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return getName().hashCode();
     }
     
     /**
@@ -151,8 +151,7 @@ public class SurveyProcedureEntry extends Entry implements SurveyProcedure {
         }
         if (super.equals(object)) {
             final SurveyProcedureEntry that = (SurveyProcedureEntry) object;
-            return Utilities.equals(this.name,              that.name) &&
-                   Utilities.equals(this.operator,          that.operator)   &&
+            return Utilities.equals(this.operator,          that.operator)   &&
                    //Utilities.equals(this.elevationDatum,    that.elevationDatum)   && 
                    Utilities.equals(this.elevationMethod,   that.elevationMethod) &&
                    Utilities.equals(this.elevationAccuracy, that.elevationAccuracy) &&

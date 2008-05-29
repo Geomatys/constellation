@@ -280,10 +280,10 @@ public class ObservationEntry extends Entry implements Observation {
     /**
      */
     public void setName(String name) {
-        super.name = name;
         this.name  = name;
     }
     
+    @Override
     public String getName() {
         return this.name;
     }
