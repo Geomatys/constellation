@@ -22,8 +22,8 @@ import java.awt.Transparency;
 import java.awt.image.SampleModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.IndexColorModel;
+import javax.imageio.IIOException;
 
-import net.seagis.catalog.ConfigurationKey;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.OperationNotFoundException;
 import org.geotools.referencing.CRS;
@@ -32,6 +32,7 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultVerticalCRS;
 import org.geotools.coverage.grid.ViewType;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.util.logging.Logging;
 
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTableTest;
@@ -196,7 +197,20 @@ public class WebServiceWorkerTest extends DatabaseTest {
         worker.setTime(LayerTableTest.NETCDF_TIME_AS_TEXT);
         assertSame("The layer should be cached.", layer, worker.getLayer());
 
-        GridCoverage2D coverage = worker.getGridCoverage2D(false);
+        GridCoverage2D coverage;
+        try {
+            coverage = worker.getGridCoverage2D(false);
+        } catch (WMSWebServiceException e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof IIOException) {
+                final String message = cause.getMessage();
+                if (message.contains("image/x-netcdf-ifremer")) {
+                    Logging.getLogger(WebServiceWorkerTest.class).warning("Skipping IFREMER-specific test.");
+                    return;
+                }
+            }
+            throw e;
+        }
         assertEquals(4, coverage.getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
         assertEquals(2, worker.getGridCoverage2D(true).getCoordinateReferenceSystem().getCoordinateSystem().getDimension());
@@ -353,22 +367,22 @@ public class WebServiceWorkerTest extends DatabaseTest {
         assertEquals(604, image.getWidth());
         assertEquals(424, image.getHeight());
     }
-    
+
     /**
      * Tests the permission.
      *
      * @throws WebServiceException If a WMS parameter is illegal.
      * @throws IOException If an error occured while reading an image.
-     
+
     @Test
     public void testPermissions() throws WebServiceException, IOException {
         if (DISABLED) return;
-        
+
         // First Case we test with an "Anonymous" user.
         database.setProperty(ConfigurationKey.PERMISSION, "Anonymous");
-        
+
         //Blue Marble is Public so we can see it in WCS and WMS
-        
+
         // for a request WS/wms?bbox=-33.52649,25.033113,-25.927152,31.142384&format=image/png&service=wms&version=1.1.1&request=GetMap&layers=AO_Coriolis_(Sal)&time=2007-06-20T12:00:00Z&srs=EPSG:4326&width=608&height=428&styles=dd
         final WebServiceWorker worker = new WebServiceWorker(database, false);
         worker.setService("WMS", "1.1");
@@ -385,14 +399,14 @@ public class WebServiceWorkerTest extends DatabaseTest {
 
         GridCoverage2D coverage = worker.getGridCoverage2D(false);
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
-        
+
         File file = worker.getImageFile();
         assertTrue(file.getName().endsWith(".png"));
 
         RenderedImage image = ImageIO.read(file);
         assertEquals(608, image.getWidth());
         assertEquals(428, image.getHeight());
-        
+
         //we test with the WCS
         // corresponding to the following request
         ///WS/wcs?bbox=-33.52649,25.033113,-25.927152,31.142384,5.0,5.0&format=image/png&service=wcs&version=1.0.0&request=GetCoverage&coverage=AO_Coriolis_(Sal)&time=2007-06-20T12:00:00Z&crs=EPSG:4326&width=608&height=428
@@ -409,10 +423,10 @@ public class WebServiceWorkerTest extends DatabaseTest {
         image = ImageIO.read(file);
         assertEquals(608, image.getWidth());
         assertEquals(428, image.getHeight());
-        
+
 
        // Mars3D Ligure (XE) is Download so only WCS for anonymous user.
-        
+
         worker.setService("WCS", "1.0.0");
         worker.setBoundingBox("-33.52649,25.033113,-25.927152,31.142384");
         worker.setLayer("AO_Coriolis_(Temp)");
@@ -425,7 +439,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
         image = ImageIO.read(file);
         assertEquals(608, image.getWidth());
         assertEquals(428, image.getHeight());
-        
+
         //WMS must not work
         worker.setService("WMS", "1.1");
         worker.setLayer("AO_Coriolis_(Temp)");
@@ -441,7 +455,7 @@ public class WebServiceWorkerTest extends DatabaseTest {
 
         coverage = worker.getGridCoverage2D(false);
         assertSame("The coverage should be cached.", coverage, worker.getGridCoverage2D(false));
-        
+
         file = worker.getImageFile();
         assertTrue(file.getName().endsWith(".png"));
 

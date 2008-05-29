@@ -48,6 +48,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
 import com.sun.media.imageio.stream.RawImageInputStream;
 
+import org.geotools.util.Utilities;
 import org.geotools.util.NumberRange;
 import org.geotools.util.MeasurementRange;
 import org.geotools.coverage.Category;
@@ -60,7 +61,6 @@ import org.geotools.image.io.RawBinaryImageReadParam;
 import org.geotools.image.io.netcdf.NetcdfImageReader;
 import org.geotools.image.io.mosaic.MosaicImageReader;
 import org.geotools.image.io.mosaic.MosaicImageReadParam;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.Classes;
 import org.geotools.resources.XArray;
 
@@ -434,12 +434,14 @@ final class FormatEntry extends Entry implements Format {
                 // TODO: set up a Format Parameters table or something in the database.
 
                 final int type;
-                if (this.name.contains("flt32"))
+                final String name = getName();
+                if (name.contains("flt32")) {
                     type = DataBuffer.TYPE_FLOAT;
-                else if (this.name.contains("flt64"))
+                } else if (name.contains("flt64")) {
                     type = DataBuffer.TYPE_DOUBLE;
-                else
+                } else {
                     type = DataBuffer.TYPE_BYTE;
+                }
                 final GridSampleDimension[] bands = getSampleDimensions(param);
                 final ColorModel  cm = bands[0].getColorModel(0, bands.length, type);
                 final SampleModel sm = cm.createCompatibleSampleModel(expected.width, expected.height);

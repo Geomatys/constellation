@@ -16,6 +16,7 @@ package net.seagis.coverage.catalog;
 
 import net.seagis.catalog.Entry;
 import net.seagis.coverage.web.Service;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -35,17 +36,17 @@ final class PermissionEntry extends Entry {
     /**
      * {@code true} if the data can be displayed in a Web Map Server (WMS).
      */
-    protected final boolean WMS;
+    private final boolean WMS;
 
     /**
      * {@code true} if the data can be displayed in a Web Coverage Server (WCS).
      */
-    protected final boolean WCS;
+    private final boolean WCS;
 
     /**
      * User for who the permission will apply. By default the user is {@code Anonymous}.
      */
-    protected final String user;
+    private final String user;
 
     /**
      * Creates a new entry.
@@ -60,13 +61,36 @@ final class PermissionEntry extends Entry {
     }
 
     /**
-     * Returns {@code true} if the given user is allowed to obtain data through the given service.
+     * Returns {@code true} if the user can obtain data of at least one service.
+     */
+    public boolean isVisible() {
+        return WCS | WMS;
+    }
+
+    /**
+     * Returns {@code true} if the user is allowed to obtain data through the given service.
      */
     public boolean isAccessibleService(final Service service) {
-            switch (service) {
-                case WMS: return WMS;
-                case WCS: return WCS;
-            }
-            return false;
+        switch (service) {
+            case WMS: return WMS;
+            case WCS: return WCS;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (super.equals(object)) {
+            final PermissionEntry that = (PermissionEntry) object;
+            return this.WMS == that.WMS && this.WCS == that.WCS &&
+                   Utilities.equals(this.user, that.user);
+        }
+        return false;
     }
 }

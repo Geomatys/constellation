@@ -68,6 +68,8 @@ public interface Layer extends Element {
 
     /**
      * Returns all series for this layer.
+     *
+     * @return The series, or an empty set if none.
      */
     Set<Series> getSeries();
 
@@ -114,12 +116,15 @@ public interface Layer extends Element {
     /**
      * Returns the ranges of valid sample values for each band.
      * The ranges are always expressed in <cite>geophysics</cite> values.
+     *
+     * @return The range of valis sample values.
      */
     MeasurementRange<?>[] getSampleValueRanges();
 
     /**
      * Returns a time range encompassing all coverages in this layer.
      *
+     * @return The time range encompassing all coverages.
      * @throws CatalogException if an error occured while fetching the time range.
      */
     DateRange getTimeRange() throws CatalogException;
@@ -127,31 +132,35 @@ public interface Layer extends Element {
     /**
      * Returns a geographic bounding box encompassing all coverages in this layer.
      *
+     * @return The geographic bounding box encompassing all coverages.
      * @throws CatalogException if an error occured while fetching the bounding box.
      */
     GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
 
     /**
-     * Returns the average pixel resolution in this layer, or {@code null} if unknown.
+     * Returns the typical pixel resolution in this layer, or {@code null} if unknown.
      * Values are degrees of longitude and latitude.
      *
+     * @return The typical pixel resolution.
      * @throws CatalogException if an error occured while fetching the resolution.
      */
-    Dimension2D getAverageResolution() throws CatalogException;
+    Dimension2D getTypicalResolution() throws CatalogException;
 
     /**
      * Returns a typical image bounds in this layer, or {@code null} if unknown.
      * This is a hint only - there is no garantee that images will really have this bounds.
      *
+     * @return The typical image bounds, or {@code null} if unknown.
      * @throws CatalogException if an error occured while fetching the bounds.
      */
-    Rectangle getBounds() throws CatalogException;
+    Rectangle getTypicalBounds() throws CatalogException;
 
     /**
      * Returns a reference to a coverage for the given date and elevation.
      *
      * @param  time The date, or {@code null} if not applicable.
      * @param  elevation The elevation, or {@code null} if not applicable.
+     * @return A reference to a coverage.
      * @throws CatalogException if an error occured while querying the catalog.
      */
     CoverageReference getCoverageReference(Date time, Number elevation) throws CatalogException;
@@ -193,6 +202,7 @@ public interface Layer extends Element {
      *       evaluations on a remote server.</li>
      * </ul>
      *
+     * @return A view of this layer as a <var>n</var>-dimensional coverage.
      * @throws CatalogException if the coverage can not be created.
      */
     Coverage getCoverage() throws CatalogException;
@@ -211,14 +221,17 @@ public interface Layer extends Element {
      * If this layer is the result of a numerical model, returns this model.
      * Otherwise returns {@code null}.
      *
+     * @return The numerical model, or {@code null} if none.
      * @throws CatalogException if an error occured while querying the catalog.
      */
     Model getModel() throws CatalogException;
-    
+
     /**
-     * Return true if all the series are queryable by the specified service.
-     * 
-     * @param service The web service trying to request this layer.(WMS or WCS)
+     * Return {@code true} if all series are queryable by the specified service.
+     * This information is inferred from the {@code Permissions} table.
+     *
+     * @param service The web service trying to request this layer (WMS or WCS).
+     * @return {@code true} if all series are queryable for the given service.
      */
     boolean isQueryable(Service service);
 }

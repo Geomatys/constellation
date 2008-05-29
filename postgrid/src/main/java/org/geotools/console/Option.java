@@ -37,16 +37,22 @@ import java.lang.annotation.Target;
 public @interface Option {
     /**
      * The argument name. The default is the same name than the field.
+     *
+     * @return The argument name, or {@code ""} for the default.
      */
     String name() default "";
 
     /**
      * {@code true} if this option is mandatory. Options are optional by default.
+     *
+     * @return Whatever this option is mandatory or optional.
      */
     boolean mandatory() default false;
 
     /**
      * A description of this option to be printed when the {@code --help} option is provided.
+     *
+     * @return The description, or {@code ""} for none.
      */
     String description() default "";
 }

@@ -81,7 +81,7 @@ public enum ConfigurationKey {
     READONLY("ReadOnly", "true"),
 
     /**
-     * Key for the user permissions.
+     * Key for user permissions.
      * <p>
      * The default value is {@code "Anonymous"}.
      */

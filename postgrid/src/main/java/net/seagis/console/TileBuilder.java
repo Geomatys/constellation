@@ -43,6 +43,7 @@ import org.geotools.geometry.Envelope2D;
 import org.geotools.image.io.mosaic.Tile;
 import org.geotools.image.io.mosaic.TileManager;
 import org.geotools.image.io.mosaic.MosaicBuilder;
+import org.geotools.image.io.mosaic.TileWritingPolicy;
 import org.geotools.image.io.mosaic.TileManagerFactory;
 import org.geotools.util.FrequencySortedSet;
 import org.geotools.console.Option;
@@ -72,8 +73,11 @@ import org.geotools.image.io.mosaic.TileWritingPolicy;
  * the following options must be specified:
  * <p>
  * <ul>
- *   <li>{@code -write-to-disk} writes the tiles to the target directory.</li>
- *   <li>{@code -fill-database} inserts the tiles metadata in the database.</li>
+ *   <li>{@code -write}     writes the tiles to the target directory, skipping existing ones.</li>
+ *   <li>{@code -overwrite} writes the tiles to the target directory, overwriting existing ones.</li>
+ *   <li>{@code -insert}    inserts the tiles metadata in the database.</li>
+ *   <li>{@code -pretend}   like {@code -insert} but prints the SQL statement instead
+ *                          of executing them.</li>
  * </ul>
  *
  * @author Cédric Briançon
@@ -130,14 +134,20 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
     /**
      * Flag specified on the command lines.
      */
-    @Option(name="write-to-disk", description="Write the tiles to the target directory.")
-    private boolean writeToDisk;
+    @Option(description="Write the tiles to the target directory, skipping existing ones.")
+    private boolean write;
 
     /**
      * Flag specified on the command lines.
      */
-    @Option(name="fill-database", description="Insert the tiles metadata in the database.")
-    private boolean fillDatabase;
+    @Option(description="Write the tiles to the target directory, overwriting existing ones.")
+    private boolean overwrite;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(description="Insert the tiles metadata in the database.")
+    private boolean insert;
 
     /**
      * Flag specified on the command lines.
@@ -316,8 +326,15 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
             if (keepLayout) {
                 tileManager = TileManagerFactory.DEFAULT.create(tiles)[0];
             } else {
-                tileManager = builder.createTileManager(tiles, 0, (writeToDisk && !pretend) ?
-                    TileWritingPolicy.OVERWRITE : TileWritingPolicy.NO_WRITE);
+                TileWritingPolicy policy = TileWritingPolicy.NO_WRITE;
+                if (!pretend) {
+                    if (overwrite) {
+                        policy = TileWritingPolicy.OVERWRITE;
+                    } else if (write) {
+                        policy = TileWritingPolicy.WRITE_NEWS_ONLY;
+                    }
+                }
+                tileManager = builder.createTileManager(tiles, 0, policy);
             }
         } catch (IOException e) {
             err.println(e);
@@ -367,7 +384,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
          * "Tiles" table while the global entry will be inserted into the "GridCoverages" table.
          */
         out.println(tileManager);
-        if (fillDatabase) try {
+        if (insert || pretend) try {
             final Database database = new Database();
             if (pretend) {
                 database.setUpdateSimulator(out);

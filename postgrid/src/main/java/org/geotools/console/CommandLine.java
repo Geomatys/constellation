@@ -189,8 +189,10 @@ public class CommandLine {
      * for values that are not of one of the pre-defined types. The default implementation thrown
      * an exception in all cases.
      *
+     * @param  <T> The field type.
      * @param  type The field type.
      * @param  value The value given on the command line.
+     * @return The value for the given string to parse.
      * @throws UnsupportedOperationException if the value can't be parsed.
      */
     protected <T> T parse(final Class<T> type, final String value) throws UnsupportedOperationException {

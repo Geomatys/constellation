@@ -77,6 +77,9 @@ public class LayerTableTest extends TableTest {
 
     /**
      * Tests the {@link LayerTableTest#getIdentifiers} method.
+     *
+     * @throws SQLException If an error occured while querying the database.
+     * @throws CatalogException If a logical errors was found in database records.
      */
     @Test
     public void testIdentifiers() throws CatalogException, SQLException {
@@ -88,6 +91,9 @@ public class LayerTableTest extends TableTest {
 
     /**
      * Tests the {@link LayerTableTest#getEntry} and @link LayerTableTest#getEntries} methods.
+     *
+     * @throws SQLException If an error occured while querying the database.
+     * @throws CatalogException If a logical errors was found in database records.
      */
     @Test
     public void testSelectAndList() throws CatalogException, SQLException {
@@ -120,6 +126,10 @@ public class LayerTableTest extends TableTest {
 
     /**
      * Tests the layer for NetCDF images.
+     *
+     * @throws SQLException If an error occured while querying the database.
+     * @throws CatalogException If a logical errors was found in database records.
+     * @throws ParseException If a date can't be parsed.
      */
     @Test
     public void testNetCDF() throws CatalogException, SQLException, ParseException {

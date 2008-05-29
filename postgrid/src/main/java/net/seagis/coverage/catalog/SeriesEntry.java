@@ -18,7 +18,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import net.seagis.catalog.Entry;
 import net.seagis.coverage.web.Service;
 import org.geotools.resources.i18n.Vocabulary;
@@ -70,28 +70,21 @@ final class SeriesEntry extends Entry implements Series {
     private final Format format;
 
     /**
-     * {@code true} if this series should be included in {@link Layer#getSeries}.
-     * use permission instead.
+     * The restrictions to be applied on coverage data, or {@code null} if there is no restriction.
      */
-    @Deprecated 
-    final boolean visible;
-    
-    /**
-     * The restrictions to be applied on coverage data.
-     */
-    final PermissionEntry permission;
+    private final PermissionEntry permission;
 
     /**
      * Creates a new series entry.
      *
-     * @param name      The name for this series.
-     * @param layer     The layer which contains this series.
-     * @param root      The root directory or URL, or {@code null} if none.
-     * @param pathname  The relative or absolute directory which contains the data files for this series.
-     * @param extension The extension to add to filenames, not including the dot character.
-     * @param format    The format of all coverages in this series.
-     * @param visible   {@code true} if this series should be included in {@link Layer#getSeries}.
-     * @param remarks   The remarks, or {@code null} if none.
+     * @param name       The name for this series.
+     * @param layer      The layer which contains this series.
+     * @param root       The root directory or URL, or {@code null} if none.
+     * @param pathname   The relative or absolute directory which contains the data files for this series.
+     * @param extension  The extension to add to filenames, not including the dot character.
+     * @param format     The format of all coverages in this series.
+     * @param permission The permissions for current user, or {@code null} if there is no restriction.
+     * @param remarks    The remarks, or {@code null} if none.
      */
     protected SeriesEntry(final String name, final Layer layer, final String root,
                           final String pathname, final String extension, final Format format,
@@ -101,7 +94,6 @@ final class SeriesEntry extends Entry implements Series {
         this.layer      = layer;
         this.extension  = extension;
         this.format     = format;
-        this.visible    = true;
         this.permission = permission;
         /*
          * Checks if the pathname contains a URL host.  If it does, then this URL will have
@@ -226,14 +218,21 @@ final class SeriesEntry extends Entry implements Series {
         }
         return new URI(protocol, host, buffer.toString(), null);
     }
-    
+
+    /**
+     * Returns {@code true} if the user can obtain data of at least one service.
+     */
+    final boolean isVisible() {
+        return (permission == null) || permission.isVisible();
+    }
+
     /**
      * Return true if the Series is visible par the specified service.
-     * 
+     *
      * @param service The web service requesting the series (WMS or WCS)
      */
     public boolean isQueryable(Service service) {
-        return permission.isAccessibleService(service);
+        return (permission == null) || permission.isAccessibleService(service);
     }
 
     /**
@@ -246,12 +245,13 @@ final class SeriesEntry extends Entry implements Series {
         }
         if (super.equals(object)) {
             final SeriesEntry that = (SeriesEntry) object;
-            return Utilities.equals(this.layer,     that.layer )    &&
-                   Utilities.equals(this.protocol,  that.protocol)  &&
-                   Utilities.equals(this.host,      that.host)      &&
-                   Utilities.equals(this.path,      that.path)      &&
-                   Utilities.equals(this.extension, that.extension) &&
-                   Utilities.equals(this.format,    that.format);
+            return Utilities.equals(this.layer,      that.layer )    &&
+                   Utilities.equals(this.protocol,   that.protocol)  &&
+                   Utilities.equals(this.host,       that.host)      &&
+                   Utilities.equals(this.path,       that.path)      &&
+                   Utilities.equals(this.extension,  that.extension) &&
+                   Utilities.equals(this.format,     that.format)    &&
+                   Utilities.equals(this.permission, that.permission);
         }
         return false;
     }
@@ -262,7 +262,7 @@ final class SeriesEntry extends Entry implements Series {
     @Override
     public String toString() {
         String name = super.toString();
-        if (!visible) {
+        if (!isVisible()) {
             name = name + " (" + Vocabulary.format(VocabularyKeys.HIDEN) + ')';
         }
         return name;

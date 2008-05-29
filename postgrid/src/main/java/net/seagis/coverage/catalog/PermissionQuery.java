@@ -32,6 +32,12 @@ import static net.seagis.catalog.QueryType.*;
  */
 final class PermissionQuery extends Query {
     /**
+     * Default user. The value should match the default provided in
+     * {@link net.seagis.catalog.ConfigurationKey#PERMISSION}.
+     */
+    static final String DEFAULT = "Anonymous";
+
+    /**
      * Column to appear after the {@code "SELECT"} clause.
      */
     protected final Column name, user, WMS, WCS, description;
@@ -50,7 +56,7 @@ final class PermissionQuery extends Query {
         super(database, "Permissions");
         final QueryType[] SL = {SELECT, LIST};
         name        = addColumn("name",                  SL);
-        user        = addColumn("user",    "Anonymous",  SL);
+        user        = addColumn("user",    DEFAULT,      SL);
         WMS         = addColumn("WMS",     Boolean.TRUE, SL);
         WCS         = addColumn("WCS",     Boolean.TRUE, SL);
         description = addColumn("description",           SL);

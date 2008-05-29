@@ -35,10 +35,10 @@ import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import org.geotools.util.Utilities;
 import org.geotools.util.DateRange;
 import org.geotools.util.MeasurementRange;
 import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
 import org.geotools.coverage.CoverageStack;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
@@ -196,7 +196,7 @@ final class LayerEntry extends Entry implements Layer {
             // Following is specific to SeriesEntry implementation. If faced with a different
             // implementation, we will conservatively assume that all series are to be shown.
             if (entry instanceof SeriesEntry) {
-                if (!((SeriesEntry) entry).visible) {
+                if (!((SeriesEntry) entry).isVisible()) {
                     it.remove();
                 }
             }
@@ -337,7 +337,7 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    public Dimension2D getAverageResolution() throws CatalogException {
+    public Dimension2D getTypicalResolution() throws CatalogException {
         if (domain != null) {
             final Dimension2D resolution = domain.resolution;
             if (resolution != null) {
@@ -350,8 +350,8 @@ final class LayerEntry extends Entry implements Layer {
     /**
      * {@inheritDoc}
      */
-    public Rectangle getBounds() throws CatalogException {
-        final Dimension2D resolution = getAverageResolution();
+    public Rectangle getTypicalBounds() throws CatalogException {
+        final Dimension2D resolution = getTypicalResolution();
         if (resolution != null) {
             final GeographicBoundingBox box = getGeographicBoundingBox();
             if (box != null) {
@@ -501,16 +501,17 @@ final class LayerEntry extends Entry implements Layer {
     }
 
     /**
-     * Return true if all the Series are queryable for the specified service.
+     * {@inheritDoc}
      */
     public boolean isQueryable(Service service) {
-        for (Series s: series) {
-            if (!s.isQueryable(service))
+        for (final Series s : series) {
+            if (!s.isQueryable(service)) {
                 return false;
+            }
         }
         return true;
     }
-    
+
     /**
      * Compares this layer with the specified object for equality.
      */

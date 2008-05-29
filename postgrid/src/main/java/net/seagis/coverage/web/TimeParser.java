@@ -286,8 +286,8 @@ final class TimeParser {
      */
     @Override
     public int hashCode() {
-        return numDateFields + 37*numTimeFields +
-                (hasTimeZone ? 31 : 37);
+        // For hasTimeZone we use the same values than Boolean.hashCode().
+        return numDateFields + 37*numTimeFields + (hasTimeZone ? 1231 : 1237);
     }
 
     /**

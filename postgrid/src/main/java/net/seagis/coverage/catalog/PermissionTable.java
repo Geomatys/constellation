@@ -34,17 +34,18 @@ import org.geotools.util.Utilities;
  */
 final class PermissionTable extends SingletonTable<PermissionEntry> {
     /**
-     * identifier secondary of the table.
+     * The user connected to the database. This is the user declared in the {@code config.xml}
+     * file. It may or may not be the same one than the user given to the JDBC driver.
      */
-    private String user;
-    
+    private String user = PermissionQuery.DEFAULT;
+
     /**
      * Creates a new table for the given database.
      */
     public PermissionTable(final Database database) {
         this(new PermissionQuery(database));
     }
-    
+
      /**
      * Creates a shared table.
      */
@@ -60,30 +61,40 @@ final class PermissionTable extends SingletonTable<PermissionEntry> {
         setIdentifierParameters(query.byName, null);
     }
 
+    /**
+     * Returns the current user.
+     *
+     * @return The current user.
+     */
     public String getUser() {
         return user;
     }
-    
-    public void setUser(String user) {
+
+    /**
+     * Sets the user.
+     *
+     * @param user The new user.
+     */
+    public void setUser(final String user) {
+        ensureNonNull("user", user);
         if (!Utilities.equals(this.user, user)) {
             this.user = user;
             fireStateChanged("user");
         }
-        
     }
-    
+
     /**
-     * Specifie les parametres a utiliser dans la requetes de type "type".
+     * Sets the user parameter in the given statement.
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
+    protected void configure(final QueryType type, final PreparedStatement statement)
+            throws SQLException, CatalogException
+    {
         super.configure(type, statement);
         final PermissionQuery query = (PermissionQuery) super.query;
-        if (! type.equals(QueryType.INSERT))
-            statement.setString(indexOf(query.byUser), user);
-        
+        statement.setString(indexOf(query.byUser), user);
     }
-    
+
     /**
      * Creates a new entry for the current row in the given result set.
      */

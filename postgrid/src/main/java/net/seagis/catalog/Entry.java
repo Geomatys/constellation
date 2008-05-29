@@ -18,7 +18,7 @@ package net.seagis.catalog;
 import java.util.UUID;
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlTransient;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -37,14 +37,15 @@ public class Entry implements Element, Serializable {
     private static final long serialVersionUID = -7119518186999674633L;
 
     /**
-     * Nom de cette entrée. Dans certains cas, un nom peut être créé à la volé
-     * la première fois où il sera demandé (voir {@link #createName}).
+     * Name of this entry. In some case this name may be created on the fly when first needed.
+     *
+     * @see #createName
      */
     @XmlTransient
-    protected String name;
+    private String name;
 
     /**
-     * Remarques s'appliquant à cette entrée, ou {@code null}.
+     * Remarks for this entry, of {@code null}.
      */
     @XmlTransient
     private final String remarks;
@@ -83,6 +84,8 @@ public class Entry implements Element, Serializable {
     /**
      * Creates a name of the fly. This method is invoked when first needed if the entry
      * has been created with a {@code null} name.
+     *
+     * @return A name generated on the fly.
      */
     protected String createName() {
         return UUID.randomUUID().toString();
@@ -90,6 +93,8 @@ public class Entry implements Element, Serializable {
 
     /**
      * Returns the name for this entry.
+     *
+     * @return The name for this entry. Should never be {@code null}.
      */
     public String getName() {
         if (name == null) {
@@ -100,6 +105,8 @@ public class Entry implements Element, Serializable {
 
     /**
      * Returns the remarks for this entry, or {@code null} if none.
+     *
+     * @return Remarks for this entry, or {@code null}.
      */
     public String getRemarks() {
         return remarks;
@@ -132,6 +139,9 @@ public class Entry implements Element, Serializable {
      * example when the name is the primary key in a database table. Subclasses should compare
      * other attributes as a safety when affordable, but should avoid any comparaison that may
      * force the loading of a large amount of data.
+     *
+     * @param  object The object to compare with this entry.
+     * @return {@code true} if the given object is equals to this entry.
      */
     @Override
     public boolean equals(final Object object) {

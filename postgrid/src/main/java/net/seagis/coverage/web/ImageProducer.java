@@ -355,6 +355,8 @@ public abstract class ImageProducer {
      * Creates a new image producer connected to the same database than the specified worker.
      * This constructor is used for creating many worker instance to be used in multi-threads
      * application.
+     *
+     * @param worker The worker to use as a template.
      */
     public ImageProducer(final ImageProducer worker) {
         database = worker.database;
@@ -364,7 +366,9 @@ public abstract class ImageProducer {
     }
 
     /**
-     * Returns the output MIME type for exception
+     * Returns the output MIME type for exceptions.
+     *
+     * @return The output MIMI type for exceptions.
      */
     public String getExceptionFormat() {
         if (exceptionFormat == null) {
@@ -403,6 +407,7 @@ public abstract class ImageProducer {
      * Returns only the name of all available layers. This method is much cheaper than
      * {@link #getLayers} when only the names are wanted.
      *
+     * @return The layer names, or an empty set if none.
      * @throws WebServiceException if an error occured while fetching the table.
      */
     public Set<String> getLayerNames() throws WebServiceException {
@@ -422,6 +427,7 @@ public abstract class ImageProducer {
      * be a comma or semi-colon separated list of name returned by {@link #getLayerNames}.
      *
      * @param  layerNames a list of layer names separated by comma or semi-colon.
+     * @return The layers, or an empty list if none.
      * @throws WebServiceException if an error occured while fetching the table.
      */
     public List<Layer> getLayers(final String layerNames) throws WebServiceException {
@@ -453,6 +459,7 @@ public abstract class ImageProducer {
      * Returns the specified layers.
      *
      * @param  layerNames a list of layer names.
+     * @return The layers, or an empty list if none.
      * @throws WebServiceException if an error occured while fetching the table.
      */
     public List<Layer> getLayers(final Collection<String> layerNames) throws WebServiceException {
@@ -482,6 +489,7 @@ public abstract class ImageProducer {
     /**
      * Returns all available layers.
      *
+     * @return The layers, or an empty list if none.
      * @throws WebServiceException if an error occured while fetching the table.
      */
     public Set<Layer> getLayers() throws WebServiceException {
@@ -498,6 +506,7 @@ public abstract class ImageProducer {
     /**
      * Returns the layer for the current configuration.
      *
+     * @return The current layer.
      * @throws WebServiceException if an error occured while fetching the table.
      */
     public Layer getLayer() throws WebServiceException {
@@ -521,7 +530,7 @@ public abstract class ImageProducer {
                     change   |= table.setGeographicBoundingBox(request.bbox);
                     change   |= table.setPreferredResolution(request.resolution);
                     candidate = table.getEntry(layer);
-                    
+
                     layers.put(request, candidate);
                 }
             }
@@ -562,6 +571,8 @@ public abstract class ImageProducer {
 
     /**
      * Returns the coordinate reference system, or {@code null} if unknown.
+     *
+     * @return The current CRS for queries, or {@code null}.
      */
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return (envelope != null) ? envelope.getCoordinateReferenceSystem() : null;
@@ -569,6 +580,8 @@ public abstract class ImageProducer {
 
     /**
      * Returns the response CRS, or {@code null} if unknown.
+     *
+     * @return The current CRS for responses, or {@code null}.
      */
     public CoordinateReferenceSystem getResponseCRS() {
         return (responseCRS != null) ? responseCRS : getCoordinateReferenceSystem();
@@ -598,7 +611,7 @@ public abstract class ImageProducer {
                     final Layer layer = getLayer();
                     try {
                         if (gridRange == null) {
-                            final Rectangle bounds = layer.getBounds();
+                            final Rectangle bounds = layer.getTypicalBounds();
                             if (bounds != null) {
                                 gridRange = new GeneralGridRange(bounds);
                             }
@@ -626,19 +639,21 @@ public abstract class ImageProducer {
         }
         return gridGeometry;
     }
-    
+
     /**
      * Gets the coverage referred to by the web service request params
-     * 
+     *
      * This is used in WMS GetFeatureInfo to provide information about the original data source.
-     * 
-     * @return CoverageReference for the requested time
+     *
+     * @return The coverage reference for the requested time and elevation.
+     * @throws WebServiceException if an error occured while querying the layer.
      */
     public CoverageReference getCoverageReference() throws WebServiceException {
         final Layer layer = getLayer();
         final CoverageReference ref;
         if (time == null) {
-            throw new WMSWebServiceException("Must specify TIME.", INVALID_PARAMETER_VALUE, version);
+            throw new WMSWebServiceException("Must specify TIME.",
+                    INVALID_PARAMETER_VALUE, version);
         }
         try {
             ref = layer.getCoverageReference(time, elevation);
@@ -658,6 +673,7 @@ public abstract class ImageProducer {
      *
      * @param  resample {@code true} for resampling the coverage to the specified envelope
      *         and dimension, or {@code false} for getting the coverage as in the database.
+     * @return The coverage for the requested time and elevation.
      * @throws WebServiceException if an error occured while querying the coverage.
      */
     public GridCoverage2D getGridCoverage2D(final boolean resample) throws WebServiceException {
@@ -719,6 +735,7 @@ public abstract class ImageProducer {
      * Gets the image for the {@linkplain #getGridCoverage2D current coverage}.
      * The image is resized to the requested dimension and CRS.
      *
+     * @return The rendered image for the requested time and elevation.
      * @throws WebServiceException if an error occured while querying the coverage.
      */
     public RenderedImage getRenderedImage() throws WebServiceException {
@@ -791,6 +808,7 @@ public abstract class ImageProducer {
     /**
      * Returns the format as a mime type.
      *
+     * @return The format MIME type.
      * @throws WebServiceException if the format is not defined.
      */
     public String getMimeType() throws WebServiceException {
@@ -823,6 +841,7 @@ public abstract class ImageProducer {
      * Returns the legend as an image. The {@link #setDimension dimension} and {@link #setFormat
      * format} are honored.
      *
+     * @return The legend image as a file.
      * @throws WebServiceException if an error occured while processing the legend.
      */
     public File getLegendFile() throws WebServiceException {
@@ -848,6 +867,7 @@ public abstract class ImageProducer {
      * directory, may be overwritten during the next invocation of this method and will
      * be deleted at JVM exit.
      *
+     * @return The image as a file.
      * @throws WebServiceException if an error occured while processing the image.
      */
     public File getImageFile() throws WebServiceException {
@@ -1119,6 +1139,11 @@ public abstract class ImageProducer {
      * <strong>in pixels coordinates</strong>. If the coverage has more than one band, only
      * the value in the first band is returned. This methods returns the <cite>geophysics</cite>
      * value, if possible.
+     *
+     * @param  x The first coordinate, typically longitude.
+     * @param  y The second coordinate, typically latitude.
+     * @return The geophysics value at the given position.
+     * @throws WebServiceException if an error occured while processing the date.
      */
     public double evaluatePixel(final double x, final double y) throws WebServiceException {
         final GridGeometry gridGeometry = getGridGeometry();
@@ -1143,25 +1168,6 @@ public abstract class ImageProducer {
             }
         }
         return Double.NaN;
-    }
-
-    /**
-     * Evaluates the {@linkplain #getGridCoverage2D current coverage} at the given position,
-     * <strong>in pixels coordinates</strong>. If the coverage has more than one band, only
-     * the value in the first band is returned. This methods returns the <cite>geophysics</cite>
-     * value, if possible.
-     */
-    public double evaluatePixel(final String x, final String y) throws WebServiceException {
-        final double xv, yv;
-        String n = null;
-        try {
-            xv = Double.parseDouble(n = x.trim());
-            yv = Double.parseDouble(n = y.trim());
-        } catch (NumberFormatException exception) {
-            throw new WMSWebServiceException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, n),
-                    exception, INVALID_POINT, version);
-        }
-        return evaluatePixel(xv, yv);
     }
 
     /**

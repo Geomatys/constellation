@@ -42,18 +42,24 @@ public interface Series extends Element {
     /**
      * Returns the layer which contains this series.
      *
+     * @return The layer which contains this series.
+     *
      * @see Layer#getSeries
      */
     Layer getLayer();
 
     /**
      * Returns the format of all coverages in this series.
+     *
+     * @return The coverages format.
      */
     Format getFormat();
 
     /**
      * Returns the URL protocol for data transmission. The protocol may be for example
      * {@code "file"}, {@code "ftp"} or {@code "dods"} (the later is for OpenDAP).
+     *
+     * @return The protocol for data transmission.
      */
     String getProtocol();
 
@@ -80,11 +86,13 @@ public interface Series extends Element {
      *         provided in the database.
      */
     URI uri(String filename) throws URISyntaxException;
-    
+
     /**
-     * Returns true if the Series is queryable by the specified service
-     * 
-     * @param service The web service trying to request this series.
+     * Returns true if this series can be queried by the specified service.
+     * This information is inferred from the {@code Permissions} table.
+     *
+     * @param service The web service trying to query this series.
+     * @return {@code true} if this series can be queried by the given service.
      */
     boolean isQueryable(Service service);
 }

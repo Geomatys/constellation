@@ -175,10 +175,9 @@ final class SeriesTable extends SingletonTable<Series> {
         final Format format = formats.getEntry(formatID);
         if (permissions == null) {
             permissions = getDatabase().getTable(PermissionTable.class);
-            permissions =  new PermissionTable(permissions);
+            permissions = new PermissionTable(permissions);
             permissions.setUser(getProperty(ConfigurationKey.PERMISSION));
         }
-        
         final PermissionEntry userCredential = permissions.getEntry(permission);
         return new SeriesEntry(name, layer, rootDirectory != null ? rootDirectory : rootURL,
                                pathname, extension, format, userCredential, null);

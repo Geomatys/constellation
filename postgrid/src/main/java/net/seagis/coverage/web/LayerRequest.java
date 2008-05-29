@@ -20,8 +20,8 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
+import org.geotools.util.Utilities;
 import org.geotools.util.logging.Logging;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
@@ -92,7 +92,7 @@ final class LayerRequest {
          * values than necessary and flush the cache less often. This method conceptually
          * "rounds" the bounding box on a grid.
          */
-        Dimension2D resolution = layer.getAverageResolution();
+        Dimension2D resolution = layer.getTypicalResolution();
         if (resolution != null) {
             final GeographicBoundingBox global = layer.getGeographicBoundingBox();
             if (bbox == null) {

@@ -97,6 +97,8 @@ public class WebServiceWorker extends ImageProducer {
      * Creates a new image producer connected to the same database than the specified worker.
      * This constructor is used for creating many worker instance to be used in multi-threads
      * application.
+     *
+     * @param worker The worker to use as a template.
      */
     public WebServiceWorker(final WebServiceWorker worker) {
         super(worker);
@@ -254,7 +256,7 @@ public class WebServiceWorker extends ImageProducer {
      *  <var>x</var><sub>max</sub>, <var>y</var><sub>max</sub>,
      *  <var>z</var><sub>min</sub>, <var>z</var><sub>max</sub>)
      *
-     * @param  The bounding box, or {@code null} if unknown.
+     * @param  bbox The bounding box, or {@code null} if unknown.
      * @throws WebServiceException if the given bounding box can't be parsed.
      */
     @SuppressWarnings("fallthrough")
@@ -411,7 +413,7 @@ public class WebServiceWorker extends ImageProducer {
     /**
      * Sets the time, or {@code null} if unknown.
      *
-     * @param  elevation The elevation.
+     * @param  date The date.
      * @throws WebServiceException if the elevation can't be parsed from the given string.
      *
      * @todo Needs to take the whole list in account.
@@ -453,6 +455,7 @@ public class WebServiceWorker extends ImageProducer {
      * If not set the default value is {@link Interpolation#INTERP_BILINEAR}.
      *
      * @param interpolation The name of the requested interpolation method.
+     * @throws WebServiceException if the interpolation can't be parsed from the given string.
      */
     public void setInterpolation(String interpolation) throws WebServiceException {
         final int code;
@@ -478,6 +481,9 @@ public class WebServiceWorker extends ImageProducer {
 
     /**
      * Sets the range on value on which to apply a color ramp.
+     *
+     * @param range The color map range.
+     * @throws WebServiceException if the range can't be parsed from the given string.
      */
     public void setColormapRange(String range) throws WebServiceException {
        if (range == null) {
@@ -500,6 +506,7 @@ public class WebServiceWorker extends ImageProducer {
      * if not set the default value is {@code 0xFFFFFF}.
      *
      * @param background an hexadecimal description of a color.
+     * @throws WebServiceException if the background can't be parsed from the given string.
      */
     public void setBackgroundColor(String background) throws WebServiceException {
         if (background == null) {
@@ -519,7 +526,7 @@ public class WebServiceWorker extends ImageProducer {
      * Sets the background transparency of the requested image.
      * If not set the default value {@code false}.
      *
-     * @param a string representing a boolean.
+     * @param transparent A string representing a boolean.
      */
     public void setTransparency(String transparent) {
         if (transparent != null) {
@@ -586,6 +593,30 @@ public class WebServiceWorker extends ImageProducer {
             throw new WMSWebServiceException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
                             "Exception", format), INVALID_PARAMETER_VALUE, version);
         }
+    }
+
+    /**
+     * Evaluates the {@linkplain #getGridCoverage2D current coverage} at the given position,
+     * <strong>in pixels coordinates</strong>. If the coverage has more than one band, only
+     * the value in the first band is returned. This methods returns the <cite>geophysics</cite>
+     * value, if possible.
+     *
+     * @param  x The first coordinate, typically longitude.
+     * @param  y The second coordinate, typically latitude.
+     * @return The geophysics value at the given position.
+     * @throws WebServiceException if an error occured while processing the date.
+     */
+    public double evaluatePixel(final String x, final String y) throws WebServiceException {
+        final double xv, yv;
+        String n = null;
+        try {
+            xv = Double.parseDouble(n = x.trim());
+            yv = Double.parseDouble(n = y.trim());
+        } catch (NumberFormatException exception) {
+            throw new WMSWebServiceException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, n),
+                    exception, INVALID_POINT, version);
+        }
+        return evaluatePixel(xv, yv);
     }
 
     /**
