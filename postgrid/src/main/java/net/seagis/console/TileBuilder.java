@@ -55,7 +55,6 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.coverage.catalog.WritableGridCoverageEntry;
 import net.seagis.coverage.catalog.WritableGridCoverageTable;
-import org.geotools.image.io.mosaic.TileWritingPolicy;
 
 
 /**
@@ -142,6 +141,12 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
      */
     @Option(description="Write the tiles to the target directory, overwriting existing ones.")
     private boolean overwrite;
+
+    /**
+     * Flag specified on the command lines.
+     */
+    @Option(description="Do not ommit empty tiles (default is to skip them).")
+    private boolean empty;
 
     /**
      * Flag specified on the command lines.
@@ -331,7 +336,11 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
                     if (overwrite) {
                         policy = TileWritingPolicy.OVERWRITE;
                     } else if (write) {
-                        policy = TileWritingPolicy.WRITE_NEWS_ONLY;
+                        if (empty) {
+                            policy = TileWritingPolicy.WRITE_NEWS_ONLY;
+                        } else {
+                            policy = TileWritingPolicy.WRITE_NEWS_NONEMPTY;
+                        }
                     }
                 }
                 tileManager = builder.createTileManager(tiles, 0, policy);
@@ -384,7 +393,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
          * "Tiles" table while the global entry will be inserted into the "GridCoverages" table.
          */
         out.println(tileManager);
-        if (insert || pretend) try {
+        if (insert) try {
             final Database database = new Database();
             if (pretend) {
                 database.setUpdateSimulator(out);
