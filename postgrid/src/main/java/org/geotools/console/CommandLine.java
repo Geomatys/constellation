@@ -44,6 +44,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Cédric Briançon
  */
 public class CommandLine {
     /**
@@ -90,6 +91,16 @@ public class CommandLine {
      * The remaining arguments after all option values have been assigned to the fields.
      */
     protected final String[] arguments;
+
+    /**
+     * Creates a new {@code CommandLine} instance from the given arguments, and specifies that
+     * the default value for the remaining number of arguments is {@code 0}.
+     *
+     * @param args The command-line arguments.
+     */
+    protected CommandLine(final String[] args) {
+        this(args, 0);
+    }
 
     /**
      * Creates a new {@code CommandLine} instance from the given arguments. If this constructor
