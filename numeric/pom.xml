@@ -21,7 +21,6 @@
   <groupId>net.seagis</groupId>
   <artifactId>numeric</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
   <name>Numerical algorithms</name>
   <description>
     Algorithmes de calculs numériques.

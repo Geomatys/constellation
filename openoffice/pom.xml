@@ -21,7 +21,6 @@
   <groupId>net.seagis</groupId>
   <artifactId>openoffice</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
   <name>OpenOffice Addin</name>
   <description>
     Connexion aux méthodes du module "Observations et mesures" à partir d'OpenOffice.
