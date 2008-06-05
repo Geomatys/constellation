@@ -49,7 +49,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -95,7 +94,6 @@ import net.seagis.coverage.catalog.LayerTable;
 import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.resources.i18n.Resources;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
-import org.geotools.geometry.GeneralDirectPosition;
 import org.opengis.coverage.Coverage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -220,15 +218,10 @@ public abstract class ImageProducer {
     protected NumberRange<Double> colormapRange;
 
     /**
-     * The requested time.
+     * The requested times. Typically contains a singleton, but could also contains more
+     * values for WCS requests that span the time dimension.
      */
-    protected Date time;
-    
-    /**
-     * The requested time list.  
-     * Used for WCS requests that span the time dimension.
-     */
-    protected List<Date> timeList;
+    protected final List<Date> times = new ArrayList<Date>();
 
     /**
      * The requested elevation.
@@ -385,68 +378,75 @@ public abstract class ImageProducer {
         manager  = worker.manager;
         manager.addWorker(this);
     }
-    
+
     /**
-     * Determines if the request is for a time-series by checking for the size of {@code timeList}.
-     * @return {@code true} if {@code timeList} is > 1, else return {@code false}
+     * Determines if the request is for a time-series by checking for the size of {@link #times}.
+     *
+     * @return {@code true} if {@code times.size()} is > 1, else return {@code false}.
      */
     public boolean isTimeseriesRequest() {
-        if (timeList.size() > 1) return true;
-        else return false;
+        return times.size() > 1;
     }
-    
+
     /**
      * Executes a request for a time-series
      * Currently evaluates just one point at a corner of the envelope.
-     * TODO: return a time-series of the average value in the envelope?
-     * @return double[] containing the extracted time-series
+     *
+     * @return An array containing the extracted time-series.
+     * @throws WebServiceException if an error occured while querying the database.
+     *
+     * @todo Return a time-series of the average value in the envelope?
      */
     public double[] getTimeseries() throws WebServiceException {
+        final Layer layer = getLayer();
+        final Coverage coverage;
         try {
-
-            Layer layer = getLayer();
-            Coverage coverage = layer.getCoverage();
-            SpatioTemporalCoverage3D stCoverage = new SpatioTemporalCoverage3D(layer.getName(), coverage);
-            Point2D point = new Point2D.Double(envelope.getMinimum(0), envelope.getMinimum(1));
-            double[] res = null;
-            double[] values = new double[timeList.size()];
-            int i = 0;
-            for (Date t : timeList) {
-                res = stCoverage.evaluate(point, t, res);
-                values[i] = res[0];
-                i += 1;
-            }
-            return values;
-        } catch (CatalogException ex) {
-            Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, "Error finding coverage in database.", ex);
-            return null;
+            coverage = layer.getCoverage();
+        } catch (CatalogException exception) {
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
-    } 
-    
+        SpatioTemporalCoverage3D stCoverage = new SpatioTemporalCoverage3D(layer.getName(), coverage);
+        Point2D point = new Point2D.Double(envelope.getMinimum(0), envelope.getMinimum(1));
+        double[] res = null;
+        final double[] values = new double[times.size()];
+        for (int i=0; i<values.length; i++) {
+            final Date t = times.get(i);
+            res = stCoverage.evaluate(point, t, res);
+            values[i] = res[0];
+        }
+        return values;
+    }
+
     /**
-     * Dumps the resulting timeseries to an XML file
-     * TODO: Write to a standard schem for representing time-series
-     * @return XML file containing generated time-series
-     * @throws net.seagis.coverage.web.WebServiceException
+     * Dumps the resulting timeseries to an XML file.
+     *
+     * @return XML file containing generated time-series.
+     * @throws WebServiceException if an error occured while querying the database.
+     *
+     * @todo Write to a standard schem for representing time-series.
+     *
+     * @todo Current implementation creates a new temporary files everytime it is invoked.
+     *       We should try to use some pool instead, like what we do for images.
+     *
+     * @todo The XML formatting part should be delagated to an other class, something
+     *       like a {@code XMLWriter}.
      */
     public File getTimeseriesAsXML() throws WebServiceException {
+        final double[] ts = getTimeseries();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
-
-            double[] ts = getTimeseries();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = dbf.newDocumentBuilder();
-            Document doc = builder.newDocument();
-            Element elem = doc.createElement("timeseries");
-            doc.appendChild(elem);
+            final DocumentBuilder builder = dbf.newDocumentBuilder();
+            final Document doc = builder.newDocument();
+            final Element element = doc.createElement("timeseries");
+            doc.appendChild(element);
             for (double val : ts) {
                 Element e = doc.createElement(layer);
                 e.appendChild(doc.createTextNode(Double.toString(val)));
-                elem.appendChild(e);
+                element.appendChild(e);
             }
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer transformer = tf.newTransformer();
-            DOMSource source = new DOMSource(doc);
-
+            final TransformerFactory tf = TransformerFactory.newInstance();
+            final Transformer transformer = tf.newTransformer();
+            final DOMSource source = new DOMSource(doc);
             final String directory = System.getProperty("java.io.tmpdir");
             if (directory != null) {
                 temporaryDirectory = new File(directory, "seagis");
@@ -456,18 +456,16 @@ public abstract class ImageProducer {
             }
             File file = File.createTempFile("testout", "xml", temporaryDirectory);
             file.deleteOnExit();
-
             StreamResult result = new StreamResult(file);
             transformer.transform(source, result);
             return file;
-        } catch (TransformerException ex) {
-            Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransformerException exception) {
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+        } catch (IOException exception) {
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
+        } catch (ParserConfigurationException exception) {
+            throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
-        return null;
     }
 
     /**
@@ -632,13 +630,13 @@ public abstract class ImageProducer {
                 candidate = layers.get(request);
                 if (candidate == null) {
                     final LayerTable table = getLayerTable(false);
-                    change   |= table.setGeographicBoundingBox(request.bbox);
-                    change   |= table.setPreferredResolution(request.resolution);
-                    if (!timeList.isEmpty()) {
-                        change |= table.setTimeRange(timeList.get(0), timeList.get(timeList.size()-1));
+                    change |= table.setGeographicBoundingBox(request.bbox);
+                    change |= table.setPreferredResolution(request.resolution);
+                    if (!times.isEmpty()) {
+                        change |= table.setTimeRange(Collections.min(times),
+                                                     Collections.max(times));
                     }
                     candidate = table.getEntry(layer);
-
                     layers.put(request, candidate);
                 }
             }
@@ -653,6 +651,15 @@ public abstract class ImageProducer {
             LOGGER.fine("LayerTable configuration changed.");
         }
         return candidate;
+    }
+
+    /**
+     * Returns a single time from the {@linkplain #times} list, or {@code null} if none.
+     * If there is more than one time, select the last one on the basis that it is typically
+     * the most recent one.
+     */
+    private Date getTime() {
+        return times.isEmpty() ? null : times.get(times.size() - 1);
     }
 
     /**
@@ -755,16 +762,19 @@ public abstract class ImageProducer {
      *
      * @return The coverage reference for the requested time and elevation.
      * @throws WebServiceException if an error occured while querying the layer.
+     *
+     * @todo In current implementation, the TIME parameter is mandatory. This is inconsistent
+     *       with the behavior of other methods like {@link #getGridCoverage2D}.
      */
     public CoverageReference getCoverageReference() throws WebServiceException {
         final Layer layer = getLayer();
         final CoverageReference ref;
-        if (time == null) {
+        if (times.isEmpty()) {
             throw new WMSWebServiceException("Must specify TIME.",
                     INVALID_PARAMETER_VALUE, version);
         }
         try {
-            ref = layer.getCoverageReference(time, elevation);
+            ref = layer.getCoverageReference(getTime(), elevation);
         } catch (CatalogException exception) {
             throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
@@ -787,7 +797,7 @@ public abstract class ImageProducer {
     public GridCoverage2D getGridCoverage2D(final boolean resample) throws WebServiceException {
         final Layer layer = getLayer();
         final CoverageReference ref;
-        if (time == null) {
+        if (times.isEmpty()) {
             /*
              * If the WMS request does not include a TIME parameter, then use the latest time available.
              *
@@ -800,7 +810,7 @@ public abstract class ImageProducer {
             try {
                 final SortedSet<Date> availableTimes = layer.getAvailableTimes();
                 if (availableTimes != null && !availableTimes.isEmpty()) {
-                    time = availableTimes.last();
+                    times.addAll(availableTimes);
                 }
             } catch (CatalogException ex) {
                 Logging.unexpectedException(LOGGER, ImageProducer.class, "getGridCoverage2D", ex);
@@ -808,7 +818,7 @@ public abstract class ImageProducer {
             }
         }
         try {
-            ref = layer.getCoverageReference(time, elevation);
+            ref = layer.getCoverageReference(getTime(), elevation);
         } catch (CatalogException exception) {
             throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
         }
@@ -942,7 +952,7 @@ public abstract class ImageProducer {
     private ImageRequest getImageRequest(final ImageType type) throws WebServiceException {
         final GridGeometry geometry = getGridGeometry();
         return new ImageRequest(type, layer, geometry, responseCRS, colormapRange,
-                time, elevation, interpolation, format, background, transparent);
+                getTime(), elevation, interpolation, format, background, transparent);
     }
 
     /**

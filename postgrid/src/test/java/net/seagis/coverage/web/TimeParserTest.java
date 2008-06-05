@@ -17,6 +17,7 @@ package net.seagis.coverage.web;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -61,7 +62,8 @@ public class TimeParserTest extends TestCase {
         final DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH'Z'");
         format.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        List<Date> dates = TimeParser.parse(PERIOD, TimeParser.MILLIS_IN_DAY);
+        final List<Date> dates = new ArrayList<Date>();
+        TimeParser.parse(PERIOD, TimeParser.MILLIS_IN_DAY, dates);
         // Verify that the list contains at least one element.
         assertFalse(dates.isEmpty());
         assertEquals(format.parse("2007-01-01T12Z"), dates.get(0));

@@ -120,18 +120,20 @@ final class TimeParser {
      *
      * @param  value The date, time and period to parse.
      * @param  defaultPeriod The default period (in milliseconds) if it is needed but not specified.
+     * @param  dates The destination list where to append the parsed dates.
      * @return A list of dates, or an empty list of the {@code value} string is null or empty.
      * @throws ParseException if the string can not be parsed.
      */
-    public static List<Date> parse(String value, final long defaultPeriod) throws ParseException {
+    public static void parse(String value, final long defaultPeriod, final List<Date> dates)
+            throws ParseException
+    {
         if (value == null) {
-            return Collections.emptyList();
+            return;
         }
         value = value.trim();
         if (value.length() == 0) {
-            return Collections.emptyList();
+            return;
         }
-        final List<Date> dates = new ArrayList<Date>(4);
         final StringTokenizer periods = new StringTokenizer(value, ",");
         while (periods.hasMoreTokens()) {
             final StringTokenizer elements = new StringTokenizer(periods.nextToken().trim(), "/");
@@ -160,7 +162,6 @@ final class TimeParser {
                 time += period;
             }
         }
-        return dates;
     }
 
     /**

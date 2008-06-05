@@ -415,27 +415,15 @@ public class WebServiceWorker extends ImageProducer {
      *
      * @param  date The date.
      * @throws WebServiceException if the elevation can't be parsed from the given string.
-     *
-     * @todo Needs to take the whole list in account.
      */
     public void setTime(String date) throws WebServiceException {
-        if (date == null) {
-            time = null;
-            return;
-        }
-        final List<Date> dates;
-        try {
-            dates = TimeParser.parse(date.trim(), TimeParser.MILLIS_IN_DAY);
+        times.clear();
+        if (date != null) try {
+            // 'times' will hold the List<Date> that we will use for executing WCS requests across multiple dates.
+            TimeParser.parse(date.trim(), TimeParser.MILLIS_IN_DAY, times);
         } catch (ParseException exception) {
             throw new WMSWebServiceException(exception, INVALID_PARAMETER_VALUE, version);
         }
-        if (dates.isEmpty()) {
-            time = null;
-        } else {
-            time = dates.get(0);
-        }
-        // 'timeList' will hold the List<Date> that we will use for executing WCS requests across multiple dates.  
-        timeList = dates;
     }
 
     /**
