@@ -185,6 +185,11 @@ public class CSWworker {
     private FilterParser filterParser;
     
     /**
+     * A flag indicating if the worker is correctly started.
+     */
+    private boolean isStarted;
+            
+    /**
      * The queryable element from ISO 19115 and their path id.
      */
     protected static Map<String, List<String>> ISO_QUERYABLE;
@@ -536,12 +541,13 @@ public class CSWworker {
         cswFactory      = new ObjectFactory();
         Properties prop = new Properties();
         File f          = null;
-        String env      = "/home/tomcat/.sicade" ; //System.getenv("CATALINA_HOME");
+        File env        = new File("/root/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
         logger.info("Path to config file=" + env);
-        boolean start = true;
+        isStarted = true;
         try {
             // we get the configuration file
-            f = new File(env + "/csw_configuration/config.properties");
+            
+            f = new File(env, "config.properties");
             FileInputStream in = new FileInputStream(f);
             prop.load(in);
             in.close();
@@ -553,11 +559,11 @@ public class CSWworker {
             logger.severe("The CSW service is not working!"                       + '\n' + 
                           "cause: The srevice can not load the properties files!" + '\n' + 
                           "cause: " + e.getMessage());
-            start = false;
+            isStarted = false;
         }
         
         //we create a connection to the metadata database
-        if (start) {
+        if (isStarted) {
             PGSimpleDataSource dataSourceMD = new PGSimpleDataSource();
             dataSourceMD.setServerName(prop.getProperty("MDDBServerName"));
             dataSourceMD.setPortNumber(Integer.parseInt(prop.getProperty("MDDBServerPort")));
@@ -573,10 +579,11 @@ public class CSWworker {
                 index            = null;
                 MDReader         = null;
                 MDWriter         = null;
+                isStarted        = false;
             } else {
                  databaseReader  = new Reader20(Standard.ISO_19115,  MDConnection);
                  databaseWriter  = new Writer20(MDConnection);
-                 index           = new IndexLucene(databaseReader);
+                 index           = new IndexLucene(databaseReader, env);
                  MDReader        = new MetadataReader(databaseReader, dataSourceMD.getConnection());
                  MDWriter        = new MetadataWriter(databaseReader, databaseWriter);
                  logger.info("CSW service running");
@@ -1270,6 +1277,10 @@ public class CSWworker {
      * @param request an object request with the base attribute (all except GetCapabilities request); 
      */ 
     private void verifyBaseRequest(RequestBaseType request) throws WebServiceException {
+        if (!isStarted) {
+            throw new OWSWebServiceException("The service is not running!",
+                                              NO_APPLICABLE_CODE, null, version);
+        }
         if (request != null) {
             if (request.getService() != null) {
                 if (!request.getService().equals("CSW"))  {

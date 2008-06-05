@@ -39,7 +39,6 @@ import com.sun.ws.rest.spi.resource.Singleton;
 
 // JAXB xml binding dependencies
 import java.io.IOException;
-import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
@@ -47,13 +46,11 @@ import javax.xml.bind.JAXBException;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.coverage.catalog.CoverageReference;
-import net.seagis.coverage.catalog.Series;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.sld.DescribeLayerResponseType;
 import net.seagis.sld.LayerDescriptionType;
 import net.seagis.sld.StyledLayerDescriptor;
-import net.seagis.wms.Layer;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
 import net.seagis.coverage.web.ServiceVersion;
@@ -63,23 +60,19 @@ import net.seagis.se.OnlineResourceType;
 import net.seagis.sld.TypeNameType;
 import net.seagis.util.PeriodUtilities;
 import net.seagis.wms.AbstractWMSCapabilities;
-import net.seagis.wms.BoundingBox;
-import net.seagis.wms.DCPType;
-import net.seagis.wms.Dimension;
-import net.seagis.wms.EXGeographicBoundingBox;
-import net.seagis.wms.Get;
-import net.seagis.wms.LegendURL;
-import net.seagis.wms.OnlineResource;
-import net.seagis.wms.OperationType;
-import net.seagis.wms.Post;
-import net.seagis.wms.Request;
-import net.seagis.wms.Style;
+import net.seagis.wms.AbstractDCP;
+import net.seagis.wms.AbstractDimension;
+import net.seagis.wms.AbstractLayer;
+import net.seagis.wms.AbstractRequest;
+import net.seagis.wms.AbstractOperation;
+import net.seagis.wms.AbstractProtocol;
+import net.seagis.wms.v111.LatLonBoundingBox;
+import net.seagis.wms.v130.OperationType;
+import net.seagis.wms.v130.EXGeographicBoundingBox;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
-import net.seagis.coverage.metadata.CoverageMetadata;
 import net.seagis.coverage.metadata.LayerMetadata;
 import net.seagis.coverage.metadata.SeriesMetadata;
-import net.seagis.coverage.metadata.CoverageMetadataTable;
 import net.seagis.coverage.metadata.LayerMetadataTable;
 import net.seagis.coverage.metadata.PointOfContact;
 import net.seagis.coverage.metadata.PointOfContactTable;
@@ -153,7 +146,7 @@ public class WMService extends WebService {
         super("WMS", new ServiceVersion(Service.WMS, "1.3.0") ,new ServiceVersion(Service.WMS, "1.1.1"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("net.seagis.coverage.web:net.seagis.wms:net.seagis.sld:net.seagis.gml",
+        setXMLContext("net.seagis.coverage.web:net.seagis.wms.v111:net.seagis.wms.v130:net.seagis.sld:net.seagis.gml",
                       "http://www.opengis.net/wms");
                 
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
@@ -459,17 +452,17 @@ public class WMService extends WebService {
         } 
         //we update the url in the static part.
         response.getService().getOnlineResource().setHref(getServiceURL() + "wms");
-        Request request = response.getCapability().getRequest();
+        AbstractRequest request = response.getCapability().getRequest();
         
         updateURL(request.getGetCapabilities().getDCPType());
         updateURL(request.getGetFeatureInfo().getDCPType());
         updateURL(request.getGetMap().getDCPType());
-        updateExtendedOperationURL(request.getExtendedOperation());
+        updateExtendedOperationURL(request);
         
         //we build the layers object of the document
         
         //we get the list of layers
-        List<Layer> layers = new ArrayList<Layer>();
+        List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
         for (net.seagis.coverage.catalog.Layer inputLayer: layerList) {
             try {
                 if (!inputLayer.isQueryable(Service.WMS)) {
@@ -489,22 +482,8 @@ public class WMService extends WebService {
                 
                 GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
                
-                /*
-                 * TODO
-                 * Envelope inputBox                 = inputLayer.getCoverage().getEnvelope();
-                 */
-                BoundingBox outputBBox = null;
-                if(inputGeoBox != null) {
-                    outputBBox = new BoundingBox(code.toString(), 
-                                                 inputGeoBox.getWestBoundLongitude(),
-                                                 inputGeoBox.getSouthBoundLatitude(),
-                                                 inputGeoBox.getEastBoundLongitude(),
-                                                 inputGeoBox.getNorthBoundLatitude(),
-                                                 0.0, 0.0,
-                                                 getCurrentVersion().toString());
-                }
                 //we add the list od available date and elevation
-                List<Dimension> dimensions = new ArrayList<Dimension>();
+                List<AbstractDimension> dimensions = new ArrayList<AbstractDimension>();
                 
                 
                 //the available date
@@ -512,13 +491,17 @@ public class WMService extends WebService {
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 PeriodUtilities periodFormatter = new PeriodUtilities(df);
-                Dimension dim;
+                AbstractDimension dim;
                 String value = "";
                 SortedSet<Date> dates = inputLayer.getAvailableTimes();
                 if (dates != null && dates.size() > 0) {
                     defaut = df.format(dates.last());
                     
-                dim = new Dimension("time", "ISO8601", defaut, null);
+                    if (getCurrentVersion().toString().endsWith("1.1.1"))
+                        dim = new net.seagis.wms.v111.Dimension("time", "ISO8601", defaut, null);
+                    else
+                        dim = new net.seagis.wms.v130.Dimension("time", "ISO8601", defaut, null);
+                    
                     value = periodFormatter.getDatesRespresentation(dates);
                     dim.setValue(value);
                     dimensions.add(dim);
@@ -529,8 +512,11 @@ public class WMService extends WebService {
                 SortedSet<Number> elevations = inputLayer.getAvailableElevations();
                 if (elevations != null && elevations.size() > 0) {
                     defaut = elevations.first().toString();
-                
-                    dim = new Dimension("elevation", "EPSG:5030", defaut, null);
+                    
+                    if (getCurrentVersion().toString().endsWith("1.1.1"))
+                        dim = new net.seagis.wms.v111.Dimension("elevation", "EPSG:5030", defaut, null);
+                    else
+                        dim = new net.seagis.wms.v130.Dimension("elevation", "EPSG:5030", defaut, null);
                     value = "";
                     for (Number n:elevations){
                         value += n.toString() + ','; 
@@ -548,32 +534,95 @@ public class WMService extends WebService {
                     Unit u = ranges[0].getUnits();
                     if (u != null)
                         unit = u.toString();
-                    dim = new Dimension("dim_range", unit, defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
+                    
+                    if (getCurrentVersion().toString().endsWith("1.1.1"))
+                        dim = new net.seagis.wms.v111.Dimension("dim_range", unit, defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
+                    else
+                        dim = new net.seagis.wms.v130.Dimension("dim_range", unit, defaut, ranges[0].getMinimum() + "," + ranges[0].getMaximum());
                     dimensions.add(dim);
                 }
                 
-                // we build a Style Object
-                OnlineResource or = new OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
-                LegendURL legendURL1 = new LegendURL("image/png", or);
-
-                or = new OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
-                LegendURL legendURL2 = new LegendURL("image/gif", or);
-                Style style = new Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
                 
                 //we build and add a layer 
-                Layer outputLayer = new Layer(inputLayer.getName(), 
-                                              cleanSpecialCharacter(inputLayer.getRemarks()),
-                                              cleanSpecialCharacter(inputLayer.getThematic()), 
-                                              crs, 
-                                              new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(), 
-                                                                          inputGeoBox.getSouthBoundLatitude(), 
-                                                                          inputGeoBox.getEastBoundLongitude(), 
-                                                                          inputGeoBox.getNorthBoundLatitude()), 
-                                              outputBBox,  
-                                              1,
-                                              dimensions,
-                                              style,
-                                              getCurrentVersion().toString());
+                AbstractLayer outputLayer;
+                if (getCurrentVersion().toString().equals("1.1.1")) {
+                    
+                    /*
+                     * TODO
+                     * Envelope inputBox                 = inputLayer.getCoverage().getEnvelope();
+                     */
+                    net.seagis.wms.v111.BoundingBox outputBBox = null;
+                    if(inputGeoBox != null) {
+                        outputBBox = new net.seagis.wms.v111.BoundingBox(code.toString(), 
+                                                                         inputGeoBox.getWestBoundLongitude(),
+                                                                         inputGeoBox.getSouthBoundLatitude(),
+                                                                         inputGeoBox.getEastBoundLongitude(),
+                                                                         inputGeoBox.getNorthBoundLatitude(),
+                                                                         0.0, 0.0,
+                                                                         getCurrentVersion().toString());
+                    }
+                    
+                    // we build a Style Object
+                    net.seagis.wms.v111.OnlineResource or    = new net.seagis.wms.v111.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
+                    net.seagis.wms.v111.LegendURL legendURL1 = new net.seagis.wms.v111.LegendURL("image/png", or);
+
+                    or = new net.seagis.wms.v111.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
+                    net.seagis.wms.v111.LegendURL legendURL2 = new net.seagis.wms.v111.LegendURL("image/gif", or);
+                    net.seagis.wms.v111.Style style          = new net.seagis.wms.v111.Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
+                    
+                    outputLayer = new net.seagis.wms.v111.Layer(inputLayer.getName(), 
+                                                                cleanSpecialCharacter(inputLayer.getRemarks()),
+                                                                cleanSpecialCharacter(inputLayer.getThematic()), 
+                                                                crs, 
+                                                                new LatLonBoundingBox(inputGeoBox.getWestBoundLongitude(), 
+                                                                                      inputGeoBox.getSouthBoundLatitude(), 
+                                                                                      inputGeoBox.getEastBoundLongitude(), 
+                                                                                      inputGeoBox.getNorthBoundLatitude()), 
+                                                                outputBBox,  
+                                                                1,
+                                                                dimensions,
+                                                                style);
+                //version 1.3.0
+                } else {
+                    
+                    /*
+                     * TODO
+                     * Envelope inputBox                 = inputLayer.getCoverage().getEnvelope();
+                     */
+                    net.seagis.wms.v130.BoundingBox outputBBox = null;
+                    if(inputGeoBox != null) {
+                        outputBBox = new net.seagis.wms.v130.BoundingBox(code.toString(), 
+                                                                         inputGeoBox.getWestBoundLongitude(),
+                                                                         inputGeoBox.getSouthBoundLatitude(),
+                                                                         inputGeoBox.getEastBoundLongitude(),
+                                                                         inputGeoBox.getNorthBoundLatitude(),
+                                                                         0.0, 0.0,
+                                                                         getCurrentVersion().toString());
+                    }
+                    
+                    // we build a Style Object
+                    net.seagis.wms.v130.OnlineResource or    = new net.seagis.wms.v130.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/png&LAYER=" + inputLayer.getName());
+                    net.seagis.wms.v130.LegendURL legendURL1 = new net.seagis.wms.v130.LegendURL("image/png", or);
+
+                    or = new net.seagis.wms.v130.OnlineResource(getServiceURL() + "wms?REQUEST=GetLegendGraphic&VERSION=1.1.0&FORMAT=image/gif&LAYER=" + inputLayer.getName());
+                    net.seagis.wms.v130.LegendURL legendURL2 = new net.seagis.wms.v130.LegendURL("image/gif", or);
+                    net.seagis.wms.v130.Style style          = new net.seagis.wms.v130.Style("Style1", "default Style", null, null, null,legendURL1,legendURL2);
+                    
+                    
+                    outputLayer = new net.seagis.wms.v130.Layer(inputLayer.getName(), 
+                                                                cleanSpecialCharacter(inputLayer.getRemarks()),
+                                                                cleanSpecialCharacter(inputLayer.getThematic()), 
+                                                                crs, 
+                                                                new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(), 
+                                                                                            inputGeoBox.getSouthBoundLatitude(), 
+                                                                                            inputGeoBox.getEastBoundLongitude(), 
+                                                                                            inputGeoBox.getNorthBoundLatitude()), 
+                                                                outputBBox,  
+                                                                1,
+                                                                dimensions,
+                                                                style);
+                    
+                }
                 layers.add(outputLayer);
                 
             } catch (CatalogException exception) {
@@ -588,19 +637,34 @@ public class WMService extends WebService {
         crs.add("EPSG:27571");crs.add("EPSG:27572");crs.add("EPSG:27573");
         crs.add("EPSG:27574");
         
-        //we build a general boundingbox
+        //we build a general boundingbox TODO 
         EXGeographicBoundingBox exGeographicBoundingBox = null;
-        //we build the general layer and add it to the document
-        Layer layer = new Layer("Seagis Web Map Layer", 
-                                "description of the service(need to be fill)", 
-                                crs, 
-                                exGeographicBoundingBox, 
-                                layers,
-                                getCurrentVersion().toString());
         
-        response.getCapability().setLayer(layer);
+        //we build the general layer and add it to the document
+        AbstractLayer mainLayer;
+        if (getCurrentVersion().toString().equals("1.1.1")) {
+            mainLayer = new net.seagis.wms.v111.Layer("Seagis Web Map Layer", 
+                                                      "description of the service(need to be fill)", 
+                                                       crs, 
+                                                       null, 
+                                                       layers);
+        // version 1.3.0
+        } else {
+            mainLayer = new net.seagis.wms.v130.Layer("Seagis Web Map Layer", 
+                                                      "description of the service(need to be fill)", 
+                                                       crs, 
+                                                       null, 
+                                                       layers);
+        }
+        
+        response.getCapability().setLayer(mainLayer);
+        
         //we marshall the response and return the XML String
         StringWriter sw = new StringWriter();
+        if (getCurrentVersion().toString().equals("1.1.1")) {
+            marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
+              "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n");
+        }
         marshaller.marshal(response, sw);
          
         return Response.ok(sw.toString(), format).build();
@@ -641,7 +705,7 @@ public class WMService extends WebService {
         DescribeLayerResponseType response = new DescribeLayerResponseType(getSldVersion().toString(), layersDescriptions);
        
         //we marshall the response and return the XML String
-        StringWriter sw = new StringWriter();    
+        StringWriter sw = new StringWriter();   
         marshaller.marshal(response, sw);
         return sw.toString();
     }
@@ -676,13 +740,13 @@ public class WMService extends WebService {
     /**
      * update The URL in capabilities document with the service actual URL.
      */
-    private void updateURL(List<DCPType> dcpList) {
-        for(DCPType dcp: dcpList) {
-            Get getMethod = dcp.getHTTP().getGet();
+    private void updateURL(List<? extends AbstractDCP> dcpList) {
+        for(AbstractDCP dcp: dcpList) {
+            AbstractProtocol getMethod = dcp.getHTTP().getGet();
             if (getMethod != null) {
                 getMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
             }
-            Post postMethod = dcp.getHTTP().getPost();
+            AbstractProtocol postMethod = dcp.getHTTP().getPost();
             if (postMethod != null) {
                 postMethod.getOnlineResource().setHref(getServiceURL() + "wms?SERVICE=WMS&");
             }
@@ -692,9 +756,31 @@ public class WMService extends WebService {
     /**
      * update The URL in capabilities document for the extended operation.
      */
-    private void updateExtendedOperationURL(List<JAXBElement<OperationType>> extendedOperations) {
-        for(JAXBElement<OperationType> extOp: extendedOperations) {
-            updateURL(extOp.getValue().getDCPType());
+    private void updateExtendedOperationURL(AbstractRequest request) {
+        
+        if (getCurrentVersion().toString().equals("1.3.0")) {
+            net.seagis.wms.v130.Request r = (net.seagis.wms.v130.Request) request;
+            List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
+            for(JAXBElement<OperationType> extOp: extendedOperations) {
+                updateURL(extOp.getValue().getDCPType());
+            }
+        
+        // version 1.1.1  
+        } else {
+           net.seagis.wms.v111.Request r = (net.seagis.wms.v111.Request) request;
+           AbstractOperation op = r.getDescribeLayer();
+           if (op != null)
+                updateURL(op.getDCPType());
+           op = r.getGetLegendGraphic();
+           if (op != null)
+                updateURL(op.getDCPType());
+           op = r.getGetStyles();
+           if (op != null)
+                updateURL(op.getDCPType());
+           op = r.getPutStyles();
+           if (op != null)
+                updateURL(op.getDCPType());
         }
+        
     }
 }

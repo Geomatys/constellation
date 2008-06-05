@@ -19,7 +19,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import net.seagis.wms.OperationType;
+import net.seagis.wms.v130.OperationType;
 
 
 /**

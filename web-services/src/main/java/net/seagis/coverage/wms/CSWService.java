@@ -102,6 +102,7 @@ public class CSWService extends WebService {
         
             worker = new CSWworker(unmarshaller);
             worker.setVersion(getCurrentVersion());
+            
         } catch (JAXBException ex){
             logger.severe("The CSW serving is not running." + '\n' +
                           " cause: Error creating XML context." + '\n' +
@@ -282,9 +283,12 @@ public class CSWService extends WebService {
                     logger.info("SENDING EXCEPTION: " + owsex.getExceptionCode().name() + " " + owsex.getMessage() + '\n');
                 }
                 StringWriter sw = new StringWriter();    
-                marshaller.marshal(owsex.getExceptionReport(), sw);
-                return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
-            
+                if (marshaller != null) {
+                    marshaller.marshal(owsex.getExceptionReport(), sw);
+                    return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
+                } else {
+                   return Response.ok("The CSW server is not running cause: unable to create JAXB context!", "text/plain").build(); 
+                }
             //TODO remove this part
             } else if (ex instanceof net.seagis.ows.v110.OWSWebServiceException) {
                 net.seagis.ows.v110.OWSWebServiceException owsex = (net.seagis.ows.v110.OWSWebServiceException)ex;

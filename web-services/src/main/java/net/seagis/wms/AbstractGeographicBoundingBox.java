@@ -15,10 +15,13 @@
 
 package net.seagis.wms;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 /**
  *
  * @author Guilhem Legal
  */
+@XmlTransient
 public abstract class AbstractGeographicBoundingBox {
     
     public abstract double getWestBoundLongitude();

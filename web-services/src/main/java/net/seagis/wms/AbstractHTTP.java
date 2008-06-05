@@ -13,40 +13,19 @@
  *    Lesser General Public License for more details.
  */
 
-
 package net.seagis.wms;
 
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- * Abstract main class which describe a capabilities document  for all version of WMS.
- * 
+ *
  * @author Guilhem Legal
  */
 @XmlTransient
-public abstract class AbstractWMSCapabilities {
-
-     /**
-     * return the Service part of the capabilities document.
-     * 
-     */
-    public abstract AbstractService getService(); 
+public abstract class AbstractHTTP {
     
-    /**
-     *return the capability part of the capabilities document.
-     * 
-     */
-    public abstract AbstractCapability getCapability();
+    public abstract AbstractProtocol getGet();
+    
+    public abstract AbstractProtocol getPost();
 
-    /**
-     * get the version number.
-     * 
-     */
-    public abstract String getVersion(); 
-
-    /**
-     * Gets the value of the updateSequence property.
-     * 
-     */
-    public abstract String getUpdateSequence();
 }

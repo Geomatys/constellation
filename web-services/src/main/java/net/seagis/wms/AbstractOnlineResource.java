@@ -12,41 +12,26 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-
 package net.seagis.wms;
 
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- * Abstract main class which describe a capabilities document  for all version of WMS.
+ * Abstract class for Online resource object.
  * 
  * @author Guilhem Legal
  */
 @XmlTransient
-public abstract class AbstractWMSCapabilities {
-
-     /**
-     * return the Service part of the capabilities document.
-     * 
-     */
-    public abstract AbstractService getService(); 
+public abstract class AbstractOnlineResource {
     
-    /**
-     *return the capability part of the capabilities document.
+     /**
+     * Gets the value of the href property.
      * 
      */
-    public abstract AbstractCapability getCapability();
-
+    public abstract String getHref();
     /**
-     * get the version number.
+     * Gets the value of the href property.
      * 
      */
-    public abstract String getVersion(); 
-
-    /**
-     * Gets the value of the updateSequence property.
-     * 
-     */
-    public abstract String getUpdateSequence();
+    public abstract void setHref(String href);
 }

@@ -71,16 +71,13 @@ public class IndexLucene extends AbstractIndex {
     private final Analyzer analyzer;
     
     /** Creates a new instance of IndexLucene */
-    public IndexLucene(Reader reader) throws SQLException {
+    public IndexLucene(Reader reader, File configDirectory) throws SQLException {
         
         this.reader = reader;
         analyzer    = new StandardAnalyzer();
-        String env      = "/home/tomcat/.sicade" ; //System.getenv("CATALINA_HOME");
-        logger.info("Path to config file=" + env);
-        File f;
         
         // we get the configuration file
-        f = new File(env + "/csw_configuration/index");
+        File f = new File(configDirectory, "index");
         
         setFileDirectory(f);
         
