@@ -65,15 +65,16 @@ import net.seagis.wcs.v100.ServiceType;
 import net.seagis.wcs.v100.WCSCapabilitiesType;
 import net.seagis.wcs.v111.Capabilities;
 import net.seagis.webservice.UserData;
-import net.seagis.wms.ContactAddress;
-import net.seagis.wms.ContactInformation;
-import net.seagis.wms.ContactPersonPrimary;
-import net.seagis.wms.Keyword;
-import net.seagis.wms.KeywordList;
-import net.seagis.wms.OnlineResource;
-import net.seagis.wms.Service;
-import net.seagis.wms.WMSCapabilities;
-import net.seagis.wms.WMT_MS_Capabilities;
+import net.seagis.wms.AbstractService;
+import net.seagis.wms.v130.ContactAddress;
+import net.seagis.wms.v130.ContactInformation;
+import net.seagis.wms.v130.ContactPersonPrimary;
+import net.seagis.wms.v130.Keyword;
+import net.seagis.wms.v130.KeywordList;
+import net.seagis.wms.v130.OnlineResource;
+import net.seagis.wms.v130.Service;
+import net.seagis.wms.v111.WMT_MS_Capabilities;
+import net.seagis.wms.v130.WMSCapabilities;
 import org.apache.myfaces.custom.fileupload.UploadedFile;
 
 /**
@@ -510,9 +511,18 @@ public class ServicesBean {
 
             // for WMS 1.3.0/1.1.1
             } else if (capa instanceof WMSCapabilities || capa instanceof WMT_MS_Capabilities) {
-                Service S = getWMSService();
-                ((WMSCapabilities) capa).setService(S);
-                logger.info("update WMS version" + i);
+                List<AbstractService> S = getWMSService();
+                
+                // 1.3.0
+                if (capa instanceof  WMSCapabilities) {
+                    ((WMSCapabilities) capa).setService(S.get(0));
+                    logger.info("update WMS version 1.3.0");
+                
+                // 1.1.1
+                } else {
+                    ((WMT_MS_Capabilities) capa).setService(S.get(1));
+                    logger.info("update WMS version 1.1.1");
+                }
             }
             i++;
         }
@@ -614,8 +624,11 @@ public class ServicesBean {
     /**
      * Build a service object for a  WMS 1.3.0/1.1.1 Service.
      */
-    private Service getWMSService() {
+    private List<AbstractService> getWMSService() {
 
+        List<AbstractService> result = new ArrayList<AbstractService>();
+        
+        // v1.3.0
         List<Keyword> listKey = new ArrayList<Keyword>();
         for (SelectItem k : keywords) {
             listKey.add(new Keyword((String) k.getValue()));
@@ -628,12 +641,34 @@ public class ServicesBean {
         ContactInformation CI = new ContactInformation(CPP, positionName,
                 CA, phoneVoice, phoneFacsimile, electronicAddress);
 
-        Service service = new Service(title, title, _abstract,
+        Service service130 = new Service(title, title, _abstract,
                 keywordList,
                 new OnlineResource(providerSite),
                 CI, fees, accessConstraints, getLayerLimit(),
                 getMaxWidth(), getMaxHeight());
-        return service;
+        result.add(service130);
+        
+        // v1.1.1
+        List<net.seagis.wms.v111.Keyword> listKey111 = new ArrayList<net.seagis.wms.v111.Keyword>();
+        for (SelectItem k : keywords) {
+            listKey111.add(new net.seagis.wms.v111.Keyword((String) k.getValue()));
+        }
+        net.seagis.wms.v111.KeywordList keywordList111 = new net.seagis.wms.v111.KeywordList(listKey111);
+        net.seagis.wms.v111.ContactPersonPrimary CPP111 = new net.seagis.wms.v111.ContactPersonPrimary(individualName, providerName);
+        net.seagis.wms.v111.ContactAddress CA111 = new net.seagis.wms.v111.ContactAddress(
+                getAddressType(), deliveryPoint, city, administrativeArea, postalCode, country);
+
+        net.seagis.wms.v111.ContactInformation CI111 = new net.seagis.wms.v111.ContactInformation(CPP111, positionName,
+                CA111, phoneVoice, phoneFacsimile, electronicAddress);
+
+        net.seagis.wms.v111.Service service111 = new net.seagis.wms.v111.Service(
+                title, title, _abstract,
+                keywordList111,
+                new net.seagis.wms.v111.OnlineResource(providerSite),
+                CI111, fees, accessConstraints);
+        result.add(service111);
+        
+        return result;
     }
 
     /**

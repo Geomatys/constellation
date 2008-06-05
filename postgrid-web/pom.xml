@@ -138,7 +138,7 @@
         <version>2.4</version>
         <!--scope>provided</scope-->   <!-- Uncomment if Tomcat already has jsp / servlet APIs in <TOMCAT_HOME>/lib -->
     </dependency>
-    <!--<dependency>
+    <!--dependency>
       <groupId>javax.el</groupId>
       <artifactId>el-api</artifactId>
       <version>1.0</version>
@@ -147,18 +147,18 @@
       <groupId>com.sun.el</groupId>
       <artifactId>el-ri</artifactId>
       <version>1.0</version>
-    </dependency>-->
-<dependency>
+    </dependency-->
+    <dependency>
       <groupId>org.apache.myfaces.tomahawk</groupId>
       <artifactId>tomahawk-sandbox</artifactId>
       <version>1.1.7-SNAPSHOT</version>
     </dependency>
-<dependency>
-<groupId>poi</groupId>
-<artifactId>poi</artifactId>
-<version>2.5.1-final-20040804</version>
-</dependency>
-   </dependencies>
+    <dependency>
+      <groupId>poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>2.5.1-final-20040804</version>
+   </dependency>
+ </dependencies>
 
     <!--properties>     
         <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>

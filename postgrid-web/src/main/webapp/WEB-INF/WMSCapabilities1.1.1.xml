@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<WMT_MS_Capabilities version="1.1.1" xmlns="http://www.opengis.net/wms" xmlns:sld="http://www.opengis.net/sld" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd">
+<!DOCTYPE WMT_MS_Capabilities SYSTEM "http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd">
+<WMT_MS_Capabilities version="1.1.1" xmlns:sld="http://www.opengis.net/sld" xmlns:xlink="http://www.w3.org/1999/xlink">
 <!-- Service Metadata -->
 <Service>
   <!-- The WMT-defined name for this type of service -->
@@ -13,7 +14,7 @@
   </KeywordList>
   <!-- Top-level web address of service or service provider.  See also OnlineResource
   elements under <DCPType>. -->
-  <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://sensor.geomatys.fr/"/>
+  <OnlineResource xlink:type="simple" xlink:href="http://sensor.geomatys.fr/"/>
   <!-- Contact information -->
   <ContactInformation>
     <ContactPersonPrimary>
@@ -25,7 +26,7 @@
       <AddressType>postal</AddressType>
       <Address>24 rue Pierre Renaudel</Address>
       <City>ARLES</City>
-      <StateOrProvince>bouches du rhone</StateOrProvince>
+      <StateOrProvince>Bouches du rhone</StateOrProvince>
       <PostCode>13200 </PostCode>
       <Country>FRANCE</Country>
     </ContactAddress>
@@ -86,7 +87,7 @@
         </HTTP>
       </DCPType>
     </GetFeatureInfo>
-    <sld:DescribeLayer>
+    <DescribeLayer>
 	<Format>text/xml</Format>
 	<DCPType>
 	   <HTTP>
@@ -98,8 +99,8 @@
 	     </Post>
 	   </HTTP>
 	</DCPType>
-    </sld:DescribeLayer>
-    <sld:GetLegendGraphic>
+    </DescribeLayer>
+    <GetLegendGraphic>
         <Format>image/png</Format>
         <Format>image/jpeg</Format>
         <Format>image/gif</Format>
@@ -113,11 +114,11 @@
 	     </Post>
 	   </HTTP>
 	</DCPType>
-    </sld:GetLegendGraphic>
+    </GetLegendGraphic>
   </Request>
   <Exception>
     <Format>XML</Format>
   </Exception>
-<sld:UserDefinedSymbolization SupportSLD="1" UserLayer="1" UserStyle="1" RemoteWFS="1"/>
+<UserDefinedSymbolization SupportSLD="1" UserLayer="1" UserStyle="1" RemoteWFS="1"/>
 </Capability>
 </WMT_MS_Capabilities>

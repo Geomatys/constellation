@@ -23,8 +23,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.wcs.v100.WCSCapabilitiesType;
 import net.seagis.wcs.v111.Capabilities;
-import net.seagis.wms.WMSCapabilities;
-import net.seagis.wms.WMT_MS_Capabilities;
+import net.seagis.wms.v111.WMT_MS_Capabilities;
+import net.seagis.wms.v130.WMSCapabilities;
 
 
 /**
