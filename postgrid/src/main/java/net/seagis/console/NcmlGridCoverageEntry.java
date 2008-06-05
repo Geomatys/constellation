@@ -95,9 +95,14 @@ final class NcmlGridCoverageEntry extends WritableGridCoverageEntry {
         // Just to initialize time units for the metadata reader.
         // Time values will be recalculated from the ncml entries.
         super.getDateRanges();
+        final long origin = getTimeOrigin().getTime();
         if (npts == 1 || increment == 0) {
-            final long startTimeInMillis = convertInMillis(startTime);
-            final long nextItemStartInMillis = convertInMillis(nextItemStart);
+            final long startTimeInMillis = convertInMillis(startTime) + origin;
+            if (nextItemStart == 0L) {
+                final Date startDate = new Date(startTimeInMillis);
+                return new DateRange[] {new DateRange(startDate, startDate)};
+            }
+            final long nextItemStartInMillis = convertInMillis(nextItemStart) + origin;
             final long halfRange = Math.abs((nextItemStartInMillis - startTimeInMillis) / 2);
             final Date newStartTime = new Date(startTimeInMillis - halfRange);
             final Date newEndTime = new Date(startTimeInMillis + halfRange);
@@ -105,7 +110,6 @@ final class NcmlGridCoverageEntry extends WritableGridCoverageEntry {
         }
         final DateRange[] ncmlDates = new DateRange[npts];
         final long incrementInMillis = convertInMillis(increment);
-        final long origin = getTimeOrigin().getTime();
         for (int i = 0; i < ncmlDates.length; i++) {
             final long startTimeInMillis = (i == 0) ? 
                 convertInMillis(startTime) + origin : ncmlDates[i-1].getMaxValue().getTime();
