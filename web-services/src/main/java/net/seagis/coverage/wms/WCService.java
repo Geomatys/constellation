@@ -153,7 +153,7 @@ public class WCService extends WebService {
                 logger.info("path to catalina config file using sicade configuration");
                 initialValue = new WebServiceWorker(new Database(), true); 
             }
-
+           
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
                 @Override
                 protected WebServiceWorker initialValue() {
@@ -1064,8 +1064,14 @@ public class WCService extends WebService {
             }
         }
         webServiceWorker.setResponseCRS(responseCRS);
-            
-        return webServiceWorker.getImageFile();
+        
+        // If we are requesting a time series (which is assumed to return text output, 
+        // as opposed to an image output) then process the request using a special method.
+        if ( webServiceWorker.isTimeseriesRequest() ) {
+            return webServiceWorker.getTimeseriesAsXML();
+        } else {
+            return webServiceWorker.getImageFile();
+        }
     }
     
     

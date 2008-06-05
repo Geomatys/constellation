@@ -26,6 +26,7 @@ import java.awt.Graphics2D;
 import java.awt.Transparency;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.DataBuffer;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
@@ -44,6 +45,15 @@ import javax.media.jai.Interpolation;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
@@ -84,6 +94,11 @@ import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.LayerTable;
 import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.resources.i18n.Resources;
+import org.geotools.coverage.SpatioTemporalCoverage3D;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.opengis.coverage.Coverage;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import static net.seagis.coverage.wms.WMSExceptionCode.*;
 
 
@@ -208,6 +223,12 @@ public abstract class ImageProducer {
      * The requested time.
      */
     protected Date time;
+    
+    /**
+     * The requested time list.  
+     * Used for WCS requests that span the time dimension.
+     */
+    protected List<Date> timeList;
 
     /**
      * The requested elevation.
@@ -363,6 +384,90 @@ public abstract class ImageProducer {
         layers   = worker.layers;
         manager  = worker.manager;
         manager.addWorker(this);
+    }
+    
+    /**
+     * Determines if the request is for a time-series by checking for the size of {@code timeList}.
+     * @return {@code true} if {@code timeList} is > 1, else return {@code false}
+     */
+    public boolean isTimeseriesRequest() {
+        if (timeList.size() > 1) return true;
+        else return false;
+    }
+    
+    /**
+     * Executes a request for a time-series
+     * Currently evaluates just one point at a corner of the envelope.
+     * TODO: return a time-series of the average value in the envelope?
+     * @return double[] containing the extracted time-series
+     */
+    public double[] getTimeseries() throws WebServiceException {
+        try {
+
+            Layer layer = getLayer();
+            Coverage coverage = layer.getCoverage();
+            SpatioTemporalCoverage3D stCoverage = new SpatioTemporalCoverage3D(layer.getName(), coverage);
+            Point2D point = new Point2D.Double(envelope.getMinimum(0), envelope.getMinimum(1));
+            double[] res = null;
+            double[] values = new double[timeList.size()];
+            int i = 0;
+            for (Date t : timeList) {
+                res = stCoverage.evaluate(point, t, res);
+                values[i] = res[0];
+                i += 1;
+            }
+            return values;
+        } catch (CatalogException ex) {
+            Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, "Error finding coverage in database.", ex);
+            return null;
+        }
+    } 
+    
+    /**
+     * Dumps the resulting timeseries to an XML file
+     * TODO: Write to a standard schem for representing time-series
+     * @return XML file containing generated time-series
+     * @throws net.seagis.coverage.web.WebServiceException
+     */
+    public File getTimeseriesAsXML() throws WebServiceException {
+        try {
+
+            double[] ts = getTimeseries();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document doc = builder.newDocument();
+            Element elem = doc.createElement("timeseries");
+            doc.appendChild(elem);
+            for (double val : ts) {
+                Element e = doc.createElement(layer);
+                e.appendChild(doc.createTextNode(Double.toString(val)));
+                elem.appendChild(e);
+            }
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            DOMSource source = new DOMSource(doc);
+
+            final String directory = System.getProperty("java.io.tmpdir");
+            if (directory != null) {
+                temporaryDirectory = new File(directory, "seagis");
+                if (!temporaryDirectory.isDirectory() && !temporaryDirectory.mkdir()) {
+                    temporaryDirectory = null; // Fallback on system default.
+                }
+            }
+            File file = File.createTempFile("testout", "xml", temporaryDirectory);
+            file.deleteOnExit();
+
+            StreamResult result = new StreamResult(file);
+            transformer.transform(source, result);
+            return file;
+        } catch (TransformerException ex) {
+            Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(ImageProducer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     /**
@@ -529,6 +634,9 @@ public abstract class ImageProducer {
                     final LayerTable table = getLayerTable(false);
                     change   |= table.setGeographicBoundingBox(request.bbox);
                     change   |= table.setPreferredResolution(request.resolution);
+                    if (!timeList.isEmpty()) {
+                        change |= table.setTimeRange(timeList.get(0), timeList.get(timeList.size()-1));
+                    }
                     candidate = table.getEntry(layer);
 
                     layers.put(request, candidate);

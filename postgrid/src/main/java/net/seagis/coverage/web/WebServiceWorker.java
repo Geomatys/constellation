@@ -434,6 +434,8 @@ public class WebServiceWorker extends ImageProducer {
         } else {
             time = dates.get(0);
         }
+        // 'timeList' will hold the List<Date> that we will use for executing WCS requests across multiple dates.  
+        timeList = dates;
     }
 
     /**
