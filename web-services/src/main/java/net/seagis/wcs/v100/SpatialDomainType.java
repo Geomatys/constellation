@@ -25,10 +25,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.PolygonType;
-import net.seagis.gml.EnvelopeEntry;
-import net.seagis.gml.GridType;
-import net.seagis.gml.ObjectFactory;
+import net.seagis.gml.v311.PolygonType;
+import net.seagis.gml.v311.EnvelopeEntry;
+import net.seagis.gml.v311.GridType;
+import net.seagis.gml.v311.ObjectFactory;
 
 /**
  * Definition of the spatial domain of a coverage. 

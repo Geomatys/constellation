@@ -25,8 +25,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.AbstractCoordinateOperationType;
-import net.seagis.gml.PolygonType;
+import net.seagis.gml.v311.AbstractCoordinateOperationType;
+import net.seagis.gml.v311.PolygonType;
 import net.seagis.ows.v110.BoundingBoxType;
 
 /**

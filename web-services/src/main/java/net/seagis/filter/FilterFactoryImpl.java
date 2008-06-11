@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import net.seagis.coverage.web.ExpressionType;
-import net.seagis.gml.AbstractGeometryType;
+import net.seagis.gml.v311.AbstractGeometryType;
 import net.seagis.ogc.AndType;
 import net.seagis.ogc.ArithmeticOperatorsType;
 import net.seagis.ogc.BBOXType;

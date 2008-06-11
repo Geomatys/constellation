@@ -1,0 +1,179 @@
+/*
+ * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
+ * (C) 2005, Institut de Recherche pour le Développement
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
+package net.seagis.gml.v311;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
+import org.geotools.resources.Utilities;
+
+
+/**
+ * This type is available wherever there is a need for a "text" type property. It is of string type, so the text can be included inline, but the value can also be referenced remotely via xlinks from the AssociationAttributeGroup. If the remote reference is present, then the value obtained by traversing the link should be used, and the string content of the element can be used for an annotation.
+ * 
+ * <p>Java class for StringOrRefType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="StringOrRefType">
+ *   &lt;simpleContent>
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
+ *       &lt;attGroup ref="{http://www.opengis.net/gml}AssociationAttributeGroup"/>
+ *     &lt;/extension>
+ *   &lt;/simpleContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * @author Guilhem Legal
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "StringOrRefType", propOrder = {
+    "value"
+})
+public class StringOrRefType {
+
+    @XmlValue
+    private String value;
+    @XmlAttribute(namespace = "http://www.opengis.net/gml")
+    @XmlSchemaType(name = "anyURI")
+    private String remoteSchema;
+    @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
+    private String type;
+    @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
+    @XmlSchemaType(name = "anyURI")
+    private String href;
+    @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
+    @XmlSchemaType(name = "anyURI")
+    private String role;
+    @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
+    @XmlSchemaType(name = "anyURI")
+    private String arcrole;
+    @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
+    private String title;
+    @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
+    private String show;
+    @XmlAttribute(namespace = "http://www.w3.org/1999/xlink")
+    private String actuate;
+
+    /**
+     * Gets the value of the value property.
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * Gets the value of the remoteSchema property.
+     */
+    public String getRemoteSchema() {
+        return remoteSchema;
+    }
+
+    /**
+     * Gets the value of the type property.
+     */
+    public String getType() {
+        if (type == null) {
+            return "simple";
+        } else {
+            return type;
+        }
+    }
+
+    /**
+     * Gets the value of the href property.
+     */
+    public String getHref() {
+        return href;
+    }
+
+    /**
+     * Gets the value of the role property.
+     */
+    public String getRole() {
+        return role;
+    }
+
+    /**
+     * Gets the value of the arcrole property.
+     */
+    public String getArcrole() {
+        return arcrole;
+    }
+
+    /**
+     * Gets the value of the title property.
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * Gets the value of the show property.
+     */
+    public String getShow() {
+        return show;
+    }
+
+    /**
+     * Gets the value of the actuate property.
+     */
+    public String getActuate() {
+        return actuate;
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final StringOrRefType that = (StringOrRefType) object;
+
+        return Utilities.equals(this.actuate,            that.actuate)          &&
+               Utilities.equals(this.value,              that.value)            &&
+               Utilities.equals(this.arcrole,            that.arcrole)          &&
+               Utilities.equals(this.type,               that.type)             &&
+               Utilities.equals(this.href,               that.href)             &&
+               Utilities.equals(this.remoteSchema,       that.remoteSchema)     &&
+               Utilities.equals(this.show,               that.show)             &&
+               Utilities.equals(this.role,               that.role)             &&
+               Utilities.equals(this.title,              that.title);
+        
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 23 * hash + (this.value != null ? this.value.hashCode() : 0);
+        hash = 23 * hash + (this.remoteSchema != null ? this.remoteSchema.hashCode() : 0);
+        hash = 23 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        hash = 23 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 23 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 23 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 23 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 23 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 23 * hash + (this.type != null ? this.type.hashCode() : 0);
+        return hash;
+    }
+}

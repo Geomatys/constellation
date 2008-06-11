@@ -19,8 +19,8 @@ package net.seagis.wcs.v100;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.EnvelopeEntry;
-import net.seagis.gml.GridType;
+import net.seagis.gml.v311.EnvelopeEntry;
+import net.seagis.gml.v311.GridType;
 
 
 /**

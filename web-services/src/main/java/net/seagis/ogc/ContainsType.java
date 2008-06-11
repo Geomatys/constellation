@@ -17,7 +17,7 @@
 
 package net.seagis.ogc;
 
-import net.seagis.gml.AbstractGeometryType;
+import net.seagis.gml.v311.AbstractGeometryType;
 import org.opengis.filter.spatial.Contains;
 
 /**

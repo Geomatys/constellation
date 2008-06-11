@@ -24,10 +24,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.AbstractGeometryType;
+import net.seagis.gml.v311.AbstractGeometryType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
-import net.seagis.gml.ObjectFactory;
+import net.seagis.gml.v311.ObjectFactory;
 
 
 /**

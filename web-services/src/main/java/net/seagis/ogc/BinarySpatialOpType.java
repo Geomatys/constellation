@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.AbstractGeometryType;
+import net.seagis.gml.v311.AbstractGeometryType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 
@@ -78,7 +78,7 @@ public class BinarySpatialOpType extends SpatialOpsType {
     private ObjectFactory ogcFactory = new ObjectFactory();
     
     @XmlTransient
-    private net.seagis.gml.ObjectFactory gmlFactory = new net.seagis.gml.ObjectFactory();
+    private net.seagis.gml.v311.ObjectFactory gmlFactory = new net.seagis.gml.v311.ObjectFactory();
     
     /**
      * An empty constructor used by JAXB

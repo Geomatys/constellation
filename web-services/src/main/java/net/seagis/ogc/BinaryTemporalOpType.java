@@ -25,10 +25,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
-import net.seagis.gml.AbstractTimeObjectType;
-import net.seagis.gml.TimeInstantType;
-import net.seagis.gml.TimePeriodType;
+import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
+import net.seagis.gml.v311.AbstractTimeObjectType;
+import net.seagis.gml.v311.TimeInstantType;
+import net.seagis.gml.v311.TimePeriodType;
 
 
 /**
