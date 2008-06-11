@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 // Geotools dependencies
-import net.seagis.gml.AbstractFeatureEntry;
+import net.seagis.gml.v311.AbstractFeatureEntry;
 import net.seagis.observation.ObservationEntry;
 import net.seagis.observation.SurveyProcedureEntry;
 import org.geotools.resources.Utilities;

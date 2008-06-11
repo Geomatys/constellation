@@ -19,8 +19,8 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import org.oasis.xal.v20.AddressDetails;
-import org.w3._2005.atom.AtomPersonConstruct;
-import org.w3._2005.atom.Link;
+import net.seagis.atom.AtomPersonConstruct;
+import net.seagis.atom.Link;
 
 
 /**

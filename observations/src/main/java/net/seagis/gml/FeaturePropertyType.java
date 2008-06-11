@@ -15,6 +15,7 @@
 
 package net.seagis.gml;
 
+import net.seagis.gml.v311.AbstractFeatureEntry;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

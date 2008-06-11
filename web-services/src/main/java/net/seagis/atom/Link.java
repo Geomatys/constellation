@@ -6,7 +6,7 @@
 //
 
 
-package org.w3._2005.atom;
+package net.seagis.atom;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

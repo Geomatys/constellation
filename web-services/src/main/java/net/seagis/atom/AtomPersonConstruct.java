@@ -6,7 +6,7 @@
 //
 
 
-package org.w3._2005.atom;
+package net.seagis.atom;
 
 import java.util.ArrayList;
 import java.util.List;

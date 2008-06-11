@@ -24,8 +24,8 @@ import java.util.Set;
 import net.seagis.catalog.CatalogException;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.swe.PhenomenonTable;
-import net.seagis.gml.UnitOfMeasureEntry;
-import net.seagis.gml.UnitOfMeasureTable;
+import net.seagis.gml.v311.UnitOfMeasureEntry;
+import net.seagis.gml.v311.UnitOfMeasureTable;
 import net.seagis.sampling.SamplingPointEntry;
 import net.seagis.sampling.SamplingPointTable;
 

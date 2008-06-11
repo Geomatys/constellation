@@ -17,7 +17,7 @@
 package net.seagis.sos;
 
 import net.seagis.catalog.Entry;
-import net.seagis.gml.ReferenceEntry;
+import net.seagis.gml.v311.ReferenceEntry;
 
 /**
  *

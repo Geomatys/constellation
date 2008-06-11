@@ -21,8 +21,8 @@ import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
-import net.seagis.gml.ReferenceEntry;
-import net.seagis.gml.ReferenceTable;
+import net.seagis.gml.v311.ReferenceEntry;
+import net.seagis.gml.v311.ReferenceTable;
 
 /**
  * Connexion vers la table des {@linkplain AnyResultEntry AnyResult}.

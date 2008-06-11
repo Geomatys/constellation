@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 
 // geotools dependencies
-import net.seagis.gml.DefinitionType;
+import net.seagis.gml.v311.DefinitionType;
 import org.geotools.resources.Utilities;
 
 // GeoAPI dependencies 

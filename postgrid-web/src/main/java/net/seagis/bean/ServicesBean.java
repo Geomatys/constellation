@@ -46,7 +46,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // SeaGIS dependencies
-import net.seagis.gml.CodeListType;
+import net.seagis.gml.v311.CodeListType;
 import net.seagis.ows.v110.AddressType;
 import net.seagis.ows.v110.CapabilitiesBaseType;
 import net.seagis.ows.v110.CodeType;

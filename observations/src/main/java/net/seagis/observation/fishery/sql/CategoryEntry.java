@@ -23,7 +23,7 @@ import org.geotools.resources.Utilities;
 
 // Sicade dependencies
 import net.seagis.coverage.model.Distribution;
-import net.seagis.gml.AbstractTimeGeometricPrimitiveType;
+import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
 import net.seagis.observation.ElementEntry;
 import net.seagis.metadata.MetaDataEntry;
 import net.seagis.observation.fishery.Stage;

@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.gml.PointType;
+import net.seagis.gml.v311.PointType;
 import net.seagis.observation.ObservationEntry;
 import net.seagis.observation.SurveyProcedureEntry;
 import org.geotools.resources.Utilities;

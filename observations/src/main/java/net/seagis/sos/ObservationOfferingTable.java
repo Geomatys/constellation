@@ -29,16 +29,16 @@ import net.seagis.catalog.Database;
 import net.seagis.catalog.NoSuchTableException;
 import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
-import net.seagis.gml.BoundingShapeEntry;
-import net.seagis.gml.EnvelopeEntry;
-import net.seagis.gml.EnvelopeTable;
+import net.seagis.gml.v311.BoundingShapeEntry;
+import net.seagis.gml.v311.EnvelopeEntry;
+import net.seagis.gml.v311.EnvelopeTable;
 import net.seagis.swe.PhenomenonEntry;
 import net.seagis.coverage.wms.NamespacePrefixMapperImpl;
-import net.seagis.gml.ReferenceEntry;
-import net.seagis.gml.TimeIndeterminateValueType;
-import net.seagis.gml.TimeInstantType;
-import net.seagis.gml.TimePeriodType;
-import net.seagis.gml.TimePositionType;
+import net.seagis.gml.v311.ReferenceEntry;
+import net.seagis.gml.v311.TimeIndeterminateValueType;
+import net.seagis.gml.v311.TimeInstantType;
+import net.seagis.gml.v311.TimePeriodType;
+import net.seagis.gml.v311.TimePositionType;
 
 /**
  *
