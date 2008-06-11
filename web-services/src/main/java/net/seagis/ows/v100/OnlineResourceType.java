@@ -74,7 +74,7 @@ public class OnlineResourceType extends AbstractOnlineResourceType {
     /**
      * Empty constructor used by JAXB.
      */
-    OnlineResourceType(){
+    public OnlineResourceType(){
     }
     
     /**
