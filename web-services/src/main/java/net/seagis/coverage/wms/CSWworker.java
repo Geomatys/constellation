@@ -685,6 +685,7 @@ public class CSWworker {
      * @return
      */
     public GetRecordsResponseType getRecords(GetRecordsType request) throws WebServiceException {
+        logger.info("GetRecords request processing" + '\n');
         verifyBaseRequest(request);
         
         // we initialize the filterParser
@@ -837,6 +838,7 @@ public class CSWworker {
      * @return
      */
     public GetRecordByIdResponseType getRecordById(GetRecordByIdType request) throws WebServiceException {
+        logger.info("GetRecordById request processing" + '\n');
         verifyBaseRequest(request);
         
         // we initialize the output format of the response
@@ -936,6 +938,7 @@ public class CSWworker {
      * @return
      */
     public GetDomainResponseType getDomain(GetDomainType request) throws WebServiceException{
+        logger.info("GetDomain request processing" + '\n');
         verifyBaseRequest(request);
         // we prepare the response
         List<DomainValuesType> responseList = new ArrayList<DomainValuesType>();
@@ -1038,6 +1041,7 @@ public class CSWworker {
      * @return
      */
     public TransactionResponseType transaction(TransactionType request) throws WebServiceException {
+        logger.info("Transaction request processing" + '\n');
         verifyBaseRequest(request);
         // we prepare the report
         int totalInserted = 0;
@@ -1123,7 +1127,7 @@ public class CSWworker {
             Collection<Identification> idents = ((MetaDataImpl) obj).getIdentificationInfo();
             if (idents.size() != 0) {
                 Identification ident = idents.iterator().next();
-                if (ident.getCitation() != null && ident.getCitation().getTitle() != null) {
+                if (ident != null && ident.getCitation() != null && ident.getCitation().getTitle() != null) {
                     title = ident.getCitation().getTitle().toString();
                 } 
             }
@@ -1144,6 +1148,7 @@ public class CSWworker {
      * @return
      */
     public HarvestResponseType harvest(HarvestType request) throws WebServiceException {
+        logger.info("Harvest request processing" + '\n');
         verifyBaseRequest(request);
         HarvestResponseType response;
         // we prepare the report

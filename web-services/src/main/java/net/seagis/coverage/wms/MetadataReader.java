@@ -99,6 +99,11 @@ public class MetadataReader {
     private Map<String, Object> metadatas;
     
     /**
+     * A map containing the mapping beetween the MDWeb className and java typeName
+     */
+    private Map<String, Class> classBinding;
+    
+    /**
      * Record the date format in the metadata.
      */
     private DateFormat dateFormat; 
@@ -149,16 +154,19 @@ public class MetadataReader {
     public MetadataReader(Reader MDReader, Connection c) throws SQLException {
         this.MDReader        = MDReader;
         this.connection      = c;
-        this.dateFormat      = new SimpleDateFormat("dd-mm-yyyy");
+        this.dateFormat      = new SimpleDateFormat("yyyy-mm-dd");
         
         this.MDCatalogs       = new ArrayList<Catalog>();
         this.MDCatalogs.add(MDReader.getCatalog("FR_SY"));
         this.MDCatalogs.add(MDReader.getCatalog("CSWCat"));
         
-        this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing", "net.seagis.temporal");
-        this.opengisPackage  = searchSubPackage("org.opengis.metadata",  "org.opengis.referencing", "org.opengis.temporal");
+        this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing", "net.seagis.temporal", 
+                                                "org.geotools.service", "org.geotools.util");
+        this.opengisPackage  = searchSubPackage("org.opengis.metadata",  "org.opengis.referencing", "org.opengis.temporal",
+                                                "org.opengis.service");
         this.seagisPackage   = searchSubPackage("net.seagis.cat.csw",  "net.seagis.dublincore.elements", "net.seagis.ows.v100");
         this.metadatas       = new HashMap<String, Object>();
+        this.classBinding    = new HashMap<String, Class>();
     }
 
     /**
@@ -473,6 +481,9 @@ public class MetadataReader {
         try {
             // we get the value's class
             classe = getClassFromName(className, standardName);
+            if (classe == null) {
+                return null;
+            }
 
             // if the value is a leaf => primitive type
             if (value instanceof TextValue) {
@@ -488,12 +499,16 @@ public class MetadataReader {
                     // the textValue of a codelist is the code and not the value
                     // so we must find the codeList element corrrespounding to this code.
                     org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList) value.getType();
-                    CodeListElement element = codelist.getElementByCode(Integer.parseInt(textValue));
+                    try {
+                        CodeListElement element = codelist.getElementByCode(Integer.parseInt(textValue));
                     
-                    Method method = classe.getMethod("valueOf", String.class);
-                    result = method.invoke(null, element.getName());
-                    return result;
-
+                        Method method = classe.getMethod("valueOf", String.class);
+                        result = method.invoke(null, element.getName());
+                        return result;
+                    } catch (NumberFormatException e) {
+                        logger.severe("Format NumberException : unable to parse the code: " + textValue + " in the codelist: " + codelist.getName());
+                        return null;
+                    }
 
                 // if the value is a date we call the static method parse 
                 // instead of a constructor (temporary patch: createDate method)  
@@ -507,7 +522,7 @@ public class MetadataReader {
                     temp = "String";
                     // we try to get a constructor(String)
                     Constructor constructor = classe.getConstructor(String.class);
-                    logger.finer("constructor:" + '\n' + constructor.toGenericString());
+                    logger.info("constructor:" + '\n' + constructor.toGenericString());
                     
                     //we execute the constructor
                     result = constructor.newInstance(textValue);
@@ -520,9 +535,30 @@ public class MetadataReader {
 
             } else {
 
+                // Again another special case LocalName does not have a empty constructor (immutable) 
+                // and no setters so we must call the normal constructor.
+                if (classe.getSimpleName().equals("LocalName")) {
+                    Constructor constructor = classe.getConstructor(CharSequence.class);
+                    TextValue child = null;
+                    //We search the child of the localName
+                    for (Value childValue : form.getValues()) {
+                        if (childValue.getParent()!= null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
+                            child = (TextValue) childValue;
+                        }
+                    }
+                    if (child != null) {
+                        CharSequence cs = child.getValue();
+                        result = constructor.newInstance(cs);
+                        return result;
+                    } else {
+                        logger.severe("The localName is mal-formed");
+                        return null;
+                    }
+                }
+                
                 // we get the empty constructor
                 Constructor constructor = classe.getConstructor();
-                logger.finer("constructor:" + '\n' + constructor.toGenericString());
+                logger.info("constructor:" + '\n' + constructor.toGenericString());
                 //we execute the constructor
                 result = constructor.newInstance();
             }
@@ -541,7 +577,7 @@ public class MetadataReader {
             logger.severe("The class is not accessible");
             return null;
         } catch (ParseException e) {
-            logger.severe("The date cannot be parsed");
+            logger.severe("The date cannot be parsed ");
             return null;
         } catch (java.lang.reflect.InvocationTargetException e) {
             logger.severe("Exception throw in the invokated constructor");
@@ -564,11 +600,13 @@ public class MetadataReader {
             Path path = childValue.getPath();
 
             if (childValue.getParent()!= null && childValue.getParent().equals(value)) {
-                logger.finer("new childValue:" + path.getName());
+                logger.info("new childValue:" + path.getName());
 
                 // we get the object from the child Value
                 Object param = getObjectFromValue(form, childValue);
-                
+                if (param == null) {
+                    continue;
+                }
                 //we try to put the parameter in the parent object
                 // by searching for the good attribute name
                 boolean tryAgain = true;
@@ -585,7 +623,7 @@ public class MetadataReader {
                 while (tryAgain) {
                     try {
 
-                        logger.finer("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
+                        logger.info("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
                         if (isMeta) {
                             metaMap.put(attribName, param);
                         } else {
@@ -594,7 +632,7 @@ public class MetadataReader {
                         }
                         tryAgain = false;
                     } catch (IllegalArgumentException e) {
-                        logger.finer(e.getMessage());
+                        logger.info(e.getMessage());
                         switch (casee) {
 
                             case 0:
@@ -612,12 +650,13 @@ public class MetadataReader {
                                 casee = 2;
                                 break;
                             default:
-                                throw e;
+                                logger.severe("unable to put " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
+                                tryAgain = false;
                             }
                     }
                 }
 
-                logger.finer("");
+                logger.info("");
             }
         }
         return result;
@@ -690,7 +729,7 @@ public class MetadataReader {
             return Boolean.class;
         } else if (className.equalsIgnoreCase("Distance")) {
             return Double.class;
-        } else if (className.equalsIgnoreCase("URL")) {
+        } else if (className.equalsIgnoreCase("URL") || className.equalsIgnoreCase("URI")) {
             return URI.class;
         //special case for locale codeList.
         } else if (className.equals("LanguageCode")) {
@@ -712,11 +751,17 @@ public class MetadataReader {
      * @return a class object corresponding to the specified name.
      */
     private Class getClassFromName(String className, String standardName) {
-        logger.finer("searche for class " + className);
-
+        Class result = classBinding.get(standardName + ':' + className);
+        if (result == null) {
+            logger.info("searche for class " + className);
+        } else {
+            return result;
+        }
+        
         //for the primitive type we return java primitive type
-        Class result = getPrimitiveTypeFromName(className);
+        result = getPrimitiveTypeFromName(className);
         if (result != null) {
+            classBinding.put(standardName + ':' + className, result);
             return result;
         }
 
@@ -738,7 +783,7 @@ public class MetadataReader {
             standardName.equals("OGC Web Service")) {
             packagesName = seagisPackage;
         } else {
-            if (!className.contains("Code")) {
+            if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType")) {
                 packagesName = geotoolsPackage;
             } else {
                 packagesName = opengisPackage;
@@ -753,6 +798,8 @@ public class MetadataReader {
                 packageName = "net.seagis.referencing";
             else if (className.equals("MD_ScopeCode"))
                 packageName = "org.opengis.metadata.maintenance";
+            else if (className.equals("SV_ServiceIdentification")) 
+                packageName = "org.geotools.service";
             
             String name = className;
             int nameType = 0;
@@ -760,7 +807,10 @@ public class MetadataReader {
                 try {
                     logger.finer("searching: " + packageName + '.' + name);
                     result = Class.forName(packageName + '.' + name);
-                    logger.finer("class found:" + packageName + '.' + name);
+                    
+                    //if we found the class we store and return it
+                    classBinding.put(standardName + ':' + className, result);
+                    logger.info("class found:" + packageName + '.' + name);
                     return result;
 
                 } catch (ClassNotFoundException e) {
@@ -821,7 +871,7 @@ public class MetadataReader {
      * @return a setter to this attribute.
      */
     private Method getSetterFromName(String propertyName, Class classe, Class rootClass) {
-        logger.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
+        logger.info("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
         
         //special case
         if (propertyName.equals("beginPosition")) {
@@ -878,7 +928,7 @@ public class MetadataReader {
                         break;
                     }
                 }
-                logger.finer("setter found: " + setter.toGenericString());
+                logger.info("setter found: " + setter.toGenericString());
                 return setter;
 
             } catch (NoSuchMethodException e) {
@@ -886,38 +936,38 @@ public class MetadataReader {
                 switch (occurenceType) {
 
                     case 0: {
-                        logger.finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
+                        logger.info("The setter " + methodName + "(" + classe.getName() + ") does not exist");
                         occurenceType = 1;
                         break;
                     }
 
                     case 1: {
-                        logger.finer("The setter " + methodName + "(long) does not exist");
+                        logger.info("The setter " + methodName + "(long) does not exist");
                         occurenceType = 2;
                         break;
                     }
                     
                     case 2: {
                         if (interfacee != null) {
-                            logger.finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
+                            logger.info("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
                         }
                         occurenceType = 3;
                         break;
                     }
 
                     case 3: {
-                        logger.finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
+                        logger.info("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 4;
                         break;
                     }
                     case 4: {
-                        logger.finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
+                        logger.info("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 5;
                         break;
                     }
                     case 5: {
                         if (superC != null) {
-                            logger.finer("The setter " + methodName + "(" + superC.getName() + ") does not exist");
+                            logger.info("The setter " + methodName + "(" + superC.getName() + ") does not exist");
                         }
                         occurenceType = 6;
                         break;
@@ -1093,7 +1143,7 @@ public class MetadataReader {
         String year;
         String month;
         String day;
-        Date tmp = dateFormat.parse("01" + "-" + "01" + "-" + "1900");
+        Date tmp = dateFormat.parse("1900" + "-" + "01" + "-" + "01");
         if (date != null){
             if(date.contains("/")){
                 
@@ -1102,7 +1152,7 @@ public class MetadataReader {
                 month = date.substring(0, date.indexOf("/"));
                 year  = date.substring(date.indexOf("/")+1);
                                 
-                tmp   = dateFormat.parse(day + "-" + month + "-" + year);
+                tmp   = dateFormat.parse(year + "-" + month + "-" + day);
             } else if ( getOccurence(date, " ") == 2 ) {
                 if (! date.contains("?")){
                                
@@ -1111,21 +1161,21 @@ public class MetadataReader {
                     month  = POOL.get(date.substring(0, date.indexOf(" ")));
                     year   = date.substring(date.indexOf(" ")+1);
 
-                    tmp    = dateFormat.parse(day+"-"+month+"-"+year);
+                    tmp    = dateFormat.parse(year + "-" + month + "-" + day);
                 } else tmp = dateFormat.parse("01" + "-" + "01" + "-" + "2000");
                 
             } else if ( getOccurence(date, " ") == 1 ) {
                 
                 month = POOLcase.get(date.substring(0, date.indexOf(" ")));
                 year  = date.substring(date.indexOf(" ") + 1);   
-                tmp   = dateFormat.parse("01" + "-" + month + "-" + year);
+                tmp   = dateFormat.parse(year + "-" + month + "-01");
                 
             } else if ( getOccurence(date, "-") == 1 ) {
                 
                 month = date.substring(0, date.indexOf("-"));
                 year  = date.substring(date.indexOf("-")+1);
                                 
-                tmp   = dateFormat.parse("01" + "-" + month + "-" + year);
+                tmp   = dateFormat.parse(year + "-" + month + "-01");
                 
             } else if ( getOccurence(date, "-") == 2 ) {
                 
@@ -1136,7 +1186,7 @@ public class MetadataReader {
                     month = date.substring(0, date.indexOf("-"));
                     day   = date.substring(date.indexOf("-")+1);
                     
-                    tmp   = dateFormat.parse(day + "-" + month + "-" + year);
+                    tmp   = dateFormat.parse(year + "-" + month + "-" + day);
                 }
                 else{
                     day   = date.substring(0, date.indexOf("-"));
@@ -1144,12 +1194,12 @@ public class MetadataReader {
                     month = date.substring(0, date.indexOf("-"));
                     year  = date.substring(date.indexOf("-")+1);
                     
-                    tmp =  dateFormat.parse(day + "-" + month + "-" + year);
+                    tmp =  dateFormat.parse(year + "-" + month + "-" + day);
                 }
                 
             } else {
                 year = date;
-                tmp  =  dateFormat.parse("01" + "-" + "01" + "-" + year);
+                tmp  =  dateFormat.parse(year + "-01-01");
             }
         }
         return tmp;

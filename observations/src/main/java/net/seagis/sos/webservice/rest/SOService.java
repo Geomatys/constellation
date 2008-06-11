@@ -69,7 +69,7 @@ public class SOService extends WebService {
         super("SOS", new ServiceVersion(Service.OWS, "1.0.0"));
         worker = new SOSworker();
         worker.setVersion(getCurrentVersion());
-        setXMLContext("net.seagis.sos:net.seagis.gml:net.seagis.swe:net.seagis.gml:net.seagis.observation",
+        setXMLContext("net.seagis.sos:net.seagis.gml.v311:net.seagis.swe:net.seagis.observation",
                       "");
     }
 

@@ -19,10 +19,14 @@ package net.seagis.coverage.wms;
 import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import org.mdweb.model.schemas.Classe;
@@ -76,16 +80,28 @@ public class MetadataWriter {
     private Standard mainStandard;
     
     /**
+     * Record the date format in the metadata.
+     */
+    private DateFormat dateFormat; 
+    
+    /**
+     * A map recording the binding between java Class and MDWeb classe 
+     */
+    private Map<Class, Classe> classBinding;
+    
+    /**
      * Build a new metadata writer.
      * 
      * @param MDReader an MDWeb database reader.
      */
     public MetadataWriter(Reader MDReader, Writer20 MDWriter) throws SQLException {
         
-        MDCatalog      = MDReader.getCatalog("CSWCat");
-        user           = MDReader.getUser("admin");
-        this.MDReader  = MDReader;  
-        this.MDWriter  = MDWriter;
+        MDCatalog         = MDReader.getCatalog("CSWCat");
+        user              = MDReader.getUser("admin");
+        this.MDReader     = MDReader;  
+        this.MDWriter     = MDWriter;
+        this.dateFormat   = new SimpleDateFormat("yyyy-mm-dd");
+        this.classBinding = new HashMap<Class, Classe>();
     }
 
     /**
@@ -130,7 +146,11 @@ public class MetadataWriter {
         if (MDReader.getPath(path.getId()) == null) {
            MDWriter.writePath(path);
         } 
-                            
+        if (object == null) {
+            return;
+        }             
+        
+        //if the object is a collection we call the method on each child
         Classe classe;
         if (object instanceof Collection) {
             Collection c = (Collection) object;
@@ -139,14 +159,19 @@ public class MetadataWriter {
                 
             }
             return;
+            
+        //if the object is a JAXBElement we desencapsulate it    
         } else {
             if (object instanceof JAXBElement) {
                 JAXBElement jb = (JAXBElement) object;
                 object = jb.getValue();
-            } else if (object instanceof Double ){
-                
-            }
+            } 
             classe = getClasseFromObject(object);
+        }
+        
+        //if we don't have found the class we stop here
+        if (classe == null) {
+            return;
         }
         
         //we try to find the good ordinal
@@ -167,42 +192,68 @@ public class MetadataWriter {
                     codelistElement =  ((org.opengis.util.CodeList) object).identifier();
                 }
                 CodeListElement cle = (CodeListElement) cl.getPropertyByName(codelistElement);
-                if (cle != null) {
+                if (cle != null && cle instanceof org.mdweb.model.schemas.Locale) {
+                    object = cle.getShortName();
+                } else if (cle != null) {
                     object = cle.getCode();
                 } else {
-                    logger.severe("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName());
+                    String values = "";
+                    for (Property p: classe.getProperties()) {
+                        values += p.getName() +'\n';
+                    }
+                    logger.severe("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() + '\n' +
+                                  "allowed values are: " + '\n' +  values);
                 }
             }
-            TextValue textValue = new TextValue(path, form , ordinal, object + "", classe, parentValue);
+            String value;
+            if (object instanceof java.util.Date) {
+                value = dateFormat.format(object);
+            } else {
+                value = object + "";
+            }
+            
+            TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);
             logger.finer("new TextValue: " + path.toString() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
-        } else {
+        } 
+        else {
             
             Value value = new Value(path, form, ordinal, classe, parentValue);
-            logger.finer("new Value: " + path.toString() + " classe:" + classe.getName() + " ordinal=" + ordinal);
-            for (Property prop: classe.getProperties()) {
-                Method getter = getGetterFromName(prop.getName(), object.getClass());
-                if (getter != null) {
-                    try {
-                        Object propertyValue = getter.invoke(object);
-                        if (propertyValue != null) {
-                            Path childPath = new Path(path, prop); 
+            logger.info("new Value: " + path.toString() + " classe:" + classe.getName() + " ordinal=" + ordinal);
+            do {
+                for (Property prop: classe.getProperties()) {
+                    logger.info("property :" + prop.getName());
+                    // TODO remove when fix in MDweb2
+                    if (prop.getName().equals("geographicElement3") ||  prop.getName().equals("geographicElement4"))
+                        continue;
+                
+                    Method getter = getGetterFromName(prop.getName(), object.getClass());
+                    if (getter != null) {
+                        try {
+                            Object propertyValue = getter.invoke(object);
+                            if (propertyValue != null) {
+                                Path childPath = new Path(path, prop); 
                             
-                            //if the path is not already in the database we write it
-                            if (MDReader.getPath(childPath.getId()) == null) {
-                                MDWriter.writePath(childPath);
-                            }
-                            addValueFromObject(form, propertyValue, childPath, value);
-                        } 
+                                //if the path is not already in the database we write it
+                                if (MDReader.getPath(childPath.getId()) == null) {
+                                    MDWriter.writePath(childPath);
+                                }
+                                addValueFromObject(form, propertyValue, childPath, value);
+                            } 
                     
-                    } catch (IllegalAccessException e) {
-                        logger.severe("The class is not accessible");
-                        return;
-                    } catch (java.lang.reflect.InvocationTargetException e) {
-                        logger.severe("Exception throw in the invokated constructor");
-                        return;
-                    }   
+                        } catch (IllegalAccessException e) {
+                            logger.severe("The class is not accessible");
+                            return;
+                        } catch (java.lang.reflect.InvocationTargetException e) {
+                            logger.severe("Exception throw in the invokated constructor");
+                            return;
+                        }   
+                    }
                 }
-            }
+                classe = classe.getSuperClass();
+                if (classe != null) {
+                    logger.info("searching in superclasse " + classe.getName());
+                }
+            } while (classe != null);
         }
     }
 
@@ -210,7 +261,6 @@ public class MetadataWriter {
      * Return a getter Method for the specified attribute (propertyName) 
      * 
      * @param propertyName The attribute name.
-     * @param classe       The attribute type.  
      * @param rootClass    The class whitch owe this attribute
      * 
      * @return a setter to this attribute.
@@ -218,17 +268,24 @@ public class MetadataWriter {
     private Method getGetterFromName(String propertyName, Class rootClass) {
         logger.finer("search for a getter in " + rootClass.getName() + " of name :" + propertyName);
         
-        //special case
+        //special case and corrections
         if (propertyName.equals("beginPosition")) {
             propertyName = "begining";
         } else if (propertyName.equals("endPosition")) {
             propertyName = "ending";
-        } 
+        } else if (propertyName.equals("onlineResource")) {
+            propertyName = "onLineResource";
+        } else if (propertyName.equals("dataSetURI")) {
+            propertyName = "dataSetUri";
+        // TODO remove when this issue will be fix in MDWeb    
+        } else if (propertyName.indexOf("geographicElement") != -1) {
+            propertyName = "geographicElement";
+        }
         
         String methodName = "get" + firstToUpper(propertyName);
         int occurenceType = 0;
         
-        while (occurenceType < 2) {
+        while (occurenceType < 4) {
 
             try {
                 Method getter = null;
@@ -242,6 +299,18 @@ public class MetadataWriter {
                         getter = rootClass.getMethod(methodName + "s");
                         break;
                     }
+                    case 2: {
+                        getter = rootClass.getMethod(methodName + "es");
+                        break;
+                    }
+                    case 3: {
+                        if (methodName.endsWith("y")) {
+                            methodName = methodName.substring(0, methodName.length() - 1) + 'i';
+                        }
+                        getter = rootClass.getMethod(methodName + "es");
+                        break;
+                    }
+                   
                 }
                 if (getter != null) {
                     logger.finer("getter found: " + getter.toGenericString());
@@ -263,8 +332,18 @@ public class MetadataWriter {
                         occurenceType = 2;
                         break;
                     }
-                    default:
+                    case 2: {
+                        logger.finer("The getter " + methodName + "es() does not exist");
                         occurenceType = 3;
+                        break;
+                    }
+                    case 3: {
+                        logger.finer("The getter " + methodName + "es() does not exist");
+                        occurenceType = 4;
+                        break;
+                    }
+                    default:
+                        occurenceType = 5;
                 }
             }
         }
@@ -288,28 +367,38 @@ public class MetadataWriter {
     }
     
     /**
-     * Return true if the MDWeb classe is primitive.
+     * Return true if the MDWeb classe is primitive (i.e. if its a CodeList or if it has no properties).
      * 
      * @param classe an MDWeb classe Object
      */
     private boolean isPrimitive(Classe classe) {
-        return (classe.getProperties().size() == 0 || classe instanceof CodeList);
+        if (classe != null)
+            return (classe.getProperties().size() == 0 || classe instanceof CodeList);
+        return false;
     }
     
     /**
      * Return an MDWeb classe object for the specified java object.
      * 
      * @param object the object to identify
-     * @param mainStandard A standard indicating in witch specification search.
      *
      * @throws java.sql.SQLException
      */
     private Classe getClasseFromObject(Object object) throws SQLException {
-        Classe result;
+        
         String className;
+        String packageName;
+        Classe result;
         if (object != null) {
-            className = object.getClass().getSimpleName();
-            logger.finer("searche for classe " + className);
+            
+            result = classBinding.get(object.getClass());
+            if (result != null) {
+                return result;
+            }
+            
+            className   = object.getClass().getSimpleName();
+            packageName = object.getClass().getPackage().getName();
+            logger.info("searche for classe " + className);
             
         } else {
             return null;
@@ -317,6 +406,7 @@ public class MetadataWriter {
         //for the primitive type we return ISO primitive type
         result = getPrimitiveTypeFromName(className);
         if (result != null) {
+            classBinding.put(object.getClass(), result);
             return result;
         }
 
@@ -338,15 +428,23 @@ public class MetadataWriter {
         }
         
         //we remove the Type suffix
-        if (className.endsWith("Type")) {
+        if (className.endsWith("Type") && !className.equals("CouplingType") 
+                                       && !className.equals("DateType") 
+                                       && !className.equals("KeywordType")) {
             className = className.substring(0, className.length() - 4);
         }
         
         List<Standard> availableStandards = new ArrayList<Standard>();
+        
+        // ISO 19115 and its sub standard (ISO 19119, 19110)
         if (mainStandard.equals(Standard.ISO_19115)) {
             availableStandards.add(mainStandard);
             availableStandards.add(Standard.ISO_19108);
             availableStandards.add(Standard.ISO_19103);
+            availableStandards.add(MDReader.getStandard("ISO 19119"));
+            availableStandards.add(MDReader.getStandard("ISO 19110"));
+        
+        // CSW standard    
         } else {
             availableStandards.add(MDReader.getStandard("Catalog Web Service"));
             availableStandards.add(MDReader.getStandard("DublinCore"));
@@ -355,15 +453,21 @@ public class MetadataWriter {
         }
         for (Standard standard : availableStandards) {
             
-                
+            /* to avoid some confusion between to classes with the same name
+             * we affect the standard in some special case
+             */
+            if (packageName.equals("org.geotools.service")) {
+                standard = MDReader.getStandard("ISO 19119");
+            }       
             String name = className;
             int nameType = 0;
-            while (nameType < 5) {
+            while (nameType < 8) {
                 
                 logger.finer("searching: " + standard.getName() + ":" + name);
                 result = MDReader.getClasse(name, standard);
                 if (result != null) {
-                    logger.finer("class found:" + standard.getName() + ":" + name);
+                    logger.info("class found:" + standard.getName() + ":" + name);
+                    classBinding.put(object.getClass(), result);
                     return result;
                 } 
                 
@@ -375,35 +479,53 @@ public class MetadataWriter {
                             name = "MD_" + className;    
                             break;
                         }
-                        //we add the prefix CI_
+                        //we add the prefix MD_ + the suffix "Code"
                         case 1: {
                             nameType = 2;
+                            name = "MD_" + className + "Code";    
+                            break;
+                        }
+                        //we add the prefix CI_
+                        case 2: {
+                            nameType = 3;
                             name = "CI_" + className;    
                             break;
                         }
+                        //we add the prefix CI_ + the suffix "Code"
+                        case 3: {
+                            nameType = 4;
+                            name = "CI_" + className + "Code";    
+                            break;
+                        }
                         //we add the prefix EX_
-                        case 2: {
-                            nameType = 3;
+                        case 4: {
+                            nameType = 5;
                             name = "EX_" + className;    
                             break;
                         }
+                        //we add the prefix SV_
+                        case 5: {
+                            nameType = 6;
+                            name = "SV_" + className;    
+                            break;
+                        }
                         //for the code list we add the "code" suffix
-                        case 3: {
+                        case 6: {
                             if (name.indexOf("Code") != -1) {
                                 name += "Code";
                             }
-                            nameType = 4;
+                            nameType = 7;
                             break;
                         }
                          //for the code list we add the "code" suffix
                         //for the temporal element we remove add prefix
-                        case 4: {
+                        case 7: {
                             name = "Time" + name;
-                            nameType = 5;
+                            nameType = 8;
                             break;
                         }
                         default:
-                            nameType = 5;
+                            nameType = 8;
                             break;
                     }
 

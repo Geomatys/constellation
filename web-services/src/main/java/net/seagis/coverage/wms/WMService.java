@@ -146,7 +146,7 @@ public class WMService extends WebService {
         super("WMS", new ServiceVersion(Service.WMS, "1.3.0") ,new ServiceVersion(Service.WMS, "1.1.1"));
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("net.seagis.coverage.web:net.seagis.wms.v111:net.seagis.wms.v130:net.seagis.sld:net.seagis.gml",
+        setXMLContext("net.seagis.coverage.web:net.seagis.wms.v111:net.seagis.wms.v130:net.seagis.sld.v110:net.seagis.gml.v311",
                       "http://www.opengis.net/wms");
                 
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();

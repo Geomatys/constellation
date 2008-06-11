@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +89,13 @@ public class CSWService extends WebService {
     public CSWService() throws IOException, SQLException {
         super("CSW", new ServiceVersion(Service.OWS, "2.0.2"));
         try {
-            setXMLContext("http://www.opengis.net/cat/csw/2.0.2", MetaDataImpl.class, Capabilities.class, DescribeRecordType.class
+            
+            List<Class> classeList = new ArrayList<Class>();
+            //ISO 19115 class
+            classeList.add(MetaDataImpl.class);
+            
+            //CSW classes
+            classeList.addAll(Arrays.asList(Capabilities.class, DescribeRecordType.class
                         ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
                         ,GetCapabilities.class, GetDomainType.class, GetRecordByIdType.class
                         ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
@@ -97,8 +104,22 @@ public class CSWService extends WebService {
                         ,DescribeRecordResponseType.class, GetDomainResponseType.class
                         ,TransactionResponseType.class, HarvestResponseType.class
                         ,ExceptionReport.class, net.seagis.ows.v110.ExceptionReport.class
-                        ,net.seagis.dublincore.terms.ObjectFactory.class);
-                        // TODO remove net.seagis.ows.v110.ExceptionReport.class
+                        ,net.seagis.dublincore.terms.ObjectFactory.class));
+            // TODO remove net.seagis.ows.v110.ExceptionReport.class
+            
+            // if they are present in the classPath we add the ISO 19119 classes
+            Class c = null;
+            try {
+                c = Class.forName("org.geotools.service.ServiceIdentificationImpl");
+            } catch (ClassNotFoundException e) {
+                logger.info("ISO 19119 classes not found");
+            }
+            if (c != null) {
+                classeList.add(c);
+            }
+            Class[] classes = toArray(classeList);
+             
+            setXMLContext("http://www.opengis.net/cat/csw/2.0.2", classes);
         
             worker = new CSWworker(unmarshaller);
             worker.setVersion(getCurrentVersion());
@@ -724,6 +745,19 @@ public class CSWService extends WebService {
                                resourceFormat, 
                                handler, 
                                harvestInterval);
+    }
+    
+    /**
+     * Transform a List of class in a Class[]
+     */
+    public Class[] toArray(List<Class> classes) {
+        Class[] result = new Class[classes.size()];
+        int i = 0;
+        for (Class classe : classes) {
+            result[i] = classe;
+            i++;
+        }
+        return result;
     }
 
 }
