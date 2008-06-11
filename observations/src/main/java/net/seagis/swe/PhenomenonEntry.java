@@ -17,19 +17,11 @@ package net.seagis.swe;
 //jaxB import
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 // Sicade dependencies
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.catalog.Entry;
-
-// geotools dependencies
 import net.seagis.gml.v311.DefinitionType;
-import org.geotools.resources.Utilities;
-
-// GeoAPI dependencies 
 import org.opengis.observation.Phenomenon;
 
 
@@ -49,25 +41,6 @@ public class PhenomenonEntry extends DefinitionType implements Phenomenon {
      */
     private static final long serialVersionUID = 5140595674231914861L;
 
-    /**
-     * The phenomenon identifier.
-     
-    @XmlAttribute(required = true, namespace="http://www.opengis.net/gml")
-    private String id;
-    */
-    /**
-     * The phenomenon name.
-     
-    @XmlElement(name="name", namespace="http://www.opengis.net/gml", type = String.class)
-    private String name;
-    */
-    
-    /**
-     * The phenomenon description.
-     
-    @XmlElement(name="description", namespace="http://www.opengis.net/gml", type = String.class)
-    private String description;
-    */
     
     /**
      * Empty constructor used by JAXB.

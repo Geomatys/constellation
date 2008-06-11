@@ -13,21 +13,16 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.gml;
+package net.seagis.gml.v311;
 
-import net.seagis.gml.v311.AbstractFeatureEntry;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.observation.ObservationEntry;
-import net.seagis.sampling.ObjectFactory;
 import net.seagis.sampling.SamplingFeatureEntry;
 import net.seagis.sampling.SamplingPointEntry;
 import org.geotools.resources.Utilities;

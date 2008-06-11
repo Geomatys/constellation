@@ -31,7 +31,7 @@ import net.seagis.coverage.model.Distribution;
 
 // openGis dependencies
 import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
-import net.seagis.gml.FeaturePropertyType;
+import net.seagis.gml.v311.FeaturePropertyType;
 import net.seagis.gml.v311.ReferenceEntry;
 import net.seagis.gml.v311.TimePeriodType;
 import net.seagis.gml.v311.TimePositionType;

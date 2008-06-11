@@ -79,7 +79,7 @@ import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.wms.WebService;
 import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.v311.EnvelopeEntry;
-import net.seagis.gml.FeaturePropertyType;
+import net.seagis.gml.v311.FeaturePropertyType;
 import net.seagis.gml.v311.ReferenceEntry;
 import net.seagis.gml.v311.ReferenceTable;
 import net.seagis.gml.v311.TimePositionType;

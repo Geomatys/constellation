@@ -25,7 +25,7 @@ import net.seagis.catalog.QueryType;
 import net.seagis.catalog.SingletonTable;
 import net.seagis.gml.v311.ReferenceEntry;
 import net.seagis.gml.v311.ReferenceTable;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 /**
  *

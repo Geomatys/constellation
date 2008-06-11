@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlType;
 import net.seagis.catalog.Entry;
 import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
 import net.seagis.metadata.ResponsiblePartyEntry;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.observation.Measure;
 import org.opengis.observation.sampling.SurveyProcedure;

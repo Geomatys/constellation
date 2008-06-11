@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.v311.TimeInstantType;
 import net.seagis.gml.v311.TimePeriodType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
