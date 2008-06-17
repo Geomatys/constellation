@@ -277,7 +277,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
             in.close();
         } catch (IOException e) {
             err.println(e);
-            System.exit(IOEXCEPTION_EXIT_CODE);
+            System.exit(IO_EXCEPTION_EXIT_CODE);
         }
         final File[] files = list.toArray(new File[list.size()]);
         for (final File file : files) {
@@ -286,7 +286,7 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
                 tr = parseTransform(file);
             } catch (IOException e) {
                 err.println(e);
-                System.exit(IOEXCEPTION_EXIT_CODE);
+                System.exit(IO_EXCEPTION_EXIT_CODE);
                 continue;
             }
             final Tile tile = new Tile(null, file, 0, null, tr);

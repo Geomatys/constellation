@@ -231,7 +231,7 @@ public final class Reformat extends CommandLine implements FileFilter {
             worker.run();
         } catch (IOException e) {
             worker.err.println(e);
-            System.exit(IOEXCEPTION_EXIT_CODE);
+            System.exit(IO_EXCEPTION_EXIT_CODE);
         }
     }
 }

@@ -63,7 +63,7 @@ public class ExternalyConfiguredCommandLine extends CommandLine {
             in.close();
         } catch (IOException e) {
             err.println(e);
-            System.exit(IOEXCEPTION_EXIT_CODE);
+            System.exit(IO_EXCEPTION_EXIT_CODE);
         }
     }
 
