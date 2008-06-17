@@ -604,7 +604,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      * with different metadata.
      *
      * @param  tile The tile to use for the entry.
-     * @return The entry to be inserted into the database.
+     * @return The entry to be inserted into the database,
+     *         or {@code null} if the given tile should be skipped.
      * @throws IOException if an error occured while reading the image.
      */
     protected WritableGridCoverageEntry createEntry(final Tile tile) throws IOException {
@@ -620,7 +621,8 @@ public class WritableGridCoverageTable extends GridCoverageTable {
      *
      * @param  reader     The reader where to fetch metadata from.
      * @param  imageIndex The index of the image to be read.
-     * @return The entry to be inserted into the database.
+     * @return The entry to be inserted into the database,
+     *         or {@code null} if the given image should be skipped.
      * @throws IOException if an error occured while reading the image.
      */
     protected WritableGridCoverageEntry createEntry(final ImageReader reader, final int imageIndex)

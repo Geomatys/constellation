@@ -17,6 +17,7 @@ package net.seagis.coverage.catalog;
 import java.awt.Point;
 import java.util.Map;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.io.IOException;
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
@@ -65,9 +66,9 @@ final class WritableGridCoverageIterator implements Iterator<WritableGridCoverag
     private final Iterator<?> files;
 
     /**
-     * The next input read, or {@code null} if we have reached the iteration end.
+     * The next entry to return, or {@code null} if we have reached the iteration end.
      */
-    private Object next;
+    private WritableGridCoverageEntry next;
 
     /**
      * The image reader to use. Will be created when first needed. May never be created if every
@@ -83,17 +84,21 @@ final class WritableGridCoverageIterator implements Iterator<WritableGridCoverag
      * @param  series     The series in which the images will be added, or {@code null} if unknown.
      * @param  imageIndex Index of images to read. Ignored if the inputs are {@link Tile} instances.
      * @param  files      The files to read. Iteration shall be at the second element.
-     * @param  next       The first element from the given iterator.
+     * @param  input      The first element from the given iterator.
+     * @throws IOException if an I/O operation was required and failed.
      */
     WritableGridCoverageIterator(final WritableGridCoverageTable table,
                                  final Series series, final int imageIndex,
-                                 final Iterator<?> files, final Object next)
+                                 final Iterator<?> files, Object input)
+            throws IOException
     {
         this.table      = table;
         this.series     = series;
         this.imageIndex = imageIndex;
         this.files      = files;
-        this.next       = next;
+        do {
+            next = createEntry(input);
+        } while (next == null && (input = nextInput()) != null);
     }
 
     /**
@@ -136,19 +141,26 @@ final class WritableGridCoverageIterator implements Iterator<WritableGridCoverag
     }
 
     /**
-     * Returns the current entry without advancing the iterator.
+     * Creantes an entry for the given input.
+     *
+     * @param  input The input, or {@code null} if none.
+     * @return The entry, or {@code null} if the given input should be skipped.
+     * @throws IOException if an I/O operation was required and failed.
      */
-    private WritableGridCoverageEntry peek() throws IOException {
-        if (next instanceof Tile) {
-            return table.createEntry((Tile) next);
+    private WritableGridCoverageEntry createEntry(final Object input) throws IOException {
+        if (input == null) {
+            return null;
+        }
+        if (input instanceof Tile) {
+            return table.createEntry((Tile) input);
         }
         final ImageReader reader;
-        if (next instanceof ImageReader) {
-            reader = (ImageReader) next;
+        if (input instanceof ImageReader) {
+            reader = (ImageReader) input;
         } else {
             reader = getImageReader();
             if (reader != null) {
-                reader.setInput(next);
+                reader.setInput(input);
             } else {
                 // Lets the Tile constructor figure out the provider by itself.
                 final Tile tile = new Tile(null, next, imageIndex, new Point(0,0), null);
@@ -162,30 +174,51 @@ final class WritableGridCoverageIterator implements Iterator<WritableGridCoverag
      * Returns the next entry to add to the database.
      */
     public WritableGridCoverageEntry next() {
-        final WritableGridCoverageEntry entry;
-        try {
-            entry = peek();
-        } catch (IOException exception) {
-            // Will be unwrapped by WritableGridCoverageTable.
-            throw new UndeclaredThrowableException(exception);
+        final WritableGridCoverageEntry entry = next;
+        if (entry == null) {
+            throw new NoSuchElementException();
         }
         next = null;
-        while (files.hasNext()) {
-            next = files.next();
-            if (next instanceof Map.Entry) {
-                final Map.Entry<?,?> candidate = (Map.Entry) next;
-                if (series != null && !series.equals(candidate.getValue())) {
-                    continue;
-                }
-                next = candidate.getKey();
+        do {
+            final Object input = nextInput();
+            if (input == null) {
+                break;
             }
-            if (series != null) {
-                files.remove();
+            try {
+                next = createEntry(input);
+            } catch (IOException exception) {
+                // Will be unwrapped by WritableGridCoverageTable.
+                throw new UndeclaredThrowableException(exception);
             }
-            break;
-        }
+        } while (next == null);
         entry.series = series;
         return entry;
+    }
+
+    /**
+     * Returns the next input (omitting {@code null} values), or {@code null} if we have
+     * reached the iteration end.
+     *
+     * @return The next input, or {@code null} if we have reached iteration end.
+     */
+    private Object nextInput() {
+        while (files.hasNext()) {
+            Object input = files.next();
+            if (input != null) {
+                if (input instanceof Map.Entry) {
+                    final Map.Entry<?,?> candidate = (Map.Entry) input;
+                    if (series != null && !series.equals(candidate.getValue())) {
+                        continue;
+                    }
+                    input = candidate.getKey();
+                }
+                if (series != null) {
+                    files.remove();
+                }
+                return input;
+            }
+        }
+        return null;
     }
 
     /**

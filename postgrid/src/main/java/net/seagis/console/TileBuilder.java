@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.logging.Level;
@@ -82,7 +82,7 @@ import net.seagis.coverage.catalog.WritableGridCoverageTable;
  * @author Cédric Briançon
  * @author Martin Desruisseaux
   */
-public class TileBuilder extends ExternalyConfiguredCommandLine {
+public class TileBuilder extends ExternalyConfiguredCommandLine implements Runnable {
     /**
      * The prefix for tiles in the {@linkplain #properties} map.
      */
@@ -202,7 +202,8 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
             try {
                 id = CRS.lookupEpsgCode(crs, true);
             } catch (FactoryException e) {
-                // Ignore...
+                err.println(e);
+                // Continue anyway. The horizontalSRID will be set to "unknown".
             }
         }
         // TODO: 'id' is the EPSG code. This is not necessarly the same that spatial_ref_sys primary key...
@@ -210,7 +211,9 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
     }
 
     /**
-     * Process to the command execution.
+     * Process to the command execution. This method can be invoked at any time (but only once)
+     * after {@code TileBuilder} construction. If this method fails, a message is printed to the
+     * {@link System#err standard error stream} and {@link System#exit} is invoked.
      */
     public void run() {
         final Collection<Tile> tiles = createSourceTiles();
@@ -219,92 +222,92 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
             err.println("At least one tile must be specified.");
             System.exit(BAD_CONTENT_EXIT_CODE);
         }
-        createTargetTiles(tiles);
+        final TileManager manager = createTargetTiles(tiles);
+        if (insert) {
+            updateDatabase(manager);
+        }
         out.flush();
         err.flush();
-    }
-
-    /**
-     * Creates a source {@link File} from the given filename.
-     */
-    private File sourceFile(final String filename) {
-        if (filename == null) {
-            return null;
-        }
-        final File file = new File(filename);
-        if (sourceDirectory == null || file.isAbsolute()) {
-            return file;
-        }
-        return new File(sourceDirectory, filename);
     }
 
     /**
      * Creates the collection of source tiles. The default implementation builds the collection
      * from the files declared in the property file given on the command line. Subclasses can
      * override this method in order to complete the collection in an other way.
+     * <p>
+     * If this method fails, a message is printed to the {@link System#err standard error stream}
+     * and {@link System#exit} is invoked.
      *
-     * @return A collection of tiles. If this method fails, a message is printed to the
-     *         {@link System#err standard error stream} and {@link System#exit} is invoked.
+     * @return A collection of tiles.
      */
     protected Collection<Tile> createSourceTiles() {
-        final Collection<Tile> tiles = new HashSet<Tile>();
-        final String[] keys = properties.keySet().toArray(new String[properties.size()]);
-        for (String file : keys) {
-            if (file.startsWith(TILE_PREFIX)) {
-                final Point origin = getPoint(file);
-                file = file.substring(TILE_PREFIX.length());
-                final Tile tile = new Tile(null, sourceFile(file), 0, origin, null);
+        final Collection<Tile> tiles = new LinkedHashSet<Tile>();
+        /*
+         * Creates the tiles from the properties given explicitly with "tile." prefix.
+         */
+        for (final Object key : properties.keySet()) {
+            String filename = (String) key;
+            if (filename.startsWith(TILE_PREFIX)) {
+                final Point origin = getPoint(filename);
+                filename = filename.substring(TILE_PREFIX.length());
+                File file = new File(filename);
+                if (sourceDirectory != null && !file.isAbsolute()) {
+                    file = new File(sourceDirectory, filename);
+                }
+                final Tile tile = new Tile(null, file, 0, origin, null);
                 tiles.add(tile);
             }
         }
-        final File tileFiles = getFile("Tiles");
-        if (tileFiles == null) {
-            return tiles;
-        }
         /*
-         * Loads the file given by the "tiles" property.
+         * Loads the file given by the "tiles" property. We read all lines before to
+         * process them because we want to close the stream first in case of failure.
          */
-        final List<File> list = new ArrayList<File>();
-        try {
-            final BufferedReader in = new BufferedReader(new FileReader(tileFiles));
-            String line;
-            while ((line = in.readLine()) != null) {
-                line = line.trim();
-                if (line.length() != 0) {
-                    list.add(new File(line));
-                }
-            }
-            in.close();
-        } catch (IOException e) {
-            err.println(e);
-            System.exit(IO_EXCEPTION_EXIT_CODE);
-        }
-        final File[] files = list.toArray(new File[list.size()]);
-        for (final File file : files) {
-            final AffineTransform tr;
+        final File tileFiles = getFile("Tiles");
+        if (tileFiles != null) {
+            final List<File> files = new ArrayList<File>();
             try {
-                tr = parseTransform(file);
+                final BufferedReader in = new BufferedReader(new FileReader(tileFiles));
+                String line;
+                while ((line = in.readLine()) != null) {
+                    line = line.trim();
+                    if (line.length() != 0) {
+                        files.add(new File(line));
+                    }
+                }
+                in.close();
             } catch (IOException e) {
                 err.println(e);
                 System.exit(IO_EXCEPTION_EXIT_CODE);
-                continue;
             }
-            final Tile tile = new Tile(null, file, 0, null, tr);
-            tiles.add(tile);
+            for (final File file : files) {
+                final AffineTransform tr;
+                try {
+                    tr = parseTransform(file);
+                } catch (IOException e) {
+                    err.println(e);
+                    System.exit(IO_EXCEPTION_EXIT_CODE);
+                    continue;
+                }
+                final Tile tile = new Tile(null, file, 0, null, tr);
+                tiles.add(tile);
+            }
         }
         return tiles;
     }
 
     /**
-     * Creates the target tiles, optionnaly writes them to disk and to the database.
+     * Creates the target tiles, optionnaly writes them to disk and to the database. If this
+     * method fails, a message is printed to the {@link System#err standard error stream}
+     * and {@link System#exit} is invoked.
      *
-     * @return {@code true} on success, or {@code false} if aborted.
+     * @param  tiles The source tiles.
+     * @return The tile manager containing target tiles.
      */
-    private boolean createTargetTiles(Collection<Tile> tiles) {
+    private TileManager createTargetTiles(final Collection<Tile> tiles) {
         if (!targetDirectory.isDirectory()) {
             err.print(targetDirectory.getPath());
             err.println(" is not a directory.");
-            return false;
+            System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
         }
         /*
          * From the big tiles declared in the property files, infers a set of smaller tiles at
@@ -326,10 +329,10 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
         builder.setTileDirectory(targetDirectory);
         builder.setMosaicEnvelope(envelope);
         builder.setTileReaderSpi(format);
-        final TileManager tileManager;
+        final TileManager manager;
         try {
             if (keepLayout) {
-                tileManager = TileManagerFactory.DEFAULT.create(tiles)[0];
+                manager = TileManagerFactory.DEFAULT.create(tiles)[0];
             } else {
                 TileWritingPolicy policy = TileWritingPolicy.NO_WRITE;
                 if (!pretend) {
@@ -343,21 +346,57 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
                         }
                     }
                 }
-                tileManager = builder.createTileManager(tiles, 0, policy);
+                manager = builder.createTileManager(tiles, 0, policy);
             }
         } catch (IOException e) {
             err.println(e);
-            return false;
+            System.exit(IO_EXCEPTION_EXIT_CODE);
+            return null; // Should never reach this point.
         }
-        if (tileManager == null) {
+        if (manager == null) {
             err.println("Aborted.");
-            return false;
+            System.exit(ABORT_EXIT_CODE);
         }
+        out.println(manager);
+        return manager;
+    }
+
+    /**
+     * Insert the tile entries in the database. If this method fails, a message is printed
+     * to the {@link System#err standard error stream} and {@link System#exit} is invoked.
+     *
+     * @param tileManager The tile manager containing target tiles.
+     */
+    private void updateDatabase(final TileManager manager) {
+        Collection<Tile> tiles;
+        /*
+         * Keep only the tiles associated to existing files. Those tiles should have been written
+         * by the above code. We do this filtering only after the tiles writting because the empty
+         * tiles are detected reliably only by MosaicImageWriter. An other reason is that if tiles
+         * writting and datebase update are two separated steps, looking for existing files is the
+         * only way to know which tiles were determined as empty by the previous run.
+         */
         try {
-            tiles = tileManager.getTiles();
+            tiles = manager.getTiles();
         } catch (IOException e) {
             err.println(e);
-            return false;
+            System.exit(IO_EXCEPTION_EXIT_CODE);
+            return;
+        }
+        if (!empty) {
+            final ArrayList<Tile> filtered = new ArrayList<Tile>(tiles.size());
+            for (final Tile tile : tiles) {
+                final Object input = tile.getInput();
+                if (input instanceof File) {
+                    final File file = (File) input;
+                    if (!file.isFile()) {
+                        continue;
+                    }
+                }
+                filtered.add(tile);
+            }
+            filtered.trimToSize();
+            tiles = filtered;
         }
         /*
          * Creates a global tiles which cover the whole area.
@@ -383,17 +422,17 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
         }
         final Tile global;
         try {
-            global = tileManager.createGlobalTile(null, name, 0);
+            global = manager.createGlobalTile(null, name, 0);
         } catch (IOException e) {
             err.println(e);
-            return false;
+            System.exit(IO_EXCEPTION_EXIT_CODE);
+            return;
         }
         /*
          * Fills the database if requested by the user. The tiles entries will be inserted in the
          * "Tiles" table while the global entry will be inserted into the "GridCoverages" table.
          */
-        out.println(tileManager);
-        if (insert) try {
+        try {
             final Database database = new Database();
             if (pretend) {
                 database.setUpdateSimulator(out);
@@ -417,16 +456,14 @@ public class TileBuilder extends ExternalyConfiguredCommandLine {
             database.close();
         } catch (IOException e) {
             err.println(e);
-            return false;
+            System.exit(IO_EXCEPTION_EXIT_CODE);
         } catch (SQLException e) {
             err.println(e);
-            return false;
+            System.exit(SQL_EXCEPTION_EXIT_CODE);
         } catch (CatalogException e) {
             err.println(e);
-            return false;
+            System.exit(SQL_EXCEPTION_EXIT_CODE);
         }
-        out.flush();
-        return true;
     }
 
     /**
