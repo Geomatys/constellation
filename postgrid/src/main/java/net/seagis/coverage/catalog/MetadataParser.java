@@ -21,10 +21,12 @@ import java.sql.SQLException;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
-import javax.units.Unit;
-import javax.units.SI;
-import javax.units.NonSI;
-import javax.units.Converter;
+import javax.measure.unit.Unit;
+import javax.measure.unit.SI;
+import javax.measure.unit.NonSI;
+import javax.measure.quantity.Quantity;
+import javax.measure.quantity.Duration;
+import javax.measure.converter.UnitConverter;
 
 import org.opengis.util.CodeList;
 import org.opengis.referencing.FactoryException;
@@ -37,6 +39,8 @@ import org.geotools.image.io.metadata.ImageGeometry;
 import org.geotools.image.io.metadata.ImageReferencing;
 import org.geotools.image.io.metadata.GeographicMetadata;
 import org.geotools.image.io.metadata.GeographicMetadataFormat;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.util.MeasurementRange;
 import org.geotools.util.NumberRange;
 import org.geotools.util.DateRange;
@@ -78,7 +82,7 @@ final class MetadataParser {
      * {@code null} if the later method has not been invoked or didn't
      * completed successfully.
      */
-    protected Unit timeUnit;
+    protected Unit<Duration> timeUnit;
 
     /**
      * Gets the geographic metadata from the specified reader.
@@ -113,7 +117,22 @@ final class MetadataParser {
     /**
      * Returns the units for the specified axis, or {@code null} if none.
      */
-    private static Unit getUnits(final Axis axis) {
+    private static <Q extends Quantity> Unit<Q> getUnits(final Axis axis, final Class<Q> type)
+            throws CatalogException
+    {
+        final Unit<?> units = getUnits(axis);
+        if (units != null) try {
+            return units.asType(type);
+        } catch (ClassCastException e) {
+            throw new CatalogException(Errors.format(ErrorKeys.INCOMPATIBLE_UNIT_$1, units));
+        }
+        return null;
+    }
+
+    /**
+     * Returns the units for the specified axis, or {@code null} if none.
+     */
+    private static Unit<?> getUnits(final Axis axis) {
         final String symbol = axis.getUnits();
         if (symbol == null) {
             return null;
@@ -205,7 +224,7 @@ final class MetadataParser {
         if (values == null) {
             return null;
         }
-        final Unit units = getUnits(metadata.getReferencing().getAxis(dimension));
+        final Unit<?> units = getUnits(metadata.getReferencing().getAxis(dimension));
         @SuppressWarnings("unchecked")  // Generic array creation.
         final MeasurementRange<Double>[] ranges = new MeasurementRange[values.length];
         switch (ranges.length) {
@@ -238,8 +257,9 @@ final class MetadataParser {
      * but more than one time range could be returned if the image reader contains data at many times.
      *
      * @return The date range for the given metadata, or {@code null} if none.
+     * @throws CatalogException If a logical error occured.
      */
-    public DateRange[] getDateRanges() {
+    public DateRange[] getDateRanges() throws CatalogException {
         final ImageReferencing referencing = metadata.getReferencing();
         for (int i=referencing.getDimension(); --i>=0;) {
             final Axis axis = referencing.getAxis(i);
@@ -252,7 +272,7 @@ final class MetadataParser {
                         dates[j] = new DateRange(ranges[j], origin);
                     }
                     timeOrigin = origin;
-                    timeUnit = getUnits(axis);
+                    timeUnit = getUnits(axis, Duration.class);
                     return dates;
                 }
             }
@@ -462,7 +482,7 @@ final class MetadataParser {
         // patch for now since this vertical SRID will be ignored by WritableGridCoverageTable if
         // getVerticalValues(SI.METER) returns null.
         if (metadata.getReferencing().getDimension() > 2) {
-            final Unit units = getVerticalUnits();
+            final Unit<?> units = getVerticalUnits();
             if (units != null) {
                 if (units.isCompatible(SI.METER)) {
                     return 5714; // Mean Sea Level
@@ -483,7 +503,7 @@ final class MetadataParser {
      * @todo Current implementation uses hard-coded values.
      *       We need to do something more generic.
      */
-    public double[] getVerticalValues(final Unit units) {
+    public double[] getVerticalValues(final Unit<?> units) {
         final ImageReferencing referencing = metadata.getReferencing();
         for (int i=referencing.getDimension(); --i>=0;) {
             final Axis axis = referencing.getAxis(i);
@@ -497,7 +517,7 @@ final class MetadataParser {
                 } else {
                     continue;
                 }
-                final Unit axisUnits = getUnits(axis);
+                final Unit<?> axisUnits = getUnits(axis);
                 final boolean convert = (units != null && axisUnits != null);
                 if (convert && !units.isCompatible(axisUnits)) {
                     continue;
@@ -513,7 +533,7 @@ final class MetadataParser {
                 }
                 if (convert) {
                     // TODO: Should convert the whole array in one method call (JSR-275)
-                    final Converter converter = axisUnits.getConverterTo(units);
+                    final UnitConverter converter = axisUnits.getConverterTo(units);
                     for (int j=0; j<values.length; j++) {
                         values[j] = converter.convert(values[j]);
                     }
@@ -530,7 +550,7 @@ final class MetadataParser {
      * @todo Current implementation uses hard-coded values.
      *       We need to do something more generic.
      */
-    private Unit getVerticalUnits() {
+    private Unit<?> getVerticalUnits() {
         final ImageReferencing referencing = metadata.getReferencing();
         for (int i=referencing.getDimension(); --i>=0;) {
             final Axis axis = referencing.getAxis(i);

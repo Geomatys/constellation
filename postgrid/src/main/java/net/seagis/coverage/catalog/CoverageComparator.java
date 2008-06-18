@@ -16,8 +16,8 @@ package net.seagis.coverage.catalog;
 
 import java.util.Comparator;
 import java.rmi.RemoteException;
-import javax.units.Unit;
-import javax.units.NonSI;
+import javax.measure.unit.Unit;
+import javax.measure.unit.NonSI;
 
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.referencing.cs.CoordinateSystem;
@@ -165,8 +165,8 @@ final class CoverageComparator implements Comparator<CoverageReference> {
      */
     private double getArea(double xmin, double ymin, double xmax, double ymax) {
         final CoordinateSystem cs = crs.getCoordinateSystem();
-        final Unit xUnit = cs.getAxis(xDim).getUnit();
-        final Unit yUnit = cs.getAxis(yDim).getUnit();
+        final Unit<?> xUnit = cs.getAxis(xDim).getUnit();
+        final Unit<?> yUnit = cs.getAxis(yDim).getUnit();
         xmin = xUnit.getConverterTo(NonSI.DEGREE_ANGLE).convert(xmin);
         xmax = xUnit.getConverterTo(NonSI.DEGREE_ANGLE).convert(xmax);
         ymin = yUnit.getConverterTo(NonSI.DEGREE_ANGLE).convert(ymin);

@@ -30,8 +30,9 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
-import javax.units.Unit;
-import javax.units.SI;
+import javax.measure.quantity.Duration;
+import javax.measure.unit.Unit;
+import javax.measure.unit.SI;
 
 import org.geotools.util.DateRange;
 import org.geotools.resources.Classes;
@@ -337,7 +338,7 @@ public class WritableGridCoverageEntry {
      *
      * @return The time unit, or {@code null} if none.
      */
-    protected Unit getTimeUnit() {
+    protected Unit<Duration> getTimeUnit() {
         return (metadata != null) ? metadata.timeUnit : null;
     }
 

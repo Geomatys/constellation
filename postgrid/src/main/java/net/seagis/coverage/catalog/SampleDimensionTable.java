@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
-import javax.units.Unit;
+import java.text.ParseException;
+import javax.measure.unit.Unit;
+import javax.measure.unit.UnitFormat;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
@@ -82,7 +84,12 @@ final class SampleDimensionTable extends Table {
             final String identifier = results.getString(idIndex);
             final int          band = results.getInt   (bandIndex); // Comptées à partir de 1.
             final String unitSymbol = results.getString(unitIndex);
-            final Unit         unit = (unitSymbol != null) ? Unit.searchSymbol(unitSymbol) : null;
+            Unit<?> unit = null;
+            if (unitSymbol != null) try {
+                unit = (Unit) (UnitFormat.getInstance().parseObject(unitSymbol));
+            } catch (ParseException e) {
+                throw new CatalogException(e);
+            }
             if (categories == null) {
                 categories = getDatabase().getTable(CategoryTable.class);
             }

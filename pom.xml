@@ -148,9 +148,9 @@
         <version>10.2.2.0</version>
       </dependency>
       <dependency>
-        <groupId>javax.units</groupId>
-        <artifactId>jsr108</artifactId>
-        <version>0.01</version>
+        <groupId>net.java.dev.jsr-275</groupId>
+        <artifactId>jsr-275</artifactId>
+        <version>1.0-beta-2</version>
       </dependency>
       <dependency>
         <groupId>xerces</groupId>
@@ -425,7 +425,7 @@
             <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
             <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
             <link>http://javadoc.geotools.fr/snapshot</link>
-            <link>http://jsr-108.sourceforge.net/javadoc</link>
+            <link>http://jscience.org/api/</link>
           </links>
           <excludePackageNames>net.seagis.resources</excludePackageNames>
           <!-- Separates packages on the overview page into whatever groups is specified. -->

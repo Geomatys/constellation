@@ -28,7 +28,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.units.Unit;
+import javax.measure.unit.Unit;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -531,7 +531,7 @@ public class WMService extends WebService {
                 MeasurementRange[] ranges = inputLayer.getSampleValueRanges();
                 if (ranges!= null && ranges.length>0 && ranges[0]!= null) {
                     defaut = ranges[0].getMinimum() + "," + ranges[0].getMaximum();
-                    Unit u = ranges[0].getUnits();
+                    Unit<?> u = ranges[0].getUnits();
                     if (u != null)
                         unit = u.toString();
                     
