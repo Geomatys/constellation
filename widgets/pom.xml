@@ -72,12 +72,12 @@
     <dependency>
       <groupId>net.seagis</groupId>
       <artifactId>postgrid</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>net.seagis</groupId>
       <artifactId>observations</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

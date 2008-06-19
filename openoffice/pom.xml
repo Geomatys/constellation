@@ -50,6 +50,9 @@
   <!--
     Dépendences.
   -->
+  <properties>
+    <openoffice.version>1.9</openoffice.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -62,35 +65,35 @@
     <dependency>
       <groupId>net.seagis</groupId>
       <artifactId>numeric</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>net.seagis</groupId>
       <artifactId>observations</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.openoffice</groupId>
       <artifactId>juh</artifactId>
-      <version>1.9</version>
+      <version>${openoffice.version}</version>
       <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
     </dependency>
     <dependency>
       <groupId>org.openoffice</groupId>
       <artifactId>jurt</artifactId>
-      <version>1.9</version>
+      <version>${openoffice.version}</version>
       <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
     </dependency>
     <dependency>
       <groupId>org.openoffice</groupId>
       <artifactId>ridl</artifactId>
-      <version>1.9</version>
+      <version>${openoffice.version}</version>
       <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
     </dependency>
     <dependency>
       <groupId>org.openoffice</groupId>
       <artifactId>unoil</artifactId>
-      <version>1.9</version>
+      <version>${openoffice.version}</version>
       <scope>provided</scope>  <!-- Already included in OpenOffice runtime environment -->
     </dependency>
     <dependency>
