@@ -36,6 +36,9 @@ public class FormatTableTest extends TableTest {
 
     /**
      * Tests the {@link FormatTable#getEntry} and {@link FormatTable#getEntries} methods.
+     *
+     * @throws CatalogException If a logical error occured.
+     * @throws SQLException If an error occured while connecting to the database.
      */
     @Test
     public void testSelectAndList() throws CatalogException, SQLException {

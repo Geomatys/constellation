@@ -34,6 +34,8 @@ import net.seagis.catalog.Database;
 import net.seagis.catalog.QueryType;
 import net.seagis.resources.i18n.Resources;
 import net.seagis.resources.i18n.ResourceKeys;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -83,12 +85,19 @@ final class SampleDimensionTable extends Table {
         while (results.next()) {
             final String identifier = results.getString(idIndex);
             final int          band = results.getInt   (bandIndex); // Comptées à partir de 1.
-            final String unitSymbol = results.getString(unitIndex);
+            String unitSymbol = results.getString(unitIndex);
             Unit<?> unit = null;
-            if (unitSymbol != null) try {
-                unit = (Unit) (UnitFormat.getInstance().parseObject(unitSymbol));
-            } catch (ParseException e) {
-                throw new CatalogException(e);
+            if (unitSymbol != null) {
+                unitSymbol = unitSymbol.trim();
+                if (unitSymbol.length() == 0) {
+                    unit = Unit.ONE;
+                } else try {
+                    unit = (Unit) (UnitFormat.getInstance().parseObject(unitSymbol));
+                } catch (ParseException e) {
+                    throw new CatalogException(Errors.format(ErrorKeys.UNPARSABLE_STRING_$2,
+                            "unit(" + unitSymbol + ')',
+                            unitSymbol.substring(Math.max(0, e.getErrorOffset()))), e);
+                }
             }
             if (categories == null) {
                 categories = getDatabase().getTable(CategoryTable.class);
