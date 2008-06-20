@@ -37,6 +37,7 @@ import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
+import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
@@ -90,6 +91,12 @@ public class MetadataWriter {
     private Map<Class, Classe> classBinding;
     
     /**
+     * A List of the already see object for the current metadata readed
+     * (in order to avoid infinite loop)
+     */
+    private Map<Object, Value> alreadyWrite;
+    
+    /**
      * Build a new metadata writer.
      * 
      * @param MDReader an MDWeb database reader.
@@ -102,6 +109,7 @@ public class MetadataWriter {
         this.MDWriter     = MDWriter;
         this.dateFormat   = new SimpleDateFormat("yyyy-mm-dd");
         this.classBinding = new HashMap<Class, Classe>();
+        this.alreadyWrite = new HashMap<Object, Value>();
     }
 
     /**
@@ -117,18 +125,35 @@ public class MetadataWriter {
             Form form = new Form(-1, MDCatalog, title, user, null, null, creationDate);
 
             String className = object.getClass().getSimpleName();
-            if (className.equals("MetaDataImpl")) {
+            
+            // ISO 19115 types
+            if (className.equals("MetaDataImpl")         || 
+            
+            // ISO 19110 types        
+                className.equals("FeatureCatalogueImpl") ||
+                className.equals("FeatureOperationImpl") ||
+                className.equals("FeatureAssociationImpl")
+            ) {
                 mainStandard   = Standard.ISO_19115;
+            
+            // CSW Types    
             } else if (className.equals("RecordType")) {
                 mainStandard = MDReader.getStandard("Catalog Web Service");
+            
+            // unkow types
             } else {
                 throw new IllegalArgumentException("Can't register ths kind of object:" + className);
             }
             Classe rootClasse = getClasseFromObject(object);
-            Path rootPath = new Path(mainStandard, rootClasse);
-            
-            addValueFromObject(form, object, rootPath, null);
-            return form;
+            if (rootClasse != null) {
+                alreadyWrite.clear();
+                Path rootPath = new Path(rootClasse.getStandard(), rootClasse);
+                addValueFromObject(form, object, rootPath, null);
+                return form;
+            } else {
+                logger.severe("unable to find the root class:" + object.getClass().getSimpleName());
+                return null;
+            }
         } else {
             logger.severe("unable to create form object is null");
             return null;
@@ -182,6 +207,10 @@ public class MetadataWriter {
             ordinal  = form.getNewOrdinal(parentValue.getIdValue() + ':' + path.getName());
         }
         
+        //we look if the object have been already write
+        Value linkedValue = alreadyWrite.get(object);
+        
+        // if its a primitive type we create a TextValue
         if (isPrimitive(classe)) {
             if (classe instanceof CodeList) {
                 CodeList cl = (CodeList) classe;
@@ -214,14 +243,24 @@ public class MetadataWriter {
             
             TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);
             logger.finer("new TextValue: " + path.toString() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
-        } 
-        else {
+        
+        // if we have already see this object we build a Linked Value.
+        } else if (linkedValue != null) {
             
+            // TODO uncomment when succed deploying MDWEB jar 
+            //LinkedValue value = new LinkedValue(path, form, ordinal, form, linkedValue, classe, parentValue);
+            logger.finer("new LinkedValue: " + path.toString() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
+        
+        // else we build a Value node.
+        } else {
+        
             Value value = new Value(path, form, ordinal, classe, parentValue);
-            logger.info("new Value: " + path.toString() + " classe:" + classe.getName() + " ordinal=" + ordinal);
+            logger.finer("new Value: " + path.toString() + " classe:" + classe.getName() + " ordinal=" + ordinal);
+            //we add this object to the listed of already write element
+            alreadyWrite.put(object, value);
+            
             do {
                 for (Property prop: classe.getProperties()) {
-                    logger.info("property :" + prop.getName());
                     // TODO remove when fix in MDweb2
                     if (prop.getName().equals("geographicElement3") ||  prop.getName().equals("geographicElement4"))
                         continue;
@@ -251,7 +290,7 @@ public class MetadataWriter {
                 }
                 classe = classe.getSuperClass();
                 if (classe != null) {
-                    logger.info("searching in superclasse " + classe.getName());
+                    logger.finer("searching in superclasse " + classe.getName());
                 }
             } while (classe != null);
         }
@@ -398,7 +437,7 @@ public class MetadataWriter {
             
             className   = object.getClass().getSimpleName();
             packageName = object.getClass().getPackage().getName();
-            logger.info("searche for classe " + className);
+            logger.finer("searche for classe " + className);
             
         } else {
             return null;
@@ -430,7 +469,8 @@ public class MetadataWriter {
         //we remove the Type suffix
         if (className.endsWith("Type") && !className.equals("CouplingType") 
                                        && !className.equals("DateType") 
-                                       && !className.equals("KeywordType")) {
+                                       && !className.equals("KeywordType")
+                                       && !className.equals("FeatureType")) {
             className = className.substring(0, className.length() - 4);
         }
         
@@ -461,12 +501,12 @@ public class MetadataWriter {
             }       
             String name = className;
             int nameType = 0;
-            while (nameType < 8) {
+            while (nameType < 9) {
                 
                 logger.finer("searching: " + standard.getName() + ":" + name);
                 result = MDReader.getClasse(name, standard);
                 if (result != null) {
-                    logger.info("class found:" + standard.getName() + ":" + name);
+                    logger.finer("class found:" + standard.getName() + ":" + name);
                     classBinding.put(object.getClass(), result);
                     return result;
                 } 
@@ -509,23 +549,29 @@ public class MetadataWriter {
                             name = "SV_" + className;    
                             break;
                         }
-                        //for the code list we add the "code" suffix
+                        //we add the prefix FC_
                         case 6: {
+                            nameType = 7;
+                            name = "FC_" + className;    
+                            break;
+                        }
+                        //for the code list we add the "code" suffix
+                        case 7: {
                             if (name.indexOf("Code") != -1) {
                                 name += "Code";
                             }
-                            nameType = 7;
+                            nameType = 8;
                             break;
                         }
                          //for the code list we add the "code" suffix
                         //for the temporal element we remove add prefix
-                        case 7: {
+                        case 8: {
                             name = "Time" + name;
-                            nameType = 8;
+                            nameType = 9;
                             break;
                         }
                         default:
-                            nameType = 8;
+                            nameType = 9;
                             break;
                     }
 

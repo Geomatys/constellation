@@ -21,14 +21,17 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.cat.csw.GetCapabilities;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
- * XML encoded GetCapabilities operation request. This operation allows clients to retrieve service metadata about a specific service instance. In this XML encoding, no "request" parameter is included, since the element name specifies the specific operation. This base type shall be extended by each specific OWS to include the additional required "service" attribute, with the correct value for that OWS. 
+ * XML encoded GetCapabilities operation request. 
+ * This operation allows clients to retrieve service metadata about a specific service instance. 
+ * In this XML encoding, no "request" parameter is included, 
+ * since the element name specifies the specific operation. 
+ * This base type shall be extended by each specific OWS to include the additional required "service" attribute, 
+ * with the correct value for that OWS. 
  * 
  * <p>Java class for GetCapabilitiesType complex type.
  * 
@@ -56,9 +59,6 @@ import org.geotools.resources.Utilities;
     "acceptVersions",
     "sections",
     "acceptFormats"
-})
-@XmlSeeAlso({
-    GetCapabilities.class
 })
 public class GetCapabilitiesType {
 

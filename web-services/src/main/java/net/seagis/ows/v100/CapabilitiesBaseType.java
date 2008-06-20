@@ -21,14 +21,20 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.cat.csw.Capabilities;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
- * XML encoded GetCapabilities operation response. This document provides clients with service metadata about a specific service instance, usually including metadata about the tightly-coupled data served. If the server does not implement the updateSequence parameter, the server shall always return the complete Capabilities document, without the updateSequence parameter. When the server implements the updateSequence parameter and the GetCapabilities operation request included the updateSequence parameter with the current value, the server shall return this element with only the "version" and "updateSequence" attributes. Otherwise, all optional elements shall be included or not depending on the actual value of the Contents parameter in the GetCapabilities operation request. This base type shall be extended by each specific OWS to include the additional contents needed. 
+ * XML encoded GetCapabilities operation response.
+ * This document provides clients with service metadata about a specific service instance, 
+ * usually including metadata about the tightly-coupled data served. 
+ * If the server does not implement the updateSequence parameter, 
+ * the server shall always return the complete Capabilities document, without the updateSequence parameter. 
+ * When the server implements the updateSequence parameter and the GetCapabilities operation request included the updateSequence parameter with the current value, 
+ * the server shall return this element with only the "version" and "updateSequence" attributes.
+ * Otherwise, all optional elements shall be included or not depending on the actual value of the Contents parameter in the GetCapabilities operation request. 
+ * This base type shall be extended by each specific OWS to include the additional contents needed. 
  * 
  * <p>Java class for CapabilitiesBaseType complex type.
  * 
@@ -57,9 +63,6 @@ import org.geotools.resources.Utilities;
     "serviceIdentification",
     "serviceProvider",
     "operationsMetadata"
-})
-@XmlSeeAlso({
-    Capabilities.class             //TODO add sos capabilities
 })
 public class CapabilitiesBaseType {
 

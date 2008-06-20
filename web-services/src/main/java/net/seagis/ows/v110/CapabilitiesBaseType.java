@@ -21,10 +21,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wcs.v111.Capabilities;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -57,9 +55,6 @@ import org.geotools.resources.Utilities;
     "serviceIdentification",
     "serviceProvider",
     "operationsMetadata"
-})
-@XmlSeeAlso({
-    Capabilities.class             //TODO add sos capabilities
 })
 public class CapabilitiesBaseType {
 

@@ -415,34 +415,38 @@ public abstract class WebService {
     @ConsumeMime("*/xml")
     public Response doPOSTXml(InputStream is) throws JAXBException  {
         logger.info("request POST xml: ");
-        Object request = null;
-        try {
-            request = unmarshaller.unmarshal(is);
+        if (unmarshaller != null) {
+            Object request = null;
+            try {
+                request = unmarshaller.unmarshal(is);
         
-        } catch (UnmarshalException e) {
-            logger.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
-            StringWriter sw = new StringWriter(); 
-            if (getCurrentVersion().isOWS()) {
-                OWSWebServiceException wse = new OWSWebServiceException("The XML request is not valid",
-                                                                        OWSExceptionCode.INVALID_REQUEST, 
-                                                                        null,
-                                                                        getCurrentVersion());
-                marshaller.marshal(wse.getExceptionReport(), sw);
-            } else {
-                WMSWebServiceException wse = new WMSWebServiceException("The XML request is not valid",
-                                                                        WMSExceptionCode.INVALID_PARAMETER_VALUE,
-                                                                        getCurrentVersion());
-                marshaller.marshal(wse.getServiceExceptionReport(), sw);
-            }
+            } catch (UnmarshalException e) {
+                logger.severe("UNMARSHALL EXCEPTION: " + e.getMessage());
+                StringWriter sw = new StringWriter(); 
+                if (getCurrentVersion().isOWS()) {
+                    OWSWebServiceException wse = new OWSWebServiceException("The XML request is not valid",
+                                                                            OWSExceptionCode.INVALID_REQUEST, 
+                                                                            null,
+                                                                            getCurrentVersion());
+                    marshaller.marshal(wse.getExceptionReport(), sw);
+                } else {
+                    WMSWebServiceException wse = new WMSWebServiceException("The XML request is not valid",
+                                                                            WMSExceptionCode.INVALID_PARAMETER_VALUE,
+                                                                            getCurrentVersion());
+                    marshaller.marshal(wse.getServiceExceptionReport(), sw);
+                }
             
-            return Response.ok(sw.toString(), "text/xml").build();
-        }
+                return Response.ok(sw.toString(), "text/xml").build();
+            }
         
-        if (request != null && request instanceof AbstractRequest) {
-            AbstractRequest ar = (AbstractRequest) request;
-            context.getQueryParameters().add("VERSION", ar.getVersion());
+            if (request != null && request instanceof AbstractRequest) {
+                AbstractRequest ar = (AbstractRequest) request;
+                context.getQueryParameters().add("VERSION", ar.getVersion());
+            }
+            return treatIncommingRequest(request);
+        } else {
+            return Response.ok("This service is not running", "text/plain").build();
         }
-        return treatIncommingRequest(request);
     }
     
     @POST

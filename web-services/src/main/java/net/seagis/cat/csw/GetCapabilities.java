@@ -19,6 +19,7 @@ package net.seagis.cat.csw;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
@@ -49,7 +50,7 @@ import net.seagis.ows.v100.SectionsType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "GetCapabilitiesType")
+@XmlRootElement(name = "GetCapabilities")
 public class GetCapabilities extends GetCapabilitiesType {
 
     @XmlAttribute
@@ -63,6 +64,13 @@ public class GetCapabilities extends GetCapabilitiesType {
     
     /**
      * Build a new getCapabilities request with the specified service
+     * 
+     * @param acceptVersions The different versions accepted by the client.
+     * @param sections The different sections of the capabilities document requested.
+     *                 one or more of "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities", "All".
+     * @param acceptFormats The different fomat (MIME type) accepted by the client.
+     * @param updateSequence not used yet.
+     * @param service MUST be CSW.
      */
     public  GetCapabilities(AcceptVersionsType acceptVersions, SectionsType sections,
             AcceptFormatsType acceptFormats, String updateSequence, String service) {

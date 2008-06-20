@@ -107,27 +107,22 @@ public class CSWService extends WebService {
                         ,net.seagis.dublincore.terms.ObjectFactory.class));
             // TODO remove net.seagis.ows.v110.ExceptionReport.class
             
-            // if they are present in the classPath we add the ISO 19119 classes
-            Class c = null;
-            try {
-                c = Class.forName("org.geotools.service.ServiceIdentificationImpl");
-            } catch (ClassNotFoundException e) {
-                logger.info("ISO 19119 classes not found");
-            }
-            if (c != null) {
-                classeList.add(c);
-            }
+           // we add the extensions classes
+           classeList.addAll(loadExtensionsClasses());
+            
+            
+            
             Class[] classes = toArray(classeList);
-             
             setXMLContext("http://www.opengis.net/cat/csw/2.0.2", classes);
         
             worker = new CSWworker(unmarshaller);
             worker.setVersion(getCurrentVersion());
             
         } catch (JAXBException ex){
-            logger.severe("The CSW serving is not running." + '\n' +
-                          " cause: Error creating XML context." + '\n' +
-                          " error: " + ex.getMessage());
+            logger.severe("The CSW serving is not running."       + '\n' +
+                          " cause  : Error creating XML context." + '\n' +
+                          " error  : " + ex.getMessage()          + '\n' + 
+                          " details: " + ex.toString());
         }
         
     }
@@ -748,9 +743,11 @@ public class CSWService extends WebService {
     }
     
     /**
-     * Transform a List of class in a Class[]
+     * An utilities method which tansform a List of class in a Class[]
+     * 
+     * @param classes A java.util.List<Class>
      */
-    public Class[] toArray(List<Class> classes) {
+    private Class[] toArray(List<Class> classes) {
         Class[] result = new Class[classes.size()];
         int i = 0;
         for (Class classe : classes) {
@@ -759,5 +756,111 @@ public class CSWService extends WebService {
         }
         return result;
     }
+    
+    /**
+     * Load some extensions classes (ISO 19119 and ISO 19110) if thay are present in the classPath.
+     * Return a list of classes to add in the context of JAXB.
+     */
+    private List<Class> loadExtensionsClasses() {
+        List<Class> ExtClasses = new ArrayList<Class>();
+        
+        // if they are present in the classPath we add the ISO 19119 classes
+        Class c = null;
+        try {
+            c = Class.forName("org.geotools.service.ServiceIdentificationImpl");
+        } catch (ClassNotFoundException e) {
+            logger.info("ISO 19119 classes not found (optional)") ;
+        }
+        if (c != null) {
+            ExtClasses.add(c);
+            logger.info("extension ISO 19119 loaded");
+        } 
+
+        // if they are present in the classPath we add the ISO 19110 classes
+        
+        try {
+            c = Class.forName("org.geotools.feature.catalog.AssociationRoleImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.BindingImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.BoundFeatureAttributeImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.ConstraintImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.DefinitionReferenceImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.DefinitionSourceImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.FeatureAssociationImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.FeatureAttributeImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.FeatureCatalogueImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.FeatureOperationImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.FeatureTypeImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.InheritanceRelationImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.ListedValueImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+
+            c = Class.forName("org.geotools.feature.catalog.PropertyTypeImpl");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+            
+            c = Class.forName("org.geotools.util.Multiplicity");
+            if (c != null) {
+                ExtClasses.add(c);
+            }
+            
+            logger.info("extension ISO 19110 loaded");
+        } catch (ClassNotFoundException e) {
+            logger.info("ISO 19110 classes not found (optional).");
+        }
+        return ExtClasses;
+    }
+    
+    
 
 }

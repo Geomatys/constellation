@@ -67,6 +67,7 @@ import org.mdweb.sql.Reader;
 
 //geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
+import org.mdweb.model.storage.LinkedValue;
 import org.opengis.util.CodeList;
 
 
@@ -127,6 +128,13 @@ public class MetadataReader {
      * A list of package containing the CSW and dublinCore implementation
      */
     private List<String> seagisPackage;
+    
+    /**
+     * A List of the already see object for the current metadata readed
+     * (in order to avoid infinite loop)
+     */
+    private Map<Value, Object> alreadyRead;
+    
 
     public final static int DUBLINCORE = 0;
     public final static int ISO_19115  = 1;
@@ -160,13 +168,14 @@ public class MetadataReader {
         this.MDCatalogs.add(MDReader.getCatalog("FR_SY"));
         this.MDCatalogs.add(MDReader.getCatalog("CSWCat"));
         
-        this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing", "net.seagis.temporal", 
-                                                "org.geotools.service", "org.geotools.util");
-        this.opengisPackage  = searchSubPackage("org.opengis.metadata",  "org.opengis.referencing", "org.opengis.temporal",
-                                                "org.opengis.service");
-        this.seagisPackage   = searchSubPackage("net.seagis.cat.csw",  "net.seagis.dublincore.elements", "net.seagis.ows.v100");
+        this.geotoolsPackage = searchSubPackage("org.geotools.metadata", "net.seagis.referencing"  , "net.seagis.temporal", 
+                                                "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog");
+        this.opengisPackage  = searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
+                                                "org.opengis.service"  , "org.opengis.feature.catalog");
+        this.seagisPackage   = searchSubPackage("net.seagis.cat.csw"   , "net.seagis.dublincore.elements", "net.seagis.ows.v100");
         this.metadatas       = new HashMap<String, Object>();
         this.classBinding    = new HashMap<String, Class>();
+        this.alreadyRead     = new HashMap<Value, Object>();
     }
 
     /**
@@ -182,29 +191,31 @@ public class MetadataReader {
         Object result;
         int id = getIDFromFileIdentifier(identifier);
         if (id == -1) {
-            throw new OWSWebServiceException("This identifier " + identifier + " does not exist",
+            id = getIDFromTitle(identifier);
+            if (id == -1)
+                throw new OWSWebServiceException("This identifier " + identifier + " does not exist",
                                               INVALID_PARAMETER_VALUE, "id", version);
-        } else {
-            if (mode == ISO_19115) {
-                result = metadatas.get(identifier);
-                if (result == null) {
-                    //TODO gere plusieur catalogue proprement
-                    Form f = MDReader.getForm(MDCatalogs.get(0), id);
-                    if (f == null) {
-                        MDReader.getForm(MDCatalogs.get(1), id);
-                    }
-                    result = getObjectFromForm(f);
-                    if (result != null) {
-                        metadatas.put(identifier, result);
-                    }
-                }
-            } else {
+        } 
+        alreadyRead.clear();
+        if (mode == ISO_19115) {
+            result = metadatas.get(identifier);
+            if (result == null) {
+                //TODO gere plusieur catalogue proprement
                 Form f = MDReader.getForm(MDCatalogs.get(0), id);
                 if (f == null) {
                     MDReader.getForm(MDCatalogs.get(1), id);
                 }
-                result = getRecordFromForm(f, type);
+                result = getObjectFromForm(f);
+                if (result != null) {
+                    metadatas.put(identifier, result);
+                }
             }
+        } else {
+            Form f = MDReader.getForm(MDCatalogs.get(0), id);
+            if (f == null) {
+                MDReader.getForm(MDCatalogs.get(1), id);
+            }
+            result = getRecordFromForm(f, type);
         }
         return result;
     }
@@ -227,6 +238,20 @@ public class MetadataReader {
     }
     
     /**
+     * Return the MDWeb form ID from the fileIdentifier
+     */
+    public int getIDFromTitle(String title) throws SQLException {
+        
+       PreparedStatement stmt = connection.prepareStatement("Select identifier from \"Forms\" WHERE title=? ");
+       stmt.setString(1, title);
+       ResultSet queryResult = stmt.executeQuery();
+       if (queryResult.next()) {
+            return queryResult.getInt(1);
+       }
+       return -1;
+    }
+    
+    /**
      * Return a dublinCore record from a MDWeb formular
      * 
      * @param form the MDWeb formular.
@@ -238,7 +263,11 @@ public class MetadataReader {
         if (recordStandard.equals(Standard.ISO_19115)) {
             return getRecordFromMDForm(form, type);
         } else {
-            return (AbstractRecordType) getObjectFromForm(form);
+            Object obj =  getObjectFromForm(form);
+            if (obj instanceof AbstractRecordType)
+                return (AbstractRecordType) obj;
+            else
+                return null;
         }
         
     }
@@ -522,7 +551,7 @@ public class MetadataReader {
                     temp = "String";
                     // we try to get a constructor(String)
                     Constructor constructor = classe.getConstructor(String.class);
-                    logger.info("constructor:" + '\n' + constructor.toGenericString());
+                    logger.finer("constructor:" + '\n' + constructor.toGenericString());
                     
                     //we execute the constructor
                     result = constructor.newInstance(textValue);
@@ -533,10 +562,24 @@ public class MetadataReader {
                     } 
                 }
 
+            //if the value is a link
+            } else if (value instanceof LinkedValue) {
+                LinkedValue lv = (LinkedValue) value;
+                Object tempobj = null;// TODO uncomment when succed deploying mdweb jar alreadyRead.get(lv.getLinkedValue());
+                if (tempobj != null) {
+                    return tempobj;
+                } else {
+                    //logger.severe("the linked object is not already read: " + lv.getLinkedValue().getIdValue());
+                    return null;
+                }
+                
+            // else if the value is a complex object    
             } else {
 
-                // Again another special case LocalName does not have a empty constructor (immutable) 
-                // and no setters so we must call the normal constructor.
+                /** 
+                 * Again another special case LocalName does not have a empty constructor (immutable) 
+                 * and no setters so we must call the normal constructor.
+                 */
                 if (classe.getSimpleName().equals("LocalName")) {
                     Constructor constructor = classe.getConstructor(CharSequence.class);
                     TextValue child = null;
@@ -556,11 +599,15 @@ public class MetadataReader {
                     }
                 }
                 
-                // we get the empty constructor
+                /**
+                 * normal case
+                 * we get the empty constructor
+                 */ 
                 Constructor constructor = classe.getConstructor();
-                logger.info("constructor:" + '\n' + constructor.toGenericString());
+                logger.finer("constructor:" + '\n' + constructor.toGenericString());
                 //we execute the constructor
                 result = constructor.newInstance();
+                alreadyRead.put(value, result);
             }
 
         } catch (NoSuchMethodException e) {
@@ -600,7 +647,7 @@ public class MetadataReader {
             Path path = childValue.getPath();
 
             if (childValue.getParent()!= null && childValue.getParent().equals(value)) {
-                logger.info("new childValue:" + path.getName());
+                logger.finer("new childValue:" + path.getName());
 
                 // we get the object from the child Value
                 Object param = getObjectFromValue(form, childValue);
@@ -623,16 +670,17 @@ public class MetadataReader {
                 while (tryAgain) {
                     try {
 
-                        logger.info("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
+                        logger.finer("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
                         if (isMeta) {
                             metaMap.put(attribName, param);
                         } else {
                             Method setter = getSetterFromName(attribName, param.getClass(), classe);
-                            invokeSetter(setter, result, param);
+                            if (setter != null)
+                                invokeSetter(setter, result, param);
                         }
                         tryAgain = false;
                     } catch (IllegalArgumentException e) {
-                        logger.info(e.getMessage());
+                        logger.finer(e.getMessage());
                         switch (casee) {
 
                             case 0:
@@ -652,11 +700,9 @@ public class MetadataReader {
                             default:
                                 logger.severe("unable to put " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
                                 tryAgain = false;
-                            }
+                        }
                     }
                 }
-
-                logger.info("");
             }
         }
         return result;
@@ -753,7 +799,7 @@ public class MetadataReader {
     private Class getClassFromName(String className, String standardName) {
         Class result = classBinding.get(standardName + ':' + className);
         if (result == null) {
-            logger.info("searche for class " + className);
+            logger.finer("searche for class " + className);
         } else {
             return result;
         }
@@ -810,7 +856,7 @@ public class MetadataReader {
                     
                     //if we found the class we store and return it
                     classBinding.put(standardName + ':' + className, result);
-                    logger.info("class found:" + packageName + '.' + name);
+                    logger.finer("class found:" + packageName + '.' + name);
                     return result;
 
                 } catch (ClassNotFoundException e) {
@@ -871,7 +917,7 @@ public class MetadataReader {
      * @return a setter to this attribute.
      */
     private Method getSetterFromName(String propertyName, Class classe, Class rootClass) {
-        logger.info("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
+        logger.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
         
         //special case
         if (propertyName.equals("beginPosition")) {
@@ -882,18 +928,25 @@ public class MetadataReader {
         
         String methodName = "set" + firstToUpper(propertyName);
         int occurenceType = 0;
+        
+        //TODO look all interfaces
         Class interfacee = null;
         if (classe.getInterfaces().length != 0) {
             interfacee = classe.getInterfaces()[0];
         }
         
         //TODO make it recursivly
-        Class superC = null;
+        Class argumentSuperClass     = null;
+        Class argumentSuperInterface = null;
         if (classe.getSuperclass() != null) {
-            superC = classe.getSuperclass();
+            argumentSuperClass     = classe.getSuperclass();
+            if (argumentSuperClass.getInterfaces().length > 0) {
+                argumentSuperInterface = argumentSuperClass.getInterfaces()[0];
+            }
         }
+        
 
-        while (occurenceType < 6) {
+        while (occurenceType < 7) {
 
             try {
                 Method setter = null;
@@ -924,56 +977,70 @@ public class MetadataReader {
                         break;
                     }
                     case 5: {
-                        setter = rootClass.getMethod(methodName , superC);
+                        setter = rootClass.getMethod(methodName , argumentSuperClass);
+                        break;
+                    }
+                    case 6: {
+                        setter = rootClass.getMethod(methodName , argumentSuperInterface);
                         break;
                     }
                 }
-                logger.info("setter found: " + setter.toGenericString());
+                logger.finer("setter found: " + setter.toGenericString());
                 return setter;
 
             } catch (NoSuchMethodException e) {
 
+                /**
+                 * This switch is for debugging purpose
+                 */
                 switch (occurenceType) {
 
                     case 0: {
-                        logger.info("The setter " + methodName + "(" + classe.getName() + ") does not exist");
+                        logger.finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
                         occurenceType = 1;
                         break;
                     }
 
                     case 1: {
-                        logger.info("The setter " + methodName + "(long) does not exist");
+                        logger.finer("The setter " + methodName + "(long) does not exist");
                         occurenceType = 2;
                         break;
                     }
                     
                     case 2: {
                         if (interfacee != null) {
-                            logger.info("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
+                            logger.finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
                         }
                         occurenceType = 3;
                         break;
                     }
 
                     case 3: {
-                        logger.info("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
+                        logger.finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 4;
                         break;
                     }
                     case 4: {
-                        logger.info("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
+                        logger.finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 5;
                         break;
                     }
                     case 5: {
-                        if (superC != null) {
-                            logger.info("The setter " + methodName + "(" + superC.getName() + ") does not exist");
+                        if (argumentSuperClass != null) {
+                            logger.finer("The setter " + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
                         }
                         occurenceType = 6;
                         break;
                     }
+                    case 6: {
+                        if (argumentSuperInterface != null) {
+                            logger.finer("The setter " + methodName + "(" + argumentSuperInterface.getName() + ") does not exist");
+                        }
+                        occurenceType = 7;
+                        break;
+                    }
                     default:
-                        occurenceType = 6;
+                        occurenceType = 7;
                 }
             }
         }

@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -524,6 +526,7 @@ public class CSWworker {
     static {
         ACCEPTED_RESOURCE_TYPE = new ArrayList<String>();
         ACCEPTED_RESOURCE_TYPE.add("http://www.isotc211.org/2005/gmd");
+        ACCEPTED_RESOURCE_TYPE.add("http://www.isotc211.org/2005/gfc");
         ACCEPTED_RESOURCE_TYPE.add("http://www.opengis.net/cat/csw/2.0.2");
     }
     
@@ -858,8 +861,7 @@ public class CSWworker {
         String outputSchema = "http://www.opengis.net/cat/csw/2.0.2";
         if (request.getOutputSchema() != null) {
             outputSchema = request.getOutputSchema();
-            if (!outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2") && 
-                !outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
+            if (!ACCEPTED_RESOURCE_TYPE.contains(outputSchema)) {
                 throw new OWSWebServiceException("The server does not support this output schema: " + outputSchema,
                                                   INVALID_PARAMETER_VALUE, "outputSchema", version);
             }
@@ -892,7 +894,7 @@ public class CSWworker {
                 }
             }
         
-            response = new GetRecordByIdResponseType(records, null);
+            response = new GetRecordByIdResponseType(records, null, null);
         //we build ISO 19139 object    
         } else if (outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
            List<MetaDataImpl> records = new ArrayList<MetaDataImpl>();
@@ -908,7 +910,23 @@ public class CSWworker {
                 }
            }
         
-           response = new GetRecordByIdResponseType(null, records);      
+           response = new GetRecordByIdResponseType(null, records, null);      
+        
+        } else if (outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
+           List<Object> records = new ArrayList<Object>();
+           for (String id:request.getId()) {
+                try {
+                    Object o = MDReader.getMetadata(id, ISO_19115, set);
+                    if (o != null) {
+                        records.add(o);
+                    }
+                } catch (SQLException e) {
+                    throw new OWSWebServiceException("This service has throw an SQLException: " + e.getMessage(),
+                                                      NO_APPLICABLE_CODE, "id", version);
+                }
+           }
+        
+           response = new GetRecordByIdResponseType(null, null, records);      
         
         // this case must never append
         } else {
@@ -1101,11 +1119,35 @@ public class CSWworker {
      * Record an object in the metadata database.
      * 
      * @param obj The object to store in the database.
+     * @return true if the storage succeed, false else.
      */
-    private void storeMetadata(Object obj) throws SQLException {
+    private boolean storeMetadata(Object obj) throws SQLException {
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
         }
+        
+        String title = findName(obj);
+        // we create a MDWeb form form the object
+        Form f = MDWriter.getFormFromObject(obj, title);
+        
+        // and we store it in the database
+        if (f != null) {
+            databaseWriter.writeForm(f, false);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * This method try to find a title to this object.
+     * if the object is a ISO19115:Metadata or CSW:Recored we know were to search the title,
+     * else we try to find a getName() method.
+     * 
+     * @param obj the object for wich we want a title
+     * 
+     * @return the founded title or "Unknow title"
+     */
+    private String findName(Object obj) {
         
         //here we try to get the title
         SimpleLiteral titleSL = null;
@@ -1132,13 +1174,47 @@ public class CSWworker {
                 } 
             }
         } else {
-            logger.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
+            Method nameGetter = null;
+            int i = 0;
+            while (i < 2) {
+                try {
+                    switch (i) {
+                        case 0: nameGetter = obj.getClass().getMethod("getName");
+                                break;
+                        case 1: nameGetter = obj.getClass().getMethod("getId");
+                                break;
+                    }
+                
+                
+                } catch (NoSuchMethodException ex) {
+                    logger.finer("not getName() method in " + obj.getClass().getSimpleName());
+                } catch (SecurityException ex) {
+                    logger.severe(" security exception while getting the title of the object.");
+                }
+                if (nameGetter != null) {
+                    i = 2;
+                } else {
+                    i++;
+                }
+            }
+            
+            if (nameGetter != null) {
+                try {
+                    title = (String) nameGetter.invoke(obj);
+                    
+                } catch (IllegalAccessException ex) {
+                    logger.severe("illegal access for method getName() in " + obj.getClass().getSimpleName());
+                } catch (IllegalArgumentException ex) {
+                    logger.severe("illegal argument for method getName() in " + obj.getClass().getSimpleName());
+                } catch (InvocationTargetException ex) {
+                    logger.severe("invocation target exception for method getName() in " + obj.getClass().getSimpleName());
+                }
+            }
+            
+            if (title.equals("unknow title"))
+                logger.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
         }
-        // we create a MDWeb form form the object
-        Form f = MDWriter.getFormFromObject(obj, title);
-        
-        // and we store it in the database
-        databaseWriter.writeForm(f, false);
+        return title;
     }
     
     /**
@@ -1186,10 +1262,14 @@ public class CSWworker {
                 
                 //TODO find a way to know if the source is another csw or directly the resource (resourceType?)
                 // for now we consider that is directly the resource to harvest
-                if (resourceType.equals("http://www.isotc211.org/2005/gmd") || resourceType.equals("http://www.opengis.net/cat/csw/2.0.2")) {
-                    Object harvested = unmarshaller.unmarshal(fileToHarvest);
-                    storeMetadata(harvested);
-                    totalInserted++;
+                if (resourceType.equals("http://www.isotc211.org/2005/gmd")      || 
+                    resourceType.equals("http://www.opengis.net/cat/csw/2.0.2")  ||
+                    resourceType.equals("http://www.isotc211.org/2005/gfc"))        {
+
+                        Object harvested = unmarshaller.unmarshal(fileToHarvest);
+                        
+                    if (storeMetadata(harvested))
+                        totalInserted++;
                 }
                 
             } catch (SQLException ex) {

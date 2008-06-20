@@ -479,11 +479,11 @@ public class ObjectFactory {
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetCapabilitiesType }{@code >}}
      * 
-     */
+    
     @XmlElementDecl(namespace = "http://www.opengis.net/cat/csw/2.0.2", name = "GetCapabilities")
     public JAXBElement<GetCapabilities> createGetCapabilities(GetCapabilities value) {
         return new JAXBElement<GetCapabilities>(_GetCapabilities_QNAME, GetCapabilities.class, null, value);
-    }
+    } */
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link TransactionType }{@code >}}

@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import net.seagis.wcs.v111.InterpolationMethodBaseType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

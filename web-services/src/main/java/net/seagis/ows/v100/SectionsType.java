@@ -76,13 +76,28 @@ public class SectionsType {
     
     /**
      * Build a new list of Section.
+     * 
+     * @param section one or more of "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities", "All".
      */
     public SectionsType(List<String> section){
         this.section = section;
     }
     
     /**
-     * Gets the value of the section property.
+     * Build a new list of Section.
+     * 
+     * @param section one or more of "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities", "All".
+     */
+    public SectionsType(String... section){
+        this.section = new ArrayList<String>();
+        for (String s: section) {
+            this.section.add(s);
+        }
+        
+    }
+    
+    /**
+     * return the list of section names (unmodifiable).
      */
     public List<String> getSection() {
         if (section == null){
