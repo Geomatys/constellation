@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.sampling.SamplingFeatureEntry;
 import net.seagis.sampling.SamplingPointEntry;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**

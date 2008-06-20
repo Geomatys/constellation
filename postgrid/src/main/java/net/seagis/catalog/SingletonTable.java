@@ -53,7 +53,7 @@ import net.seagis.resources.i18n.ResourceKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class SingletonTable<E extends Element> extends Table {
+public abstract class SingletonTable<E> extends Table {
     /**
      * The maximal value (inclusive) for auto-increment. Used in order to avoid long
      * iteration over too big tables (in which case we need to find a better algorithm).
@@ -295,7 +295,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
          * name, uses the entry's String instance in order to reduce the number of objects
          * to be managed by the garbage collector.
          */
-        final String name = entry.getName();
+        final String name = ((Entry)entry).getName();
         if (key.equals(name)) {
             key = name; // Use the same instance (slight memory saver).
         } else {
@@ -416,7 +416,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
             while (results.next()) {
                 E entry = createEntry(results, null, indexByName);
                 if (accept(entry)) {
-                    final String name = entry.getName();
+                    final String name = ((Entry)entry).getName();//entry.getName();
                     /*
                      * Si une entrée existait déjà dans la cache, réutilise cette entrée en se
                      * souvenant que postCreateEntry(...) n'a pas besoin d'être appelée pour elle.
@@ -471,7 +471,7 @@ public abstract class SingletonTable<E extends Element> extends Table {
     private void roolback(final Map<E,Boolean> set) {
         for (final Map.Entry<E,Boolean> entry : set.entrySet()) {
             if (!entry.getValue().booleanValue()) {
-                pool.remove(entry.getKey().getName());
+                pool.remove(((Entry)entry.getKey()).getName());
             }
         }
     }

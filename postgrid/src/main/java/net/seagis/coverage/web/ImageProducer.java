@@ -579,8 +579,9 @@ public abstract class ImageProducer {
             } catch (SQLException exception) {
                 throw new WMSWebServiceException(exception, LAYER_NOT_QUERYABLE, version);
             }
-
-            if (layer.getSeries().isEmpty() || !layer.isQueryable(version.getService())) {
+            if (layer == null || layer.getSeries().isEmpty() || 
+                    (version != null && !layer.isQueryable(version.getService())))
+            {
                 throw new WMSWebServiceException(Resources.format(ResourceKeys.NO_DATA_TO_DISPLAY),
                         LAYER_NOT_DEFINED, version);
             }

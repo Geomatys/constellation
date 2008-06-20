@@ -20,9 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wcs.v100.MetadataAssociationType;
 
 
 /**
@@ -51,9 +49,6 @@ import net.seagis.wcs.v100.MetadataAssociationType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MetaDataPropertyType", propOrder = {
     "metaData"
-})
-@XmlSeeAlso({
-    MetadataAssociationType.class
 })
 public class MetaDataPropertyType {
 

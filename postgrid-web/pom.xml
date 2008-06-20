@@ -2,7 +2,8 @@
 <!--
   Configuration of "wms" module from SeaGIS project.
   Version: $Id:
---><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>net.seagis</groupId>
@@ -65,7 +66,7 @@
     </dependency>
     <dependency>
       <groupId>net.seagis</groupId>
-      <artifactId>web-services</artifactId>
+      <artifactId>service</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -117,14 +118,14 @@
       <groupId>org.apache.myfaces.tomahawk</groupId>
       <artifactId>tomahawk</artifactId>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>org.apache.myfaces.tomahawk</groupId>
       <artifactId>tomahawk-sandbox</artifactId>
     </dependency>
     <dependency>
       <groupId>net.java.dev.ajax4jsf</groupId>
       <artifactId>ajax4jsf</artifactId>
-    </dependency>
+    </dependency-->
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>

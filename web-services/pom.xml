@@ -19,10 +19,10 @@
   -->
   <groupId>net.seagis</groupId>
   <artifactId>web-services</artifactId>
-  <packaging>jar</packaging>
-  <name>Web Map Service</name>
+  <packaging>pom</packaging>
+  <name>Constellation OGC Web Service</name>
   <description>
-    A Web Map Service producing maps of spatially referenced data dynamically from geographic information.
+    A group of standardized Web Services.
   </description>
 
 
@@ -55,58 +55,20 @@
     </developer>
   </developers>
 
-
-
-  <!--
-    Dépendances requises pour la compilation. Ces dépendances seront incluses
-    dans la liste de JARs que Maven placera dans le répertoire "target/binaries".
-  -->
-  <dependencies>
-    <dependency>
-      <groupId>net.seagis</groupId>
-      <artifactId>postgrid</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jersey</groupId>
-      <artifactId>jersey</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.mdweb</groupId>
-      <artifactId>model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.ws</groupId>
-      <artifactId>jaxws-rt</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.xml.ws</groupId>
-      <artifactId>jaxws-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-cql</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-main</artifactId>
-    </dependency>
-  </dependencies>
+  <!-- =========================================================== -->
+  <!--     Modules included in the build                           -->
+  <!-- =========================================================== -->
+  <modules>
+    <module>csw</module>
+    <module>gml</module>
+    <module>kml</module>
+    <module>ogc</module>
+    <module>ows</module>
+    <module>se</module>
+    <module>service</module>
+    <module>sld</module>
+    <module>wcs</module>
+    <module>wms</module>
+  </modules>
 
 </project>

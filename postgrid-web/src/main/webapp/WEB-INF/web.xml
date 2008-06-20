@@ -19,6 +19,7 @@
         <url-pattern>/WS/*</url-pattern>
     </servlet-mapping>
 
+
    <!-- Servlet for seagis JSF interface -->
     <!-- filtres pour tomahawk et sandbox -->
     <filter>
