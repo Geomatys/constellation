@@ -13,7 +13,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.wcs;
+package net.seagis.ows;
 
 /**
  * A class who permit to get the version parameter on each request.

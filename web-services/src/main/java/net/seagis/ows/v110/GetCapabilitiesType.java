@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wcs.AbstractGetCapabilities;
+import net.seagis.ows.AbstractGetCapabilities;
 import org.geotools.util.Utilities;
 
 

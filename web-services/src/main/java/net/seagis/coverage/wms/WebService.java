@@ -65,7 +65,7 @@ import net.seagis.coverage.web.WebServiceException;
 import net.seagis.ows.AbstractDCP;
 import net.seagis.ows.AbstractOnlineResourceType;
 import net.seagis.ows.AbstractOperation;
-import net.seagis.wcs.AbstractRequest;
+import net.seagis.ows.AbstractRequest;
 import net.seagis.ows.OWSExceptionCode;
 /**
  *
@@ -359,7 +359,6 @@ public abstract class WebService {
      * Return the current version of the Web Service.
      */
     protected void setCurrentVersion(String versionNumber) {
-        logger.finer("set current version to: " + versionNumber);
         currentVersion = getVersionFromNumber(versionNumber);
     }
     

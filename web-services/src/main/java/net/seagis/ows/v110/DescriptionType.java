@@ -25,11 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.wcs.v111.AxisType;
-import net.seagis.wcs.v111.CoverageDescriptionType;
-import net.seagis.wcs.v111.CoverageSummaryType;
-import net.seagis.wcs.v111.FieldType;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -64,10 +60,10 @@ import org.geotools.resources.Utilities;
     "keywords"
 })
 @XmlSeeAlso({
-    CoverageSummaryType.class,
-    CoverageDescriptionType.class,
-    FieldType.class,
-    AxisType.class,
+    //CoverageSummaryType.class,
+    //CoverageDescriptionType.class,
+    //FieldType.class,
+    //AxisType.class,
     BasicIdentificationType.class,
     ServiceIdentification.class
 })

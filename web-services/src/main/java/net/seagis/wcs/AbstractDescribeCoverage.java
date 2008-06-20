@@ -15,6 +15,8 @@
 
 package net.seagis.wcs;
 
+import net.seagis.ows.AbstractRequest;
+
 /**
  *  Super abstract type for all the different versions of DescribeCoverage request.
  *

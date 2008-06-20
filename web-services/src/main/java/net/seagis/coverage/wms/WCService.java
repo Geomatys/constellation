@@ -74,7 +74,7 @@ import net.seagis.ows.v110.ServiceIdentification;
 import net.seagis.ows.v110.ServiceIdentification;
 import net.seagis.ows.v110.ServiceProvider;
 import net.seagis.wcs.AbstractDescribeCoverage;
-import net.seagis.wcs.AbstractGetCapabilities;
+import net.seagis.ows.AbstractGetCapabilities;
 import net.seagis.wcs.AbstractGetCoverage;
 import net.seagis.wcs.v111.RangeType;
 import net.seagis.wcs.v111.Capabilities;
@@ -1091,6 +1091,7 @@ public class WCService extends WebService {
         } else {
            isSupportedVersion(inputVersion);
            setCurrentVersion(inputVersion);
+           webServiceWorker.setService("WCS", getCurrentVersion().toString());
         }
         
         //we prepare the response object to return
@@ -1199,6 +1200,10 @@ public class WCService extends WebService {
             net.seagis.wcs.v111.DescribeCoverage request = (net.seagis.wcs.v111.DescribeCoverage) abstractRequest;
             if (request.getIdentifier().size() == 0) {
                 throwException("the parameter IDENTIFIER must be specified", "MISSING_PARAMETER_VALUE", "identifier");
+            }
+            System.out.println("identifier:");
+            for (String s: request.getIdentifier()) {
+                System.out.println("s=" + s);
             }
             List<Layer> layers = webServiceWorker.getLayers(request.getIdentifier());
             

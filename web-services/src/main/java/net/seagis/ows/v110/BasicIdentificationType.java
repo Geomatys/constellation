@@ -41,9 +41,7 @@ import javax.xml.bind.annotation.XmlType;
     ManifestType.class,
     IdentificationType.class
 })
-public class BasicIdentificationType
-    extends DescriptionType
-{
+public class BasicIdentificationType extends DescriptionType {
 
     @XmlElement(name = "Identifier")
     protected CodeType identifier;

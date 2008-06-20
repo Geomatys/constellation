@@ -20,10 +20,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
-import net.seagis.wcs.v111.InterpolationMethodBaseType;
 import org.geotools.util.Utilities;
 
 
@@ -49,9 +47,6 @@ import org.geotools.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CodeType", propOrder = {
     "value"
-})
-@XmlSeeAlso({
-    InterpolationMethodBaseType.class
 })
 public class CodeType {
 
