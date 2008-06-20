@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration of "wms" module from SeaGIS project.
+  Version: $Id: pom.xml 585 2008-05-06 10:29:12Z glegal $
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.seagis</groupId>
+    <artifactId>web-services</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Module description.
+  -->
+  <groupId>net.seagis</groupId>
+  <artifactId>csw</artifactId>
+  <packaging>jar</packaging>
+  <name>Catalogue Web Service</name>
+  <description>
+    A Catalogue Web Service managing metadatas from geographic information.
+  </description>
+
+
+
+  <!--
+    Developers and contributors.
+  -->
+  <developers>
+    <developer>
+      <id>glegal</id>
+      <name>Guilhem Legal</name>
+      <email>guilhem.legal@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>desruisseaux</id>
+      <name>Martin Desruisseaux</name>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+
+
+  <!--
+    Dépendances requises pour la compilation. Ces dépendances seront incluses
+    dans la liste de JARs que Maven placera dans le répertoire "target/binaries".
+  -->
+  <dependencies>
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xml.ws</groupId>
+      <artifactId>jaxws-rt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml.ws</groupId>
+      <artifactId>jaxws-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-cql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-main</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>postgrid</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>ogc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>ows</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+</project>
