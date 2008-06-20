@@ -179,7 +179,7 @@ final class MetadataParser {
      */
     private double[] getCoordinateValues(final int dimension) {
         final ImageGeometry geometry = metadata.getGeometry();
-        double[] values = geometry.getCoordinateValues(dimension);
+        double[] values = geometry.getOrdinates(dimension);
         if (values == null) {
             final NumberRange range = geometry.getCoordinateRange(dimension);
             if (range != null) {
