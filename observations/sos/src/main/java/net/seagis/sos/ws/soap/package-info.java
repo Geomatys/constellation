@@ -16,4 +16,4 @@
 xmlns = { @javax.xml.bind.annotation.XmlNs(prefix = "g", namespaceURI= "http://soap.webservice.sos.seagis.net/"),
           @javax.xml.bind.annotation.XmlNs(prefix = "ows", namespaceURI= "http://www.opengis.net/ows/1.1"),
           @javax.xml.bind.annotation.XmlNs(prefix = "sos", namespaceURI= "http://www.opengis.net/sos/1.0")})
-package net.seagis.sos.webservice.soap;
+package net.seagis.sos.ws.soap;

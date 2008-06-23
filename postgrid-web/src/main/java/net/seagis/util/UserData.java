@@ -13,7 +13,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.webservice;
+package net.seagis.util;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

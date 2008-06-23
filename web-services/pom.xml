@@ -59,16 +59,8 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>csw</module>
-    <module>gml</module>
-    <module>kml</module>
-    <module>ogc</module>
-    <module>ows</module>
-    <module>se</module>
-    <module>service</module>
-    <module>sld</module>
-    <module>wcs</module>
-    <module>wms</module>
+    <module>services</module>
+    <module>backend</module>
   </modules>
 
 </project>

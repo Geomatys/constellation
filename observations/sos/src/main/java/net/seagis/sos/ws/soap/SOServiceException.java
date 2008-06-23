@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.sos.webservice.soap;
+package net.seagis.sos.ws.soap;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

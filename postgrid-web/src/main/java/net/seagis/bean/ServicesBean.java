@@ -64,7 +64,7 @@ import net.seagis.wcs.v100.ResponsiblePartyType;
 import net.seagis.wcs.v100.ServiceType;
 import net.seagis.wcs.v100.WCSCapabilitiesType;
 import net.seagis.wcs.v111.Capabilities;
-import net.seagis.webservice.UserData;
+import net.seagis.util.UserData;
 import net.seagis.wms.AbstractService;
 import net.seagis.wms.v130.ContactAddress;
 import net.seagis.wms.v130.ContactInformation;

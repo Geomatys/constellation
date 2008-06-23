@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.sos.webservice.rest;
+package net.seagis.sos.ws.rs;
 
 // Jersey dependencies
 import java.io.IOException;
