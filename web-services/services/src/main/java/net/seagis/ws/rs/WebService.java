@@ -13,7 +13,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.coverage.wms;
+package net.seagis.ws.rs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,6 +62,7 @@ import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
+import net.seagis.coverage.wms.WMSExceptionCode;
 import net.seagis.ows.AbstractDCP;
 import net.seagis.ows.AbstractOnlineResourceType;
 import net.seagis.ows.AbstractOperation;

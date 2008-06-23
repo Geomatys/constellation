@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.coverage.wms;
+package net.seagis.metadata;
 
 // J2SE dependencies
 import java.io.File;
@@ -50,7 +50,7 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.sql.Reader;
 
 // SeaGIS dependencies
-import static net.seagis.coverage.wms.CSWworker.*;
+import static net.seagis.metadata.CSWworker.*;
 
 /**
  *

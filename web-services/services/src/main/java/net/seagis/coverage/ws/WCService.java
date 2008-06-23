@@ -13,7 +13,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.coverage.wms;
+package net.seagis.coverage.ws;
 
 //jdk dependencies
 import java.io.File;
@@ -51,6 +51,7 @@ import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WMSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.coverage.web.WebServiceWorker;
+import net.seagis.coverage.wms.WMSExceptionCode;
 import net.seagis.gml.v311.CodeListType;
 import net.seagis.gml.v311.CodeType;
 import net.seagis.gml.v311.DirectPositionType;
@@ -108,6 +109,7 @@ import net.seagis.wcs.v111.GridCrsType;
 
 // geoAPI dependencies
 import net.seagis.wcs.v111.RangeSubsetType.FieldSubset;
+import net.seagis.ws.rs.WebService;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 // geoTools dependencies

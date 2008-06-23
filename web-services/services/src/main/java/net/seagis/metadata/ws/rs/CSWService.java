@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.coverage.wms;
+package net.seagis.metadata.ws.rs;
 
 // java se dependencies
 import java.io.IOException;
@@ -74,7 +74,9 @@ import net.seagis.ows.v100.AcceptVersionsType;
 import net.seagis.ows.v100.OWSWebServiceException;
 import net.seagis.ows.v100.SectionsType;
 import net.seagis.coverage.web.Service;
+import net.seagis.metadata.CSWworker;
 import net.seagis.ows.v100.ExceptionReport;
+import net.seagis.ws.rs.WebService;
 import org.geotools.metadata.iso.MetaDataImpl;
 import static net.seagis.ows.OWSExceptionCode.*;
 

@@ -10,7 +10,7 @@
         </init-param>
         <init-param>
           <param-name>com.sun.jersey.config.property.packages</param-name>
-          <param-value>net.seagis.coverage.wms</param-value>
+          <param-value>net.seagis.coverage.ws;net.seagis.metadata.ws.rs</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

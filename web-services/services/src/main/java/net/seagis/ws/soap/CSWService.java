@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.webservice.soap;
+package net.seagis.ws.soap;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +53,7 @@ import net.seagis.cat.csw.TransactionType;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.wms.CSWworker;
+import net.seagis.metadata.CSWworker;
 import net.seagis.ows.v100.ExceptionReport;
 import net.seagis.ows.v100.OWSWebServiceException;
 import org.geotools.metadata.iso.MetaDataImpl;

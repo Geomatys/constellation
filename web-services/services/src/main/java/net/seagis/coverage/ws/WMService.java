@@ -13,7 +13,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.coverage.wms;
+package net.seagis.coverage.ws;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -79,6 +79,7 @@ import net.seagis.coverage.metadata.PointOfContactTable;
 import net.seagis.coverage.metadata.SeriesMetadataTable;
 
 //geotools dependencies
+import net.seagis.ws.rs.WebService;
 import org.geotools.util.MeasurementRange;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.metadata.extent.GeographicBoundingBox;

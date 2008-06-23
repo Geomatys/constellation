@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.coverage.wms;
+package net.seagis.metadata;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -91,10 +91,11 @@ import net.seagis.ows.v100.OperationsMetadata;
 import net.seagis.ows.v100.SectionsType;
 import net.seagis.ows.v100.ServiceIdentification;
 import net.seagis.ows.v100.ServiceProvider;
+import net.seagis.ws.rs.WebService;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.queryParser.ParseException;
 import static net.seagis.ows.OWSExceptionCode.*;
-import static net.seagis.coverage.wms.MetadataReader.*;
+import static net.seagis.metadata.MetadataReader.*;
 
 
 //geotols dependencies

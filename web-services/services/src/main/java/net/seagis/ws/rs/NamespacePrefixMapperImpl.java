@@ -1,4 +1,4 @@
-package net.seagis.coverage.wms;
+package net.seagis.ws.rs;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 

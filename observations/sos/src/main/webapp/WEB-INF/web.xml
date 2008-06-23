@@ -18,7 +18,7 @@
         </init-param>
         <init-param>
           <param-name>com.sun.jersey.config.property.packages</param-name>
-          <param-value>net.seagis.sos.webservice.rest</param-value>
+          <param-value>net.seagis.sos.ws.rs</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

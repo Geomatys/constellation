@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.coverage.wms;
+package net.seagis.metadata;
 
 import java.lang.reflect.Method;
 import java.sql.Date;

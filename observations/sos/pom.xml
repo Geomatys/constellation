@@ -130,7 +130,7 @@
     </dependency>
     <dependency>
       <groupId>net.seagis</groupId>
-      <artifactId>service</artifactId>
+      <artifactId>services</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -195,7 +195,7 @@
                 <goal>wsgen</goal>
               </goals>
               <configuration>
-                <sei>net.seagis.sos.webservice.soap.SOService</sei>
+                <sei>net.seagis.sos.ws.soap.SOService</sei>
                 <genWsdl>true</genWsdl>           
                 <keep>true</keep>
               </configuration>
