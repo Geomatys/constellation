@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.ws.soap;
+package net.seagis.metadata.ws.soap;
 
 import java.io.File;
 import java.io.IOException;
