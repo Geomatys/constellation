@@ -122,8 +122,8 @@ final class GridGeometryIO extends GridGeometry2D {
      */
     public Rectangle getSourceRegion() {
         return new Rectangle(x, y,
-                gridRange.getLength(gridDimensionX) * sx,
-                gridRange.getLength(gridDimensionY) * sy);
+                gridRange.getSpan(gridDimensionX) * sx,
+                gridRange.getSpan(gridDimensionY) * sy);
     }
 
     /**
