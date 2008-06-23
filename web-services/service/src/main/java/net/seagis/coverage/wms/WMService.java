@@ -35,7 +35,7 @@ import java.util.StringTokenizer;
 // jersey dependencies
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB xml binding dependencies
 import java.io.IOException;

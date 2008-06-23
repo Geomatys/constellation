@@ -117,7 +117,7 @@
       <artifactId>persistence-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>jersey</groupId>
+      <groupId>com.sun.jersey</groupId>
       <artifactId>jersey</artifactId>
     </dependency>
     

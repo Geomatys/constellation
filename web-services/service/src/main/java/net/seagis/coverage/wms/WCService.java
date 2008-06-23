@@ -36,7 +36,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.JAXBElement;
 
 // jersey dependencies
-import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.jersey.spi.resource.Singleton;
 import java.io.IOException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.Path;

@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.jersey.spi.resource.Singleton;
 import java.io.StringWriter;
 
 //JAXB dependencies

@@ -16,7 +16,7 @@
 
 package net.seagis.coverage.wms;
 
-import com.sun.ws.rest.spi.resource.Singleton;
+// java se dependencies
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -27,13 +27,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+// jersey dependencies
+import com.sun.jersey.spi.resource.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+
+//JAXB dependencies
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
+
+// seagis dependencies
 import net.seagis.cat.csw.Capabilities;
 import net.seagis.cat.csw.DescribeRecordResponseType;
 import net.seagis.cat.csw.DescribeRecordType;
