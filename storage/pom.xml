@@ -2,7 +2,7 @@
 
 <!--
   Configuration du module "observations" du projet Sicade.
-  Version: $Id$
+  Version: $Id: pom.xml 666 2008-06-23 12:19:32Z glegal $
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -19,11 +19,11 @@
     Description du module.
   -->
   <groupId>net.seagis</groupId>
-  <artifactId>observations</artifactId>
+  <artifactId>storage</artifactId>
   <packaging>pom</packaging>
-  <name>Observations and measurements Service</name>
+  <name>Constellation Storage management</name>
   <description>
-    Sensor Service and implementations for observations and measurement.
+    Object and methods to store postgrid or OnM datas in a database.
   </description>
 
 
@@ -94,7 +94,8 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>sos</module>
+    <module>observation</module>
+    <module>postgrid</module>
   </modules>
 
 </project>

@@ -582,9 +582,9 @@
   -->
   <modules>
     <module>analytics</module>
-    <module>postgrid</module>
+    <module>storage</module>
     <module>web-services</module>
-    <module>postgrid-web</module>
+    <module>gui</module>
     <!--module>observations</module-->
     <!--module>widgets</module-->
     <!--module>openoffice</module -->
