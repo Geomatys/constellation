@@ -137,7 +137,7 @@ public class PeriodUtilities {
             gap = d.getTime() - previousDate.getTime();
 
             if (previousGap != gap) {
-                if (nbDataInGap >= 3) {
+                if (nbDataInGap >= 2) {
                     String firstDate = dateFormat.format(first) + "";
                     if (response.indexOf(firstDate + ',') != -1) {
                         int pos = response.indexOf(firstDate);
@@ -161,7 +161,7 @@ public class PeriodUtilities {
         }
 
         if (nbDataInGap > 0) {
-            if (nbDataInGap >= 3) {
+            if (nbDataInGap >= 2) {
                 String firstDate = dateFormat.format(first) + "";
                 if (response.indexOf(firstDate + ',') != -1) {
                     int pos = response.indexOf(firstDate);

@@ -64,7 +64,19 @@ public class PeriodUtilitiesTest {
         assertEquals(expResult, result);
         
         /**
-         * Test 2: one period
+         * Test 2: three isolated date
+         */
+        dates = new TreeSet<Date>();
+        dates.add(df.parse("2007-06-06T14:00:00Z"));
+        dates.add(df.parse("2007-06-13T14:00:00Z"));
+        dates.add(df.parse("2007-06-20T14:00:00Z"));
+
+        expResult = "2007-06-06T14:00:00Z/2007-06-20T14:00:00Z/P1W";
+        result = instance.getDatesRespresentation(dates);
+        assertEquals(expResult, result);
+        
+        /**
+         * Test 3: one period
          */
         dates    = new TreeSet<Date>();
         dates.add(df.parse("2004-01-28T00:00:00Z"));
@@ -81,7 +93,7 @@ public class PeriodUtilitiesTest {
         assertEquals(expResult, result);
         
         /**
-         * Test 3: two period not joined
+         * Test 4: two period not joined
          */
         dates    = new TreeSet<Date>();
         
@@ -107,7 +119,7 @@ public class PeriodUtilitiesTest {
         
         
         /**
-         * Test 3: two period joined
+         * Test 5: two period joined
          */
         dates    = new TreeSet<Date>();
         
@@ -132,7 +144,7 @@ public class PeriodUtilitiesTest {
         assertEquals(expResult, result);
         
         /**
-         * Test 5: isolated dates + period1 + isolated dates + period2 + isolated dates
+         * Test 6: isolated dates + period1 + isolated dates + period2 + isolated dates
          */
         dates    = new TreeSet<Date>();
         
