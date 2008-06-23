@@ -3,13 +3,13 @@
     <!-- Servlet for seagis web service -->
     <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
-        <servlet-class>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</servlet-class>
+        <servlet-class>com.sun.jersey.impl.container.servlet.ServletAdaptor</servlet-class>
         <init-param>
-          <param-name>com.sun.ws.rest.config.property.resourceConfigClass</param-name>
-          <param-value>com.sun.ws.rest.api.core.PackagesResourceConfig</param-value>
+          <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
+          <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
         </init-param>
         <init-param>
-          <param-name>com.sun.ws.rest.config.property.packages</param-name>
+          <param-name>com.sun.jersey.config.property.packages</param-name>
           <param-value>net.seagis.coverage.wms</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>

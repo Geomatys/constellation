@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Configuration du module "observations" du projet Sicade.
+  Version: $Id$
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.seagis</groupId>
+    <artifactId>analytics</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Description du module.
+  -->
+  <groupId>net.seagis</groupId>
+  <artifactId>numeric</artifactId>
+  <packaging>jar</packaging>
+  <name>Numerical algorithms</name>
+  <description>
+    Algorithmes de calculs numériques.
+  </description>
+
+
+
+  <!--
+    Liste des développeurs et des contributeurs.
+  -->
+  <developers>
+    <developer>
+      <id>desruisseaux</id>
+      <name>Martin Desruisseaux</name>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Administrateur du projet</role>
+        <role>Développeur Java</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+
+
+  <!--
+    Dépendences.
+  -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-referencing</artifactId>
+    </dependency>
+  </dependencies>
+</project>

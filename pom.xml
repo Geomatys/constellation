@@ -581,12 +581,12 @@
     All SeaGIS modules.
   -->
   <modules>
-   <!-- <module>numeric</module>-->
+    <module>analytics</module>
     <module>postgrid</module>
     <module>web-services</module>
     <module>postgrid-web</module>
-  <!--  <module>observations</module>-->
-<!-- <module>widgets</module> -->
-<!-- <module>openoffice</module> -->
+    <!--module>observations</module-->
+    <!--module>widgets</module-->
+    <!--module>openoffice</module -->
   </modules>
 </project>

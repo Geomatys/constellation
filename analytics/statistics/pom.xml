@@ -2,14 +2,14 @@
 
 <!--
   Configuration du module "observations" du projet Sicade.
-  Version: $Id$
+  Version: $Id: pom.xml 640 2008-06-05 15:09:50Z cedricbr $
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>net.seagis</groupId>
-    <artifactId>seagis</artifactId>
+    <artifactId>analytics</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
@@ -19,11 +19,11 @@
     Description du module.
   -->
   <groupId>net.seagis</groupId>
-  <artifactId>numeric</artifactId>
+  <artifactId>statistics</artifactId>
   <packaging>jar</packaging>
-  <name>Numerical algorithms</name>
+  <name>Statistics</name>
   <description>
-    Algorithmes de calculs numériques.
+    Utilitaires dédiés à l'exploitation d'une base de données PostgreSQL contenant un ensemble de mesures.
   </description>
 
 
@@ -53,8 +53,9 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-referencing</artifactId>
+      <groupId>net.seagis</groupId>
+      <artifactId>observation</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>
