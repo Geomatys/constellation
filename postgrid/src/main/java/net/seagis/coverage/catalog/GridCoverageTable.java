@@ -274,8 +274,8 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
             flushExceptEntries();
             final String startText, endText;
             synchronized (dateFormat) {
-                startText = dateFormat.format(startTime);
-                endText   = dateFormat.format(  endTime);
+                startText = (startTime != null) ? dateFormat.format(startTime) : "-infinity";
+                endText   = (  endTime != null) ? dateFormat.format(  endTime) : "+infinity";
             }
             log("setTimeRange", Level.CONFIG, ResourceKeys.SET_TIME_RANGE_$3,
                                 new String[]{startText, endText, getLayerName()});
