@@ -52,7 +52,7 @@ import net.seagis.sos.InsertObservation;
 import net.seagis.sos.InsertObservationResponse;
 import net.seagis.sos.RegisterSensor;
 import net.seagis.sos.RegisterSensorResponse;
-import net.seagis.sos.webservice.SOSworker;
+import net.seagis.sos.ws.SOSworker;
 
 
 

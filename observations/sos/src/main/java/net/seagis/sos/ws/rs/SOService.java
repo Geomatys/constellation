@@ -38,7 +38,7 @@ import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.coverage.web.Service;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.wms.WebService;
+import net.seagis.ws.rs.WebService;
 import net.seagis.ows.v110.AcceptFormatsType;
 import net.seagis.ows.v110.AcceptVersionsType;
 import net.seagis.ows.v110.SectionsType;
@@ -49,7 +49,7 @@ import net.seagis.sos.GetObservation;
 import net.seagis.sos.GetResult;
 import net.seagis.sos.InsertObservation;
 import net.seagis.sos.RegisterSensor;
-import net.seagis.sos.webservice.SOSworker;
+import net.seagis.sos.ws.SOSworker;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 /**

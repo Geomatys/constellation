@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.sos.webservice;
+package net.seagis.sos.ws;
 
 // JDK dependencies
 import org.apache.xerces.dom.ElementNSImpl;
@@ -76,7 +76,7 @@ import net.seagis.catalog.NoSuchRecordException;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.coverage.wms.WebService;
+import net.seagis.ws.rs.WebService;
 import net.seagis.gml.v311.AbstractTimeGeometricPrimitiveType;
 import net.seagis.gml.v311.EnvelopeEntry;
 import net.seagis.gml.v311.FeaturePropertyType;
