@@ -2,7 +2,7 @@
 
 <!--
   Configuration du module "observations" du projet Sicade.
-  Version: $Id: pom.xml 658 2008-06-20 15:02:05Z glegal $
+  Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
