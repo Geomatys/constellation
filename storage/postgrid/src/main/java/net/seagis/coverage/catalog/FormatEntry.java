@@ -496,6 +496,18 @@ final class FormatEntry extends Entry implements Format {
                 .add(param)                        // Les paramètres
                 .add(reader));                     // L'objet à utiliser pour la lecture.
             this.reader = null;                    // N'utilise qu'un ImageReader par opération.
+
+            if (inputStream != null && XArray.containsIgnoreCase(spi.getFormatNames(), "raw")) {
+            // workaround to mask out no-data values in the new image
+            // TODO: add no-data specification in Formats table, or somewhere
+                double[] lower = { -9999 };  //TODO: get these from the database
+                double[] upper = { -999 };
+                double[] fill = { Float.NaN };
+                ParameterBlock pb = new ParameterBlock();
+                pb.addSource(image).add(lower).add(upper).add(fill);
+                image = JAI.create("threshold", pb, null);
+            } 
+            
         } else try {
             /*
              * Direct use of 'ImageReader': This approach reads the image immediately,
