@@ -118,11 +118,11 @@
       <groupId>org.apache.myfaces.tomahawk</groupId>
       <artifactId>tomahawk</artifactId>
     </dependency>
-    <!--dependency>
+    <dependency>
       <groupId>org.apache.myfaces.tomahawk</groupId>
       <artifactId>tomahawk-sandbox</artifactId>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>net.java.dev.ajax4jsf</groupId>
       <artifactId>ajax4jsf</artifactId>
     </dependency-->

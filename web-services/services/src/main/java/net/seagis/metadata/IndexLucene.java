@@ -170,11 +170,6 @@ public class IndexLucene extends AbstractIndex {
         for (String term :ISO_QUERYABLE.keySet()) {
             doc.add(new Field(term, getValues(term,  form),   Field.Store.YES, Field.Index.TOKENIZED));
         }
-          
-	/* convert the lat / long to lucene fields
-	doc.add(new Field("lat", NumberUtils.double2sortableStr(lat),Field.Store.YES, Field.Index.UN_TOKENIZED));
-	doc.add(new Field("lng", NumberUtils.double2sortableStr(lng),Field.Store.YES, Field.Index.UN_TOKENIZED));
-        */
         
         // add a default meta field to make searching all documents easy 
 	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
