@@ -191,7 +191,10 @@ public class WMService extends WebService {
             } else if (request.equalsIgnoreCase("GetLegendGraphic")) {
                     
                 return Response.ok(getLegendGraphic(), webServiceWorker.getMimeType()).build();
-                    
+            } else if (request.equalsIgnoreCase("GetOrigFile")) {
+                
+                return Response.ok(getOrigFile()).build();
+                                   
             } else {
                 throw new WMSWebServiceException("The operation " + request + " is not supported by the service",
                                               OPERATION_NOT_SUPPORTED, getCurrentVersion());
@@ -216,6 +219,14 @@ public class WMService extends WebService {
         }
     }
     
+    private File getOrigFile() throws WebServiceException {
+        final WebServiceWorker worker = this.webServiceWorker.get();
+        worker.setLayer(getParameter("LAYER", true));
+        worker.setTime(getParameter("TIME", true));
+        worker.setService("WMS", "1.3.0");
+        CoverageReference cr = worker.getCoverageReference();
+        return cr.getFile();
+    }
     
     /**
      * Return a map for the specified parameters in the query.
@@ -382,13 +393,58 @@ public class WMService extends WebService {
                 final SeriesMetadata seriesMetaEntry = seriesMetaTable.getEntry(coverageRef.getSeries().toString());
                                 
                 final PointOfContactTable pocTable = new PointOfContactTable(webServiceWorker.getDatabase());
-                final PointOfContact pocEntry = pocTable.getEntry(seriesMetaEntry.getPointOfContactID());
+                final PointOfContact pocEntry;
+                if (seriesMetaEntry.getPointOfContactID() != null) pocEntry = pocTable.getEntry(seriesMetaEntry.getPointOfContactID());
+                else pocEntry = null;
                 
-                response =  "<table border=1>" +
-                            "<tr><td>URI:</td><td>" + filename + "</td></tr>" +
-                            "<tr><td>Time Period:</td><td>" + coverageRef.getTimeRange().toString() + "</td></tr>" +
-                            "</table>" +
-                            layerMetaEntry.getMetadata() + seriesMetaEntry.getMetadata() + pocEntry.getMetadata();
+                
+                final Date startDate = coverageRef.getTimeRange().getMinValue();
+                final Date endDate = coverageRef.getTimeRange().getMaxValue();
+                DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+                df.setTimeZone(TimeZone.getTimeZone("GMT"));
+                
+                final String pocName, pocOrg, pocEmail;
+                if (pocEntry == null) {
+                    pocName = pocOrg = pocEmail = "---";
+                }
+                else {
+                    pocName = pocEntry.getName();
+                    pocEmail = pocEntry.getEmail();
+                    pocOrg = pocEntry.getOrg();
+                }
+                
+                final String linkToOrig = "../postgrid-web/WS/wms?REQUEST=GetOrigFile&LAYER=" + layer + "&TIME=" + getParameter("TIME", true);
+                
+                response =  "<table id=\"metadataTable\">\n" +
+                            "<tr><td width=200><b>Data Layer Title:</b></td><td>" + layerMetaEntry.getLongTitle() + "</td></tr>\n" +
+                            "<tr><td><b>Start Date:</b></td><td>" + df.format(startDate) + "</td></tr>\n" +
+                            "<tr><td><b>End Date:</b></td><td>" + df.format(endDate) + "</td></tr>\n" +
+                            "<tr><td><b>Data File:</b></td><td><a href=\"" + linkToOrig + "\">" + coverageRef.getFile().getName() + "</a></td></tr>\n" +
+                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                            "<tr><td><b>Parameter Name:</b></td><td>" + layerMetaEntry.getParameterName() + "</td></tr>\n" +
+                            "<tr><td><b>Parameter Type:</b></td><td>" + layerMetaEntry.getParameterType() + "</td></tr>\n" +
+                            "<tr><td><b>Minimum Value:</b></td><td>" + Math.round(coverageRef.getSampleDimensions()[0].getMinimumValue()) + "</td></tr>\n" +
+                            "<tr><td><b>Maximum Value:</b></td><td>" + Math.round(coverageRef.getSampleDimensions()[0].getMaximumValue()) + "</td></tr>\n" +
+                            "<tr><td><b>Units:</b></td><td>" + coverageRef.getSampleDimensions()[0].getUnits() + "</td></tr>\n" +
+                            "<tr><td><b>Update Frequency:</b></td><td>" + layerMetaEntry.getUpdateFrequency() + "</td></tr>\n" +
+                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                            "<tr><td><b>Description:</b></td><td>" + layerMetaEntry.getDescription() + "</td></tr>\n" +
+                            "<tr><td><b>Purpose:</b></td><td>" + layerMetaEntry.getPurpose() + "</td></tr>\n" +
+                            "<tr><td><b>Bounding Box:</b></td><td>&nbsp;</td></tr>\n" +
+                            "<tr><td><i>&nbsp;&nbsp;&nbsp;West</i></td><td>"+ coverageRef.getGeographicBoundingBox().getWestBoundLongitude() + "</td></tr>\n" +
+                            "<tr><td><i>&nbsp;&nbsp;&nbsp;East</i></td><td>"+ coverageRef.getGeographicBoundingBox().getEastBoundLongitude() + "</td></tr>\n" +
+                            "<tr><td><i>&nbsp;&nbsp;&nbsp;North</i></td><td>"+ coverageRef.getGeographicBoundingBox().getNorthBoundLatitude() + "</td></tr>\n" +
+                            "<tr><td><i>&nbsp;&nbsp;&nbsp;South</i></td><td>"+ coverageRef.getGeographicBoundingBox().getSouthBoundLatitude() + "</td></tr>\n" +
+                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                            //"<tr><td><b>Spatial Reference:</b></td><td>" + coverageRef.getCoordinateReferenceSystem().toString() + "</td></tr>\n" +
+                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                            "<tr><td><b>Publisher:</b></td><td>" + pocOrg + "</td></tr>\n" +
+                            "<tr><td><b>Contact:</b></td><td>" + pocName + "</td></tr>\n" +
+                            "<tr><td><b>Email:</b></td><td>" + pocEmail + "</td></tr>\n" +
+                            "<tr><td><b></b></td><td>&nbsp;</td></tr>\n" +
+                            "<tr><td><b>Use Constraints:</b></td><td>" + layerMetaEntry.getUseConstraint() + "</td></tr>\n" +
+                            "<tr><td></b></td><td>&nbsp;</td></tr>\n" +
+                            "</table>" ;
                 
             } catch (CatalogException ex) {
                 Logger.getLogger(WMService.class.getName()).log(Level.SEVERE, null, ex);

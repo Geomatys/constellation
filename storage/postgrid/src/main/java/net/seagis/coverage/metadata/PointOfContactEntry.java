@@ -119,4 +119,13 @@ final class PointOfContactEntry extends Entry implements PointOfContact {
                 
         return res;
     }
+        public String getName() {
+        return firstName + " " + lastName;
+    }
+    public String getOrg() {
+        return org;
+    }
+    public String getEmail() {
+        return email;
+    }
 }

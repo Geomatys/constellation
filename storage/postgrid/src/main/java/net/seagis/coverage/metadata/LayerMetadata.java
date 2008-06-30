@@ -37,5 +37,12 @@ public interface LayerMetadata extends Element {
      * 
      */
     String getMetadata();
-
+    String getLongTitle();
+    String getParameterName();
+    String getParameterType();
+    String getUpdateFrequency();
+    String getDescription();
+    String getPurpose();
+    String getUseConstraint();
+    
 }

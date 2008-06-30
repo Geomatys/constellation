@@ -95,4 +95,25 @@ final class LayerMetadataEntry extends Entry implements LayerMetadata {
                 "</table>" ;
         return res;
     }
+    public String getLongTitle() {
+        return longTitle;
+    }
+    public String getParameterName() {
+        return parameterName;
+    }
+    public String getParameterType() {
+        return parameterType;
+    }
+    public String getUpdateFrequency() {
+        return updateFrequency;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public String getPurpose() {
+        return purpose;
+    }
+    public String getUseConstraint() {
+        return useConstraint;
+    }    
 }

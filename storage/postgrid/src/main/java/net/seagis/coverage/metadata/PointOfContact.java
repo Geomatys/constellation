@@ -37,5 +37,8 @@ public interface PointOfContact extends Element {
      * 
      */
     String getMetadata();
+    String getName();
+    String getOrg();
+    String getEmail();
 
 }
