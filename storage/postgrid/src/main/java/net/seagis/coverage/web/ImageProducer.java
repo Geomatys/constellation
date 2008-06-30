@@ -94,6 +94,7 @@ import net.seagis.coverage.catalog.LayerTable;
 import net.seagis.resources.i18n.ResourceKeys;
 import net.seagis.resources.i18n.Resources;
 import org.geotools.coverage.SpatioTemporalCoverage3D;
+import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.Coverage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -411,7 +412,15 @@ public abstract class ImageProducer {
         final double[] values = new double[times.size()];
         for (int i=0; i<values.length; i++) {
             final Date t = times.get(i);
-            res = stCoverage.evaluate(point, t, res);
+            try {
+                res = stCoverage.evaluate(point, t, res);
+            } catch (CannotEvaluateException e) {
+                res[0] = Float.NaN;
+                System.out.println("Error evaluating pixel.  Returning NaN for this pixel.  "+e.getLocalizedMessage());
+            } catch (RuntimeException e) {
+                res[0] = Float.NaN;
+                System.out.println("Error reading file.  Returning NaN for this pixel.  "+e.getLocalizedMessage());
+            }
             values[i] = res[0];
         }
         return values;
