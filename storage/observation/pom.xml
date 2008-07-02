@@ -109,7 +109,7 @@
     </dependency>
     <dependency>
       <groupId>net.seagis</groupId>
-      <artifactId>service</artifactId>
+      <artifactId>services</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
