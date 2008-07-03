@@ -771,7 +771,7 @@ public class CSWworker {
         // we try to execute the query
         List<String> results;
         try {
-            results = index.doSearch(luceneQuery);
+            results = index.doSearch(luceneQuery, null);
         
         } catch (CorruptIndexException ex) {
             throw new OWSWebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",

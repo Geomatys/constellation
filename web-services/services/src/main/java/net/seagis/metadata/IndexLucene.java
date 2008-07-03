@@ -34,6 +34,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -70,7 +71,12 @@ public class IndexLucene extends AbstractIndex {
      */
     private final Analyzer analyzer;
     
-    /** Creates a new instance of IndexLucene */
+    /** 
+     * Creates a new Lucene Index.
+     * 
+     * @param reader An mdweb reader for read the metadata database.
+     * @param configDirectory A directory where the index can write indexation file. 
+     */
     public IndexLucene(Reader reader, File configDirectory) throws SQLException {
         
         this.reader = reader;
@@ -114,10 +120,20 @@ public class IndexLucene extends AbstractIndex {
     }
     
     /**
-     * this method add to index of lucene a new document based on Form object.
+     * This method add to index of lucene a new document based on Form object.
+     * (implements AbstractIndex.indexDocument() )
+     * object must be a Form.
+     * 
+     * @param writer A lucene Index Writer.
+     * @param object A MDweb formular.
      */
     public void indexDocument(IndexWriter writer, Object object) {
-        Form r = (Form) object;
+        Form r;
+        if (object instanceof Form) {
+            r = (Form) object;
+        } else {
+            throw new IllegalArgumentException("Unexpected type, supported one is: org.mdweb.model.storage.Form");
+        }
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(r));
@@ -133,6 +149,11 @@ public class IndexLucene extends AbstractIndex {
     
     /**
      * Return a string description for the specified terms
+     * 
+     * @param term An ISO queryable term defined in CSWWorker (like Title, Subject, Abstract,...)
+     * @param form An MDWeb formular from whitch we extract the values correspounding to the specified term.
+     * 
+     * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
     private String getValues(String term, Form form) throws SQLException {
         StringBuilder response  = new StringBuilder("");
@@ -157,6 +178,9 @@ public class IndexLucene extends AbstractIndex {
     
    /**
     * Makes a document for a MDWeb formular.
+    * 
+    * @param Form An MDweb formular to index.
+    * @return A Lucene document.
     */
     private Document createDocument(Form form) throws SQLException {
         
@@ -175,14 +199,16 @@ public class IndexLucene extends AbstractIndex {
 	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
         
         return doc;
-  }
+    }
     
-  /**
-     * This method proceed to a lucene search and returns a list of ID.
+    /**
+     * This method proceed a lucene search and returns a list of ID.
      *
-     * @param qString the lucene query string.
+     * @param queryString the lucene query string.
+     * @param filter a lucene filter (here its essentialy use for spatial filter)
+     * @return a List of id.
      */
-    public List<String> doSearch(String qString) throws CorruptIndexException, IOException, ParseException {
+    public List<String> doSearch(String queryString, Filter filter) throws CorruptIndexException, IOException, ParseException {
         
         List<String> results = new ArrayList<String>();
         
@@ -191,13 +217,13 @@ public class IndexLucene extends AbstractIndex {
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
         
-        if (qString == null)
-            qString = " ";
+        if (queryString == null)
+            queryString = " ";
         
-        Query query = parser.parse(qString);
+        Query query = parser.parse(queryString);
         logger.info("Searching for: " + query.toString(field));
         
-        Hits hits = searcher.search(query);
+        Hits hits = searcher.search(query, filter);
         
         logger.info(hits.length() + " total matching documents");
         
