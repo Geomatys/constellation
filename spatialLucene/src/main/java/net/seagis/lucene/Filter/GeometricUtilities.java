@@ -135,8 +135,12 @@ public class GeometricUtilities {
      */
     public static double lineToBBoxDistance(final Line2D line, final GeneralEnvelope boundingBox, final String units) {
         
+        CoordinateReferenceSystem crs = boundingBox.getCoordinateReferenceSystem();
         GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
+        tempPoint1.setCoordinateReferenceSystem(crs);
         GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
+        tempPoint2.setCoordinateReferenceSystem(crs);
+        
         if (boundingBox.contains(tempPoint1) || boundingBox.contains(tempPoint2))
             return 0;
         
@@ -414,8 +418,11 @@ public class GeometricUtilities {
      * @return True if the line crosses the envelope.
      */
     public static boolean crosses(GeneralEnvelope boundingBox, Line2D line) {
+        CoordinateReferenceSystem crs = boundingBox.getCoordinateReferenceSystem();
         GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
+        tempPoint1.setCoordinateReferenceSystem(crs);
         GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
+        tempPoint2.setCoordinateReferenceSystem(crs);
         
         // for this case we look if the line have a point inside and a point outside
         if ((boundingBox.contains(tempPoint1) && !boundingBox.contains(tempPoint2)) || 
@@ -452,9 +459,11 @@ public class GeometricUtilities {
      * @return True if the envelope contain the line.
      */
     public static boolean contains(GeneralEnvelope boundingBox, Line2D line) {
+        CoordinateReferenceSystem crs = boundingBox.getCoordinateReferenceSystem();
         GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
+        tempPoint1.setCoordinateReferenceSystem(crs);
         GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
-        
+        tempPoint2.setCoordinateReferenceSystem(crs);
         if ((boundingBox.contains(tempPoint1) && boundingBox.contains(tempPoint2)))
             return true;
         return false;

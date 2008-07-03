@@ -81,6 +81,7 @@ import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.dublincore.elements.SimpleLiteral;
 import net.seagis.filter.FilterParser;
+import net.seagis.lucene.Filter.SpatialQuery;
 import net.seagis.ogc.FilterCapabilities;
 import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
@@ -766,12 +767,12 @@ public class CSWworker {
         Integer startPos  = request.getStartPosition();
         
         // build the lucene query from the specified filter
-        String luceneQuery = filterParser.getLuceneQuery(query.getConstraint());
-        logger.info("Lucene query=" + luceneQuery);
+        SpatialQuery luceneQuery = filterParser.getLuceneQuery(query.getConstraint());
+        logger.info("Lucene query=" + luceneQuery.getQuery() + '\n' + "Spatial Filter" + luceneQuery.getSpatialFilter());
         // we try to execute the query
         List<String> results;
         try {
-            results = index.doSearch(luceneQuery, null);
+            results = index.doSearch(luceneQuery.getQuery(), luceneQuery.getSpatialFilter());
         
         } catch (CorruptIndexException ex) {
             throw new OWSWebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",

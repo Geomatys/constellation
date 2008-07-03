@@ -322,6 +322,11 @@
         <artifactId>poi</artifactId>
         <version>2.5.1-final-20040804</version>
       </dependency>
+      <dependency>
+      	<groupId>org.apache.lucene</groupId>
+      	<artifactId>lucene-core</artifactId>
+      	<version>2.2.0</version>
+    </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -580,6 +585,7 @@
     <module>storage</module>
     <module>web-services</module>
     <module>gui</module>
+    <module>spatialLucene</module>
     <!--module>observations</module-->
     <!--module>widgets</module-->
     <!--module>openoffice</module -->

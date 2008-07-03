@@ -16,12 +16,7 @@
 
 package net.seagis.lucene.Filter;
 
-import java.awt.geom.Line2D;
-import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.Query;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.geometry.GeneralEnvelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.operation.TransformException;
@@ -33,73 +28,88 @@ import org.opengis.referencing.operation.TransformException;
 public class SpatialQuery {
     
     /**
-     * The geometry object witch witch we want to filter.
+     * The spatial filter added to the lucene query.
      */
-    private Object geometry ;
+    private Filter spatialFilter ;
     
     /**
-     * The spatial operator to apply.
+     * The lucene query
      */
-    private int filterType;
-
-    /**
-     * The distance use in the Distance filter like DWITHIN or BEYOND
-     */
-    private Double distance;
+    private StringBuilder query;
+   
     
     /**
-     * The distance units  use in the Distance filter like DWITHIN or BEYOND
-     */
-    private String units;
-    
-    private String crsName;
-    
-    /**
+     * Build a new Query combinating a lucene query and a spatial filter.
      * 
-     * @param geometry
-     * @param crsName
-     * @param filterType
+     * @param geometry   A geometry object.
+     * @param crsName    A corrdinate Reference System name
+     * @param filterType A flag correspounding to the type of the spatial filter
+     * 
      * @throws org.opengis.referencing.NoSuchAuthorityCodeException
      * @throws org.opengis.referencing.FactoryException
      * @throws org.opengis.referencing.operation.TransformException
      */
     public SpatialQuery(Object geometry, String crsName, int filterType) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
-        if (!(geometry instanceof GeneralEnvelope) && !(geometry instanceof Line2D) && !(geometry instanceof GeneralDirectPosition)) {
-            throw new IllegalArgumentException("illegal geometry type. supported ones are: GeneralEnvelope, Line2D, GeneralDirectPosition");
-        }
-        this.filterType = filterType;
-        this.distance   = null;
-        this.units      = null;
-        this.geometry   = geometry;
-        this.crsName    = crsName;
+        
+        spatialFilter = new SpatialFilter(geometry, crsName, filterType);
+        query         = new StringBuilder();
     }
     
+    /**
+     * Build a new Query combinating a lucene query and a distance filter .
+     * 
+     * @param geometry   A geometry object.
+     * @param crsName    A corrdinate Reference System name
+     * @param filterType A flag correspounding to the type of the spatial filter
+     * @param distance   A distance expressed in the specified units.
+     * @param units      The units of the specified distance. 
+     * 
+     * @throws org.opengis.referencing.NoSuchAuthorityCodeException
+     * @throws org.opengis.referencing.FactoryException
+     * @throws org.opengis.referencing.operation.TransformException
+     */
     public SpatialQuery(Object geometry, String crsName, int filterType, double distance, String units) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
-        if (!(geometry instanceof GeneralEnvelope) && !(geometry instanceof Line2D) && !(geometry instanceof GeneralDirectPosition)) {
-            throw new IllegalArgumentException("illegal geometry type. supported ones are: GeneralEnvelope, Line2D, GeneralDirectPosition");
-        }
-        this.filterType = filterType;
-        this.distance   = distance;
-        this.units      = units;
-        this.geometry   = geometry;
-        this.crsName    = crsName;
+        
+        this.spatialFilter = new SpatialFilter(geometry, crsName, filterType, distance, units);
+        query         = new StringBuilder();
+    }
+    
+    public SpatialQuery(String query, Filter filter) {
+        this.query    = new StringBuilder(query);
+        spatialFilter = filter;
     }
     
     
     
     /**
-     * 
+     * Return the spatial filter (it can be a SerialChainFilter) to add to the lucene query.
      */
-    public Filter getFilter() throws NoSuchAuthorityCodeException, FactoryException {
+    public Filter getSpatialFilter() {
 
-        if (distance == null)
-            return new SpatialFilter(geometry, crsName, filterType);
-        else
-            return new SpatialFilter(geometry, crsName, filterType, distance, units);
+        return spatialFilter;
     }
 
-    public Query getQuery() throws NoSuchAuthorityCodeException, FactoryException {
-        return new ConstantScoreQuery(getFilter());
+    /**
+     * Return the lucene query associated with the filter. 
+     */
+    public String getQuery() {
+        return query.toString();
+    }
+    
+    /**
+     * set the lucene query associated with the filter. 
+     */
+    public void setQuery(String query) {
+        this.query = new StringBuilder(query);
+    }
+    
+    /**
+     * append a piece of lucene query to the main query.
+     * 
+     * @param s a piece of lucene query.
+     */
+    public void appendToQuery(String s) {
+        query.append(s);
     }
 
 }

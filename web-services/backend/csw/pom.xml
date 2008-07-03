@@ -101,6 +101,11 @@
       <artifactId>ows</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>net.seagis</groupId>
+      <artifactId>spatialLucene</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

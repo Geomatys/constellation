@@ -30,6 +30,8 @@ import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.gml.v311.EnvelopeEntry;
 import net.seagis.gml.v311.EnvelopeEntry;
+import net.seagis.lucene.Filter.SpatialFilter;
+import net.seagis.lucene.Filter.SpatialQuery;
 import net.seagis.ogc.AbstractIdType;
 import net.seagis.ogc.BBOXType;
 import net.seagis.ogc.BinaryComparisonOpType;
@@ -47,9 +49,15 @@ import net.seagis.ogc.PropertyNameType;
 import net.seagis.ogc.SpatialOpsType;
 import net.seagis.ogc.UnaryLogicOpType;
 import net.seagis.ows.v100.OWSWebServiceException;
+import org.apache.lucene.search.Filter;
 import org.geotools.filter.text.cql2.CQL;
 import static net.seagis.ows.OWSExceptionCode.*;
 import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * A parser for filter 1.1.0 and CQL 2.0
@@ -78,7 +86,7 @@ public class FilterParser {
      */
     public FilterParser(ServiceVersion version) throws JAXBException {
         this.version = version;
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.gml");
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.gml.v311");
         filterMarshaller = jbcontext.createMarshaller();
         filterMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
     }
@@ -88,7 +96,7 @@ public class FilterParser {
      * 
      * @param constraint a constraint expressed in CQL or FilterType
      */
-    public String getLuceneQuery(QueryConstraintType constraint) throws WebServiceException {
+    public SpatialQuery getLuceneQuery(QueryConstraintType constraint) throws WebServiceException {
         FilterType filter = null;
         if (constraint.getCqlText() != null && constraint.getFilter() != null) {
             throw new OWSWebServiceException("The query constraint must be in Filter or CQL but not both.",
@@ -146,13 +154,15 @@ public class FilterParser {
      * 
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
-    public String getLuceneQuery(FilterType filter) throws WebServiceException {
+    public SpatialQuery getLuceneQuery(FilterType filter) throws WebServiceException {
         
-        StringBuilder query = new StringBuilder("");
-            
+        StringBuilder query  = new StringBuilder("");
+        Filter spatialFilter = null;    
         // we treat logical Operators like AND, OR, ...
         if (filter.getLogicOps() != null) {
-            query.append(treatLogicalOperator(filter.getLogicOps()));
+            SpatialQuery sq = treatLogicalOperator(filter.getLogicOps());
+            query.append(sq.getQuery());
+            spatialFilter = sq.getSpatialFilter();
             
         // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
         } else if (filter.getComparisonOps() != null) {
@@ -160,13 +170,13 @@ public class FilterParser {
                 
         // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
         } else if (filter.getSpatialOps() != null) {
-            query.append(treatSpatialOperator(filter.getSpatialOps()));
+            spatialFilter = treatSpatialOperator(filter.getSpatialOps());
                 
         } else if (filter.getId() != null) {
             query.append(treatIDOperator(filter.getId()));
         }  
         
-        return query.toString();
+        return new SpatialQuery(query.toString(), spatialFilter);
     }
     
     /**
@@ -176,9 +186,9 @@ public class FilterParser {
      * @return
      * @throws net.seagis.coverage.web.WebServiceException
      */
-    private String treatLogicalOperator(JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException {
-        StringBuilder response = new StringBuilder();
-        
+    private SpatialQuery treatLogicalOperator(JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException {
+        StringBuilder response      = new StringBuilder();
+        Filter spatialFilter = null;
         LogicOpsType logicOps = JBlogicOps.getValue();
         String operator = JBlogicOps.getName().getLocalPart();
         
@@ -188,8 +198,9 @@ public class FilterParser {
             for (JAXBElement<?> jb: binary.getOperators()) {
                 
                 if (jb.getValue() instanceof LogicOpsType) {
-                    
-                    response.append(treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb));
+                    SpatialQuery sq = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
+                    response.append(sq.getQuery());
+                    spatialFilter = sq.getSpatialFilter();
                     
                 } else if (jb.getValue() instanceof ComparisonOpsType) {
                     
@@ -197,7 +208,7 @@ public class FilterParser {
                 
                 } else if (jb.getValue() instanceof SpatialOpsType) {
                     
-                   response.append(treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb)); 
+                   spatialFilter = treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb); 
                     
                 } else {
                     
@@ -215,7 +226,7 @@ public class FilterParser {
             throw new UnsupportedOperationException("Not supported yet.");
         }
         
-        return response.toString();
+        return new SpatialQuery(response.toString(), spatialFilter);
     }
     
     /**
@@ -384,14 +395,17 @@ public class FilterParser {
      * @return
      * @throws net.seagis.coverage.web.WebServiceException
      */
-    private String treatSpatialOperator(JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws WebServiceException {
-        StringBuilder response = new StringBuilder();
+    private Filter treatSpatialOperator(JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws WebServiceException {
+        SpatialFilter spatialfilter = null;
         
         SpatialOpsType spatialOps = JBSpatialOps.getValue();
         
         if (spatialOps instanceof BBOXType) {
             BBOXType bbox       = (BBOXType) spatialOps;
             String propertyName = bbox.getPropertyName();
+            String CRSName      = bbox.getSRS();
+            
+            //we verify that all the parameters are specified
             if (propertyName == null) {
                 throw new OWSWebServiceException("An operator BBOX must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
@@ -400,9 +414,27 @@ public class FilterParser {
                 throw new OWSWebServiceException("An operator BBOX must specified an envelope.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             }
+            if (CRSName == null) {
+                throw new OWSWebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
             
-            //TODO
-            throw new UnsupportedOperationException("Not supported yet.");
+            //we transform the EnvelopeEntry in GeneralEnvelope
+            double min[] = {bbox.getMinX(), bbox.getMinY()};
+            double max[] = {bbox.getMaxX(), bbox.getMaxY()};
+            GeneralEnvelope envelope = new GeneralEnvelope(min, max);
+            try {
+                CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
+                envelope.setCoordinateReferenceSystem(crs);
+                spatialfilter = new SpatialFilter(envelope, CRSName, SpatialFilter.BBOX);
+                
+            } catch (NoSuchAuthorityCodeException e) {
+                throw new OWSWebServiceException("Unknow Coordinate Reference System: " + bbox.getSRS(),
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            } catch (FactoryException e) {
+                throw new OWSWebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
             
         } else if (spatialOps instanceof DistanceBufferType) {
             
@@ -439,7 +471,7 @@ public class FilterParser {
             
         }
         
-        return response.toString();
+        return spatialfilter;
     }
     
     private String treatIDOperator(List<JAXBElement<? extends AbstractIdType>> JBIdsOps) {

@@ -192,7 +192,6 @@ public class SpatialFilter extends Filter {
     
     @Override
     public BitSet bits(IndexReader reader) throws IOException {
-        long start = System.currentTimeMillis();
     	
         // we prepare the result
         BitSet bits = new BitSet(reader.maxDoc());
@@ -210,9 +209,9 @@ public class SpatialFilter extends Filter {
             switch (filterType) {
                 
                 case BBOX :
-                
+                    
                     if (boundingBox != null && boundingBox.contains(tempPoint)) {
-                        bits.set(docNum);
+                            bits.set(docNum);
                     }
                     break;
             
@@ -425,7 +424,9 @@ public class SpatialFilter extends Filter {
             
             Line2D tempLine = readLine(reader.document(docNum));
             GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(tempLine.getX1(), tempLine.getY1());
+            tempPoint1.setCoordinateReferenceSystem(geometryCRS);
             GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(tempLine.getX2(), tempLine.getY2());
+            tempPoint2.setCoordinateReferenceSystem(geometryCRS);
             
             switch (filterType) {
                 
@@ -534,11 +535,6 @@ public class SpatialFilter extends Filter {
         }
         
         
-        long end = System.currentTimeMillis();
-        logger.info("Spatial filter Time Taken: "+ (end - start));
-        
-        
-        
         return bits;
     }
     
@@ -567,11 +563,8 @@ public class SpatialFilter extends Filter {
                 result.setCoordinateReferenceSystem(geometryCRS);
             } else {
                 result.setCoordinateReferenceSystem(CRS.decode(sourceCRSName, true));
-                System.out.println("before: " + result.toString());
                 result = (GeneralEnvelope) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
                 
-                
-                System.out.println("reprojecting BBOX FROM " + sourceCRSName + " to " + geometryCRSName +" :" + '\n' + result.toString());
             }
         
         } catch (NoSuchAuthorityCodeException ex) {
@@ -636,8 +629,7 @@ public class SpatialFilter extends Filter {
             } else {
                 result.setCoordinateReferenceSystem(CRS.decode(sourceCRSName, true));
                 result = (GeneralDirectPosition) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
-               
-                
+                result.setCoordinateReferenceSystem(geometryCRS); 
             }
         
         } catch (NoSuchAuthorityCodeException ex) {
@@ -708,6 +700,47 @@ public class SpatialFilter extends Filter {
         } else {
             return 0;
         }   
+    }
+    
+    /**
+     * Return a string description of the filter type.
+     */
+    public String valueOf(int filterType) {
+        switch (filterType) {
+            case 0: return "CONTAINS";
+            
+            case 1:  return "INTERSECT";
+            case 2:  return "EQUALS";
+            case 3:  return "DISJOINT";
+            case 4:  return "BBOX";
+            case 5:  return "BEYOND";
+            case 6:  return "CROSSES";       
+            case 7:  return "DWITHIN";
+            case 8:  return "WITHIN";
+            case 9:  return "TOUCHES";
+            case 10: return "OVERLAPS";
+            default: return "UNKNOW FILTER TYPE";
+        }
+    }
+    
+    /**
+     * Return a String description of the filter
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[SpatialFilter]: ").append(valueOf(filterType)).append('\n');
+        if (boundingBox != null) {
+            s.append("geometry types: GeneralEnvelope.").append('\n').append(boundingBox);
+        } else if (line != null) {
+            s.append("geometry types: Line2D.").append('\n').append(GeometricUtilities.logLine2D(line));
+        } else if (point != null) {
+            s.append("geometry types: GeneralDirectPosition.").append('\n').append(point);
+        }
+        s.append("geometry CRS: ").append(geometryCRSName).append('\n');
+        s.append("precision: ").append(precision).append('\n');
+        if (distance != null) 
+            s.append("Distance: ").append(distance).append(" ").append(distanceUnit).append('\n');
+        return s.toString();
     }
 
 }
