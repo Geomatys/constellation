@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.wms.AbstractLayer;
 import net.seagis.wms.AbstractService;
 import net.seagis.wms.AbstractWMSCapabilities;
 
@@ -124,5 +125,18 @@ public class WMSCapabilities extends AbstractWMSCapabilities {
      */
     public String getUpdateSequence() {
         return updateSequence;
+    }
+    
+    /**
+     * Get a specific layer from the capabilities document.
+     * 
+     */
+    public AbstractLayer getLayerFromName(String name) {
+        for( Layer layer : getCapability().getLayer().getLayer()){
+            if(layer.getName().equals(name)){
+                return (AbstractLayer)layer; 
+            }
+        }        
+        return null;
     }
 }

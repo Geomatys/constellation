@@ -58,7 +58,7 @@ public class DistanceBufferType
 
     @XmlElement(name = "PropertyName", required = true)
     protected PropertyNameType propertyName;
-    @XmlElementRef(name = "_Geometry", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractGeometry", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     protected JAXBElement<? extends AbstractGeometryType> geometry;
     @XmlElement(name = "Distance", required = true)
     protected DistanceType distance;

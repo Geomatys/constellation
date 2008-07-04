@@ -17,8 +17,11 @@ package net.seagis.wms.v111;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -282,7 +285,7 @@ public class Layer extends AbstractLayer {
     /**
      * Gets the value of the dimension property.
      * 
-     */
+     */    
     public List<Dimension> getDimension() {
         return Collections.unmodifiableList(dimension);
     }
@@ -413,5 +416,34 @@ public class Layer extends AbstractLayer {
      */
     public BigInteger getFixedHeight() {
         return fixedHeight;
+    }
+    
+    /**
+     * Gets all values of each dimension property.
+     * 
+     */
+    public List<AbstractDimension> getAbstractDimension() {
+        
+        List<AbstractDimension> list = new ArrayList<AbstractDimension>();
+        
+        /*Transform a  List<Dimension> in an  List<AbstractDimension>*/
+        for( Dimension dim : getDimension() ){
+            list.add((AbstractDimension) dim);
+        }        
+        
+        /*Set the AbstractDimension value from the corresponding Extent 
+         *<Dimension name="time" ..../>
+         *<Extent name="time" ...>value1,value2,....</Extent> 
+         */
+        List<Extent> listExt =  getExtent();        
+        for (int i=0;i<listExt.size();i++){  
+            AbstractDimension dimTmp = list.get(i);
+            Extent extTmp = listExt.get(i);
+            if(dimTmp.getDefault() == null)
+                dimTmp.setDefault(extTmp.getDefault());
+            dimTmp.setValue(extTmp.getvalue());
+        }
+        
+        return list;
     }
 }

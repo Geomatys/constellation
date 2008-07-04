@@ -49,4 +49,10 @@ public abstract class AbstractWMSCapabilities {
      * 
      */
     public abstract String getUpdateSequence();
+    
+    /**
+     * Get a specific layer from the capabilities document.
+     * 
+     */
+    public abstract AbstractLayer getLayerFromName(String name);
 }

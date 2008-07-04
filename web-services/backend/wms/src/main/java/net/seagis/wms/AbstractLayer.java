@@ -15,6 +15,7 @@
 
 package net.seagis.wms;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
@@ -23,5 +24,11 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @XmlTransient
 public abstract class AbstractLayer {
+    
+    /**
+     * Get all Dimensions (TIME,ELEVATION,...) from a specific layer.
+     * 
+     */
+    public abstract List<AbstractDimension> getAbstractDimension();
 
 }

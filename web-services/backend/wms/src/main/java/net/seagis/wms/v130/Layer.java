@@ -447,4 +447,20 @@ public class Layer extends AbstractLayer {
     public BigInteger getFixedHeight() {
         return fixedHeight;
     }
+    
+    /**
+     * Gets all values of each dimension property.
+     * 
+     */
+    public List<AbstractDimension> getAbstractDimension() {
+        
+        List<AbstractDimension> list = new ArrayList<AbstractDimension>();
+        
+        /*Transform a  List<Dimension> in an  List<AbstractDimension>*/
+        for( Dimension dim : getDimension() ){
+            list.add((AbstractDimension) dim);
+        }    
+        
+        return list;
+    }
 }

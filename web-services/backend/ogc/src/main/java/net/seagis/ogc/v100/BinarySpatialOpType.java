@@ -38,7 +38,7 @@ import net.seagis.gml.v212.PolygonType;
  *       &lt;sequence>
  *         &lt;element ref="{http://www.opengis.net/ogc}PropertyName"/>
  *         &lt;choice>
- *           &lt;element ref="{http://www.opengis.net/gml}_Geometry"/>
+ *           &lt;element ref="{http://www.opengis.net/gml}AbstractGeometry"/>
  *           &lt;element ref="{http://www.opengis.net/gml}Box"/>
  *         &lt;/choice>
  *       &lt;/sequence>
@@ -61,7 +61,7 @@ public class BinarySpatialOpType
 
     @XmlElement(name = "PropertyName", required = true)
     protected PropertyNameType propertyName;
-    @XmlElementRef(name = "_Geometry", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractGeometry", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     protected JAXBElement<? extends AbstractGeometryType> geometry;
     @XmlElement(name = "Box", namespace = "http://www.opengis.net/gml")
     protected BoxType box;
