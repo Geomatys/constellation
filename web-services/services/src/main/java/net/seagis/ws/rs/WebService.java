@@ -245,7 +245,8 @@ public abstract class WebService {
      */
     protected void writeParameters() throws WebServiceException {
         MultivaluedMap parameters = context.getQueryParameters();
-        logger.info(parameters.toString());
+        if (!parameters.isEmpty())
+            logger.info(parameters.toString());
     }
     
     /**

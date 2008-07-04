@@ -17,19 +17,26 @@
 package net.seagis.lucene;
 
 import java.awt.geom.Line2D;
-import java.io.IOException;
 
+// J2SE dependencies
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+// seagis dependencies
 import net.seagis.lucene.Filter.SerialChainFilter;
 import net.seagis.lucene.Filter.SpatialFilter;
 import net.seagis.lucene.Filter.SpatialQuery;
+
+// Lucene dependencies
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
@@ -37,14 +44,14 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.RAMDirectory;
 
+// geotools/geoAPI dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
-import org.junit.*;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
+
+// JUnit dependencies
+import org.junit.*;
 import static org.junit.Assert.*;
 
 
@@ -2393,6 +2400,160 @@ public class LuceneTest {
         
     }
     
+    /**
+     * Test the combination of a String query and/or spatial filter.
+     */
+    @Test
+    public void QueryAndSpatialFilterTest() throws Exception {
+        
+        /*
+         * case 1: a normal spatial request BBOX
+         */ 
+        double min1[] = {-20, -20};
+        double max1[] = { 20,  20};
+        GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
+        CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
+        bbox.setCoordinateReferenceSystem(crs);
+        SpatialQuery bboxQuery = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BBOX);
+
+        //we perform a lucene query
+        Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+
+        int nbResults = hits.length();
+        logger.info("QnS:BBOX 1 CRS=4326: nb Results: " + nbResults);
+        
+        List<String> results = new ArrayList<String>();
+        for (int i = 0; i < nbResults; i++) {
+            String name = hits.doc(i).get("name");
+            results.add(name);
+            logger.info('\t' + "Name: " +  name);
+        }
+        
+        //we verify that we obtain the correct results
+        assertEquals(nbResults, 7);
+        assertTrue(results.contains("point 1"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("line 2"));
+        
+        /*
+         *  case 2: same filter with a StringQuery
+         */ 
+        
+        //we perform a lucene query
+        Analyzer analyzer    = new StandardAnalyzer();
+        QueryParser parser  = new QueryParser("metafile", analyzer);
+        Query query         = parser.parse("name:point*");
+        
+        hits = searcher.search(query, bboxQuery.getSpatialFilter());
+
+        nbResults = hits.length();
+        logger.info("QnS: title like point* AND BBOX 1: nb Results: " + nbResults);
+        
+        results = new ArrayList<String>();
+        for (int i = 0; i < nbResults; i++) {
+            String name = hits.doc(i).get("name");
+            results.add(name);
+            logger.info('\t' + "Name: " +  name);
+        }
+        
+        //we verify that we obtain the correct results
+        assertEquals(nbResults, 4);
+        assertTrue(results.contains("point 1"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        
+        /*
+         *  case 3: same filter same query but with an OR
+         */ 
+        
+        //we perform two lucene query
+        analyzer    = new StandardAnalyzer();
+        parser  = new QueryParser("metafile", analyzer);
+        query         = parser.parse("name:point*");
+        
+        Hits hits1 = searcher.search(query);
+        Hits hits2 = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
+        
+        
+        results = new ArrayList<String>();
+        StringBuilder resultString = new StringBuilder();
+        for (int i = 0; i < hits1.length(); i++) {
+            String name = hits1.doc(i).get("name");
+            results.add(name);
+            resultString.append('\t').append("Name: ").append(name).append('\n');
+        }
+        for (int i = 0; i < hits2.length(); i++) {
+            String name = hits2.doc(i).get("name");
+            if (!results.contains(name)) {
+                results.add(name);
+                resultString.append('\t').append("Name: ").append(name).append('\n');
+            }
+        }
+        nbResults = results.size();
+        logger.info("QnS: name like point* OR BBOX 1: nb Results: " + nbResults);
+        logger.info(resultString.toString());
+                
+        //we verify that we obtain the correct results
+        assertEquals(nbResults, 9);
+        assertTrue(results.contains("point 1"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("point 4"));
+        assertTrue(results.contains("point 5"));
+        assertTrue(results.contains("box 2"));
+        assertTrue(results.contains("box 2 projected"));
+        assertTrue(results.contains("line 2"));
+        
+        /*
+         *  case 4: two filter two query with an OR in the middle
+         *          (BBOX and name like point*) OR (INTERSECT line1 and name like box*) 
+         */ 
+        
+        //we perform two lucene query
+        analyzer                = new StandardAnalyzer();
+        parser                  = new QueryParser("metafile", analyzer);
+        Query query1            = parser.parse("name:point*");
+        Query query2            = parser.parse("name:box*");
+        Line2D line             = new Line2D.Double(40, 30, 40, -30);
+        SpatialQuery interQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.INTERSECT);
+        
+        hits1 = searcher.search(query1, bboxQuery.getSpatialFilter());
+        hits2 = searcher.search(query2, interQuery.getSpatialFilter());
+        
+        
+        results      = new ArrayList<String>();
+        resultString = new StringBuilder();
+        for (int i = 0; i < hits1.length(); i++) {
+            String name = hits1.doc(i).get("name");
+            results.add(name);
+            resultString.append('\t').append("Name: ").append(name).append('\n');
+        }
+        for (int i = 0; i < hits2.length(); i++) {
+            String name = hits2.doc(i).get("name");
+            if (!results.contains(name)) {
+                results.add(name);
+                resultString.append('\t').append("Name: ").append(name).append('\n');
+            }
+        }
+        nbResults = results.size();
+        logger.info("QnS: (name like point* AND BBOX 1) OR (name like box* AND INTERSECT line 1): nb Results: " + nbResults);
+        logger.info(resultString.toString());
+                
+        //we verify that we obtain the correct results
+        assertEquals(nbResults, 5);
+        assertTrue(results.contains("point 1"));
+        assertTrue(results.contains("point 1 projected"));
+        assertTrue(results.contains("point 2"));
+        assertTrue(results.contains("point 3"));
+        assertTrue(results.contains("box 3"));
+    }
+    
     private void fillTestData(IndexWriter writer) throws Exception {
         Document doc = new Document();
         doc.add(new Field("name", "point 1", Field.Store.YES, Field.Index.TOKENIZED));
@@ -2461,7 +2622,7 @@ public class LuceneTest {
      * @param y       The y coordinate of the point.
      * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
-    private void addPoint(Document doc, double y, double x, String crsName) throws IOException, NoSuchAuthorityCodeException, FactoryException, TransformException {
+    private void addPoint(Document doc, double y, double x, String crsName) {
 
         // convert the lat / long to lucene fields
         doc.add(new Field("geometry" , "point", Field.Store.YES, Field.Index.UN_TOKENIZED));
@@ -2483,7 +2644,7 @@ public class LuceneTest {
      * @param maxy the maximum Y coordinate of the bounding box.
      * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
-    private void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
+    private void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) {
 
         // convert the corner of the box to lucene fields
         doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.UN_TOKENIZED));
@@ -2508,7 +2669,7 @@ public class LuceneTest {
      * @param y2  the Y coordinate of the first point of the line.
      * @param crsName The coordinate reference system in witch the coordinates are expressed.
      */
-    private void addLine(Document doc, double x1, double y1, double x2, double y2, String crsName) throws IOException, NoSuchAuthorityCodeException, FactoryException, TransformException {
+    private void addLine(Document doc, double x1, double y1, double x2, double y2, String crsName) {
 
         
         // convert the corner of the box to lucene fields

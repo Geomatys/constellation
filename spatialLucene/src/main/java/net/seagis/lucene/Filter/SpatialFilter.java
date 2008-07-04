@@ -192,7 +192,6 @@ public class SpatialFilter extends Filter {
     
     @Override
     public BitSet bits(IndexReader reader) throws IOException {
-    	
         // we prepare the result
         BitSet bits = new BitSet(reader.maxDoc());
         

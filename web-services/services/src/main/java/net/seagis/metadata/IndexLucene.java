@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 // Lucene dependencies
+import net.seagis.lucene.Filter.SpatialQuery;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -32,6 +33,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Filter;
@@ -39,6 +41,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // MDWeb dependencies
@@ -71,7 +74,12 @@ public class IndexLucene extends AbstractIndex {
      */
     private final Analyzer analyzer;
     
-    /** 
+    /**
+     * A default Query requesting all the document
+     */
+    private final Query simpleQuery = new TermQuery(new Term("metafile", "doc"));
+    
+    /**
      * Creates a new Lucene Index.
      * 
      * @param reader An mdweb reader for read the metadata database.
@@ -92,17 +100,19 @@ public class IndexLucene extends AbstractIndex {
             logger.info("Creating lucene index for the first time...");
             long time = System.currentTimeMillis();
             IndexWriter writer;
-
+            int nbCatalogs = 0;
+            int nbForms    = 0; 
             try {
                 writer = new IndexWriter(getFileDirectory(), analyzer, true);
                 
                 // getting the objects list and index avery item in the IndexWriter.
-                List<Catalog> cats = new ArrayList<Catalog>();
-                cats.add(reader.getCatalog("FR_SY"));
+                List<Catalog> cats = reader.getCatalogs();
+                nbCatalogs = cats.size();
                 List<Form> results = reader.getAllForm(cats);
-                for (Form form : results)
+                nbForms    =  results.size();
+                for (Form form : results) {
                     indexDocument(writer, form);
-                
+                }
                 writer.optimize();
                 writer.close();
                 
@@ -113,7 +123,8 @@ public class IndexLucene extends AbstractIndex {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms");
+            logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' + 
+                        "catalogs: " + nbCatalogs + " documents indexed: " + nbForms);
         } else {
             logger.info("Index already created");
         }
@@ -195,6 +206,28 @@ public class IndexLucene extends AbstractIndex {
             doc.add(new Field(term, getValues(term,  form),   Field.Store.YES, Field.Index.TOKENIZED));
         }
         
+        //we add the geometry parts
+        String coord = "null";
+        try {
+            coord = getValues("WestBoundLongitude", form);
+            double minx = Double.parseDouble(coord);
+            
+            coord = getValues("EastBoundLongitude", form);
+            double maxx = Double.parseDouble(coord);
+            
+            coord = getValues("NorthBoundLatitude", form);
+            double maxy = Double.parseDouble(coord);
+            
+            coord = getValues("SouthBoundLatitude", form);
+            double miny = Double.parseDouble(coord);
+            
+            addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
+            
+        } catch (NumberFormatException e) {
+            if (!coord.equals("null"))
+                logger.severe("unable to spatially index form: " + form.getTitle() + '\n' +
+                              "cause:  unable to parse double: " + coord);
+        }    
         // add a default meta field to make searching all documents easy 
 	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
         
@@ -204,11 +237,11 @@ public class IndexLucene extends AbstractIndex {
     /**
      * This method proceed a lucene search and returns a list of ID.
      *
-     * @param queryString the lucene query string.
-     * @param filter a lucene filter (here its essentialy use for spatial filter)
-     * @return a List of id.
+     * @param query   The lucene query string with spatials filters.
+     * 
+     * @return                A List of id.
      */
-    public List<String> doSearch(String queryString, Filter filter) throws CorruptIndexException, IOException, ParseException {
+    public List<String> doSearch(SpatialQuery spatialQuery) throws CorruptIndexException, IOException, ParseException {
         
         List<String> results = new ArrayList<String>();
         
@@ -217,13 +250,12 @@ public class IndexLucene extends AbstractIndex {
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
         
-        if (queryString == null)
-            queryString = " ";
+        Query query = parser.parse(spatialQuery.getQuery());
+        Filter f    = spatialQuery.getSpatialFilter();
+        logger.info("Searching for: "    + query.toString(field) + '\n' +
+                    " with the filter: " + f);
         
-        Query query = parser.parse(queryString);
-        logger.info("Searching for: " + query.toString(field));
-        
-        Hits hits = searcher.search(query, filter);
+        Hits hits = searcher.search(query, f);
         
         logger.info(hits.length() + " total matching documents");
         
@@ -237,5 +269,66 @@ public class IndexLucene extends AbstractIndex {
         return results;
     }  
     
+    /**
+     * Add a boundingBox geometry to the specified Document.
+     * 
+     * @param doc  The document to add the geometry
+     * @param minx the minimun X coordinate of the bounding box.
+     * @param maxx the maximum X coordinate of the bounding box.
+     * @param miny the minimun Y coordinate of the bounding box.
+     * @param maxy the maximum Y coordinate of the bounding box.
+     * @param crsName The coordinate reference system in witch the coordinates are expressed.
+     */
+    private void addBoundingBox(Document doc, double minx, double maxx, double miny, double maxy, String crsName) {
+
+        // convert the corner of the box to lucene fields
+        doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("minx"     , minx + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("maxx"     , maxx + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("miny"     , miny + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("maxy"     , maxy + "",     Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("CRS"      , crsName  ,     Field.Store.YES, Field.Index.UN_TOKENIZED));
+        logger.info("added boundingBox");
+    }
+    
+    /**
+     *  Add a point geometry to the specified Document.
+     * 
+     * @param doc     The document to add the geometry
+     * @param x       The x coordinate of the point.
+     * @param y       The y coordinate of the point.
+     * @param crsName The coordinate reference system in witch the coordinates are expressed.
+     */
+    private void addPoint(Document doc, double y, double x, String crsName) {
+
+        // convert the lat / long to lucene fields
+        doc.add(new Field("geometry" , "point", Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("x"        , x + "" , Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("y"        , y + "" , Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.UN_TOKENIZED));
+       
+    }
+    
+    /**
+     * Add a Line geometry to the specified Document.
+     * 
+     * @param doc The document to add the geometry
+     * @param x1  the X coordinate of the first point of the line.
+     * @param y1  the Y coordinate of the first point of the line.
+     * @param x2  the X coordinate of the second point of the line.
+     * @param y2  the Y coordinate of the first point of the line.
+     * @param crsName The coordinate reference system in witch the coordinates are expressed.
+     */
+    private void addLine(Document doc, double x1, double y1, double x2, double y2, String crsName) {
+
+        
+        // convert the corner of the box to lucene fields
+        doc.add(new Field("geometry" , "line" , Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("x1"       , x1 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("y1"       , y1 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("x2"       , x2 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("y2"       , y2 + "", Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field("CRS"      , crsName, Field.Store.YES, Field.Index.UN_TOKENIZED));
+    }
    
 }

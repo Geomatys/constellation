@@ -74,6 +74,11 @@ public class SpatialQuery {
         query         = new StringBuilder();
     }
     
+    /**
+     * 
+     * @param query
+     * @param filter
+     */
     public SpatialQuery(String query, Filter filter) {
         this.query    = new StringBuilder(query);
         spatialFilter = filter;
@@ -93,6 +98,9 @@ public class SpatialQuery {
      * Return the lucene query associated with the filter. 
      */
     public String getQuery() {
+        if (query ==null)
+            return "";
+        
         return query.toString();
     }
     

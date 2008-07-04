@@ -17,6 +17,8 @@
 package net.seagis.filter;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.gml.v311.EnvelopeEntry;
 import net.seagis.gml.v311.EnvelopeEntry;
+import net.seagis.lucene.Filter.SerialChainFilter;
 import net.seagis.lucene.Filter.SpatialFilter;
 import net.seagis.lucene.Filter.SpatialQuery;
 import net.seagis.ogc.AbstractIdType;
@@ -74,17 +77,17 @@ public class FilterParser {
      /**
      * The version of the service
      */
-    private ServiceVersion version;
+    private final ServiceVersion version;
     
     /**
      * A temporary marshaller whitch will be replaced by FilterFactoryImpl
      */
-    private Marshaller filterMarshaller;
+    private final Marshaller filterMarshaller;
     
     /**
      * Build a new FilterParser with the specified version.
      */
-    public FilterParser(ServiceVersion version) throws JAXBException {
+    public FilterParser(final ServiceVersion version) throws JAXBException {
         this.version = version;
         JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.ogc:net.seagis.gml.v311");
         filterMarshaller = jbcontext.createMarshaller();
@@ -96,7 +99,7 @@ public class FilterParser {
      * 
      * @param constraint a constraint expressed in CQL or FilterType
      */
-    public SpatialQuery getLuceneQuery(QueryConstraintType constraint) throws WebServiceException {
+    public SpatialQuery getLuceneQuery(final QueryConstraintType constraint) throws WebServiceException {
         FilterType filter = null;
         if (constraint.getCqlText() != null && constraint.getFilter() != null) {
             throw new OWSWebServiceException("The query constraint must be in Filter or CQL but not both.",
@@ -154,7 +157,7 @@ public class FilterParser {
      * 
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
-    public SpatialQuery getLuceneQuery(FilterType filter) throws WebServiceException {
+    public SpatialQuery getLuceneQuery(final FilterType filter) throws WebServiceException {
         
         StringBuilder query  = new StringBuilder("");
         Filter spatialFilter = null;    
@@ -186,47 +189,80 @@ public class FilterParser {
      * @return
      * @throws net.seagis.coverage.web.WebServiceException
      */
-    private SpatialQuery treatLogicalOperator(JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException {
-        StringBuilder response      = new StringBuilder();
-        Filter spatialFilter = null;
-        LogicOpsType logicOps = JBlogicOps.getValue();
-        String operator = JBlogicOps.getName().getLocalPart();
+    private SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException {
+        StringBuilder queryBuilder = new StringBuilder();
+        LogicOpsType logicOps      = JBlogicOps.getValue();
+        String operator            = JBlogicOps.getName().getLocalPart();
+        List<Filter> filters       = new ArrayList<Filter>();
         
         if (logicOps instanceof BinaryLogicOpType) {
             BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
-            response.append('(');
+            queryBuilder.append('(');
             for (JAXBElement<?> jb: binary.getOperators()) {
+                
+                boolean writeOperator = true;
                 
                 if (jb.getValue() instanceof LogicOpsType) {
                     SpatialQuery sq = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
-                    response.append(sq.getQuery());
-                    spatialFilter = sq.getSpatialFilter();
+                    queryBuilder.append(sq.getQuery());
+                    filters.add(sq.getSpatialFilter());
                     
                 } else if (jb.getValue() instanceof ComparisonOpsType) {
                     
-                    response.append(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
+                    queryBuilder.append(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
                 
                 } else if (jb.getValue() instanceof SpatialOpsType) {
-                    
-                   spatialFilter = treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb); 
+                   
+                   //for the spatial filter we don't need to write into the lucene query 
+                   filters.add(treatSpatialOperator((JAXBElement<? extends SpatialOpsType>)jb));
+                   writeOperator = false;
                     
                 } else {
                     
                     throw new IllegalArgumentException("unknow BinaryLogicalOp:" + jb.getValue().getClass().getSimpleName()); 
                 }
                 
-                response.append(" ").append(operator.toUpperCase()).append(" ");
+                if (writeOperator) {
+                    queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
+                } else {
+                    writeOperator = true;
+                }
             }
           
-          // we remove the last Operator and add a ') ' 
-          response.delete(response.length()- (operator.length() + 2), response.length());
-          response.append(')');
+          // we remove the last Operator and add a ') '
+          int pos = queryBuilder.length()- (operator.length() + 2);
+          if (pos > 0)
+            queryBuilder.delete(queryBuilder.length()- (operator.length() + 2), queryBuilder.length());
+          
+          queryBuilder.append(')');
                 
         } else if (logicOps instanceof UnaryLogicOpType) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
         
-        return new SpatialQuery(response.toString(), spatialFilter);
+        Filter spatialFilter = null;
+        if (filters.size() == 1) {
+            spatialFilter = filters.get(0);
+        
+        } else if (filters.size() > 1) {
+            int ftype = 0;
+            if (operator.equals("And"))
+                ftype = SerialChainFilter.AND;
+            else if (operator.equals("Or"))
+                ftype = SerialChainFilter.OR;
+            else if (operator.equals("Xor"))
+                ftype = SerialChainFilter.XOR;
+            else if (operator.equals("Not"))
+                ftype = SerialChainFilter.NOT;
+            
+            int filterType[] = new int[filters.size() - 1];
+            for (int i = 0; i < filterType.length; i++) {
+                filterType[i] = ftype;
+            }
+            spatialFilter = new SerialChainFilter(filters, filterType);
+        }
+        
+        return new SpatialQuery(queryBuilder.toString(), spatialFilter);
     }
     
     /**
@@ -236,7 +272,7 @@ public class FilterParser {
      * @return
      * @throws net.seagis.coverage.web.WebServiceException
      */
-    private String treatComparisonOperator(JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws WebServiceException {
+    private String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws WebServiceException {
         StringBuilder response = new StringBuilder();
         
         ComparisonOpsType comparisonOps = JBComparisonOps.getValue();
@@ -262,7 +298,7 @@ public class FilterParser {
                 brutValue = brutValue.replace(pil.getEscapeChar(),  "\\");
                 
                 // lucene does not accept '*' on first character
-                while (brutValue.charAt(0) == '*') {
+                while (brutValue.charAt(0) == '*' && brutValue.length() != 1) {
                     brutValue = brutValue.substring(1);
                 }
                 response.append(brutValue);
@@ -395,7 +431,7 @@ public class FilterParser {
      * @return
      * @throws net.seagis.coverage.web.WebServiceException
      */
-    private Filter treatSpatialOperator(JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws WebServiceException {
+    private Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws WebServiceException {
         SpatialFilter spatialfilter = null;
         
         SpatialOpsType spatialOps = JBSpatialOps.getValue();
@@ -422,17 +458,20 @@ public class FilterParser {
             //we transform the EnvelopeEntry in GeneralEnvelope
             double min[] = {bbox.getMinX(), bbox.getMinY()};
             double max[] = {bbox.getMaxX(), bbox.getMaxY()};
-            GeneralEnvelope envelope = new GeneralEnvelope(min, max);
             try {
+                GeneralEnvelope envelope = new GeneralEnvelope(min, max);
                 CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
                 envelope.setCoordinateReferenceSystem(crs);
                 spatialfilter = new SpatialFilter(envelope, CRSName, SpatialFilter.BBOX);
                 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new OWSWebServiceException("Unknow Coordinate Reference System: " + bbox.getSRS(),
+                throw new OWSWebServiceException("Unknow Coordinate Reference System: " + CRSName,
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             } catch (FactoryException e) {
                 throw new OWSWebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            } catch (IllegalArgumentException e) {
+                throw new OWSWebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             }
             
@@ -465,16 +504,68 @@ public class FilterParser {
                 throw new OWSWebServiceException("An Binarary spatial operator must specified a propertyName and an envelope.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             }
+            String CRSName = envelope.getSrsName();
+            if (CRSName == null) {
+                throw new OWSWebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
             
-            //TODO
-            throw new UnsupportedOperationException("Not supported yet.");
+            int filterType;
+            if (operator.equals("Intersects")) {
+                filterType = SpatialFilter.INTERSECT;
+            } else if (operator.equals("Touches")) {
+                filterType = SpatialFilter.TOUCHES;
+            } else if (operator.equals("Disjoint")) {
+                filterType = SpatialFilter.DISJOINT;
+            } else if (operator.equals("Crosses")) {
+                filterType = SpatialFilter.CROSSES;
+            } else if (operator.equals("Contains")) {
+                filterType = SpatialFilter.CONTAINS;
+            } else if (operator.equals("Equals")) {
+                filterType = SpatialFilter.EQUALS;
+            } else if (operator.equals("Overlaps")) {
+                filterType = SpatialFilter.OVERLAPS;
+            } else if (operator.equals("Within")) {
+                filterType = SpatialFilter.WITHIN;
+            } else {
+                throw new OWSWebServiceException("Unknow FilterType: " + operator,
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
+            
+            //we transform the EnvelopeEntry in GeneralEnvelope
+            List<Double> lmin = envelope.getLowerCorner().getValue();
+            double min[] = new double[lmin.size()];
+            for (int i = 0; i < min.length; i++)
+                min[i] = lmin.get(i);
+            
+            List<Double> lmax = envelope.getUpperCorner().getValue();
+            double max[] = new double[lmax.size()];
+            for (int i = 0; i < min.length; i++)
+                max[i] = lmax.get(i);
+            
+            try {
+                GeneralEnvelope envelopeF = new GeneralEnvelope(min, max);
+                CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
+                envelopeF.setCoordinateReferenceSystem(crs);
+                spatialfilter = new SpatialFilter(envelopeF, CRSName, filterType);
+                
+            } catch (NoSuchAuthorityCodeException e) {
+                throw new OWSWebServiceException("Unknow Coordinate Reference System: " + CRSName,
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            } catch (FactoryException e) {
+                throw new OWSWebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            } catch (IllegalArgumentException e) {
+                throw new OWSWebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
             
         }
         
         return spatialfilter;
     }
     
-    private String treatIDOperator(List<JAXBElement<? extends AbstractIdType>> JBIdsOps) {
+    private String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> JBIdsOps) {
         StringBuilder response = new StringBuilder();
         
         //TODO
@@ -619,6 +710,14 @@ public class FilterParser {
     
     /**
      * This method returns a number of occurences occ in the string s.
+     * 
+     * example getOccurence( "hello, welcome to hell", "hell") returns 2.
+     * example getOccurence( "hello, welcome to hell", "o")    returns 3. 
+     * 
+     * @param s   A character String.
+     * @param occ A character String.
+     * 
+     * @return The number of occurence of the string occ in the string s.
      */
     private int getOccurence (String s, String occ){
         if (! s.contains(occ))

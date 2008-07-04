@@ -17,6 +17,7 @@ package net.seagis.lucene.Filter;
 import java.io.IOException;
 import java.util.BitSet;
 
+import java.util.List;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Filter;
@@ -38,7 +39,7 @@ import org.apache.lucene.search.Filter;
 public class SerialChainFilter extends Filter {
 
 	
-	private Filter chain[];
+	private List<Filter> chain;
 	public static final int AND       = 1;	     
 	public static final int OR        = 2;   
         public static final int NOT       = 3;
@@ -47,12 +48,12 @@ public class SerialChainFilter extends Filter {
 	
 	private int actionType[];
 	
-	public SerialChainFilter(Filter chain[]){
+	public SerialChainFilter(List<Filter> chain){
 		this.chain      = chain;
 		this.actionType = new int[] {DEFAULT};
 	}
 	
-	public SerialChainFilter(Filter chain[], int actionType[]){
+	public SerialChainFilter(List<Filter> chain, int actionType[]){
 		this.chain      = chain;
 		this.actionType = actionType;
 	}
@@ -63,10 +64,10 @@ public class SerialChainFilter extends Filter {
 	@Override
 	public BitSet bits(IndexReader reader) throws CorruptIndexException, IOException {
 		
-		int chainSize  = chain.length;
+		int chainSize  = chain.size();
 		int actionSize = actionType.length;
 		
-		BitSet bits    = chain[0].bits(reader);
+		BitSet bits    = chain.get(0).bits(reader);
                 
                 //if there is only an operand not we don't enter the loop
                 int j = 0;
@@ -83,7 +84,7 @@ public class SerialChainFilter extends Filter {
                          j++;
                     } else action = DEFAULT;
                     
-                    BitSet nextFilterResponse = chain[i].bits(reader);
+                    BitSet nextFilterResponse = chain.get(i).bits(reader);
                     
                     //if the next operator is NOT we have to process the action before the current operand
                     if (j < actionSize && actionType[j] == NOT) {
@@ -112,10 +113,10 @@ public class SerialChainFilter extends Filter {
 		return bits;
 	}
 
-    /**
+        /**
 	 * @return the chain
 	 */
-	Filter[] getChain() {
+	List<Filter> getChain() {
 		return chain;
 	}
 
@@ -131,19 +132,19 @@ public class SerialChainFilter extends Filter {
      * 
      * @see org.apache.lucene.search.RangeFilter#equals
      */
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SerialChainFilter)) return false;
         SerialChainFilter other = (SerialChainFilter) o;
 
-        if (this.chain.length != other.getChain().length ||
+        if (this.chain.size() != other.getChain().size() ||
         	this.actionType.length != other.getActionType().length)
         	return false;
         
-        for (int i = 0; i < this.chain.length; i++) {
-        	if (this.actionType[i] != other.getActionType()[i]  ||
-        		(!this.chain[i].equals(other.getChain()[i])))
-        		return false;
+        for (int i = 0; i < this.chain.size(); i++) {
+            if (this.actionType[i] != other.getActionType()[i]  || !this.chain.get(i).equals(other.getChain().get(i)))
+                return false;
         }
         return true;
     }
@@ -153,34 +154,36 @@ public class SerialChainFilter extends Filter {
      * 
      * @see org.apache.lucene.search.RangeFilter#hashCode
      */
+    @Override
     public int hashCode() {
-      if (chain.length == 0)
+      if (chain.size() == 0)
     	  return 0;
 
-      int h = chain[0].hashCode() ^ new Integer(actionType[0]).hashCode(); 
-      for (int i = 1; i < this.chain.length; i++) {
-    	  h ^= chain[i].hashCode();
+      int h = chain.get(0).hashCode() ^ new Integer(actionType[0]).hashCode(); 
+      for (int i = 1; i < this.chain.size(); i++) {
+    	  h ^= chain.get(i).hashCode();
     	  h ^= new Integer(actionType[i]).hashCode();
       }
 
       return h;
     }
     
+    @Override
     public String toString() {
     	StringBuffer buf = new StringBuffer();
-    	buf.append("SerialChainFilter(");
-    	for (int i = 0; i < chain.length; i++) {
-    		switch(actionType[i]) {
-			case (AND):
-				buf.append("AND");
-				break;
-			case (OR):
-				buf.append("OR");
-				break;
-			default:
-				buf.append(actionType[i]);
-    		}
-    		buf.append(" " + chain[i].toString() + " ");
+    	buf.append("[SerialChainFilter]");
+    	for (int i = 0; i < chain.size(); i++) {
+            switch(actionType[i]) {
+                case (AND):
+                    buf.append("AND");
+                    break;
+		case (OR):
+                    buf.append("OR");
+                    break;
+		default:
+                    buf.append(actionType[i]);
+            }
+            buf.append(" " + chain.get(i).toString() + " ");
     	}
     	return buf.toString().trim() + ")";
     }

@@ -252,12 +252,12 @@ public class CSWworker {
         ISO_QUERYABLE.put("EastBoundLongitude",     paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLongitude");
-        ISO_QUERYABLE.put("NorthBoundLongitude",     paths);
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude");
+        ISO_QUERYABLE.put("NorthBoundLatitude",     paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLongitude");
-        ISO_QUERYABLE.put("SouthBoundLongitude",     paths);
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude");
+        ISO_QUERYABLE.put("SouthBoundLatitude",     paths);
         
         /*
          * CRS 
@@ -474,14 +474,14 @@ public class CSWworker {
         DUBLIN_CORE_QUERYABLE.put("EastBoundLongitude",     paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLongitude");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude");
         paths.add("Catalog Web Service:Record:BoundingBox:UpperCorner");
-        DUBLIN_CORE_QUERYABLE.put("NorthBoundLongitude",     paths);
+        DUBLIN_CORE_QUERYABLE.put("NorthBoundLatitude",     paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLongitude");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude");
         paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner");
-        DUBLIN_CORE_QUERYABLE.put("SouthBoundLongitude",     paths);
+        DUBLIN_CORE_QUERYABLE.put("SouthBoundLatitude",     paths);
     }
     
     /**
@@ -768,11 +768,11 @@ public class CSWworker {
         
         // build the lucene query from the specified filter
         SpatialQuery luceneQuery = filterParser.getLuceneQuery(query.getConstraint());
-        logger.info("Lucene query=" + luceneQuery.getQuery() + '\n' + "Spatial Filter" + luceneQuery.getSpatialFilter());
+        logger.info("Lucene query=" + luceneQuery.getQuery() + '\n' + "Spatial Filter: " + luceneQuery.getSpatialFilter());
         // we try to execute the query
         List<String> results;
         try {
-            results = index.doSearch(luceneQuery.getQuery(), luceneQuery.getSpatialFilter());
+            results = index.doSearch(luceneQuery);
         
         } catch (CorruptIndexException ex) {
             throw new OWSWebServiceException("The service has throw an CorruptIndex exception. please rebuild the luncene index.",
