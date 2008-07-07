@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.filter.expression.Value;
 import org.opengis.filter.expression.ExpressionVisitor;
 import org.opengis.filter.expression.Literal;
 
@@ -140,9 +139,13 @@ public class LiteralType implements Literal {
        Object literal = null;
        if (content != null && content.size() != 0) {
             literal = content.get(0);
-        }
-       Value v = new Value( literal );
-       return v.value(context);
+       } 
+       
+       if(literal == null || literal.getClass().equals(context))
+            return context.cast( literal );
+       else
+            return null;
+        
     }
 
     /**

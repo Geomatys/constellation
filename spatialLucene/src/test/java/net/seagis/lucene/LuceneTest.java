@@ -1323,7 +1323,9 @@ public class LuceneTest {
         SpatialQuery spatialQuery1 = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.TOUCHES);
         SpatialQuery spatialQuery2 = new SpatialQuery(bbox, "EPSG:4326", SpatialFilter.BBOX);
         
-        Filter filters[]  = {spatialQuery1.getSpatialFilter(), spatialQuery2.getSpatialFilter()};
+        List<Filter> filters  = new ArrayList<Filter>();
+        filters.add(spatialQuery1.getSpatialFilter());
+        filters.add(spatialQuery2.getSpatialFilter());
         int filterType[]  = {SerialChainFilter.OR};
         SerialChainFilter serialFilter = new SerialChainFilter(filters, filterType); 
         
@@ -1380,7 +1382,8 @@ public class LuceneTest {
          */ 
         Line2D line               = new Line2D.Double(7, 40, 6, -40);
         SpatialQuery spatialQuery = new SpatialQuery(line, "EPSG:4326", SpatialFilter.INTERSECT);
-        Filter filters3[]         = {spatialQuery.getSpatialFilter()};
+        List<Filter> filters3     = new ArrayList<Filter>();
+        filters3.add(spatialQuery.getSpatialFilter());
         int filterType3[]         = {SerialChainFilter.NOT};
         serialFilter              = new SerialChainFilter(filters3, filterType3); 
         
@@ -1420,7 +1423,9 @@ public class LuceneTest {
         GeneralEnvelope bbox2  = new GeneralEnvelope(min2, max2);
         bbox2.setCoordinateReferenceSystem(crs);
         SpatialQuery bboxQuery = new SpatialQuery(bbox2, "EPSG:4326", SpatialFilter.BBOX);
-        Filter filters4[]         = {spatialQuery.getSpatialFilter(), bboxQuery.getSpatialFilter()};
+        List<Filter> filters4  = new ArrayList<Filter>();
+        filters4.add(spatialQuery.getSpatialFilter());
+        filters4.add(bboxQuery.getSpatialFilter());
         int filterType4[]         = {SerialChainFilter.AND};
         serialFilter              = new SerialChainFilter(filters4, filterType4); 
         

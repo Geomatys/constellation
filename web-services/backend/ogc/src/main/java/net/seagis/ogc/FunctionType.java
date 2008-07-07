@@ -17,7 +17,6 @@
 package net.seagis.ogc;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
@@ -29,7 +28,6 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.coverage.web.ExpressionType;
-import org.opengis.filter.capability.FunctionName;
 import org.opengis.filter.capability.Functions;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.ExpressionVisitor;
@@ -127,6 +125,10 @@ public class FunctionType extends ExpressionType implements Function {
      */
     public String getName() {
         return name;
+    }
+    
+    public LiteralType getFallbackValue() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public Object evaluate(Object object) {
