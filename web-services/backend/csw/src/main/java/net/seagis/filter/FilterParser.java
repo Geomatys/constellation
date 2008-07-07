@@ -18,7 +18,6 @@ package net.seagis.filter;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +111,7 @@ public class FilterParser {
                 /*
                  * here we put a temporary patch consisting in using the geotools filterFactory implementation
                  * instead of our own implementation.
-                 * The we unmarshaller the xml to get a seagis Filter object.
+                 * Then we unmarshaller the xml to get a seagis Filter object.
                  *
                  *
                  * File f = File.createTempFile("CQL", "query");
@@ -159,27 +158,27 @@ public class FilterParser {
      */
     public SpatialQuery getLuceneQuery(final FilterType filter) throws WebServiceException {
         
-        StringBuilder query  = new StringBuilder("");
-        Filter spatialFilter = null;    
+        SpatialQuery response = null;
+        //for ambigous purpose
+        Filter nullFilter     = null;
+        
         // we treat logical Operators like AND, OR, ...
         if (filter.getLogicOps() != null) {
-            SpatialQuery sq = treatLogicalOperator(filter.getLogicOps());
-            query.append(sq.getQuery());
-            spatialFilter = sq.getSpatialFilter();
+            response = treatLogicalOperator(filter.getLogicOps());
             
         // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
         } else if (filter.getComparisonOps() != null) {
-            query.append(treatComparisonOperator(filter.getComparisonOps()));
+            response = new SpatialQuery(treatComparisonOperator(filter.getComparisonOps()), nullFilter, SerialChainFilter.AND);
                 
         // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
         } else if (filter.getSpatialOps() != null) {
-            spatialFilter = treatSpatialOperator(filter.getSpatialOps());
+            response = new SpatialQuery("", treatSpatialOperator(filter.getSpatialOps()), SerialChainFilter.AND);
                 
         } else if (filter.getId() != null) {
-            query.append(treatIDOperator(filter.getId()));
+            response = new SpatialQuery(treatIDOperator(filter.getId()), nullFilter, SerialChainFilter.AND);
         }  
         
-        return new SpatialQuery(query.toString(), spatialFilter);
+        return response;
     }
     
     /**
@@ -190,10 +189,11 @@ public class FilterParser {
      * @throws net.seagis.coverage.web.WebServiceException
      */
     private SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws WebServiceException {
-        StringBuilder queryBuilder = new StringBuilder();
-        LogicOpsType logicOps      = JBlogicOps.getValue();
-        String operator            = JBlogicOps.getName().getLocalPart();
-        List<Filter> filters       = new ArrayList<Filter>();
+        List<SpatialQuery> subQueries = new ArrayList<SpatialQuery>();
+        StringBuilder queryBuilder    = new StringBuilder();
+        LogicOpsType logicOps         = JBlogicOps.getValue();
+        String operator               = JBlogicOps.getName().getLocalPart();
+        List<Filter> filters          = new ArrayList<Filter>();
         
         if (logicOps instanceof BinaryLogicOpType) {
             BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
@@ -202,15 +202,32 @@ public class FilterParser {
                 
                 boolean writeOperator = true;
                 
+                // we treat logical Operators like AND, OR, ...
                 if (jb.getValue() instanceof LogicOpsType) {
-                    SpatialQuery sq = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
-                    queryBuilder.append(sq.getQuery());
-                    filters.add(sq.getSpatialFilter());
+                    SpatialQuery sq  = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
+                    String subQuery  = sq.getQuery();
+                    Filter subFilter = sq.getSpatialFilter();
                     
+                    if (sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null) {
+                        subQueries.add(sq);
+                         writeOperator = false;
+                    } else {
+                        
+                        if (subQuery.equals("()")) {
+                            writeOperator = false;
+                        } else  {
+                            queryBuilder.append(subQuery);
+                        }
+                        if (subFilter != null)
+                            filters.add(sq.getSpatialFilter());
+                    }
+                
+                // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...        
                 } else if (jb.getValue() instanceof ComparisonOpsType) {
                     
                     queryBuilder.append(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
                 
+                // we treat spatial constraint : BBOX, Beyond, Overlaps, ...        
                 } else if (jb.getValue() instanceof SpatialOpsType) {
                    
                    //for the spatial filter we don't need to write into the lucene query 
@@ -240,29 +257,24 @@ public class FilterParser {
             throw new UnsupportedOperationException("Not supported yet.");
         }
         
+        int logicalOperand = SerialChainFilter.valueOf(operator);
+        
         Filter spatialFilter = null;
         if (filters.size() == 1) {
             spatialFilter = filters.get(0);
         
         } else if (filters.size() > 1) {
-            int ftype = 0;
-            if (operator.equals("And"))
-                ftype = SerialChainFilter.AND;
-            else if (operator.equals("Or"))
-                ftype = SerialChainFilter.OR;
-            else if (operator.equals("Xor"))
-                ftype = SerialChainFilter.XOR;
-            else if (operator.equals("Not"))
-                ftype = SerialChainFilter.NOT;
             
             int filterType[] = new int[filters.size() - 1];
             for (int i = 0; i < filterType.length; i++) {
-                filterType[i] = ftype;
+                filterType[i] = logicalOperand;
             }
             spatialFilter = new SerialChainFilter(filters, filterType);
         }
         
-        return new SpatialQuery(queryBuilder.toString(), spatialFilter);
+        SpatialQuery response = new SpatialQuery(queryBuilder.toString(), spatialFilter, logicalOperand);
+        response.setSubQueries(subQueries);
+        return response;
     }
     
     /**
@@ -297,10 +309,6 @@ public class FilterParser {
                 brutValue = brutValue.replace(pil.getSingleChar(),  "?");
                 brutValue = brutValue.replace(pil.getEscapeChar(),  "\\");
                 
-                // lucene does not accept '*' on first character
-                while (brutValue.charAt(0) == '*' && brutValue.length() != 1) {
-                    brutValue = brutValue.substring(1);
-                }
                 response.append(brutValue);
                 
             } else {

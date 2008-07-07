@@ -16,6 +16,8 @@
 
 package net.seagis.lucene.Filter;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.lucene.search.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -36,6 +38,17 @@ public class SpatialQuery {
      * The lucene query
      */
     private StringBuilder query;
+    
+    /**
+     * Logical operator to apply between the spatial filter and the query
+     * default operator is AND.
+     */
+    private int logicalOperator = SerialChainFilter.AND;
+    
+    /**
+     * A list of sub-queries with have to be executed separely.
+     */
+    private List<SpatialQuery> subQueries;
    
     
     /**
@@ -53,6 +66,7 @@ public class SpatialQuery {
         
         spatialFilter = new SpatialFilter(geometry, crsName, filterType);
         query         = new StringBuilder();
+        subQueries    = new ArrayList<SpatialQuery>();
     }
     
     /**
@@ -70,18 +84,23 @@ public class SpatialQuery {
      */
     public SpatialQuery(Object geometry, String crsName, int filterType, double distance, String units) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
         
-        this.spatialFilter = new SpatialFilter(geometry, crsName, filterType, distance, units);
+        spatialFilter = new SpatialFilter(geometry, crsName, filterType, distance, units);
         query         = new StringBuilder();
+        subQueries    = new ArrayList<SpatialQuery>();
     }
     
     /**
+     * Build a new Query combinating a lucene query and a lucene filter.
      * 
-     * @param query
-     * @param filter
+     * @param query  A well-formed Lucene query. 
+     * @param filter A lucene filter (spatial, serialChain, ...)
+     * @pram  logicalOperator The logical operator to apply between the query and the spatialFilter.
      */
-    public SpatialQuery(String query, Filter filter) {
-        this.query    = new StringBuilder(query);
-        spatialFilter = filter;
+    public SpatialQuery(String query, Filter filter, int logicalOperator) {
+        this.query           = new StringBuilder(query);
+        spatialFilter        = filter;
+        this.logicalOperator = logicalOperator;
+        subQueries           = new ArrayList<SpatialQuery>();
     }
     
     
@@ -98,26 +117,84 @@ public class SpatialQuery {
      * Return the lucene query associated with the filter. 
      */
     public String getQuery() {
-        if (query ==null)
+        if (query == null)
             return "";
         
         return query.toString();
     }
     
     /**
-     * set the lucene query associated with the filter. 
+     * Return the logical operator to apply between the query and the filter. 
+     */
+    public int getLogicalOperator() {
+        return logicalOperator;
+    }
+    
+    /**
+     * Return the subQueries joined to this query. 
+     */
+    public List<SpatialQuery> getSubQueries() {
+        return subQueries;
+    }
+    
+    /**
+     * Set the sub-queries list.
+     * 
+     * @param subQueries a list of spatial queries.
+     */
+    public void setSubQueries(List<SpatialQuery> subQueries) {
+        this.subQueries = subQueries;
+    }
+    
+    /**
+     * Add a new spatial query to the list of sub-queries
+     *
+     * @param sq a spatial query.
+     */
+    public void addSubQuery(SpatialQuery sq) {
+        subQueries.add(sq);
+    }
+    
+    /**
+     * Set the lucene query associated with the filter. 
      */
     public void setQuery(String query) {
         this.query = new StringBuilder(query);
     }
     
     /**
-     * append a piece of lucene query to the main query.
+     * Append a piece of lucene query to the main query.
      * 
      * @param s a piece of lucene query.
      */
     public void appendToQuery(String s) {
         query.append(s);
+    }
+    
+    /**
+     * Return a String representation of the object. 
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[SpatialQuery]:").append('\n');
+        if (!query.equals(""))
+            s.append('\t').append("query: ").append(query).append('\n');
+        
+        if (spatialFilter != null && !query.equals("")) {
+            s.append(SerialChainFilter.ValueOf(logicalOperator)).append('\n');
+        }
+        
+        if (spatialFilter != null) {
+            s.append('\t').append(spatialFilter).append('\n');
+        }
+        if (subQueries != null && subQueries.size() > 0) {
+            s.append("subqueries:").append('\n');
+            int i = 0;
+            for (SpatialQuery sq: subQueries) {
+                s.append("sub ").append(i).append(':').append(sq);
+            }
+        }
+        return s.toString();
     }
 
 }

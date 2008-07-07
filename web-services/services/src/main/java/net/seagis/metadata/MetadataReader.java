@@ -565,11 +565,11 @@ public class MetadataReader {
             //if the value is a link
             } else if (value instanceof LinkedValue) {
                 LinkedValue lv = (LinkedValue) value;
-                Object tempobj = null;// TODO uncomment when succed deploying mdweb jar alreadyRead.get(lv.getLinkedValue());
+                Object tempobj = alreadyRead.get(lv.getLinkedValue());
                 if (tempobj != null) {
                     return tempobj;
                 } else {
-                    //logger.severe("the linked object is not already read: " + lv.getLinkedValue().getIdValue());
+                    logger.severe("the linked object is not already read: " + lv.getLinkedValue().getIdValue());
                     return null;
                 }
                 

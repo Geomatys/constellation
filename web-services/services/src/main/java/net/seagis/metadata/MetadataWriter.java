@@ -247,8 +247,7 @@ public class MetadataWriter {
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
             
-            // TODO uncomment when succed deploying MDWEB jar 
-            //LinkedValue value = new LinkedValue(path, form, ordinal, form, linkedValue, classe, parentValue);
+            LinkedValue value = new LinkedValue(path, form, ordinal, form, linkedValue, classe, parentValue);
             logger.finer("new LinkedValue: " + path.toString() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
         
         // else we build a Value node.

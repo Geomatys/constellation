@@ -768,7 +768,7 @@ public class CSWworker {
         
         // build the lucene query from the specified filter
         SpatialQuery luceneQuery = filterParser.getLuceneQuery(query.getConstraint());
-        logger.info("Lucene query=" + luceneQuery.getQuery() + '\n' + "Spatial Filter: " + luceneQuery.getSpatialFilter());
+        logger.info("Lucene query obtained:" + luceneQuery);
         // we try to execute the query
         List<String> results;
         try {

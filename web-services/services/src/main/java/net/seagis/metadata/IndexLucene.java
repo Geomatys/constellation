@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 // Lucene dependencies
+import net.seagis.lucene.Filter.SerialChainFilter;
 import net.seagis.lucene.Filter.SpatialQuery;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -237,9 +238,9 @@ public class IndexLucene extends AbstractIndex {
     /**
      * This method proceed a lucene search and returns a list of ID.
      *
-     * @param query   The lucene query string with spatials filters.
+     * @param query The lucene query string with spatials filters.
      * 
-     * @return                A List of id.
+     * @return      A List of id.
      */
     public List<String> doSearch(SpatialQuery spatialQuery) throws CorruptIndexException, IOException, ParseException {
         
@@ -249,21 +250,55 @@ public class IndexLucene extends AbstractIndex {
         Searcher searcher   = new IndexSearcher(ireader);
         String field        = "Title";
         QueryParser parser  = new QueryParser(field, analyzer);
+        if (spatialQuery.getQuery().indexOf(":*") != -1)
+            parser.setAllowLeadingWildcard(true);
         
-        Query query = parser.parse(spatialQuery.getQuery());
-        Filter f    = spatialQuery.getSpatialFilter();
+        Query query  = parser.parse(spatialQuery.getQuery());
+        Filter f     = spatialQuery.getSpatialFilter();
+        int operator = spatialQuery.getLogicalOperator();
         logger.info("Searching for: "    + query.toString(field) + '\n' +
-                    " with the filter: " + f);
+                    SerialChainFilter.ValueOf(operator) + '\n' +
+                    f + '\n');
         
-        Hits hits = searcher.search(query, f);
+        // simple query with an AND
+        if (operator == SerialChainFilter.AND) {
+            Hits hits = searcher.search(query, f);
         
-        logger.info(hits.length() + " total matching documents");
-        
-        for (int i = 0; i < hits.length(); i ++) {
+            for (int i = 0; i < hits.length(); i ++) {
             
-            Document doc = hits.doc(i);
-            results.add(doc.get("Identifier"));
+                results.add( hits.doc(i).get("Identifier"));
+            }
+        
+        // for a OR with need to perform many request 
+        } else {
+            Hits hits1 = searcher.search(query);
+            Hits hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
+            
+            for (int i = 0; i < hits1.length(); i++) {
+                results.add(hits1.doc(i).get("Identifier"));
+            }
+            
+            for (int i = 0; i < hits2.length(); i++) {
+                String id = hits2.doc(i).get("Identifier");
+                if (!results.contains(id)) {
+                    results.add(id);
+                }
+            }
         }
+        
+        // if we have some subQueries we execute it separely and merge the result
+        if (spatialQuery.getSubQueries().size() > 0) {
+            List<String> subResults =  doSearch(spatialQuery.getSubQueries().get(0));
+            for (String r: results) {
+                if (!subResults.contains(r)) {
+                    results.remove(r);
+                } 
+            }
+        }
+        
+        logger.info(results.size() + " total matching documents");
+        for (String s: results)
+            logger.info(s);
         ireader.close();
         
         return results;

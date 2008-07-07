@@ -38,96 +38,142 @@ import org.apache.lucene.search.Filter;
  */
 public class SerialChainFilter extends Filter {
 
+    private List<Filter> chain;
+    
+    public static final int AND     = 1;	     
+    public static final int OR      = 2;   
+    public static final int NOT     = 3;
+    public static final int XOR     = 4;
+    public static final int DEFAULT = OR;
 	
-	private List<Filter> chain;
-	public static final int AND       = 1;	     
-	public static final int OR        = 2;   
-        public static final int NOT       = 3;
-        public static final int XOR       = 4;
-	public static final int DEFAULT   = OR;
-	
-	private int actionType[];
-	
-	public SerialChainFilter(List<Filter> chain){
-		this.chain      = chain;
-		this.actionType = new int[] {DEFAULT};
-	}
-	
-	public SerialChainFilter(List<Filter> chain, int actionType[]){
-		this.chain      = chain;
-		this.actionType = actionType;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.apache.lucene.search.Filter#bits(org.apache.lucene.index.IndexReader)
-	 */
-	@Override
-	public BitSet bits(IndexReader reader) throws CorruptIndexException, IOException {
-		
-		int chainSize  = chain.size();
-		int actionSize = actionType.length;
-		
-		BitSet bits    = chain.get(0).bits(reader);
-                
-                //if there is only an operand not we don't enter the loop
-                int j = 0;
-                if (actionType[j] == NOT) {
-                    bits.flip(0, reader.maxDoc());
-                    j++;
-                }
-                
-		for( int i = 1; i < chainSize; i++) {
-                        
-                    int action;
-                    if (j < actionSize ) {
-			 action = actionType[j];
-                         j++;
-                    } else action = DEFAULT;
-                    
-                    BitSet nextFilterResponse = chain.get(i).bits(reader);
-                    
-                    //if the next operator is NOT we have to process the action before the current operand
-                    if (j < actionSize && actionType[j] == NOT) {
-                        nextFilterResponse.flip(0, reader.maxDoc());
-                        j++;
-                    }
-                    
-	            switch (action) {
-			
-			case (AND):
-				bits.and(nextFilterResponse);
-				break;
-			case (OR) :
-				bits.or(nextFilterResponse);
-				break;
-                        case (XOR) :
-				bits.xor(nextFilterResponse);
-				break;
-                        default   :
-                                bits.or(nextFilterResponse);
-				break;
-			
-			}
-	
-		}
-		return bits;
-	}
+    private int actionType[];
 
-        /**
-	 * @return the chain
-	 */
-	List<Filter> getChain() {
-		return chain;
-	}
+    public SerialChainFilter(List<Filter> chain) {
+        this.chain      = chain;
+        this.actionType = new int[]{DEFAULT};
+    }
 
-	/**
-	 * @return the actionType
-	 */
-	int[] getActionType() {
-		return actionType;
-	}
+    public SerialChainFilter(List<Filter> chain, int actionType[]) {
+        this.chain      = chain;
+        this.actionType = actionType;
+    }
+	
+	   /* (non-Javadoc)
+     * @see org.apache.lucene.search.Filter#bits(org.apache.lucene.index.IndexReader)
+     */
+    @Override
+    public BitSet bits(IndexReader reader) throws CorruptIndexException, IOException {
 
-	/** 
+        int chainSize  = chain.size();
+        int actionSize = actionType.length;
+
+        BitSet bits    = chain.get(0).bits(reader);
+
+        //if there is only an operand not we don't enter the loop
+        int j = 0;
+        if (actionType[j] == NOT) {
+            bits.flip(0, reader.maxDoc());
+            j++;
+        }
+
+        for (int i = 1; i < chainSize; i++) {
+
+            int action;
+            if (j < actionSize) {
+                action = actionType[j];
+                j++;
+            } else {
+                action = DEFAULT;
+            }
+
+            BitSet nextFilterResponse = chain.get(i).bits(reader);
+
+            //if the next operator is NOT we have to process the action before the current operand
+            if (j < actionSize && actionType[j] == NOT) {
+                nextFilterResponse.flip(0, reader.maxDoc());
+                j++;
+            }
+
+            switch (action) {
+
+                case (AND):
+                    bits.and(nextFilterResponse);
+                    break;
+                case (OR):
+                    bits.or(nextFilterResponse);
+                    break;
+                case (XOR):
+                    bits.xor(nextFilterResponse);
+                    break;
+                default:
+                    bits.or(nextFilterResponse);
+                    break;
+
+            }
+
+        }
+        return bits;
+    }
+
+      /**
+     * @return the chain
+     */
+    public List<Filter> getChain() {
+        return chain;
+    }
+
+    /**
+     * @return the actionType
+     */
+    public int[] getActionType() {
+        return actionType;
+    }
+
+    /**
+     * Return the flag correspounding to the specified filterName.
+     * 
+     * @param filterName A filter name : And, Or, Xor or Not.
+     * 
+     * @return an int flag.
+     */
+    public static int valueOf(final String filterName) {
+
+        if (filterName.equals("And")) {
+            return AND;
+        } else if (filterName.equals("Or")) {
+            return OR;
+        } else if (filterName.equals("Xor")) {
+            return XOR;
+        } else if (filterName.equals("Not")) {
+            return NOT;
+        } else {
+            return DEFAULT;
+        }
+    }
+
+    /**
+     * Return the filterName correspounding to the specified flag.
+     * 
+     * @param flag an int flag.
+     * 
+     * @return A filter name : And, Or, Xor or Not. 
+     */
+    public static String ValueOf(final int flag) {
+        switch (flag) {
+            case (AND):
+                return "AND";
+            case (OR):
+                return "OR";
+            case (NOT):
+                return "NOT";
+            case (XOR):
+                return "XOR";
+            default:
+               return "unknow";
+        }
+    }
+    
+    /** 
      * Returns true if <code>o</code> is equal to this.
      * 
      * @see org.apache.lucene.search.RangeFilter#equals
@@ -171,20 +217,32 @@ public class SerialChainFilter extends Filter {
     @Override
     public String toString() {
     	StringBuffer buf = new StringBuffer();
-    	buf.append("[SerialChainFilter]");
-    	for (int i = 0; i < chain.size(); i++) {
-            switch(actionType[i]) {
-                case (AND):
-                    buf.append("AND");
-                    break;
-		case (OR):
-                    buf.append("OR");
-                    break;
-		default:
-                    buf.append(actionType[i]);
+    	buf.append("[SerialChainFilter]").append('\n');
+        if (chain != null && chain.size() > 0) {
+            buf.append('\t').append(chain.get(0));
+            
+            for (int i = 0; i < actionType.length; i++) {
+                switch(actionType[i]) {
+                    case (AND):
+                        buf.append("AND");
+                        break;
+                    case (OR):
+                        buf.append("OR");
+                        break;
+                    case (NOT):
+                        buf.append("NOT");
+                        break;
+                    case (XOR):
+                        buf.append("XOR");
+                        break;
+                    default:
+                        buf.append(actionType[i]);
+                }
+                buf.append('\n');
+                if (chain.size() > i + 1)
+                    buf.append('\t').append(" " + chain.get(i + 1).toString());
             }
-            buf.append(" " + chain.get(i).toString() + " ");
-    	}
+        }
     	return buf.toString().trim() + ")";
     }
 }
