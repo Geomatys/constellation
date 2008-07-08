@@ -16,21 +16,28 @@
 
 package net.seagis.filter;
 
+// J2SE dependencies
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
+// Seagis dependencies
 import net.seagis.cat.csw.QueryConstraintType;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.gml.v311.EnvelopeEntry;
 import net.seagis.gml.v311.EnvelopeEntry;
+import net.seagis.gml.v311.PointType;
 import net.seagis.lucene.Filter.SerialChainFilter;
 import net.seagis.lucene.Filter.SpatialFilter;
 import net.seagis.lucene.Filter.SpatialQuery;
@@ -51,12 +58,19 @@ import net.seagis.ogc.PropertyNameType;
 import net.seagis.ogc.SpatialOpsType;
 import net.seagis.ogc.UnaryLogicOpType;
 import net.seagis.ows.v100.OWSWebServiceException;
-import org.apache.lucene.search.Filter;
-import org.geotools.filter.text.cql2.CQL;
 import static net.seagis.ows.OWSExceptionCode.*;
+
+// Lucene dependencies
+import org.apache.lucene.search.Filter;
+
+// geotools dependencies
+import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+
+// GeoAPI dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -151,8 +165,9 @@ public class FilterParser {
         }
         return getLuceneQuery(filter);
     }
+    
      /**
-     * Build a lucene request from the specified Filter
+     * Build a lucene request from the specified Filter.
      * 
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
@@ -194,6 +209,8 @@ public class FilterParser {
         LogicOpsType logicOps         = JBlogicOps.getValue();
         String operator               = JBlogicOps.getName().getLocalPart();
         List<Filter> filters          = new ArrayList<Filter>();
+        //for ambigous purpose
+        Filter nullFilter             = null;
         
         if (logicOps instanceof BinaryLogicOpType) {
             BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
@@ -254,7 +271,38 @@ public class FilterParser {
           queryBuilder.append(')');
                 
         } else if (logicOps instanceof UnaryLogicOpType) {
-            throw new UnsupportedOperationException("Not supported yet.");
+            UnaryLogicOpType unary = (UnaryLogicOpType) logicOps;
+                       
+                        
+            // we treat comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
+            if (unary.getComparisonOps() != null) {
+                queryBuilder.append(treatComparisonOperator(unary.getComparisonOps()));
+                
+            // we treat spatial constraint : BBOX, Beyond, Overlaps, ...        
+            } else if (unary.getSpatialOps() != null) {
+                
+                filters.add(treatSpatialOperator(unary.getSpatialOps()));
+                
+                
+             // we treat logical Operators like AND, OR, ...
+            } else if (unary.getLogicOps() != null) {
+                SpatialQuery sq  = treatLogicalOperator(unary.getLogicOps());
+                String subQuery  = sq.getQuery();
+                Filter subFilter = sq.getSpatialFilter();
+                    
+                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null) ||
+                    (sq.getLogicalOperator() == SerialChainFilter.NOT)) {
+                    subQueries.add(sq);
+                    
+                  } else {
+                        
+                        if (!subQuery.equals("()")) {
+                            queryBuilder.append(subQuery);
+                        }
+                        if (subFilter != null)
+                            filters.add(sq.getSpatialFilter());
+                  }
+            }
         }
         
         int logicalOperand = SerialChainFilter.valueOf(operator);
@@ -357,7 +405,7 @@ public class FilterParser {
                 } else if (operator.equals("PropertyIsNotEqualTo")) {
                     
                    response.append("metafile:doc NOT ");
-                   response.append(removePrefix(propertyName)).append(":").append(literal.getStringValue()).append('"');
+                   response.append(removePrefix(propertyName)).append(":\"").append(literal.getStringValue()).append('"');
                 
                 } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
                     if (propertyName.contains("Date") || propertyName.contains("Modified")) {
@@ -485,9 +533,64 @@ public class FilterParser {
             
         } else if (spatialOps instanceof DistanceBufferType) {
             
-            //TODO
-            throw new UnsupportedOperationException("Not supported yet.");
-            
+            DistanceBufferType dist = (DistanceBufferType) spatialOps;
+            double distance         = dist.getDistance();
+            String units            = dist.getDistanceUnits();
+            JAXBElement JBgeom      = dist.getAbstractGeometry();
+            String operator         = JBSpatialOps.getName().getLocalPart();
+            int filterType;
+            if (operator.equals("DWithin"))
+                filterType = SpatialFilter.DWITHIN;
+            else if (operator.equals("Beyond"))
+                filterType = SpatialFilter.BEYOND;
+            else
+                throw new OWSWebServiceException("Unknow DistanceBuffer operator.",
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+           
+            //we verify that all the parameters are specified
+            if (dist.getPropertyName() == null) {
+                 throw new OWSWebServiceException("An distanceBuffer operator must specified the propertyName.",
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
+            if (units == null) {
+                 throw new OWSWebServiceException("An distanceBuffer operator must specified the ditance units.",
+                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
+            if (JBgeom == null || JBgeom.getValue() == null) {
+                 throw new OWSWebServiceException("An distanceBuffer operator must specified a geometric object.",
+                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
+           
+            Object geometry  = JBgeom.getValue(); 
+            String propName  = dist.getPropertyName().getPropertyName();
+            String CRSName   = null;
+           
+            // we transform the gml geometry in treatable geometry
+            try {
+                if (geometry instanceof PointType) {
+                    PointType GMLpoint = (PointType) geometry;
+                    CRSName  = GMLpoint.getSrsName();
+                    geometry = GMLpointToGeneralDirectPosition(GMLpoint);
+                    
+               
+                } else if (geometry instanceof EnvelopeEntry) {
+                    EnvelopeEntry GMLenvelope = (EnvelopeEntry) geometry;
+                    CRSName  = GMLenvelope.getSrsName();
+                    geometry = GMLenvelopeToGeneralEnvelope(GMLenvelope);
+                }
+                spatialfilter = new SpatialFilter(geometry, CRSName, filterType, distance, units);
+               
+            } catch (NoSuchAuthorityCodeException e) {
+                    throw new OWSWebServiceException("Unknow Coordinate Reference System: " + CRSName,
+                                                     INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            } catch (FactoryException e) {
+                    throw new OWSWebServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                                                     INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            } catch (IllegalArgumentException e) {
+                    throw new OWSWebServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                                                      INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
+           
         } else if (spatialOps instanceof BinarySpatialOpType) {
             
             BinarySpatialOpType binSpatial = (BinarySpatialOpType) spatialOps;
@@ -518,43 +621,15 @@ public class FilterParser {
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             }
             
-            int filterType;
-            if (operator.equals("Intersects")) {
-                filterType = SpatialFilter.INTERSECT;
-            } else if (operator.equals("Touches")) {
-                filterType = SpatialFilter.TOUCHES;
-            } else if (operator.equals("Disjoint")) {
-                filterType = SpatialFilter.DISJOINT;
-            } else if (operator.equals("Crosses")) {
-                filterType = SpatialFilter.CROSSES;
-            } else if (operator.equals("Contains")) {
-                filterType = SpatialFilter.CONTAINS;
-            } else if (operator.equals("Equals")) {
-                filterType = SpatialFilter.EQUALS;
-            } else if (operator.equals("Overlaps")) {
-                filterType = SpatialFilter.OVERLAPS;
-            } else if (operator.equals("Within")) {
-                filterType = SpatialFilter.WITHIN;
-            } else {
+            int filterType = SpatialFilter.valueOf(operator);
+            if (filterType == -1) {
                 throw new OWSWebServiceException("Unknow FilterType: " + operator,
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             }
             
             //we transform the EnvelopeEntry in GeneralEnvelope
-            List<Double> lmin = envelope.getLowerCorner().getValue();
-            double min[] = new double[lmin.size()];
-            for (int i = 0; i < min.length; i++)
-                min[i] = lmin.get(i);
-            
-            List<Double> lmax = envelope.getUpperCorner().getValue();
-            double max[] = new double[lmax.size()];
-            for (int i = 0; i < min.length; i++)
-                max[i] = lmax.get(i);
-            
             try {
-                GeneralEnvelope envelopeF = new GeneralEnvelope(min, max);
-                CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
-                envelopeF.setCoordinateReferenceSystem(crs);
+                GeneralEnvelope envelopeF = GMLenvelopeToGeneralEnvelope(envelope);
                 spatialfilter = new SpatialFilter(envelopeF, CRSName, filterType);
                 
             } catch (NoSuchAuthorityCodeException e) {
@@ -739,5 +814,93 @@ public class FilterParser {
             return nbocc;
         }
     }
+    
+    /**
+     * Parses a value as a floating point.
+     *
+     * @throws WebServiceException if the value can't be parsed.
+     */
+    private double parseDouble(String value) throws WebServiceException {
+        value = value.trim();
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException exception) {
+            throw new OWSWebServiceException("The value:" + value + " is not a valid double coordinate.",
+                                              INVALID_PARAMETER_VALUE, "Coordinates", version);
+        }
+    }
+    
+    /**
+     * Transform A GML point into a treatable geometric object : GeneralDirectPosition
+     * 
+     * @param GMLpoint The GML point to transform.
+     * 
+     * @return A GeneralDirectPosition.
+     * 
+     * @throws net.seagis.coverage.web.WebServiceException
+     * @throws org.opengis.referencing.NoSuchAuthorityCodeException
+     * @throws org.opengis.referencing.FactoryException
+     */
+    private GeneralDirectPosition GMLpointToGeneralDirectPosition(PointType GMLpoint) throws WebServiceException, NoSuchAuthorityCodeException, FactoryException {
+        
+        String CRSName = GMLpoint.getSrsName();
 
+        if (CRSName == null) {
+            throw new OWSWebServiceException("A GML point must specify Coordinate Reference System.",
+                    INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+        }
+
+        //we get the coordinate of the point (if they are present)
+        if (GMLpoint.getCoordinates() == null) {
+            throw new OWSWebServiceException("A GML point must specify coordinates.",
+                    INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+        }
+        String coord = GMLpoint.getCoordinates().getValue();
+
+        final StringTokenizer tokens = new StringTokenizer(coord, " ");
+        final double[] coordinates = new double[2];
+        int index = 0;
+        while (tokens.hasMoreTokens()) {
+            final double value = parseDouble(tokens.nextToken());
+            if (index >= coordinates.length) {
+                throw new OWSWebServiceException("This service support only 2D point.",
+                        INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+            }
+            coordinates[index++] = value;
+        }
+        
+        GeneralDirectPosition point = new GeneralDirectPosition(coordinates);
+        CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
+        point.setCoordinateReferenceSystem(crs);
+        return point;    
+    }
+    
+    /**
+     * Transform A GML envelope into a treatable geometric object : GeneralEnvelope
+     * 
+     * @param GMLenvelope A GML envelope.
+     * 
+     * @return A general Envelope. 
+     * @throws org.opengis.referencing.NoSuchAuthorityCodeException
+     * @throws org.opengis.referencing.FactoryException
+     */
+    public GeneralEnvelope GMLenvelopeToGeneralEnvelope(EnvelopeEntry GMLenvelope) throws NoSuchAuthorityCodeException, FactoryException {
+        String CRSName = GMLenvelope.getSrsName();
+        List<Double> lmin = GMLenvelope.getLowerCorner().getValue();
+        double min[] = new double[lmin.size()];
+        for (int i = 0; i < min.length; i++) {
+            min[i] = lmin.get(i);
+        }
+
+        List<Double> lmax = GMLenvelope.getUpperCorner().getValue();
+        double max[] = new double[lmax.size()];
+        for (int i = 0; i < min.length; i++) {
+            max[i] = lmax.get(i);
+        }
+
+        GeneralEnvelope envelopeF = new GeneralEnvelope(min, max);
+        CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
+        envelopeF.setCoordinateReferenceSystem(crs);
+        return envelopeF;
+    }
 }

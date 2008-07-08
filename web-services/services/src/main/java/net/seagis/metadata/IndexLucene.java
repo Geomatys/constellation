@@ -261,29 +261,49 @@ public class IndexLucene extends AbstractIndex {
                     f + '\n');
         
         // simple query with an AND
-        if (operator == SerialChainFilter.AND) {
+        if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && f == null)) {
             Hits hits = searcher.search(query, f);
         
             for (int i = 0; i < hits.length(); i ++) {
             
-                results.add( hits.doc(i).get("Identifier"));
+                results.add( hits.doc(i).get("id"));
             }
         
-        // for a OR with need to perform many request 
-        } else {
+        // for a OR we need to perform many request 
+        } else if (operator == SerialChainFilter.OR) {
             Hits hits1 = searcher.search(query);
             Hits hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter());
             
             for (int i = 0; i < hits1.length(); i++) {
-                results.add(hits1.doc(i).get("Identifier"));
+                results.add(hits1.doc(i).get("id"));
             }
             
             for (int i = 0; i < hits2.length(); i++) {
-                String id = hits2.doc(i).get("Identifier");
+                String id = hits2.doc(i).get("id");
                 if (!results.contains(id)) {
                     results.add(id);
                 }
             }
+            
+        // for a NOT we need to perform many request 
+        } else if (operator == SerialChainFilter.NOT) {
+            Hits hits1 = searcher.search(query);
+            
+            List<String> unWanteds = new ArrayList<String>();
+            for (int i = 0; i < hits1.length(); i++) {
+                unWanteds.add(hits1.doc(i).get("id"));
+            }
+            
+            Hits hits2 = searcher.search(simpleQuery);
+            for (int i = 0; i < hits2.length(); i++) {
+                String id = hits2.doc(i).get("id");
+                if (!unWanteds.contains(id)) {
+                    results.add(id);
+                }
+            }
+            
+        } else {
+            throw new IllegalArgumentException("unsupported logical Operator");
         }
         
         // if we have some subQueries we execute it separely and merge the result

@@ -100,8 +100,15 @@ public class SpatialFilter extends Filter {
     static {
         supportedUnits = new ArrayList<String>();
         supportedUnits.add("kilometers");
+        supportedUnits.add("km");
         supportedUnits.add("meters");
+        supportedUnits.add("m");
+        supportedUnits.add("centimeters");
+        supportedUnits.add("cm");
+        supportedUnits.add("milimeters");
+        supportedUnits.add("mm");
         supportedUnits.add("miles");
+        supportedUnits.add("mi");
     }
     
     /**
@@ -647,7 +654,7 @@ public class SpatialFilter extends Filter {
      * 
      * @param geometry a geometric object.
      */
-    public double getDistance(Object geometry) {
+    private double getDistance(final Object geometry) {
         if (geometry instanceof GeneralDirectPosition) {
 
             GeneralDirectPosition tempPoint = (GeneralDirectPosition) geometry;
@@ -701,9 +708,31 @@ public class SpatialFilter extends Filter {
     }
     
     /**
+     * Return the current filter type.
+     * 
+     */
+    public int getFilterType() {
+        return filterType;
+    }
+    
+    /**
+     * Return the current geometry object.
+     * 
+     */
+    public Object getGeometry() {
+        if (boundingBox != null)
+            return boundingBox;
+        else if (line != null)
+            return line;
+        else if (point != null)
+            return point;
+        return null;
+    }
+    
+    /**
      * Return a string description of the filter type.
      */
-    public String valueOf(int filterType) {
+    public static String valueOf(final int filterType) {
         switch (filterType) {
             case 0: return "CONTAINS";
             
@@ -718,6 +747,36 @@ public class SpatialFilter extends Filter {
             case 9:  return "TOUCHES";
             case 10: return "OVERLAPS";
             default: return "UNKNOW FILTER TYPE";
+        }
+    }
+    
+    /**
+     * Return The flag corresponding to the specified spatial operator name.
+     * 
+     * @param operator The spatial operator name.
+     * 
+     * @return a flag.
+     */
+    public static int valueOf(final String operator) {
+        
+        if (operator.equalsIgnoreCase("Intersects")) {
+            return SpatialFilter.INTERSECT;
+        } else if (operator.equalsIgnoreCase("Touches")) {
+            return SpatialFilter.TOUCHES;
+        } else if (operator.equalsIgnoreCase("Disjoint")) {
+            return SpatialFilter.DISJOINT;
+        } else if (operator.equalsIgnoreCase("Crosses")) {
+            return SpatialFilter.CROSSES;
+        } else if (operator.equalsIgnoreCase("Contains")) {
+            return SpatialFilter.CONTAINS;
+        } else if (operator.equalsIgnoreCase("Equals")) {
+            return SpatialFilter.EQUALS;
+        } else if (operator.equalsIgnoreCase("Overlaps")) {
+            return SpatialFilter.OVERLAPS;
+        } else if (operator.equalsIgnoreCase("Within")) {
+            return SpatialFilter.WITHIN;
+        } else {
+            return -1;
         }
     }
     

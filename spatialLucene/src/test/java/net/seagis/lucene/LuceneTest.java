@@ -16,12 +16,11 @@
 
 package net.seagis.lucene;
 
-import java.awt.geom.Line2D;
-
 // J2SE dependencies
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.awt.geom.Line2D;
 
 // seagis dependencies
 import net.seagis.lucene.Filter.SerialChainFilter;
@@ -56,8 +55,9 @@ import static org.junit.Assert.*;
 
 
 /**
- *
- * @author guilhem
+ * A Test classes testing the different spatial filters.
+ * 
+ * @author Guilhem Legal
  */
 public class LuceneTest {
     

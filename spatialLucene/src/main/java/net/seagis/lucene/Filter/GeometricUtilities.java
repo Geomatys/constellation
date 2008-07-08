@@ -195,12 +195,21 @@ public class GeometricUtilities {
      */
     public static double getOrthodromicDistance(final double x1, final double y1, final double x2, final double y2, final String units) {
         double result = de.orthodromicDistance(y1, x1, y2, x2);
-        if (units.equals("meters"))
+        if (units.equals("meters") || units.equals("m"))
             return result;
-        else if (units.equals("kilometers")) 
+        
+        else if (units.equals("kilometers") || units.equals("km")) 
             return result/1000;
-        else if (units.equals("miles")) 
+        
+        else if (units.equals("centimeters") || units.equals("cm")) 
+            return result * 100;
+        
+        else if (units.equals("milimeters") || units.equals("mm")) 
+            return result * 1000;
+        
+        else if (units.equals("miles") || units.equals("mi"))  
             return (result*0.621371) /1000;
+        
         else
             throw new IllegalArgumentException("unknow distance units");
     }
@@ -542,6 +551,10 @@ public class GeometricUtilities {
         CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName, true);
 
         if (geometry instanceof GeneralEnvelope) {
+            GeneralEnvelope env = (GeneralEnvelope) geometry;
+            if (env.getCoordinateReferenceSystem() == null) {
+                env.setCoordinateReferenceSystem(sourceCRS);
+            }
             return CRS.transform((GeneralEnvelope) geometry, targetCRS);
 
         } else if (geometry instanceof GeneralDirectPosition) {

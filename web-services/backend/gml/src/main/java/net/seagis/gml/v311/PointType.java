@@ -13,21 +13,39 @@ import org.geotools.resources.Utilities;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "PointType", propOrder = {
+@XmlType(propOrder = {
     "pos",
     "coordinates"
 })
-@XmlRootElement(name="PointType")
+@XmlRootElement(name="Point")
 public class PointType extends AbstractGeometricPrimitiveType {
 
     private DirectPositionType pos;
     private CoordinatesType coordinates;
 
+    /**
+     * An empty constructor used by JAXB.
+     */
     public PointType() {}
-            
+    
+    /**
+     * Build a new Point with the specified identifier and DirectPositionType
+     *  
+     * @param id The identifier of the point.
+     * @param pos A direcPosition locating the point.
+     */
     public PointType(String id, DirectPositionType pos) {
         super.setId(id);
         this.pos = pos;
+    }
+    
+    /**
+     * Build a point Type with the specified coordinates.
+     * 
+     * @param coordinates a list of coordinates.
+     */
+    public PointType(CoordinatesType coordinates) {
+        this.coordinates = coordinates;
     }
      
     /**

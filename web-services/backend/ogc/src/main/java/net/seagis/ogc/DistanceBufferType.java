@@ -28,6 +28,8 @@ import net.seagis.gml.v311.AbstractGeometryType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 import net.seagis.gml.v311.ObjectFactory;
+import net.seagis.gml.v311.PointType;
+import net.seagis.gml.v311.PolygonType;
 
 
 /**
@@ -82,8 +84,14 @@ public class DistanceBufferType extends SpatialOpsType {
         this.propertyName = new PropertyNameType(propertyName);
         this.distance     = new DistanceType(distance, unit);
         
-        //TODO gerer en fonction du type
-        this.abstractGeometry = factory.createAbstractGeometry(geometry);
+        //TODO rajouter les autre type possible
+        if (geometry instanceof PointType) {
+            this.abstractGeometry = factory.createPoint((PointType)geometry);
+        } else if (geometry instanceof PolygonType) {
+            this.abstractGeometry = factory.createPolygon((PolygonType)geometry);
+        } else {
+            this.abstractGeometry = factory.createAbstractGeometry(geometry);
+        }
     }
     
     /**
@@ -134,7 +142,8 @@ public class DistanceBufferType extends SpatialOpsType {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(super.toString());
-        s.append("PropertyName=").append(s).append('\n');
+        if (propertyName != null)
+            s.append("PropertyName=").append(propertyName.getContent()).append('\n');
         if (abstractGeometry != null) {
             s.append("abstract Geometry= ").append(abstractGeometry.getValue().toString()).append('\n');
         } else {

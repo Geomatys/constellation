@@ -90,6 +90,8 @@ public class FilterType implements Filter {
      * build a new FilterType with the specified logical operator
      */
     public FilterType(Object obj) {
+        
+        // comparison operator
         if (obj instanceof PropertyIsLessThanOrEqualToType) {
             this.comparisonOps = (factory.createPropertyIsLessThanOrEqualTo((PropertyIsLessThanOrEqualToType) obj));
         } else if (obj instanceof PropertyIsLessThanType) {
@@ -102,12 +104,6 @@ public class FilterType implements Filter {
             this.comparisonOps = (factory.createPropertyIsGreaterThan((PropertyIsGreaterThanType) obj));
         } else if (obj instanceof PropertyIsEqualToType) {
             this.comparisonOps = (factory.createPropertyIsEqualTo((PropertyIsEqualToType) obj));
-        } else if (obj instanceof OrType) {
-            this.logicOps = (factory.createOr((OrType) obj));
-        } else if (obj instanceof NotType) {
-            this.logicOps = (factory.createNot((NotType) obj));
-        } else if (obj instanceof AndType) {
-            this.logicOps = (factory.createAnd((AndType) obj));
         } else if (obj instanceof PropertyIsNullType) {
             this.comparisonOps =  (factory.createPropertyIsNull((PropertyIsNullType) obj));
         } else if (obj instanceof PropertyIsBetweenType) {
@@ -116,10 +112,43 @@ public class FilterType implements Filter {
             this.comparisonOps = (factory.createPropertyIsLike((PropertyIsLikeType) obj));
         } else if (obj instanceof ComparisonOpsType) {
             this.comparisonOps = (factory.createComparisonOps((ComparisonOpsType) obj));
-        } else if (obj instanceof SpatialOpsType) {
-            this.spatialOps = (factory.createSpatialOps((SpatialOpsType) obj));
+            
+        // logical operator    
+        } else if (obj instanceof OrType) {
+            this.logicOps = (factory.createOr((OrType) obj));
+        } else if (obj instanceof NotType) {
+            this.logicOps = (factory.createNot((NotType) obj));
+        } else if (obj instanceof AndType) {
+            this.logicOps = (factory.createAnd((AndType) obj));
         } else if (obj instanceof LogicOpsType) {
             this.logicOps = (factory.createLogicOps((LogicOpsType) obj));
+            
+        // spatial operator    
+        } else if (obj instanceof BeyondType) {
+            this.spatialOps = factory.createBeyond((DistanceBufferType)obj);
+        } else if (obj instanceof DWithinType) {
+            this.spatialOps = factory.createDWithin((DistanceBufferType)obj);
+        } else if (obj instanceof BBOXType) {
+            this.spatialOps = factory.createBBOX((BBOXType)obj);
+        } else if (obj instanceof ContainsType) {
+            this.spatialOps = factory.createContains((BinarySpatialOpType)obj);  
+        } else if (obj instanceof CrossesType) {
+            this.spatialOps = factory.createCrosses((BinarySpatialOpType)obj);
+        } else if (obj instanceof DisjointType) {
+            this.spatialOps = factory.createDisjoint((BinarySpatialOpType)obj);
+        } else if (obj instanceof EqualsType) {
+            this.spatialOps = factory.createEquals((BinarySpatialOpType)obj);
+        } else if (obj instanceof IntersectsType) {
+            this.spatialOps = factory.createIntersects((BinarySpatialOpType)obj);
+        } else if (obj instanceof OverlapsType) {
+            this.spatialOps = factory.createOverlaps((BinarySpatialOpType)obj);
+        } else if (obj instanceof TouchesType) {
+            this.spatialOps = factory.createTouches((BinarySpatialOpType)obj); 
+        } else if (obj instanceof WithinType) {
+            this.spatialOps = factory.createWithin((BinarySpatialOpType)obj);    
+        } else if (obj instanceof SpatialOpsType) {
+            this.spatialOps = (factory.createSpatialOps((SpatialOpsType) obj));
+        
         } else {
             throw new IllegalArgumentException("This kind of object is not allowed:" + obj.getClass().getSimpleName());
         }
@@ -159,7 +188,7 @@ public class FilterType implements Filter {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("class:").append(this.getClass().getSimpleName()).append('\n');
+        StringBuilder s = new StringBuilder("[").append(this.getClass().getSimpleName()).append(']').append('\n');
         if (spatialOps != null) {
             s.append("SpatialOps: ").append(spatialOps.getValue().toString()).append('\n');
         }
