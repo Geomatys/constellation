@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.v311.AbstractGeometryType;
+import net.seagis.gml.v311.PointType;
+import net.seagis.gml.v311.PolygonType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.expression.Expression;
 
@@ -93,8 +95,13 @@ public class BinarySpatialOpType extends SpatialOpsType {
     public BinarySpatialOpType(String propertyName, AbstractGeometryType geometry) {
         rest = new ArrayList<JAXBElement<?>>();
         rest.add(ogcFactory.createPropertyName(new PropertyNameType(propertyName)));
-        //TODO specialize
-        rest.add(gmlFactory.createAbstractGeometry(geometry));
+        if (geometry instanceof PointType) {
+            rest.add(gmlFactory.createPoint((PointType)geometry));
+        } else if (geometry instanceof PolygonType) {
+            rest.add(gmlFactory.createPolygon((PolygonType)geometry));
+        } else {
+            rest.add(gmlFactory.createGeometry(geometry));
+        }
         
     }
     

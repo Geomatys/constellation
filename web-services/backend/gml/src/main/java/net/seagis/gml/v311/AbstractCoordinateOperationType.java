@@ -76,7 +76,7 @@ public abstract class AbstractCoordinateOperationType extends AbstractCoordinate
     private String operationVersion;
     private ExtentType validArea;
     private String scope;
-    @XmlElementRef(name = "_positionalAccuracy", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractpositionalAccuracy", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     private List<JAXBElement<? extends AbstractPositionalAccuracyType>> positionalAccuracy;
     private CRSRefType sourceCRS;
     private CRSRefType targetCRS;

@@ -177,9 +177,15 @@ public class SpatialQuery {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[SpatialQuery]:").append('\n');
-        if (!query.equals(""))
-            s.append('\t').append("query: ").append(query).append('\n');
         
+        
+        if (spatialFilter == null && !query.equals("") && logicalOperator == SerialChainFilter.NOT) {
+            s.append("query: NOT <").append(query).append(">").append('\n');
+            
+        } else if (!query.equals("")) {
+            s.append('\t').append("query: ").append(query).append('\n');
+        }
+            
         if (spatialFilter != null && !query.equals("")) {
             s.append(SerialChainFilter.ValueOf(logicalOperator)).append('\n');
         }
@@ -192,6 +198,7 @@ public class SpatialQuery {
             int i = 0;
             for (SpatialQuery sq: subQueries) {
                 s.append("sub ").append(i).append(':').append(sq);
+                i++;
             }
         }
         return s.toString();

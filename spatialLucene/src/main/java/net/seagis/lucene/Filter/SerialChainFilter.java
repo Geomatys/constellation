@@ -218,8 +218,12 @@ public class SerialChainFilter extends Filter {
     public String toString() {
     	StringBuffer buf = new StringBuffer();
     	buf.append("[SerialChainFilter]").append('\n');
-        if (chain != null && chain.size() > 0) {
+        if (chain != null && chain.size() == 1) {
+            buf.append("NOT ").append('\n');
             buf.append('\t').append(chain.get(0));
+            
+        } else if (chain != null && chain.size() > 0) {
+            buf.append('\t').append(chain.get(0)).append('\n');
             
             for (int i = 0; i < actionType.length; i++) {
                 switch(actionType[i]) {
@@ -240,9 +244,10 @@ public class SerialChainFilter extends Filter {
                 }
                 buf.append('\n');
                 if (chain.size() > i + 1)
-                    buf.append('\t').append(" " + chain.get(i + 1).toString());
+                    buf.append('\t').append(" " + chain.get(i + 1).toString()).append('\n');
             }
         }
-    	return buf.toString().trim() + ")";
+        buf.append('\n');
+    	return buf.toString().trim();
     }
 }

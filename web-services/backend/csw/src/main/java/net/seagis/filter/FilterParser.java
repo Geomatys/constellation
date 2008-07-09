@@ -225,18 +225,22 @@ public class FilterParser {
                     String subQuery  = sq.getQuery();
                     Filter subFilter = sq.getSpatialFilter();
                     
-                    if (sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null) {
+                    //if the sub spatial query contains both term search and spatial search we create a subQuery 
+                    if ((subFilter != null && !subQuery.equals("")) 
+                        || sq.getSubQueries().size() != 0 
+                        || (sq.getLogicalOperator() == SerialChainFilter.NOT && sq.getSpatialFilter() == null)) {
+                        
                         subQueries.add(sq);
-                         writeOperator = false;
+                        writeOperator = false;
                     } else {
                         
-                        if (subQuery.equals("()")) {
+                        if (subQuery.equals("")) {
                             writeOperator = false;
                         } else  {
                             queryBuilder.append(subQuery);
                         }
                         if (subFilter != null)
-                            filters.add(sq.getSpatialFilter());
+                            filters.add(subFilter);
                     }
                 
                 // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...        
@@ -290,13 +294,13 @@ public class FilterParser {
                 String subQuery  = sq.getQuery();
                 Filter subFilter = sq.getSpatialFilter();
                     
-                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null) ||
+                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals("")) ||
                     (sq.getLogicalOperator() == SerialChainFilter.NOT)) {
                     subQueries.add(sq);
-                    
+                   
                   } else {
                         
-                        if (!subQuery.equals("()")) {
+                        if (!subQuery.equals("")) {
                             queryBuilder.append(subQuery);
                         }
                         if (subFilter != null)
@@ -309,7 +313,13 @@ public class FilterParser {
         
         Filter spatialFilter = null;
         if (filters.size() == 1) {
-            spatialFilter = filters.get(0);
+            
+            if (logicalOperand == SerialChainFilter.NOT) {
+                int filterType[] = {SerialChainFilter.NOT};
+                spatialFilter = new SerialChainFilter(filters, filterType);
+            } else {
+                spatialFilter = filters.get(0);
+            }
         
         } else if (filters.size() > 1) {
             
@@ -319,8 +329,11 @@ public class FilterParser {
             }
             spatialFilter = new SerialChainFilter(filters, filterType);
         }
-        
-        SpatialQuery response = new SpatialQuery(queryBuilder.toString(), spatialFilter, logicalOperand);
+        String query = queryBuilder.toString();
+        if (query.equals("()"))
+            query = "";
+            
+        SpatialQuery response = new SpatialQuery(query, spatialFilter, logicalOperand);
         response.setSubQueries(subQueries);
         return response;
     }
@@ -515,7 +528,7 @@ public class FilterParser {
             double min[] = {bbox.getMinX(), bbox.getMinY()};
             double max[] = {bbox.getMaxX(), bbox.getMaxY()};
             try {
-                GeneralEnvelope envelope = new GeneralEnvelope(min, max);
+                GeneralEnvelope envelope      = new GeneralEnvelope(min, max);
                 CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
                 envelope.setCoordinateReferenceSystem(crs);
                 spatialfilter = new SpatialFilter(envelope, CRSName, SpatialFilter.BBOX);
@@ -596,28 +609,25 @@ public class FilterParser {
             BinarySpatialOpType binSpatial = (BinarySpatialOpType) spatialOps;
             List<JAXBElement<?>> objects   = binSpatial.getRest();
             
-            String propertyName    = null;
-            String operator        = JBSpatialOps.getName().getLocalPart();
-            EnvelopeEntry envelope = null;
+            String propertyName = null;
+            String operator     = JBSpatialOps.getName().getLocalPart();
+            Object geometry     = null;
             
             for (JAXBElement<?> jb: objects) {
                 if (jb.getValue() instanceof PropertyNameType) {
                     PropertyNameType p = (PropertyNameType) jb.getValue();
                     propertyName = p.getContent();
                 } else if (jb.getValue() instanceof EnvelopeEntry) {
-                    envelope     = (EnvelopeEntry) jb.getValue();
+                    geometry     = (EnvelopeEntry) jb.getValue();
+                } else if (jb.getValue() instanceof PointType) {
+                    geometry     = (PointType) jb.getValue();    
                 } else {
                     throw new IllegalArgumentException("unknow BinarySpatialOp type:" + jb.getValue().getClass().getSimpleName());
                 }
             }
             
-            if (propertyName == null && envelope == null) {
-                throw new OWSWebServiceException("An Binarary spatial operator must specified a propertyName and an envelope.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint", version);
-            }
-            String CRSName = envelope.getSrsName();
-            if (CRSName == null) {
-                throw new OWSWebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
+            if (propertyName == null && geometry == null) {
+                throw new OWSWebServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             }
             
@@ -627,10 +637,21 @@ public class FilterParser {
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint", version);
             }
             
-            //we transform the EnvelopeEntry in GeneralEnvelope
+            String CRSName = "undefined CRS";
             try {
-                GeneralEnvelope envelopeF = GMLenvelopeToGeneralEnvelope(envelope);
-                spatialfilter = new SpatialFilter(envelopeF, CRSName, filterType);
+                if (geometry instanceof EnvelopeEntry) {
+                    
+                    //we transform the EnvelopeEntry in GeneralEnvelope
+                    EnvelopeEntry GMLenvelope   = (EnvelopeEntry)geometry;
+                    CRSName                     = GMLenvelope.getSrsName();
+                    GeneralEnvelope envelope    = GMLenvelopeToGeneralEnvelope(GMLenvelope);
+                    spatialfilter               = new SpatialFilter(envelope, CRSName, filterType);
+                } else if (geometry instanceof PointType) {
+                    PointType GMLpoint          = (PointType) geometry;
+                    CRSName                     = GMLpoint.getSrsName();
+                    GeneralDirectPosition point = GMLpointToGeneralDirectPosition(GMLpoint);
+                    spatialfilter               = new SpatialFilter(point, CRSName, filterType);
+                }
                 
             } catch (NoSuchAuthorityCodeException e) {
                 throw new OWSWebServiceException("Unknow Coordinate Reference System: " + CRSName,
@@ -884,8 +905,13 @@ public class FilterParser {
      * @throws org.opengis.referencing.NoSuchAuthorityCodeException
      * @throws org.opengis.referencing.FactoryException
      */
-    public GeneralEnvelope GMLenvelopeToGeneralEnvelope(EnvelopeEntry GMLenvelope) throws NoSuchAuthorityCodeException, FactoryException {
+    public GeneralEnvelope GMLenvelopeToGeneralEnvelope(EnvelopeEntry GMLenvelope) throws NoSuchAuthorityCodeException, FactoryException, WebServiceException {
         String CRSName = GMLenvelope.getSrsName();
+        if (CRSName == null) {
+            throw new OWSWebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
+                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+        }
+       
         List<Double> lmin = GMLenvelope.getLowerCorner().getValue();
         double min[] = new double[lmin.size()];
         for (int i = 0; i < min.length; i++) {

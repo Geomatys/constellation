@@ -55,7 +55,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class TimePrimitivePropertyType {
 
-    @XmlElementRef(name = "_TimePrimitive", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractTimePrimitive", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     private JAXBElement<? extends AbstractTimePrimitiveType> timePrimitive;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")

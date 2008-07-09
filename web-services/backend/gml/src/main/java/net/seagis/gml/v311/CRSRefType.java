@@ -45,7 +45,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class CRSRefType {
 
-    @XmlElementRef(name = "_CRS", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractCRS", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     protected JAXBElement<? extends AbstractReferenceSystemType> crs;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")

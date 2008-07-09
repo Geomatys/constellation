@@ -90,7 +90,7 @@ public class DistanceBufferType extends SpatialOpsType {
         } else if (geometry instanceof PolygonType) {
             this.abstractGeometry = factory.createPolygon((PolygonType)geometry);
         } else {
-            this.abstractGeometry = factory.createAbstractGeometry(geometry);
+            this.abstractGeometry = factory.createGeometry(geometry);
         }
     }
     

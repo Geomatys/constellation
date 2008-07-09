@@ -51,6 +51,21 @@ public class CoordinatesType {
     /**
      * build a new coordinate with the specified values.
      * 
+     * @param value   A list of coordinates coma space separated.
+     * @param cs      Symbol used to separate components within a tuple or coordinate string (default="," a comma) 
+     * @param decimal Symbol used for a decimal point (default="." a stop or period)
+     * @param ts      symbol used to separate tuples or coordinate strings (default=" " a space)
+     */
+    public CoordinatesType(String value, String cs, String decimal, String ts) {
+        this.value   = value;
+        this.cs      = cs;
+        this.ts      = ts;
+        this.decimal = decimal;
+    }
+    
+    /**
+     * build a new coordinate with the specified values.
+     * 
      * @param value a list of coordinates coma space separated.
      */
     public CoordinatesType(String value) {
@@ -96,4 +111,16 @@ public class CoordinatesType {
             return ts;
         }
     }
+    
+    /**
+     * Return a String description of the Object. 
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder('[').append(this.getClass().getSimpleName()).append("]:").append('\n');
+        s.append("value:").append(value).append('\n');
+        s.append("ts: ").append(getTs()).append(" cs: ").append(getCs()).append(" decimal: ").append(getDecimal());
+        return s.toString();
+    }
+    
 }
