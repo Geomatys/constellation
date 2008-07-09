@@ -48,6 +48,7 @@ import org.geotools.util.Ranks;
 
 import net.seagis.catalog.Database;
 import net.seagis.catalog.CatalogException;
+import org.geotools.image.io.metadata.Identification;
 
 
 /**
@@ -181,7 +182,7 @@ final class MetadataParser {
         final ImageGeometry geometry = metadata.getGeometry();
         double[] values = geometry.getOrdinates(dimension);
         if (values == null) {
-            final NumberRange range = geometry.getCoordinateRange(dimension);
+            final NumberRange range = geometry.getOrdinateRange(dimension);
             if (range != null) {
                 final NumberRange gridRange = geometry.getGridRange(dimension);
                 if (gridRange != null) {
@@ -344,7 +345,7 @@ final class MetadataParser {
         if (sourceRange == null) {
             return false;
         }
-        final NumberRange targetRange = geometry.getCoordinateRange(targetDim);
+        final NumberRange targetRange = geometry.getOrdinateRange(targetDim);
         if (targetRange == null) {
             return false;
         }
@@ -445,7 +446,8 @@ final class MetadataParser {
             // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
             return 4327; // WGS 84
         }
-        type = referencing.getCoordinateSystem().type;
+        final Identification cs = referencing.getCoordinateSystem();
+        type = (cs == null) ? null : cs.type;
         if (GeographicMetadataFormat.CARTESIAN.equalsIgnoreCase(type)) {
             // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
             return 3395; // World Mercator
