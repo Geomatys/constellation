@@ -1403,7 +1403,6 @@ public class FilterParserTest {
         assertTrue(filter.getSpatialOps()    == null);
         
         spaQuery = filterParser.getLuceneQuery(filter);
-        System.out.println(spaQuery);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "");

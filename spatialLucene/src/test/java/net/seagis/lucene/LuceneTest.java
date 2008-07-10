@@ -2425,13 +2425,13 @@ public class LuceneTest {
         Hits hits = searcher.search(simpleQuery, bboxQuery.getSpatialFilter());
 
         int nbResults = hits.length();
-        logger.info("QnS:BBOX 1 CRS=4326: nb Results: " + nbResults);
+        logger.finer("QnS:BBOX 1 CRS=4326: nb Results: " + nbResults);
         
         List<String> results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
             String name = hits.doc(i).get("name");
             results.add(name);
-            logger.info('\t' + "Name: " +  name);
+            logger.finer('\t' + "Name: " +  name);
         }
         
         //we verify that we obtain the correct results
@@ -2456,13 +2456,13 @@ public class LuceneTest {
         hits = searcher.search(query, bboxQuery.getSpatialFilter());
 
         nbResults = hits.length();
-        logger.info("QnS: title like point* AND BBOX 1: nb Results: " + nbResults);
+        logger.finer("QnS: title like point* AND BBOX 1: nb Results: " + nbResults);
         
         results = new ArrayList<String>();
         for (int i = 0; i < nbResults; i++) {
             String name = hits.doc(i).get("name");
             results.add(name);
-            logger.info('\t' + "Name: " +  name);
+            logger.finer('\t' + "Name: " +  name);
         }
         
         //we verify that we obtain the correct results
@@ -2500,8 +2500,8 @@ public class LuceneTest {
             }
         }
         nbResults = results.size();
-        logger.info("QnS: name like point* OR BBOX 1: nb Results: " + nbResults);
-        logger.info(resultString.toString());
+        logger.finer("QnS: name like point* OR BBOX 1: nb Results: " + nbResults);
+        logger.finer(resultString.toString());
                 
         //we verify that we obtain the correct results
         assertEquals(nbResults, 9);
@@ -2547,8 +2547,8 @@ public class LuceneTest {
             }
         }
         nbResults = results.size();
-        logger.info("QnS: (name like point* AND BBOX 1) OR (name like box* AND INTERSECT line 1): nb Results: " + nbResults);
-        logger.info(resultString.toString());
+        logger.finer("QnS: (name like point* AND BBOX 1) OR (name like box* AND INTERSECT line 1): nb Results: " + nbResults);
+        logger.finer(resultString.toString());
                 
         //we verify that we obtain the correct results
         assertEquals(nbResults, 5);
