@@ -42,13 +42,14 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
- *
+ * A suite of test verifying the transformation of an XML filter into a Lucene Query/filter 
+ * 
  * @author Guilhem Legal
  */
 public class FilterParserTest {
     
     private FilterParser filterParser;
-    private Logger       logger = Logger.getLogger("net.seagis.metadata");
+    private Logger       logger = Logger.getLogger("net.seagis.filter");
     private Unmarshaller filterUnmarshaller;
    
     @BeforeClass
