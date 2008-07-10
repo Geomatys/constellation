@@ -210,15 +210,14 @@ public class Collector extends CommandLine {
          * by the user, in order to begin the process.
          */
         if (path == null) {
-            throw new IllegalArgumentException("The argument -path was not specified.");
+            throw new IllegalArgumentException("The argument --path was not specified.");
         }
         if (variable == null) {
-            throw new IllegalArgumentException("The argument -variable was not specified.");
+            throw new IllegalArgumentException("The argument --variable was not specified.");
         }
         final File ncml = new File(path);
         if (!ncml.exists()) {
-            err.println("Path invalid to NcML file : " + path);
-            System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
+            throw new IllegalArgumentException("The specified ncml file does not exist.");
         }
         final NcmlGridCoverageTable ncmlTable = new NcmlGridCoverageTable(database, format);
         ncmlTable.setCanInsertNewLayers(true);
