@@ -182,9 +182,9 @@ final class MetadataParser {
         final ImageGeometry geometry = metadata.getGeometry();
         double[] values = geometry.getOrdinates(dimension);
         if (values == null) {
-            final NumberRange range = geometry.getOrdinateRange(dimension);
+            final NumberRange<Double> range = geometry.getOrdinateRange(dimension);
             if (range != null) {
-                final NumberRange gridRange = geometry.getGridRange(dimension);
+                final NumberRange<Integer> gridRange = geometry.getGridRange(dimension);
                 if (gridRange != null) {
                     final double  minimum       = range.getMinimum(); // May be negative infinity.
                     final double  maximum       = range.getMaximum(); // May be positive infinity.
@@ -345,7 +345,7 @@ final class MetadataParser {
         if (sourceRange == null) {
             return false;
         }
-        final NumberRange targetRange = geometry.getOrdinateRange(targetDim);
+        final NumberRange<Double> targetRange = geometry.getOrdinateRange(targetDim);
         if (targetRange == null) {
             return false;
         }
