@@ -53,7 +53,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class CoordinateSystemRefType {
 
-    @XmlElementRef(name = "_CoordinateSystem", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
+    @XmlElementRef(name = "AbstractCoordinateSystem", namespace = "http://www.opengis.net/gml", type = JAXBElement.class)
     private JAXBElement<? extends AbstractCoordinateSystemType> coordinateSystem;
     @XmlAttribute(namespace = "http://www.opengis.net/gml")
     @XmlSchemaType(name = "anyURI")

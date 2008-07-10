@@ -621,7 +621,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link EngineeringDatumType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "EngineeringDatum", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_Datum")
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "EngineeringDatum", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractDatum")
     public JAXBElement<EngineeringDatumType> createEngineeringDatum(EngineeringDatumType value) {
         return new JAXBElement<EngineeringDatumType>(_EngineeringDatum_QNAME, EngineeringDatumType.class, null, value);
     }
