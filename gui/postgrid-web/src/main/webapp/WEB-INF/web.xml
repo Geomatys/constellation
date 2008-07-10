@@ -10,6 +10,8 @@
         </init-param>
         <init-param>
           <param-name>com.sun.jersey.config.property.packages</param-name>
+	  <!-- To disable CSW     service remove packageName: net.seagis.metadata.ws.rs-->
+          <!-- To disable WMS/WCS service remove packageName: net.seagis.coverage.ws-->
           <param-value>net.seagis.coverage.ws;net.seagis.metadata.ws.rs</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -20,8 +22,8 @@
     </servlet-mapping>
 
 
-   <!-- Servlet for seagis JSF interface -->
-    <!-- filtres pour tomahawk et sandbox -->
+    <!-- Servlet for seagis JSF interface -->
+    <!-- filters for tomahawk and sandbox -->
     <filter>
         <filter-name>MyFacesExtensionsFilter</filter-name>
         <filter-class>org.apache.myfaces.webapp.filter.ExtensionsFilter</filter-class>

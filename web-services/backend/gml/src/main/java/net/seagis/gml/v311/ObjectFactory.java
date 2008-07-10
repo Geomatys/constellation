@@ -175,7 +175,22 @@ public class ObjectFactory {
     private final static QName _Location_QNAME                  = new QName("http://www.opengis.net/gml", "location");
     private final static QName _UnitDefinition_QNAME            = new QName("http://www.opengis.net/gml", "UnitDefinition");
     private final static QName _UnitOfMeasure_QNAME             = new QName("http://www.opengis.net/gml", "unitOfMeasure");
-     
+    private final static QName _AbstractCurve_QNAME             = new QName("http://www.opengis.net/gml", "AbstractCurve");
+    private final static QName _TimeComplex_QNAME               = new QName("http://www.opengis.net/gml", "AbstractTimeComplex"); 
+    private final static QName _TemporalCRS_QNAME               = new QName("http://www.opengis.net/gml", "TemporalCRS");
+    private final static QName _TemporalCSRef_QNAME             = new QName("http://www.opengis.net/gml", "temporalCSRef");
+    private final static QName _UsesTemporalCS_QNAME            = new QName("http://www.opengis.net/gml", "usesTemporalCS");
+    private final static QName _TemporalCS_QNAME                = new QName("http://www.opengis.net/gml", "TemporalCS");
+    private final static QName _TemporalDatumRef_QNAME          = new QName("http://www.opengis.net/gml", "temporalDatumRef");
+    private final static QName _UsesTemporalDatum_QNAME         = new QName("http://www.opengis.net/gml", "usesTemporalDatum");
+    private final static QName _TemporalDatum_QNAME             = new QName("http://www.opengis.net/gml", "TemporalDatum");
+    private final static QName _CoordinateSystemRef_QNAME       = new QName("http://www.opengis.net/gml", "coordinateSystemRef");
+    private final static QName _UsesCS_QNAME                    = new QName("http://www.opengis.net/gml", "usesCS");
+    private final static QName _EngineeringCRS_QNAME            = new QName("http://www.opengis.net/gml", "EngineeringCRS");
+    private final static QName _EngineeringDatumRef_QNAME       = new QName("http://www.opengis.net/gml", "engineeringDatumRef");
+    private final static QName _UsesEngineeringDatum_QNAME      = new QName("http://www.opengis.net/gml", "usesEngineeringDatum");
+    private final static QName _EngineeringDatum_QNAME          = new QName("http://www.opengis.net/gml", "EngineeringDatum");
+        
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
      * 
@@ -530,6 +545,213 @@ public class ObjectFactory {
         return new UnitOfMeasureType();
     }
 
+    /**
+     * Create an instance of {@link TemporalCRSType }
+     * 
+     */
+    public TemporalCRSType createTemporalCRSType() {
+        return new TemporalCRSType();
+    }
+    
+    /**
+     * Create an instance of {@link TemporalCSRefType }
+     * 
+     */
+    public TemporalCSRefType createTemporalCSRefType() {
+        return new TemporalCSRefType();
+    }
+    
+    /**
+     * Create an instance of {@link TemporalCSType }
+     * 
+     */
+    public TemporalCSType createTemporalCSType() {
+        return new TemporalCSType();
+    }
+    
+    /**
+     * Create an instance of {@link TemporalDatumRefType }
+     * 
+     */
+    public TemporalDatumRefType createTemporalDatumRefType() {
+        return new TemporalDatumRefType();
+    }
+    
+    /**
+     * Create an instance of {@link TemporalDatumType }
+     * 
+     */
+    public TemporalDatumType createTemporalDatumType() {
+        return new TemporalDatumType();
+    }
+    
+    /**
+     * Create an instance of {@link CoordinateSystemRefType }
+     * 
+     */
+    public CoordinateSystemRefType createCoordinateSystemRefType() {
+        return new CoordinateSystemRefType();
+    }
+    
+    /**
+     * Create an instance of {@link EngineeringCRSType }
+     * 
+     */
+    public EngineeringCRSType createEngineeringCRSType() {
+        return new EngineeringCRSType();
+    }
+   
+    /**
+     * Create an instance of {@link EngineeringDatumRefType }
+     * 
+     */
+    public EngineeringDatumRefType createEngineeringDatumRefType() {
+        return new EngineeringDatumRefType();
+    }
+    
+    /**
+     * Create an instance of {@link EngineeringDatumType }
+     * 
+     */
+    public EngineeringDatumType createEngineeringDatumType() {
+        return new EngineeringDatumType();
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link EngineeringDatumType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "EngineeringDatum", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "_Datum")
+    public JAXBElement<EngineeringDatumType> createEngineeringDatum(EngineeringDatumType value) {
+        return new JAXBElement<EngineeringDatumType>(_EngineeringDatum_QNAME, EngineeringDatumType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link EngineeringDatumRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "engineeringDatumRef")
+    public JAXBElement<EngineeringDatumRefType> createEngineeringDatumRef(EngineeringDatumRefType value) {
+        return new JAXBElement<EngineeringDatumRefType>(_EngineeringDatumRef_QNAME, EngineeringDatumRefType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link EngineeringDatumRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "usesEngineeringDatum")
+    public JAXBElement<EngineeringDatumRefType> createUsesEngineeringDatum(EngineeringDatumRefType value) {
+        return new JAXBElement<EngineeringDatumRefType>(_UsesEngineeringDatum_QNAME, EngineeringDatumRefType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link EngineeringCRSType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "EngineeringCRS", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractCoordinateReferenceSystem")
+    public JAXBElement<EngineeringCRSType> createEngineeringCRS(EngineeringCRSType value) {
+        return new JAXBElement<EngineeringCRSType>(_EngineeringCRS_QNAME, EngineeringCRSType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CoordinateSystemRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "coordinateSystemRef")
+    public JAXBElement<CoordinateSystemRefType> createCoordinateSystemRef(CoordinateSystemRefType value) {
+        return new JAXBElement<CoordinateSystemRefType>(_CoordinateSystemRef_QNAME, CoordinateSystemRefType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CoordinateSystemRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "usesCS")
+    public JAXBElement<CoordinateSystemRefType> createUsesCS(CoordinateSystemRefType value) {
+        return new JAXBElement<CoordinateSystemRefType>(_UsesCS_QNAME, CoordinateSystemRefType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TemporalDatumType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "TemporalDatum", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractDatum")
+    public JAXBElement<TemporalDatumType> createTemporalDatum(TemporalDatumType value) {
+        return new JAXBElement<TemporalDatumType>(_TemporalDatum_QNAME, TemporalDatumType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TemporalDatumRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "usesTemporalDatum")
+    public JAXBElement<TemporalDatumRefType> createUsesTemporalDatum(TemporalDatumRefType value) {
+        return new JAXBElement<TemporalDatumRefType>(_UsesTemporalDatum_QNAME, TemporalDatumRefType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TemporalDatumRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "temporalDatumRef")
+    public JAXBElement<TemporalDatumRefType> createTemporalDatumRef(TemporalDatumRefType value) {
+        return new JAXBElement<TemporalDatumRefType>(_TemporalDatumRef_QNAME, TemporalDatumRefType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TemporalCSType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "TemporalCS", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractCoordinateSystem")
+    public JAXBElement<TemporalCSType> createTemporalCS(TemporalCSType value) {
+        return new JAXBElement<TemporalCSType>(_TemporalCS_QNAME, TemporalCSType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TemporalCSRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "usesTemporalCS")
+    public JAXBElement<TemporalCSRefType> createUsesTemporalCS(TemporalCSRefType value) {
+        return new JAXBElement<TemporalCSRefType>(_UsesTemporalCS_QNAME, TemporalCSRefType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TemporalCSRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "temporalCSRef")
+    public JAXBElement<TemporalCSRefType> createTemporalCSRef(TemporalCSRefType value) {
+        return new JAXBElement<TemporalCSRefType>(_TemporalCSRef_QNAME, TemporalCSRefType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TemporalCRSType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "TemporalCRS", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractCoordinateReferenceSystem")
+    public JAXBElement<TemporalCRSType> createTemporalCRS(TemporalCRSType value) {
+        return new JAXBElement<TemporalCRSType>(_TemporalCRS_QNAME, TemporalCRSType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractCurveType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "AbstractCurve", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractGeometricPrimitive")
+    public JAXBElement<AbstractCurveType> createAbstractCurve(AbstractCurveType value) {
+        return new JAXBElement<AbstractCurveType>(_AbstractCurve_QNAME, AbstractCurveType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractTimeComplexType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "AbstractTimeComplex", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractTimeObject")
+    public JAXBElement<AbstractTimeComplexType> createTimeComplex(AbstractTimeComplexType value) {
+        return new JAXBElement<AbstractTimeComplexType>(_TimeComplex_QNAME, AbstractTimeComplexType.class, null, value);
+    }
+    
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link UnitOfMeasureType }{@code >}}
      * 
