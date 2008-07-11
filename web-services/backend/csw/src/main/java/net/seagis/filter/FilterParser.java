@@ -17,6 +17,7 @@
 package net.seagis.filter;
 
 // J2SE dependencies
+import java.awt.geom.Line2D;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +36,10 @@ import javax.xml.bind.Marshaller;
 import net.seagis.cat.csw.QueryConstraintType;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
+import net.seagis.gml.v311.CoordinatesType;
 import net.seagis.gml.v311.EnvelopeEntry;
 import net.seagis.gml.v311.EnvelopeEntry;
+import net.seagis.gml.v311.LineStringType;
 import net.seagis.gml.v311.PointType;
 import net.seagis.lucene.Filter.SerialChainFilter;
 import net.seagis.lucene.Filter.SpatialFilter;
@@ -597,7 +600,11 @@ public class FilterParser {
                     CRSName  = GMLpoint.getSrsName();
                     geometry = GMLpointToGeneralDirectPosition(GMLpoint);
                     
-               
+                } else if (geometry instanceof LineStringType) {
+                    LineStringType GMLline =  (LineStringType) geometry;
+                    CRSName  = GMLline.getSrsName();
+                    geometry = GMLlineToline2d(GMLline);
+                    
                 } else if (geometry instanceof EnvelopeEntry) {
                     EnvelopeEntry GMLenvelope = (EnvelopeEntry) geometry;
                     CRSName  = GMLenvelope.getSrsName();
@@ -626,13 +633,24 @@ public class FilterParser {
             Object geometry     = null;
             
             for (JAXBElement<?> jb: objects) {
+                
+                // the propertyName
                 if (jb.getValue() instanceof PropertyNameType) {
                     PropertyNameType p = (PropertyNameType) jb.getValue();
                     propertyName = p.getContent();
+                
+                // geometric object: envelope    
                 } else if (jb.getValue() instanceof EnvelopeEntry) {
                     geometry     = (EnvelopeEntry) jb.getValue();
+                
+                // geometric object: point
                 } else if (jb.getValue() instanceof PointType) {
-                    geometry     = (PointType) jb.getValue();    
+                    geometry     = (PointType) jb.getValue();
+                 
+                // geometric object: Line    
+                } else if (jb.getValue() instanceof LineStringType) {
+                    geometry     = (LineStringType) jb.getValue();    
+                
                 } else if (jb.getValue() == null) {
                    throw new IllegalArgumentException("null value in BinarySpatialOp type");
                 } else {
@@ -660,11 +678,18 @@ public class FilterParser {
                     CRSName                     = GMLenvelope.getSrsName();
                     GeneralEnvelope envelope    = GMLenvelopeToGeneralEnvelope(GMLenvelope);
                     spatialfilter               = new SpatialFilter(envelope, CRSName, filterType);
+                
                 } else if (geometry instanceof PointType) {
                     PointType GMLpoint          = (PointType) geometry;
                     CRSName                     = GMLpoint.getSrsName();
                     GeneralDirectPosition point = GMLpointToGeneralDirectPosition(GMLpoint);
                     spatialfilter               = new SpatialFilter(point, CRSName, filterType);
+                
+                } else if (geometry instanceof LineStringType) {
+                    LineStringType GMLline =  (LineStringType) geometry;
+                    CRSName                = GMLline.getSrsName();
+                    Line2D line            = GMLlineToline2d(GMLline);
+                    spatialfilter          = new SpatialFilter(line, CRSName, filterType);
                 }
                 
             } catch (NoSuchAuthorityCodeException e) {
@@ -930,7 +955,7 @@ public class FilterParser {
     public GeneralEnvelope GMLenvelopeToGeneralEnvelope(EnvelopeEntry GMLenvelope) throws NoSuchAuthorityCodeException, FactoryException, WebServiceException {
         String CRSName = GMLenvelope.getSrsName();
         if (CRSName == null) {
-            throw new OWSWebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
+            throw new OWSWebServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
         }
        
@@ -950,5 +975,46 @@ public class FilterParser {
         CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
         envelopeF.setCoordinateReferenceSystem(crs);
         return envelopeF;
+    }
+    
+    /**
+     * Transform A GML lineString into a treatable geometric object : Line2D
+     * 
+     * @param GMLlineString A GML lineString.
+     * 
+     * @return A Line2D. 
+     * @throws org.opengis.referencing.NoSuchAuthorityCodeException
+     * @throws org.opengis.referencing.FactoryException
+     */
+    public Line2D GMLlineToline2d(LineStringType GMLline) throws NoSuchAuthorityCodeException, FactoryException, WebServiceException {
+        String CRSName = GMLline.getSrsName();
+        if (CRSName == null) {
+            throw new OWSWebServiceException("A CRS (coordinate Reference system) must be specified for the line.",
+                                             INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+        }
+       
+        CoordinatesType coord = GMLline.getCoordinates();
+        String s = coord.getValue();
+        double X1, X2, Y1, Y2;
+        
+        X1 = Double.parseDouble(s.substring(0, s.indexOf(coord.getCs())));
+        
+        s = s.substring(s.indexOf(coord.getCs()) + 1);
+        
+        Y1 = Double.parseDouble(s.substring(0, s.indexOf(coord.getTs())));
+        
+        s = s.substring(s.indexOf(coord.getTs()) + 1);
+        
+        X2 = Double.parseDouble(s.substring(0, s.indexOf(coord.getCs())));
+        
+        s = s.substring(s.indexOf(coord.getCs()) + 1);
+        
+        Y2 = Double.parseDouble(s);
+
+        Line2D line = new Line2D.Double(X1, Y1, X2, Y2);
+        
+        // TODO CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
+        
+        return line;
     }
 }

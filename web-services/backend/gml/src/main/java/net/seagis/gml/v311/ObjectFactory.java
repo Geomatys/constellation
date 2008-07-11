@@ -1,6 +1,6 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2007, Geomatys
+ * (C) 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -190,6 +190,18 @@ public class ObjectFactory {
     private final static QName _EngineeringDatumRef_QNAME       = new QName("http://www.opengis.net/gml", "engineeringDatumRef");
     private final static QName _UsesEngineeringDatum_QNAME      = new QName("http://www.opengis.net/gml", "usesEngineeringDatum");
     private final static QName _EngineeringDatum_QNAME          = new QName("http://www.opengis.net/gml", "EngineeringDatum");
+    private final static QName _AbstractCurveSegment_QNAME      = new QName("http://www.opengis.net/gml", "AbstractCurveSegment");
+    private final static QName _PosList_QNAME                   = new QName("http://www.opengis.net/gml", "posList");
+    private final static QName _LineStringProperty_QNAME        = new QName("http://www.opengis.net/gml", "lineStringProperty");
+    private final static QName _LineStringMember_QNAME          = new QName("http://www.opengis.net/gml", "lineStringMember");
+    private final static QName _LineStringSegment_QNAME         = new QName("http://www.opengis.net/gml", "LineStringSegment");
+    private final static QName _LineString_QNAME                = new QName("http://www.opengis.net/gml", "LineString");
+    private final static QName _PointRep_QNAME                  = new QName("http://www.opengis.net/gml", "pointRep");
+    private final static QName _PointMember_QNAME               = new QName("http://www.opengis.net/gml", "pointMember");
+    private final static QName _Position_QNAME                  = new QName("http://www.opengis.net/gml", "position");
+    private final static QName _PointProperty_QNAME             = new QName("http://www.opengis.net/gml", "pointProperty");
+    private final static QName _CenterOf_QNAME                  = new QName("http://www.opengis.net/gml", "centerOf");
+    private final static QName _Coord_QNAME                     = new QName("http://www.opengis.net/gml", "coord");
         
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: net.opengis.gml
@@ -615,6 +627,162 @@ public class ObjectFactory {
      */
     public EngineeringDatumType createEngineeringDatumType() {
         return new EngineeringDatumType();
+    }
+    
+    /**
+     * Create an instance of {@link DirectPositionListType }
+     * 
+     */
+    public DirectPositionListType createDirectPositionListType() {
+        return new DirectPositionListType();
+    }
+    
+    /**
+     * Create an instance of {@link LineStringPropertyType }
+     * 
+     */
+    public LineStringPropertyType createLineStringPropertyType() {
+        return new LineStringPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link LineStringSegmentType }
+     * 
+     */
+    public LineStringSegmentType createLineStringSegmentType() {
+        return new LineStringSegmentType();
+    }
+    
+    /**
+     * Create an instance of {@link LineStringType }
+     * 
+     */
+    public LineStringType createLineStringType() {
+        return new LineStringType();
+    }
+    
+    /**
+     * Create an instance of {@link PointPropertyType }
+     * 
+     */
+    public PointPropertyType createPointPropertyType() {
+        return new PointPropertyType();
+    }
+    
+    /**
+     * Create an instance of {@link CoordType }
+     * 
+     */
+    public CoordType createCoordType() {
+        return new CoordType();
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CoordType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "coord")
+    public JAXBElement<CoordType> createCoord(CoordType value) {
+        return new JAXBElement<CoordType>(_Coord_QNAME, CoordType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PointPropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "pointRep")
+    public JAXBElement<PointPropertyType> createPointRep(PointPropertyType value) {
+        return new JAXBElement<PointPropertyType>(_PointRep_QNAME, PointPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PointPropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "pointMember")
+    public JAXBElement<PointPropertyType> createPointMember(PointPropertyType value) {
+        return new JAXBElement<PointPropertyType>(_PointMember_QNAME, PointPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PointPropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "position")
+    public JAXBElement<PointPropertyType> createPosition(PointPropertyType value) {
+        return new JAXBElement<PointPropertyType>(_Position_QNAME, PointPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PointPropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "pointProperty")
+    public JAXBElement<PointPropertyType> createPointProperty(PointPropertyType value) {
+        return new JAXBElement<PointPropertyType>(_PointProperty_QNAME, PointPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PointPropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "centerOf")
+    public JAXBElement<PointPropertyType> createCenterOf(PointPropertyType value) {
+        return new JAXBElement<PointPropertyType>(_CenterOf_QNAME, PointPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LineStringType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "LineString", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractCurve")
+    public JAXBElement<LineStringType> createLineString(LineStringType value) {
+        return new JAXBElement<LineStringType>(_LineString_QNAME, LineStringType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LineStringSegmentType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "LineStringSegment", substitutionHeadNamespace = "http://www.opengis.net/gml", substitutionHeadName = "AbstractCurveSegment")
+    public JAXBElement<LineStringSegmentType> createLineStringSegment(LineStringSegmentType value) {
+        return new JAXBElement<LineStringSegmentType>(_LineStringSegment_QNAME, LineStringSegmentType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LineStringPropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "lineStringProperty")
+    public JAXBElement<LineStringPropertyType> createLineStringProperty(LineStringPropertyType value) {
+        return new JAXBElement<LineStringPropertyType>(_LineStringProperty_QNAME, LineStringPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LineStringPropertyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "lineStringMember")
+    public JAXBElement<LineStringPropertyType> createLineStringMember(LineStringPropertyType value) {
+        return new JAXBElement<LineStringPropertyType>(_LineStringMember_QNAME, LineStringPropertyType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DirectPositionListType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "posList")
+    public JAXBElement<DirectPositionListType> createPosList(DirectPositionListType value) {
+        return new JAXBElement<DirectPositionListType>(_PosList_QNAME, DirectPositionListType.class, null, value);
+    }
+    
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AbstractCurveSegmentType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.opengis.net/gml", name = "AbstractCurveSegment")
+    public JAXBElement<AbstractCurveSegmentType> createAbstractCurveSegment(AbstractCurveSegmentType value) {
+        return new JAXBElement<AbstractCurveSegmentType>(_AbstractCurveSegment_QNAME, AbstractCurveSegmentType.class, null, value);
     }
     
     /**

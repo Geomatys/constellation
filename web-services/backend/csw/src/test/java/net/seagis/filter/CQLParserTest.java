@@ -17,6 +17,7 @@
 package net.seagis.filter;
 
 // J2SE dependencies
+import java.awt.geom.Line2D;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -382,6 +383,28 @@ public class CQLParserTest {
         /**
          * Test 5: a simple Contains filter
          */
+        filter = filterParser.CQLtoFilter("CONTAINS(BoundingBox, LINESTRING(1 2, 10 15))");
+        
+        assertTrue(filter.getComparisonOps() == null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().size()     == 0   );
+        assertTrue(filter.getSpatialOps()    != null);
+        
+        spaQuery = filterParser.getLuceneQuery(filter);
+        
+        assertTrue(spaQuery.getSpatialFilter() != null);
+        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        
+        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
+        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+                
+        assertEquals(spatialFilter.getFilterType(), SpatialFilter.CONTAINS);
+        assertTrue(spatialFilter.getGeometry() instanceof Line2D);
+        
+        /*
+         * Test 6: a simple Contains filter
+         */
         filter = filterParser.CQLtoFilter("CONTAINS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
         assertTrue(filter.getComparisonOps() == null);
@@ -402,7 +425,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
         
          /**
-         * Test 6: a simple Crosses filter
+         * Test 7: a simple Crosses filter
          */
         filter = filterParser.CQLtoFilter("CROSS(BoundingBox, POINT(14.05 46.46))");
         
@@ -424,7 +447,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
         
         /**
-         * Test 7: a simple Crosses filter
+         * Test 8: a simple Crosses filter
          */
         filter = filterParser.CQLtoFilter("CROSS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
@@ -446,7 +469,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
         
         /**
-         * Test 8: a simple Disjoint filter
+         * Test 9: a simple Disjoint filter
          */
         filter = filterParser.CQLtoFilter("DISJOINT(BoundingBox, POINT(14.05 46.46))");
         
@@ -468,7 +491,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
         
         /**
-         * Test 9: a simple Disjoint filter
+         * Test 10: a simple Disjoint filter
          */
         filter = filterParser.CQLtoFilter("DISJOINT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
@@ -490,7 +513,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
         
         /**
-         * Test 10: a simple Equals filter
+         * Test 11: a simple Equals filter
          */
         filter = filterParser.CQLtoFilter("EQUAL(BoundingBox, POINT(14.05 46.46))");
         
@@ -512,7 +535,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
         
         /**
-         * Test 11: a simple Equals filter
+         * Test 12: a simple Equals filter
          */
         filter = filterParser.CQLtoFilter("EQUAL(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
@@ -534,7 +557,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
         
         /**
-         * Test 12: a simple Overlaps filter
+         * Test 13: a simple Overlaps filter
          */
         filter = filterParser.CQLtoFilter("OVERLAP(BoundingBox, POINT(14.05 46.46))");
         
@@ -556,7 +579,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
         
         /**
-         * Test 13: a simple Overlaps filter
+         * Test 14: a simple Overlaps filter
          */
         filter = filterParser.CQLtoFilter("OVERLAP(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
@@ -578,7 +601,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
         
         /**
-         * Test 14: a simple Touches filter
+         * Test 15: a simple Touches filter
          */
         filter = filterParser.CQLtoFilter("TOUCH(BoundingBox, POINT(14.05 46.46))");
         
@@ -600,7 +623,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
         
         /**
-         * Test 15: a simple Touches filter
+         * Test 16: a simple Touches filter
          */
         filter = filterParser.CQLtoFilter("TOUCH(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
@@ -622,7 +645,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
         
         /**
-         * Test 16: a simple Within filter
+         * Test 17: a simple Within filter
          */
         filter = filterParser.CQLtoFilter("WITHIN(BoundingBox, POINT(14.05 46.46))");
         
@@ -644,7 +667,7 @@ public class CQLParserTest {
         assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
         
         /**
-         * Test 17: a simple Within filter
+         * Test 18: a simple Within filter
          */
         filter = filterParser.CQLtoFilter("WITHIN(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         

@@ -17,6 +17,7 @@
 package net.seagis.filter;
 
 // J2SE dependencies
+import java.awt.geom.Line2D;
 import java.io.StringReader;
 import java.util.logging.Logger;
 
@@ -508,6 +509,40 @@ public class FilterParserTest {
                 
         assertEquals(spatialFilter.getFilterType(), SpatialFilter.DWITHIN);
         assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
+        
+        /**
+         * Test 3: a simple spatial Filter Intersects 
+         */
+        XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"          "  +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\">         "  +
+                           "    <ogc:Intersects>                                          "  +
+                           "       <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName> "  +
+                           "           <gml:LineString srsName=\"EPSG:4326\">             "  +
+                           "                <gml:coordinates ts=\" \" decimal=\".\" cs=\",\">1,2 10,15</gml:coordinates>" +
+                           "           </gml:LineString>                                  "  + 
+			   "    </ogc:Intersects>                                         "  +
+                           "</ogc:Filter>";
+        reader = new StringReader(XMLrequest);
+        
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+        
+        assertTrue(filter.getComparisonOps() == null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().size()     == 0   );
+        assertTrue(filter.getSpatialOps()    != null);
+        
+        spaQuery = filterParser.getLuceneQuery(filter);
+        
+        assertTrue(spaQuery.getSpatialFilter() != null);
+        assertEquals(spaQuery.getQuery(), "");
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        
+        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
+        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+                
+        assertEquals(spatialFilter.getFilterType(), SpatialFilter.INTERSECT);
+        assertTrue(spatialFilter.getGeometry() instanceof Line2D);
         
     }
     

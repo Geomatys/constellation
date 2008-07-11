@@ -17,6 +17,7 @@
 package net.seagis.filter;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import java.text.DateFormat;
@@ -28,8 +29,10 @@ import java.util.Set;
 import java.util.logging.Logger;
 import net.seagis.coverage.web.ExpressionType;
 import net.seagis.gml.v311.AbstractGeometryType;
+import net.seagis.gml.v311.CoordinatesType;
 import net.seagis.gml.v311.DirectPositionType;
 import net.seagis.gml.v311.EnvelopeEntry;
+import net.seagis.gml.v311.LineStringType;
 import net.seagis.gml.v311.PointType;
 import net.seagis.ogc.AndType;
 import net.seagis.ogc.ArithmeticOperatorsType;
@@ -637,6 +640,13 @@ public class FilterFactoryImpl implements FilterFactory2 {
             Coordinate[] coord = p.getCoordinates();
             result = new PointType(null, new DirectPositionType(coord[0].x, coord[0].y));
             ((PointType)result).setSrsName("EPSG:4326");
+        
+        } else if (geom instanceof LineString){ 
+            LineString ls = (LineString) geom;
+            Coordinate[] coord = ls.getCoordinates();
+            result = new LineStringType(new CoordinatesType(coord[0].x + "," + coord[0].y + " " + coord[1].x + "," + coord[1].y ));
+            ((LineStringType)result).setSrsName("EPSG:4326");
+            
         } else {
             logger.severe("unable to create GML geometry with: " + geom.getClass().getSimpleName());
         }

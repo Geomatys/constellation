@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.v311.AbstractGeometryType;
 import net.seagis.gml.v311.EnvelopeEntry;
+import net.seagis.gml.v311.LineStringType;
 import net.seagis.gml.v311.PointType;
 import net.seagis.gml.v311.PolygonType;
 import org.opengis.filter.FilterVisitor;
@@ -71,9 +72,9 @@ import org.opengis.filter.expression.Expression;
 public class BinarySpatialOpType extends SpatialOpsType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "Envelope", namespace = "http://www.opengis.net/gml", type = JAXBElement.class),
+        @XmlElementRef(name = "Envelope",         namespace = "http://www.opengis.net/gml", type = JAXBElement.class),
         @XmlElementRef(name = "AbstractGeometry", namespace = "http://www.opengis.net/gml", type = JAXBElement.class),
-        @XmlElementRef(name = "PropertyName", namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
+        @XmlElementRef(name = "PropertyName",     namespace = "http://www.opengis.net/ogc", type = JAXBElement.class)
     })
     private List<JAXBElement<?>> rest;
 
@@ -99,8 +100,13 @@ public class BinarySpatialOpType extends SpatialOpsType {
         
         if (geometry instanceof PointType) {
             rest.add(gmlFactory.createPoint((PointType)geometry));
+        
+        } else if (geometry instanceof LineStringType) {
+            rest.add(gmlFactory.createLineString((LineStringType)geometry));
+        
         } else if (geometry instanceof PolygonType) {
             rest.add(gmlFactory.createPolygon((PolygonType)geometry));
+        
         } else {
             rest.add(gmlFactory.createGeometry(geometry));
         }
@@ -116,10 +122,16 @@ public class BinarySpatialOpType extends SpatialOpsType {
         
         if (geometry instanceof PointType) {
             rest.add(gmlFactory.createPoint((PointType)geometry));
+            
         } else if (geometry instanceof PolygonType) {
             rest.add(gmlFactory.createPolygon((PolygonType)geometry));
+        
+        } else if (geometry instanceof LineStringType) {
+            rest.add(gmlFactory.createLineString((LineStringType)geometry));
+            
         } else if (geometry instanceof EnvelopeEntry) {
             rest.add(gmlFactory.createEnvelope((EnvelopeEntry)geometry));
+        
         } else if (geometry instanceof AbstractGeometryType) {
             rest.add(gmlFactory.createGeometry((AbstractGeometryType)geometry));
         }
