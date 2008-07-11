@@ -430,6 +430,11 @@ public class FilterParserTest {
     }
     
     
+    /**
+     * Test simple Spatial filter
+     * 
+     * @throws java.lang.Exception
+     */
     @Test
     public void simpleSpatialFilterTest() throws Exception {
         
@@ -506,6 +511,11 @@ public class FilterParserTest {
         
     }
     
+    /**
+     * Test Multiple Spatial Filter
+     * 
+     * @throws java.lang.Exception
+     */
     @Test
     public void multipleSpatialFilterTest() throws Exception {
         
@@ -853,6 +863,11 @@ public class FilterParserTest {
         
     }
 
+    /**
+     * Test complex query with both comparison, logical and spatial query
+     * 
+     * @throws java.lang.Exception
+     */
     @Test
     public void multipleMixedFilterTest() throws Exception {
 
@@ -944,7 +959,7 @@ public class FilterParserTest {
         assertEquals(spaFilter.getFilterType(), SpatialFilter.INTERSECT);
         assertTrue  (spaFilter.getGeometry() instanceof GeneralEnvelope);
         
-         /**
+        /**
          * Test 3:  INTERSECT AND propertyIsEquals AND BBOX
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                          " +
@@ -1109,7 +1124,7 @@ public class FilterParserTest {
         assertTrue   (f2.getGeometry() instanceof GeneralEnvelope);
         
         /**
-         * Test 5:  INTERSECT AND (propertyIsEquals OR BBOX)
+         * Test 6:  INTERSECT AND (propertyIsEquals OR BBOX)
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                          " +
                            "            xmlns:gml=\"http://www.opengis.net/gml\">                         " +
@@ -1173,7 +1188,7 @@ public class FilterParserTest {
         assertTrue   (spaFilter.getGeometry() instanceof GeneralEnvelope);
         
         /**
-         * Test 6:  propertyIsNotEquals OR (propertyIsLike AND BBOX)
+         * Test 7:  propertyIsNotEquals OR (propertyIsLike AND DWITHIN)
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                                  " +
                            "            xmlns:gml=\"http://www.opengis.net/gml\">                                 " +
@@ -1229,7 +1244,7 @@ public class FilterParserTest {
         
         
         /**
-         * Test 7:  propertyIsLike AND INTERSECT AND (propertyIsEquals OR BBOX) AND (propertyIsNotEquals OR (Beyond AND propertyIsLike))
+         * Test 8:  propertyIsLike AND INTERSECT AND (propertyIsEquals OR BBOX) AND (propertyIsNotEquals OR (Beyond AND propertyIsLike))
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                                  " +
                            "            xmlns:gml=\"http://www.opengis.net/gml\">                                 " +
@@ -1336,7 +1351,7 @@ public class FilterParserTest {
         
         
         /**
-         * Test 8:  NOT propertyIsLike AND NOT INTERSECT AND NOT (propertyIsEquals OR BBOX) AND (propertyIsNotEquals OR (Beyond AND propertyIsLike))
+         * Test 9:  NOT propertyIsLike AND NOT INTERSECT AND NOT (propertyIsEquals OR BBOX) AND (propertyIsNotEquals OR (Beyond AND propertyIsLike))
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                                  " +
                            "            xmlns:gml=\"http://www.opengis.net/gml\">                                 " +

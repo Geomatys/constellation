@@ -39,4 +39,11 @@ public class ContainsType extends BinarySpatialOpType implements Contains {
     public ContainsType(String propertyName, AbstractGeometryType geometry) {
         super(propertyName, geometry);
     }
+    
+    /**
+     * Build a new Beyond Type
+     */
+    public ContainsType(PropertyNameType propertyName, Object geometry) {
+        super(propertyName, geometry);
+    }
 }

@@ -81,39 +81,68 @@ public class UnaryLogicOpType extends LogicOpsType {
       * Build a new Binary logic operator 
       */
      public UnaryLogicOpType(Object obj) {
-        if (obj instanceof PropertyIsLessThanOrEqualToType) {
-                 this.comparisonOps = factory.createPropertyIsLessThanOrEqualTo((PropertyIsLessThanOrEqualToType)obj);
-             } else if (obj instanceof PropertyIsLessThanType) {
-                 this.comparisonOps = factory.createPropertyIsLessThan((PropertyIsLessThanType)obj);
-             } else if (obj instanceof PropertyIsGreaterThanOrEqualToType) {
-                 this.comparisonOps = factory.createPropertyIsGreaterThanOrEqualTo((PropertyIsGreaterThanOrEqualToType)obj);
-             } else if (obj instanceof PropertyIsNotEqualToType) {
-                 this.comparisonOps = factory.createPropertyIsNotEqualTo((PropertyIsNotEqualToType)obj);
-             } else if (obj instanceof PropertyIsGreaterThanType) {
-                 this.comparisonOps = factory.createPropertyIsGreaterThan((PropertyIsGreaterThanType)obj);
-             } else if (obj instanceof PropertyIsEqualToType) {
-                this.comparisonOps = factory.createPropertyIsEqualTo((PropertyIsEqualToType)obj);
-             } else if (obj instanceof OrType) {
-                 this.logicOps = factory.createOr((OrType)obj);
-             } else if (obj instanceof NotType) {
-                 this.logicOps = factory.createNot((NotType)obj);
-             } else if (obj instanceof AndType) {
-                 this.logicOps = factory.createAnd((AndType)obj);
-             } else if (obj instanceof PropertyIsNullType) {
-                 this.comparisonOps = factory.createPropertyIsNull((PropertyIsNullType)obj);
-             } else if (obj instanceof PropertyIsBetweenType) {
-                 this.comparisonOps = factory.createPropertyIsBetween((PropertyIsBetweenType)obj);
-             } else if (obj instanceof PropertyIsLikeType) {
-                 this.comparisonOps = factory.createPropertyIsLike((PropertyIsLikeType)obj);
-             } else if (obj instanceof ComparisonOpsType) {
-                this.comparisonOps = factory.createComparisonOps((ComparisonOpsType)obj);
-             } else if (obj instanceof SpatialOpsType) {
-                 this.spatialOps = factory.createSpatialOps((SpatialOpsType)obj);
-             } else if (obj instanceof LogicOpsType) {
-                 this.logicOps = factory.createLogicOps((LogicOpsType)obj);
-             } else {
-                 throw new IllegalArgumentException("This kind of object is not allowed:" + obj.getClass().getSimpleName());
-             }
+         
+         // comparison operator
+         if (obj instanceof PropertyIsLessThanOrEqualToType) {
+             this.comparisonOps = factory.createPropertyIsLessThanOrEqualTo((PropertyIsLessThanOrEqualToType) obj);
+         } else if (obj instanceof PropertyIsLessThanType) {
+             this.comparisonOps = factory.createPropertyIsLessThan((PropertyIsLessThanType) obj);
+         } else if (obj instanceof PropertyIsGreaterThanOrEqualToType) {
+             this.comparisonOps = factory.createPropertyIsGreaterThanOrEqualTo((PropertyIsGreaterThanOrEqualToType) obj);
+         } else if (obj instanceof PropertyIsNotEqualToType) {
+             this.comparisonOps = factory.createPropertyIsNotEqualTo((PropertyIsNotEqualToType) obj);
+         } else if (obj instanceof PropertyIsGreaterThanType) {
+             this.comparisonOps = factory.createPropertyIsGreaterThan((PropertyIsGreaterThanType) obj);
+         } else if (obj instanceof PropertyIsEqualToType) {
+             this.comparisonOps = factory.createPropertyIsEqualTo((PropertyIsEqualToType) obj);
+         } else if (obj instanceof PropertyIsNullType) {
+             this.comparisonOps = factory.createPropertyIsNull((PropertyIsNullType) obj);
+         } else if (obj instanceof PropertyIsBetweenType) {
+             this.comparisonOps = factory.createPropertyIsBetween((PropertyIsBetweenType) obj);
+         } else if (obj instanceof PropertyIsLikeType) {
+             this.comparisonOps = factory.createPropertyIsLike((PropertyIsLikeType) obj);
+         } else if (obj instanceof ComparisonOpsType) {
+             this.comparisonOps = factory.createComparisonOps((ComparisonOpsType) obj);
+             
+         // logical operator    
+         } else if (obj instanceof OrType) {
+             this.logicOps = factory.createOr((OrType) obj);
+         } else if (obj instanceof NotType) {
+             this.logicOps = factory.createNot((NotType) obj);
+         } else if (obj instanceof AndType) {
+             this.logicOps = factory.createAnd((AndType) obj);
+         } else if (obj instanceof LogicOpsType) {
+             this.logicOps = factory.createLogicOps((LogicOpsType) obj);
+             
+         // spatial operator    
+        } else if (obj instanceof BeyondType) {
+            this.spatialOps = factory.createBeyond((DistanceBufferType)obj);
+        } else if (obj instanceof DWithinType) {
+            this.spatialOps = factory.createDWithin((DistanceBufferType)obj);
+        } else if (obj instanceof BBOXType) {
+            this.spatialOps = factory.createBBOX((BBOXType)obj);
+        } else if (obj instanceof ContainsType) {
+            this.spatialOps = factory.createContains((BinarySpatialOpType)obj);  
+        } else if (obj instanceof CrossesType) {
+            this.spatialOps = factory.createCrosses((BinarySpatialOpType)obj);
+        } else if (obj instanceof DisjointType) {
+            this.spatialOps = factory.createDisjoint((BinarySpatialOpType)obj);
+        } else if (obj instanceof EqualsType) {
+            this.spatialOps = factory.createEquals((BinarySpatialOpType)obj);
+        } else if (obj instanceof IntersectsType) {
+            this.spatialOps = factory.createIntersects((BinarySpatialOpType)obj);
+        } else if (obj instanceof OverlapsType) {
+            this.spatialOps = factory.createOverlaps((BinarySpatialOpType)obj);
+        } else if (obj instanceof TouchesType) {
+            this.spatialOps = factory.createTouches((BinarySpatialOpType)obj); 
+        } else if (obj instanceof WithinType) {
+            this.spatialOps = factory.createWithin((BinarySpatialOpType)obj); 
+         } else if (obj instanceof SpatialOpsType) {
+             this.spatialOps = factory.createSpatialOps((SpatialOpsType) obj);
+         
+         } else {
+             throw new IllegalArgumentException("This kind of object is not allowed:" + obj.getClass().getSimpleName());
+         }
          
      }
     /**

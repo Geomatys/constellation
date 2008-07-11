@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.gml.v311.AbstractGeometryType;
+import net.seagis.gml.v311.EnvelopeEntry;
 import net.seagis.gml.v311.PointType;
 import net.seagis.gml.v311.PolygonType;
 import org.opengis.filter.FilterVisitor;
@@ -95,12 +96,32 @@ public class BinarySpatialOpType extends SpatialOpsType {
     public BinarySpatialOpType(String propertyName, AbstractGeometryType geometry) {
         rest = new ArrayList<JAXBElement<?>>();
         rest.add(ogcFactory.createPropertyName(new PropertyNameType(propertyName)));
+        
         if (geometry instanceof PointType) {
             rest.add(gmlFactory.createPoint((PointType)geometry));
         } else if (geometry instanceof PolygonType) {
             rest.add(gmlFactory.createPolygon((PolygonType)geometry));
         } else {
             rest.add(gmlFactory.createGeometry(geometry));
+        }
+        
+    }
+    
+    /**
+     * Build a new Binary spatial operator
+     */
+    public BinarySpatialOpType(PropertyNameType propertyName, Object geometry) {
+        rest = new ArrayList<JAXBElement<?>>();
+        rest.add(ogcFactory.createPropertyName(propertyName));
+        
+        if (geometry instanceof PointType) {
+            rest.add(gmlFactory.createPoint((PointType)geometry));
+        } else if (geometry instanceof PolygonType) {
+            rest.add(gmlFactory.createPolygon((PolygonType)geometry));
+        } else if (geometry instanceof EnvelopeEntry) {
+            rest.add(gmlFactory.createEnvelope((EnvelopeEntry)geometry));
+        } else if (geometry instanceof AbstractGeometryType) {
+            rest.add(gmlFactory.createGeometry((AbstractGeometryType)geometry));
         }
         
     }

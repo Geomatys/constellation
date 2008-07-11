@@ -38,5 +38,12 @@ public class TouchesType extends BinarySpatialOpType implements Touches {
     public TouchesType(String propertyName, AbstractGeometryType geometry) {
         super(propertyName, geometry);
     }
+    
+    /**
+     * Build a new Overlaps Type
+     */
+    public TouchesType(PropertyNameType propertyName, Object geometry) {
+        super(propertyName, geometry);
+    }
 
 }

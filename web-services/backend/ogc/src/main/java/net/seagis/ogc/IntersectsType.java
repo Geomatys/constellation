@@ -35,6 +35,14 @@ public class IntersectsType extends BinarySpatialOpType implements Intersects {
     /**
      * Build a new Intersects Type
      */
+    public IntersectsType(PropertyNameType propertyName, Object geometry) {
+        super(propertyName, geometry);
+    }
+    
+    
+    /**
+     * Build a new Intersects Type
+     */
     public IntersectsType(String propertyName, AbstractGeometryType geometry) {
         super(propertyName, geometry);
     }

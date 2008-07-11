@@ -730,6 +730,20 @@ public class SpatialFilter extends Filter {
     }
     
     /**
+     * Return the distance units (in case of a Distance Spatial filter).
+     */
+    public String getDistanceUnit() {
+        return this.distanceUnit;
+    }
+    
+    /**
+     * Return the distance (in case of a Distance Spatial filter).
+     */
+    public Double getDistance() {
+        return this.distance;
+    }
+            
+    /**
      * Return a string description of the filter type.
      */
     public static String valueOf(final int filterType) {

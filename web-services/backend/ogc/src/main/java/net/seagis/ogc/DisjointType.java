@@ -38,5 +38,12 @@ public class DisjointType extends BinarySpatialOpType implements Disjoint {
     public DisjointType(String propertyName, AbstractGeometryType geometry) {
         super(propertyName, geometry);
     }
+    
+    /**
+     * Build a new Disjoint Type
+     */
+    public DisjointType(PropertyNameType propertyName, Object geometry) {
+        super(propertyName, geometry);
+    }
 
 }

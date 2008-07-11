@@ -90,6 +90,9 @@ public abstract class AbstractGeometryType extends AbstractGMLEntry implements E
         return srsName;
     }
 
+    public void setSrsName(String srsName) {
+        this.srsName = srsName;
+    }
     /**
      * Gets the value of the axisLabels property (unmodifiable).
      */

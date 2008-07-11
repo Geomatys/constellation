@@ -107,7 +107,7 @@ public class MetadataWriter {
         user              = MDReader.getUser("admin");
         this.MDReader     = MDReader;  
         this.MDWriter     = MDWriter;
-        this.dateFormat   = new SimpleDateFormat("yyyy-mm-dd");
+        this.dateFormat   = new SimpleDateFormat("yyyy-MM-dd");
         this.classBinding = new HashMap<Class, Classe>();
         this.alreadyWrite = new HashMap<Object, Value>();
     }

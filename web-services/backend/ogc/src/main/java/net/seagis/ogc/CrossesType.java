@@ -38,4 +38,11 @@ public class CrossesType extends BinarySpatialOpType implements Crosses {
     public CrossesType(String propertyName, AbstractGeometryType geometry) {
         super(propertyName, geometry);
     }
+    
+    /**
+     * Build a new Crosses Type
+     */
+    public CrossesType(PropertyNameType propertyName, Object geometry) {
+        super(propertyName, geometry);
+    }
 }

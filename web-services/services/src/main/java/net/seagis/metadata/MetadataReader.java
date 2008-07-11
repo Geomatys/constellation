@@ -162,7 +162,7 @@ public class MetadataReader {
     public MetadataReader(Reader MDReader, Connection c) throws SQLException {
         this.MDReader        = MDReader;
         this.connection      = c;
-        this.dateFormat      = new SimpleDateFormat("yyyy-mm-dd");
+        this.dateFormat      = new SimpleDateFormat("yyyy-MM-dd");
         
         this.MDCatalogs       = new ArrayList<Catalog>();
         this.MDCatalogs.add(MDReader.getCatalog("FR_SY"));

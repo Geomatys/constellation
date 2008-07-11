@@ -120,27 +120,7 @@ public class FilterParser {
         }
         if (constraint.getCqlText() != null) {
             try {
-                String query = constraint.getCqlText();
-                Object newFilter = CQL.toFilter(query, new FilterFactoryImpl());
-                /*
-                 * here we put a temporary patch consisting in using the geotools filterFactory implementation
-                 * instead of our own implementation.
-                 * Then we unmarshaller the xml to get a seagis Filter object.
-                 *
-                 *
-                 * File f = File.createTempFile("CQL", "query");
-                 * FileWriter fw = new FileWriter(f);
-                 * new FilterTransformer().transform(newFilter, fw);
-                 * fw.close();
-                 * JAXBElement jb = (JAXBElement) filterUnMarshaller.unmarshal(f);
-                 */
-               
-                if (!(newFilter instanceof FilterType)) {
-                    filter = new FilterType(newFilter);
-                } else {
-                    filter = (FilterType) newFilter;
-                }
-                filterMarshaller.marshal(filter, System.out);
+                filter = CQLtoFilter(constraint.getCqlText());
                  
             } catch (JAXBException ex) {
                 ex.printStackTrace();
@@ -164,6 +144,38 @@ public class FilterParser {
             
         }
         return getLuceneQuery(filter);
+    }
+    
+    /**
+     * Build a Filter with the specified CQL query
+     * 
+     * @param cqlQuery A well-formed CQL query .
+     */
+    public FilterType CQLtoFilter(String cqlQuery) throws CQLException, JAXBException {
+        FilterType result;
+        Object newFilter = CQL.toFilter(cqlQuery, new FilterFactoryImpl());
+        /*
+         * here we put a temporary patch consisting in using the geotools filterFactory implementation
+         * instead of our own implementation.
+         * Then we unmarshaller the xml to get a seagis Filter object.
+         *
+         *
+         * File f = File.createTempFile("CQL", "query");
+         * FileWriter fw = new FileWriter(f);
+         * new FilterTransformer().transform(newFilter, fw);
+         * fw.close();
+         * JAXBElement jb = (JAXBElement) filterUnMarshaller.unmarshal(f);
+         */
+
+        if (!(newFilter instanceof FilterType)) {
+            result = new FilterType(newFilter);
+        } else {
+            result = (FilterType) newFilter;
+        }
+        
+        /*Debuging purpose
+        filterMarshaller.marshal(result, System.out);*/
+        return result;
     }
     
      /**
@@ -621,6 +633,8 @@ public class FilterParser {
                     geometry     = (EnvelopeEntry) jb.getValue();
                 } else if (jb.getValue() instanceof PointType) {
                     geometry     = (PointType) jb.getValue();    
+                } else if (jb.getValue() == null) {
+                   throw new IllegalArgumentException("null value in BinarySpatialOp type");
                 } else {
                     throw new IllegalArgumentException("unknow BinarySpatialOp type:" + jb.getValue().getClass().getSimpleName());
                 }
@@ -872,24 +886,32 @@ public class FilterParser {
         }
 
         //we get the coordinate of the point (if they are present)
-        if (GMLpoint.getCoordinates() == null) {
-            throw new OWSWebServiceException("A GML point must specify coordinates.",
+        if (GMLpoint.getCoordinates() == null && GMLpoint.getPos() == null) {
+            throw new OWSWebServiceException("A GML point must specify coordinates or direct position.",
                     INVALID_PARAMETER_VALUE, "QueryConstraint", version);
         }
-        String coord = GMLpoint.getCoordinates().getValue();
 
-        final StringTokenizer tokens = new StringTokenizer(coord, " ");
         final double[] coordinates = new double[2];
-        int index = 0;
-        while (tokens.hasMoreTokens()) {
-            final double value = parseDouble(tokens.nextToken());
-            if (index >= coordinates.length) {
-                throw new OWSWebServiceException("This service support only 2D point.",
-                        INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+        if (GMLpoint.getCoordinates() != null) {
+            String coord = GMLpoint.getCoordinates().getValue();
+       
+            final StringTokenizer tokens = new StringTokenizer(coord, " ");
+            int index = 0;
+            while (tokens.hasMoreTokens()) {
+                final double value = parseDouble(tokens.nextToken());
+                if (index >= coordinates.length) {
+                    throw new OWSWebServiceException("This service support only 2D point.",
+                            INVALID_PARAMETER_VALUE, "QueryConstraint", version);
+                }
+                coordinates[index++] = value;
             }
-            coordinates[index++] = value;
+        } else if (GMLpoint.getPos().getValue() != null && GMLpoint.getPos().getValue().size() == 2){
+            coordinates[0] = GMLpoint.getPos().getValue().get(0);
+            coordinates[0] = GMLpoint.getPos().getValue().get(1);
+        } else {
+            throw new OWSWebServiceException("The GML pointis malformed.",
+                    INVALID_PARAMETER_VALUE, "QueryConstraint", version);
         }
-        
         GeneralDirectPosition point = new GeneralDirectPosition(coordinates);
         CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
         point.setCoordinateReferenceSystem(crs);
