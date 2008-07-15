@@ -453,14 +453,11 @@ public class Layer extends AbstractLayer {
      * 
      */
     public List<AbstractDimension> getAbstractDimension() {
-        
         List<AbstractDimension> list = new ArrayList<AbstractDimension>();
-        
-        /*Transform a  List<Dimension> in an  List<AbstractDimension>*/
+        /*Transform a  List<Dimension> to an  List<AbstractDimension>*/
         for( Dimension dim : getDimension() ){
             list.add((AbstractDimension) dim);
         }    
-        
         return list;
     }
 }

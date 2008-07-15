@@ -94,7 +94,7 @@ public class WMT_MS_Capabilities extends AbstractWMSCapabilities {
     public String getUpdateSequence() {
         return updateSequence;
     }
-
+    
     /**
      * Get a specific layer from the capabilities document.
      * 
@@ -102,9 +102,11 @@ public class WMT_MS_Capabilities extends AbstractWMSCapabilities {
     public AbstractLayer getLayerFromName(String name) {
         for( Layer layer : getCapability().getLayer().getLayer()){
             if(layer.getName().equals(name)){
-                return (AbstractLayer)layer; 
+                return (AbstractLayer) layer; 
             }
         }        
         return null;
     }
+   
+    
 }

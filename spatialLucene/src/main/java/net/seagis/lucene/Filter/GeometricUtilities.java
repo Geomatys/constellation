@@ -19,11 +19,13 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.resources.geometry.ShapeUtilities;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -547,9 +549,9 @@ public class GeometricUtilities {
      * @throws org.opengis.referencing.operation.TransformException
      */
     public static Object reprojectGeometry(final String targetCRSName, final String sourceCRSName, Object geometry) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
-        CoordinateReferenceSystem targetCRS = CRS.decode(targetCRSName, true);
-        CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName, true);
-
+        CoordinateReferenceSystem targetCRS = CRS.decode(targetCRSName,true);
+        CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName,true);
+        
         if (geometry instanceof GeneralEnvelope) {
             GeneralEnvelope env = (GeneralEnvelope) geometry;
             if (env.getCoordinateReferenceSystem() == null) {
@@ -590,6 +592,32 @@ public class GeometricUtilities {
         } else {
             throw new IllegalArgumentException("Unknow geometry types: allowed ones are: GeneralEnvelope, Line2D, GeneralDirectPosition");
         }
+    }
+     /**
+     * Reproject the specified bbox string From the sourceCRS to the targetCRS.
+     * 
+     * @param targetCRSName The coordinate reference system in which we have to reproject the geometry. 
+     * @param sourceCRSName The current coordinate reference system of the geometry.
+     * @param geometry the geometric object to reproject.
+     * 
+     * @return The geometric object reprojected in the target coordinate reference system.
+     * 
+     * @throws org.opengis.referencing.NoSuchAuthorityCodeException
+     * @throws org.opengis.referencing.FactoryException
+     * @throws org.opengis.referencing.operation.TransformException
+     */
+    public static Object reprojectBbox2DString(final String sourceCRSName, final String targetCRSName,  String boundingBox) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
+      
+      String[] bbox = boundingBox.split(",");
+      double[] lowerCorner ={Double.parseDouble(bbox[1]),Double.parseDouble(bbox[0])};
+      double[] upperCorner ={Double.parseDouble(bbox[3]),Double.parseDouble(bbox[2])};  
+      GeneralEnvelope env = new GeneralEnvelope(lowerCorner,upperCorner);
+      env.setCoordinateReferenceSystem( CRS.decode(sourceCRSName,true));
+      env = (GeneralEnvelope) reprojectGeometry(targetCRSName, sourceCRSName, env);
+      lowerCorner = env.getLowerCorner().getCoordinate();
+      upperCorner = env.getUpperCorner().getCoordinate();
+      System.out.println(lowerCorner[0]+","+lowerCorner[1]+","+upperCorner[0]+","+upperCorner[1]);
+      return lowerCorner[0]+","+lowerCorner[1]+","+upperCorner[0]+","+upperCorner[1];
     }
 
 }
