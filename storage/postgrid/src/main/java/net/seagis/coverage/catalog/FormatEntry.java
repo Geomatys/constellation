@@ -443,17 +443,16 @@ final class FormatEntry extends Entry implements Format {
                     type = DataBuffer.TYPE_BYTE;
                 }
                 final GridSampleDimension[] bands = getSampleDimensions(param);
-                try {
-                    final ColorModel  cm = bands[0].getColorModel(0, bands.length, type);
-                    final SampleModel sm = cm.createCompatibleSampleModel(expected.width, expected.height);
-                    inputObject = inputStream = new RawImageInputStream(inputStream,
-                                                                        new ImageTypeSpecifier(cm, sm),
-                                                                        new long[]{0},
-                                                                        new Dimension[]{expected});
-                    inputStream.setByteOrder(ByteOrder.nativeOrder());                
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    throw new IOException("ERROR: no Sample Dimension found for format "+name);
+                if (bands.length == 0) {
+                    throw new IIOException("No Sample Dimension found for format \"" + name + "\".");
                 }
+                final ColorModel  cm = bands[0].getColorModel(0, bands.length, type);
+                final SampleModel sm = cm.createCompatibleSampleModel(expected.width, expected.height);
+                inputObject = inputStream = new RawImageInputStream(inputStream,
+                                                                    new ImageTypeSpecifier(cm, sm),
+                                                                    new long[]{0},
+                                                                    new Dimension[]{expected});
+                inputStream.setByteOrder(ByteOrder.nativeOrder());
             }
         }
         // Patch temporaire, en attendant que les décodeurs spéciaux (e.g. "image/raw-msla")
@@ -510,8 +509,8 @@ final class FormatEntry extends Entry implements Format {
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource(image).add(lower).add(upper).add(fill);
                 image = JAI.create("threshold", pb, null);
-            } 
-            
+            }
+
         } else try {
             /*
              * Direct use of 'ImageReader': This approach reads the image immediately,
