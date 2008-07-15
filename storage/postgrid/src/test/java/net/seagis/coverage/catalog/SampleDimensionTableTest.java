@@ -37,6 +37,9 @@ public class SampleDimensionTableTest extends TableTest {
 
     /**
      * Tests the {@link SampleDimensionTable#getEntry} method.
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
     public void testSelect() throws CatalogException, SQLException {

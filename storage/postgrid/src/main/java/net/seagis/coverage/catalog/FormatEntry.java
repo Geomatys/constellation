@@ -46,6 +46,7 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
+import javax.media.jai.operator.BandMergeDescriptor;
 import com.sun.media.imageio.stream.RawImageInputStream;
 
 import org.geotools.util.Utilities;
@@ -259,7 +260,8 @@ final class FormatEntry extends Entry implements Format {
                 readers = ImageIO.getImageReadersByFormatName(formatName);
             }
             if (!readers.hasNext()) {
-                throw new IIOException(Resources.format(ResourceKeys.ERROR_NO_IMAGE_DECODER_$1, formatName));
+                throw new IIOException(Resources.format(
+                        ResourceKeys.ERROR_NO_IMAGE_DECODER_$1, formatName));
             }
             reader = readers.next();
             if (false && readers.hasNext()) { // Check disabled for now.
@@ -273,11 +275,13 @@ final class FormatEntry extends Entry implements Format {
 
     /**
      * Handles special cases for image reader configuration.
+     *
+     * @deprecated We need to figure out a better way to do this stuff.
      */
     private void handleSpecialCases(final ImageReader reader, final ImageReadParam param) {
         if (reader instanceof NetcdfImageReader) {
             final NetcdfImageReader r = (NetcdfImageReader) reader;
-            final GridSampleDimension[] bands = getSampleDimensions(param);
+            final GridSampleDimension[] bands = getSampleDimensions(null);
             final String[] names = new String[bands.length];
             for (int i=0; i<names.length; i++) {
                 names[i] = bands[i].getDescription().toString();
@@ -287,9 +291,9 @@ final class FormatEntry extends Entry implements Format {
     }
 
     /**
-     * Returns a block of default parameters for the current format. This method isn't
-     * called by {@link GridCoverageEntry#getCoverage}. Note: the method
-     * <strong>doit</strong> is called from a synchronized blok on {@code this}.
+     * Returns a block of default parameters for the current format. This method is called by
+     * {@link GridCoverageEntry#getCoverage}. Note: this method <strong>must</strong> be called
+     * from block synchronized on {@code this}.
      *
      * @return Un bloc de paramètres par défaut. Cette méthode ne retourne jamais {@code null}.
      * @throws IIOException s'il n'y a pas d'objet {@link ImageReader} pour ce format.
@@ -370,6 +374,8 @@ final class FormatEntry extends Entry implements Format {
      *
      * @param  input Fichier à lire. Habituellement un objet {@link File}, {@link URL} ou {@link URI}.
      * @param  imageIndex Index (à partir de 0) de l'image à lire.
+     * @param  numImages Number of consecutive images to read as different bands.
+     *         WARNING: This is an ugly patch to remove when we can.
      * @param  param Bloc de paramètre à utiliser pour la lecture.
      * @param  listeners Objets à informer des progrès de la lecture ainsi que des éventuels
      *         avertissements, ou {@code null} s'il n'y en a pas. Les objets qui ne sont
@@ -385,6 +391,7 @@ final class FormatEntry extends Entry implements Format {
      */
     final RenderedImage read(final Object         input,
                              final int            imageIndex,
+                             final int            numImages,
                              final ImageReadParam param,
                              final IIOListeners   listeners,
                              final Dimension      expected,
@@ -444,14 +451,13 @@ final class FormatEntry extends Entry implements Format {
                 }
                 final GridSampleDimension[] bands = getSampleDimensions(param);
                 if (bands.length == 0) {
+                    // We should instead make the code tolerant to images without SampleDimension.
                     throw new IIOException("No Sample Dimension found for format \"" + name + "\".");
                 }
                 final ColorModel  cm = bands[0].getColorModel(0, bands.length, type);
                 final SampleModel sm = cm.createCompatibleSampleModel(expected.width, expected.height);
                 inputObject = inputStream = new RawImageInputStream(inputStream,
-                                                                    new ImageTypeSpecifier(cm, sm),
-                                                                    new long[]{0},
-                                                                    new Dimension[]{expected});
+                        new ImageTypeSpecifier(cm, sm), new long[] {0}, new Dimension[] {expected});
                 inputStream.setByteOrder(ByteOrder.nativeOrder());
             }
         }
@@ -510,7 +516,6 @@ final class FormatEntry extends Entry implements Format {
                 pb.addSource(image).add(lower).add(upper).add(fill);
                 image = JAI.create("threshold", pb, null);
             }
-
         } else try {
             /*
              * Direct use of 'ImageReader': This approach reads the image immediately,
@@ -541,6 +546,12 @@ final class FormatEntry extends Entry implements Format {
                 System.runFinalization();
                 System.gc();
                 image = reader.readAsRenderedImage(imageIndex, param);
+            }
+            // WARNING: Ugly and unefficient patch below, to remove when we can (we
+            // need a real GridCoverageReader in order to clean all this stuff).
+            for (int i=1; i<numImages; i++) {
+                final RenderedImage more = reader.readAsRenderedImage(imageIndex + i, param);
+                image = BandMergeDescriptor.create(image, more, null);
             }
         } finally {
             final boolean aborted;

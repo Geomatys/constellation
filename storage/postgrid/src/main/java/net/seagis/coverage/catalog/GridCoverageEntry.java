@@ -410,21 +410,24 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * Handles special cases for some specific image formats.
      *
+     * @return 0 if there is no special processing, 1 if there is special processing but
+     *         the default number of bands is okay, or the number of bands to read otherwise.
+     *
      * @deprecated We need to find a better way to do this stuff.
      */
-    private boolean handleSpecialCases(final ImageReadParam param) {
+    private int handleSpecialCases(final ImageReadParam param) {
         if (param instanceof NetcdfReadParam) {
             final NetcdfReadParam p = (NetcdfReadParam) param;
             p.setBandDimensionTypes(AxisType.Height, AxisType.Pressure);
             if (index != 0) {
                 p.setSliceIndice(AxisType.Time, index - 1);
             }
-            return true;
+            return series.getFormat().getSampleDimensions().length;
         } else if (param instanceof MosaicImageReadParam) {
             ((MosaicImageReadParam) param).setSubsamplingChangeAllowed(true);
-            return true;
+            return 1;
         }
-        return false;
+        return 0;
     }
 
     /**
@@ -661,14 +664,16 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                     param.setSourceBands(new int[] {zIndice - 1});
                 }
                 final int imageIndex;
-                if (handleSpecialCases(param) || format.getImageFormat().equalsIgnoreCase("RAW")) {
+                // WARNING! Convolved ugly code below. We need to find a better way to do that.
+                final int numImages = handleSpecialCases(param);
+                if (numImages != 0 || format.getImageFormat().equalsIgnoreCase("RAW")) {
                     imageIndex = 0; // The index has been processed by 'handleSpecialCases'.
                 } else {
                     imageIndex = (index != 0) ? index-1 : 0;
                 }
                 if (image == null) {
                     final Dimension size = geometry.getSize();
-                    image = format.read(input, imageIndex, param, listeners, size, this);
+                    image = format.read(input, imageIndex, numImages, param, listeners, size, this);
                     if (image == null) {
                         return null;
                     }
@@ -676,7 +681,9 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
                             param.getSourceXSubsampling(), param.getSourceYSubsampling());
                     imageGeometry = gridGeometry.scaleForSubsampling(subsampling);
                 }
-                bands = format.getSampleDimensions(param);
+                // WARNING: ugly patch for numImages >= 2. Hopefully to be resolved
+                // when we will get a read GridCoverageReader.
+                bands = format.getSampleDimensions(numImages < 2 ? param : null);
             }
         } finally {
             format.setReading(this, false);

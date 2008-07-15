@@ -16,6 +16,7 @@ package net.seagis.coverage.catalog;
 
 import java.util.Set;
 import java.sql.SQLException;
+import org.geotools.coverage.GridSampleDimension;
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.TableTest;
 
@@ -35,17 +36,46 @@ public class FormatTableTest extends TableTest {
     public static final String SAMPLE_NAME = "PNG Température [-3 .. 35,25 °C]";
 
     /**
+     * The name of a format with two bands.
+     */
+    public static final String SAMPLE_NAME_2 = "Mars (u,v)";
+
+    /**
      * Tests the {@link FormatTable#getEntry} and {@link FormatTable#getEntries} methods.
      *
-     * @throws CatalogException If a logical error occured.
-     * @throws SQLException If an error occured while connecting to the database.
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
     public void testSelectAndList() throws CatalogException, SQLException {
         final FormatTable table = new FormatTable(database);
-        final Format      entry = table.getEntry(SAMPLE_NAME);
+        final Format entry = table.getEntry(SAMPLE_NAME);
         assertEquals(SAMPLE_NAME, entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
+        assertEquals("image/png", entry.getImageFormat());
+        final GridSampleDimension[] bands = entry.getSampleDimensions();
+        assertEquals(1, bands.length);
+
+        final Set<Format> entries = table.getEntries();
+        assertFalse(entries.isEmpty());
+        assertTrue(entries.contains(entry));
+    }
+
+    /**
+     * Tests a for an entry having two bands
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws CatalogException Should never happen in normal test execution.
+     */
+    @Test
+    public void testTwoBands() throws CatalogException, SQLException {
+        final FormatTable table = new FormatTable(database);
+        final Format entry = table.getEntry(SAMPLE_NAME_2);
+        assertEquals(SAMPLE_NAME_2, entry.getName());
+        assertSame(entry, table.getEntry(SAMPLE_NAME_2));
+        final GridSampleDimension[] bands = entry.getSampleDimensions();
+        assertEquals(2, bands.length);
+        assertFalse(bands[0].equals(bands[1]));
 
         final Set<Format> entries = table.getEntries();
         assertFalse(entries.isEmpty());

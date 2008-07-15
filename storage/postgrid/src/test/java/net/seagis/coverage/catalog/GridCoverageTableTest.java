@@ -14,6 +14,7 @@
  */
 package net.seagis.coverage.catalog;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
@@ -26,6 +27,7 @@ import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.coverage.grid.GridCoverage2D;
 
 import net.seagis.catalog.CatalogException;
 import net.seagis.catalog.TableTest;
@@ -48,6 +50,10 @@ public class GridCoverageTableTest extends TableTest {
 
     /**
      * Tests the {@link GridCoverageTable#getEntry} and {@link GridCoverageTable#getEntries} methods.
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws ParseException   Should never happen in normal test execution.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
     public void testSelectAndList() throws CatalogException, SQLException, ParseException {
@@ -57,6 +63,7 @@ public class GridCoverageTableTest extends TableTest {
         final CoverageReference entry = table.getEntry(SAMPLE_NAME);
         assertEquals(SeriesTableTest.SAMPLE_NAME + ':' + SAMPLE_NAME + ":1", entry.getName());
         assertSame(entry, table.getEntry(SAMPLE_NAME));
+        assertEquals(1, entry.getSampleDimensions().length);
         /*
          * Tests the envelope of a single entry.
          */
@@ -98,17 +105,26 @@ public class GridCoverageTableTest extends TableTest {
 
     /**
      * Tests the table for NetCDF images. They use a Mercator projection.
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws ParseException   Should never happen in normal test execution.
+     * @throws CatalogException Should never happen in normal test execution.
+     * @throws IOException      If the test image can't be read.
      */
     @Test
-    public void testNetCDF() throws CatalogException, SQLException, ParseException {
+    public void testNetCDF() throws CatalogException, SQLException, ParseException, IOException {
         final GridCoverageTable table = new GridCoverageTable(database);
         table.setLayer(LayerTableTest.NETCDF_NAME);
         final Set<Date> availableTimes = table.getAvailableTimes();
         assertEquals(3, availableTimes.size());
         /*
-         * Tests the envelope of a single entry.
+         * Tests a single entry.
          */
         final CoverageReference entry = table.getEntry();
+        assertEquals(1, entry.getSampleDimensions().length);
+        /*
+         * Tests the envelope, which may be projected.
+         */
         final Envelope envelope = entry.getEnvelope();
         assertTrue(getHorizontalCRS(envelope.getCoordinateReferenceSystem()) instanceof ProjectedCRS);
         assertEquals(-2.00375E7, envelope.getMinimum(0), 100.0);
@@ -116,17 +132,43 @@ public class GridCoverageTableTest extends TableTest {
         assertEquals(-1.38176E7, envelope.getMinimum(1), 100.0);
         assertEquals( 1.38176E7, envelope.getMaximum(1), 100.0);
         /*
-         * Tests the geographic envelope, which should have been projected.
+         * Tests the geographic envelope, which must be geographic.
          */
         final GeographicBoundingBox bbox = entry.getGeographicBoundingBox();
         assertEquals(-180, bbox.getWestBoundLongitude(), 0.0);
         assertEquals(+180, bbox.getEastBoundLongitude(), 0.0);
         assertEquals( -77, bbox.getSouthBoundLatitude(), 0.1);
         assertEquals( +77, bbox.getNorthBoundLatitude(), 0.1);
+        /*
+         * Tries to read the image.
+         */
+        final GridCoverage2D coverage = entry.getCoverage(null);
+        assertEquals(1, coverage.getSampleDimensions().length);
+    }
+
+    /**
+     * Tests the table for a NetCDF image with two bands.
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws ParseException   Should never happen in normal test execution.
+     * @throws CatalogException Should never happen in normal test execution.
+     * @throws IOException      If the test image can't be read.
+     */
+    @Test
+    public void testTwoBands() throws CatalogException, SQLException, ParseException, IOException {
+        final GridCoverageTable table = new GridCoverageTable(database);
+        table.setLayer(LayerTableTest.TWO_BANDS_NAME);
+        final CoverageReference entry = table.getEntry();
+        assertEquals(2, entry.getSampleDimensions().length);
+        final GridCoverage2D coverage = entry.getCoverage(null);
+        assertEquals(2, coverage.getSampleDimensions().length);
     }
 
     /**
      * Tests the request for the bounding box.
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
     public void testBoundingBox() throws CatalogException, SQLException {

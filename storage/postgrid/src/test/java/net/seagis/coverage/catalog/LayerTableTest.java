@@ -50,6 +50,11 @@ public class LayerTableTest extends TableTest {
     public static final String NETCDF_NAME = "AO_Coriolis_(Temp)";
 
     /**
+     * The name of a NetCDF layer with two bands to be tested.
+     */
+    public static final String TWO_BANDS_NAME = "Mars2D_(UV)";
+
+    /**
      * The start time, end time, and a sample time between them.
      */
     public static final Date START_TIME, END_TIME, SAMPLE_TIME;
@@ -78,8 +83,8 @@ public class LayerTableTest extends TableTest {
     /**
      * Tests the {@link LayerTableTest#getIdentifiers} method.
      *
-     * @throws SQLException If an error occured while querying the database.
-     * @throws CatalogException If a logical errors was found in database records.
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
     public void testIdentifiers() throws CatalogException, SQLException {
@@ -92,8 +97,8 @@ public class LayerTableTest extends TableTest {
     /**
      * Tests the {@link LayerTableTest#getEntry} and @link LayerTableTest#getEntries} methods.
      *
-     * @throws SQLException If an error occured while querying the database.
-     * @throws CatalogException If a logical errors was found in database records.
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
     public void testSelectAndList() throws CatalogException, SQLException {
@@ -127,9 +132,9 @@ public class LayerTableTest extends TableTest {
     /**
      * Tests the layer for NetCDF images.
      *
-     * @throws SQLException If an error occured while querying the database.
-     * @throws CatalogException If a logical errors was found in database records.
-     * @throws ParseException If a date can't be parsed.
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws ParseException   Should never happen in normal test execution.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
     public void testNetCDF() throws CatalogException, SQLException, ParseException {
@@ -153,5 +158,20 @@ public class LayerTableTest extends TableTest {
         assertNotNull(legend);
         assertEquals(400, legend.getWidth());
         assertEquals( 30, legend.getHeight());
+    }
+
+    /**
+     * Tests the layer for NetCDF images with two bands.
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws ParseException   Should never happen in normal test execution.
+     * @throws CatalogException Should never happen in normal test execution.
+     */
+    @Test
+    public void testTwoBands() throws CatalogException, SQLException, ParseException {
+        final LayerTable table = new LayerTable(database);
+        final Layer entry = table.getEntry(TWO_BANDS_NAME);
+        final CoverageReference reference = entry.getCoverageReference();
+        assertEquals(2, reference.getSampleDimensions().length);
     }
 }

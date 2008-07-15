@@ -16,8 +16,10 @@
 package net.seagis.coverage.catalog;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Set;
 import javax.imageio.ImageIO;
@@ -45,9 +47,13 @@ public class WritableGridCoverageTableTest extends TableTest {
 
     /**
      * Tests a {@code INSERT} statement (but do not really performs the insert).
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws IOException      Should never happen in normal test execution.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
-    public void testPseudoInserts() throws Exception {
+    public void testPseudoInserts() throws SQLException, CatalogException, IOException {
         final StringWriter insertStatements = new StringWriter();
         database.setUpdateSimulator(new PrintWriter(insertStatements));
 

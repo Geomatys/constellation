@@ -15,9 +15,11 @@
 package net.seagis.coverage.catalog;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import net.seagis.catalog.CatalogException;
 import org.junit.Test;
 
 import org.geotools.util.DateRange;
@@ -42,9 +44,12 @@ public class MetadataParserTest extends DatabaseTest {
 
     /**
      * Tests on a NetCDF file.
+     *
+     * @throws IOException      If the test file can not be read.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
-    public void testCoriolis() throws Exception {
+    public void testCoriolis() throws IOException, CatalogException {
         final File file = new File(TEST_FILE);
         if (!file.isFile()) {
             Element.LOGGER.warning("Test file \"" + file + "\" not found.");

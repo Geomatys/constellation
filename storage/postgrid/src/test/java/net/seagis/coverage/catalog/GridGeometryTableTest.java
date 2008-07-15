@@ -42,6 +42,9 @@ public class GridGeometryTableTest extends TableTest {
 
     /**
      * Tests the {@link GridGeometryTable#getEntry} and {@link GridGeometryTable#getEntries} methods.
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
     public void testSelectAndList() throws CatalogException, SQLException {

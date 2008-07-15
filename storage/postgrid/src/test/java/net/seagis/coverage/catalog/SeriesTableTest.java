@@ -36,6 +36,9 @@ public class SeriesTableTest extends TableTest {
 
     /**
      * Tests the {@link SeriesTable#getEntry} and {@link SeriesTable#getEntries} methods.
+     *
+     * @throws SQLException     If the test can't connect to the database.
+     * @throws CatalogException Should never happen in normal test execution.
      */
     @Test
     public void testSelectAndList() throws CatalogException, SQLException {
