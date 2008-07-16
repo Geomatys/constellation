@@ -122,9 +122,9 @@ public class CSWService extends WebService {
             
             
             Class[] classes = toArray(classeList);
-            setXMLContext("http://www.opengis.net/cat/csw/2.0.2", classes);
+            setXMLContext("", classes);
         
-            worker = new CSWworker(unmarshaller);
+            worker = new CSWworker(unmarshaller, marshaller);
             worker.setVersion(getCurrentVersion());
             
         } catch (JAXBException ex){

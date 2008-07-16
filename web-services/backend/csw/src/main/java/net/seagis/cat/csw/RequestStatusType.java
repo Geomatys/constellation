@@ -95,13 +95,17 @@ public class RequestStatusType {
         }
     }
     
-    
-    
     /**
      * Gets the value of the timestamp property.
      */
     public XMLGregorianCalendar getTimestamp() {
         return timestamp;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[requestStatusType] ").append("timeStamp:").append(timestamp);
+        return s.toString();
     }
 
 }

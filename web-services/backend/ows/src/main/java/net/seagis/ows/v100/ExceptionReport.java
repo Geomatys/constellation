@@ -112,4 +112,27 @@ public class ExceptionReport {
     public String getLanguage() {
         return language;
     }
+    
+    /**
+     * Return a String representation of the exception report.
+     * 
+     * @return A String representation of the exception report.
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[ExceptionReport]");
+        if (language != null)
+            s.append('[').append(language).append(']');
+        if (version != null)
+            s.append('[').append(version).append(']');
+        s.append('\n');
+        if (exception != null) {
+            int i = 0;
+            for (ExceptionType ex: exception) {
+                s.append("exception ").append(i).append(':').append(ex.toString()).append('\n');
+                i++;
+            }
+        }
+        return s.toString();
+    }
 }

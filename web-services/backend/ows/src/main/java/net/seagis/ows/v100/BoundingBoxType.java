@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -163,5 +164,54 @@ public class BoundingBoxType {
      */
     public BigInteger getDimensions() {
         return dimensions;
+    }
+    
+     /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        final BoundingBoxType that = (BoundingBoxType) object;
+
+        return Utilities.equals(this.crs        , that.crs)         &&
+               Utilities.equals(this.dimensions , that.dimensions)  &&
+               Utilities.equals(this.lowerCorner, that.lowerCorner) &&
+               Utilities.equals(this.upperCorner, that.upperCorner);
+        
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 43 * hash + (this.lowerCorner != null ? this.lowerCorner.hashCode() : 0);
+        hash = 43 * hash + (this.upperCorner != null ? this.upperCorner.hashCode() : 0);
+        hash = 43 * hash + (this.crs != null ? this.crs.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder('[').append(this.getClass().getSimpleName()).append("]:").append('\n');
+        if (crs != null)
+            s.append("CRS:").append(crs).append('\n');
+        if (dimensions != null) {
+            s.append("Dim:").append(dimensions).append('\n');
+        }
+        if (lowerCorner != null) {
+            s.append("lower corner: ");
+            for (Double d: lowerCorner) {
+                s.append(d).append(' ');
+            }
+        }
+        if (upperCorner != null) {
+            s.append("upper corner: ");
+            for (Double d: upperCorner) {
+                s.append(d).append(' ');
+            }
+        }
+        return s.toString();
     }
 }

@@ -24,10 +24,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.dublincore.elements.SimpleLiteral;
 import net.seagis.ows.v100.WGS84BoundingBoxType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -61,6 +63,7 @@ import net.seagis.ows.v100.WGS84BoundingBoxType;
     "anyText",
     "boundingBox"
 })
+@XmlRootElement(name = "Record")
 public class RecordType extends DCMIRecordType {
 
     @XmlElement(name = "AnyText")
@@ -80,13 +83,17 @@ public class RecordType extends DCMIRecordType {
      */
     public RecordType(SimpleLiteral identifier, SimpleLiteral title, SimpleLiteral type, 
             List<SimpleLiteral> subject, SimpleLiteral format, SimpleLiteral modified, SimpleLiteral _abstract,
-            List<BoundingBoxType> bboxes, SimpleLiteral creator, SimpleLiteral distributor, SimpleLiteral language) {
+            List<BoundingBoxType> bboxes, SimpleLiteral creator, SimpleLiteral distributor, SimpleLiteral language, 
+            SimpleLiteral spatial,SimpleLiteral references) {
         
-        super(identifier, title,type, subject, format, modified, _abstract, creator, distributor, language);
+        super(identifier, title,type, subject, format, modified, _abstract, creator, distributor, language, spatial, references);
         
         this.boundingBox = new ArrayList<JAXBElement<? extends BoundingBoxType>>();
         for (BoundingBoxType bbox: bboxes) {
-            this.boundingBox.add(owsFactory.createBoundingBox(bbox));
+            if (bbox instanceof WGS84BoundingBoxType)
+                this.boundingBox.add(owsFactory.createWGS84BoundingBox((WGS84BoundingBoxType)bbox));
+            else
+                this.boundingBox.add(owsFactory.createBoundingBox(bbox));
         }
         
     }
@@ -142,6 +149,41 @@ public class RecordType extends DCMIRecordType {
         }
         
         return s.toString();
+    }
+    
+     /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof RecordType && super.equals(object)) {
+            final RecordType that = (RecordType) object;
+            
+            boolean bbox = this.getBoundingBox().size() == that.getBoundingBox().size();
+            
+            //we verify that the two list contains the same object
+            List<BoundingBoxType> obj = new ArrayList<BoundingBoxType>();
+            for (JAXBElement<? extends BoundingBoxType> jb: boundingBox) {
+                obj.add(jb.getValue());
+            }
+        
+            for (JAXBElement<? extends BoundingBoxType> jb: that.boundingBox) {
+                if (!obj.contains(jb.getValue())) {
+                    bbox = false;
+                }
+            }
+            return  Utilities.equals(this.anyText,   that.anyText)   &&
+                    bbox;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
 }

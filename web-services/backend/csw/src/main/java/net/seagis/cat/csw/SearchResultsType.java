@@ -32,19 +32,21 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * Includes representations of result set members if maxRecords > 0.
- *          The items must conform to one of the csw:Record views or a 
- *          profile-specific representation. 
+ * The items must conform to one of the csw:Record views or a profile-specific representation. 
  *          
- *          resultSetId  - id of the result set (a URI).
- *          elementSet  - The element set that has been returned
- *                        (i.e., "brief", "summary", "full")
- *          recordSchema  - schema reference for included records(URI)
- *          numberOfRecordsMatched  - number of records matched by the query
- *          numberOfRecordsReturned - number of records returned to client
- *          nextRecord - position of next record in the result set
- *                       (0 if no records remain).
- *          expires - the time instant when the result set expires and 
- *                    is discarded (ISO 8601 format)
+ *      resultSetId  - id of the result set (a URI).
+ *      
+ *      elementSet  - The element set that has been returned (i.e., "brief", "summary", "full")
+ * 
+ *      recordSchema  - schema reference for included records(URI)
+ *      
+ *      numberOfRecordsMatched  - number of records matched by the query
+ *      
+ *      numberOfRecordsReturned - number of records returned to client
+ *      
+ *      nextRecord - position of next record in the result set (0 if no records remain).
+ *    
+ *      expires - the time instant when the result set expires and is discarded (ISO 8601 format)
  * 
  * <p>Java class for SearchResultsType complex type.
  * 
@@ -85,23 +87,51 @@ public class SearchResultsType {
     private List<JAXBElement<? extends AbstractRecordType>> abstractRecord;
     @XmlAnyElement(lax = true)
     private List<Object> any;
+    
+    /**
+     * Id of the result set (a URI).
+     */
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
     private String resultSetId;
+    
+    /**
+     * The element set that has been returned (i.e., "brief", "summary", "full").
+     */
     @XmlAttribute
     private ElementSetType elementSet;
+    
+    /**
+     * Schema reference for included records(URI).
+     */
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
     private String recordSchema;
+    
+    /**
+     * Number of records matched by the query.
+     */
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "nonNegativeInteger")
     private int numberOfRecordsMatched;
+    
+    /**
+     * Number of records returned to client.
+     */
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "nonNegativeInteger")
     private int numberOfRecordsReturned;
+    
+    /**
+     * Position of next record in the result set (0 if no records remain).
+     */
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
     private int nextRecord;
+    
+    /**
+     * The time instant when the result set expires and is discarded (ISO 8601 format)
+     */
     @XmlAttribute
     @XmlSchemaType(name = "dateTime")
     private XMLGregorianCalendar expires;
@@ -228,5 +258,32 @@ public class SearchResultsType {
      */
     public XMLGregorianCalendar getExpires() {
         return expires;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[SearchResultType] :").append('\n');
+        if (resultSetId != null)
+            s.append("resultSetId: ").append(resultSetId).append('\n');
+        if (elementSet != null)
+            s.append("elementSet:").append(elementSet.value()).append('\n');
+        if (recordSchema != null)
+            s.append("recordShema: ").append(recordSchema).append('\n');
+        
+        s.append("nbRec Matched = ").append(numberOfRecordsMatched).append(" ").append("nbRec Returned = ").append(numberOfRecordsReturned);
+        s.append("next record = ").append(nextRecord).append('\n');
+        
+        if (expires != null) {
+            s.append("expires at: ").append(expires);
+        }
+        
+        if (abstractRecord != null && abstractRecord.size() != 0) {
+            s.append("nb CSW records: ").append(abstractRecord.size());
+            
+        }
+        if (any != null && any.size() != 0) {
+            s.append("nb Other records: ").append(any.size());
+        }
+        return s.toString();
     }
 }

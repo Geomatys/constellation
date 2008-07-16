@@ -50,5 +50,20 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "WGS84BoundingBoxType")
 public class WGS84BoundingBoxType extends BoundingBoxType {
+    
+    /**
+     * An empty constructor used by JAXB.
+     */
+    public WGS84BoundingBoxType() {
+        
+    }
+    
+    /**
+     * Build a 2 dimension boundingBox.
+     * 
+     */
+    public WGS84BoundingBoxType(double minx, double miny, double maxx, double maxy){
+        super(null, minx, miny, maxx, maxy);
+    }
 
 }

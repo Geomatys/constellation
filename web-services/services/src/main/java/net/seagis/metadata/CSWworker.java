@@ -22,6 +22,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -43,8 +46,10 @@ import java.util.logging.Logger;
 //seaGIS dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import net.seagis.cat.csw.AbstractQueryType;
 import net.seagis.cat.csw.AbstractRecordType;
 import net.seagis.cat.csw.AcknowledgementType;
 import net.seagis.cat.csw.BriefRecordType;
@@ -67,6 +72,7 @@ import net.seagis.cat.csw.HarvestType;
 import net.seagis.cat.csw.InsertType;
 import net.seagis.cat.csw.ListOfValuesType;
 import net.seagis.cat.csw.ObjectFactory;
+import net.seagis.cat.csw.QueryConstraintType;
 import net.seagis.cat.csw.QueryType;
 import net.seagis.cat.csw.RecordType;
 import net.seagis.cat.csw.RequestBaseType;
@@ -83,6 +89,9 @@ import net.seagis.dublincore.elements.SimpleLiteral;
 import net.seagis.filter.FilterParser;
 import net.seagis.lucene.Filter.SpatialQuery;
 import net.seagis.ogc.FilterCapabilities;
+import net.seagis.ogc.FilterType;
+import net.seagis.ogc.PropertyIsLikeType;
+import net.seagis.ogc.PropertyNameType;
 import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
 import net.seagis.ows.v100.DomainType;
@@ -179,6 +188,11 @@ public class CSWworker {
     private final Unmarshaller unmarshaller;
     
     /**
+     * A Marshaller to send request to another CSW services.
+     */
+    private final Marshaller marshaller;
+    
+    /**
      * A lucene index to make quick search on the metadatas.
      */
     private final IndexLucene index;
@@ -186,7 +200,7 @@ public class CSWworker {
     /**
      * A filter parser whitch create lucene query from OGC filter
      */
-    private FilterParser filterParser;
+    private final FilterParser filterParser;
     
     /**
      * A flag indicating if the worker is correctly started.
@@ -533,6 +547,11 @@ public class CSWworker {
     }
     
     /**
+     * A getRecords request used to request another csw. 
+     */
+    private GetRecordsType fullGetRecordsRequest;
+    
+    /**
      * Build a new CSW worker
      * 
      * @param marshaller A JAXB marshaller to send xml to MDWeb
@@ -540,13 +559,14 @@ public class CSWworker {
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
-    public CSWworker(Unmarshaller unmarshaller) throws IOException, SQLException {
+    public CSWworker(Unmarshaller unmarshaller, Marshaller marshaller) throws IOException, SQLException {
         
         this.unmarshaller = unmarshaller;
-        cswFactory      = new ObjectFactory();
-        Properties prop = new Properties();
-        File f          = null;
-        File env        = new File("/root/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
+        this.marshaller   = marshaller; 
+        cswFactory        = new ObjectFactory();
+        Properties prop   = new Properties();
+        File f            = null;
+        File env          = new File("/root/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
         logger.info("Path to config file=" + env);
         isStarted = true;
         try {
@@ -562,10 +582,23 @@ public class CSWworker {
                 logger.severe(f.getPath());
             }
             logger.severe("The CSW service is not working!"                       + '\n' + 
-                          "cause: The srevice can not load the properties files!" + '\n' + 
+                          "cause: The service can not load the properties files!" + '\n' + 
                           "cause: " + e.getMessage());
             isStarted = false;
         }
+        
+        // we initialize the filterParser
+        FilterParser fp = null;
+        try {
+            fp = new FilterParser(version);
+        } catch (JAXBException ex) {
+            isStarted = false;
+            
+            logger.severe("The CSW service is not working!"       + '\n' + 
+                          "Unable to create Filter JAXB Context." + '\n' + 
+                          "Cause: " + ex.getMessage());
+        }
+        filterParser = fp;
         
         //we create a connection to the metadata database
         if (isStarted) {
@@ -576,6 +609,7 @@ public class CSWworker {
             dataSourceMD.setUser(prop.getProperty("MDDBUser"));
             dataSourceMD.setPassword(prop.getProperty("MDDBUserPassword"));
             MDConnection    = dataSourceMD.getConnection();
+            
             if (MDConnection == null) {
                 logger.severe("The CSW service is not working!" + '\n' + 
                               "cause: The web service can't connect to the metadata database!");
@@ -591,6 +625,17 @@ public class CSWworker {
                  index           = new IndexLucene(databaseReader, env);
                  MDReader        = new MetadataReader(databaseReader, dataSourceMD.getConnection());
                  MDWriter        = new MetadataWriter(databaseReader, databaseWriter);
+                 
+                 //we build the base request to harvest another CSW service
+                 List<QName> typeNames          = new ArrayList<QName>();
+                 PropertyNameType pname         = new PropertyNameType("dc:Title");
+                 PropertyIsLikeType pil         = new PropertyIsLikeType(pname, "*", "?", "*", "\\");
+                 FilterType filter              = new FilterType(pil);
+                 QueryConstraintType constraint = new QueryConstraintType(filter, "1.1.0");
+                 typeNames.add(_Record_QNAME);
+                 QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint); 
+                 JAXBElement<? extends AbstractQueryType> jbQuery =  cswFactory.createQuery(query);
+                 fullGetRecordsRequest = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, jbQuery, null);
                  logger.info("CSW service running");
             }
             
@@ -692,16 +737,6 @@ public class CSWworker {
     public GetRecordsResponseType getRecords(GetRecordsType request) throws WebServiceException {
         logger.info("GetRecords request processing" + '\n');
         verifyBaseRequest(request);
-        
-        // we initialize the filterParser
-        if (filterParser == null) {
-            try {
-                filterParser = new FilterParser(version);
-            } catch (JAXBException ex) {
-                 throw new OWSWebServiceException("The server can't build the Filter JAXB Context: " + ex.getMessage(),
-                                                   NO_APPLICABLE_CODE, null, version);
-            }
-        }
         
         //we prepare the response
         GetRecordsResponseType response;
@@ -1123,18 +1158,42 @@ public class CSWworker {
      * @param obj The object to store in the database.
      * @return true if the storage succeed, false else.
      */
-    private boolean storeMetadata(Object obj) throws SQLException {
+    private boolean storeMetadata(Object obj) throws SQLException, WebServiceException {
+        // profiling operation
+        long start     = System.currentTimeMillis();
+        long transTime = 0;
+        long writeTime = 0;
+        
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
         }
         
         String title = findName(obj);
         // we create a MDWeb form form the object
-        Form f = MDWriter.getFormFromObject(obj, title);
+        Form f = null;
+        try {
+            long start_trans = System.currentTimeMillis();
+            f = MDWriter.getFormFromObject(obj, title);
+            transTime = System.currentTimeMillis() - start_trans;
+            
+        } catch (IllegalArgumentException e) {
+             throw new OWSWebServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName(),
+                                               NO_APPLICABLE_CODE, null, version);
+        }
         
         // and we store it in the database
         if (f != null) {
-            databaseWriter.writeForm(f, false);
+            try {
+                long startWrite = System.currentTimeMillis();
+                databaseWriter.writeForm(f, false);
+                writeTime = System.currentTimeMillis() - startWrite;
+            } catch (IllegalArgumentException e) {
+                logger.severe("illegalArgument: " + e.getMessage());
+                return false;
+            }
+            
+            long time = System.currentTimeMillis() - start; 
+            logger.info("inserted new Form: " + f.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " +  writeTime + ")");
             return true;
         }
         return false;
@@ -1142,7 +1201,7 @@ public class CSWworker {
     
     /**
      * This method try to find a title to this object.
-     * if the object is a ISO19115:Metadata or CSW:Recored we know were to search the title,
+     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
      * else we try to find a getName() method.
      * 
      * @param obj the object for wich we want a title
@@ -1244,11 +1303,12 @@ public class CSWworker {
                                              MISSING_PARAMETER_VALUE, "resourceType", version);
             }
         }
-        
-        if (request.getSource() != null) {
+        String sourceURL = request.getSource();
+        if (sourceURL != null) {
             
             try {
-                URL source          = new URL(request.getSource());
+                
+                URL source          = new URL(sourceURL);
                 URLConnection conec = source.openConnection();
                 
                 // we get the source document
@@ -1268,10 +1328,21 @@ public class CSWworker {
                     resourceType.equals("http://www.opengis.net/cat/csw/2.0.2")  ||
                     resourceType.equals("http://www.isotc211.org/2005/gfc"))        {
 
-                        Object harvested = unmarshaller.unmarshal(fileToHarvest);
-                        
-                    if (storeMetadata(harvested))
-                        totalInserted++;
+                    Object harvested = unmarshaller.unmarshal(fileToHarvest);
+                    if (harvested == null) {
+                        throw new OWSWebServiceException("The resource can not be parsed.",
+                                                          INVALID_PARAMETER_VALUE, "Source", version);
+                    }
+                    
+                    // if the resource is another CSW service we get all the data of this catalogue.
+                    if (harvested.getClass().getName().equals("net.seagis.cat.csw.Capabilities")) {
+                        totalInserted = harvestCatalogue(sourceURL);
+                    } else {
+                        logger.info("Object Type of the harvested Resource: " + harvested.getClass().getName());
+                        if (storeMetadata(harvested))
+                            totalInserted++;
+                    }
+                    
                 }
                 
             } catch (SQLException ex) {
@@ -1309,6 +1380,98 @@ public class CSWworker {
         }
         
         return response;
+    }
+    
+    /**
+     * Harvest another CSW service by getting all this records ans storing it into the database
+     * 
+     * @param sourceURL
+     * @return
+     */
+    private int harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, WebServiceException, SQLException {
+        sourceURL = sourceURL.substring(0, sourceURL.indexOf('?'));
+        
+        //we initialize the getRecords request
+        fullGetRecordsRequest.setStartPosition(1);
+        
+        //we open the connection
+        int nbRecordInserted = 0;
+        boolean moreResults = true;
+        
+        //we make multiple request by pack of 20 record 
+        while (moreResults) {
+        
+            URL source          = new URL(sourceURL);
+            URLConnection conec = source.openConnection();
+            conec.setDoOutput(true);
+            OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        
+            StringWriter sw = new StringWriter();
+            try {
+                marshaller.marshal(fullGetRecordsRequest, sw);
+            } catch (JAXBException ex) {
+                throw new OWSWebServiceException("Unable to marshall GetRecords request.",
+                                                  NO_APPLICABLE_CODE, null, version);
+            }
+            wr.write(sw.toString());
+            wr.flush();
+        
+            // we get the response document
+            InputStream in = conec.getInputStream();
+            StringWriter out = new StringWriter();
+            byte[] buffer = new byte[1024];
+            int size;
+
+            while ((size = in.read(buffer, 0, 1024)) > 0) {
+                out.write(new String(buffer, 0, size));
+            }
+        
+            //we convert the brut String value into UTF-8 encoding
+            String brutString = out.toString();
+            
+            //we need to replace % character by "percent because they are reserved char for url encoding
+            brutString = brutString.replaceAll("%", "percent");
+            String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
+        
+            Object harvested = null;
+            try {
+                harvested = unmarshaller.unmarshal(new StringReader(decodedString));
+                if (harvested != null && harvested instanceof JAXBElement)  {
+                    harvested = ((JAXBElement)harvested).getValue();
+                }
+            } catch (JAXBException ex) {
+                ex.printStackTrace();
+                throw new OWSWebServiceException("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                                                 "cause: " + ex.getMessage(),
+                                                  NO_APPLICABLE_CODE, null, version);
+            }
+        
+            if (harvested == null) {
+                throw new OWSWebServiceException("The distant service does not respond correctly.",
+                                                  NO_APPLICABLE_CODE, null, version);
+            } else if (harvested instanceof GetRecordsResponseType) {
+                logger.info("First response of distant service:" + '\n' + harvested.toString());
+                GetRecordsResponseType serviceResponse = (GetRecordsResponseType) harvested;
+                SearchResultsType results = serviceResponse.getSearchResults();
+            
+                for (JAXBElement<? extends AbstractRecordType> JBrecord: results.getAbstractRecord()) {
+                    AbstractRecordType record = JBrecord.getValue();
+                    if (storeMetadata(record))
+                        nbRecordInserted++;
+                }
+                
+                //if there is more results we need to make another request
+                moreResults = results.getNumberOfRecordsReturned() != 0;
+                if (moreResults) {
+                    fullGetRecordsRequest.setStartPosition(results.getNextRecord());
+                }
+                
+            } else {
+                throw new OWSWebServiceException("The distant service does not respond correctly: unexpected response type: " + harvested.getClass().getSimpleName(),
+                                             NO_APPLICABLE_CODE, null, version);
+            }
+        }
+        return nbRecordInserted;
     }
     
     /**

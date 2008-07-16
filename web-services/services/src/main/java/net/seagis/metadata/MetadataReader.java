@@ -395,7 +395,7 @@ public class MetadataReader {
             
         }
         return new RecordType(identifier, title, litType , keywords, format, modified, description, bboxes,
-                creator, publisher, language);
+                creator, publisher, language, null, null);
     }
     
     /**

@@ -101,4 +101,24 @@ public class ExceptionType {
     public String getLocator() {
         return locator;
     }
+    
+     /**
+     * Return a String representation of the exception.
+     * 
+     * @return A String representation of the exception.
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("[ExceptionType]:").append('\n');
+        s.append("code: ").append(exceptionCode).append('\n');
+        s.append("locator: ").append(locator).append('\n');
+        if (exceptionText != null) {
+            int i = 0;
+            for (String ex: exceptionText) {
+                s.append(i).append(": Text: ").append(ex).append('\n');
+                i++;
+            }
+        }
+        return s.toString();
+    }
 }

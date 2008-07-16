@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -137,6 +138,31 @@ public class SimpleLiteral {
     public void setScheme(String scheme){
         this.scheme = scheme;
     }
+    
+     /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof SimpleLiteral) {
+            final SimpleLiteral that = (SimpleLiteral) object;
+            return Utilities.equals(this.content,   that.content)   &&
+                   Utilities.equals(this.scheme  , that.scheme);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 61 * hash + (this.content != null ? this.content.hashCode() : 0);
+        hash = 61 * hash + (this.scheme != null ? this.scheme.hashCode() : 0);
+        return hash;
+    }
+    
     
     @Override
     public String toString() {

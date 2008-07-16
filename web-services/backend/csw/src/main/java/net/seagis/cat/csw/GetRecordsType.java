@@ -201,6 +201,15 @@ public class GetRecordsType extends RequestBaseType {
     }
 
     /**
+     * Initialize the start position.
+     * 
+     * @param startPosition 
+     */
+    public void setStartPosition(Integer startPosition) {
+        this.startPosition = startPosition;
+    }
+    
+    /**
      * Gets the value of the startPosition property.
      */
     public Integer getStartPosition() {
