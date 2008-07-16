@@ -51,10 +51,10 @@ public abstract class AbstractRecordType {
     protected static net.seagis.ows.v100.ObjectFactory owsFactory = new net.seagis.ows.v100.ObjectFactory();
     
     @XmlTransient
-    protected static net.seagis.dublincore.elements.ObjectFactory dublinFactory = new net.seagis.dublincore.elements.ObjectFactory();
+    protected static net.seagis.dublincore.v1.elements.ObjectFactory dublinFactory = new net.seagis.dublincore.v1.elements.ObjectFactory();
     
     @XmlTransient
-    protected static net.seagis.dublincore.terms.ObjectFactory dublinTermFactory = new net.seagis.dublincore.terms.ObjectFactory();
+    protected static net.seagis.dublincore.v1.terms.ObjectFactory dublinTermFactory = new net.seagis.dublincore.v1.terms.ObjectFactory();
 
 
 }

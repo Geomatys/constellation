@@ -49,7 +49,7 @@ import net.seagis.cat.csw.v202.BriefRecordType;
 import net.seagis.cat.csw.v202.ElementSetType;
 import net.seagis.cat.csw.v202.SummaryRecordType;
 import net.seagis.cat.csw.v202.RecordType;
-import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.dublincore.v2.elements.SimpleLiteral;
 import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.ows.v100.OWSWebServiceException;
 import net.seagis.coverage.web.ServiceVersion;

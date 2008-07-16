@@ -111,7 +111,7 @@ public class CSWService {
                         ,DescribeRecordResponseType.class, GetDomainResponseType.class
                         ,TransactionResponseType.class, HarvestResponseType.class
                         ,ExceptionReport.class, net.seagis.ows.v110.ExceptionReport.class
-                        ,net.seagis.dublincore.terms.ObjectFactory.class);
+                        ,net.seagis.dublincore.v2.terms.ObjectFactory.class);
        
        unmarshaller = jbcontext.createUnmarshaller();
        worker = new CSWworker(unmarshaller, jbcontext.createMarshaller());

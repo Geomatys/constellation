@@ -15,13 +15,13 @@
  */
 
 
-package net.seagis.dublincore.terms;
+package net.seagis.dublincore.v2.terms;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.dublincore.v2.elements.SimpleLiteral;
 
 
 /**

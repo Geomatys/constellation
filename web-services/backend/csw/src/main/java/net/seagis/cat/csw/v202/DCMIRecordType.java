@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.dublincore.v2.elements.SimpleLiteral;
 import org.geotools.util.Utilities;
 
 

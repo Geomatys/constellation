@@ -14,11 +14,9 @@
  *    Lesser General Public License for more details.
  */
 
-
-package net.seagis.dublincore.elements;
+package net.seagis.dublincore.v1.elements;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -26,16 +24,17 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import org.geotools.util.Utilities;
 
 
 /**
- * This is the default type for all of the DC elements. It defines a 
+ * 
+ *       This is the default type for all of the DC elements. It defines a 
  *       complexType SimpleLiteral which permits mixed content but disallows 
  *       child elements by use of minOcccurs/maxOccurs. However, this complexType 
  *       does permit the derivation of other types which would permit child 
  *       elements. The scheme attribute may be used as a qualifier to reference 
  *       an encoding scheme that describes the value domain for a given property.
+ *       
  * 
  * <p>Java class for SimpleLiteral complex type.
  * 
@@ -69,109 +68,37 @@ public class SimpleLiteral {
     private String scheme;
 
     /**
-     * An empty constructor used by JAXB
-     */
-    public SimpleLiteral() {
-        
-    }
-    
-    /**
-     * Build a new Simple literal
-     */
-    public SimpleLiteral(String content) {
-        this.content = new ArrayList<String>();
-        this.content.add(content);
-    }
-    
-    /**
-     * Build a new Simple literal
-     */
-    public SimpleLiteral(String scheme, String content) {
-        this.scheme  = scheme;
-        this.content = new ArrayList<String>();
-        this.content.add(content);
-    }
-    
-    /**
-     * Build a new Simple literal
-     */
-    public SimpleLiteral(String scheme, List<String> content) {
-        this.scheme  = scheme;
-        this.content = content;
-    }
-    
-    /**
-     * This is the default type for all of the DC elements. It defines a 
+     * 
+     *       This is the default type for all of the DC elements. It defines a 
      *       complexType SimpleLiteral which permits mixed content but disallows 
      *       child elements by use of minOcccurs/maxOccurs. However, this complexType 
      *       does permit the derivation of other types which would permit child 
      *       elements. The scheme attribute may be used as a qualifier to reference 
-     *       an encoding scheme that describes the value domain for a given property.Gets the value of the content property.
+     *       an encoding scheme that describes the value domain for a given property.
+     *       Gets the value of the content property.
      * 
-     * (unmodifiable) 
      */
     public List<String> getContent() {
         if (content == null) {
             content = new ArrayList<String>();
         }
-        return Collections.unmodifiableList(content);
-    }
-    
-    public void setContent(List<String> content) {
-        this.content = content;
-    }
-    
-    public void setContent(String content) {
-        if (this.content == null) {
-            this.content = new ArrayList<String>();
-        }
-        this.content.add(content);
+        return this.content;
     }
 
     /**
      * Gets the value of the scheme property.
-     */
+     * 
+    */
     public String getScheme() {
         return scheme;
     }
-    
-    public void setScheme(String scheme){
-        this.scheme = scheme;
-    }
-    
-     /**
-     * Verify if this entry is identical to the specified object.
+
+    /**
+     * Sets the value of the scheme property.
+     * 
      */
-    @Override
-    public boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object instanceof SimpleLiteral) {
-            final SimpleLiteral that = (SimpleLiteral) object;
-            return Utilities.equals(this.content,   that.content)   &&
-                   Utilities.equals(this.scheme  , that.scheme);
-        }
-        return false;
+    public void setScheme(String value) {
+        this.scheme = value;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 61 * hash + (this.content != null ? this.content.hashCode() : 0);
-        hash = 61 * hash + (this.scheme != null ? this.scheme.hashCode() : 0);
-        return hash;
-    }
-    
-    
-    @Override
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        
-        if (scheme != null) {
-            s.append(scheme).append(':');
-        }
-        s.append(content);
-        return s.toString();
-    }
 }

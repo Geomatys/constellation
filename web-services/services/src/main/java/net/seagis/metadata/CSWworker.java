@@ -85,7 +85,7 @@ import net.seagis.cat.csw.v202.TransactionType;
 import net.seagis.cat.csw.v202.UpdateType;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
-import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.dublincore.v2.elements.SimpleLiteral;
 import net.seagis.filter.FilterParser;
 import net.seagis.lucene.Filter.SpatialQuery;
 import net.seagis.ogc.FilterCapabilities;
@@ -1308,41 +1308,41 @@ public class CSWworker {
             
             try {
                 
-                URL source          = new URL(sourceURL);
-                URLConnection conec = source.openConnection();
-                
-                // we get the source document
-                File fileToHarvest = File.createTempFile("harvested", "xml");
-                InputStream in = conec.getInputStream();
-                FileOutputStream out = new FileOutputStream(fileToHarvest);
-                byte[] buffer = new byte[1024];
-                int size;
-
-                while ((size = in.read(buffer, 0, 1024)) > 0) {
-                    out.write(buffer, 0, size);
-                }
-                
-                //TODO find a way to know if the source is another csw or directly the resource (resourceType?)
-                // for now we consider that is directly the resource to harvest
-                if (resourceType.equals("http://www.isotc211.org/2005/gmd")      || 
-                    resourceType.equals("http://www.opengis.net/cat/csw/2.0.2")  ||
-                    resourceType.equals("http://www.isotc211.org/2005/gfc"))        {
-
-                    Object harvested = unmarshaller.unmarshal(fileToHarvest);
-                    if (harvested == null) {
-                        throw new OWSWebServiceException("The resource can not be parsed.",
-                                                          INVALID_PARAMETER_VALUE, "Source", version);
-                    }
+                // if the resource is a simple record
+                if (sourceURL.endsWith("xml")) {
                     
-                    // if the resource is another CSW service we get all the data of this catalogue.
-                    if (harvested.getClass().getName().equals("net.seagis.cat.csw.Capabilities")) {
-                        totalInserted = harvestCatalogue(sourceURL);
-                    } else {
+                    URL source          = new URL(sourceURL);
+                    URLConnection conec = source.openConnection();
+                
+                    // we get the source document
+                    File fileToHarvest = File.createTempFile("harvested", "xml");
+                    InputStream in = conec.getInputStream();
+                    FileOutputStream out = new FileOutputStream(fileToHarvest);
+                    byte[] buffer = new byte[1024];
+                    int size;
+
+                    while ((size = in.read(buffer, 0, 1024)) > 0) {
+                        out.write(buffer, 0, size);
+                    }
+                
+                    if (resourceType.equals("http://www.isotc211.org/2005/gmd")      || 
+                        resourceType.equals("http://www.opengis.net/cat/csw/2.0.2")  ||
+                        resourceType.equals("http://www.isotc211.org/2005/gfc"))        {
+
+                        Object harvested = unmarshaller.unmarshal(fileToHarvest);
+                        if (harvested == null) {
+                            throw new OWSWebServiceException("The resource can not be parsed.",
+                                                              INVALID_PARAMETER_VALUE, "Source", version);
+                        }
+                    
                         logger.info("Object Type of the harvested Resource: " + harvested.getClass().getName());
                         if (storeMetadata(harvested))
                             totalInserted++;
                     }
-                    
+                
+                // if the resource is another CSW service we get all the data of this catalogue.
+                } else {
+                    totalInserted = harvestCatalogue(sourceURL);
                 }
                 
             } catch (SQLException ex) {
@@ -1389,7 +1389,20 @@ public class CSWworker {
      * @return
      */
     private int harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, WebServiceException, SQLException {
-        sourceURL = sourceURL.substring(0, sourceURL.indexOf('?'));
+        
+        //first we make a getCapabilities request to see what service version we have
+        Object distantCapabilities = sendRequest(sourceURL + "?request=GetCapabilities&service=CSW", null);
+        
+        
+        if (distantCapabilities instanceof Capabilities) {
+            logger.info("CSW 2.0.2 service identified");
+            
+        } else if (distantCapabilities instanceof net.seagis.cat.csw.v200.CapabilitiesType) {
+            logger.info("CSW 2.0.0 service identified");
+        } else {
+            throw new OWSWebServiceException("This service if it is one is not requestable by constellation",
+                                              OPERATION_NOT_SUPPORTED, "ResponseHandler", version);
+        }
         
         //we initialize the getRecords request
         fullGetRecordsRequest.setStartPosition(1);
@@ -1401,54 +1414,12 @@ public class CSWworker {
         //we make multiple request by pack of 20 record 
         while (moreResults) {
         
-            URL source          = new URL(sourceURL);
-            URLConnection conec = source.openConnection();
-            conec.setDoOutput(true);
-            OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
-        
-            StringWriter sw = new StringWriter();
-            try {
-                marshaller.marshal(fullGetRecordsRequest, sw);
-            } catch (JAXBException ex) {
-                throw new OWSWebServiceException("Unable to marshall GetRecords request.",
-                                                  NO_APPLICABLE_CODE, null, version);
-            }
-            wr.write(sw.toString());
-            wr.flush();
-        
-            // we get the response document
-            InputStream in = conec.getInputStream();
-            StringWriter out = new StringWriter();
-            byte[] buffer = new byte[1024];
-            int size;
-
-            while ((size = in.read(buffer, 0, 1024)) > 0) {
-                out.write(new String(buffer, 0, size));
-            }
-        
-            //we convert the brut String value into UTF-8 encoding
-            String brutString = out.toString();
-            
-            //we need to replace % character by "percent because they are reserved char for url encoding
-            brutString = brutString.replaceAll("%", "percent");
-            String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
-        
-            Object harvested = null;
-            try {
-                harvested = unmarshaller.unmarshal(new StringReader(decodedString));
-                if (harvested != null && harvested instanceof JAXBElement)  {
-                    harvested = ((JAXBElement)harvested).getValue();
-                }
-            } catch (JAXBException ex) {
-                ex.printStackTrace();
-                throw new OWSWebServiceException("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
-                                                 "cause: " + ex.getMessage(),
-                                                  NO_APPLICABLE_CODE, null, version);
-            }
+            Object harvested = sendRequest(sourceURL, fullGetRecordsRequest);
         
             if (harvested == null) {
                 throw new OWSWebServiceException("The distant service does not respond correctly.",
                                                   NO_APPLICABLE_CODE, null, version);
+            
             } else if (harvested instanceof GetRecordsResponseType) {
                 logger.info("First response of distant service:" + '\n' + harvested.toString());
                 GetRecordsResponseType serviceResponse = (GetRecordsResponseType) harvested;
@@ -1472,6 +1443,60 @@ public class CSWworker {
             }
         }
         return nbRecordInserted;
+    }
+    
+    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException, WebServiceException {
+        
+        URL source         = new URL(sourceURL);
+        URLConnection conec = source.openConnection();
+        
+
+        // for a POST request
+        if (request != null) {
+        
+            conec.setDoOutput(true);
+            OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+            StringWriter sw = new StringWriter();
+            try {
+                marshaller.marshal(request, sw);
+            } catch (JAXBException ex) {
+                throw new OWSWebServiceException("Unable to marshall the request.",
+                                                 NO_APPLICABLE_CODE, null, version);
+            }
+            wr.write(sw.toString());
+            wr.flush();
+        }
+        
+        // we get the response document
+        InputStream in = conec.getInputStream();
+        StringWriter out = new StringWriter();
+        byte[] buffer = new byte[1024];
+        int size;
+
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            out.write(new String(buffer, 0, size));
+        }
+
+        //we convert the brut String value into UTF-8 encoding
+        String brutString = out.toString();
+
+        //we need to replace % character by "percent because they are reserved char for url encoding
+        brutString = brutString.replaceAll("%", "percent");
+        String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
+
+        Object harvested = null;
+        try {
+            harvested = unmarshaller.unmarshal(new StringReader(decodedString));
+            if (harvested != null && harvested instanceof JAXBElement) {
+                harvested = ((JAXBElement) harvested).getValue();
+            }
+        } catch (JAXBException ex) {
+            ex.printStackTrace();
+            throw new OWSWebServiceException("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                    "cause: " + ex.getMessage(),
+                    NO_APPLICABLE_CODE, null, version);
+        }
+        return harvested;
     }
     
     /**

@@ -1,6 +1,7 @@
 /*
  * Sicade - Systèmes intégrés de connaissances pour l'aide à la décision en environnement
- * (C) 2008, Institut de Recherche pour le Développement
+ * (C) 2005, Institut de Recherche pour le Développement
+ * (C) 2007, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,38 +14,34 @@
  *    Lesser General Public License for more details.
  */
 
-
-package net.seagis.cat.csw.v200;
+package net.seagis.dublincore.v2.elements;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.dublincore.v1.elements.SimpleLiteral;
 
 
 /**
+ * This type definition is included as a convenience for schema authors 
+ *       who need a container element for all of the DC elements.
  * 
- * This type encapsulates all of the standard DCMI metadata terms, 
- * including the Dublin Core refinements; these terms may be mapped to the profile-specific information model.
- *       
- * 
- * <p>Java class for DCMIRecordType complex type.
+ * <p>Java class for elementContainer complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="DCMIRecordType">
+ * &lt;complexType name="elementContainer">
  *   &lt;complexContent>
- *     &lt;extension base="{http://www.opengis.net/cat/csw}AbstractRecordType">
- *       &lt;sequence>
- *         &lt;group ref="{http://www.purl.org/dc/terms/}DCMI-terms"/>
- *       &lt;/sequence>
- *     &lt;/extension>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;choice>
+ *         &lt;group ref="{http://purl.org/dc/elements/1.1/}DC-element-set"/>
+ *       &lt;/choice>
+ *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
@@ -52,27 +49,23 @@ import net.seagis.dublincore.v1.elements.SimpleLiteral;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DCMIRecordType", propOrder = {
+@XmlType(name = "elementContainer", propOrder = {
     "dcElement"
 })
-@XmlSeeAlso({
-    RecordType.class
-})
-public class DCMIRecordType extends AbstractRecordType {
+public class ElementContainer {
 
-    @XmlElementRef(name = "DC-element", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class)
+    @XmlElementRef(name = "DC-element", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
     private List<JAXBElement<SimpleLiteral>> dcElement;
 
     /**
      * Gets the value of the dcElement property.
-     * 
-     * 
+     * (unmodifiable)
      */
     public List<JAXBElement<SimpleLiteral>> getDCElement() {
         if (dcElement == null) {
             dcElement = new ArrayList<JAXBElement<SimpleLiteral>>();
         }
-        return this.dcElement;
+        return Collections.unmodifiableList(dcElement);
     }
 
 }

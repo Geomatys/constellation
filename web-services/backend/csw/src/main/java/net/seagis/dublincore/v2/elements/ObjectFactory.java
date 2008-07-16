@@ -15,7 +15,7 @@
  */
 
 
-package net.seagis.dublincore.elements;
+package net.seagis.dublincore.v2.elements;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;

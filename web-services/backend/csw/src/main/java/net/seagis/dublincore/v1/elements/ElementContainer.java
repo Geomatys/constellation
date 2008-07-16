@@ -14,10 +14,9 @@
  *    Lesser General Public License for more details.
  */
 
-package net.seagis.dublincore.elements;
+package net.seagis.dublincore.v1.elements;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -27,8 +26,10 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * This type definition is included as a convenience for schema authors 
- *       who need a container element for all of the DC elements.
+ * 
+ *       This complexType is included as a convenience for schema authors who 
+ *       need to define a root or container element for all of the DC elements.
+ *       
  * 
  * <p>Java class for elementContainer complex type.
  * 
@@ -39,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
- *         &lt;group ref="{http://purl.org/dc/elements/1.1/}DC-element-set"/>
+ *         &lt;group ref="{http://www.purl.org/dc/elements/1.1/}DC-element-set"/>
  *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -54,18 +55,18 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class ElementContainer {
 
-    @XmlElementRef(name = "DC-element", namespace = "http://purl.org/dc/elements/1.1/", type = JAXBElement.class)
+    @XmlElementRef(name = "DC-element", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class)
     private List<JAXBElement<SimpleLiteral>> dcElement;
 
     /**
      * Gets the value of the dcElement property.
-     * (unmodifiable)
+     * 
      */
     public List<JAXBElement<SimpleLiteral>> getDCElement() {
         if (dcElement == null) {
             dcElement = new ArrayList<JAXBElement<SimpleLiteral>>();
         }
-        return Collections.unmodifiableList(dcElement);
+        return this.dcElement;
     }
 
 }

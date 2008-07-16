@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import net.seagis.ows.v100.BoundingBoxType;
-import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.dublincore.v2.elements.SimpleLiteral;
 import net.seagis.ows.v100.WGS84BoundingBoxType;
 import org.geotools.util.Utilities;
 

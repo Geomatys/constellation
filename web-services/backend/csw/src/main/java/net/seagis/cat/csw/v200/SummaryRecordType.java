@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.dublincore.v1.elements.SimpleLiteral;
 
 
 /**

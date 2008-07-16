@@ -16,13 +16,11 @@
 
 package net.seagis.cat.csw.v200;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlType;
-import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.dublincore.v1.elements.SimpleLiteral;
 
 
 /**
@@ -58,8 +56,8 @@ import net.seagis.dublincore.elements.SimpleLiteral;
 })
 public class BriefRecordType extends AbstractRecordType {
 
-    @XmlElementRef(name = "identifier", namespace = "http://www.purl.org/dc/elements/1.1/", type = JAXBElement.class)
-    private JAXBElement<SimpleLiteral> identifier;
+    @XmlElement(name = "identifier", namespace = "http://www.purl.org/dc/elements/1.1/")
+    private SimpleLiteral identifier;
     @XmlElement(namespace = "http://www.purl.org/dc/elements/1.1/")
     private SimpleLiteral type;
 
@@ -68,17 +66,15 @@ public class BriefRecordType extends AbstractRecordType {
      * 
      */
     public SimpleLiteral getIdentifier() {
-        if (identifier != null)
-            return identifier.getValue();
-        return null;
+        return identifier;
     }
 
     /**
      * Sets the value of the identifier property.
      * 
      */
-    public void setIdentifier(SimpleLiteral value) {
-        this.identifier = dublinFactory.createIdentifier(value);
+    public void setIdentifier(SimpleLiteral identifier) {
+        this.identifier = identifier;
     }
 
     /**

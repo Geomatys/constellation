@@ -103,19 +103,49 @@ public class CSWService extends WebService {
             //ISO 19115 class
             classeList.add(MetaDataImpl.class);
             
-            //CSW classes
-            classeList.addAll(Arrays.asList(Capabilities.class, DescribeRecordType.class
-                        ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
-                        ,GetCapabilities.class, GetDomainType.class, GetRecordByIdType.class
-                        ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
-                        ,QueryType.class, ResultType.class, TransactionType.class
-                        ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
-                        ,DescribeRecordResponseType.class, GetDomainResponseType.class
-                        ,TransactionResponseType.class, HarvestResponseType.class
-                        ,ExceptionReport.class, net.seagis.ows.v110.ExceptionReport.class
-                        ,net.seagis.dublincore.terms.ObjectFactory.class));
-            // TODO remove net.seagis.ows.v110.ExceptionReport.class
+            //CSW 2.0.2 classes
+            classeList.addAll(Arrays.asList(Capabilities.class, 
+                                            DescribeRecordType.class,
+                                            DistributedSearchType.class,
+                                            ElementSetNameType.class,
+                                            ElementSetType.class,
+                                            GetCapabilities.class, 
+                                            GetDomainType.class, 
+                                            GetRecordByIdType.class,
+                                            GetRecordsType.class, 
+                                            HarvestType.class, 
+                                            QueryConstraintType.class,
+                                            QueryType.class, 
+                                            ResultType.class, 
+                                            TransactionType.class,
+                                            GetRecordsResponseType.class, 
+                                            GetRecordByIdResponseType.class,
+                                            DescribeRecordResponseType.class, 
+                                            GetDomainResponseType.class,
+                                            TransactionResponseType.class, 
+                                            HarvestResponseType.class,
+                                            ExceptionReport.class, 
+                                            net.seagis.ows.v110.ExceptionReport.class,  // TODO remove
+                                            net.seagis.dublincore.v2.terms.ObjectFactory.class));
             
+           //CSW 2.0.0 classes
+           classeList.addAll(Arrays.asList(net.seagis.cat.csw.v200.CapabilitiesType.class, 
+                                           net.seagis.cat.csw.v200.DescribeRecordType.class,
+                                           net.seagis.cat.csw.v200.DistributedSearchType.class, 
+                                           net.seagis.cat.csw.v200.ElementSetNameType.class, 
+                                           net.seagis.cat.csw.v200.ElementSetType.class,
+                                           net.seagis.cat.csw.v200.GetCapabilitiesType.class,
+                                           net.seagis.cat.csw.v200.GetDomainType.class, 
+                                           net.seagis.cat.csw.v200.GetRecordByIdType.class,
+                                           net.seagis.cat.csw.v200.GetRecordsType.class, 
+                                           net.seagis.cat.csw.v200.QueryConstraintType.class,
+                                           net.seagis.cat.csw.v200.QueryType.class, 
+                                           net.seagis.cat.csw.v200.ResultType.class, 
+                                           net.seagis.cat.csw.v200.GetRecordsResponseType.class,
+                                           net.seagis.cat.csw.v200.GetRecordByIdResponseType.class,
+                                           net.seagis.cat.csw.v200.DescribeRecordResponseType.class, 
+                                           net.seagis.cat.csw.v200.GetDomainResponseType.class,
+                                           net.seagis.dublincore.v1.terms.ObjectFactory.class));
            // we add the extensions classes
            classeList.addAll(loadExtensionsClasses());
             
