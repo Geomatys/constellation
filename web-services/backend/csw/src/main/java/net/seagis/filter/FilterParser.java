@@ -33,7 +33,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 // Seagis dependencies
-import net.seagis.cat.csw.QueryConstraintType;
+import net.seagis.cat.csw.v202.QueryConstraintType;
 import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.coverage.web.WebServiceException;
 import net.seagis.gml.v311.CoordinatesType;

@@ -49,7 +49,7 @@ public class UserData {
     })
     private Object[] WCSCapabilities;
     
-    @XmlElementRef(name= "Capabilities", namespace="http://www.opengis.net/cat/csw/2.0.2", type = net.seagis.cat.csw.Capabilities.class)
+    @XmlElementRef(name= "Capabilities", namespace="http://www.opengis.net/cat/csw/2.0.2", type = net.seagis.cat.csw.v202.Capabilities.class)
     private Object[] CSWCapabilities;
     
     private Object[] SOSCapabilities;

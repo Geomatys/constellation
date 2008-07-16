@@ -44,15 +44,15 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
 // Seagis Dependencies
-import net.seagis.cat.csw.AbstractRecordType;
-import net.seagis.cat.csw.BriefRecordType;
-import net.seagis.cat.csw.ElementSetType;
-import net.seagis.cat.csw.SummaryRecordType;
+import net.seagis.cat.csw.v202.AbstractRecordType;
+import net.seagis.cat.csw.v202.BriefRecordType;
+import net.seagis.cat.csw.v202.ElementSetType;
+import net.seagis.cat.csw.v202.SummaryRecordType;
+import net.seagis.cat.csw.v202.RecordType;
 import net.seagis.dublincore.elements.SimpleLiteral;
 import net.seagis.ows.v100.BoundingBoxType;
-import net.seagis.cat.csw.RecordType;
-import net.seagis.coverage.web.ServiceVersion;
 import net.seagis.ows.v100.OWSWebServiceException;
+import net.seagis.coverage.web.ServiceVersion;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 // MDWeb dependencies

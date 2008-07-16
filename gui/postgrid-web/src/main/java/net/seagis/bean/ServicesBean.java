@@ -236,7 +236,7 @@ public class ServicesBean {
         //we create the JAXBContext and read the selected file 
         JAXBContext JBcontext = JAXBContext.newInstance(Capabilities.class, WMSCapabilities.class,
                 WMT_MS_Capabilities.class, WCSCapabilitiesType.class,
-                net.seagis.cat.csw.Capabilities.class, UserData.class);
+                net.seagis.cat.csw.v202.Capabilities.class, UserData.class);
 
         unmarshaller = JBcontext.createUnmarshaller();
         marshaller = JBcontext.createMarshaller();
