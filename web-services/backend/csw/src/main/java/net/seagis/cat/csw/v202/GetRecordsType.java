@@ -29,16 +29,16 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.cat.csw.GetRecordsRequest;
 
 
 /**
  * 
- * The principal means of searching the catalogue. The matching 
- * catalogue entries may be included with the response. The client 
- * may assign a requestId (absolute URI). A distributed search is 
- * performed if the DistributedSearch element is present and the 
- * catalogue is a member of a federation. Profiles may allow 
- * alternative query expressions.
+ * The principal means of searching the catalogue. 
+ * The matching catalogue entries may be included with the response. 
+ * The client may assign a requestId (absolute URI). 
+ * A distributed search is performed if the DistributedSearch element is present and the catalogue is a member of a federation. 
+ * Profiles may allow alternative query expressions.
  * 
  * <p>Java class for GetRecordsType complex type.
  * 
@@ -74,7 +74,7 @@ import javax.xml.bind.annotation.XmlType;
     "any"
 })
 @XmlRootElement(name = "GetRecords")
-public class GetRecordsType extends RequestBaseType {
+public class GetRecordsType extends RequestBaseType implements GetRecordsRequest {
 
     @XmlElement(name = "DistributedSearch")
     private DistributedSearchType distributedSearch;
@@ -110,7 +110,7 @@ public class GetRecordsType extends RequestBaseType {
     }
     
     /**
-     * Build a new GetRecors request
+     * Build a new GetRecords request
      */
     public GetRecordsType(String service, String version, ResultType resultType, 
             String requestId, String outputFormat, String outputSchema, Integer startPosition,
@@ -126,11 +126,7 @@ public class GetRecordsType extends RequestBaseType {
         this.maxRecords        = maxRecords;
         this.abstractQuery     = abstractQuery;
         this.distributedSearch = distributedSearch;
-        
-        
     }
-    
-    
 
     /**
      * Gets the value of the distributedSearch property.
@@ -175,6 +171,14 @@ public class GetRecordsType extends RequestBaseType {
     }
 
     /**
+     * Sets the value of the requestId property.
+     * 
+     */
+    public void setRequestId(String value) {
+        this.requestId = value;
+    }
+    
+    /**
      * Gets the value of the resultType property.
      */
     public ResultType getResultType() {
@@ -193,12 +197,28 @@ public class GetRecordsType extends RequestBaseType {
     }
 
     /**
+     * Sets the value of the outputFormat property.
+     * 
+     */
+    public void setOutputFormat(String value) {
+        this.outputFormat = value;
+    }
+    
+    /**
      * Gets the value of the outputSchema property.
      */
     public String getOutputSchema() {
         return outputSchema;
     }
 
+    /**
+     * Sets the value of the outputSchema property.
+     * 
+     */
+    public void setOutputSchema(String value) {
+        this.outputSchema = value;
+    }
+    
     /**
      * Initialize the start position.
      * 
@@ -228,5 +248,13 @@ public class GetRecordsType extends RequestBaseType {
         } else {
             return maxRecords;
         }
+    }
+    
+    /**
+     * Sets the value of the maxRecords property.
+     * 
+     */
+    public void setMaxRecords(Integer value) {
+        this.maxRecords = value;
     }
 }

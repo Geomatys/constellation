@@ -29,15 +29,13 @@ import net.seagis.ogc.SortByType;
 
 
 /**
- * Specifies a query to execute against instances of one or
- *          more object types. A set of ElementName elements may be included 
- *          to specify an adhoc view of the csw:Record instances in the result 
- *          set. Otherwise, use ElementSetName to specify a predefined view. 
- *          The Constraint element contains a query filter expressed in a 
- *          supported query language. A sorting criterion that specifies a 
- *          property to sort by may be included.
+ * Specifies a query to execute against instances of one or more object types. 
+ * A set of ElementName elements may be included to specify an adhoc view of the csw:Record instances in the result set.
+ * Otherwise, use ElementSetName to specify a predefined view. 
+ * The Constraint element contains a query filter expressed in a supported query language. 
+ * A sorting criterion that specifies a property to sort by may be included.
  * 
- *          typeNames - a list of object types to query.
+ *  typeNames - a list of object types to query.
  * 
  * <p>Java class for QueryType complex type.
  * 

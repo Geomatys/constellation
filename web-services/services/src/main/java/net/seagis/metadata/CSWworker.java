@@ -49,6 +49,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import net.seagis.cat.csw.GetRecordsRequest;
+import net.seagis.cat.csw.v200.CapabilitiesType;
+import net.seagis.cat.csw.v200.GetCapabilitiesType;
 import net.seagis.cat.csw.v202.AbstractQueryType;
 import net.seagis.cat.csw.v202.AbstractRecordType;
 import net.seagis.cat.csw.v202.AcknowledgementType;
@@ -94,10 +97,15 @@ import net.seagis.ogc.PropertyIsLikeType;
 import net.seagis.ogc.PropertyNameType;
 import net.seagis.ows.v100.AcceptFormatsType;
 import net.seagis.ows.v100.AcceptVersionsType;
+import net.seagis.ows.v100.CapabilitiesBaseType;
+import net.seagis.ows.v100.DCP;
 import net.seagis.ows.v100.DomainType;
+import net.seagis.ows.v100.ExceptionReport;
+import net.seagis.ows.v100.ExceptionType;
 import net.seagis.ows.v100.OWSWebServiceException;
 import net.seagis.ows.v100.Operation;
 import net.seagis.ows.v100.OperationsMetadata;
+import net.seagis.ows.v100.RequestMethodType;
 import net.seagis.ows.v100.SectionsType;
 import net.seagis.ows.v100.ServiceIdentification;
 import net.seagis.ows.v100.ServiceProvider;
@@ -175,7 +183,12 @@ public class CSWworker {
     /**
      * A JAXB factory to csw object 
      */
-    private final ObjectFactory cswFactory;
+    private final ObjectFactory cswFactory202;
+    
+    /**
+     * A JAXB factory to csw object 
+     */
+    private final net.seagis.cat.csw.v200.ObjectFactory cswFactory200;
     
     /**
      * The current MIME type of return
@@ -547,9 +560,26 @@ public class CSWworker {
     }
     
     /**
-     * A getRecords request used to request another csw. 
+     * A getRecords request used to request another csw (2.0.2).
      */
-    private GetRecordsType fullGetRecordsRequest;
+    private GetRecordsType fullGetRecordsRequestv202;
+    
+    /**
+     * A getRecords request used to request another csw(2.0.0).
+     */
+    private net.seagis.cat.csw.v200.GetRecordsType fullGetRecordsRequestv200;
+    
+    /**
+     * A getCapabilities request used request another csw(2.0.2)
+     */
+    private GetCapabilities getCapabilitiesRequestv202;
+    
+    /**
+     * A getCapabilities request used request another csw(2.0.0)
+     */
+    private GetCapabilitiesType getCapabilitiesRequestv200;
+    
+    
     
     /**
      * Build a new CSW worker
@@ -563,7 +593,8 @@ public class CSWworker {
         
         this.unmarshaller = unmarshaller;
         this.marshaller   = marshaller; 
-        cswFactory        = new ObjectFactory();
+        cswFactory202     = new ObjectFactory();
+        cswFactory200     = new net.seagis.cat.csw.v200.ObjectFactory();
         Properties prop   = new Properties();
         File f            = null;
         File env          = new File("/root/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
@@ -625,17 +656,8 @@ public class CSWworker {
                  index           = new IndexLucene(databaseReader, env);
                  MDReader        = new MetadataReader(databaseReader, dataSourceMD.getConnection());
                  MDWriter        = new MetadataWriter(databaseReader, databaseWriter);
+                 initializeRequest();
                  
-                 //we build the base request to harvest another CSW service
-                 List<QName> typeNames          = new ArrayList<QName>();
-                 PropertyNameType pname         = new PropertyNameType("dc:Title");
-                 PropertyIsLikeType pil         = new PropertyIsLikeType(pname, "*", "?", "*", "\\");
-                 FilterType filter              = new FilterType(pil);
-                 QueryConstraintType constraint = new QueryConstraintType(filter, "1.1.0");
-                 typeNames.add(_Record_QNAME);
-                 QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint); 
-                 JAXBElement<? extends AbstractQueryType> jbQuery =  cswFactory.createQuery(query);
-                 fullGetRecordsRequest = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, jbQuery, null);
                  logger.info("CSW service running");
             }
             
@@ -647,6 +669,43 @@ public class CSWworker {
             MDWriter        = null;
             MDConnection    = null;
         }
+    }
+    
+    /**
+     * Initialize The object request to harvest distant CSW
+     */
+    public void initializeRequest() {
+        
+        //we build the base request to harvest another CSW service (2.0.2)
+        List<QName> typeNames          = new ArrayList<QName>();
+        PropertyNameType pname         = new PropertyNameType("dc:Title");
+        PropertyIsLikeType pil         = new PropertyIsLikeType(pname, "*", "?", "*", "\\");
+        FilterType filter              = new FilterType(pil);
+        QueryConstraintType constraint = new QueryConstraintType(filter, "1.1.0");
+        typeNames.add(_Record_QNAME);
+        QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint); 
+        JAXBElement<? extends AbstractQueryType> jbQuery =  cswFactory202.createQuery(query);
+        fullGetRecordsRequestv202 = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, jbQuery, null);
+                 
+        
+        //we build the base request to harvest another CSW service (2.0.0)
+        net.seagis.cat.csw.v200.QueryConstraintType constraint2 = new net.seagis.cat.csw.v200.QueryConstraintType(filter, "1.1.0");
+        List<String> typeNames2 = new ArrayList<String>();
+        typeNames2.add("csw:dataset");
+        net.seagis.cat.csw.v200.QueryType query2 = new net.seagis.cat.csw.v200.QueryType(typeNames2, 
+                                                                                         new net.seagis.cat.csw.v200.ElementSetNameType(net.seagis.cat.csw.v200.ElementSetType.FULL), 
+                                                                                         constraint2); 
+        JAXBElement<? extends net.seagis.cat.csw.v200.AbstractQueryType> jbQuery2 =  cswFactory200.createQuery(query2);
+        fullGetRecordsRequestv200 = new net.seagis.cat.csw.v200.GetRecordsType("CSW", "2.0.0", net.seagis.cat.csw.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, jbQuery2, null);
+        
+        //we build the base request to get the capabilities of anoter CSW service (2.0.2)
+        AcceptVersionsType versions = new AcceptVersionsType("2.0.2", "2.0.0");
+        SectionsType sections       = new SectionsType("All");
+        AcceptFormatsType formats   = new AcceptFormatsType("text/xml", "application/xml");
+        getCapabilitiesRequestv202  = new GetCapabilities(versions, sections, formats, null, "CSW");
+        
+        //we build the base request to get the capabilities of anoter CSW service (2.0.0)
+        getCapabilitiesRequestv200  = new GetCapabilitiesType(versions, sections, formats, null, "CSW");
     }
     
     /**
@@ -918,11 +977,11 @@ public class CSWworker {
                 try {
                     Object o = MDReader.getMetadata(id, DUBLINCORE, set);
                     if (o instanceof BriefRecordType) {
-                        records.add(cswFactory.createBriefRecord((BriefRecordType)o));
+                        records.add(cswFactory202.createBriefRecord((BriefRecordType)o));
                     } else if (o instanceof SummaryRecordType) {
-                        records.add(cswFactory.createSummaryRecord((SummaryRecordType)o));
+                        records.add(cswFactory202.createSummaryRecord((SummaryRecordType)o));
                     } else if (o instanceof RecordType) {
-                        records.add(cswFactory.createRecord((RecordType)o));
+                        records.add(cswFactory202.createRecord((RecordType)o));
                     }
                     
                 } catch (SQLException e) {
@@ -1390,22 +1449,38 @@ public class CSWworker {
      */
     private int harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, WebServiceException, SQLException {
         
-        //first we make a getCapabilities request to see what service version we have
-        Object distantCapabilities = sendRequest(sourceURL + "?request=GetCapabilities&service=CSW", null);
+        //first we make a getCapabilities(GET) request to see what service version we have
+        Object distantCapabilities = sendRequest(sourceURL + "?request=GetCapabilities&service=CSW&a", null);
         
+        //if the GET request does not work we try the POST request
+        if (distantCapabilities == null) {
+            distantCapabilities = sendRequest(sourceURL, getCapabilitiesRequestv202);
+            if (distantCapabilities == null) {
+                distantCapabilities = sendRequest(sourceURL, getCapabilitiesRequestv200);
+            }
+        }
+        
+        GetRecordsRequest getRecordRequest = null;
         
         if (distantCapabilities instanceof Capabilities) {
-            logger.info("CSW 2.0.2 service identified");
+            
+            Capabilities capa = (Capabilities) distantCapabilities;
+            getRecordRequest = fullGetRecordsRequestv202;
+            analyseCapabilitiesDocument(capa, getRecordRequest);
             
         } else if (distantCapabilities instanceof net.seagis.cat.csw.v200.CapabilitiesType) {
-            logger.info("CSW 2.0.0 service identified");
+            
+            net.seagis.cat.csw.v200.CapabilitiesType capa = (CapabilitiesType) distantCapabilities;
+            getRecordRequest = fullGetRecordsRequestv200;
+            analyseCapabilitiesDocument(capa, getRecordRequest);
+            
         } else {
             throw new OWSWebServiceException("This service if it is one is not requestable by constellation",
                                               OPERATION_NOT_SUPPORTED, "ResponseHandler", version);
         }
         
         //we initialize the getRecords request
-        fullGetRecordsRequest.setStartPosition(1);
+        getRecordRequest.setStartPosition(1);
         
         //we open the connection
         int nbRecordInserted = 0;
@@ -1414,7 +1489,7 @@ public class CSWworker {
         //we make multiple request by pack of 20 record 
         while (moreResults) {
         
-            Object harvested = sendRequest(sourceURL, fullGetRecordsRequest);
+            Object harvested = sendRequest(sourceURL, getRecordRequest);
         
             if (harvested == null) {
                 throw new OWSWebServiceException("The distant service does not respond correctly.",
@@ -1434,9 +1509,19 @@ public class CSWworker {
                 //if there is more results we need to make another request
                 moreResults = results.getNumberOfRecordsReturned() != 0;
                 if (moreResults) {
-                    fullGetRecordsRequest.setStartPosition(results.getNextRecord());
+                    fullGetRecordsRequestv202.setStartPosition(results.getNextRecord());
                 }
-                
+            } else if (harvested instanceof ExceptionReport) {
+                ExceptionReport ex = (ExceptionReport) harvested;
+                String msg = "";
+                if (ex.getException() != null && ex.getException().size() > 0) {
+                    for (ExceptionType e:ex.getException()) {
+                        for (String s: e.getExceptionText())
+                            msg = msg + s + '\n';
+                    }
+                }
+                throw new OWSWebServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
+                                             NO_APPLICABLE_CODE, null, version);
             } else {
                 throw new OWSWebServiceException("The distant service does not respond correctly: unexpected response type: " + harvested.getClass().getSimpleName(),
                                              NO_APPLICABLE_CODE, null, version);
@@ -1445,6 +1530,57 @@ public class CSWworker {
         return nbRecordInserted;
     }
     
+    /**
+     *  Analyse a capabilities Document and update the specified GetRecords request at the same time.
+     */
+    public void analyseCapabilitiesDocument(CapabilitiesBaseType capa, GetRecordsRequest request) {
+        String distantVersion = "2.0.2";
+        String report = "";
+
+        //we get the service version (could be 2.0.0 or 2.0.1 or 2.0.2)
+        if (capa.getVersion() != null) {
+            distantVersion = capa.getVersion();
+        }
+        request.setVersion(distantVersion);
+
+        //we get the Operations metadata if they are present
+        OperationsMetadata om = capa.getOperationsMetadata();
+
+        //we look for the GetRecords operation.
+        Operation GRop = om.getOperation("GetRecords");
+        if (GRop != null) {
+            if (GRop.getDCP().size() == 1) {
+                DCP dcp = GRop.getDCP().get(0);
+                List<JAXBElement<RequestMethodType>> protocols = dcp.getHTTP().getRealGetOrPost();
+                report = report + "available protocols:" + '\n';
+                for (JAXBElement<RequestMethodType> jb : protocols) {
+                    report = report + jb.getName().getLocalPart() + '\n';
+                }
+
+            } else if (GRop.getDCP().size() > 1) {
+                report = report + "multiple DCP" + '\n';
+            } else {
+                report = report + "no DCP found" + '\n';
+            }
+        } else {
+            report = report + "NO GetRecords operation find" + '\n';
+        }
+
+        logger.info("CSW " + distantVersion + " service identified:" + '\n' + report);
+    }
+    
+    /**
+     * Send a request to another CSW service.
+     * 
+     * @param sourceURL the url of the distant web-service
+     * @param request The XML object to send in POST mode (if null the request is GET)
+     * 
+     * @return The object correspounding to the XML response of the distant web-service
+     * 
+     * @throws java.net.MalformedURLException
+     * @throws java.io.IOException
+     * @throws net.seagis.coverage.web.WebServiceException
+     */
     private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException, WebServiceException {
         
         URL source         = new URL(sourceURL);
@@ -1455,12 +1591,13 @@ public class CSWworker {
         if (request != null) {
         
             conec.setDoOutput(true);
+            conec.setRequestProperty("Content-Type","text/xml");
             OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
             StringWriter sw = new StringWriter();
             try {
                 marshaller.marshal(request, sw);
             } catch (JAXBException ex) {
-                throw new OWSWebServiceException("Unable to marshall the request.",
+                throw new OWSWebServiceException("Unable to marshall the request: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE, null, version);
             }
             wr.write(sw.toString());
@@ -1491,10 +1628,8 @@ public class CSWworker {
                 harvested = ((JAXBElement) harvested).getValue();
             }
         } catch (JAXBException ex) {
-            ex.printStackTrace();
-            throw new OWSWebServiceException("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
-                    "cause: " + ex.getMessage(),
-                    NO_APPLICABLE_CODE, null, version);
+            logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                    "cause: " + ex.getMessage());
         }
         return harvested;
     }

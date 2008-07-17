@@ -77,6 +77,23 @@ public class QueryType extends AbstractQueryType {
     private List<String> typeNames;
 
     /**
+     * Empty constructor used by JAXB
+     */
+    QueryType() {
+        
+    }
+    
+    /**
+     * Build a new Query
+     */
+    public QueryType(List<String> typeNames, ElementSetNameType elementSetName, QueryConstraintType constraint) {
+        
+        this.typeNames      = typeNames;
+        this.elementSetName = elementSetName; 
+        this.constraint     = constraint;
+    }
+    
+    /**
      * Gets the value of the elementSetName property.
      * 
      */

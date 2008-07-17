@@ -25,8 +25,8 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * 
- * Base type for all request messages except GetCapabilities. The 
- * attributes identify the relevant service type and version.
+ * Base type for all request messages except GetCapabilities. 
+ * The attributes identify the relevant service type and version.
  *          
  * 
  * <p>Java class for RequestBaseType complex type.
@@ -49,12 +49,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RequestBaseType")
 @XmlSeeAlso({
-    //DescribeRecordType.class,
-    //GetRecordByIdType.class,
-    //GetDomainType.class,
-    GetRecordsType.class
-    //HarvestType.class,
-    //TransactionType.class
+    DescribeRecordType.class,
+    GetRecordByIdType.class,
+    GetDomainType.class,
+    GetRecordsType.class,
+    HarvestType.class,
+    TransactionType.class
 })
 public abstract class RequestBaseType {
 
@@ -93,5 +93,12 @@ public abstract class RequestBaseType {
      */
     public String getVersion() {
         return version;
+    }
+    
+    /**
+     * Gets the value of the version property.
+     */
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

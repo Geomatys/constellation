@@ -54,6 +54,20 @@ public class ElementSetNameType {
     private List<String> typeNames;
 
     /**
+     * An empty constructor used by JAXB
+     */
+    ElementSetNameType(){
+        
+    }
+    
+    /**
+     * Build a elementSetName with only the elementSet value (no typeNames).
+     */
+    public ElementSetNameType(ElementSetType value){
+        this.value = value;
+    }
+    
+    /**
      * Named subsets of catalogue object properties; 
      * these views are bound to a specific information model and are defined within an application profile.
      */

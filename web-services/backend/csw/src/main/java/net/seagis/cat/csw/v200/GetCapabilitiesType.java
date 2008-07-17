@@ -19,7 +19,11 @@ package net.seagis.cat.csw.v200;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.ows.v100.AcceptFormatsType;
+import net.seagis.ows.v100.AcceptVersionsType;
+import net.seagis.ows.v100.SectionsType;
 
 
 /**
@@ -45,12 +49,34 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "GetCapabilitiesType")
+@XmlRootElement(name = "GetCapabilities")
 public class GetCapabilitiesType extends net.seagis.ows.v100.GetCapabilitiesType {
 
     @XmlAttribute
     private String service;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    GetCapabilitiesType() {
+    }
+    
+    /**
+     * Build a new getCapabilities request with the specified service
+     * 
+     * @param acceptVersions The different versions accepted by the client.
+     * @param sections The different sections of the capabilities document requested.
+     *                 one or more of "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities", "All".
+     * @param acceptFormats The different fomat (MIME type) accepted by the client.
+     * @param updateSequence not used yet.
+     * @param service MUST be CSW.
+     */
+    public GetCapabilitiesType(AcceptVersionsType acceptVersions, SectionsType sections,
+            AcceptFormatsType acceptFormats, String updateSequence, String service) {
+        super(acceptVersions, sections, acceptFormats, updateSequence);
+        this.service = service;
+    }
+    
     /**
      * Gets the value of the service property.
      * 

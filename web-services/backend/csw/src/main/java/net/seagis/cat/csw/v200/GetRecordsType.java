@@ -16,7 +16,6 @@
 
 package net.seagis.cat.csw.v200;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
@@ -25,8 +24,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import net.seagis.cat.csw.GetRecordsRequest;
 
 
 /**
@@ -65,7 +66,8 @@ import javax.xml.bind.annotation.XmlType;
     "responseHandler",
     "abstractQuery"
 })
-public class GetRecordsType extends RequestBaseType {
+@XmlRootElement(name = "GetRecords")        
+public class GetRecordsType extends RequestBaseType implements GetRecordsRequest {
 
     @XmlElement(name = "DistributedSearch")
     private DistributedSearchType distributedSearch;
@@ -86,11 +88,39 @@ public class GetRecordsType extends RequestBaseType {
     private String outputSchema;
     @XmlAttribute
     @XmlSchemaType(name = "positiveInteger")
-    private BigInteger startPosition;
+    private Integer startPosition;
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
-    private BigInteger maxRecords;
+    private Integer maxRecords;
 
+    /**
+     * An empty constructor used by JAXB
+     */
+    GetRecordsType() {
+        
+    }
+    
+    /**
+     * Build a new GetRecords request
+     */
+    public GetRecordsType(String service, String version, ResultType resultType, 
+            String requestId, String outputFormat, String outputSchema, Integer startPosition,
+            Integer maxRecords, JAXBElement<? extends AbstractQueryType> abstractQuery,
+            DistributedSearchType distributedSearch) {
+        
+        super(service, version);
+        this.resultType        = resultType;
+        this.requestId         = requestId;
+        this.outputFormat      = outputFormat;
+        this.outputSchema      = outputSchema;
+        this.startPosition     = startPosition;
+        this.maxRecords        = maxRecords;
+        this.abstractQuery     = abstractQuery;
+        this.distributedSearch = distributedSearch;
+        
+        
+    }
+    
     /**
      * Gets the value of the distributedSearch property.
      * 
@@ -207,9 +237,9 @@ public class GetRecordsType extends RequestBaseType {
      * Gets the value of the startPosition property.
      * 
      */
-    public BigInteger getStartPosition() {
+    public Integer getStartPosition() {
         if (startPosition == null) {
-            return new BigInteger("1");
+            return new Integer("1");
         } else {
             return startPosition;
         }
@@ -219,7 +249,7 @@ public class GetRecordsType extends RequestBaseType {
      * Sets the value of the startPosition property.
      * 
      */
-    public void setStartPosition(BigInteger value) {
+    public void setStartPosition(Integer value) {
         this.startPosition = value;
     }
 
@@ -227,9 +257,9 @@ public class GetRecordsType extends RequestBaseType {
      * Gets the value of the maxRecords property.
      * 
      */
-    public BigInteger getMaxRecords() {
+    public Integer getMaxRecords() {
         if (maxRecords == null) {
-            return new BigInteger("10");
+            return new Integer("10");
         } else {
             return maxRecords;
         }
@@ -239,7 +269,7 @@ public class GetRecordsType extends RequestBaseType {
      * Sets the value of the maxRecords property.
      * 
      */
-    public void setMaxRecords(BigInteger value) {
+    public void setMaxRecords(Integer value) {
         this.maxRecords = value;
     }
 

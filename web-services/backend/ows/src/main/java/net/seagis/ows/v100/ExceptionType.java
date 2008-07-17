@@ -85,6 +85,9 @@ public class ExceptionType {
      * Gets the value of the exceptionText property.
      */
     public List<String> getExceptionText() {
+        if (exceptionText == null) {
+            exceptionText = new ArrayList<String>();
+        }
         return Collections.unmodifiableList(exceptionText);
     }
 
