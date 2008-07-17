@@ -63,12 +63,12 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 
+import org.geotools.util.Utilities;
 import org.geotools.util.DateRange;
 import org.geotools.util.NumberRange;
 import org.geotools.util.logging.Logging;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Classes;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
@@ -780,10 +780,10 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     final GridCoverageEntry getLowestResolution(final GridCoverageEntry that) {
         final GridRange gridRange  = this.geometry.geometry.getGridRange();
         final GridRange gridRange2 = that.geometry.geometry.getGridRange();
-        final int width   = gridRange .getLength(0);
-        final int height  = gridRange .getLength(1);
-        final int width2  = gridRange2.getLength(0);
-        final int height2 = gridRange2.getLength(1);
+        final int width   = gridRange .getSpan(0);
+        final int height  = gridRange .getSpan(1);
+        final int width2  = gridRange2.getSpan(0);
+        final int height2 = gridRange2.getSpan(1);
         if (this.startTime == that.startTime &&
             this.endTime   == that.endTime   &&
             this.zIndice   == that.zIndice   &&
