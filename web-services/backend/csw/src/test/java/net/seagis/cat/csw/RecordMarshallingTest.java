@@ -26,7 +26,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import net.seagis.dublincore.elements.SimpleLiteral;
+import net.seagis.cat.csw.v202.RecordType;
+import net.seagis.dublincore.v2.elements.SimpleLiteral;
 import net.seagis.ows.v100.BoundingBoxType;
 import net.seagis.ows.v100.WGS84BoundingBoxType;
 import net.seagis.ws.rs.NamespacePrefixMapperImpl;
@@ -54,7 +55,7 @@ public class RecordMarshallingTest {
 
     @Before
     public void setUp() throws Exception {
-        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.cat.csw");
+        JAXBContext jbcontext = JAXBContext.newInstance("net.seagis.cat.csw.v202");
         recordUnmarshaller    = jbcontext.createUnmarshaller();
         recordMarshaller      = jbcontext.createMarshaller();
         recordMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -164,10 +165,10 @@ public class RecordMarshallingTest {
         
         RecordType expResult = new RecordType(id, title, type, subject, null, modified, Abstract, bbox, null, null, null, spatial, references);
         
-        System.out.println("RESULT: " + result.toString());
-        System.out.println("");
-        System.out.println("EXPRESULT: " + expResult.toString());
-        System.out.println("-----------------------------------------------------------");
+        logger.finer("RESULT: " + result.toString());
+        logger.finer("");
+        logger.finer("EXPRESULT: " + expResult.toString());
+        logger.finer("-----------------------------------------------------------");
         assertEquals(expResult, result);
     }
 

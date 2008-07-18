@@ -23,20 +23,19 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 
 /**
- * This request allows a user to discover elements of the
- *          information model supported by the catalogue. If no TypeName 
- *          elements are included, then all of the schemas for the 
- *          information model must be returned.
+ * This request allows a user to discover elements of the information model supported by the catalogue. 
+ * If no TypeName elements are included, then all of the schemas for the information model must be returned.
  *       
- *          schemaLanguage - preferred schema language
- *                           (W3C XML Schema by default)
- *          outputFormat - preferred output format (application/xml by default)
+ *  schemaLanguage - preferred schema language (W3C XML Schema by default)
+ * 
+ *  outputFormat - preferred output format (application/xml by default)
  * 
  * <p>Java class for DescribeRecordType complex type.
  * 
@@ -59,9 +58,10 @@ import javax.xml.namespace.QName;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DescribeRecordType", propOrder = {
+@XmlType(name = "", propOrder = {
     "typeName"
 })
+@XmlRootElement(name = "DescribeRecord")
 public class DescribeRecordType extends RequestBaseType {
 
     @XmlElement(name = "TypeName")
@@ -80,7 +80,13 @@ public class DescribeRecordType extends RequestBaseType {
     }
     
     /**
-     * An empty constructor used by JAXB
+     * Build a new DescribeRecord Request
+     * 
+     * @param service Fixed at "CSW".
+     * @param version The version of the service.
+     * @param typeName A list of QName
+     * @param outputFormat The desired MIME type of the response
+     * @param schemaLanguage sefault value is http://www.w3.org/XML/Schema
      */
     public DescribeRecordType(String service, String version, List<QName> typeName,
             String outputFormat, String schemaLanguage) {

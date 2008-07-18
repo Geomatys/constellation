@@ -142,5 +142,9 @@ public class QueryType extends AbstractQueryType {
         }
         return Collections.unmodifiableList(typeNames);
     }
+    
+    public void setTypeNames(List<QName> typeNames) {
+        this.typeNames = typeNames;
+    }
 
 }

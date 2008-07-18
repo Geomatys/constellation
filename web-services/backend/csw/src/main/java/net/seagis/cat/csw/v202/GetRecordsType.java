@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
 import net.seagis.cat.csw.GetRecordsRequest;
 
 
@@ -256,5 +257,12 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
      */
     public void setMaxRecords(Integer value) {
         this.maxRecords = value;
+    }
+
+    public void setTypeNames(List<QName> typenames) {
+        if (abstractQuery != null && abstractQuery.getValue() != null) {
+            AbstractQueryType query = abstractQuery.getValue();
+            query.setTypeNames(typenames);
+        }
     }
 }

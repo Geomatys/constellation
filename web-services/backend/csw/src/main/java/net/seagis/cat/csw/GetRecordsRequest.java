@@ -16,6 +16,9 @@
 
 package net.seagis.cat.csw;
 
+import java.util.List;
+import javax.xml.namespace.QName;
+
 
 /**
  * An interface containing the common methods to the different version of the operation GetRecords.
@@ -91,5 +94,10 @@ public interface GetRecordsRequest  {
      * Set the service version number.
      */
     public void setVersion(String version);
+    
+    /**
+     * Set the typeNames field of the Query part.
+     */
+    public void setTypeNames(List<QName> typenames);
 
 }

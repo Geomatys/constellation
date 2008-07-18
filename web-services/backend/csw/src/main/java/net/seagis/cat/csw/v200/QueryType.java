@@ -144,5 +144,9 @@ public class QueryType extends AbstractQueryType {
         }
         return this.typeNames;
     }
+    
+    public void setTypeNames(List<String> typeNames) {
+        this.typeNames = typeNames;
+    }
 
 }
