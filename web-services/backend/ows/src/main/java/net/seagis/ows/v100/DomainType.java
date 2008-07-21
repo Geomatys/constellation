@@ -66,13 +66,12 @@ public class DomainType {
 
     /**
      * Gets the value of the value property.
-     * (unmodifiable)
      */
     public List<String> getValue() {
         if (value == null) {
             value = new ArrayList<String>();
         }
-        return Collections.unmodifiableList(value);
+        return value;
     }
 
     /**

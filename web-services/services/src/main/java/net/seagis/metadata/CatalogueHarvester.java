@@ -66,6 +66,7 @@ import net.seagis.ows.v100.Operation;
 import net.seagis.ows.v100.OperationsMetadata;
 import net.seagis.ows.v100.RequestMethodType;
 import net.seagis.ows.v100.SectionsType;
+import net.seagis.ws.rs.NamespacePrefixMapperImpl;
 import static net.seagis.ows.OWSExceptionCode.*;
 
 /**
@@ -113,7 +114,12 @@ public class CatalogueHarvester {
     /**
      * The CSW worker which owe this ctalogue harvester.
      */
-    private CSWworker worker;
+    private final CSWworker worker;
+    
+    /**
+     * A prefix mapper
+     */
+    private NamespacePrefixMapperImpl prefixMapper;
     
     /**
      * Build a new catalogue harvester.
@@ -123,6 +129,7 @@ public class CatalogueHarvester {
     public CatalogueHarvester(CSWworker worker) {
         
         this.worker = worker;
+        prefixMapper = new NamespacePrefixMapperImpl("");
         initializeRequest();
     }
     
@@ -175,10 +182,10 @@ public class CatalogueHarvester {
      * 
      * @return the number of inserted Record.
      */
-    protected int harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, WebServiceException, SQLException {
+    protected int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, WebServiceException, SQLException {
         
         //first we make a getCapabilities(GET) request to see what service version we have
-        Object distantCapabilities = sendRequest(sourceURL + "?request=GetCapabilities&service=CSW&a", null);
+        Object distantCapabilities = sendRequest(sourceURL + "?request=GetCapabilities&service=CSW", null);
         
         //if the GET request does not work we try the POST request
         if (distantCapabilities == null) {
@@ -206,7 +213,11 @@ public class CatalogueHarvester {
         //we initialize the getRecords request
         getRecordRequest.setStartPosition(1);
         int nbRecordInserted = 0;
+        int nbRecordUpdated  = 0;
+        boolean succeed      = false;
         
+        //we prepare to store the distant serviceException and send it later if this is necessary
+        List<WebServiceException> distantException = new ArrayList<WebServiceException>();
         
         //we request all the records for each outputSchema supported
         for (String outputSchema: currentDistantOuputSchema) {
@@ -226,14 +237,21 @@ public class CatalogueHarvester {
             
                 // if the service respond correctly    
                 } else if (harvested instanceof GetRecordsResponseType) {
+                    succeed = true;
                     logger.info("Response of distant service:" + '\n' + harvested.toString());
                     GetRecordsResponseType serviceResponse = (GetRecordsResponseType) harvested;
                     SearchResultsType results = serviceResponse.getSearchResults();
             
                     for (JAXBElement<? extends AbstractRecordType> JBrecord: results.getAbstractRecord()) {
                         AbstractRecordType record = JBrecord.getValue();
-                        if (worker.storeMetadata(record))
-                            nbRecordInserted++;
+                        
+                        //Temporary ugly patch TODO handle update in CSW
+                        try {
+                            if (worker.storeMetadata(record))
+                                nbRecordInserted++;
+                        } catch (IllegalArgumentException e) {
+                            nbRecordUpdated++;
+                        }
                     }
                 
                     //if there is more results we need to make another request
@@ -252,8 +270,10 @@ public class CatalogueHarvester {
                                 msg = msg + s + '\n';
                         }
                     }
-                    throw new OWSWebServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
-                                                 NO_APPLICABLE_CODE, null, worker.getVersion());
+                    logger.severe("The distant service has throw a webService exception: ");
+                    distantException.add(new OWSWebServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
+                                                 NO_APPLICABLE_CODE, null, worker.getVersion()));
+                    moreResults = false;
                 
                 // if we obtain an object that we don't expect    
                 } else {
@@ -263,7 +283,18 @@ public class CatalogueHarvester {
             }
         }
         
-        return nbRecordInserted;
+        
+        if (!succeed && distantException.size() > 0) {
+            // TODO see how return multiple exception in one
+            throw distantException.get(0);
+        }
+        
+        int result[] = new int[3];
+        result[0]    = nbRecordInserted;
+        result[1]    = nbRecordUpdated;
+        result[2]    = 0;
+        
+        return result;
     }
     
     /**
@@ -278,7 +309,14 @@ public class CatalogueHarvester {
             distantVersion = capa.getVersion();
         }
         request.setVersion(distantVersion);
-        report.append("CSW ").append(distantVersion).append(" service identified:").append('\n');
+        
+        String serviceName = "unknow";
+        //we get the name of the service
+        if (capa.getServiceIdentification() != null) {
+            serviceName = capa.getServiceIdentification().getTitle();
+        }
+        
+        report.append("CSW ").append(distantVersion).append(" service identified: " + serviceName).append('\n');
         
         //we get the Operations metadata if they are present
         OperationsMetadata om = capa.getOperationsMetadata();
@@ -327,6 +365,10 @@ public class CatalogueHarvester {
             
             if (outputDomain != null) {
                 currentDistantOuputSchema = outputDomain.getValue();
+                
+                //ugly patch to be compatible with some CSW service who specify the wrong ouputSchema
+                currentDistantOuputSchema.add("csw:Record");
+                
                 report.append("OutputSchema supported:").append('\n');
                 for (String osc: currentDistantOuputSchema) {
                     report.append('\t').append("- ").append(osc).append('\n');
@@ -361,24 +403,33 @@ public class CatalogueHarvester {
                 }
             }
             
+            List<QName>  typeNamesQname = new ArrayList<QName>();
             if (typeNameDomain != null) {
-                List<String> typeNames = typeNameDomain.getValue();
+                List<String> typeNames      = typeNameDomain.getValue();
+                
                 report.append("TypeNames supported:").append('\n');
                 for (String osc: typeNames) {
                     report.append('\t').append("- ").append(osc).append('\n');
+                    String prefix, localPart;
+                    
+                    if (osc.indexOf(':') != -1) {
+                        prefix    = osc.substring(0, osc.indexOf(':'));
+                        localPart = osc.substring(osc.indexOf(':') + 1, osc.length());
+                        String namespaceURI = getNamespaceURIFromprefix(prefix, distantVersion);
+                        typeNamesQname.add(new QName(namespaceURI, localPart, prefix));
+                    } else {
+                        
+                    }
                 }
-                //TODO transform string in QNAme
-                request.setTypeNames(new ArrayList<QName>());
             } else {
                 report.append("No outputSchema specified using default:"    + '\n' +
-                              '\t' + "http://www.opengis.net/cat/csw/2.0.2" + '\n' + 
                               '\t' + "csw:Record"                           + '\n');
                 
-                //we add the default outputSchema used
-                currentDistantOuputSchema = new ArrayList<String>();
-                currentDistantOuputSchema.add("http://www.opengis.net/cat/csw/2.0.2");
-                currentDistantOuputSchema.add("csw:Record");
+                //we add the default typeNames used
+                typeNamesQname.add(_Record_QNAME);
             }
+            //we update the request
+            request.setTypeNames(typeNamesQname);
             
         } else {
             report.append("No GetRecords operation find").append('\n');
@@ -450,5 +501,25 @@ public class CatalogueHarvester {
                     "cause: " + ex.getMessage());
         }
         return harvested;
+    }
+    
+    /**
+     * 
+     * @param prefix
+     * @param distantVersion
+     * @return
+     */
+    private String getNamespaceURIFromprefix(String prefix, String distantVersion) {
+        if (distantVersion.equals("2.0.2")) {
+            if (prefix.equals("csw"))
+                return "http://www.opengis.net/cat/csw/2.0.2";
+            else 
+                throw new IllegalArgumentException("prefix unsupported: " + prefix);
+        } else {
+            if (prefix.equals("csw"))
+                return "http://www.opengis.net/cat/csw";
+            else 
+                throw new IllegalArgumentException("prefix unsupported: " + prefix);
+        }
     }
 }

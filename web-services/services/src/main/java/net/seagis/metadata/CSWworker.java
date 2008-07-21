@@ -1187,8 +1187,9 @@ public class CSWworker {
                 databaseWriter.writeForm(f, false);
                 writeTime = System.currentTimeMillis() - startWrite;
             } catch (IllegalArgumentException e) {
-                logger.severe("illegalArgument: " + e.getMessage());
-                return false;
+                //TODO restore catching at this point
+                throw e;
+                //return false;
             }
             
             long time = System.currentTimeMillis() - start; 
@@ -1290,6 +1291,7 @@ public class CSWworker {
         // we prepare the report
         int totalInserted = 0;
         int totalUpdated  = 0;
+        int totalDeleted  = 0;
         
         //we verify the resource Type
         String resourceType = request.getResourceType();
@@ -1335,13 +1337,22 @@ public class CSWworker {
                         }
                     
                         logger.info("Object Type of the harvested Resource: " + harvested.getClass().getName());
-                        if (storeMetadata(harvested))
-                            totalInserted++;
+                        
+                        // ugly patch TODO handle update in mdweb
+                        try {
+                            if (storeMetadata(harvested))
+                                totalInserted++;
+                        } catch( IllegalArgumentException e) {
+                            totalUpdated++;
+                        }
                     }
                 
                 // if the resource is another CSW service we get all the data of this catalogue.
                 } else {
-                    totalInserted = catalogueHarvester.harvestCatalogue(sourceURL);
+                    int[] results = catalogueHarvester.harvestCatalogue(sourceURL);
+                    totalInserted = results[0];
+                    totalUpdated  = results[1];
+                    totalDeleted  = results[2];
                 }
                 
             } catch (SQLException ex) {
@@ -1365,7 +1376,7 @@ public class CSWworker {
            
             TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
                                                                         totalUpdated,
-                                                                        0,
+                                                                        totalDeleted,
                                                                         null);
             TransactionResponseType transactionResponse = new TransactionResponseType(summary, null, version.toString());
             response = new HarvestResponseType(transactionResponse);
@@ -1378,6 +1389,7 @@ public class CSWworker {
                                                   OPERATION_NOT_SUPPORTED, "ResponseHandler", version);
         }
         
+        logger.info("Harvest operation finished");
         return response;
     }
     

@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
-import org.geotools.resources.Utilities;
+import org.geotools.util.Utilities;
 
 
 /**
@@ -78,7 +78,7 @@ public class CodeType {
     }
 
     /**
-     * Verifie si cette entree est identique l'objet specifie.
+     * Verify if this entry is identical to the specified object.
      */
     @Override
     public boolean equals(final Object object) {

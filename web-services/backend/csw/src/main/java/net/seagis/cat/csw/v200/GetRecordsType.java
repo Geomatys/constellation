@@ -275,11 +275,16 @@ public class GetRecordsType extends RequestBaseType implements GetRecordsRequest
     }
 
     public void setTypeNames(List<QName> typeNames) {
-        //TODO transform QNAme in String 
-        List<String> tname = null;
-        if (abstractQuery != null && abstractQuery.getValue() != null) {
-            AbstractQueryType query = abstractQuery.getValue();
-            query.setTypeNames(tname);
+        List<String> tname = new ArrayList<String>();
+        
+        if (typeNames != null) {
+            for (QName qn: typeNames) {
+                tname.add(qn.getPrefix() + ':' + qn.getLocalPart());
+            }
+            if (abstractQuery != null && abstractQuery.getValue() != null) {
+                AbstractQueryType query = abstractQuery.getValue();
+                query.setTypeNames(tname);
+            }
         }
     }
 

@@ -103,6 +103,13 @@ public class HarvestType extends RequestBaseType {
     
     /**
      * Build a new harvest request
+     * 
+     * @param service Service type fixed at CSW.
+     * @param version The service version fixed at 2.0.2.
+     * @param source  The distant resource URL.
+     * @param resourceType The type of the resource to harvest.
+     * @param handler
+     * @param harvestInterval
      */
     public HarvestType(String service, String version, String source, String resourceType, 
             String resourceFormat, String handler, Duration harvestInterval) {
@@ -121,6 +128,13 @@ public class HarvestType extends RequestBaseType {
      */
     public String getSource() {
         return source;
+    }
+    
+    /**
+     * sets the value of the source property.
+     */
+    public void setSource(String source) {
+        this.source = source;
     }
 
     /**
