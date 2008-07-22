@@ -213,7 +213,7 @@
       </ows:Constraint>
 		</ows:Operation>
 		<ows:Operation name="GetDomain">
-      <ows:DCP>
+      			<ows:DCP>
 				<ows:HTTP>
 					<ows:Get xlink:href=""/>
 				</ows:HTTP>
@@ -222,16 +222,16 @@
 				<ows:HTTP>
 					<ows:Post xlink:href=""/>
 				</ows:HTTP>
-				<ows:Parameter name="Version">
-          <ows:Value>2.0.2</ows:Value>
-        </ows:Parameter>
-        <ows:Parameter name="Service">
-				<ows:Value>CSW</ows:Value>
-			</ows:Parameter>
-				<ows:Constraint name="PostEncoding">
-          <ows:Value>XML</ows:Value>
-        </ows:Constraint>
 			</ows:DCP>
+				<ows:Parameter name="Version">
+          				<ows:Value>2.0.2</ows:Value>
+        			</ows:Parameter>
+        			<ows:Parameter name="Service">
+					<ows:Value>CSW</ows:Value>
+				</ows:Parameter>
+				<ows:Constraint name="PostEncoding">
+			        	<ows:Value>XML</ows:Value>
+			        </ows:Constraint>
 		</ows:Operation>
 		<ows:Operation name="Transaction">
 			<ows:DCP>
@@ -259,6 +259,12 @@
 				<ows:Value>CSW</ows:Value>
 			</ows:Parameter>
 		</ows:Operation>
+		<ows:Parameter name="service">
+		      <ows:Value>http://www.opengis.net/cat/csw/2.0.2</ows:Value>
+	        </ows:Parameter>
+   		<ows:Parameter name="version">
+			<ows:Value>2.0.2</ows:Value>
+		</ows:Parameter>
 	</ows:OperationsMetadata>
 	<ogc:Filter_Capabilities>
 		<ogc:Spatial_Capabilities>

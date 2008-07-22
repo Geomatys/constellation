@@ -106,8 +106,14 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
         else if( "http://purl.org/dc/elements/1.1/".equals(namespaceUri) )
             prefix = "dc";
         
+        else if( "http://www.purl.org/dc/elements/1.1/".equals(namespaceUri) )
+            prefix = "dc2";
+        
         else if( "http://purl.org/dc/terms/".equals(namespaceUri) )
             prefix = "dct";
+        
+        else if( "http://www.purl.org/dc/terms/".equals(namespaceUri) )
+            prefix = "dct2";
         
         else if( "http://www.isotc211.org/2005/gmd".equals(namespaceUri) )
             prefix = "gmd";

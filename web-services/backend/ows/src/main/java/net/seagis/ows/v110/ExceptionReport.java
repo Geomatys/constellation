@@ -101,7 +101,17 @@ public class ExceptionReport {
         return version;
     }
     
-        /**
+    /**
+     * Return the first locator 
+     */
+    public String getFirstLocator() {
+        if (exception != null && exception.size() > 0) {
+            return exception.get(0).getLocator();
+        }
+        return null;
+    }
+    
+    /**
      * Return a String representation of the exception report.
      * 
      * @return A String representation of the exception report.

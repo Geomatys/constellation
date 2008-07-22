@@ -34,6 +34,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 //JAXB dependencies
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -175,6 +176,11 @@ public class CSWService extends WebService {
                 worker.setServiceURL(getServiceURL());
                 writeParameters();
                 String request = "";
+                
+                if (objectRequest instanceof JAXBElement) {
+                    objectRequest = ((JAXBElement)objectRequest).getValue();
+                }
+                
                 if (objectRequest == null)
                     request = (String) getParameter("REQUEST", true);
             
@@ -346,7 +352,8 @@ public class CSWService extends WebService {
                 }
             //TODO remove this part
             } else if (ex instanceof net.seagis.ows.v110.OWSWebServiceException) {
-                net.seagis.ows.v110.OWSWebServiceException owsex = (net.seagis.ows.v110.OWSWebServiceException)ex;
+                OWSWebServiceException owsex = new OWSWebServiceException((net.seagis.ows.v110.OWSWebServiceException)ex, getCurrentVersion());
+                
                 if (!owsex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)   &&
                     !owsex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)&& 
                     !owsex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)&& 

@@ -52,6 +52,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "DomainType", propOrder = {
+    "defaultValue",
     "value",
     "metadata"
 })
@@ -59,11 +60,25 @@ public class DomainType {
 
     @XmlElement(name = "Value", required = true)
     private List<String> value;
+    
+    /**
+     * This attribute has been added for compatibility with other CSW.
+     */
+    @XmlElement(name = "DefaultValue", required = true)
+    private String defaultValue;
+    
     @XmlElement(name = "Metadata")
     private List<MetadataType> metadata;
     @XmlAttribute(required = true)
     private String name;
 
+    /**
+     * return the default value for this domain
+     */
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+            
     /**
      * Gets the value of the value property.
      */

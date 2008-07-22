@@ -572,7 +572,7 @@ public class CSWworker {
         cswFactory200     = new net.seagis.cat.csw.v200.ObjectFactory();
         Properties prop   = new Properties();
         File f            = null;
-        File env          = new File("/root/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
+        File env          = new File("/opt/tomcat/.sicade/csw_configuration"); //System.getenv("CATALINA_HOME");
         logger.info("Path to config file=" + env);
         isStarted = true;
         try {
@@ -678,9 +678,12 @@ public class CSWworker {
         }
         AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains("text/xml")) {
-            throw new OWSWebServiceException("accepted format : text/xml",
+            /*
+             * Acoording to the CITE test this case does not return an exception
+             throw new OWSWebServiceException("accepted format : text/xml",
                                              INVALID_PARAMETER_VALUE, "acceptFormats",
                                              version);
+             */ 
         }
         
         //we prepare the response document
@@ -692,6 +695,12 @@ public class CSWworker {
         FilterCapabilities    fc = null;
             
         SectionsType sections = requestCapabilities.getSections();
+        
+        //if the users specify a empty list of sections we return the OperationsMetadata part
+        if (sections.getSection().size() == 0) {
+            sections.add("OperationsMetadata");
+        }
+        
         //we enter the information for service identification.
         if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
                 

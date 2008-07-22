@@ -168,7 +168,7 @@ public class SearchResultsType {
         this.numberOfRecordsReturned = numberOfRecordsReturned;
         
         abstractRecord = new ArrayList<JAXBElement<? extends AbstractRecordType>>(); 
-        for (int i = 0; i < numberOfRecordsReturned; i++) {
+        for (int i = 0; i < records.size(); i++) {
             
             AbstractRecordType record = records.get(i);
             

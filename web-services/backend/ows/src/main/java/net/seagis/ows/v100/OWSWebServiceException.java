@@ -30,13 +30,32 @@ public class OWSWebServiceException extends WebServiceException {
      */
     private ExceptionReport exception;
     
+    /**
+     * Empty constructor
+     */
     OWSWebServiceException() {
         super();
     }
-            
+         
+    /**
+     * Build a new OWS 1.0.0 web service exception.
+     * 
+     * @param message A text explaining why this exception has been launched.
+     * @param code    A OWS error code.
+     * @param locator The parameter or location which provocate the exception.
+     * @param v       The version.
+     */
     public OWSWebServiceException(String message, OWSExceptionCode code, String locator, ServiceVersion v) {
         super(message);
         this.exception = new ExceptionReport(message, code.name(), locator, v);
+    }
+    
+    /**
+     * Build an OWS v1.0.0 web service exception from an OWS v 1.1.0 exception
+     */
+    public OWSWebServiceException(net.seagis.ows.v110.OWSWebServiceException exc, ServiceVersion v) {
+        super("");
+        this.exception = new ExceptionReport(exc.getMessage(), exc.getExceptionCode().name(), exc.getExceptionReport().getFirstLocator(), v);
     }
     
     public ExceptionReport getExceptionReport() {

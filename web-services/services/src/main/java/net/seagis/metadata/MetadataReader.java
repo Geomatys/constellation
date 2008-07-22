@@ -172,7 +172,7 @@ public class MetadataReader {
                                                 "org.geotools.service" , "org.geotools.util"       , "org.geotools.feature.catalog");
         this.opengisPackage  = searchSubPackage("org.opengis.metadata" , "org.opengis.referencing" , "org.opengis.temporal",
                                                 "org.opengis.service"  , "org.opengis.feature.catalog");
-        this.seagisPackage   = searchSubPackage("net.seagis.cat.csw"   , "net.seagis.dublincore.elements", "net.seagis.ows.v100");
+        this.seagisPackage   = searchSubPackage("net.seagis.cat.csw.v202"   , "net.seagis.dublincore.v2.elements", "net.seagis.ows.v100");
         this.metadatas       = new HashMap<String, Object>();
         this.classBinding    = new HashMap<String, Class>();
         this.alreadyRead     = new HashMap<Value, Object>();

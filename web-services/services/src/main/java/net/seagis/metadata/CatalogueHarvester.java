@@ -91,6 +91,11 @@ public class CatalogueHarvester {
     private net.seagis.cat.csw.v200.GetRecordsType fullGetRecordsRequestv200;
     
     /**
+     * A special getRecords request used to request another unstandardized csw (2.0.0).
+     */
+    private net.seagis.cat.csw.v200.GetRecordsType fullGetRecordsRequestv200_Special1;
+    
+    /**
      * A getCapabilities request used request another csw(2.0.2)
      */
     private GetCapabilities getCapabilitiesRequestv202;
@@ -122,6 +127,11 @@ public class CatalogueHarvester {
     private NamespacePrefixMapperImpl prefixMapper;
     
     /**
+     * A flag indicating that we are harvesting a CSW special case 1
+     */
+    private boolean specialCase1 = false;
+    
+    /**
      * Build a new catalogue harvester.
      * 
      * @param worker
@@ -138,16 +148,27 @@ public class CatalogueHarvester {
      */
     public void initializeRequest() {
         
-        //we build the base request to harvest another CSW service (2.0.2)
         
-        //we build the first filter
+        
+        /*
+         * we build the first filter : < dublinCore:Title IS LIKE '*' >
+         */ 
         List<QName> typeNames          = new ArrayList<QName>();
         PropertyNameType pname         = new PropertyNameType("dc:Title");
         PropertyIsLikeType pil         = new PropertyIsLikeType(pname, "*", "*", "?", "\\");
-        FilterType filter              = new FilterType(pil);
+        FilterType filter1              = new FilterType(pil);
+        
+        /*
+         * Second filter a special case for some unstandardized CSW : < title IS NOT LIKE 'something' >
+         */
+        typeNames          = new ArrayList<QName>();
+        pname              = new PropertyNameType("title");
+        pil                = new PropertyIsLikeType(pname, "something", null, null, null);
+        FilterType filter2 = new FilterType(pil);
         
         
-        QueryConstraintType constraint = new QueryConstraintType(filter, "1.1.0");
+        //we build the base request to harvest another CSW service (2.0.2)
+        QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
         typeNames.add(_Record_QNAME);
         QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint); 
         JAXBElement<? extends AbstractQueryType> jbQuery =  worker.cswFactory202.createQuery(query);
@@ -155,7 +176,7 @@ public class CatalogueHarvester {
                  
         
         //we build the base request to harvest another CSW service (2.0.0)
-        net.seagis.cat.csw.v200.QueryConstraintType constraint2 = new net.seagis.cat.csw.v200.QueryConstraintType(filter, "1.1.0");
+        net.seagis.cat.csw.v200.QueryConstraintType constraint2 = new net.seagis.cat.csw.v200.QueryConstraintType(filter1, "1.1.0");
         List<String> typeNames2 = new ArrayList<String>();
         typeNames2.add("csw:dataset");
         net.seagis.cat.csw.v200.QueryType query2 = new net.seagis.cat.csw.v200.QueryType(typeNames2, 
@@ -163,6 +184,18 @@ public class CatalogueHarvester {
                                                                                          constraint2); 
         JAXBElement<? extends net.seagis.cat.csw.v200.AbstractQueryType> jbQuery2 =  worker.cswFactory200.createQuery(query2);
         fullGetRecordsRequestv200 = new net.seagis.cat.csw.v200.GetRecordsType("CSW", "2.0.0", net.seagis.cat.csw.v200.ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, jbQuery2, null);
+        
+        
+        //we build the special request to harvest unstandardized CSW service (2.0.0)
+        constraint2        = new net.seagis.cat.csw.v200.QueryConstraintType(filter2, "1.0.20");
+        typeNames2         = new ArrayList<String>();
+        typeNames2.add("Dataset");
+        query2             = new net.seagis.cat.csw.v200.QueryType(typeNames2, 
+                                                                   new net.seagis.cat.csw.v200.ElementSetNameType(net.seagis.cat.csw.v200.ElementSetType.FULL), 
+                                                                   constraint2); 
+        jbQuery2 =  worker.cswFactory200.createQuery(query2);
+        fullGetRecordsRequestv200_Special1 = new net.seagis.cat.csw.v200.GetRecordsType("CSW", "2.0.0", net.seagis.cat.csw.v200.ResultType.RESULTS, null, "application/xml", null, 1, 20, jbQuery2, null);
+        
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.2)
         AcceptVersionsType versions = new AcceptVersionsType("2.0.2", "2.0.0");
@@ -208,7 +241,7 @@ public class CatalogueHarvester {
                                               OPERATION_NOT_SUPPORTED, "ResponseHandler", worker.getVersion());
         }
         
-        analyseCapabilitiesDocument((CapabilitiesBaseType)distantCapabilities, getRecordRequest);
+        getRecordRequest = analyseCapabilitiesDocument((CapabilitiesBaseType)distantCapabilities, getRecordRequest);
         
         //we initialize the getRecords request
         getRecordRequest.setStartPosition(1);
@@ -223,7 +256,9 @@ public class CatalogueHarvester {
         for (String outputSchema: currentDistantOuputSchema) {
             logger.info("harvesting with outputSchema: " + outputSchema);
             
-            getRecordRequest.setOutputSchema(outputSchema);
+            if (!specialCase1)
+                getRecordRequest.setOutputSchema(outputSchema);
+            
             boolean moreResults = true;
             //we make multiple request by pack of 20 record 
             while (moreResults) {
@@ -300,7 +335,7 @@ public class CatalogueHarvester {
     /**
      *  Analyse a capabilities Document and update the specified GetRecords request at the same time.
      */
-    public void analyseCapabilitiesDocument(CapabilitiesBaseType capa, GetRecordsRequest request) {
+    public GetRecordsRequest analyseCapabilitiesDocument(CapabilitiesBaseType capa, GetRecordsRequest request) {
         String distantVersion = "2.0.2";
         StringBuilder report = new StringBuilder();
 
@@ -311,12 +346,20 @@ public class CatalogueHarvester {
         request.setVersion(distantVersion);
         
         String serviceName = "unknow";
+        String special     = "";
         //we get the name of the service
         if (capa.getServiceIdentification() != null) {
             serviceName = capa.getServiceIdentification().getTitle();
         }
         
-        report.append("CSW ").append(distantVersion).append(" service identified: " + serviceName).append('\n');
+        // Special case 1
+        if (serviceName.equals("IAAA CSW")) {
+            specialCase1 = true;
+            request      = fullGetRecordsRequestv200_Special1;
+            special      = "Special case 1";
+        }
+        
+        report.append("CSW ").append(distantVersion).append(" service identified: " + serviceName).append(" ").append(special).append('\n');
         
         //we get the Operations metadata if they are present
         OperationsMetadata om = capa.getOperationsMetadata();
@@ -365,6 +408,10 @@ public class CatalogueHarvester {
             
             if (outputDomain != null) {
                 currentDistantOuputSchema = outputDomain.getValue();
+                String defaultValue = outputDomain.getDefaultValue(); 
+                if (defaultValue != null && !defaultValue.equals(""))
+                    currentDistantOuputSchema.add(defaultValue);
+                
                 
                 //ugly patch to be compatible with some CSW service who specify the wrong ouputSchema
                 currentDistantOuputSchema.add("csw:Record");
@@ -373,7 +420,7 @@ public class CatalogueHarvester {
                 for (String osc: currentDistantOuputSchema) {
                     report.append('\t').append("- ").append(osc).append('\n');
                 }
-                
+             
             } else {
                 report.append("No outputSchema specified using default:"    + '\n' +
                               '\t' + "http://www.opengis.net/cat/csw/2.0.2" + '\n' + 
@@ -407,6 +454,10 @@ public class CatalogueHarvester {
             if (typeNameDomain != null) {
                 List<String> typeNames      = typeNameDomain.getValue();
                 
+                String defaultValue = typeNameDomain.getDefaultValue(); 
+                if (defaultValue != null && !defaultValue.equals(""))
+                    typeNames.add(defaultValue);
+                
                 report.append("TypeNames supported:").append('\n');
                 for (String osc: typeNames) {
                     report.append('\t').append("- ").append(osc).append('\n');
@@ -418,7 +469,7 @@ public class CatalogueHarvester {
                         String namespaceURI = getNamespaceURIFromprefix(prefix, distantVersion);
                         typeNamesQname.add(new QName(namespaceURI, localPart, prefix));
                     } else {
-                        
+                        logger.severe("NO ':' in Typenames => unexpected!!!");
                     }
                 }
             } else {
@@ -436,6 +487,7 @@ public class CatalogueHarvester {
         }
 
         logger.info(report.toString());
+        return request;
     }
     
     /**
@@ -469,7 +521,21 @@ public class CatalogueHarvester {
                 throw new OWSWebServiceException("Unable to marshall the request: " + ex.getMessage(),
                                                  NO_APPLICABLE_CODE, null, worker.getVersion());
             }
-            wr.write(sw.toString());
+            String XMLRequest = sw.toString();
+            
+            // in the special case 1 we need to remove ogc prefix inside  the >Filter
+            if (specialCase1) {
+                XMLRequest = XMLRequest.replace("<ogc:", "<");
+                XMLRequest = XMLRequest.replace("<Filter", "<ogc:Filter");
+                XMLRequest = XMLRequest.replace("</Filter", "</ogc:Filter");
+                XMLRequest = XMLRequest.replace("xmlns:gco=\"http://www.isotc211.org/2005/gco\"", "");
+                XMLRequest = XMLRequest.replace("xmlns:gmd=\"http://www.isotc211.org/2005/gmd\"", "");
+                XMLRequest = XMLRequest.replace("xmlns:dc=\"http://purl.org/dc/elements/1.1/\"" , ""); 
+                XMLRequest = XMLRequest.replace("xmlns:dc2=\"http://www.purl.org/dc/elements/1.1/\"" , "");
+                        logger.info("special obtained request: " + '\n' + XMLRequest);
+            }
+            
+            wr.write(XMLRequest);
             wr.flush();
         }
         
@@ -490,6 +556,16 @@ public class CatalogueHarvester {
         brutString = brutString.replaceAll("%", "percent");
         String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
 
+         /*
+         * Some implemention replace the standardized namespace "http://www.opengis.net/cat/csw" by "http://www.opengis.net/csw"
+         * if we detect this we replace this namespace before unmarshalling the object.
+         * 
+         * TODO replace even when the prefix is not "csw" or blank
+         */ 
+        if (decodedString.contains("xmlns:csw=\"http://www.opengis.net/csw\"")) {
+            decodedString = decodedString.replace("xmlns:csw=\"http://www.opengis.net/csw\"", "xmlns:csw=\"http://www.opengis.net/cat/csw\"");
+        }
+        
         Object harvested = null;
         try {
             harvested = worker.unmarshaller.unmarshal(new StringReader(decodedString));
@@ -513,11 +589,19 @@ public class CatalogueHarvester {
         if (distantVersion.equals("2.0.2")) {
             if (prefix.equals("csw"))
                 return "http://www.opengis.net/cat/csw/2.0.2";
+            
+            else if (prefix.equals("ebrim"))
+                return "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
+            
             else 
                 throw new IllegalArgumentException("prefix unsupported: " + prefix);
         } else {
             if (prefix.equals("csw"))
                 return "http://www.opengis.net/cat/csw";
+            
+            else if (prefix.equals("ebrim"))
+                return "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
+            
             else 
                 throw new IllegalArgumentException("prefix unsupported: " + prefix);
         }

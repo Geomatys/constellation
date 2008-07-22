@@ -117,7 +117,12 @@ public class FilterParser {
      */
     public SpatialQuery getLuceneQuery(final QueryConstraintType constraint) throws WebServiceException {
         FilterType filter = null;
-        if (constraint.getCqlText() != null && constraint.getFilter() != null) {
+        //if the constraint is null we make a full filter
+        if (constraint == null)  {
+            Filter nullFilter = null;
+            return new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
+            
+        } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
             throw new OWSWebServiceException("The query constraint must be in Filter or CQL but not both.",
                                              INVALID_PARAMETER_VALUE, "QueryConstraint", version);
         }
