@@ -38,11 +38,19 @@ import javax.xml.bind.JAXBElement;
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Properties;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.naming.Reference;
+import javax.sql.DataSource;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.Path;
 
 // seagis dependencies
 import net.seagis.catalog.CatalogException;
+import net.seagis.catalog.ConfigurationKey;
 import net.seagis.catalog.Database;
 import net.seagis.coverage.catalog.Layer;
 import net.seagis.coverage.catalog.Series;
@@ -71,7 +79,6 @@ import net.seagis.ows.v110.OWSWebServiceException;
 import net.seagis.ows.v110.WGS84BoundingBoxType;
 import net.seagis.ows.v110.OperationsMetadata;
 import net.seagis.ows.v110.SectionsType;
-import net.seagis.ows.v110.ServiceIdentification;
 import net.seagis.ows.v110.ServiceIdentification;
 import net.seagis.ows.v110.ServiceProvider;
 import net.seagis.wcs.AbstractDescribeCoverage;
@@ -117,13 +124,16 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
 /**
+ * WCS 1.1.1 / 1.0.0
+ * web service implementing the operation getCoverage, describeCoverage and getCapabilities.
  *
  * @author Guilhem Legal
+ * @author Cédric Briançon
  */
 @Path("wcs")
 @Singleton
 public class WCService extends WebService {
-    
+
     /**
      * A list of layer initialized a begining;
      */
@@ -133,65 +143,88 @@ public class WCService extends WebService {
      * The object whitch made all the operation on the postgrid database
      */
     private static ThreadLocal<WebServiceWorker> webServiceWorker;
-    static {
-        try {
-            /* only for ifremer configuration */
-            File configFile = null;
-            File dirCatalina = null;
-            if(System.getenv().get("CATALINA_HOME") != null)
-                dirCatalina = new File(System.getenv().get("CATALINA_HOME"));
-            
-            if (dirCatalina!= null &&dirCatalina.exists()) {
-                configFile = new File(dirCatalina, "webapps/ifremerWS/WEB-INF/config.xml");
-                if (!configFile.exists()) {
-                    configFile = null;
-                } 
-            } 
-            final WebServiceWorker initialValue;
-            if (configFile != null) {
-                logger.info("path to config file:" + configFile.getAbsolutePath());
-                initialValue = new WebServiceWorker(new Database(configFile), true); 
-            } else {
-                logger.info("path to catalina config file using sicade configuration");
-                initialValue = new WebServiceWorker(new Database(), true); 
+
+    /**
+     * Instanciate the {@link WebServiceWorker} if not already defined, trying to get some
+     * information already defined in the JNDI configuration of the application server.
+     *
+     * @throws NamingException if an error in getting properties from JNDI references occured.
+     * @throws SQLException if an error occured while configuring the connection.
+     */
+    private static synchronized void ensureWorkerInitialized() throws NamingException, SQLException {
+        if (webServiceWorker == null) {
+            final InitialContext ctx = new InitialContext();
+            // Initialize the database connection
+            final DataSource ds = (DataSource) ctx.lookup("Coverages");
+            if (ds == null) {
+                throw new NamingException("DataSource \"Coverages\" is not defined.");
             }
-           
+            final Connection connection = ds.getConnection();
+            // Gets properties defined in the JNDI reference "Coverages Properties"
+            final Reference props = (Reference) ctx.lookup("Coverages Properties");
+            if (props == null) {
+                throw new NamingException("\"Coverages Properties\" JNDI reference is not defined.");
+            }
+            final String permission = (String) props.get("Permission").getContent();
+            final String rootDir    = (String) props.get("RootDirectory").getContent();
+            final String readOnly   = (String) props.get("ReadOnly").getContent();
+            /* Put all properties found in the JNDI reference into the Properties HashMap
+             */
+            final Properties properties = new Properties();
+            if (permission != null) {
+                properties.setProperty(ConfigurationKey.PERMISSION.getKey(), permission);
+            }
+            if (rootDir != null) {
+                properties.setProperty(ConfigurationKey.ROOT_DIRECTORY.getKey(), rootDir);
+            }
+            if (readOnly != null) {
+                properties.setProperty(ConfigurationKey.READONLY.getKey(), readOnly);
+            }
+            final Database database;
+            try {
+                database = new Database(connection, properties);
+            } catch (IOException io) {
+                /* This error should never appear, because the IOException on the Database
+                 * constructor can only overcome if we use the constructor
+                 * Database(DataSource, Properties, String), and here the string for the
+                 * configuration file is null, so no reading method on a file will be used.
+                 * Anyways if this error occurs, an AssertionError is then thrown.
+                 */
+                throw new AssertionError(io);
+            }
+            final WebServiceWorker initialValue = new WebServiceWorker(database, true);
             webServiceWorker = new ThreadLocal<WebServiceWorker>() {
                 @Override
                 protected WebServiceWorker initialValue() {
                     return new WebServiceWorker(initialValue);
                 }
             };
-            
-       }catch (IOException e) {
-            logger.severe("IOException a l'initialisation du webServiceWorker:" + e);
-       }
-        
+        }
     }
-    
-    /** 
-     * Build a new instance of the webService and initialise the JAXB marshaller. 
+
+    /**
+     * Build a new instance of the webService and initialise the JAXB marshaller.
      */
-    public WCService() throws JAXBException, WebServiceException {
+    public WCService() throws JAXBException, WebServiceException, NamingException, SQLException {
         super("WCS", new ServiceVersion(Service.WCS, "1.1.1"), new ServiceVersion(Service.WCS, "1.0.0"));
-        
+        ensureWorkerInitialized();
+
         setXMLContext("net.seagis.coverage.web:net.seagis.wcs.v100:net.seagis.wcs.v111",
                       "http://www.opengis.net/wcs");
-        
+
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         logger.info("Loading layers please wait...");
         layerList = webServiceWorker.getLayers();
         logger.info("WCS service running");
     }
-    
+
     /**
      * Treat the incomming request and call the right function.
-     * 
+     *
      * @return an image or xml response.
      * @throw JAXBException
      */
-    @Override
     public Response treatIncommingRequest(Object objectRequest) throws JAXBException {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
         try {
@@ -199,31 +232,31 @@ public class WCService extends WebService {
             String request = "";
             if (objectRequest == null)
                 request = (String) getParameter("REQUEST", true);
-            
+
             if (request.equalsIgnoreCase("DescribeCoverage") || (objectRequest instanceof AbstractDescribeCoverage)) {
-                
+
                 AbstractDescribeCoverage dc = (AbstractDescribeCoverage)objectRequest;
                 verifyBaseParameter(0);
-                
+
                 //this wcs does not implement "store" mechanism
                 String store = getParameter("STORE", false);
                 if (store!= null && store.equals("true")) {
-                    throwException("The service does not implement the store mechanism", 
+                    throwException("The service does not implement the store mechanism",
                                    "NO_APPLICABLE_CODE", null);
                 }
-                
+
                 /*
                  * if the parameters have been send by GET or POST kvp,
                  * we build a request object with this parameter.
-                 */ 
+                 */
                 if (dc == null) {
                     dc = createNewDescribeCoverageRequest();
                 }
-                
+
                 return Response.ok(describeCoverage(dc), "text/xml").build();
-                    
+
             } else if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof AbstractGetCapabilities)) {
-                
+
                 AbstractGetCapabilities gc = (AbstractGetCapabilities)objectRequest;
                 /*
                  * if the parameters have been send by GET or POST kvp,
@@ -231,25 +264,25 @@ public class WCService extends WebService {
                  */
                 if (gc == null) {
                     gc = createNewGetCapabilitiesRequest();
-                } 
+                }
                 return getCapabilities(gc);
-                    
+
             } else if (request.equalsIgnoreCase("GetCoverage") || (objectRequest instanceof AbstractGetCoverage)) {
-                
+
                 AbstractGetCoverage gc = (AbstractGetCoverage)objectRequest;
                 verifyBaseParameter(0);
-                
+
                 /*
                  * if the parameters have been send by GET or POST kvp,
                  * we build a request object with this parameter.
                  */
                 if (gc == null) {
-                    
-                    gc = createNewGetCoverageRequest(); 
-                      
+
+                    gc = createNewGetCoverageRequest();
+
                 }
                 return Response.ok(getCoverage(gc), webServiceWorker.getMimeType()).build();
-                     
+
             } else {
                 throwException("The operation " + request + " is not supported by the service",
                                "OPERATION_NOT_SUPPORTED", "request");
@@ -257,9 +290,9 @@ public class WCService extends WebService {
                 return null;
             }
         } catch (WebServiceException ex) {
-            
+
             if (ex instanceof WMSWebServiceException && this.getCurrentVersion().isOWS()) {
-                ex = new OWSWebServiceException(ex.getMessage(), 
+                ex = new OWSWebServiceException(ex.getMessage(),
                                                 OWSExceptionCode.valueOf(ex.getExceptionCode().name()),
                                                 null,
                                                 getVersionFromNumber(ex.getVersion()));
@@ -275,20 +308,20 @@ public class WCService extends WebService {
                     !wmsex.getExceptionCode().equals(WMSExceptionCode.OPERATION_NOT_SUPPORTED)) {
                     wmsex.printStackTrace();
                 }
-                StringWriter sw = new StringWriter();    
+                StringWriter sw = new StringWriter();
                 marshaller.marshal(wmsex.getServiceExceptionReport(), sw);
                 return Response.ok(cleanSpecialCharacter(sw.toString()), webServiceWorker.getExceptionFormat()).build();
             } else if (ex instanceof OWSWebServiceException) {
-              
+
                 OWSWebServiceException owsex = (OWSWebServiceException)ex;
                 if (!owsex.getExceptionCode().equals(OWSExceptionCode.MISSING_PARAMETER_VALUE)   &&
-                    !owsex.getExceptionCode().equals(OWSExceptionCode.VERSION_NEGOTIATION_FAILED)&& 
+                    !owsex.getExceptionCode().equals(OWSExceptionCode.VERSION_NEGOTIATION_FAILED)&&
                     !owsex.getExceptionCode().equals(OWSExceptionCode.OPERATION_NOT_SUPPORTED)) {
                     owsex.printStackTrace();
                 } else {
                     logger.info(owsex.getMessage());
                 }
-                StringWriter sw = new StringWriter();    
+                StringWriter sw = new StringWriter();
                 marshaller.marshal(owsex.getExceptionReport(), sw);
                 return Response.ok(cleanSpecialCharacter(sw.toString()), "text/xml").build();
             } else {
@@ -296,12 +329,12 @@ public class WCService extends WebService {
             }
         }
      }
-    
+
     /**
-     * Build a new GetCapabilities request from a kvp request 
+     * Build a new GetCapabilities request from a kvp request
      */
     private AbstractGetCapabilities createNewGetCapabilitiesRequest() throws WebServiceException {
-        
+
         if (!getParameter("SERVICE", true).equalsIgnoreCase("WCS")) {
             throwException("The parameters SERVICE=WCS must be specified",
                     "MISSING_PARAMETER_VALUE", "service");
@@ -326,7 +359,7 @@ public class WCService extends WebService {
             AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
 
             //We transform the String of sections in a list.
-            //In the same time we verify that the requested sections are valid. 
+            //In the same time we verify that the requested sections are valid.
             String section = getParameter("Sections", false);
             List<String> requestedSections = new ArrayList<String>();
             if (section != null) {
@@ -352,9 +385,9 @@ public class WCService extends WebService {
                                                            null);
         }
     }
-    
+
     /**
-     * Build a new DescribeCoverage request from a kvp request 
+     * Build a new DescribeCoverage request from a kvp request
      */
     private AbstractDescribeCoverage createNewDescribeCoverageRequest() throws WebServiceException {
         if (getCurrentVersion().toString().equals("1.0.0")) {
@@ -363,21 +396,21 @@ public class WCService extends WebService {
             return new net.seagis.wcs.v111.DescribeCoverage(getParameter("IDENTIFIERS", true));
         }
     }
-    
+
     /**
-     * Build a new DescribeCoverage request from a kvp request 
+     * Build a new DescribeCoverage request from a kvp request
      */
     private AbstractGetCoverage createNewGetCoverageRequest() throws WebServiceException {
-        
+
         if (getCurrentVersion().toString().equals("1.0.0")) {
             // temporal subset
             net.seagis.wcs.v100.TimeSequenceType temporal = null;
             String timeParameter = getParameter("time", false);
             if (timeParameter != null) {
                 TimePositionType time     = new TimePositionType(timeParameter);
-                temporal = new net.seagis.wcs.v100.TimeSequenceType(time); 
+                temporal = new net.seagis.wcs.v100.TimeSequenceType(time);
             }
-                    
+
             /*
              * spatial subset
              */
@@ -393,15 +426,15 @@ public class WCService extends WebService {
                         coordinates[i] = value;
                         i++;
                     }
-                    
+
                     pos.add(new DirectPositionType(coordinates[0], coordinates[2]));
                     pos.add(new DirectPositionType(coordinates[1], coordinates[3]));
             }
             EnvelopeEntry envelope    = new EnvelopeEntry(pos, getParameter("CRS", true));
-                    
+
             // the grid dimensions.
             GridType grid = null;
-                    
+
             String width  = getParameter("width",  false);
             String height = getParameter("height", false);
             String depth  = getParameter("depth", false);
@@ -411,9 +444,9 @@ public class WCService extends WebService {
                 String resx = getParameter("resx",  false);
                 String resy = getParameter("resy",  false);
                 String resz = getParameter("resz",  false);
-                
+
                 if (resx == null || resy == null) {
-                    throwException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" , 
+                    throwException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified" ,
                                    "INVALID_PARAMETER_VALUE", null);
                 }
             } else {
@@ -435,27 +468,27 @@ public class WCService extends WebService {
                 grid        = new GridType(limits, axis);
             }
             net.seagis.wcs.v100.SpatialSubsetType spatial = new net.seagis.wcs.v100.SpatialSubsetType(envelope, grid);
-                    
+
             //domain subset
             net.seagis.wcs.v100.DomainSubsetType domain   = new net.seagis.wcs.v100.DomainSubsetType(temporal, spatial);
-                    
+
             //range subset (not yet used)
             net.seagis.wcs.v100.RangeSubsetType  range    = null;
-                    
+
             //interpolation method
             net.seagis.wcs.v100.InterpolationMethod interpolation = net.seagis.wcs.v100.InterpolationMethod.fromValue(getParameter("interpolation", false));
-                    
+
             //output
             net.seagis.wcs.v100.OutputType output         = new net.seagis.wcs.v100.OutputType(getParameter("format", true),
                                                                                                            getParameter("response_crs", false));
-                    
+
             return new net.seagis.wcs.v100.GetCoverage(getParameter("coverage", true),
                                                        domain,
                                                        range,
                                                        interpolation,
                                                        output);
          } else {
-                       
+
             // temporal subset
             net.seagis.wcs.v111.TimeSequenceType temporal = null;
             String timeParameter = getParameter("timeSequence", false);
@@ -463,12 +496,12 @@ public class WCService extends WebService {
                 if (timeParameter.indexOf('/') == -1) {
                     temporal = new net.seagis.wcs.v111.TimeSequenceType(new TimePositionType(timeParameter));
                 } else {
-                    throwException("The service does not handle TimePeriod" , 
+                    throwException("The service does not handle TimePeriod" ,
                                    "INVALID_PARAMETER_VALUE", "temporalSubset");
                 }
-                             
+
             }
-                    
+
             /*
              * spatial subset
              */
@@ -479,11 +512,11 @@ public class WCService extends WebService {
                 crs  = bbox.substring(bbox.lastIndexOf(',') + 1, bbox.length());
                 bbox = bbox.substring(0, bbox.lastIndexOf(','));
              } else {
-                throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" , 
+                throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" ,
                                 "INVALID_PARAMETER_VALUE", "BoundingBox");
-             } 
+             }
              BoundingBoxType envelope = null;
-                        
+
              if (bbox != null) {
                 StringTokenizer tokens = new StringTokenizer(bbox, ",;");
                 Double[] coordinates   = new Double[tokens.countTokens()];
@@ -494,26 +527,26 @@ public class WCService extends WebService {
                     i++;
                 }
                     if (i < 4){
-                        throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" , 
+                        throwException("The correct pattern for BoundingBox parameter are crs,minX,minY,maxX,maxY,CRS" ,
                                        "INVALID_PARAMETER_VALUE", "BoundingBox");
                      }
                 envelope = new BoundingBoxType(crs,coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
              }
-                        
+
              //domain subset
              net.seagis.wcs.v111.DomainSubsetType domain   = new net.seagis.wcs.v111.DomainSubsetType(temporal, envelope);
-                    
+
              //range subset.
              net.seagis.wcs.v111.RangeSubsetType  range = null;
              String rangeSubset = getParameter("RangeSubset", false);
              if (rangeSubset != null) {
-                            
+
                 //for now we don't handle Axis Identifiers
                 if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
-                    throwException("The service does not handle axis identifiers" , 
+                    throwException("The service does not handle axis identifiers" ,
                                    "INVALID_PARAMETER_VALUE", "rangeSubset");
                 }
-                            
+
                 StringTokenizer tokens   = new StringTokenizer(rangeSubset, ";");
                 List<FieldSubset> fields = new ArrayList<FieldSubset>(tokens.countTokens());
                 while (tokens.hasMoreTokens()) {
@@ -528,11 +561,11 @@ public class WCService extends WebService {
                     }
                     fields.add(new FieldSubset(rangeIdentifier, interpolation));
                 }
-                            
+
                     range = new net.seagis.wcs.v111.RangeSubsetType(fields);
                 }
-                        
-                        
+
+
                 String gridType = getParameter("GridType", false);
                 if (gridType == null) {
                     gridType = "urn:ogc:def:method:WCS:1.1:2dSimpleGrid";
@@ -547,7 +580,7 @@ public class WCService extends WebService {
                     Double value = parseDouble(tokens.nextToken());
                     origin.add(value);
                 }
-                        
+
                 String gridOffsets = getParameter("GridOffsets", false);
                 List<Double> offset   = new ArrayList<Double>();
                 if (gridOffsets != null) {
@@ -561,7 +594,7 @@ public class WCService extends WebService {
                 if (gridCS == null) {
                     gridCS = "urn:ogc:def:cs:OGC:0.0:Grid2dSquareCS";
                 }
-            
+
                 //output
                 CodeType codeCRS = new CodeType(crs);
                 GridCrsType grid = new GridCrsType(codeCRS,
@@ -572,25 +605,25 @@ public class WCService extends WebService {
                                                    gridCS,
                                                    "");
                 net.seagis.wcs.v111.OutputType output = new net.seagis.wcs.v111.OutputType(grid, getParameter("format", true));
-                   
+
                 return new net.seagis.wcs.v111.GetCoverage(new net.seagis.ows.v110.CodeType(getParameter("identifier", true)),
                                                            domain,
                                                            range,
                                                            output);
          }
     }
-    
+
     /**
-     * GetCapabilities operation. 
-     * 
+     * GetCapabilities operation.
+     *
      * TODO refaire tte la fonction en separant proprement les versions.
-     */ 
+     */
     public Response getCapabilities(AbstractGetCapabilities abstractRequest) throws JAXBException, WebServiceException {
         logger.info("getCapabilities request processing");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-        
+
         //we begin by extract the base attribute
-        String inputVersion = abstractRequest.getVersion();       
+        String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
             setCurrentVersion("1.1.1");
         } else {
@@ -598,16 +631,16 @@ public class WCService extends WebService {
            setCurrentVersion(inputVersion);
         }
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
-        
+
         Capabilities        responsev111 = null;
         WCSCapabilitiesType responsev100 = null;
         boolean contentMeta              = false;
         String format                    = "text/xml";
-        
+
         if (getCurrentVersion().toString().equals("1.1.1")) {
-            
+
             net.seagis.wcs.v111.GetCapabilities request = (net.seagis.wcs.v111.GetCapabilities) abstractRequest;
-            
+
             // if the user have specified one format accepted (only one for now != spec)
             AcceptFormatsType formats = request.getAcceptFormats();
             if (formats == null || formats.getOutputFormat().size() == 0) {
@@ -619,20 +652,20 @@ public class WCService extends WebService {
                                    "INVALID_PARAMETER_VALUE", "format");
                 }
             }
-            
+
             //if the user have requested only some sections
             List<String> requestedSections = SectionsType.getExistingSections("1.1.1");
-            
+
             if (request.getSections() != null && request.getSections().getSection().size() > 0) {
                 requestedSections = request.getSections().getSection();
                 for (String sec:requestedSections) {
                     if (!SectionsType.getExistingSections("1.1.1").contains(sec)){
                        throwException("This sections " + sec + " is not allowed",
-                                       "INVALID_PARAMETER_VALUE", "sections"); 
+                                       "INVALID_PARAMETER_VALUE", "sections");
                     }
                 }
-            } 
-            
+            }
+
             // we unmarshall the static capabilities document
             Capabilities staticCapabilities = null;
             try {
@@ -640,39 +673,39 @@ public class WCService extends WebService {
             } catch(IOException e)   {
                 throwException("IO exception while getting Services Metadata: " + e.getMessage(),
                                "INVALID_PARAMETER_VALUE", null);
-            
-            } 
+
+            }
             ServiceIdentification si = null;
             ServiceProvider       sp = null;
             OperationsMetadata    om = null;
-        
+
             //we add the static sections if the are included in the requested sections
-            if (requestedSections.contains("ServiceProvider") || requestedSections.contains("All")) 
+            if (requestedSections.contains("ServiceProvider") || requestedSections.contains("All"))
                 sp = staticCapabilities.getServiceProvider();
-            if (requestedSections.contains("ServiceIdentification") || requestedSections.contains("All")) 
+            if (requestedSections.contains("ServiceIdentification") || requestedSections.contains("All"))
                 si = staticCapabilities.getServiceIdentification();
-            if (requestedSections.contains("OperationsMetadata") || requestedSections.contains("All")) { 
+            if (requestedSections.contains("OperationsMetadata") || requestedSections.contains("All")) {
                 om = staticCapabilities.getOperationsMetadata();
                 //we update the url in the static part.
                 WebService.updateOWSURL(om.getOperation(), getServiceURL(), "WCS");
             }
             responsev111 = new Capabilities(si, sp, om, "1.1.1", null, null);
-            
+
             // if the user does not request the contents section we can return the result.
             if (!requestedSections.contains("Contents") && !requestedSections.contains("All")) {
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(responsev111, sw);
                 return Response.ok(sw.toString(), format).build();
             }
-                   
+
         } else {
-            
+
             net.seagis.wcs.v100.GetCapabilities request = (net.seagis.wcs.v100.GetCapabilities) abstractRequest;
-            
+
             /*
-             * In WCS 1.0.0 the user can request only one section 
+             * In WCS 1.0.0 the user can request only one section
              * ( or all by ommiting the parameter section)
-             */ 
+             */
             String section = request.getSection();
             String requestedSection = null;
             if (section != null) {
@@ -682,7 +715,7 @@ public class WCService extends WebService {
                     throwException("The section " + section + " does not exist",
                                    "INVALID_PARAMETER_VALUE", "section");
                }
-               contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata"); 
+               contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata");
             }
             WCSCapabilitiesType staticCapabilities = null;
             try {
@@ -690,16 +723,16 @@ public class WCService extends WebService {
             } catch(IOException e)   {
                 throwException("IO exception while getting Services Metadata: " + e.getMessage(),
                                "INVALID_PARAMETER_VALUE", null);
-            
-            }    
+
+            }
             if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") || requestedSection.equals("/")) {
                 //we update the url in the static part.
-                Request req = staticCapabilities.getCapability().getRequest(); 
+                Request req = staticCapabilities.getCapability().getRequest();
                 updateURL(req.getGetCapabilities().getDCPType());
                 updateURL(req.getDescribeCoverage().getDCPType());
                 updateURL(req.getGetCoverage().getDCPType());
             }
-            
+
             if (requestedSection == null || contentMeta  || requestedSection.equals("/")) {
                 responsev100 = staticCapabilities;
             } else {
@@ -708,7 +741,7 @@ public class WCService extends WebService {
                 } else if (requestedSection.equals("/WCS_Capabilities/Service")) {
                     responsev100 = new WCSCapabilitiesType(staticCapabilities.getService());
                 }
-                
+
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(responsev100, sw);
                 return Response.ok(sw.toString(), format).build();
@@ -716,11 +749,11 @@ public class WCService extends WebService {
         }
         Contents contents = null;
         ContentMetadata contentMetadata = null;
-        
+
         //we get the list of layers
         List<CoverageSummaryType>        summary = new ArrayList<CoverageSummaryType>();
         List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
-        
+
         net.seagis.wcs.v111.ObjectFactory wcs111Factory = new net.seagis.wcs.v111.ObjectFactory();
         net.seagis.wcs.v100.ObjectFactory wcs100Factory = new net.seagis.wcs.v100.ObjectFactory();
         net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
@@ -728,67 +761,67 @@ public class WCService extends WebService {
             for (Layer inputLayer:layerList) {
                 if (!inputLayer.isQueryable(Service.WCS))
                     continue;
-                
+
                 List<LanguageStringType> title = new ArrayList<LanguageStringType>();
                 title.add(new LanguageStringType(inputLayer.getName()));
                 List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
                 remark.add(new LanguageStringType(cleanSpecialCharacter(inputLayer.getRemarks())));
-                
+
                 CoverageSummaryType       cs = new CoverageSummaryType(title, remark);
                 CoverageOfferingBriefType co = new CoverageOfferingBriefType();
-                
+
                 co.addRest(wcs100Factory.createName(inputLayer.getName()));
                 co.addRest(wcs100Factory.createLabel(inputLayer.getName()));
-                
+
                 GeographicBoundingBox inputGeoBox = inputLayer.getGeographicBoundingBox();
-               
+
                 if(inputGeoBox != null) {
                      String crs = "WGS84(DD)";
                     if (getCurrentVersion().toString().equals("1.1.1")){
-                        WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType( 
+                        WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
                                                      inputGeoBox.getWestBoundLongitude(),
                                                      inputGeoBox.getSouthBoundLatitude(),
                                                      inputGeoBox.getEastBoundLongitude(),
                                                      inputGeoBox.getNorthBoundLatitude());
-                
+
                         cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
                     } else {
                         List<Double> pos1 = new ArrayList<Double>();
                         pos1.add(inputGeoBox.getWestBoundLongitude());
                         pos1.add(inputGeoBox.getSouthBoundLatitude());
-                        
+
                         List<Double> pos2 = new ArrayList<Double>();
                         pos2.add(inputGeoBox.getEastBoundLongitude());
                         pos2.add(inputGeoBox.getNorthBoundLatitude());
-                        
+
                         List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
                         pos.add(new DirectPositionType(pos1));
                         pos.add(new DirectPositionType(pos2));
                         LonLatEnvelopeType outputBBox = new LonLatEnvelopeType(pos, crs);
                         co.setLonLatEnvelope(outputBBox);
                     }
-                    
+
                 }
                 cs.addRest(wcs111Factory.createIdentifier(inputLayer.getName()));
                 summary.add(cs);
                 offBrief.add(co);
             }
-            
+
             /**
              * FOR CITE TEST we put the first data mars because of ifremer overlapping data
-             * TODO delete when overlapping problem is solved 
+             * TODO delete when overlapping problem is solved
              */
             CoverageSummaryType temp = summary.get(10);
             summary.remove(10);
             summary.add(0, temp);
-                    
-            contents        = new Contents(summary, null, null, null);    
-            contentMetadata = new ContentMetadata("1.0.0", offBrief); 
+
+            contents        = new Contents(summary, null, null, null);
+            contentMetadata = new ContentMetadata("1.0.0", offBrief);
         } catch (CatalogException exception) {
             throwException(exception.getMessage(), "NO_APPLICABLE_CODE", null);
         }
-            
-        
+
+
         StringWriter sw = new StringWriter();
         if (getCurrentVersion().toString().equals("1.1.1")) {
             responsev111.setContents(contents);
@@ -796,84 +829,84 @@ public class WCService extends WebService {
         } else {
             if (contentMeta) {
                 responsev100 = new WCSCapabilitiesType(contentMetadata);
-            } else { 
+            } else {
                 responsev100.setContentMetadata(contentMetadata);
             }
             marshaller.marshal(responsev100, sw);
         }
-        
+
         return Response.ok(sw.toString(), format).build();
-        
+
     }
-    
-    
+
+
     /**
      * Web service operation
      */
     public File getCoverage(AbstractGetCoverage AbstractRequest) throws JAXBException, WebServiceException {
         logger.info("getCoverage request processing");
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-        
+
         webServiceWorker.setService("WCS", getCurrentVersion().toString());
         String format = null, coverage = null, crs = null, bbox = null, time = null , interpolation = null, exceptions;
         String width = null, height = null, depth = null;
         String resx  = null, resy   = null, resz  = null;
         String gridType, gridOrigin = "", gridOffsets = "", gridCS, gridBaseCrs;
         String responseCRS = null;
-        
+
        if (getCurrentVersion().toString().equals("1.1.1")) {
             net.seagis.wcs.v111.GetCoverage request = (net.seagis.wcs.v111.GetCoverage)AbstractRequest;
-            
+
             if (request.getIdentifier() != null) {
                 coverage = request.getIdentifier().getValue();
             } else {
-                throwException("The parameter identifiers must be specified" , 
+                throwException("The parameter identifiers must be specified" ,
                                "MISSING_PARAMETER_VALUE", "identifier");
             }
-            
+
             /*
              * Domain subset: - spatial subSet
              *                - temporal subset
-             * 
+             *
              * spatial subset: - BoundingBox
              * here the boundingBox parameter contain the crs.
              * we must extract it before calling webServiceWorker.setBoundingBox(...)
-             * 
+             *
              * temporal subSet: - timeSequence
-             *  
+             *
              */
             net.seagis.wcs.v111.DomainSubsetType domain = request.getDomainSubset();
             if (domain == null) {
-                throwException("The DomainSubset must be specify" , 
+                throwException("The DomainSubset must be specify" ,
                                "MISSING_PARAMETER_VALUE", "DomainSubset");
             }
             BoundingBoxType boundingBox = null;
             if (domain.getBoundingBox() != null) {
-                boundingBox = domain.getBoundingBox().getValue(); 
+                boundingBox = domain.getBoundingBox().getValue();
             }
-            if (boundingBox != null && boundingBox.getLowerCorner() != null && 
+            if (boundingBox != null && boundingBox.getLowerCorner() != null &&
                 boundingBox.getUpperCorner() != null     &&
-                boundingBox.getLowerCorner().size() == 2 && 
+                boundingBox.getLowerCorner().size() == 2 &&
                 boundingBox.getUpperCorner().size() == 2) {
-                
-                
+
+
                 crs  = boundingBox.getCrs();
                 bbox = boundingBox.getLowerCorner().get(0) + "," +
                        boundingBox.getLowerCorner().get(1) + "," +
                        boundingBox.getUpperCorner().get(0) + "," +
                        boundingBox.getUpperCorner().get(1);
             } else {
-                throwException("The BoundingBox is not well-formed" , 
+                throwException("The BoundingBox is not well-formed" ,
                                "INVALID_PARAMETER_VALUE", "BoundingBox");
             }
-                        
+
             if (domain.getTemporalSubset() != null) {
                 List<Object> timeSeq = domain.getTemporalSubset().getTimePositionOrTimePeriod();
                 for (Object obj:timeSeq) {
                     if (obj instanceof TimePositionType)
                         time = ((TimePositionType)obj).getValue();
                     else if (obj instanceof net.seagis.wcs.v111.TimePeriodType) {
-                        throwException("The service does not handle time Period type" , 
+                        throwException("The service does not handle time Period type" ,
                                        "INVALID_PARAMETER_VALUE", "temporalSubset");
                     }
                 }
@@ -882,13 +915,13 @@ public class WCService extends WebService {
              * Range subSet.
              * contain the sub fields : fieldSubset
              * for now we handle only one field to change the interpolation method.
-             * 
+             *
              * FieldSubset: - identifier
              *              - interpolationMethodType
              *              - axisSubset (not yet used)
-             * 
+             *
              * AxisSubset:  - identifier
-             *              - key 
+             *              - key
              */
             net.seagis.wcs.v111.RangeSubsetType rangeSubset = request.getRangeSubset();
             if (rangeSubset != null) {
@@ -896,64 +929,64 @@ public class WCService extends WebService {
                 for(net.seagis.wcs.v111.RangeSubsetType.FieldSubset field: rangeSubset.getFieldSubset()) {
                     Layer currentLayer =  webServiceWorker.getLayers(coverage).get(0);
                     if (currentLayer.getSeries().size() == 0) {
-                        throwException("The layer " + coverage + " is not available" , 
+                        throwException("The layer " + coverage + " is not available" ,
                                        "LAYER_NOT_DEFINED", "Coverage");
-                    }                    
+                    }
                     if (field.getIdentifier().equalsIgnoreCase(currentLayer.getThematic())){
                         interpolation = field.getInterpolationType();
-                        
+
                         //we look that the same field is not requested two times
                         if (!requestedField.contains(field.getIdentifier())) {
                             requestedField.add(field.getIdentifier());
                         } else {
-                            throwException("The field " + field.getIdentifier() + " is already present in the request" , 
+                            throwException("The field " + field.getIdentifier() + " is already present in the request" ,
                                        "INVALID_PARAMETER_VALUE", "RangeSubset");
                         }
-                        
+
                         //if there is some AxisSubset we send an exception
                         if (field.getAxisSubset().size() != 0) {
-                            throwException("The service does not handle AxisSubset" , 
+                            throwException("The service does not handle AxisSubset" ,
                                        "INVALID_PARAMETER_VALUE", "RangeSubset");
                         }
                     } else {
-                        throwException("The field " + field.getIdentifier() + " is not present in this coverage" , 
+                        throwException("The field " + field.getIdentifier() + " is not present in this coverage" ,
                                        "INVALID_PARAMETER_VALUE", "RangeSubset");
                     }
                 }
-                
+
             } else {
                 interpolation = null;
             }
-            
-            /* 
-             * output subSet:  - format 
-             *                 - GridCRS 
-             * 
+
+            /*
+             * output subSet:  - format
+             *                 - GridCRS
+             *
              * Grid CRS: - GridBaseCRS (not yet used)
              *           - GridOffsets
              *           - GridType (not yet used)
              *           - GridOrigin
              *           - GridCS (not yet used)
-             *  
+             *
              */
 
             net.seagis.wcs.v111.OutputType output = request.getOutput();
             if (output == null) {
-                throwException("The Output must be specify" , 
-                               "MISSING_PARAMETER_VALUE", "output");
-            } 
-            format = output.getFormat();
-            if (format == null) {
-                throwException("The format must be specify" , 
+                throwException("The Output must be specify" ,
                                "MISSING_PARAMETER_VALUE", "output");
             }
-            
+            format = output.getFormat();
+            if (format == null) {
+                throwException("The format must be specify" ,
+                               "MISSING_PARAMETER_VALUE", "output");
+            }
+
             GridCrsType grid = output.getGridCRS();
             if (grid != null) {
                 gridBaseCrs = grid.getGridBaseCRS();
                 gridType = grid.getGridType();
                 gridCS = grid.getGridCS();
-            
+
                 for (Double d: grid.getGridOffsets()) {
                     gridOffsets += d.toString() + ',';
                 }
@@ -962,7 +995,7 @@ public class WCService extends WebService {
                 } else {
                     gridOffsets = null;
                 }
-            
+
                 for (Double d: grid.getGridOrigin()) {
                     gridOrigin += d.toString() + ',';
                 }
@@ -975,9 +1008,9 @@ public class WCService extends WebService {
                 gridOrigin  = "0.0,0.0";
             }
             exceptions    = getParameter("exceptions", false);
-            
+
         } else {
-            
+
             // parameter for 1.0.0 version
             net.seagis.wcs.v100.GetCoverage request = (net.seagis.wcs.v100.GetCoverage)AbstractRequest;
             if (request.getOutput().getFormat()!= null) {
@@ -986,7 +1019,7 @@ public class WCService extends WebService {
                 throwException("The parameters Format have to be specified",
                                                  "MISSING_PARAMETER_VALUE", "Format");
             }
-            
+
             coverage      = request.getSourceCoverage();
             if (coverage == null) {
                 throwException("The parameters sourceCoverage have to be specified",
@@ -999,9 +1032,9 @@ public class WCService extends WebService {
             if (request.getOutput().getCrs() != null){
                 responseCRS   = request.getOutput().getCrs().getValue();
             }
-            
+
             //for now we only handle one time parameter with timePosition type
-            net.seagis.wcs.v100.TimeSequenceType temporalSubset = request.getDomainSubset().getTemporalSubSet(); 
+            net.seagis.wcs.v100.TimeSequenceType temporalSubset = request.getDomainSubset().getTemporalSubSet();
             if (temporalSubset != null) {
                 for (Object timeObj:temporalSubset.getTimePositionOrTimePeriod()){
                     if (timeObj instanceof TimePositionType) {
@@ -1013,19 +1046,19 @@ public class WCService extends WebService {
             EnvelopeEntry env = spatial.getEnvelope();
             crs               = env.getSrsName();
             //TODO remplacer les param dans webServiceWorker
-            if (env.getPos().size() > 1) { 
+            if (env.getPos().size() > 1) {
                 bbox  = env.getPos().get(0).getValue().get(0).toString() + ',';
                 bbox += env.getPos().get(1).getValue().get(0).toString() + ',';
                 bbox += env.getPos().get(0).getValue().get(1).toString() + ',';
                 bbox += env.getPos().get(1).getValue().get(1).toString();
             }
-            
+
             if (temporalSubset == null && env.getPos().size() == 0) {
-                        throwException("The parameters BBOX or TIME have to be specified" , 
+                        throwException("The parameters BBOX or TIME have to be specified" ,
                                        "MISSING_PARAMETER_VALUE", null);
             }
             /* here the parameter width and height (and depth for 3D matrix)
-             *  have to be fill. If not they can be replace by resx and resy 
+             *  have to be fill. If not they can be replace by resx and resy
              * (resz for 3D grid)
              */
             GridType grid = spatial.getGrid();
@@ -1033,7 +1066,7 @@ public class WCService extends WebService {
                 resx = getParameter("resx",  false);
                 resy = getParameter("resy",  false);
                 resz = getParameter("resz",  false);
-           
+
             } else {
                 GridEnvelopeType gridEnv = grid.getLimits().getGridEnvelope();
                 if (gridEnv.getHigh().size() > 0) {
@@ -1043,12 +1076,12 @@ public class WCService extends WebService {
                         depth     = gridEnv.getHigh().get(2).toString();
                     }
                 } else {
-                     throwException("you must specify grid size or resolution" , 
+                     throwException("you must specify grid size or resolution" ,
                                                       "MISSING_PARAMETER_VALUE", null);
                 }
             }
         }
-        
+
         webServiceWorker.setExceptionFormat(exceptions);
         webServiceWorker.setFormat(format);
         webServiceWorker.setLayer(coverage);
@@ -1066,8 +1099,8 @@ public class WCService extends WebService {
             }
         }
         webServiceWorker.setResponseCRS(responseCRS);
-        
-        // If we are requesting a time series (which is assumed to return text output, 
+
+        // If we are requesting a time series (which is assumed to return text output,
         // as opposed to an image output) then process the request using a special method.
         if ( webServiceWorker.isTimeseriesRequest() ) {
             return webServiceWorker.getTimeseriesAsXML();
@@ -1075,8 +1108,8 @@ public class WCService extends WebService {
             return webServiceWorker.getImageFile();
         }
     }
-    
-    
+
+
     /**
      * Web service operation
      */
@@ -1084,34 +1117,34 @@ public class WCService extends WebService {
         logger.info("describeCoverage request processing");
         try {
         final WebServiceWorker webServiceWorker = this.webServiceWorker.get();
-        
+
         //we begin by extract the base attribute
-        String inputVersion = abstractRequest.getVersion();       
+        String inputVersion = abstractRequest.getVersion();
         if(inputVersion == null) {
-            throwException("you must specify the service version" , 
+            throwException("you must specify the service version" ,
                            "MISSING_PARAMETER_VALUE", "version");
         } else {
            isSupportedVersion(inputVersion);
            setCurrentVersion(inputVersion);
            webServiceWorker.setService("WCS", getCurrentVersion().toString());
         }
-        
+
         //we prepare the response object to return
         Object response;
-        
+
         if (getCurrentVersion().toString().equals("1.0.0")) {
             net.seagis.wcs.v100.DescribeCoverage request = (net.seagis.wcs.v100.DescribeCoverage) abstractRequest;
             if (request.getCoverage().size() == 0) {
                 throwException("the parameter COVERAGE must be specified", "MISSING_PARAMETER_VALUE", "coverage");
             }
             List<Layer> layers = webServiceWorker.getLayers(request.getCoverage());
-        
+
             List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
             for (Layer layer: layers) {
                 if (layer.getSeries().size() == 0) {
                     throwException("the coverage " + layer.getName() + " is not defined", "LAYER_NOT_DEFINED", "coverage");
                 }
-                
+
                 GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
                 LonLatEnvelopeType               llenvelope = null;
                 if(inputGeoBox != null) {
@@ -1119,35 +1152,35 @@ public class WCService extends WebService {
                     List<Double> pos1 = new ArrayList<Double>();
                     pos1.add(inputGeoBox.getWestBoundLongitude());
                     pos1.add(inputGeoBox.getSouthBoundLatitude());
-                       
+
                     List<Double> pos2 = new ArrayList<Double>();
                     pos2.add(inputGeoBox.getEastBoundLongitude());
                     pos2.add(inputGeoBox.getNorthBoundLatitude());
-                        
+
                     List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
                     pos.add(new DirectPositionType(pos1));
                     pos.add(new DirectPositionType(pos2));
                     llenvelope = new LonLatEnvelopeType(pos, crs);
                 }
                 Keywords keywords = new Keywords("WCS", layer.getName(), cleanSpecialCharacter(layer.getThematic()));
-                
-                //Spatial metadata 
+
+                //Spatial metadata
                 net.seagis.wcs.v100.SpatialDomainType spatialDomain = new net.seagis.wcs.v100.SpatialDomainType(llenvelope);
-                
+
                 // temporal metadata
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 List<Object> times = new ArrayList<Object>();
                 SortedSet<Date> dates = layer.getAvailableTimes();
                 for (Date d:dates){
-                        times.add(new TimePositionType(df.format(d))); 
+                        times.add(new TimePositionType(df.format(d)));
                 }
                 net.seagis.wcs.v100.TimeSequenceType temporalDomain = new net.seagis.wcs.v100.TimeSequenceType(times);
-                
+
                 DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
-                
+
                 //TODO complete
-                RangeSetType  rangeSetT  = new RangeSetType(null, 
+                RangeSetType  rangeSetT  = new RangeSetType(null,
                                                            layer.getName(),
                                                            layer.getName(),
                                                            null,
@@ -1157,7 +1190,7 @@ public class WCService extends WebService {
                 RangeSet rangeSet        = new RangeSet(rangeSetT);
                 //supported CRS
                 SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
-                
+
                 // supported formats
                 Set<CodeListType> formats = new LinkedHashSet<CodeListType>();
                 formats.add(new CodeListType("matrix"));
@@ -1172,14 +1205,14 @@ public class WCService extends WebService {
                     nativeFormat = s.getFormat().getImageFormat();
                 }
                 SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, new ArrayList<CodeListType>(formats));
-                
+
                 //supported interpolations
                 List<net.seagis.wcs.v100.InterpolationMethod> interpolations = new ArrayList<net.seagis.wcs.v100.InterpolationMethod>();
                 interpolations.add(net.seagis.wcs.v100.InterpolationMethod.BILINEAR);
                 interpolations.add(net.seagis.wcs.v100.InterpolationMethod.BICUBIC);
                 interpolations.add(net.seagis.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR);
                 SupportedInterpolationsType supInt = new SupportedInterpolationsType(net.seagis.wcs.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
-                
+
                 //we build the coverage offering for this layer/coverage
                 CoverageOfferingType coverage = new CoverageOfferingType(null,
                                                                          layer.getName(),
@@ -1192,12 +1225,12 @@ public class WCService extends WebService {
                                                                          supCRS,
                                                                          supForm,
                                                                          supInt);
-        
+
                 coverages.add(coverage);
             }
-            response = new CoverageDescription(coverages, "1.0.0"); 
-        
-        // describeCoverage version 1.1.1    
+            response = new CoverageDescription(coverages, "1.0.0");
+
+        // describeCoverage version 1.1.1
         } else {
             net.seagis.wcs.v111.DescribeCoverage request = (net.seagis.wcs.v111.DescribeCoverage) abstractRequest;
             if (request.getIdentifier().size() == 0) {
@@ -1208,7 +1241,7 @@ public class WCService extends WebService {
                 System.out.println("s=" + s);
             }
             List<Layer> layers = webServiceWorker.getLayers(request.getIdentifier());
-            
+
             net.seagis.ows.v110.ObjectFactory owsFactory = new net.seagis.ows.v110.ObjectFactory();
             List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
             for (Layer layer: layers) {
@@ -1224,17 +1257,17 @@ public class WCService extends WebService {
                                                          inputGeoBox.getEastBoundLongitude(),
                                                          inputGeoBox.getNorthBoundLatitude());
                     bboxs.add(owsFactory.createWGS84BoundingBox(outputBBox));
-                    
+
                     String crs = "EPSG:4326";
                     BoundingBoxType outputBBox2 = new BoundingBoxType(crs,
                                                          inputGeoBox.getWestBoundLongitude(),
                                                          inputGeoBox.getSouthBoundLatitude(),
                                                          inputGeoBox.getEastBoundLongitude(),
                                                          inputGeoBox.getNorthBoundLatitude());
-                    
-                    bboxs.add(owsFactory.createBoundingBox(outputBBox2));        
+
+                    bboxs.add(owsFactory.createBoundingBox(outputBBox2));
                 }
-                
+
                 //general metadata
                 List<LanguageStringType> title   = new ArrayList<LanguageStringType>();
                 title.add(new LanguageStringType(layer.getName()));
@@ -1244,37 +1277,37 @@ public class WCService extends WebService {
                 keywords.add(new KeywordsType(new LanguageStringType("WCS"),
                                               new LanguageStringType(layer.getName())
                                               ));
-                
+
                 // spatial metadata
                 net.seagis.wcs.v111.SpatialDomainType spatial = new net.seagis.wcs.v111.SpatialDomainType(bboxs);
-                
+
                 // temporal metadata
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 List<Object> times = new ArrayList<Object>();
                 SortedSet<Date> dates = layer.getAvailableTimes();
                 for (Date d:dates){
-                        times.add(new TimePositionType(df.format(d))); 
+                        times.add(new TimePositionType(df.format(d)));
                 }
                 net.seagis.wcs.v111.TimeSequenceType temporalDomain = new net.seagis.wcs.v111.TimeSequenceType(times);
-                
+
                 CoverageDomainType domain       = new CoverageDomainType(spatial, temporalDomain);
-                
+
                 //supported interpolations
                 List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
                 intList.add(new InterpolationMethodType(net.seagis.wcs.v111.InterpolationMethod.BILINEAR.value(), null));
                 intList.add(new InterpolationMethodType(net.seagis.wcs.v111.InterpolationMethod.BICUBIC.value(), null));
                 intList.add(new InterpolationMethodType(net.seagis.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
-                InterpolationMethods interpolations = new InterpolationMethods(intList, net.seagis.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());  
-                RangeType range = new RangeType(new FieldType(cleanSpecialCharacter(layer.getThematic()), 
-                                                              null, 
-                                                              new net.seagis.ows.v110.CodeType("0.0"), 
+                InterpolationMethods interpolations = new InterpolationMethods(intList, net.seagis.wcs.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+                RangeType range = new RangeType(new FieldType(cleanSpecialCharacter(layer.getThematic()),
+                                                              null,
+                                                              new net.seagis.ows.v110.CodeType("0.0"),
                                                               interpolations));
-               
+
                 //supported CRS
                 List<String> supportedCRS = new ArrayList<String>();
                 supportedCRS.add("EPSG:4326");
-                
+
                 //supported formats
                 List<String> supportedFormat = new ArrayList<String>();
                 supportedFormat.add("application/matrix");
@@ -1290,17 +1323,17 @@ public class WCService extends WebService {
                                                                                range,
                                                                                supportedCRS,
                                                                                supportedFormat);
-        
+
                 coverages.add(coverage);
             }
             response = new CoverageDescriptions(coverages);
         }
-       
+
         //we marshall the response and return the XML String
-        StringWriter sw = new StringWriter();    
+        StringWriter sw = new StringWriter();
         marshaller.marshal(response, sw);
         return sw.toString();
-        
+
         } catch (CatalogException exception) {
             throwException(exception.getMessage(), "NO_APPLICABLE_CODE", null);
             //never reach
@@ -1324,8 +1357,8 @@ public class WCService extends WebService {
            }
         }
     }
-    
-    
+
+
     /**
      * Parses a value as a floating point.
      *
