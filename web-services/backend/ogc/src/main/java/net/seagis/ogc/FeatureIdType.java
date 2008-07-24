@@ -76,11 +76,11 @@ public class FeatureIdType extends AbstractIdType implements FeatureId {
         return fid;
     }
 
-    public boolean matches(Feature feature) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     public String getID() {
         return fid;
+    }
+
+    public boolean matches(Object feature) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
